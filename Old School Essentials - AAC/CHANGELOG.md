@@ -2,6 +2,32 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
+
+## 1.5.0
+
+### Added
+
+- Add critical hit and miss results to attack rolls
+- Add Dolmenwood classes
+
+### Changed
+
+- Change "AC Benefit" to just AC
+- Change "Threshold Modifier" to "Situational Bonus"
+- Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
+- Change weapons table to only have attack type and not attribute
+
+### Fixed
+
+- Fix a bug where colors were not appearing for max and min rolls on dice
+
 ## 1.4.0
 
 ### Changed

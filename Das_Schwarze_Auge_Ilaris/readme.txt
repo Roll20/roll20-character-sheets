@@ -116,3 +116,8 @@ Neue Features:
 - Berechnung von Verteidigungswürfen gefixt.
 
 1.4.1: Fix der Anzeige von "Meisterschuss" in den Roll Templates.
+
+1.5:
+Neue Features:
+- Getrennte AE- und KE-Werte für geweihte Zauberer
+- Optionale Sektion für Inventar und Notizen

@@ -8,21 +8,15 @@
     <input type="hidden" class="entity" name="attr_entity" value="corporeal" />
     
     <!-- SHEET OPTIONS & PAGE TABS-->
-    <input type="radio" class="attr sheetoptions settingssheet" name="attr_pagenumber" title="Settings" value="settings" />
-    <span class="attr" data-i18n="settings" >Settings</span>
-    
-    <input type="radio" class="attr sheetoptions page1-sheet" name="attr_pagenumber" title="Page1" value="1" checked="checked" />
-    <span class="attr" data-i18n="page-1" >Page 1</span>
-    
-    <input type="radio" class="attr sheetoptions page2-sheet" name="attr_pagenumber" title="Page2" value="2" />
-    <span class="attr" data-i18n="page-2" >Page 2</span>
-    
-    <input type="radio" class="attr sheetoptions page3-sheet" name="attr_pagenumber" title="Page3" value="3" />
-    <span class="attr" data-i18n="page-3" >Page 3</span>
+    <input type="hidden" class="page" name="attr_pagenumber" value="1" />
+    <button type="action" class="toggle page-settings" name="act_page_settings" data-i18n="settings">Settings</button>
+    <button type="action" class="toggle page-1" name="act_page_1" data-i18n="page-1">Page 1</button>
+    <button type="action" class="toggle page-2" name="act_page_2" data-i18n="page-2">Page 2</button>
+    <button type="action" class="toggle page-3" name="act_page_3" data-i18n="page-3">Page 3</button>
     
     <div class="spacer"></div>
     
-    <div class="settings">
+    <div class="page settings">
         <div class="spacer"></div>
         <div class="spacer"></div>
     
@@ -122,7 +116,9 @@
     <div class="background-image"></div>
     
     <!-- DICE ROLLER -->
-    <div class="page1 diceroller">
+    <div class="page page1 diceroller">
+        <input type="hidden" class="rollstyle" name="attr_rollstyle" value="sheet" />
+        <input type="hidden" class="rolltype-select" name="attr_rolltype_select" value="normal" />
         <table>
             <tbody>
                 <tr>
@@ -130,73 +126,69 @@
                 </tr>
                 <tr>
                     <td colspan="2" class="initiative">
-                        <button type="roll" name="roll_initiative" data-i18n="roll-initiative" value="&{template:wod-initiative} {{name=@{character_name}}} {{dexterity=@{dexterity}}} {{composure=@{composure}}} {{fastReflexes=@{fast_reflexes}}} {{initiativePenalty=@{initiative_penalty}}} {{result=[[1d10 + @{dexterity} + @{composure} + @{fast_reflexes} + @{initiative_penalty} &{tracker}]]}}">Roll Initiative</button>
+                        <button type="roll" class="toggle active" name="roll_initiative" data-i18n="roll-initiative" value="&{template:wod-initiative} {{name=@{character_name}}} {{dexterity=@{dexterity}}} {{composure=@{composure}}} {{fastReflexes=@{fast_reflexes}}} {{initiativePenalty=@{initiative_penalty}}} {{result=[[1d10 + @{dexterity} + @{composure} + @{fast_reflexes} + @{initiative_penalty} &{tracker}]]}}">
+                            Roll Initiative
+                        </button>
                     </td>
                 </tr>
-                <tr class="rollstyle">
+                <tr>
                     <td rowspan="3" class="rollcontainer">
-                        <button type="roll" name="roll_check" value="@{rollstyle}@{rolltype}"></button>
+                        <button type="roll" class="rollstyle sheet" name="roll_sheet" value="&{template:wod} {{name=@{character_name}}} {{dicePool=@{dice_pool}}} {{dicePoolHtml=@{dice_pool_html}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{result=[[{((?{@{modifiermacro}|0}+@{wound_penalty}+@{dice_pool})@{rolltype}"></button>
+                        <button type="roll" class="rollstyle attack" name="roll_attack" value="&{template:wod-attack} {{name=@{character_name}}} {{strength=@{strength}}} {{dexterity=@{dexterity}}} {{brawl=@{brawl}}} {{weaponry=@{weaponry}}} {{firearms=@{firearms}}} {{athletics=@{athletics}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{wpen=[[@{weapon_penalty}]]}} {{apen=[[@{armor_penalty}]]}} @{attack}@{rolltype}"></button>
+                        <button type="roll" class="rollstyle simple" name="roll_simple" value="&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}@{rolltype}"></button>
                     </td>
                     <td>
-                        <input type="radio" class="attr" name="attr_rollstyle" value="@{roll_base}" title="Sheet Roll" checked="checked" />
-                        <span class="attr" data-i18n="sheet-roll" >Sheet Roll</span>
+                        <button type="action" class="toggle rollstyle-sheet" name="act_rollstyle_sheet" data-i18n="sheet-roll">Sheet Roll</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rollstyle" value="@{rollattack}" />
-                        <span class="attr" data-i18n="attack-roll" >Attack Roll</span>
+                        <button type="action" class="toggle rollstyle-attack" name="act_rollstyle_attack" data-i18n="attack-roll">Attack Roll</button>
                     </td>
                 </tr>
                 <tr>
                     <td class="bottom">
-                        <input type="radio" class="attr" name="attr_rollstyle" value="@{rollsimple}" />
-                        <span class="attr" data-i18n="simple-roll" >Simple Roll</span>
+                        <button type="action" class="toggle rollstyle-simple" name="act_rollstyle_simple" data-i18n="simple-roll">Simple Roll</button>
                     </td>
                 </tr>
                 <tr>
                     <td rowspan="7" class="rolldisplay">
-                        <textarea type="text" name="attr_rolldisplay"></textarea>
+                        <textarea type="text" class="rollstyle sheet" name="attr_rolldisplay"></textarea>
+                        <div class="rollstyle attack">Attack</div>
+                        <div class="rollstyle simple">Simple</div>
                     </td>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Chance" />
-                        <span class="attr" data-i18n="chance" >Chance</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Normal" title="Normal" checked="checked" />
-                        <span class="attr" data-i18n="normal" >Normal</span>
+                        <button type="action" class="toggle rolltype-chance" name="act_rolltype_select_chance" data-i18n="chance">Chance</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="9-Again" />
-                        <span class="attr" data-i18n="9-again">9-Again</span>
+                        <button type="action" class="toggle rolltype-normal" name="act_rolltype_select_normal" data-i18n="normal">Normal</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="8-Again" />
-                        <span class="attr" data-i18n="8-again">8-Again</span>
+                        <button type="action" class="toggle rolltype-9-again" name="act_rolltype_select_9-again" data-i18n="9-again">9-Again</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Don't Reroll 10s" />
-                        <span class="attr" data-i18n="dont-reroll" >Don't Reroll 10s</span>
+                        <button type="action" class="toggle rolltype-8-again" name="act_rolltype_select_8-again" data-i18n="8-again">8-Aagain</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Chance Rote" />
-                        <span class="attr" data-i18n="chance-rote" >Chance Rote</span>
+                        <button type="action" class="toggle rolltype-dont-reroll" name="act_rolltype_select_dont-reroll" data-i18n="dont-reroll">Don't Reroll 10s</button>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <input type="radio" class="attr" name="attr_rolltype_select" value="Rote" />
-                        <span class="attr" data-i18n="rote" >Rote</span>
+                        <button type="action" class="toggle rolltype-chance-rote" name="act_rolltype_select_chance-rote" data-i18n="chance-rote">Chance Rote</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="action" class="toggle rolltype-rote" name="act_rolltype_select_rote" data-i18n="rote">Rote</button>
                     </td>
                 </tr>
             </tbody>
@@ -204,7 +196,7 @@
     </div>
     
     <!-- HEADER -->
-    <div class="header">
+    <div class="page page1 page2 page3 header">
         <img class="mortal" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Chronicles%20of%20Darkness/images/chroniclesofdarkness.png">
         <img class="vampire" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Chronicles%20of%20Darkness/images/vampire.png">
         <img class="werewolf" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Chronicles%20of%20Darkness/images/werewolf.png">
@@ -218,7 +210,7 @@
     </div>
     
     <!-- PAGE 1 -->
-    <div class="page1">
+    <div class="page page1">
         <!-- CHARACTER INFO FIELDS -->
         <div class="info-grid">
             <!-- Row 1 -->
@@ -257,7 +249,7 @@
             <input type="text" name="attr_Chronicle">
             <!-- Row 2 -->
             <div class="input-label">
-                <span class="mortal1 mortal2 vampire werewolf mage promethean changeling geist1 mummy hunter demon" data-i18n="player">Player:</span>
+                <span class="mortal1 mortal2 vampire werewolf mage promethean changeling geist1 geist2 mummy hunter demon" data-i18n="player">Player:</span>
                 <span class="geist2-geist" data-i18n="sin-eater-c" >Sin-Eater:</span>
                 <span class="geist2-organization" data-i18n="archtype">Archetype:</span>
             </div>
@@ -324,88 +316,133 @@
         <div class="spacer"></div>
     
         <!-- ATTRIBUTE FIELDS -->
-        <div class="corporeal 3colrow">
-            <table class="attributes">
-                <tbody>
-                    <tr>
-                        <th class="section-header" colspan="10" data-i18n="attributes-u">ATTRIBUTES</th>
-                    </tr>
-                    <tr>
-                        <td class="attributes-category" data-i18n="power">Power</td>
-                        <td rowspan="3" class="spacer"></td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Intelligence_flag" value="@{intelligence}" />
-                            <span class="attr" data-i18n="intelligence" >Intelligence</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Intelligence" value="0" /><span></span><input type="radio" class="dot" name="attr_Intelligence" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Intelligence" value="2" /><span></span><input type="radio" class="dot" name="attr_Intelligence" value="3" /><span></span><input type="radio" class="dot" name="attr_Intelligence" value="4" /><span></span><input type="radio" class="dot" name="attr_Intelligence" value="5" /><span></span>
-                        </td>
-                        <td rowspan="3" class="spacer"></td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Strength_flag" value="@{strength}" />
-                            <span class="attr" data-i18n="strength" >Strength</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Strength" value="0" /><span></span><input type="radio" class="dot" name="attr_Strength" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Strength" value="2" /><span></span><input type="radio" class="dot" name="attr_Strength" value="3" /><span></span><input type="radio" class="dot" name="attr_Strength" value="4" /><span></span><input type="radio" class="dot" name="attr_Strength" value="5" /><span></span>
-                        </td>
-                        <td rowspan="3" class="spacer"></td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Presence_flag" value="@{presence}" />
-                            <span class="attr" data-i18n="presence" >Presence</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Presence" value="0" /><span></span><input type="radio" class="dot" name="attr_Presence" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Presence" value="2" /><span></span><input type="radio" class="dot" name="attr_Presence" value="3" /><span></span><input type="radio" class="dot" name="attr_Presence" value="4" /><span></span><input type="radio" class="dot" name="attr_Presence" value="5" /><span></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="attributes-category" data-i18n="finesse">Finesse<td>
-                            <input type="checkbox" class="attr" name="attr_Wits_flag" value="@{wits}" />
-                            <span class="attr" data-i18n="wits" >Wits</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Wits" value="0" /><span></span><input type="radio" class="dot" name="attr_Wits" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Wits" value="2" /><span></span><input type="radio" class="dot" name="attr_Wits" value="3" /><span></span><input type="radio" class="dot" name="attr_Wits" value="4" /><span></span><input type="radio" class="dot" name="attr_Wits" value="5" /><span></span>
-                        </td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Dexterity_flag" value="@{dexterity}" />
-                            <span class="attr" data-i18n="dexterity" >Dexterity</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Dexterity" value="0" /><span></span><input type="radio" class="dot" name="attr_Dexterity" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Dexterity" value="2" /><span></span><input type="radio" class="dot" name="attr_Dexterity" value="3" /><span></span><input type="radio" class="dot" name="attr_Dexterity" value="4" /><span></span><input type="radio" class="dot" name="attr_Dexterity" value="5" /><span></span>
-                        </td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Manipulation_flag" value="@{manipulation}" />
-                            <span class="attr" data-i18n="manipulation" >Manipulation</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Manipulation" value="0" /><span></span><input type="radio" class="dot" name="attr_Manipulation" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Manipulation" value="2" /><span></span><input type="radio" class="dot" name="attr_Manipulation" value="3" /><span></span><input type="radio" class="dot" name="attr_Manipulation" value="4" /><span></span><input type="radio" class="dot" name="attr_Manipulation" value="5" /><span></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="attributes-category" data-i18n="resistance">Resistance</td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Resolve_flag" value="@{resolve}" />
-                            <span class="attr" data-i18n="resolve" >Resolve</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Resolve" value="0" /><span></span><input type="radio" class="dot" name="attr_Resolve" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Resolve" value="2" /><span></span><input type="radio" class="dot" name="attr_Resolve" value="3" /><span></span><input type="radio" class="dot" name="attr_Resolve" value="4" /><span></span><input type="radio" class="dot" name="attr_Resolve" value="5" /><span></span>
-                        </td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Stamina_flag" value="@{stamina}" />
-                            <span class="attr" data-i18n="stamina" >Stamina</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Stamina" value="0" /><span></span><input type="radio" class="dot" name="attr_Stamina" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Stamina" value="2" /><span></span><input type="radio" class="dot" name="attr_Stamina" value="3" /><span></span><input type="radio" class="dot" name="attr_Stamina" value="4" /><span></span><input type="radio" class="dot" name="attr_Stamina" value="5" /><span></span>
-                        </td>
-                        <td>
-                            <input type="checkbox" class="attr" name="attr_Composure_flag" value="@{composure}" />
-                            <span class="attr" data-i18n="composure" >Composure</span>
-                        </td>
-                        <td>
-                            <input type="radio" class="dot zero" name="attr_Composure" value="0" /><span></span><input type="radio" class="dot" name="attr_Composure" value="1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Composure" value="2" /><span></span><input type="radio" class="dot" name="attr_Composure" value="3" /><span></span><input type="radio" class="dot" name="attr_Composure" value="4" /><span></span><input type="radio" class="dot" name="attr_Composure" value="5" /><span></span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="corporeal">
+            <div class="section-header" data-i18n="attributes-u">ATTRIBUTES</div>
+            <div class="attributes">
+                <div class="attributes-category power">Power</div>
+                <div class="attributes-category finesse">Finesse</div>
+                <div class="attributes-category resistance">Resistance</div>
+                <div class="power mental label">
+                    <input type="hidden" class="flag" name="attr_intelligence_flag" value="0" />
+                    <button type="action" class="toggle" name="act_intelligence" data-i18n="intelligence">Intelligence</button>
+                </div>
+                <div class="power mental dots">
+                    <input type="hidden" name="attr_intelligence" value="1" />
+                    <button type="action" class="dot zero" name="act_intelligence_0">×</button>
+                    <button type="action" class="dot" name="act_intelligence_1"></button>
+                    <button type="action" class="dot ne-1" name="act_intelligence_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_intelligence_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_intelligence_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_intelligence_5"></button>
+                </div>
+                <div class="finesse mental label">
+                    <input type="hidden" class="flag" name="attr_wits_flag" value="0" />
+                    <button type="action" class="toggle" name="act_wits" data-i18n="wits">Wits</button>
+                </div>
+                <div class="finesse mental dots">
+                    <input type="hidden" name="attr_wits" value="1" />
+                    <button type="action" class="dot zero" name="act_wits_0">×</button>
+                    <button type="action" class="dot" name="act_wits_1"></button>
+                    <button type="action" class="dot ne-1" name="act_wits_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_wits_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_wits_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_wits_5"></button>
+                </div>
+                <div class="resistance mental label">
+                    <input type="hidden" class="flag" name="attr_resolve_flag" value="0" />
+                    <button type="action" class="toggle" name="act_resolve" data-i18n="resolve">Resolve</button>
+                </div>
+                <div class="resistance mental dots">
+                    <input type="hidden" name="attr_resolve" value="1" />
+                    <button type="action" class="dot zero" name="act_resolve_0">×</button>
+                    <button type="action" class="dot" name="act_resolve_1"></button>
+                    <button type="action" class="dot ne-1" name="act_resolve_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_resolve_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_resolve_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_resolve_5"></button>
+                </div>
+                <div class="mental border"></div>
+                <div class="power physical label">
+                    <input type="hidden" class="flag" name="attr_strength_flag" value="0" />
+                    <button type="action" class="toggle" name="act_strength" data-i18n="strength">Strength</button>
+                </div>
+                <div class="power physical dots">
+                    <input type="hidden" name="attr_strength" value="1" />
+                    <button type="action" class="dot zero" name="act_strength_0">×</button>
+                    <button type="action" class="dot" name="act_strength_1"></button>
+                    <button type="action" class="dot ne-1" name="act_strength_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_strength_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_strength_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_strength_5"></button>
+                </div>
+                <div class="finesse physical label">
+                    <input type="hidden" class="flag" name="attr_dexterity_flag" value="0" />
+                    <button type="action" class="toggle" name="act_dexterity" data-i18n="dexterity">Dexterity</button>
+                </div>
+                <div class="finesse physical dots">
+                    <input type="hidden" name="attr_dexterity" value="1" />
+                    <button type="action" class="dot zero" name="act_dexterity_0">×</button>
+                    <button type="action" class="dot" name="act_dexterity_1"></button>
+                    <button type="action" class="dot ne-1" name="act_dexterity_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_dexterity_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_dexterity_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_dexterity_5"></button>
+                </div>
+                <div class="resistance physical label">
+                    <input type="hidden" class="flag" name="attr_stamina_flag" value="0" />
+                    <button type="action" class="toggle" name="act_stamina" data-i18n="stamina">Stamina</button>
+                </div>
+                <div class="resistance physical dots">
+                    <input type="hidden" name="attr_stamina" value="1" />
+                    <button type="action" class="dot zero" name="act_stamina_0">×</button>
+                    <button type="action" class="dot" name="act_stamina_1"></button>
+                    <button type="action" class="dot ne-1" name="act_stamina_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_stamina_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_stamina_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_stamina_5"></button>
+                </div>
+                <div class="physical border"></div>
+                <div class="power social label">
+                    <input type="hidden" class="flag" name="attr_presence_flag" value="0" />
+                    <button type="action" class="toggle" name="act_presence" data-i18n="presence">Presence</button>
+                </div>
+                <div class="power social dots">
+                    <input type="hidden" name="attr_presence" value="1" />
+                    <button type="action" class="dot zero" name="act_presence_0">×</button>
+                    <button type="action" class="dot" name="act_presence_1"></button>
+                    <button type="action" class="dot ne-1" name="act_presence_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_presence_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_presence_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_presence_5"></button>
+                </div>
+                <div class="finesse social label">
+                    <input type="hidden" class="flag" name="attr_manipulation_flag" value="0" />
+                    <button type="action" class="toggle" name="act_manipulation" data-i18n="manipulation">Manipulation</button>
+                </div>
+                <div class="finesse social dots">
+                    <input type="hidden" name="attr_manipulation" value="1" />
+                    <button type="action" class="dot zero" name="act_manipulation_0">×</button>
+                    <button type="action" class="dot" name="act_manipulation_1"></button>
+                    <button type="action" class="dot ne-1" name="act_manipulation_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_manipulation_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_manipulation_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_manipulation_5"></button>
+                </div>
+                <div class="resistance social label">
+                    <input type="hidden" class="flag" name="attr_composure_flag" value="0" />
+                    <button type="action" class="toggle" name="act_composure" data-i18n="composure">Composure</button>
+                </div>
+                <div class="resistance social dots">
+                    <input type="hidden" name="attr_composure" value="1" />
+                    <button type="action" class="dot zero" name="act_composure_0">×</button>
+                    <button type="action" class="dot" name="act_composure_1"></button>
+                    <button type="action" class="dot ne-1" name="act_composure_2"></button>
+                    <button type="action" class="dot ne-1 ne-2" name="act_composure_3"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3" name="act_composure_4"></button>
+                    <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_composure_5"></button>
+                </div>
+                <div class="social border"></div>
+            </div>
         </div>
     
         <!-- SIMPLE ATTRIBUTE FIELDS -->
@@ -494,8 +531,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Academics_flag" value="@{Academics}" />
-                                <span class="attr" data-i18n="academics" >Academics</span>
+                                <input type="hidden" class="flag" name="attr_academics_flag" value="0" />
+                                <button type="action" class="toggle" name="act_academics" data-i18n="academics">Academics</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Academics" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Academics" value="1" /><span></span><input type="radio" class="dot" name="attr_Academics" value="2" /><span></span><input type="radio" class="dot" name="attr_Academics" value="3" /><span></span><input type="radio" class="dot" name="attr_Academics" value="4" /><span></span><input type="radio" class="dot" name="attr_Academics" value="5" /><span></span>
@@ -503,8 +540,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Computer_flag" value="@{Computer}" />
-                                <span class="attr" data-i18n="computer" >Computer</span>
+                                <input type="hidden" class="flag" name="attr_computer_flag" value="0" />
+                                <button type="action" class="toggle" name="act_computer" data-i18n="computer">Computer</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Computer" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Computer" value="1" /><span></span><input type="radio" class="dot" name="attr_Computer" value="2" /><span></span><input type="radio" class="dot" name="attr_Computer" value="3" /><span></span><input type="radio" class="dot" name="attr_Computer" value="4" /><span></span><input type="radio" class="dot" name="attr_Computer" value="5" /><span></span>
@@ -512,8 +549,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Crafts_flag" value="@{Crafts}" />
-                                <span class="attr" data-i18n="crafts" >Crafts</span>
+                                <input type="hidden" class="flag" name="attr_crafts_flag" value="0" />
+                                <button type="action" class="toggle" name="act_crafts" data-i18n="crafts">Crafts</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Crafts" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Crafts" value="1" /><span></span><input type="radio" class="dot" name="attr_Crafts" value="2" /><span></span><input type="radio" class="dot" name="attr_Crafts" value="3" /><span></span><input type="radio" class="dot" name="attr_Crafts" value="4" /><span></span><input type="radio" class="dot" name="attr_Crafts" value="5" /><span></span>
@@ -521,8 +558,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Investigation_flag" value="@{Investigation}" />
-                                <span class="attr" data-i18n="investigation" >Investigation</span>
+                                <input type="hidden" class="flag" name="attr_investigation_flag" value="0" />
+                                <button type="action" class="toggle" name="act_investigation" data-i18n="investigation">Investigation</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Investigation" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Investigation" value="1" /><span></span><input type="radio" class="dot" name="attr_Investigation" value="2" /><span></span><input type="radio" class="dot" name="attr_Investigation" value="3" /><span></span><input type="radio" class="dot" name="attr_Investigation" value="4" /><span></span><input type="radio" class="dot" name="attr_Investigation" value="5" /><span></span>
@@ -530,8 +567,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Medicine_flag" value="@{Medicine}" />
-                                <span class="attr" data-i18n="medicine" >Medicine</span>
+                                <input type="hidden" class="flag" name="attr_medicine_flag" value="0" />
+                                <button type="action" class="toggle" name="act_medicine" data-i18n="medicine">Medicine</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Medicine" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Medicine" value="1" /><span></span><input type="radio" class="dot" name="attr_Medicine" value="2" /><span></span><input type="radio" class="dot" name="attr_Medicine" value="3" /><span></span><input type="radio" class="dot" name="attr_Medicine" value="4" /><span></span><input type="radio" class="dot" name="attr_Medicine" value="5" /><span></span>
@@ -539,8 +576,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Occult_flag" value="@{Occult}" />
-                                <span class="attr" data-i18n="occult" >Occult</span>
+                                <input type="hidden" class="flag" name="attr_occult_flag" value="0" />
+                                <button type="action" class="toggle" name="act_occult" data-i18n="occult">Occult</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Occult" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Occult" value="1" /><span></span><input type="radio" class="dot" name="attr_Occult" value="2" /><span></span><input type="radio" class="dot" name="attr_Occult" value="3" /><span></span><input type="radio" class="dot" name="attr_Occult" value="4" /><span></span><input type="radio" class="dot" name="attr_Occult" value="5" /><span></span>
@@ -548,8 +585,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Politics_flag" value="@{Politics}" />
-                                <span class="attr" data-i18n="politics" >Politics</span>
+                                <input type="hidden" class="flag" name="attr_politics_flag" value="0" />
+                                <button type="action" class="toggle" name="act_politics" data-i18n="politics">Politics</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Politics" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Politics" value="1" /><span></span><input type="radio" class="dot" name="attr_Politics" value="2" /><span></span><input type="radio" class="dot" name="attr_Politics" value="3" /><span></span><input type="radio" class="dot" name="attr_Politics" value="4" /><span></span><input type="radio" class="dot" name="attr_Politics" value="5" /><span></span>
@@ -557,8 +594,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Science_flag" value="@{Science}" />
-                                <span class="attr" data-i18n="science" >Science</span>
+                                <input type="hidden" class="flag" name="attr_science_flag" value="0" />
+                                <button type="action" class="toggle" name="act_science" data-i18n="science">Science</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Science" value="-3" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Science" value="1" /><span></span><input type="radio" class="dot" name="attr_Science" value="2" /><span></span><input type="radio" class="dot" name="attr_Science" value="3" /><span></span><input type="radio" class="dot" name="attr_Science" value="4" /><span></span><input type="radio" class="dot" name="attr_Science" value="5" /><span></span>
@@ -572,8 +609,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Athletics_flag" value="@{Athletics}" />
-                                <span class="attr" data-i18n="athletics" >Athletics</span>
+                                <input type="hidden" class="flag" name="attr_athletics_flag" value="0" />
+                                <button type="action" class="toggle" name="act_athletics" data-i18n="athletics">Athletics</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Athletics" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Athletics" value="1" /><span></span><input type="radio" class="dot" name="attr_Athletics" value="2" /><span></span><input type="radio" class="dot" name="attr_Athletics" value="3" /><span></span><input type="radio" class="dot" name="attr_Athletics" value="4" /><span></span><input type="radio" class="dot" name="attr_Athletics" value="5" /><span></span>
@@ -581,8 +618,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Brawl_flag" value="@{Brawl}" />
-                                <span class="attr" data-i18n="brawl" >Brawl</span>
+                                <input type="hidden" class="flag" name="attr_brawl_flag" value="0" />
+                                <button type="action" class="toggle" name="act_brawl" data-i18n="brawl">Brawl</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Brawl" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Brawl" value="1" /><span></span><input type="radio" class="dot" name="attr_Brawl" value="2" /><span></span><input type="radio" class="dot" name="attr_Brawl" value="3" /><span></span><input type="radio" class="dot" name="attr_Brawl" value="4" /><span></span><input type="radio" class="dot" name="attr_Brawl" value="5" /><span></span>
@@ -590,8 +627,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Drive_flag" value="@{Drive}" />
-                                <span class="attr" data-i18n="drive" >Drive</span>
+                                <input type="hidden" class="flag" name="attr_drive_flag" value="0" />
+                                <button type="action" class="toggle" name="act_drive" data-i18n="drive">Drive</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Drive" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Drive" value="1" /><span></span><input type="radio" class="dot" name="attr_Drive" value="2" /><span></span><input type="radio" class="dot" name="attr_Drive" value="3" /><span></span><input type="radio" class="dot" name="attr_Drive" value="4" /><span></span><input type="radio" class="dot" name="attr_Drive" value="5" /><span></span>
@@ -599,8 +636,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Firearms_flag" value="@{Firearms}" />
-                                <span class="attr" data-i18n="firearms" >Firearms</span>
+                                <input type="hidden" class="flag" name="attr_firearms_flag" value="0" />
+                                <button type="action" class="toggle" name="act_firearms" data-i18n="firearms">Firearms</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Firearms" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Firearms" value="1" /><span></span><input type="radio" class="dot" name="attr_Firearms" value="2" /><span></span><input type="radio" class="dot" name="attr_Firearms" value="3" /><span></span><input type="radio" class="dot" name="attr_Firearms" value="4" /><span></span><input type="radio" class="dot" name="attr_Firearms" value="5" /><span></span>
@@ -608,8 +645,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Larceny_flag" value="@{Larceny}" />
-                                <span class="attr" data-i18n="larceny" >Larceny</span>
+                                <input type="hidden" class="flag" name="attr_larceny_flag" value="0" />
+                                <button type="action" class="toggle" name="act_larceny" data-i18n="larceny">Larceny</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Larceny" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Larceny" value="1" /><span></span><input type="radio" class="dot" name="attr_Larceny" value="2" /><span></span><input type="radio" class="dot" name="attr_Larceny" value="3" /><span></span><input type="radio" class="dot" name="attr_Larceny" value="4" /><span></span><input type="radio" class="dot" name="attr_Larceny" value="5" /><span></span>
@@ -617,8 +654,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Stealth_flag" value="@{Stealth}" />
-                                <span class="attr" data-i18n="stealth" >Stealth</span>
+                                <input type="hidden" class="flag" name="attr_stealth_flag" value="0" />
+                                <button type="action" class="toggle" name="act_stealth" data-i18n="stealth">Stealth</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Stealth" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Stealth" value="1" /><span></span><input type="radio" class="dot" name="attr_Stealth" value="2" /><span></span><input type="radio" class="dot" name="attr_Stealth" value="3" /><span></span><input type="radio" class="dot" name="attr_Stealth" value="4" /><span></span><input type="radio" class="dot" name="attr_Stealth" value="5" /><span></span>
@@ -626,8 +663,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Survival_flag" value="@{Survival}" />
-                                <span class="attr" data-i18n="survival" >Survival</span>
+                                <input type="hidden" class="flag" name="attr_survival_flag" value="0" />
+                                <button type="action" class="toggle" name="act_survival" data-i18n="survival">Survival</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Survival" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Survival" value="1" /><span></span><input type="radio" class="dot" name="attr_Survival" value="2" /><span></span><input type="radio" class="dot" name="attr_Survival" value="3" /><span></span><input type="radio" class="dot" name="attr_Survival" value="4" /><span></span><input type="radio" class="dot" name="attr_Survival" value="5" /><span></span>
@@ -635,8 +672,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Weaponry_flag" value="@{Weaponry}" />
-                                <span class="attr" data-i18n="weaponry" >Weaponry</span>
+                                <input type="hidden" class="flag" name="attr_weaponry_flag" value="0" />
+                                <button type="action" class="toggle" name="act_weaponry" data-i18n="weaponry">Weaponry</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Weaponry" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Weaponry" value="1" /><span></span><input type="radio" class="dot" name="attr_Weaponry" value="2" /><span></span><input type="radio" class="dot" name="attr_Weaponry" value="3" /><span></span><input type="radio" class="dot" name="attr_Weaponry" value="4" /><span></span><input type="radio" class="dot" name="attr_Weaponry" value="5" /><span></span>
@@ -650,8 +687,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_AnimalKen_flag" value="@{AnimalKen}" />
-                                <span class="attr" data-i18n="animalken" >Animal Ken</span>
+                                <input type="hidden" class="flag" name="attr_animalken_flag" value="0" />
+                                <button type="action" class="toggle" name="act_animalken" data-i18n="animalken">Animal Ken</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_AnimalKen" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_AnimalKen" value="1" /><span></span><input type="radio" class="dot" name="attr_AnimalKen" value="2" /><span></span><input type="radio" class="dot" name="attr_AnimalKen" value="3" /><span></span><input type="radio" class="dot" name="attr_AnimalKen" value="4" /><span></span><input type="radio" class="dot" name="attr_AnimalKen" value="5" /><span></span>
@@ -659,8 +696,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Empathy_flag" value="@{Empathy}" />
-                                <span class="attr" data-i18n="empathy" >Empathy</span>
+                                <input type="hidden" class="flag" name="attr_empathy_flag" value="0" />
+                                <button type="action" class="toggle" name="act_empathy" data-i18n="empathy">Empathy</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Empathy" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Empathy" value="1" /><span></span><input type="radio" class="dot" name="attr_Empathy" value="2" /><span></span><input type="radio" class="dot" name="attr_Empathy" value="3" /><span></span><input type="radio" class="dot" name="attr_Empathy" value="4" /><span></span><input type="radio" class="dot" name="attr_Empathy" value="5" /><span></span>
@@ -668,8 +705,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Expression_flag" value="@{Expression}" />
-                                <span class="attr" data-i18n="expression" >Expression</span>
+                                <input type="hidden" class="flag" name="attr_expression_flag" value="0" />
+                                <button type="action" class="toggle" name="act_expression" data-i18n="expression">Expression</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Expression" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Expression" value="1" /><span></span><input type="radio" class="dot" name="attr_Expression" value="2" /><span></span><input type="radio" class="dot" name="attr_Expression" value="3" /><span></span><input type="radio" class="dot" name="attr_Expression" value="4" /><span></span><input type="radio" class="dot" name="attr_Expression" value="5" /><span></span>
@@ -677,16 +714,16 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Intimidation_flag" value="@{Intimidation}" />
-                                <span class="attr" data-i18n="intimidation" >Intimidation</span>
+                                <input type="hidden" class="flag" name="attr_intimidation_flag" value="0" />
+                                <button type="action" class="toggle" name="act_intimidation" data-i18n="intimidation">Intimidation</button>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Intimidation" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Intimidation" value="1" /><span></span><input type="radio" class="dot" name="attr_Intimidation" value="2" /><span></span><input type="radio" class="dot" name="attr_Intimidation" value="3" /><span></span><input type="radio" class="dot" name="attr_Intimidation" value="4" /><span></span><input type="radio" class="dot" name="attr_Intimidation" value="5" /><span></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Persuasion_flag" value="@{Persuasion}" />
-                                <span class="attr" data-i18n="persuasion" >Persuasion</span>
+                                <input type="hidden" class="flag" name="attr_persuasion_flag" value="0" />
+                                <button type="action" class="toggle" name="act_persuasion" data-i18n="persuasion">Persuasion</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Persuasion" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Persuasion" value="1" /><span></span><input type="radio" class="dot" name="attr_Persuasion" value="2" /><span></span><input type="radio" class="dot" name="attr_Persuasion" value="3" /><span></span><input type="radio" class="dot" name="attr_Persuasion" value="4" /><span></span><input type="radio" class="dot" name="attr_Persuasion" value="5" /><span></span>
@@ -694,8 +731,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Socialize_flag" value="@{Socialize}" />
-                                <span class="attr" data-i18n="socialize" >Socialize</span>
+                                <input type="hidden" class="flag" name="attr_socialize_flag" value="0" />
+                                <button type="action" class="toggle" name="act_socialize" data-i18n="socialize">Socialize</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Socialize" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Socialize" value="1" /><span></span><input type="radio" class="dot" name="attr_Socialize" value="2" /><span></span><input type="radio" class="dot" name="attr_Socialize" value="3" /><span></span><input type="radio" class="dot" name="attr_Socialize" value="4" /><span></span><input type="radio" class="dot" name="attr_Socialize" value="5" /><span></span>
@@ -703,8 +740,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Streetwise_flag" value="@{Streetwise}" />
-                                <span class="attr" data-i18n="streetwise" >Streetwise</span>
+                                <input type="hidden" class="flag" name="attr_streetwise_flag" value="0" />
+                                <button type="action" class="toggle" name="act_streetwise" data-i18n="streetwise">Streetwise</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Streetwise" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Streetwise" value="1" /><span></span><input type="radio" class="dot" name="attr_Streetwise" value="2" /><span></span><input type="radio" class="dot" name="attr_Streetwise" value="3" /><span></span><input type="radio" class="dot" name="attr_Streetwise" value="4" /><span></span><input type="radio" class="dot" name="attr_Streetwise" value="5" /><span></span>
@@ -712,8 +749,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <input type="checkbox" class="attr" name="attr_Subterfuge_flag" value="@{Subterfuge}" />
-                                <span class="attr" data-i18n="subterfuge" >Subterfuge</span>
+                                <input type="hidden" class="flag" name="attr_subterfuge_flag" value="0" />
+                                <button type="action" class="toggle" name="act_subterfuge" data-i18n="subterfuge">Subterfuge</button>
                             </td>
                             <td>
                                 <input type="radio" class="dot zero" name="attr_Subterfuge" value="-1" checked="checked" /><span></span><input type="radio" class="dot" name="attr_Subterfuge" value="1" /><span></span><input type="radio" class="dot" name="attr_Subterfuge" value="2" /><span></span><input type="radio" class="dot" name="attr_Subterfuge" value="3" /><span></span><input type="radio" class="dot" name="attr_Subterfuge" value="4" /><span></span><input type="radio" class="dot" name="attr_Subterfuge" value="5" /><span></span>
@@ -2171,20 +2208,20 @@
                                 <table class="potency">
                                     <tr>
                                         <td class="subheader">
-                                            <input type="checkbox" class="attr" name="attr_potency_flag" value="@{potency}" />
-                                            <span class="attr ephemeral" style="font-size: 1em;" data-i18n="rank">Rank</span>
-                                            <span class="attr mortal2-organization" style="font-size: 1em;" data-i18n="standing">Standing</span>
-                                            <span class="attr vampire" style="font-size: 1em;" data-i18n="blood-potency" >Blood Potency</span>
-                                            <span class="attr werewolf" style="font-size: 1em;" data-i18n="primal-urge" >Primal Urge</span>
-                                            <span class="attr mage" style="font-size: 1em;" data-i18n="gnosis" >Gnosis</span>
-                                            <span class="attr promethean" style="font-size: 1em;" data-i18n="azoth" >Azoth</span>
-                                            <span class="attr changeling" style="font-size: 1em;" data-i18n="wyrd" >Wyrd</span>
-                                            <span class="attr geist1" style="font-size: 1em;" data-i18n="psyche" >Psyche</span>
-                                            <span class="attr geist2" style="font-size: 1em;" data-i18n="synergy" >Synergy</span>
-                                            <span class="attr geist2-organization" style="font-size: 1em;" data-i18n="esotery">Esotery</span>
-                                            <span class="attr mummy" style="font-size: 1em;" data-i18n="sekhem" >Sekhem</span>
-                                            <span class="attr demon" style="font-size: 1em;" data-i18n="primum" >Primum</span>
-                                            <span class="attr beast" style="font-size: 1em;" data-i18n="lair" >Lair</span>
+                                            <input type="hidden" class="flag" name="attr_potency_flag" value="0" />
+                                            <button type="action" class="toggle ephemeral" name="act_potency" data-i18n="rank">Rank</button>
+                                            <button type="action" class="toggle mortal2-organization" name="act_potency" data-i18n="standing">Standing</button>
+                                            <button type="action" class="toggle vampire" name="act_potency" data-i18n="blood-potency" >Blood Potency</button>
+                                            <button type="action" class="toggle werewolf" name="act_potency" data-i18n="primal-urge" >Primal Urge</button>
+                                            <button type="action" class="toggle mage" name="act_potency" data-i18n="gnosis" >Gnosis</button>
+                                            <button type="action" class="toggle promethean" name="act_potency" data-i18n="azoth" >Azoth</button>
+                                            <button type="action" class="toggle changeling" name="act_potency" data-i18n="wyrd" >Wyrd</button>
+                                            <button type="action" class="toggle geist1" name="act_potency" data-i18n="psyche" >Psyche</button>
+                                            <button type="action" class="toggle geist2" name="act_potency" data-i18n="synergy" >Synergy</button>
+                                            <button type="action" class="toggle geist2-organization" name="act_potency" data-i18n="esotery">Esotery</button>
+                                            <button type="action" class="toggle mummy" name="act_potency" data-i18n="sekhem" >Sekhem</button>
+                                            <button type="action" class="toggle demon" name="act_potency" data-i18n="primum" >Primum</button>
+                                            <button type="action" class="toggle beast" name="act_potency" data-i18n="lair" >Lair</button>
                                         </td>
                                     </tr>
                                     <tr>
@@ -2361,7 +2398,7 @@
     </div>
     
     <!-- PAGE 2 -->
-    <div class="page2">
+    <div class="page page2">
     
         <div class="leftcolumn" style="width: 447px;">
     
@@ -2377,7 +2414,7 @@
                             <option value="Contested" data-i18n="contested" >Contested</option>
                         </select>
                     <div class="rollcontainer">
-                        <button type='roll' class="sheet-roll" name='roll_customRoll1' value="&{template:wod-3part} {{name=@{character_name}}} {{roll_name=@{customRollName1}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{part1=@{part1name_1}}} {{part2=@{part2name_1}}} {{part3=@{part3name_1}}} {{part1pool=@{part1pool_1}}} {{part2pool=@{part2pool_1}}} {{part3pool=@{part3pool_1}}} {{result=[[{((?{@{modifiermacro}|0}+(@{part1pool_1}+0)+(@{part2pool_1}+0)+(@{part3pool_1}+0))@{rolltype}" ></button>
+                        <button type="roll" name="roll_customRoll1" value="&{template:wod-3part} {{name=@{character_name}}} {{roll_name=@{customRollName1}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{part1=@{part1name_1}}} {{part2=@{part2name_1}}} {{part3=@{part3name_1}}} {{part1pool=@{part1pool_1}}} {{part2pool=@{part2pool_1}}} {{part3pool=@{part3pool_1}}} {{result=[[{((?{@{modifiermacro}|0}+(@{part1pool_1}+0)+(@{part2pool_1}+0)+(@{part3pool_1}+0))@{rolltype}" ></button>
                     </div>
                     <br>
                     <span data-i18n="source-d">Source: </span>
@@ -2405,7 +2442,7 @@
                             <option value="Contested" data-i18n="contested" >Contested</option>
                         </select>
                     <div class="rollcontainer">
-                        <button type='roll' class="sheet-roll" name='roll_customRoll2' value="&{template:wod-3part} {{name=@{character_name}}} {{roll_name=@{customRollName2}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{part1=@{part1name_2}}} {{part2=@{part2name_2}}} {{part3=@{part3name_2}}} {{part1pool=@{part1pool_2}}} {{part2pool=@{part2pool_2}}} {{part3pool=@{part3pool_2}}} {{result=[[{((?{@{modifiermacro}|0}+(@{part1pool_2}+0)+(@{part2pool_2}+0)+(@{part3pool_2}+0))@{rolltype}" ></button>
+                        <button type="roll" name="roll_customRoll2" value="&{template:wod-3part} {{name=@{character_name}}} {{roll_name=@{customRollName2}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{part1=@{part1name_2}}} {{part2=@{part2name_2}}} {{part3=@{part3name_2}}} {{part1pool=@{part1pool_2}}} {{part2pool=@{part2pool_2}}} {{part3pool=@{part3pool_2}}} {{result=[[{((?{@{modifiermacro}|0}+(@{part1pool_2}+0)+(@{part2pool_2}+0)+(@{part3pool_2}+0))@{rolltype}" ></button>
                     </div>
                     <br>
                     <span  data-i18n="source-d">Source: </span>
@@ -2422,7 +2459,7 @@
     </div>
     
     <!-- PAGE 3 -->
-    <div class="page3" style="width: 100%;">
+    <div class="page page3" style="width: 100%;">
     
         <div class="leftcolumn">
         <div class="sheet-customroll">
@@ -2840,26 +2877,19 @@
     <!-- HIDDEN FIELDS AND FORMULAS -->
     <input type="hidden" name="attr_version" value="0" />
     <input type="hidden" name="attr_0" value="0" />
-    <input type="hidden" name="attr_rollsimple" value="&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}" />
-    <input type="hidden" name="attr_roll3part" value="" />
-    <input type="hidden" name="attr_rollsheet" value="&{template:wod} {{name=@{character_name}}} {{mod=?{@{modifiermacro}|0}}} {{strength=@{strength}}} {{dexterity=@{dexterity}}} {{stamina=@{stamina}}} {{intelligence=@{intelligence}}} {{wits=@{wits}}} {{resolve=@{resolve}}} {{presence=@{presence}}} {{manipulation=@{manipulation}}} {{composure=@{composure}}} {{Academics=@{Academics}}} {{Computer=@{Computer}}} {{Crafts=@{Crafts}}} {{Investigation=@{Investigation}}} {{Medicine=@{Medicine}}} {{Occult=@{Occult}}} {{Politics=@{Politics}}} {{Science=@{Science}}} {{Athletics=@{Athletics}}} {{Brawl=@{Brawl}}} {{Drive=@{Drive}}} {{Firearms=@{Firearms}}} {{Larceny=@{Larceny}}} {{Stealth=@{Stealth}}} {{Survival=@{Survival}}} {{Weaponry=@{Weaponry}}} {{AnimalKen=@{AnimalKen}}} {{Empathy=@{Empathy}}} {{Expression=@{Expression}}} {{Intimidation=@{Intimidation}}} {{Persuasion=@{Persuasion}}} {{Socialize=@{Socialize}}} {{Streetwise=@{Streetwise}}} {{Subterfuge=@{Subterfuge}}} {{Animalism=@{Animalism}}} {{Auspex=@{Auspex}}} {{Celerity=@{Celerity}}} {{Dominate=@{Dominate}}} {{Majesty=@{Majesty}}} {{Nightmare=@{Nightmare}}} {{Obfuscate=@{Obfuscate}}} {{Protean=@{Protean}}} {{Resilience=@{Resilience}}} {{Vigor=@{Vigor}}} {{Crúac=@{Crúac}}} {{ThebanSorcery=@{ThebanSorcery}}} {{Death=@{Death}}} {{Fate=@{Fate}}} {{Forces=@{Forces}}} {{Life=@{Life}}} {{Matter=@{Matter}}} {{Mind=@{Mind}}} {{Prime=@{Prime}}} {{Spirit=@{Spirit}}} {{Space=@{Space}}} {{Time=@{Time}}} {{potency=@{potency}}} {{@{strength_flag}str=1}} {{@{dexterity_flag}dex=1}} {{@{stamina_flag}sta=1}} {{@{intelligence_flag}int=1}} {{@{wits_flag}wit=1}} {{@{resolve_flag}res=1}} {{@{presence_flag}pre=1}} {{@{manipulation_flag}man=1}} {{@{composure_flag}com=1}} {{@{Academics_flag}aca=1}} {{@{Computer_flag}comp=1}} {{@{Crafts_flag}cra=1}} {{@{Investigation_flag}inv=1}} {{@{Medicine_flag}med=1}} {{@{Occult_flag}occ=1}} {{@{Politics_flag}pol=1}} {{@{Science_flag}sci=1}} {{@{Athletics_flag}ath=1}} {{@{Brawl_flag}bra=1}} {{@{Drive_flag}dri=1}} {{@{Firearms_flag}fir=1}} {{@{Larceny_flag}lar=1}} {{@{Stealth_flag}ste=1}} {{@{Survival_flag}sur=1}} {{@{Weaponry_flag}wea=1}} {{@{AnimalKen_flag}ani=1}} {{@{Empathy_flag}emp=1}} {{@{Expression_flag}exp=1}} {{@{Intimidation_flag}inti=1}} {{@{Persuasion_flag}per=1}} {{@{Socialize_flag}soc=1}} {{@{Streetwise_flag}stre=1}} {{@{Subterfuge_flag}sub=1}} {{@{Animalism_flag}anim=1}} {{@{Auspex_flag}ausp=1}} {{@{Celerity_flag}cele=1}} {{@{Dominate_flag}domi=1}} {{@{Majesty_flag}maje=1}} {{@{Nightmare_flag}nigh=1}} {{@{Obfuscate_flag}obfu=1}} {{@{Protean_flag}prot=1}} {{@{Resilience_flag}resi=1}} {{@{Vigor_flag}vigo=1}} {{@{Crúac_flag}crúa=1}} {{@{ThebanSorcery_flag}theb=1}} {{@{Death_flag}deat=1}} {{@{Fate_flag}fate=1}} {{@{Forces_flag}forc=1}} {{@{Life_flag}life=1}} {{@{Matter_flag}matt=1}} {{@{Mind_flag}mind=1}} {{@{Prime_flag}prim=1}} {{@{Spirit_flag}spir=1}} {{@{Space_flag}spac=1}} {{@{Time_flag}time=1}} {{@{potency_flag}pote=1}} {{result=[[{(([[?{@{modifiermacro}|0}+@{strength_flag}+@{dexterity_flag}+@{stamina_flag}+@{intelligence_flag}+@{wits_flag}+@{resolve_flag}+@{presence_flag}+@{manipulation_flag}+@{composure_flag}+@{Academics_flag}+@{Computer_flag}+@{Crafts_flag}+@{Investigation_flag}+@{Medicine_flag}+@{Occult_flag}+@{Politics_flag}+@{Science_flag}+@{Athletics_flag}+@{Brawl_flag}+@{Drive_flag}+@{Firearms_flag}+@{Larceny_flag}+@{Stealth_flag}+@{Survival_flag}+@{Weaponry_flag}+@{AnimalKen_flag}+@{Empathy_flag}+@{Expression_flag}+@{Intimidation_flag}+@{Persuasion_flag}+@{Socialize_flag}+@{Streetwise_flag}+@{Subterfuge_flag}+@{Animalism_flag}+@{Auspex_flag}+@{Celerity_flag}+@{Dominate_flag}+@{Majesty_flag}+@{Nightmare_flag}+@{Obfuscate_flag}+@{Protean_flag}+@{Resilience_flag}+@{Vigor_flag}+@{Crúac_flag}+@{ThebanSorcery_flag}+@{Death_flag}+@{Fate_flag}+@{Forces_flag}+@{Life_flag}+@{Matter_flag}+@{Mind_flag}+@{Prime_flag}+@{Spirit_flag}+@{Space_flag}+@{Time_flag}+@{potency_flag}]])" />
-    <input type="hidden" name="attr_rollattack" value="&{template:wod-attack} {{name=@{character_name}}} {{strength=@{strength}}} {{dexterity=@{dexterity}}} {{brawl=@{brawl}}} {{weaponry=@{weaponry}}} {{firearms=@{firearms}}} {{athletics=@{athletics}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{wpen=[[@{weapon_penalty}]]}} {{apen=[[@{armor_penalty}]]}} @{attack}" />
-    
+
     <input type="hidden" name="attr_balistic_armor" value="((@{armor_ballistic0}+0)*@{armor_flag0})+((@{armor_ballistic1}+0)*@{armor_flag1})+((@{armor_ballistic2}+0)*@{armor_flag2})" />
     <input type="hidden" name="attr_general_armor" value="((@{armor_general0}+0)*@{armor_flag0})+((@{armor_general1}+0)*@{armor_flag1})+((@{armor_general2}+0)*@{armor_flag2})" />
     <input type="hidden" name="attr_defense_penalty" value="((@{armor_defense0}+0)*@{armor_flag0})+((@{armor_defense1}+0)*@{armor_flag1})+((@{armor_defense2}+0)*@{armor_flag2})" />
     <input type="hidden" name="attr_speed_penalty" value="((@{armor_speed0}+0)*@{armor_flag0})+((@{armor_speed1}+0)*@{armor_flag1})+((@{armor_speed2}+0)*@{armor_flag2})" />
-    <!-- <input type="hidden" name="attr_initiative_penalty" value="((@{attack_initiative0}+0)*@{attack_flag0})+((@{attack_initiative1}+0)*@{attack_flag1})+((@{attack_initiative2}+0)*@{attack_flag2})+((@{attack_initiative3}+0)*@{attack_flag3})+((@{attack_initiative4}+0)*@{attack_flag4})" /> -->
     <input type="hidden" name="attr_initiative_penalty" value="0" />
     <input type="hidden" name="attr_weapon_penalty" value="0" />
     <input type="hidden" name="attr_armor_penalty" value="0" />
     <input type="hidden" name="attr_wound_penalty" value="0" />
-    <input type="hidden" name="attr_attack_pool" value="((@{attack_type0}+0)*@{attack_flag0})+((@{attack_type1}+0)*@{attack_flag1})+((@{attack_type2}+0)*@{attack_flag2})+((@{attack_type3}+0)*@{attack_flag3})+((@{attack_type4}+0)*@{attack_flag4})" />
-    <input type="hidden" name="attr_attack_base_damage" value="((@{attack_damage0}+0)*@{attack_flag0})+((@{attack_damage1}+0)*@{attack_flag1})+((@{attack_damage2}+0)*@{attack_flag2})+((@{attack_damage3}+0)*@{attack_flag3})+((@{attack_damage4}+0)*@{attack_flag4})" />
-    <input type="hidden" name="attr_roll_array" />
-    <input type="hidden" name="attr_roll_base" />
     <input type="hidden" name="attr_defense_base" />
-    <input type="hidden" name="attr_potency_name" />
+    <input type="hidden" name="attr_dice_pool_attributes" value="" />
+    <input type="hidden" name="attr_dice_pool_html" value="" />
+    <input type="hidden" name="attr_dice_pool" value="0" />
     <input type="hidden" name="attr_rolltype" value=")d10!cs>10}>8]]}}" />
     <!-- Translation handles for sheetworkers -->
     <span style="display: none" data-i18n="dice-pool">Dice Pool</span>
@@ -2877,178 +2907,22 @@
     <!-- ROLL TEMPLATES -->
     <rolltemplate class="sheet-rolltemplate-wod">
         <table>
-            <tr><th>{{name}} <span data-i18n="rolls">rolls</span>{{#roll_name}} {{roll_name}}{{/roll_name}}</th></tr>
-            <tr><td class="attr">
-                {{^0str}}
-                    <span data-i18n="strength">Strength</span>({{strength}})<br>
-                {{/0str}}
-                {{^0dex}}
-                    <span data-i18n="dexterity">Dexterity</span>({{dexterity}})<br>
-                {{/0dex}}
-                {{^0sta}}
-                    <span data-i18n="stamina">Stamina</span>({{stamina}})<br>
-                {{/0sta}}
-                {{^0int}}
-                    <span data-i18n="intelligence">Intelligence</span>({{intelligence}})<br>
-                {{/0int}}
-                {{^0wit}}
-                    <span data-i18n="wits">Wits</span>({{wits}})<br>
-                {{/0wit}}
-                {{^0res}}
-                    <span data-i18n="resolve">Resolve</span>({{resolve}})<br>
-                {{/0res}}
-                {{^0pre}}
-                    <span data-i18n="presence">Presence</span>({{presence}})<br>
-                {{/0pre}}
-                {{^0man}}
-                    <span data-i18n="manipulation">Manipulation</span>({{manipulation}})<br>
-                {{/0man}}
-                {{^0com}}
-                    <span data-i18n="composure">Composure</span>({{composure}})<br>
-                {{/0com}}
-                {{^0aca}}
-                    <span data-i18n="academics">Academics</span>({{Academics}})<br>
-                {{/0aca}}
-                {{^0comp}}
-                    <span data-i18n="computer">Computer</span>({{Computer}})<br>
-                {{/0comp}}
-                {{^0cra}}
-                    <span data-i18n="crafts">Crafts</span>({{Crafts}})<br>
-                {{/0cra}}
-                {{^0inv}}
-                    <span data-i18n="investigation">Investigation</span>({{Investigation}})<br>
-                {{/0inv}}
-                {{^0med}}
-                    <span data-i18n="medicine">Medicine</span>({{Medicine}})<br>
-                {{/0med}}
-                {{^0occ}}
-                    <span data-i18n="occult">Occult</span>({{Occult}})<br>
-                {{/0occ}}
-                {{^0pol}}
-                    <span data-i18n="politics">Politics</span>({{Politics}})<br>
-                {{/0pol}}
-                {{^0sci}}
-                    <span data-i18n="science">Science</span>({{Science}})<br>
-                {{/0sci}}
-                {{^0ath}}
-                    <span data-i18n="athletics">Athletics</span>({{Athletics}})<br>
-                {{/0ath}}
-                {{^0bra}}
-                    <span data-i18n="brawl">Brawl</span>({{Brawl}})<br>
-                {{/0bra}}
-                {{^0dri}}
-                    <span data-i18n="drive">Drive</span>({{Drive}})<br>
-                {{/0dri}}
-                {{^0fir}}
-                    <span data-i18n="firearms">Firearms</span>({{Firearms}})<br>
-                {{/0fir}}
-                {{^0lar}}
-                    <span data-i18n="larceny">Larceny</span>({{Larceny}})<br>
-                {{/0lar}}
-                {{^0ste}}
-                    <span data-i18n="stealth">Stealth</span>({{Stealth}})<br>
-                {{/0ste}}
-                {{^0sur}}
-                    <span data-i18n="survival">Survival</span>({{Survival}})<br>
-                {{/0sur}}
-                {{^0wea}}
-                    <span data-i18n="weaponry">Weaponry</span>({{Weaponry}})<br>
-                {{/0wea}}
-                {{^0ani}}
-                    <span data-i18n="animalken">Animal Ken</span>({{AnimalKen}})<br>
-                {{/0ani}}
-                {{^0emp}}
-                    <span data-i18n="empathy">Empathy</span>({{Empathy}})<br>
-                {{/0emp}}
-                {{^0exp}}
-                    <span data-i18n="expression">Expression</span>({{Expression}})<br>
-                {{/0exp}}
-                {{^0inti}}
-                    <span data-i18n="intimidation">Intimidation</span>({{Intimidation}})<br>
-                {{/0inti}}
-                {{^0per}}
-                    <span data-i18n="persuasion">Persuasion</span>({{Persuasion}})<br>
-                {{/0per}}
-                {{^0soc}}
-                    <span data-i18n="socialize">Socialize</span>({{Socialize}})<br>
-                {{/0soc}}
-                {{^0stre}}
-                    <span data-i18n="streetwise">Streetwise</span>({{Streetwise}})<br>
-                {{/0stre}}
-                {{^0sub}}
-                    <span data-i18n="subterfuge">Subterfuge</span>({{Subterfuge}})<br>
-                {{/0sub}}
-                {{^0anim}}
-                    <span data-i18n="animalism">Animalism</span>({{Animalism}})<br>
-                {{/0anim}}
-                {{^0ausp}}
-                    <span data-i18n="auspex">Auspex</span>({{Auspex}})<br>
-                {{/0ausp}}
-                {{^0cele}}
-                    <span data-i18n="celerity">Celerity</span>({{Celerity}})<br>
-                {{/0cele}}
-                {{^0domi}}
-                    <span data-i18n="dominate">Dominate</span>({{Dominate}})<br>
-                {{/0domi}}
-                {{^0maje}}
-                    <span data-i18n="majesty">Majesty</span>({{Majesty}})<br>
-                {{/0maje}}
-                {{^0nigh}}
-                    <span data-i18n="nightmare">Nightmare</span>({{Nightmare}})<br>
-                {{/0nigh}}
-                {{^0obfu}}
-                    <span data-i18n="obfuscate">Obfuscate</span>({{Obfuscate}})<br>
-                {{/0obfu}}
-                {{^0prot}}
-                    <span data-i18n="protean">Protean</span>({{Protean}})<br>
-                {{/0prot}}
-                {{^0resi}}
-                    <span data-i18n="resilience">Resilience</span>({{Resilience}})<br>
-                {{/0resi}}
-                {{^0vigo}}
-                    <span data-i18n="vigor">Vigor</span>({{Vigor}})<br>
-                {{/0vigo}}
-                {{^0crúa}}
-                    <span data-i18n="crúac">Crúac</span>({{Crúac}})<br>
-                {{/0crúa}}
-                {{^0theb}}
-                    <span data-i18n="thebansorcery">Theban Sorcery</span>({{ThebanSorcery}})<br>
-                {{/0theb}}
-                {{^0deat}}
-                    <span data-i18n="death">Death</span>({{Death}})<br>
-                {{/0deat}}
-                {{^0fate}}
-                    <span data-i18n="fate">Fate</span>({{Fate}})<br>
-                {{/0fate}}
-                {{^0forc}}
-                    <span data-i18n="forces">Forces</span>({{Forces}})<br>
-                {{/0forc}}
-                {{^0life}}
-                    <span data-i18n="life">Life</span>({{Life}})<br>
-                {{/0life}}
-                {{^0matt}}
-                    <span data-i18n="matter">Matter</span>({{Matter}})<br>
-                {{/0matt}}
-                {{^0mind}}
-                    <span data-i18n="mind">Mind</span>({{Mind}})<br>
-                {{/0mind}}
-                {{^0prim}}
-                    <span data-i18n="prime">Prime</span>({{Prime}})<br>
-                {{/0prim}}
-                {{^0spir}}
-                    <span data-i18n="spirit">Spirit</span>({{Spirit}})<br>
-                {{/0spir}}
-                {{^0spac}}
-                    <span data-i18n="space">Space</span>({{Space}})<br>
-                {{/0spac}}
-                {{^0time}}
-                    <span data-i18n="time">Time</span>({{Time}})<br>
-                {{/0time}}
-                {{^0pote}}
-                    <span data-i18n="power-stat">Power Stat</span>({{potency}})<br>
-                {{/0pote}}
-                    <span data-i18n="modifiers">Modifiers</span>({{mod}})
-            </td></tr>
+            <tr><th>{{name}} <span data-i18n="rolls">rolls</span> {{dicePool}}</th></tr>
+            <tr>
+                <td>
+                    {{dicePoolHtml}}
+                    {{#^rollTotal() woundpenalty 0}}
+                    <div>
+                        <span data-i18n="wound">Wound</span> <span data-i18n="penalty">Penalty</span>({{woundpenalty}})
+                    </div>
+                    {{/^rollTotal() woundpenalty 0}}
+                    {{#^rollTotal() mod 0}}
+                    <div>
+                        <span data-i18n="modifiers">Modifiers</span>({{mod}})
+                    </div>
+                    {{/^rollTotal() mod 0}}
+                </td>
+            </tr>
             <tr>
                 <td class="result">{{result}} <span data-i18n="successes">Successes</span></td>
             </tr>
@@ -3071,7 +2945,7 @@
     <rolltemplate class="sheet-rolltemplate-wod-simple">
         <table>
             <tr><th>{{name}} <span data-i18n="rolls">rolls</span></th></tr>
-            <tr><td class="attr">
+            <tr><td>
                 {{option}} <span data-i18n="dice-for">dice for</span><br>
             </td></tr>
             <tr>
@@ -3096,7 +2970,7 @@
     <rolltemplate class="sheet-rolltemplate-wod-3part">
         <table>
             <tr><th>{{name}} <span data-i18n="rolls">rolls</span>{{#roll_name}} {{roll_name}}{{/roll_name}}</th></tr>
-            <tr><td class="attr">
+            <tr><td>
                 {{#part1}}
                     {{part1}}({{part1pool}})<br>
                 {{/part1}}
@@ -3135,7 +3009,7 @@
     <rolltemplate class="sheet-rolltemplate-wod-initiative">
         <table>
             <tr><th>{{name}} <span data-i18n="rolls">rolls</span> <span data-i18n="initiative">Initiative</span></th></tr>
-            <tr><td class="attr">
+            <tr><td>
                 {{#dexterity}}
                     <span data-i18n="dexterity">Dexterity</span>({{dexterity}})<br>
                 {{/dexterity}}
@@ -3161,7 +3035,7 @@
     <rolltemplate class="sheet-rolltemplate-wod-attack">
         <table>
             <tr><th>{{name}} <span data-i18n="makes-a">makes a</span> {{attack_name}} <span data-i18n="attack">attack</span></th></tr>
-            <tr><td class="attr">
+            <tr><td>
                 {{#str}}
                     <span data-i18n="strength">Strength</span>({{strength}})<br>
                 {{/str}}
@@ -3227,21 +3101,32 @@
     
     <script type="text/worker">
         var attributes = ["intelligence","wits","resolve","strength","dexterity","stamina","presence","manipulation","composure","power","finesse","resistance"];
-        var skills = ["academics","computer","crafts","investigation","medicine","occult","politics","science","athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry","animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge"];
+        var mentalSkills = ["academics","computer","crafts","investigation","medicine","occult","politics","science"];
+        var physicalSkills = ["athletics","brawl","drive","firearms","larceny","stealth","survival","weaponry"];
+        var socialSkills = ["animalken","empathy","expression","intimidation","persuasion","socialize","streetwise","subterfuge"];
+        var skills = [ ...mentalSkills, ...physicalSkills, ...socialSkills ];
         var normalStats = [ ...attributes, ...skills ];
         var powers = ["animalism","auspex","celerity","dominate","majesty","nightmare","obfuscate","protean","resilience","vigor","crúac","thebansorcery","death","fate","forces","life","matter","mind","prime","spirit","space","time"];
         var allStats = [ ...attributes, ...skills, ...powers, "potency" ];
-        var potencyNames = { mortal1:"", mortal2:"", "mortal2-organization":"Standing", vampire1:"Blood Potency", vampire2:"Blood Potency", werewolf1:"Primal Urge", werewolf2:"Primal Urge", mage1:"Gnosis", mage2:"Gnosis", promethean1:"Azoth", promethean2:"Azoth", changeling1:"Wyrd", changeling2:"Wyrd", demon:"Primum", beast:"Lair", hunter:"", geist1:"Psyche", geist2:"Synergy", "geist2-geist":"Rank", "geist2-organization":"Esotery", mummy1:"Sekhem" };
+        var potencyTranslationKeys = {
+            mortal1:"", mortal2:"", "mortal2-organization":"standing",
+            vampire1:"blood-potency", vampire2:"blood-potency",
+            werewolf1:"primal-urge", werewolf2:"primal-urge",
+            mage1:"gnosis", mage2:"gnosis",
+            promethean1:"azoth", promethean2:"azoth",
+            changeling1:"wyrd", changeling2:"wyrd",
+            demon:"primum", beast:"lair", hunter:"",
+            geist1:"psyche", geist2:"synergy", "geist2-geist":"rank", "geist2-organization":"esotery",
+            mummy1:"sekhem"
+        };
         
-        [ ...allStats, "rolltype" ].forEach((attr) => {
-            on(`change:${attr} change:${attr}_flag`, (eventInfo) => {
+        allStats.forEach((attr) => {
+            on(`change:${attr}`, (eventInfo) => {
                 const source = eventInfo.sourceAttribute;
-                const attribute = (attr.includes("flag")) ? attr.split(`_flag`)[0] : attr; //Remove the "_flag" part so we can pass the name
+
+                updateDicePool();
     
-                updateRolls(`${attribute}`);
-                console.log(source);
-    
-                if (source === "resolve_flag" || source === "composure_flag") {
+                if (["resolve", "composure"].includes(source)) {
                     updateWillpower();
                 };
     
@@ -3264,32 +3149,18 @@
                     updateInitiative();
                 }
     
-                if (source === "stamina" || source === "resilience" || source === "resistance") {
+                if (["stamina", "resilience", "resistance"].includes(source)) {
                     updateHealth();
                 };
             });
     
-            // Toggle flag
+            // Toggle roll selections
             on(`clicked:${attr}`, () => {
-                const flag = `${attr}_flag`;
-                getAttrs([flag], (v) => {
-                    setAttrs({
-                        [flag]: !v[flag] ? 1 : 0
-                    });
-                });
-            });
-        });
-    
-        [...Array(5).keys()].forEach((attr) => {
-            on(`change:attack_type${attr}`, (eventInfo) => {//checks attack_type0 trough attack_type4
-                const source = eventInfo.sourceAttribute;
-                console.log(source);
-                updateRolls("rolltype");
+                updateDicePoolAttributes(attr);
             });
         });
     
         on("change:attack", function() {
-            updateRolls("rolltype");
             updateAttacks();
         });
     
@@ -3330,9 +3201,7 @@
                     .map((_, index) => `${trait}${index + 1}`)
             ], []);
         const dotAttrs = [
-            "power",
-            "finesse",
-            "resistance",
+            ...attributes,
             ...listDotAttrs,
             ...powers,
             "potency"
@@ -3374,6 +3243,15 @@
                 });
             });
         });
+
+        const pages = ["settings", "1", "2", "3"];
+        pages.forEach((page) => {
+            on(`clicked:page_${page}`, () => {
+                setAttrs({
+                    "pagenumber": page
+                });
+            });
+        });
     
         const sheettypes = [
             "mortal1","vampire1","werewolf1","mage1","promethean1","changeling1","hunter","geist1","mummy1",
@@ -3394,13 +3272,30 @@
                 });
             });
         });
+
+        const rollstyles = ["sheet", "attack", "simple"];
+        rollstyles.forEach((rollstyle) => {
+            on(`clicked:rollstyle_${rollstyle}`, () => {
+                setAttrs({
+                    "rollstyle": rollstyle
+                });
+            });
+        });
+        
+        const rolltypes = ["chance", "normal", "9-again", "8-again", "dont-reroll", "rote", "chance-rote"];
+        rolltypes.forEach((rolltype) => {
+            on(`clicked:rolltype_select_${rolltype}`, () => {
+                setAttrs({
+                    "rolltype_select": rolltype
+                });
+            });
+        });
     
-        on("change:sheettype", function() {
+        on("sheet:opened change:sheettype", function() {
             updateHealth();
             updateSpeed();
             updateDefaultDefense();
             updateInitiative();
-            updatePotencyName();
             updateRollType();
             const resetRollFlagAttrs = resetRollFlags();
     
@@ -3431,14 +3326,6 @@
         });
     
         on("change:rolltype_select", function() {
-            updateRollType();
-        });
-    
-        on("sheet:opened", function() {
-            updateSpeed();
-            updateDefaultDefense();
-            updateInitiative();
-            updatePotencyName();
             updateRollType();
         });
     
@@ -3473,7 +3360,8 @@
                 }
             });
         });
-    // ---------------------------------- Translation functions ------------------------------------------
+
+        // ---------------------------------- Translation functions ------------------------------------------
         on("sheet:opened", function(){
             setAttrs({
                 dicepoolmacro: getTranslationByKey("dice-pool"),
@@ -3482,8 +3370,44 @@
             });
         });
     
-    // --------------------------------------------------------------------------------------------------
+        // --------------------------------------------------------------------------------------------------
     
+
+        var tryParse = function(s) {
+            try {
+                return JSON.parse(s);
+            }
+            catch(e) {
+                return null;
+            }
+        }
+
+        var getAttributeType = function(attribute) {
+            if (attributes.includes(attribute)) {
+                return "attribute";
+            }
+            if (skills.includes(attribute)) {
+                return "skill";
+            }
+            if (attribute === "potency") {
+                return "potency";
+            }
+            return "power";
+        }
+
+        var getUnskilledPenalty = function(attribute) {
+            if (mentalSkills.includes(attribute)) {
+                return -3;
+            }
+            if (physicalSkills.includes(attribute)) {
+                return -1;
+            }
+            if (socialSkills.includes(attribute)) {
+                return -1;
+            }
+            return 0;
+        }
+
         var getGameLine = function(sheettype) {
             switch (sheettype) {
                 case "mortal1":
@@ -3584,152 +3508,105 @@
                     return "organization";
             }
         }
-    
-        var updateRolls = function(stat) {
-            var type;
-            var stat_flag = stat + "_flag";
-            var rarray = [];
-            const attrs = [
-                "attack","rollstyle","roll_array","attack_type0","attack_type1","attack_type2","attack_type3","attack_type4",
-                ...allStats,
-                ...allStats.map((s) => `${s}_flag`),
-                "potency_name"
-            ];
-            getAttrs(attrs, function(v) {
-                allStats.forEach(function(x) {
-                    var flagname = x + "_flag";
-                    if(parseInt(v[flagname], 10) != 0) {
-                        rarray.push(x);
-                    }
-                });
-                var prev_rarray = v.roll_array && v.roll_array != "" ? v.roll_array.split(",") : [];
-                if(stat != "rolltype") {
-                    if(parseInt(v[stat_flag], 10) === 0) {
-                        if(rarray.indexOf(stat) > -1) {
-                            rarray.splice(rarray.indexOf(stat), 1);
-                        }
-                    }
-                    else if (stat != "potency") {
-                        if(attributes.indexOf(stat) > -1) {
-                            type = "attribute";
-                        }
-                        else if(skills.indexOf(stat) > -1) {
-                            type = "skill";
-                        }
-                        else {
-                            type = "power";
-                        }
-                        if(type === "attribute") {
-                            if(rarray.filter(function(x){return attributes.indexOf(x) > -1}).length > 1) {
-                                rarray = [stat, prev_rarray.filter(function(x){return attributes.indexOf(x) > -1})[0]];
-                            }
-                        }
-                        if(type === "skill") {
-                            const attrFilter = rarray.filter(function(x){return attributes.indexOf(x) > -1}),
-                                skillFilter = rarray.filter(function(x){return skills.indexOf(x) > -1});
-                            if(attrFilter.length < 2 && skillFilter.length === 0) {
-                                rarray.unshift(stat);
-                            }else if(attrFilter.length < 2 && skillFilter.length > 0) {
-                                rarray = rarray.filter(function(x) {return skills.indexOf(x) < 0;});
-                                rarray.unshift(stat);
-                            }else if(attrFilter.length > 1) {
-                                rarray = [stat, prev_rarray.filter(function(x){return attributes.indexOf(x) > -1})[0]];//This could probably be done with .shift instead of the filter, but I don't know what's going on the grand scheme of things so...
-                            }
-                        }
-                        if(type === "power") {
-                            if(rarray.filter(function(x){return normalStats.indexOf(x) === -1}).length > 0) {
-                                rarray = rarray.filter(function(x){return normalStats.indexOf(x) > -1});
-                                rarray.unshift(stat);
-                            }
-                            else {
-                                rarray.unshift(stat);
-                            }
-                        }
-                    }
-                    if(rarray.length > 3) {
-                        rarray.length = 3;
-                    }
-                    var cleanup = {};
-                    var diff = prev_rarray.filter(function(x) {return rarray.indexOf(x) < 0});
-                    diff.forEach(function(x) {
-                        var flagname = x + "_flag";
-                        cleanup[flagname] = 0;
-                    });
-                    setAttrs(cleanup);
+
+        var updateDicePoolAttributes = function(attribute) {
+            getAttrs([...allStats, "dice_pool_attributes", "sheettype"], (v) => {
+                // Update roll stats collection
+                let poolAttributes = v["dice_pool_attributes"]
+                    .split(",")
+                    .filter((poolAttribute) => poolAttribute);
+
+                if (poolAttributes.includes(attribute)) {
+                    // Remove attribute from roll
+                    poolAttributes = poolAttributes.filter((poolAttribute) => poolAttribute !== attribute);
                 }
-                var final = parseInt(v[stat_flag], 10) === 0 || type === "rolltype" ? prev_rarray.join(",") : rarray.join(",");
-                var order = [];
-                rarray.filter(function(x){return attributes.indexOf(x) > -1}).forEach(function(x) {order.push(x);});
-                rarray.filter(function(x){return skills.indexOf(x) > -1}).forEach(function(x) {order.push(x);});
-                if (rarray.indexOf("potency") > -1) {order.push("potency");}
-                rarray.filter(function(x){return normalStats.indexOf(x) === -1 && x != "potency"}).forEach(function(x) {order.push(x);});
-    
-                var names = order.map(function(x) {
-                    let transX = getTranslationByKey(x);
-                    if (x == "potency"){
-                        return v.potency_name;//may need to do getTranslationgByKey here as well, but not sure what the potential values of this are, and if they are user defined or sheet defined
-                    }
-                    return transX.charAt(0).toUpperCase() + transX.slice(1);//note I actually prefer to do this using .replace if there's going to be a chance for multi word casing
-                });
-    
-                var base = "&{template:wod-simple} {{name=@{character_name}}} {{option=?{@{dicepoolmacro}|0}}} {{result=[[{(?{@{dicepoolmacro}|1}@{rolltype}";
-                if(order.length > 0) {
-                    base = "&{template:wod-3part} {{name=@{character_name}}} {{mod=[[?{@{modifiermacro}|0}]]}} {{woundpenalty=[[@{wound_penalty}]]}} {{part1=" + names[0] + "}} {{part1pool=" + v[order[0]] + "}}";
-                    var result = " {{result=[[{((?{@{modifiermacro}|0}+@{wound_penalty}+" + v[order[0]];
-                    if(order.length > 1) {
-                        base = base + " {{part2=" + names[1] + "}} {{part2pool=" + v[order[1]] + "}}";
-                        result = result + "+" + v[order[1]];
-                    }
-                    if(order.length > 2) {
-                        base = base + " {{part3=" + names[2] + "}} {{part3pool=" + v[order[2]] + "}}";
-                        result = result + "+" + v[order[2]];
-                    }
-                    base = base + result + ")@{rolltype}"
+                else {
+                    // Add attribute to roll
+                    poolAttributes = poolAttributes.concat(attribute);
+
+                    // Cap stats by type
+                    const poolAttributeTypes = poolAttributes
+                        .map((poolAttribute) => ({ poolAttribute, type: getAttributeType(poolAttribute) }));
+                    poolAttributes = poolAttributeTypes.filter((x) => x.type === "attribute").reverse().slice(0, 2).reverse()
+                        .concat(poolAttributeTypes.filter((x) => x.type === "skill").reverse().slice(0, 1).reverse())
+                        .concat(poolAttributeTypes.filter((x) => x.type === "power").reverse().slice(0, 1).reverse())
+                        .concat(poolAttributeTypes.filter((x) => x.type === "potency").reverse().slice(0, 1).reverse())
+                        .map((x) => x.poolAttribute);
                 }
-                var display = "";
-                if(v.rollstyle === "@{roll_base}") {
-                    if(order.length === 0) {
-                        display = `${display}${getTranslationByKey("simple-roll")}\n`
-                    }
-                    else {
-                        //display = order.join(" +\n");
-                        //display = display.replace(/\b./g, function(x){ return x.toUpperCase(); });
-                        display = names.join(" +\n");
-                    }
-                }
-                else if(v.rollstyle === "@{rollattack}") {
-                    var regex = /attack_type(.)/;
-                    var attack_type = "attack_type" + v.attack.match(regex)[1];
-                    if(v[attack_type].indexOf("str=1") > -1) {
-                        display = `${display}${getTranslationByKey("strength")}\n`
-                    }
-                    if(v[attack_type].indexOf("dex=1") > -1) {
-                        display = `${display}${getTranslationByKey("dexterity")}\n`
-                    }
-                    if(v[attack_type].indexOf("bra=1") > -1) {
-                        display = `${display}${getTranslationByKey("brawl")}\n`
-                    }
-                    if(v[attack_type].indexOf("wea=1") > -1) {
-                        display = `${display}${getTranslationByKey("weaponry")}\n`
-                    }
-                    if(v[attack_type].indexOf("fir=1") > -1) {
-                        display = `${display}${getTranslationByKey("firearms")}\n`
-                    }
-                    if(v[attack_type].indexOf("ath=1") > -1) {
-                        display = `${display}${getTranslationByKey("athletics")}\n`
-                    }
-                }
-                else if(v.rollstyle === "@{rollsimple}") {
-                    display = `${display}${getTranslationByKey("simple-roll")}\n`
-                }
-    
+
+                // Create HTML for roll template
+                const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, v);
+
+                // Create dice pool for roll
+                const dicePool = getSheetDicePool(poolAttributes, v);
+                console.log("pool", dicePool);
+
+                // Create display for dice roller
+                const rollDisplay = poolAttributes
+                    .map((poolAttribute) => getAttributeTranslation(poolAttribute, v.sheettype))
+                    .join(" +\n");
+
+                // Determine flag values
+                const flags = allStats
+                    .map((flagAttribute) => ({
+                        "flag": `${flagAttribute}_flag`,
+                        "value": poolAttributes.includes(flagAttribute) ? 1 : 0
+                    }))
+                    .reduce((all, next) => ({ ...all, [next.flag]: next.value }), {});
+
                 setAttrs({
-                    roll_array: final,
-                    roll_base: base,
-                    rolldisplay: display
+                    ["dice_pool_attributes"]: poolAttributes.join(","),
+                    ["dice_pool_html"]: dicePoolHtml,
+                    ["dice_pool"]: dicePool,
+                    ["rolldisplay"]: rollDisplay,
+                    ...flags,
                 });
             });
-        };
+        }
+
+        var updateDicePool = function() {
+            getAttrs([...allStats, "dice_pool_attributes", "sheettype"], (values) => {
+                const poolAttributes = values["dice_pool_attributes"].split(",");
+
+                const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, values);
+                const dicePool = getSheetDicePool(poolAttributes, values);
+
+                setAttrs({
+                    ["dice_pool_html"]: dicePoolHtml,
+                    ["dice_pool"]: dicePool
+                });
+            });
+        }
+
+        var getSheetDicePoolHtml = function(poolAttributes, values) {
+            return poolAttributes
+                .map((poolAttribute) => ({
+                    label: getAttributeTranslation(poolAttribute, values["sheettype"]),
+                    value: getAttributePool(poolAttribute, values)
+                }))
+                .map((stat) => `<div>${stat.label} (${stat.value})</div>`)
+                .join("");
+        }
+
+        var getAttributeTranslation = function(attribute, sheettype) {
+            const translationKey = getAttributeType(attribute) === "potency"
+                ? potencyTranslationKeys[sheettype]
+                : attribute;
+
+            return getTranslationByKey(translationKey);
+        }
+
+        var getAttributePool = function(attribute, values) {
+            return Number(values[attribute]) || getUnskilledPenalty(attribute);
+        }
+
+        var getSheetDicePool = function(poolAttributes, values) {
+            const sum = poolAttributes
+                .map((poolAttribute) => getAttributePool(poolAttribute, values))
+                .reduce((sum, value) => sum + value, 0)
+            
+            return Math.max(sum, 1);
+        }
     
         var updateHealth = function() {
             getAttrs(["stamina","resistance","base_size","giant","small_framed","sheettype","entity","resilience","bonus_health"], function(v) {
@@ -3928,21 +3805,13 @@
             };
         }
     
-        var updatePotencyName = function() {
-            getAttrs(["sheettype"], function(v){
-                setAttrs({
-                    potency_name: potencyNames[v.sheettype] || ""
-                });
-            });
-        }
-    
         var updateRollType = function() {
             getAttrs(["rolltype_select","sheettype","attack_type0","attack_type1","attack_type2","attack_type3","attack_type4"], function(v) {
                 var update = {};
                 var isSecondEdition = getEdition(v.sheettype) === 2;
                 var value;
                 switch (v.rolltype_select) {
-                    case "Chance":
+                    case "chance":
                         if (isSecondEdition) {
                             value = "*0+1)d10cf<1}>10]]}} {{chance=1}}";
                         }
@@ -3950,22 +3819,23 @@
                             value = "*0+1)d10!cf<1}>10]]}} {{chance=1}}";
                         }
                         break;
-                    case "Normal":
+                    case "normal":
+                    default:
                         value = ")d10!cs>10}>8]]}}";
                         break;
-                    case "9-Again":
+                    case "9-again":
                         value = ")d10!>9cs>9}>8]]}} {{9again=1}}";
                         break;
-                    case "8-Again":
+                    case "8-again":
                         value = ")d10!>8cs>8}>8]]}} {{8again=1}}";
                         break;
-                    case "Don't Reroll 10s":
+                    case "dont-reroll":
                         value = ")d10cs>10}>8]]}}";
                         break;
-                    case "Rote":
+                    case "rote":
                         value = ")d10ro<7}>8]]}}";
                         break;
-                    case "Chance Rote":
+                    case "chance-rote":
                         if (isSecondEdition) {
                             value = "*0+1)d10ro<7cf<1}>10]]}} {{chance=1}}";
                         }
@@ -4028,11 +3898,19 @@
                 setAttrs(update, {silent: true});
             });
         }
-        
-        var resetRollFlags = function() { 
-            return allStats
+
+        var resetRollFlags = function() {
+            var flagValues = allStats
                 .map((attribute) => `${attribute}_flag`)
                 .reduce((attrs, flag) => ({ ...attrs, [flag]: "" }), {});
+            
+            return {
+                ["dice_pool_attributes"]: "",
+                ["dice_pool_html"]: "",
+                ["dice_pool"]: 0,
+                ["rolldisplay"]: "",
+                ...flagValues
+            };
         }
     </script>
     
