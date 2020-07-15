@@ -20,6 +20,7 @@
 					<option value="dfa" data-i18n="dfa"></option>
 					<option value="foc" data-i18n="foc"></option>
 					<option value="kaijuinc" data-i18n="kaijuinc"></option>
+					<option value="ngen" data-i18n="ngen"></option>
 					<option value="cats" data-i18n="cats"></option>
 					<option value="shotc" data-i18n="shotc"></option>
 					<option value="tachyon" data-i18n="tachyon-squadron"></option>
@@ -72,6 +73,7 @@
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Skills" value="1" checked><span class="checker" data-i18n="skills">Skills</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Stress" value="1" checked><span class="checker" data-i18n="stress">Stress</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Stunts" value="1" checked><span class="checker" data-i18n="stunts">Stunts</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-Skillswaps" value="1"><span class="checker" data-i18n="swap-skills">Swappable Skillsets</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-TempAspects" value="1" checked><span class="checker" data-i18n="situation-aspects">Situation Aspects</span> </span>
 		<span>
 			<select name="attr_theme" class="compact">
@@ -266,6 +268,44 @@
 				</div>
 			</div> <!-- End Roles -->
 
+			<!-- Swappable Skillsets -->
+			<input type="hidden" name="attr_lastswapped" value="">
+			<input type="checkbox" class="triggerbox" name="attr_Show-Skillswaps" value="1">
+			<div class="SkillCell">
+				<div class="SectionHeader">
+					<span><span data-i18n="swap-skills">Swappable Skillsets</span> <span name="attr_lastswapped"></span> <span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditSwaps" value="1" checked><span class="pencilbox"/></span>
+				</div>
+				<div class="SkillFrame">
+					<input type="checkbox" class="triggerbox" name="attr_EditSwaps" value="1" checked>
+					<div class="SkillEdit">
+						<div class="EditTitleBar">
+							<span><span data-i18n="edit">Edit</span> <span data-i18n="swap-skills">Swappable Skillsets</span></span>
+							<span><input type="checkbox" class="checkbox" name="attr_EditSwaps" value="1" checked><span class="pencilbox"/></span>
+						</div>
+						<fieldset class="repeating_swaps">
+							<div>
+								<div class="fieldlabel" data-i18n="label">Label</div>
+							</div>
+							<input type="text" name="attr_label" value="">
+							<div>
+								<div class="fieldlabel" data-i18n="skills">Skills</div>
+							</div>
+							<div data-i18n="swap-skills-instruct"></div>
+							<textarea name="attr_skills"></textarea>
+							<button type="action" name="act_importswap"><span data-i18n="grab-current-skills"></span></button>
+						</fieldset>
+					</div>
+					<div class="SkillDisplay">
+						<input type="hidden" value="list">
+						<div class="SkillList">
+							<fieldset class="repeating_swaps">
+								<button type="action" name="act_loadswap"><span data-i18n="load-skillset"></span>: <b><span name="attr_label"></span></b></button>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- / Swappable Skillsets -->
 
 			<!-- Skills -->
 
@@ -1696,6 +1736,7 @@
 // These skills, aspect labels, and stress labels are translation keys, but if no translation is found it'll default to the key-as-given for the name.
 
 var skillsets = {
+	ngen: [ "Athletics", "Contacts", "Deceive", "Empathy", "Fight", "Heart", "Humanity", "Investigate", "Kindness", "Notice", "Provoke", "Resources", "Shapeshift", "Stealth", "Strength", "Thieving", "Will", "Wisdom" ],
 	tachyon: [ "Athletics", "Discipline", "Empathy", "Fight", "Gunnery", "Investigate", "Notice", "Pilot", "Provoke", "Rapport", "Shoot", "Sneak", "Tactics", "Technology" ],
 	kaijuinc: [ "Ambition", "Combat", "Empathy", "Fitness", "Kaiju Studies", "Networking", "Operate", "Provoke", "Rapport", "Spin", "Technology", "Tradecraft" ], 
 	robo: [ "Athletics", "Burglary", "Combat", "Contacts", "Deceive", "Empathy", "Notice", "Physique", "Provoke", "Rapport", "Stealth", "Vehicles", "Will" ],
@@ -1724,6 +1765,31 @@ var gamesets = {
 		conditions: [],
 		skills: [],
 		settings: {}
+	},
+	ngen: {
+		addskills: "ngen",
+		addstress: "esc", 
+		stresskeys: ["physical","mental"], 
+		stresslength: 2,
+		addconsequence: "all",
+		addswaps: [ "Immaterial", "Animal", "Plant", "Human" ],
+		aspects: [ "High Concept", "Weakness", "Immaterial Form", "Plant Form", "Animal Form", "Human Form", "Bond", "Free Aspect" ],
+		settings: {
+			"SkillStyle": "pyramid",
+			"Show-Aspects": 1,
+			"Show-Conditions": 0,
+			"Show-Consequences": 1,
+			"Show-Corruption": 0,
+			"Show-FP": 1,
+			"Show-Notes": 1,
+			"Show-Powers": 0,
+			"Show-Refresh": 1,
+			"Show-Skills": 1,
+			"Show-Skillswaps": 1,
+			"Show-Stress": 1,
+			"Show-Stunts": 1,
+			"Show-TempAspects": 1
+		}
 	},
 	fcore: { 
 		addskills: "fcore",
@@ -2678,10 +2744,23 @@ var loadGameProcess  = function(set) {
 	if ( typeof set.aspects !== "undefined" ) {
 		addAspect(set);
 	}
+	if ( typeof set.addswaps !== "undefined" ) {
+		var attrs = {};
+		for ( var i = 0; i < set.addswaps.length; i++ ) {
+			var newid = generateActuallyUniqueRowID();
+			var lid = "repeating_swaps_" + newid + "_label";
+			var ltext = getTranslationByKey(set.addswaps[i]);
+			if ( ltext === false ) {
+				ltext = set.addswaps[i];
+ 			}
+			attrs[lid] = ltext;
+		}
+		setAttrs(attrs);
+	}
 };
 
-var loadSkills = function() {
-	log("ENTER loadSkills() called");
+var loadSkills = function(caller) {
+	log("ENTER loadSkills() called by " + caller);
 	getSectionIDs("skills", function(list) {
 		// log("ENTER loadSkills() getSectionIDs()");
 		var fieldlist = [];
@@ -2742,7 +2821,7 @@ var loadSkills = function() {
 					attrs[attrnamelist] = listform;
 				}
 				// log(attrs);
-				setAttrs(attrs);
+				setAttrs(attrs,{silent:true}); // We don't need to trigger any cascades here, this contains modifications of some fields in repeating_skills but we're already processing the whole thing in here
 				// log("EXIT loadSkills() getAttrs");
 
 				// As a coda to this, we go and make sure that stunts with incorporated skills are recorded properly.
@@ -2935,7 +3014,7 @@ var addSkills = function(values) {
 						log("NOT INSERTED: I believe that " + skillname + " is already in the skill list, so, nope.");
 					}
 				}
-				setAttrs(attrs,"silent",function() { log("addSkills callback to loadSkills"); loadSkills(); }); // doing loadSkills() as a callback so it'll happen after all the attrs are set
+				setAttrs(attrs,{silent:true},function() { log("addSkills callback to loadSkills"); loadSkills("addSkills"); }); // doing loadSkills() as a callback so it'll happen after all the attrs are set
 
 			}
 		);
@@ -3173,7 +3252,7 @@ var addConsequence = function(values) {
 
 on("sheet:opened", function() {
 	log("Event: Sheet Opened");
-	loadSkills();
+	loadSkills("sheet:opened");
 });
 
 on("change:addextra", function() {
@@ -3229,7 +3308,7 @@ on("change:repeating_roles remove:repeating_roles sheet:opened", function() {
 							}
 							log("Attrs ready to set:");
 							log(attrs);
-							setAttrs(attrs,"quiet",function() { loadSkills(); });
+							setAttrs(attrs,{silent:true},function() { loadSkills("change:repeating_roles remove:repeating_roles sheet:opened"); });
 						});
 					});
 				});
@@ -3305,7 +3384,7 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 							}
 							log("Attrs ready to set:");
 							log(attrs);
-							setAttrs(attrs,"quiet",function() { loadSkills(); });
+							setAttrs(attrs,{silent:true},function() { loadSkills("change:repeating_modes remove:repeating_modes sheet:opened"); });
 						});
 					});
 				});
@@ -3350,8 +3429,8 @@ on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() 
 	});
 });
 
-on("change:repeating_skills remove:repeating_skills change:skillstyle  change:repeating_stunts:skill change:repeating_extras:skill change:rolltally", function() {
-	loadSkills();
+on("change:repeating_skills:skill change:repeating_skills:rating change:repeating_skills:bonus remove:repeating_skills change:skillstyle change:repeating_stunts:skill change:repeating_extras:skill change:rolltally", function() {
+	loadSkills("change:repeating_skills:skill change:repeating_skills:rating change:repeating_skills:bonus remove:repeating_skills change:skillstyle change:repeating_stunts:skill change:repeating_extras:skill change:rolltally");
 });
 
 on("sheet:opened change:repeating_stunts remove:repeating_stunts", function() {
@@ -3462,7 +3541,7 @@ on("change:repeating_powers:sfxmenu", function(e) {
 				}
 				newtext = newtext + text + " ";
 				attrs[fxid] = newtext;
-				setAttrs(attrs,"silent"); // Silent because we don't need to trigger a second run through this same handler
+				setAttrs(attrs,{silent:true}); // Silent because we don't need to trigger a second run through this same handler
 			});
 		}
 	}
@@ -3515,6 +3594,93 @@ on("change:repeating_aspects:rollthis", function(e) {
 			setAttrs(attrs);
 		});
 	});
+});
+
+on("clicked:repeating_swaps:importswap", function(e) {
+	const rowprefix = (e.sourceAttribute).slice(0,-10); // Strips off the importswap
+	const skillsid = rowprefix + "skills";
+	getSectionIDs("skills", function(s) {
+		var fields = [];
+		for(var i=0; i < s.length; i++) {
+			fields[i*2] = "repeating_skills_" + s[i] + "_skill";
+			fields[i*2+1] = "repeating_skills_" + s[i] + "_rating";
+		}
+		getAttrs(fields, function(v) {
+			var attrs = {};
+			attrs[skillsid] = "";
+			for(var i=0; i < s.length; i++) {
+				const sid = "repeating_skills_" + s[i] + "_skill";
+				const rid = "repeating_skills_" + s[i] + "_rating";
+				if ( i > 0 ) {
+					attrs[skillsid] += ", ";
+				}
+				attrs[skillsid] += v[sid] + ":" + v[rid];
+			}
+			setAttrs(attrs);
+		});
+	});
+});
+
+on("change:repeating_swaps:skills", function(e) {
+	log("change:repeating_swaps:skills");
+	log(e);
+	const skillsid = e.sourceAttribute;
+	getAttrs([skillsid], function(s) {
+		var stext = s[skillsid];
+		stext = stext.replace(/\n/," ");
+		stext = stext.replace(/  */," ");
+		stext = stext.replace(/^  */,"");
+		stext = stext.replace(/  *$/,"");
+		var attrs = {};
+		attrs[skillsid] = stext;
+		setAttrs(attrs,{silent:true});
+	});
+})
+
+on("clicked:repeating_swaps:loadswap", function(e) {
+	const rowprefix = (e.sourceAttribute).slice(0,-8); // Strips off the loadswap
+	const skillsid = rowprefix + "skills";
+
+	getAttrs([skillsid], function(l) {
+
+		var list = l[skillsid].toString().split(/\s*,\s*/);
+
+		var rates = {};
+		for(var i = 0; i < list.length; i++) {
+			var parts = list[i].toString().split(/\s*:\s*/);
+			rates[parts[0]] = Number(parts[1]);
+		}
+		log(rates);
+
+		getSectionIDs("skills", function(s) {
+			const lid = rowprefix + "label";
+			var fields = [ lid ];
+			for(var i=0; i < s.length; i++) {
+				fields[1+i*2] = "repeating_skills_" + s[i] + "_skill";
+				fields[1+i*2+1] = "repeating_skills_" + s[i] + "_rating";
+			}
+			getAttrs(fields, function(v) {
+				var attrs = { "lastswapped": "(" + v[lid] + ")" };
+				for(var i=0; i < s.length; i++) {
+					const sid = "repeating_skills_" + s[i] + "_skill";
+					const rid = "repeating_skills_" + s[i] + "_rating";
+					const skill = v[sid];
+					const rating = Number(v[rid]);
+					if ( typeof rates[skill] !== "undefined") {
+						// Then we have a skill that matches one of the loadable's skills
+						if ( rating != rates[skill] ) {
+							attrs[rid] = rates[skill];
+							log("Changing "+skill+" rating to "+rates[skill]);
+						}
+					}
+				}
+				setAttrs(attrs,{silent:true},function() { loadSkills("clicked:repeating_swaps:loadswap") });
+			});
+		});
+
+	});
+
+
 });
 
 </script>
