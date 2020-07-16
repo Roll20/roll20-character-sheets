@@ -18,6 +18,7 @@
 ### Fixed
 
 - Fix incorrect or missing attack buttons for DAC sheet
+- Fix buttons not being draggable onto macro bar
 
 ## 1.5.1
 
