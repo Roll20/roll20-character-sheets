@@ -14,6 +14,7 @@
 - Update OSE Logo
 - Rename Critical Miss / Hit to Natural 1 / 20
 - Change default attributes to 10
+- Change encumbrance calculation to multiply quantity of items by their weight
 
 ### Fixed
 
