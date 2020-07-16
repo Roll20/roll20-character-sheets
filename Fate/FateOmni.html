@@ -2816,7 +2816,7 @@ var loadSkills = function(caller) {
 						value = Number(value) + bonus;
 						gridrow = "row" + value;
 						skillRatingByNameID[skillid] = value;
-						attrs["Skill"+skillNameByID[skillid]] = value; // Externalize the skill rating in an attribute that can be addressed by macros
+						attrs["Skill-"+skillNameByID[skillid]] = value; // Externalize the skill rating in an attribute that can be addressed by macros
 						skillRatingByName[skillNameByID[skillid]] = value;
 						var wordid = id + "-word";
 						attrs[wordid] = "";
@@ -3418,6 +3418,7 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 
 on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() {
 	getSectionIDs("aspects", function(list) {
+		log("Parsing aspect list");
 		var gets = [];
 		for( var i = 0; i < list.length; i++ ) {
 			gets[i*4] = "repeating_aspects_" + list[i] + "_aspect";
@@ -3427,7 +3428,10 @@ on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() 
 		}
 		getAttrs(gets, function(a) {
 			var atext = "";
+			var lcount = {};
+			var attrs = {}
 			for( var i = 0; i < list.length; i++ ) {
+				var lmod = "Unlabeled";
 				var aspect = a["repeating_aspects_" + list[i] + "_aspect"];
 				var label = a["repeating_aspects_" + list[i] + "_label"];
 				var flags = a["repeating_aspects_" + list[i] + "_flags"];
@@ -3441,13 +3445,26 @@ on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() 
 						atext = atext + " (" + flags + ")";
 					}
 					atext = atext + ":**\n";
+					lmod = label.replace(/\s+/g,"");
 				}
 				atext = atext + "***" + aspect + "***";
 				if ( typeof notes !== "undefined" && notes !== "" ) {
 					atext = atext + "\n"+ notes ;
 				}
+				if ( typeof lcount[lmod] === "undefined" ) {
+					lcount[lmod] = 0;
+				}
+				lcount[lmod]++;
+				var lkey = lmod + lcount[lmod];
+				if ( lcount[lmod] == 1 ) {
+					lkey = lmod;
+				}
+				lkey = "Aspect-" + lkey;
+				attrs[lkey] = aspect;
 			}
-			setAttrs({ "aspectlist": atext });
+			attrs["aspectlist"] = atext;
+			log("Done parsing aspect list"); log(attrs);
+			setAttrs(attrs);
 		});
 	});
 });
@@ -3459,11 +3476,191 @@ on("change:repeating_skills:skill change:repeating_skills:rating change:repeatin
 on("sheet:opened change:repeating_stunts remove:repeating_stunts", function() {
 	log("Event: Stunts change");
 	getSectionIDs("stunts", function(list) {
-		setAttrs({
-			stuntcount: list.length
+		log("parsing stunt list");
+		var attrs = { stuntcount: list.length };
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*2] = "repeating_stunts_" + list[i] + "_name";
+			slist[i*2+1] = "repeating_stunts_" + list[i] + "_desc";
+		}
+		getAttrs(slist,function(stunts) {
+			for ( var i = 0; i < list.length; i++ ) {
+				var stuntkey = "repeating_stunts_" + list[i] + "_name";
+				var desckey = "repeating_stunts_" + list[i] + "_desc";
+				var snum = i + 1;
+				var atstunt = "Stunt-Name-" + snum;
+				var atstuntd = "Stunt-Desc-" + snum;
+				var atstuntf = "Stunt-" + snum;
+				attrs[atstunt] = stunts[stuntkey];
+				attrs[atstuntd] = stunts[desckey];
+				attrs[atstuntf] = stunts[stuntkey] + ": " + stunts[desckey];
+			}			
+			setAttrs(attrs);
+			log("stunt list parsed"); log(attrs);
 		});
 	});
 });
+
+on("sheet:opened change:repeating_consequences remove:repeating_consequences", function() {
+	log("Event: Consequences change");
+	getSectionIDs("consequences", function(list) {
+		log("parsing consequence list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*4] = "repeating_consequences_" + list[i] + "_label";
+			slist[i*4+1] = "repeating_consequences_" + list[i] + "_track";
+			slist[i*4+2] = "repeating_consequences_" + list[i] + "_trackcheck";
+			slist[i*4+3] = "repeating_consequences_" + list[i] + "_aspect";
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var ckey = "repeating_consequences_" + list[i] + "_label";
+				var tkey = "repeating_consequences_" + list[i] + "_track";
+				var akey = "repeating_consequences_" + list[i] + "_aspect";
+				var tckey = "repeating_consequences_" + list[i] + "_trackcheck";
+				var checked = false;
+				if ( c[tckey] == "1" ) {
+					checked = true;
+				}
+				var aspect = c[akey];
+				var value = Number(c[tkey]);
+				var remaining = value;
+				if ( checked ) { remaining = 0; }
+				var label = c[ckey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Consequence-" + label;
+				attrs[label] = aspect;
+				attrs[label+"-Total"] = value;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Marked"] = checked;
+			}
+			setAttrs(attrs);
+			log("consequence list parsed"); log(attrs);
+		});
+	});
+});
+
+on("sheet:opened change:repeating_stress remove:repeating_stress", function() {
+	log("Event: Stress change");
+	getSectionIDs("stress", function(list) {
+		log("parsing stress list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*20] = "repeating_stress_" + list[i] + "_label";
+			slist[i*20+1] = "repeating_stress_" + list[i] + "_track";
+			for ( var j = 1; j < 10; j++ ) {
+				slist[i*20+j*2] = "repeating_stress_" + list[i] + "_track" + j;
+				slist[i*20+j*2+1] = "repeating_stress_" + list[i] + "_check" + j;
+			}
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var lkey = "repeating_stress_" + list[i] + "_label";
+				var tkey = "repeating_stress_" + list[i] + "_track";
+				var tally = 0; var remaining = 0;
+				for ( var j = 1; j <= Number(c[tkey]); j++ ) {
+					var vakey = "repeating_stress_" + list[i] + "_track" + j;
+					var chkey = "repeating_stress_" + list[i] + "_check" + j;
+					var value = Number(c[vakey]);
+					if ( isNaN(value) || value == 0 ) {
+						value = 1;
+					}
+					var count = 1;
+					if ( c[chkey] == "1" ) {
+						count = 0;
+					}
+					tally += value;
+					remaining += value*count;
+				}
+				var label = c[lkey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( label == "" ) { label = "Track"; }
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Stress-" + label;
+				attrs[label+"-Total"] = tally;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Used"] = tally - remaining;
+				attrs[label+"-Length"] = c[tkey];
+			}
+			setAttrs(attrs);
+			log("stress list parsed"); log(attrs);
+		});
+	});
+});
+
+on("sheet:opened change:repeating_conditions remove:repeating_conditions", function() {
+	log("Event: Condition change");
+	getSectionIDs("conditions", function(list) {
+		log("parsing conditions list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*20] = "repeating_conditions_" + list[i] + "_label";
+			slist[i*20+1] = "repeating_conditions_" + list[i] + "_track";
+			for ( var j = 1; j < 10; j++ ) {
+				slist[i*20+j*2] = "repeating_conditions_" + list[i] + "_track" + j;
+				slist[i*20+j*2+1] = "repeating_conditions_" + list[i] + "_check" + j;
+			}
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var lkey = "repeating_conditions_" + list[i] + "_label";
+				var tkey = "repeating_conditions_" + list[i] + "_track";
+				var tally = 0; var remaining = 0;
+				for ( var j = 1; j <= Number(c[tkey]); j++ ) {
+					var vakey = "repeating_conditions_" + list[i] + "_track" + j;
+					var chkey = "repeating_conditions_" + list[i] + "_check" + j;
+					var value = Number(c[vakey]);
+					if ( isNaN(value) || value == 0 ) {
+						value = 1;
+					}
+					var count = 1;
+					if ( c[chkey] == "1" ) {
+						count = 0;
+					}
+					tally += value;
+					remaining += value*count;
+				}
+				var label = c[lkey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( label == "" ) { label = "Track"; }
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Condition-" + label;
+				attrs[label+"-Total"] = tally;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Used"] = tally - remaining;
+				attrs[label+"-Length"] = c[tkey];
+			}
+			setAttrs(attrs);
+			log("conditions list parsed"); log(attrs);
+		});
+	});
+});
+
 
 on("change:addskills", function() {
 	log("Event: addskills change");
@@ -3650,8 +3847,8 @@ on("change:repeating_swaps:skills", function(e) {
 	const skillsid = e.sourceAttribute;
 	getAttrs([skillsid], function(s) {
 		var stext = s[skillsid];
-		stext = stext.replace(/\n/," ");
-		stext = stext.replace(/  */," ");
+		stext = stext.replace(/\n/g," ");
+		stext = stext.replace(/  */g," ");
 		stext = stext.replace(/^  */,"");
 		stext = stext.replace(/  *$/,"");
 		var attrs = {};
@@ -3663,18 +3860,13 @@ on("change:repeating_swaps:skills", function(e) {
 on("clicked:repeating_swaps:loadswap", function(e) {
 	const rowprefix = (e.sourceAttribute).slice(0,-8); // Strips off the loadswap
 	const skillsid = rowprefix + "skills";
-
 	getAttrs([skillsid], function(l) {
-
 		var list = l[skillsid].toString().split(/\s*,\s*/);
-
 		var rates = {};
 		for(var i = 0; i < list.length; i++) {
 			var parts = list[i].toString().split(/\s*:\s*/);
 			rates[parts[0]] = Number(parts[1]);
 		}
-		log(rates);
-
 		getSectionIDs("skills", function(s) {
 			const lid = rowprefix + "label";
 			var fields = [ lid ];
@@ -3700,10 +3892,7 @@ on("clicked:repeating_swaps:loadswap", function(e) {
 				setAttrs(attrs,{silent:true},function() { loadSkills("clicked:repeating_swaps:loadswap") });
 			});
 		});
-
 	});
-
-
 });
 
 </script>
