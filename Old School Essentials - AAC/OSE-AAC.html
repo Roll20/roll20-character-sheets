@@ -1293,6 +1293,12 @@
         });
       });
     });
+
+    // Set attack matrix values
+    getAttrs(["thac0", "monsterThac0"], function (values) {
+      setAttackMatrix(values.thac0);
+      setAttackMatrix(values.monsterThac0, 'monsterAttackMatrix');
+    })
   });
 
   on("sheet:opened change:situationalBonusEnabled", function (eventInfo) {
@@ -1535,20 +1541,20 @@
   on("change:monsterBAB", function () {
     getAttrs(["monsterBAB"], function (values) {
       setAttrs({ monsterThac0: 19 - values.monsterBAB });
-      setAttackMatrix(19 - values.monsterBAB);
+      setAttackMatrix(19 - values.monsterBAB, 'monsterAttackMatrix');
     });
   });
   // Calculate BAB from THAC0
   on("change:monsterThac0", function () {
     getAttrs(["monsterThac0"], function (values) {
       setAttrs({ monsterBAB: 19 - values.monsterThac0 });
-      setAttackMatrix(values.monsterThac0);
+      setAttackMatrix(values.monsterThac0, 'monsterAttackMatrix');
     });
   });
-  function setAttackMatrix(thac0) {
+  function setAttackMatrix(thac0, type = 'attackMatrix') {
     const matrix = {};
     for (let ac = 0; ac < 10; ac++) {
-      matrix[`monsterAttackMatrix${ac}`] = Math.min(thac0 - ac, 20);
+      matrix[`${type}${ac}`] = Math.min(thac0 - ac, 20);
     }
     setAttrs(matrix);
   }
