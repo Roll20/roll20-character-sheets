@@ -8,6 +8,7 @@
 
 - Add spells per level
 - Add memorized spell checkbox
+- Add attack value matrix to DAC sheet
 
 ### Changed
 
