@@ -21,6 +21,7 @@
 
 - Fix incorrect or missing attack buttons for DAC sheet
 - Fix buttons not being draggable onto macro bar
+- Fix a bug where the worn checkbox didn't reduce the amount of armor worn when unchecked
 
 ## 1.5.1
 
