@@ -315,6 +315,8 @@
 
               <input type="text" name="attr_af"
                      class="sheet-input-dotted-hth">
+              <input type="hidden" name="attr_af_base" id="af_base" value="">
+              <input type="hidden" name="attr_af_dmg" id="af_dmg" value="">
               <input type="hidden" name="attr_af_plus">
             </div>
 
@@ -334,9 +336,43 @@
               <input type="hidden" name="attr_ar_plus">
             </div>
 
+            <div class="sheet-hth-attack-panel">
+  
+              <div class="sheet-flexc sheet-grid-lbl-col">
+                <div class="sheet-lbl2g">Attacker's AL:</div>
+                <div class="sheet-lbl2g">Attack Order:</div>
+                <div class="sheet-lbl2g">Melee Number:</div>
+              </div>
+              <div class="sheet-flexc sheet-grid-input-col">
+                <input type="number" name="attr_atkr_al" value="1"
+                       class="sheet-input-dotted-sm-grd">
+                <input type="number" name="attr_atk_order" value="1"
+                       class="sheet-input-dotted-sm-grd">
+                <input type="number" name="attr_melee_num" value="1"
+                       class="sheet-input-dotted-sm-grd">
+              </div>
+              
+              
+            </div>
+            <span class="sheet-lbl">Volley Count:</span>
+            <div class="sheet-volley-cnt">
+              
+              <label for="sheet-vc1">1</label>
+              <input type="radio" name="volleycnt"
+                     checked id="sheet-vc1">
+              <label for="sheet-vc2">2</label>
+              <input type="radio" name="volleycnt" id="sheet-vc2">
+              <label for="sheet-vc3">3</label>
+              <input type="radio" name="volleycnt" id="sheet-vc3">
+              <label for="sheet-vc4">4</label>
+              <input type="radio" name="volleycnt" id="sheet-vc4">
+            </div>
+            
+            
           </div>
+          
 
-          <div class="sheet-flexc sheet-jcfs sheet-col-slaying">
+          <div class="sheet-flexc sheet-jcfs sheet-hth-col2">
             <div class="sheet-col-header">
               Weapon
             </div>
@@ -383,13 +419,21 @@
                        class="sheet-cb-slaying">
               </div>
             </div>
+            <div class="sheet-flexc sheet-jcc sheet-atk-btn-col">
+              <button type="roll" class="sheet-lbl-hth-btn"
+                      name="roll_hth_attack" title="Hand To Hand Attack"
+                      value="&{template:hth} {{name=@{character_name}}} {{af=@{af}}} {{afplus=@{af_plus}}} {{need=[[@{hth_need}]]}} {{val=[[d10]]}} {{dmg=[[@{af_dmg}]]}} {{whereto=[[d10]]}}"
+              >Attack</button>
+            </div>
+            
           </div>
 
 
         </div>  <!-- end blquad -->
 
         <div class="sheet-flexr sheet-jcsa sheet-stats-brquad">
-
+          
+          <!--  ****************** Missile to hit  *********     -->
           <div class="sheet-flexc sheet-jcfs sheet-col-mth">
             <div class="sheet-lbl3">Missile</div>
             <div class="sheet-lbl3">to Hit#'s</div>
@@ -402,7 +446,6 @@
             </div>
             
             <div class="sheet-flexr sheet-jcsb">
-<!--              <span class="sheet-info-col-lbl-mth">Short:</span>-->
               <button type="roll" class="sheet-lbl-mth-btn"
                       name="roll_mth_short" title="Missile to Hit at short range"
                       value="&{template:mth} {{name=@{character_name}}} {{weapon=@{mth_af_base}}} {{afplus=@{mth_af_plus}}} {{need=[[@{mth_short}]]}} {{val=[[d10]]}} {{dmg=[[@{mth_weapon_dmg}]]}} {{range=short}} {{whereto=[[d10]]}}"
@@ -440,6 +483,7 @@
 
           </div>
 
+          <!--  ****************** Saving rolls  *********     -->
           <div class="sheet-flexc sheet-jcfs sheet-col-saving">
             <div class="sheet-lbl3">Saving Roll vs:</div>
               <div class="sheet-flexr sheet-jcsb">
@@ -1369,6 +1413,97 @@
   </div>
 </rolltemplate>
 
+<!--============================================================-->
+<!--           Hand to Hand Attack                              -->
+
+<rolltemplate class="sheet-rolltemplate-hth">
+  {{#af}}
+  <div class="sheet-hth-container">
+    <div class="sheet-header">
+      <div><h3>{{name}}</h3></div>
+      attacks with {{af}}
+    </div>
+    <div class="sheet-results">
+      <div class="sheet-need-col">
+        <div class="sheet-need-header">Needs a</div>
+        <div class="sheet-needed">{{need}}</div>
+        <div class="sheet-need-footer">or higher</div>
+      </div>
+      <div class="sheet-roll-col">
+        <div class="sheet-roll-header">And got</div>
+        <div class="sheet-roll-val">{{val}}</div>
+        {{#^rollLess() val need}}
+        <div class="sheet-roll-success"></div>
+        {{/^rollLess() val need}}
+        {{#rollLess() val need}}
+        <div class="sheet-roll-fail"></div>
+        {{/rollLess() val need}}
+      </div>
+    </div>
+    {{#rollLess() val need}}
+    That would be a miss
+    {{/rollLess() val need}}
+    {{#^rollLess() val need}}
+    <div class="sheet-dmg-done">
+      That is a hit doing <span class="sheet-hth-dmg">{{dmg}}</span>
+      {{#afplus}}
+      <span class="sheet-plus">+1</span>
+      {{/afplus}}
+      {{#rollTotal() dmg 1}}
+      pt
+      {{/rollTotal() dmg 1}}
+      {{#^rollTotal() dmg 1}}
+      pts
+      {{/^rollTotal() dmg 1}}
+      of Damage to the
+      {{#rollTotal() whereto 1}}
+      <span class="sheet-hlbl">Head</span>
+      {{#rollWasCrit() dmg }}
+      <div class="sheet-maxdmg">Mortal</div>
+      {{/rollWasCrit() dmg }}
+      {{/rollTotal() whereto 1}}
+      {{#rollTotal() whereto 2}}
+      <span class="sheet-hlbl">Neck</span>
+      {{#rollWasCrit() dmg }}
+      <div class="sheet-maxdmg">Mortal</div>
+      {{/rollWasCrit() dmg }}
+      {{/rollTotal() whereto 2}}
+      {{#rollTotal() whereto 3}}
+      <span class="sheet-hlbl">Left Shoulder</span>
+      {{/rollTotal() whereto 3}}
+      {{#rollTotal() whereto 4}}
+      <span class="sheet-hlbl">Right Shoulder</span>
+      {{/rollTotal() whereto 4}}
+      {{#rollTotal() whereto 5}}
+      <span class="sheet-hlbl">Left Arm</span>
+      {{/rollTotal() whereto 5}}
+      {{#rollTotal() whereto 6}}
+      <span class="sheet-hlbl">Right Arm</span>
+      {{/rollTotal() whereto 6}}
+      {{#rollTotal() whereto 7}}
+      <span class="sheet-hlbl">Chest</span>
+      {{#rollWasCrit() dmg }}
+      <div class="sheet-maxdmg">Mortal</div>
+      {{/rollWasCrit() dmg }}
+      {{/rollTotal() whereto 7}}
+      {{#rollTotal() whereto 8}}
+      <span class="sheet-hlbl">Back</span>
+      {{#rollWasCrit() dmg }}
+      <div class="sheet-maxdmg">Mortal</div>
+      {{/rollWasCrit() dmg }}
+      {{/rollTotal() whereto 8}}
+      {{#rollTotal() whereto 9}}
+      <span class="sheet-hlbl">Left Leg</span>
+      {{/rollTotal() whereto 9}}
+      {{#rollTotal() whereto 10}}
+      <span class="sheet-hlbl">Right Leg</span>
+      {{/rollTotal() whereto 10}}
+    </div>
+    {{/^rollLess() val need}}
+  </div>
+  {{/af}}
+</rolltemplate>
+
 
 
 <script type="text/worker">
@@ -1389,81 +1524,68 @@
   };
   const run_str_bp = [3, 5, 8, 10, 12];
   
+  const all_attrs = [ 'character_name',
+    'char_str', 'char_int', 'char_dex',
+    'char_race', 'char_type',
+    'al', 'al_base', 'al_fighter', 'al_thief',
+    'al_magician', 'al_alchemist', 'al_priest',
+    'numattacks', 'af', 'af_plus', 'af_base', 'af_dmg',
+    'mth_af', 'mth_af_base', 'mth_af_plus',
+    'lp', 'lp_base', 'bs', 'bs_base',
+    'load_cat', 'full_load', 'run_idx', 'max_run',
+    'el', 'el_base', 'el_fighter', 'el_thief',
+    'el_magician', 'el_alchemist', 'el_priest',
+    'ep_fighter', 'ep_thief', 'ep_magician',
+    'ep_alchemist', 'ep_priest',
+    'dm', 'ip', 'di',
+    'swq1', 'swq2', 'swq3', 'swq4',
+    'pwq1', 'pwq2', 'pwq3', 'pwq4',
+    'bwq1', 'bwq2', 'bwq3', 'bwq4',
+    'lc_4lc', 'lc_dto', 'lc_moo', 'lc_lod',
+    'copper', 'silver', 'gold', 'mythril',
+    'mp', 'ing',
+    'hth_weapon_dmg', 'mth_weapon_dmg',
+    'mth_short', 'mth_medium', 'mth_long',
+  ]
+  
   const Character = {
-    char_str: 0,
-    char_int: 0,
-    char_dex: 0,
-    char_race: 'M',
-    char_type: 'fighter',
-    al: 1,
-    al_base: 1,
-    al_fighter: 1,
-    al_thief: 1,
-    al_magician: 1,
-    al_alchemist: 1,
-    al_priest: 1,
-    numattacks: 1,
-    af_plus: '',
-    af_base: '',
-    af: '',
-    mth_af: '',
-    mth_af_base: '',
-    mth_af_plus: '',
-    lp: '',
-    lp_base: 0,
-    bs: '',
-    bs_base: 0,
-    load_cat: 'no',
-    full_load: 0,
-    run_idx: 0,
-    max_run: 0,
-    el: 1,
-    el_base: 1,
-    el_fighter: 1,
-    el_thief: 1,
-    el_magician: 0,
-    el_alchemist: 0,
-    el_priest: 1,
-    ep_fighter: '',
-    ep_thief: '',
-    ep_magician: '',
-    ep_alchemist: '',
-    ep_priest: '',
-    bwq1: 0,
-    bwq2: 0,
-    bwq3: 0,
-    bwq4: 0,
-    swq1: 0,
-    swq2: 0,
-    swq3: 0,
-    swq4: 0,
-    pwq1: 0,
-    pwq2: 0,
-    pwq3: 0,
-    pwq4: 0,
-    lc_4lc: 0,
-    lc_dto: 0,
-    lc_moo: 0,
-    lc_lod: 0,
-    silver: 100,
-    hth_weapon_dmg: 'd8',
-    mth_weapon_dmg: 'd6'
+    char_str: 0, char_int: 0, char_dex: 0,
+    char_race: 'M', char_type: 'fighter',
+    al: 1, al_base: 1, al_fighter: 1, al_thief: 1,
+    al_magician: 1, al_alchemist: 1, al_priest: 1,
+    numattacks: 1,  af: '', af_plus: '', af_base: '', af_dmg: '',
+    mth_af: '', mth_af_base: '',  mth_af_plus: '',
+    lp: '', lp_base: 0, bs: '', bs_base: 0,
+    load_cat: 'no', full_load: 0, run_idx: 0, max_run: 0,
+    el: 1, el_base: 1, el_fighter: 1, el_thief: 1,
+    el_magician: 0, el_alchemist: 0, el_priest: 1,
+    ep_fighter: '',  ep_thief: '',
+    ep_magician: '', ep_alchemist: '', ep_priest: '',
+    dm: 0, ip: 0, di: 0,
+    swq1: 0, swq2: 0, swq3: 0, swq4: 0,
+    pwq1: 0, pwq2: 0, pwq3: 0, pwq4: 0,
+    bwq1: 0, bwq2: 0, bwq3: 0, bwq4: 0,
+    lc_4lc: 0, lc_dto: 0, lc_moo: 0, lc_lod: 0,
+    copper: 0, silver: 100, gold: 0, mythril: 0,
+    mp: 0, ing: 0,
+    hth_weapon_dmg: 'd8', mth_weapon_dmg: 'd6',
+    mth_short: '10', mth_medium: '--', mth_long: '--',
   }
   
   const num_attacks = [1, 1, 1, 2, 2, 3, 3];
   
   const hthWeaponDmgMap = {
-    GSw: 'd10', BAx: 'd10',
-    MSt: 'd9',
-    Sw: 'd8', Ax: 'd8',
-    SSw: 'd7', Sb: 'd7', Wh: 'd7', Mtk: 'd7', Sp: 'd7', Pk: 'd7',
-    Cl: 'd6', Hm: 'd6', To: 'd6', Kn: 'd6', Dg: 'd6', Ha: 'd6'
+    gsw: 'd10', bax: 'd10',
+    mst: 'd9',
+    sw: 'd8', ax: 'd8',
+    ssw: 'd7', sb: 'd7', wh: 'd7', mtk: 'd7', sp: 'd7', pk: 'd7',
+    cl: 'd6', hm: 'd6', to: 'd6', kn: 'd6', dg: 'd6', ha: 'd6'
   }
   
   const mthWeaponDmgMap = {
-    x: 'd5', Sl: 'd5',
-    TKn: 'd6', Bw: 'd6', LBw: 'd6',
-    Sp: 'd7', Pk: 'd7', XBw: 'd7'
+    x: 'd5', sl: 'd5',
+    tKn: 'd6', bw: 'd6', lbw: 'd6',
+    sp: 'd7', pk: 'd7', xbw: 'd7'
   }
   
   const al_class_map = {
@@ -1487,26 +1609,26 @@
   // missile to hit map array
   const mth_map = [
     ['10', '--', '--'],
-    ['9', '10', '--'],
-    ['8', '9', '10'],
-    ['7', '8', '9'],
-    ['5', '7', '8'],
-    ['4', '6', '7'],
-    ['3', '5', '6'],
-    ['2', '4', '5'],
-    ['1', '3', '4']
+    [ '9', '10', '--'],
+    [ '8',  '9', '10'],
+    [ '7',  '8',  '9'],
+    [ '5',  '7',  '8'],
+    [ '4',  '6',  '7'],
+    [ '3',  '5',  '6'],
+    [ '2',  '4',  '5'],
+    [ '1',  '3',  '4']
   ];
   
   const sv_bp = [1, 3, 5, 8, 10, 12, 15];
   const sv_map = [
     [10, 9, 9, 8, 8],
-    [9, 8, 8, 7, 7],
-    [8, 7, 7, 6, 6],
-    [7, 7, 6, 6, 5],
-    [7, 6, 6, 5, 4],
-    [6, 6, 5, 4, 3],
-    [6, 5, 4, 3, 2],
-    [5, 4, 3, 2, 1]
+    [ 9, 8, 8, 7, 7],
+    [ 8, 7, 7, 6, 6],
+    [ 7, 7, 6, 6, 5],
+    [ 7, 6, 6, 5, 4],
+    [ 6, 6, 5, 4, 3],
+    [ 6, 5, 4, 3, 2],
+    [ 5, 4, 3, 2, 1]
   ];
   
   const parseValues = function (values, stat, type = 'int') {
@@ -1579,7 +1701,7 @@
     return speeds[load.load_cat][load.run_idx];
   };
   
-  const getMTH = (dex) => {
+  const getMTHmap = (dex) => {
     idx = 0;
     for (let bp of mth_dex_bp) {
       if (dex > bp) idx++;
@@ -1667,57 +1789,61 @@
     return stat;
   };
   
-  const all_attrs = ['character_name', 'char_str', 'char_int', 'char_dex', 'char_race',
-    'char_type', 'lp_base', 'lp', 'bs_base', 'bs', 'al', 'al_base',
-    'copper', 'silver', 'gold', 'mythril', 'mp', 'ing', 'af', 'af_plus', 'el',
-    'df', 'df_plus', 'load_cat', 'el_fighter', 'el_thief', 'el_magician',
-    'el_alchemist', 'el_priest', 'al_fighter', 'al_thief', 'al_magician',
-    'al_alchemist', 'al_priest', 'ep_fighter', 'ep_thief', 'ep_magician',
-    'ep_alchemist', 'ep_priest', 'sv_spell', 'sv_thief', 'sv_poison', 'sv_exposure',
-    'poi_immune'];
+  const new_char = (_char) => {
+    for (key of Object.keys(Character)) {
+      _char[key] = Character[key];
+    }
+  }
+  
+  const cp_char = (name, _char) => {
+    let c = characters[name];
+    if(c === undefined) {
+      c = characters[name] = {};
+    }
+    for( key in Object.keys(_char)) {
+      c[key] = _char[key];
+    }
+  };
+  
+  const cp_values = (v, _char) => {
+    for (key of Object.keys(v)) {
+      _char[key] = v[key];
+    }
+  }
   
   on('sheet:opened', function () {
-    getAttrs(['character_name', 'char_str', 'char_int', 'char_dex', 'char_race',
-        'al_fighter'],
-      (v) => {
+    getAttrs(all_attrs, (v) => {
       console.log('sheet opened for:', v.character_name);
-      const _char = {};
+      let _char = {};
+      
       let _str = parseValues(v, 'char_str');
       let _int = parseValues(v, 'char_int');
       let _dex = parseValues(v, 'char_dex');
       
+
+      
       if (_str === 0 && _int === 0 && _dex === 0) {
         // if str, int, and dex are zero, assuming character is dead, so clear
         // or reset all fields
-        for (key of Object.keys(Character)) {
-          _char[key] = Character[key];
-        }
+        new_char(_char);
         
         // character now reset, roll new stats
         _str = _char.char_str = rollStat();
         _int = _char.char_int = rollStat();
         _dex = _char.char_dex = rollStat();
-        
         _char.lp_base = getBaseLP({
           char_str: _str, char_race: v.char_race
         });
         
         _char.bs_base = _str;
         
-        const load = getMaxLoad(_str);
-        load.load_cat = 'half'; // default to half load
-        _char.full_load = load.max;
-        _char.run_idx = load.run_idx;
-        _char.max_run = getMaxRunSpeed(load);
-        
-        mthmap = getMTH(_dex);
+        mthmap = getMTHmap(_dex);
         _char.mth_short = mthmap[0];
         _char.mth_short_base = mthmap[0];
         _char.mth_medium = mthmap[1];
         _char.mth_medium_base = mthmap[1];
         _char.mth_long = mthmap[2];
         _char.mth_long_base = mthmap[2];
-      
       
         const svs = getSaves(_str, _int, 1);
         _char.sv_spell = svs.spell;
@@ -1726,19 +1852,42 @@
         _char.sv_exposure = svs.exposure;
         
         _char.numattacks = num_attacks[parseInt(v.al_fighter) - 1];
+        
+        // new character setup done. now copy to back end copy
+        cp_char(v.character_name, _char);
+      } else {
+        // just open character card, and not a new chararacter
+        // so copy old values to back end copy of character
+        
+        // get list of charater names in back end copy of characters
+        const chars = Object.keys(characters);
+        let ci = chars.indexOf(v.character_name);
+        
+        // indexOf from above will return -1 if current characters
+        // name is not in the list. Proceed to copy current values
+        // to backend copy.
+        if(ci === -1) {
+          cp_values(v, _char);
+          characters[v.character_name] = _char;
+        } else {
+          // need to set characters name in current character data
+          _char = characters[v.character_name];
+        }
       }
   
-        setAttrs(_char, () => {
+      const load = getMaxLoad(_str);
+      load.load_cat = 'half'; // default to half load
+      _char.max_run = getMaxRunSpeed(load);
+      _char.full_load = load.max;
+      _char.run_idx = load.run_idx;
+  
+      // console.log('_char:', _char);
+      setAttrs(_char, () => {
         set_dex_bonus(v.char_dex);
         set_Thief_Functions();
       });
     });
   });
-  
-  const save_attr = (char_name, attr, val) => {
-    const char = characters[char_name];
-    char[attr] = val;
-  }
   
   on('change:load_cat', () => {
     getAttrs(['load_cat', 'char_str'], (v) => {
@@ -1788,7 +1937,7 @@
       // determine weapon bonuses
       const ench = parseInt(v.mth_af_plus) || 0;
       const armorments = v.armorments === 'on' ? 1 : 0;
-      const mthmap = getMTH(_dex);
+      const mthmap = getMTHmap(_dex);
       const elf_bonus = v.char_race === 'E' ? 1 : 0;
       const mth_adj = armorments + ench + elf_bonus;
       
@@ -1827,15 +1976,20 @@
       const armorments = v.armorments === 'on' ? 1 : 0;
       const elf_bonus = v.char_race === 'E' ? 1 : 0;
       const hit_adj = armorments + ench + elf_bonus;
-      const mthmap = getMTH(_dex);
+      const mthmap = getMTHmap(_dex);
+      let medium = mthmap[1];
+      if (medium !== '--') medium -= hit_adj;
+      let long = mthmap[2];
+      if (long !== '--') long -= hit_adj;
+      
       setAttrs({
         el_thief: el,
         mth_short_base: mthmap[0],
         mth_short: mthmap[0] - hit_adj,
         mth_medium_base: mthmap[1],
-        mth_medium: mthmap[1] - hit_adj ,
+        mth_medium: medium,
         mth_long_base: mthmap[2],
-        mth_long: mthmap[2] - hit_adj
+        mth_long: long
       });
       set_dex_bonus(parseInt(v.char_dex));
     });
@@ -1902,15 +2056,23 @@
   on('change:af', () => {
     getAttrs(['af'], (values) => {
       const af_update = {};
+      const hthList = Object.keys(hthWeaponDmgMap);
+      let keyIdx = null;
       let plus = values.af.match(/(^[+]\d|^[m])/);
       if (plus !== null) {
         plus = plus[0];
-        af_update.af_base = values.af.slice(plus.length);
+        af_update.af_base = values.af.slice(plus.length).toLowerCase();
         af_update.af_plus = plus.length === 1 ? 4 : parseInt(plus.charAt(1));
       } else {
-        af_update.af_base = values.af;
+        af_update.af_base = values.af.toLowerCase();
         af_update.af_plus = '';
       }
+      keyIdx = hthList.indexOf(af_update.af_base);
+      af_update.af_dmg = '';
+      if(keyIdx >= 0) {
+        af_update.af_dmg = hthWeaponDmgMap[af_update.af_base];
+      }
+      
       console.log('af_update:', af_update);
       setAttrs(af_update);
     });
@@ -1920,7 +2082,7 @@
     console.log('mth attack factor changed:');
     getAttrs(['mth_af', 'mth_short_base', 'mth_medium_base',
       'mth_long_base', 'char_race', 'armorments'], (v) => {
-      const af = v.mth_af;
+      const af = v.mth_af.toLowerCase();
       let short = parseInt(v.mth_short_base);
       let medium = parseInt(v.mth_medium_base) || '--';
       let long = parseInt(v.mth_long_base) || '--';
@@ -1960,6 +2122,41 @@
       af_update.mth_weapon_dmg = mthWeaponDmgMap[mth_af_base];
       console.log('--=>', short, medium, long, af_update);
       setAttrs(af_update);
+    });
+  });
+  
+  on('change:atkr_al change:atk_order change:melee_num change:al change:af_plus', () => {
+    getAttrs(['al', 'atkr_al', 'tactics', 'atk_order', 'melee_num', 'af_plus'],
+    (v) => {
+      let al = parseInt(v.al) || 1;
+      const atk_al = parseInt(v.atkr_al) || 1;
+      const af_ench = parseInt(v.af_plus) || 0;
+      
+      // tactics is only effective on first melee, so on first
+      //  melee add one to al
+      if(v.tactics === 'on' && parseInt(v.melee_num) === 1) {
+        al += 1;
+      }
+      
+      // order of attack, is this character 1st, 2nd, 3rd,
+      // 4th, 5th... attacker; get bonus if not first attacker.
+      let order = parseInt(v.atk_order);
+      if(order < 1) order = 1;
+      let order_bonus = [0, 1, 1, 2, 2, 3][order-1];
+      
+      let toHit = [7, 6, 6, 5, 5, 4, 4, 3];
+      let al_diff = al - atk_al;
+      if(atk_al > al) {
+        toHit = [7, 7, 8, 8, 9, 9, 10, 10];
+        al_diff = atk_al - al;
+      }
+      let hth_idx = al_diff;
+      if( hth_idx > 6) hth_idx = 6;
+      setAttrs({
+        hth_need: toHit[hth_idx] - af_ench - order_bonus
+      });
+      
+      
     });
   });
   
@@ -2008,7 +2205,7 @@
       attr[`el_${klass}`] = klass_el;
       
       if (klass === 'fighter') {
-        attr['numattacks'] = num_attacks[klass_el];
+        attr['numattacks'] = num_attacks[klass_el - 1];
       }
       
       setAttrs(attr);
@@ -2048,8 +2245,6 @@
       let al_add = 0;
       if (values.onhorse === 'on' || values.higherground === 'on')
         al_add = 1;
-      if (values.tactics === 'on')
-        al_add++;
       
       const new_al = Math.max(...als) + al_add;
       setAttrs({al: new_al});
@@ -2082,12 +2277,11 @@
   
   const set_Thief_Functions = () => {
     console.log('setting thief functions');
-    getAttrs(['char_race', 'el_thief'], (values) => {
-      race = values.char_race;
-      const idx = parseInt(values.el_thief) - 1;
+    getAttrs(['char_race', 'el_thief'], (v) => {
+      race = v.char_race;
+      const idx = parseInt(v.el_thief) - 1;
       
       const rb = thief_func_race_bonus[race];
-      
       setAttrs({
         cw: thief_functions.CW[idx],
         pl: thief_functions.PL[idx],
