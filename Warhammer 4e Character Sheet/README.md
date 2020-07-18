@@ -12,7 +12,8 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 July 13 2020 
 
 - Endurance test in Combat Action no longer rolls a Heal test
-- NPC pages 2/3/4 fixes
+- Impale mechanics tiedied up for Attack/Opposed/Shoot rools and made more obvious when it occurs.
+- NPC pages 2/3/4 fixes which were only applied on page 1 before
 
 
 July 13 2020 
