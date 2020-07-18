@@ -585,7 +585,7 @@
                             </div>
                             <div class="sheet-item" style="width:10%; float: right;">
                                 <button name="roll_meleehit" type="roll"
-                                    value="&{template:dh1ed} {{rollname=@{meleeweaponname} ^{tohit}}} [[floor((@{WS} ?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} ?{Attack Type | Standard (+0),+0 | Charge (+10),+10 | All out (+20),+20 | Lighting (-10),-10} + ?{Modifier|0}-[[1d100]])/10)]] {{diceroll=$[[0]]}} {{roll=$[[1]]}} {{target=[[@{WS} ?{Aim | } ?{Attack Type | } + ?{Modifier|0}]]}} {{aim=?{Aim | }}} {{attacktype=?{Attack Type | }}} {{modifier=?{Modifier|0}}}">
+                                    value="&{template:dh1ed} {{rollname=@{meleeweaponname} ^{tohit}}} [[floor((@{WS} ?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} ?{Attack Type | Standard (+0),+0 | Charge (+10),+10 | All out (+20),+20 | Lighting (-10),-10} + ?{Modifier|0}-[[1d100]])/10)]] {{weapondiceroll=$[[0]]}} {{roll=$[[1]]}} {{target=[[@{WS} ?{Aim | } ?{Attack Type | } + ?{Modifier|0}]]}} {{aim=?{Aim | }}} {{attacktype=?{Attack Type | }}} {{modifier=?{Modifier|0}}}">
                                     <label data-i18n="hit">Hit</label>
                                 </button>
                             </div>
@@ -756,7 +756,7 @@
                             </div>
                             <div class="sheet-item" style="width: 10%; float: right;">
                                 <button name="roll_rangedhit" type="roll"
-                                    value="&{template:dh1ed} {{rollname=@{rangedweaponname} ^{tohit}}} [[floor((@{BS} ?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} ?{Range | Point Blank (+30),+30 | Short (+10),+10 | Middle (+0),+0 | Long (-10),-10 | Extreme (-30),-30} ?{Rate of Fire/Attack Type | Standard (+0),+0 | Semi auto (+10),+10 | Full Auto (+20),+20 | Called Shot (-20),-20 | Suppressing Fire (-20),-20} + ?{Modifier|0}-[[1d100]])/10)]] {{diceroll=$[[0]]}} {{roll=$[[1]]}} {{target=[[@{BS} ?{Aim | } ?{Range | } ?{Rate of Fire/Attack Type | } + ?{Modifier|0}]]}} {{aim=?{Aim | }}} {{range=?{Range | }}} {{attacktype=?{Rate of Fire/Attack Type | }}} {{modifier=?{Modifier|0}}}">
+                                    value="&{template:dh1ed} {{rollname=@{rangedweaponname} ^{tohit}}} [[floor((@{BS} ?{Aim | Half aim (+10),+10| No aim (+0),+0 | Full aim (+20),+20} ?{Range | Point Blank (+30),+30 | Short (+10),+10 | Middle (+0),+0 | Long (-10),-10 | Extreme (-30),-30} ?{Rate of Fire/Attack Type | Standard (+0),+0 | Semi auto (+10),+10 | Full Auto (+20),+20 | Called Shot (-20),-20 | Suppressing Fire (-20),-20} + ?{Modifier|0}-[[1d100]])/10)]] {{weapondiceroll=$[[0]]}} {{roll=$[[1]]}} {{reliable=[[1d10]]}} {{target=[[@{BS} ?{Aim | } ?{Range | } ?{Rate of Fire/Attack Type | } + ?{Modifier|0}]]}} {{aim=?{Aim | }}} {{range=?{Range | }}} {{attacktype=?{Rate of Fire/Attack Type | }}} {{modifier=?{Modifier|0}}}">
                                     <label data-i18n="hit">Hit</label>
                                 </button>
                             </div>
@@ -1226,6 +1226,28 @@
             <td><span class="tcat" data-i18n="diceroll:">dice roll: </span>{{diceroll}}</td>
         </tr>
         {{/diceroll}}
+        {{#rollGreater() weapondiceroll 96}}
+        <tr class="sheet-failure">
+            <td><span class="tcat" data-i18n="diceroll:">dice roll: </span>{{weapondiceroll}}</td>
+        </tr>
+        {{/rollGreater() weapondiceroll 96}}
+        {{#rollGreater() weapondiceroll 96}}
+            {{#rollTotal() reliable 10}}
+            <tr class="sheet-failure">
+                <td><span class="tcat" data-i18n="reliable:">reliable: </span>{{reliable}}</td>
+            </tr>
+            {{/rollTotal() reliable 10}}
+            {{#rollLess() reliable 10}}
+            <tr>
+                <td><span class="tcat" data-i18n="reliable:">reliable: </span>{{reliable}}</td>
+            </tr>
+            {{/rollLess() reliable 10}}
+        {{/rollGreater() weapondiceroll 96}}
+        {{#rollLess() weapondiceroll 97}}
+        <tr>
+            <td><span class="tcat" data-i18n="diceroll:">dice roll: </span>{{weapondiceroll}}</td>
+        </tr>
+        {{/rollLess() weapondiceroll 97}}
         {{#rollGreater() roll 0}}
         <tr>
             <td><span class="tcat" data-i18n="success">Success</span> : <span data-i18n="with">With</span> {{roll}}
