@@ -87,12 +87,12 @@
                 <span class="tooltip">
                     <span class="tooltiptext" data-i18n="Armor Points Tooltip">Armor Points</span>
                     <label class="iconlabel"><span style="font-family:'Pictos Three'">b</span></label>
-                    <label style="width:46px;"><span data-i18n="Armor Points:">AP:</span></label></span><input type="number" name="attr_ap" value="0" />
+                    <label style="width:46px;"><span data-i18n="Armor Points:">AP:</span></label></span><input type="number" name="attr_ap" value="0" /><span class="labellike">&nbsp;/&nbsp;</span><input type="number" name="attr_ap_max"/>
                 <br />
                 <span class="tooltip">
                     <span class="tooltiptext" data-i18n="Shield Points Tooltip">Shield Points</span>
                     <img class="shieldicon" src="https://raw.githubusercontent.com/RandyKnapp/roll20-character-sheets/master/Zafir/shieldsymbol.png" />
-                    <label style="width:46px;"><span data-i18n="Shield Points:">SP:</span></label></span><input type="number" name="attr_sp" value="0" />
+                    <label style="width:46px;"><span data-i18n="Shield Points:">SP:</span></label></span><input type="number" name="attr_sp" value="0" /><span class="labellike">&nbsp;/&nbsp;</span><input type="number" name="attr_sp_max" />
                 <br />
                 <input type="hidden" class="hideifzero" name="attr_showfocus" value="1"/>
                 <div><span class="tooltip">
@@ -123,20 +123,14 @@
                 <label style="width:90px;"  data-i18n="Aim:">Aim:</label><label class="attrvalue"><span name="attr_aim"></span></label><br />
                 <label style="width:90px;"  data-i18n="Will:">Will:</label><label class="attrvalue"><span name="attr_will"></span></label>
             </div>
-            <div class="col status" style="width:140px;margin-right:15px;">
-                <label class="iconlabel"><span style="font-family:Pictos">k</span></label>
+            <div class="col status" style="width:120px;margin-right:15px;">
                 <label style="width:30px;"><span data-i18n="Hit Points:">HP:</span></label><input type="number" name="attr_hp" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_hp_max"></span><br/>
-                <input type="hidden" class="hideifzero" name="attr_showfocus" value="1"/>
-                <span>
-                    <img class="focusicon" src="https://raw.githubusercontent.com/RandyKnapp/roll20-character-sheets/master/Zafir/focussymbol.png" />
-                    <label style="width:30px;" data-i18n="Focus Points:">FP:</label><input type="number" name="attr_focus" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_focus_max"></span>
-                </span>
+                <label style="width:30px;"><span data-i18n="Armor Points:">AP</span></label><input type="number" name="attr_ap" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_ap_max"></span><br/>
+                <label style="width:30px;"><span data-i18n="Shield Points:">SP</span></label><input type="number" name="attr_sp" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_sp_max"></span><br/>
             </div>
+            <input type="hidden" class="hideifzero" name="attr_showfocus" value="1"/>
             <div class="col status" style="width:130px;">
-                <label class="iconlabel"><span style="font-family:'Pictos Three'">b</span></label>
-                <label style="width:30px;"><span data-i18n="Armor Points:">AP</span></label><input type="number" name="attr_ap" /><br/>
-                <img class="shieldicon" src="https://raw.githubusercontent.com/RandyKnapp/roll20-character-sheets/master/Zafir/shieldsymbol.png" />
-                <label style="width:30px;"><span data-i18n="Shield Points:">SP</span></label><input type="number" name="attr_sp" /><br/>
+                <label style="width:30px;" data-i18n="Focus Points:">FP:</label><input type="number" name="attr_focus" /><span class="labellike">&nbsp;/&nbsp;</span><span class="labellike" name="attr_focus_max"></span>
             </div>
         </div>
     </div>
@@ -3622,12 +3616,16 @@ on("clicked:initcombat", function() {
     ClearRepeatingSection("chargetracker");
     ReloadPrimaryWeapon(false);
 
+    let currentHp = parseInt(values.hp_max)||0;
+    let maxAp = parseInt(values.ap)||0;
+    let maxSp = parseInt(values.sp)||0;
+
     // Setup max AP
     getAttrs(["hp_max", "ap", "sp"], function(values) {
         setAttrs({
-            hp: parseInt(values.hp_max)||0,
-            ap_max: parseInt(values.ap)||"",
-            sp_max: parseInt(values.sp)||""
+            hp: currentHp,
+            ap_max: maxAp == 0 ? "" : maxAp,
+            sp_max: maxSp == 0 ? "" : maxSp
         });
     });
 
