@@ -4,8 +4,6 @@
 <!-- Hidden Inputs -->
 <input type="hidden" name="attr_BonusSTR" value="0" />
 <input type="hidden" name="attr_BonusDEX" value="0" />
-<input type="hidden" name="attr_ArmorTotal" value="0" />
-<input type="hidden" name="attr_ArmorWornTotal" value="0" />
 <input type="hidden" name="attr_ArmorWeightTotal" value="0" />
 <input type="hidden" name="attr_ItemWeightTotal" value="0" />
 <input type="hidden" name="attr_WeaponWeightTotal" value="0" />
@@ -497,7 +495,7 @@
             <input type="text" name="attr_armorValue" placeholder="12" />
             <input type="number" name="attr_armorWeight" placeholder="200" />
             <div class="checkbox">
-              <input type="checkbox" checked name="attr_armorWorn" />
+              <input type="checkbox" name="attr_armorWorn" />
             </div>
           </div>
         </fieldset>
@@ -1059,13 +1057,21 @@
       idArray.forEach(function(id) {
         const attributes = ["attackType", "weaponAttributeBonusDamage"]
           .map(name => `repeating_weapons_${id}_${name}`)
-          .push('BonusStr');
+          .concat(['BonusSTR', 'BonusDEX']) ;
         getAttrs(attributes, function(values) {
           if (!values[`repeating_weapons_${id}_attackType`]) {
             if (values.BonusSTR !== 0 && values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0) {
-              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Ranged" })
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Ranged",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: '0'
+              });
             } else {
-              setAttrs({ [`repeating_weapons_${id}_attackType`]: "Melee" })
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Melee",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR
+              });
             }
           }
         });
@@ -1220,31 +1226,29 @@
 
   // Armor Calculation
   on('sheet:opened change:dex change:repeating_armor remove:repeating_armor', function () {
-    repeatingSum(
-      "ArmorTotal",
-      "armor",
-      ["armorValue", "armorWorn"],
-      {
-        callback: function () {
-          repeatingSum(
-            "ArmorWornTotal",
-            "armor",
-            ["armorWorn"],
-            {
-              callback: function () {
-                getAttrs(["ArmorTotal", "ArmorWornTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
-                  const armorTotal = parseInt(values.ArmorTotal, 10);
-                  setAttrs({
-                    aacAc: (values.ArmorWornTotal > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
-                    dacAc: (values.ArmorWornTotal > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored
-                  });
-                });
-              }
-            }
-          )
-        }
-      }
-    );
+    getSectionIDs("repeating_armor", function(idArray) {
+      let armorWorn = 0;
+      let armorTotal = 0;
+
+      idArray.forEach(function(id) {
+        const attributes = ["armorValue", "armorWorn"]
+          .map(name => `repeating_armor_${id}_${name}`)
+          .concat(['BonusSTR', 'BonusDEX']);
+        getAttrs(attributes, function(values) {
+          if (values[`repeating_armor_${id}_armorWorn`]) {
+            armorWorn += 1;
+            armorTotal += parseFloat(values[`repeating_armor_${id}_armorValue`]);
+          }
+        });
+      });
+
+      getAttrs(["BonusDEX"], function(values) {
+        setAttrs({
+          aacAc: (armorWorn > 0) ? armorTotal + values.BonusDEX : values.aacAcUnarmored,
+          dacAc: (armorWorn > 0) ? armorTotal - values.BonusDEX : values.dacAcUnarmored,
+        })
+      })
+    });
   });
 
   // Recalculate encumbrance
@@ -1296,24 +1300,29 @@
     });
   });
 
-  // Set weaponAttributeBonus and weaponAttributeBonusDamage
-  on('change:repeating_weapons:attackType', function(event) {
-    const attackType = event.newValue;
-    getAttrs(["BonusSTR", "BonusDEX"], function(values) {
-      console.log(values)
-      if (attackType == "ranged") {
-        setAttrs({
-          repeating_weapons_weaponAttributeBonus: values.BonusDEX,
-          repeating_weapons_weaponAttributeBonusDamage: 0
-        })
-      } else {
-        setAttrs({
-          repeating_weapons_weaponAttributeBonus: values.BonusSTR,
-          repeating_weapons_weaponAttributeBonusDamage: values.BonusSTR
-        })
-      }
-    })
-  })
+  // Update weaponAttributeBonus and weaponAttributeBonusDamage when STR or DEX changes
+  on('change:repeating_weapons:attackType change:str change:dex', function() {
+    getSectionIDs("repeating_weapons", function(idArray) {
+      idArray.forEach(function(id) {
+        const attributes = ["attackType"]
+          .map(name => `repeating_weapons_${id}_${name}`)
+          .concat(['BonusSTR', 'BonusDEX']) ;
+        getAttrs(attributes, function(values) {
+          if (values[`repeating_weapons_${id}_attackType`] === 'ranged') {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: '0'
+            });
+          } else {
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR
+            });
+          }
+        });
+      });
+    });
+  });
 
   // Set saving throws, BAB, THAC0, HD, Next Level Experience
   on('change:level change:class change:monsterhitdice change:monsterhitdicemodifier', function() {
