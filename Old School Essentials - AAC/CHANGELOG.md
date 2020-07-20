@@ -7,7 +7,7 @@
 ### Added
 
 - Add spells per level
-- Add memorized spell checkbox
+- Add memorized spell number input
 - Add attack value matrix to DAC sheet
 - Add option for individual initiative which accounts for both arbitrary bonus/penalty and dex bonus on players and arbitrary bonus/penalty for monsters
 
