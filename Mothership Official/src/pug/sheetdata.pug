@@ -1,0 +1,631 @@
+- 
+
+    const headerfields = [{label: "name", attr: "character_name", type: "text"},{label: "level", attr: "level", type: "number"},{label: "rank / title", attr: "rank_title", type: "text"},{label: "XP", attr: "xp", type: "text"},{label: "class", attr: "class", type: "text"}];
+
+    const toprowfields = [{attr:"stress",subtext:"starts at 2",placeholder:"2"},{attr:"resolve",subtext:"starts at 0",placeholder:"0"}];
+
+    const stats = [
+            {
+                attr:"strength",
+                label:"How able-bodied you are. Lifting, pushing, hitting things hard, etc."
+            },
+            {
+                attr:"speed",
+                label:"How quickly you can act and react under pressure."
+            },
+            {
+                attr:"intellect",
+                label:"How knowledgeable and experienced you are."
+            },
+            {
+                attr:"combat",
+                label:"How good you are at fighting."
+            }
+        ]
+
+    const saves = [
+        {
+            name:"sanity",
+            subtext:"rationalization, logic",
+            desc:"Sanity is your ability to explain away logical inconsistencies in the universe, rationalize and make sense out of chaos, detect illusions and mimicry and think quickly under pressure."
+        },
+        {
+            name:"fear",
+            subtext:"surprise, loneliness",
+            desc:"Fear is how well you can cope with emotional trauma, and covers not only fear, but also loneliness, depression or any other emotional surge."
+        },
+        {
+            name:"body",
+            subtext:"hunger, disease, infection",
+            desc:"Body is your reflexes, and how well you can resist hunger, disease or any other organism that might attempt to invade your insides."
+        },
+        {
+            name:"armor",
+            subtext:"physical damage",
+            desc:"Armor is how resistant you ae to damage sustained during combat, whether that be through bullets, claws, teeth, etc."
+        }
+    ];
+
+    const skills = {
+        trained: [
+            {
+                name: "linguistics",
+                desc: "Study of language"
+            },
+            {
+                name: "biology",
+                desc: "Study of life"
+            },
+            {
+                name: "first aid",
+                desc: "Emergency medical care and treatment"
+            },
+            {
+                name: "hydroponics",
+                desc: "Growing plants in nutrient solutions without soil (farming in space)"
+            },
+            {
+                name: "geology",
+                desc: "The solid features of any terrestrial planet or natural satellite"
+            },
+            {
+                name: "zero-g",
+                desc: "Working in a vaccuum, vaccsuits, etc."
+            },
+            {
+                name: "scavenging",
+                desc: "Searching discarded wastes for useful items"
+            },
+            {
+                name: "heavy machinery",
+                desc: "Operation and use of large pieces of equipment (cranes, exosuits, forkliftsm etc.)"
+            },
+            {
+                name: "computers",
+                desc: "Fluent use of computers and networks"
+            },
+            {
+                name: "mechanical repair",
+                desc: "Fixing broken machines"
+            },
+            {
+                name: "driving",
+                desc: "Operation and control of motor vehicles"
+            },
+            {
+                name: "piloting",
+                desc: "Operation and control of air and spacecraft"
+            },
+            {
+                name: "mathematics",
+                desc: "The science of numbers, quantity, and space"
+            },
+            {
+                name: "art",
+                desc: "The expression or application of a species' creative ability and imagination"
+            },
+            {
+                name: "archaeology",
+                desc: "Ancient cultures and their artifacts"
+            },
+            {
+                name: "theology",
+                desc: "Study of religion"
+            },
+            {
+                name: "military training",
+                desc: "Standard basic training given to all military personnel"
+            },
+            {
+                name: "rimwise",
+                desc: "Outer rim colonies and seedy parts of the galaxy"
+            },
+            {
+                name: "athletics",
+                desc: "Physical sports and games"
+            },
+            {
+                name: "chemistry",
+                desc: "The identification of the substances of which matter is composed"
+            },
+        ],
+        expert: [
+            {
+                name: "psychology",
+                prereq: ["biology"],
+                desc: "The study of behavior and the human mind"
+            },
+            {
+                name: "genetics",
+                prereq: ["biology"],
+                desc: "Heredity and the variation of the inherited characteristics"
+            },
+            {
+                name: "pathology",
+                prereq: ["first aid"],
+                desc: "Study of the cause and effect of disease"
+            },
+            {
+                name: "botany",
+                prereq: ["hydroponics"],
+                desc: "The study of plant life"
+            },
+            {
+                name: "planetology",
+                prereq: ["geology"],
+                desc: "Study of planets and other celestial body"
+            },
+            {
+                name: "asteroid mining",
+                prereq: ["geology","zero-g","heavy machinery","scavenging"],
+                desc: "Training in the tools and procedures used in mining asteroids"
+            },
+            {
+                name: "jury rigging",
+                prereq: ["scavenging","mechanical repair"],
+                desc: "Makeshift repairs"
+            },
+            {
+                name: "engineering",
+                prereq: ["heavy machinery","computers","mechanical repair"],
+                desc: "Design, building, and use of engines, machines, and structures"
+            },
+            {
+                name: "hacking",
+                prereq: ["computers"],
+                desc: "Unauthorized access to computer systems"
+            },
+            {
+                name: "vehicle specialization",
+                prereq: ["mechanical repair","piloting","driving"],
+                desc: "Specific vehicle class"
+            },
+            {
+                name: "astrogation",
+                prereq: ["piloting"],
+                desc: "Navigation in outer space"
+            },
+            {
+                name: "physics",
+                prereq: ["mathematics"],
+                desc: "Study of nature and properties of matter and energy"
+            },
+            {
+                name: "mysticism",
+                prereq: ["art","archaeology","theology"],
+                desc: "Spiritual apprehension of hidden knowledge"
+            },
+            {
+                name: "tactics",
+                prereq: ["military training"],
+                desc: "Manuevering military forces in battle"
+            },
+            {
+                name: "gunnery",
+                prereq: ["military training"],
+                desc: "Starship weaponry"
+            },
+            {
+                name: "firearms",
+                prereq: ["military training","rimwise"],
+                desc: "Guns and their use"
+            },
+            {
+                name: "close-quarters combat",
+                prereq: ["athletics","military training","rimwise"],
+                desc: "Hand-tohand, melee fighting"
+            },
+            {
+                name: "explosives",
+                prereq: ["military training","chemistry"],
+                desc: "Bombs and incendiary devices"
+            },
+        ],
+        master: [ 
+            {
+                name: "sophontology",
+                prereq: ["linguistics", "psychology"],
+                desc: "Alien psychology"
+            },  
+            {
+                name: "xenobiology",
+                prereq: ["genetics","botany","pathology"],
+                desc: "Alien biology"
+            },   
+            {
+                name: "surgery",
+                prereq: ["pathology"],
+                desc: "Medical speciality involving manual operation"
+            },  
+            {
+                name: "cybernetics",
+                prereq: ["jury rigging","engineering"],
+                desc: "Interface between man and machine"
+            },
+            {
+                name: "robotics",
+                prereq: ["engineering"],
+                desc: "Design and operation of robots, drones, and androids"
+            },
+            {
+                name: "artificial intelligence",
+                prereq: ["engineering","hacking"],
+                desc: "Knowledge of simulacrum of human consciousness"
+            },
+            {
+                name: "command",
+                prereq: ["vehicle specialization","tactics"],
+                desc: "Leadership and authority"
+            },   
+            {
+                name: "hyperspace",
+                prereq: ["astrogation","mysticism","physics"],
+                desc: "FTL travel"
+            },  
+            {
+                name: "xenoesotericism",
+                prereq: ["mysticism"],
+                desc: "Obscure alien mysticism, religion, and belief"
+            },   
+            {
+                name: "weapon specialization",
+                prereq: ["gunnery","firearms","close-quarters combat","explosives"],
+                desc: "Proficiency with a specific weapon"
+            },            
+        ]
+    };
+    
+    const shipfields = [
+        {
+            label: "ship name", 
+            attr: "character_name", 
+            type: "text"
+        },
+        {
+            label: "type", 
+            attr: "type", 
+            type: "text"
+        },
+        {
+            label: "class", 
+            attr: "ship_class", 
+            type: "text"
+            }
+    ];
+    
+    const shipminmaxfields = [
+
+    ]
+
+    const shipstats = [
+            {
+                attr:"armor",
+                label:"The value the ship must roll under to avoid taking Damage. Generally the captain or acting captain of the ship rolls the Armor Save."
+            },
+            {
+                attr:"combat",
+                label:"Used during Combat Checks. You can use whichever is higher: your own Combat Stat or the ship's."
+            },
+            {
+                attr:"intellect",
+                label:"Used as both a stat and a Sanity Save, should the need arise."
+            },
+            {
+                attr:"speed",
+                label:"Often used to see if the ship can dodge asteroids or escape explosions from collapsing stars."
+            }
+        ]
+
+    const primary_modules = {
+        life_support: {
+            fields: [
+                {
+                    name: "human passengers",
+                    attr: "ship_passengers",
+                    after: "/10"
+                },
+                {
+                    name: "life support",
+                    attr: "ship_lifesupport_modules",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        command: {
+            fields: [
+                {
+                    name: "officers",
+                    attr: "ship_officers",
+                    after: "/4"
+                },
+                {
+                    name: "command modules",
+                    attr: "ship_command_modules",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        armor: {
+            fields: [
+                {
+                    name: "armor",
+                    attr: "ship_armor_modules",
+                    after: "x10"
+                },
+                {
+                    name: "armor save",
+                    attr: "armor",
+                    display: true
+                },
+            ]
+        }
+    };
+
+    const secondary_modules = {
+        jump_drives: {
+            fields: [
+                {
+                    name: "jump drives",
+                    attr: "ship_jumpdrive_modules",
+                    after: "..."
+                },
+            ]
+        },
+        computer: {
+            fields: [
+                {
+                    name: "computer modules",
+                    attr: "ship_computer_modules",
+                    after: "equals"
+                },
+            ]
+        },
+        galley: {
+            fields: [
+                {
+                    name: "galleys",
+                    attr: "ship_galleys",
+                    after: "equals"
+                },
+            ]            
+        },
+        weapon_mount: {
+            fields: [
+                {
+                    name: "weapons",
+                    attr: "ship_weapons",
+                    after: "arrow"
+                },
+                {
+                    name: "weapon mounts",
+                    attr: "ship_weapon_mounts",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        medical_bay: {
+            fields: [
+                {
+                    name: "medbays",
+                    attr: "ship_medbays",
+                    after: "x5"
+                },
+                {
+                    name: "medical intellect bonus",
+                    attr: "ship_medint_bonus",
+                    display: true
+                },
+            ]
+        },
+        cryochamber: {
+            fields: [
+                {
+                    name: "cryo-sleep pods",
+                    attr: "ship_cryopods",
+                    after: "/4"
+                },
+                {
+                    name: "cryo-chambers",
+                    attr: "ship_cryochambers",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        living_quarters: {
+            fields: [
+                {
+                    name: "officers",
+                    attr: "ship_officers",
+                    after: "arrow",
+                    display: true
+                },
+                {
+                    name: "living quarters",
+                    attr: "ship_livingquarters",
+                    after: "equals"
+                },
+            ]
+        },
+        barracks: {
+            fields: [
+                {
+                    name: "crew",
+                    attr: "ship_crew",
+                    after: "/12"
+                },
+                {
+                    name: "barracks",
+                    attr: "ship_barracks",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        cargo_hold: {
+            fields: [
+                {
+                    name: "cargo",
+                    attr: "ship_cargo",
+                    after: "/10"
+                },
+                {
+                    name: "cargo holds",
+                    attr: "ship_cargoholds",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        science_lab: {
+            fields: [
+                {
+                    name: "science labs",
+                    attr: "ship_sciencelabs",
+                    after: "x5"
+                },
+                {
+                    name: "research intellect bonus",
+                    attr: "ship_resint_bonus",
+                    display: true
+                },
+            ]
+        }
+    }
+
+    const required_modules = {
+        thrusters: {
+            fields: [
+                {
+                    name: "hull req.",
+                    attr: "ship_thruster_hullreq",
+                    display: true,
+                    after: "+"
+                },
+                {
+                    name: "thrusters",
+                    attr: "ship_thrusters",
+                    after: "equals"
+                },
+            ]
+        },
+        engine: {
+            fields: [
+                {
+                    name: "hull req.",
+                    attr: "ship_engine_hullreq",
+                    display: true,
+                    after: "+"
+                },
+                {
+                    name: "thruster req.",
+                    attr: "ship_engine_thrusterreq",
+                    display: true,
+                    after: "+"
+                },
+                {
+                    name: "jump drives",
+                    attr: "ship_jumpdrive_modules",
+                    display: true,
+                    after: "="
+                },
+                {
+                    name: "engine",
+                    attr: "ship_engine",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+        fuel: {
+            fields: [
+                {
+                    name: "min. fuel",
+                    attr: "ship_fuel_min",
+                    display: true,
+                    after: "+"
+                },
+                {
+                    name: "extra fuel",
+                    attr: "ship_fuel_extra",
+                    after: "equals"
+                },
+            ]
+        },
+        frame: {
+            fields: [
+                {
+                    name: "frame",
+                    attr: "ship_frame",
+                    display: true,
+                    after: "equals"
+                },
+            ]
+        },
+    }
+
+    const shipsecondaries = [
+        {
+            name:"life support",
+            attr:"ship_lifesupport_modules",
+            placeholder:"2"
+        },
+        {
+            name:"command modules",
+            attr:"ship_command_modules",
+            placeholder:"2"
+        },
+        {
+            name:"jump drives",
+            attr:"ship_jumpdrive_modules",
+            placeholder:"2"
+        },
+        {
+            name:"computer modules",
+            attr:"ship_computer_modules",
+            placeholder:"2"
+        },
+        {
+            name:"galleys",
+            attr:"ship_galleys",
+            placeholder:"2"
+        },
+        {
+            name:"weapon mounts",
+            attr:"ship_weapon_mounts",
+            placeholder:"2"
+        },
+        {
+            name:"medbays",
+            attr:"ship_medbays",
+            placeholder:"2"
+        },
+        {
+            name:"cryo-chambers",
+            attr:"ship_cryochambers",
+            placeholder:"2"
+        },
+        {
+            name:"living quarters",
+            attr:"ship_livingquarters",
+            placeholder:"2"
+        },
+        {
+            name:"barracks",
+            attr:"ship_barracks",
+            placeholder:"2"
+        },
+        {
+            name:"cargo holds",
+            attr:"ship_cargoholds",
+            placeholder:"2"
+        },
+        {
+            name:"science labs",
+            attr:"ship_sciencelabs",
+            placeholder:"2"
+        },
+    ];
