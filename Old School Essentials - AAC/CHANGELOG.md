@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.1
+
+### Fixed
+
+- Fix a bug where the roll templates were showing nothing
+
 ## 1.6.0
 
 ### Added
