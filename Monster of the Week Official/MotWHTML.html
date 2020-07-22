@@ -1,18 +1,18 @@
 <script type="text/worker">
 	on("change:skinname", function() {
-	    console.log("SkinName change event detected.");
-	    console.log("Set SkinCheck = SkinName if not already equal.")
-	    getAttrs(["SkinName","SkinCheck"], function(values) {
-	        if (values.SkinCheck !== values.SkinName) {
-	        console.log("Values are not equal. Changing SkinCheck.");
-	            setAttrs({ SkinCheck: values.SkinName });
-	        };
-	    });
-	    console.log("SkinName change event ends.");
+		console.log("SkinName change event detected.");
+		console.log("Set SkinCheck = SkinName if not already equal.")
+		getAttrs(["SkinName","SkinCheck"], function(values) {
+			if (values.SkinCheck !== values.SkinName) {
+			console.log("Values are not equal. Changing SkinCheck.");
+				setAttrs({ SkinCheck: values.SkinName });
+			};
+		});
+		console.log("SkinName change event ends.");
 	});
 
 	on("change:startingstats", function() {
-	    console.log("StartingStats changed");
+		console.log("StartingStats changed");
 			getAttrs(["StartingStats"], function(values) {
 				if ( values.StartingStats !== "" ) {
 					var stats = values.StartingStats.split(" ");
@@ -27,6 +27,41 @@
 					});
 				}
 			});
+	});
+
+	on("sheet:opened change:harm1 change:harm2 change:harm3 change:harm4 change:harm5 change:harm6 change:harm7 change:moves-constructed1 change:constructed-harm1 change:constructed-harm2 change:constructed-harm3 change:imp-dying change:extra-harm1 change:advimp-dying change:extra-harm2", function() {
+		const alist = [ "Harm1", "Harm2", "Harm3", "Harm4", "Harm5", "Harm6", "Harm7", "Moves-Constructed1", "Constructed-Harm1", "Constructed-Harm2", "Constructed-Harm3", "Imp-Dying", "Extra-Harm1", "AdvImp-Dying", "Extra-Harm2" ];
+		getAttrs(alist,function(a) {
+
+			// Values are "0" if not checked, "on" if checked. First we must adapt for this, as we want them numeric, 0 or 1.
+			for(var i = 0; i < alist.length; i++) {
+				var val = a[alist[i]];
+				if ( val == "on" || val == "1" || val == "true" || val === true ) {
+					val = 1;
+				} else {
+					val = 0;
+				}
+				a[alist[i]] = val;
+			}
+
+			var atts = {};
+			var capacity = 7;
+			var constructed = false; if ( a["Moves-Constructed1"] == 1 ) { constructed = true; capacity += 3; }
+			var dying = false; if ( a["Imp-Dying"] == 1 ) { dying = true; capacity += 1; }
+			var advdying = false; if ( a["AdvImp-Dying"] == 1 ) { advdying = true; capacity += 1; }
+			var taken = a["Harm1"] + a["Harm2"] + a["Harm3"] + a["Harm4"] + a["Harm5"] + a["Harm6"] + a["Harm7"];
+			if ( constructed ) { taken += a["Constructed-Harm1"] + a["Constructed-Harm2"] + a["Constructed-Harm3"]; }
+			if ( dying ) { taken += a["Extra-Harm1"]; }
+			if ( advdying ) { taken += a["Extra-Harm2"]; }
+			var remaining = capacity - taken;
+
+			atts["Harm-TotalCapacity"] = capacity;
+			atts["Harm-Remaining"] = remaining;
+			atts["Harm-Taken"] = taken;
+
+			setAttrs(atts);
+
+		});
 	});
 </script>
 
@@ -148,7 +183,7 @@
 			</div>
 			<input type="hidden" name="attr_SkinCheck" class="sheet-SkinCheck" value="0">
 			<div class="sheet-col sheet-NoKeep">
-				<span class="sheet-Label" data-i18n="character-gender">Gender</span> <br/><input type="text" name="attr_Gender" />
+				<span class="sheet-Label" data-i18n="character-gender">Pronouns</span> <br/><input type="text" name="attr_Gender" />
 			</div>
 			<div class="sheet-col">
 			<span class="sheet-Label" data-i18n="playbook">Playbook</span>
@@ -180,6 +215,7 @@
 					<optgroup label="Reinforcements" data-i18n-label="reinforcements">
 						<option class="sheet-SkinSelect" value="17" data-i18n="the-exile">The Exile</option>
 						<option class="sheet-SkinSelect" value="18" data-i18n="the-hardcase">The Hard Case</option>
+						<option class="sheet-SkinSelect" value="26" data-i18n="the-hardcase2020">The Hard Case (2020)</option>
 						<option class="sheet-SkinSelect" value="19" data-i18n="the-luchador">The Luchador</option>
 						<option class="sheet-SkinSelect" value="20" data-i18n="the-meddlingkid">The Meddling Kid</option>
 						<option class="sheet-SkinSelect" value="21" data-i18n="the-sidekick">The Sidekick</option>
@@ -310,6 +346,9 @@
 		</div>
 		<div class="sheet-move">
 				<input type="radio" name="attr_SkinName" value="18"> <b><span data-i18n="the-hardcase">The Hard Case</span>:</b> <span data-i18n="hardcase-desc">The toughest, hardest to kill fighter. E.g. Ray Lilly from the Twenty Palaces series or Owen Pitt from the Monster Hunter International series.</span>
+		</div>
+		<div class="sheet-move">
+				<input type="radio" name="attr_SkinName" value="26"> <b><span data-i18n="the-hardcase2020">The Hard Case (2020)</span>:</b> <span data-i18n="hardcase2020-desc">The new Hard Case playbook, significantly different from the original.</span>
 		</div>
 		<div class="sheet-move">
 				<input type="radio" name="attr_SkinName" value="19"> <b><span data-i18n="the-luchador">The Luchador</span>:</b> <span data-i18n="luchador-desc">A heroic masked wrestler, fighting to protect the innocent between matches.</span>
@@ -2762,13 +2801,23 @@
 						<select class="sheet-StartingStats" name="attr_StartingStats">
 							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
 							<option value="-1 2 1 2 0" data-i18n="starting-stats-choices" data-i18n-vars="-1|+2|+1|+2|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="0 1 2 0 1" data-i18n="starting-stats-choices" data-i18n-vars="=0|+1|+2|=0|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="-1 2 2 1 0" data-i18n="starting-stats-choices" data-i18n-vars="-1|+2|+2|+1|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="1 0 1 3 -1" data-i18n="starting-stats-choices" data-i18n-vars="+1|=0|+1|+3|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="-1 1 1 1 2" data-i18n="starting-stats-choices" data-i18n-vars="-1|+1|+1|+1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="2 1 1 1 -1" data-i18n="starting-stats-choices" data-i18n-vars="+2|+1|+1|+1|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="-1 2 0 1 2" data-i18n="starting-stats-choices" data-i18n-vars="-1|+2|=0|+1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="2 -1 -1 1 2" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|-1|+1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 						</select>
 					</div>
 					<div class="sheet-Hardcase">
+						<select class="sheet-StartingStats" name="attr_StartingStats">
+							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
+							<option value="-1 1 1 2 0" data-i18n="starting-stats-choices" data-i18n-vars="-1|+1|+1|+2|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="1 1 0 2 -1" data-i18n="starting-stats-choices" data-i18n-vars="+1|+1|=0|+2|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="0 2 -1 2 -1" data-i18n="starting-stats-choices" data-i18n-vars="=0|+2|-1|+2|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="1 0 1 2 -1" data-i18n="starting-stats-choices" data-i18n-vars="+1|=0|+1|+2|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="-1 1 0 2 1" data-i18n="starting-stats-choices" data-i18n-vars="-1|+1|=0|+2|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+						</select>
+					</div>
+					<div class="sheet-Hardcase2020">
 						<select class="sheet-StartingStats" name="attr_StartingStats">
 							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
 							<option value="-1 1 1 2 0" data-i18n="starting-stats-choices" data-i18n-vars="-1|+1|+1|+2|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
@@ -2791,7 +2840,7 @@
 					<div class="sheet-Meddlingkid">
 						<select class="sheet-StartingStats" name="attr_StartingStats">
 							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
-							<option value="2 -1 1 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|+1|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="2 0 2 -1 -1" data-i18n="starting-stats-choices" data-i18n-vars="+2|=0|+2|-1|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 0 1 1 -1" data-i18n="starting-stats-choices" data-i18n-vars="+2|=0|+1|+1|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 -1 0 -1 2" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|=0|-1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 1 0 1 -1" data-i18n="starting-stats-choices" data-i18n-vars="+2|+1|=0|+1|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
@@ -2801,17 +2850,18 @@
 					<div class="sheet-Sidekick">
 						<select class="sheet-StartingStats" name="attr_StartingStats">
 							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
-							<option value="2 -1 1 -1 0" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|+1|-1|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="1 1 0 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="+1|+1|=0|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="1 1 1 -1 0" data-i18n="starting-stats-choices" data-i18n-vars="+1|+1|+1|-1|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="1 -1 2 -1 -1" data-i18n="starting-stats-choices" data-i18n-vars="+1|-1|+2|-1|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="0 -1 1 -1 2" data-i18n="starting-stats-choices" data-i18n-vars="=0|-1|+1|-1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
-							<option value="1 -1 1 -1 2" data-i18n="starting-stats-choices" data-i18n-vars="+1|-1|+1|-1|+2">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="1 0 1 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="+1|=0|+1|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="0 1 1 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="=0|+1|+1|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="1 0 1 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="+1|=0|+1|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 						</select>
+						<div data-i18n="sidekick-reminder"></div>
 					</div>
 					<div class="sheet-Snoop">
 						<select class="sheet-StartingStats" name="attr_StartingStats">
 							<option value="" checked data-i1n data-i18n="choose-starting-stats">Choose a set</option>
-							<option value="2 0 1 0 0" data-i18n="starting-stats-choices" data-i18n-vars="+2|=0|+1|=0|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
+							<option value="2 -1 1 0 1" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|+1|=0|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 0 1 -1 1" data-i18n="starting-stats-choices" data-i18n-vars="+2|=0|+1|-1|+1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 1 1 0 -1" data-i18n="starting-stats-choices" data-i18n-vars="+2|+1|+1|=0|-1">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
 							<option value="2 -1 2 -1 0" data-i18n="starting-stats-choices" data-i18n-vars="+2|-1|+2|-1|=0">Charm{{0}}, Cool{{1}}, Sharp{{2}}, Tough{{3}}, Weird{{4}}</option>
@@ -2907,13 +2957,16 @@
 				</div>
 				<div class="sheet-col">
 					<div class="sheet-Harm">
-						<div class="sheet-Subsection"><span data-i18n="harm">Harm</span></div>
+						<div class="sheet-Subsection">
+							<span data-i18n="harm">Harm</span>
+							(<span name="attr_Harm-Remaining"></span>/<span name="attr_Harm-TotalCapacity"></span>)
+						</div>
 						<div class="sheet-nowrap" align=center> <b class="sheet-statelabel"><span data-i18n="okay">Okay</span></b>
 
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm1"><span class="sheet-altbox"></span>
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm2"><span class="sheet-altbox"></span>
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm3"><span class="sheet-altbox"></span>
-							<b>&#124;</b>
+							<input type="checkbox" class="sheet-inverted-triggerbox" name="attr_Moves-Constructed1"><span class="sheet-triggertext"><b>&#124;</b></span>
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm4"><span class="sheet-altbox"></span>
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm5"><span class="sheet-altbox"></span>
 							<input type="checkbox" class="sheet-checkbox" name="attr_Harm6"><span class="sheet-altbox"></span>
@@ -2941,13 +2994,23 @@
 							<b class="sheet-statelabel"><span data-i18n="unstable">Unstable</span></b></span>
 
 						</div>
+
 						<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Unstable-Instructions" value="1" checked><span class="sheet-anglebox"></span> 
 						<span class="sheet-ExpHeader"><span data-i18n="instructions">Instructions</span></span>
 						<div class="sheet-Expander">
-							<p>
+
+							<input type="checkbox" class="sheet-inverted-triggerbox" name="attr_Moves-Constructed1">
+							<span class="sheet-triggertext">
 								<span data-i18n="harm-instructions">When you reach 4 or more, mark unstable. Unstable injuries worsen as time passes.</span>
-							</p>
+							</span>
+
+							<input type="checkbox" class="sheet-triggerbox" name="attr_Moves-Constructed1">
+							<span class="sheet-triggertext">
+								<span data-i18n="constructed-unstable"></span>
+							</span>
+
 						</div>
+
 					</div>
 				</div>
 				<div class="sheet-col">
@@ -3015,6 +3078,7 @@
 									<div class="sheet-Searcher"><span data-i18n="luck-special-searcher" class="sheet-highlights"></span></div>
 									<div class="sheet-Exile"><span data-i18n="luck-special-exile" class="sheet-highlights"></span></div>
 									<div class="sheet-Hardcase"><span data-i18n="luck-special-hardcase" class="sheet-highlights"></span></div>
+									<div class="sheet-Hardcase2020"><span data-i18n="luck-special-hardcase2020" class="sheet-highlights"></span></div>
 									<div class="sheet-Luchador"><span data-i18n="luck-special-luchador" class="sheet-highlights"></span></div>
 									<div class="sheet-Meddlingkid"><span data-i18n="luck-special-meddlingkid" class="sheet-highlights"></span></div>
 									<div class="sheet-Sidekick"><span data-i18n="luck-special-sidekick" class="sheet-highlights"></span></div>
@@ -3025,7 +3089,7 @@
 									<div class="sheet-Spooktacular"><span data-i18n="luck-special-spooktacular" class="sheet-highlights"></span></div>
 									<div class="sheet-Constructed"><span data-i18n="luck-special-constructed" class="sheet-highlights"></span></div>
 									<div class="sheet-Custom"><span data-i18n="luck-special-custom" class="sheet-highlights">You may come up with a Luck Special move for this playbook with help from the Keeper.</span></div>
-									<div class="sheet-Luchador sheet-Sidekick sheet-Traveler sheet-Custom">
+									<div class="sheet-Luchador sheet-Traveler sheet-Custom">
 										<textarea name="attr_Luck-Special" rows="4" cols="40" placeholder="(Optional) Write your own Luck Special Move"></textarea>
 									</div>
 							</div>
@@ -3855,13 +3919,13 @@
 									<span data-i18n="exile-origin-desc1">You were taken from your home in the past, and dropped into the modern world with only what you were carrying.</span>
 								</div>
 								<div>
-									<textarea name="attr_Origin-Exile-Descrip" rows="5" cols="40" placeholder="Describe where and when you are from"></textarea>
+									<textarea name="attr_Origin-Exile-Descrip" rows="2" cols="40" placeholder="Describe where and when you are from"></textarea>
 								</div>
 								<div>
-									<span data-i18n="exile-origin-desc2">Your nemesis came to the modern world as well, and is aware that you followed them. They will try and kill you if you don't kill them first. Decide who or what they are (with the Keeper's agreement).</span>
+									<span data-i18n="exile-origin-desc2">Your nemesis came to the modern world and is aware you followed it. It will kill you if you don’t kill it first. Decide what it is with the Keeper. Name it, if you know.</span>
 								</div>
 								<div>
-									<textarea name="attr_Origin-Exile-Nemesis" rows="3" cols="40" placeholder="Describe your Nemesis"></textarea>
+									<textarea name="attr_Origin-Exile-Nemesis" rows="2" cols="40" placeholder="Describe your Nemesis"></textarea>
 								</div>
 								<div><b><span data-i18n="exile-origin-desc3">How did you get transported to the modern day?</span></b> <i>(<span data-i18n="pick-one">pick one</span>)</i>:</div>
 								<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Exile-Origin-Unused" value="1" checked><span class="sheet-anglebox"></span>
@@ -4118,6 +4182,62 @@
 							</div>
 						</div>
 
+						<div class="sheet-Hardcase2020">
+							<div class="sheet-Subsection"><span data-i18n="hardknocks">Hard Knocks</span></div>
+							<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Hardknocks-All" value="1" checked><span class="sheet-anglebox"></span>
+							<span class="sheet-ExpHeader"><span data-i18n="all">All</span></span>
+							<div class="sheet-Expander">
+								<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Hardknocks-Unused" value="1" checked><span class="sheet-anglebox"></span>
+								<span class="sheet-ExpHeader"><span data-i18n="unused">Unused</span></span>
+								<div data-i18n="hardknocks-desc"></div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks1" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks1"><b>Bodyguard</b>: When you spend 1 Fire to <i>protect someone</i>, as well as +1 forward, you may protect them even if they are out of reach or the harm they are about to suffer would be unstoppable. Get an ally group of old colleagues: good at protecting people. Get the “concealed armour” gear pick.</span>
+										<button class="sheet-2d6-button" type="roll" value="&{template:motw-dieroll} {{CharName=@{character_name}}} {{title=Protect Someone}} {{Roll=[[2d6+?{Protect Someone with|Tough (Default),@{Tough}|Charm,@{Charm}|Cool,@{Cool}|Sharp,@{Sharp}|Tough,@{Tough}|Weird,@{Weird}}+?{+/- forward?|1}]]}}" name="roll_hk1"></button>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks1}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks2" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks2"><b>Enforcer</b>: Spend 1 Fire to look so scary that it counts as a reason for <i>manipulating someone</i>. After you roll, if you terrify them, spend Fire 1-for-1 to increase your result. Gain an ally who can help with money, disguises, back you up, or get underworld gossip. Get the “bag of cash” gear pick.</span>
+										<button class="sheet-2d6-button" type="roll" value="&{template:motw-dieroll} {{CharName=@{character_name}}} {{title=Manipulate Someone}} {{Roll=[[2d6+?{Manipulate Someone with|Charm (Default),@{Charm}|Charm,@{Charm}|Cool,@{Cool}|Sharp,@{Sharp}|Tough,@{Tough}|Weird,@{Weird}}+?{+/- forward?|0}]]}}" name="roll_hk2"></button>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks2}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks3" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks3"><b>Secret Martial Art</b>: Spend Fire 1-for-1 to increase harm inflicted by your unarmed attacks. Your unarmed attacks gain `ignore-armour`. Get an ally, a mentor or student: good in a fight or philosophical discussion. Get the “ancient sword” gear pick.</span>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks3}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks4" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks4"><b>Military</b>: When you’re using military gear on a move, you may spend 2 Fire to boost the result level (a miss becomes a 7-9, 7-9 becomes 10+, or 10+ becomes 12+). You have an ally group, your old comrades: good in a fight or when you need help making preparations. Get the “battered assault rifle” gear pick.</span>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks4}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks5" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks5"><b>Resistance</b>: What was your cause? You have contacts amongst sympathetic activists. If you need help and it fits the cause, call on them. Roll +Charm. On a 10+ they will help. On a 7-9 they’ll help you but then you have to help them. On a miss, they help but you get drawn into their trouble. You may spend 2-Fire instead of rolling; you rouse them and they’ll help as if you rolled 10+. Gain an ally, an old comrade from the movement. Get the “spell formula” gear pick.</span>
+										<button class="sheet-2d6-button" type="roll" value="&{template:motw-dieroll} {{CharName=@{character_name}}} {{title=Resistance}} {{Roll=[[2d6+?{Resistance with|Charm (Default),@{Charm}|Charm,@{Charm}|Cool,@{Cool}|Sharp,@{Sharp}|Tough,@{Tough}|Weird,@{Weird}}+?{+/- forward?|0}]]}}" name="roll_hk5"></button>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks5}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+								<div class="sheet-move">
+									<input type="checkbox" class="sheet-checkbox" name="attr_hardknocks6" value="1"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardknocks6"><b>Street Fighter</b>: When you have an ally standing by your side, spend 1-Fire to add +2 harm when you inflict harm. If there are multiple allies at your side, you may spend Fire for each. Gain an ally, an old friend you can count on for anything. Get the “firewater” gear pick.</span>
+										<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardknocks6}}" data-i18n-title="send_details_to_chat"></button> 
+									</span>
+								</div>
+							</div>
+						</div>
+
 						<div class="sheet-Custom sheet-Special-Custom">
 							<div class="sheet-Subsection"><span data-i18n="custom-special">Playbook Special</span></div>
 							<i>(<span data-i18n="custom-special-example">Like the Expert's haven or the Spellslinger's combat magic</span>)</i>
@@ -4148,8 +4268,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!-- COME BACK FOR EXPERT'S HAVEN since it's used by others -->
 
 						<input type="checkbox" class="sheet-triggerbox sheet-HavenRevealer" name="attr_Imp-Haven">
 						<div class="sheet-Expert sheet-Haven">
@@ -4215,8 +4333,6 @@
 								</span></div>
 							</div>
 						</div> 
-
-						<!-- COME BACK FOR INITIATE'S SECT since it's used by Summoned too (I think) -->
 
 						<input type="checkbox" class="sheet-triggerbox sheet-SectRevealer" name="attr_Imp-Sect">
 						<div class="sheet-Initiate sheet-Sect">
@@ -4353,6 +4469,16 @@
 							</div> <!-- ally expander  -->
 						</div> <!-- Ally -->
 
+						<div class="sheet-Summoned">
+							<div class="sheet-Subsection"><span data-i18n="hobby"></span></div>
+							<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Hobby" value="1" checked><span class="sheet-anglebox"></span>
+							<span class="sheet-ExpHeader"></span>
+							<div class="sheet-Expander">
+								<div data-i18n="summoned-hobby"></div>
+								<input type="text" name="attr_Hobby" value="">
+							</div>
+						</div>
+
 						<!-- History -->
 
 						<div class="sheet-History">
@@ -4385,6 +4511,7 @@
 										<div class="sheet-Searcher"><span data-i18n="searcher-hx" class="sheet-highlights"></span></div>
 										<div class="sheet-Exile"><span data-i18n="exile-hx" class="sheet-highlights"></span></div>
 										<div class="sheet-Hardcase"><span data-i18n="hardcase-hx" class="sheet-highlights"></span></div>
+										<div class="sheet-Hardcase2020"><span data-i18n="hardcase2020-hx" class="sheet-highlights"></span></div>
 										<div class="sheet-Luchador"><span data-i18n="luchador-hx" class="sheet-highlights"></span></div>
 										<div class="sheet-Meddlingkid"><span data-i18n="meddlingkid-hx" class="sheet-highlights"></span></div>
 										<div class="sheet-Sidekick"><span data-i18n="sidekick-hx" class="sheet-highlights"></span></div>
@@ -4403,6 +4530,35 @@
 					<div class="sheet-col"> <!-- mid column -->
 
 						<input type="hidden" name="attr_SkinCheck" class="sheet-SkinCheck" value="0"> 
+
+						<div class="sheet-isolator">
+							<input type="checkbox" class="sheet-triggerbox" name="attr_hardcase2020-move1" value="1">
+							<div class="sheet-triggerframe">
+								<div class="sheet-nowrap">
+									<div class="sheet-Subsection"><span data-i18n="fire"></span></div>
+									<p class="sheet-space-above" align=center>
+										<b class="sheet-statelabel"><span data-i18n="calm">Calm</span></b>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire1"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire2"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire3"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire4"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire5"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire6"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire7"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire8"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire9"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire10"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-triggerbox" name="attr_AdvImp-Fire">
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire11"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-triggerbox" name="attr_AdvImp-Fire">
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire12"><span class="sheet-altbox"></span>
+										<input type="checkbox" class="sheet-triggerbox" name="attr_AdvImp-Fire">
+										<input type="checkbox" class="sheet-checkbox" name="attr_fire13"><span class="sheet-altbox"></span>
+										<b class="sheet-statelabel"><span data-i18n="raging">Raging</span></b>
+									</p>
+								</div>
+							</div>
+						</div>
 
 						<div class="sheet-Playbook-Moves">
 
@@ -5131,6 +5287,82 @@
 									</div>
 								</div>  <!-- .sheet-Gumshoe .sheet-OPB -->
 
+								<!-- Hard Case 2020 Moves -->
+
+								<div class="sheet-OPBHead sheet-MinorHead sheet-space-above" data-i18n="the-hardcase2020">The Hard Case (2020)</div>
+
+								<div class="sheet-Hardcase2020">
+									<i><span data-i18n="1-fixed-move">You get this</span></i>:
+								</div>
+
+								<div class="sheet-Hardcase2020 sheet-OPB">
+									<input type="checkbox" class="sheet-triggerbox sheet-ExpToggle" name="attr_Toggle-MovesUnused" value="1" checked>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move1" value="1"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move1"><b>Furnace</b>: You have a Fire track with 10 boxes. Mark 1 Fire per harm you suffer, every time someone openly defies you, and every time a friend is hurt. You may spend 1 Fire to add +1-harm whenever you inflict harm, or take +1 to a <i>kick some ass</i> or <i>protect someone</i> move. Fire is cleared between mysteries.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move1}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+								</div> <!-- .sheet-Hardcase2020 .sheet-OPB -->
+
+								<div class="sheet-Hardcase2020">
+									<i><span data-i18n="2-moves-then">Then pick two of these</span></i>:
+								</div>
+
+								<div class="sheet-Hardcase2020 sheet-OPB">
+									<input type="checkbox" class="sheet-triggerbox sheet-ExpToggle" name="attr_Toggle-MovesUnused" value="1" checked>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move2"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move2"><b>Unstoppable</b>: You may spend 3 Fire to avoid or heal 2-harm. This also stabilizes you, if appropriate.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move2}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move3"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move3"><b>Ascetic</b>: Spend 1 Fire to ignore all pain and discomfort in your current situation, even beyond normal human tolerances.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move3}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move4"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move4"><b>Always Angry</b>: Start mysteries with 2 Fire marked.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move4}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move5"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move5"><b>FINISH HIM!</b>: When you have Fire remaining and strike a foe for 3-harm or more, tell the Keeper how much Fire you have and ask if that’s enough. If the foe has that much or less harm capacity left, the Keeper will tell you. You may spend all your Fire immediately to make a follow up attack, defeating your foe.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move5}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move6"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move6"><b>Inspired Guesswork</b>: When you <i>investigate a mystery</i>, you may spend 1 Fire to add 1 extra hold. The extra question must be about powers, motivations, or weaknesses.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move6}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move7"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move7"><b>Stone Cold</b>: You never really get ruffled by danger. Gain +1 whenever pain or fear requires you <i>act under pressure</i>. Your nearby allies also gain this bonus against pain and fear, as long as you keep it together.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move7}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-move8"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-move8"><b>Weapon Master</b>: When you take possession of a new weapon you may add, remove, or change one tag. This change only applies for you. When you get this move, apply it to all your current weapons.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=hardcase2020-move8}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+								</div> <!-- .sheet-Hardcase2020 .sheet-OPB -->
+
 								<!-- The Hard Case Moves -->
 
 								<div class="sheet-OPBHead sheet-MinorHead sheet-space-above" data-i18n="the-hardcase">The Hard Case</div>
@@ -5527,7 +5759,7 @@
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Moves-Meddlingkid2"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
-											<span data-i18n="meddlingkid-move2"><b>Power Snack</b>: Pick a favourite snack food. Whenever you take a moment to eat some and enjoy it, take +1 forward.</span>
+											<span data-i18n="meddlingkid-move2"><b>Power Snack</b>: When you take the time to eat your chosen snacks and really enjoy them, take +1 forward. My power snack is:</span>
 											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move2}} {{extra=@{Snack-Meddlingkid}}}" data-i18n-title="send_details_to_chat"></button>
 											<input type="text" name="attr_Snack-Meddlingkid">
 										</span>
@@ -5538,18 +5770,15 @@
 											<span data-i18n="meddlingkid-move3"><b>Wallop!</b>: When you use an improvised weapon to attack something, you may choose one of these extra effects</span>:
 											<ul>
 												<li>
-													<span data-i18n="meddlingkid-move3.1">Inflict 1 harm.</span>
-												</li>
-												<li>
 													<span data-i18n="meddlingkid-move3.2">Momentarily stun them with a blow to the head.</span>
 												</li>
 												<li>
 													<span data-i18n="meddlingkid-move3.3">Trip or entangle them.</span>
 												</li>
 												<li>
-													<span data-i18n="meddlingkid-move3.4">Inflict 2 harm but the improvised weapon breaks.</span>
+													<span data-i18n="meddlingkid-move3.1">Inflict +1 harm but the improvised weapon breaks.</span>
 													<button class="sheet-2d6-button" type="roll" value="&{template:motw-dieroll} {{CharName=@{character_name}}} {{title=Wallop!}} {{Roll=[[2d6+?{Wallop! with|Tough (Default),@{Tough}|Charm,@{Charm}|Cool,@{Cool}|Sharp,@{Sharp}|Tough,@{Tough}|Weird,@{Weird}}+?{+/- forward?|0}]]}}" name="roll_ksb"></button>
-													<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move3}} {{key1=meddlingkid-move3.1}} {{key2=meddlingkid-move3.2}} {{key3=meddlingkid-move3.3}} {{key4=meddlingkid-move3.4}}" data-i18n-title="send_details_to_chat"></button>
+													<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move3}} {{key1=meddlingkid-move3.1}} {{key2=meddlingkid-move3.2}} {{key3=meddlingkid-move3.3}}" data-i18n-title="send_details_to_chat"></button>
 												</li>
 											</ul>
 										</span>
@@ -5609,6 +5838,20 @@
 											<span data-i18n="meddlingkid-move7"><b>A Pleasant and Friendly Manner</b>: When you politely <i>manipulate someone</i>, your impeccable manners always count as a reason for the person to do what you say.</span>
 											<button class="sheet-2d6-button" type="roll" value="&{template:motw-dieroll} {{CharName=@{character_name}}} {{title=Manipulate Someone}} {{Roll=[[2d6+?{Manipulate Someone with|Charm (Default),@{Charm}|Charm,@{Charm}|Cool,@{Cool}|Sharp,@{Sharp}|Tough,@{Tough}|Weird,@{Weird}}+?{+/- forward?|0}]]}}" name="roll_ms"></button>
 											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move7}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Moves-Meddlingkid8"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-move8"><b>Best Bud!</b>: You have an animal ally to help you solve mysteries. They can talk, but with a heavy accent (most people don’t understand).</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move8}}" data-i18n-title="send_details_to_chat"></button>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Moves-Meddlingkid9"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-move9">b>Hard Head!</b>: Any time you suffer harm from an attack, you may choose to take 0-harm. You instead are knocked out for a few minutes.</span>
+											<button class="sheet-broadcast-button" type="roll" name="roll_Show" value="&{template:motw-moveshare} {{CharName=@{character_name}}} {{movekey=meddlingkid-move9}}" data-i18n-title="send_details_to_chat"></button>
 										</span>
 									</div>
 								</div> <!-- .sheet-Meddlingkid .sheet-OPB -->
@@ -7536,6 +7779,11 @@
 										<span data-i18n="spooktacular-gear9">Truck.</span>
 										</span>
 									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_spooktacular-gear9b"><span class="sheet-mainbox"></span><span class="sheet-grayable">
+										<span data-i18n="spooktacular-gear9b">Motorcycle &amp; Sidecar.</span>
+										</span>
+									</div>
 									<div class="space-above"><b><span data-i18n="spooktacular-mysticalitems">Mystical Items</span></b> (<i><span data-i18n="pick-one">pick one</span></i>)</div>
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_spooktacular-gear10"><span class="sheet-mainbox"></span><span class="sheet-grayable">
@@ -7985,6 +8233,12 @@
 										</span>
 									</div>
 									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice11"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="exile-gear11">Spear (2 harm, hand/close)</span> 
+										</span>
+									</div>
+									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice3"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
 											<span data-i18n="exile-gear3">Big sword (3 harm, hand, messy, heavy)</span> 
@@ -7993,13 +8247,13 @@
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice4"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
-											<span data-i18n="exile-gear4">Big axe (3 harm, hand, messy, heavy)</span> 
+											<span data-i18n="exile-gear4">Poleaxe (3 harm, hand, messy, heavy)</span> 
 										</span>
 									</div>
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice5"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
-											<span data-i18n="exile-gear5">Shield (1 harm, hand, 1 armour), (<i>cannot be used at the same time as a heavy weapon</i>)</span> 
+											<span data-i18n="exile-gear5">Shield (1 harm, hand, 1 armour)</span> 
 										</span>
 									</div>
 									<div class="sheet-move">
@@ -8033,12 +8287,6 @@
 										</span>
 									</div>
 									<div class="sheet-move">
-										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice11"><span class="sheet-mainbox"></span>
-										<span class="sheet-grayable">
-											<span data-i18n="exile-gear11">Spear (2 harm, hand/close)</span> 
-										</span>
-									</div>
-									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice12"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
 											<span data-i18n="exile-gear12">Big knife (1 harm, hand)</span> 
@@ -8054,6 +8302,156 @@
 										<input type="checkbox" class="sheet-checkbox" name="attr_Exile_gearchoice14"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
 											<span data-i18n="exile-gear14">Martial arts (1 harm, hand)</span> 
+										</span>
+									</div>
+								</div>
+
+								<!-- Gear for Hard Case 2020 -->
+								<div class="sheet-Hardcase2020">
+									<input type="checkbox" class="sheet-triggerbox sheet-ExpToggle" name="attr_Toggle-GearUnused-Hider" value="1" checked>
+									<div data-i18n="hardcase2020-gear-directions">You get one Hard Case weapon, one vehicle, one other, and whatever you got from your Hard Knocks.</div>
+									<div class="sheet-space-above">
+										<b><span data-i18n="hardcase-weapons">Hard Case Weapons</span></b> <i>(<span data-i18n="pick-one">pick one</span>)</i>:
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear1"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear1">Ancient sword (2-harm hand valuable balanced holy)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear2"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear2">Auto shotgun (3-harm close load reload area)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear3"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear3">Battered assault rifle (3-harm close/far area loud)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear4"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear4">Chainsaw (3-harm hand unreliable messy heavy)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear5"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear5">Crowbar (2-harm hand messy innocuous)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear6"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear6">Hand cannon (3-harm close loud)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear7"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear7">Huge fucking knife (2-harm hand messy)</span>
+										</span>
+									</div>
+									<div class="sheet-space-above">
+										<b><span data-i18n="hardcase-normal">Normal Weapons</span></b> <i>(<span data-i18n="pick-two">pick two</span>)</i>:
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear8"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear8">Shotgun (3-harm close messy)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear9"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear9">Hunting rifle (2-harm far loud)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear10"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear10">Pistol (2-harm close)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear11"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear11">Big knife (1-harm hand)</span>
+										</span>
+									</div>
+									<div class="sheet-space-above">
+										<b><span data-i18n="hardcase-vehicles">Vehicles</span></b> <i>(<span data-i18n="pick-one">pick one</span>)</i>:
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear12"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear12">Pickup</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear13"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear13">Motorbike</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear14"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear14">Muscle car</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear15"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear15">Sportscar</span>
+										</span>
+									</div>
+									<div class="sheet-space-above">
+										<b><span data-i18n="hardcase-other">Other items</span></b> <i>(<span data-i18n="pick-one">pick one</span>)</i>:
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear16"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear16">Concealed armour (1-armour hidden)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear17"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear17">Heavy armour (2-armour heavy)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear18"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear18">Firewater (once per mystery, drink it to mark 1 Fire)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear19"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear19">Bag of cash (untraceable)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear20"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear20">Ghost detector (unreliable)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear21"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear21">A bunch of old monster hunting journals</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_hardcase2020-gear22"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="hardcase2020-gear22">A spell formula, written on a napkin</span>
 										</span>
 									</div>
 								</div>
@@ -8284,6 +8682,30 @@
 											<span data-i18n="meddlingkid-gear8">Camera</span>
 										</span>
 									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Meddlingkid_gearchoice9"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-gear9">Bag of snacks</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Meddlingkid_gearchoice10"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-gear10">Toolbox</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Meddlingkid_gearchoice11"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-gear11">Tape recorder</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Meddlingkid_gearchoice12"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="meddlingkid-gear12">Disguise kit</span>
+										</span>
+									</div>
 								</div>
 
 								<!-- Gear for The Sidekick -->
@@ -8411,6 +8833,18 @@
 											<span data-i18n="snoop-gear12">SLR camera</span>
 										</span>
 									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice28"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="snoop-gear28">Nice smartphone</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice_blank1"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<input type="text" name="attr_Snoop_gearchoice_blank1_text">
+										</span>
+									</div>
 									<div class="sheet-space-above">
 										<b><span data-i18n="snoop-detector">Detectors</span></b> <i>(<span data-i18n="pick-two">pick two</span>)</i>:
 									</div>
@@ -8480,19 +8914,31 @@
 											<span data-i18n="snoop-gear23">Pendulum</span>
 										</span>
 									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice29"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="snoop-gear29">Tarot deck</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice_blank2"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<input type="text" name="attr_Snoop_gearchoice_blank2_text">
+										</span>
+									</div>
 									<div class="sheet-space-above">
 										<b><span data-i18n="snoop-weapon">Subtle Weapons</span></b> <i>(<span data-i18n="pick-one">pick one</span>)</i>:
 									</div>
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice24"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
-											<span data-i18n="snoop-gear24">.32 revolver (2 harm, close, reload, small)</span>
+											<span data-i18n="snoop-gear24">Stun Gun (1 harm, hand, stun)</span>
 										</span>
 									</div>
 									<div class="sheet-move">
 										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice25"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
-											<span data-i18n="snoop-gear25">9mm (2 harm, close, loud)</span>
+											<span data-i18n="snoop-gear25">Handgun (2 harm, close, loud)</span>
 										</span>
 									</div>
 									<div class="sheet-move">
@@ -8505,6 +8951,12 @@
 										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice27"><span class="sheet-mainbox"></span>
 										<span class="sheet-grayable">
 											<span data-i18n="snoop-gear27">Multitool/pocket knife (1 harm, hand, hidden, useful)</span>
+										</span>
+									</div>
+									<div class="sheet-move">
+										<input type="checkbox" class="sheet-checkbox" name="attr_Snoop_gearchoice30"><span class="sheet-mainbox"></span>
+										<span class="sheet-grayable">
+											<span data-i18n="snoop-gear30">Baseball/cricket bat (2 harm, hand, innocuous, messy)</span>
 										</span>
 									</div>
 								</div>
@@ -8693,56 +9145,56 @@
 								<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Improvements-Hider" value="1" checked><span class="sheet-anglebox"></span> <span class="sheet-ExpHeader"><span data-i18n="unused">Unused</span></span>
 
 								<!-- CHARM -->
-								<div class="sheet-move sheet-Spooktacular sheet-Actionscientist sheet-Spooky sheet-Professional sheet-Mundane sheet-Monstrous sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Spooktacular sheet-Actionscientist sheet-Spooky sheet-Professional sheet-Mundane sheet-Monstrous sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Charm-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="charm">Charm</span>
-										<span class="sheet-Actionscientist sheet-Spooky sheet-Professional sheet-Monstrous sheet-Flake sheet-Expert sheet-Crooked sheet-Divine sheet-Hex sheet-Searcher sheet-Exile sheet-Luchador sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
+										<span class="sheet-Actionscientist sheet-Spooky sheet-Professional sheet-Monstrous sheet-Flake sheet-Expert sheet-Crooked sheet-Divine sheet-Hex sheet-Searcher sheet-Luchador sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
 										<span class="sheet-Spooktacular sheet-Mundane sheet-Chosen sheet-Gumshoe sheet-Pararomantic sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
 									</span>
 								</div>
 
 								<!-- COOL -->
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Cool-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="cool">Cool</span>
-										<span class="sheet-Spooktacular sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Expert sheet-Crooked sheet-Divine sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
-										<span class="sheet-Constructed sheet-Professional sheet-Chosen sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
+										<span class="sheet-Spooktacular sheet-Hardcase2020 sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Expert sheet-Crooked sheet-Divine sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
+										<span class="sheet-Exile sheet-Constructed sheet-Professional sheet-Chosen sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
 									</span>
 								</div>
 
 								<!-- SHARP -->
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Flake sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Sharp-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="sharp">Sharp</span>
-										<span class="sheet-Constructed sheet-Spooktacular sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Divine sheet-Hex sheet-Pararomantic sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Snoop sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
-										<span class="sheet-Actionscientist sheet-Flake sheet-Expert sheet-Chosen sheet-Crooked sheet-Gumshoe sheet-Searcher sheet-Sidekick sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
+										<span class="sheet-Constructed sheet-Hardcase2020 sheet-Spooktacular sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Divine sheet-Hex sheet-Pararomantic sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Snoop sheet-Summoned">(<span data-i18n="max">max</span> +2)</span>
+										<span class="sheet-Exile sheet-Actionscientist sheet-Flake sheet-Expert sheet-Chosen sheet-Crooked sheet-Gumshoe sheet-Searcher sheet-Sidekick sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
 									</span>
 								</div>
 
 								<!-- TOUGH -->
-								<div class="sheet-move sheet-Constructed sheet-Actionscientist sheet-Wronged sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Chosen sheet-Crooked sheet-Divine sheet-Gumshoe sheet-Hardcase sheet-Luchador sheet-Sidekick sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Actionscientist sheet-Wronged sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Chosen sheet-Crooked sheet-Divine sheet-Exile sheet-Gumshoe sheet-Hardcase sheet-Luchador sheet-Sidekick sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Tough-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="tough">Tough</span>
 										<span class="sheet-Actionscientist sheet-Spellslinger sheet-Professional sheet-Mundane sheet-Monstrous sheet-Initiate sheet-Crooked sheet-Gumshoe sheet-Sidekick">(<span data-i18n="max">max</span> +2)</span>
-										<span class="sheet-Constructed sheet-Wronged sheet-Chosen sheet-Divine sheet-Hardcase sheet-Luchador sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
+										<span class="sheet-Exile sheet-Hardcase2020 sheet-Constructed sheet-Wronged sheet-Chosen sheet-Divine sheet-Hardcase sheet-Luchador sheet-Traveler">(<span data-i18n="max">max</span> +3)</span>
 									</span>
 								</div>
 
 								<!-- WEIRD -->
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Initiate sheet-Flake sheet-Chosen sheet-Hex sheet-Divine sheet-Expert sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Meddlingkid sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom ">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Wronged sheet-Spooky sheet-Spellslinger sheet-Initiate sheet-Flake sheet-Chosen sheet-Hex sheet-Divine sheet-Expert sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Meddlingkid sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom ">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Weird-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="weird">Weird</span>
-										<span class="sheet-Constructed sheet-Actionscientist sheet-Wronged sheet-Flake sheet-Divine sheet-Expert sheet-Pararomantic sheet-Hardcase sheet-Meddlingkid sheet-Snoop sheet-Traveler">(<span data-i18n="max">max</span> +2)</span>
+										<span class="sheet-Constructed sheet-Actionscientist sheet-Wronged sheet-Flake sheet-Divine sheet-Expert sheet-Pararomantic sheet-Hardcase sheet-Hardcase2020 sheet-Meddlingkid sheet-Snoop sheet-Traveler">(<span data-i18n="max">max</span> +2)</span>
 										<span class="sheet-Spooktacular sheet-Spooky sheet-Spellslinger sheet-Initiate sheet-Chosen sheet-Hex sheet-Searcher sheet-Exile sheet-Summoned">(<span data-i18n="max">max</span> +3)</span>
 									</span>
 								</div>
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-PlaybookMove-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="another">Take another</span> 
@@ -8767,6 +9219,7 @@
 										<span class="sheet-Searcher" data-i18n="Searcher">Searcher</span>
 										<span class="sheet-Exile" data-i18n="Exile">Exile</span>
 										<span class="sheet-Hardcase" data-i18n="Hardcase">Hard Case</span>
+										<span class="sheet-Hardcase2020" data-i18n="Hardcase">Hard Case</span>
 										<span class="sheet-Luchador" data-i18n="Luchador">Luchador</span>
 										<span class="sheet-Meddlingkid" data-i18n="Meddlingkid">Meddling Kid</span>
 										<span class="sheet-Sidekick" data-i18n="Sidekick">Sidekick</span>
@@ -8802,6 +9255,7 @@
 										<span class="sheet-Searcher" data-i18n="Searcher">Searcher</span>
 										<span class="sheet-Exile" data-i18n="Exile">Exile</span>
 										<span class="sheet-Hardcase" data-i18n="Hardcase">Hard Case</span>
+										<span class="sheet-Hardcase2020" data-i18n="Hardcase">Hard Case</span>
 										<span class="sheet-Luchador" data-i18n="Luchador">Luchador</span>
 										<span class="sheet-Meddlingkid" data-i18n="Meddlingkid">Meddling Kid</span>
 										<span class="sheet-Sidekick" data-i18n="Sidekick">Sidekick</span>
@@ -8813,13 +9267,13 @@
 									</span>
 								</div>
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-PlaybookMove-Other1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="playbook-move">Take a move from another playbook</span>
 									</span>
 								</div>
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-PlaybookMove-Other2"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="playbook-move">Take a move from another playbook</span>
@@ -8828,14 +9282,14 @@
 
 								<!-- Playbook Specific Options -->
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler">
+								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Hardcase2020 sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Ally"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span class="sheet-Actionscientist"> <span data-i18n="as-team">Gain a team of action scientists under your command.</span> </span>
 										<span class="sheet-Crooked"> <span data-i18n="ally">Gain an ally</span>: <span data-i18n="crooked-ally">one of your old crew</span></span>
 										<span class="sheet-Divine"> <span data-i18n="ally">Gain an ally</span>: <span data-i18n="Divine-ally">a lesser divine being, sent to help you with your mission</span></span>
 										<span class="sheet-Exile"><span data-i18n="ally">Gain an ally</span>: <span data-i18n="exile-ally">you find one of your old comrades, who has come to join you in the modern day</span></span>
-										<span class="sheet-Hardcase" data-i18n="hardcase-advance1">Gain command of a team of monster-hunters</span>
+										<span class="sheet-Hardcase sheet-Hardcase2020" data-i18n="hardcase-advance1">Gain command of a team of monster-hunters</span>
 										<span class="sheet-Luchador"><span data-i18n="ally">Gain an ally</span>: <span data-i18n="luchador-ally">another wrestler who has chosen to fight monsters with you</span></span>
 										<span class="sheet-Meddlingkid"><span data-i18n="ally">Gain an ally</span>: <span data-i18n="meddlingkid-ally">someone to join the gang, it may be an animal (most likely a dog or a cat)</span></span>
 										<span class="sheet-Sidekick"><span data-i18n="ally">Gain an ally</span>: <span data-i18n="sidekick-ally">another sidekick for your hero, your junior</span></span>
@@ -8982,7 +9436,7 @@
 									</span>
 								</div>
 
-								<div class="sheet-move sheet-Gumshoe sheet-Hardcase">
+								<div class="sheet-move sheet-Gumshoe sheet-Hardcase sheet-Hardcase2020">
 									<input type="checkbox" class="sheet-checkbox" name="attr_Imp-Dying"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="hardcase-advance2">Add an extra harm box on the Dying side</span>
@@ -9015,26 +9469,26 @@
 								<div><span data-i18n="advanced-improvements">Once you have taken 5 <i>Improvements</i> you may choose from these options as well as the list above</span>:</div>
 								<input type="checkbox" class="sheet-checkbox sheet-ExpToggle" name="attr_Toggle-Improvements-Hider" value="1" checked><span class="sheet-anglebox"></span> <span class="sheet-ExpHeader"><span data-i18n="unused">Unused</span></span>
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Any-1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										+1 <span data-i18n="rating">to any rating</span> (<span data-i18n="max">max</span> +3) <input type="text" name="attr_AdvImp-Any-1-Choice"> 
 									</span>
 								</div>
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-ChangePB"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="new-playbook">Change playbooks</span>
 									</span>
 								</div>
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-2ndHunter"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="second-hunter">Create a second hunter to play</span>
 									</span>
 								</div>
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-AdvBasic"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="basic-moves">Advance 2 basic moves</span>
@@ -9131,7 +9585,7 @@
 									</div>
 								</div>
 								
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Pararomantic sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler sheet-Custom">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Retire"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="retire">Retire this hunter to safety</span>. <span class="sheet-Exile" data-i18n="exile-return">Optionally, you may return home to the past</span>
@@ -9140,7 +9594,7 @@
 
 								<!-- Playbook-Specific Choices -->
 
-								<div class="sheet-move sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler">
+								<div class="sheet-move sheet-Hardcase2020 sheet-Constructed sheet-Spooktacular sheet-Actionscientist sheet-Chosen sheet-Crooked sheet-Divine sheet-Expert sheet-Flake sheet-Initiate sheet-Monstrous sheet-Mundane sheet-Professional sheet-Spellslinger sheet-Spooky sheet-Wronged sheet-Gumshoe sheet-Hex sheet-Searcher sheet-Exile sheet-Hardcase sheet-Luchador sheet-Meddlingkid sheet-Sidekick sheet-Snoop sheet-Summoned sheet-Traveler">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Luck1"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="erase-luck">Erase one used <i>Luck</i> point</span>
@@ -9151,6 +9605,13 @@
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Luck2"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="erase-luck">Erase one used <i>Luck</i> point</span>
+									</span>
+								</div>
+
+								<div class="sheet-move sheet-Snoop">
+									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-MakeItBig"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="snoop-advance2">Take another Show option</span>
 									</span>
 								</div>
 
@@ -9269,10 +9730,17 @@
 									</span>
 								</div>
 
-								<div class="sheet-move sheet-Hardcase">
+								<div class="sheet-move sheet-Hardcase sheet-Hardcase2020">
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Dying"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="hardcase-advance2">Add an extra harm box on the Dying side</span>
+									</span>
+								</div>
+
+								<div class="sheet-move sheet-Hardcase2020">
+									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Fire"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="hardcase2020-advance1">Your Fire track increases to 13 boxes.</span>
 									</span>
 								</div>
 
@@ -9294,6 +9762,13 @@
 									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Summoned-ReEvil"><span class="sheet-mainbox"></span>
 									<span class="sheet-grayable">
 										<span data-i18n="summoned-advance3">Turn evil (again?). Retire this character, they become one of the Keeper's threats</span>
+									</span>
+								</div>
+
+								<div class="sheet-move sheet-Summoned">
+									<input type="checkbox" class="sheet-checkbox" name="attr_AdvImp-Summoned-ApocalypseRewind"><span class="sheet-mainbox"></span>
+									<span class="sheet-grayable">
+										<span data-i18n="summoned-advance4">Undo one sign of the Apocalypse</span>
 									</span>
 								</div>
 
