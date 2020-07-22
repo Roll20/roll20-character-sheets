@@ -1402,7 +1402,10 @@
                 <!--<button type="action" name="act_clearselectedunit" class="btn" style="float:right;width:auto;padding-top:4px;padding-bottom:4px;">Clear</button>-->
                 <h3 data-i18n="Enemy Unit Selector">Enemy Unit Selector</h3>
                 <fieldset class="repeating_gmenemyunitlist">
+                    <input type="hidden" class="hideifone" name="attr_selected" value="0">
                     <button type="action" name="act_selectunit" class="btn"><span name="attr_gmunitname"></span></button>
+                    <input type="hidden" class="hideifzero" name="attr_selected" value="0">
+                    <button type="action" name="act_selectunit" class="btn selected"><span name="attr_gmunitname"></span></button>
                 </fieldset>
                 <h3 data-i18n="Unit Display Options">Unit Display Options</h3>
                 <label data-i18n="Show Attack Info:">Show Attack Info:</label><input type="checkbox" name="attr_gmshowattackinfo" value="1" checked /><br />
@@ -1420,7 +1423,10 @@
                 <h3 data-i18n="Enemy Units">Enemy Units</h3>
                 <fieldset class="repeating_gmenemyunitlist">
                     <input type="hidden" name="attr_gmunitname" value="New Unit" >
+                    <input type="hidden" class="hideifone" name="attr_selected" value="0">
                     <button type="action" name="act_selectunit" class="btn"><span name="attr_gmunitname"></span></button>
+                    <input type="hidden" class="hideifzero" name="attr_selected" value="0">
+                    <button type="action" name="act_selectunit" class="btn selected"><span name="attr_gmunitname"></span></button>
                 </fieldset>
                 <button class="addbtn" type="action" name="act_addgmunit"><span data-i18n="Plus Add">+Add</span></button>
             </div>
@@ -3120,48 +3126,61 @@ const selectedEnemyAttrs = [
 ];
 
 function SelectUnit(unitId) {
-    let attrs = [
-        ["_gmunitwill", "gmwatkwill"],
-        ["_gmunitdodge", "gmdodgedice"],
+    getAttrs(["selectedenemyid"], function(values) {
+        let selectedenemyid = values.selectedenemyid;
+        if (selectedenemyid == unitId) {
+            return;
+        }
+        console.log("selectedenemyid: " + selectedenemyid);
+        let attrs = [
+            ["_gmunitwill", "gmwatkwill"],
+            ["_gmunitdodge", "gmdodgedice"],
 
-        ["_gmunitatkname", "gmatkname"],
-        ["_gmunitatkcrit", "gmatkcritdice"],
-        ["_gmunitatkdmg", "gmatkdamage"],
-        ["_gmunitatkcritdmg", "gmatkcritdamage"],
-        ["_gmunitatkaim", "gmatkaimdice"],
-        ["_gmunitatknotes", "selectedenemyatknotes"],
+            ["_gmunitatkname", "gmatkname"],
+            ["_gmunitatkcrit", "gmatkcritdice"],
+            ["_gmunitatkdmg", "gmatkdamage"],
+            ["_gmunitatkcritdmg", "gmatkcritdamage"],
+            ["_gmunitatkaim", "gmatkaimdice"],
+            ["_gmunitatknotes", "selectedenemyatknotes"],
 
-        ["_gmunitatk1name", "gmatk1name"],
-        ["_gmunitatk1crit", "gmatk1critdice"],
-        ["_gmunitatk1dmg", "gmatk1damage"],
-        ["_gmunitatk1critdmg", "gmatk1critdamage"],
-        ["_gmunitatk1aim", "gmatk1aimdice"],
-        ["_gmunitatk1notes", "selectedenemyatk1notes"],
+            ["_gmunitatk1name", "gmatk1name"],
+            ["_gmunitatk1crit", "gmatk1critdice"],
+            ["_gmunitatk1dmg", "gmatk1damage"],
+            ["_gmunitatk1critdmg", "gmatk1critdamage"],
+            ["_gmunitatk1aim", "gmatk1aimdice"],
+            ["_gmunitatk1notes", "selectedenemyatk1notes"],
 
-        ["_gmunitatk2name", "gmatk2name"],
-        ["_gmunitatk2crit", "gmatk2critdice"],
-        ["_gmunitatk2dmg", "gmatk2damage"],
-        ["_gmunitatk2critdmg", "gmatk2critdamage"],
-        ["_gmunitatk2aim", "gmatk2aimdice"],
-        ["_gmunitatk2notes", "selectedenemyatk2notes"]
-    ];
-    attrGetters = [];
-    attrs.forEach(attrPair => {
-        attrPair[0] = "repeating_gmenemyunitlist_" + unitId + attrPair[0];
-        attrGetters.push(attrPair[0]);
-    });
-    selectedEnemyAttrs.forEach(attrPair => {
-        let completeAttr = "repeating_gmenemyunitlist_" + unitId + attrPair[0];
-        attrs.push([completeAttr, attrPair[1]]);
-        attrGetters.push(completeAttr);
-    });
-
-    let output = { selectedenemyid: unitId };
-    getAttrs(attrGetters, function(values) {
+            ["_gmunitatk2name", "gmatk2name"],
+            ["_gmunitatk2crit", "gmatk2critdice"],
+            ["_gmunitatk2dmg", "gmatk2damage"],
+            ["_gmunitatk2critdmg", "gmatk2critdamage"],
+            ["_gmunitatk2aim", "gmatk2aimdice"],
+            ["_gmunitatk2notes", "selectedenemyatk2notes"]
+        ];
+        attrGetters = [];
         attrs.forEach(attrPair => {
-            output[attrPair[1]] = values[attrPair[0]]||"";
+            attrPair[0] = "repeating_gmenemyunitlist_" + unitId + attrPair[0];
+            attrGetters.push(attrPair[0]);
         });
-        setAttrs(output);
+        selectedEnemyAttrs.forEach(attrPair => {
+            let completeAttr = "repeating_gmenemyunitlist_" + unitId + attrPair[0];
+            attrs.push([completeAttr, attrPair[1]]);
+            attrGetters.push(completeAttr);
+        });
+
+        let output = {
+            selectedenemyid: unitId,
+            [`repeating_gmenemyunitlist_${unitId}_selected`]: 1
+        };
+        if (selectedenemyid) {
+            output[`repeating_gmenemyunitlist_${selectedenemyid}_selected`] = 0;
+        }
+        getAttrs(attrGetters, function(values) {
+            attrs.forEach(attrPair => {
+                output[attrPair[1]] = values[attrPair[0]]||"";
+            });
+            setAttrs(output);
+        });
     });
 }
 
