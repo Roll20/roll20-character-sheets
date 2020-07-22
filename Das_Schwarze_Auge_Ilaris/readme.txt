@@ -121,3 +121,5 @@ Neue Features:
 Neue Features:
 - Getrennte AE- und KE-Werte für geweihte Zauberer
 - Optionale Sektion für Inventar und Notizen
+
+1.5.1: Fix des Zuschlags für "Doppelangriff".
