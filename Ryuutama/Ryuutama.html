@@ -14,6 +14,14 @@
             }
         }
 
+        function htmlEncodeString(string){
+			var codedLetters = [];
+            for (var i=string.length-1;i>=0;i--) {
+                codedLetters.unshift(['&#', string[i].charCodeAt(), ';'].join(''));
+            }
+            return codedLetters.join('');
+        }
+
         on("change:injury change:condition", function() {
             getAttrs(["condition", "injury"], function(values) {
                 setAttrs({
@@ -466,6 +474,17 @@
                 };
             });
         });
+
+        on("sheet:opened", () => {
+            getAttrs(["character_name", "safeCharacterName"], v => {
+                encodedName = htmlEncodeString(v.character_name)
+                if (encodedName != v.safeCharacterName){
+                    setAttrs({
+                        safeCharacterName: encodedName
+                    });
+                };
+            });
+        });
     </script>
 
     <div>
@@ -500,6 +519,7 @@
                 <input type="number" name="attr_concentrationBonus" value="0"/>
                 <input type="number" name="attr_speciesConditionMod" value="0"/>
                 <input type="number" name="attr_speciesInitiativeMod" value="0"/>
+                <input type="hidden" name="attr_safeCharacterName" value=""/>
             </div>
             <!-- End Hidden Fields -->
 
@@ -779,7 +799,7 @@
                         <div class="sheet-spellRow">
 
                         <div class="spell-details">
-                            <button class="spellName skill-check-button" type="roll" value="&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{character_name}}}" name="roll_repeatingSpellCard">
+                            <button class="spellName skill-check-button" type="roll" value="&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{safeCharacterName}}}" name="roll_repeatingSpellCard">
                                 <span name="attr_spellName"></span>
                             </button>
                             <span class="spellCost" name="attr_spellCost"></span>
@@ -982,46 +1002,68 @@
                     </div>
                 </div>
                 <hr>
-                <div class="sheet-3colrow">
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-injury">Injury</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_injured" value="2"/>
-                        <input type="number" name="attr_injury" value="0" min="0"/> <span data-i18n="status-lowerdex">lowers DEX die size</span>
+                <div class="flex">
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-injury">Injury</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/bandaids.png" alt="bandaids" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_injured" value="2"/>
+                            <input type="number" name="attr_injury" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerdex">lowers DEX die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-poison">Poison</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_poisoned" value="2"/>
-                        <input type="number" name="attr_poison" value="0" min="0"/> <span data-i18n="status-lowerstr">lowers STR die size</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-poison">Poison</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/skullcrossbones.png" alt="skullcrossbones" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_poisoned" value="2"/>
+                            <input type="number" name="attr_poison" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerstr">lowers STR die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-sickness">Sickness</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_sick" value="2"/>
-                        <input type="number" name="attr_sickness" value="0" min="0"/> <span data-i18n="status-lowerall">lowers all dice sizes</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-sickness">Sickness</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/bedmeds.png" alt="bed" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_sick" value="2"/>
+                            <input type="number" name="attr_sickness" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerall">lowers all dice sizes</span>
                     </div>
-                </div>
 
-                <div class="sheet-3colrow">
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-exhaustion">Exhaustion</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_exhausted" value="2"/>
-                        <input type="number" name="attr_exhaustion" value="0" min="0"/> <span data-i18n="status-lowerspi">lowers SPI die size</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-exhaustion">Exhaustion</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/moonstars.png" alt="exhaustion" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_exhausted" value="2"/>
+                            <input type="number" name="attr_exhaustion" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerspi">lowers SPI die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-muddled">Muddled</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_muddled" value="2"/>
-                        <input type="number" name="attr_muddle" value="0" min="0"/> <span data-i18n="status-lowerint">lowers INT die size</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-muddled">Muddled</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/questionmarks.png" alt="questionmarks" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_muddled" value="2"/>
+                            <input type="number" name="attr_muddle" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerint">lowers INT die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-shock">Shock</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_shocked" value="2"/>
-                        <input type="number" name="attr_shock" value="0" min="0"/> <span data-i18n="status-lowerall">lowers all dice sizes</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-shock">Shock</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restyling/Ryuutama/images/brokenheart.png" alt="brokenheart" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_shocked" value="2"/>
+                            <input type="number" name="attr_shock" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerall">lowers all dice sizes</span>
                     </div>
                 </div>
                 <hr>
                 <div class="sheet-row">
                     <div class="sheet-col">
                         <label class="header headerLabel checkLabel terrainLabel" data-i18n="terrain-modifiers">Terrain Modifiers</label>
-                        <span class="pictos notesIcon">i</span>
+                        <span class="pictos notesIcon">W</span>
                         <input type="checkbox" name="attr_terrainNotesToggle" class="notesToggle sheet-hider">
                         <div class="terrainNotes">
                                 <textarea name="attr_terrainNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
@@ -1062,7 +1104,7 @@
                 <div class="sheet-row">
                     <div class="sheet-col">
                         <label class="header headerLabel checkLabel weatherLabel" data-i18n="weather-modifiers">Weather Modifiers</label>
-                        <span class="pictos notesIcon">i</span>
+                        <span class="pictos notesIcon">W</span>
                         <input type="checkbox" name="attr_weatherNotesToggle" class="notesToggle sheet-hider">
                         <div class="terrainNotes">
                                 <textarea name="attr_weatherNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
