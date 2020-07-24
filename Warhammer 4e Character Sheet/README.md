@@ -9,14 +9,24 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
-July 13 2020 
+July 26 2020 - v1.02 
+
+- Missing Impale code added from last update.
+- Weapon Reach now displays in the roll template.
+- Ranged Ammo now dispalys properly in the roll template.
+- Criticals & Injuries section title in the Core Stats tab renamed to Injuries and Other Ailments.
+- Talents now have a roll template which displays their info in chat.
+- All spell types now have a custom name option and input field next to the selector (request feature)
+
+
+July 19 2020 - v1.01 
 
 - Endurance test in Combat Action no longer rolls a Heal test
 - Impale mechanics tiedied up for Attack/Opposed/Shoot rools and made more obvious when it occurs.
 - NPC pages 2/3/4 fixes which were only applied on page 1 before
 
 
-July 13 2020 
+July 13 2020 - v1.0
 
 - Major Art overhaul -  in style of the rule book, removed the black banners and reworked section titles, new background for all themes. Overall effect is less contrast and more white space. Easier on the Eyes.
 - Weapons Tab overhaul - Weapons must now be selected to use them, and will fire of from the new Attack/Opposed/Shoot buttons. This should be fairly obvious when the Player next tries to use a weapon after this update. This feature is supported by new sheetworkers. This allows using weapons outside the Weapons reaping sections which is the main reason this was implemented.
@@ -107,7 +117,7 @@ Jan 20 2020
 
 - Asset and Color palate rework, light/dark mode
 - Clean up of global rolls mechanic
-- Xp spend log tab added, these field interact with Xp current/earned/spent fields.
+- Xp spend log tab added, these fields interact with Xp current/earned/spent fields.
 - Bug fixes
 
 
@@ -133,7 +143,7 @@ Dec 24 2019
 Usage Notes:
 
 
-- SETTING: Check setting (cog) tab ever time when setting up a new Char sheet, and select correct options for your game
+- SETTING: Check setting (cog) tab ever time when setting up any new Char sheet for all players, and select correct options for your game.
 - Wounds: ensure correct Race and Hardy level are chosen. Wounds are subtracted by adding damage, and given back by subtracting it. Will not go our of 0-Max Wounds range.
 - Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge) automatically, and shows i the roll result.
 - For an advanced Skill you must select the taken checkbox in order for target to be above 0.
@@ -141,7 +151,7 @@ Usage Notes:
 - Themes, see setting tab for various theme which change the look of the char sheet overall. Inclung Emprie/Dwarf & Elf themes.
 - Arcane Spells need to have a number in CN and Damage Field or they will not roll correctly, both fields will default to Zero.
 - Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. (NPC tab has channelling on all spells for simplicity)
-- NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with conmtained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a colapisble notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
+- NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
 - Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only (new default) on all combat rolls and all non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. 
 
 This has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it also requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset1.0.zip) 
@@ -151,10 +161,10 @@ It should be noted that some conditons can we highly situational, like Perceptio
 Condition effects are currently bound as follows:
 
 Broken/Fatigued/Poisoned/Stunned = Effects all Melee/Spellcast and skill rolls (only excludes roll tables like Misscast/Oops etc.)
-Entangled/Prone = Effects Movement based rolls, so melee/spells, combat actions and any skill which would require movement like dodge/athletics/climb etc.
-Blinded = Effects Weapon/Spells casts rolls
+Entangled/Prone = Effects Movement based rolls, all Melee/Spellcast, combat actions and any skill which would require movement like dodge/athletics/climb etc.
+Blinded = Effects Weapon & Spells casts rolls
 Deafened = Effects Spells casts rolls
-Unconscious = Effects all rolls (Roll block)
+Unconscious = Effects all rolls except endurance (Roll block essentially)
 
 Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
 
