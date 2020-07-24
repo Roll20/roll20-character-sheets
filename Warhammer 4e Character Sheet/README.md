@@ -12,11 +12,11 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 July 26 2020 - v1.02 
 
 - Missing Impale code added from last update.
-- Weapon Reach now displays in the roll template.
-- Ranged Ammo now dispalys properly in the roll template.
-- Criticals & Injuries section title in the Core Stats tab renamed to Injuries and Other Ailments.
+- Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
+- Ranged Ammo now displays properly in the roll template.
+- Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
 - Talents now have a roll template which displays their info in chat.
-- All spell types now have a custom name option and input field next to the selector (request feature)
+- All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
 July 19 2020 - v1.01 
