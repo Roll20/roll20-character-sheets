@@ -12,6 +12,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 July 26 2020 - v1.02 
 
 - Missing Impale code added from last update.
+- Added the missed "Medium" choice to Weapon Reach selction.
 - Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
 - Ranged Ammo now displays properly in the roll template.
 - Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
