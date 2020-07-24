@@ -1131,12 +1131,16 @@
                 </div>
                 <input type="hidden" class="valuehider" name="attr_selectedenemyatk1_id" value="">
                 <div class="customattack attack clearfix">
+                    <input type="hidden" name="attr_gmatk1aimdicetotal" />
+                    <input type="hidden" name="attr_gmatk1critdicetotal" />
                     <button type="roll" name="roll_gmatk1" class="btn" value="&{template:zafir} {{name=@{gmatk1name}}} {{aim=[[(@{gmatk1aimdicetotal})d6>5]]}} {{crit=[[(@{gmatk1critdicetotal})d6>6]]}} {{damage=[[(@{gmatk1damage})]]}} {{critdmg=[[(@{gmatk1damage}) + (@{gmatk1critdamage})]]}} {{notes=@{selectedenemyatk1notes}}} {{enemy=@{selectedenemy}}}"><span data-i18n="Attack">Attack</span></button>
                     <input type="text" name="attr_gmatk1name" spellcheck="false" placeholder="Attack Name" style="width:110px;margin-right:10px;">
                         <label>&nbsp;&nbsp;<input type="number" name="attr_gmatk1aimdice" value="0">&nbsp;<span data-i18n="aim">aim</span>&nbsp;&nbsp;&nbsp;<input type="number" name="attr_gmatk1critdice" value="0">&nbsp;<span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmatk1damage" spellcheck="false" value="0">(+<input type="number" name="attr_gmatk1critdamage" value="0">)</label>
                 </div>
                 <input type="hidden" class="valuehider" name="attr_selectedenemyatk2_id" value="">
                 <div class="customattack attack clearfix">
+                    <input type="hidden" name="attr_gmatk2aimdicetotal" />
+                    <input type="hidden" name="attr_gmatk2critdicetotal" />
                     <button type="roll" name="roll_gmatk2" class="btn" value="&{template:zafir} {{name=@{gmatk2name}}} {{aim=[[(@{gmatk2aimdicetotal})d6>5]]}} {{crit=[[(@{gmatk2critdicetotal})d6>6]]}} {{damage=[[(@{gmatk2damage})]]}} {{critdmg=[[(@{gmatk2damage}) + (@{gmatk2critdamage})]]}} {{notes=@{selectedenemyatk2notes}}} {{enemy=@{selectedenemy}}}"><span data-i18n="Attack">Attack</span></button>
                     <input type="text" name="attr_gmatk2name" spellcheck="false" placeholder="Attack Name" style="width:110px;margin-right:10px;">
                         <label>&nbsp;&nbsp;<input type="number" name="attr_gmatk2aimdice" value="0">&nbsp;<span data-i18n="aim">aim</span>&nbsp;&nbsp;&nbsp;<input type="number" name="attr_gmatk2critdice" value="0">&nbsp;<span data-i18n="crit">crit</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="attr_gmatk2damage" spellcheck="false" value="0">(+<input type="number" name="attr_gmatk2critdamage" value="0">)</label>
@@ -1407,7 +1411,7 @@
                         </div>
                     </div>
                 </div>
-                <!--<button type="action" name="act_clearselectedunit" class="btn" style="float:right;width:auto;padding-top:4px;padding-bottom:4px;">Clear</button>-->
+                <button type="action" name="act_refreshselectedunit" class="btn" style="float:right;width:auto;padding-top:4px;padding-bottom:4px;">Refresh</button>
                 <h3 data-i18n="Enemy Unit Selector">Enemy Unit Selector</h3>
                 <fieldset class="repeating_gmenemyunitlist">
                     <input type="hidden" class="hideifone" name="attr_selected" value="0">
@@ -2681,6 +2685,10 @@ const attackDiceInputs = [
     "atkothercrit",
     "gmatkaimdice",
     "gmatkcritdice",
+    "gmatk1aimdice",
+    "gmatk1critdice",
+    "gmatk2aimdice",
+    "gmatk2critdice",
     "atkoverwatch"
 ];
 on(sheetOpenAndAttrChanged(attackDiceInputs) + 
@@ -2709,6 +2717,10 @@ on(sheetOpenAndAttrChanged(attackDiceInputs) +
         let atkothercrit = parseInt(values.atkothercrit)||0;
         let gmatkaimdice = parseInt(values.gmatkaimdice)||0;
         let gmatkcritdice = parseInt(values.gmatkcritdice)||0;
+        let gmatk1aimdice = parseInt(values.gmatk1aimdice)||0;
+        let gmatk1critdice = parseInt(values.gmatk1critdice)||0;
+        let gmatk2aimdice = parseInt(values.gmatk2aimdice)||0;
+        let gmatk2critdice = parseInt(values.gmatk2critdice)||0;
 
         let aimBonus = 0;
         let critBonus = 0;
@@ -2747,7 +2759,11 @@ on(sheetOpenAndAttrChanged(attackDiceInputs) +
             custattackaimdice: Math.max(aim + atkotheraim + aimBonus, 0),
             custattackcritdice: Math.max(atkothercrit + critBonus, 0),
             gmatkaimdicetotal: Math.max(gmatkaimdice + aimBonus, 0),
-            gmatkcritdicetotal: Math.max(gmatkcritdice + critBonus, 0)
+            gmatkcritdicetotal: Math.max(gmatkcritdice + critBonus, 0),
+            gmatk1aimdicetotal: Math.max(gmatk1aimdice + aimBonus, 0),
+            gmatk1critdicetotal: Math.max(gmatk1critdice + critBonus, 0),
+            gmatk2aimdicetotal: Math.max(gmatk2aimdice + aimBonus, 0),
+            gmatk2critdicetotal: Math.max(gmatk2critdice + critBonus, 0)
         });
 
         const repeatAttrs = [
@@ -3133,10 +3149,10 @@ const selectedEnemyAttrs = [
     ["_gmunitabl4effect", "selectedenemyabl4effect"],
 ];
 
-function SelectUnit(unitId) {
+function SelectUnit(unitId, force) {
     getAttrs(["selectedenemyid"], function(values) {
         let selectedenemyid = values.selectedenemyid;
-        if (selectedenemyid == unitId) {
+        if (!force && selectedenemyid == unitId) {
             return;
         }
         console.log("selectedenemyid: " + selectedenemyid);
@@ -3180,7 +3196,7 @@ function SelectUnit(unitId) {
             selectedenemyid: unitId,
             [`repeating_gmenemyunitlist_${unitId}_selected`]: 1
         };
-        if (selectedenemyid) {
+        if (selectedenemyid && selectedenemyid != unitId) {
             output[`repeating_gmenemyunitlist_${selectedenemyid}_selected`] = 0;
         }
         getAttrs(attrGetters, function(values) {
@@ -3289,6 +3305,13 @@ function AddSelectedUnitAbility(index) {
 
 on("clicked:clearselectedunit", function() {
     ClearSelectedUnit();
+});
+
+on("clicked:refreshselectedunit", function() {
+    getAttrs(["selectedenemyid"], function(values) {
+        let unitId = values.selectedenemyid;
+        SelectUnit(unitId, true);
+    });
 });
 
 on("remove:repeating_gmenemyunitlist", function(eventInfo) {
