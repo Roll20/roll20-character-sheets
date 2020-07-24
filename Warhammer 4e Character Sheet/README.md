@@ -12,6 +12,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 July 26 2020 - v1.02 
 
 - Missing Impale code added from last update.
+- Persuit Roll Rule text changed to be clearer to read.
 - Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
 - Ranged Ammo now displays properly in the roll template.
 - Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
@@ -173,9 +174,9 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future releases :
 
-- NPC weapon rework adding Attack/Oppose button to the minimized NPC boxes. (v1.1)
-- Inventory reword, add containers. (v1.2)
-- Talents rework (v 1.3)
+- NPC weapon rework adding Attack/Oppose buttons usable while minimized. (v1.1)
+- Inventory reword, add container mechanic. (v1.2)
+- Talents rework, roll integration. This is very complex to do and would be limited to non-situational Talents (miniority). (maybe)
 - More themes
 
 
