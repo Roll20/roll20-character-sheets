@@ -9,14 +9,17 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
-July 26 2020 - v1.02 
+July 26 2020 - v1.1
+
+NEW - Condition Tracking fully implentantion, now adds up Multiple Conditions correctly as per the rule book. Meaning only one (highest) condition will be added to the roll template Automatically. Also changed the setting descirbtion to clarify this.
+NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. Allows for simple seperation of carried and non-carried items, in Packs & Vehicles. Seperate weight calc built in. Container with enc now add to Total Character Enc too. (Great for any sort of travel heavy stories, e.g. Death on the Reik!)
 
 - Missing Impale code added from last update.
 - Persuit Roll Rule text changed to be clearer to read.
 - Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
 - Ranged Ammo now displays properly in the roll template.
-- Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
 - Talents now have a roll template which displays their info in chat.
+- Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
 - All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
@@ -140,6 +143,26 @@ Dec 24 2019
 
 
 
+Features:
+
+- Attack / Opposed / Ranged Seprated combat sytem with roll template which relevant information
+
+- Skill system, Basic / Advanced Skill List is fully implemented
+
+- Armor system with Enc, AP and Damage tracking
+
+- Spell book system, with core book spell name list, and optional custom spell function.
+
+- SL indicator for all rolls, also aids manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self calcualted approach while providing the maximum possible information in miminal mouse clicks to enable that easily.)
+
+- Advantage & Condition Tracking
+
+- Full Encumbrance Management system 
+
+- Cointainer & Vehicle carry space Management
+
+- Roll Table integration for Critical / Oops / Miscast & Wrath of the God
+
 
 Usage Notes:
 
@@ -167,17 +190,19 @@ Blinded = Effects Weapon & Spells casts rolls
 Deafened = Effects Spells casts rolls
 Unconscious = Effects all rolls except endurance (Roll block essentially)
 
+Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When thisoccurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had the Fatigued and Prone Conditions, you would suffer a –20 penalty to all active Tests, not –30.
+
 Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
 
 
 
 
-Future releases :
+Future release wish list :
 
-- NPC weapon rework adding Attack/Oppose buttons usable while minimized. (v1.1)
-- Inventory reword, add container mechanic. (v1.2)
-- Talents rework, roll integration. This is very complex to do and would be limited to non-situational Talents (miniority). (maybe)
-- More themes
+- Add Mutation Roll table button. (expanded list from Death on the Reik) (v1.2)
+- Talents Tab rework, with possible roll integration. (v1.3)
+- WFRP 4e Roll API with SL resolution API. (v1.x)
+- More themes. (v1.x)
 
 
 Enjoy.
