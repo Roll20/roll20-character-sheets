@@ -11,16 +11,16 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 July 26 2020 - v1.1
 
-NEW - Condition Tracking fully implentantion, now adds up Multiple Conditions correctly as per the rule book. Meaning only one (highest) condition will be added to the roll template Automatically. Also changed the setting descirbtion to clarify this.
-NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. Allows for simple seperation of carried and non-carried items, in Packs & Vehicles. Seperate weight calc built in. Container with enc now add to Total Character Enc too. (Great for any sort of travel heavy stories, e.g. Death on the Reik!)
+NEW - Condition Tracking full implementation, now adds up Multiple Conditions correctly as per the rule book. Meaning only one (highest) condition will be added to the roll template Automatically. Also changed the setting description to clarify this.
+NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. Allows for simple separation of carried and non-carried items, in Packs & Vehicles. Separate weight calc built in. Container with Enc now add to Total Character Enc too. (Great for any sort of travel heavy stories, e.g. Death on the Reik!)
 
-- Missing Impale code added from last update.
-- Persuit Roll Rule text changed to be clearer to read.
-- Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
-- Ranged Ammo now displays properly in the roll template.
-- Talents now have a roll template which displays their info in chat.
-- Criticals & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
-- All spell types now have a custom name option and input field next to the selector (requested feature)
+Missing Impale code added from last update.
+Pursuit Roll Rule text changed to be clearer to read.
+Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
+Ranged Ammo now displays properly in the roll template.
+Talents now have a roll template which displays their info in chat.
+Critical & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
+All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
 July 19 2020 - v1.01 
