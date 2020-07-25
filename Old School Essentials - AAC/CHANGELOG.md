@@ -2,6 +2,29 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.0
+
+### Added
+
+- Add spells per level
+- Add memorized spell number input
+- Add attack value matrix to DAC sheet
+- Add option for individual initiative which accounts for both arbitrary bonus/penalty and dex bonus on players and arbitrary bonus/penalty for monsters
+
+### Changed
+
+- Update OSE Logo
+- Rename Critical Miss / Hit to Natural 1 / 20
+- Change default attributes to 10
+- Change encumbrance calculation to multiply quantity of items by their weight
+- Changed the contents of some placeholders and switched some placeholders to values to reduce confusion
+
+### Fixed
+
+- Fix incorrect or missing attack buttons for DAC sheet
+- Fix buttons not being draggable onto macro bar
+- Fix a bug where the worn checkbox didn't reduce the amount of armor worn when unchecked
+
 ## 1.5.1
 
 ### Fixed

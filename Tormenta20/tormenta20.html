@@ -1,5 +1,3 @@
-<html>
-<body>
 <div class="main">
     <div class="left-container">
         <div class="header-info">
@@ -1582,11 +1580,10 @@
 <input type="hidden" name="attr_metade_do_nivel" value="floor(@{charnivel}/2)">
 <!-- <input name="attr_character_name" type="hidden" spellcheck="false"> -->
 <input name="attr_charname" type="hidden" spellcheck="false" value=""/>
-<input type="hidden" name="attr_vida_max" value="@{vidatotal} + @{vidatemp}"/>
-<input type="hidden" name="attr_mana_max" value="@{manatotal} + @{manatemp}"/>
+<input type="hidden" name="attr_vida_max" value="@{vidatotal} + @{vidatemp}" readonly/>
+<input type="hidden" name="attr_mana_max" value="@{manatotal} + @{manatemp}" readonly/>
 <input name="attr_defesatotal" maxlength="3" type="hidden" value="10" spellcheck="false">
-</body>
-</html>
+
 
 
 
@@ -1811,60 +1808,17 @@
             return 0;
         }
         return Math.floor((valor - 10) / 2);
-    }
-    //Força
-    on("sheet:opened change:for", function(){
-        getAttrs(["for"], function(v){
-            let formod = calc_mod(v.for);
-            setAttrs({
-                for_mod: formod 
-            });
-        }); 
-    });
-    //Destreza
-    on("sheet:opened change:des", function(){
-        getAttrs(["des"], function(v){
-            let desmod = calc_mod(v.des);
-            setAttrs({
-                des_mod: desmod 
-            });
-        }); 
-    });
-    //Constituição
-    on("sheet:opened change:con", function(){
-        getAttrs(["con"], function(v){
-            let conmod = calc_mod(v.con);
-            setAttrs({
-                con_mod: conmod 
-            });
-        }); 
-    });
-    //Inteligencia
-    on("sheet:opened change:int", function(){
-        getAttrs(["int"], function(v){
-            let intmod = calc_mod(v.int);
-            setAttrs({
-                int_mod: intmod 
-            });
-        }); 
-    });
-    //Sabedoria
-    on("sheet:opened change:sab", function(){
-        getAttrs(["sab"], function(v){
-            let sabmod = calc_mod(v.sab);
-            setAttrs({
-                sab_mod: sabmod 
-            });
-        }); 
-    });
-    //Carisma
-    on("sheet:opened change:car", function(){
-        getAttrs(["car"], function(v){
-            let carmod = calc_mod(v.car);
-            setAttrs({
-                car_mod: carmod 
-            });
-        }); 
+    };
+    // Stat mods
+    ['for', 'des', 'con', 'int', 'sab', 'car'].forEach(stat => {
+        on(`sheet:opened change:${stat}`, function(){
+            getAttrs([stat], function(v){
+                let mod = calc_mod(v[stat] ||10);
+                setAttrs({
+                    [`${stat}_mod`]: mod 
+                });
+            }); 
+        });
     });
 
     //Bonus em perícia por nível
@@ -1899,7 +1853,8 @@
     });
 
     //Calculando o dano de um acerto critico
-    on("sheet:opened change:repeating_attacks:danoataque change:repeating_attacks:multiplicadorcriticoataque", function() {
+    // removed sheet:opened as its not valid for repeating section workers without a row ID.
+    on("change:repeating_attacks:danoataque change:repeating_attacks:multiplicadorcriticoataque", function() {
         getAttrs([
            "repeating_attacks_danoataque",
            "repeating_attacks_multiplicadorcriticoataque"
@@ -2052,6 +2007,17 @@
         }); 
     });*/
     
+    ['vida', 'mana'].forEach(max => {
+        on(`change:${max}total change:${max}temp`, () => {
+            getAttrs([`${max}total`, `${max}temp`], v => {
+                const temp = +v[`${max}temp`] || 0;
+                const total = +v[`${max}total`] || 0;
+                setAttrs({
+                    [`${max}_max`]: temp + total
+                });
+            });
+        });
+    });
     
 
 

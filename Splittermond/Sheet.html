@@ -3057,6 +3057,11 @@
     
         <div class="sheet-section sheet-section-Updates" style="background-color:#C81369; color: white">
         <h1 style="color: white;">Letzte Updates</h1> <br/>
+        <h2 style="color: white;">21.07.2020</h2>
+        <ul>
+            <li>Der Bug, nach dem frisch importierte Charaktere einen Schadensmodifikator von 8 haben, ist behoben.</li>
+            <li>Beim Import aus Genesis wird die Ausr&uuml;stung jetzt im neuen Interface hinterlegt.</li>
+        </ul>
         <h2 style="color: white;">14.07.2020</h2>
         <ul>
             <li>Tooltips für abgeleitete Werte wurden hinzugef&uuml;gt. Um die Tooltips mit Inhalten zu f&uuml;llen, einfach die Werte oder Attribute einmal ver&aauml;ndern (z.B. Modifikator erh&ouml;hen) und dann wieder r&uuml;ckg&auml;gngi machen</li>
@@ -3072,10 +3077,6 @@
         <ul>
             <li>Vielen Dank für eure massive Beteiligung an der Umfrage! Die Umfrage ist ab sofort geschlossen, da sind viele gute Ideen bei rumgekommen! Der erste Punkt ist auch schon umgesetzt:</li>
             <li>Es gibt einen neuen Reiter f&uuml;r Ausr&uuml;stung. Als Standard wird lediglich "Am K&ouml;rper getragen" angezeigt, es sind aber bis zu f&uuml;nf weitere Beh&auml;lter hinzuf&uuml;g- und beschriftbar (z.B. Rucksack, Satteltaschenm etc.). Viel Spa&szlig; damit! Das Ausr&uuml;stung-Feld unter "Charakterentwicklung" hat damit ausgesorgt und wird demnächst deaktiviert.</li>
-        </ul>
-        <h2 style="color: white;">23.06.2020</h2>
-        <ul>
-            <li>Die Tooltips folgen wieder dem alten Mechanismus (Konfigurieren via Einstellungen). Zauberspr&uuml;che k&oumL;nnen jetzt ebenso konfiguriert werden.</li>
         </ul>
     </div>
     <br/><p style="font-size:10px; text-align:center;">Mit Dank an alle begeisterten Splittermond-Spieler, die diesen Charakterbogen nutzen und mit ihrem Feedback für stetige Verbesserungen sorgen!</p>
@@ -5209,7 +5210,7 @@ on("change:fokus", function(e) {
     });
 });
 
-on("change:lebenspunkte_v change:schmerzresistenz change:sw1 change:sw2 change:verwundet change:schadenimmun change:wundabzugsmod", function(e) {
+on("change:lebenspunkte_v change:lebenspunkte change:schmerzresistenz change:sw1 change:sw2 change:verwundet change:schadenimmun change:wundabzugsmod", function(e) {
    getAttrs(["lebenspunkte", "lebenspunkte_v", "lebenspunkte_k", "lebenspunkte_e", "schmerzresistenz", "sw1", "sw2", "verwundet", "schadenimmun", "wundabzugsmod"], function(v) {
         var mod;
         var row = Math.ceil( +v.lebenspunkte_v / +v.lebenspunkte );
@@ -6182,19 +6183,16 @@ function writeToSheet (characterData) {
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenmerkmale"] = characterData["shields"][0]["features"][0]["name"];
         }
         if (characterData["items"].length > 0 && characterData["items"] != null) {
-            let items = "";
             let count;
             let item;
             for (var i = 0; i < characterData["items"].length; i++) {
                 item = characterData["items"][i]["name"];
                 count = characterData["items"][i]["count"];
-                items += item;
-                if (+count > 1) {
-                    items += ": " + count + " Stück";
-                }
-                items += "\n";
+                newrowid = generateRowID();
+                character["repeating_ausruestung_" + newrowid + "_anzahl"] = +count;
+                character["repeating_ausruestung_" + newrowid + "_name"] = item;
+                character["repeating_ausruestung_" + newrowid + "_getragen"] = true;
             }
-            character["stuff"] = items;
         }
         if (characterData["notes"] != null) {
             character["notizen"] = characterData["notes"];
