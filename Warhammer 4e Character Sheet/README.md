@@ -20,6 +20,8 @@ NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. 
 - Ranged Ammo now displays properly in the roll template.
 - Talents now have a roll template which displays their info in chat.
 - Critical & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
+- Fate/Fortune/Resiliance/Resolve value mininum is now locked to 0.
+- Tab Menu alignment issue fixed & inactive buttons shadowed.
 - All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
