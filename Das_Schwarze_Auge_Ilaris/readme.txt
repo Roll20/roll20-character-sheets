@@ -122,4 +122,7 @@ Neue Features:
 - Getrennte AE- und KE-Werte für geweihte Zauberer
 - Optionale Sektion für Inventar und Notizen
 
-1.5.1: Fix des Zuschlags für "Doppelangriff".
+1.5.1: 
+- Fix des Zuschlags für "Doppelangriff".
+- Mehrfachnennung "Entwaffnen" entfernt.
+- Globaler Modifikator wird jetzt zur besseren Übersichtlichkeit in den verschiedenen Sektionen nochmal angezeigt.
