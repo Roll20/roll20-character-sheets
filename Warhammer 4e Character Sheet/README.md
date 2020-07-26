@@ -22,7 +22,7 @@ NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. 
 - Talents now have a roll template which displays their info in chat.
 - Critical & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
 - Fate/Fortune/Resiliance/Resolve value mininum is now locked to 0.
-- Tab Menu alignment issue fixed & inactive buttons shadowed.
+- Tab Menu inactive buttons shadowed.
 - All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
@@ -202,7 +202,7 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future release wish list :
 
-- Add Mutation Roll table button. (expanded list from Death on the Reik) (v1.2)
+- Add Physical/Mental Corruption Roll table button. (expanded list from Enemy within Companion) (v1.2)
 - Talents Tab rework, with possible roll integration. (v1.3)
 - WFRP 4e Roll API with SL resolution API. (v1.x)
 - More themes. (v1.x)
