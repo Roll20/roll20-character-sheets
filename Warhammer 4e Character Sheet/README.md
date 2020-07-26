@@ -8,6 +8,22 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+
+July 13 2020 
+
+- Endurance test in Combat Action no longer rolls a Heal test
+- Impale mechanics tiedied up for Attack/Opposed/Shoot rools and made more obvious when it occurs.
+- NPC pages 2/3/4 fixes which were only applied on page 1 before
+
+
+July 13 2020 
+
+- Major Art overhaul -  in style of the rule book, removed the black banners and reworked section titles, new background for all themes. Overall effect is less contrast and more white space. Easier on the Eyes.
+- Weapons Tab overhaul - Weapons must now be selected to use them, and will fire of from the new Attack/Opposed/Shoot buttons. This should be fairly obvious when the Player next tries to use a weapon after this update. This feature is supported by new sheetworkers. This allows using weapons outside the Weapons reaping sections which is the main reason this was implemented.
+- Combat Actions section overhaul - Added custom roll field, core rule based movement rolls for Athletics/Climbing/Falling/Leaping/Pursuit/Sprinting in drop-down menu, current active Attack/Opposed/Shoot display and buttons which are underpinend by the new Weapons mechanic.
+- And a number of minor bug fixes
+
+
 July 5 2020
 
 - Add Armor value to NPC boxes
