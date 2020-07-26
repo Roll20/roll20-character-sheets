@@ -5,24 +5,12 @@
 			_hit_points: ['strength_score', 'constitution_score'],
 			_sanity_points: ['power_score'], //ALSO USED FOR BREAKING POINTS
 			_willpower_points: ['power_score'],
-			_toggles: ['settings']
+			_toggles: ['settings'],
+			_sanity_loss: ['san_success', 'san_failure']
 		};
 
 		
-	// VERSIONING
-	on("sheet:opened", function() {
-		getAttrs(['version'], function(v) {
-			if(v.version != '1.05') {
-				let update={version: '1.05',
-							 initial_san: 0,
-							 initial_hp:  0,
-							 initial_str: 0,
-							 initial_con: 0
-				}
-				setAttributes(update, true);
-			}
-		});
-	});
+	
 	// === SHARED FUNCTIONS
 	const setAttributes = (update, silent) => { 
 		(silent === true) ? setAttrs(update, {silent:true}) : setAttrs(update); 
@@ -125,6 +113,18 @@
 		});
 	});
 	
+	// === SAN LOSS Button
+	arrays['_sanity_loss'].forEach(attr => {
+		on(`change:${attr}`, (eventinfo) => {
+			const value = eventinfo.newValue;
+			if (value ===""){
+				setAttributes({[`has_${attr}`]: 0}, true);
+			} else {
+				setAttributes({[`has_${attr}`]: 1}, true);
+			}
+		});
+	});
+	
 	// === TOGGLE INPUT SETTINGS
     arrays['_toggles'].forEach(attr => {
         on(`clicked:toggle_${attr}`, () => {
@@ -141,20 +141,91 @@
         return newString
 	};
 
+
 	// === SHEET VERSIONING
 	on('sheet:opened', () => {
-		getAttrs(['version'], (values) => { versioning(parseFloat(values.version) || 1); });
+		getAttrs(['version'], values => { versioning(parseFloat(values.version) || 1); });
 	});			
 
 	const versioning = (version) => {
 	   console.log(`%c Versioning, ${version}`, 'color: green; font-weight:bold');
-	   if (version >= 1) {
-			console.log(`%c Version is update to date`, 'color: orange; font-weight:bold');
-	    } else {
-			setAttrs({version: 1}, () => {versioning(1)});
-		};
+	   if (version < 1.05) {
+		   version_0_105();
+	    } 
+		else if (version <1.5) {
+			version_105_150();
+		}
 	};
 
+	// UPDATE TO VERSION 1.05
+	const version_0_105= () => {
+		getAttrs(['version'], function(v) {
+			let codeversion=1.05;
+			let update={version: codeversion,
+						 initial_san: 0,
+						 initial_hp:  0,
+						 initial_str: 0,
+						 initial_con: 0
+			};
+			setAttrs(update, //Update attributes
+				{silent:true},  // will not trigger sheet workers
+				versioning(codeversion)); // call versioning again
+		});
+	};
+	// UPDATE TO VERSION 1.5
+	// UPDATE TO VERSION 1.5
+	const version_105_150 = () => {
+		
+		let codeversion=1.5;
+		let update={};
+		
+		getSectionIDs("weapons",idarray=>{
+	   console.log(`%c idarray`, 'color: green; font-weight:bold');
+	   console.info(idarray);
+			let fieldnames=['sheet_type','version'];
+	        console.log(`%c did I found weapons?`, 'color: green; font-weight:bold');
+			idarray.forEach(id => {
+        	        console.log(`%c ${id}`, 'color: green; font-weight:bold');
+					fieldnames.push(`repeating_weapons_${id}_damage`,`repeating_weapons_${id}_lethality_percent`,`repeating_weapons_${id}_attack`);
+			});
+	   		getAttrs(fieldnames,function(v) {
+        	   console.log(`%c v`, 'color: green; font-weight:bold');
+        	   console.info(v);
+        	   update['version']=codeversion;
+        	   console.info(update);
+				idarray.forEach(id=>{
+				    console.log(`%c ${id}`, 'color: green; font-weight:bold');
+					if (v[`repeating_weapons_${id}_damage`]===""){
+					    update["repeating_weapons_"+id+"_hasdamage"]="0";
+        	   console.info(update);
+					} else{
+					    update["repeating_weapons_"+id+"_hasdamage"]="1";
+        	   console.info(update);
+					}
+						
+					if (v[`repeating_weapons_${id}_lethality_percent`]>0){
+					    update["repeating_weapons_"+id+"_haslethality"]="1";
+        	   console.info(update);
+					} else {
+					    update["repeating_weapons_"+id+"_haslethality"]="0";
+        	   console.info(update);
+					}
+					if (v['sheet_type']==='npc'){
+					    update["repeating_weapons_"+id+"_weapons"]=v[`repeating_weapons_${id}_attack`];
+					}
+    			});
+    			
+    		   console.log(`%c update`, 'color: green; font-weight:bold');
+        	   console.info(update);
+        		setAttrs(update, //Update attributes
+        				{silent:true},  // will not trigger sheet workers
+        				versioning(codeversion)); // call versioning again
+				
+			});
+		});
+	};
+
+	
 // UPDATE THE VALUE OF THE BOND IN THE REPEATING SECTION WHEN CREATED
 	on("change:repeating_bonds",function(){
 		getAttrs(["repeating_bonds_flag","charisma_score"],function(value){
@@ -162,8 +233,27 @@
 				let update={
 							repeating_bond_score:value["charisma_score"],
 							repeating_bond_flag:1
-							}
+							};
 				setAttributes(update,true);
 			}
+		});
+	});
+
+// CHECK IF DAMAGE OR LETHALITY EXISTS
+	on("change:repeating_weapons",function(){
+		getAttrs(['repeating_weapons_damage','repeating_weapons_lethality_percent'],function(value){
+			let update={};
+			if (value['repeating_weapons_damage']===""){
+				update['repeating_weapons_hasdamage']=0;
+			}else{
+				update['repeating_weapons_hasdamage']=1;
+			}
+			
+			if (value['repeating_weapons_lethality_percent']>0){
+				update['repeating_weapons_haslethality']=1;
+			}else{
+				update['repeating_weapons_haslethality']=0;
+			}
+			setAttributes(update,true);
 		});
 	});
