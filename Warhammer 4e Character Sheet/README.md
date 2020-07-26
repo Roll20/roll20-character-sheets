@@ -23,6 +23,7 @@ NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. 
 - Critical & Injuries section title in the Core Stats tab renamed to Injuries & Other Ailments.
 - Fate/Fortune/Resiliance/Resolve value mininum is now locked to 0.
 - Tab Menu inactive buttons shadowed.
+- NPC tab characters weapon & spells selection is now persistant
 - All spell types now have a custom name option and input field next to the selector (requested feature)
 
 
