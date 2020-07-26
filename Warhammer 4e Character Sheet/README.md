@@ -15,6 +15,7 @@ NEW - Condition Tracking full implementation, now adds up Multiple Conditions co
 NEW - Expandable Packs, Containers & Vehicle section added under Inventory Tab. Allows for simple separation of carried and non-carried items, in Packs & Vehicles. Separate weight calc built in. Container with Enc now add to Total Character Enc too. (Great for any sort of travel heavy stories, e.g. Death on the Reik!)
 
 - Missing Impale code added from last update.
+- Manual Roll Modifier now displays in the Roll Template for most rolls.
 - Pursuit Roll Rule text changed to be clearer to read.
 - Weapon Reach now displays in the roll template, similar to Range for Ranged Weapons.
 - Ranged Ammo now displays properly in the roll template.
