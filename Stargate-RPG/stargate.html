@@ -1,5 +1,8 @@
 <input type="radio" name="attr_tab" class="tab tab1" value="1" checked="checked"><span title="Main"></span>
 <input type="radio" name="attr_tab" class="tab tab2" value="2"                  ><span title="Background"></span>
+
+<span class="version bold">Sheet Version: 1.1</span>
+
 <!-- 
 <div>
     <button type="action" name="act_character" >Character</button>
@@ -624,26 +627,30 @@
 
 <script type="text/worker">
 
-// Tab management
-/*
-const buttonlist = ["character","journal","configuration"];
-buttonlist.forEach(button => {
-    on(`clicked:${button}`, function() {
-        setAttrs({
-            sheetTab: button
-        });
-    });
-});*/
-
-
-// Calculate Stat modifier
 const int = score => parseInt(score, 10) || 0;
 const stats = ["str", "dex", "con", "wis", "int", "cha"];
+
+
+const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
+const skillsdex = ["acrobatics", "pilot","sleight", "stealth"];
+const skillsint = ["engineering", "history", "investigation", "nature", "science"];
+const skillswis = ["animalhandling", "culture", "insight", "medicine", "perception", "survival"];
+const skillscha = ["deception", "intimidation", "performance", "persuasion"];
+const init = ["init", "moxie"];
+
+const statmods = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "prof"];
+
+const skillslistprof = ["acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c"];
+const skillslistprofget = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "prof"];
+
+// Calculate Stat modifier
+
 stats.forEach(stat => {
     on(`change:${stat}`, () => {
         getAttrs([stat], values => {
             const stat_base = int(values[stat]);
-            //console.log(stat_base);
+            console.log("stat changed");
+            console.log(stat_base);
             let stat_mod = 0;
             if (stat_base >= 30) stat_mod = "+10";
             else if (stat_base >= 28) stat_mod = "+9";
@@ -669,5 +676,87 @@ stats.forEach(stat => {
         });
     });
 });
+
+
+
+// skill prof check/uncheck
+
+skillslist.forEach(skillcheckbox => {
+    on(`change:${skillcheckbox}_c`, (eventInfo) => {
+        console.log("skill prof toggle");
+        console.log(skillcheckbox);
+        let xbox = skillcheckbox + "_c";
+
+        console.log("xbox defined");
+        console.log("xbox is " + xbox);
+
+        let getlist = [ xbox, "acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival", "acrobatics_c", "animalhandling_c", "athletics_c", "culture_c", "deception_c", "engineering_c", "history_c", "insight_c", "intimidation_c", "investigation_c", "medicine_c", "nature_c", "perception_c", "performance_c", "persuasion_c", "pilot_c", "science_c", "sleight_c", "stealth_c", "survival_c", "prof"];
+        console.log("def getlist");
+
+        getAttrs(getlist, values => {
+            console.log("getatt done");
+            let checkbox = int(values[xbox]);
+            let skillnow = int(values[skillcheckbox]);
+            let profval = int(values["prof"]);
+            let skillnew = 0;
+            console.log("checkbox " + checkbox + "skillnow " + skillnow);
+
+            if (checkbox === 1){
+                skillnew = skillnow + profval;
+            }
+            else{
+               skillnew = skillnow - profval; 
+            }
+            console.log("skillew " + skillnew);
+
+            setAttrs({
+                [`${skillcheckbox}`]: skillnew
+            });
+            console.log("setAttr done");
+        });
+    });
+});
+
+
+// save prof check/uncheck
+
+stats.forEach(savecheckbox => {
+    on(`change:${savecheckbox}_save_c`, (eventInfo) => {
+        console.log("save prof toggle");
+        console.log(savecheckbox);
+        let xbox = savecheckbox + "_save_c";
+
+        console.log("xbox defined");
+        console.log("xbox is " + xbox);
+
+        let getlist = [ xbox, "str_save", "dex_save", "con_save", "wis_save", "int_save", "cha_save","str_save_c", "dex_save_c", "con_save_c", "wis_save_c", "int_save_c", "cha_save_c", "prof"];
+        console.log("def getlist");
+
+        getAttrs(getlist, values => {
+            console.log("getatt done");
+            let checkbox = int(values[xbox]);
+            let savenow = int(values[`${savecheckbox}_save`]);
+            let profval = int(values["prof"]);
+            let savenew = 0;
+            console.log("checkbox " + checkbox + "savenow " + savenow);
+
+            if (checkbox === 1){
+                savenew = savenow + profval;
+            }
+            else{
+               savenew = savenow - profval; 
+            }
+            console.log("skillew " + savenew);
+
+            setAttrs({
+                [`${savecheckbox}_save`]: savenew
+            });
+            console.log("setAttr done");
+        });
+    });
+});
+
+
+
 
 </script>
