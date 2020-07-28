@@ -7,3 +7,10 @@ Changes include:
 2. Geist: The Sin-Eaters Second Edition
 3. Krewe sheet for Geist: The Sin-Eaters Second Edition (also available as generic Organization sheet)
 4. Geist sheet for Geist: The Sin-Eaters Second Edition
+5. Homebrew sheet, which allows custom labels for specific traits
+
+Planned changes:
+1. Remove Health and Willpower dots, leaving just the checkboxes.
+2. Include ability description in page 2 sheet rolls
+3. Dark Eras skills: Ride, Enigma, Archery
+4. Absent sheet for Geist: The Sin-Eaters Second Edition
