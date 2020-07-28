@@ -8,6 +8,11 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+August 3rd 2020 v1.11
+
+- NPC pages 2,3 & 4 weapon/spell rolls fixed
+
+
 
 July 27 2020 - v1.1
 
