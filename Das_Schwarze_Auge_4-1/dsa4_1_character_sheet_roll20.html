@@ -808,7 +808,7 @@
                     <div class="sheet-talent-cell sheet-talent-stf">E</div>
                     <div class="sheet-talent-cell sheet-talent-ebe">BE−1</div>
                     <input type="text" class="sheet-talent-spez" name="attr_Spez_peitsche">
-                    <input type="number" class="sheet-talent-at" name="attr_AT_peitsche" disabled="disabled" value="@{ATbasis} + @{TaW_peitsche}">
+                    <input type="number" class="sheet-talent-at" name="attr_AT_peitsche" readonly="true"></input>
                     <input type="text" class="sheet-talent-pa" disabled="disabled" value="-">
                     <input type="number" class="sheet-talent-taw" name="attr_TaW_peitsche" min="-4" value="0">
                     <br>
@@ -10949,6 +10949,30 @@
                 </table>
             </div>
 
+            <h3>Schilde & Parierwaffen (Nur Parade unterstützt)</h3>
+            <div class="shields_container">
+                <span class="shield_active">Aktiv</span>
+                <span class="shield_item">Name</span>
+                <span class="shield_item">Typ</span>
+                <span class="shield_item">INI-Mod</span>
+                <span class="shield_item">AT-Mod</span>
+                <span class="shield_item">PA-Mod</span>
+            </div>
+            
+            <fieldset class="repeating_shields">
+                <div class="shields_container">
+                    <input type="checkbox" name="attr_shield_active"  class="shield_active"/>
+                    <input type="text" name="attr_shield_name"  class="shield_item"/>
+                    <select class="shield_item" name="attr_shield_type">
+                        <option value="shield">Schild</option>
+                        <option value="parryweapon">Parierwaffe</option>
+                    </select>
+                    <input type="number" name="attr_shield_ini_mod" min="-5" max="10" value="0"  class="shield_item"/>
+                    <input type="number" name="attr_shield_at_mod" min="-5" max="10" value="0"  class="shield_item"/>
+                    <input type="number" name="attr_shield_pa_mod" min="-5" max="10" value="0"  class="shield_item"/>
+                </div>
+            </fieldset>
+
             <h3>Rüstung</h3>
             <table>
                 <tr align="center">
@@ -11154,6 +11178,7 @@
             </table>
         </div>
 
+        <!-- Kampf -> Nahkampf -->
         <div class="sheet-section sheet-section-Kampfwerte2">
 
             <table align="center">
@@ -11180,10 +11205,25 @@
                 </tr>
             </table>
 
+            <h3>Nahkampf Werte</h3>
+            <div class="nahkampf_werte_container">
+                <div class="nahkampf_werte_label"></div> <!-- Dummy Container um erste Spalte aufzufüllen -->
+                <span class="nahkampf_werte_label">Waffen-Attacke</span>
+                <span class="nahkampf_werte_label">Waffen-Parade</span>
+                <span class="nahkampf_werte_label">Schild-Parade</span>
+                <span class="nahkampf_werte_label">Parierwaffen-Parade</span>
+                <div class="nahkampf_werte_value"></div> <!-- Dummy Container um erste Spalte aufzufüllen -->
+                <span class="nahkampf_werte_value" name="attr_AT_Aktiv"></span>
+                <span class="nahkampf_werte_value" name="attr_PA_Aktiv"></span>
+                <span class="nahkampf_werte_value" name="attr_shield_pa"></span>
+                <span class="nahkampf_werte_value" name="attr_parryweapon_pa"></span>
+            </div>
+
             <input type="checkbox" class="sheet-hide-melee-weapon-1 sheet-default-hide" name="attr_NKW_Aktiv1" value="1" checked="true">
             <input type="checkbox" class="sheet-hide-melee-weapon-2 sheet-default-hide" name="attr_NKW_Aktiv2" value="1" checked="true">
             <input type="checkbox" class="sheet-hide-melee-weapon-3 sheet-default-hide" name="attr_NKW_Aktiv3" value="1" checked="true">
             <input type="checkbox" class="sheet-hide-melee-weapon-4 sheet-default-hide" name="attr_NKW_Aktiv4" value="1" checked="true">
+
             <table class="sheet-hideable-melee-weapons">
                 <tr>
                     <th>Aktive Waffe</th>
@@ -11379,6 +11419,8 @@
             <input type="checkbox" class="sheet-hide-man-meisterparade sheet-default-hide" name="attr_sf_meisterparade">
             <input type="checkbox" class="sheet-hide-man-waffezerbrechen sheet-default-hide" name="attr_sf_waffezerbrechen">
             <input type="checkbox" class="sheet-hide-man-windmuehle sheet-default-hide" name="attr_sf_windmuehle">
+            <input type="checkbox" class="sheet-hide-man-schildparade sheet-default-hide" name="attr_shield_pa_available">
+            <input type="checkbox" class="sheet-hide-man-pwparade sheet-default-hide" name="attr_parryweapon_pa_available">
             <table class="sheet-table-defensive-actions" align="left">
                 <tr>
                     <th>Parade</th>
@@ -11387,6 +11429,14 @@
                 <tr>
                     <td><button name="PA" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Nahkampfparade}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{modansage=[[-1]]}} {{wert=[[@{PA_Aktiv}]]}} {{eff_wert=[[@{PA_Aktiv}]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Parade</span></button></td>
                     <td><button name="PA+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Nahkampfparade}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{modansage=[[-1]]}} {{ansage=[[-1]]}} {{wert=[[@{PA_Aktiv}]]}} {{eff_wert=[[[[@{PA_Aktiv}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button></td>
+                </tr>
+                <tr class="sheet-hideable-man-schildparade">
+                    <td><button name="Schild-PA" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Schildparade}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{modansage=[[-1]]}} {{wert=[[@{shield_pa}]]}} {{eff_wert=[[@{shield_pa}]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Schild-Parade</span></button></td>
+                    <td><button name="Schild-PA+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Schildparade}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{modansage=[[-1]]}} {{ansage=[[-1]]}} {{wert=[[@{shield_pa}]]}} {{eff_wert=[[[[@{shield_pa}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button></td>
+                </tr>
+                <tr class="sheet-hideable-man-pwparade">
+                    <td><button name="Parierwaffen-PA" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Parierwaffenparade}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{modansage=[[-1]]}} {{wert=[[@{parryweapon_pa}]]}} {{eff_wert=[[@{parryweapon_pa}]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Parierwaffen-Parade</span></button></td>
+                    <td><button name="Parierwaffen-PA+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Parierwaffenparade}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{modansage=[[-1]]}} {{ansage=[[-1]]}} {{wert=[[@{parryweapon_pa}]]}} {{eff_wert=[[[[@{parryweapon_pa}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button></td>
                 </tr>
                 <tr>
                     <td><button name="Ausweichen" type="roll" value="@{gm_roll_opt} &{template:DSA-Kampf-Ausweichen} {{name=Ausweichen}} {{ausweichenmod=[[(-1)*((@{sf_ausweichenI}) + (@{sf_ausweichenII}) + (@{sf_ausweichenIII}))]]}} {{probenmod=[[0]]}} {{mod=[[(-1)*((@{sf_ausweichenI}) + (@{sf_ausweichenII}) + (@{sf_ausweichenIII})) + (@{BE_TaW})]]}} {{ansage=[[-1]]}} {{modansage=[[-1]]}} {{pa=[[@{PABasis}]]}} {{be=[[@{BE_TaW}]]}} {{wert=[[@{PABasis}]]}} {{eff_wert=[[@{PABasis} + (@{sf_ausweichenI}) + (@{sf_ausweichenII}) + (@{sf_ausweichenIII}) - (@{BE_TaW})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Ausweichen</span></button></td>
@@ -12058,7 +12108,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <label class="sheet-lone-input-label"><input type="checkbox" name="attr_sf_parierwaffenI"> Parierwaffen I</label>
+                                    <label class="sheet-lone-input-label"><input type="checkbox" name="attr_sf_parierwaffenI" value="1"> Parierwaffen I</label>
                                 </td>
                             </tr>
                             <tr>
@@ -12791,7 +12841,8 @@
             <div class="sheet-hide">
                 <!-- Comfort Attributes (= to shorten rolls) -->
                 AT-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
-                <input type="number" name="attr_AT_Aktiv" disabled="disabled" value="((@{AT_NKW1}) * @{NKW_Aktiv1}) + ((@{AT_NKW2}) * @{NKW_Aktiv2}) + ((@{AT_NKW3}) * @{NKW_Aktiv3}) + ((@{AT_NKW4}) * @{NKW_Aktiv4})">
+                <!-- Berechnung AT Wert -->
+                <!-- <input type="number" name="attr_AT_Aktiv" disabled="disabled" value="((@{AT_NKW1}) * @{NKW_Aktiv1}) + ((@{AT_NKW2}) * @{NKW_Aktiv2}) + ((@{AT_NKW3}) * @{NKW_Aktiv3}) + ((@{AT_NKW4}) * @{NKW_Aktiv4})"> -->
 
                 Anzahl an W6 aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
                 <input type="number" name="attr_TP_W_Aktiv" disabled="disabled" value="@{NKW_Aktiv1} * @{NKWschaden1_1} + @{NKW_Aktiv2} * @{NKWschaden2_1} + @{NKW_Aktiv3} * @{NKWschaden3_1} + @{NKW_Aktiv4} * @{NKWschaden4_1}">
@@ -12799,8 +12850,7 @@
                 Schadensbonus aus aktiver Waffe inkl. TP/KK (bei Wahl mehrerer aktiver Waffen wird addiert!)
                 <input type="number" name="attr_TP_Bonus_Aktiv" disabled="disabled" value="@{NKW_Aktiv1} * (@{NKWschaden1_2} + @{NKW1_SB}) + @{NKW_Aktiv2} * (@{NKWschaden2_2} + @{NKW2_SB}) + @{NKW_Aktiv3} * (@{NKWschaden3_2} + @{NKW3_SB}) + @{NKW_Aktiv4} * (@{NKWschaden4_2} + @{NKW4_SB})">
 
-                PA-Wert aus aktiver Waffe (bei Wahl mehrerer aktiver Waffen wird addiert!)
-                <input type="number" name="attr_PA_Aktiv" disabled="disabled" value="((@{PA_NKW1}) * @{NKW_Aktiv1}) + ((@{PA_NKW2}) * @{NKW_Aktiv2}) + ((@{PA_NKW3}) * @{NKW_Aktiv3}) + ((@{PA_NKW4}) * @{NKW_Aktiv4})">
+                <!-- Wird jetzt mittels Sheet Worker berechnet <input type="number" name="attr_PA_Aktiv" disabled="disabled" value="((@{PA_NKW1}) * @{NKW_Aktiv1}) + ((@{PA_NKW2}) * @{NKW_Aktiv2}) + ((@{PA_NKW3}) * @{NKW_Aktiv3}) + ((@{PA_NKW4}) * @{NKW_Aktiv4})">-->
 
                 Ausweichen-Wert für den Kampf (quasi deaktiviert im Zuge der Umstellung auf das WdS-System zum Ausweichen)
                 <input type="number" name="attr_Ausweichen_Kampf" disabled="disabled" value="@{PABasis} - @{BE_TaW}">
@@ -16045,5 +16095,234 @@ on("sheet:opened", function() {
     migrationCheck();
 });
 
-</script>
+// Berechnet den Gesamt-AT-Wert inklusive Modifikation durch ein eventuell verwendetes Schild
+// sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
+// Not working: Peitsche
+on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII", 
+function(eventInfos) {
+    // Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
+    // "activeShieldRowId" can be the id of either a shield or a parry weapon
+    getAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
+        var weapon = 0;
+        if (rowIdValues["NKW_Aktiv1"] === "1") {
+            weapon = 1;
+        } else if (rowIdValues["NKW_Aktiv2"] === "1") {
+            weapon = 2;
+        } else if (rowIdValues["NKW_Aktiv3"] === "1") {
+            weapon = 3;
+        } else if (rowIdValues["NKW_Aktiv4"] === "1") {
+            weapon = 4;
+        } else {
+            // didn't find an active weapon. setting values to 0;
+            setAttrs({ "AT_Aktiv": 0 });
+            setAttrs({ "PA_Aktiv": 0 });
+            setAttrs({ "shield_pa": 0 });
+            setAttrs({ "parryweapon_pa": 0 });
+            setAttrs({ "shield_pa_available": "0" });
+            setAttrs({ "parryweapon_pa_available": "0" });
+            return;
+        }
+        var variablesToGet = [ "NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod", "NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod", "NKW" + weapon + "_Spez", 
+            "AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", 
+            "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
+            "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
+            "PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", 
+            "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
+            "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
+            "PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII" ];
 
+        // Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
+        var activeShieldRowId = rowIdValues["activeShieldRowId"];
+        if (eventInfos.sourceAttribute.endsWith("_shield_active")) {
+            if (eventInfos.newValue === "on") {
+                activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
+            } else if (eventInfos.sourceType === "player") {
+                activeShieldRowId = undefined;
+            }
+        }
+
+        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+        if (activeShieldRowId) {
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+        }
+        getAttrs(variablesToGet, function(values) {
+            var attrsToChange = {};
+
+            // Berechne Waffen-AT
+            var attackType = values["NKW_AT_typ" + weapon];
+            // Wir berechnen den AT Wert nur, wenn ein Talenttyp für den AT Wert der Waffe ausgewählt ist
+            if (attackType) {
+                var baseAttack = parseInt(values[attackType.match("@{(.*)}")[1]]);
+                // Es gibt einige Attribute wo das Naming unterschiedlich ist, was bei Auto Calculating Fields nicht zu Fehlern führt aber hier. Daher im Zweifelsfall mit Lower-Case Namen nochmal probieren
+                if (!baseAttack) {
+                    var matchResult = attackType.match("@{AT_([A-Za-z])(.*)}");
+                    var attributeName = "AT_" + matchResult[1].toLowerCase() + matchResult[2];
+                    baseAttack = parseInt(values[attributeName]);
+                }
+                var atMod = parseInt(values["NKW" + weapon +"ATMod"]);
+                var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+                var atValue = baseAttack + atMod + spec;
+                // bei aktivem Schild (nicht bei Parierwaffen), wird der AT Wert der Hauptwaffe um den AT-Mod des Schildes verändert
+                if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+                    atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+                }
+                attrsToChange["AT_Aktiv"] = atValue;
+            }
+
+            // Berechne Waffen-PA
+            var paType = values["NKW_PA_typ" + weapon];
+            var paValue = 0;
+            // Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
+            if (paType) {
+                var basePa = parseInt(values[paType.match("@{(.*)}")[1]]);
+                // Siehe oben
+                if (!basePa) {
+                    var matchResult = paType.match("@{PA_([A-Za-z])(.*)}");
+                    var attributeName = "PA_" + matchResult[1].toLowerCase() + matchResult[2];
+                    basePa = parseInt(values[attributeName]);
+                }
+                var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
+                var spec = parseInt(values["NKW" + weapon + "_Spez"]);
+                paValue = basePa + paMod + spec;
+                
+                if (Number.isNaN(paValue) || paValue < 0) {
+                    paValue = 0;
+                }
+                attrsToChange["PA_Aktiv"] = paValue;
+            }
+
+            // Berechne Schild-PA Wert
+            var shieldPa = 0;
+            var parryweaponPa = 0;
+            // natürlich nur, wenn ein Schild aktiv ist (Siehe WdS S. 70)
+            if (activeShieldRowId) {
+                var linkhand = values["sf_linkhand"];
+                if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
+                    // Lade die Werte der für Schildparaden relevanten SF
+                    var schildkampf1 = values["sf_schildkampfI"];
+                    var schildkampf2 = values["sf_schildkampfII"];
+                    // Wir starten mit dem PA Basiswert des Charakters
+                    shieldPa = values["PABasis"];
+                    // Für Schildkampf 2 werden 5 Punkte, für Schildkampf 1 3 Punkte und für Linkhand 1 Punkt addiert
+                    if (schildkampf2 === "1") {
+                        shieldPa += 5;
+                    } else if (schildkampf1 === "1") {
+                        shieldPa += 3;
+                    } else if (linkhand === "1") {
+                        shieldPa += 1;
+                    }
+
+                    // Ist der PA Wert der Waffe >= 21 werden 3 Punkte, >= 18 2 Punkte und >= 15 1 Punkt addiert
+                    if (paValue >= 21) {
+                        shieldPa += 3;
+                    } else if (paValue >= 18) {
+                        shieldPa += 2;
+                    } else if (paValue >= 15) {
+                        shieldPa += 1;
+                    }
+
+                    // Zuletzt: Addiere den PA-Modifikator des Schildes
+                    shieldPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
+                } else if (values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "parryweapon") {
+                    var parierwaffen1 = values["sf_parierwaffenI"];
+                    var parierwaffen2 = values["sf_parierwaffenII"];
+                    // Basis für Parierwaffen-PA ist die PA der Hauptwaffe
+                    parryweaponPa = paValue;
+
+                    // Dazu wird der PA-Mod der Parierwaffe addiert
+                    parryweaponPa += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_pa_mod"]);
+
+                    if (parierwaffen2 === "1") {
+                        parryweaponPa += 2;
+                    } else if (parierwaffen1 === "1") {
+                        parryweaponPa += -1;
+                    } else if (linkhand === "1") {
+                        parryweaponPa += -4;
+                    } else {
+                        // Ohne die SF Linkhand können Parierwaffen nicht verwendet werden
+                        parryweaponPa = 0;
+                    }
+                }
+                
+            }
+            
+            if (shieldPa > 0) {
+                attrsToChange["shield_pa_available"] = "on";
+            } else {
+                attrsToChange["shield_pa_available"] = "0";
+            }
+            if (parryweaponPa > 0) {
+                attrsToChange["parryweapon_pa_available"] = "on";
+            } else {
+                attrsToChange["parryweapon_pa_available"] = "0";
+            }
+            attrsToChange["shield_pa"] = shieldPa;
+            attrsToChange["parryweapon_pa"] = parryweaponPa;
+
+            setAttrs(attrsToChange);
+        });
+    });
+});
+
+// Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
+// Funktionsweise siehe Methode unten zum deaktivieren der Schilde
+on("change:NKW_Aktiv1 change:NKW_Aktiv2 change:NKW_Aktiv3 change:NKW_Aktiv4", function(eventInfo) {
+    console.log(eventInfo);
+    if (eventInfo.newValue !== "1") {
+        return;
+    }
+    var attrsToChange = {};
+    for (var i = 1; i <= 4; i++) {
+        if (eventInfo.sourceAttribute !== "nkw_aktiv" + i) {
+            attrsToChange["NKW_Aktiv" + i] = 0;
+        }
+    }
+    setAttrs(attrsToChange);
+});
+
+// Wird ein Schild als "Aktiv" markiert, werden automatisch alle anderen Schilde als inaktiv markiert
+on("change:repeating_shields:shield_active", function(eventInfo) {
+    if (eventInfo.newValue !== "on") {
+        setAttrs({"activeShieldRowId": "" }, { silent: true });
+        return;
+    }
+
+    // Wir holen uns alle Row-Ids für die "shields" Section
+    getSectionIDs("shields", function(idarray) {
+        var attrsToChange = {};
+        for(var i=0; i < idarray.length; i++) {
+            // Ist die Row-Id nicht die des "auslösenden" Attributs, wird es zu den zu deaktivierenden Attributen hinzugefügt
+            if (eventInfo.sourceAttribute.indexOf(idarray[i]) < 0) {
+                attrsToChange[ "repeating_shields_" + idarray[i] + "_shield_active" ] = 0;
+            }
+        }
+        // Wir setzen das derzeit aktive Schild in einem eigenen Attribut
+        attrsToChange[ "activeShieldRowId" ] = extractRowId(eventInfo.sourceAttribute);
+        setAttrs(attrsToChange, { silent: true });
+     });
+    
+});
+
+// wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
+function extractRowId(attributeId) {
+    return attributeId.match("repeating_[a-zA-Z]*_([-a-zA-Z0-9]*)_.*")[1];
+}
+
+on("change:ATbasis change:TaW_peitsche change:AT_peitsche", function(eventInfo) {
+    // do prevent infinite loop
+    if (eventInfo.sourceType === "sheetworker" && eventInfo.sourceAttribute === "AT_peitsche") {
+        return;
+    }
+    getAttrs([ "ATbasis", "TaW_peitsche" ], function(values) {
+        console.log(values);
+        var peitscheAT = 0;
+        if (values["TaW_peitsche"]) {
+            peitscheAT = parseInt(values["ATbasis"]) + parseInt(values["TaW_peitsche"]);
+        }
+        setAttrs({ "AT_peitsche": peitscheAT });
+    });
+});
+
+</script>
