@@ -2,13 +2,13 @@ mixin sectionheader(name, label)
 	//- Creates one of the toggleable headers
 		Parameters
 			name: underlying attribute name (without "attr_")
-			label: i18n code for the text appearing on the header
-				(block is inserted if no label is specified)
+			label: i18n code for the text appearing on the header. Block is inserted as placeholder.
 	.section-toggle-header
 		input(type="checkbox", name=`attr_${name}`, value="1", data-i18n-title="SHOW_HIDE", checked)
 		h1
 			if (label)
 				span(data-i18n=label)
+					block
 			else
 				block
 	input.hider(type="hidden", name=`attr_${name}`, value="1")
@@ -16,9 +16,10 @@ mixin sectionheader(name, label)
 mixin text-input(name, label, extraclass)
 	//- Creates one of the standard underlined text inputs
 		Defaults to a input of type text
+		Always passes block to the label, since new keys take days/weeks to propagate through Roll20
 		Parameters
 			name: underlying attribute name (without "attr_")
-			label: i18n code for the label (block is inserted if no label is specified)
+			label: i18n code for the label
 			extraclass: if present, will be the class of the input
 		Attributes
 			All attributes except class are passed on to the input. class is passed on
@@ -29,6 +30,7 @@ mixin text-input(name, label, extraclass)
 		input(type="text", name=`attr_${name}`, class=extraclass)&attributes(attributes)
 		if (label)
 			.label(data-i18n=label)
+				block
 		else
 			.label
 				block
@@ -39,7 +41,7 @@ mixin text-input-duo(name1, name2, label, attributes2)
 		Parameters
 			name1: underlying attribute name of first input (without "attr_")
 			name2: underlying attribute name of second input (without "attr_")
-			label: i18n code for the label (block is inserted if no label is specified)
+			label: i18n code for the label. Block is inserted as placeholder.
 			attributes2: will be passed on as the attributes of the second input
 		Attributes
 			All attributes except class are passed on to the first input.
@@ -52,19 +54,22 @@ mixin text-input-duo(name1, name2, label, attributes2)
 		input(type="number", name=`attr_${name2}`)&attributes(attributes2)
 		if (label)
 			.label(data-i18n=label)
+				block
 		else
 			block
 
-mixin fake-text-input(label)
+mixin fake-text-input(label, labeltext)
 	//- Creates a label container that looks like one of the underlined text inputs.
 		block is inserted where the input would normally be
 		Parameters
 			label: i18n code for the text appearing underneath
+			labeltext: Placeholder for the label, due to translation propagation delay.
 		Attributes
 			class is passed on to the containing label
 	label(class=["text-input", attributes.class])
 		block
 		.label(data-i18n=label)
+			=labeltext
 
 mixin makeSave(name)
 	//- Creates a saving throw button
