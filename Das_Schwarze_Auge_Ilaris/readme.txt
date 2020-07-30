@@ -126,3 +126,6 @@ Neue Features:
 - Fix des Zuschlags für "Doppelangriff".
 - Mehrfachnennung "Entwaffnen" entfernt.
 - Globaler Modifikator wird jetzt zur besseren Übersichtlichkeit in den verschiedenen Sektionen nochmal angezeigt.
+
+1.6.0:
+- GM-Roll-Funktion hinzugefügt.
