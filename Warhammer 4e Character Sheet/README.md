@@ -8,9 +8,12 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
-August 3rd 2020 v1.11
+August 3rd 2020 v1.2
+
+NEW - Mutation Roll button added, with selection between all chaos powers or individual gods.
 
 - NPC pages 2,3 & 4 weapon/spell rolls fixed
+- Firefox spin button showing fixed
 
 
 
