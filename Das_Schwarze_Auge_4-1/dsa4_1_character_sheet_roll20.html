@@ -643,7 +643,7 @@
                 <th>GE: <input type="text" class="sheet-stat-immutable" name="attr_GE" readonly="readonly" value="0"></th>
                 <th>KO: <input type="text" class="sheet-stat-immutable" name="attr_KO" readonly="readonly" value="0"></th>
                 <th>KK: <input type="text" class="sheet-stat-immutable" name="attr_KK" readonly="readonly" value="0"></th>
-                <th>BE: <input type="text" class="sheet-stat-immutable" name="attr_BE_TaW" disabled="disabled" value="(@{Ges_BE} + @{BE_Last})"></th>
+                <th>BE: <input type="text" class="sheet-stat-immutable" name="attr_BE_TaW" readonly="true" ></th>
             </tr>
         </table>
         <br>
@@ -6360,7 +6360,7 @@
                 <th>GE: <input type="text" class="sheet-stat-immutable" name="attr_GE" readonly="readonly" value="0"></th>
                 <th>KO: <input type="text" class="sheet-stat-immutable" name="attr_KO" readonly="readonly" value="0"></th>
                 <th>KK: <input type="text" class="sheet-stat-immutable" name="attr_KK" readonly="readonly" value="0"></th>
-                <th>BE: <input type="text" class="sheet-stat-immutable" name="attr_BE_TaW" disabled="disabled" value="(@{Ges_BE} + @{BE_Last})"></th>
+                <th>BE: <input type="text" class="sheet-stat-immutable" name="attr_BE_TaW" readonly="true"></th>
             </tr>
         </table>
         <br>
@@ -10988,6 +10988,7 @@
                     <th>gBE</th>
                     <th>Gewicht</th>
                     <th>Aktiv</th>
+                    <th>RG1 Aktiv</th>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11025,6 +11026,9 @@
                     </td>
                     <td>
                         <input type="checkbox" name="attr_RSAktiv1" value="1">
+                    </td>
+                    <td>
+                        <input type="checkbox" name="attr_rs1_rg1" value="1"/>
                     </td>
                 </tr>
                 <tr align="center">
@@ -11064,6 +11068,9 @@
                     <td>
                         <input type="checkbox" name="attr_RSAktiv2" value="1">
                     </td>
+                    <td>
+                        <input type="checkbox" name="attr_rs2_rg1" value="1"/>
+                    </td>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11101,6 +11108,9 @@
                     </td>
                     <td>
                         <input type="checkbox" name="attr_RSAktiv3" value="1">
+                    </td>
+                    <td>
+                        <input type="checkbox" name="attr_rs3_rg1" value="1"/>
                     </td>
                 </tr>
                 <tr align="center">
@@ -11140,6 +11150,9 @@
                     <td>
                         <input type="checkbox" name="attr_RSAktiv4" value="1">
                     </td>
+                    <td>
+                        <input type="checkbox" name="attr_rs4_rg1" value="1"/>
+                    </td>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11168,7 +11181,7 @@
                             <input type="number" disabled="disabled" name="attr_Ges_RS_RB" value="@{RSAktiv1} * @{RS_RB1} + @{RSAktiv2} * @{RS_RB2} + @{RSAktiv3} * @{RS_RB3} + @{RSAktiv4} * @{RS_RB4}">
                         </td>
                         <td>
-                            <input type="number" disabled="disabled" name="attr_Ges_BE" value="round(@{RSAktiv1} * @{RS_gBE1} + @{RSAktiv2} * @{RS_gBE2} + @{RSAktiv3} * @{RS_gBE3} + @{RSAktiv4} * @{RS_gBE4})">
+                            <input type="number" readonly="true" name="attr_Ges_BE">
                         </td>
                         <td>
                             <input type="number" disabled="disabled" name="attr_Ges_Gewicht" value="@{RSAktiv1} * @{RSGew1} + @{RSAktiv2} * @{RSGew2} + @{RSAktiv3} * @{RSGew3} + @{RSAktiv4} * @{RSGew4}">
@@ -11531,7 +11544,7 @@
                     <th>IB
                         <input class="sheet-stat-immutable" readonly="readonly" type="text" name="attr_INIBasis2" style="width: 3em" value="0">
                     </th>
-                    <th>BE <input class="sheet-stat-immutable" disabled="disabled" type="text" name="attr_Ges_BE_Anzeige" value="@{BE_TaW}" style="width: 2em">
+                    <th>BE <input class="sheet-stat-immutable" readonly="true" type="text" name="attr_BE_TaW" style="width: 2em">
                     </th>
                     <th><button name="Initiative" type="roll" value="&{template:DSA-Initiative} {{char=@{Name}}} {{mod=[[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]]}} {{dice=[[@{INI_dice_count}]]}} {{IB=[[@{INIBasis2}]]}} {{be=[[@{BE_TaW}]]}} {{ini=[[(@{INI_dice_count}d6 + @{INIBasis2} - @{BE_TaW} + [[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]])&{tracker}]]}}"> <span>Initiative</span></button> mit <select type="number" name="attr_INI_dice_count" style="width: 4em">
                 <option value="1" selected="selected">1</option>
@@ -12123,7 +12136,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <label class="sheet-lone-input-label"><input type="checkbox" name="attr_sf_rustungsgewonungII" value="1"> Rüstungsgewöhnung II</label>
+                                    <label class="sheet-lone-input-label"><input type="checkbox" name="attr_sf_rustungsgewohnungII" value="1"> Rüstungsgewöhnung II</label>
                                 </td>
                             </tr>
                             <tr>
@@ -15883,12 +15896,65 @@ function migrateTo20200730() {
     });
 }
 
+function migrateTo20200731() {
+    console.log("migrating to version 20200731");
+    
+    getAttrs(["RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "Ges_BE", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII"], function(values) {
+        var attrsToChange = { "data_version": 20200731 };
+        if (values["sf_rustungsgewonungII"] === "1") {
+            attrsToChange["sf_rustungsgewohnungII"] = "1";
+        }
+
+        var activeCount = 0;
+        for (var i = 1; i <= 4; i++) {
+            if (values["RSAktiv" + i] === "1") {
+                activeCount += 1;
+            }
+            if (activeCount > 1) {
+                attrsToChange["RSAktiv" + i] = "0";
+            }
+        }
+        if (activeCount === 0) {
+            attrsToChange["RSAktiv1"] = "1";
+        }
+
+        // übernehme die bisher berechneten Änderungen in die Values, da diese für calculateRuestungBE interessant sind
+        Object.assign(values, attrsToChange);
+
+        // MARKER
+        var calculatedRuestungBE = calculateRuestungBE(values, {});
+        // Übernehme die berechneten Werte zurück in attrsToChange
+        Object.assign(attrsToChange, calculatedRuestungBE);
+
+        var beTaw = 0;
+        // Wir nehmen den Ges_BE aus den berechneten Werten
+        if (calculatedRuestungBE["Ges_BE"]) {
+            beTaw += parseInt(calculatedRuestungBE["Ges_BE"]);
+        }
+        if (values["BE_Last"]) {
+            beTaw += parseInt(values["BE_Last"]);
+        }
+        attrsToChange["BE_TaW"] = beTaw;
+
+        setAttrs(attrsToChange);
+    });
+}
+
+function migrateTo20200801() {
+    getAttrs([ "BE_TaW", "NKW_Aktiv1", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_Aktiv2", "NKW_AT_typ2", "NKW_PA_typ2", "NKW_Aktiv3", "NKW_AT_typ3", "NKW_PA_typ3", "NKW_Aktiv4", "NKW_AT_typ4", "NKW_PA_typ4" ], function(values) {
+        var weaponBE = calculateWeaponBE(values);
+        setAttrs({ be_at_mod: weaponBE.be_at, be_pa_mod: weaponBE.be_pa, data_version: 20200801 });
+    });
+}
+
 /*
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */
 var versionsWithMigrations = [
     20190427,
-    20200730
+    20200730,
+    20200731,
+    20200801
 ]
 
 /*
@@ -15899,6 +15965,8 @@ Relevant character sheet versions
 * 20171014: last version before sheet worker scripts conversion
 * 20190427: new repeating sections for meta-talents and gifts
 * 20200730: shields and parry weapons. AT- and PA value calculation using sheet workers
+* 20200731: migrates BE calculation to sheetworkers
+* 20200801: weapon be calculation: attack and parry values for weapons and shields are affected by the eBE
 */
 function migrationCheck() {
     getAttrs(["character_sheet_version", "data_version"], function(v) {
@@ -16141,7 +16209,7 @@ on("sheet:opened", function() {
 // Berechnet den Gesamt-AT-Wert inklusive Modifikation durch ein eventuell verwendetes Schild
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
-on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII", 
+on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:be_at_mod change:be_pa_mod", 
 function(eventInfos) {
     calculateCombatValues(eventInfos);
 });
@@ -16177,7 +16245,7 @@ function calculateCombatValues(eventInfos) {
             "PA_Anderthalbhander", "PA_dolche", "PA_fechtwaffen", "PA_hiebwaffen", 
             "PA_infanteriewaffen", "PA_kettenstabe", "PA_kettenwaffen", "PA_lanzenreiten", "PA_peitsche", "PA_raufen", "PA_ringen", "PA_sabel", 
             "PA_schwerter", "PA_speere", "PA_stabe", "PA_zweihandflegel", "PA_zweihand-hiebwaffen", "PA_zweihandschwerter",
-            "PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII" ];
+            "PABasis", "sf_schildkampfI", "sf_schildkampfII", "sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "be_at_mod", "be_pa_mod" ];
 
         // Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
@@ -16216,6 +16284,9 @@ function calculateCombatValues(eventInfos) {
                 if (activeShieldRowId && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
                     atValue = atValue + parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
                 }
+                if (values["be_at_mod"]) {
+                    atValue -= parseInt(values["be_at_mod"]);
+                }
                 attrsToChange["AT_Aktiv"] = atValue;
             }
 
@@ -16234,6 +16305,10 @@ function calculateCombatValues(eventInfos) {
                 var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
                 paValue = basePa + paMod + spec;
+
+                if (values["be_pa_mod"]) {
+                    paValue -= parseInt(values["be_pa_mod"]);
+                }
                 
                 if (Number.isNaN(paValue) || paValue < 0) {
                     paValue = 0;
@@ -16269,6 +16344,11 @@ function calculateCombatValues(eventInfos) {
                         shieldPa += 2;
                     } else if (paValue >= 15) {
                         shieldPa += 1;
+                    }
+
+                    // berechne BE modifikator mit ein
+                    if (values["be_pa_mod"]) {
+                        shieldPa -= parseInt(values["be_pa_mod"]);
                     }
 
                     // Zuletzt: Addiere den PA-Modifikator des Schildes
@@ -16372,4 +16452,182 @@ on("change:ATbasis change:TaW_peitsche change:AT_peitsche", function(eventInfo) 
     });
 });
 
+on("change:RS_gBE1 change:RSAktiv1 change:rs1_rg1 change:RS_gBE2 change:RSAktiv2 change:rs2_rg1 change:RS_gBE3 change:RSAktiv3 change:rs3_rg1 change:RS_gBE4 change:RSAktiv4 change:rs4_rg1 change:sf_rustungsgewohnungI change:sf_rustungsgewohnungII change:sf_rustungsgewohnungIII", function(eventInfo) {
+    getAttrs([ "RS_gBE1", "RSAktiv1", "rs1_rg1", "RS_gBE2", "RSAktiv2", "rs2_rg1", "RS_gBE3", "RSAktiv3", "rs3_rg1", "RS_gBE4", "RSAktiv4", "rs4_rg1", "sf_rustungsgewohnungI", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"], function(values) {
+        var attrsToChange = calculateRuestungBE(values, eventInfo);
+        setAttrs(attrsToChange);
+    });
+});
+
+// Berechnet die BE der aktiven Rüstungsteile
+// benötigt "RS_gBE1", "RSAktiv1", "rs1_rg1", "RS_gBE2", "RSAktiv2", "rs2_rg1", "RS_gBE3", "RSAktiv3", "rs3_rg1", "RS_gBE4", "RSAktiv4", "rs4_rg1", "sf_rustungsgewohnungI", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"
+// wenn bei dem übergebenen Event die aktive Rüstungsgewöhnung 1 geändert wurde, wird auch das übergeben
+function calculateRuestungBE(values, eventInfo) {
+    var attrsToChange = {};
+    var activeRg1 = 0;
+    // Bestimmung aktiver Rüstungsgewöhnung 1
+    if (eventInfo && eventInfo.sourceAttribute && eventInfo.sourceAttribute.match("rs[0-9]_rg1")) {
+        if (eventInfo.newValue === "1") {
+            for (var i = 1; i <= 4; i++) {
+                if (eventInfo.sourceAttribute === ("rs" + i + "_rg1")) {
+                    activeRg1 = i;
+                } else {
+                    attrsToChange["rs" + i + "_rg1"] = "0";
+                }
+            }
+        }
+    } else {
+        for (var i = 1; i <= 4; i++) {
+            if (values["rs" + i + "_rg1"] === "1") {
+                activeRg1 = i;
+            }
+        }
+    }
+
+    var totalBe = 0;
+    var rg1RuestungActive = false;
+    for (var i = 1; i <= 4; i++) {
+        if (values["RSAktiv" + i] === "1") {
+            if (activeRg1 === i) {
+                rg1RuestungActive = true;
+            }
+            totalBe += parseInt(values["RS_gBE" + i]);
+        }
+    }
+
+    var rg1 = values["sf_rustungsgewohnungI"];
+    var rg2 = values["sf_rustungsgewohnungII"];
+    var rg3 = values["sf_rustungsgewohnungIII"];
+    if (rg3 === "1") {
+        totalBe -= 2;
+    } if (rg2 === "1") {
+        totalBe -= 1;
+    } if (rg1 === "1" && rg1RuestungActive) {
+        totalBe -= 1;
+    }
+
+    if (totalBe < 0) {
+        totalBe = 0;
+    }
+
+    console.log("calculated total BE: " + totalBe);
+    attrsToChange["Ges_BE"] = totalBe;
+    return attrsToChange;
+}
+
+// Berechne BE-Basis aus dem gesamten Rüstungs BE und der BE durch Last
+on("change:Ges_BE change:BE_Last", function(eventInfo) {
+    getAttrs(["Ges_BE", "BE_Last"], function(values) {
+        var beTaw = calculateBEBasis(values);
+        setAttrs({ "BE_TaW": beTaw });
+    });
+});
+
+// Berechnet beTaW Wert
+// Benötigt GesBE und BE_Last
+function calculateBEBasis(values) {
+    var beTaw = 0;
+    if (values["Ges_BE"]) {
+        beTaw += parseInt(values["Ges_BE"]);
+    }
+    if (values["BE_Last"]) {
+        beTaw += parseInt(values["BE_Last"]);
+    }
+    return beTaw;
+}
+
+// Berechne Waffenspezifische BE
+on("change:BE_TaW change:NKW_Aktiv1 change:NKW_AT_typ1 change:NKW_PA_typ1 change:NKW_Aktiv2 change:NKW_AT_typ2 change:NKW_PA_typ2 change:NKW_Aktiv3 change:NKW_AT_typ3 change:NKW_PA_typ3 change:NKW_Aktiv4 change:NKW_AT_typ4 change:NKW_PA_typ4", function(eventInfo) {
+    getAttrs([ "BE_TaW", "NKW_Aktiv1", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_Aktiv2", "NKW_AT_typ2", "NKW_PA_typ2", "NKW_Aktiv3", "NKW_AT_typ3", "NKW_PA_typ3", "NKW_Aktiv4", "NKW_AT_typ4", "NKW_PA_typ4" ], function(values) {
+        var weaponBE = calculateWeaponBE(values);
+
+        setAttrs({ be_at_mod: weaponBE.be_at, be_pa_mod: weaponBE.be_pa });
+    });
+});
+
+var closefighttalent_be = {
+    "anderthalbhander": { type: "minus", value: 2 }, 
+    "dolche": { type: "minus", value: 1 }, 
+    "fechtwaffen": { type: "minus", value: 1 }, 
+    "hiebwaffen": { type: "minus", value: 4 },
+    "infanteriewaffen": { type: "minus", value: 3 }, 
+    "kettenstabe": { type: "minus", value: 1 }, 
+    "kettenwaffen": { type: "minus", value: 3 }, 
+    "lanzenreiten": { type: "none", value: 0 }, 
+    "peitsche": { type: "minus", value: 1 }, 
+    "raufen": { type: "minus", value: 0 }, 
+    "ringen": { type: "minus", value: 0 }, 
+    "sabel": { type: "minus", value: 2 },
+    "schwerter": { type: "minus", value: 2 }, 
+    "speere": { type: "minus", value: 3 }, 
+    "stabe": { type: "minus", value: 2 }, 
+    "zweihandflegel": { type: "minus", value: 3 }, 
+    "zweihand-hiebwaffen": { type: "minus", value: 3 }, 
+    "zweihandschwerter": { type: "minus", value: 2 }
+}
+/* 
+    Methode die die waffenspezifische BE berechnet und nach AT und PA getrennt zurückgibt. 
+    Benötigt
+    NKW_Aktiv 1-4
+    NKW_AT_typ 1-4
+    NKW_PA_typ 1-4
+    BE_TaW
+*/
+function calculateWeaponBE(values) {
+    var weapon = 0;
+    if (values["NKW_Aktiv1"] === "1") {
+        weapon = 1;
+    } else if (values["NKW_Aktiv2"] === "1") {
+        weapon = 2;
+    } else if (values["NKW_Aktiv3"] === "1") {
+        weapon = 3;
+    } else if (values["NKW_Aktiv4"] === "1") {
+        weapon = 4;
+    } else {
+        return { be_at: 0, be_pa: 0 };
+    }
+    var baseBE = values["BE_TaW"];
+    var be_at = 0;
+    var atTyp = values["NKW_AT_typ" + weapon];
+    if (atTyp) {
+        var beValues = closefighttalent_be[atTyp.replace("@{AT_", "").replace("}", "").toLowerCase()];
+        console.log(beValues);
+
+        var atTypBE = baseBE;
+        if (beValues.type === "none") {
+            atTypBE = 0;
+        } else if (beValues.type === "minus") {
+            atTypBE -= beValues.value;
+        }
+        console.log("atTypBE: " + atTypBE);
+
+        // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
+        be_at = Math.floor(atTypBE / 2);
+        console.log("be_at: " + be_at);
+    } 
+    var be_pa = 0;
+    var paTyp = values["NKW_PA_typ" + weapon];
+    if (paTyp) {
+        console.log("looking up fight talent be values: " + paTyp.replace("@{PA_", "").replace("}", "").toLowerCase());
+        var beValues = closefighttalent_be[paTyp.replace("@{PA_", "").replace("}", "").toLowerCase()];
+        console.log(beValues);
+        var paTypBE = baseBE;
+        console.log("paTypBE base: " + paTypBE);
+        if (beValues.type === "none") {
+            paTypBE = 0;
+        } else if (beValues.type === "minus") {
+            console.log("subtract " + beValues.value);
+            paTypBE -= beValues.value;
+        }
+        console.log("paTypBE: " + paTypBE);
+
+        // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
+        be_pa = Math.ceil(paTypBE / 2);
+        console.log("be_pa: " + be_pa);
+    }
+    return { 
+        be_at: be_at >= 0 ? be_at : 0, 
+        be_pa: be_pa >= 0 ? be_pa : 0 
+        };
+}
 </script>
