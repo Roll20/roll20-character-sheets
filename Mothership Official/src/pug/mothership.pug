@@ -1,10 +1,15 @@
 include sheetdata.pug
 
-.ms-wrapper
+.ms-wrapper.compendium-drop-target.monsters
     input(type="hidden", name="attr_sheet_toggle", value="pc")
     input(type="hidden", name="attr_init", value="0")
     input(type="hidden", name="attr_settings_toggle")
     input.sheet-skill-toggle(type="hidden", name="attr_sheet_skill_toggles")
+
+    input(accept="Category", name="attr_drop_category", type="hidden")
+    input(accept="Name", name="attr_drop_name", type="hidden")
+    input(accept="data", name="attr_drop_data", type="hidden")
+    input(accept="Content", name="attr_drop_content", type="hidden")
     
     label.ms-settings__toggle
         input(type="checkbox", name="attr_settings_toggle")
@@ -100,13 +105,13 @@ include sheetdata.pug
                 .ms-tooltip--skills
                     ul
                         li 
-                            strong(data-i18n="trained skills")
+                            strong.ms-tooltip__label(data-i18n="trained skills")
                             span(data-i18n="cost 1 point")
                         li 
-                            strong(data-i18n="expert skills")
+                            strong.ms-tooltip__label(data-i18n="expert skills")
                             span(data-i18n="cost 2 points")
                         li 
-                            strong(data-i18n="master skills")
+                            strong.ms-tooltip__label(data-i18n="master skills")
                             span(data-i18n="cost 3 points")
                     span(data-i18n="To take an Expert or Master skill you must first take one of its prerequisite skills")
             .ms-skills__trained
@@ -211,7 +216,7 @@ include sheetdata.pug
                             p
                                 span(data-i18n=skill.desc)
                             p
-                                strong(data-i18n="prerequisites")
+                                strong.ms-tooltip__label(data-i18n="prerequisites")
                                 div(data-i18n=skill.prereq.join(", "))
 
                 fieldset(class=`repeating_expert`)
@@ -282,7 +287,7 @@ include sheetdata.pug
                             p
                                 span(data-i18n=skill.desc)
                             p
-                                strong(data-i18n="prerequisites")
+                                strong.ms-tooltip__label(data-i18n="prerequisites")
                                 div(data-i18n=skill.prereq.join(", "))
                 fieldset(class=`repeating_master`)
                     -
@@ -325,7 +330,9 @@ include sheetdata.pug
                 fieldset(class=`repeating_equipment`)
                     .ms-equipmentrow
                         input(name=`attr_equipment_settings`, type="hidden", value="on")
+                        input(name=`attr_equipment_linkedid`, type="hidden")
                         input.ms-equipmentrow__name(name=`attr_equipment_name`, type="text")
+                        input.ms-equipmentrow__type(name=`attr_equipment_type`, type="hidden")
                         select.ms-equipmentrow__type(name=`attr_equipment_type`)
                             option(data-i18n="Gear")
                             option(data-i18n="Weapon")
@@ -338,10 +345,12 @@ include sheetdata.pug
                             input(name=`attr_equipment_settings`, type="checkbox", checked)
                             span y
                         .ms-equipmentrow__settings
-                            .ms-attackrow__settingsrow
-                                .ms-attackrow__settingsrow--full
-                                .ms-attackrow__settingstitle(data-i18n="notes")
-                                textarea.ms-sattackrow__textarea(name="attr_equipment_notes")
+                            .ms-equipmentrow__settingsrow--full.show_armor
+                                .ms-equipmentrow__settingstitle(data-i18n="armor bonus")
+                                input.ms-equipmentrow__settingsinput(name="attr_equipment_armor_bonus", type="text")
+                            .ms-equipmentrow__settingsrow--full
+                                .ms-equipmentrow__settingstitle(data-i18n="notes")
+                                textarea.ms-equipmentrow__textarea(name="attr_equipment_notes")
                 
                 .ms-credits
                     .ms-credits__label(data-i18n="credits")
@@ -362,9 +371,9 @@ include sheetdata.pug
                                 `{{roll=[[1d100cs1cf100]]}}`,
                                 `{{roll2=[[?{Advantage/Disadvantage|Normal,0|Advantage/Disadvantage,1d100cs1cf100}]]}}`,
                                 `{{target=[[@{combat}]]}}`,
-                                //- `{{ranges=@{attack_range_s}}}`,
-                                //- `{{rangem=@{attack_range_m}}}`,
-                                //- `{{rangel=@{attack_range_l}}}`,
+                                `{{ranges=@{attack_range_s}}}`,
+                                `{{rangem=@{attack_range_m}}}`,
+                                `{{rangel=@{attack_range_l}}}`,
                                 `{{damage=[[@{attack_damage}]]}}`
                             ].join(" ");
                     .ms-attackrow
@@ -372,6 +381,7 @@ include sheetdata.pug
                         input(name=`attr_attack_linkedid`, type="hidden")
                         button.ms-attackrow__name(type="roll", value=roll9)
                             span(name=`attr_attack_name`, type="text")
+                        input.ms-attackrow__skill(name=`attr_attack_type`, type="hidden")
                         select.ms-attackrow__skill(name=`attr_attack_type`)
                             option(data-i18n="Ranged")
                             option(data-i18n="Melee")
@@ -380,9 +390,28 @@ include sheetdata.pug
                             input(name=`attr_attack_settings`, type="checkbox", checked)
                             span y
                         .ms-attackrow__settings
-                            .ms-attackrow__settingsrow
+                            .ms-attackrow__settingsrow--full
                                 .ms-attackrow__settingstitle(data-i18n="name")
                                 input.ms-attackrow__settingsinput(data-i18n-value="custom skill", name="attr_attack_name", type="text")
+                            .ms-attackrow__settingsrow--range.show_ranged
+                                .ms-attackrow__settingstitle(data-i18n="range")
+                                input.ms-attackrow__settingsinput(data-i18n-placeholder="short", name="attr_attack_range_s", type="text")
+                                input.ms-attackrow__settingsinput(data-i18n-placeholder="medium", name="attr_attack_range_m", type="text")
+                                input.ms-attackrow__settingsinput(data-i18n-placeholder="long", name="attr_attack_range_l", type="text")
+                            .ms-attackrow__settingsrow
+                                div
+                                    .ms-attackrow__settingstitle(data-i18n="critical damage")
+                                    input.ms-attackrow__settingsinput(data-i18n-placeholder="damage", name="attr_attack_crit_damage", type="text")
+                                div 
+                                    .ms-attackrow__settingstitle(data-i18n="critical effect")
+                                    input.ms-attackrow__settingsinput(data-i18n-placeholder="effect", name="attr_attack_crit_effect", type="text")
+                            .ms-attackrow__settingsrow
+                                div 
+                                    .ms-attackrow__settingstitle(data-i18n="shots")
+                                    input.ms-attackrow__settingsinput(data-i18n-placeholder="shots", name="attr_attack_shots", type="text")
+                                div
+                                    .ms-attackrow__settingstitle(data-i18n="ammunition")
+                                    input.ms-attackrow__settingsinput(data-i18n-placeholder="damage", name="attr_attack_ammunition", type="text")
                             .ms-attackrow__settingsrow--full
                                 .ms-attackrow__settingstitle(data-i18n="notes")
                                 textarea.ms-sattackrow__textarea(name="attr_attack_notes")
