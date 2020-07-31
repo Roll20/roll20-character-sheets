@@ -10,7 +10,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 August 3rd 2020 v1.2
 
-NEW - Mutation Roll button added, with selection between all chaos powers or individual gods.
+NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.
 
 - NPC pages 2,3 & 4 weapon/spell rolls fixed
 - Firefox spin button showing fixed
