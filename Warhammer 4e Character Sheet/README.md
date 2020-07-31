@@ -211,10 +211,10 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future release wish list :
 
-- Add Physical/Mental Corruption Roll table button. (expanded list from Enemy within Companion) (v1.2)
+- More themes. (v1.3)
 - Talents Tab rework, with possible roll integration. (v1.3)
 - WFRP 4e Roll API with SL resolution API. (v1.x)
-- More themes. (v1.x)
+
 
 
 Enjoy.
