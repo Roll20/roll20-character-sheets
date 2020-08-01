@@ -14,7 +14,9 @@ NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a sele
 
 - NPC pages 2,3 & 4 weapon/spell rolls fixed
 - Firefox spin button showing fixed
-- When rolling a critical in combat the roll template text will now show "Critical Hit" rather then just "Critical", when a Ranged weapon is used it will show "Critical Hit (Impaled)".
+- When rolling a critical in combat the roll template text will now show "Critical Hit" rather then just "Critical", when a Ranged weapon is used it will show "Critical Hit (Impaled)"
+- Combat Advantage +X display in the roll template is no longer value at locked
+- SL display in roll template extended to roll target of 259 (Maximum SL +25), critical failure will always be SL -1
 
 
 July 27 2020 - v1.1
