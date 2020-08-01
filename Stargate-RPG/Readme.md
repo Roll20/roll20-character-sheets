@@ -4,11 +4,18 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Full release
 
 ### Changelog
 
-**v.1.2 (2020-07-27)**
+**v.1.21 (2020-08-04)**
+* Init & moxie now rolls only once
+* attacks section made more clear and given more space, rolls doesn't break if no damage is given any longer
+* Skills set as default to zero
+* Default speed set to 6m, deafult HP removed.
+* Important fields that need to be filled out, are higlighted in red while empty.
+
+**v.1.2 (2020-07-28)**
 * skills, saves, init, ac, ac_extra & moxie now update when their attribute changes. init is keyed to dex, moxie to cha.
 * skills & saves that have been marked as proficient will now update when the prof bonus changes.
 
-**v.1.1 (2020-07-27)**
+**v.1.1 (2020-07-28)**
 * checking/unchecking proficency checkbox for skills/saves automatically adds/subtracts the proficiency bonus to the affected skill.
 
 **v.1.01 (2020-05-13)**
