@@ -146,9 +146,21 @@
                 <option value="lowest_plus_brawl" data-i18n="lowest-plus-brawl" >Lowest + Brawl</option>
                 <option value="lowest_plus_weaponry" data-i18n="lowest-plus-weapon" >Lowest + Weaponry</option>
             </select><br><br>
-            <span data-i18n="base-size" >Base Size</span>: <input type="number" name="attr_base_size" value="5" />
-            <input type="checkbox" class="checkbox" name="attr_giant" value="1" /><span></span><span data-i18n="giant" > Giant</span>
-            <input type="checkbox" class="checkbox" name="attr_small_framed" value="-1" /><span></span><span data-i18n="small-framed" > Small Framed</span><br><br>
+            <div>
+                <span data-i18n="base-size" >Base Size</span>
+                <input type="number" name="attr_base_size" value="5" />
+                <span class="checkbox">
+                    <input type="hidden" class="flag" name="attr_giant">
+                    <button type="action" name="act_giant"></button>
+                    <button type="action" class="toggle" name="act_giant" data-i18n="giant">Giant</button>
+                </span>
+                <span class="checkbox">
+                    <input type="hidden" class="flag" name="attr_small_framed">
+                    <button type="action" name="act_small_framed"></button>
+                    <button type="action" class="toggle" name="act_small_framed" data-i18n="small-framed" >Small Framed</button>
+                </span>
+            </div>
+            <br>
             <span data-i18n="bonus-health-levels" >Bonus Health Levels</span>:<input type="number" name="attr_bonus_health" value="0" /><br><br>
             <span data-i18n="bonus-willpower-point" >Bonus Willpower Points</span>:<input type="number" name="attr_bonus_willpower" value="0" /><br><br>
             <span class="changeling2"><span data-i18n="bonus-clarity-points" >Bonus Clarity Points:</span><input type="number" name="attr_bonus_moralhealth" value="0" /><br><br></span>
@@ -2393,7 +2405,7 @@
                         </div>
                         <div class="organization-inverse">
                             <div class="derived">
-                                <span data-i18n="size">Size</span>:<input type="number" name="attr_size" value="@{base_size}+@{giant}+@{small_framed}" disabled="disabled" />
+                                <span data-i18n="size">Size</span>:<input type="number" name="attr_size" value="@{base_size}+@{giant}-@{small_framed}" disabled="disabled" />
                             </div>
                             <div class="derived">
                                 <span data-i18n="speed">Speed</span>:<input type="number" name="attr_speed" value="@{species_factor}+@{speed_base}+@{speed_penalty}+@{fleet_of_foot}" disabled="disabled" />
@@ -3328,12 +3340,16 @@
         });
 
         const checkboxSeriesAttributes = ["willpower", "vitae", "beat"];
-        const checkboxAttributes = checkboxSeriesAttributes
-            .map((checkboxSeriesAttribute) => new Array(30)
-                .fill(1)
-                .map((_, index) => `${checkboxSeriesAttribute}_box${index + 1}`)
-            )
-            .reduce((allEvents, thisEvents) => [...allEvents, ...thisEvents], []);
+        const checkboxAttributes = [
+            ...checkboxSeriesAttributes
+                .map((checkboxSeriesAttribute) => new Array(30)
+                    .fill(1)
+                    .map((_, index) => `${checkboxSeriesAttribute}_box${index + 1}`)
+                )
+                .reduce((allEvents, thisEvents) => [...allEvents, ...thisEvents], []),
+            "giant",
+            "small_framed"
+        ];
         checkboxAttributes.forEach((checkboxAttribute) => {
             on(`clicked:${checkboxAttribute}`, () => {
                 getAttrs([checkboxAttribute], (values) => {
@@ -3432,7 +3448,7 @@
     
         // Version update for new or modified attributes
         on("sheet:opened", function() {
-            getAttrs(["version", "sheettype", "iron_stamina"], function(v) {
+            getAttrs(["version", "sheettype", "iron_stamina", "small_framed"], function(v) {
                 const version = parseInt(v.version) || 0;
                 var attrs = {};
     
@@ -3454,7 +3470,14 @@
                         "version": 2
                     };
                 }
-                
+
+                if (version < 3) {
+                    attrs = {
+                        ...attrs,
+                        "small_framed": Number(v["small_framed"]) === -1 ? "1" : "0",
+                        "version": 3
+                    };
+                }
     
                 if (Object.keys(attrs).length) {
                     setAttrs(attrs);
