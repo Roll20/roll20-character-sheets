@@ -2,7 +2,126 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
-## 1.0.0 - Unreleased
+## 1.6.1
+
+### Fixed
+
+- Fix a bug where the roll templates were showing nothing
+
+## 1.6.0
+
+### Added
+
+- Add spells per level
+- Add memorized spell number input
+- Add attack value matrix to DAC sheet
+- Add option for individual initiative which accounts for both arbitrary bonus/penalty and dex bonus on players and arbitrary bonus/penalty for monsters
+
+### Changed
+
+- Update OSE Logo
+- Rename Critical Miss / Hit to Natural 1 / 20
+- Change default attributes to 10
+- Change encumbrance calculation to multiply quantity of items by their weight
+- Changed the contents of some placeholders and switched some placeholders to values to reduce confusion
+
+### Fixed
+
+- Fix incorrect or missing attack buttons for DAC sheet
+- Fix buttons not being draggable onto macro bar
+- Fix a bug where the worn checkbox didn't reduce the amount of armor worn when unchecked
+
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
+
+## 1.5.0
+
+### Added
+
+- Add critical hit and miss results to attack rolls
+- Add Dolmenwood classes
+
+### Changed
+
+- Change "AC Benefit" to just AC
+- Change "Threshold Modifier" to "Situational Bonus"
+- Change damage roll to show roll formula, but also no longer enforce minimum of 1 damage
+- Change weapons table to only have attack type and not attribute
+
+### Fixed
+
+- Fix a bug where colors were not appearing for max and min rolls on dice
+
+## 1.4.0
+
+### Changed
+
+- Add optgroups to class dropdown to categorize classes
+- Add automatic XP calculation for monsters based on hit dice
+
+### Fixed
+
+- Fix a missing translation for "Find secret door"
+- Fix automatic hit dice for character classes
+
+## 1.3.0
+
+### Added
+
+- Add a reaction roll button to monster sheet
+- Add a Wisdom modifier next to saving throws on the character sheet
+- Add modifier queries to all saving throw rolls
+- Add a Patreon link to the sheet.json in case folks want to donate
+- Add French translation, courtesy of @elbj
+
+### Fixed
+
+- Fix a bug where saving throws were being reverted to zero due to transition code for old saving throw attributes
+
+### Removed
+
+- Remove (hidden) deprecated saving throw values that aren't necessary given the automatic saving throw values
+
+## 1.2.0
+
+### Added
+
+- Add an option to disable threshold modifier
+- Add monster, normal human, and custom classes as options
+- Add auto-calculating saves and BAB/THAC0 for monsters either as monster HD or as class and level
+- Add monsters in wilderness number appearing values
+
+### Changed
+
+- Change class input to a dropdown
+- Change monster attacks so there is no minimum damage
+- Change monster HD label and title to Number of Hit Dice for clarification
+
+### Fixed
+
+- Fix movementEncounter and movementOverland not being available to tokens (needed to be readonly versus disabled, which means it needed to be calculated via sheet workers and not in the value itself)
+- Fix a bug where monster attack descriptions were not shown
+
+## 1.1.0
+
+### Added
+
+- Add a toggleable description for weapons
+- Add the ability for spells to just show descriptions when no effect roll exists (e.g. Read Languages)
+
+### Fixed
+
+- Fix a bug where armor class types that were uppercased didn't display BAB or THAC0
+- Fix a bug where the attack macros were saved between character and monster tabs
+- Fix a bug where the monster name wouldn't be used in the journal or on tokens (it was formerly separate from character name, now they're linked)
+- Fix a bug where the dex modifier was incorrect for Dexterity values of 16-17
+
+## 1.0.0
 
 ### Added
 

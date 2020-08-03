@@ -1872,6 +1872,8 @@
             <input name="attr_shield_thresholds_max" type="number" data-i18n-vars="${shield_thresholds_max}|undefined" title="${shield_thresholds_max}"/>
             <label data-i18n="e_shield_hits"></label>
             <input name="attr_shield_hits" type="number" data-i18n-vars="${shield_hits}|undefined" title="${shield_hits}"/>
+            <label>/</label>
+            <input name="attr_shield_hits_max" type="number" data-i18n-vars="${shield_hits_max}|undefined" title="${shield_hits_max}"/>
           </div>
         </div>
       </div>
@@ -1884,9 +1886,11 @@
           <input class="fs-vitality-current" name="attr_vitality_current" type="number" data-i18n-vars="${vitality_current}|0" title="${vitality_current}" value="0" min="0"/>
           <label class="fs-revivals-header fs-uppercase-header" data-i18n="revivals"></label>
           <label class="fs-revivals-rating" data-i18n="rating"></label>
-          <input class="fs-revivals-rating" name="attr_revivals_rating" type="number" data-i18n-vars="${revivals_rating}|0" title="${revivals_rating}" value="0" min="0"/>
-          <label class="fs-revivals-number" data-i18n="number"></label>
-          <input class="fs-revivals-number" name="attr_revivals_number" type="number" data-i18n-vars="${revivals_number}|0" title="${revivals_number}" value="0" min="0"/>
+          <input class="fs-revivals-rating" name="attr_revivals_rating" type="number" data-i18n-vars="${revivals_rating}|0" title="${revivals_rating}" value="0" min="0"/><span class="fs-revivals-number">
+            <label data-i18n="number"></label>
+            <input name="attr_revivals_number" type="number" data-i18n-vars="${revivals_number}|1" data-i18n-title="numeric_input_with_default_info" value="1" min="0"/>
+            <label>/</label></span>
+          <input class="fs-revivals-number" name="attr_revivals_number_max" type="number" data-i18n-vars="${revivals_number_max}|1" data-i18n-title="numeric_input_with_default_info" value="1" min="1"/>
         </div>
       </div>
     </div>
@@ -2052,9 +2056,11 @@
             <input class="fs-current-wp" name="attr_current_wp" type="number" data-i18n-vars="${current_wp}|0" title="${current_wp}" value="0" min="0"/>
             <label class="fs-uppercase-header fs-surge-header" data-i18n="surge"></label>
             <label class="fs-surge-rating" data-i18n="surge_rating"></label>
-            <input class="fs-surge-rating" name="attr_surge_rating" type="number" data-i18n-vars="${surge_rating}|0" title="${surge_rating}" value="0" min="0"/>
-            <label class="fs-surge-number" data-i18n="surge_number"></label>
-            <input class="fs-surge-number" name="attr_surge_number" type="number" data-i18n-vars="${surge_number}|0" title="${surge_number}" value="0" min="0"/>
+            <input class="fs-surge-rating" name="attr_surge_rating" type="number" data-i18n-vars="${surge_rating}|0" title="${surge_rating}" value="0" min="0"/><span class="fs-surge-number">
+              <label data-i18n="surge_number"></label>
+              <input name="attr_surge_number" type="number" data-i18n-vars="${surge_number}|1" data-i18n-title="numeric_input_with_default_info" value="1" min="0"/>
+              <label>/</label></span>
+            <input class="fs-surge-number" name="attr_surge_number_max" type="number" data-i18n-vars="${surge_number_max}|1" data-i18n-title="numeric_input_with_default_info" value="1" min="1"/>
           </div>
         </div>
       </div>
@@ -2345,10 +2351,7 @@
 
 <!-- ROLL TEMPLATES - END-->
 <!-- SHEET WORKERS - START-->
-<script type="text/worker">
-  // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
-  
-  const characteristic_names = [{"category":"body","list":["strength","dexterity","endurance"]},{"category":"mind","list":["wits","perception","will"]},{"category":"spirit","list":["presence","intuition","faith"]}].flatMap(x => x.list);
+<script type="text/worker">const characteristic_names = [{"category":"body","list":["strength","dexterity","endurance"]},{"category":"mind","list":["wits","perception","will"]},{"category":"spirit","list":["presence","intuition","faith"]}].flatMap(x => x.list);
   const skill_names = [{"name":"academia","default":3},{"name":"alchemy","default":0},{"name":"animalia","default":3},{"name":"arts","default":3},{"name":"charm","default":3},{"name":"crafts","default":3},{"name":"disguise","default":3},{"name":"drive","default":3},{"name":"empathy","default":3},{"name":"fight","default":3},{"name":"focus","default":3},{"name":"impress","default":3},{"name":"interface","default":0},{"name":"intrusion","default":3},{"name":"knavery","default":3},{"name":"melee","default":3},{"name":"observe","default":3},{"name":"perform","default":3},{"name":"pilot","default":0},{"name":"remedy","default":3},{"name":"shoot","default":3},{"name":"sleight_of_hand","default":3},{"name":"sneak","default":3},{"name":"survival","default":3},{"name":"tech_redemption","default":3},{"name":"vigor","default":3}].flatMap(x => x.name);
   const armor_proofing_types = ["blaster","flame","hard","laser","shock","slam","sonic"];
   const state_names = [{"category":"physical_states","list":["blinded","dazed","deafened","desensitized","disoriented","dying","euphoric","fatigued","hearing_impaired","hindered","immobilized","incapacitated","mangled","nauseated","paralized","prone","seeing_impaired","stimulated","stunned","suspended","tormented","unconscious"]},{"category":"mental_states","list":["afraid","angered","anxious","berserk","commanded","confused","deceived","enlightened","penalized","terrified","wowed"]},{"category":"social_states","list":["awed","befriended","castigated","convinced","daunted","divinely_inspired","entreated","guilty","humiliated","mesmerized","roused"]},{"category":"tech_compulsions","list":["acquisitive","bloodthirsty","cruel","destructive","heedless","hypercritical","indiscreet","industrious","inerrant","pretentious","protective","reckless"]}].flatMap(x => x.list);
@@ -2356,6 +2359,20 @@
   const repeating_rolls = [
       { "section": "actions", "prefix": "action" }
   ];
+  
+  const repeating_sections = repeating_rolls.concat([
+      { "section": "states", "prefix": "state" },
+      { "section": "perks", "prefix": "perk" },
+      { "section": "capabilities", "prefix": "capability" },
+      { "section": "birthrights", "prefix": "birthright" },
+      { "section": "carriedequipment1", "prefix": "carriedequipment1" },
+      { "section": "carriedequipment2", "prefix": "carriedequipment2" },
+      { "section": "weapons", "prefix": "weapon" },
+      { "section": "owned1", "prefix": "owned1" },
+      { "section": "owned2", "prefix": "owned2" },
+      { "section": "assets1", "prefix": "asset1" },
+      { "section": "assets2", "prefix": "asset2" },
+  ]);
   
   const updateGoalNumber = (section, prefix) => {
       getSectionIDs(`repeating_${section}`, idArray => {
@@ -2390,6 +2407,13 @@
       });
   });
   
+  repeating_sections.forEach( repeating => {
+      on(`remove:repeating_${repeating.section}`, eventInfo => {
+          const timestamp = Number(new Date())
+          setAttrs({ repeat_delete: timestamp });
+      });
+  });
+  
   armor_proofing_types.forEach( type => {
       on(`sheet:opened change:armor_resistance change:${type}proof`, eventInfo => {
           let checkbox = `${type}proof`;
@@ -2403,6 +2427,43 @@
       });
   });
   
+  //- Auto-computation disabled for now, as this needs to be improved to support partial advancements and potential modifiers (from perks or GM ruling)
+  //-
+  //- on("sheet:opened change:size change:endurance change:will change:faith change:level", eventInfo => {
+  //-     getAttrs([ 'size', 'endurance', 'will', 'faith', 'level' ], values => {
+  //-         setAttrs({ vitality_rating: parseInt(values.size) +
+  //-                                     parseInt(values.endurance) +
+  //-                                     parseInt(values.will) +
+  //-                                     parseInt(values.faith) + 
+  //-                                     parseInt(values.level) });
+  //-     });
+  //- });
+  //-
+  //- on("sheet:opened change:strength change:wits change:presence change:level", eventInfo => {
+  //-     getAttrs([ 'strength', 'wits', 'presence', 'level' ], values => {
+  //-         setAttrs({ surge_rating: Math.max(parseInt(values.strength), parseInt(values.wits), parseInt(values.presence)) + parseInt(values.level) });
+  //-     });
+  //- });
+  //-
+  //- on("sheet:opened change:size change:level", eventInfo => {
+  //-     getAttrs([ 'size', 'level' ], values => {
+  //-         setAttrs({ revivals_rating: parseInt(values.size) + parseInt(values.level) });
+  //-     });
+  //- });
+  //-
+  //- on("sheet:opened change:level", eventInfo => {
+  //-     getAttrs([ 'level' ], values => {
+  //-         let calc_bank_capa = (Math.floor(parseInt(values.level)/2) + 1) * 5;
+  //-         let calc_surge_nb = Math.floor((parseInt(values.level)+2)/3);
+  //-         let calc_revivals_nb = calc_surge_nb;
+  //-         setAttrs({
+  //-             vp_bank_capacity: calc_bank_capa,
+  //-             surge_number_max: calc_surge_nb,
+  //-             revivals_number_max: calc_revivals_nb
+  //-         });
+  //-     });
+  //- });
+  
   on("sheet:opened", function() {
       // sheet versioning
       getAttrs( [ 'sheet_version' ], values => {
@@ -2410,12 +2471,13 @@
           if (values.sheet_version !== "latest") {
   
               // insert version updates here
-              if (values.sheet_version == "1.0.0") {
-                  // no need for any attribute migrations between 1.0.0 to 1.1.0
-              }
+  
+              // 1.0.0 to 1.1.0 => nothing to do
+  
+              // 1.1.0 to 1.2.0 => nothing to do
           }
   
-          const latest_version = "1.1.0";
+          const latest_version = "1.2.0";
           
           if (values.sheet_version != latest_version) {
               setAttrs({ sheet_version: latest_version });

@@ -270,19 +270,24 @@ mixin skill(name, value)
                         +numeric_input('shield_thresholds_max')
                         label(data-i18n='e_shield_hits')
                         +numeric_input('shield_hits')
+                        label /
+                        +numeric_input('shield_hits_max')
 
             .fs-sheet-section
                 .fs-vita-and-revivals-grid
                     label.fs-vitality-header.fs-uppercase-header(data-i18n='vitality')
                     label.fs-vitality-rating(data-i18n='rating')
-                    +numeric_input('vitality_rating', 0, 0)(class='fs-vitality-rating')
+                    +numeric_input('vitality_rating', 0, 0 /*once computed: , 'computed_info'*/)(class='fs-vitality-rating' /*once computed: readonly*/)
                     label.fs-vitality-current(data-i18n='current')
                     +numeric_input('vitality_current', 0, 0)(class='fs-vitality-current')
                     label.fs-revivals-header.fs-uppercase-header(data-i18n='revivals')
                     label.fs-revivals-rating(data-i18n='rating')
-                    +numeric_input('revivals_rating', 0, 0)(class='fs-revivals-rating')
-                    label.fs-revivals-number(data-i18n='number')
-                    +numeric_input('revivals_number', 0, 0)(class='fs-revivals-number')
+                    +numeric_input('revivals_rating', 0, 0 /*once computed: , 'computed_info'*/)(class='fs-revivals-rating' /*once computed: readonly*/)
+                    span.fs-revivals-number
+                        label(data-i18n='number')
+                        +numeric_input('revivals_number', 1, 0)
+                        label /
+                    +numeric_input('revivals_number_max', 1, 1 /*once computed: , 'computed_info'*/)(class='fs-revivals-number' /*once computed: readonly*/)
 
         .fs-actions-vp-bank-and-surge
             .fs-sheet-section
@@ -340,16 +345,19 @@ mixin skill(name, value)
                     .fs-vp-bank-and-surge-grid
                         label.fs-uppercase-header(data-i18n='vp_bank')(class='fs-vp-bank-header')
                         label(data-i18n='vp_bank_capacity')(class='fs-vp-bank-capacity')
-                        +numeric_input('vp_bank_capacity', 0, 0)(class='fs-vp-bank-capacity')
+                        +numeric_input('vp_bank_capacity', 0, 0 /*once computed: , 'computed_info'*/)(class='fs-vp-bank-capacity' /*once computed: readonly*/)
                         label(data-i18n='current_vp')(class='fs-current-vp')
                         +numeric_input('current_vp', 0, 0)(class='fs-current-vp')
                         label(data-i18n='current_wp')(class='fs-current-wp')
                         +numeric_input('current_wp', 0, 0)(class='fs-current-wp')
                         label.fs-uppercase-header(data-i18n='surge')(class='fs-surge-header')
                         label(data-i18n='surge_rating')(class='fs-surge-rating')
-                        +numeric_input('surge_rating', 0, 0)(class='fs-surge-rating')
-                        label(data-i18n='surge_number')(class='fs-surge-number')
-                        +numeric_input('surge_number', 0, 0)(class='fs-surge-number')
+                        +numeric_input('surge_rating', 0, 0 /*once computed: , 'computed_info'*/)(class='fs-surge-rating' /*once computed: readonly*/)
+                        span(class='fs-surge-number')
+                            label(data-i18n='surge_number')
+                            +numeric_input('surge_number', 1, 0)
+                            label /
+                        +numeric_input('surge_number_max', 1, 1 /*once computed: , 'computed_info'*/)(class='fs-surge-number' /*once computed: readonly*/)
 
         .fs-perks-capabilities-and-birthrights
             .fs-sheet-section
@@ -492,9 +500,8 @@ include roll-templates.html
 // ROLL TEMPLATES - END
 
 // SHEET WORKERS - START
-script(type='text/worker').
-    // You may temporarily remove the (type='text/worker') part from the live above to get syntax highlighting in vscode
-
+script(type='text/worker')
+ .
     const characteristic_names = !{JSON.stringify(characteristics)}.flatMap(x => x.list);
     const skill_names = !{JSON.stringify(skills)}.flatMap(x => x.name);
     const armor_proofing_types = !{JSON.stringify(armor_proofing_types)};
@@ -503,6 +510,20 @@ script(type='text/worker').
     const repeating_rolls = [
         { "section": "actions", "prefix": "action" }
     ];
+
+    const repeating_sections = repeating_rolls.concat([
+        { "section": "states", "prefix": "state" },
+        { "section": "perks", "prefix": "perk" },
+        { "section": "capabilities", "prefix": "capability" },
+        { "section": "birthrights", "prefix": "birthright" },
+        { "section": "carriedequipment1", "prefix": "carriedequipment1" },
+        { "section": "carriedequipment2", "prefix": "carriedequipment2" },
+        { "section": "weapons", "prefix": "weapon" },
+        { "section": "owned1", "prefix": "owned1" },
+        { "section": "owned2", "prefix": "owned2" },
+        { "section": "assets1", "prefix": "asset1" },
+        { "section": "assets2", "prefix": "asset2" },
+    ]);
 
     const updateGoalNumber = (section, prefix) => {
         getSectionIDs(`repeating_${section}`, idArray => {
@@ -537,6 +558,13 @@ script(type='text/worker').
         });
     });
 
+    repeating_sections.forEach( repeating => {
+        on(`remove:repeating_${repeating.section}`, eventInfo => {
+            const timestamp = Number(new Date())
+            setAttrs({ repeat_delete: timestamp });
+        });
+    });
+
     armor_proofing_types.forEach( type => {
         on(`sheet:opened change:armor_resistance change:${type}proof`, eventInfo => {
             let checkbox = `${type}proof`;
@@ -550,6 +578,43 @@ script(type='text/worker').
         });
     });
 
+    //- Auto-computation disabled for now, as this needs to be improved to support partial advancements and potential modifiers (from perks or GM ruling)
+    //-
+    //- on("sheet:opened change:size change:endurance change:will change:faith change:level", eventInfo => {
+    //-     getAttrs([ 'size', 'endurance', 'will', 'faith', 'level' ], values => {
+    //-         setAttrs({ vitality_rating: parseInt(values.size) +
+    //-                                     parseInt(values.endurance) +
+    //-                                     parseInt(values.will) +
+    //-                                     parseInt(values.faith) + 
+    //-                                     parseInt(values.level) });
+    //-     });
+    //- });
+    //-
+    //- on("sheet:opened change:strength change:wits change:presence change:level", eventInfo => {
+    //-     getAttrs([ 'strength', 'wits', 'presence', 'level' ], values => {
+    //-         setAttrs({ surge_rating: Math.max(parseInt(values.strength), parseInt(values.wits), parseInt(values.presence)) + parseInt(values.level) });
+    //-     });
+    //- });
+    //-
+    //- on("sheet:opened change:size change:level", eventInfo => {
+    //-     getAttrs([ 'size', 'level' ], values => {
+    //-         setAttrs({ revivals_rating: parseInt(values.size) + parseInt(values.level) });
+    //-     });
+    //- });
+    //-
+    //- on("sheet:opened change:level", eventInfo => {
+    //-     getAttrs([ 'level' ], values => {
+    //-         let calc_bank_capa = (Math.floor(parseInt(values.level)/2) + 1) * 5;
+    //-         let calc_surge_nb = Math.floor((parseInt(values.level)+2)/3);
+    //-         let calc_revivals_nb = calc_surge_nb;
+    //-         setAttrs({
+    //-             vp_bank_capacity: calc_bank_capa,
+    //-             surge_number_max: calc_surge_nb,
+    //-             revivals_number_max: calc_revivals_nb
+    //-         });
+    //-     });
+    //- });
+
     on("sheet:opened", function() {
         // sheet versioning
         getAttrs( [ 'sheet_version' ], values => {
@@ -557,12 +622,13 @@ script(type='text/worker').
             if (values.sheet_version !== "latest") {
 
                 // insert version updates here
-                if (values.sheet_version == "1.0.0") {
-                    // no need for any attribute migrations between 1.0.0 to 1.1.0
-                }
+
+                // 1.0.0 to 1.1.0 => nothing to do
+
+                // 1.1.0 to 1.2.0 => nothing to do
             }
 
-            const latest_version = "1.1.0";
+            const latest_version = "1.2.0";
             
             if (values.sheet_version != latest_version) {
                 setAttrs({ sheet_version: latest_version });
