@@ -9823,18 +9823,32 @@
         //Close Ship Salvo Mode and spend Ship Charge after roll
         on("change:spendshipchargeclosesalvo", (event) =>
         {
-            getAttrs(["shipReactorCharge", "shipReactorOvercharge", "salvoChargeShip", "supply", "salvoSupply"], function (values)
+            getAttrs(["salvoChargeShip", "salvoToolShip", "shipReactorCharge", "shipReactorOvercharge", "tugReactorCharge", "tugReactorOvercharge", "supply", "salvoSupply"], function (values)
             {
                 const setObj = {};
 
-                //Spend Charge from Personal Reactor
-                let adjustedReactorCharge = parseInt(values.shipReactorCharge) || 0;
-                adjustedReactorCharge += parseInt(values.shipReactorOvercharge) || 0;
-                adjustedReactorCharge -= parseInt(values.salvoChargeShip) || 0;
-                setObj.shipReactorCharge = adjustedReactorCharge;
-                setObj.shipReactorOvercharge = 0;
+                //Test Ship Tool to determine which Reactor to use
+                let adjustedReactorCharge = 0;
+                if (values.salvoToolShip == "Launch Bay")
+                {
+                    //Spend Charge from Tug Reactor
+                    adjustedReactorCharge = parseInt(values.tugReactorCharge) || 0;
+                    adjustedReactorCharge += parseInt(values.tugReactorOvercharge) || 0;
+                    adjustedReactorCharge -= parseInt(values.salvoChargeShip) || 0;
+                    setObj.tugReactorCharge = adjustedReactorCharge;
+                    setObj.tugReactorOvercharge = 0;
+                }
+                else
+                {
+                    //Spend Charge from Ship Reactor
+                    adjustedReactorCharge = parseInt(values.shipReactorCharge) || 0;
+                    adjustedReactorCharge += parseInt(values.shipReactorOvercharge) || 0;
+                    adjustedReactorCharge -= parseInt(values.salvoChargeShip) || 0;
+                    setObj.shipReactorCharge = adjustedReactorCharge;
+                    setObj.shipReactorOvercharge = 0;
+                }
 
-                //Spend Charge from Personal Reactor
+                //Spend Charge from Ship Supply
                 let adjustedSupply = parseInt(values.supply) || 0;
                 adjustedSupply -= parseInt(values.salvoSupply) || 0;
                 setObj.supply = adjustedSupply;
@@ -10182,7 +10196,7 @@
                 setObj.salvoShipMod4 = 0;
                 setObj.salvoModuleFitting = 0;
                 setObj.salvoShuttleTrailer = "Choose a Trailer";
-                
+
                 //Reset the basic Reactor settings
                 setObj.salvoChargeDirection = "Charged";
 
@@ -11447,6 +11461,7 @@
             getAttrs(["salvoToolShip",
                 "shipReactorCharge", "shipReactorOvercharge",
                 "supply",
+                "tugReactorCharge", "tugReactorOvercharge",
                 "salvoShipMod1", "salvoShipMod2", "salvoShipMod3", "salvoShipMod4",
                 "salvoModuleFitting", "salvoShuttleTrailer",
                 "SensorsSurveySensor", "SensorsDepthAnalyser", "SensorsAreaEffect", "SensorsRangeCompensator",
@@ -11989,7 +12004,7 @@
                 }
                 else if (values.salvoToolShip == "Launch Bay")
                 {
-                    //Set up to equip Trailer 
+                    //Set up to equip Trailer
 
                     //Set up to choose Shuttle System
 
@@ -12146,7 +12161,7 @@
 
         /*Sheet Totals*/
         //Reactor Overcharge control
-        on("change:reactorcharge change:reactorovercharge change:shipreactorcharge change:shipReactorovercharge change:tugreactorcharge change:tugreactorovercharge", (event) =>
+        on("change:reactorcharge change:reactorovercharge change:shipreactorcharge change:shipreactorovercharge change:tugreactorcharge change:tugreactorovercharge", (event) =>
         {
             getAttrs(["ReactorCharge", "portableReactor", "ReactorOvercharge", "shipReactorCharge", "shipReactor", "shipReactorOvercharge", "tugReactorCharge", "tugReactor", "tugReactorOvercharge"], function (values)
             {
