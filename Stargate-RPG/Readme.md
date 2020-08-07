@@ -4,12 +4,26 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Full release
 
 ### Changelog
 
-**v.1.21 (2020-08-04)**
+**v.1.4**
+
+* Roll buttons & hover highlight made more distinct
+* roll templates updated, now mentions character name, works better for descriptions
 * Init & moxie now rolls only once
-* attacks section made more clear and given more space, rolls doesn't break if no damage is given any longer
+* attacks section made more clear and given more space, rolls doesn't break if no damage is given, any special info is displayed on the roll
 * Skills set as default to zero
 * Default speed set to 6m, deafult HP removed.
 * Important fields that need to be filled out, are higlighted in red while empty.
+
+Stat Additions/Removals:
+
+* determination now have a max value, moved next to AC
+* `hp_temp` added, next to `hp`
+* Tension die added, can be added to rolls with `@{td}`
+* (MP)Mission Points added
+* Bulk tracker
+* Small Inventory section on first page
+* Ammo trackers & `ac_extra` removed
+
 
 **v.1.2 (2020-07-28)**
 * skills, saves, init, ac, ac_extra & moxie now update when their attribute changes. init is keyed to dex, moxie to cha.
