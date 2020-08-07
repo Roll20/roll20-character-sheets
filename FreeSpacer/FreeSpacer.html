@@ -2102,7 +2102,7 @@
             <!--Shuttle Trailer--> 
             <input type="hidden" class="colorChanger" name="attr_salvoShuttleTrailer" value="Choose a Trailer" />
             <div class="salvoTrailer inputBox salvoOverlayBox">
-               <div class="salvoTrailerCheckboxGrid"> <input type="checkbox" class="salvoTrailerCheckbox" name="attr_salvoShuttleTrailerPrinter" /><span class="salvoTrailerCheckbox"></span> <span class="salvoTrailerCheckboxText">Print new Trailer</span></div>
+               <div class="salvoTrailerCheckboxGrid"> <input type="checkbox" class="salvoTrailerCheckbox" name="attr_salvoShuttleTrailerPrinter" value="1"/><span class="salvoTrailerCheckbox"></span> <span class="salvoTrailerCheckboxText">Print new Trailer</span></div>
                 <input type="text" class="salvoAttr" name="attr_salvoShuttleTrailer" readonly />
             </div>
 
@@ -9873,9 +9873,15 @@
             //Ship stat reset
             setObj.salvoModeShip = 0;
             setObj.salvoSkillShip = "Select Skill";
+            setObj.salvoSpecialtyShip = "Select Specialty";
+            setObj.salvoToolShip = "Choose a Tool";
+            setObj.salvoAdvantageShip = 0;
             setObj.salvoOperatorShip = "Choose Operator";
             setObj.salvoOperatorShipSelect = 0;
             setObj.salvoSkillRatingShip = 0;
+            setObj.salvoModuleFitting = 0;
+            setObj.salvoShuttleTrailerPrinter = 0;
+            setObj.salvoShuttleTrailer = "Choose a Trailer";
             setObj.salvoOperator1 = "No Operator Found";
             setObj.salvoOperator1StationA = "";
             setObj.salvoOperator1StationZ = "";
@@ -9908,7 +9914,7 @@
             setAttrs(setObj);
         });
 
-        //Reset Salvo Mode
+        //Reset Salvo Mode when Salvo mode opened
         on("change:salvomode", (event) =>
         {
             getAttrs(["ReactorCharge", "ReactorOvercharge"], function (values)
@@ -9937,7 +9943,7 @@
             });
         });
 
-        //Reset Salvo Mode Ship
+        //Reset Salvo Mode Ship when Salvo mode opened
         on("change:salvomodeship", (event) =>
         {
             getAttrs(["shipReactorCharge", "shipReactorOvercharge", "supply"], function (values)
@@ -9950,6 +9956,7 @@
                 setObj.salvoSpecialtyShip = "Select Specialty";
                 setObj.salvoToolShip = "Choose a Tool";
                 setObj.salvoAdvantageShip = 0;
+                setObj.salvoShuttleTrailerPrinter = 0;
 
                 //Reset Operator List
                 let index = 1;
@@ -10186,7 +10193,7 @@
         //Reset Ship salvoMods
         on("change:salvotoolship", (event) =>
         {
-            getAttrs(["shipReactorCharge", "shipReactorOvercharge", "supply"], function (values)
+            getAttrs(["salvoToolShip", "shipReactorCharge", "shipReactorOvercharge", "tugReactorCharge", "tugReactorOvercharge", "supply"], function (values)
             {
                 const setObj = {};
 
@@ -10195,16 +10202,30 @@
                 setObj.salvoShipMod3 = 0;
                 setObj.salvoShipMod4 = 0;
                 setObj.salvoModuleFitting = 0;
+                setObj.salvoShuttleTrailerPrinter = 0;
                 setObj.salvoShuttleTrailer = "Choose a Trailer";
+                
+                //Determine the Reactor to be monitored
+                let overcharge = 0;
+                let charge = 0;
+                if (values.salvoToolShip == "Launch Bay")
+                {
+                    overcharge = parseInt(values.tugReactorOvercharge) || 0;
+                    charge = parseInt(values.tugReactorCharge) || 0;
+                }
+                else
+                {
+                    overcharge = parseInt(values.shipReactorOvercharge) || 0;
+                    charge = parseInt(values.shipReactorCharge) || 0;
+                }
 
                 //Reset the basic Reactor settings
                 setObj.salvoChargeDirection = "Charged";
-
-                if (values.shipReactorOvercharge == "1")
+                if (overcharge == "1")
                 {
                     setObj.salvoChargeDirection = "Overcharged";
                 }
-                else if (values.shipReactorCharge <= 0)
+                else if (charge <= 0)
                 {
                     setObj.salvoChargeDirection = "Uncharged";
                 }
@@ -10219,6 +10240,14 @@
 
                 setAttrs(setObj);
             });
+        });
+
+        //Reset Printer
+        on("change:salvoshuttletrailer", (event) =>
+        {
+            setObj.salvoShuttleTrailerPrinter = 0;
+
+            setAttrs(setObj);
         });
 
         //Set the Salvo Tool Rating, track Charge spent, and limit spending to current ReactorCharge
@@ -11456,11 +11485,11 @@
         });
 
         //Set the Ship Salvo Tool Rating, track shipCharge spent, and limit spending to current shipReactorCharge
-        on("change:salvoshipmod1 change:salvoshipmod2 change:salvoshipmod3 change:salvoshipmod4 change:salvomodulefitting change:salvoshuttletrailer", (event) =>
+        on("change:salvoshipmod1 change:salvoshipmod2 change:salvoshipmod3 change:salvoshipmod4 change:salvomodulefitting change:salvoshuttletrailer change:salvoshuttletrailerprinter", (event) =>
         {
             getAttrs(["salvoToolShip",
                 "shipReactorCharge", "shipReactorOvercharge",
-                "supply",
+                "supply", "salvoShuttleTrailerPrinter",
                 "tugReactorCharge", "tugReactorOvercharge",
                 "salvoShipMod1", "salvoShipMod2", "salvoShipMod3", "salvoShipMod4",
                 "salvoModuleFitting", "salvoShuttleTrailer",
@@ -11471,26 +11500,38 @@
             {
                 const setObj = {};
 
-                //console.log("Tool: ", values.salvoToolShip);
                 let rating = 0;
 
-                //Set Reactor Charge and Max
+                //Determine the Reactor to be monitored
+                let overcharge = 0;
                 let charge = 0;
-                let maxCharge = parseInt(values.shipReactorCharge) || 0;
-                maxCharge += parseInt(values.shipReactorOvercharge) || 0;
+                if (values.salvoToolShip == "Launch Bay")
+                {
+                    overcharge = parseInt(values.tugReactorOvercharge) || 0;
+                    charge = parseInt(values.tugReactorCharge) || 0;
+                }
+                else
+                {
+                    overcharge = parseInt(values.shipReactorOvercharge) || 0;
+                    charge = parseInt(values.shipReactorCharge) || 0;
+                }
+
+                //Set Reactor Max
+                let maxCharge = charge;
+                maxCharge += overcharge;
                 //console.log("Max Charge: ", maxCharge);
 
                 //Set Supply and supplyTotal
                 let supplySpent = 0;
                 let supplyTotal = parseInt(values.supply) || 0;
 
-                //Set the status of the Reactor
+                //Reset the basic Reactor settings
                 setObj.salvoChargeDirection = "Charged";
-                if (values.shipReactorOvercharge == "1" && charge <= 0)
+                if (overcharge == "1")
                 {
                     setObj.salvoChargeDirection = "Overcharged";
                 }
-                else if (values.shipReactorCharge <= 0)
+                else if (charge <= 0)
                 {
                     setObj.salvoChargeDirection = "Uncharged";
                 }
@@ -12004,7 +12045,51 @@
                 }
                 else if (values.salvoToolShip == "Launch Bay")
                 {
-                    //Set up to equip Trailer
+                    let printTrailer = parseInt(values.salvoShuttleTrailerPrinter) || 0;
+                  
+                    //Equip Trailer and set supply Spent
+                    if (values.salvoShuttleTrailer == "Transport")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 6;
+                        }
+                    }
+                    else if (values.salvoShuttleTrailer == "Flight")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 9;
+                        }
+                    }
+                    else if (values.salvoShuttleTrailer == "Drop")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 12;
+                        }
+                    }
+                    else if (values.salvoShuttleTrailer == "Boarding")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 12;
+                        }
+                    }
+                    else if (values.salvoShuttleTrailer == "Survey")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 15;
+                        }
+                    }
+                    else if (values.salvoShuttleTrailer == "Fighter")
+                    {
+                        if (printTrailer == 1)
+                        {
+                            supplySpent = 18;
+                        }
+                    }
 
                     //Set up to choose Shuttle System
 
