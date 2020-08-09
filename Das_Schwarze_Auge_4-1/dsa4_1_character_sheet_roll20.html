@@ -10952,25 +10952,31 @@
             <h3>Schilde und Parierwaffen</h3>
             <div class="shields-overflow-container">
                 <div class="shields_container container_head">
-                    <span class="shield_active oversize_head">Aktiv</span>
+                    <span class="shield_item oversize-head">Aktiv</span>
                     <span class="shield_item">Name</span>
                     <span class="shield_item">Typ</span>
-                    <span class="shield_item oversize_head">INI-Mod</span>
-                    <span class="shield_item oversize_head">AT-Mod</span>
-                    <span class="shield_item oversize_head">PA-Mod</span>
+                    <span class="shield_item number-content">INI-Mod</span>
+                    <span class="shield_item number-content">AT-Mod</span>
+                    <span class="shield_item number-content">PA-Mod</span>
+                    <span class="shield_item number-content">TP/KK</span>
+                    <span class="shield_item number-content">TP/TP(A)</span>
+                    <span class="shield_item number-content">BF</span>
                 </div>
                 
                 <fieldset class="repeating_shields">
                     <div class="shields_container">
-                        <input type="checkbox" name="attr_shield_active"  class="shield_active"/>
-                        <input type="text" name="attr_shield_name"  class="shield_item"/>
-                        <select class="shield_item" name="attr_shield_type">
+                        <input type="checkbox" name="attr_shield_active" class="shield_item"/>
+                        <input type="text" name="attr_shield_name" class="shield_item"/>
+                        <select name="attr_shield_type" class="shield_item">
                             <option value="shield">Schild</option>
                             <option value="parryweapon">Parierwaffe</option>
                         </select>
-                        <input type="number" name="attr_shield_ini_mod" min="-5" max="10" value="0"  class="shield_item"/>
-                        <input type="number" name="attr_shield_at_mod" min="-5" max="10" value="0"  class="shield_item"/>
-                        <input type="number" name="attr_shield_pa_mod" min="-5" max="10" value="0"  class="shield_item"/>
+                        <input type="number" name="attr_shield_ini_mod" min="-5" max="10" value="0" class="number-content shield_item"/>
+                        <input type="number" name="attr_shield_at_mod" min="-5" max="10" value="0" class="number-content shield_item"/>
+                        <input type="number" name="attr_shield_pa_mod" min="-5" max="10" value="0" class="number-content shield_item"/>
+                        <input type="text" name="attr_shield_tpkk" value="13/3" class="number-content shield_item"/>
+                        <input type="text" name="attr_shield_tp" value="1W6 + 1" class="number-content shield_item"/>
+                        <input type="number" name="attr_shield_bf" min="-99" max="99" value="0" class="number-content shield_item"/>
                     </div>
                 </fieldset>
             </div>
@@ -11206,7 +11212,7 @@
                     </th>
                     <th>BE <input class="sheet-stat-immutable" disabled="disabled" type="text" name="attr_Ges_BE_Anzeige" value="@{BE_TaW}" style="width: 2em">
                     </th>
-                    <th><button name="Initiative" type="roll" value="@{gm_roll_opt} &{template:DSA-Initiative} {{char=@{Name}}} {{mod=[[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]]}} {{dice=[[@{INI_dice_count}]]}} {{IB=[[@{INIBasis2}]]}} {{be=[[@{BE_TaW}]]}} {{ini=[[(@{INI_dice_count}d6 + @{INIBasis2} - @{BE_TaW} + [[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]])&{tracker}]]}}"> <span>Initiative</span></button> mit <select type="number" name="attr_INI_dice_count" style="width: 4em">
+                    <th><button name="Initiative" type="roll" value="@{gm_roll_opt} &{template:DSA-Initiative} {{char=@{Name}}} {{mod=[[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]]}} {{dice=[[@{INI_dice_count}]]}} {{IB=[[@{INIBasis2}]]}} {{be=[[@{BE_TaW}]]}} {{ini=[[(@{INI_dice_count}d6 + @{INIBasis2} - @{BE_TaW} + [[@{ShieldParryINI}]] + [[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]])&{tracker}]]}}"> <span>Initiative</span></button> mit <select type="number" name="attr_INI_dice_count" style="width: 4em">
                 <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
             </select><span class="sheet-abbr" title="sechsseitiger Würfel" style="margin-right: 1em;">W6</span>
@@ -16264,6 +16270,11 @@ function calculateCombatValues(eventInfos) {
         if (activeShieldRowId) {
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_bf");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_ini_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_name");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         }
         getAttrs(variablesToGet, function(values) {
@@ -16391,6 +16402,55 @@ function calculateCombatValues(eventInfos) {
             }
             attrsToChange["shield_pa"] = shieldPa;
             attrsToChange["parryweapon_pa"] = parryweaponPa;
+
+            // Set INI modifier from shields/parry weapons
+            var shieldparryini = 0;
+            if (activeShieldRowId) {
+                shieldparryini = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_ini_mod"]);
+            }
+            attrsToChange["ShieldParryINI"] = shieldparryini;
+
+            // Set shield parry weapon BF (Bruchfaktor; lit. breaking factor -> fragility)
+            var shieldparrybf = 0;
+            if (activeShieldRowId) {
+                shieldparrybf = values["repeating_shields_" + activeShieldRowId + "_shield_bf"];
+                if (shieldparrybf === undefined || isNaN(parseInt(shieldparrybf))) {
+                    shieldparrybf = 0;
+                }
+            }
+            attrsToChange["shield_bf"] = shieldparrybf;
+
+            // Set shield parry weapon TP/KK (damage modifier based on low/high strength)
+            // For now no calculations, just showing text
+            var shieldparrytpkk = "";
+            if (activeShieldRowId) {
+                shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
+                if (shieldparrytpkk === undefined || shieldparrytpkk === "") {
+                    shieldparryname = " ";
+                }
+            }
+            attrsToChange["shield_tpkk"] = shieldparrytpkk;
+
+            // Set shield parry weapon TP (damage)
+            // For now no calculations, just showing text
+            var shieldparrytp = "";
+            if (activeShieldRowId) {
+                shieldparrytp = values["repeating_shields_" + activeShieldRowId + "_shield_tp"];
+                if (shieldparrytp === undefined || shieldparrytp === "") {
+                    shieldparrytp = " ";
+                }
+            }
+            attrsToChange["shield_tp"] = shieldparrytp;
+
+            // Set shield parry weapon name
+            var shieldparryname = "";
+            if (activeShieldRowId) {
+                shieldparryname = values["repeating_shields_" + activeShieldRowId + "_shield_name"];
+                if (shieldparryname === undefined || shieldparryname === "") {
+                    shieldparryname = " ";
+                }
+            }
+            attrsToChange["shield_name"] = shieldparryname;
 
             setAttrs(attrsToChange);
         });
