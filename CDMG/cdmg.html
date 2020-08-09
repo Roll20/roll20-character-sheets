@@ -61,14 +61,19 @@
                         <input class="center-text" type="text" name="attr_luck_base" />
                         <div class="input-label center-text">BASE</div>
                     </div>
-                    <div class="stat-content"> +/- </div>
+                    <div class="stat-content">
+                        <label>
+                            <input name="attr_luck_modifier" type="checkbox" value="1"/>
+                            <span></span>
+                        </label>
+                    </div>
                     <div class="stat-content">
                         <input class="center-text" type="text" name="attr_luck_bonus" />
                         <div class="input-label center-text">BONUS</div>
                     </div>
                     <div class="stat-content"> = </div>
                     <div class="stat-content">
-                        <input class="center-text" type="text" name="attr_luck" />
+                        <input class="center-text" type="text" name="attr_luck_total" />
                         <div class="input-label center-text">TOTAL</div>
                     </div>
                     <div class="stat-content">
@@ -88,14 +93,19 @@
                         <input class="center-text" type="text" name="attr_vul_base" />
                         <div class="input-label center-text">BASE</div>
                     </div>
-                    <div class="stat-content"> +/- </div>
+                    <div class="stat-content">
+                        <label>
+                            <input name="attr_vul_modifier" type="checkbox" value="1"/>
+                            <span></span>
+                        </label>
+                    </div>
                     <div class="stat-content">
                         <input class="center-text" type="text" name="attr_vul_bonus" />
                         <div class="input-label center-text">BONUS</div>
                     </div>
                     <div class="stat-content"> = </div>
                     <div class="stat-content">
-                        <input class="center-text" type="text" name="attr_vul" />
+                        <input class="center-text" type="text" name="attr_vul_total" />
                         <div class="input-label center-text">TOTAL</div>
                     </div>
                     <div class="stat-content">
@@ -114,14 +124,19 @@
                         <input class="center-text" type="text" name="attr_res_base" />
                         <div class="input-label center-text">BASE</div>
                     </div>
-                    <div class="stat-content"> +/- </div>
+                    <div class="stat-content">
+                        <label>
+                            <input name="attr_res_modifier" type="checkbox" value="1"/>
+                            <span></span>
+                        </label>
+                    </div>
                     <div class="stat-content">
                         <input class="center-text" type="text" name="attr_res_bonus" />
                         <div class="input-label center-text">BONUS</div>
                     </div>
                     <div class="stat-content"> = </div>
                     <div class="stat-content">
-                        <input class="center-text" type="text" name="attr_res" />
+                        <input class="center-text" type="text" name="attr_res_total" />
                         <div class="input-label center-text">TOTAL</div>
                     </div>
                     <div class="stat-content">
@@ -229,20 +244,25 @@
 <script type="text/worker">
 const stats = ["luck", "vul", "res"];
 stats.forEach(stat => {
-    on(`change:${stat}`, () => {
-        getAttrs([stat], values => {
-            const stat_base = parseInt(values[stat]) || 0;
-            console.log(stat_base);
-            let dice = 0;
+    on(`change:${stat}_base change:${stat}_modifier change:${stat}_bonus`, () => {
+        getAttrs([`${stat}_base`, `${stat}_modifier`, `${stat}_bonus`], values => {
+            const base = parseInt(values[`${stat}_base`]) || 0;
+            const mod = parseInt(values[`${stat}_modifier`]) || 0;
+            const bonus = parseInt(values[`${stat}_bonus`]) || 0;
+
+            //Calculate the total
+            let total;
+            if(mod) total = base - bonus;
+            else total = base + bonus;
 
             //Calculate the dice bonus
-            if(stat_base < 5) dice = 1;
-            else if(stat_base >= 5 && stat_base < 9) dice = 2;
+            let dice;
+            if(total < 5) dice = 1;
+            else if(total >= 5 && total < 9) dice = 2;
             else dice = 3;
 
-            console.log(dice);
-
             setAttrs({
+                [`${stat}_total`]: total,
                 [`${stat}_dice`]: dice
             });
         });
