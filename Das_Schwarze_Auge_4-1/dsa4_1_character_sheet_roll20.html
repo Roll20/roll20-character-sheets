@@ -15864,12 +15864,20 @@ on("change:kegrundw change:kezugek", function(eventInfo) {
     - calculate fighting values
     - set shield_pa and parryweapon_pa to 0
     - set shield_pa_available and parryweapon_pa_available to "0"
+    - change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
+    - calculate BE from armor
+    - calculate BE modifications for weapons
 */
-function migrateTo20200730() {
-    console.log("migrateTo20200730 invoked");
+function migrateTo20200809(migrationChain) {
+    console.log("migrateTo20200809 invoked");
 
-    getAttrs(["NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis"], function(v) {
-        console.log("got attributes");
+    getAttrs([
+            "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
+            "RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
+            "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "Ges_BE", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
+            "BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
+            "NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
+        
         var attrsToChange = {};
         var activeCount = 0;
         for (var i = 1; i <= 4; i++) {
@@ -15889,61 +15897,36 @@ function migrateTo20200730() {
             peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
         }
         attrsToChange["AT_peitsche"] = peitscheAT;
-        attrsToChange["data_version"] = 20200730;
-        setAttrs(attrsToChange, { silent: true }, function(){
-            calculateCombatValues({});
-        });
-    });
-}
 
-function migrateTo20200731() {
-    console.log("migrating to version 20200731");
-    
-    getAttrs(["RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "Ges_BE", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII"], function(values) {
-        var attrsToChange = { "data_version": 20200731 };
-        if (values["sf_rustungsgewonungII"] === "1") {
+        if (v["sf_rustungsgewonungII"] === "1") {
             attrsToChange["sf_rustungsgewohnungII"] = "1";
         }
 
-        var activeCount = 0;
-        for (var i = 1; i <= 4; i++) {
-            if (values["RSAktiv" + i] === "1") {
-                activeCount += 1;
-            }
-            if (activeCount > 1) {
-                attrsToChange["RSAktiv" + i] = "0";
-            }
-        }
-        if (activeCount === 0) {
-            attrsToChange["RSAktiv1"] = "1";
-        }
+        // take calculated values into "v" so that they are available to following computation steps
+        Object.assign(v, attrsToChange);
 
-        // übernehme die bisher berechneten Änderungen in die Values, da diese für calculateRuestungBE interessant sind
-        Object.assign(values, attrsToChange);
-
-        // MARKER
-        var calculatedRuestungBE = calculateRuestungBE(values, {});
-        // Übernehme die berechneten Werte zurück in attrsToChange
+        var calculatedRuestungBE = calculateRuestungBE(v, {});
+        // apply calculated values to attrsToChange
         Object.assign(attrsToChange, calculatedRuestungBE);
 
         var beTaw = 0;
-        // Wir nehmen den Ges_BE aus den berechneten Werten
+        // take Ges_BE from calculated values
         if (calculatedRuestungBE["Ges_BE"]) {
             beTaw += parseInt(calculatedRuestungBE["Ges_BE"]);
         }
-        if (values["BE_Last"]) {
-            beTaw += parseInt(values["BE_Last"]);
+        if (v["BE_Last"]) {
+            beTaw += parseInt(v["BE_Last"]);
         }
         attrsToChange["BE_TaW"] = beTaw;
+        v["BE_TaW"] = beTaw;
 
-        setAttrs(attrsToChange);
-    });
-}
+        var weaponBE = calculateWeaponBE(v);
+        attrsToChange["be_at_mod"] = weaponBE.be_at;
+        attrsToChange["be_pa_mod"] = weaponBE.be_pa;
 
-function migrateTo20200801() {
-    getAttrs([ "BE_TaW", "NKW_Aktiv1", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_Aktiv2", "NKW_AT_typ2", "NKW_PA_typ2", "NKW_Aktiv3", "NKW_AT_typ3", "NKW_PA_typ3", "NKW_Aktiv4", "NKW_AT_typ4", "NKW_PA_typ4" ], function(values) {
-        var weaponBE = calculateWeaponBE(values);
-        setAttrs({ be_at_mod: weaponBE.be_at, be_pa_mod: weaponBE.be_pa, data_version: 20200801 });
+        setAttrs(attrsToChange, {}, function(){
+            callNextMigration(migrationChain);
+        });
     });
 }
 
@@ -15952,9 +15935,7 @@ function migrateTo20200801() {
 */
 var versionsWithMigrations = [
     20190427,
-    20200730,
-    20200731,
-    20200801
+    20200809
 ]
 
 /*
@@ -15963,10 +15944,10 @@ Always try to migrate as much data as possible
 
 Relevant character sheet versions
 * 20171014: last version before sheet worker scripts conversion
-* 20190427: new repeating sections for meta-talents and gifts
-* 20200730: shields and parry weapons. AT- and PA value calculation using sheet workers
-* 20200731: migrates BE calculation to sheetworkers
-* 20200801: weapon be calculation: attack and parry values for weapons and shields are affected by the eBE
+* 20200809: new repeating sections for meta-talents and gifts
+*           shields and parry weapons. AT- and PA value calculation using sheet workers
+*           migrates BE calculation to sheetworkers
+*           weapon BE calculation: attack and parry values for weapons and shields are affected by the eBE
 */
 function migrationCheck() {
     getAttrs(["character_sheet_version", "data_version"], function(v) {
@@ -15975,229 +15956,245 @@ function migrationCheck() {
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
 
+        let functionsToCall = [];
+        let firstFunction;
+        /*
+            we run over the possible migrations and check if they are already applied.
+            if not and it is the first migration, than the function name is saved as "firstFunction"
+            if it is not the first migration to apply it is added to "functionsToCall" array
+        */
         for (var i = 0; i < versionsWithMigrations.length; i++) {
             if (dataVersion < versionsWithMigrations[i]) {
                 var functionName = "migrateTo" + versionsWithMigrations[i];
                 console.log("dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
-                window[functionName]();
+                if (firstFunction) {
+                    functionsToCall.push(functionName);
+                } else {
+                    firstFunction = functionName;
+                }
             };
+        }
+        // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+        // then we call the function with name "firstFunction"
+        if (firstFunction) {
+            functionsToCall.push("setCurrentVersion");
+            window[firstFunction](functionsToCall);
         }
     });
 }
+
+function setCurrentVersion(migrationChain) {
+    setAttrs({ "data_version": versionsWithMigrations.slice(-1).pop() });
+}
+
+function callNextMigration(migrationChain) {
+    if (migrationChain && migrationChain.length > 0) {
+        let nextMigration = migrationChain.shift();
+        if (nextMigration) {
+            window[nextMigration](migrationChain);
+        }
+    }
+}
+
 
 /*
 ## From version 20171014 to 20190427
 * Gifts and meta-talents were changed
 */
-function migrateTo20190427 () {
-    console.log("Migrating sheet data from version to 20190427 ...");
-    let migrationFinished = 0;
+function migrateTo20190427 (migrationChain) {
+    console.log("migrateTo20190427 invoked");
 
     getSectionIDs("GabenTalente", function(gabenIDs) {
         getSectionIDs("MetaTalente", function(metatalenteIDs) {
+
+            let giftsConversion = {
+                "@{MU}": "mu",
+                "@{KL}": "kl",
+                "@{IN}": "in",
+                "@{CH}": "ch",
+                "@{FF}": "ff",
+                "@{GE}": "ge",
+                "@{KO}": "ko",
+                "@{KK}": "kk",
+                "---": "nothing",
+                "Empathie": "empathie",
+                "Gefahreninstinkt": "gefahreninstinkt",
+                "Geräuschhexerei": "geraeuschhexerei",
+                "Kräfteschub/Talentschub": "kraefteschub/talentschub",
+                "Magiegespür": "magiegespuer",
+                "Prophezeien": "prophezeien",
+                "Tierempathie": "tierempathie",
+                "Zwergennase": "zwergennase",
+            };
+
+            let metaTalentConversion = {
+                "@{MU}": "mu",
+                "@{KL}": "kl",
+                "@{IN}": "in",
+                "@{CH}": "ch",
+                "@{FF}": "ff",
+                "@{GE}": "ge",
+                "@{KO}": "ko",
+                "@{KK}": "kk",
+                "---": "nothing",
+                "Ansitzjagd": "ansitzjagd",
+                "Hetzjagd": "hetzjagd",
+                "Kräutersuchen": "kraeutersuchen",
+                "Nahrungsammeln": "nahrungsammeln",
+                "Pirschjagd": "pirschjagd",
+                "Speerfischen": "speerfischen",
+                "Tierfallenstellen": "tierfallenstellen",
+                "Wachehalten": "wachehalten"
+            };
+                
+            let gaben = {
+                "nothing": [ ["---", "---", "---"], "nothing" ],
+                "empathie": [ ["mu", "in", "in"], "Empathie" ],
+                "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
+                "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
+                "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
+                "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
+                "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
+                "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
+                "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
+            };
+                
+            let metatalente = {
+                "nothing": [ ["---", "---", "---"], "nothing" ],
+                "ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
+                "hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
+                "kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
+                "nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
+                "pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
+                "speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
+                "tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
+                "wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
+            };
+
+            let attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
             // GIFTS MIGRATION
             if(gabenIDs.length == 0) {
                 console.log("Migration: No gifts found, nothing to migrate.");
-                migrationFinished += 1;
             } else {
                 console.log("Migration: Found old gifts, continuing ...");
-                let conversion = {
-                    "@{MU}": "mu",
-                    "@{KL}": "kl",
-                    "@{IN}": "in",
-                    "@{CH}": "ch",
-                    "@{FF}": "ff",
-                    "@{GE}": "ge",
-                    "@{KO}": "ko",
-                    "@{KK}": "kk",
-                    "---": "nothing",
-                    "Empathie": "empathie",
-                    "Gefahreninstinkt": "gefahreninstinkt",
-                    "Geräuschhexerei": "geraeuschhexerei",
-                    "Kräfteschub/Talentschub": "kraefteschub/talentschub",
-                    "Magiegespür": "magiegespuer",
-                    "Prophezeien": "prophezeien",
-                    "Tierempathie": "tierempathie",
-                    "Zwergennase": "zwergennase",
-                };
-                let gaben = {
-                    "nothing": [ ["---", "---", "---"], "nothing" ],
-                    "empathie": [ ["mu", "in", "in"], "Empathie" ],
-                    "gefahreninstinkt": [ ["kl", "in", "in"], "Gefahreninstinkt" ],
-                    "geraeuschhexerei": [ ["in", "ch", "ko"], "Geräuschhexerei" ],
-                    "kraefteschub/talentschub": [ ["mu", "in", "ko"], "Kräfteschub/Talentschub" ],
-                    "magiegespuer": [ ["mu", "in", "in"], "Magiegespür" ],
-                    "prophezeien": [ ["in", "in", "ch"], "Prophezeien" ],
-                    "tierempathie": [ ["mu", "in", "ch"], "Tierempathie" ],
-                    "zwergennase": [ ["in", "in", "ff"], "Zwergennase" ]
-                };
                 for(var i=0; i < gabenIDs.length; i++) {
-                    getAttrs(
-                        [
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_TalentName",
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1",
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2",
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft3",
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_TaW",
-                            "repeating_GabenTalente_" + gabenIDs[i] + "_SE",
-                            "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
-                        ], function(v) {
-                            console.log(v);
-                            let defaultTaW = 3;
-                            let update = {};
-                            let newrow = generateRowID();
-                            let current = Object.keys(v)[0].split("_")[2];
-                            let prefixNew = "repeating_Gaben_" + newrow;
-                            let prefixOld = "repeating_GabenTalente_" + current;
-
-                            // Gather data
-                            // Updating the name will set the stats automatically
-                            // To prevent overwriting of custom stats check that the RAW stats are used
-                            // Need to check that the three correct ones are used, order irrelevant
-                            // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
-                            let gabeStats = gaben[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
-                            let gabeStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
-                            if(gabeStats == gabeStatsOld) {
-                                update[prefixNew + "_Name_Gabe"] = conversion[v[prefixOld + "_TalentName"]];
-                                update[prefixNew + "_Name_Gabe_Zusatz"] = "";
-                            } else {
-                                update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
-                            }
-                            if(v[prefixOld + "_SE"] == "on") {
-                                update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
-                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
-                            } else {
-                                update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
-                            }
-                            update[prefixNew + "_Name_Gabe_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
-                            update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
-                            update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
-                            update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
-                            update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
-                            update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
-                            update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
-                            if(v[prefixOld + "_TaW"] === "") {
-                                update[prefixNew + "_TaW"] = defaultTaW;
-                            } else {
-                                update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
-                            }
-                            console.log(update);
-
-                            // Create new row
-                            setAttrs(update);
-                        });
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TalentName");
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1");
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft2");
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft3");
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TaW");
+                    attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_SE");
                 }
-                migrationFinished += 1;
             }
 
             // META-TALENTS MIGRATION
             if(metatalenteIDs.length == 0) {
                 console.log("Migration: No meta-talents found, nothing to migrate.");
-                migrationFinished += 2;
             } else {
                 console.log("Migration: Found old meta-talents, continuing ...");
-                let conversion = {
-                    "@{MU}": "mu",
-                    "@{KL}": "kl",
-                    "@{IN}": "in",
-                    "@{CH}": "ch",
-                    "@{FF}": "ff",
-                    "@{GE}": "ge",
-                    "@{KO}": "ko",
-                    "@{KK}": "kk",
-                    "---": "nothing",
-                    "Ansitzjagd": "ansitzjagd",
-                    "Hetzjagd": "hetzjagd",
-                    "Kräutersuchen": "kraeutersuchen",
-                    "Nahrungsammeln": "nahrungsammeln",
-                    "Pirschjagd": "pirschjagd",
-                    "Speerfischen": "speerfischen",
-                    "Tierfallenstellen": "tierfallenstellen",
-                    "Wachehalten": "wachehalten"
-                };
-                let metatalente = {
-                    "nothing": [ ["---", "---", "---"], "nothing" ],
-                    "ansitzjagd": [ ["mu", "in", "ge"], "Ansitzjagd" ],
-                    "hetzjagd": [ ["mu", "in", "ge"], "Hetzjagd" ],
-                    "kraeutersuchen": [ ["mu", "in", "ff"], "Kräutersuchen" ],
-                    "nahrungsammeln": [ ["mu", "in", "ff"], "Nahrungsammeln" ],
-                    "pirschjagd": [ ["mu", "in", "ge"], "Pirschjagd" ],
-                    "speerfischen": [ ["mu", "in", "ge"], "Speerfischen" ],
-                    "tierfallenstellen": [ ["kl", "in", "ff"], "Tierfallenstellen" ],
-                    "wachehalten": [ ["mu", "in", "ko"], "Wachehalten" ]
-                };
                 for(var i=0; i < metatalenteIDs.length; i++) {
-                    getAttrs(
-                        [
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName",
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1",
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2",
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft3",
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_TaW",
-                            "repeating_MetaTalente_" + metatalenteIDs[i] + "_SE",
-                            "mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"
-                        ], function(v) {
-                            console.log(v);
-                            let defaultTaW = 0;
-                            let update = {};
-                            let newrow = generateRowID();
-                            let current = Object.keys(v)[0].split("_")[2];
-                            let prefixNew = "repeating_Metatalente201904_" + newrow;
-                            let prefixOld = "repeating_MetaTalente_" + current;
-
-                            // Gather data
-                            // Updating the name will set the stats automatically
-                            // To prevent overwriting of custom stats check that the RAW stats are used
-                            // Need to check that the three correct ones are used, order irrelevant
-                            // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
-                            let metatalentStats = metatalente[conversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
-                            let metatalentStatsOld = [conversion[v[prefixOld + "_Eigenschaft1"]], conversion[v[prefixOld + "_Eigenschaft2"]], conversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
-                            if(metatalentStats == metatalentStatsOld) {
-                                update[prefixNew + "_Name_Metatalent"] = conversion[v[prefixOld + "_TalentName"]];
-                                update[prefixNew + "_Name_Metatalent_Eigen"] = "";
-                            } else {
-                                update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
-                            }
-                            if(v[prefixOld + "_SE"] == "on") {
-                                update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
-                                console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
-                            } else {
-                                update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
-                            }
-                            update[prefixNew + "_Name_Metatalent_Anzeige"] = conversion[v[prefixOld + "_TalentName"]];
-                            update[prefixNew + "_Eigenschaft1"] = conversion[v[prefixOld + "_Eigenschaft1"]];
-                            update[prefixNew + "_Eigenschaft2"] = conversion[v[prefixOld + "_Eigenschaft2"]];
-                            update[prefixNew + "_Eigenschaft3"] = conversion[v[prefixOld + "_Eigenschaft3"]];
-                            update[prefixNew + "_hiddenEigenschaft1"] = v[conversion[v[prefixOld + "_Eigenschaft1"]]];
-                            update[prefixNew + "_hiddenEigenschaft2"] = v[conversion[v[prefixOld + "_Eigenschaft2"]]];
-                            update[prefixNew + "_hiddenEigenschaft3"] = v[conversion[v[prefixOld + "_Eigenschaft3"]]];
-                            if(v[prefixOld + "_TaW"] === "") {
-                                update[prefixNew + "_TaW"] = defaultTaW;
-                            } else {
-                                update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
-                            }
-                            console.log(update);
-
-                            // Create new row
-                            setAttrs(update);
-                        });
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName");
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1");
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft2");
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft3");
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TaW");
+                    attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_SE");
                 }
-                migrationFinished += 2;
             }
-            // FINISHING
-            if (migrationFinished === 1) {
-                console.log("Migration: Gifts migrated to new version, but there seems to be a problem with meta-talents. See console/log for further hints. Data version not updated to character sheet version.");
-            } else if (migrationFinished === 2) {
-                console.log("Migration: Meta-talents migrated to new version, but there seems to be a problem with gifts. See console/log for further hints. Data version not updated to character sheet version.");
-            } else if (migrationFinished === 3) {
-                let dataVersionNew = "20190427";
-                setAttrs({ "data_version": dataVersionNew });
-                console.log("Migration: Data version updated to character sheet version (" + dataVersionNew + "). Migration complete.");
-            } else {
-                console.log("Migration: Migration appears to be incomplete. See console/log for further hints. Data version not updated to character sheet version.");
-            }
+
+            // Gaben
+            getAttrs(
+                attrsToGet, function(v) {
+                    console.log(v);
+                    let defaultGiftTaW = 3;
+                    let defaultMetaTaW = 0;
+                    let update = {};
+                    for(var i=0; i < gabenIDs.length; i++) {
+                        let newrow = generateRowID();
+                        let current = gabenIDs[i];
+                        let prefixNew = "repeating_Gaben_" + newrow;
+                        let prefixOld = "repeating_GabenTalente_" + current;
+
+                        // Gather data
+                        // Updating the name will set the stats automatically
+                        // To prevent overwriting of custom stats check that the RAW stats are used
+                        // Need to check that the three correct ones are used, order irrelevant
+                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+                        let gabeStats = gaben[giftsConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+                        let gabeStatsOld = [giftsConversion[v[prefixOld + "_Eigenschaft1"]], giftsConversion[v[prefixOld + "_Eigenschaft2"]], giftsConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+                        if(gabeStats == gabeStatsOld) {
+                            update[prefixNew + "_Name_Gabe"] = giftsConversion[v[prefixOld + "_TalentName"]];
+                            update[prefixNew + "_Name_Gabe_Zusatz"] = "";
+                        } else {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
+                        }
+                        if(v[prefixOld + "_SE"] == "on") {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
+                        } else {
+                            update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
+                        }
+                        update[prefixNew + "_Name_Gabe_Anzeige"] = giftsConversion[v[prefixOld + "_TalentName"]];
+                        update[prefixNew + "_Eigenschaft1"] = giftsConversion[v[prefixOld + "_Eigenschaft1"]];
+                        update[prefixNew + "_Eigenschaft2"] = giftsConversion[v[prefixOld + "_Eigenschaft2"]];
+                        update[prefixNew + "_Eigenschaft3"] = giftsConversion[v[prefixOld + "_Eigenschaft3"]];
+                        update[prefixNew + "_hiddenEigenschaft1"] = v[giftsConversion[v[prefixOld + "_Eigenschaft1"]]];
+                        update[prefixNew + "_hiddenEigenschaft2"] = v[giftsConversion[v[prefixOld + "_Eigenschaft2"]]];
+                        update[prefixNew + "_hiddenEigenschaft3"] = v[giftsConversion[v[prefixOld + "_Eigenschaft3"]]];
+                        if(v[prefixOld + "_TaW"] === "") {
+                            update[prefixNew + "_TaW"] = defaultGiftTaW;
+                        } else {
+                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+                        }
+                    }
+                    console.log(update);
+
+                    for(var i=0; i < metatalenteIDs.length; i++) {
+                        let newrow = generateRowID();
+                        let current = metatalenteIDs[i];
+                        let prefixNew = "repeating_Metatalente201904_" + newrow;
+                        let prefixOld = "repeating_MetaTalente_" + current;
+
+                        // Gather data
+                        // Updating the name will set the stats automatically
+                        // To prevent overwriting of custom stats check that the RAW stats are used
+                        // Need to check that the three correct ones are used, order irrelevant
+                        // Comparison made easy by taking all three stats, sorting them alphabetically and then concatenating them into one string -> simple string comparison will reveal whether the same stats are used (order not important)
+                        let metatalentStats = metatalente[metaTalentConversion[v[prefixOld + "_TalentName"]]][0].sort().join("");
+                        let metatalentStatsOld = [metaTalentConversion[v[prefixOld + "_Eigenschaft1"]], metaTalentConversion[v[prefixOld + "_Eigenschaft2"]], metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]].sort().join("");
+                        if(metatalentStats == metatalentStatsOld) {
+                            update[prefixNew + "_Name_Metatalent"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
+                            update[prefixNew + "_Name_Metatalent_Eigen"] = "";
+                        } else {
+                            update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
+                        }
+                        if(v[prefixOld + "_SE"] == "on") {
+                            update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
+                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
+                        } else {
+                            update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
+                        }
+                        update[prefixNew + "_Name_Metatalent_Anzeige"] = metaTalentConversion[v[prefixOld + "_TalentName"]];
+                        update[prefixNew + "_Eigenschaft1"] = metaTalentConversion[v[prefixOld + "_Eigenschaft1"]];
+                        update[prefixNew + "_Eigenschaft2"] = metaTalentConversion[v[prefixOld + "_Eigenschaft2"]];
+                        update[prefixNew + "_Eigenschaft3"] = metaTalentConversion[v[prefixOld + "_Eigenschaft3"]];
+                        update[prefixNew + "_hiddenEigenschaft1"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft1"]]];
+                        update[prefixNew + "_hiddenEigenschaft2"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft2"]]];
+                        update[prefixNew + "_hiddenEigenschaft3"] = v[metaTalentConversion[v[prefixOld + "_Eigenschaft3"]]];
+                        if(v[prefixOld + "_TaW"] === "") {
+                            update[prefixNew + "_TaW"] = defaultMetaTaW;
+                        } else {
+                            update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
+                        }
+                    }
+
+                    // Create new row
+                    setAttrs(update, {}, function() {
+                        callNextMigration(migrationChain);
+                    });
+            });
         });
     });
 }
@@ -16216,6 +16213,7 @@ function(eventInfos) {
 
 function calculateCombatValues(eventInfos) {
     console.log("calculating combat values");
+    console.log(eventInfos);
     // Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
     // "activeShieldRowId" can be the id of either a shield or a parry weapon
     getAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
@@ -16230,12 +16228,15 @@ function calculateCombatValues(eventInfos) {
             weapon = 4;
         } else {
             // didn't find an active weapon. setting values to 0;
-            setAttrs({ "AT_Aktiv": 0 });
-            setAttrs({ "PA_Aktiv": 0 });
-            setAttrs({ "shield_pa": 0 });
-            setAttrs({ "parryweapon_pa": 0 });
-            setAttrs({ "shield_pa_available": "0" });
-            setAttrs({ "parryweapon_pa_available": "0" });
+            attrsToChange = {
+                "AT_Aktiv": 0,
+                "PA_Aktiv": 0,
+                "shield_pa": 0,
+                "parryweapon_pa": 0,
+                "shield_pa_available": "0",
+                "parryweapon_pa_available": "0"
+            }
+            setAttrs(attrsToChange);
             return;
         }
         var variablesToGet = [ "NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod", "NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod", "NKW" + weapon + "_Spez", 
@@ -16269,7 +16270,7 @@ function calculateCombatValues(eventInfos) {
             // Berechne Waffen-AT
             var attackType = values["NKW_AT_typ" + weapon];
             // Wir berechnen den AT Wert nur, wenn ein Talenttyp für den AT Wert der Waffe ausgewählt ist
-            if (attackType) {
+            if (attackType && attackType !== "0") {
                 var baseAttack = parseInt(values[attackType.match("@{(.*)}")[1]]);
                 // Es gibt einige Attribute wo das Naming unterschiedlich ist, was bei Auto Calculating Fields nicht zu Fehlern führt aber hier. Daher im Zweifelsfall mit Lower-Case Namen nochmal probieren
                 if (!baseAttack) {
@@ -16294,7 +16295,7 @@ function calculateCombatValues(eventInfos) {
             var paType = values["NKW_PA_typ" + weapon];
             var paValue = 0;
             // Wir berechnen den PA Wert nur, wenn ein Talenttyp für den PA Wert der Waffe ausgewählt ist
-            if (paType) {
+            if (paType && paType !== "0" ) {
                 var basePa = parseInt(values[paType.match("@{(.*)}")[1]]);
                 // Siehe oben
                 if (!basePa) {
@@ -16397,7 +16398,6 @@ function calculateCombatValues(eventInfos) {
 // Wird eine Nahkampfwaffe aktiviert, werden alle anderen deaktiviert. Auf diese Weise wird sichergestellt, dass immer maximal eine Nahkampfwaffe aktiv ist.
 // Funktionsweise siehe Methode unten zum deaktivieren der Schilde
 on("change:NKW_Aktiv1 change:NKW_Aktiv2 change:NKW_Aktiv3 change:NKW_Aktiv4", function(eventInfo) {
-    console.log(eventInfo);
     if (eventInfo.newValue !== "1") {
         return;
     }
@@ -16500,9 +16500,9 @@ function calculateRuestungBE(values, eventInfo) {
     var rg3 = values["sf_rustungsgewohnungIII"];
     if (rg3 === "1") {
         totalBe -= 2;
-    } if (rg2 === "1") {
+    } else if (rg2 === "1") {
         totalBe -= 1;
-    } if (rg1 === "1" && rg1RuestungActive) {
+    } else if (rg1 === "1" && rg1RuestungActive) {
         totalBe -= 1;
     }
 
@@ -16510,7 +16510,6 @@ function calculateRuestungBE(values, eventInfo) {
         totalBe = 0;
     }
 
-    console.log("calculated total BE: " + totalBe);
     attrsToChange["Ges_BE"] = totalBe;
     return attrsToChange;
 }
@@ -16589,9 +16588,8 @@ function calculateWeaponBE(values) {
     var baseBE = values["BE_TaW"];
     var be_at = 0;
     var atTyp = values["NKW_AT_typ" + weapon];
-    if (atTyp) {
+    if (atTyp && atTyp !== "0" && atTyp !== 0) {
         var beValues = closefighttalent_be[atTyp.replace("@{AT_", "").replace("}", "").toLowerCase()];
-        console.log(beValues);
 
         var atTypBE = baseBE;
         if (beValues.type === "none") {
@@ -16599,35 +16597,115 @@ function calculateWeaponBE(values) {
         } else if (beValues.type === "minus") {
             atTypBE -= beValues.value;
         }
-        console.log("atTypBE: " + atTypBE);
 
         // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
         be_at = Math.floor(atTypBE / 2);
-        console.log("be_at: " + be_at);
     } 
     var be_pa = 0;
     var paTyp = values["NKW_PA_typ" + weapon];
-    if (paTyp) {
-        console.log("looking up fight talent be values: " + paTyp.replace("@{PA_", "").replace("}", "").toLowerCase());
+    if (paTyp && paTyp !== "0" && paTyp !== 0) {
         var beValues = closefighttalent_be[paTyp.replace("@{PA_", "").replace("}", "").toLowerCase()];
-        console.log(beValues);
         var paTypBE = baseBE;
-        console.log("paTypBE base: " + paTypBE);
         if (beValues.type === "none") {
             paTypBE = 0;
         } else if (beValues.type === "minus") {
-            console.log("subtract " + beValues.value);
             paTypBE -= beValues.value;
         }
-        console.log("paTypBE: " + paTypBE);
 
         // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
         be_pa = Math.ceil(paTypBE / 2);
-        console.log("be_pa: " + be_pa);
     }
     return { 
         be_at: be_at >= 0 ? be_at : 0, 
         be_pa: be_pa >= 0 ? be_pa : 0 
         };
 }
+
+on("change:sf_linkhand", function(eventInfo) {
+    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var attrsToChange = {};
+
+        if (eventInfo.newValue === "0") {
+            if (values["sf_parierwaffenII"] === "1") {
+                attrsToChange["sf_parierwaffenII"] = "0";
+            }
+            if (values["sf_parierwaffenI"] === "1") {
+                attrsToChange["sf_parierwaffenI"] = "0";
+            }
+            if (values["sf_schildkampfI"] === "1") {
+                attrsToChange["sf_schildkampfI"] = "0";
+            }
+            if (values["sf_schildkampfII"] === "1") {
+                attrsToChange["sf_schildkampfII"] = "0";
+            }
+        }
+        setAttrs(attrsToChange);
+    });
+});
+
+on("change:sf_parierwaffenI", function(eventInfo) {
+    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var attrsToChange = {};
+
+        if (eventInfo.newValue === "1") {
+            if (values["sf_linkhand"] === "0") {
+                attrsToChange["sf_linkhand"] = "1";
+            }
+        } else {
+            if (values["sf_parierwaffenII"] === "1") {
+                attrsToChange["sf_parierwaffenII"] = "0";
+            }
+        }
+        setAttrs(attrsToChange);
+    });
+});
+
+on("change:sf_schildkampfI", function(eventInfo) {
+    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var attrsToChange = {};
+
+        if (eventInfo.newValue === "1") {
+            if (values["sf_linkhand"] === "0") {
+                attrsToChange["sf_linkhand"] = "1";
+            }
+        } else {
+            if (values["sf_schildkampfII"] === "1") {
+                attrsToChange["sf_schildkampfII"] = "0";
+            }
+        }
+        setAttrs(attrsToChange);
+    });
+});
+
+on("change:sf_schildkampfII", function(eventInfo) {
+    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var attrsToChange = {};
+
+        if (eventInfo.newValue === "1") {
+            if (values["sf_linkhand"] === "0") {
+                attrsToChange["sf_linkhand"] = "1";
+            }
+            if (values["sf_schildkampfI"] === "0") {
+                attrsToChange["sf_schildkampfI"] = "1";
+            }
+        }
+        setAttrs(attrsToChange);
+    });
+});
+
+on("change:sf_parierwaffenII", function(eventInfo) {
+    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var attrsToChange = {};
+
+        if (eventInfo.newValue === "1") {
+            if (values["sf_linkhand"] === "0") {
+                attrsToChange["sf_linkhand"] = "1";
+            }
+            if (values["sf_parierwaffenI"] === "0") {
+                attrsToChange["sf_parierwaffenI"] = "1";
+            }
+        }
+        setAttrs(attrsToChange);
+    });
+});
 </script>
