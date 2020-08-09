@@ -12,6 +12,8 @@ Das Character Sheet ist ausdrücklich kein Ersatz für Sephrasto oder generell d
 
 Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Proben-Würfe aufgeschlagen wird (positive Zahl bedeutet Bonus, negative Zahl bedeutet Malus), und jeweils globale Modifikatoren für den Kampf und Übernatürliches, und einen Schadensmodifikator für alle Würfe auf Waffenschaden. Das kann man jeweils für situative Modifikatoren verwenden.
 
+Alle Würfelwürfe (wegen technischer Limitationen bis auf die bei zusätzlich eingetragenen Fertigkeiten :( ) können auch verdeckt an den Meister durchgeführt werden. Dazu wird oben links im Sheet der Haken bei "Verdeckt würfeln" gesetzt.
+
 Der Einsatz von Schicksalspunkten um zusätzliche Würfel zu erhalten funktioniert, indem man in der Kopfzeile den Haken "Schicksalspunkt" setzt. Sollte man eine Eigenheit nutzen und zwei Würfel dazubekommen, kann der zweite Haken zusätzlich gesetzt werden (für dann 5 Würfel bei 3d20-Median-Proben oder 3 Würfel bei 1d20-Proben).
 
 Die Einschränkungen (Wunden/Erschöpfung) verursachen automatisch globale Wundmodifikatoren. Ist ein Charakter aus beliebigem Grund immun gegen Wundabzüge, kann der Haken bei "Kalte Wut" gesetzt werden, um die Abzüge pauschal auf 0 zu setzen.
@@ -126,3 +128,6 @@ Neue Features:
 - Fix des Zuschlags für "Doppelangriff".
 - Mehrfachnennung "Entwaffnen" entfernt.
 - Globaler Modifikator wird jetzt zur besseren Übersichtlichkeit in den verschiedenen Sektionen nochmal angezeigt.
+
+1.6:
+- GM-Roll-Funktion hinzugefügt.
