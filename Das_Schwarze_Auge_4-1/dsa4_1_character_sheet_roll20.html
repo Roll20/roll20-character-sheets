@@ -10298,7 +10298,7 @@
                             <input type="number" name="attr_NKW1_Schwellenwert" min="1" value="4" style="width: 2.5em;">
                         </td>
                         <td>
-                            <input type="number" name="attr_NKW1_SB" style="width: 2.5em;" disabled="disabled" value="floor((abs(@{KK} - @{NKW1_SchwellenwertKK}))/@{NKW1_Schwellenwert})*((@{KK} - @{NKW1_SchwellenwertKK} + 0.01)/abs(@{KK} - @{NKW1_SchwellenwertKK} + 0.01))">
+                            <input type="number" name="attr_NKW1_SB" style="width: 2.5em;" readonly="true">
                         </td>
                         <td>
                             <input type="number" name="attr_NKWschaden1_1" min="0" value="1" style="width: 2.5em;">
@@ -10394,7 +10394,7 @@
                             <input type="number" name="attr_NKW2_Schwellenwert" min="1" value="4" style="width: 2.5em;">
                         </td>
                         <td>
-                            <input type="number" name="attr_NKW2_SB" style="width: 2.5em;" disabled="disabled" value="floor((abs(@{KK} - @{NKW2_SchwellenwertKK}))/@{NKW2_Schwellenwert})*((@{KK} - @{NKW2_SchwellenwertKK} + 0.01)/abs(@{KK} - @{NKW2_SchwellenwertKK} + 0.01))">
+                            <input type="number" name="attr_NKW2_SB" style="width: 2.5em;" readonly="true">
                         </td>
                         <td>
                             <input type="number" name="attr_NKWschaden2_1" min="0" value="1" style="width: 2.5em;">
@@ -10490,7 +10490,7 @@
                             <input type="number" name="attr_NKW3_Schwellenwert" min="1" value="4" style="width: 2.5em;">
                         </td>
                         <td>
-                            <input type="number" name="attr_NKW3_SB" style="width: 2.5em;" disabled="disabled" value="floor((abs(@{KK} - @{NKW3_SchwellenwertKK}))/@{NKW3_Schwellenwert})*((@{KK} - @{NKW3_SchwellenwertKK} + 0.01)/abs(@{KK} - @{NKW3_SchwellenwertKK} + 0.01))">
+                            <input type="number" name="attr_NKW3_SB" style="width: 2.5em;" readonly="true">
                         </td>
                         <td>
                             <input type="number" name="attr_NKWschaden3_1" min="0" value="1" style="width: 2.5em;">
@@ -10586,7 +10586,7 @@
                             <input type="number" name="attr_NKW4_Schwellenwert" min="1" value="4" style="width: 2.5em;">
                         </td>
                         <td>
-                            <input type="number" name="attr_NKW4_SB" style="width: 2.5em;" disabled="disabled" value="floor((abs(@{KK} - @{NKW4_SchwellenwertKK}))/@{NKW4_Schwellenwert})*((@{KK} - @{NKW4_SchwellenwertKK} + 0.01)/abs(@{KK} - @{NKW4_SchwellenwertKK} + 0.01))">
+                            <input type="number" name="attr_NKW4_SB" style="width: 2.5em;" readonly="true">
                         </td>
                         <td>
                             <input type="number" name="attr_NKWschaden4_1" min="0" value="1" style="width: 2.5em;">
@@ -14266,6 +14266,7 @@
                 title="Trefferzone zufällig ausgewählt. Basis: {{#rollTotal() target 0}}Zweibeiner gegen unbeschwänzten Zweibeiner{{/rollTotal() target 0}}{{#rollTotal() target 1}}Zweibeiner gegen beschwänzten Zweibeiner{{/rollTotal() target 1}}{{#rollTotal() target 3}}Zweibeiner gegen Vierbeiner{{/rollTotal() target 3}}{{#rollTotal() target 4}}Zweibeiner gegen Reiter{{/rollTotal() target 4}}{{#rollTotal() target 2}}Reiter gegen Zweibeiner{{/rollTotal() target 2}}">{{name}}treffer</span></th>
         </tr>
         <tr>
+            {{#rollGreater() damage 0}}
             <td>{{damage}} <span class="sheet-abbr" title="Trefferpunkte">TP</span> auf 
                 {{#rollTotal() zone 1}}
                     {{#rollTotal() target 0}}das linke Bein{{/rollTotal() target 0}}
@@ -14381,6 +14382,10 @@
                     {{#rollTotal() target 4}}den Schwertarm{{/rollTotal() target 4}}
                 {{/rollTotal() zone 20}}
                 ({{zone}})</td>
+            {{/rollGreater() damage 0}}
+            {{#^rollGreater() damage 0}}
+                <td>0 <span class="sheet-abbr" title="Trefferpunkte">TP</span></td>
+            {{/^rollGreater() damage 0}}
         </tr>
     </table>
 <!-- Zone selection based on the following data (all found in WdS):
@@ -15969,12 +15974,32 @@ function migrateTo20200809(migrationChain) {
     });
 }
 
+function migrateTo99999999(migrationChain) {
+    
+    getAttrs([
+            "kk", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "NKW1_Schwellenwert", "NKW1_SchwellenwertKK", "NKW2_Schwellenwert",
+            "NKW2_SchwellenwertKK", "NKW3_Schwellenwert", "NKW3_SchwellenwertKK", "NKW4_Schwellenwert", "NKW4_SchwellenwertKK"], function(v) {
+
+        let attrsToChange = {};
+
+        for (var i = 1; i <= 4; i++) {
+            let weaponTpkkModResult = calculateTpKKMod(v, i);
+            attrsToChange["NKW" + i + "_SB"] = weaponTpkkModResult.tpkkMod;
+        }
+
+        setAttrs(attrsToChange, {}, function(){
+            callNextMigration(migrationChain);
+        });
+    });
+}
+
 /*
  this list has to be always ordered ascending in order to apply the migration steps in the correct order
 */
 var versionsWithMigrations = [
     20190427,
-    20200809
+    20200809,
+    99999999 // dummy version for development purposes
 ]
 
 /*
@@ -16333,11 +16358,12 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
 on("change:PABasis " +
-"change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:INIModNKW1 change:NKW1_Spez change:NKW_Aktiv1 " +
-"change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:INIModNKW2 change:NKW2_Spez change:NKW_Aktiv2 " +
-"change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:INIModNKW3 change:NKW3_Spez change:NKW_Aktiv3 " +
-"change:NKW_AT_typ4 change:NKW4ATMod change:NKW_PA_typ4 change:NKW4PAMod change:INIModNKW4 change:NKW4_Spez change:NKW_Aktiv4 " +
-"change:repeating_shields change:be_at_mod change:be_pa_mod",
+"change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:INIModNKW1 change:NKW1_Spez change:NKW_Aktiv1 change:NKW1_SB " +
+"change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:INIModNKW2 change:NKW2_Spez change:NKW_Aktiv2 change:NKW2_SB " +
+"change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:INIModNKW3 change:NKW3_Spez change:NKW_Aktiv3 change:NKW3_SB " +
+"change:NKW_AT_typ4 change:NKW4ATMod change:NKW_PA_typ4 change:NKW4PAMod change:INIModNKW4 change:NKW4_Spez change:NKW_Aktiv4 change:NKW4_SB " +
+"change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII " +
+"change:be_at_mod change:be_pa_mod",
 function(eventInfos) {
     calculateCombatValues();
 });
@@ -16373,7 +16399,7 @@ function calculateCombatValues() {
         	"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
         	"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
         	"INIModNKW" + weapon,
-        	"NKW" + weapon + "_Spez", 
+        	"NKW" + weapon + "_Spez", "NKW" + weapon + "_SB",
             "AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", 
             "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
             "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
@@ -16399,6 +16425,8 @@ function calculateCombatValues() {
         getAttrs(variablesToGet, function(values) {
             var attrsToChange = {};
 
+            let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
+
             // Berechne Waffen-AT
             var attackType = values["NKW_AT_typ" + weapon];
             // Wir berechnen den AT Wert nur, wenn ein Talenttyp für den AT Wert der Waffe ausgewählt ist
@@ -16419,6 +16447,9 @@ function calculateCombatValues() {
                 }
                 if (values["be_at_mod"]) {
                     atValue -= parseInt(values["be_at_mod"]);
+                }
+                if (tpkkMod && tpkkMod < 0) {
+                    atValue += tpkkMod;
                 }
                 attrsToChange["AT_Aktiv"] = atValue;
             }
@@ -16445,6 +16476,9 @@ function calculateCombatValues() {
                 
                 if (Number.isNaN(paValue) || paValue < 0) {
                     paValue = 0;
+                }
+                if (tpkkMod && tpkkMod < 0) {
+                    paValue += tpkkMod;
                 }
                 attrsToChange["PA_Aktiv"] = paValue;
             }
@@ -17132,4 +17166,46 @@ on("change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:s
         });
     });
 });
+
+on("change:kk change:NKW_Aktiv1 change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW_Aktiv2 change:NKW2_SchwellenwertKK change:NKW2_Schwellenwert change:NKW_Aktiv3 change:NKW3_SchwellenwertKK change:NKW3_Schwellenwert change:NKW_Aktiv4 change:NKW4_SchwellenwertKK change:NKW4_Schwellenwert", function(eventInfo) {
+    console.log(eventInfo);
+    var weaponsToCalculate = [];
+    let attrsToGet = [ "kk" ];
+    if (eventInfo.sourceAttribute === "kk") {
+        for (var weapon = 1; weapon <= 4; weapon++) {
+            weaponsToCalculate.push(weapon);
+            attrsToGet.push("NKW_Aktiv" + weapon);
+            attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+            attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+        }
+    } else {
+        let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
+        console.log(matchResult);
+        let weapon = matchResult[1];
+        weaponsToCalculate.push(weapon);
+        attrsToGet.push("NKW_Aktiv" + weapon);
+        attrsToGet.push("NKW" + weapon + "_Schwellenwert");
+        attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
+    }
+        
+    getAttrs(attrsToGet, function(values) {
+        let attrsToChange = {};
+        for (var i = 0; i < weaponsToCalculate.length; i++) {
+            let weapon = weaponsToCalculate[i];
+            var tpkkModResult = calculateTpKKMod(values, weapon);
+            attrsToChange["NKW" + weapon +  "_SB"] = tpkkModResult.tpkkMod;
+        }
+        setAttrs(attrsToChange);
+    })
+});
+
+function calculateTpKKMod(values, weapon) {
+    let kkDifference = parseInt(values["kk"]) - parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
+
+    var tpkkMod = Math.floor(Math.abs(kkDifference) / parseInt(values["NKW" + weapon + "_Schwellenwert"]));
+    if (kkDifference < 0) {
+        tpkkMod = tpkkMod * -1;
+    }
+    return { tpkkMod: tpkkMod };
+}
 </script>
