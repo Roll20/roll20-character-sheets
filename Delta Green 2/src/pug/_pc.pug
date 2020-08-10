@@ -35,7 +35,8 @@
 				h2.aligned-left(data-i18n='distinguishing features' data-i18n-title='') distinguishing features
 				.horz-line
 				each val, key in statsObject
-					- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}`;
+					//- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}`;
+					- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
 					button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
 						h3.aligned-left(data-i18n=key)= key
 						span.para(data-i18n=val)=   val 
@@ -66,11 +67,11 @@
 						- const presetValue =  (val === 'HP' || val === 'WP') ? 10 : (val === 'SAN') ? 50 : (val === 'BP') ? 40: 50;
 						- const attrName = key.replace(' ','_');
 						if (val === 'SAN') 
-							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
 								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
 								span.para(data-i18n=val)=  val 
 						else if (val==='Luck')
-							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
 								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
 						else
 							.derived-attr.nbsp
@@ -82,6 +83,7 @@
 						if (val === 'Luck')
 							span(class='center' name='attr_' + attrName + '_max' title='@{' + attrName + '_max' + '}')
 								input(name='attr_' + attrName placeholder='10' title='@{' + attrName + '}' type='hidden' value=presetValue)
+								span.percent %
 						else
 							label(data-i18n-title=key title=key)
 								input(name='attr_' + attrName placeholder='-' title='@{' + attrName + '}' type='number' value=' ')
@@ -146,7 +148,7 @@
 					fieldset.repeating_skills
 						.grid.section-repeating.border-bottom
 							//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
-							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{dice=[[1d100]]}}`;
+							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
 							label.styled-checkbox(data-i18n-title='skill fail checkbox' title='skill fail checkbox')
 								input(name='attr_fail' title='@{repeating_skills_${x}_fail}' type='checkbox')
 							label(data-i18n-title='skill name' title='skill name')
@@ -192,15 +194,29 @@
 				fieldset.repeating_weapons
 					.grid.section-weapons.border-bottom
 						//- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
-						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d100]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
+						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}}`; 
 						each weapon in weaponsAttrs
 							- const attrName = weapon.replace(' ', '_').replace('%', 'percent')
 							- const type = weapon.includes('%') || weapon === 'ammo' ? 'number' : 'text';
+							if (attrName==='lethality_percent')
+								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+									input(name='attr_haslethality' type='hidden' value='0')
+								.vert-line
+							else if (attrName==='damage')
+								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
+									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
+									input(name='attr_hasdamage'  type='hidden' value='0')
+								.vert-line
+							else
 								label(data-i18n-title=weapon + ' input' title=weapon + ' input')
 									input(data-i18n-placeholder=weapon name='attr_' + attrName placeholder=weapon title='@{repeating_weapons_${x}_' + attrName + '}' type=type value='')
 								.vert-line
 						button.dicefontd10(name='weapon' type='roll' title='weapon roll' value=weaponRollValue) k
-						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=^{damage}}} {{damage=[[@{damage}]]}}')
+						button.none(name='roll_damage' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[@{damage}]]}}')
+						button.none(name='roll_lethality' type='roll' value='@{gm_toggle} &{template:lethality} {{header=@{weapons}}} {{subheader=@{lethality_percent}}}{{lethality_rating=[[@{lethality_percent}]]}} {{lethality=[[1d100]]}}')
+						button.none(name='roll_damage_critical' type='roll' value='@{gm_toggle} &{template:damage} {{header=@{weapons}}} {{subheader=@{damage}}} {{damage=[[@{damage}*2]]}}')
+						button.none(name='roll_lethality_critical' type='roll' value='@{gm_toggle} &{template:lethality_critical} {{header=@{weapons}}} {{subheader=@{lethality_percent}}} {{lethality_rating=[[@{lethality_percent}*2]]}} {{lethality=[[1d100]]}}')
 
 	//REMARKS
 	.grid.header-body.remarks.border
