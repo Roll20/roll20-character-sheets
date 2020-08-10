@@ -9,9 +9,13 @@ Cette feuilles de personnage inclut quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](http://www.black-book-editions.fr/produit.php?id=4349).
 
 # Version courante
-3.2 [Screenshot](coc_v2.png)
+3.3 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.3 (2020-08-04)
+* Génération automatique de lignes de ressources sur l'onglet équipement en fonction de l'univers choisi
+* Ajout d'une liste de choix de surhumains permettant de générer automatique des lignes de ressources et/ou de déterminer les dés de vie, caractéristiques magiques, etc...
 
 ## v3.2 (2020-04-28)
 * Modifications internes sur les champs INIT et DEF pour permettre la liaison de ces attributs avec un token (contourne un bug de Roll20 sur la liaison avec des champs auto-calculés)
