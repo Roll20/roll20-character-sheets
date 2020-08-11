@@ -7,6 +7,7 @@
 ### Fixed
 
 - Fix a bug where the strength bonus was not added to new melee weapons
+- Fix a bug where strength and dexterity weapon modifiers didn't change when the attributes changed
 
 ## 1.6.1
 
