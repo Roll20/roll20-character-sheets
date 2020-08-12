@@ -1,8 +1,8 @@
 <div class="sheet-mainBg">
   <!-- FDP -->
   <!-- INPUT HIDDEN Version FdP -->
-  <input type="hidden" name="attr_verfdp" value="2020.0525" />
-  <input type="hidden" name="attr_VERSION" value="2020.0525" />
+  <input type="hidden" name="attr_verfdp" value="3.10.0" />
+  <input type="hidden" name="attr_VERSION" value="3.10.0" />
   <!-- INPUT HIDDEN Univers (COF, CG, COC) -->
   <input type="hidden" name="attr_UNIVERS" value="CG" />
   <!-- INPUT HIDDEN Type de jets -->
@@ -3104,7 +3104,7 @@ function buildCaracs() {
  * Sheet migrations
  */
 function migrateSheet(verfdp) {
-  if (verfdp === 0) {
+  if (verfdp.major === 0) {
     // Version 1.6 vers 1.7
     getAttrs(["FOR_SUP", "DEX_SUP", "CON_SUP", "INT_SUP", "PER_SUP", "CHA_SUP"], function (jets) {
       var sfor, sdex, scon, sint, sper, scha = "";
@@ -3149,7 +3149,7 @@ function migrateSheet(verfdp) {
       });
     });
   }
-  if (verfdp < 3) { // version 2.0 > 3.0
+  if (verfdp.major < 3) { // version 2.0 > 3.0
     getAttrs(['UNIVERS', 'FOR_BONUS', 'DEX_BONUS', 'CON_BONUS', 'INT_BONUS', 'PER_BONUS', 'CHA_BONUS', 'ATKCAC_DIV', 'ATKTIR_DIV', 'ATKMAG_DIV', 'ATKMEN_DIV', 'PSYINTUI_DIV', 'PSYINFLU_DIV', 'INIT_DIV', 'DEFDIV', 'DEPDIV'], function (values) {
       let for_bonus = parseInt(values.FOR_BONUS) || 0;
       let for_bonus_desc = (for_bonus !== 0) ? 'Bonus FOR' : '';
@@ -3232,7 +3232,7 @@ function migrateSheet(verfdp) {
       });
     });
   }
-  if (verfdp < 3.4) { // version 3.3 > 3.4
+  if (verfdp.major == 3 && verfdp.minor < 4) { // version 3.3 > 3.4
     getAttrs(['TRAITS'], function (values) {
       var traits = values.TRAITS.split(':');
       if (traits.length >= 2) {
@@ -3247,8 +3247,23 @@ function migrateSheet(verfdp) {
       }
     });
   }
-  if (verfdp < 3.5) { // version 3.4 > 3.5
-    const attrList = ['FOR', 'DEX', 'CON', 'INT', 'PER', 'CHA', 'ATKCAC', 'ATKTIR', 'PSYINFLU', 'PSYINTUI', 'INIT', 'DEF', 'DEP'];
+  if (verfdp.major == 3 && verfdp.minor < 5) {
+    // version 3.4 > 3.5
+    const attrList = [
+      "FOR",
+      "DEX",
+      "CON",
+      "INT",
+      "PER",
+      "CHA",
+      "ATKCAC",
+      "ATKTIR",
+      "PSYINFLU",
+      "PSYINTUI",
+      "INIT",
+      "DEF",
+      "DEP",
+    ];
     for (let a = 0; a < attrList.length; a++) {
       let attr = attrList[a];
       let attrDesc = [];
@@ -3261,18 +3276,18 @@ function migrateSheet(verfdp) {
         let attr = Object.keys(values)[0];
         let buffList = [];
         for (let b = 1; b < 6; b++) {
-          let desc = values[`${attr}_BUFF${b}_DESC`] || '';
+          let desc = values[`${attr}_BUFF${b}_DESC`] || "";
           let buff = values[`${attr}_BUFF${b}`] || 0;
-          if (desc !== '') buffList.push(`${desc} : ${buff}`);
+          if (desc !== "") buffList.push(`${desc} : ${buff}`);
         }
         let buffAttr = {};
-        buffAttr[`${attr}_BUFF_LIST`] = buffList.join(';');
+        buffAttr[`${attr}_BUFF_LIST`] = buffList.join(";");
         setAttrs(buffAttr);
       });
     }
     setAttrs({ VERSION: '3.5' });
   }
-  if (verfdp < 3.90) { // version 3.50 > 3.90
+  if (verfdp.major == 3 && verfdp.minor < 9) { // version 3.50 > 3.90
     getAttrs([
       'FOR_BUFF_LIST',
       'DEX_BUFF_LIST',
@@ -3343,7 +3358,7 @@ function migrateSheet(verfdp) {
       }
     });
   }
-  if (verfdp < 3.91) { // version 3.90 > 3.91
+  if (verfdp.major == 3 && verfdp.minor < 91) { // version 3.90 > 3.91
     getSectionIDs('repeating_materiel', function (ids) {
       for (const id of ids) {
         getAttrs([`repeating_materiel_${id}_mater-nom`], function (value) {
@@ -3358,7 +3373,8 @@ function migrateSheet(verfdp) {
       }
     });
   }
-  if (verfdp < 3.92) { // version 3.91 > 3.92
+  if (verfdp.major == 3 && verfdp.minor < 92) {
+    // version 3.91 > 3.92
     const vrNames = [];
     for (v = 1; v < 10; v++) {
       for (r = 1; r < 6; r++) {
@@ -3366,18 +3382,33 @@ function migrateSheet(verfdp) {
       }
     }
     getAttrs(vrNames, function (values) {
-      const vrFlags = {}
-      Object.keys(values).forEach(name => {
-        const flag = name.replace('oie', '').replace('-', 'r');
-        if (values[name] !== '') {
-          vrFlags[flag] = '1';
+      const vrFlags = {};
+      Object.keys(values).forEach((name) => {
+        const flag = name.replace("oie", "").replace("-", "r");
+        if (values[name] !== "") {
+          vrFlags[flag] = "1";
         } else {
-          vrFlags[flag] = '0';
+          vrFlags[flag] = "0";
         }
       });
       setAttrs(vrFlags);
     });
   }
+}
+
+/**
+ * Parse semantic version label
+ * @param {string} version 
+ */
+function parseSemVer(version) {
+  version += '.0.0';
+  if (version.toLowerCase().startsWith('v')) version = version.slice(1);
+  const semVer = version.split('.');
+  return {
+    major: parseInt(semver[0]) || 0,
+    minor: parseInt(semver[1]) || 0,
+    patch: parseInt(semver[2]) || 0,
+  };
 }
 
 /**
@@ -3390,9 +3421,16 @@ function migrateSheet(verfdp) {
 on('sheet:opened', function () {
   // **** Gestion transition de version
   getAttrs(['VERSION', 'VERFDP'], function (values) {
-    const verfdp = parseFloat(values.VERSION) || 0;
-    const newver = parseFloat(values.VERFDP) || 0;
-    if (verfdp < newver) {
+    const verfdp = parseSemVer(values.VERSION);
+    const newver = parseSemVer(values.VERFDP);
+    if (verfdp.major == 2020 && verfdp == 525) {
+      const verfdp = parseSemVer(values.VERFDP);
+    }
+    if (
+      verfdp.major < newver.major ||
+      verfdp.minor < newver.minor ||
+      verfdp.patch < newver.patch
+    ) {
       migrateSheet(verfdp);
     }
   });
