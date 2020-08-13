@@ -16256,7 +16256,7 @@ on("sheet:opened", function() {
 // Berechnet den Gesamt-AT-Wert inklusive Modifikation durch ein eventuell verwendetes Schild
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
-on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:be_at_mod change:be_pa_mod", 
+on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:be_at_mod change:be_pa_mod",
 function(eventInfos) {
     calculateCombatValues(eventInfos);
 });
@@ -16725,91 +16725,79 @@ function calculateWeaponBE(values) {
         };
 }
 
-on("change:sf_linkhand", function(eventInfo) {
+on("change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:sf_schildkampfI change:sf_schildkampfII", function(eventInfo) {
     getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
         var attrsToChange = {};
 
-        if (eventInfo.newValue === "0") {
-            if (values["sf_parierwaffenII"] === "1") {
-                attrsToChange["sf_parierwaffenII"] = "0";
-            }
-            if (values["sf_parierwaffenI"] === "1") {
-                attrsToChange["sf_parierwaffenI"] = "0";
-            }
-            if (values["sf_schildkampfI"] === "1") {
-                attrsToChange["sf_schildkampfI"] = "0";
-            }
-            if (values["sf_schildkampfII"] === "1") {
-                attrsToChange["sf_schildkampfII"] = "0";
-            }
-        }
-        setAttrs(attrsToChange);
-    });
-});
-
-on("change:sf_parierwaffenI", function(eventInfo) {
-    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-        var attrsToChange = {};
-
-        if (eventInfo.newValue === "1") {
-            if (values["sf_linkhand"] === "0") {
-                attrsToChange["sf_linkhand"] = "1";
-            }
-        } else {
-            if (values["sf_parierwaffenII"] === "1") {
-                attrsToChange["sf_parierwaffenII"] = "0";
-            }
-        }
-        setAttrs(attrsToChange);
-    });
-});
-
-on("change:sf_schildkampfI", function(eventInfo) {
-    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-        var attrsToChange = {};
-
-        if (eventInfo.newValue === "1") {
-            if (values["sf_linkhand"] === "0") {
-                attrsToChange["sf_linkhand"] = "1";
-            }
-        } else {
-            if (values["sf_schildkampfII"] === "1") {
-                attrsToChange["sf_schildkampfII"] = "0";
-            }
-        }
-        setAttrs(attrsToChange);
-    });
-});
-
-on("change:sf_schildkampfII", function(eventInfo) {
-    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-        var attrsToChange = {};
-
-        if (eventInfo.newValue === "1") {
-            if (values["sf_linkhand"] === "0") {
-                attrsToChange["sf_linkhand"] = "1";
-            }
-            if (values["sf_schildkampfI"] === "0") {
-                attrsToChange["sf_schildkampfI"] = "1";
-            }
-        }
-        setAttrs(attrsToChange);
-    });
-});
-
-on("change:sf_parierwaffenII", function(eventInfo) {
-    getAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
-        var attrsToChange = {};
-
-        if (eventInfo.newValue === "1") {
-            if (values["sf_linkhand"] === "0") {
-                attrsToChange["sf_linkhand"] = "1";
-            }
-            if (values["sf_parierwaffenI"] === "0") {
-                attrsToChange["sf_parierwaffenI"] = "1";
-            }
-        }
-        setAttrs(attrsToChange);
+		// Caution: This might cause trouble if some function other than this one changed these attributes.
+		if (eventInfo.sourceType === "sheetworker")
+		{
+			console.log("Suppressing setting LH/PW/SK (again) ...");
+			return;
+		}
+		switch(eventInfo.sourceAttribute) {
+			case "sf_linkhand":
+				if (eventInfo.newValue === "0") {
+				    if (values["sf_parierwaffenII"] === "1") {
+				        attrsToChange["sf_parierwaffenII"] = "0";
+				    }
+				    if (values["sf_parierwaffenI"] === "1") {
+				        attrsToChange["sf_parierwaffenI"] = "0";
+				    }
+				    if (values["sf_schildkampfI"] === "1") {
+				        attrsToChange["sf_schildkampfI"] = "0";
+				    }
+				    if (values["sf_schildkampfII"] === "1") {
+				        attrsToChange["sf_schildkampfII"] = "0";
+				    }
+				}
+				break;
+			case "sf_parierwaffeni":
+				if (eventInfo.newValue === "1") {
+				    if (values["sf_linkhand"] === "0") {
+				        attrsToChange["sf_linkhand"] = "1";
+				    }
+				} else {
+				    if (values["sf_parierwaffenII"] === "1") {
+				        attrsToChange["sf_parierwaffenII"] = "0";
+				    }
+				}
+				break;
+			case "sf_parierwaffenii":
+				if (eventInfo.newValue === "1") {
+				    if (values["sf_linkhand"] === "0") {
+				        attrsToChange["sf_linkhand"] = "1";
+				    }
+				    if (values["sf_parierwaffenI"] === "0") {
+				        attrsToChange["sf_parierwaffenI"] = "1";
+				    }
+				}
+				break;
+			case "sf_schildkampfi":
+				if (eventInfo.newValue === "1") {
+				    if (values["sf_linkhand"] === "0") {
+				        attrsToChange["sf_linkhand"] = "1";
+				    }
+				} else {
+				    if (values["sf_schildkampfII"] === "1") {
+				        attrsToChange["sf_schildkampfII"] = "0";
+				    }
+				}
+				break;
+			case "sf_schildkampfii":
+				if (eventInfo.newValue === "1") {
+				    if (values["sf_linkhand"] === "0") {
+				        attrsToChange["sf_linkhand"] = "1";
+				    }
+				    if (values["sf_schildkampfI"] === "0") {
+				        attrsToChange["sf_schildkampfI"] = "1";
+				    }
+				}
+				break;
+		}
+        setAttrs(attrsToChange, () => {
+			calculateCombatValues(eventInfo);
+        });
     });
 });
 </script>
