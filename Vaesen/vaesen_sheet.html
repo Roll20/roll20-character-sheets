@@ -81,7 +81,7 @@
             <th>Name</th><th>Protect</th><th>Agility</th>
             <tr>
               <td><input class="longtext" Type="text" name="attr_armor"></td>
-              <td><input class="attribtext" Type="number" name="attr_armorprotection"></td>
+              <td><input class="attribtext" Type="number" name="attr_armorprotection" value="0"></td>
               <td><input class="atrribtext" Type="number" name="attr_armoragility" value="0"><button type="roll" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=@{armor} Check}}{{attribvalue=@{armorprotection}}}{{bonus=@{equipedbonus}}}{{result=[[(@{armorprotection}+@{equipedbonus})d6>6]]}}" name="roll_protection"></button></td>
             </tr>
         </table>
@@ -144,28 +144,97 @@
 
         <td><hr class="minorbreak"></td>
 
-        Max Capital: <input type="number" name="attr_capital" class="attribtext" value="0">
-        Spent: <input type="number" name="attr_spent" class="attribtext" value="0">
+        <span class="normallabel">Max Capital:</span> <input type="number" name="attr_capital" class="attribtext" value="0">
+        <span class="normallabel">Spent:</span> <input type="number" name="attr_spent" class="attribtext" value="0">
         <br>
-        Lifestyle Bonus: <input type="number" name="attr_lifestyle" class="attribtext" value="0">
+        <span class="normallabel">Lifestyle Bonus:</span> <input type="number" name="attr_lifestyle" class="attribtext" value="0">
         <HR class="break">
-        <h2 class="biglabel">Physical Condtion</h2>
-        <select name="attr_PhysicalCondition">
-            <option value="0" selected="selected">Healthy</option>
-            <option value="1">Exhausted</option>
-            <option value="2">Battered</option>
-            <option value="3">Wounded</option>
-            <option value="4">Broken</option>
-        </select>
-        <BR>
-        <h2 class="biglabel">Mental Condition</h2>
-        <select name="attr_MentalCondition">
-            <option value="0" selected="selected">Healthy</option>
-            <option value="1">Angry</option>
-            <option value="2">Frightened</option>
-            <option value="3">Hopeless</option>
-            <option value="4">Broken</option>
-         </select>
+        <h2 class="areaheader">Conditions</h2>    
+
+        <table>
+            <tr>
+                <td>
+                    <span class="normallabel">Physical</span>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Exhausted</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_exhausted" value="1">
+                </td>
+            <tr>
+                <td>
+                    <input type="number" name="attr_physicalcondition" value="@{exhausted}+@{battered}+@{wounded}" disabled class="attribtext">
+                </td>
+                <td>
+                    <span class="normallabel-nb">Battered</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_battered" value="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Wounded</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_wounded" value="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Broken</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_physicalbroken" value="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span class="normallabel">Mental</span>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Angry</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_angry" value="1">
+                </td>
+            <tr>
+                <td>
+                    <input type="number" name="attr_mentalcondition" value="@{angry}+@{frightened}+@{hopeless}" disabled class="attribtext">
+                </td>
+                <td>
+                    <span class="normallabel-nb">Frightened</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_frightened" value="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Hopeless</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_hopeless" value="1">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                </td>
+                <td>
+                    <span class="normallabel-nb">Broken</span>
+                </td>
+                <td>
+                    <input type="checkbox" name="attr_mentalbroken" value="1">
+                </td>
+            </tr>
+        </table>
          <HR class="break">
          <table class="attribtable">
             <tr>
@@ -173,52 +242,55 @@
               <th></th>
             </tr>
             <tr>
-                <td>Agility</td>
-                <td><input type="number" value="0" name="attr_agility"></td><td><button type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Agility Check}}{{attribvalue=@{physique}}}{{skillvalue=@{agility}}}{{bonus=@{equipedbonus}}}{{agility=@{armoragility}}}{{result=[[(@{physique}+@{agility}+@{equipedbonus}-@{armoragility})d6>6]]}}" ></button></td>    
+
+                <!-- [[[[{10-15,1}kh1]]d6>6]] Roll minimum 1 die -->
+                
+                <td>Agility</td>  
+                <td><input type="number" value="0" name="attr_agility"></td><td><button type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Agility Check}}{{attribvalue=@{physique}}}{{skillvalue=@{agility}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{agility=@{armoragility}}}{{result=[[[[{(@{physique}-[[@{physicalcondition}]]+@{agility}+@{equipedbonus}-@{armoragility}),1}kh1]]d6>6]]}}" ></button></td>    
             </tr>
             <tr>
                 <td>Close Combat</td>
-                <td><input type="number" value="0" name="attr_closecombat"></td><td><button name="closecombat_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Close Combat Check}}{{attribvalue=@{physique}}}{{skillvalue=@{closecombat}}}{{bonus=@{equipedbonus}}}{{result=[[(@{physique}+@{closecombat}+@{equipedbonus})d6>6]]}}"></button></td>    
+                <td><input type="number" value="0" name="attr_closecombat"></td><td><button name="closecombat_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Close Combat Check}}{{attribvalue=@{physique}}}{{skillvalue=@{closecombat}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{result=[[[[{(@{physique}-[[@{physicalcondition}]]+@{closecombat}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>    
             </tr>
             <tr>
                 <td>Force</td>
-                <td><input type="number" value="0" name="attr_force"></td><td><button name="force_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Force Check}}{{attribvalue=@{physique}}}{{skillvalue=@{force}}}{{bonus=@{equipedbonus}}}{{result=[[(@{physique}+@{force}+@{equipedbonus})d6>6]]}}"></button></td>    
+                <td><input type="number" value="0" name="attr_force"></td><td><button name="force_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Force Check}}{{attribvalue=@{physique}}}{{skillvalue=@{force}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{result=[[[[{(@{physique}-[[@{physicalcondition}]]+@{force}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>    
             </tr>
             <tr>
                 <td>Medicine</td>
-                <td><input type="number" value="0" name="attr_medicine"></td><td><button name="medicine_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Medicine Check}}{{attribvalue=@{precision}}}{{skillvalue=@{medicine}}}{{bonus=@{equipedbonus}}}{{result=[[(@{precision}+@{medicine}+@{equipedbonus})d6>6]]}}"></button></td>    
+                <td><input type="number" value="0" name="attr_medicine"></td><td><button name="medicine_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Medicine Check}}{{attribvalue=@{precision}}}{{skillvalue=@{medicine}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{result=[[[[{(@{precision}-[[@{physicalcondition}]]+@{medicine}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>    
             </tr>
             <tr>
               <td>Ranged Combat</td>
-              <td><input type="number" value="0" name="attr_rangedcombat"></td><td><button name="ramgedcombat_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Ranged Combat Check}}{{attribvalue=@{precision}}}{{skillvalue=@{rangedcombat}}}{{bonus=@{equipedbonus}}}{{result=[[(@{precision}+@{rangedcombat}+@{equipedbonus})d6>6]]}}"></button></td>    
+              <td><input type="number" value="0" name="attr_rangedcombat"></td><td><button name="rangedcombat_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Ranged Combat Check}}{{attribvalue=@{precision}}}{{skillvalue=@{rangedcombat}}}{{condition=[[@{physicalcondition}]]}}{{bonus=@{equipedbonus}}}{{result=[[[[(@{precision}-[[@{physicalcondition}]]+@{rangedcombat}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>    
             </tr>
             <tr>
               <td>Stealth</td>
-              <td><input type="number" value="0" name="attr_stealth"></td><td><button name="stealth_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Stealth Check}}{{attribvalue=@{precision}}}{{skillvalue=@{stealth}}}{{bonus=@{equipedbonus}}}{{result=[[(@{precision}+@{stealth}+@{equipedbonus})d6>6]]}}"></button></td>    
+              <td><input type="number" value="0" name="attr_stealth"></td><td><button name="stealth_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Stealth Check}}{{attribvalue=@{precision}}}{{skillvalue=@{stealth}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{result=[[[[{(@{precision}-[[@{physicalcondition}]]+@{stealth}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>    
             </tr>
             <tr>
               <td>Investigation</td>
-              <td><input type="number" value="0" name="attr_investigation"></td><td><button name="investigation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Investigation Check}}{{attribvalue=@{logic}}}{{skillvalue=@{investigation}}}{{bonus=@{equipedbonus}}}{{result=[[(@{logic}+@{investigation}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_investigation"></td><td><button name="investigation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Investigation Check}}{{attribvalue=@{logic}}}{{skillvalue=@{investigation}}}{{condition=[[@{mentalcondition}]]}}{{bonus=@{equipedbonus}}}{{result=[[[[{(@{logic}-[[@{mentalcondition}]]+@{investigation}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
             <tr>
               <td>Learning</td></td>
-              <td><input type="number" value="0" name="attr_learning"></td><td><button name="learning_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Learning Check}}{{attribvalue=@{logic}}}{{skillvalue=@{learning}}}{{bonus=@{equipedbonus}}}{{result=[[(@{logic}+@{learning}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_learning"></td><td><button name="learning_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Learning Check}}{{attribvalue=@{logic}}}{{skillvalue=@{learning}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{logic}-[[@{mentalcondition}]]+@{learning}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
             <tr>
               <td>Vigilance</td>
-              <td><input type="number" value="0" name="attr_vigilance"></td><td><button name="vigilance_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Vigilance Check}}{{attribvalue=@{logic}}}{{skillvalue=@{vigilance}}}{{bonus=@{equipedbonus}}}{{result=[[(@{logic}+@{vigilance}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_vigilance"></td><td><button name="vigilance_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Vigilance Check}}{{attribvalue=@{logic}}}{{skillvalue=@{vigilance}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{logic}-[[@{mentalcondition}]]+@{vigilance}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
             <tr>
               <td>Inspiration</td></td>
-              <td><input type="number" value="0" name="attr_inspiration"></td><td><button name="inspiration_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Inspiration Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{inspiration}}}{{bonus=@{equipedbonus}}}{{result=[[(@{empathy}+@{inspiration}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_inspiration"></td><td><button name="inspiration_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Inspiration Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{inspiration}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{empathy}-[[@{mentalcondition}]]+@{inspiration}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
             <tr>
               <td>Manipulation</td></td>
-              <td><input type="number" value="0" name="attr_manipulation"></td><td><button name="manipulation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Manipulation Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{manipulation}}}{{bonus=@{equipedbonus}}}{{result=[[(@{empathy}+@{manipulation}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_manipulation"></td><td><button name="manipulation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Manipulation Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{manipulation}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{empathy}-[[@{mentalcondition}]]+@{manipulation}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
             <tr>
               <td>Observation</td></td>
-              <td><input type="number" value="0" name="attr_observation"></td><td><button name="observation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Observation Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{observation}}}{{bonus=@{equipedbonus}}}{{result=[[(@{empathy}+@{observation}+@{equipedbonus})d6>6]]}}"></button></td>
+              <td><input type="number" value="0" name="attr_observation"></td><td><button name="observation_roll" type="roll" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=Observation Check}}{{attribvalue=@{empathy}}}{{skillvalue=@{observation}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{empathy}-[[@{mentalcondition}]]+@{observation}+@{equipedbonus}),1}kh1]]d6>6]]}}"></button></td>
             </tr>
           </table>
           <HR class="break">
@@ -390,6 +462,7 @@
          </fieldset>
     </div>
 </div>
+
 <rolltemplate class="sheet-rolltemplate-vaesen-attrib">
 <div class="sheet-vaesen-container">
     <div class="sheet-vaesen-header">
@@ -405,6 +478,7 @@
     <div class="sheet-vaesen-result">{{result}}</div>
 </div>
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-vaesen-skill">
 <div class="sheet-vaesen-container">
     <div class="sheet-vaesen-header">
@@ -427,9 +501,15 @@
         Armor Penalty: {{agility}}
     </div>
     {{/agility}}
+    {{#condition}}
+    <div class="sheet-vaesen-type">
+        Condition Penalty: {{condition}}
+    </div>
+    {{/condition}}
     <div class="sheet-vaesen-result">{{result}}</div>
 </div>
 </rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-vaesen-attack">
 <div class="sheet-vaesen-container">
     <div class="sheet-vaesen-header">
