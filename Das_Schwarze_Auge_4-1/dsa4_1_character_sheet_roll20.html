@@ -16708,25 +16708,34 @@ on("change:BE_TaW change:NKW_Aktiv1 change:NKW_AT_typ1 change:NKW_PA_typ1 change
     });
 });
 
-var closefighttalent_be = {
-    "anderthalbhander": { type: "minus", value: 2 }, 
-    "dolche": { type: "minus", value: 1 }, 
-    "fechtwaffen": { type: "minus", value: 1 }, 
-    "hiebwaffen": { type: "minus", value: 4 },
-    "infanteriewaffen": { type: "minus", value: 3 }, 
-    "kettenstabe": { type: "minus", value: 1 }, 
-    "kettenwaffen": { type: "minus", value: 3 }, 
-    "lanzenreiten": { type: "none", value: 0 }, 
-    "peitsche": { type: "minus", value: 1 }, 
-    "raufen": { type: "minus", value: 0 }, 
-    "ringen": { type: "minus", value: 0 }, 
-    "sabel": { type: "minus", value: 2 },
-    "schwerter": { type: "minus", value: 2 }, 
-    "speere": { type: "minus", value: 3 }, 
-    "stabe": { type: "minus", value: 2 }, 
-    "zweihandflegel": { type: "minus", value: 3 }, 
-    "zweihand-hiebwaffen": { type: "minus", value: 3 }, 
-    "zweihandschwerter": { type: "minus", value: 2 }
+const combatTechniques = {
+    "anderthalbhander":    { type: "melee",  ebe: -2,        "at-only": false },
+    "armbrust":            { type: "ranged", ebe: -5,        "at-only": true },
+    "belagerungswaffen":   { type: "ranged", ebe: undefined, "at-only": true },
+    "blasrohr":            { type: "ranged", ebe: -5,        "at-only": true },
+    "bogen":               { type: "ranged", ebe: -3,        "at-only": true },
+    "diskus":              { type: "ranged", ebe: -2,        "at-only": true },
+    "dolche":              { type: "melee",  ebe: -1,        "at-only": false },
+    "fechtwaffen":         { type: "melee",  ebe: -1,        "at-only": false },
+    "hiebwaffen":          { type: "melee",  ebe: -4,        "at-only": false },
+    "infanteriewaffen":    { type: "melee",  ebe: -3,        "at-only": false },
+    "kettenstabe":         { type: "melee",  ebe: -1,        "at-only": false },
+    "kettenwaffen":        { type: "melee",  ebe: -3,        "at-only": false },
+    "lanzenreiten":        { type: "melee",  ebe: undefined, "at-only": false },
+    "peitsche":            { type: "melee",  ebe: -1,        "at-only": true },
+    "raufen":              { type: "melee",  ebe: 0,         "at-only": false },
+    "ringen":              { type: "melee",  ebe: 0,         "at-only": false },
+    "sabel":               { type: "melee",  ebe: -2,        "at-only": false },
+    "schleuder":           { type: "ranged", ebe: -2,        "at-only": true },
+    "schwerter":           { type: "melee",  ebe: -2,        "at-only": false },
+    "speere":              { type: "melee",  ebe: -3,        "at-only": false },
+    "stabe":               { type: "melee",  ebe: -2,        "at-only": false },
+    "wurfbeile":           { type: "ranged", ebe: -2,        "at-only": true },
+    "wurfmesser":          { type: "ranged", ebe: -3,        "at-only": true },
+    "wurfspeere":          { type: "ranged", ebe: -2,        "at-only": true },
+    "zweihandflegel":      { type: "melee",  ebe: -3,        "at-only": false },
+    "zweihand-hiebwaffen": { type: "melee",  ebe: -3,        "at-only": false },
+    "zweihandschwerter":   { type: "melee",  ebe: -2,        "at-only": false }
 }
 /* 
     Methode die die waffenspezifische BE berechnet und nach AT und PA getrennt zurückgibt. 
@@ -16753,13 +16762,13 @@ function calculateWeaponBE(values) {
     var be_at = 0;
     var atTyp = values["NKW_AT_typ" + weapon];
     if (atTyp && atTyp !== "0" && atTyp !== 0) {
-        var beValues = closefighttalent_be[atTyp.replace("@{AT_", "").replace("}", "").toLowerCase()];
+        var beValues = combatTechniques[atTyp.replace("@{AT_", "").replace("}", "").toLowerCase()];
 
         var atTypBE = baseBE;
-        if (beValues.type === "none") {
+        if (beValues.ebe === undefined) {
             atTypBE = 0;
-        } else if (beValues.type === "minus") {
-            atTypBE -= beValues.value;
+        } else {
+            atTypBE += beValues.ebe;
         }
 
         // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
@@ -16768,12 +16777,12 @@ function calculateWeaponBE(values) {
     var be_pa = 0;
     var paTyp = values["NKW_PA_typ" + weapon];
     if (paTyp && paTyp !== "0" && paTyp !== 0) {
-        var beValues = closefighttalent_be[paTyp.replace("@{PA_", "").replace("}", "").toLowerCase()];
+        var beValues = combatTechniques[paTyp.replace("@{PA_", "").replace("}", "").toLowerCase()];
         var paTypBE = baseBE;
-        if (beValues.type === "none") {
+        if (beValues.ebe === undefined) {
             paTypBE = 0;
-        } else if (beValues.type === "minus") {
-            paTypBE -= beValues.value;
+        } else {
+            paTypBE += beValues.ebe;
         }
 
         // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
