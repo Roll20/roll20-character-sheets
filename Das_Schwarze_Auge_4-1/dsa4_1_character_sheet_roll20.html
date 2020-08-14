@@ -10996,7 +10996,6 @@
                     <th>gBE</th>
                     <th>Gewicht</th>
                     <th>Aktiv</th>
-                    <th>RG1 Aktiv</th>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11034,9 +11033,6 @@
                     </td>
                     <td>
                         <input type="checkbox" name="attr_RSAktiv1" value="1">
-                    </td>
-                    <td>
-                        <input type="checkbox" name="attr_rs1_rg1" value="1"/>
                     </td>
                 </tr>
                 <tr align="center">
@@ -11076,9 +11072,6 @@
                     <td>
                         <input type="checkbox" name="attr_RSAktiv2" value="1">
                     </td>
-                    <td>
-                        <input type="checkbox" name="attr_rs2_rg1" value="1"/>
-                    </td>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11117,9 +11110,6 @@
                     <td>
                         <input type="checkbox" name="attr_RSAktiv3" value="1">
                     </td>
-                    <td>
-                        <input type="checkbox" name="attr_rs3_rg1" value="1"/>
-                    </td>
                 </tr>
                 <tr align="center">
                     <td>
@@ -11157,9 +11147,6 @@
                     </td>
                     <td>
                         <input type="checkbox" name="attr_RSAktiv4" value="1">
-                    </td>
-                    <td>
-                        <input type="checkbox" name="attr_rs4_rg1" value="1"/>
                     </td>
                 </tr>
                 <tr align="center">
@@ -16544,60 +16531,145 @@ on("change:ATbasis change:TaW_peitsche change:AT_peitsche", function(eventInfo) 
     });
 });
 
-on("change:RS_gBE1 change:RSAktiv1 change:rs1_rg1 change:RS_gBE2 change:RSAktiv2 change:rs2_rg1 change:RS_gBE3 change:RSAktiv3 change:rs3_rg1 change:RS_gBE4 change:RSAktiv4 change:rs4_rg1 change:sf_rustungsgewohnungI change:sf_rustungsgewohnungII change:sf_rustungsgewohnungIII", function(eventInfo) {
-    getAttrs([ "RS_gBE1", "RSAktiv1", "rs1_rg1", "RS_gBE2", "RSAktiv2", "rs2_rg1", "RS_gBE3", "RSAktiv3", "rs3_rg1", "RS_gBE4", "RSAktiv4", "rs4_rg1", "sf_rustungsgewohnungI", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"], function(values) {
+on("change:RSName1 change:RS_gBE1 change:RSAktiv1 change:RSName2 change:RS_gBE2 change:RSAktiv2 change:RSName3 change:RS_gBE3 change:RSAktiv3 change:RSName4 change:RS_gBE4 change:RSAktiv4 change:sf_rustungsgewohnungI change:rustungsgewohnungI_rustungen change:sf_rustungsgewohnungII change:sf_rustungsgewohnungIII", function(eventInfo) {
+    getAttrs([ "RSName1", "RS_gBE1", "RSAktiv1", "RSName2", "RS_gBE2", "RSAktiv2", "RSName2", "RS_gBE3", "RSAktiv3", "RSName3", "RS_gBE4", "RSAktiv4", "RSName4", "sf_rustungsgewohnungI", "rustungsgewohnungI_rustungen", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"], function(values) {
         var attrsToChange = calculateRuestungBE(values, eventInfo);
         setAttrs(attrsToChange);
     });
 });
 
 // Berechnet die BE der aktiven Rüstungsteile
-// benötigt "RS_gBE1", "RSAktiv1", "rs1_rg1", "RS_gBE2", "RSAktiv2", "rs2_rg1", "RS_gBE3", "RSAktiv3", "rs3_rg1", "RS_gBE4", "RSAktiv4", "rs4_rg1", "sf_rustungsgewohnungI", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"
+// benötigt "RS_gBE1", "RSAktiv1", "RS_gBE2", "RSAktiv2", "RS_gBE3", "RSAktiv3", "RS_gBE4", "RSAktiv4", "sf_rustungsgewohnungI", "rustungsgewohnungI_rustungen", "sf_rustungsgewohnungII", "sf_rustungsgewohnungIII"
 // wenn bei dem übergebenen Event die aktive Rüstungsgewöhnung 1 geändert wurde, wird auch das übergeben
 function calculateRuestungBE(values, eventInfo) {
     var attrsToChange = {};
-    var activeRg1 = 0;
-    // Bestimmung aktiver Rüstungsgewöhnung 1
-    if (eventInfo && eventInfo.sourceAttribute && eventInfo.sourceAttribute.match("rs[0-9]_rg1")) {
-        if (eventInfo.newValue === "1") {
-            for (var i = 1; i <= 4; i++) {
-                if (eventInfo.sourceAttribute === ("rs" + i + "_rg1")) {
-                    activeRg1 = i;
-                } else {
-                    attrsToChange["rs" + i + "_rg1"] = "0";
-                }
-            }
-        }
-    } else {
-        for (var i = 1; i <= 4; i++) {
-            if (values["rs" + i + "_rg1"] === "1") {
-                activeRg1 = i;
-            }
-        }
-    }
 
+	// Determine old/previous degree of armour adaptation
+	var RG = { '1': values["sf_rustungsgewohnungI"], '2': values["sf_rustungsgewohnungII"], '3': values["sf_rustungsgewohnungIII"] };
+
+	if (RG['3'] === "1") {
+		RG = 3;
+	} else if (RG['2'] === "1") {
+		RG = 2;
+	} else if (RG['1'] === "1") {
+		RG = 1;
+	} else {
+		RG = 0;
+	}
+
+	// Handle changes to degree of armour adaptation
+	if (eventInfo.sourceType === "player") {
+		if (eventInfo.sourceAttribute === "sf_rustungsgewohnungi" && eventInfo.newValue === "1") {
+			RG = 1;
+		} else if (eventInfo.sourceAttribute === "sf_rustungsgewohnungii" && eventInfo.newValue === "1") {
+			RG = 2;
+		} else if (eventInfo.sourceAttribute === "sf_rustungsgewohnungiii" && eventInfo.newValue === "1") {
+			RG = 3;
+		} else if (eventInfo.sourceAttribute === "sf_rustungsgewohnungiii" && eventInfo.newValue === "0") {
+			RG = 2;
+		} else if (eventInfo.sourceAttribute === "sf_rustungsgewohnungii" && eventInfo.newValue === "0") {
+			RG = 1;
+		} else if (eventInfo.sourceAttribute === "sf_rustungsgewohnungi" && eventInfo.newValue === "0") {
+			RG = 0;
+		}
+	}
+	// Populate attrsToChange so we don't forget later on
+	switch(RG) {
+		case 0:
+			attrsToChange["sf_rustungsgewohnungI"] = "0";
+			attrsToChange["sf_rustungsgewohnungII"] = "0";
+			attrsToChange["sf_rustungsgewohnungIII"] = "0";
+			break;
+		case 1:
+			attrsToChange["sf_rustungsgewohnungI"] = "1";
+			attrsToChange["sf_rustungsgewohnungII"] = "0";
+			attrsToChange["sf_rustungsgewohnungIII"] = "0";
+			break;
+		case 2:
+			attrsToChange["sf_rustungsgewohnungI"] = "1";
+			attrsToChange["sf_rustungsgewohnungII"] = "1";
+			attrsToChange["sf_rustungsgewohnungIII"] = "0";
+			break;
+		case 3:
+			attrsToChange["sf_rustungsgewohnungI"] = "1";
+			attrsToChange["sf_rustungsgewohnungII"] = "1";
+			attrsToChange["sf_rustungsgewohnungIII"] = "1";
+			break;
+	}
+
+	// Encumbrance Reduction Through Armour Adaptation
+	var RGBonus = 0;
+
+	// Armour Adaptation I is complicated
+	// The special skill can be acquired for different pieces of armour.
+	// The user has a textarea to fill with the names of the armours.
+	// If we find the same armour as mentioned in that field, apply the bonus.
+
+	// Algorithm for the comparison of armour names with the armours given in Armour Adaptation I:
+	// Armour name: Remove all characters except a-zA-Z (including German Umlaute and Eszett äöüÄÖÜß), lowercase the string
+	// Armour Adaptation I names: Remove all "|", replace all commas, semicolons and linebreaks (\r and \n ...) with |, remove all characters except a-zA-Z| (including German Umlaute and Eszett äöüÄÖÜß), lowercase the string, split the string at |
+	// See whether any of the active armour pieces matches with Armour Adaptation I armours ...
+
+	if (RG === 1) {
+		// Get armour names
+		var armours = [];
+
+		for (name of [
+			[ values["RSName1"], values["RSAktiv1"] ],
+			[ values["RSName2"], values["RSAktiv2"] ],
+			[ values["RSName3"], values["RSAktiv3"] ],
+			[ values["RSName4"], values["RSAktiv4"] ] ]) {
+			// We do not want to throw warnings for inactive armour pieces later on, so only add active ones
+			if (typeof(name[0]) !== 'undefined' && typeof(name[1]) !== 'undefined' && name[1] === "1") {
+				armours.push(name[0]);
+			}
+		}
+		for (name in armours) {
+			armours[name] = armours[name]
+				.replace(/[^a-zA-ZäöüÄÖÜß|]/g, "")
+				.toLowerCase();
+		}
+		oldLen = armours.length;
+		armours = armours.filter(Boolean);
+		if (oldLen > armours.length) console.log("Warnung: Mindestens ein Rüstungsname ist ungültig, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
+
+		// Get names of armour with armour adaptation
+		var RGarmours = values["rustungsgewohnungI_rustungen"]
+		if (typeof(RGarmours) === 'undefined' || RGarmours === "") console.log("Warnung: Keine Rüstungsnamen für Rüstungsgewöhnung I definiert.");
+		RGarmours = RGarmours
+			.replace(/\|/g, "")
+			.replace(/[,;\r\n]/gm, "|")
+			.replace(/[^a-zA-ZäöüÄÖÜß|]/gm, "")
+			.toLowerCase()
+			.split("|")
+			.filter(Boolean);
+		if (RGarmours.length === 0) console.log("Warnung: Kein gültiger Rüstungsnamen für Rüstungsgewöhnung I gefunden, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
+
+		// Find the first match and stop
+		for (armour of armours) {
+			if (RGarmours.indexOf(armour) > -1) {
+				RGBonus = 1;
+				console.log("Rüstungsgewöhnung I: \"" + armour + "\" erhält den Bonus.");
+				break;
+			}
+		}
+
+		if(RGBonus === 0) console.log("Hinweis: Entweder ist keine Rüstung aktiv, für die eine Rüstungsgewöhnung I vorhanden ist, oder der Rüstungsname ist falsch geschrieben.");
+	} else if (RG === 2) {
+		RGBonus = 1;
+	} else if (RG === 3) {
+		RGBonus = 2;
+	}
+
+	// Encumbrance calculation
     var totalBe = 0;
-    var rg1RuestungActive = false;
     for (var i = 1; i <= 4; i++) {
         if (values["RSAktiv" + i] === "1") {
-            if (activeRg1 === i) {
-                rg1RuestungActive = true;
-            }
             totalBe += parseInt(values["RS_gBE" + i]);
         }
     }
 
-    var rg1 = values["sf_rustungsgewohnungI"];
-    var rg2 = values["sf_rustungsgewohnungII"];
-    var rg3 = values["sf_rustungsgewohnungIII"];
-    if (rg3 === "1") {
-        totalBe -= 2;
-    } else if (rg2 === "1") {
-        totalBe -= 1;
-    } else if (rg1 === "1" && rg1RuestungActive) {
-        totalBe -= 1;
-    }
-
+	totalBe -= RGBonus;
     if (totalBe < 0) {
         totalBe = 0;
     }
