@@ -16787,6 +16787,8 @@ function calculateWeaponBEModifiers(combatTechnique, BE) {
 */
 function calculateWeaponBE(values) {
     var weapon = 0;
+    var BEModifiers = { "be_at": 0, "be_pa": 0 };
+
     if (values["NKW_Aktiv1"] === "1") {
         weapon = 1;
     } else if (values["NKW_Aktiv2"] === "1") {
@@ -16796,42 +16798,28 @@ function calculateWeaponBE(values) {
     } else if (values["NKW_Aktiv4"] === "1") {
         weapon = 4;
     } else {
-        return { be_at: 0, be_pa: 0 };
+        return BEModifiers;
     }
     var baseBE = values["BE_TaW"];
-    var be_at = 0;
     var atTyp = values["NKW_AT_typ" + weapon];
-    if (atTyp && atTyp !== "0" && atTyp !== 0) {
-        var beValues = combatTechniques[atTyp.replace("@{AT_", "").replace("}", "").toLowerCase()];
-
-        var atTypBE = baseBE;
-        if (beValues.ebe === undefined) {
-            atTypBE = 0;
-        } else {
-            atTypBE += beValues.ebe;
-        }
-
-        // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
-        be_at = Math.floor(atTypBE / 2);
-    } 
-    var be_pa = 0;
     var paTyp = values["NKW_PA_typ" + weapon];
-    if (paTyp && paTyp !== "0" && paTyp !== 0) {
-        var beValues = combatTechniques[paTyp.replace("@{PA_", "").replace("}", "").toLowerCase()];
-        var paTypBE = baseBE;
-        if (beValues.ebe === undefined) {
-            paTypBE = 0;
-        } else {
-            paTypBE += beValues.ebe;
-        }
+    var combatTechnique = {};
 
-        // Der BE wird zwischen PA und AT aufgeteilt. Daher geteilt durch 2. Bei ungeraden Werten wird 1 Punkt mehr von der PA abgezogen. Daher "ceil" bei AT, "round" bei PA
-        be_pa = Math.ceil(paTypBE / 2);
+    if (atTyp && atTyp !== "0" && atTyp !== 0) {
+        combatTechnique[ "AT" ] = atTyp.match("@\{AT_([^}]+)\}")[1].toLowerCase();
+    } 
+    if (paTyp && paTyp !== "0" && paTyp !== 0) {
+        combatTechnique[ "PA" ] = paTyp.match("@\{PA_([^}]+)\}")[1].toLowerCase();
     }
-    return { 
-        be_at: be_at >= 0 ? be_at : 0, 
-        be_pa: be_pa >= 0 ? be_pa : 0 
-        };
+
+    if (combatTechnique[ "AT" ] === combatTechnique[ "PA" ]) {
+        BEModifiers = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE);
+    } else {
+        BEModifiers[ "be_at" ] = calculateWeaponBEModifiers(combatTechnique["AT"], baseBE)["be_at"];
+        BEModifiers[ "be_pa" ] = calculateWeaponBEModifiers(combatTechnique["PA"], baseBE)["be_pa"];
+    }
+
+    return BEModifiers;
 }
 
 on("change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:sf_schildkampfI change:sf_schildkampfII", function(eventInfo) {
