@@ -266,24 +266,26 @@
 		<label><input type='checkbox' name='attr_inlinemod-toggle' value='?{Modifier|0}' class='select_button hidden' checked/><span class='select_text'>Inline Mod</span></label>
 		<p></p>
 		<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[(?{Degrees of Failiure|1})+?{Modifier|0}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
+		<button class='clear minimisable_infographic_override' type='roll' name='shock' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{shock= [[(?{Fear DoF|1})*10 + 1d100]]}}">Shock</button>
+		<button class='clear minimisable_infographic_override' type='roll' name='d100' value="@{to-gm}&{template:mythic} [[ ([[?{Target Number|50}]] - [[1d100]])/10]] {{character= @{character_name}}} {{target= $[[0]]}} {{roll=$[[1]]}} {{difference=$[[2]]}}">1d100</button>
 	  </div>
 	  <input type='checkbox' name='attr_infographic' class='collapsible_entity_switch hidden' />
 	  <div class='collapsible_entity_block'>
 		<div class='minimisable_infographic_grid'>
 
-		  <div class='minimisable_infographic_field4x3 radius_border'>
-			<button name='shield_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
-			value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{name=Wounds}} {{4x2-1-name=Current}} {{4x2-1=@{wounds}}} {{4x2-1-name-max=Max}} {{4x2-1-max=@{wounds|max}}}  {{4x2-2-name=Critical Damage}} {{4x2-2=@{shields_charge}}}'>Wounds</button>
+		  <div class='minimisable_infographic_field4x3a radius_border'>
+			<button name='wound_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
+			value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{name=Wounds}} {{4x2-1-name=Current}} {{4x2-1=@{wounds}}} {{4x2-1-name-max=Max}} {{4x2-1-max=@{wounds|max}}}  {{4x2-2-name=Critical}} {{4x2-2=@{critical_dmg}}}'>Wounds</button>
 			<p class='minimisable_infographic_g6'>Current</p>
 			<input class='minimisable_infographic_g7 full_width' type='text' name='attr_wounds' value='0' />
 			<p class='minimisable_infographic_g4'>Critical Damage</p>
-			<input class='minimisable_infographic_g5 full_width' type='text' name='attr_shields_max' value='0' />
+			<input class='minimisable_infographic_g5 full_width' type='text' name='attr_critical_dmg' value='0' />
 			<p class='minimisable_infographic_g2'>Max</p>
 			<input class='minimisable_infographic_g3 full_width' type='text' name='attr_wounds_max' value='0' />
 		  </div>
 
 		  <div class='minimisable_infographic_field2x3 radius_border'>
-			<button name='shield_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
+			<button name='fatigue_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
 			value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{name=Fatigue}} {{2x2-name=Current}} {{2x2=@{fatigue}}} {{2x2-name-max=Max}} {{2x2-max=@{fatigue|max}}}'>Fatigue</button>
 			<p class='minimisable_infographic_g2'>Current</p>
 			<input class='minimisable_infographic_g3 full_width' type='text' name='attr_fatigue' value='0' />
@@ -299,6 +301,18 @@
 			<p class='minimisable_infographic_g4'>Max</p>
 			<input class='minimisable_infographic_g5 full_width' type='text' name='attr_fate_max' value='0' />
 		  </div>
+		  
+		  <div class='minimisable_infographic_field4x3b radius_border'>
+			<button name='forcefield_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
+			value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{forcefield= @{forcefield_name}}} {{roll= [[1d100cs>@{forcefield_protection}cf<@{forcefield_overload}]]}}'>Force Field</button>
+			<p class='minimisable_infographic_g2'>Name</p>
+			<input class='minimisable_infographic_g3 full_width' type='text' name='attr_forcefield_name' value='None' />
+			<p class='minimisable_infographic_g8'>Overload</p>
+			<input class='minimisable_infographic_g9 full_width' type='text' name='attr_forcefield_overload' value='0' />
+			<p class='minimisable_infographic_g4'>Protection</p>
+			<input class='minimisable_infographic_g5 full_width' type='text' name='attr_forcefield_protection' value='0' />
+		  </div>
+		  
 		</div>
 	  </div>
 
@@ -1413,6 +1427,7 @@
 				<option value='1'>Unfettered</option>
 				<option value='2'>Push</option>
 			</select>
+			<input class='hidden' name='attr_psy_roll' type='text' readonly />
 			<div class='psykana_info_gs5'>Psy Rating</div>
 			<input class='psykana_info_gs6 full_width' type='number' name='attr_psy_rating' />
 			<input name='attr_psykana_limit' type='checkbox' value='2' class='hidden hider' />
@@ -1429,6 +1444,8 @@
 			<input class='psykana_info_gs14 full_width' type='number' name='attr_effective_psy_rating' readonly />
 			<div class='psykana_info_gs15'>Phenomena</div>
 			<input class='psykana_info_gs16 full_width' type='number' name='attr_psykana_phenomena' readonly />
+			<button class='psykana_info_gs17 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{phenomena= }} {{roll=[[1d100 + @{psykana_phenomena}]]}}' >Phenomena</button>
+			<button class='psykana_info_gs18 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{perils= }} {{roll=[[1d100]]}}' >Perils</button>
 		</div>
 	  </div>
 	  
@@ -1470,7 +1487,7 @@
 			  <input class='psykana_ability_gs14 full_width' type='text' name='attr_P_action' />
 			  <div class='psykana_ability_gs15'>Sustained</div>
 			  <input class='psykana_ability_gs16 full_width' type='text' name='attr_P_sustained' />
-			  <button class='psykana_ability_gs17 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{P_name}}} {{roll=[[floor(( [[@{P_focus} + @{P_mod1} ]] + [[5 * @{effective_psy_rating}]] + @{inlinemod-toggle} - 1d100)/10)]]}} @{settings_hitroll}' >Cast</button>
+			  <button class='psykana_ability_gs17 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{P_name}}} {{roll=[[floor(( [[@{P_focus} + @{P_mod1} ]] + [[5 * @{effective_psy_rating}]] + @{inlinemod-toggle} - 1d100@{psy_roll})/10)]]}} @{settings_hitroll}' >Cast</button>
 			  <button class='psykana_ability_gs18 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{P_type}}} {{weapon= @{P_name}}} {{damage=[[@{P_dam-roll}]] }} {{pen=[[@{P_pen}]] }} {{@{settings_weapondescription}=@{P_ability_r} }}' >DMG</button>
 			</div>
 			<div class='psykana_ability_grid4'>
@@ -2036,13 +2053,22 @@
 	  switch (psykana_limit) {
 		case 0:
 		  psykana_limit_factor = 0.5;
+		  setAttrs({
+			psy_roll: ('')
+		  });
 		  break;
 		case 1:
 		  psykana_limit_factor = 1;
+		  setAttrs({
+			psy_roll: ('cs11cs22cs33cs44cs55cs66cs77cs88cs99cs100')
+		  });
 		  break;
 		case 2:
 		  psykana_limit_factor = 1;
 		  push_addend_epr = psy_push;
+		  setAttrs({
+			psy_roll: ('cs>0cf0')
+		  });
 		  break;
 	  }
 	  if (psykana_sustain == 1) {
@@ -2188,6 +2214,29 @@
 
   </div>
   {{/initiative}}
+  
+  
+  
+  {{#target}}
+  <div class="sheet-template-header">{{character}} just rolls a d100 </div>
+  <div class="sheet-template-content">
+    <div class="sheet-template-row template-center">Target: {{target}} Roll: {{roll}} </div>
+	<div class="sheet-template-row template-center">Difference: {{difference}}</div>
+  </div>
+  {{/target}}
+  
+  
+  
+  {{#forcefield}}
+  <div class="sheet-template-header">{{character}} tries a Force Field</div>
+  <div class="sheet-template-content">
+	<div class="sheet-template-row sheet-template-center">{{forcefield}}</div>
+	<div class="sheet-template-row sheet-template-center">{{roll}}</div>
+	
+	{{#rollWasCrit() roll }}<div class="sheet-template-row sheet-template-center">Failed to Engage</div>{{/rollWasCrit() roll }}
+    {{#rollWasFumble() roll }}<div class="sheet-template-row sheet-template-center">Overloaded</div>{{/rollWasFumble() roll }}
+  </div>
+  {{/forcefield}}
 
 
 
@@ -2197,8 +2246,8 @@
     <div class="sheet-template-2x2">
       <div class="sheet-template-row sheet-template-right">{{roll}}</div>
       <div class="sheet-template-row">
-        {{#^rollLess() roll 0 }}Degrees of Success{{/^rollLess() roll 0 }}
-        {{#rollLess() roll 0 }}Degrees of Failure{{/rollLess() roll 0 }}
+        {{#^rollLess() roll 0 }}Additional DoS{{/^rollLess() roll 0 }}
+        {{#rollLess() roll 0 }}Additional DoF{{/rollLess() roll 0 }}
       </div>
     </div>
 
@@ -2214,12 +2263,12 @@
 
       <div class="sheet-template-2x2 sheet-template-row">
         <div class="sheet-template-right">{{roll}}</div>
-        {{#^rollLess() roll 0 }}<div style="float: right">Degrees of Success</div>{{/^rollLess() roll 0 }}
-        {{#rollLess() roll 0 }}<div style="float: right">Degrees of Failure</div>{{/rollLess() roll 0 }}
+        {{#^rollLess() roll 0 }}<div style="float: right">Additional DoS</div>{{/^rollLess() roll 0 }}
+        {{#rollLess() roll 0 }}<div style="float: right">Additional DoF</div>{{/rollLess() roll 0 }}
       </div>
 
-      {{#rollWasCrit() roll }}<div class="sheet-template-row template-center">A CRITICAL FAIL!</div>{{/rollWasCrit() roll }}
-      {{#rollWasFumble() roll }}<div class="sheet-template-row template-center">A CRITICAL HIT!</div>{{/rollWasFumble() roll }}
+      {{#rollWasCrit() roll }}<div class="sheet-template-row template-center">That's not good...</div>{{/rollWasCrit() roll }}
+      {{#rollWasFumble() roll }}<div class="sheet-template-row template-center">How about that?</div>{{/rollWasFumble() roll }}
     </div>
     {{/attack}}
 
@@ -2239,11 +2288,11 @@
 		  
 		  {{#rollBetween() loc 1 20}} / MOTIVE SYSTEM	{{/rollBetween() loc 1 20}}
 		  {{#rollBetween() loc 21 60}} / HULL			{{/rollBetween() loc 21 60}}
-		  {{#rollBetween() loc 61 80}} / WEAPON		{{/rollBetween() loc 61 80}}
+		  {{#rollBetween() loc 61 80}} / WEAPON			{{/rollBetween() loc 61 80}}
 		  {{#rollBetween() loc 81 100}} / TURRET		{{/rollBetween() loc 81 100}}
         </div>
       </div>
-      {{/loc}}
+    {{/loc}}
 
 
 
@@ -2293,6 +2342,199 @@
 
         </div>
         {{/scatter-range}}
+		
+		
+		
+		{{#shock}}
+        <div class="sheet-template-header">{{character}} experiences Shock</div>
+        <div class="sheet-template-content">
+          <div class="sheet-template-row template-center">Severity: {{shock}}</div>
+          {{#rollBetween() shock 1 20}}
+			<div class="sheet-template-row">May only take a single Half Action during next Turn</div>
+		  {{/rollBetween() shock 1 20}}
+          {{#rollBetween() shock 21 40}}
+			<div class="sheet-template-row">–10 penalty on all Tests for rest of encounter unless this unit Snaps Out of It (p305).</div>
+		  {{/rollBetween() shock 21 40}}
+          {{#rollBetween() shock 41 60}}
+			<div class="sheet-template-row">Cannot willingly approach source of Fear. –10 penalty on all Tests until end of encounter.</div>
+		  {{/rollBetween() shock 41 60}}
+          {{#rollBetween() shock 61 80}}
+			<div class="sheet-template-row">No Actions until this unit Snaps Out of It (p305). Even afterwards, -10 penalty for rest of encounter.</div>
+		  {{/rollBetween() shock 61 80}}
+		  {{#rollBetween() shock 81 100}}
+			<div class="sheet-template-row">If able, unit must flee source of Fear as fast as possible. If unable, may only take Half Actions and gains –20 penalty to all Tests. Once away from the danger, must successfully Snap Out of It (p305) to regain control.</div>
+		  {{/rollBetween() shock 81 100}}
+          {{#rollBetween() shock 101 120}}
+			<div class="sheet-template-row">Falls unconscious for 1d5 Rounds. Afterwards, -10 penalty on all Tests until end of encounter.</div>
+		  {{/rollBetween() shock 101 120}}
+		  {{#rollBetween() shock 121 130}}
+			<div class="sheet-template-row">Screams and vomits uncontrollably for 1d5 Rounds. Unit may do nothing else during this time, and drops any held items. Afterwards, may only take a single Half Action each Turn until given a chance to rest.</div>
+		  {{/rollBetween() shock 121 130}}
+          {{#rollBetween() shock 131 140}}
+			<div class="sheet-template-row">Laughs hysterically and attacks anything nearby with any weapons on hand, until unit Snaps Out of It (p305) or is knocked unconscious.</div>
+		  {{/rollBetween() shock 131 140}}
+		  {{#rollBetween() shock 141 160}}
+			<div class="sheet-template-row">Crumples to the ground for 1d5+1 Rounds, sobbing, babbling, and tearing at own flesh; can do nothing else. Afterwards, -20 penalty on all Tests until end of encounter.</div>
+		  {{/rollBetween() shock 141 160}}
+          {{#rollBetween() shock 161 170}}
+			<div class="sheet-template-row">Character goes catatonic for 1d5 hours and cannot be roused.</div>
+		  {{/rollBetween() shock 161 170}}
+		  {{#rollGreater() shock 170}}
+			<div class="sheet-template-row">Heart failure. +0 Toughness Test. On fail, die. On success, character goes catatonic for 1d5 hours and cannot be roused.</div>
+		  {{/rollGreater() shock 170}}
+
+        </div>
+        {{/shock}}
+		
+		
+		
+		{{#phenomena}}
+		<div class="sheet-template-header">{{character}} rolls for Psychic Phenomena (p227)</div>
+        <div class="sheet-template-content">
+          <div class="sheet-template-row template-center">Severity: {{roll}} </div>
+		  {{#rollBetween() roll 1 3}}
+			<div class="sheet-template-row template-center">Dark Foreboding</div>
+		  {{/rollBetween() roll 1 3}}
+          {{#rollBetween() roll 4 5}}
+			<div class="sheet-template-row template-center">Warp Echo</div>
+		  {{/rollBetween() roll 4 5}}
+          {{#rollBetween() roll 6 8}}
+			<div class="sheet-template-row template-center">Unholy Stench</div>
+		  {{/rollBetween() roll 6 8}}
+		  {{#rollBetween() roll 9 11}}
+			<div class="sheet-template-row template-center">Mind Warp</div>
+		  {{/rollBetween() roll 9 11}}
+          {{#rollBetween() roll 12 14}}
+			<div class="sheet-template-row template-center">Hoarfrost</div>
+		  {{/rollBetween() roll 12 14}}
+		  {{#rollBetween() roll 15 17}}
+			<div class="sheet-template-row template-center">Aura of Taint</div>
+		  {{/rollBetween() roll 15 17}}
+          {{#rollBetween() roll 18 20}}
+			<div class="sheet-template-row template-center">Memory Worm</div>
+		  {{/rollBetween() roll 18 20}}
+		  {{#rollBetween() roll 21 23}}
+			<div class="sheet-template-row template-center">Spoilage</div>
+		  {{/rollBetween() roll 21 23}}
+          {{#rollBetween() roll 24 26}}
+			<div class="sheet-template-row template-center">Haunting Breeze</div>
+		  {{/rollBetween() roll 24 26}}
+		  {{#rollBetween() roll 27 29}}
+			<div class="sheet-template-row template-center">Veil of Darkness</div>
+		  {{/rollBetween() roll 27 29}}
+		  {{#rollBetween() roll 30 32}}
+			<div class="sheet-template-row template-center">Distorted Reflections</div>
+		  {{/rollBetween() roll 30 32}}
+		  {{#rollBetween() roll 33 35}}
+			<div class="sheet-template-row template-center">Breath Leech</div>
+		  {{/rollBetween() roll 33 35}}
+		  {{#rollBetween() roll 36 38}}
+			<div class="sheet-template-row template-center">Demonic Mask</div>
+		  {{/rollBetween() roll 36 38}}
+		  {{#rollBetween() roll 39 41}}
+			<div class="sheet-template-row template-center">Unnatural Decay</div>
+		  {{/rollBetween() roll 39 41}}
+		  {{#rollBetween() roll 42 44}}
+			<div class="sheet-template-row template-center">Spectral Gale</div>
+		  {{/rollBetween() roll 42 44}}
+		  {{#rollBetween() roll 45 47}}
+			<div class="sheet-template-row template-center">Bloody Tears</div>
+		  {{/rollBetween() roll 45 47}}
+		  {{#rollBetween() roll 48 50}}
+			<div class="sheet-template-row template-center">The Earth Protests</div>
+		  {{/rollBetween() roll 48 50}}
+		  {{#rollBetween() roll 51 53}}
+			<div class="sheet-template-row template-center">Actinic Discharge</div>
+		  {{/rollBetween() roll 51 53}}
+		  {{#rollBetween() roll 54 56}}
+			<div class="sheet-template-row template-center">Warp Ghosts</div>
+		  {{/rollBetween() roll 54 56}}
+		  {{#rollBetween() roll 57 59}}
+			<div class="sheet-template-row template-center">Falling Upwards</div>
+		  {{/rollBetween() roll 57 59}}
+		  {{#rollBetween() roll 60 62}}
+			<div class="sheet-template-row template-center">Banshee Howl</div>
+		  {{/rollBetween() roll 60 62}}
+		  {{#rollBetween() roll 63 65}}
+			<div class="sheet-template-row template-center">The Furies</div>
+		  {{/rollBetween() roll 63 65}}
+		  {{#rollBetween() roll 66 68}}
+			<div class="sheet-template-row template-center">Shadow of the Warp</div>
+		  {{/rollBetween() roll 66 68}}
+		  {{#rollBetween() roll 69 71}}
+			<div class="sheet-template-row template-center">Tech Scorn</div>
+		  {{/rollBetween() roll 69 71}}
+          {{#rollBetween() roll 72 74}}
+			<div class="sheet-template-row template-center">Warp Madness</div>
+		  {{/rollBetween() roll 72 74}}
+		  {{#rollGreater() roll 75}}
+			<div class="sheet-template-row template-center">Perils of the Warp</div>
+		  {{/rollGreater() roll 75}}
+        </div>
+		{{/phenomena}}
+		
+		
+		
+		{{#perils}}
+		<div class="sheet-template-header">{{character}} rolls for Perils of the Warp (p228)</div>
+        <div class="sheet-template-content">
+          <div class="sheet-template-row template-center">Severity: {{roll}} </div>
+		  {{#rollBetween() roll 1 5}}
+			<div class="sheet-template-row template-center">The Gibbering</div>
+		  {{/rollBetween() roll 1 5}}
+          {{#rollBetween() roll 6 9}}
+			<div class="sheet-template-row template-center">Warp Burn</div>
+		  {{/rollBetween() roll 6 9}}
+          {{#rollBetween() roll 10 13}}
+			<div class="sheet-template-row template-center">Psychic Concussion</div>
+		  {{/rollBetween() roll 10 13}}
+		  {{#rollBetween() roll 14 18}}
+			<div class="sheet-template-row template-center">Psy Blast</div>
+		  {{/rollBetween() roll 14 18}}
+          {{#rollBetween() roll 19 24}}
+			<div class="sheet-template-row template-center">Soul Sear</div>
+		  {{/rollBetween() roll 19 24}}
+		  {{#rollBetween() roll 25 30}}
+			<div class="sheet-template-row template-center">Locked In</div>
+		  {{/rollBetween() roll 25 30}}
+          {{#rollBetween() roll 31 38}}
+			<div class="sheet-template-row template-center">Chronological Incontinence</div>
+		  {{/rollBetween() roll 31 38}}
+		  {{#rollBetween() roll 39 46}}
+			<div class="sheet-template-row template-center">Psychic Mirror</div>
+		  {{/rollBetween() roll 39 46}}
+          {{#rollBetween() roll 47 55}}
+			<div class="sheet-template-row template-center">Warp Whispers</div>
+		  {{/rollBetween() roll 47 55}}
+		  {{#rollBetween() roll 56 58}}
+			<div class="sheet-template-row template-center">Vice Versa</div>
+		  {{/rollBetween() roll 56 58}}
+		  {{#rollBetween() roll 59 67}}
+			<div class="sheet-template-row template-center">Dark Summoning</div>
+		  {{/rollBetween() roll 59 67}}
+		  {{#rollBetween() roll 68 72}}
+			<div class="sheet-template-row template-center">Rending the Veil</div>
+		  {{/rollBetween() roll 68 72}}
+		  {{#rollBetween() roll 73 78}}
+			<div class="sheet-template-row template-center">Blood Rain</div>
+		  {{/rollBetween() roll 73 78}}
+		  {{#rollBetween() roll 79 82}}
+			<div class="sheet-template-row template-center">Cataclysmic Blast</div>
+		  {{/rollBetween() roll 79 82}}
+		  {{#rollBetween() roll 83 86}}
+			<div class="sheet-template-row template-center">Mass Possession</div>
+		  {{/rollBetween() roll 83 86}}
+		  {{#rollBetween() roll 87 90}}
+			<div class="sheet-template-row template-center">Reality Quake</div>
+		  {{/rollBetween() roll 87 90}}
+		  {{#rollBetween() roll 91 99}}
+			<div class="sheet-template-row template-center">Grand Possession</div>
+		  {{/rollBetween() roll 91 99}}
+		  {{#rollTotal() roll 100}}
+			<div class="sheet-template-row template-center">Annihiliation</div>
+		  {{/rollTotal() roll 100}}
+        </div>
+		{{/perils}}
 
 
 

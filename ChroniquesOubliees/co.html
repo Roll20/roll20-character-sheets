@@ -1,5 +1,5 @@
 <div class="mainBg"> <!-- FDP -->
-  <input type="hidden" name="attr_version" value="3.3" />
+  <input type="hidden" name="attr_version" value="3.4" />
   <input type="hidden" name="attr_pnj_default_jets_caches" value="false" />
   <!-- INPUT HIDDEN TYPE DE JETS -->
   <input type="hidden" name="attr_jetnormal" value="1d@{ETATDE}" />
@@ -329,7 +329,7 @@
                         <td class="boxinput-def"><input type="number" class="def" name="attr_DEFBOUCLIER" title="Bouclier" value="0" min="0" /></td>
                         <td class="boxinputlight-def"><input type="number" class="def" name="attr_DEFCAR" value="@{DEX}" title="Modificateur de Dextérité" disabled /></td>
                         <td class="boxinput-def"><input type="number" class="def" name="attr_DEFDIV" title="Bonus divers" value="0" /></td>
-                        <td class="boxinputlight-def"><input type="number" class="def" name="attr_DEF" value="10+(@{DEFARMURE}*@{DEFARMUREON})+(@{DEFBOUCLIER}*@{DEFBOUCLIERON})+@{DEFCAR}+@{DEFDIV}" title="Défense" disabled /></td>
+                        <td class="boxinputlight-def"><input type="number" class="def" name="attr_DEF" value="10+(@{DEFARMURE}*@{DEFARMUREON})+(@{DEFBOUCLIER}*@{DEFBOUCLIERON})+@{DEFCAR}+@{DEFDIV}-4*@{attaque_risquee_check}" title="Défense" disabled /></td>
                       </tr>
                       <tr>
                         <td class="textfat-def" style="text-align: right;">Malus</td>
@@ -427,8 +427,17 @@
             <div>
           <table  class="tabsep">
             <tr>
+        <input type='hidden' name='attr_armebonusoption' value='0' />
+        <input type='hidden' name='attr_armedmtemp' value='' />
+        <input type='hidden' name='attr_armedegats' value='{{degats=[[(@{armedmnbde}d@{armedmde}@{armedmrollmod}+[[@{armedmcar}]]+@{armedmdiv})@{division_attaque_assuree}]]}}' />
+        <input type='hidden' name='attr_armepoudre' value='{{poudre=}}' />
+        <input type='hidden' name='attr_armereussiteauto' value='{{attaqueautomatique=}}' />
+        <input type='hidden' name='attr_armedmrollmod' value='' />
+        <input type='hidden' name='attr_armeattrollmod' value='' />
+        <input type='hidden' name='attr_armeattnbde' value='1' />
+        <input type='hidden' name='attr_armeattde' value='@{ETATDE}' />
               <td>
-                <button type="roll" class="atk" name="roll_Arme" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[ 1d@{ETATDE}cs>@{armecrit}cf1 + [[@{armeatk}]] + @{armeatkdiv} ]]}} {{degats=[[@{armedmnbde}d@{armedmde}+[[@{armedmcar}]]+@{armedmdiv}]]}} {{special=@{armespec}}}" />
+                <button type="roll" class="atk" name="roll_Arme" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[ @{armeattnbde}d@{armeattde}@{armeattrollmod}cs>@{armecrit}cf1 + [[@{armeatk}]] + @{armeatkdiv} +@{bonus_attaque_option} +@{armebonusoption}]]}} @{armereussiteauto} @{armepoudre} @{armedegats} {{special=@{armespec}}} {{degats2=@{bonus_dm_option}}} {{dmtemp=@{armedmtemp}}}" />
               </td>
               <td class="boxinputleft-atk" style="min-width:130px;">
                 <input type="text" class="atk" style="width:11px; text-align:right; font-size:10px" name="attr_armelabel" value=0>
@@ -489,7 +498,7 @@
                     </select>
                   </td>
                   <td class="boxinputleft-atk" style="min-width: 180px;">
-                <textarea name="attr_armemodificateurs" class="atk" placeholder="Liste de modificateurs" spellcheck="false" title="Modificateurs d'attaque"></textarea>
+                <textarea name="attr_armemodificateurs" class="atk" placeholder="Liste de modificateurs" spellcheck="false" title="Modificateurs d'attaque, séparés par des virgules&#10; avantage: garde le meilleur de 2 dés&#10; avecd12: utilise le d12 en attaque&#10; auto: réussite automatique&#10; choc: peut faire des attaques non léthales sans malus&#10; désavantage: garde le moins bon de 2 dés&#10; explodeMax: dés de dégâts explosifs&#10; pasDeDmg: l'attaque ne fait pas de dégât&#10; poudre: arme à poudre&#10; reroll1: relance les 1 des dé de DM&#10; tempDmg: fait toujours des attaques non léthales"></textarea>
                   </td>
                   <td class="boxinputleft-atk">
                     <select class="carac-atk" style="width: 87px;" name="attr_armetypedegats" title="Type des dégâts">
@@ -515,6 +524,63 @@
             </div>
           </div>
         </fieldset>
+      </div>
+      <input type="checkbox" class="block-switch-arrow"><span class="textfatleft-atk">Options d'attaque</span><br/>
+      <div class="block-hidden-arrow"></div>
+      <div class="block-show-arrow"> <!-- Options d'attaque -->
+        <input type='hidden' name='attr_bonus_attaque_option' value='0' />
+        <input type='hidden' name='attr_bonus_dm_option' value='' />
+        <table>
+          <tr>
+            <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_en_puissance_check" title="Attaque en puissance utilisée" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque en puissance
+                  </td>
+                  <td>
+                  <input type='hidden' name='attr_malus_attaque_en_puissance' value='-5' />
+                  <span name="attr_malus_attaque_en_puissance"></span> en attaque et +
+                <input type="number" class="atk" style="width:32px;" name="attr_attaque_en_puissance" value="1" min="1" title="Nombre de dés de dommage ajoutés" />
+
+                                    d6 DM
+                  </td
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_assuree_check" title="Attaque assurée" value="1" unchecked>
+                  <input type='hidden' name='attr_division_attaque_assuree' value='' />
+                  </td>
+                  <td>
+                  Attaque assurée
+                  </td>
+                  <td>
+                    +5 en attaque et DM divisés par 2
+                  </td>
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_risquee_check" title="Attaque risquée" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque risquée
+                  </td>
+                  <td>
+                    +2 en attaque au contact et -4 en DEF
+                  </td>
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_dm_temp_check" title="Assomer" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque non léthale
+                  </td>
+                  <td>
+                    -2 en attaque si arme non adaptée
+                  </td>
+              </tr>
+            </table>
       </div>
     </div>
     <div class="tab-content tab2">
@@ -941,8 +1007,17 @@
             <div>
         <table  class="tabsep">
           <tr>
+        <input type='hidden' name='attr_armebonusoption' value='0' />
+        <input type='hidden' name='attr_armedmtemp' value='' />
+        <input type='hidden' name='attr_armedegats' value='{{degats=[[(@{armedmnbde}d@{armedmde}@{armedmrollmod}+@{armedm})@{division_attaque_assuree}]]}}' />
+        <input type='hidden' name='attr_armepoudre' value='{{poudre=}}' />
+        <input type='hidden' name='attr_armereussiteauto' value='{{attaqueautomatique=}}' />
+        <input type='hidden' name='attr_armedmrollmod' value='' />
+        <input type='hidden' name='attr_armeattrollmod' value='' />
+        <input type='hidden' name='attr_armeattnbde' value='1' />
+        <input type='hidden' name='attr_armeattde' value='@{ETATDE}' />
             <td>
-              <button type="roll" class="atk" name="roll_pnj_Arme" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[ 1d@{ETATDE}cs>@{armecrit}cf1 + @{armeatk}]]}} {{degats=[[@{armedmnbde}d@{armedmde}+@{armedm}]]}} {{special=@{armespec}}}" />
+              <button type="roll" class="atk" name="roll_pnj_Arme" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[ @{armeattnbde}d@{armeattde}@{armeattrollmod}cs>@{armecrit}cf1 + @{armeatk} +@{bonus_attaque_option} +@{armebonusoption}]]}} @{armereussiteauto} @{armedegats} @{armepoudre} {{special=@{armespec}}} {{degats2=@{bonus_dm_option}}} {{dmtemp=@{armedmtemp}}}" />
             </td>
             <td class="boxinputleft-atk" style="min-width:130px;">
                <input type="text" class="atk" style="width:11px; text-align:right; font-size:10px" name="attr_armelabel" value=0>
@@ -992,7 +1067,7 @@
                     </select>
                   </td>
                   <td class="boxinputleft-atk" style="min-width: 180px;">
-                <textarea name="attr_armemodificateurs" class="atk" placeholder="Liste de modificateurs" spellcheck="false" title="Modificateurs d'attaque"></textarea>
+                <textarea name="attr_armemodificateurs" class="atk" placeholder="Liste de modificateurs" spellcheck="false" title="Modificateurs d'attaque, séparés par des virgules&#10; avantage: garde le meilleur de 2 dés&#10; avecd12: utilise le d12 en attaque&#10; auto: réussite automatique&#10; choc: peut faire des attaques non léthales sans malus&#10; désavantage: garde le moins bon de 2 dés&#10; explodeMax: dé de dégâts explosifs&#10; pasDeDmg: l'attaque ne fait pas de dégâts&#10; poudre: arme à poudre&#10; reroll1: relance les 1 des dés de DM&#10; tempDmg: fait toujours des attaques non léthales"></textarea>
                   </td>
                   <td class="boxinputleft-atk">
                     <select class="carac-atk" style="width: 87px;" name="attr_armetypedegats" title="Type des dégâts">
@@ -1019,6 +1094,69 @@
           </div>
       </fieldset>
     </div>
+      <input type="checkbox" class="block-switch-arrow"><span class="textfatleft-atk">Options d'attaque</span><br/>
+      <div class="block-hidden-arrow"></div>
+      <div class="block-show-arrow"> <!-- Options d'attaque -->
+        <table>
+          <tr>
+                <td colspan='2'>
+                Attaque de groupe :
+                </td>
+                <td>
+                  <input type='hidden' name='attr_message_attaque_de_groupe' value="attaquant par jet" />
+                  <input type='number' class='atk' style="width:24px;" name="attr_attaque_de_groupe" value="1" min="1" title="Nombre d'attaques de pnj résolues en un jet" /> <span name='attr_message_attaque_de_groupe'></span>
+                </td>
+          </tr>
+          <tr>
+            <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_en_puissance_check" title="Attaque en puissance utilisée" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque en puissance
+                  </td>
+                  <td>
+                  <span name="attr_malus_attaque_en_puissance"></span> en attaque et +
+                <input type="number" class="atk" style="width:24px;" name="attr_attaque_en_puissance" value="1" min="1" title="Nombre de dés de dommage ajoutés" />
+
+                                    d6 DM
+                  </td
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_assuree_check" title="Attaque assurée" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque assurée
+                  </td>
+                  <td>
+                    +5 en attaque et DM divisés par 2
+                  </td>
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type='hidden' name='attr_defense_si_attaque_risquee' value='6'/>
+                    <input type="checkbox" name="attr_attaque_risquee_check" title="Attaque risquée" value="1" unchecked />
+                  </td>
+                  <td>
+                  Attaque risquée
+                  </td>
+                  <td>
+                  +2 en attaque au contact mais la DEF passe de <span name='attr_pnj_def'></span> à <span name='attr_defense_si_attaque_risquee'></span> pour 1 tour
+                  </td>
+              </tr>
+              <tr>
+                  <td style="text-align:center;">
+                    <input type="checkbox" name="attr_attaque_dm_temp_check" title="Assomer" value="1" unchecked>
+                  </td>
+                  <td>
+                  Attaque non léthale
+                  </td>
+                  <td>
+                    -2 en attaque si arme non adaptée
+                  </td>
+              </tr>
+            </table>
+      </div>
   </div> <!-- FIN fiche type PNJ -->
 </div> <!-- FIN FDP -->
 <!-- TEMPLATES -->
@@ -1056,6 +1194,7 @@
   </tr>
   {{/desc}}
   {{#attaque}}
+  {{^attaqueautomatique}}
   {{#rollWasCrit() attaque}}
   <tr><td colspan="2" style="color:green;"><b>Critique !</b></td></tr>
   {{/rollWasCrit() attaque}}
@@ -1068,9 +1207,23 @@
     <td class="tcat">Jet </td>
     <td>{{attaque}} contre DEF</td>
   </tr>
+  {{#poudre}}
+  <tr>
+    <td>
+      Dé de poudre
+    </td>
+    <td>
+      {{poudre}}
+    </td>
+  </tr>
+  {{/poudre}}
+  {{/attaqueautomatique}}
+  {{#attaqueautomatique}}
+  <tr><td colspan="2" style="color:green; text-align: center;">Réussite automatique</td></tr>
+  {{/attaqueautomatique}}
   {{#degats}}
   <tr>
-    <td class="tcat">Dégâts </td>
+    <td class="tcat">Dégâts {{#dmtemp}}temp.{{/dmtemp}}</td>
     <td>
       {{degats}}
       {{#rollWasCrit() attaque}}
@@ -1237,11 +1390,87 @@
         enleveAttaqueVisible('repeating_armes');
         enleveAttaqueVisible('repeating_pnjatk');
       }
+      if (verfdp < 3.4) {
+        appliqueModificateurs34('armes');
+        appliqueModificateurs34('pnjatk');
+        getAttrs(['pnj_def'], function(values) {
+          var def = parseInt(values.pnj_def);
+          if (isNaN(def) || def == 10) return;
+          setAttrs({
+            defense_si_attaque_risquee: def - 4
+          });
+        });
+      }
       setAttrs({
-        version: 3.3
+        version: 3.4
       });
     });
   });
+
+  function appliqueModificateurs34(section) {
+    getSectionIDs('repeating_' + section, function(idArray) {
+      idArray.forEach(function(id) {
+        var prefix = 'repeating_' + section + '_' + id + '_';
+        getAttrs([prefix + 'armemodificateurs'], function(values) {
+          var modifs = values[prefix + 'armemodificateurs'].split(',');
+          var attrs = {};
+          var nbDes = 1; //Nombre de dés pour l'attaque
+          var plusFort = true;
+          modifs.forEach(function(m) {
+            switch (m.trim()) {
+              case 'tempDmg':
+                attrs[prefix + 'armedmtemp'] = 1;
+                return;
+              case 'pasDeDmg':
+                attrs[prefix + 'armedegats'] = '{{degats=}}';
+                return;
+              case 'poudre':
+                attrs[prefix + 'armepoudre'] = '{{poudre=[[1d20]]}}';
+                return;
+              case 'auto':
+                attrs[prefix + 'armereussiteauto'] = '{{attaqueautomatique=1}}';
+                return;
+              case 'reroll1':
+                attrs[prefix + 'armedmrollmod'] = attrs[prefix + 'armedmrollmod'] || '';
+                attrs[prefix + 'armedmrollmod'] += 'r1';
+                return;
+              case 'explodeMax':
+                attrs[prefix + 'armedmrollmod'] = attrs[prefix + 'armedmrollmod'] || '';
+                attrs[prefix + 'armedmrollmod'] += '!';
+                return;
+              case 'avantage':
+              case 'm2d20':
+                if (plusFort) nbDes++;
+                else if (nbDes <= 1) {
+                  plusFort = true;
+                  nbDes = 2;
+                } else nbDes--;
+                return;
+              case 'desavantage':
+              case 'désavantage':
+                if (plusFort) {
+                  if (nbDes > 1) nbDes--;
+                  else {
+                    plusFort = false;
+                    nbDes = 2;
+                  }
+                } else nbDes++;
+                return;
+              case 'avecd12':
+                attrs[prefix + 'armeattde'] = '12';
+                return;
+            }
+          });
+          if (nbDes > 1) {
+            attrs[prefix + 'armeattnbde'] = nbDes;
+            if (plusFort) attrs[prefix + 'armeattrollmod'] = 'kh1';
+            else attrs[prefix + 'armeattrollmod'] = 'kl1';
+          }
+          setAttrs(attrs);
+        });
+      });
+    });
+  }
 
   function enleveAttaqueVisible(attr) {
     getSectionIDs(attr, function(idArray) {
@@ -1599,7 +1828,8 @@
       bonus = Math.floor((parseInt(values.DEXTERITE) - 10) / 2);
       if (!isNaN(bonus)) defense += bonus;
       setAttrs({
-        DEFDIV: new_def - defense
+        DEFDIV: new_def - defense,
+        defense_si_attaque_risquee: new_def - 4,
       });
     });
   });
@@ -2100,12 +2330,13 @@
     getAttrs(['DEFARMURE', 'DEFARMUREON'], function(values) {
       var def = parseInt(values.DEFARMURE);
       if (isNaN(def)) return;
-      if (eventinfo.previousValue > 0) {
-        if (def === 0 && values.DEFARMUREON) setAttrs({
+      var armureOn = parseInt(values.DEFARMUREON);
+      if (eventinfo.previousValue > 0 && eventinfo.previousValue != def) {
+        if (def === 0 && armureOn) setAttrs({
           DEFARMUREON: 0
         });
-      } else {
-        if (def > 0 && !values.DEFARMUREON) setAttrs({
+      } else { //comprend aussi le cas où previousValue == def, car c'est le cas si l'attribut n'a encore jamais été modifié
+        if (def > 0 && !armureOn) setAttrs({
           DEFARMUREON: 1
         });
       }
@@ -2115,12 +2346,13 @@
     getAttrs(['DEFBOUCLIER', 'DEFBOUCLIERON'], function(values) {
       var def = parseInt(values.DEFBOUCLIER);
       if (isNaN(def)) return;
-      if (eventinfo.previousValue > 0) {
-        if (def === 0 && values.DEFBOUCLIERON) setAttrs({
+      var bouclierOn = parseInt(values.DEFBOUCLIERON);
+      if (eventinfo.previousValue > 0 && eventinfo.previousValue != def) {
+        if (def === 0 && bouclierOn) setAttrs({
           DEFBOUCLIERON: 0
         });
       } else {
-        if (def > 0 && !values.DEFBOUCLIERON) setAttrs({
+        if (def > 0 && !bouclierOn) setAttrs({
           DEFBOUCLIERON: 1
         });
       }
@@ -2130,12 +2362,13 @@
     getAttrs(['casque_rd', 'casque_on'], function(values) {
       var rd = parseInt(values.casque_rd);
       if (isNaN(rd)) return;
-      if (eventinfo.previousValue > 0) {
-        if (rd === 0 && values.casque_on) setAttrs({
+      var casqueOn = parseInt(values.casque_on);
+      if (eventinfo.previousValue > 0 && eventinfo.previousValue != rd) {
+        if (rd === 0 && casqueOn) setAttrs({
           casque_on: 0
         });
       } else {
-        if (rd > 0 && !values.casque_on) setAttrs({
+        if (rd > 0 && !casqueOn) setAttrs({
           casque_on: 1
         });
       }
@@ -2204,4 +2437,283 @@
     });
   });
 
+  //Les options d'attaque
+  on('change:attaque_en_puissance', function(eventinfo) {
+    getAttrs(['attaque_en_puissance'], function(values) {
+      var bonus = parseInt(values.attaque_en_puissance);
+      if (isNaN(bonus) || bonus < 1) {
+        setAttrs({
+          attaque_en_puissance: 1
+        });
+        return;
+      }
+      setAttrs({
+        malus_attaque_en_puissance: -5 * bonus
+      });
+    });
+  });
+
+  on('change:attaque_en_puissance_check change:attaque_en_puissance change:attaque_de_groupe', function(eventinfo) {
+    getAttrs(['attaque_en_puissance_check', 'attaque_en_puissance', 'attaque_assuree_check', 'attaque_de_groupe'], function(values) {
+      var attrs = {};
+      var bonus = 0;
+      var attaque_en_puissance = parseInt(values.attaque_en_puissance_check) * parseInt(values.attaque_en_puissance);
+      var attaque_assuree = parseInt(values.attaque_assuree_check);
+      if (!isNaN(attaque_en_puissance) && attaque_en_puissance > 0) {
+        bonus -= 5 * attaque_en_puissance;
+        attrs.bonus_dm_option = '[[' + attaque_en_puissance + 'd6]]';
+        if (attaque_assuree) attrs.attaque_assuree_check = 0;
+      } else {
+        attrs.bonus_dm_option = '';
+        if (attaque_assuree) bonus += 5;
+      }
+      var attaque_groupe = parseInt(values.attaque_de_groupe);
+      if (isNaN(attaque_groupe) || attaque_groupe < 1) {
+        attaque_groupe = 1;
+        attrs.attaque_groupe = 1;
+      }
+      if (attaque_groupe == 1) {
+        attrs.message_attaque_de_groupe = 'attaquant par jet';
+      } else {
+        var bg = (attaque_groupe - 1) * 2;
+        attrs.message_attaque_de_groupe = 'attaquants par jet (+' + bg + ' en attaque, DM x2 si attaque > DEF + 5, et x3 si critique)';
+        bonus += bg;
+      }
+      attrs.bonus_attaque_option = bonus;
+      setAttrs(attrs);
+    });
+  });
+
+  on('change:attaque_assuree_check', function(eventinfo) {
+    getAttrs(['attaque_en_puissance_check', 'attaque_en_puissance', 'attaque_assuree_check', 'attaque_de_groupe'], function(values) {
+      var attrs = {};
+      var bonus = 0;
+      var attaque_en_puissance = parseInt(values.attaque_en_puissance_check) * parseInt(values.attaque_en_puissance);
+      var attaque_assuree = parseInt(values.attaque_assuree_check);
+      if (attaque_assuree) {
+        bonus += 5;
+        attrs.division_attaque_assuree = '/2';
+        if (isNaN(attaque_en_puissance) || attaque_en_puissance > 0)
+          attrs.attaque_en_puissance_check = 0;
+      } else {
+        attrs.division_attaque_assuree = '';
+        if (!isNaN(attaque_en_puissance) && attaque_en_puissance > 0)
+          bonus -= 5 * attaque_en_puissance;
+      }
+      var attaque_groupe = parseInt(values.attaque_de_groupe);
+      if (attaque_groupe > 1) {
+        bonus += (attaque_groupe - 1) * 2;
+      }
+      attrs.bonus_attaque_option = bonus;
+      setAttrs(attrs);
+    });
+  });
+
+  on('change:attaque_risquee_check change:attaque_dm_temp_check', function(eventinfo) {
+    getAttrs(['attaque_risquee_check', 'attaque_dm_temp_check'], function(values) {
+      var attaque_risquee = parseInt(values.attaque_risquee_check);
+      var attaque_non_lethale = parseInt(values.attaque_dm_temp_check);
+      var updateArmes = function(section) {
+        getSectionIDs('repeating_' + section, function(idArray) {
+          idArray.forEach(function(id) {
+            var prefix = 'repeating_' + section + '_' + id + '_';
+            getAttrs([prefix + 'armeportee', prefix + 'armemodificateurs'], function(values) {
+              var portee = values[prefix + 'armeportee'];
+              var modifs = values[prefix + 'armemodificateurs'].split(',');
+              var bonus = 0;
+              if (attaque_non_lethale) bonus = -2;
+              var attrs = {};
+              var dmTemp = attaque_non_lethale;
+              modifs.forEach(function(m) {
+                switch (m.trim()) {
+                  case 'tempDmg':
+                    dmTemp = true;
+                    if (attaque_non_lethale) bonus = 0;
+                    return;
+                  case 'choc':
+                    if (attaque_non_lethale) bonus = 0;
+                    return;
+                }
+              });
+              if (dmTemp) attrs[prefix + 'armedmtemp'] = 1;
+              else attrs[prefix + 'armedmtemp'] = '';
+              if (attaque_risquee && !portee) {
+                attrs[prefix + 'armebonusoption'] = bonus + 2;
+              } else {
+                attrs[prefix + 'armebonusoption'] = bonus;
+              }
+              setAttrs(attrs);
+            });
+          });
+        });
+      };
+      updateArmes('armes');
+      updateArmes('pnjatk');
+    });
+  });
+
+  const DEGATSPJ = '{{degats=[[(@{armedmnbde}d@{armedmde}@{armedmrollmod}+[[@{armedmcar}]]+@{armedmdiv})@{division_attaque_assuree}]]}}';
+
+  //Du coup, mise à jour aussi quand on change les attaques
+  on('change:repeating_armes:armeportee change:repeating_armes:armemodificateurs', function(eventinfo) {
+    getAttrs(['attaque_risquee_check', 'attaque_dm_temp_check', 'repeating_armes_armeportee', 'repeating_armes_armemodificateurs'], function(values) {
+      var attaque_risquee = parseInt(values.attaque_risquee_check);
+      var attaque_non_lethale = parseInt(values.attaque_dm_temp_check);
+      var portee = values.repeating_armes_armeportee;
+      var modifs = values.repeating_armes_armemodificateurs.split(',');
+      var bonus = 0;
+      if (attaque_non_lethale) bonus = -2;
+      var attrs = {};
+      var dmTemp = attaque_non_lethale;
+      var nbDes = 1; //Nombre de dés pour l'attaque
+      var plusFort = true;
+      attrs.repeating_armes_armedegats = DEGATSPJ;
+      attrs.repeating_armes_armepoudre = '{{poudre=}}';
+      attrs.repeating_armes_armereussiteauto = '{{attaqueautomatique=}}';
+      attrs.repeating_armes_armedmrollmod = '';
+      attrs.repeating_armes_armeattde = '@{ETATDE}';
+      modifs.forEach(function(m) {
+        switch (m.trim()) {
+          case 'tempDmg':
+            dmTemp = true;
+            if (attaque_non_lethale) bonus = 0;
+            return;
+          case 'choc':
+            if (attaque_non_lethale) bonus = 0;
+            return;
+          case 'pasDeDmg':
+            attrs.repeating_armes_armedegats = '{{degats=}}';
+            return;
+          case 'poudre':
+            attrs.repeating_armes_armepoudre = '{{poudre=[[1d20]]}}';
+            return;
+          case 'auto':
+            attrs.repeating_armes_armereussiteauto = '{{attaqueautomatique=1}}';
+            return;
+          case 'reroll1':
+            attrs.repeating_armes_armedmrollmod += 'r1';
+            return;
+          case 'explodeMax':
+            attrs.repeating_armes_armedmrollmod += '!';
+            return;
+          case 'avantage':
+          case 'm2d20':
+            if (plusFort) nbDes++;
+            else if (nbDes <= 1) {
+              plusFort = true;
+              nbDes = 2;
+            } else nbDes--;
+            return;
+          case 'desavantage':
+          case 'désavantage':
+            if (plusFort) {
+              if (nbDes > 1) nbDes--;
+              else {
+                plusFort = false;
+                nbDes = 2;
+              }
+            } else nbDes++;
+            return;
+          case 'avecd12':
+            attrs.repeating_armes_armeattde = '12';
+            return;
+        }
+      });
+      if (dmTemp) attrs.repeating_armes_armedmtemp = 1;
+      else attrs.repeating_armes_armedmtemp = '';
+      if (attaque_risquee && !portee) {
+        attrs.repeating_armes_armebonusoption = bonus + 2;
+      } else {
+        attrs.repeating_armes_armebonusoption = bonus;
+      }
+      attrs.repeating_armes_armeattnbde = nbDes;
+      if (nbDes > 1) {
+        if (plusFort) attrs.repeating_armes_armeattrollmod = 'kh1';
+        else attrs.repeating_armes_armeattrollmod = 'kl1';
+      } else attrs.repeating_armes_armeattrollmod = '';
+      setAttrs(attrs);
+    });
+  });
+
+  const DEGATSPNJ = '{{degats=[[(@{armedmnbde}d@{armedmde}@{armedmrollmod}+@{armedm})@{division_attaque_assuree}]]}}';
+
+  on('change:repeating_pnjatk:armeportee change:repeating_pnjatk:armemodificateurs', function(eventinfo) {
+    getAttrs(['attaque_risquee_check', 'attaque_dm_temp_check', 'repeating_pnjatk_armeportee', 'repeating_pnjatk_armemodificateurs'], function(values) {
+      var attaque_risquee = parseInt(values.attaque_risquee_check);
+      var attaque_non_lethale = parseInt(values.attaque_dm_temp_check);
+      var portee = values.repeating_pnjatk_armeportee;
+      var modifs = values.repeating_pnjatk_armemodificateurs.split(',');
+      var bonus = 0;
+      if (attaque_non_lethale) bonus = -2;
+      var attrs = {};
+      var dmTemp = attaque_non_lethale;
+      var nbDes = 1; //Nombre de dés pour l'attaque
+      var plusFort = true;
+      attrs.repeating_pnjatk_armedegats = DEGATSPNJ;
+      attrs.repeating_pnjatk_armepoudre = '{{poudre=}}';
+      attrs.repeating_pnjatk_armereussiteauto = '{{attaqueautomatique=}}';
+      attrs.repeating_pnjatk_armedmrollmod = '';
+      attrs.repeating_pnjatk_armeattde = '@{ETATDE}';
+      modifs.forEach(function(m) {
+        switch (m.trim()) {
+          case 'tempDmg':
+            dmTemp = true;
+            if (attaque_non_lethale) bonus = 0;
+            return;
+          case 'choc':
+            if (attaque_non_lethale) bonus = 0;
+            return;
+          case 'pasDeDmg':
+            attrs.repeating_pnjatk_armedegats = '{{degats=}}';
+            return;
+          case 'poudre':
+            attrs.repeating_pnjatk_armepoudre = '{{poudre=[[1d20]]}}';
+            return;
+          case 'auto':
+            attrs.repeating_pnjatk_armereussiteauto = '{{attaqueautomatique=1}}';
+            return;
+          case 'reroll1':
+            attrs.repeating_pnjatk_armedmrollmod += 'r1';
+            return;
+          case 'explodeMax':
+            attrs.repeating_pnjatk_armedmrollmod += '!';
+            return;
+          case 'avantage':
+          case 'm2d20':
+            if (plusFort) nbDes++;
+            else if (nbDes <= 1) {
+              plusFort = true;
+              nbDes = 2;
+            } else nbDes--;
+            return;
+          case 'desavantage':
+          case 'désavantage':
+            if (plusFort) {
+              if (nbDes > 1) nbDes--;
+              else {
+                plusFort = false;
+                nbDes = 2;
+              }
+            } else nbDes++;
+            return;
+          case 'avecd12':
+            attrs.repeating_pnjatk_armeattde = '12';
+            return;
+        }
+      });
+      if (dmTemp) attrs.repeating_pnjatk_armedmtemp = 1;
+      else attrs.repeating_pnjatk_armedmtemp = '';
+      if (attaque_risquee && !portee) {
+        attrs.repeating_pnjatk_armebonusoption = bonus + 2;
+      } else {
+        attrs.repeating_pnjatk_armebonusoption = bonus;
+      }
+      attrs.repeating_pnjatk_armeattnbde = nbDes;
+      if (nbDes > 1) {
+        if (plusFort) attrs.repeating_pnjatk_armeattrollmod = 'kh1';
+        else attrs.repeating_pnjatk_armeattrollmod = 'kl1';
+      } else attrs.repeating_pnjatk_armeattrollmod = '';
+      setAttrs(attrs);
+    });
+  });
 </script>

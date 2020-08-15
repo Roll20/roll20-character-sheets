@@ -9,9 +9,12 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-2020.0525 [Screenshot](cog_v3.png)
+V3.10 [Screenshot](cog_v3.png)
 
 # Notes de version
+## V3.10
+* Retour à un schema de versionning sémantique classique (major.minor.patch)
+
 ## V2020.0525
 * Reprise des dernières modifications de la fiche COC
 * Nouveau fichier .html pour la fiche
