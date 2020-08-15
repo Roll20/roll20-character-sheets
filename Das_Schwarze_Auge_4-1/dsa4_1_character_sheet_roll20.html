@@ -16737,6 +16737,46 @@ const combatTechniques = {
     "zweihand-hiebwaffen": { type: "melee",  ebe: -3,        "at-only": false },
     "zweihandschwerter":   { type: "melee",  ebe: -2,        "at-only": false }
 }
+
+/*
+Input: string with combatTechnique (as defined in const), BE ("Behinderung"/encumbrance)
+Output: Object with properties "be_at" and "be_pa"
+
+This function takes into account the effective encumbrance (eBE) and returns the corresponding modifiers for the AT/PA values.
+*/
+function calculateWeaponBEModifiers(combatTechnique, BE) {
+	var eBE = 0;
+	var BEModifiers = { "be_at": 0, "be_pa": 0 };
+	combatTechnique = String(combatTechnique);
+
+	// This should never happen, but in case the code gets edited in the wrong place ...
+	if ( !combatTechniques.hasOwnProperty(combatTechnique) ) {
+		console.log("Warnung: Kampftechnik \"" + combatTechnique + "\" unbekannt. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
+		return BEModifiers;
+	}
+
+	// Checking BE ...
+	if ( isNaN(parseInt(BE)) ) {
+		console.log("Warnung: Bei der BE \"" + String(BE) + "\" handelt es sich nicht um eine Ganzzahl. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
+		return BEModifiers;
+	}
+
+	// Calculate eBE
+	// Set eBE to 0 if it's undefined or if it's greater than BE
+	eBE = combatTechniques[combatTechnique][ "ebe" ];
+	eBE = eBE === undefined ? 0 : Math.max(0, BE + eBE);
+
+	// Melee AT/PA weapons: The remainder of odd eBEs goes to PA.
+	// Melee AT-only and ranged weapons: AT is reduced.
+	if (combatTechniques[combatTechnique][ "type" ] === "melee" && combatTechniques[combatTechnique][ "at-only" ] === false) {
+		BEModifiers[ "be_at" ] = Math.floor(eBE / 2);
+		BEModifiers[ "be_pa" ] = Math.ceil(eBE / 2);
+	} else {
+		BEModifiers[ "be_at" ] = eBE;
+	}
+
+	return BEModifiers;
+}
 /* 
     Methode die die waffenspezifische BE berechnet und nach AT und PA getrennt zurückgibt. 
     Benötigt
