@@ -12987,7 +12987,7 @@
     </div>
 
 
-    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20190513"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value="20171014"></b>
+    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20190513"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
     <br><b>Autoren: Gereon Heinemann (Original), Patrick Gebhardt, Steven 'Kreuvf' Koenig, apehead.</b>
     <br><b>Dank an: G V., Kai, SepDepp</b>
     </table>
@@ -15952,10 +15952,27 @@ Relevant character sheet versions
 */
 function migrationCheck() {
     getAttrs(["character_sheet_version", "data_version"], function(v) {
-        console.log("Checking versions before attempting data migration ...");
-        
+        console.log("Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
+
+        /*
+        If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
+        Since new characters do not need any migration, we just set the data_version to the current sheet version.
+
+        Why this is necessary
+        * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
+        * Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
+        * If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
+        * This would lead to no migrations being performed.
+        * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
+        */
+
+        if (isNaN(dataVersion)) {
+            setCurrentVersion();
+            return;
+        }
 
         let functionsToCall = [];
         let firstFunction;
