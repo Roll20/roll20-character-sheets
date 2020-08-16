@@ -22,6 +22,47 @@
             return codedLetters;
         }
 
+        function sheetVersionUpdater(currentVersion){
+            if (currentVersion < 1) {
+                console.log("Updating to version 1")
+                getSectionIDs("repeating_skills", skillsArray => {
+                    skillsArray.forEach( id => {
+                        updateRepeatingSkill("A", id)
+                        updateRepeatingSkill("B", id)
+                    });
+                });
+                getAttrs(["version"], function(values) {setAttrs({version: 1});});
+            }
+        }
+
+        function formatStatLetters(statA, statB) {
+            console.log(statB)
+            if (statA == 'empty-string' && statB == 'empty-string'){
+                return ""
+            } else {
+                return  " [" + getTranslationByKey(statA) + "+" + getTranslationByKey(statB) + "]"
+            }
+        }
+
+        function updateRepeatingSkill(letter, id=null) {
+            let base;
+            id ? base = `repeating_skills_${id}` : base = `repeating_skills`
+            getAttrs([`${base}_skillName${letter}`,`${base}_skillName${letter}Button`,`${base}_skillDie1${letter}`,`${base}_skillDie2${letter}` ],
+                function(values) {
+                    newName = values[`${base}_skillName${letter}`] + formatStatLetters(values[`${base}_skillDie1${letter}`], values[`${base}_skillDie2${letter}`])
+                    setAttrs({
+                        [`${base}_skillName${letter}Button`]: newName
+                    });
+                }
+            );
+        }
+
+        on('sheet:opened', () => {
+            getAttrs(['version'], v => {
+                sheetVersionUpdater(parseFloat(v.version) || 0);
+            });
+        });
+
         on("change:injury change:condition", function() {
             getAttrs(["condition", "injury"], function(values) {
                 setAttrs({
@@ -460,7 +501,12 @@
                 });
             });
         });
-
+        on("change:repeating_skills:skillNameA change:repeating_skills:skillDie1A change:repeating_skills:skillDie2A", function(event) {
+            updateRepeatingSkill('A')
+        });
+        on("change:repeating_skills:skillNameB change:repeating_skills:skillDie1B change:repeating_skills:skillDie2B", function(event) {
+            updateRepeatingSkill('B')
+        });
         on("sheet:opened", () => {
             getAttrs(["npc_switch"], v => {
                 if (v.npc_switch == "on") {
@@ -507,6 +553,7 @@
         <div class="sheet-block-a characterSheet">
             <!-- Hidden Fields -->
             <div class="hidden">
+                <input type="number" name="attr_version" value="0"/>
                 <input type="number" name="attr_typeInitiativeMod" value="0"/>
                 <input type="number" name="attr_typeDamageMod" value="0"/>
                 <input type="number" name="attr_classTravelMod" value="0"/>
@@ -809,10 +856,10 @@
                             <span class="spellTypes" name="attr_spellType" data-i18n-dynamic></span>
                         </div>
 
-                        <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-                        <span class="spell-toggles settings-toggle ">p</span>
-                        <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-                        <span class="spell-toggles collapse-toggle">i</span>
+                        <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                        <span class="config-toggles settings-toggle ">p</span>
+                        <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                        <span class="config-toggles collapse-toggle">i</span>
 
                         <div class="flex settings full-width">
                             <div class="flex-column">
@@ -838,7 +885,7 @@
                             <div class="flex-column">
                                 <span data-i18n="type">Type</span>
                                 <select name="attr_spellType" class="sheet-spellTypes">
-                                    <option value="empty-space"></option>
+                                    <option value="empty-string"         data-i18n="empty-string"></option>
                                     <option value="incantation"          data-i18n="incantation">Incantation</option>
                                     <option value="incantation-ritual"   data-i18n="incantation-ritual">Incantation (Ritual)</option>
                                     <option value="music"                data-i18n="music">Music</option>
@@ -1197,32 +1244,34 @@
                     </div>
                 </div>
 
-                <input type="checkbox" class="showDiv" name="attr_showFarmerSkills" value="1">
-                <div class="flex-column">
-                    <label class="header headerLabel itemLabel"><span data-i18n="side-job">Side Job</span></label>
-                    <div>
-                        <span data-i18n="name">Name</span>:
-                        <input type="text" name="attr_farmerSkillName"/>
-                        <span data-i18n="effect">Effect</span>:
-                        <input type="text" name="attr_farmerSkillEffect" class="spellEffect"/>
+                <span>
+                    <input type="checkbox" class="showDiv" name="attr_showFarmerSkills" value="1">
+                    <div class="flex-column">
+                        <label class="header headerLabel itemLabel"><span data-i18n="side-job">Side Job</span></label>
+                        <div>
+                            <span data-i18n="name">Name</span>:
+                            <input type="text" name="attr_farmerSkillName"/>
+                            <span data-i18n="effect">Effect</span>:
+                            <input type="text" name="attr_farmerSkillEffect" class="spellEffect"/>
 
-                        <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{farmerSkillName}}} {{die1=[[1d@{farmerSkillDie1}]]}} {{die2=[[1d@{farmerSkillDie2}]]}} {{bonusesAndPenalties=[[@{farmerSkillMod}-1[Skill Mod]+@{classSkillBonus}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_farmerSkillRoll"></button>
-                        <select name="attr_farmerSkillDie1" class="attributeType">
-                            <option value="@{currentStr}" data-i18n="str">STR</option>
-                            <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                            <option value="@{currentInt}" data-i18n="int">INT</option>
-                            <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                        </select> +
-                        <select name="attr_farmerSkillDie2" class="attributeType">
-                            <option value="@{currentStr}" data-i18n="str">STR</option>
-                            <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                            <option value="@{currentInt}" data-i18n="int">INT</option>
-                            <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                        </select> +
-                        <input type="number" name="attr_farmerSkillMod" value="0"/>
-                        <span data-i18n="automatic-negativeone">(automatic -1 is applied)</span>
+                            <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{farmerSkillName}}} {{die1=[[1d@{farmerSkillDie1}]]}} {{die2=[[1d@{farmerSkillDie2}]]}} {{bonusesAndPenalties=[[@{farmerSkillMod}-1[Skill Mod]+@{classSkillBonus}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_farmerSkillRoll"></button>
+                            <select name="attr_farmerSkillDie1" class="attributeType">
+                                <option value="@{currentStr}" data-i18n="str">STR</option>
+                                <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                <option value="@{currentInt}" data-i18n="int">INT</option>
+                                <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                            </select> +
+                            <select name="attr_farmerSkillDie2" class="attributeType">
+                                <option value="@{currentStr}" data-i18n="str">STR</option>
+                                <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                <option value="@{currentInt}" data-i18n="int">INT</option>
+                                <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                            </select> +
+                            <input type="number" name="attr_farmerSkillMod" value="0"/>
+                            <span data-i18n="automatic-negativeone">(automatic -1 is applied)</span>
+                        </div>
                     </div>
-                </div>
+                </span>
 
                 <span>
                     <input type="checkbox" class="showDiv" name="attr_showArtisanSkills" value="1">
@@ -1383,47 +1432,64 @@
 
                 <label class="header headerLabel itemLabel" data-i18n="additional-checks">Additional Checks</label>
                 <fieldset class="repeating_skills">
-                    <div class="flex-column">
-                        <div class="flex">
-                            <span data-i18n="name">Name</span>:
-                            <input type="text" name="attr_skillNameA"/>
-                            <div class="skillCheck classSkillRoll">
-                                <span data-i18n="roll">Roll</span>:
-                                <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA"></button>
-                                <select name="attr_skillDie1A" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
-                                <select name="attr_skillDie2A" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
+                    <div class="sheet-2colrow">
+                        <div class="col">
+                            <input class="config-toggles config-checkbox add-skill-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                            <div class="flex-between">
+                                <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA">
+                                    <span name="attr_skillNameAButton"></span>
+                                </button>
                                 <input type="number" name="attr_skillModA" value="0"/>
                             </div>
+
+                            <div class="flex flex-vertical-center settings">
+                                <input type="text" name="attr_skillNameA" data-i18n-placeholder="name" placeholder="name"/>
+                                <div class="skillCheck classSkillRoll">
+                                    <select name="attr_skillDie1A" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select> +
+                                    <select name="attr_skillDie2A" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="flex">
-                            <span data-i18n="name">Name</span>:
-                            <input type="text" name="attr_skillNameB"/>
-                            <div class="skillCheck classSkillRoll">
-                                <span data-i18n="roll">Roll</span>:
-                                <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA"></button>
-                                <select name="attr_skillDie1B" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
-                                <select name="attr_skillDie2B" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
+                        <div class="col">
+                            <input class="config-toggles config-checkbox add-skill-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                            <span class="config-toggles settings-toggle add-skill-icon">p</span>
+                            <div class="flex-between">
+                                    <button class="skill-check-button"  type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA">
+                                    <span name="attr_skillNameBButton"></span>
+                                </button>
                                 <input type="number" name="attr_skillModB" value="0"/>
+                            </div>
+
+                            <div class="flex flex-vertical-center settings">
+                                <input type="text" name="attr_skillNameB" data-i18n-placeholder="name" placeholder="name"/>
+                                <div class="skillCheck classSkillRoll">
+                                    <select name="attr_skillDie1B" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select> +
+                                    <select name="attr_skillDie2B" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1991,10 +2057,10 @@
                                     <span class="gmpc-repeatingName" name="attr_benedictionName"></span>
                                 </label>
 
-                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-				                <span class="spell-toggles settings-toggle ">p</span>
-                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-				                <span class="spell-toggles collapse-toggle">i</span>
+                                <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="config-toggles settings-toggle ">p</span>
+                                <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+				                <span class="config-toggles collapse-toggle">i</span>
 
                                 <div class="settings">
                                     <div class="flex-column">
@@ -2020,10 +2086,10 @@
                                     <span data-i18n="lp-cost">LP Cost</span>:<span class="reveilCost" name="attr_reveilCost"></span>
                                 </div>
 
-                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-				                <span class="spell-toggles settings-toggle ">p</span>
-                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-                                <span class="spell-toggles collapse-toggle">i</span>
+                                <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="config-toggles settings-toggle ">p</span>
+                                <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                                <span class="config-toggles collapse-toggle">i</span>
 
                                 <div class="settings">
                                     <div class="flex-column">
