@@ -609,7 +609,7 @@
 							<input type="checkbox" class="sheet-hidden sheet-advancement-checkbox" name="attr_circles_advancement" value="1"><span class="sheet-hidden sheet-advancement-checkbox"></span>
 						</div>
 						<div class="sheet-rating">
-							<input class="sheet-underlined-input sheet-edit" type="number" name="attr_circles" min="0" max="10" value="0">
+							<input class="sheet-underlined-input sheet-edit" type="number" name="attr_circles" min="1" max="10" value="1">
 							<span class="sheet-underlined-span sheet-play sheet-handwritten sheet-font-big" name="attr_circles"></span>
 						</div>
 						<div class="sheet-advancement">
@@ -650,7 +650,7 @@
 							<button type="roll" class="sheet-hidden sheet-simple_roll sheet-beginner_luck" name="roll_nature_beginner_luck" value="&{template:simple} {{roll_name=Nature}} {{bl=w}} {{number_of_dice=[[[[round(@{nature}/2)]][Nature]@{conditions_modifier}]]}} {{result=[[[[[[round(@{nature}/2)]][Nature]@{conditions_modifier}]]d6>4]]}} @{roll_template_conditions} {{character=@{character_name}}}">
 								<span class="sheet-bold">Nature</span>
 							</button>
-							<input type="checkbox" class="sheet-hidden sheet-complex_roll" name="attr_will_trigger" value="1"><span class="sheet-bold sheet-hidden sheet-complex_roll">Nature</span>
+							<input type="checkbox" class="sheet-hidden sheet-complex_roll" name="attr_nature_trigger" value="1"><span class="sheet-bold sheet-hidden sheet-complex_roll">Nature</span>
 							<input type="hidden" class="sheet-flag sheet-show-advancement" name="attr_nature_show_advancement" value="0">
 							<input type="checkbox" class="sheet-hidden sheet-advancement-checkbox" name="attr_nature_advancement" value="1"><span class="sheet-hidden sheet-advancement-checkbox"></span>
 						</div>
@@ -4151,7 +4151,7 @@ on("sheet:opened", function(eventinfo) {
 			const bl = bl_suffix && bl_suffix !== "" ? true : false;
 			let town_conditions_modifier = ""; let conditions_modifier = ""; let conflict_conditions_modifier = "";
 
-			if(trigger_attribute === "fresh") {
+			if(trigger_attribute === "fresh" && fresh && fresh !== "0") {
 				update["hungry_and_thirsty"] = 0;	update["angry"] = 0;update["afraid"] = 0;	update["exhausted"] = 0; update["injured"] = 0;	update["sick"] = 0;	update["dead"] = 0;
 				conditions_modifier = bl ? "+2[Fresh]" : "+1[Fresh]";
 				town_conditions_modifier = bl ? "+2[Fresh]" : "+1[Fresh]";
@@ -4300,7 +4300,7 @@ on("sheet:opened", function(eventinfo) {
 			if(trigger === "recovery") {
 				base_mod = parseInt(health, 10);
 			}
-			if(base_mod === 0) {
+			if(base_mod === 0 && trigger != "resources") {
 				let bl_type = "will";
 				if(trigger.includes("skill")) {
 					bl_type = attributes[trigger + "_bl_d"] === 'w' ? "will" : "health";
@@ -4352,11 +4352,6 @@ on("sheet:opened", function(eventinfo) {
 		};
 		setAttrs(update, {silent: true});
 	};
-
-	// const doComplexRoll = () => {
-	// 	console.log("DOING COMPLEX ROLL!!!");
-	// 	closeComplexRollModal();
-	// }
 
 	const bl_map = {
 		"alchemist": "will",
@@ -4493,7 +4488,8 @@ on("sheet:opened", function(eventinfo) {
 			if(initialized) {
 				return;
 			}
-			activateComplexRollModal("will", true);
+			updateConditions("fresh");
+			activateComplexRollModal("resources", true);
 			setAttrs({initialized: "true"});
 		});
 	}
@@ -4560,9 +4556,4 @@ on("sheet:opened", function(eventinfo) {
 		checkStigmata();
 	})
 
-	// on("change:complex_roll_listener", eventinfo => {
-	// 	console.log("HEARD LISTENER");
-	// })
-
-	
 </script>

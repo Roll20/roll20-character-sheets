@@ -253,10 +253,8 @@ const resetConditionTrack = eventinfo => {
 
 //Calculate Matrix Initiatve.
 const updateMatrixInitiative = () => {
-  getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level", "matrix_dice_modifier", "edge_toggle"], v => {
+  getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "matrix_mod_modifier", "host_rating", "level"], v => {
     const sheetType = v.sheet_type;
-    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
-
     v = processingFunctions.parseIntegers(v);
 
     let base = v.data_processing;
@@ -266,8 +264,31 @@ const updateMatrixInitiative = () => {
 
     setAttrs({
       ["matrix_mod"]: total,
-      ["matrix_dice"]: edgeFlag ? 5 : 4 + v.matrix_dice_modifier,
       ["display_matrix_mod"]: v.matrix_mod_modifier === 0 ? base : `${base} (${total})`
+    })
+  })
+}
+
+const updateMatrixInitiativeDice = () => {
+  getAttrs(["matrix_dice_modifier", "edge_toggle", "matrix_mode_toggle", "initiative_dice"], v => {
+    const matrixAttrs = {
+      dice: processingFunctions.parseInteger(v.initiative_dice) || 1, 
+      modifer: processingFunctions.parseInteger(v.matrix_dice_modifier), 
+      edge: v.edge_toggle === "@{edge}" ? true : false,
+      mode: v.matrix_mode_toggle,
+    }
+    const matrixDice = shadowrunFunctions.determineMatrixDice(matrixAttrs)
+
+    setAttrs({
+      ["matrix_dice"]: matrixDice
+    })
+  })
+}
+
+const updateHotSimsBonus = () => {
+  getAttrs(["matrix_mode_toggle"], v => {
+    setAttrs({
+      ["hot_sim"]: v.matrix_mode_toggle == "hot" ? 2 : 0
     })
   })
 }
@@ -276,7 +297,6 @@ const updateMatrixInitiative = () => {
 const updateDefaultAttribute = newValue => {
   getAttrs(["default_display"], value => {
     const display   = value.default_display
-    let update      = {};
 
     //This sets a hidden input with the Attribute name so the roll template can use it to indicate what attribute was rolled
     const attribute   = processingFunctions.sliceAttr(newValue)

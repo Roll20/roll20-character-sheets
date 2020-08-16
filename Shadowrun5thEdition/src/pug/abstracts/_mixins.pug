@@ -4,11 +4,11 @@ mixin rollButton(header, base, rollFormula)
 
 //- SKILL BUTTON
 mixin skillButton(specialization, skillType)
-    - const rollName = specialization === true ? 'specialization' : 'skill';
-    - const rollFormula = specialization === true ? '@{dicepool}+@{attribute}+2' : '@{dicepool}+@{attribute}';
-    - const desc = specialization === true ? 'Spec: @{specialization}, @{display_limit} @{limit}' : '@{display_limit} @{limit}';
-    - const display = specialization === true ? 'attr_specialization' : skillType != 'active' ? 'attr_skill' : 'attr_display_skill';
-    button.eclipse(name=`roll_${rollName}` type='roll' value!=rollBeginging+'{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[(('+rollFormula+')'+rollEnding+'{{desc='+desc+'}}')
+    - const rollName = specialization ? 'specialization' : 'skill';
+    - const specBonus = specialization ? '+ 2 [Specialization Bonus]' : '';
+    - const specDescription = specialization ? 'Spec: @{specialization}, ' : '';
+    - const display = specialization ? 'attr_specialization' : skillType != 'active' ? 'attr_skill' : 'attr_display_skill';
+    button.eclipse(name=`roll_${rollName}` type='roll' value!=rollBeginging+`{{header=@{skill}}}{{base=@{display_attribute}}}{{dice=[[((@{dicepool} [Skill] + @{attribute} [Attribute] ${specBonus} + @{hot_sim} [Hot Sim] - @{running_silent} [Running Silent])${rollEnding}{{desc=${specDescription}@{display_limit} @{limit}}}`)
         span(name=display)
 
 //- ROLLS
@@ -208,3 +208,8 @@ mixin repeatingPCVehicles(attribute)
   each val in ['base', 'modifier', 'temp']
     label(data-i18n-title=`${attribute} ${val}`)
       input(name=`attr_${attribute}_${val}` placeholder="#" title=`${repeatingRowVehicle}_${val}` type="number")
+
+//- MATRIX BUTTONS
+mixin matrixRolls(attribute, matrixAttribute)
+   button.text-left.font-bolder(type="roll" name=matrixAttribute value=`${rollBeginging}{{header=^{${matrixAttribute}}}}{{base=^{${matrixAttribute}}}}{{dice=[[(@{${attribute}}+@{persona_${matrixAttribute}_temp}+(?{Attribute|Willpower,@{willpower}|Logic,@{logic}|Intuition,@{intuition}|Charisma,@{charisma}})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}` title="Roll attack" data-i18n=matrixAttribute)
+
