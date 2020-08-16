@@ -16677,6 +16677,44 @@ function calculateRuestungBE(values, eventInfo) {
     attrsToChange["Ges_BE"] = totalBe;
     return attrsToChange;
 }
+/*
+	x.5 values are always rounded up in this system, so let's have a function for this.
+*/
+function DSAround (num) {
+	num = parseFloat(num);
+
+	if (isNaN(num)) {
+		console.log("DSAround: NaN encountered.", "num is \"" + num + "\".");
+		return NaN;
+	}
+
+	num = roundDecimals(num, 1);
+	// Round down if fraction is less than 0.5; abs() to handle negative values correctly as well
+	if (Math.abs(num) % 1 < 0.5) {
+		num = Math.floor(num);
+	} else {
+		num = Math.ceil(num);
+	}
+
+	return num;
+}
+
+/*
+	JavaScript's Math.round() only rounds to 0 decimal places.
+	Using the toFixed() + parseFloat() method is cumbersome, so here we are with a new function.
+*/
+function roundDecimals (num, digits) {
+	num = parseFloat(num);
+	digits = parseInt(digits);
+
+	if (isNaN(num) || isNaN(digits)) {
+		console.log("roundDecimals: NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
+		return NaN;
+	}
+
+	num = parseFloat(num.toFixed(digits));
+	return num;
+}
 
 // Berechne BE-Basis aus dem gesamten Rüstungs BE und der BE durch Last
 on("change:Ges_BE change:BE_Last", function(eventInfo) {
