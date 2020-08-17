@@ -68,6 +68,8 @@
 	
 	<input type="hidden" name="attr_show_roll_modifiers" value="0" />
 	<input type="hidden" name="attr_roll_modifier_types" value="" />
+	<input type="hidden" name="attr_roll_modifier_summary" value="" />
+	<input type="hidden" name="roll_trait_summary" value="" />
 	<div class="modal">
 		<div class="modal-dialog">
 			<div class="modal-header">
@@ -233,7 +235,7 @@
 									<div class="tooltip">
 										<span data-i18n="low-pain-threshold-label">Low Pain Threshold</span>
 										<span class="tooltiptext">
-											<span data-i18n="high-pain-threshold-tooltip">If checked, Low Pain Threshold doubles shock and pain penalties. See B142.</span>
+											<span data-i18n="low-pain-threshold-tooltip">If checked, Low Pain Threshold doubles shock and pain penalties. See B142.</span>
 										</span>
 									</div>
 								</div>
@@ -10632,11 +10634,58 @@ See notes for weapon.</textarea>
 	};
 	
 	/**
-	 * These fields modify a skill rolls.
+	 * Defines all the skill modifiers
+	 * used to total modifier, determine max9, and description summary.
+	 * If isDropDown, value modifier is pulled from the drop-down value or special value based on radio button
+	 * Map => key = field_name. value = { int modifier, string description, bool affectsVisibility, bool isDropDown, bool isMax9, bool isTrait, bool checkPain}
+	 */
+	const rollModifiers = new Map([
+		["night_vision", {modifier: 0, description: "Night Vision", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: true, checkPain: false}],
+		["has_dark_vision", {modifier: 0, description: "Dark Vision", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false}],
+		["is_used_to_blindness", {modifier: 0, description: "Used to blindness", affectsVisibility: true, isDropDown: false, isMax9: false, isTrait: true, checkPain: false}],
+		["has_high_pain_threshold", {modifier: 0, description: "High Pain Threshold", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: true, checkPain: false}],
+		["shock_penalty", {modifier: 0, description: "Shock", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: true}],
+		["dialog_custom_roll_modifier", {modifier: 0, description: "Custom modifier", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["darkness_penalty", {modifier: 0, description: "Darkness", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["visiblity_condition", {modifier: 0, description: "Based on selected condition", affectsVisibility: true, isDropDown: false, isMax9: true, isTrait: false, checkPain: false}],
+		["darkness_penalty", {modifier: 0, description: "Darkness", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["smoke_penalty", {modifier: 0, description: "Smoke", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["fog_penalty", {modifier: 0, description: "Fog", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["blur_penalty", {modifier: 0, description: "Blur", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["other_vision_penalty", {modifier: 0, description: "Other vision penalty", affectsVisibility: true, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["coughing_sneezing_iq", {modifier: -1, description: "IQ Coughing/Sneezing", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["coughing_sneezing_dx", {modifier: -3, description: "DX Coughing/Sneezing", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["drowzy", {modifier: -2, description: "Drowzy", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["tipsy", {modifier: -1, description: "Tipsy", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["drunk", {modifier: -2, description: "Drunk", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["euphoria", {modifier: -3, description: "Euphoria", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["distraction", {modifier: 0, description: "Distraction", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["pain_level", {modifier: 0, description: "Pain", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: true}],
+		["bad_footing", {modifier: 0, description: "Bad Footing", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["shield_close_combat_penalty", {modifier: 0, description: "Close combat with shield", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["grappled", {modifier: -4, description: "Grappled", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["holding_large_shield", {modifier: -2, description: "Holding Large Shield", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["task_difficulty", {modifier: 0, description: "Task Difficulty", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["task_extra_time", {modifier: 0, description: "Extra time for task", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["task_haste", {modifier: 0, description: "Hurry task", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["unfamiliar_culture", {modifier: -3, description: "Unfamiliar Culture", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["language_modifier", {modifier: 0, description: "Language Modifier", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["iq_tech_level_modifier", {modifier: 0, description: "IQ based Tech Level Modifier", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["non_iq_tech_level_modifier", {modifier: 0, description: "Non-IQ based Tech Level Modifier", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["task_equipment_modifier", {modifier: 0, description: "Equipment modifier", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["task_missing_items", {modifier: 0, description: "Missing items from equipment", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["task_damaged_equipment", {modifier: 0, description: "Damaged equipment", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["unfamiliar_equipment", {modifier: -2, description: "Unfamiliar Equipment", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		
+	]);
+
+	/**
+	 * These fields modify a skill roll
 	 **/
 	const skillModifierFields = [
 		"shock_penalty",
 		"dialog_custom_roll_modifier",
+		"dialog_custom_roll_modifier_reason",
 		"night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
@@ -10679,6 +10728,7 @@ See notes for weapon.</textarea>
 	 const techniqueModifierFields = [
 	 "shock_penalty",
 		"dialog_custom_roll_modifier",
+		"dialog_custom_roll_modifier_reason",
 		"night_vision",
 		"has_dark_vision",
 		"has_high_pain_threshold",
@@ -17814,14 +17864,31 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			let visibilityMod = 0;
 
-			[visibilityMod, max9] = getVisibilityModifiers(values);
+			let visibilitySummary;
 
-			let rollModifier = getTotalSkillRollModifiers(values, visibilityMod);
+			let rollModifierSummary;
+
+			let rollModifier = 0;
+
+			let traitSummary;
+
+			[rollModifier, max9, rollModifierSummary, traitSummary] = getRollModifiers(values);
+		 
+			[visibilityMod, max9, visibilitySummary] = getVisibilityModifiers(values);
+
+			// use javascript spread operator to copy values and then merge into finalSummary
+			let finalSummary = new Map([...rollModifierSummary, ...visibilitySummary]);
+
+			let strSummary = mapToString(finalSummary);
+
+			let strTraitSummary = mapToString(traitSummary);
 
 			let updateFields = {
 				"max_skill_nine": max9,
 				"visibility_modifier": visibilityMod,
-				"roll_modifier": rollModifier,
+				"roll_modifier": rollModifier + visibilityMod,
+				"roll_modifier_summary": strSummary,
+				"roll_trait_summary": strTraitSummary,
 			};
 
 			setAttrs(updateFields, {silent: true});
@@ -17831,11 +17898,30 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
-	 * Determine visibility modifiers
+	 * Convert Javascript Map to a string value
+	 * see: https://www.cloudhadoop.com/2018/09/typescript-how-to-convert-map-tofrom.html
+	 */
+	function mapToString(map) {
+
+		let jsonObject = {};
+
+		let mapString = "";
+
+		map.forEach((value, key) => {  
+    		mapString += `${value}\n`;
+		});
+
+		return mapString;
+
+	}
+
+	/**
+	 * Determine visibility modifiers, if max skill 9 should apply
+	 * and generate summary.
 	 * 
 	 * @param array values An array of field values
 	 *
-	 * @return array  [visibilityMod, max9] [int, int]
+	 * @return array  [visibilityMod, max9, summary] [int, int, Map]
 	 */
 	function getVisibilityModifiers(values) {
 
@@ -17863,23 +17949,30 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let max9 = 0;
 
+		let summary = new Map();
+
+		let summaryValue = "";
+
 		switch (visibilityCondition) {
 			case 1:
 				// can't see anything
 				visibilityMod = -10;
 				max9 = 1;
+				summaryValue = " (Can't see anything)";
 				break;
 
 			case 2:
 				// can't see target
 				visibilityMod = -6;
 				max9 = 1;
+				summaryValue = " (Can't see target)";
 				break;
 
 			case 3:
 				// can't see target, but know location
 				visibilityMod = -4;
 				max9 = 1;
+				summaryValue = " (Can't see anything, but now know location)";
 				break;
 		
 			default:
@@ -17915,20 +18008,31 @@ The attacker may choose to hit the original target or the limb you used to parry
 			visibilityMod = -10;
 		}
 
-		return [visibilityMod, max9];
+		if (visibilityMod !== 0) {
+
+			summaryValue = `${visibilityMod} due to visibility${summaryValue}`;
+
+			summary.set("Visibility", summaryValue);
+
+		}
+
+		return [visibilityMod, max9, summary];
 
 	}
 
 	/**
-	 * Totals up the total skill roll modifiers
-	 * based on the selected roll type.
-	 *
-	 * @param array values        An arraty of get attribute values
-	 * @param int   visibilityMod The precalculated visibility modifier
-	 *
-	 * @return int Return total total modifier
+	 * Determine the roll modifiers by the selected fields 
+	 * and by getting information from the rollModifiers constant variable. 
+	 * 
+	 * @param object values An object of input fields
+	 * 
+	 * @return [int totalMod, bool max9, Map summary, Map traitSummary]
 	 */
-	function getTotalSkillRollModifiers(values, visibilityMod) {
+	function getRollModifiers(values) {
+
+		let summary = new Map();
+
+		let traitSummary = new Map();
 
 		let totalMod = 0;
 
@@ -17936,83 +18040,77 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let hasLowPainThreshold = +values.has_low_pain_threshold;
 
-		let shockPenalty = getShockPenalty(+values.shock_penalty, hasHighPainThreshold, hasLowPainThreshold);
+		let max9 = false;
 
-		totalMod += shockPenalty;
+		// loop through each input values
+		for (let key in values) {
 
-		totalMod += +values.dialog_custom_roll_modifier;
+			if (values.hasOwnProperty(key)) {
 
-		if (+values.coughing_sneezing_iq) {
-			totalMod += -1;
+				// get the value of the input field
+				let value = +values[key];
+
+				let modifier = 0;
+
+				let description = "";
+
+				// get the field information by key
+				// field = key (field_name): value = { int modifier, string description, bool affectsVisibility, bool isDropDown, bool isMax9, bool isTrait, bool checkPain}
+				let field = rollModifiers.get(key);
+
+				// ignore traits and affectsVisibility
+				if (field && field.isTrait === false && field.affectsVisibility === false) {
+
+					// if drop-down, then use the value in the drop-down
+					if (field.isDropDown) {
+						modifier = value;
+					} else if (value) {
+						// if checked, otherwise use the value in the field information object
+						modifier = field.modifier;
+					}
+
+					// check for special modifiers
+					if (key === "shock_penalty") {
+						modifier = getShockPenalty(modifier, hasHighPainThreshold, hasLowPainThreshold);
+					} else if (key === "pain_level") {
+						modifier = getPainLevelPenalty(modifier, hasHighPainThreshold, hasLowPainThreshold);
+					}
+
+					totalMod += modifier;
+
+					// check for special description
+					if (key === "dialog_custom_roll_modifier" && values.dialog_custom_roll_modifier_reason) {
+						description = values.dialog_custom_roll_modifier_reason;
+					} else {
+						description = field.description;						
+					}
+
+					// only add a description if there's a modifier value
+					if (modifier > 0) {
+						summary.set(key, `+${modifier} ${description}`);
+					} else if (modifier < 0) {
+						summary.set(key, `${modifier} ${description}`);
+
+						max9 = field.isMax9;
+					}
+
+				} else if (field && field.isTrait) {
+
+					// if there's a trait with a selected modifier, display the modifier and the description
+					if (field.isDropDown && value !== 0) {
+						traitSummary.set(key, `+${value} ${field.description}`);
+					} else if (value) {
+						// if the trait is a checkbox, just show the description
+						traitSummary.set(key, `${field.description}`);
+					}
+
+				}
+
+			}
+
 		}
 
-		if (+values.coughing_sneezing_dx) {
-			totalMod += -3;
-		}
-
-		if (+values.drowzy) {
-			totalMod += -2;
-		}
-
-		if (+values.tipsy) {
-			totalMod += -1;
-		}
-
-		if (+values.drunk) {
-			totalMod += -2;
-		}
-
-		if (+values.euphoria) {
-			totalMod += -3;
-		}
-
-		totalMod += +values.distraction;
-
-		let painLevelPenalty = getPainLevelPenalty(+values.pain_level, hasHighPainThreshold, hasLowPainThreshold);
-
-		totalMod += painLevelPenalty;
-
-		totalMod += +values.bad_footing;
-
-		totalMod += +values.shield_close_combat_penalty;
-
-		if (+values.grappled) {
-			totalMod += -4;
-		}
-		
-		if (+values.holding_large_shield) {
-			totalMod += -2;
-		}
-		
-		totalMod += +values.task_difficulty;
-
-		totalMod += +values.task_extra_time;
-
-		totalMod += +values.task_haste;
-
-		if (+values.unfamiliar_culture) {
-			totalMod += -3;
-		}
-		
-		totalMod += +values.language_modifier;
-
-		totalMod += +values.iq_tech_level_modifier;
-
-		totalMod += +values.non_iq_tech_level_modifier;
-
-		totalMod += +values.task_equipment_modifier;
-
-		totalMod += +values.task_missing_items;
-
-		totalMod += +values.task_damaged_equipment;
-
-		if (+values.unfamiliar_equipment) {
-			totalMod += -2;
-		}
-
-		totalMod += visibilityMod;
-		
-		return totalMod;
+		return [totalMod, max9, summary, traitSummary];
 
 	}
 
