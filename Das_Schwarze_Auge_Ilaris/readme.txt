@@ -131,3 +131,5 @@ Neue Features:
 
 1.6:
 - GM-Roll-Funktion hinzugefügt.
+
+1.6.1: Fix der Anzeige von Würfelbuttons.
