@@ -1,8 +1,8 @@
 <div>
-    <button type="action" name="act_main" >PC</button>
-    <button type="action" name="act_NPC" >NPC</button>
-    <button type="action" name="act_Vaesen" >Vaesen</button>
+    <button type="action" name="act_main">PC</button>
     <button type="action" name="act_HQ">Headquarters</button>
+    <button type="action" name="act_NPC">NPC</button>
+    <button type="action" name="act_Vaesen" class="gmtab">Vaesen</button>
 </div>
 
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main">
@@ -128,7 +128,7 @@
         
         <br>
         <fieldset class="repeating_equipment">
-            <input class="longtext" type="text" name="attr_equipment" >
+            <input class="longtext2" type="text" name="attr_equipment" >
             <input class="attribtext"type="number" name="attr_equbonus">
             <button type="action" name="act_equip">Use</button>
         </fieldset>
@@ -206,7 +206,7 @@
         <span class="normallabel">Max Capital:</span> <input type="number" name="attr_capital" class="attribtext" value="0">
         <span class="normallabel">Spent:</span> <input type="number" name="attr_spent" class="attribtext" value="0">
         <br>
-        <span class="normallabel">Lifestyle Bonus:</span> <input type="number" name="attr_lifestyle" class="attribtext" value="0">
+        <span class="normallabel">Lifestyle Bonus:</span> <input type="number" name="attr_lifestyle" class="attribtext" title="Used as a bonus when bartering with an NPC over an item they do not wish to part with" value="0"><button type="action" name="act_lifestyle">Use</button>
         <HR class="break">
         <h2 class="areaheader">Conditions</h2>    
 
@@ -419,7 +419,7 @@
     </div>
     <div class="NPCSkills">
         <HR class="break">
-        <h2 class="areaheader">Weapons</h2>
+        <h2 class="areaheader">Skills</h2>
         <fieldset class="repeating_NPCskills">
             <select name="attr_attrib_skill">
                 <option value="@{physique}" selected="selected">Agility</option>
@@ -443,7 +443,7 @@
         <h2 class="areaheader">Equipment</h2>
         <br>
         <fieldset class="repeating_equipment">
-            <input class="medtext" type="text" name="attr_equipment" >
+            <input class="shorttext2" type="text" name="attr_equipment" >
             <input class="attribtext"type="number" name="attr_equbonus" value="0">
             <button type="action" name="act_equip">Use</button>
         </fieldset>
@@ -610,10 +610,23 @@ setAttrs({
 });
 
 on("clicked:repeating_equipment:equip", function(eventInfo) {
-getAttrs(["repeating_equipment_equbonus"], function(values){
-    let newbonus=parseInt(values.repeating_equipment_equbonus)||0;
+    getAttrs(["repeating_equipment_equbonus","equipedbonus"], function(values){
+        let newbonus=parseInt(values.repeating_equipment_equbonus)||0;
+        let bonus=parseInt(values.equipedbonus)||0;
+        setAttrs({
+            "equipedbonus": newbonus+bonus
+        });
+    });
+    });
+
+
+
+on("clicked:lifestyle", function(eventInfo) {
+getAttrs(["lifestyle","equipedbonus"], function(values){
+    let newbonus=parseInt(values.lifestyle)||0;
+    let bonus=parseInt(values.equipedbonus)||0;
     setAttrs({
-        "equipedbonus": newbonus
+        "equipedbonus": newbonus+bonus
     });
 });
 });
