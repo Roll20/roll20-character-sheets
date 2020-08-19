@@ -2,6 +2,14 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.2
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to new melee weapons
+- Fix a bug where strength and dexterity weapon modifiers didn't change when the attributes changed
+- Fix colored borders shown for skill rolls
+
 ## 1.6.1
 
 ### Fixed

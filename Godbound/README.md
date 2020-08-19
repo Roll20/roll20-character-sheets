@@ -4,17 +4,23 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
-
+- v2.4.0
+  - Major
+    * Add a new tab for Strifes, Low Magic, and Theurgy
+  - Minor
+    * Spelling fixes and tweaks
+    * Line added to roll template describing type of roll
+    * Streamline sheet by removing superfluous html style codes
 - v2.3.0
   - Minor
-    - Description fields for words, gifts, miracles, and artifacts changed to auto-expand
-    - Small adjustment to project layout
-    - Correction for styling of two  fieldset "add" buttons
+    * Description fields for words, gifts, miracles, and artifacts changed to auto-expand
+    * Small adjustment to project layout
+    * Correction for styling of two  fieldset "add" buttons
 - v2.2.0
   - Minor
-    - Renamed Project Opposition to Resistance
-    - Corrected calculation for Project Cost
-    - Small teaks and spelling corrections
+    * Renamed Project Opposition to Resistance
+    * Corrected calculation for Project Cost
+    * Small teaks and spelling corrections
 - v2.1.0
   - Minor
     - Renamed Headings for Clarity
