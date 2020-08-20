@@ -16224,17 +16224,86 @@ on("sheet:opened", function() {
     migrationCheck();
 });
 
+/*
+Handle (de)activation of shields/parry weapons
+
+There are two possible results: one and only one active shield; no active shield.
+We need to make sure that the right thing™ is done
+*/
+on("change:repeating_shields:shield_active", function(eventInfo) {
+    // Get the source shield, its row ID and whether it was turned on or off
+    var sourceShield = eventInfo.sourceAttribute;
+    var sourceShieldId = extractRowId(sourceShield);
+    var mode = eventInfo.newValue;
+
+    // Get all the shields
+    getSectionIDs("shields", function(idarray) {
+        var prefix = "repeating_shields_";
+        var suffix = "_shield_active";
+
+        // Gather all the shield_active states (as attribute names)
+        var attrsToGet = [];
+        for(id of idarray) {
+            attrsToGet.push(prefix + id + suffix);
+        }
+
+        // Get the attributes
+        getAttrs( attrsToGet, function(shieldActiveStates) {
+            var activeShields = [];
+            var activeShieldRowId = "";
+
+            for (attr of attrsToGet) {
+                if (shieldActiveStates[ attr ] === "on") {
+                    activeShields.push(attr);
+                }
+            }
+
+            var attrsToChange = {};
+            // 0 active shields? Deactivate shields, nothing to do.
+            if (activeShields.length === 0) {
+                // do something for deactivation
+                console.log("Deactivating shields/parry weapons ...");
+                activeShieldRowId = "";
+            } else if (activeShields.length === 1) {
+                // this is the active shield
+                var activeShield = activeShields[0];
+                console.log("Setting active shields/parry weapons to \"" + activeShield + "\"");
+                activeShieldRowId = extractRowId(activeShield);
+            } else {
+                // If one shield got activated, deactivate all others.
+                if (mode === "on") {
+                    activeShieldRowId = sourceShieldId;
+                    console.log("Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
+                    for (activeShield of activeShields) {
+                        if (activeShield !== sourceShield) {
+                            attrsToChange[ activeShield ] = 0;
+                        }
+                    }
+                } else {
+                // If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
+                    console.log("Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
+                    activeShieldRowId = extractRowId(activeShields[0]);
+                    for (var i = 1; i < activeShields.length; i++) {
+                        attrsToChange[ activeShields[i] ] = 0;
+                    }
+                }
+            }
+            attrsToChange[ "activeShieldRowId" ] = activeShieldRowId;
+            setAttrs( attrsToChange, { silent: true }, () => { calculateCombatValues() } );
+        });
+    });
+});
+
 // Berechnet den Gesamt-AT-Wert inklusive Modifikation durch ein eventuell verwendetes Schild
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
 on("change:PABasis change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 change:NKW_AT_typ4 change:NKW4ATMod change:NKW_AT_typ4 change:NKW4ATMod change:NKW4_Spez change:NKW_Aktiv4 change:repeating_shields change:be_at_mod change:be_pa_mod",
 function(eventInfos) {
-    calculateCombatValues(eventInfos);
+    calculateCombatValues();
 });
 
-function calculateCombatValues(eventInfos) {
+function calculateCombatValues() {
     console.log("calculating combat values");
-    console.log(eventInfos);
     // Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
     // "activeShieldRowId" can be the id of either a shield or a parry weapon
     getAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
@@ -16271,13 +16340,6 @@ function calculateCombatValues(eventInfos) {
 
         // Wurde dieses Event dadurch ausgelöst, dass sich die Aktivität eines Schildes geändert hat, dann müssen wir die activeShieldRowId noch manuell bearbeiten, da diese eventuell noch nicht korrekt gesetzt wurde
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
-        if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
-            if (eventInfos.newValue === "on") {
-                activeShieldRowId = extractRowId(eventInfos.sourceAttribute);
-            } else if (eventInfos.sourceType === "player") {
-                activeShieldRowId = undefined;
-            }
-        }
 
         // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
         if (activeShieldRowId) {
@@ -16483,29 +16545,6 @@ on("change:NKW_Aktiv1 change:NKW_Aktiv2 change:NKW_Aktiv3 change:NKW_Aktiv4", fu
         }
     }
     setAttrs(attrsToChange);
-});
-
-// Wird ein Schild als "Aktiv" markiert, werden automatisch alle anderen Schilde als inaktiv markiert
-on("change:repeating_shields:shield_active", function(eventInfo) {
-    if (eventInfo.newValue !== "on") {
-        setAttrs({"activeShieldRowId": "" }, { silent: true });
-        return;
-    }
-
-    // Wir holen uns alle Row-Ids für die "shields" Section
-    getSectionIDs("shields", function(idarray) {
-        var attrsToChange = {};
-        for(var i=0; i < idarray.length; i++) {
-            // Ist die Row-Id nicht die des "auslösenden" Attributs, wird es zu den zu deaktivierenden Attributen hinzugefügt
-            if (eventInfo.sourceAttribute.indexOf(idarray[i]) < 0) {
-                attrsToChange[ "repeating_shields_" + idarray[i] + "_shield_active" ] = 0;
-            }
-        }
-        // Wir setzen das derzeit aktive Schild in einem eigenen Attribut
-        attrsToChange[ "activeShieldRowId" ] = extractRowId(eventInfo.sourceAttribute);
-        setAttrs(attrsToChange, { silent: true });
-     });
-    
 });
 
 // wird verwendet um aus dem Attributsnamen einer repeating section die Row-ID zu ermitteln
