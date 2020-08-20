@@ -1,1 +1,1 @@
-This is an unofficial character sheet for the Terra Devastada RPG game by John Bogéa.
+This is a character sheet for the Crianças Enxeridas RPG game by Raphael Lima.
