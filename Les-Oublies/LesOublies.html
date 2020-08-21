@@ -19,18 +19,19 @@
 <!-- ----------------------------------------------------------------------- -->
 	
 	<div class="navigation-div">
-        <input type='hidden' class='sheet-tabstoggleforbtn' name='attr_sheetTabForBtn'  value='fullsheet'  />
+        <input type='hidden' class='sheet-tabstoggleforbtn' name='attr_sheetTabForBtn'  value='combat'  />
         <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Les-Oublies/images/shadow.png">
         <button type="action" name="act_character" >Personnage</button>
         <button type="action" name="act_skills" >Compétences</button>
-        <button type="action" name="act_equipment_and_actions" >Equipement & Actions</button>
+        <button type="action" name="act_combat" >Combat</button>
+        <button type="action" name="act_equipment_and_spells" >Equipement & Sortilèges</button>
         <button type="action" name="act_journal" >Journal</button>
         <button type="action" name="act_fullsheet" >Fiche complète</button>
     </div>
-    <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='fullsheet'  />
+    <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='combat'  />
 
     <script type="text/worker">
-        const buttonlist = ["character", "skills", "equipment_and_actions", "journal", "fullsheet"];
+        const buttonlist = ["character", "skills", "combat", "equipment_and_spells", "journal", "fullsheet"];
         buttonlist.forEach(button => {
             on(`clicked:${button}`, function() {
                 setAttrs({
@@ -1017,7 +1018,379 @@
 	
 </div>
 
-<div class="sheet-equipment_and_actions">
+<div class="sheet-combat">
+	
+<!-- ----------------------------------------------------------------------- -->
+<!-- ------------------------------ INITIATIVE ----------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+	<div class="sheet-row"> <!-- Initiative -->
+		<div class="sheet-col section-initiative">
+			<button type="roll" class="init-roll" name="initiative"
+					value="&{template:initiative-roll} {{roll=[[ceil((@{rapidite} + 1d12) / 2) - @{amure_penalite} &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}"
+				<span class="small-text">Initiative</span>
+			</button>
+		</div>
+	</div> <!-- END Section Initiative -->
+	
+<!-- ----------------------------------------------------------------------- -->
+<!-- --------------------------------- ARMES ------------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+	<div class="sheet-row">  <!-- Section Armes -->
+
+		<div class="sheet-col small-outline section-armes">
+			<h1 class="title">Armes</h1>
+			
+			<span class="label-name">Nom</span>
+			<span class="label-number">Taille</span>
+			<span class="label-number">Dégâts</span>
+			<span class="label-particularites">Particularités</span>
+			<span class="label-roll">Attaques</span>
+			
+			<fieldset class="repeating_armes">
+			    <div class="repeating-section">
+    				<input type="text" class="input-name" name="attr_arme_nom"/>
+    				<input type="number" class="input-number" name="attr_arme_taille"/>
+    				<input type="number" class="input-number" name="attr_arme_degats"/>
+    				<input type="text" class="input-particularites" name="attr_arme_particularites"/>
+    				<button type="roll" class="input-roll" name="attaque_melee"
+    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (mêlée)}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{degats=[[ceil((@{taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{threshold=[[12+?{Modificateur|0}]]}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
+    				    <span class="small-text">Mêlée</span>
+    				</button>
+    				<button type="roll" class="input-roll" name="attaque_tir"
+    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (tir)}} {{whiteroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{degats=[[ceil((@{taille} + @{arme_degats}) * @{facteur_prime_degats} * @{facteur_penalite_degats})]]}} {{particularites=@{arme_particularites}}} {{prime=@{prime}}} {{prime_descr=@{prime_short_descr}}} {{penalite=@{penalite}}} {{penalite_descr=@{penalite_short_descr}}}">
+    				    <span class="small-text">Tir</span>
+    				</button>
+    			</div>
+			</fieldset>
+		</div>
+		
+	</div> <!-- END Section Armes -->
+	
+<!-- ----------------------------------------------------------------------- -->
+<!-- -------------------------- PRIMES ET PENALITES ------------------------ -->
+<!-- ----------------------------------------------------------------------- -->
+	   
+	<div class="sheet-row">  <!-- Section Primes et Penalites -->
+	
+		<div class="small-outline section-primes-penalites">
+			<h1 class="title">Primes & Pénalités</h1>
+			
+		    <table>
+		        <tr>
+		            <th><h3>Prime</h3></th>
+		            <th><h3>Pénalité</h3></th>
+		        </tr>
+		        <tr>
+		            <td>
+		                <select name="attr_prime">
+            			    <option value="">Aucune</option>
+            			    <option value="Accélération">Accélération</option>
+            			    <option value="Attaques multiples">Attaques multiples</option>
+            			    <option value="Blessure grave">Blessure grave</option>
+            			    <option value="Blessure non létale">Blessure non létale</option>
+            			    <option value="Blessure précise">Blessure précise</option>
+            			    <option value="Efficacité">Efficacité</option>
+            			    <option value="Débordement">Débordement</option>
+            			    <option value="Prudence">Prudence</option>
+            			</select>
+		            </td>
+		            <td>
+		                <select name="attr_penalite">
+            			    <option value="">Aucune</option>
+            			    <option value="Abandon de position avantageuse">Abandon de position avantageuse</option>
+            			    <option value="Blessure légère">Blessure légère</option>
+            			    <option value="Danger">Danger</option>
+            			    <option value="Difficulté">Difficulté</option>
+            			    <option value="Facilité">Facilité</option>
+            			    <option value="Ralentissement">Ralentissement</option>
+            			    <option value="Risque">Risque</option>
+            			</select>
+		            </td>
+		        </tr>
+		        <tr>
+		            <td>
+		                <textarea name="attr_prime_descr"></textarea>
+		            </td>
+		            <td>
+		                <textarea name="attr_penalite_descr"></textarea>
+		            </td>
+		        </tr>
+		    </table>
+		    
+		    
+		    <input type="hidden" name="attr_bonus_init" value="0"/>
+		    <input type="hidden" name="attr_prime_init" value=""/>
+		    <input type="hidden" name="attr_bonus_action" value="0"/>
+		    <input type="hidden" name="attr_prime_action" value=""/>
+		    <input type="hidden" name="attr_bonus_reaction" value="0"/>
+		    <input type="hidden" name="attr_prime_reaction" value=""/>
+		    <input type="hidden" name="attr_facteur_prime_degats" value="1"/>
+		    <input type="hidden" name="attr_prime_degats" value=""/>
+		    
+		    <input type="hidden" name="attr_malus_init" value="0"/>
+		    <input type="hidden" name="attr_penalite_init" value=""/>
+		    <input type="hidden" name="attr_malus_action" value="0"/>
+		    <input type="hidden" name="attr_penalite_action" value=""/>
+		    <input type="hidden" name="attr_malus_reaction" value="0"/>
+		    <input type="hidden" name="attr_penalite_reaction" value=""/>
+		    <input type="hidden" name="attr_facteur_penalite_degats" value="1"/>
+		    <input type="hidden" name="attr_penalite_degats" value=""/>
+		    
+		    <script type="text/worker">
+                on("sheet:opened change:prime", function() {
+                    getAttrs(["prime"], function(values) {
+            			var prime = values["prime"];
+            			var descr = "";
+            			var shortDescr = "";
+            			setAttrs({
+            				"bonus_init": 0,
+            				"prime_init": "",
+            				"bonus_action": 0,
+            				"prime_action": "",
+            				"bonus_reaction": 0,
+            				"prime_reaction": "",
+            				"facteur_prime_degats": 1,
+            				"prime_degats": ""
+            			});
+            			if(prime == "Accélération") {
+            			    descr = "Le personnage est plus rapide. Son score d'initiative est augmenté de +3.";
+            			    shortDescr = "Initiative à +3";
+                			setAttrs({
+                				"bonus_init": 3,
+            				    "prime_init": "Accélération"
+                			});
+            			} else if(prime == "Attaques multiples") {
+            			    descr = "L'attaque vise plusieurs cibles à la fois. Lors d'une attaque de mêlée, leur nombre est limité au nombre d'adversaires engagés par le personnage. Lors d'un tir, leur nombre est limité au nombre de munition dans le chargeur. Un seul jet est effectué, et le résultat des dégâts est divisé par 2 (arrondi au supérieur).";
+            			    shortDescr = "Dégâts /2";
+                			setAttrs({
+                				"facteur_prime_degats": 0.5,
+            				    "prime_degats": "Attaques multiples"
+                			});
+            			} else if(prime == "Blessure grave") {
+            			    descr = "Les dégâts de l'arme sont augmentés de 50%.";
+            			    shortDescr = "Dégâts +50%";
+                			setAttrs({
+                				"facteur_prime_degats": 1.5,
+            				    "prime_degats": "Blessure grave"
+                			});
+            			} else if(prime == "Blessure non létale") {
+            			    descr = "L'adversaire ne peut pas mourir suite au coup donné. Si l'attaque réussit, l'adversaire tombe inconscient.";
+            			    shortDescr = "Mort impossible.";
+            			} else if(prime == "Blessure précise") {
+            			    descr = "Le personnage place une attaque qui exploite les défauts de l'armure de l'adversaire. La protection de cette dernière est divisée par 2 (arrondi au supérieur).";
+            			    shortDescr = "Protection /2";
+            			} else if(prime == "Efficacité") {
+            			    descr = "L'action en cours bénéficie d'un bonus de +3.";
+            			    shortDescr = "Résultat final +3";
+            			    setAttrs({
+            			        "bonus_action": 3,
+            			        "prime_action": "Efficacité"
+            			    })
+            			} else if(prime == "Débordement") {
+            			    descr = "La prochaine réaction de l'adversaire sera accompagnée d'un malus de -3.";
+            			    shortDescr = "Réaction de l'adversaire -3";
+            			} else if(prime == "Prudence") {
+            			    descr = "La prochaine réaction du personnage bénéficie d'un bonus de +3. Plusieurs Prudences augmentent le nombre de réactions successives bénéficiant du bonus.";
+            			    shortDescr = "Réaction +3";
+            			    setAttrs({
+            			        "bonus_reaction": 3,
+            			        "prime_reaction": "Prudence"
+            			    })
+            			}
+            			console.log("descr");
+            			setAttrs({
+            				"prime_descr": descr,
+            				"prime_short_descr": shortDescr
+            			});
+                    });
+                });
+                on("ready change:penalite", function() {
+                    getAttrs(["penalite"], function(values) {
+            			var penalite = values["penalite"];
+            			var descr = "";
+            			var shortDescr = "";
+            			setAttrs({
+            				"malus_init": 0,
+            				"penalite_init": "",
+            				"malus_action": 0,
+            				"penalite_action": "",
+            				"malus_reaction": 0,
+            				"penalite_reaction": "",
+            				"facteur_penalite_degats": 1,
+            				"penalite_degats": ""
+            			});
+            			if(penalite == "Abandon de position avantageuse") {
+            			    descr = "Pour pouvoir choisir cette pénalité, le personnage doit être dans une position avantageuse (à couvert, caché, etc.) dont il perd les avantages.";
+            			    shortDescr = "Perte des avantages de sa position.";
+            			} else if(penalite == "Blessure légère") {
+            			    descr = "Les dégâts sont divisés par 2 (arrondi au supérieur).";
+            			    shortDescr = "Dégâts /2";
+                			setAttrs({
+                				"facteur_penalite_degats": 0.5,
+            				    "penalite_degats": "Blessure légère"
+                			});
+            			} else if(penalite == "Danger") {
+            			    descr = "La prochaine réaction du personnage subit un malus de -3. D'autres Dangers augmentent le nombre de défenses successives subissant ce malus.";
+            			    shortDescr = "Réaction -3";
+                			setAttrs({
+                				"malus_reaction": -3,
+                				"penalite_reaction": "Danger"
+                			});
+            			} else if(penalite == "Difficulté") {
+            			    descr = "L'action en cours du personnage subit un malus de -3.";
+            			    shortDescr = "Résultat final -3";
+                			setAttrs({
+                				"malus_action": -3,
+                				"penalite_action": "Difficulté"
+                			});
+            			} else if(penalite == "Facilité") {
+            			    descr = "La prochaine réaction de l'adversaire bénéficie d'un bonus de +3";
+            			    shortDescr = "Réaction de l'adversaire +3";
+            			} else if(penalite == "Ralentissement") {
+            			    descr = "Le personnage est plus lent. Son initiative est diminuée de -3.";
+            			    shortDescr = "Initiative -3";
+                			setAttrs({
+                				"malus_init": -3,
+                				"penalite_init": "Ralentissement"
+                			});
+            			} else if(penalite == "Risque") {
+            			    descr = "Si l'action en cours échoue, un incident, déterminé par le MJ, survient. Par exemple, l'arme est coincé ou détruite, le personnage glisse et tombe au sol, il lâche un objet, un de ses vêtements s'accroche quelque part et lui fait perdre sa prochaine action, l'attaque touche un allié, ...";
+            			    shortDescr = "Incident en cas d'échec";
+            			}
+            			setAttrs({
+            				"penalite_descr": descr,
+            				"penalite_short_descr": shortDescr
+            			});
+                    });
+                });
+            </script>
+			
+		</div>
+
+	</div>  <!-- END Section Primes et Penalites -->
+	
+<!-- ----------------------------------------------------------------------- -->
+<!-- -------------------------- COMPETENCES COMBAT ------------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+	<div class="sheet-row"> <!-- Competences combat -->
+		<div class="sheet-col small-outline section-competences-combat">
+			<h1 class="title">Compétences</h1>
+			<table>
+				<tr>
+					<th></th>
+					<th></th>
+					<th>Rang</th>
+					<th>Action</th>
+					<th>Réaction</th>
+					<th>Dé bonus</th>
+				</tr>
+				<tr>
+					<td>(Force de la nature)</td>
+					<td>Force</td>
+					<td>
+						<input type="number" value="0" min="0" name="attr_force" readonly/>
+					</td>
+					<td>
+						<button type="roll"  name="force_test_action" class="action_roll"
+								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature} + @{force} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature} + @{force} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<button type="roll"  name="force_test_reaction" class="reaction_roll"
+								value="&{template:classic-roll} {{name=Force}} {{whiteroll=[[1d12 + @{domaine_force_de_la_nature} + @{force} + @{bonus_reaction} + @{malus_reaction}]]}} {{blackroll=[[1d12 + @{domaine_force_de_la_nature} + @{force} + @{bonus_reaction} + @{malus_reaction}]]}} {{bonusdice=[[@{force_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<input type="checkbox" value="1" name="attr_force_bonus_dice"/> +1D12
+					</td>
+				</tr>
+				<tr>
+					<td>(Guerrier)</td>
+					<td>Corps à corps</td>
+					<td>
+						<input type="number" value="0" min="0" name="attr_cac" readonly/>
+					</td>
+					<td>
+						<button type="roll"  name="cac_test_action" class="action_roll"
+								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{cac} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{cac} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<button type="roll"  name="cac_test_reaction" class="reaction_roll"
+								value="&{template:classic-roll} {{name=Corps à corps}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{cac} + @{bonus_reaction} + @{malus_reaction}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{cac} + @{bonus_reaction} + @{malus_reaction}]]}} {{bonusdice=[[@{cac_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<input type="checkbox" value="1" name="attr_cac_bonus_dice"/> +1D12
+					</td>
+				</tr>
+				<tr>
+					<td>(Guerrier)</td>
+					<td>Mêlée</td>
+					<td>
+						<input type="number" value="0" min="0" name="attr_melee" readonly/>
+					</td>
+					<td>
+						<button type="roll"  name="melee_test_action" class="action_roll"
+								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<button type="roll"  name="melee_test_reaction" class="reaction_roll"
+								value="&{template:classic-roll} {{name=Mêlée}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_reaction} + @{malus_reaction}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{melee} + @{bonus_reaction} + @{malus_reaction}]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<input type="checkbox" value="1" name="attr_melee_bonus_dice"/> +1D12
+					</td>
+				</tr>
+				<tr>
+					<td>(Chasseur)</td>
+					<td>Tir</td>
+					<td>
+						<input type="number" value="0" min="0" name="attr_tir" readonly/>
+					</td>
+					<td>
+						<button type="roll"  name="tir_test_action" class="action_roll"
+								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_action} + @{malus_action}]]}} {{blackroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_action} + @{malus_action}]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<button type="roll"  name="tir_test_reaction" class="reaction_roll"
+								value="&{template:classic-roll} {{name=Tir}} {{whiteroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_reaction} + @{malus_reaction}]]}} {{blackroll=[[1d12 + @{domaine_chasseur} + @{tir} + @{bonus_reaction} + @{malus_reaction}]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<input type="checkbox" value="1" name="attr_tir_bonus_dice"/> +1D12
+					</td>
+				</tr>
+				<tr>
+					<td>(Ombre)</td>
+					<td>Esquive</td>
+					<td>
+						<input type="number" value="0" min="0" name="attr_esquive" readonly/>
+					</td>
+					<td>
+					</td>
+					<td>
+						<button type="roll"  name="esquive_test_reaction" class="reaction_roll"
+								value="&{template:classic-roll} {{name=Esquive}} {{whiteroll=[[1d12 + @{domaine_ombre} + @{esquive} + @{bonus_reaction} + @{malus_reaction}]]}} {{blackroll=[[1d12 + @{domaine_ombre} + @{esquive} + @{bonus_reaction} + @{malus_reaction}]]}} {{bonusdice=[[@{esquive_bonus_dice}d12]]}} {{prime=@{prime}}} {{penalite=@{penalite}}}">
+						</button>
+					</td>
+					<td>
+						<input type="checkbox" value="1" name="attr_esquive_bonus_dice"/> +1D12
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div> <!-- END Competences combat -->
+
+</div>
+
+<div class="sheet-equipment_and_spells">
 <!-- ----------------------------------------------------------------------- -->
 <!-- ------------------------------- MONTURES  ----------------------------- -->
 <!-- ----------------------------------------------------------------------- -->
@@ -1048,48 +1421,7 @@
 			</fieldset>
 		</div>  <!-- END Column 2 Equipement -->
 
-	</div>  <!-- END Section 2 --> 
-	
-<!-- ----------------------------------------------------------------------- -->
-<!-- --------------------------------- ARMES ------------------------------- -->
-<!-- ----------------------------------------------------------------------- -->
-
-	<div class="sheet-row">  <!-- Section Armes -->
-
-		<div class="sheet-col small-outline section-armes">
-			<h1 class="title">Armes</h1>
-			
-			<button type="roll" class="init-roll" name="initiative"
-					value="/roll ceil((@{rapidite} + 1d12) / 2) - @{amure_penalite} &{tracker}">
-			    <span class="small-text">Initiative</span>
-			</button>
-			<br/>
-			
-			<span class="label-name">Nom</span>
-			<span class="label-number">Taille</span>
-			<span class="label-number">Dégâts</span>
-			<span class="label-particularites">Particularités</span>
-			<span class="label-roll">Attaques</span>
-			
-			<fieldset class="repeating_armes">
-			    <div class="repeating-section">
-    				<input type="text" class="input-name" name="attr_arme_nom"/>
-    				<input type="number" class="input-number" name="attr_arme_taille"/>
-    				<input type="number" class="input-number" name="attr_arme_degats"/>
-    				<input type="text" class="input-particularites" name="attr_arme_particularites"/>
-    				<button type="roll" class="input-roll" name="attaque_melee"
-    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (mêlée)}} {{whiteroll=[[1d12 + @{domaine_guerrier} + @{melee}]]}} {{blackroll=[[1d12 + @{domaine_guerrier} + @{melee}]]}} {{bonusdice=[[@{melee_bonus_dice}d12]]}} {{degats=[[@{taille} + @{arme_degats}]]}} {{particularites=@{arme_particularites}}} {{threshold=[[12+?{Modificateur|0}]]}}">
-    				    <span class="small-text">Mêlée</span>
-    				</button>
-    				<button type="roll" class="input-roll" name="attaque_tir"
-    						value="&{template:attack-roll} {{name=Attaque @{arme_nom} (tir)}} {{whiteroll=[[1d12 + @{domaine_chasseur} + @{tir}]]}} {{blackroll=[[1d12 + @{domaine_chasseur} + @{tir}]]}} {{bonusdice=[[@{tir_bonus_dice}d12]]}} {{degats=[[@{taille} + @{arme_degats}]]}} {{particularites=@{arme_particularites}}}">
-    				    <span class="small-text">Tir</span>
-    				</button>
-    			</div>
-			</fieldset>
-		</div>
-		
-	</div> <!-- END Section Armes -->
+	</div>  <!-- END Section 2 -->
 	
 <!-- ----------------------------------------------------------------------- -->
 <!-- -------------------------------- ARMURES ------------------------------ -->
@@ -1233,6 +1565,18 @@
 				</td>
 				<td>{{bonusdice}}</td>
 			</tr>
+			
+			{{#prime}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="4">Prime : {{prime}}</td>
+			</tr>
+			{{/prime}}
+			
+			{{#penalite}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="4">Pénalité : {{penalite}}</td>
+			</tr>
+			{{/penalite}}
 		</table>
 	</div>
 </rolltemplate>
@@ -1269,6 +1613,45 @@
 				<td colspan="2" class="sheet-template-particularites">{{particularites}}</td>
 			</tr>
 			{{/particularites}}
+			
+			{{#prime}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="1">{{prime}} :</td>
+				<td colspan="3">{{prime_descr}}</td>
+			</tr>
+			{{/prime}}
+			
+			{{#penalite}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="1">{{penalite}} :</td>
+				<td colspan="3">{{penalite_descr}}</td>
+			</tr>
+			{{/penalite}}
+		</table>
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-initiative-roll">
+    <div class="sheet-template-container">
+		<table>
+			<tr>
+				<td class="sheet-template-first-col">
+					<span class="sheet-template-strong">Initiative :</span>
+				</td>
+				<td>{{roll}}</td>
+			</tr>
+			
+			{{#prime}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="4">Prime : {{prime}}</td>
+			</tr>
+			{{/prime}}
+			
+			{{#penalite}}
+			<tr class="sheet-template-primes-penalites sheet-template-weak">
+			    <td colspan="4">Pénalité : {{penalite}}</td>
+			</tr>
+			{{/penalite}}
 		</table>
 	</div>
 </rolltemplate>
