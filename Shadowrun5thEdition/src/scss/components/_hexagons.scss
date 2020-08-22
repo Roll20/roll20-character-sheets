@@ -4,7 +4,7 @@ div.sheet-attribute {
 		position: relative;
 		width: 20px; 
 		height: 11.55px;
-		background-color: $lightgray;
+		background-color: $blackish;
 		margin: 7.22px 0;
 	}
 	
@@ -19,44 +19,74 @@ div.sheet-attribute {
 	
 	.sheet-hexagon:before {
 		bottom: 100%;
-		border-bottom: 5.77px solid $lightgray;
+		border-bottom: 5.77px solid $blackish;
 	}
 	
 	.sheet-hexagon:after {
 		top: 100%;
 		width: 0;
-		border-top: 5.77px solid $lightgray;
+		border-top: 5.77px solid $blackish;
 	}
 
-	input.sheet-edge-hider {
+	@mixin hexagon() {
+		.sheet-hexagon {
+			background-color: $lightgray;
+		}
+	
+		.sheet-hexagon:before {
+			border-bottom-color: $lightgray;
+		}
+	
+		.sheet-hexagon:after {
+			border-top-color: $lightgray;
+		}
+	}
+
+	input.sheet-hex-highlight {
+		&[value='0'] ~ div.sheet-edge:nth-of-type(1n+1) {
+			@include hexagon();
+		}
+
 		@for $i from 1 through 8 {
 			&[value='#{$i}'] ~ div.sheet-edge:nth-of-type(1n+#{$i+1}) {
-				display: none;
+				@include hexagon();
 			}
 		}
 	}
-}
 
-.sheet-con-hex {
-	position: relative;
-	top     : -60px;
-	transition: transform .2s;
-}
+	input[name="attr_edge_hex"]:checked + .sheet-hexagon {
+		background-color: $blackish;
+	}
 
-.sheet-con-hex input[type='radio'] {
-	height      : 20px;
-	margin-right: -21px;
-	width       : 20px;
-	opacity: 0;
-	z-index: 2;
-	position: absolute;
-
-	&:hover + span {
-		transform: $button-scale-medium;
+	input[name="attr_edge_hex"]:checked + .sheet-hexagon:before  {
+		border-bottom-color: $blackish;
+	}
+	
+	input[name="attr_edge_hex"]:checked + .sheet-hexagon:after {
+		border-top-color: $blackish;
 	}
 }
 
+/* Old way of doing it */
 div.sheet-matrix {
+	.sheet-con-hex {
+		position: relative;
+		transition: transform .2s;
+	}
+	
+	.sheet-con-hex input[type='radio'] {
+		height      : 20px;
+		margin-right: -21px;
+		width       : 20px;
+		opacity: 0;
+		z-index: 2;
+		position: absolute;
+	
+		&:hover + span {
+			transform: $button-scale-medium;
+		}
+	}
+
 	.sheet-hexagon {
 		display: inline-block;
 		margin: 5.77px 0;
@@ -124,5 +154,4 @@ div.sheet-matrix {
 	.sheet-con-hex input[type='radio']:checked + .sheet-hexagon:after {
 		border-top-color: $blackish;
 	}
-
 }
