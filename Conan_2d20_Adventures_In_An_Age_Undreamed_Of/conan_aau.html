@@ -40,10 +40,10 @@
             </div>
             -->
             <div class="weapons-separator"></div>
-            <fieldset class="repeating_weapons">                
+            <fieldset class="repeating_weapons">
                 <div class="weapons-weapon-grid">
-                    <div class="weapons-weapon-name">Weapon Name</div>
-                    <input class="input-field-medium" type="text" name="attr_weapon_Name" style="grid-column: 3 / span 2;"/>
+                    <div class="weapons-weapon-name" >Weapon Name</div>
+                    <input class="input-field-medium sheet-col-span-3-2" type="text" name="attr_weapon_Name"/>
                     <div class="weapons-weapon-grid-button-group">
                         Roll:
                         <button type='roll' name="roll_Combat-Dice"
@@ -312,7 +312,7 @@
             <div class="belongings-banner">Belongings</div>
             <div class="belongings-outergrid">
                 <!-- repeating section of belongings rows (grid) -->
-                <fieldset class="repeating_belongings">
+                <fieldset class="repeating_belongings col-span-1-1 row-span-1-2">
                     <div class="belongings-list">
                         <div class="field-border-narrow belongings-list-hdr">Type</div>
                         <div class="field-border-narrow belongings-list-hdr">Location</div>
@@ -328,7 +328,7 @@
                         <input class="input-field-narrow col-span-2-4" type="text" name="attr_belongings-item-desc" />
                     </div>
                 </fieldset>
-                <div class="belongings-cointracker">
+                <div class="belongings-cointracker col-span-2-1 row-span-1-1">
                     <div class="belongings-gold">
                         <div class="belongings-gold-banner">GOLD</div>
                         <div><input type="text" name="attr_GoldTotal" /></div>
@@ -495,7 +495,7 @@
                         </button>
                     </div>
                     <div class="field-border-narrow talents-grid-label">Effect</div>
-                    <input class="input-field-wide" style="grid-column: 2 / span 9;" name="attr_talent_effect" value="" />
+                    <input class="input-field-wide sheet-col-span-2-9" name="attr_talent_effect" value="" />
                 </div>
             </fieldset>
         </div>
@@ -893,123 +893,51 @@
 
 </div>
 
-    <!--
-    <div class="area-stress">
-        <div class="section-label1">Stress</div>
-        <table class="attributeTable" border="1" style="width:100%">
-            <tr>
-                <td class="attributeTD">Vigor</td>
-                <td align="center">
-                    <button class="updownbutton" type="action" name="act_addVigor">+</button>
-                    <input style="height: 20px; width: 30px;color: black;" type="text" name="attr_Vigor">
-                    <button class="updownbutton" type="action" name="act_subtractVigor">-</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Fatigue</td>
-                <td align="center">
-                    <button class="updownbutton" type="action" name="act_addFatigue">+</button>
-                    <input style="height: 20px; width: 30px;color: black;" type="text" name="attr_Fatigue">
-                    <button class="updownbutton" type="action" name="act_subtractFatigue">-</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Resolve</td>
-                <td align="center">
-                    <button class="updownbutton" type="action" name="act_addResolve">+</button>
-                    <input style="height: 20px; width: 30px;color: black;" type="text" name="attr_Resolve">
-                    <button class="updownbutton" type="action" name="act_subtractResolve">-</button>
-                </td>
-            </tr>
-            <tr>
-                <td>Despair</td>
-                <td align="center">
-                    <button class="updownbutton" type="action" name="act_addDispair">+</button>
-                    <input style="height: 20px; width: 30px;color: black;" type="text" name="attr_Dispair">
-                    <button class="updownbutton" type="action" name="act_subtractDispair">-</button>
-                </td>
-            </tr>
-        </table>
-    </div>
 
-    <div class="area-momemtum">
-        <div class="section-label1">Momentum</div>
-        <table class="attributeTable" border="1" style="width:100%">
-            <tr>
-                <td class="attributeTD">Momentum</td>
-                <td align="center">
-                    <button class="updownbutton" type="action" name="act_addMomentum">+</button>
-                    <input style="height: 20px; width: 30px;color: black;" type="text" name="attr_Momentum">
-                    <button class="updownbutton" type="action" name="act_subtractMomentum">-</button>
-                </td>
-            </tr>
-        </table>
-    </div>
+<script type="text/worker">
 
-    <div class="area-bonus-damage">
-        <div class="section-label1"> Bonus Damage</div>
-        <table border="1" style="width:100%">
-            <tr>
-                <td>
-                    <label>Ranged</label>
-                    <input style=width:130px type="text" name="attr_Ranged" />
-                </td>
-                <td>
-                    <label>Melee</label>
-                    <input style=width:130px type="text" name="attr_Melee" />
-                </td>
-                <td>
-                    <label>Presence</label>
-                    <input style=width:130px type="text" name="attr_Presance" />
-                </td>
-            </tr>
-        </table>
-    </div>
+    function prePopulateSection(sectionName, minRows, fieldName) {
+        getSectionIDs(sectionName, function(idArray) {
+            var currentRows = idArray.length;
+            for(var i = currentRows; i < minRows; i++) {
+                var newrowid = generateRowID();
+                var newrowattrs = {};
+                newrowattrs["repeating_" + sectionName + "_" + newrowid + "_" + fieldName] = " ";
+                setAttrs(newrowattrs);
+            }
+        });
+    }
+    
+    
+    handleChangeAttribute = function(eventInfo) {
+        var attrName = eventInfo.sourceAttribute;
+        console.log("Attribute changed event for " + attrName);
+        getAttrs([eventInfo.sourceAttribute], function(values) {
+            console.log("Attribute value:" + values[attrName]);
+        });
+        getSectionRowCount(attrName);
+	}
+    
+    //on('change:attribute', handleChangeAttribute);
+    //on('change:gender', handleChangeAttribute);
+    //on('change:Gender', handleChangeAttribute);
+    //on('change:repeating_weapons:weapon_Name', handleChangeAttribute);
+    on('change:repeating_weapons', handleChangeAttribute);  //this fires for any weapon field in row
+    on('change:repeating_belongings', handleChangeAttribute);
+    on('change:repeating_talents', handleChangeAttribute);
+    on('change:repeating_magic', handleChangeAttribute);
+    on('change:repeating_npc', handleChangeAttribute);
+    
 
-    <div class="area-armour">
-        <div class="section-label1">Armour Value and Type </div>
-        <table border="1" style="width:100%">
-            <tr>
-                <td>
-                    
-                </td>
-                <td>
-                    <label>Armour Qualities</label>
-                    
-                </td>
-            </tr>
-        </table>
-        <table class="attributeTable" border="1" style="width:100%">
-            <tr>
-                <td>1-2&nbsp;</td>
-                <td>Head&nbsp;</td>
-                <td>Armour Type&nbsp;</td>
-            <tr>
-                <td>3-5&nbsp;</td>
-                <td>Right Arm&nbsp;</td>
-            <tr>
-                <td>6-8&nbsp;</td>
-                
-            <tr>
-                <td>9-14&nbsp;</td>
-                <td>Torso&nbsp;
-            <tr>
-                <td>15-17&nbsp;</td>
-                
-            <tr>
-                <td>18-20&nbsp;</td>
-                
-            </tr>
-        </table>
-    </div>
-    -->
-
-    <div class="area-footer">
-    </div>
-<script>
     on('sheet:opened',function(){
-        log('Starting Conan sheet...');
-        //console.log("Rows in weapons:" + getSectionRowCount("weapons"));
-        //insertRows("weapons", 3, "weapon_Name");        
+        console.log('Starting Conan sheet...');
+        
+        prePopulateSection("weapons", 2, "weapon_Name");
+        prePopulateSection("belongings", 3, "weapon_Name");
+        prePopulateSection("talents", 5, "weapon_Name");
+        prePopulateSection("magic", 2, "weapon_Name");
+        prePopulateSection("npc", 1, "weapon_Name");
         });
 </script>
+
+
