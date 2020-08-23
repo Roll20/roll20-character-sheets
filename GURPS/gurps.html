@@ -1077,6 +1077,14 @@
 				</h4>
 				<ul>
 					<li>Combat and Defense Calculator</li>
+					<li>
+						Bug fix. Redid how items linked to spells, skills, techniques, or attributes are updated. 
+						If you had multiple character sheets open, certain conditions would cause creating empty 
+						rows for techniques, melee attacks, and range attacks.
+					</li>
+					<li>
+						Bug fix. Resolved several javascript warning messages, only visible if viewing developer tools.
+					</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -6404,7 +6412,7 @@ Any other value, and the text box will get <b>cleared</b> out.<br />
 			<div class="table">
 			    <div class="header">
 					<div class="cell col-mod-tool">
-						<input class="toggle-mod-tool" disabled="disabled" type="checkbox" value="1" title="Click to show/hide attack modifiers." name="attr_toggle_melee_mod_tool" />
+						<!-- <input class="toggle-mod-tool" disabled="disabled" value="1" type="checkbox" title="Click to show/hide attack modifiers." name="attr_toggle_melee_mod_tool" /> -->
 						<span class="icon">y</span>
 					</div>
 					<div class="cell col0">
@@ -8569,6 +8577,14 @@ For more information, see B409.
 
 			<ul>
 				<li>Combat and Defense Calculator</li>
+				<li>
+					Bug fix. Redid how items linked to spells, skills, techniques, or attributes are updated. 
+					If you had multiple character sheets open, certain conditions would cause creating empty 
+					rows for techniques, melee attacks, and range attacks.
+				</li>
+				<li>
+					Bug fix. Resolved several javascript warning messages, only visible if viewing developer tools.
+				</li>
 			</ul>
 			
 			<h4>Version: 2.3.10</h4>
@@ -10935,8 +10951,6 @@ See notes for weapon.</textarea>
 	
 	function thenUpdateLinkedAttacksSkills() {
 		
-	    console.log("Updating linked attack skills");
-		
 	    updateLinkedSkills("repeating_melee", "melee");
     
         updateLinkedSkills("repeating_ranged", "ranged");
@@ -10948,8 +10962,6 @@ See notes for weapon.</textarea>
 	}
 
 	function thenUpdateLinkedAttacksSpells() {
-		
-	    console.log("Updating linked spells");
 		
 	    updateLinkedSkills("repeating_melee", "melee");
     
@@ -12075,7 +12087,6 @@ See notes for weapon.</textarea>
      */
     function updateToggleUnspentCheckBox() {
         
-        console.log('***** TOGGLE UNSPENT BOX *****');
         getAttrs(['use_unspent_box'], function(values) {
 
 		    setAttrs({ 
@@ -12099,8 +12110,6 @@ See notes for weapon.</textarea>
      */
     function updateDiceDamageIcons() {
         
-        console.log('***** UPDATE DICE DAMAGE *****');
-		    
         updateThrustSwingDamageIcons();
         
         updateRepeatingDamageDice("repeating_melee");
@@ -15375,9 +15384,7 @@ See notes for weapon.</textarea>
     
     // check if skill level mirror changed, if so update repeating sections that match the item that changed
     on("change:repeating_skills:level_mirror", function(event) {
-        
-		console.log("repeating_skills: update linked sections");
-
+          
         var rowId = getRowIdFromEventInfo(event, "repeating_skills");
         
         updateSectionSkillsLinkedToUpdatedRow(rowId);
@@ -15387,8 +15394,6 @@ See notes for weapon.</textarea>
     // check if spell level mirror changed
     on("change:repeating_spells:level_mirror", function(event) {
         
-        console.log("repeating_spells: update linked sections");
-
 		var rowId = getRowIdFromEventInfo(event, "repeating_spells");
         
 		updateSectionSkillsLinkedToUpdatedRow(rowId);
@@ -15398,9 +15403,7 @@ See notes for weapon.</textarea>
 	// check if technique level changed
 	on("change:repeating_techniquesrevised:level", function(event) {
         
-        console.log("repeating_techniquesrevised: update linked sections");
-
-		var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
+        var rowId = getRowIdFromEventInfo(event, "repeating_techniquesrevised");
         
 		updateSectionSkillsLinkedToUpdatedRow(rowId);
         
@@ -15409,15 +15412,11 @@ See notes for weapon.</textarea>
 	// if an attribute is updated, update linked items
 	on("change:strength_display", event => {
 
-		console.log("ST: update linked sections");
-
 		updateSectionSkillsLinkedToUpdatedRow("ST");
 
 	});
 
 	on("change:striking_st", event => {
-
-		console.log("STRIKING: update linked sections");
 
 		updateSectionSkillsLinkedToUpdatedRow("STRIKING");
 
@@ -15425,15 +15424,11 @@ See notes for weapon.</textarea>
 
 	on("change:dexterity", event => {
 
-		console.log("DX: update linked sections");
-
 		updateSectionSkillsLinkedToUpdatedRow("DX");
 
 	});
 
 	on("change:intelligence", event => {
-
-		console.log("IQ: update linked sections");
 
 		updateSectionSkillsLinkedToUpdatedRow("IQ");
 
@@ -15441,15 +15436,11 @@ See notes for weapon.</textarea>
 
 	on("change:willpower", event => {
 
-		console.log("WILL: update linked sections");
-
 		updateSectionSkillsLinkedToUpdatedRow("WILL");
 
 	});
 
 	on("change:health", event => {
-
-		console.log("HT: update linked sections");
 
 		updateSectionSkillsLinkedToUpdatedRow("HT");
 
@@ -15457,15 +15448,11 @@ See notes for weapon.</textarea>
 
 	on("change:dodge", event => {
 
-		console.log("DODGE: update linked sections");
-
 		updateSectionSkillsLinkedToUpdatedRow("DODGE");
 
 	});
 
 	on("change:basic_speed", event => {
-
-		console.log("SPEED: update linked sections");
 
 		updateSectionSkillsLinkedToUpdatedRow("SPEED");
 
@@ -15479,10 +15466,6 @@ See notes for weapon.</textarea>
 	function updateKnockbackLinkedToRow(rowId) {
 
 		let fields = ["knockback_defense_row_type", "defense_knockback_skill_row_id"];
-
-		console.log("update knockback link");
-
-		console.log("rowId:", rowId);
 
 		getAttrs(fields, values => {
 
@@ -15521,17 +15504,13 @@ See notes for weapon.</textarea>
         
         let sections = [
 			{sectionName: "repeating_melee", prefix: "melee"},
-			{sectionName: "repeating_range", prefix: "range"},
+			{sectionName: "repeating_ranged", prefix: "ranged"},
 			{sectionName: "repeating_techniquesrevised", prefix: "technique"},
 			{sectionName: "repeating_defense", prefix: "defense"}
 		];
 		
-		console.log("rowId:", rowId);
-
 		// loop through each section and update items that match the rowId
 		sections.forEach((section) => {
-
-			console.log("section:", section);
 
 			toggleRepeatingSectionLinkedToRow(rowId, section.sectionName, section.prefix)
 
@@ -15575,23 +15554,15 @@ See notes for weapon.</textarea>
 			// lets get all the values
 			getAttrs(fields, values => {
 
-				console.log(`${sectionName} linked to values: `, values);
-
 				let updateFields = {};
 
 				// convert the values object into an array
 				let entries = Object.entries(values);
 
-				console.log("array of entries: ", entries);
-
 				let foundMatch = false;
 
 				// loop through each entry
 				for (const [field, value] of entries) {
-
-					console.log("field:", field);
-
-					console.log("value:", value);
 
 					// NOTE: This match based on either skill/technique ID or against an attribute
 					// the field name lets us know which.
@@ -15616,8 +15587,6 @@ See notes for weapon.</textarea>
 					}
 
 					if (foundMatch) {
-
-						console.log("found matches:", updateFields);
 
 						// don't run silently, the toggle fields forces the row to update the skill level
 						setAttrs(updateFields);
