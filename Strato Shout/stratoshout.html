@@ -16,6 +16,16 @@
 <input type="hidden" name="attr_D" class="sheet-element-to-determine-style-D" value="">
 <input type="hidden" name="attr_E" class="sheet-element-to-determine-style-E" value="">
 
+<button type="roll" class="sheet-hidden" name='roll_defaultDamage' value='&{template:StratoDamage}{{name=@{character_name}}} {{roll=[[@{power}+@{abill}+?{판정에 소비한 컨디션|0}]]}} '></button>
+<button type="roll" class="sheet-hidden" name='roll_defaultHeal' value='&{template:StratoDamage}{{name=@{character_name}}} {{roll=[[1d6]]}} '></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseDamage' value='&{template:StratoDamage}{{name=@{character_name}}} {{roll=[[@{power} + @{abill}+ 2D6 + ?{판정에 소비한 컨디션|0}]]}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseHeal' value='&{template:StratoDamage}{{roll=[[2D6]]}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseVDamage' value='&{template:StratoDamage}{{roll=[[@{power} + @{abill}+ 2D6 + ?{판정에 소비한 컨디션|0} + ?{무력화 얽매임 수|0}D6]]}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseGDamage' value='&{template:StratoDamage}{{roll=[[@{power}+@{abill}+?{판정에 소비한 컨디션|0}}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseBDamage' value='&{template:StratoDamage}{{roll=[[@{power} + @{abill}+ ?{판정에 소비한 컨디션|0}D6]]}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseKDamage' value='&{template:StratoDamage}{{roll=[[@{power} + @{abill}+ 2D6 + ?{판정에 소비한 컨디션|0}]]}}'></button>
+<button type="roll" class="sheet-hidden" name='roll_phraseDDamage' value='&{template:StratoDamage}{{roll=[[@{power} + @{abill}+ 2D6 + ?{판정에 소비한 컨디션|0}]]}}'></button>
+
 <div class="sheet-st-wrap">
 	<div class="sheet-acc"></div>
 	<div class="sheet-st-top">
@@ -1017,7 +1027,7 @@
 			<div class="sheet-st-bustdetail">
 				<div class="sheet-tit">天唱 : Strato Shout</div>
 				<div class="sheet-detail">
-					대상에게 프레이즈 공격과 같은 대미지를 주며,<br />이 판정에 소비한 【컨디션】의 절반(소수점 올림)을 자신 이외의 PC전원에게 전달한다.
+					대상에게 프레이즈 공격과 똑같이 데미지를 입힌다.<br />이 데미지는 현재 무력화하고 있는 얽매임 1개마다 2D6점 상승한다.
 				</div>
 			</div>
 		</div>
@@ -1066,7 +1076,7 @@
 	<div class="sheet-st-attack">
 		<div class="sheet-item">
 			<div class="sheet-item-in">
-				<button class="old-roll" type="roll" value="&{template:StratoSkillDice} {{subject=통상 공격}}{{name=@{character_name}}}{{AssignedSkill=@{attack01_spec}}}{{target=@{attack01_target}}}{{roll=[[2d6]]}}{{Effect=@{attack01_effect}}}{{cond=[[?{소모할 컨디션|0}]]}}{{damage=[[@{power} + @{abill}]]}}{{etctype=[[1]]}}"></button>
+				<button class="old-roll" type="roll" value="&{template:StratoSkillDice} {{subject=통상 공격}}{{name=@{character_name}}}{{AssignedSkill=@{attack01_spec}}}{{target=@{attack01_target}}}{{roll=[[2d6]]}}{{Effect=@{attack01_effect}}}{{cond=[[?{소모할 컨디션|0}]]}}{{damage=[대미지 주사위 결과](~defaultDamage)}}{{etctype=[[1]]}}"></button>
 				<input type="text" name="attr_attack01_name" value="통상 공격" readonly/>
 				<input type="text" name="attr_attack01_type" value="라이브" readonly/>
 				<input type="text" name="attr_attack01_effect" value="대상에게 [【악기위력】+【역량】+이 판정에 소비한 【컨디션】]점의 대미지" readonly/>
@@ -1076,7 +1086,7 @@
 		</div>
 		<div class="sheet-item">
 			<div class="sheet-item-in">
-				<button class="old-roll" type="roll" value="&{template:StratoSkillDice} {{subject=통상 회복}}{{name=@{character_name}}}{{AssignedSkill=@{attack02_spec}}}{{target=@{attack02_target}}}{{roll=[[2d6]]}}{{Effect=@{attack02_effect}}}{{cond=[[?{소모할 컨디션|0}]]}}{{damage=[[1d6]]}}{{etctype=[[2]]}}"></button>
+				<button class="old-roll" type="roll" value="&{template:StratoSkillDice} {{subject=통상 회복}}{{name=@{character_name}}}{{AssignedSkill=@{attack02_spec}}}{{target=@{attack02_target}}}{{roll=[[2d6]]}}{{Effect=@{attack02_effect}}}{{cond=[[?{소모할 컨디션|0}]]}}{{damage=[회복 주사위 결과](~defaultHeal)}}{{etctype=[[2]]}}"></button>
 				<input type="text" name="attr_attack02_name" value="통상 회복" readonly/>
 				<input type="text" name="attr_attack02_type" value="라이브" readonly/>
 				<input type="text" name="attr_attack02_effect" value="【컨디션】을 1D6점 회복" readonly/>
@@ -1098,12 +1108,12 @@
 			<input type="checkbox" name="attr_phrase01_use" value="1" />
 			<div class="sheet-item-in">
 				<div class="sheet-phrase-dice">
-					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6]]}} {{heal=[[2d6]]}} {{etctype=[[@{phrase01_Types}]]}} {{Phrase=@{phrase01_name}}}" title="기본"></button>
-					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6+(?{무력화 얽매임 수|0}*2)D6]]}} {{Phrase=@{phrase01_name}}}" title="보컬"></button>
-					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase01_name}}}" title="키보드"></button>
-					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase01_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
-					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase01_name}}}" title="베이스"></button>
-					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase01_name}}}" title="드럼"></button>
+					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDamage)}} {{heal=[회복 주사위 결과](~phraseHeal)}} {{etctype=[[@{phrase01_Types}]]}} {{Phrase=@{phrase01_name}}}" title="기본"></button>
+					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseVDamage)}} {{Phrase=@{phrase01_name}}}" title="보컬"></button>
+					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseKDamage)}} {{Phrase=@{phrase01_name}}}" title="키보드"></button>
+					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseGDamage)}} {{Phrase=@{phrase01_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
+					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseBDamage)}} {{Phrase=@{phrase01_name}}}" title="베이스"></button>
+					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase01_spec}}} {{target=@{phrase01_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDDamage)}} {{Phrase=@{phrase01_name}}}" title="드럼"></button>
 				</div>
 				<select name="attr_phrase01_Types" value="">
 					<option value="1">공격</option>
@@ -1118,12 +1128,12 @@
 			<input type="checkbox" name="attr_phrase02_use" value="1" />
 			<div class="sheet-item-in">
 				<div class="sheet-phrase-dice">
-					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6]]}} {{heal=[[2d6]]}} {{etctype=[[@{phrase02_Types}]]}} {{Phrase=@{phrase02_name}}}" title="기본"></button>
-					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6+(?{무력화 얽매임 수|0}*2)D6]]}} {{Phrase=@{phrase02_name}}}" title="보컬"></button>
-					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase02_name}}}" title="키보드"></button>
-					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase02_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
-					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase02_name}}}" title="베이스"></button>
-					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase02_name}}}" title="드럼"></button>
+					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDamage)}} {{heal=[회복 주사위 결과](~phraseHeal)}} {{etctype=[[@{phrase02_Types}]]}} {{Phrase=@{phrase02_name}}}" title="기본"></button>
+					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseVDamage)}} {{Phrase=@{phrase02_name}}}" title="보컬"></button>
+					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseKDamage)}} {{Phrase=@{phrase02_name}}}" title="키보드"></button>
+					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseGDamage)}} {{Phrase=@{phrase02_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
+					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseBDamage)}} {{Phrase=@{phrase02_name}}}" title="베이스"></button>
+					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase02_spec}}} {{target=@{phrase02_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDDamage)}} {{Phrase=@{phrase02_name}}}" title="드럼"></button>
 				</div>
 				<select name="attr_phrase02_Types" value="">
 					<option value="1">공격</option>
@@ -1138,12 +1148,12 @@
 			<input type="checkbox" name="attr_phrase03_use" value="1" />
 			<div class="sheet-item-in">
 				<div class="sheet-phrase-dice">
-					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6]]}} {{heal=[[2d6]]}} {{etctype=[[@{phrase03_Types}]]}} {{Phrase=@{phrase03_name}}}" title="기본"></button>
-					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6+(?{무력화 얽매임 수|0}*2)D6]]}} {{Phrase=@{phrase03_name}}}" title="보컬"></button>
-					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase03_name}}}" title="키보드"></button>
-					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase03_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
-					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase03_name}}}" title="베이스"></button>
-					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase03_name}}}" title="드럼"></button>
+					<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDamage)}} {{heal=[회복 주사위 결과](~phraseHeal)}} {{etctype=[[@{phrase03_Types}]]}} {{Phrase=@{phrase03_name}}}" title="기본"></button>
+					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseVDamage)}} {{Phrase=@{phrase03_name}}}" title="보컬"></button>
+					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseKDamage)}} {{Phrase=@{phrase03_name}}}" title="키보드"></button>
+					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseGDamage)}} {{Phrase=@{phrase03_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
+					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseBDamage)}} {{Phrase=@{phrase03_name}}}" title="베이스"></button>
+					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase03_spec}}} {{target=@{phrase03_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDDamage)}} {{Phrase=@{phrase03_name}}}" title="드럼"></button>
 				</div>
 				<select name="attr_phrase03_Types" value="">
 					<option value="1">공격</option>
@@ -1160,12 +1170,12 @@
 				<input type="checkbox" name="attr_phrase_use" value="1" />
 				<div class="sheet-item-in">
 					<div class="sheet-phrase-dice">
-						<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6]]}} {{heal=[[2d6]]}} {{etctype=[[@{phrase_Types}]]}} {{Phrase=@{phrase_name}}}" title="기본"></button>
-						<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power} + @{abill}+2D6+(?{무력화 얽매임 수|0}*2)D6]]}} {{Phrase=@{phrase_name}}}" title="보컬"></button>
-						<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase_name}}}" title="키보드"></button>
-						<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
-						<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}]]}} {{Phrase=@{phrase_name}}}" title="베이스"></button>
-						<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[[@{power}+@{abill}+2D6]]}} {{Phrase=@{phrase_name}}}" title="드럼"></button>
+						<button class="old-roll sheet-default" type="roll" value="&{template:StratoPhrase} {{name=@{character_name}}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDamage)}} {{heal=[회복 주사위 결과](~phraseHeal)}} {{etctype=[[@{phrase_Types}]]}} {{Phrase=@{phrase_name}}}" title="기본"></button>
+					<button class="old-roll sheet-V" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[1]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseVDamage)}} {{Phrase=@{phrase_name}}}" title="보컬"></button>
+					<button class="old-roll sheet-K" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[2]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseKDamage)}} {{Phrase=@{phrase_name}}}" title="키보드"></button>
+					<button class="old-roll sheet-G" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[3]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseGDamage)}} {{Phrase=@{phrase_name}}} {{round=?{현재라운드|0}}}" title="기타"></button>
+					<button class="old-roll sheet-B" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[4]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseBDamage)}} {{Phrase=@{phrase_name}}}" title="베이스"></button>
+					<button class="old-roll sheet-D" type="roll" value="&{template:StratoBustPhrase} {{name=@{character_name}}}{{position=[[5]]}} {{AssignedSkill=@{phrase_spec}}} {{target=@{phrase_target}}} {{roll=[[2d6]]}} {{cond=[[?{소모할 컨디션|0}]]}} {{damage=[대미지 주사위 결과](~phraseDDamage)}} {{Phrase=@{phrase_name}}}" title="드럼"></button>
 					</div>
 					<select name="attr_phrase_Types" value="">
 						<option value="1">공격</option>
@@ -2289,10 +2299,10 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 
 		{{#etctype}}
 			{{#rollTotal() etctype 1}}
-				{{#damage}}<div class="sheet-damage">공격 Dice : {{damage}} {{#cond}}{{#rollGreater() cond 0}}<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>{{/rollGreater() cond 0}}{{/cond}}</div>{{/damage}}
+				<div class="sheet-damage">{{damage}}</div>
 			{{/rollTotal() etctype 1}}
 			{{#rollTotal() etctype 2}}
-				{{#heal}}<div class="sheet-damage">회복 Dice : {{heal}}</div>{{/heal}}
+				<div class="sheet-damage">{{heal}}</div>
 			{{/rollTotal() etctype 2}}
 		{{/etctype}}
 	</div>
@@ -2305,15 +2315,15 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 		</div>
 		{{#roll}}
 		<div class="sheet-dice">
-				{{roll}}
-				{{#cond}}{{#rollGreater() cond 0}}<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>{{/rollGreater() cond 0}}{{/cond}}
+			{{roll}}
+			{{#cond}}{{#rollGreater() cond 0}}<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>{{/rollGreater() cond 0}}{{/cond}}
 
-				{{#rollTotal() roll 2}}
-					<div class="sheet-result-fumble">FUMBLE!</div>
-				{{/rollTotal() roll 2}}
-				{{#rollTotal() roll 12}}
-					<div class="sheet-result-special">SPECIAL!</div>
-				{{/rollTotal() roll 12}}
+			{{#rollTotal() roll 2}}
+				<div class="sheet-result-fumble">FUMBLE!</div>
+			{{/rollTotal() roll 2}}
+			{{#rollTotal() roll 12}}
+				<div class="sheet-result-special">SPECIAL!</div>
+			{{/rollTotal() roll 12}}
 		</div>
 		{{/roll}}
 		{{#Phrase}}
@@ -2335,14 +2345,7 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 				<strong><em>天唱</em> Strato Shout (천창)</strong>
 				대상에게 프레이즈 공격과 똑같이 대미지를 입힌다. 이 대미지는 현재 무력화하고 있는 얽매임 1개마다 2D6점 상승한다.
 			</div>
-			<div class="sheet-damage sheet-damage-V">
-				공격 Dice : {{damage}} 
-				{{#cond}}
-					{{#rollGreater() cond 0}}
-						<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>
-					{{/rollGreater() cond 0}}
-				{{/cond}}
-			</div>
+			<div class="sheet-damage sheet-damage-V">{{damage}}</div>
 		{{/rollTotal() position 1}}
 
 		{{#rollTotal() position 2}}
@@ -2351,14 +2354,7 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 				<strong><em>軽階</em> Scale Dance (경계)</strong>
 				대상에게 프레이즈 공격과 같은 대미지를 주며, 이 판정에 소비한 【컨디션】의 절반(소수점 올림)을 자신 이외의 PC전원에게 전달한다.
 			</div>
-			<div class="sheet-damage sheet-damage-K">
-				공격 Dice : {{damage}} 
-				{{#cond}}
-					{{#rollGreater() cond 0}}
-						<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>
-					{{/rollGreater() cond 0}}
-				{{/cond}}
-			</div>
+			<div class="sheet-damage sheet-damage-K">{{damage}}</div>
 		{{/rollTotal() position 2}}
 
 		{{#rollTotal() position 3}}
@@ -2367,14 +2363,7 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 				<strong><em>弦語</em> Chord Talker (현어)</strong>
 				통상 공격의 대미지를 산출한다. 【지배력】이 이 대미지 이하인 얽매임을 {{round}}개를 골라 전부 무력화한다.
 			</div>
-			<div class="sheet-damage sheet-damage-G">
-				공격 Dice : {{damage}} 
-				{{#cond}}
-					{{#rollGreater() cond 0}}
-						<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>
-					{{/rollGreater() cond 0}}
-				{{/cond}}
-			</div>
+			<div class="sheet-damage sheet-damage-G">{{damage}}</div>
 		{{/rollTotal() position 3}}
 
 		{{#rollTotal() position 4}}
@@ -2383,14 +2372,7 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 				<strong><em>隙殺</em> Moment Killer (극살)</strong>
 				대상에게 [【악기위력】+【역량】+이 판정에 소비한 【컨디션】 D6]점의 데미지를 전달한다.
 			</div>
-			<div class="sheet-damage sheet-damage-B">
-				공격 Dice : {{damage}} 
-				{{#cond}}
-					{{#rollGreater() cond 0}}
-						<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}D6</span>
-					{{/rollGreater() cond 0}}
-				{{/cond}}
-			</div>
+			<div class="sheet-damage sheet-damage-B">{{damage}}</div>
 		{{/rollTotal() position 4}}
 
 		{{#rollTotal() position 5}}
@@ -2401,14 +2383,15 @@ on("change:Ab_01_spec change:Ab_02_spec change:Ab_03_spec change:Ab_spec change:
 				① 대상에게 프레이즈 공격과 같은 데미지를 준다.<br />
 				② 이 프레이즈 버스트를 사용한 라운드의 종료 직후, 추가 라운드가 발생한다. 단, 추가 라운드 중 모든 PC는 【컨디션】과 【프레이즈】를 사용할 수 없다. 또한, 이 프레이즈 버스트를 사용한 타이밍이 3라운드 째였을 경우, 얽매임이 전부 무력화 된다.
 			</div>
-			<div class="sheet-damage sheet-damage-K">
-				공격 Dice : {{damage}} 
-				{{#cond}}
-					{{#rollGreater() cond 0}}
-						<span class="sheet-dice-side sheet-cond" title="컨디션">+{{cond}}</span>
-					{{/rollGreater() cond 0}}
-				{{/cond}}
-			</div>
+			<div class="sheet-damage sheet-damage-D">{{damage}}</div>
 		{{/rollTotal() position 5}}
+	</div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-StratoDamage">
+	<div class="sheet-stratioDice-wrap">
+		<div class="sheet-dice">
+			{{roll}}
+		</div>
 	</div>
 </rolltemplate>
