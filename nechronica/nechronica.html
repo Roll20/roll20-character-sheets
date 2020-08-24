@@ -11,7 +11,7 @@
 
 		<div class="sheet-nc-info">
 			<div class="sheet-col">
-				<span class="sheet-label">향년</span>
+				<span class="sheet-label">향연</span>
 				<input type="text" name="attr_year" />
 			</div>
 			<div class="sheet-col">
@@ -55,7 +55,7 @@
 				<input type="number" name="attr_dicecount" value="1">D10+<input type="number" name="attr_dicemod" value="0">
 			</span>
 			<span class="sheet-item2">
-				행동 <button class='sheet-old-roll' type='roll' value='&{template:NcAct} {{subject=행동판정}}{{name=@{character_name}}}{{roll=[[@{dicecount}d10+@{dicemod}]]}}'></button>
+				행동 <button class='sheet-old-roll' type='roll' value='&{template:NcAct} {{subject=행동판정}}{{name=@{character_name}}}{{dicecount=[[@{dicecount}]]}} {{roll1=[[1d10+@{dicemod}]]}} {{roll2=[[1d10+@{dicemod}]] }} {{roll3=[[1d10+@{dicemod}]]}} {{roll4=[[1d10+@{dicemod}]]}}'></button>
 				대화 <button class='sheet-old-roll' type='roll' value='&{template:NcTal} {{subject=대화판정}}{{name=@{character_name}}}{{roll=[[@{dicecount}d10+@{dicemod}]]}}'></button>
 				광기 <button class='sheet-old-roll' type='roll' value='&{template:NcIns} {{subject=광기판정}}{{name=@{character_name}}}{{roll=[[@{dicecount}d10+@{dicemod}]]}}'></button>
 			</span>
@@ -1595,44 +1595,172 @@ on("change:move_add",
 			<div class="sheet-nc-in">
 				{{#name}}<div class="sheet-name">{{name}}</div>{{/name}}
 				{{#subject}}<div class="sheet-subj">{{subject}}</div>{{/subject}}
-				{{#roll}}
-				<div class="sheet-dt-area"></div>
-				{{/roll}}
+				{{#roll1}}
+					<div class="sheet-dt-area"></div>
+				{{/roll1}}
 			</div>
 		</div>
-		{{#roll}}
+
 		<div class="sheet-bottom">
 			<div class="sheet-nc-in">
-				{{#roll}}
-					{{roll}}
-				{{/roll}}
+				{{#rollGreater() dicecount 0}}
+					<!-- 다이스 갯수가 1개이상일 때 -->
+					{{roll1}}
+					{{#rollGreater() dicecount 1}}
+						<!-- 다이스 갯수가 2개이상일 때 -->
+						/ {{roll2}}
+						{{#rollGreater() dicecount 2}}
+							<!-- 다이스 갯수가 3개이상일 때 -->
+							/ {{roll3}}
+							{{#rollGreater() dicecount 3}}
+								<!-- 다이스 갯수가 4개이상일 때 -->
+								/ {{roll4}}
+							{{/rollGreater() dicecount 3}}
+						{{/rollGreater() dicecount 2}}
+					{{/rollGreater() dicecount 1}}
+				{{/rollGreater() dicecount 0}}
 
-				{{#rollLess() roll 6}}
-				<div class="sheet-result-fumble">
-					<div class="sheet-result-title">대실패</div>
-					<div class="sheet-con">
-						행동 실패. 자신의 파츠를 1개 손상한다. 또한 판정에 사용한 파츠가 있을 경우 그 파츠도 함께 손상된다.
-					</div>
-				</div>
-				<div class="sheet-result-fail">
-					<div class="sheet-result-title">실패</div>
-				</div>
-				{{/rollLess() roll 6}}
-				{{#rollGreater() roll 5}}
-					{{#rollGreater() roll 10}}
+				<!-- 대성공 판정 -->
+				{{#rollGreater() dicecount 0}}
+					{{#rollWasCrit() roll1}}
 						<div class="sheet-result-ciritical">
 							<div class="sheet-result-title">대성공</div>
 						</div>
-					{{/rollGreater() roll 10}}
-					{{#^rollGreater() roll 10}}
+					{{/rollWasCrit() roll1}}
+				{{/rollGreater() dicecount 0}}
+
+				{{#rollGreater() dicecount 1}}
+					{{#rollWasCrit() roll2}}
+						<div class="sheet-result-ciritical">
+							<div class="sheet-result-title">대성공</div>
+						</div>
+					{{/rollWasCrit() roll2}}
+				{{/rollGreater() dicecount 1}}
+
+				{{#rollGreater() dicecount 2}}
+					{{#rollWasCrit() roll3}}
+						<div class="sheet-result-ciritical">
+							<div class="sheet-result-title">대성공</div>
+						</div>
+					{{/rollWasCrit() roll3}}
+				{{/rollGreater() dicecount 2}}
+				{{#rollGreater() dicecount 3}}
+					{{#rollWasCrit() roll4}}
+						<div class="sheet-result-ciritical">
+							<div class="sheet-result-title">대성공</div>
+						</div>
+					{{/rollWasCrit() roll4}}
+				{{/rollGreater() dicecount 3}}
+
+				<!-- 성공 판정 -->
+				{{#rollGreater() dicecount 0}}
+					{{#rollGreater() roll1 5}}
 						<div class="sheet-result-succed">
 							<div class="sheet-result-title">성공</div>
 						</div>
-					{{/^rollGreater() roll 10}}
-				{{/rollGreater() roll 5}}
+					{{/rollGreater() roll1 5}}
+				{{/rollGreater() dicecount 0}}
+
+				{{#rollGreater() dicecount 1}}
+					{{#rollGreater() roll2 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/rollGreater() roll2 5}}
+				{{/rollGreater() dicecount 1}}
+
+				{{#rollGreater() dicecount 2}}
+					{{#rollGreater() roll3 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/rollGreater() roll3 5}}
+				{{/rollGreater() dicecount 2}}
+				{{#rollGreater() dicecount 3}}
+					{{#rollGreater() roll4 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/rollGreater() roll4 5}}
+				{{/rollGreater() dicecount 3}}
+
+				<!-- 펌블 판정 -->
+				{{#rollGreater() dicecount 0}}
+					{{#rollWasFumble() roll1}}
+						<div class="sheet-result-fumble">
+							<div class="sheet-result-title">대실패</div>
+							<div class="sheet-con">
+								행동 실패. 자신의 파츠를 1개 손상한다. 또한 판정에 사용한 파츠가 있을 경우 그 파츠도 함께 손상된다.
+							</div>
+						</div>
+					{{/rollWasFumble() roll1}}
+				{{/rollGreater() dicecount 0}}
+
+				{{#rollGreater() dicecount 1}}
+					{{#rollWasFumble() roll2}}
+						<div class="sheet-result-fumble">
+							<div class="sheet-result-title">대실패</div>
+							<div class="sheet-con">
+								행동 실패. 자신의 파츠를 1개 손상한다. 또한 판정에 사용한 파츠가 있을 경우 그 파츠도 함께 손상된다.
+							</div>
+						</div>
+					{{/rollWasFumble() roll2}}
+				{{/rollGreater() dicecount 1}}
+
+				{{#rollGreater() dicecount 2}}
+					{{#rollWasFumble() roll3}}
+						<div class="sheet-result-fumble">
+							<div class="sheet-result-title">대실패</div>
+							<div class="sheet-con">
+								행동 실패. 자신의 파츠를 1개 손상한다. 또한 판정에 사용한 파츠가 있을 경우 그 파츠도 함께 손상된다.
+							</div>
+						</div>
+					{{/rollWasFumble() roll3}}
+				{{/rollGreater() dicecount 2}}
+				{{#rollGreater() dicecount 3}}
+					{{#rollWasFumble() roll4}}
+						<div class="sheet-result-fumble">
+							<div class="sheet-result-title">대실패</div>
+							<div class="sheet-con">
+								행동 실패. 자신의 파츠를 1개 손상한다. 또한 판정에 사용한 파츠가 있을 경우 그 파츠도 함께 손상된다.
+							</div>
+						</div>
+					{{/rollWasFumble() roll4}}
+				{{/rollGreater() dicecount 3}}
+
+				<!-- 실패 판정 -->
+				{{#rollGreater() dicecount 0}}
+					{{#^rollGreater() roll1 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/^rollGreater() roll1 5}}
+				{{/rollGreater() dicecount 0}}
+
+				{{#rollGreater() dicecount 1}}
+					{{#^rollGreater() roll2 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/^rollGreater() roll2 5}}
+				{{/rollGreater() dicecount 1}}
+
+				{{#rollGreater() dicecount 2}}
+					{{#^rollGreater() roll3 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/^rollGreater() roll3 5}}
+				{{/rollGreater() dicecount 2}}
+				{{#rollGreater() dicecount 3}}
+					{{#^rollGreater() roll4 5}}
+						<div class="sheet-result-succed">
+							<div class="sheet-result-title">성공</div>
+						</div>
+					{{/^rollGreater() roll4 5}}
+				{{/rollGreater() dicecount 3}}
 			</div>
 		</div>
-		{{/roll}}
 	</div>
 </rolltemplate>
 
@@ -1844,7 +1972,6 @@ on("change:move_add",
 		</div>
 	</div>
 </rolltemplate>
-
 
 <rolltemplate class="sheet-rolltemplate-NcDefault">
 	<div class="sheet-nc-dicebox">
