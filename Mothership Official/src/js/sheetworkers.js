@@ -160,17 +160,16 @@ const toggleSkill = (source, newValue) => {
             unlocks.forEach(unlock => updateAttr += `${unlock} `);
 
         }
-
-        console.log(updateAttr);
             
         setAttrs({sheet_skill_toggles:updateAttr}); 
     });
 
 }
 
-const addItem = (new_value, previous_value, source) => {
-    console.log(`${new_value} ${previous_value} ${source}`)
-    if (new_value === previous_value || new_value !== "Weapon") return;
+const addItem = (new_value, previous_value, source, source_type) => {
+    if (new_value === previous_value || new_value !== "Weapon" || source_type !== "player") return;
+
+    console.log(source_type)
 
     const repeating_length = "repeating_equipment_".length;
     const repeating_id_length = 20;
@@ -180,8 +179,6 @@ const addItem = (new_value, previous_value, source) => {
     const repeating_attacks_prefix = `repeating_attacks_${new_repeating_id}`;
 
     const requestAttrs = [`${repeating_equipment_prefix}_equipment_name`,`${repeating_equipment_prefix}_equipment_type`];
-
-    console.log(requestAttrs);
 
     getAttrs(requestAttrs, values => {
         const updateAttrs = {};
@@ -213,7 +210,7 @@ const toggleClass = (new_class, previous_class, source_type) => {
 
     const update = {};
 
-    update["level"] = 1;
+    update["level"] = 0;
     update["xp"] = 0;
     update["stress"] = 2;
     update["resolve"] = 0;
@@ -276,9 +273,11 @@ const toggleClass = (new_class, previous_class, source_type) => {
 
         if (previous_class === new_class && values["init"] === "1") return;
 
-        console.log(values["level"]);
+        requestAttrs.forEach(attr => {
+            if (values[attr] !== "") update[attr] = values[attr];
+        })
 
-        if (values["level"] === 1 || values["level"] === "") {
+        if (values["level"] === 0 || values["level"] === "") {
 
             const fields = [
                 "level",
@@ -309,8 +308,6 @@ const toggleClass = (new_class, previous_class, source_type) => {
 
             updateAttrs["health"] = hitpoints;
             updateAttrs["health_max"] = hitpoints;
-
-            console.log(updateAttrs);
 
             setAttrs(updateAttrs);
 
@@ -476,13 +473,9 @@ const calculateHullValues = () => {
     getAttrs(["hull_max"], values => {
         const value = parseInt(values["hull_max"]) || 0;
     
-        console.log(value);
-    
         const n25 = Math.floor(value * 0.75);
         const n50 = Math.floor(value * 0.5);
         const n75 = Math.floor(value * 0.25);
-    
-        console.log(`${n25} : ${n50} : ${n75}`)
         
         setAttrs({
             hull_25: n25,
@@ -492,11 +485,144 @@ const calculateHullValues = () => {
     });
 }
 
+const dropHandler = (values) => {
+    const name = values.drop_name;
+    const data = JSON.parse(values.drop_data) || {};
+    const category = values.drop_category;
+
+    console.log(data);
+
+    if (name === ""|| typeof data === "" || typeof category === "") return console.warn("No drag and drop data found.");
+
+    switch (category) {
+        case "Classes": 
+            handleClassDrop(name, data);
+            break;
+        case "Items":
+            handleItemDrop(name, data);
+            break;
+        case "Mercenaries": 
+            handleMercenaryDrop(name, data);
+            break;
+        case "Ships":
+            handleShipDrop(name, data);
+            break;
+        case "Ship Weapons": 
+            handleShipWeaponDrop(name, data);
+            break;
+        default:
+            console.warn("Could not distinguish category from drop.")
+            break;
+    }
+
+}
+
+const handleItemDrop = (name, data) => {
+    const id = generateRowID();        
+    const address = `repeating_equipment_${id}_equipment`;
+
+    let updateAttrs = {};
+
+    updateAttrs[`${address}_name`] = name;
+    updateAttrs[`${address}_notes`] = data.Description || "";
+
+    if (data.Damage) {
+        const attack_id = generateRowID();
+        const attack_address = `repeating_attacks_${id}_attack`
+
+        updateAttrs[`${address}_type`] = "Weapon";
+        updateAttrs[`${address}_linkedid`] = attack_id;
+        
+        updateAttrs[`${attack_address}_linkedid`] = id;
+        updateAttrs[`${attack_address}_name`] = name;
+        updateAttrs[`${attack_address}_damage`] = data.Damage;
+        updateAttrs[`${attack_address}_critical_damage`] = data["Critical Damage"] || "";
+        updateAttrs[`${attack_address}_critical_effect`] = data["Critical Effect"] || "-";
+
+        let combined_string = (data.Description) ? `${data.Description} ` : ``;
+        combined_string += (data.Special) ? `${data.Special} ` : ``;
+
+        updateAttrs[`${attack_address}_notes`] = combined_string;
+
+        const range = JSON.parse(data.Range) || {};
+
+        if (range && range.CQC !== "Yes") {
+            updateAttrs[`${attack_address}_type`] = "Ranged";
+
+            updateAttrs[`${attack_address}_shots`] = data.Shots;
+            updateAttrs[`${attack_address}_ammunition`] = data.Ammunition;
+
+            updateAttrs[`${attack_address}_range_s`] = range.Short;
+            updateAttrs[`${attack_address}_range_m`] = range.Medium || "-";
+            updateAttrs[`${attack_address}_range_l`] = range.Long || "-";
+
+        } else {
+            updateAttrs[`${attack_address}_type`] = "Melee";      
+        }
+    } else if (data["Armor Save"]) {
+        updateAttrs[`${address}_type`] = "Armor";
+        updateAttrs[`${address}_armor_bonus`] = data["Armor Save"];
+    } else {
+        updateAttrs[`${address}_type`] = "Gear";
+    }
+
+    setAttrs(updateAttrs);
+
+}
+
+const handleClassDrop = (name, data) => {
+    setAttrs({class:name});
+    if (name) toggleClass(name,"","player");
+}
+
+const handleMercenaryDrop = () => {
+    console.warn("Mercenary drop not yet supported.");
+}
+
+const handleMonsterDrop = () => {
+    console.warn("Monster drop not yet supported.");
+}
+
+const handleShipDrop = (name, data) => {
+    const modules_raw = data["Required Modules"].split(",").map(item => item.trim());
+    const modules_parsed = {};
+    const updateAttrs = {};
+
+    modules_raw.forEach(module => modules_parsed[module.toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ /g,"_")] = parseInt(module.replace(/[^0-9]/g,"")) || 0);
+
+    console.log(modules_parsed);
+
+    updateAttrs["ship_class"] = name;
+    updateAttrs["ship_passengers"] = ((modules_parsed.barracks || 0) * 12) + modules_parsed.living_quarters || 1;
+    updateAttrs["life_support"] = modules_parsed.life_support || 1;
+    updateAttrs["ship_officers"] = modules_parsed.living_quarters || 0;
+    updateAttrs["ship_armor_modules"] = modules_parsed.armor || 0;
+    updateAttrs["ship_jumpdrive_modules"] = modules_parsed.jump_drive || 0;
+    updateAttrs["ship_computer_modules"] = modules_parsed.computer || 0;
+    updateAttrs["ship_galley"] = modules_parsed.galley || "";
+    updateAttrs["ship_weapon_mounts"] = modules_parsed.weapon_mount || 0;
+    updateAttrs["ship_medbays"] = modules_parsed.medical_bays || 0;
+    updateAttrs["ship_cyropods"] = (modules_parsed.cryochamber * 4) || 0;
+    updateAttrs["ship_living_quarters"] = modules_parsed.living_quarters || 0;
+    updateAttrs["ship_barracks"] = modules_parsed.barracks || 0;
+    updateAttrs["ship_cargoholds"] = modules_parsed.cargo_hold || 0;
+    updateAttrs["ship_sciencelabs"] = modules_parsed.science_lab || 0;
+    updateAttrs["ship_thrusters"] = modules_parsed.thrusters || 0;
+    updateAttrs["ship_engine"] = modules_parsed.engine || 0;
+    
+    console.log(updateAttrs);
+    setAttrs(updateAttrs);    
+}
+
+const handleShipWeaponDrop = () => {
+
+}
+
 // EVENT HANDLERS
 
 skillArray.forEach(skill => on(`change:${skill}`, eventInfo => toggleSkill(skill, eventInfo.newValue)));
 
-on(`change:repeating_equipment:equipment_type`, eventInfo => addItem(eventInfo.newValue, eventInfo.previousValue, eventInfo.sourceAttribute));
+on(`change:repeating_equipment:equipment_type`, eventInfo => addItem(eventInfo.newValue, eventInfo.previousValue, eventInfo.sourceAttribute, eventInfo.sourceType));
 
 on(`change:class`, eventInfo => toggleClass(eventInfo.newValue, eventInfo.previousValue, eventInfo.sourceType));
 
@@ -529,6 +655,14 @@ on(`change:hull_max`, eventInfo => calculateHullValues());
 on(`clicked:startship`, eventInfo => setAttrs({shipbuild:"on"}));
 on(`clicked:completeship`, eventInfo => setAttrs({shipbuild:0}));
 
+on(`clicked:editname_on`, eventInfo => setAttrs({npcname_toggle:"on"}));
+on(`clicked:editname_off`, eventInfo => setAttrs({npcname_toggle:0}));
+
+on("change:drop_name", (eventInfo) => {
+    getAttrs(["drop_name", "drop_content", "drop_data", "drop_category"], (values) => {
+        dropHandler(values);
+    });
+});
 
 ["life_support_hull","command_hull","armor_hull","jump_drives_hull","computer_hull","galley_hull",
 "weapon_mount_hull","medical_bay_hull","cryochamber_hull","living_quarters_hull","barracks_hull",
