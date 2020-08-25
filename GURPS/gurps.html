@@ -108,7 +108,6 @@
 									</div>
 								</div>
 							</label>
-
 						</div>
 
 					</div>
@@ -4567,11 +4566,24 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					</div>
 					<div class="cell number-input">
 						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" />
-						<input type="hidden" value="" name="attr_skill_roll_modifier_description" />
-						
-					</div>
+						<input type="hidden" value="" name="attr_skill_roll_modifier_summary" />
+						<input type="hidden" value="" name="attr_skill_roll_trait_summary" />
+					  </div>
 					<div class="cell">
 						<button type="action" name="act_show_roll_modifiers_for_skills" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+					<div class="cell cell-popup">
+						<div>
+							<input type="checkbox" name="attr_skill_roll_max_nine" value="1" title="Macro: @{skill_roll_max_nine}" />
+						</div>
+						<div>
+							<div class="popup">
+								<span data-i18n="max-skill-9-label">Max skill of 9</span>
+							</div>
+							<div class="tooltip">
+								<span data-i18n="max-skill-9-tooltip">The effective skill cannot exceed 9.</span>
+							</div>
+						</div>
 					</div>
 				</div>
 				
@@ -8761,7 +8773,7 @@ For more information, see B409.
 	
 	<div class="tab0">
 		
-		<div class="options medium-height">
+		<div class="options">
 		    
 		    <div class="option-column">
 		        
@@ -8825,6 +8837,83 @@ For more information, see B409.
 						</span>
 					</span>
 					
+				</div><!-- end roll modifiers -->
+				
+				<!-- roll modifiers -->
+		        <div class="option-container">
+					<h4>
+						<span data-i18n="skill-modifier-tools-label">Skill Modifier Tools</span>
+					</h4>
+					
+    				<input type="checkbox" name="attr_use_skill_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-skill-modifier-tool-label">Use Skill Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">Displays a modifier text box, a button to open a tool to modify effective skill, and to check off Max skill of 9.</span>
+					</span>
+					<br />
+					
+					<input type="checkbox" name="attr_use_technique_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-technique-modifier-tool-label">Use Technique Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">
+							Displays a modifier text box, a button to open a tool to modify effective skill, and
+							to check off Max skill of 9.
+						</span>
+    				</span>
+					<br />
+					
+					<input type="checkbox" name="attr_use_defense_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-defense-modifier-tool-label">Use Defense Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">
+							Displays a modifier text box, a button to open a tool to modify effective skill, and
+							to check off Max skill of 9.
+						</span>
+    				</span>
+					<br />
+
+					<input type="checkbox" name="attr_use_melee_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-melee-modifier-tool-label">Use Melee Attack Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">
+							Displays a modifier text box, a button to open a tool to modify effective skill, and
+							to check off Max skill of 9.
+						</span>
+    				</span>
+					<br />
+					
+					<input type="checkbox" name="attr_use_ranged_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-ranged-modifier-tool-label">Use Ranged Attack Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">
+							Displays a modifier text box, a button to open a tool to modify effective skill, and
+							to check off Max skill of 9.
+						</span>
+    				</span>
+					<br />
+					
+					<input type="checkbox" name="attr_use_spell_modifier_tool" value="1" />
+    				<span class="popup">
+						<span data-i18n="use-spell-modifier-tool-label">Use Spell Modifier Tool</span>
+					</span>
+    				<span class="tooltip">
+						<span data-i18n="use-skill-modifier-tool-tooltip">
+							Displays a modifier text box, a button to open a tool to modify effective skill, and
+							to check off Max skill of 9.
+						</span>
+    				</span>
+					<br />
+
     			</div><!-- end roll modifiers -->
     			
     			<div class="option-container">
@@ -9108,7 +9197,7 @@ For more information, see B409.
 			
 		</div><!-- end options row -->
 			
-		<div class="options tall-height">
+		<div class="options">
 		    
 		    <div class="option-column">
 		       
@@ -17571,12 +17660,47 @@ The attacker may choose to hit the original target or the limb you used to parry
 	// apply and close the roll modifiers modal box
 	on("clicked:apply_roll_modifiers", (event) => {
 
-		let fields = {
-			"show_roll_modifiers": 0,
-			"roll_modifier_types": ""
-		};
+		let fields = [
+			"roll_modifier_types",
+			"max_skill_nine", 
+			"roll_modifier", 
+			"roll_modifier_summary", 
+			"roll_trait_summary"
+		];
 
-		setAttrs(fields, {silent:true});
+		getAttrs(fields, values => {
+
+			let updateFields;
+
+			switch (values.roll_modifier_types) {
+				case "skill":
+					
+					// fields to get updated 
+					updateFields = {
+						"show_roll_modifiers": 0,
+						"roll_modifier_types": "",
+						"skill_roll_modifier": Number(values.roll_modifier),
+						"skill_roll_modifier_summary": values.roll_modifier_summary,
+						"skill_roll_trait_summary": values.roll_trait_summary,
+						"skill_roll_max_nine": values.max_skill_nine,
+					};
+
+					break;
+			
+				default:
+					
+					// clear current dialog settings
+					updateFields = {
+						"show_roll_modifiers": 0,
+						"roll_modifier_types": "",
+					};
+
+					break;
+			}
+
+			setAttrs(updateFields, {silent:true});
+
+		});
 
 	});
 
