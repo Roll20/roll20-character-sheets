@@ -34,13 +34,26 @@
 		{
 			const sang = parseInt(value["sang"], 10)||0;
 			
-			if(sang== 0 || sang == 1 || sang == 3)
+			if(sang == 0)
 			{
 				setAttrs({
 					bricolageMB:10,
 					cultureGeneraleMoldueMMB:20,
 					jeuxMoldusMMB:10,
 					serrurerieMB:10,
+					cultureGeneraleSorciersSMB:20,
+					jeuxSorciersSMB:10,
+					mythesLegendesSorciersMB:5
+				});
+			}
+			
+			if(sang == 1)
+			{
+				setAttrs({
+					bricolageMB:0,
+					cultureGeneraleMoldueMMB:0,
+					jeuxMoldusMMB:0,
+					serrurerieMB:0,
 					cultureGeneraleSorciersSMB:20,
 					jeuxSorciersSMB:10,
 					mythesLegendesSorciersMB:5
@@ -59,6 +72,19 @@
 					mythesLegendesSorciersMB:0
 				});
 			}
+			
+			if(sang == 3)
+			{
+				setAttrs({
+					bricolageMB:10,
+					cultureGeneraleMoldueMMB:20,
+					jeuxMoldusMMB:10,
+					serrurerieMB:10,
+					cultureGeneraleSorciersSMB:0,
+					jeuxSorciersSMB:0,
+					mythesLegendesSorciersMB:0
+				});
+			}
 		});
 	});
 
@@ -68,6 +94,26 @@
 			
 		setAttrs({
 			["debloquerCScolaire"]:1
+		});
+	});
+	
+	on(
+	"sheet:opened"
+	, function() 
+	{
+		getAttrs(["discretionFamilier", "version"], function(value)
+		{
+			const version = parseInt(value["version"], 10)||0;
+			const discretion = parseInt(value["discretionFamilier"], 10)||0;
+			
+			if(version < 1)
+			{
+				setAttrs({
+					discretionScoreFamilier:discretion,
+					discretionFamilier:"Discrétion",
+					version:1
+				});
+			}
 		});
 	});
 </script>
@@ -130,6 +176,20 @@
 				<option value="/w gm">Oui</option>
 			</select>
 		</label>
+		<label>
+			<span>Possède l'avantage "Education Mixte"</span>
+			<select name="attr_educationMixte">
+				<option value="0" selected>Non</option>
+				<option value="1">Oui</option>
+			</select>
+		</label>
+		<label>
+			<span>Possède l'avantage "Chanceux"</span>
+			<select name="attr_chanceux">
+				<option value="cs<5cf>96]]}} {{critique=[[5]]}}" selected>Non</option>
+				<option value="cs<10cf>96]]}} {{critique=[[10]]}}">Oui</option>
+			</select>
+		</label>
 	</div>
 </div>
 <div class="top">
@@ -189,44 +249,44 @@
 	<div class="colLeft">
 		<div class="carac">
 			<div>
-				<button type="roll" name="roll_for" value="@{gm} &{template:base} {{nom=Force}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{for}@{caracDifficulte}]]+@{modif}]]}}" >Force</button>
+				<button type="roll" name="roll_for" value="@{gm} &{template:base} {{nom=Force}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{for}@{caracDifficulte}]]+@{modif}]]}}" >Force</button>
 				<input type="number" name="attr_for" value="0" />
-				<button type="roll" name="roll_forOpp" value="@{gm} &{template:base} {{nom=Jet opposé de force}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_forOpp" value="@{gm} &{template:base} {{nom=Jet opposé de force}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_con" value="@{gm} &{template:base} {{nom=Constitution}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{con}@{caracDifficulte}]]+@{modif}]]}}" >Constitution</button>
+				<button type="roll" name="roll_con" value="@{gm} &{template:base} {{nom=Constitution}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{con}@{caracDifficulte}]]+@{modif}]]}}" >Constitution</button>
 				<input type="number" name="attr_con" value="0" />
-				<button type="roll" name="roll_conOpp" value="@{gm} &{template:base} {{nom=Jet opposé de constitution}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_conOpp" value="@{gm} &{template:base} {{nom=Jet opposé de constitution}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_tai" value="@{gm} &{template:base} {{nom=Taille}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tai}@{caracDifficulte}]]+@{modif}]]}}" >Taille</button>
+				<button type="roll" name="roll_tai" value="@{gm} &{template:base} {{nom=Taille}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tai}@{caracDifficulte}]]+@{modif}]]}}" >Taille</button>
 				<input type="number" name="attr_tai" value="0" />
-				<button type="roll" name="roll_taiOpp" value="@{gm} &{template:base} {{nom=Jet opposé de taille}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_taiOpp" value="@{gm} &{template:base} {{nom=Jet opposé de taille}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_per" value="@{gm} &{template:base} {{nom=Perception}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}@{caracDifficulte}]]+@{modif}]]}}" >Perception</button>
+				<button type="roll" name="roll_per" value="@{gm} &{template:base} {{nom=Perception}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}@{caracDifficulte}]]+@{modif}]]}}" >Perception</button>
 				<input type="number" name="attr_per" value="0" />
-				<button type="roll" name="roll_perOpp" value="@{gm} &{template:base} {{nom=Jet opposé de perception}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_perOpp" value="@{gm} &{template:base} {{nom=Jet opposé de perception}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_int" value="@{gm} &{template:base} {{nom=Intelligence}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{int}@{caracDifficulte}]]+@{modif}]]}}" >Intelligence</button>
+				<button type="roll" name="roll_int" value="@{gm} &{template:base} {{nom=Intelligence}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{int}@{caracDifficulte}]]+@{modif}]]}}" >Intelligence</button>
 				<input type="number" name="attr_int" value="0" />
-				<button type="roll" name="roll_intOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'intelligence}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_intOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'intelligence}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_dex" value="@{gm} &{template:base} {{nom=Dextérité}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dex}@{caracDifficulte}]]+@{modif}]]}}" >Dextérité</button>
+				<button type="roll" name="roll_dex" value="@{gm} &{template:base} {{nom=Dextérité}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dex}@{caracDifficulte}]]+@{modif}]]}}" >Dextérité</button>
 				<input type="number" name="attr_dex" value="0" />
-				<button type="roll" name="roll_dexOpp" value="@{gm} &{template:base} {{nom=Jet opposé de dextérité}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_dexOpp" value="@{gm} &{template:base} {{nom=Jet opposé de dextérité}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_app" value="@{gm} &{template:base} {{nom=Apparence}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{app}@{caracDifficulte}]]+@{modif}]]}}" >Apparence</button>
+				<button type="roll" name="roll_app" value="@{gm} &{template:base} {{nom=Apparence}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{app}@{caracDifficulte}]]+@{modif}]]}}" >Apparence</button>
 				<input type="number" name="attr_app" value="0" />
-				<button type="roll" name="roll_appOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'apparence}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_appOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'apparence}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 			<div>
-				<button type="roll" name="roll_pou" value="@{gm} &{template:base} {{nom=Pouvoir}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{pou}@{caracDifficulte}]]+@{modif}]]}}" >Pouvoir</button>
+				<button type="roll" name="roll_pou" value="@{gm} &{template:base} {{nom=Pouvoir}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{pou}@{caracDifficulte}]]+@{modif}]]}}" >Pouvoir</button>
 				<input type="number" name="attr_pou" value="0" />
-				<button type="roll" name="roll_pouOpp" value="@{gm} &{template:base} {{nom=Jet opposé de pouvoir}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+				<button type="roll" name="roll_pouOpp" value="@{gm} &{template:base} {{nom=Jet opposé de pouvoir}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 			</div>
 		</div>
 		
@@ -269,11 +329,11 @@
 				<input type="text" name="attr_bonusDmg" value="" readonly />
 			</label>
 			<div>
-				<button type="roll" name="roll_idee" value="@{gm} &{template:base} {{nom=Idée}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{int}*5]]+@{modif}]]}}">Idée</button>
+				<button type="roll" name="roll_idee" value="@{gm} &{template:base} {{nom=Idée}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{int}*5]]+@{modif}]]}}">Idée</button>
 				<input type="text" name="attr_idee" value="@{int}*5" disabled />
 			</div>
 			<div>
-				<button type="roll" name="roll_chance" value="@{gm} &{template:base} {{nom=Chance}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{pou}*5]]+@{modif}]]}}">Chance</button>
+				<button type="roll" name="roll_chance" value="@{gm} &{template:base} {{nom=Chance}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{pou}*5]]+@{modif}]]}}">Chance</button>
 				<input type="text" name="attr_chance" value="@{pou}*5" disabled />
 			</div>
 			<label>
@@ -283,11 +343,11 @@
 		</div>
 	
 		<div class="jetsPerception">
-			<button type="roll" name="roll_gout" value="@{gm} &{template:base} {{nom=Goût}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Goût</button>
-			<button type="roll" name="roll_odorat" value="@{gm} &{template:base} {{nom=Odorat}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Odorat</button>
-			<button type="roll" name="roll_ouie" value="@{gm} &{template:base} {{nom=Ouïe}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}*4]]+@{modif}]]}}">Ouïe</button>
-			<button type="roll" name="roll_toucher" value="@{gm} &{template:base} {{nom=Toucher}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Toucher</button>
-			<button type="roll" name="roll_vue" value="@{gm} &{template:base} {{nom=Vue}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{per}*5]]+@{modif}]]}}">Vue</button>
+			<button type="roll" name="roll_gout" value="@{gm} &{template:base} {{nom=Goût}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Goût</button>
+			<button type="roll" name="roll_odorat" value="@{gm} &{template:base} {{nom=Odorat}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Odorat</button>
+			<button type="roll" name="roll_ouie" value="@{gm} &{template:base} {{nom=Ouïe}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}*4]]+@{modif}]]}}">Ouïe</button>
+			<button type="roll" name="roll_toucher" value="@{gm} &{template:base} {{nom=Toucher}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}*3]]+@{modif}]]}}">Toucher</button>
+			<button type="roll" name="roll_vue" value="@{gm} &{template:base} {{nom=Vue}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{per}*5]]+@{modif}]]}}">Vue</button>
 		</div>
 	</div>
 	
@@ -361,6 +421,7 @@
 
 <div class="tab2">
 	<input type="hidden" name="attr_ficheType" value="0" />
+	
 	<div class="fichePJ">
 		<div class="compCol">
 			<div class="competencesGenerales">
@@ -386,7 +447,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_acrobatieQuidditchMT" value="@{acrobatieQuidditchMB}+@{acrobatieQuidditchMA}"  disabled />
-					<button type="roll" name="roll_acrobatieQuidditch" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieQuidditchMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_acrobatieQuidditch" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieQuidditchMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -414,7 +475,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_artisanatMT" value="@{artisanatMB}+@{artisanatMA}"  disabled />
-					<button type="roll" name="roll_artisanat" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artisanatMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_artisanat" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artisanatMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -442,7 +503,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_athletismeMT" value="@{athletismeMB}+@{athletismeMA}"  disabled />
-					<button type="roll" name="roll_athletisme" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{athletismeMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_athletisme" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{athletismeMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -470,7 +531,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_bagarreMT" value="@{bagarreMB}+@{bagarreMA}"  disabled />
-					<button type="roll" name="roll_bagarre" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bagarreMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_bagarre" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bagarreMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -498,7 +559,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_bibliothequeMT" value="@{bibliothequeMB}+@{bibliothequeMA}"  disabled />
-					<button type="roll" name="roll_bibliotheque" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bibliothequeMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_bibliotheque" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bibliothequeMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -526,7 +587,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_commandementMT" value="@{commandementMB}+@{commandementMA}"  disabled />
-					<button type="roll" name="roll_commandement" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{commandementMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_commandement" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{commandementMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -554,7 +615,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_connaissanceScolaireSMMT" value="@{connaissanceScolaireSMMB}+@{connaissanceScolaireSMMA}"  disabled />
-					<button type="roll" name="roll_connaissanceScolaireSM" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceScolaireSMMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_connaissanceScolaireSM" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceScolaireSMMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -582,7 +643,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_deguisementMT" value="@{deguisementMB}+@{deguisementMA}"  disabled />
-					<button type="roll" name="roll_deguisement" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{deguisementMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_deguisement" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{deguisementMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -610,7 +671,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_discretionMT" value="@{discretionMB}+@{discretionMA}"  disabled />
-					<button type="roll" name="roll_discretion" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_discretion" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -638,7 +699,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_dressageSoinMT" value="@{dressageSoinMB}+@{dressageSoinMA}"  disabled />
-					<button type="roll" name="roll_dressageSoin" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dressageSoinMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_dressageSoin" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dressageSoinMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -666,7 +727,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_empathieMT" value="@{empathieMB}+@{empathieMA}"  disabled />
-					<button type="roll" name="roll_empathie" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{empathieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_empathie" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{empathieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -694,7 +755,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_esquiveMT" value="@{esquiveMB}+@{esquiveMA}"  disabled />
-					<button type="roll" name="roll_esquive" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_esquive" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -722,7 +783,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_fouilleMenageMT" value="@{fouilleMenageMB}+@{fouilleMenageMA}"  disabled />
-					<button type="roll" name="roll_fouilleMenage" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{fouilleMenageMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_fouilleMenage" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{fouilleMenageMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -750,7 +811,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_langueEtrangereRuneMT" value="@{langueEtrangereRuneMB}+@{langueEtrangereRuneMA}"  disabled />
-					<button type="roll" name="roll_langueEtrangereRune" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueEtrangereRuneMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_langueEtrangereRune" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueEtrangereRuneMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -778,7 +839,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_langueNataleMT" value="@{langueNataleMB}+@{langueNataleMA}"  disabled />
-					<button type="roll" name="roll_langueNatale" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueNataleMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_langueNatale" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueNataleMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -806,7 +867,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_orientationMT" value="@{orientationMB}+@{orientationMA}"  disabled />
-					<button type="roll" name="roll_orientation" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_orientation" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -834,7 +895,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_persuasionBaratinMT" value="@{persuasionBaratinMB}+@{persuasionBaratinMA}"  disabled />
-					<button type="roll" name="roll_persuasionBaratin" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{persuasionBaratinMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_persuasionBaratin" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{persuasionBaratinMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -862,7 +923,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_psychologieMT" value="@{psychologieMB}+@{psychologieMA}"  disabled />
-					<button type="roll" name="roll_psychologie" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{psychologieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_psychologie" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{psychologieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -890,7 +951,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_secourismeMT" value="@{secourismeMB}+@{secourismeMA}"  disabled />
-					<button type="roll" name="roll_secourisme" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{secourismeMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_secourisme" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{secourismeMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -918,7 +979,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_survieMT" value="@{survieMB}+@{survieMA}"  disabled />
-					<button type="roll" name="roll_survie" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_survie" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -946,7 +1007,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_tricheMT" value="@{tricheMB}+@{tricheMA}"  disabled />
-					<button type="roll" name="roll_triche" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tricheMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_triche" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tricheMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -974,7 +1035,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_vigilanceMT" value="@{vigilanceMB}+@{vigilanceMA}"  disabled />
-					<button type="roll" name="roll_vigilance" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_vigilance" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1002,11 +1063,11 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_competenceGeneraleMT" value="@{competenceGeneraleMB}+@{competenceGeneraleMA}"  disabled />
-					<button type="roll" name="roll_competenceGenerale" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceGeneraleMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_competenceGenerale" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceGeneraleMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
-							<input type="number" name="attr_competenceGeneraleMM" value="((((50+((@{anneeScolaire}-1)*10)) + 90) - abs((50+((@{anneeScolaire}-1)*10)) - 90)) / 2)"  disabled />
+							<input type="number" name="attr_competenceGeneraleMM" value="0"  />
 						</label>
 						<label>
 							<span>Maîtrise de base</span>
@@ -1021,6 +1082,7 @@
 			</div>
 		
 			<input type="hidden" name="attr_sang" class="sangHidden" value="0" />
+			<input type="hidden" name="attr_educationMixte" class="educationMixte" value="0" />
 			<div class="competencesMoldus">
 				<h3>Compétences des Moldus</h3>
 				<label>
@@ -1044,7 +1106,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_bricolageMT" value="@{bricolageMB}+@{bricolageMA}"  disabled />
-					<button type="roll" name="roll_bricolage" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bricolageMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_bricolage" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bricolageMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1072,7 +1134,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_conduireMT" value="@{conduireMB}+@{conduireMA}"  disabled />
-					<button type="roll" name="roll_conduire" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conduireMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_conduire" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conduireMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1100,7 +1162,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_cultureGeneraleMoldueMMT" value="@{cultureGeneraleMoldueMMB}+@{cultureGeneraleMoldueMMA}"  disabled />
-					<button type="roll" name="roll_cultureGeneraleMoldueM" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleMoldueMMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_cultureGeneraleMoldueM" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleMoldueMMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1128,7 +1190,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_jeuxMoldusMMT" value="@{jeuxMoldusMMB}+@{jeuxMoldusMMA}"  disabled />
-					<button type="roll" name="roll_jeuxMoldusM" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxMoldusMMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_jeuxMoldusM" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxMoldusMMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1156,7 +1218,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_serrurerieMT" value="@{serrurerieMB}+@{serrurerieMA}"  disabled />
-					<button type="roll" name="roll_serrurerie" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{serrurerieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_serrurerie" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{serrurerieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1184,7 +1246,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_connaissanceMT" value="@{connaissanceMB}+@{connaissanceMA}"  disabled />
-					<button type="roll" name="roll_connaissance" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_connaissance" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1229,7 +1291,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_arithmancieMT" value="@{arithmancieMB}+@{arithmancieMA}"  disabled />
-					<button type="roll" name="roll_arithmancie" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{arithmancieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_arithmancie" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{arithmancieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1257,7 +1319,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_artMagiqueMT" value="@{artMagiqueMB}+@{artMagiqueMA}"  disabled />
-					<button type="roll" name="roll_artMagique" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMagiqueMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_artMagique" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMagiqueMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1285,7 +1347,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_artMolduMT" value="@{artMolduMB}+@{artMolduMA}"  disabled />
-					<button type="roll" name="roll_artMoldu" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMolduMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_artMoldu" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMolduMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1313,7 +1375,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_astrologieMT" value="@{astrologieMB}+@{astrologieMA}"  disabled />
-					<button type="roll" name="roll_astrologie" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astrologieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_astrologie" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astrologieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1341,7 +1403,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_astronomieMT" value="@{astronomieMB}+@{astronomieMA}"  disabled />
-					<button type="roll" name="roll_astronomie" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astronomieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_astronomie" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astronomieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1369,7 +1431,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_botaniqueMT" value="@{botaniqueMB}+@{botaniqueMA}"  disabled />
-					<button type="roll" name="roll_botanique" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{botaniqueMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_botanique" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{botaniqueMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1397,7 +1459,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_coursVolMT" value="@{coursVolMB}+@{coursVolMA}"  disabled />
-					<button type="roll" name="roll_coursVol" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{coursVolMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_coursVol" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{coursVolMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1425,7 +1487,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_defenseForcesMalMT" value="@{defenseForcesMalMB}+@{defenseForcesMalMA}"  disabled />
-					<button type="roll" name="roll_defenseForcesMal" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{defenseForcesMalMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_defenseForcesMal" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{defenseForcesMalMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1453,7 +1515,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_divinationMT" value="@{divinationMB}+@{divinationMA}"  disabled />
-					<button type="roll" name="roll_divination" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{divinationMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_divination" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{divinationMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1481,7 +1543,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_enchantementsMT" value="@{enchantementsMB}+@{enchantementsMA}"  disabled />
-					<button type="roll" name="roll_enchantements" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_enchantements" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1509,7 +1571,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_etudeRunesMT" value="@{etudeRunesMB}+@{etudeRunesMA}"  disabled />
-					<button type="roll" name="roll_etudeRunes" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{etudeRunesMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_etudeRunes" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{etudeRunesMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1537,7 +1599,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_histoireMagieMT" value="@{histoireMagieMB}+@{histoireMagieMA}"  disabled />
-					<button type="roll" name="roll_histoireMagie" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{histoireMagieMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_histoireMagie" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{histoireMagieMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1565,7 +1627,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_mauvaisSortsMT" value="@{mauvaisSortsMB}+@{mauvaisSortsMA}"  disabled />
-					<button type="roll" name="roll_mauvaisSorts" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mauvaisSorts" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1593,7 +1655,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_metamorphoseMT" value="@{metamorphoseMB}+@{metamorphoseMA}"  disabled />
-					<button type="roll" name="roll_metamorphose" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_metamorphose" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1621,7 +1683,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_musiqueMagiqueMT" value="@{musiqueMagiqueMB}+@{musiqueMagiqueMA}"  disabled />
-					<button type="roll" name="roll_musiqueMagique" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMagiqueMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_musiqueMagique" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMagiqueMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1649,7 +1711,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_musiqueMoldueMT" value="@{musiqueMoldueMB}+@{musiqueMoldueMA}"  disabled />
-					<button type="roll" name="roll_musiqueMoldue" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMoldueMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_musiqueMoldue" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMoldueMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1657,7 +1719,7 @@
 						</label>
 						<label>
 							<span>Maîtrise de base</span>
-							<input type="number" name="attr_musiqueMoldueMB" value="5"  disabled />
+							<input type="number" name="attr_musiqueMoldueMB" value="0"  disabled />
 						</label>
 						<label>
 							<span>Maîtrise actuelle</span>
@@ -1677,7 +1739,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_potionsMT" value="@{potionsMB}+@{potionsMA}"  disabled />
-					<button type="roll" name="roll_potions" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{potionsMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_potions" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{potionsMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1705,7 +1767,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_soinsCreaturesMagiquesMT" value="@{soinsCreaturesMagiquesMB}+@{soinsCreaturesMagiquesMA}"  disabled />
-					<button type="roll" name="roll_soinsCreaturesMagiques" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{soinsCreaturesMagiquesMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_soinsCreaturesMagiques" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{soinsCreaturesMagiquesMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1733,7 +1795,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_competenceScolaireMT" value="@{competenceScolaireMB}+@{competenceScolaireMA}"  disabled />
-					<button type="roll" name="roll_competenceScolaire" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScolaireMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_competenceScolaire" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScolaireMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1752,6 +1814,7 @@
 			</div>
 			
 			<input type="hidden" name="attr_sang" class="sangHidden" value="0" />
+			<input type="hidden" name="attr_educationMixte" class="educationMixte" value="0" />
 			<div class="competencesSorciers">
 				<h3>Compétences des Sorciers</h3>
 				<label>
@@ -1775,7 +1838,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_connaissanceMoldusSMT" value="@{connaissanceMoldusSMB}+@{connaissanceMoldusSMA}"  disabled />
-					<button type="roll" name="roll_connaissanceMoldusS" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMoldusSMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_connaissanceMoldusS" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMoldusSMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1803,7 +1866,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_cultureGeneraleSorciersSMT" value="@{cultureGeneraleSorciersSMB}+@{cultureGeneraleSorciersSMA}"  disabled />
-					<button type="roll" name="roll_cultureGeneraleSorciersS" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleSorciersSMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_cultureGeneraleSorciersS" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleSorciersSMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1831,7 +1894,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_jeuxSorciersSMT" value="@{jeuxSorciersSMB}+@{jeuxSorciersSMA}"  disabled />
-					<button type="roll" name="roll_jeuxSorciersS" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxSorciersSMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_jeuxSorciersS" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxSorciersSMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1859,7 +1922,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_mythesLegendesSorciersMT" value="@{mythesLegendesSorciersMB}+@{mythesLegendesSorciersMA}"  disabled />
-					<button type="roll" name="roll_mythesLegendesSorciers" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mythesLegendesSorciersMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mythesLegendesSorciers" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mythesLegendesSorciersMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1887,7 +1950,7 @@
 						<span></span>
 					</label>
 					<input type="number" name="attr_connaissanceMT" value="@{connaissanceMB}+@{connaissanceMA}"  disabled />
-					<button type="roll" name="roll_connaissance" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMT}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_connaissance" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMT}]]+@{modif}]]}}" ></button>
 					<div>
 						<label>
 							<span>Maîtrise maximale</span>
@@ -1944,117 +2007,117 @@
 					<div>
 						<input type="text" name="attr_acrobatieQuidditchNom" value="Acrobatie / Quidditch" disabled />
 						<input type="number" name="attr_acrobatieQuidditchMTPNJP0" value="0"  />
-						<button type="roll" name="roll_acrobatieQuidditchPNJP0" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieQuidditchMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_acrobatieQuidditchPNJP0" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieQuidditchMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artisanatNom" value="Artisanat" disabled />
 						<input type="number" name="attr_artisanatMTPNJP0" value="0" />
-						<button type="roll" name="roll_artisanatPNJP0" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artisanatMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artisanatPNJP0" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artisanatMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_athletismeNom" value="Athlétisme" disabled />
 						<input type="number" name="attr_athletismeMTPNJP0" value="0" />
-						<button type="roll" name="roll_athletismePNJP0" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{athletismeMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_athletismePNJP0" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{athletismeMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bagarreNom" value="Bagarre" disabled />
 						<input type="number" name="attr_bagarreMTPNJP0" value="0" />
-						<button type="roll" name="roll_bagarrePNJP0" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bagarreMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bagarrePNJP0" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bagarreMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bibliothequeNom" value="Bibliothèque" disabled />
 						<input type="number" name="attr_bibliothequeMTPNJP0" value="0" />
-						<button type="roll" name="roll_bibliothequePNJP0" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bibliothequeMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bibliothequePNJP0" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bibliothequeMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_commandementNom" value="Commandement" disabled />
 						<input type="number" name="attr_commandementMTPNJP0" value="0" />
-						<button type="roll" name="roll_commandementPNJP0" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{commandementMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_commandementPNJP0" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{commandementMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceScolaireSMNom" value="Connaissance Scolaire (S-M)" disabled />
 						<input type="number" name="attr_connaissanceScolaireSMMTPNJP0" value="0" />
-						<button type="roll" name="roll_connaissanceScolaireSMPNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissanceScolaireSMPNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_deguisementNom" value="Déguisement" disabled />
 						<input type="number" name="attr_deguisementMTPNJP0" value="0" />
-						<button type="roll" name="roll_deguisementPNJP0" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{deguisementMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_deguisementPNJP0" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{deguisementMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_discretionNom" value="Discrétion" disabled />
 						<input type="number" name="attr_discretionMTPNJP0" value="0" />
-						<button type="roll" name="roll_discretionPNJP0" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_discretionPNJP0" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_dressageSoinNom" value="Dressage / Soin" disabled />
 						<input type="number" name="attr_dressageSoinMTPNJP0" value="0" />
-						<button type="roll" name="roll_dressageSoinPNJP0" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dressageSoinMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_dressageSoinPNJP0" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dressageSoinMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_empathieNom" value="Empathie" disabled />
 						<input type="number" name="attr_empathieMTPNJP0" value="0" />
-						<button type="roll" name="roll_empathiePNJP0" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{empathieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_empathiePNJP0" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{empathieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_esquiveNom" value="Esquive" disabled />
 						<input type="number" name="attr_esquiveMTPNJP0" value="0" />
-						<button type="roll" name="roll_esquivePNJP0" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_esquivePNJP0" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_fouilleMenageNom" value="Fouille / Ménage" disabled />
 						<input type="number" name="attr_fouilleMenageMTPNJP0" value="0" />
-						<button type="roll" name="roll_fouilleMenagePNJP0" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{fouilleMenageMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_fouilleMenagePNJP0" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{fouilleMenageMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueEtrangereRuneNom" value="Langue étrangère / Rune" disabled />
 						<input type="number" name="attr_langueEtrangereRuneMTPNJP0" value="0" />
-						<button type="roll" name="roll_langueEtrangereRunePNJP0" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueEtrangereRuneMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueEtrangereRunePNJP0" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueEtrangereRuneMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueNataleNom" value="Langue natale" disabled />
 						<input type="number" name="attr_langueNataleMTPNJP0" value="0" />
-						<button type="roll" name="roll_langueNatalePNJP0" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueNataleMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueNatalePNJP0" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueNataleMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_orientationNom" value="Orientation" disabled />
 						<input type="number" name="attr_orientationMTPNJP0" value="0" />
-						<button type="roll" name="roll_orientationPNJP0" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_orientationPNJP0" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_persuasionBaratinNom" value="Persuasion / Baratin" disabled />
 						<input type="number" name="attr_persuasionBaratinMTPNJP0" value="0" />
-						<button type="roll" name="roll_persuasionBaratinPNJP0" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{persuasionBaratinMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_persuasionBaratinPNJP0" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{persuasionBaratinMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_psychologieNom" value="Psychologie" disabled />
 						<input type="number" name="attr_psychologieMTPNJP0" value="0" />
-						<button type="roll" name="roll_psychologiePNJP0" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{psychologieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_psychologiePNJP0" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{psychologieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_secourismeNom" value="Secourisme" disabled />
 						<input type="number" name="attr_secourismeMTPNJP0" value="0" />
-						<button type="roll" name="roll_secourismePNJP0" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{secourismeMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_secourismePNJP0" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{secourismeMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_survieNom" value="Survie" disabled />
 						<input type="number" name="attr_survieMTPNJP0" value="0" />
-						<button type="roll" name="roll_surviePNJP0" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_surviePNJP0" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_tricheNom" value="Triche" disabled />
 						<input type="number" name="attr_tricheMTPNJP0" value="0" />
-						<button type="roll" name="roll_trichePNJP0" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tricheMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_trichePNJP0" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tricheMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_vigilanceNom" value="Vigilance" disabled />
 						<input type="number" name="attr_vigilanceMTPNJP0" value="0" />
-						<button type="roll" name="roll_vigilancePNJP0" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_vigilancePNJP0" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesGenerales">
 						<input type="text" name="attr_competenceGeneraleNom" value="Compétence" />
 						<input type="number" name="attr_competenceGeneraleMTPNJP0" value="0" />
-						<button type="roll" name="roll_competenceGeneralePNJP0" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceGeneraleMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceGeneralePNJP0" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceGeneraleMTPNJP0}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			
@@ -2072,32 +2135,32 @@
 					<div>
 						<input type="text" name="attr_bricolageNom" value="Bricolage" disabled />
 						<input type="number" name="attr_bricolageMTPNJP0" value="0" />
-						<button type="roll" name="roll_bricolagePNJP0" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bricolageMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bricolagePNJP0" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bricolageMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_conduireNom" value="Conduire" disabled />
 						<input type="number" name="attr_conduireMTPNJP0" value="0" />
-						<button type="roll" name="roll_conduirePNJP0" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conduireMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_conduirePNJP0" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conduireMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleMoldueMNom" value="Culture générale Moldue (M)" disabled />
 						<input type="number" name="attr_cultureGeneraleMoldueMMTPNJP0" value="0" />
-						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP0" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP0" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxMoldusMNom" value="Jeux Moldus (M)" disabled />
 						<input type="number" name="attr_jeuxMoldusMMTPNJP0" value="0" />
-						<button type="roll" name="roll_jeuxMoldusMPNJP0" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxMoldusMMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxMoldusMPNJP0" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxMoldusMMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_serrurerieNom" value="Serrurerie" disabled />
 						<input type="number" name="attr_serrurerieMTPNJP0" value="0" />
-						<button type="roll" name="roll_serrureriePNJP0" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{serrurerieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_serrureriePNJP0" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{serrurerieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesMoldus">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP0" value="0" />
-						<button type="roll" name="roll_connaissancePNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP0}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2118,97 +2181,97 @@
 					<div>
 						<input type="text" name="attr_arithmancieNom" value="Arithmancie" />
 						<input type="number" name="attr_arithmancieMTPNJP0" value="0" />
-						<button type="roll" name="roll_arithmanciePNJP0" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{arithmancieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_arithmanciePNJP0" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{arithmancieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMagiqueNom" value="Art magique" />
 						<input type="number" name="attr_artMagiqueMTPNJP0" value="0" />
-						<button type="roll" name="roll_artMagiquePNJP0" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMagiqueMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMagiquePNJP0" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMagiqueMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMolduNom" value="Art moldu" />
 						<input type="number" name="attr_artMolduMTPNJP0" value="0" />
-						<button type="roll" name="roll_artMolduPNJP0" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMolduMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMolduPNJP0" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMolduMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astrologieNom" value="Astrologie" />
 						<input type="number" name="attr_astrologieMTPNJP0" value="0" />
-						<button type="roll" name="roll_astrologiePNJP0" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astrologieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astrologiePNJP0" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astrologieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astronomieNom" value="Astronomie" />
 						<input type="number" name="attr_astronomieMTPNJP0" value="0" />
-						<button type="roll" name="roll_astronomiePNJP0" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astronomieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astronomiePNJP0" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astronomieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_botaniqueNom" value="Botanique" />
 						<input type="number" name="attr_botaniqueMTPNJP0" value="0" />
-						<button type="roll" name="roll_botaniquePNJP0" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{botaniqueMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_botaniquePNJP0" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{botaniqueMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_coursVolNom" value="Cours de Vol" />
 						<input type="number" name="attr_coursVolMTPNJP0" value="0" />
-						<button type="roll" name="roll_coursVolPNJP0" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{coursVolMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_coursVolPNJP0" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{coursVolMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_defenseForcesMalNom" value="Défense contre les forces du mal" />
 						<input type="number" name="attr_defenseForcesMalMTPNJP0" value="0" />
-						<button type="roll" name="roll_defenseForcesMalPNJP0" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{defenseForcesMalMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_defenseForcesMalPNJP0" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{defenseForcesMalMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_divinationNom" value="Divination" />
 						<input type="number" name="attr_divinationMTPNJP0" value="0" />
-						<button type="roll" name="roll_divinationPNJP0" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{divinationMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_divinationPNJP0" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{divinationMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 						<input type="number" name="attr_enchantementsMTPNJP0" value="0" />
-						<button type="roll" name="roll_enchantementsPNJP0" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_enchantementsPNJP0" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_etudeRunesNom" value="Etude des runes" />
 						<input type="number" name="attr_etudeRunesMTPNJP0" value="0" />
-						<button type="roll" name="roll_etudeRunesPNJP0" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{etudeRunesMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_etudeRunesPNJP0" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{etudeRunesMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_histoireMagieNom" value="Histoire de la magie" />
 						<input type="number" name="attr_histoireMagieMTPNJP0" value="0" />
-						<button type="roll" name="roll_histoireMagiePNJP0" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{histoireMagieMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_histoireMagiePNJP0" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{histoireMagieMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 						<input type="number" name="attr_mauvaisSortsMTPNJP0" value="0" />
-						<button type="roll" name="roll_mauvaisSortsPNJP0" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mauvaisSortsPNJP0" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 						<input type="number" name="attr_metamorphoseMTPNJP0" value="0" />
-						<button type="roll" name="roll_metamorphosePNJP0" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_metamorphosePNJP0" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMagiqueNom" value="Musique magique" />
 						<input type="number" name="attr_musiqueMagiqueMTPNJP0" value="0" />
-						<button type="roll" name="roll_musiqueMagiquePNJP0" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMagiqueMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMagiquePNJP0" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMagiqueMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMoldueNom" value="Musique moldue" />
 						<input type="number" name="attr_musiqueMoldueMTPNJP0" value="0" />
-						<button type="roll" name="roll_musiqueMolduePNJP0" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMoldueMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMolduePNJP0" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMoldueMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_potionsNom" value="Potions" />
 						<input type="number" name="attr_potionsMTPNJP0" value="0" />
-						<button type="roll" name="roll_potionsPNJP0" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{potionsMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_potionsPNJP0" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{potionsMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_soinsCreaturesMagiquesNom" value="Soins des créatures magiques" />
 						<input type="number" name="attr_soinsCreaturesMagiquesMTPNJP0" value="0" />
-						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP0" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP0" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesScolaires">
 						<input type="text" name="attr_competenceScolaireNom" value="" placeholder="Nouvelle compétence scolaire..." />
 						<input type="number" name="attr_competenceScolaireMTPNJP0" value="0" />
-						<button type="roll" name="roll_competenceScolairePNJP0" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScolaireMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceScolairePNJP0" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScolaireMTPNJP0}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 				
@@ -2226,28 +2289,28 @@
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceMoldusSNom" value="Connaissance des Moldus (S)" disabled />
-						<input type="number" name="attr_connaissanceMoldusSMTPNJP0" value="0"  disabled />
-						<button type="roll" name="roll_connaissanceMoldusSPNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMoldusSMTPNJP0}]]+@{modif}]]}}" ></button>
+						<input type="number" name="attr_connaissanceMoldusSMTPNJP0" value="0"  />
+						<button type="roll" name="roll_connaissanceMoldusSPNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMoldusSMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleSorciersSNom" value="Culture générale des Sorciers (S)" disabled />
 						<input type="number" name="attr_cultureGeneraleSorciersSMTPNJP0" value="0" />
-						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP0" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP0" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxSorciersSNom" value="Jeux Sorciers (S)" disabled />
 						<input type="number" name="attr_jeuxSorciersSMTPNJP0" value="0" />
-						<button type="roll" name="roll_jeuxSorciersSPNJP0" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxSorciersSMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxSorciersSPNJP0" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxSorciersSMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mythesLegendesSorciersNom" value="Mythes et légendes des Sorciers (S)" disabled />
 						<input type="number" name="attr_mythesLegendesSorciersMTPNJP0" value="0" />
-						<button type="roll" name="roll_mythesLegendesSorciersPNJP0" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mythesLegendesSorciersPNJP0" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP0}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesSorciers">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP0" value="0" />
-						<button type="roll" name="roll_connaissancePNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP0}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP0" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP0}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2268,117 +2331,117 @@
 					<div>
 						<input type="text" name="attr_acrobatieQuidditchNom" value="Acrobatie / Quidditch" disabled />
 						<input type="number" name="attr_acrobatieQuidditchMTPNJP1" value="0"  />
-						<button type="roll" name="roll_acrobatieQuidditchPNJP1" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieQuidditchMTPNJP1PNJ}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_acrobatieQuidditchPNJP1" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieQuidditchMTPNJP1PNJ}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artisanatNom" value="Artisanat" disabled />
 						<input type="number" name="attr_artisanatMTPNJP1" value="0" />
-						<button type="roll" name="roll_artisanatPNJP1" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artisanatMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artisanatPNJP1" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artisanatMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_athletismeNom" value="Athlétisme" disabled />
 						<input type="number" name="attr_athletismeMTPNJP1" value="0" />
-						<button type="roll" name="roll_athletismePNJP1" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{athletismeMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_athletismePNJP1" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{athletismeMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bagarreNom" value="Bagarre" disabled />
 						<input type="number" name="attr_bagarreMTPNJP1" value="0" />
-						<button type="roll" name="roll_bagarrePNJP1" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bagarreMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bagarrePNJP1" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bagarreMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bibliothequeNom" value="Bibliothèque" disabled />
 						<input type="number" name="attr_bibliothequeMTPNJP1" value="0" />
-						<button type="roll" name="roll_bibliothequePNJP1" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bibliothequeMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bibliothequePNJP1" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bibliothequeMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_commandementNom" value="Commandement" disabled />
 						<input type="number" name="attr_commandementMTPNJP1" value="0" />
-						<button type="roll" name="roll_commandementPNJP1" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{commandementMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_commandementPNJP1" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{commandementMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceScolaireSMNom" value="Connaissance Scolaire (S-M)" disabled />
 						<input type="number" name="attr_connaissanceScolaireSMMTPNJP1" value="0" />
-						<button type="roll" name="roll_connaissanceScolaireSMPNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissanceScolaireSMPNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_deguisementNom" value="Déguisement" disabled />
 						<input type="number" name="attr_deguisementMTPNJP1" value="0" />
-						<button type="roll" name="roll_deguisementPNJP1" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{deguisementMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_deguisementPNJP1" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{deguisementMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_discretionNom" value="Discrétion" disabled />
 						<input type="number" name="attr_discretionMTPNJP1" value="0" />
-						<button type="roll" name="roll_discretionPNJP1" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_discretionPNJP1" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_dressageSoinNom" value="Dressage / Soin" disabled />
 						<input type="number" name="attr_dressageSoinMTPNJP1" value="0" />
-						<button type="roll" name="roll_dressageSoinPNJP1" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dressageSoinMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_dressageSoinPNJP1" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dressageSoinMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_empathieNom" value="Empathie" disabled />
 						<input type="number" name="attr_empathieMTPNJP1" value="0" />
-						<button type="roll" name="roll_empathiePNJP1" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{empathieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_empathiePNJP1" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{empathieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_esquiveNom" value="Esquive" disabled />
 						<input type="number" name="attr_esquiveMTPNJP1" value="0" />
-						<button type="roll" name="roll_esquivePNJP1" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_esquivePNJP1" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_fouilleMenageNom" value="Fouille / Ménage" disabled />
 						<input type="number" name="attr_fouilleMenageMTPNJP1" value="0" />
-						<button type="roll" name="roll_fouilleMenagePNJP1" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{fouilleMenageMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_fouilleMenagePNJP1" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{fouilleMenageMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueEtrangereRuneNom" value="Langue étrangère / Rune" disabled />
 						<input type="number" name="attr_langueEtrangereRuneMTPNJP1" value="0" />
-						<button type="roll" name="roll_langueEtrangereRunePNJP1" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueEtrangereRuneMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueEtrangereRunePNJP1" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueEtrangereRuneMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueNataleNom" value="Langue natale" disabled />
 						<input type="number" name="attr_langueNataleMTPNJP1" value="0" />
-						<button type="roll" name="roll_langueNatalePNJP1" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueNataleMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueNatalePNJP1" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueNataleMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_orientationNom" value="Orientation" disabled />
 						<input type="number" name="attr_orientationMTPNJP1" value="0" />
-						<button type="roll" name="roll_orientationPNJP1" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_orientationPNJP1" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_persuasionBaratinNom" value="Persuasion / Baratin" disabled />
 						<input type="number" name="attr_persuasionBaratinMTPNJP1" value="0" />
-						<button type="roll" name="roll_persuasionBaratinPNJP1" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{persuasionBaratinMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_persuasionBaratinPNJP1" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{persuasionBaratinMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_psychologieNom" value="Psychologie" disabled />
 						<input type="number" name="attr_psychologieMTPNJP1" value="0" />
-						<button type="roll" name="roll_psychologiePNJP1" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{psychologieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_psychologiePNJP1" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{psychologieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_secourismeNom" value="Secourisme" disabled />
 						<input type="number" name="attr_secourismeMTPNJP1" value="0" />
-						<button type="roll" name="roll_secourismePNJP1" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{secourismeMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_secourismePNJP1" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{secourismeMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_survieNom" value="Survie" disabled />
 						<input type="number" name="attr_survieMTPNJP1" value="0" />
-						<button type="roll" name="roll_surviePNJP1" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_surviePNJP1" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_tricheNom" value="Triche" disabled />
 						<input type="number" name="attr_tricheMTPNJP1" value="0" />
-						<button type="roll" name="roll_trichePNJP1" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tricheMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_trichePNJP1" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tricheMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_vigilanceNom" value="Vigilance" disabled />
 						<input type="number" name="attr_vigilanceMTPNJP1" value="0" />
-						<button type="roll" name="roll_vigilancePNJP1" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_vigilancePNJP1" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesGenerales">
 						<input type="text" name="attr_competenceGeneraleNom" value="Compétence" />
 						<input type="number" name="attr_competenceGeneraleMTPNJP1" value="0" />
-						<button type="roll" name="roll_competenceGeneralePNJP1" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceGeneraleMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceGeneralePNJP1" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceGeneraleMTPNJP1}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			
@@ -2396,32 +2459,32 @@
 					<div>
 						<input type="text" name="attr_bricolageNom" value="Bricolage" disabled />
 						<input type="number" name="attr_bricolageMTPNJP1" value="0" />
-						<button type="roll" name="roll_bricolagePNJP1" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bricolageMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bricolagePNJP1" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bricolageMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_conduireNom" value="Conduire" disabled />
 						<input type="number" name="attr_conduireMTPNJP1" value="0" />
-						<button type="roll" name="roll_conduirePNJP1" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conduireMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_conduirePNJP1" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conduireMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleMoldueMNom" value="Culture générale Moldue (M)" disabled />
 						<input type="number" name="attr_cultureGeneraleMoldueMMTPNJP1" value="0" />
-						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP1" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP1" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxMoldusMNom" value="Jeux Moldus (M)" disabled />
 						<input type="number" name="attr_jeuxMoldusMMTPNJP1" value="0" />
-						<button type="roll" name="roll_jeuxMoldusMPNJP1" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxMoldusMMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxMoldusMPNJP1" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxMoldusMMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_serrurerieNom" value="Serrurerie" disabled />
 						<input type="number" name="attr_serrurerieMTPNJP1" value="0" />
-						<button type="roll" name="roll_serrureriePNJP1" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{serrurerieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_serrureriePNJP1" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{serrurerieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesMoldus">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP1" value="0" />
-						<button type="roll" name="roll_connaissancePNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP1}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2442,97 +2505,97 @@
 					<div>
 						<input type="text" name="attr_arithmancieNom" value="Arithmancie" />
 						<input type="number" name="attr_arithmancieMTPNJP1" value="0" />
-						<button type="roll" name="roll_arithmanciePNJP1" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{arithmancieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_arithmanciePNJP1" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{arithmancieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMagiqueNom" value="Art magique" />
 						<input type="number" name="attr_artMagiqueMTPNJP1" value="0" />
-						<button type="roll" name="roll_artMagiquePNJP1" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMagiqueMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMagiquePNJP1" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMagiqueMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMolduNom" value="Art moldu" />
 						<input type="number" name="attr_artMolduMTPNJP1" value="0" />
-						<button type="roll" name="roll_artMolduPNJP1" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMolduMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMolduPNJP1" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMolduMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astrologieNom" value="Astrologie" />
 						<input type="number" name="attr_astrologieMTPNJP1" value="0" />
-						<button type="roll" name="roll_astrologiePNJP1" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astrologieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astrologiePNJP1" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astrologieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astronomieNom" value="Astronomie" />
 						<input type="number" name="attr_astronomieMTPNJP1" value="0" />
-						<button type="roll" name="roll_astronomiePNJP1" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astronomieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astronomiePNJP1" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astronomieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_botaniqueNom" value="Botanique" />
 						<input type="number" name="attr_botaniqueMTPNJP1" value="0" />
-						<button type="roll" name="roll_botaniquePNJP1" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{botaniqueMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_botaniquePNJP1" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{botaniqueMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_coursVolNom" value="Cours de Vol" />
 						<input type="number" name="attr_coursVolMTPNJP1" value="0" />
-						<button type="roll" name="roll_coursVolPNJP1" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{coursVolMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_coursVolPNJP1" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{coursVolMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_defenseForcesMalNom" value="Défense contre les forces du mal" />
 						<input type="number" name="attr_defenseForcesMalMTPNJP1" value="0" />
-						<button type="roll" name="roll_defenseForcesMalPNJP1" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{defenseForcesMalMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_defenseForcesMalPNJP1" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{defenseForcesMalMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_divinationNom" value="Divination" />
 						<input type="number" name="attr_divinationMTPNJP1" value="0" />
-						<button type="roll" name="roll_divinationPNJP1" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{divinationMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_divinationPNJP1" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{divinationMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 						<input type="number" name="attr_enchantementsMTPNJP1" value="0" />
-						<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_etudeRunesNom" value="Etude des runes" />
 						<input type="number" name="attr_etudeRunesMTPNJP1" value="0" />
-						<button type="roll" name="roll_etudeRunesPNJP1" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{etudeRunesMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_etudeRunesPNJP1" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{etudeRunesMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_histoireMagieNom" value="Histoire de la magie" />
 						<input type="number" name="attr_histoireMagieMTPNJP1" value="0" />
-						<button type="roll" name="roll_histoireMagiePNJP1" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{histoireMagieMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_histoireMagiePNJP1" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{histoireMagieMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 						<input type="number" name="attr_mauvaisSortsMTPNJP1" value="0" />
-						<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 						<input type="number" name="attr_metamorphoseMTPNJP1" value="0" />
-						<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMagiqueNom" value="Musique magique" />
 						<input type="number" name="attr_musiqueMagiqueMTPNJP1" value="0" />
-						<button type="roll" name="roll_musiqueMagiquePNJP1" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMagiqueMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMagiquePNJP1" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMagiqueMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMoldueNom" value="Musique moldue" />
 						<input type="number" name="attr_musiqueMoldueMTPNJP1" value="0" />
-						<button type="roll" name="roll_musiqueMolduePNJP1" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMoldueMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMolduePNJP1" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMoldueMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_potionsNom" value="Potions" />
 						<input type="number" name="attr_potionsMTPNJP1" value="0" />
-						<button type="roll" name="roll_potionsPNJP1" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{potionsMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_potionsPNJP1" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{potionsMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_soinsCreaturesMagiquesNom" value="Soins des créatures magiques" />
 						<input type="number" name="attr_soinsCreaturesMagiquesMTPNJP1" value="0" />
-						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP1" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP1" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesScolaires">
 						<input type="text" name="attr_competenceScolaireNom" value="" placeholder="Nouvelle compétence scolaire..." />
 						<input type="number" name="attr_competenceScolaireMTPNJP1" value="0" />
-						<button type="roll" name="roll_competenceScolairePNJP1" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScolaireMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceScolairePNJP1" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScolaireMTPNJP1}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 				
@@ -2550,28 +2613,28 @@
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceMoldusSNom" value="Connaissance des Moldus (S)" disabled />
-						<input type="number" name="attr_connaissanceMoldusSMTPNJP1" value="0"  disabled />
-						<button type="roll" name="roll_connaissanceMoldusSPNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMoldusSMTPNJP1}]]+@{modif}]]}}" ></button>
+						<input type="number" name="attr_connaissanceMoldusSMTPNJP1" value="0"  />
+						<button type="roll" name="roll_connaissanceMoldusSPNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMoldusSMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleSorciersSNom" value="Culture générale des Sorciers (S)" disabled />
 						<input type="number" name="attr_cultureGeneraleSorciersSMTPNJP1" value="0" />
-						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP1" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP1" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxSorciersSNom" value="Jeux Sorciers (S)" disabled />
 						<input type="number" name="attr_jeuxSorciersSMTPNJP1" value="0" />
-						<button type="roll" name="roll_jeuxSorciersSPNJP1" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxSorciersSMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxSorciersSPNJP1" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxSorciersSMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mythesLegendesSorciersNom" value="Mythes et légendes des Sorciers (S)" disabled />
 						<input type="number" name="attr_mythesLegendesSorciersMTPNJP1" value="0" />
-						<button type="roll" name="roll_mythesLegendesSorciersPNJP1" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mythesLegendesSorciersPNJP1" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP1}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesSorciers">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP1" value="0" />
-						<button type="roll" name="roll_connaissancePNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP1}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP1" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP1}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2592,117 +2655,117 @@
 					<div>
 						<input type="text" name="attr_acrobatieQuidditchNom" value="Acrobatie / Quidditch" disabled />
 						<input type="number" name="attr_acrobatieQuidditchMTPNJP2" value="0"  />
-						<button type="roll" name="roll_acrobatieQuidditchPNJP2" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieQuidditchMTPNJP2PNJ}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_acrobatieQuidditchPNJP2" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieQuidditchMTPNJP2PNJ}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artisanatNom" value="Artisanat" disabled />
 						<input type="number" name="attr_artisanatMTPNJP2" value="@{artisanatMB}+@{artisanatMA}"  disabled />
-						<button type="roll" name="roll_artisanatPNJP2" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artisanatMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artisanatPNJP2" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artisanatMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_athletismeNom" value="Athlétisme" disabled />
 						<input type="number" name="attr_athletismeMTPNJP2" value="0" />
-						<button type="roll" name="roll_athletismePNJP2" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{athletismeMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_athletismePNJP2" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{athletismeMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bagarreNom" value="Bagarre" disabled />
 						<input type="number" name="attr_bagarreMTPNJP2" value="0" />
-						<button type="roll" name="roll_bagarrePNJP2" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bagarreMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bagarrePNJP2" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bagarreMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bibliothequeNom" value="Bibliothèque" disabled />
 						<input type="number" name="attr_bibliothequeMTPNJP2" value="0" />
-						<button type="roll" name="roll_bibliothequePNJP2" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bibliothequeMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bibliothequePNJP2" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bibliothequeMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_commandementNom" value="Commandement" disabled />
 						<input type="number" name="attr_commandementMTPNJP2" value="0" />
-						<button type="roll" name="roll_commandementPNJP2" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{commandementMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_commandementPNJP2" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{commandementMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceScolaireSMNom" value="Connaissance Scolaire (S-M)" disabled />
 						<input type="number" name="attr_connaissanceScolaireSMMTPNJP2" value="0" />
-						<button type="roll" name="roll_connaissanceScolaireSMPNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissanceScolaireSMPNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_deguisementNom" value="Déguisement" disabled />
 						<input type="number" name="attr_deguisementMTPNJP2" value="0" />
-						<button type="roll" name="roll_deguisementPNJP2" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{deguisementMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_deguisementPNJP2" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{deguisementMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_discretionNom" value="Discrétion" disabled />
 						<input type="number" name="attr_discretionMTPNJP2" value="0" />
-						<button type="roll" name="roll_discretionPNJP2" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_discretionPNJP2" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_dressageSoinNom" value="Dressage / Soin" disabled />
 						<input type="number" name="attr_dressageSoinMTPNJP2" value="0" />
-						<button type="roll" name="roll_dressageSoinPNJP2" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dressageSoinMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_dressageSoinPNJP2" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dressageSoinMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_empathieNom" value="Empathie" disabled />
 						<input type="number" name="attr_empathieMTPNJP2" value="0" />
-						<button type="roll" name="roll_empathiePNJP2" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{empathieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_empathiePNJP2" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{empathieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_esquiveNom" value="Esquive" disabled />
 						<input type="number" name="attr_esquiveMTPNJP2" value="0" />
-						<button type="roll" name="roll_esquivePNJP2" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_esquivePNJP2" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_fouilleMenageNom" value="Fouille / Ménage" disabled />
 						<input type="number" name="attr_fouilleMenageMTPNJP2" value="0" />
-						<button type="roll" name="roll_fouilleMenagePNJP2" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{fouilleMenageMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_fouilleMenagePNJP2" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{fouilleMenageMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueEtrangereRuneNom" value="Langue étrangère / Rune" disabled />
 						<input type="number" name="attr_langueEtrangereRuneMTPNJP2" value="0" />
-						<button type="roll" name="roll_langueEtrangereRunePNJP2" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueEtrangereRuneMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueEtrangereRunePNJP2" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueEtrangereRuneMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueNataleNom" value="Langue natale" disabled />
 						<input type="number" name="attr_langueNataleMTPNJP2" value="0" />
-						<button type="roll" name="roll_langueNatalePNJP2" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueNataleMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueNatalePNJP2" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueNataleMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_orientationNom" value="Orientation" disabled />
 						<input type="number" name="attr_orientationMTPNJP2" value="0" />
-						<button type="roll" name="roll_orientationPNJP2" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_orientationPNJP2" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_persuasionBaratinNom" value="Persuasion / Baratin" disabled />
 						<input type="number" name="attr_persuasionBaratinMTPNJP2" value="0" />
-						<button type="roll" name="roll_persuasionBaratinPNJP2" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{persuasionBaratinMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_persuasionBaratinPNJP2" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{persuasionBaratinMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_psychologieNom" value="Psychologie" disabled />
 						<input type="number" name="attr_psychologieMTPNJP2" value="0" />
-						<button type="roll" name="roll_psychologiePNJP2" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{psychologieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_psychologiePNJP2" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{psychologieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_secourismeNom" value="Secourisme" disabled />
 						<input type="number" name="attr_secourismeMTPNJP2" value="0" />
-						<button type="roll" name="roll_secourismePNJP2" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{secourismeMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_secourismePNJP2" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{secourismeMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_survieNom" value="Survie" disabled />
 						<input type="number" name="attr_survieMTPNJP2" value="0" />
-						<button type="roll" name="roll_surviePNJP2" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_surviePNJP2" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_tricheNom" value="Triche" disabled />
 						<input type="number" name="attr_tricheMTPNJP2" value="0" />
-						<button type="roll" name="roll_trichePNJP2" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tricheMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_trichePNJP2" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tricheMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_vigilanceNom" value="Vigilance" disabled />
 						<input type="number" name="attr_vigilanceMTPNJP2" value="0" />
-						<button type="roll" name="roll_vigilancePNJP2" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_vigilancePNJP2" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesGenerales">
 						<input type="text" name="attr_competenceGeneraleNom" value="Compétence" />
 						<input type="number" name="attr_competenceGeneraleMTPNJP2" value="0" />
-						<button type="roll" name="roll_competenceGeneralePNJP2" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceGeneraleMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceGeneralePNJP2" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceGeneraleMTPNJP2}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			
@@ -2720,32 +2783,32 @@
 					<div>
 						<input type="text" name="attr_bricolageNom" value="Bricolage" disabled />
 						<input type="number" name="attr_bricolageMTPNJP2" value="0" />
-						<button type="roll" name="roll_bricolagePNJP2" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bricolageMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bricolagePNJP2" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bricolageMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_conduireNom" value="Conduire" disabled />
 						<input type="number" name="attr_conduireMTPNJP2" value="0" />
-						<button type="roll" name="roll_conduirePNJP2" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conduireMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_conduirePNJP2" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conduireMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleMoldueMNom" value="Culture générale Moldue (M)" disabled />
 						<input type="number" name="attr_cultureGeneraleMoldueMMTPNJP2" value="0" />
-						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP2" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP2" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxMoldusMNom" value="Jeux Moldus (M)" disabled />
 						<input type="number" name="attr_jeuxMoldusMMTPNJP2" value="0" />
-						<button type="roll" name="roll_jeuxMoldusMPNJP2" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxMoldusMMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxMoldusMPNJP2" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxMoldusMMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_serrurerieNom" value="Serrurerie" disabled />
 						<input type="number" name="attr_serrurerieMTPNJP2" value="0" />
-						<button type="roll" name="roll_serrureriePNJP2" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{serrurerieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_serrureriePNJP2" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{serrurerieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesMoldus">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP2" value="0" />
-						<button type="roll" name="roll_connaissancePNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP2}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2766,97 +2829,97 @@
 					<div>
 						<input type="text" name="attr_arithmancieNom" value="Arithmancie" />
 						<input type="number" name="attr_arithmancieMTPNJP2" value="0" />
-						<button type="roll" name="roll_arithmanciePNJP2" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{arithmancieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_arithmanciePNJP2" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{arithmancieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMagiqueNom" value="Art magique" />
 						<input type="number" name="attr_artMagiqueMTPNJP2" value="0" />
-						<button type="roll" name="roll_artMagiquePNJP2" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMagiqueMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMagiquePNJP2" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMagiqueMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMolduNom" value="Art moldu" />
 						<input type="number" name="attr_artMolduMTPNJP2" value="0" />
-						<button type="roll" name="roll_artMolduPNJP2" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMolduMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMolduPNJP2" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMolduMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astrologieNom" value="Astrologie" />
 						<input type="number" name="attr_astrologieMTPNJP2" value="0" />
-						<button type="roll" name="roll_astrologiePNJP2" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astrologieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astrologiePNJP2" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astrologieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astronomieNom" value="Astronomie" />
 						<input type="number" name="attr_astronomieMTPNJP2" value="0" />
-						<button type="roll" name="roll_astronomiePNJP2" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astronomieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astronomiePNJP2" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astronomieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_botaniqueNom" value="Botanique" />
 						<input type="number" name="attr_botaniqueMTPNJP2" value="0" />
-						<button type="roll" name="roll_botaniquePNJP2" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{botaniqueMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_botaniquePNJP2" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{botaniqueMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_coursVolNom" value="Cours de Vol" />
 						<input type="number" name="attr_coursVolMTPNJP2" value="0" />
-						<button type="roll" name="roll_coursVolPNJP2" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{coursVolMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_coursVolPNJP2" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{coursVolMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_defenseForcesMalNom" value="Défense contre les forces du mal" />
 						<input type="number" name="attr_defenseForcesMalMTPNJP2" value="0" />
-						<button type="roll" name="roll_defenseForcesMalPNJP2" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{defenseForcesMalMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_defenseForcesMalPNJP2" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{defenseForcesMalMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_divinationNom" value="Divination" />
 						<input type="number" name="attr_divinationMTPNJP2" value="0" />
-						<button type="roll" name="roll_divinationPNJP2" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{divinationMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_divinationPNJP2" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{divinationMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 						<input type="number" name="attr_enchantementsMTPNJP2" value="0" />
-						<button type="roll" name="roll_enchantementsPNJP2" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_enchantementsPNJP2" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_etudeRunesNom" value="Etude des runes" />
 						<input type="number" name="attr_etudeRunesMTPNJP2" value="0" />
-						<button type="roll" name="roll_etudeRunesPNJP2" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{etudeRunesMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_etudeRunesPNJP2" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{etudeRunesMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_histoireMagieNom" value="Histoire de la magie" />
 						<input type="number" name="attr_histoireMagieMTPNJP2" value="0" />
-						<button type="roll" name="roll_histoireMagiePNJP2" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{histoireMagieMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_histoireMagiePNJP2" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{histoireMagieMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 						<input type="number" name="attr_mauvaisSortsMTPNJP2" value="0" />
-						<button type="roll" name="roll_mauvaisSortsPNJP2" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mauvaisSortsPNJP2" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 						<input type="number" name="attr_metamorphoseMTPNJP2" value="0" />
-						<button type="roll" name="roll_metamorphosePNJP2" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_metamorphosePNJP2" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMagiqueNom" value="Musique magique" />
 						<input type="number" name="attr_musiqueMagiqueMTPNJP2" value="0" />
-						<button type="roll" name="roll_musiqueMagiquePNJP2" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMagiqueMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMagiquePNJP2" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMagiqueMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMoldueNom" value="Musique moldue" />
 						<input type="number" name="attr_musiqueMoldueMTPNJP2" value="0" />
-						<button type="roll" name="roll_musiqueMolduePNJP2" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMoldueMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMolduePNJP2" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMoldueMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_potionsNom" value="Potions" />
 						<input type="number" name="attr_potionsMTPNJP2" value="0" />
-						<button type="roll" name="roll_potionsPNJP2" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{potionsMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_potionsPNJP2" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{potionsMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_soinsCreaturesMagiquesNom" value="Soins des créatures magiques" />
 						<input type="number" name="attr_soinsCreaturesMagiquesMTPNJP2" value="0" />
-						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP2" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP2" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesScolaires">
 						<input type="text" name="attr_competenceScolaireNom" value="" placeholder="Nouvelle compétence scolaire..." />
 						<input type="number" name="attr_competenceScolaireMTPNJP2" value="0" />
-						<button type="roll" name="roll_competenceScolairePNJP2" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScolaireMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceScolairePNJP2" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScolaireMTPNJP2}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 				
@@ -2874,28 +2937,28 @@
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceMoldusSNom" value="Connaissance des Moldus (S)" disabled />
-						<input type="number" name="attr_connaissanceMoldusSMTPNJP2" value="0"  disabled />
-						<button type="roll" name="roll_connaissanceMoldusSPNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMoldusSMTPNJP2}]]+@{modif}]]}}" ></button>
+						<input type="number" name="attr_connaissanceMoldusSMTPNJP2" value="0"  />
+						<button type="roll" name="roll_connaissanceMoldusSPNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMoldusSMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleSorciersSNom" value="Culture générale des Sorciers (S)" disabled />
 						<input type="number" name="attr_cultureGeneraleSorciersSMTPNJP2" value="0" />
-						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP2" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP2" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxSorciersSNom" value="Jeux Sorciers (S)" disabled />
 						<input type="number" name="attr_jeuxSorciersSMTPNJP2" value="0" />
-						<button type="roll" name="roll_jeuxSorciersSPNJP2" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxSorciersSMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxSorciersSPNJP2" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxSorciersSMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mythesLegendesSorciersNom" value="Mythes et légendes des Sorciers (S)" disabled />
 						<input type="number" name="attr_mythesLegendesSorciersMTPNJP2" value="0" />
-						<button type="roll" name="roll_mythesLegendesSorciersPNJP2" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mythesLegendesSorciersPNJP2" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP2}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesSorciers">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP2" value="0" />
-						<button type="roll" name="roll_connaissancePNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP2}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP2" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP2}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -2916,117 +2979,117 @@
 					<div>
 						<input type="text" name="attr_acrobatieQuidditchNom" value="Acrobatie / Quidditch" disabled />
 						<input type="number" name="attr_acrobatieQuidditchMTPNJP3" value="0"  />
-						<button type="roll" name="roll_acrobatieQuidditchPNJP3" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieQuidditchMTPNJP3PNJ}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_acrobatieQuidditchPNJP3" value="@{gm} &{template:base} {{nom=@{acrobatieQuidditchNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieQuidditchMTPNJP3PNJ}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artisanatNom" value="Artisanat" disabled />
 						<input type="number" name="attr_artisanatMTPNJP3" value="@{artisanatMB}+@{artisanatMA}"  disabled />
-						<button type="roll" name="roll_artisanatPNJP3" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artisanatMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artisanatPNJP3" value="@{gm} &{template:base} {{nom=@{artisanatNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artisanatMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_athletismeNom" value="Athlétisme" disabled />
 						<input type="number" name="attr_athletismeMTPNJP3" value="0" />
-						<button type="roll" name="roll_athletismePNJP3" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{athletismeMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_athletismePNJP3" value="@{gm} &{template:base} {{nom=@{athletismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{athletismeMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bagarreNom" value="Bagarre" disabled />
 						<input type="number" name="attr_bagarreMTPNJP3" value="0" />
-						<button type="roll" name="roll_bagarrePNJP3" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bagarreMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bagarrePNJP3" value="@{gm} &{template:base} {{nom=@{bagarreNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bagarreMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_bibliothequeNom" value="Bibliothèque" disabled />
 						<input type="number" name="attr_bibliothequeMTPNJP3" value="0" />
-						<button type="roll" name="roll_bibliothequePNJP3" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bibliothequeMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bibliothequePNJP3" value="@{gm} &{template:base} {{nom=@{bibliothequeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bibliothequeMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_commandementNom" value="Commandement" disabled />
 						<input type="number" name="attr_commandementMTPNJP3" value="0" />
-						<button type="roll" name="roll_commandementPNJP3" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{commandementMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_commandementPNJP3" value="@{gm} &{template:base} {{nom=@{commandementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{commandementMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceScolaireSMNom" value="Connaissance Scolaire (S-M)" disabled />
 						<input type="number" name="attr_connaissanceScolaireSMMTPNJP3" value="0" />
-						<button type="roll" name="roll_connaissanceScolaireSMPNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissanceScolaireSMPNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceScolaireSMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceScolaireSMMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_deguisementNom" value="Déguisement" disabled />
 						<input type="number" name="attr_deguisementMTPNJP3" value="0" />
-						<button type="roll" name="roll_deguisementPNJP3" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{deguisementMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_deguisementPNJP3" value="@{gm} &{template:base} {{nom=@{deguisementNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{deguisementMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_discretionNom" value="Discrétion" disabled />
 						<input type="number" name="attr_discretionMTPNJP3" value="0" />
-						<button type="roll" name="roll_discretionPNJP3" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_discretionPNJP3" value="@{gm} &{template:base} {{nom=@{discretionNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_dressageSoinNom" value="Dressage / Soin" disabled />
 						<input type="number" name="attr_dressageSoinMTPNJP3" value="0" />
-						<button type="roll" name="roll_dressageSoinPNJP3" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dressageSoinMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_dressageSoinPNJP3" value="@{gm} &{template:base} {{nom=@{dressageSoinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dressageSoinMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_empathieNom" value="Empathie" disabled />
 						<input type="number" name="attr_empathieMTPNJP3" value="0" />
-						<button type="roll" name="roll_empathiePNJP3" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{empathieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_empathiePNJP3" value="@{gm} &{template:base} {{nom=@{empathieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{empathieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_esquiveNom" value="Esquive" disabled />
 						<input type="number" name="attr_esquiveMTPNJP3" value="0" />
-						<button type="roll" name="roll_esquivePNJP3" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_esquivePNJP3" value="@{gm} &{template:base} {{nom=@{esquiveNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_fouilleMenageNom" value="Fouille / Ménage" disabled />
 						<input type="number" name="attr_fouilleMenageMTPNJP3" value="0" />
-						<button type="roll" name="roll_fouilleMenagePNJP3" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{fouilleMenageMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_fouilleMenagePNJP3" value="@{gm} &{template:base} {{nom=@{fouilleMenageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{fouilleMenageMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueEtrangereRuneNom" value="Langue étrangère / Rune" disabled />
 						<input type="number" name="attr_langueEtrangereRuneMTPNJP3" value="0" />
-						<button type="roll" name="roll_langueEtrangereRunePNJP3" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueEtrangereRuneMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueEtrangereRunePNJP3" value="@{gm} &{template:base} {{nom=@{langueEtrangereRuneNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueEtrangereRuneMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_langueNataleNom" value="Langue natale" disabled />
 						<input type="number" name="attr_langueNataleMTPNJP3" value="0" />
-						<button type="roll" name="roll_langueNatalePNJP3" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{langueNataleMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_langueNatalePNJP3" value="@{gm} &{template:base} {{nom=@{langueNataleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{langueNataleMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_orientationNom" value="Orientation" disabled />
 						<input type="number" name="attr_orientationMTPNJP3" value="0" />
-						<button type="roll" name="roll_orientationPNJP3" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_orientationPNJP3" value="@{gm} &{template:base} {{nom=@{orientationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_persuasionBaratinNom" value="Persuasion / Baratin" disabled />
 						<input type="number" name="attr_persuasionBaratinMTPNJP3" value="0" />
-						<button type="roll" name="roll_persuasionBaratinPNJP3" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{persuasionBaratinMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_persuasionBaratinPNJP3" value="@{gm} &{template:base} {{nom=@{persuasionBaratinNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{persuasionBaratinMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_psychologieNom" value="Psychologie" disabled />
 						<input type="number" name="attr_psychologieMTPNJP3" value="0" />
-						<button type="roll" name="roll_psychologiePNJP3" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{psychologieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_psychologiePNJP3" value="@{gm} &{template:base} {{nom=@{psychologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{psychologieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_secourismeNom" value="Secourisme" disabled />
 						<input type="number" name="attr_secourismeMTPNJP3" value="0" />
-						<button type="roll" name="roll_secourismePNJP3" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{secourismeMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_secourismePNJP3" value="@{gm} &{template:base} {{nom=@{secourismeNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{secourismeMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_survieNom" value="Survie" disabled />
 						<input type="number" name="attr_survieMTPNJP3" value="0" />
-						<button type="roll" name="roll_surviePNJP3" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_surviePNJP3" value="@{gm} &{template:base} {{nom=@{survieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_tricheNom" value="Triche" disabled />
 						<input type="number" name="attr_tricheMTPNJP3" value="0" />
-						<button type="roll" name="roll_trichePNJP3" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{tricheMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_trichePNJP3" value="@{gm} &{template:base} {{nom=@{tricheNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{tricheMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_vigilanceNom" value="Vigilance" disabled />
 						<input type="number" name="attr_vigilanceMTPNJP3" value="0" />
-						<button type="roll" name="roll_vigilancePNJP3" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_vigilancePNJP3" value="@{gm} &{template:base} {{nom=@{vigilanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesGenerales">
 						<input type="text" name="attr_competenceGeneraleNom" value="Compétence" />
 						<input type="number" name="attr_competenceGeneraleMTPNJP3" value="0" />
-						<button type="roll" name="roll_competenceGeneralePNJP3" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceGeneraleMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceGeneralePNJP3" value="@{gm} &{template:base} {{nom=@{competenceGeneraleNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceGeneraleMTPNJP3}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			
@@ -3044,32 +3107,32 @@
 					<div>
 						<input type="text" name="attr_bricolageNom" value="Bricolage" disabled />
 						<input type="number" name="attr_bricolageMTPNJP3" value="0" />
-						<button type="roll" name="roll_bricolagePNJP3" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{bricolageMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_bricolagePNJP3" value="@{gm} &{template:base} {{nom=@{bricolageNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{bricolageMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_conduireNom" value="Conduire" disabled />
 						<input type="number" name="attr_conduireMTPNJP3" value="0" />
-						<button type="roll" name="roll_conduirePNJP3" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conduireMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_conduirePNJP3" value="@{gm} &{template:base} {{nom=@{conduireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conduireMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleMoldueMNom" value="Culture générale Moldue (M)" disabled />
 						<input type="number" name="attr_cultureGeneraleMoldueMMTPNJP3" value="0" />
-						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP3" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleMoldueMPNJP3" value="@{gm} &{template:base} {{nom=@{cultureGeneraleMoldueMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleMoldueMMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxMoldusMNom" value="Jeux Moldus (M)" disabled />
 						<input type="number" name="attr_jeuxMoldusMMTPNJP3" value="0" />
-						<button type="roll" name="roll_jeuxMoldusMPNJP3" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxMoldusMMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxMoldusMPNJP3" value="@{gm} &{template:base} {{nom=@{jeuxMoldusMNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxMoldusMMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_serrurerieNom" value="Serrurerie" disabled />
 						<input type="number" name="attr_serrurerieMTPNJP3" value="0" />
-						<button type="roll" name="roll_serrureriePNJP3" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{serrurerieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_serrureriePNJP3" value="@{gm} &{template:base} {{nom=@{serrurerieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{serrurerieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesMoldus">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP3" value="0" />
-						<button type="roll" name="roll_connaissancePNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP3}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -3090,97 +3153,97 @@
 					<div>
 						<input type="text" name="attr_arithmancieNom" value="Arithmancie" />
 						<input type="number" name="attr_arithmancieMTPNJP3" value="0" />
-						<button type="roll" name="roll_arithmanciePNJP3" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{arithmancieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_arithmanciePNJP3" value="@{gm} &{template:base} {{nom=@{arithmancieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{arithmancieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMagiqueNom" value="Art magique" />
 						<input type="number" name="attr_artMagiqueMTPNJP3" value="0" />
-						<button type="roll" name="roll_artMagiquePNJP3" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMagiqueMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMagiquePNJP3" value="@{gm} &{template:base} {{nom=@{artMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMagiqueMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_artMolduNom" value="Art moldu" />
 						<input type="number" name="attr_artMolduMTPNJP3" value="0" />
-						<button type="roll" name="roll_artMolduPNJP3" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{artMolduMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_artMolduPNJP3" value="@{gm} &{template:base} {{nom=@{artMolduNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{artMolduMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astrologieNom" value="Astrologie" />
 						<input type="number" name="attr_astrologieMTPNJP3" value="0" />
-						<button type="roll" name="roll_astrologiePNJP3" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astrologieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astrologiePNJP3" value="@{gm} &{template:base} {{nom=@{astrologieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astrologieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_astronomieNom" value="Astronomie" />
 						<input type="number" name="attr_astronomieMTPNJP3" value="0" />
-						<button type="roll" name="roll_astronomiePNJP3" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{astronomieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_astronomiePNJP3" value="@{gm} &{template:base} {{nom=@{astronomieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{astronomieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_botaniqueNom" value="Botanique" />
 						<input type="number" name="attr_botaniqueMTPNJP3" value="0" />
-						<button type="roll" name="roll_botaniquePNJP3" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{botaniqueMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_botaniquePNJP3" value="@{gm} &{template:base} {{nom=@{botaniqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{botaniqueMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_coursVolNom" value="Cours de Vol" />
 						<input type="number" name="attr_coursVolMTPNJP3" value="0" />
-						<button type="roll" name="roll_coursVolPNJP3" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{coursVolMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_coursVolPNJP3" value="@{gm} &{template:base} {{nom=@{coursVolNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{coursVolMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_defenseForcesMalNom" value="Défense contre les forces du mal" />
 						<input type="number" name="attr_defenseForcesMalMTPNJP3" value="0" />
-						<button type="roll" name="roll_defenseForcesMalPNJP3" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{defenseForcesMalMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_defenseForcesMalPNJP3" value="@{gm} &{template:base} {{nom=@{defenseForcesMalNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{defenseForcesMalMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_divinationNom" value="Divination" />
 						<input type="number" name="attr_divinationMTPNJP3" value="0" />
-						<button type="roll" name="roll_divinationPNJP3" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{divinationMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_divinationPNJP3" value="@{gm} &{template:base} {{nom=@{divinationNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{divinationMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 						<input type="number" name="attr_enchantementsMTPNJP3" value="0" />
-						<button type="roll" name="roll_enchantementsPNJP3" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_enchantementsPNJP3" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_etudeRunesNom" value="Etude des runes" />
 						<input type="number" name="attr_etudeRunesMTPNJP3" value="0" />
-						<button type="roll" name="roll_etudeRunesPNJP3" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{etudeRunesMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_etudeRunesPNJP3" value="@{gm} &{template:base} {{nom=@{etudeRunesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{etudeRunesMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_histoireMagieNom" value="Histoire de la magie" />
 						<input type="number" name="attr_histoireMagieMTPNJP3" value="0" />
-						<button type="roll" name="roll_histoireMagiePNJP3" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{histoireMagieMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_histoireMagiePNJP3" value="@{gm} &{template:base} {{nom=@{histoireMagieNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{histoireMagieMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 						<input type="number" name="attr_mauvaisSortsMTPNJP3" value="0" />
-						<button type="roll" name="roll_mauvaisSortsPNJP3" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mauvaisSortsPNJP3" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 						<input type="number" name="attr_metamorphoseMTPNJP3" value="0" />
-						<button type="roll" name="roll_metamorphosePNJP3" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_metamorphosePNJP3" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMagiqueNom" value="Musique magique" />
 						<input type="number" name="attr_musiqueMagiqueMTPNJP3" value="0" />
-						<button type="roll" name="roll_musiqueMagiquePNJP3" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMagiqueMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMagiquePNJP3" value="@{gm} &{template:base} {{nom=@{musiqueMagiqueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMagiqueMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_musiqueMoldueNom" value="Musique moldue" />
 						<input type="number" name="attr_musiqueMoldueMTPNJP3" value="0" />
-						<button type="roll" name="roll_musiqueMolduePNJP3" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{musiqueMoldueMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_musiqueMolduePNJP3" value="@{gm} &{template:base} {{nom=@{musiqueMoldueNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{musiqueMoldueMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_potionsNom" value="Potions" />
 						<input type="number" name="attr_potionsMTPNJP3" value="0" />
-						<button type="roll" name="roll_potionsPNJP3" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{potionsMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_potionsPNJP3" value="@{gm} &{template:base} {{nom=@{potionsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{potionsMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_soinsCreaturesMagiquesNom" value="Soins des créatures magiques" />
 						<input type="number" name="attr_soinsCreaturesMagiquesMTPNJP3" value="0" />
-						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP3" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_soinsCreaturesMagiquesPNJP3" value="@{gm} &{template:base} {{nom=@{soinsCreaturesMagiquesNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{soinsCreaturesMagiquesMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesScolaires">
 						<input type="text" name="attr_competenceScolaireNom" value="" placeholder="Nouvelle compétence scolaire..." />
 						<input type="number" name="attr_competenceScolaireMTPNJP3" value="0" />
-						<button type="roll" name="roll_competenceScolairePNJP3" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScolaireMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_competenceScolairePNJP3" value="@{gm} &{template:base} {{nom=@{competenceScolaireNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScolaireMTPNJP3}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 				
@@ -3198,28 +3261,28 @@
 					</div>
 					<div>
 						<input type="text" name="attr_connaissanceMoldusSNom" value="Connaissance des Moldus (S)" disabled />
-						<input type="number" name="attr_connaissanceMoldusSMTPNJP3" value="0"  disabled />
-						<button type="roll" name="roll_connaissanceMoldusSPNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMoldusSMTPNJP3}]]+@{modif}]]}}" ></button>
+						<input type="number" name="attr_connaissanceMoldusSMTPNJP3" value="0"   />
+						<button type="roll" name="roll_connaissanceMoldusSPNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceMoldusSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMoldusSMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_cultureGeneraleSorciersSNom" value="Culture générale des Sorciers (S)" disabled />
 						<input type="number" name="attr_cultureGeneraleSorciersSMTPNJP3" value="0" />
-						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP3" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_cultureGeneraleSorciersSPNJP3" value="@{gm} &{template:base} {{nom=@{cultureGeneraleSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{cultureGeneraleSorciersSMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_jeuxSorciersSNom" value="Jeux Sorciers (S)" disabled />
 						<input type="number" name="attr_jeuxSorciersSMTPNJP3" value="0" />
-						<button type="roll" name="roll_jeuxSorciersSPNJP3" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{jeuxSorciersSMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_jeuxSorciersSPNJP3" value="@{gm} &{template:base} {{nom=@{jeuxSorciersSNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{jeuxSorciersSMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<div>
 						<input type="text" name="attr_mythesLegendesSorciersNom" value="Mythes et légendes des Sorciers (S)" disabled />
 						<input type="number" name="attr_mythesLegendesSorciersMTPNJP3" value="0" />
-						<button type="roll" name="roll_mythesLegendesSorciersPNJP3" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_mythesLegendesSorciersPNJP3" value="@{gm} &{template:base} {{nom=@{mythesLegendesSorciersNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mythesLegendesSorciersMTPNJP3}]]+@{modif}]]}}" ></button>
 					</div>
 					<fieldset class="repeating_competencesConnaissancesSorciers">
 						<input type="text" name="attr_connaissanceNom" value="Connaissance (...)" />
 						<input type="number" name="attr_connaissanceMTPNJP3" value="0" />
-						<button type="roll" name="roll_connaissancePNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{connaissanceMTPNJP3}]]+@{modif}]]}}" ></button>
+						<button type="roll" name="roll_connaissancePNJP3" value="@{gm} &{template:base} {{nom=@{connaissanceNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{connaissanceMTPNJP3}]]+@{modif}]]}}" ></button>
 					</fieldset>
 				</div>
 			</div>
@@ -3275,7 +3338,7 @@
 					<span></span>
 				</label>
 				<input type="number" name="attr_enchantementsMT" value="@{enchantementsMB}+@{enchantementsMA}"  disabled />
-				<button type="roll" name="roll_enchantements" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMT}]]+@{modif}]]}}" ></button>
+				<button type="roll" name="roll_enchantements" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMT}]]+@{modif}]]}}" ></button>
 				<div>
 					<label>
 						<span>Maîtrise maximale</span>
@@ -3303,7 +3366,7 @@
 					<span></span>
 				</label>
 				<input type="number" name="attr_mauvaisSortsMT" value="@{mauvaisSortsMB}+@{mauvaisSortsMA}"  disabled />
-				<button type="roll" name="roll_mauvaisSorts" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMT}]]+@{modif}]]}}" ></button>
+				<button type="roll" name="roll_mauvaisSorts" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMT}]]+@{modif}]]}}" ></button>
 				<div>
 					<label>
 						<span>Maîtrise maximale</span>
@@ -3331,7 +3394,7 @@
 					<span></span>
 				</label>
 				<input type="number" name="attr_metamorphoseMT" value="@{metamorphoseMB}+@{metamorphoseMA}"  disabled />
-				<button type="roll" name="roll_metamorphose" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMT}]]+@{modif}]]}}" ></button>
+				<button type="roll" name="roll_metamorphose" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMT}]]+@{modif}]]}}" ></button>
 				<div>
 					<label>
 						<span>Maîtrise maximale</span>
@@ -3368,17 +3431,17 @@
 				<div>
 					<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 					<input type="number" name="attr_enchantementsMTPNJP1" value="0" />
-					<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 					<input type="number" name="attr_mauvaisSortsMTPNJP1" value="0" />
-					<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 					<input type="number" name="attr_metamorphoseMTPNJP1" value="0" />
-					<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 			</div>
 		</div>
@@ -3398,17 +3461,17 @@
 				<div>
 					<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 					<input type="number" name="attr_enchantementsMTPNJP1" value="0" />
-					<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_enchantementsPNJP1" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 					<input type="number" name="attr_mauvaisSortsMTPNJP1" value="0" />
-					<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mauvaisSortsPNJP1" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 					<input type="number" name="attr_metamorphoseMTPNJP1" value="0" />
-					<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_metamorphosePNJP1" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP1}]]+@{modif}]]}}" ></button>
 				</div>
 			</div>
 		</div>
@@ -3428,17 +3491,17 @@
 				<div>
 					<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 					<input type="number" name="attr_enchantementsMTPNJP2" value="0" />
-					<button type="roll" name="roll_enchantementsPNJP2" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP2}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_enchantementsPNJP2" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP2}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 					<input type="number" name="attr_mauvaisSortsMTPNJP2" value="0" />
-					<button type="roll" name="roll_mauvaisSortsPNJP2" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP2}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mauvaisSortsPNJP2" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP2}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 					<input type="number" name="attr_metamorphoseMTPNJP2" value="0" />
-					<button type="roll" name="roll_metamorphosePNJP2" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP2}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_metamorphosePNJP2" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP2}]]+@{modif}]]}}" ></button>
 				</div>
 			</div>
 		</div>
@@ -3458,17 +3521,17 @@
 				<div>
 					<input type="text" name="attr_enchantementsNom" value="Enchantements" />
 					<input type="number" name="attr_enchantementsMTPNJP3" value="0" />
-					<button type="roll" name="roll_enchantementsPNJP3" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{enchantementsMTPNJP3}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_enchantementsPNJP3" value="@{gm} &{template:base} {{nom=@{enchantementsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{enchantementsMTPNJP3}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_mauvaisSortsNom" value="Mauvais sorts" />
 					<input type="number" name="attr_mauvaisSortsMTPNJP3" value="0" />
-					<button type="roll" name="roll_mauvaisSortsPNJP3" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{mauvaisSortsMTPNJP3}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_mauvaisSortsPNJP3" value="@{gm} &{template:base} {{nom=@{mauvaisSortsNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{mauvaisSortsMTPNJP3}]]+@{modif}]]}}" ></button>
 				</div>
 				<div>
 					<input type="text" name="attr_metamorphoseNom" value="Métamorphose" />
 					<input type="number" name="attr_metamorphoseMTPNJP3" value="0" />
-					<button type="roll" name="roll_metamorphosePNJP3" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{metamorphoseMTPNJP3}]]+@{modif}]]}}" ></button>
+					<button type="roll" name="roll_metamorphosePNJP3" value="@{gm} &{template:base} {{nom=@{metamorphoseNom}}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{metamorphoseMTPNJP3}]]+@{modif}]]}}" ></button>
 				</div>
 			</div>
 		</div>
@@ -3649,44 +3712,44 @@
 	<div class="caracFamilier">
 		<h3>Caractéristiques</h3>
 		<div>
-			<button type="roll" name="roll_forFamilier" value="@{gm} &{template:base} {{nom=Familier (Force)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{forFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Force</button>
+			<button type="roll" name="roll_forFamilier" value="@{gm} &{template:base} {{nom=Familier (Force)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{forFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Force</button>
 			<input type="number" name="attr_forFamilier" value="0" />
-			<button type="roll" name="roll_forFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de force (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_forFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de force (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_conFamilier" value="@{gm} &{template:base} {{nom=Familier (Constitution)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{conFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Constitution</button>
+			<button type="roll" name="roll_conFamilier" value="@{gm} &{template:base} {{nom=Familier (Constitution)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{conFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Constitution</button>
 			<input type="number" name="attr_conFamilier" value="0" />
-			<button type="roll" name="roll_conFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de constitution (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_conFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de constitution (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_taiFamilier" value="@{gm} &{template:base} {{nom=Familier (Taille)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{taiFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Taille</button>
+			<button type="roll" name="roll_taiFamilier" value="@{gm} &{template:base} {{nom=Familier (Taille)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{taiFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Taille</button>
 			<input type="number" name="attr_taiFamilier" value="0" />
-			<button type="roll" name="roll_taiFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de taille (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_taiFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de taille (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_perFamilier" value="@{gm} &{template:base} {{nom=Familier (Perception)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{perFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Perception</button>
+			<button type="roll" name="roll_perFamilier" value="@{gm} &{template:base} {{nom=Familier (Perception)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{perFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Perception</button>
 			<input type="number" name="attr_perFamilier" value="0" />
-			<button type="roll" name="roll_perFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de perception (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_perFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de perception (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_intFamilier" value="@{gm} &{template:base} {{nom=Familier (Intelligence)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{intFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Intelligence</button>
+			<button type="roll" name="roll_intFamilier" value="@{gm} &{template:base} {{nom=Familier (Intelligence)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{intFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Intelligence</button>
 			<input type="number" name="attr_intFamilier" value="0" />
-			<button type="roll" name="roll_intFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'intelligence (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_intFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé d'intelligence (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_dexFamilier" value="@{gm} &{template:base} {{nom=Familier (Dextérité)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{dexFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Dextérité</button>
+			<button type="roll" name="roll_dexFamilier" value="@{gm} &{template:base} {{nom=Familier (Dextérité)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{dexFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Dextérité</button>
 			<input type="number" name="attr_dexFamilier" value="0" />
-			<button type="roll" name="roll_dexFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de dextérité (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_dexFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de dextérité (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_appFamilier" value="@{gm} &{template:base} {{nom=Familier (Apparence)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{appFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Apparence</button>
+			<button type="roll" name="roll_appFamilier" value="@{gm} &{template:base} {{nom=Familier (Apparence)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{appFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Apparence</button>
 			<input type="number" name="attr_appFamilier" value="0" />
-			<button type="roll" name="roll_appFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de apparence (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_appFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de apparence (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 		<div>
-			<button type="roll" name="roll_pouFamilier" value="@{gm} &{template:base} {{nom=Familier (Pouvoir)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{pouFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Pouvoir</button>
+			<button type="roll" name="roll_pouFamilier" value="@{gm} &{template:base} {{nom=Familier (Pouvoir)}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{pouFamilier}@{caracDifficulte}]]+@{modif}]]}}" >Pouvoir</button>
 			<input type="number" name="attr_pouFamilier" value="0" />
-			<button type="roll" name="roll_pouFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de pouvoir (Familier)}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
+			<button type="roll" name="roll_pouFamilierOpp" value="@{gm} &{template:base} {{nom=Jet opposé de pouvoir (Familier)}} {{jet=[[1d100@{chanceux} {{diff=[[@{caracOppose}+@{modif}]]}}" title="Jets opposés">Opp</button>
 		</div>
 	</div>
 	<div class="infoFamilier">
@@ -3729,7 +3792,7 @@
 		<fieldset class="repeating_combatFamilier">
 			<input type="text" name="attr_nomCombatFamilier" />
 			<input type="number" name="attr_scoreCombatFamilier" value="0" />
-			<button type="roll" name="roll_combatFamilier" value="@{gm} &{template:base} {{nom=Familier (@{nomCombatFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{scoreCombatFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_combatFamilier" value="@{gm} &{template:base} {{nom=Familier (@{nomCombatFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{scoreCombatFamilier}]]+@{modif}]]}}"></button>
 		</fieldset>
 	</div>
 	
@@ -3742,37 +3805,37 @@
 		<div>
 			<input type="text" name="attr_acrobatieFamilier" value="Acrobatie" readonly />
 			<input type="number" name="attr_acrobatieScoreFamilier" value="0" />
-			<button type="roll" name="roll_acrobatieFamilier" value="@{gm} &{template:base} {{nom=Familier (@{acrobatieFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{acrobatieScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_acrobatieFamilier" value="@{gm} &{template:base} {{nom=Familier (@{acrobatieFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{acrobatieScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<div>
 			<input type="text" name="attr_discretionFamilier" value="Discrétion" readonly />
-			<input type="number" name="attr_discretionFamilier" value="0" />
-			<button type="roll" name="roll_discretionFamilier" value="@{gm} &{template:base} {{nom=Familier (@{discretionFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{discretionScoreFamilier}]]+@{modif}]]}}"></button>
+			<input type="number" name="attr_discretionScoreFamilier" value="0" />
+			<button type="roll" name="roll_discretionFamilier" value="@{gm} &{template:base} {{nom=Familier (@{discretionFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{discretionScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<div>
 			<input type="text" name="attr_esquiveFamilier" value="Esquive" readonly />
 			<input type="number" name="attr_esquiveScoreFamilier" value="0" />
-			<button type="roll" name="roll_esquiveFamilier" value="@{gm} &{template:base} {{nom=Familier (@{esquiveFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{esquiveScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_esquiveFamilier" value="@{gm} &{template:base} {{nom=Familier (@{esquiveFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{esquiveScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<div>
 			<input type="text" name="attr_orientationFamilier" value="Orientation" readonly />
 			<input type="number" name="attr_orientationScoreFamilier" value="0" />
-			<button type="roll" name="roll_orientationFamilier" value="@{gm} &{template:base} {{nom=Familier (@{orientationFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{orientationScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_orientationFamilier" value="@{gm} &{template:base} {{nom=Familier (@{orientationFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{orientationScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<div>
 			<input type="text" name="attr_survieFamilier" value="Survie" readonly />
 			<input type="number" name="attr_survieScoreFamilier" value="0" />
-			<button type="roll" name="roll_survieFamilier" value="@{gm} &{template:base} {{nom=Familier (@{survieFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{survieScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_survieFamilier" value="@{gm} &{template:base} {{nom=Familier (@{survieFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{survieScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<div>
 			<input type="text" name="attr_vigilanceFamilier" value="Vigilance" readonly />
 			<input type="number" name="attr_vigilanceScoreFamilier" value="0" />
-			<button type="roll" name="roll_vigilanceFamilier" value="@{gm} &{template:base} {{nom=Familier (@{vigilanceFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{vigilanceScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_vigilanceFamilier" value="@{gm} &{template:base} {{nom=Familier (@{vigilanceFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{vigilanceScoreFamilier}]]+@{modif}]]}}"></button>
 		</div>
 		<fieldset class="repeating_competencesFamilier">
 			<input type="text" name="attr_competenceFamilier" value="" />
 			<input type="number" name="attr_competenceScoreFamilier" value="0" />
-			<button type="roll" name="roll_competenceFamilier" value="@{gm} &{template:base} {{nom=Familier (@{competenceFamilier})}} {{jet=[[1d100cs<5cf>96]]}} {{diff=[[ [[@{competenceScoreFamilier}]]+@{modif}]]}}"></button>
+			<button type="roll" name="roll_competenceFamilier" value="@{gm} &{template:base} {{nom=Familier (@{competenceFamilier})}} {{jet=[[1d100@{chanceux} {{diff=[[ [[@{competenceScoreFamilier}]]+@{modif}]]}}"></button>
 		</fieldset>
 	</div>
 	<div class="capacitesFamilier">
@@ -3803,7 +3866,7 @@
 			<span>Difficulté</span>
 			<span>{{diff}}</span>
 		</div>
-		{{#^rollBetween() jet 1 5}}
+		{{#^rollBetween() jet 1 critique}}
 			{{#^rollBetween() jet 96 100}}
 				{{#rollBetween() jet 1 diff}}
 					<div>
@@ -3811,9 +3874,9 @@
 					</div>
 				{{/rollBetween() jet 1 diff}}
 			{{/^rollBetween() jet 96 100}}
-		{{/^rollBetween() jet 1 5}}
+		{{/^rollBetween() jet 1 critique}}
 		
-		{{#^rollBetween() jet 1 5}}
+		{{#^rollBetween() jet 1 critique}}
 			{{#^rollBetween() jet 96 100}}
 				{{#rollGreater() jet diff}}
 					<div>
@@ -3821,13 +3884,13 @@
 					</div>
 				{{/rollGreater() jet diff}}
 			{{/^rollBetween() jet 96 100}}
-		{{/^rollBetween() jet 1 5}}
+		{{/^rollBetween() jet 1 critique}}
 		
-		{{#rollBetween() jet 1 5}}
+		{{#rollBetween() jet 1 critique}}
 			<div>
 				<span class="green">Réussite critique</span>
 			</div>
-		{{/rollBetween() jet 1 5}}
+		{{/rollBetween() jet 1 critique}}
 			
 		{{#rollBetween() jet 96 100}}
 			<div>
