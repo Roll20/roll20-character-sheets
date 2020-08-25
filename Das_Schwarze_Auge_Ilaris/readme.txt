@@ -11,8 +11,9 @@ Gebrauchsanweisung:
 Das Character Sheet ist ausdrücklich kein Ersatz für Sephrasto oder generell die Charakterverwaltung. Die meisten Werte müssen aus einem bereits erstellten Charakterbogen übertragen werden.
 
 Der Bogen verfügt über einen Globalen Modifikator oben rechts, der auf alle Proben-Würfe aufgeschlagen wird (positive Zahl bedeutet Bonus, negative Zahl bedeutet Malus), und jeweils globale Modifikatoren für den Kampf und Übernatürliches, und einen Schadensmodifikator für alle Würfe auf Waffenschaden. Das kann man jeweils für situative Modifikatoren verwenden.
+Außerdem ist es möglich, je nach Situation einen Modifikator für bestimmte Attribute zu vergeben. Dieser wird auf Fertigkeitsproben (inklusive Kampffertigkeiten) mit dem Attribut einfach, auf Attributsproben doppelt aufgeschlagen; das folgt im Kern den Regeln zu Elixieren und Stärkungszaubern wie dem Attributo.
 
-Alle Würfelwürfe (wegen technischer Limitationen bis auf die bei zusätzlich eingetragenen Fertigkeiten :( ) können auch verdeckt an den Meister durchgeführt werden. Dazu wird oben links im Sheet der Haken bei "Verdeckt würfeln" gesetzt.
+Alle Würfelwürfe (wegen technischer Limitationen bis auf die bei zusätzlich eingetragenen Fertigkeiten und zusätzlichen Waffen :( ) können auch verdeckt an den Meister durchgeführt werden. Dazu wird oben links im Sheet der Haken bei "Verdeckt würfeln" gesetzt.
 
 Der Einsatz von Schicksalspunkten um zusätzliche Würfel zu erhalten funktioniert, indem man in der Kopfzeile den Haken "Schicksalspunkt" setzt. Sollte man eine Eigenheit nutzen und zwei Würfel dazubekommen, kann der zweite Haken zusätzlich gesetzt werden (für dann 5 Würfel bei 3d20-Median-Proben oder 3 Würfel bei 1d20-Proben).
 
@@ -28,10 +29,11 @@ Geschwindigkeit wird nicht automatisch berechnet und muss selbst eingetragen wer
 Die Fertigkeitswerte werden in das kleine Feld eingetragen. Die Basiswerte berechnet das Sheet automatisch; der talentierte, berechnete Probenwert wird daneben angezeigt. Im Textfeld ist Platz um Talente zu notieren; die Fertigkeiten haben jeweils vier Roll-Buttons, 3d20 Median und 1d20, jeweils mit und ohne Talent (t). Je nachdem, ob ein T-Button oder ein Nicht-T-Button gedrückt wird, wird der Talentierte Probenwert oder der Untalentierte benutzt. 
 Hohe Qualität kann stufenweise für alle Talentproben global eingestellt werden - Jede Stufe macht automatisch eine Modifikation von -4.
 Für freie Fertigkeiten gibt es eine einfache Liste, die per "Add"-Button erweitert werden kann, und drei Buttons für 3d20 Median + 6/14/22 (für Unerfahren/Erfahren/Meisterlich) - komplizierter wollte ich das nicht machen.
-Zusätzliche Fertigkeiten aus Hausregeln können frei zugeschaltet werden. Wenn die drei relevanten Attribute ausgewählt wurden, berechnet das Sheet automatisch den Basiswert und mit dem Fertigkeitswert den Probenwert.
+Zusätzliche Fertigkeiten aus Hausregeln können frei zugeschaltet werden. Wenn die drei relevanten Attribute ausgewählt wurden, berechnet das Sheet automatisch den Basiswert und mit dem Fertigkeitswert den Probenwert. Leider funktionieren bei diesen Fertigkeiten weder die GM-Roll-Funktion, noch die Attributs-Modifikatoren.
 Die profanen Vorteile "Scharfsinn", "Eindrucksvoll" und "Vorausschauend" sind in einer Zeile zusammengefasst und können in der passenden Situation (sine qua non!) in ihren zwei Stufen zugeschaltet werden. Sie geben dann +2 oder +4 auf ALLE (!) Fertigkeitsproben.
 
 Der Bogen enthält keine Kampftalente und -stile, stattdessen können einfach Waffen mit ihren finalen AT-, VT- und Waffenschadens-Werten (i.e., nach Anwendung der Boni aus Kampfstilen) eingetragen werden. Der eingetragene Schaden sollte der Waffenschaden (nach eventuellen Boni aus Kraftvollem Kampf) sein, der KK-Schadensbonus wird automatisch addiert. Bei "Kopflastigen" Waffen kann der Haken bei "KL" gesetzt werden, dadurch wird der KK-Schadensbonus verdoppelt.
+Sollten die Plätze für die Waffen nicht ausreichen, können weitere als Repeating Section hinzugefügt werden. Leider funktioniert bei diesen zugeschalteten Zeilen die GM-Roll-Funktion nicht.
 
 Manöver können einzeln zum AT-, VT-, FK- und Schadenswurf zugeschaltet werden. Beim Würfeln wird die Gesamt-Modifikation und die jeweils ausgewählten relevanten Manöver "öffentlich" angezeigt. 
 
@@ -131,3 +133,12 @@ Neue Features:
 
 1.6:
 - GM-Roll-Funktion hinzugefügt.
+
+1.6.1: Fix der Anzeige von Würfelbuttons.
+
+1.7:
+Neue Features:
+- Standard-Talente der profanen Fertigkeiten können jetzt ein- und ausgeblendet werden.
+- Attributs-Modifikatoren hinzugefügt (z.B. bei Stärkung durch Elixiere oder Attributo)
+- Repeating Sections bei Waffen und Fernkampfwaffen eingefügt, falls mehr als 5 oder 3 nötig sind.
+- Kleine Layout-Anpassungen.
