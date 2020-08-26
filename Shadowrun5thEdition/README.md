@@ -255,9 +255,10 @@ The built in sheet buttons do not cover all of the rolls in Shadowrun 5e by a lo
 
 ```@{gm_toggle} &{template:rolls}{{header=Soak}}{{base=Base}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[(@{soak}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}```
 
-* **Primary Range**. This macro requires you to have selected a Primary weapon in your Arms tab.
+* **Primary Range**. This macro requires you to have selected a Primary ranged weapon in your Arms tab.
 
 ```@{gm_toggle} &{template:rolls}{{header=@{primary_range_weapon}}}{{base=Base}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[((@{primary_range_weapon_skill}+@{primary_range_weapon_dicepool})+@{agility}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{primary_range_weapon_mode}, ACC @{primary_range_weapon_acc}, DV @{primary_range_weapon_damage}, AP @{primary_range_weapon_ap}}}```
 
-* **Primary Melee**. This macro requires you to have selected a Primary (melee) weapon in your Arms tab.
+* **Primary Melee**. This macro requires you to have selected a Primary melee weapon in your Arms tab.
+
 ```@{gm_toggle} &{template:rolls}{{header=@{primary_melee_weapon}}}{{base=Base}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{dice=[[((@{primary_melee_weapon_skill}+@{primary_melee_weapon_dicepool})+@{agility}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=ACC @{primary_melee_weapon_acc}, DV @{primary_melee_weapon_damage}, AP @{primary_melee_weapon_ap}}}```
