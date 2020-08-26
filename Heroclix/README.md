@@ -10,7 +10,7 @@ The dial is above the figure and can be clicked by changing the value in the gre
 
 **Creating A New Figure**
 
-In order to use this character sheet you must first have access to a game using this character sheet. In order to gain acces to a roll20 game that uses this you must either have Roll20 Pro which allows you to use custom sheets and put the HTMl and CSS for this sheet into the settings page or contact me for an invite to game that uses the sheet. Once you are in a game that uses the sheet you must first add a character in the journal:
+In order to use this sheet you must select it from the character sheet dropdown that shows up when creating a game or in the settings page of an existing game. Once you are in a game that uses the sheet you must first add a character in the journal:
 
 ![First Image](Documentation/Create%20Character.png)
 
@@ -49,3 +49,7 @@ Then relate the first bar to Clicks, the second to attack_current and the third 
 To change clicks change the value in the green bubble when clicking on the character as shown below. Your final result should look like this:
 
 ![First Image](Documentation/Filled%20Token%20On%20Map.png)
+
+**Using a Beta version of the sheet or developing new features**
+
+In order to use this character sheet for development you must first have access to a game using this character sheet. In order to gain access to a roll20 game that uses this you must have a Roll20 Pro membership which allows you to use custom sheets and put the HTMl and CSS for this sheet into the settings page.
