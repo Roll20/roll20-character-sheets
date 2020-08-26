@@ -71,7 +71,7 @@
 	<input type="hidden" name="attr_show_roll_modifiers" value="0" />
 	<input type="hidden" name="attr_roll_modifier_types" value="" />
 	<input type="hidden" name="attr_roll_modifier_summary" value="" />
-	<input type="hidden" name="roll_trait_summary" value="" />
+	<input type="hidden" name="attr_roll_trait_summary" value="" />
 	<div class="modal">
 		<div class="modal-dialog">
 			<div class="modal-header">
@@ -10844,6 +10844,14 @@ See notes for weapon.</textarea>
 		"unfamiliar_equipment",
 	];
 
+	const traitFields = [
+		"night_vision",
+		"has_dark_vision",
+		"has_high_pain_threshold",
+		"has_low_pain_threshold",
+		"is_used_to_blindness",
+	];
+
 	/**
 	 * These fields modify a technique rolls.
 	 **/
@@ -17773,6 +17781,75 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 	});
+
+	// reset modifiers but keep traits
+	on("clicked:reset_roll_modifiers", event => {
+
+		resetRollModifiers();
+
+	});
+
+	/**
+	 * Resets the roll modifiers fields in the dialog box
+	 * Doesn't change the traits fields, since they are usually static
+	 **/
+	function resetRollModifiers() {
+
+		getAttrs(["roll_modifier_types"], values => {
+
+			let modType = values.roll_modifier_types;
+
+			let modFields;
+
+			let key = "";
+
+			let value = "";
+
+			let updateFields = {
+				roll_modifier: 0,
+				max_skill_nine: 0,
+				visibility_modifier: 0,
+				roll_modifier_summary: "",
+				roll_trait_summary: "",
+			};
+
+			switch (modType) {
+				case "skill":
+					modFields = skillModifierFields;	
+					break;
+			
+				default:
+					break;
+			}
+
+			// loop through each item in the array
+			// if a modifier add to udpatefields, clear value
+			for (let i = 0; i < modFields.length; i++) {
+
+				key = modFields[i];
+
+				// ignore traits
+				if (traitFields.indexOf(key) === -1) {
+
+					// check for reason field, which is a text value
+					if (key !== "dialog_custom_roll_modifier_reason") {
+						value = 0;
+					} else {
+						value = "";
+					}
+
+					// add a new property
+					updateFields[key] = value;
+
+				}
+
+			}
+
+			setAttrs(updateFields, {silent: true});
+
+		});
+
+	} 
 
 	let arrChangeSkillRollMods = [
 		"change:show_roll_modifiers", 
