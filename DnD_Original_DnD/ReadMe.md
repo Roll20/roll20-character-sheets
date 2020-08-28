@@ -2,9 +2,13 @@
 This is a character sheet designed for use with Original Dungeons & Dragons. The sheet is lacking a lot of automation in rolls and calculations to give maximum flexibility to the Dungeon Master in which Original Dungeons & Dragons rules to use. This sheet will also work with Holmes Basic D&D.
 
 ## Current Version
-1.2
+1.3
 
 ### Change log
+
+#### 1.3
+* Player data changed to Patrick Hand
+* Swapped Level and AC/HP stat blocks so all fo the level info is in one column
 
 #### 1.2
 * Fixed: typo, Save vs. Stone added back in, textarea css issue (affecting Misc, equipment, treasure, etc.)

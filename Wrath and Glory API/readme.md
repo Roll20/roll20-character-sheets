@@ -40,6 +40,9 @@ Updates:
 
 ### Changelog
 
+** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement** 
+
+
 ** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition** 
 
 The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.

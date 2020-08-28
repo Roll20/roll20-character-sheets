@@ -55,18 +55,18 @@ const updateRepeatingPrimary = (eventinfo, type) => {
   if (eventinfo.newValue === undefined) {
     return false
   } else if (eventinfo.newValue === 'primary') {
-    const constructedAttributes = type === 'armor' ? shadowrunFunctions.addRepRow(repRowID, sheetAttributes.armorAttributes) : shadowrunFunctions.contructRepeatingWeaponAttributes(repRowID, type);
+    const constructedAttributes = type === 'armor' ? processingFunctions.shadowrun.addRepRow(repRowID, sheetAttributes.armorAttributes) : processingFunctions.shadowrun.contructRepeatingWeaponAttributes(repRowID, type);
 
     //get the attributes to update primary
     getAttrs(constructedAttributes, attrs => {
-      const update = type === 'armor' ? shadowrunFunctions.updatePrimaryArmor(attrs) : shadowrunFunctions.updatePrimaryWeapons(attrs);
+      const update = type === 'armor' ? processingFunctions.shadowrun.updatePrimaryArmor(attrs) : processingFunctions.shadowrun.updatePrimaryWeapons(attrs);
       processingFunctions.setAttributes(update)
     })
 
     //Reset all the other primaries
-    shadowrunFunctions.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
+    processingFunctions.shadowrun.resetRepeatingFieldsPrimaries(`repeating_${type}`, repRowID)
   } else {
-    const update = type === 'armor' ? shadowrunFunctions.resetPrimaryArmor() : shadowrunFunctions.resetPrimaryWeapon(type);
+    const update = type === 'armor' ? processingFunctions.shadowrun.resetPrimaryArmor() : processingFunctions.shadowrun.resetPrimaryWeapon(type);
     processingFunctions.setAttributes(update)
   }
 }
@@ -199,6 +199,16 @@ const updateDerivedAttribute = derivedAttribute => {
   })
 }
 
+const updateInitiativeDice = () => {
+  getAttrs(['reaction', 'intuition', "initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+    const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
+    const temp = parseInt(values.initiative_dice_temp) || 0;
+    const bonus = parseInt(values.initiative_dice_modifier) || 0;
+    processingFunctions.setAttributes({
+      initiative_dice: edgeFlag ? 5 : Math.min(bonus+temp+1,5)
+    })
+  })
+}
 
 //Calculate Astral Initiatve
 const updateAstralInitiative = () => {
@@ -212,6 +222,17 @@ const updateAstralInitiative = () => {
     });
   });
 };
+
+const updateAstralInitiativeDice = () => {
+  getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
+    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+    const bonus = parseInt(v.astral_dice_modifier) || 0;
+
+    setAttrs({
+      astral_dice: edgeFlag ? 5 : Math.min(bonus+3,5)
+    })
+  })
+}
 
 const resetConditionTrack = eventinfo => {
   const attr = eventinfo.triggerName.split("_").pop()

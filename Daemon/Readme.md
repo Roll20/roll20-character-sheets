@@ -1,0 +1,9 @@
+Este é o site oficial da editoda do sistema Daemon. Aqui vc pode encontrar um netbook com as regras oficiais do sistema.
+
+This is the official website of the Daemon system editor. Here you can find a netbook with the official rules of the system.
+
+* https://www.daemon.com.br/home/
+
+## Changelog
+
+
