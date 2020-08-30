@@ -1,5 +1,5 @@
 # Empire of the Petal Throne Character Sheet
-Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR in 1975. Sheet is based on 1975 TSR designed player sheet.
+Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR in 1975.
 
 ## Current Version
 1.1
@@ -12,7 +12,9 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Fixed missing skill, "Dancer" under Group III: Noble skills
 * Fixed “Sixth Sense” to “ESP” for Priest's Professional skills
 * Moved "Bonus Spells" to under Professional skills and only display them for Priests and Magic Users
-* Pretty switch for changing between two options for managing skills
+* Added "current" fo current hits
+* Removed "average" after struggle, added some helper text to Struggle
+* Changed type to number for...you guessed it...numbers, along with appropriate minimum and maximum numbers, plus steps where applicable
 
 #### 1.0
 * Sheet creation for Roll20
