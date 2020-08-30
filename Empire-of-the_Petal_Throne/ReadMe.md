@@ -7,10 +7,12 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 ### Change log
 
 #### 1.1
+* Fixed CSS Flexbox issue in Firefox
 * Fixed an issue with skill check boxes rechecking themselves
 * Fixed missing skill, "Dancer" under Group III: Noble skills
 * Fixed “Sixth Sense” to “ESP” for Priest's Professional skills
 * Moved "Bonus Spells" to under Professional skills and only display them for Priests and Magic Users
+* Added a dropdown for Alignment
 
 #### 1.0
 * Sheet creation for Roll20
