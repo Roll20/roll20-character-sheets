@@ -62,6 +62,39 @@
 	<span data-i18n="sheet-style-option">Sheet Style</span>
 	<span data-i18n="sheet-style-desc">Select a visual style for the character sheet.</span>
 </div>
+
+<input type="hidden" name="attr_show_roll_modifiers" value="0" />
+<input type="hidden" name="attr_roll_modifier_types" value="" />
+<div class="modal">
+	<div class="modal-dialog">
+		<div class="modal-header">
+			<h2>
+				<span data-i18n="roll-modifiers-heading">Roll Modifiers</span>
+			</h2>
+		</div>
+		<div class="modal-body">
+			
+			<div class="container">
+				<div class="item">
+					<input type="number" readonly="readonly" value="0" name="attr_roll_modifier" title="macro name: @{roll_modifier}" />
+					<span data-i18n="to-roll-label">To Roll</span>
+				</div>
+				<div class="item">
+					<label>
+						<input type="checkbox" name="attr_max_skill_nine" value="1" />
+						<span data-i18n="max-skill-9-label">Max skill of 9</span>
+					</label>
+				</div>
+			</div>
+
+		</div>
+		<div class="modal-footer">
+			<button type="action" name="act_close_roll_modifiers" class="btn"><span data-i18n="apply-label">Apply</span></button>
+			<button type="action" name="act_reset_roll_modifiers" class="btn"><span data-i18n="reset-label">Reset</span></button>
+		</div>
+	</div>
+</div>
+
 <div class="wrapper">
 	<!-- HIDDEN FIELDS -->
 	<input type="hidden" name="attr_10" value="10" disabled="disabled" />
@@ -98,10 +131,9 @@
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
 				<ul>
-					<li>Combat tab. Active Defenses - Link to an attribute and calculate the base defense.</li>
-					<li>Combat tab. Knockback Defenses - Link to an attribute and calculate the base defense. Added a field to adjust the HP per yard amount.</li>
-					<li>Repeating Defense, Melee, and Ranged tables. Added ability to link a skill to WILL.</li>
-					<li>Fixed text description for Unconsciousness check, changed Hard to Kill to Hard to Subdue. Reported by Ben.</li>
+					<li>Bio\Misc Tab. Calculate Reach based on Size Modifier.</li>
+					<li>General Tab - Current Move table. Added the step disance for each movement type.</li>
+					<li>Grimoire Tab - Repeating Spells. Changed the checkboxes for <b>ON</b> and <b>CT</b> to input boxes, since a person can cast the same spell more than once.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -1411,13 +1443,28 @@ and for HP and/or FP loss below 1/3. (B419, B426)
 								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="abbreviation-enhanced-move-label">ENH MOVE</span>
+								<div class="popup">
+									<span data-i18n="abbreviation-enhanced-move-label">ENH MOVE</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="enhanced-move-tooltip">Enhanced ground move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="air-label">Air</span>
+								<div class="popup">
+									<span data-i18n="air-label">Air</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="air-tooltip">Air/Flying move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
-								<span data-i18n="water-label">Water</span>
+								<div class="popup">
+									<span data-i18n="water-label">Water</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="water-tooltip">Water/Swimming move.<br /><b>STEP:</b> The number in parentheses is the step distance.</span>
+								</span>
 							</div>
 							<div class="cell colAll">
 								<div class="popup">
@@ -1597,15 +1644,18 @@ every second that your encumbrance is over 10xBL<br />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_current_move" value="" readonly="readonly" title="Macro name: current_move" />
+								<input type="hidden" name="attr_current_ground_step" value="1" />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_enhanced_move_current" value="0" readonly="readonly" title="Macro name: enhanced_move_current" />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_current_air" value="0" readonly="readonly" title="Macro name: current_air" />
+								<input type="hidden" name="attr_current_air_step" value="1" />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_current_water" value="0" readonly="readonly" title="Macro name: current_water" />
+								<input type="hidden" name="attr_current_water_step" />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_current_dodge" value="" readonly="readonly" title="Macro name: current_dodge" />
@@ -3208,7 +3258,9 @@ PU2:126 = Power-Ups 2. Page 126<br />
 						<input type="text" name="attr_gender" title="Macro name: gender" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row">
+					
 					<div class="cell col0 label">
 						<div class="popup">
 							<span data-i18n="size-modifier-label">Size Modifier</span>
@@ -3220,10 +3272,34 @@ that is greater than 0. To do that you can use a combination of Points and<br />
 MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
 							</span>
 					</div>
-					<div class="cell col1">
+					<div class="cell col-half">
 						<input type="number" name="attr_size" value="0" title="Macro name: size" />
 					</div>
+
+					<div class="cell col0 label">
+						<div class="popup">
+							<span data-i18n="reach-modifier-label">Reach Mod</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="reach-modifier-tooltip">Reach Modifier.<br />See Size Modifier and Reach, B402<br />When grappling, you get +1 To Hit per size modifier difference.</span>
+					</div>
+					<div class="cell col-input">
+						<input type="number" name="attr_reach" value="0" readonly="readonly" title="Macro name: reach" />
+					</div>
+
+					<div class="cell col0 label">
+						<div class="popup">
+							<span data-i18n="close-reach-label">Has <span class="emphatic">C</span> Reach</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="close-reach-tooltip">If checked, a reach <span class="emphatic">C</span> weapon increases to reach 1, but no other effects.<br />See Size Modifier and Reach, B402</span>
+					</div>
+					<div class="cell col-input">
+						<input type="checkbox" name="attr_is_close_reach" title="Macro name: is_close_reach" />
+					</div>
+
 				</div> <!-- .row -->
+				
 				<div class="row">
 					<div class="cell col0 label">
 						<span data-i18n="main-hand-label">Main Hand</span>
@@ -3259,6 +3335,7 @@ MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
 						<input type="text" name="attr_age" title="Macro name: age" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row">
 					<div class="cell col0 label">
 						<span data-i18n="height-label">Height</span>
@@ -3283,6 +3360,7 @@ Weight and thus needs to be numerical.
 						<input type="number" name="attr_weight" title="Macro name: weight" />
 					</div>
 				</div> <!-- .row -->
+
 				<div class="row">
 					<div class="cell col0 label">
 						<span data-i18n="eyes-label">Eyes</span>
@@ -3499,6 +3577,7 @@ Engineering: Back to School.
 
 		<div class="box skills">
 			<div class="table">
+				
 				<div class="header">
 					<div class="cell col0">
 						<span data-i18n="skills-label">Skills</span>
@@ -3555,6 +3634,20 @@ PU2:126 = Power-Ups 2. Page 126<br />
 						</div>
 					</div>
 				</div> <!-- .header -->
+
+				<input type="hidden" name="attr_use_roll_modifiers" value="0" />
+				<div class="row roll-modifiers">
+					<div class="cell label">
+						<span data-i18n="modifier-label">Modifier:</span>
+					</div>
+					<div class="cell number-input">
+						<input type="number" value="0" step="1" name="attr_skill_roll_modifier" />
+					</div>
+					<div class="cell">
+						<button type="action" name="act_show_roll_modifiers_for_skills" class="btn" title="Select Skill Modifiers"><span data-i18n="select-skill-modifiers-button">Select Skill Modifiers</span></button>
+					</div>
+				</div>
+				
 				<fieldset class="repeating_skills">
 				    <input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
 					<input class="toggle toggle-notes" type="checkbox" title="Click to show/hide more information." name="attr_skill_toggle_notes" />
@@ -7237,7 +7330,7 @@ For more information, see B409.
 					    <div class="popup"><span data-i18n="on-label">On</span></div>
 						<div class="tooltip">
 							<span data-i18n="spell-is-on-tooltip">
-								Mark the spell as <b>ON</b><br />
+								Enter a 1 or more to mark the spell as <b>ON</b><br />
 								<b><span name="attr_penalty_per_spell_on"></span></b> skill penalty for each spell that is <b>ON</b>.<br />
 								See B238 or M10.<br/>
 								Click one at a time, wait until each penalty is applied before clicking the next one.
@@ -7248,7 +7341,7 @@ For more information, see B409.
 					    <div class="popup"><span data-i18n="abbreviation-concentration-label">CT</span></div>
 						<div class="tooltip">
 							<span data-i18n="spell-concentration-tooltip">
-								Mark the spell as <b>Under Concentration</b>.<br />
+								Enter a 1 or more to mark the spell as <b>Under Concentration</b>.<br />
 								<b><span name="attr_penalty_per_spell_maintained"></span></b> skill penalty for each spell.<br />
 								See B238 or M10.<br/>
 								Click one at a time, wait until each penalty is applied before clicking the next one.
@@ -7295,17 +7388,6 @@ For more information, see B409.
 							</span>
 						</div>
 					</div>
-					<div class="cell col3">
-						<div class="popup"><span data-i18n="abbreviation-book-reference-label">Ref</span></div>
-						<div class="tooltip tooltip-spell-ref">
-							<span data-i18n="book-reference-tooltip">
-								Reference to book and page numbers.<br />
-								Examples:<br />
-								B238 = GURPS Basic, Page 238<br />
-								PU2:126 = Power-Ups 2. Page 126<br />
-							</span>
-						</div>
-					</div>
 				</div> <!-- .header -->
 				<fieldset class="repeating_spells">
 				    <input class="toggle-highlight" type="checkbox" title="Check to highlight row" name="attr_highlight" />
@@ -7335,10 +7417,10 @@ For more information, see B409.
 							<input type="number" name="attr_points" value="1" title="Macro table name: repeating_spells. Field name: points" />
 						</div>
 						<div class="cell col12">
-							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_on_checked" value="1" />
+							<input type="number" value="" min="0" max="20" step="1" title="Adjust to mark spell as on." name="attr_spell_on_checked" />
 						</div>
 						<div class="cell col12">
-							<input type="checkbox" class="checkbox" title="Check to mark spell as on." name="attr_spell_maintained_checked" value="1" />
+							<input type="number" value="" min="0" max="20" step="1" title="Adjust to mark spell as on." name="attr_spell_maintained_checked" />
 						</div>
 						<div class="cell col7">
 							<input type="text" name="attr_spell_resisted_by" placeholder="Resist" title="Macro table name: repeating_spells. Field name: spell_resisted_by" />
@@ -7355,35 +7437,9 @@ For more information, see B409.
 						<div class="cell col11">
 							<input type="text" name="attr_maintain" placeholder="Cost to Maintain" title="Macro table name: repeating_spells. Field name: maintain" />
 						</div>
-						<div class="cell col3">
-						    <input type="text" name="attr_ref" placeholder="Ref" title="Macro table name: repeating_spells. Field name: ref" />	
-						</div>
 					</div> <!-- .row -->
 					
 					<div class="row row-details notebox">
-						
-						<div class="row-misc row-college">
-							<div class="cell label">
-							    <div class="popup">
-									<span data-i18n="class-label">Class</span>
-								</div>
-        						<div class="tooltip">
-									<span data-i18n="spell-class-tooltip">
-										Spell class; Area, Blocking, Information, Melee,<br />
-										Missile, Regular, Regular (Jet), Resisted, Special
-									</span>
-        						</div>
-							</div>
-							<div class="cell">
-							    <input type="text" name="attr_spell_class" placeholder="Class" title="Macro table name: repeating_spells. Field name: spell_class" />
-							</div>
-							<div class="cell label">
-							    <span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
-							</div>
-							<div class="cell spell-mod-notes">
-							    <input type="text" name="attr_spell_mod_notes" title="Macro table name: repeating_spells. Field name: spell_mod_notes" />
-							</div>
-						</div> <!-- .row -->
 						
 						<div class="row-misc row-college">
 							<div class="cell label">
@@ -7401,6 +7457,46 @@ For more information, see B409.
 							<div class="cell">
 							    <input type="text" readonly="readonly" name="attr_row_id" value="" />
 							</div>
+							<div class="cell align-right col3">
+								<input type="text" name="attr_ref" title="Macro table name: repeating_spells. Field name: ref" />	
+							</div>
+							<div class="cell align-right ref-label">
+								<div class="popup"><span data-i18n="abbreviation-book-reference-label">Ref</span></div>
+								<div class="tooltip tooltip-spell-ref">
+									<span data-i18n="book-reference-tooltip">
+										Reference to book and page numbers.<br />
+										Examples:<br />
+										B238 = GURPS Basic, Page 238<br />
+										PU2:126 = Power-Ups 2. Page 126<br />
+									</span>
+								</div>
+							</div>
+						</div> <!-- .row -->
+
+						<div class="row-misc row-college">
+							<div class="cell label">
+							    <span data-i18n="reason-for-modifier-label">Reason for MOD (Modifier):</span>
+							</div>
+							<div class="cell spell-mod-notes">
+							    <input type="text" name="attr_spell_mod_notes" title="Macro table name: repeating_spells. Field name: spell_mod_notes" />
+							</div>
+						</div> <!-- .row -->
+						
+						<div class="row-misc row-college">
+							<div class="cell label">
+							    <div class="popup">
+									<span data-i18n="class-label">Class</span>
+								</div>
+        						<div class="tooltip">
+									<span data-i18n="spell-class-tooltip">
+										Spell class; Area, Blocking, Information, Melee,<br />
+										Missile, Regular, Regular (Jet), Resisted, Special
+									</span>
+        						</div>
+							</div>
+							<div class="cell">
+							    <input type="text" name="attr_spell_class" title="Macro table name: repeating_spells. Field name: spell_class" />
+							</div>
 							<div class="cell label">
 								<span data-i18n="colleges-label">Primary College:</span>
 							</div>
@@ -7415,6 +7511,7 @@ For more information, see B409.
 							</div>
 							
 						</div> <!-- .row -->
+
 						<div class="header">
 							<div class="popup"><span data-i18n="notes-label">Notes</span></div>
 							<span class="tooltip">
@@ -7562,6 +7659,16 @@ For more information, see B409.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>Bio\Misc Tab. Calculate Reach based on Size Modifier.</li>
+				<li>General Tab - Current Move table. Added the step disance for each movement type.</li>
+				<li>Grimoire Tab - Repeating Spells. Changed the checkboxes for <b>ON</b> and <b>CT</b> to input boxes, since a person can cast the same spell more than once.</li>
+			</ul>
+
+			<h4>Version: 2.3.9</h4>
+
+			<p>Pull Request: </p>
+
+			<ul>
 				<li>Combat tab. Active Defenses - Link to an attribute and calculate the base defense.</li>
 				<li>Combat tab. Knockback Defenses - Link to an attribute and calculate the base defense. Added a field to adjust the HP per yard amount.</li>
 				<li>Repeating Defense, Melee, and Ranged tables. Added ability to link a skill to WILL.</li>
@@ -7570,7 +7677,7 @@ For more information, see B409.
 
 			<h4>Version: 2.3.8</h4>
 
-			<p>Pull Request: 6/16/2020</p>
+			<p>Pull Request: 6/30/2020</p>
 
 			<ul>
 				<li>Combat tab. Added Knockback save as an active defense.</li>
@@ -7704,85 +7811,6 @@ For more information, see B409.
 				<li>
 					Options Tab. There are text boxes for editing the default success/fail notes for Active Defenses.
 				</li>
-			</ul>
-
-			<h4>Version 2.2.4</h4>
-
-			<p>Pull Request: 03/24/2020</p>
-
-			<ul>
-				<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
-				<li>Fixed the placement of some ToolTips – Cosmetic Only</li>
-				<li>Changed the Vitals DR default value to “See Torso”. This will NOT override current entry.</li>
-				<li>Added a Title to the Highlight Row Checkboxes to indicate what the checkbox is for. Inspired by Jared (UserID: 1026445) – Cosmetic Only.</li>
-			</ul>
-
-			<h4>Version 2.2.3</h4>
-
-			<p>Pull Request: 03/03/2020</p>
-
-			<ul>
-				<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
-				<li>Fixed the placement of some ToolTips – Cosmetic Only</li>
-				<li>Changed the Vitals DR default value to “See Torso”. This will NOT override current entry.</li>
-				<li>Added a Title to the Highlight Row Checkboxes to indicate what the checkbox is for. Inspired by Jared (UserID: 1026445) – Cosmetic Only.</li>
-			</ul>
-			
-			<h4>Version 2.2.3</h4>
-			
-			<p>Pull Request: 03/03/2020</p>
-			
-			<ul>
-				<li>Changes, Fixes, and Adds made by Mike W (UserID: 1414610)</li>
-				<li>Added some new ToolTips – Cosmetic Only.</li>
-				<li>Changed width of Weapon and Damage Notes fields, under Melee and Raged Attacks, to be more readable – Cosmetic Only.</li>
-				<li>General Tab. Remove checkbox for whispering Perception. Default behavior is only player and game master can see the roll. 
-					There's method to roll so GM only sees the roll by the player.
-				</li>
-			</ul>
-
-			<h4>Version 2.2.2</h4>
-			
-			<p>Pull Request: 02/25/2020</p>
-
-			<ul>
-				<li>Fix spelling errors.</li>
-				<li>Rolltemplate: To avoid confusion, critical failure will only display the Critical Failure not regular Failure as well.</li>
-				<li>Traits tab: Combine Perks & Quirks into one row. Less scrolling and hopefully improved interface.</li>
-				<li>General tab: Move lifting section below HP, ER Pools, expand notes section. <b>NOTE:</b> This required changing the coding location of several sections on this tab.</li>
-			</ul>
-
-			<h4>Version 2.2.1</h4>
-			
-			<p>Pull Request: 02/18/2020</p>
-
-			<ul>
-				<li>Changes, Fixes, and Adds made by a combined effort from MadCode (UserID: 945642) and Mike W (UserID: 1414610)</li>
-				<li>Adjusted the field widths for Techniques (Revised) and Parent Attributes – Cosmetic only.</li>
-				<li>Added new function of ‘Dodge and Drop’ to default Active Defenses.</li>
-				<li>Techniques Table Revised. Points spent on techniques are now totaled correctly. <b>NOTE:</b> When transferring techniques to the revised table, be sure to delete the old technqies, otherwise the total will be wrong.</li>
-				<li>Tecnniques Table Revised. Fix bug where Modifier was not added to the final Technique Skill Level.</li>
-				<li>Quirks/Perks Bugfix. Adding a row did not total the quirks/perks correctly.</li>
-				<li>Repeating Spells, quickly clicking checkboxes prevented correct totals. Using new code provided by GiGs to improve speed.</li>
-				<li>Many ToolTips updated or added.</li>
-				<li>Some slight format changes – Cosmetic Only.</li>
-				<li>Added a Defense Bonus (DB) Notes box to the Active Defense section.</li>
-			</ul>
-
-			<h4>Version 2.2.0</h4>
-
-			<p>Pull Request: 02/11/2020</p>
-			
-			<ul>
-				<li><b style="color:red;">New Optional Feature Available.</b> A revised techniques table is available by setting the options on the character sheet or the campaign default options. This revised techniques is not final, we'll make adjustments based upon feedback.</li>
-				<li>Options tab. New option to show/hide the Original Techniques table and new Revised Techniques table. Show both tables if you want to transfer your current techniques to the new table.</li>
-				<li>Skills Tab. New Revised Technique Table. Options to show/hide old technigue or new technique tables. If old technique table has no rows, then hide old table, show new table.</li>
-				<li>Bugfix: Check when Character Weight is updated on the Bio\Misc tab to also update the Grand Total on the Inventory tab.</li>
-				<li>Various spelling and text updates. Updated wording and titles for Combat Tolls Range Calculator.</li>
-				<li>Fix display bug with Add to Tracker Roll Template.</li>
-				<li>Grimoire tab. Spells Table. Reduce the size of the Reason for MOD input line to try to prevent wrapping to next line.</li>
-				<li>Quirks and Perks tables. Set default point value of Quirks to -1 and Perks to 1, suggested by Kevin A (ID: 688156).</li>
-				<li>Rolltemplate - Skill Rolls. Added <i>(Effective Skill)</i> text after the displayed number.</li>
 			</ul>
 			
 		</div>
@@ -9577,9 +9605,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.3.9";  
+	var version = "2.3.10.2";  
 
-	var latestChangesDate = "06/20/2020";
+	var latestChangesDate = "07/07/2020";
 
 	var modCascade = true;
 	
@@ -9764,6 +9792,8 @@ See notes for weapon.</textarea>
 		    updateHealthConditionChecks(); 
 
 			updateFatiguePointThresholds();
+
+			updateReach();
 
 		});
 
@@ -10297,6 +10327,8 @@ See notes for weapon.</textarea>
 		    var dodge = +v.dodge;
 		
 			var move = +v.basic_move;
+
+			let groundStep = 0;
 		
 			var hitPointsNotes = 0;
 			
@@ -10367,8 +10399,11 @@ See notes for weapon.</textarea>
 			    
 			}
 
+			groundStep = Math.ceil(move/10);
+
 			setAttrs({
-				current_move: move,
+				current_move: `${move} (${groundStep})`,
+				current_ground_step: groundStep,
 				current_dodge: dodge,
 				hit_points_notes: hitPointsNotes,
 				fatigue_points_notes: fatiguePointNotes,
@@ -10724,6 +10759,7 @@ See notes for weapon.</textarea>
 			setAttrs({ techniques_revised_points: v });
 		});
 	});
+	
 	// Update the total cost of Spells
 	on('change:repeating_spells:points remove:repeating_spells', function (e) {
 		sumRepeating('repeating_spells', 'points', function(v) {
@@ -11228,7 +11264,11 @@ See notes for weapon.</textarea>
             // current speed based on encumbrance and pain/fatigue
             var currentEnhancedMove = "";
             
-            var injuryFatigueMoveModifier = 1;
+			var injuryFatigueMoveModifier = 1;
+			
+			let step = 0;
+
+			let baseGroundMove = 0;
             
             // validate groundModifer
             if (groundModifier < 0) {
@@ -11300,29 +11340,41 @@ See notes for weapon.</textarea>
                 // determine the current encumbrance move
                 switch(values.encumbrance_level) {
                     
-                    case 0:
-                        currentEnhancedMove = Math.floor(+basicMove * injuryFatigueMoveModifier) + "/" + Math.floor(+enhancedMove * injuryFatigueMoveModifier);
+					case 0:
+						baseGroundMove = Math.floor(+basicMove * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+                        currentEnhancedMove = baseGroundMove + "/" + Math.floor(+enhancedMove * injuryFatigueMoveModifier);
                         break;
                         
                     case 1:
-                        currentEnhancedMove = Math.floor(+move1 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove1 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move1 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove1 * injuryFatigueMoveModifier);
                         break;
                         
                     case 2:
-                        currentEnhancedMove = Math.floor(+move2 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove2 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move2 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove2 * injuryFatigueMoveModifier);
                         break;
                         
                     case 3:
-                        currentEnhancedMove = Math.floor(+move3 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove3 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move3 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove3 * injuryFatigueMoveModifier);
                         break;
                         
                     case 4:
                     case 5:
                     default:
-                        currentEnhancedMove = Math.floor(+move4 * injuryFatigueMoveModifier) + "/" + Math.floor(+encumberedEnhancedMove4 * injuryFatigueMoveModifier);
+						baseGroundMove = Math.floor(+move4 * injuryFatigueMoveModifier);
+						step = Math.ceil(baseGroundMove/10)
+						currentEnhancedMove = baseGroundMove + "/" + Math.floor(+encumberedEnhancedMove4 * injuryFatigueMoveModifier);
                         break;
                     
-                }
+				}
+				
+				currentEnhancedMove = `${currentEnhancedMove} (${step})`;
                 
             }
             
@@ -11480,7 +11532,9 @@ See notes for weapon.</textarea>
             
             var airMoveUnmodified = 0;
             
-            var airMove = 0;
+			var airMove = 0;
+			
+			let baseAirMove = 0;
             
             var airModifierFromPoints = 0;
             
@@ -11600,7 +11654,9 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentAirMove = (airMove * injuryFatigueMoveModifier);
+						currentAirMove = (airMove * injuryFatigueMoveModifier);
+						
+						baseAirMove = (airMove * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11611,7 +11667,9 @@ See notes for weapon.</textarea>
                         
                     case 1:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 1) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11622,7 +11680,9 @@ See notes for weapon.</textarea>
                         
                     case 2:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 2) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11633,7 +11693,9 @@ See notes for weapon.</textarea>
                         
                     case 3:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 3) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11646,7 +11708,9 @@ See notes for weapon.</textarea>
                     case 5:
                     default:
                         
-                        currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
+						currentAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
+						
+						baseAirMove = (getEncumberedMove(airMove, 4) * injuryFatigueMoveModifier);
                         
                         if (baseEnhancedAirMove > 0) {
                             
@@ -11661,12 +11725,16 @@ See notes for weapon.</textarea>
             } else {
                 
                 airMove = 0;
-                
+				
+				baseAirMove = 0;
+
                 baseEnhancedAirMove = 0;
                 
-                currentAirMove = 0;
-                
-            }
+				currentAirMove = 0;
+				
+			}
+			
+			let step = Math.ceil(baseAirMove/10);
             
             // set air moves
             setAttrs({
@@ -11682,7 +11750,8 @@ See notes for weapon.</textarea>
                 "air_3": encumberedDisplayMove3,
                 "air_4": encumberedDisplayMove4,
                 "air_5": encumberedDisplayMove5,
-                "current_air": currentAirMove
+				"current_air": `${currentAirMove} (${step})`,
+				"current_air_step": step
             });
                 
             
@@ -11717,7 +11786,9 @@ See notes for weapon.</textarea>
             
             var waterMoveUnmodified = 0;
             
-            var waterMove = 0;
+			var waterMove = 0;
+			
+			let baseWaterMove = 0;
             
             var waterModifierFromPoints = 0;
             
@@ -11832,25 +11903,30 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentWaterMove = (waterMove * injuryFatigueMoveModifier) + "/" + (baseEnhancedWaterMove * injuryFatigueMoveModifier);
+						currentWaterMove = (waterMove * injuryFatigueMoveModifier) + "/" + (baseEnhancedWaterMove * injuryFatigueMoveModifier);
+						baseWaterMove = (waterMove * injuryFatigueMoveModifier);
                         break;
                         
                     case 1:
-                        currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 1) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 1) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier);
                         break;
                         
                     case 2:
-                        currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 2) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 2) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier);
                         break;
                         
                     case 3:
-                        currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 3) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 3) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier);
                         break;
                         
                     case 4:
                     case 5:
                     default:
-                        currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 4) * injuryFatigueMoveModifier);
+						currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier) + "/" + (getEncumberedMove(baseEnhancedWaterMove, 4) * injuryFatigueMoveModifier);
+						baseWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier);
                         break;
                     
                 }
@@ -11915,30 +11991,37 @@ See notes for weapon.</textarea>
                 switch(values.encumbrance_level) {
                     
                     case 0:
-                        currentWaterMove = (waterMove * injuryFatigueMoveModifier);
+						currentWaterMove = (waterMove * injuryFatigueMoveModifier);
+						baseWaterMove = currentWaterMove;
                         break;
                         
                     case 1:
                         currentWaterMove = (getEncumberedMove(waterMove, 1) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 2:
                         currentWaterMove = (getEncumberedMove(waterMove, 2) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 3:
                         currentWaterMove = (getEncumberedMove(waterMove, 3) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                         
                     case 4:
                     case 5:
                     default:
                         currentWaterMove = (getEncumberedMove(waterMove, 4) * injuryFatigueMoveModifier);
+                        baseWaterMove = currentWaterMove;
                         break;
                     
                 }
                 
-            }
+			}
+			
+			let step = Math.ceil(baseWaterMove/10);
             
             // set water moves
             setAttrs({
@@ -11954,7 +12037,8 @@ See notes for weapon.</textarea>
                 "water_3": encumberedDisplayMove3,
                 "water_4": encumberedDisplayMove4,
                 "water_5": encumberedDisplayMove5,
-                "current_water": currentWaterMove
+				"current_water": `${currentWaterMove} (${step})`,
+				"current_water_step": step
             });
                 
             
@@ -13226,7 +13310,7 @@ See notes for weapon.</textarea>
 	   });
 	    
 	});
-	
+
 	on("change:yards_fallen change:gravity change:atmosphere", function() {
 	    
 	    var fields = [
@@ -15686,7 +15770,12 @@ See notes for weapon.</textarea>
 		
 					let checkedcount = 0;
 		
-					ids.forEach(id => checkedcount += ((+values[`repeating_spells_${id}_spell_${onormaintained}_checked`] || 0) > 0) ? 1: 0);
+					ids.forEach(id => {
+
+						// get the value entered into the input number box. NOTE: converted from checkbox to number.
+						checkedcount += +values[`repeating_spells_${id}_spell_${onormaintained}_checked`] ?? 0;
+
+					});
 
 					const totalpenalty = checkedcount * penalty;
 		
@@ -16272,8 +16361,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	}
 
-	
-    /**
+	/**
      * Create global function
      * use: var mod = getModBySpeedRange(14);
      * Uses the array of json object objects
@@ -16295,7 +16383,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	    
 	});
 
-	function resetShotgunFields() {
+    function resetShotgunFields() {
 
 		const updateFields = {
 			shotgun_damage: "1d6+1",
@@ -16421,61 +16509,166 @@ The attacker may choose to hit the original target or the limb you used to parry
 			
 		});
 
-		/**
-		 * Get shotgun modifier based on rate of fire
-		 *
-		 * @param string rateOfFire Shotgun rate of fire, i.e.: 2x9
-		 * 
-		 * @return object {baseDamage, Modifier}
-		 */
-		function getShotGunModifiers(rateOfFire) {
+	}
 
-			// just in case, remmove any negative numbers
-			rateOfFire = rateOfFire.replace("-", "");
+	/**
+	* Get shotgun modifier based on rate of fire
+	*
+	* @param string rateOfFire Shotgun rate of fire, i.e.: 2x9
+	* 
+	* @return object {baseDamage, Modifier}
+	*/
+	function getShotGunModifiers(rateOfFire) {
 
-			// rateOfFire = shotes x Mulitplier
-			// example: 2 x 9
-			let arrRof = rateOfFire.toLowerCase().split("x");
+		// just in case, remmove any negative numbers
+		rateOfFire = rateOfFire.replace("-", "");
 
-			let baseRof = 1;
+		// rateOfFire = shotes x Mulitplier
+		// example: 2 x 9
+		let arrRof = rateOfFire.toLowerCase().split("x");
 
-			let multiplier = 1;
+		let baseRof = 1;
 
-			let modifier = 1;
+		let multiplier = 1;
 
-			if (arrRof.length === 2) {
+		let modifier = 1;
 
-				baseRof = parseInt(arrRof[0]);
+		if (arrRof.length === 2) {
 
-				// make sure we have good number
-				if (isNaN(baseRof)) {
-					baseRof = 1;
-				}
+			baseRof = parseInt(arrRof[0]);
 
-				multiplier = parseInt(arrRof[1]);
+			// make sure we have good number
+			if (isNaN(baseRof)) {
+				baseRof = 1;
+			}
 
-				// make sure we have a number
-				if (isNaN(multiplier)) {
+			multiplier = parseInt(arrRof[1]);
 
-					modifier = 1;
+			// make sure we have a number
+			if (isNaN(multiplier)) {
 
-				} else {
+				modifier = 1;
 
-					modifier = Math.floor(multiplier/2);		
+			} else {
 
-				}
+				modifier = Math.floor(multiplier/2);		
 
 			}
 
-			let modifiers = {
-				closeRof: baseRof,
-				modifier: modifier 
-			};
-
-			return modifiers;
-
 		}
 
+		let modifiers = {
+			closeRof: baseRof,
+			modifier: modifier 
+		};
+
+		return modifiers;
+
 	}
+
+	on("change:size", (event) => {
+
+		updateReach();
+
+	});
+
+	function updateReach() {
+
+		getAttrs(["size"], (values) => {
+
+			const size = +values.size;
+
+			let isCloseReachOne = "off";
+
+			let reach = 0;
+
+			switch (size) {
+				case 0:
+					reach = 0;
+					break;
+		
+				case 1:
+					reach = 1;
+					isCloseReachOne = "on";
+					break;
+		
+				case 2:
+					reach = 1;
+					break;
+
+				case 3: 
+					reach = 2;
+					break;
+
+				case 4: 
+					reach = 3;
+					break;
+
+				case 5: 
+					reach = 5;
+					break;
+
+				case 6: 
+					reach = 7;
+					break;
+
+				case 7: 
+					reach = 10;
+					break;
+
+				case 8: 
+					reach = 15;
+					break;
+
+				case 9:
+					reach = 20;
+					break;
+
+				case 10: 
+					reach = 30;
+					break;
+
+				default:
+					reach = 0;
+					break;
+			}
+
+			let fields = {
+				"reach": reach,
+				"is_close_reach": isCloseReachOne
+			};
+
+			setAttrs(fields, {silent:true});
+
+		});
+
+	}
+
+	/* ROLL MODIFIERS BOX */
+
+	// close the roll modifiers modal box
+	on("clicked:close_roll_modifiers", (event) => {
+
+		let fields = {
+			"show_roll_modifiers": 0,
+			"roll_modifier_types": ""
+		};
+
+		setAttrs(fields, {silent:true});
+
+	});
+
+	// show modal box for skill modifiers
+	on("clicked:show_roll_modifiers_for_skills", (event) => {
+
+		let fields = {
+			"show_roll_modifiers": 1,
+			"roll_modifier_types": "skill"
+		};
+
+		setAttrs(fields, {silent:true});
+		
+	});
+	
 
 </script>

@@ -327,6 +327,171 @@ const rollDice = (number_of_dice) => {
     return total;
 }
 
+const calculateRow = (row, new_value) => {
+
+    if (!row) return console.warn("Tried to update a ship row, but there wasn't a row specified");
+
+    const int_value = parseInt(new_value) || 0;
+
+    if (row === "lifesupport") setAttrs({"ship_lifesupport_modules":Math.ceil(int_value/10), life_support_hull:Math.ceil(int_value/10), ship_galleys: Math.ceil(int_value/20)});
+    if (row === "command") setAttrs({"ship_command_modules":Math.ceil(int_value/4), command_hull:Math.ceil(int_value/4), ship_livingquarters:int_value});
+    if (row === "armor") setAttrs({armor:Math.floor(int_value*10), armor_hull:Math.floor(int_value*3)});
+    if (row === "jumpdrives") {
+        let hull = 0;
+        for (let i = 1; i <= int_value; i++) hull += i;
+        setAttrs({jump_drives_hull:hull, ship_computer_modules:int_value});
+    }
+    if (row === "computer") setAttrs({computer_hull:int_value});
+    if (row === "galley") setAttrs({galley_hull:int_value});
+    if (row === "weaponmount") setAttrs({ship_weapon_mounts:int_value, weapon_mount_hull:int_value});
+    if (row === "medbays") setAttrs({ship_medint_bonus:Math.floor(int_value*5), medical_bay_hull:int_value});
+    if (row === "cryochamber") setAttrs({ship_cryochambers:Math.ceil(int_value/4), cryochamber_hull:Math.ceil(int_value/4)});
+    if (row === "livingquarters") {setAttrs({living_quarters_hull:int_value})};
+    if (row === "barracks") setAttrs({ship_barracks:Math.ceil(int_value/12), barracks_hull:Math.ceil(int_value/12), crew_max:int_value});
+    if (row === "cargoholds") setAttrs({ship_cargoholds:Math.ceil(int_value/10), cargo_hold_hull:Math.ceil(int_value/10), cargo_max: int_value});
+    if (row === "sciencelabs") setAttrs({ship_resint_bonus:Math.floor(int_value*5), science_lab_hull:int_value});
+    if (row === "thrusters") {
+        getAttrs(["ship_thruster_hullreq","ship_thrusters"], values => {
+            const hullreq = parseInt(values["ship_thruster_hullreq"]) || 0;
+            const thrusters = parseInt(values["ship_thrusters"]) || 0;
+            setAttrs({thrusters_hull : hullreq + thrusters, ship_engine_thrusterreq: thrusters});
+        });
+    } 
+    if (row === "fuel") { 
+        getAttrs(["ship_fuel_min","ship_fuel_extra"], values => {
+            const min_fuel = parseInt(values["ship_fuel_min"]) || 0;
+            const extra_fuel = parseInt(values["ship_fuel_extra"]) || 0;
+
+            setAttrs({fuel_hull: min_fuel + extra_fuel});
+        });
+    }
+    if (row === "engine") {
+        getAttrs(["ship_engine_hullreq","ship_engine_thrusterreq","ship_jumpdrive_modules"], values => {
+            const hullreq = parseInt(values["ship_engine_hullreq"]) || 0;
+            const thrustreq = parseInt(values["ship_engine_thrusterreq"]) || 0;
+            const jumpdrive = parseInt(values["ship_jumpdrive_modules"]) || 0;
+
+            setAttrs({ship_engine:hullreq + thrustreq + jumpdrive, engine_hull: hullreq + thrustreq + jumpdrive, ship_fuel_min: (hullreq + thrustreq + jumpdrive) * 3})
+        }); 
+    }
+    if (row === "frame") setAttrs({frame_hull:int_value});
+
+}
+
+const recalculateBaseHull = () => {
+    const base_hull_array = [
+        "jump_drives_hull",
+        "life_support_hull",
+        "command_hull",
+        "armor_hull",
+        "jump_drive_hull",
+        "computer_hull",
+        "galley_hull",
+        "weapon_mount_hull",
+        "medical_bay_hull",
+        "cryochamber_hull",
+        "living_quarters_hull",
+        "barracks_hull",
+        "cargo_hold_hull",
+        "science_lab_hull"
+    ];
+    
+    getAttrs(base_hull_array, values => {
+        const base_hull_int = Object.values(values).map(value => parseInt(value) || 0);
+
+        const base_hull = base_hull_int.reduce((total, value) => total + value);
+
+        setAttrs({ship_base_hull: base_hull, ship_thruster_hullreq: Math.ceil(base_hull / 10), ship_engine_hullreq: Math.ceil(base_hull / 20), ship_frame: Math.ceil(base_hull / 10)});
+    });
+}
+
+const recalculateTotalHull = () => {
+    const total_hull_array = [
+        "ship_base_hull", 
+        "thrusters_hull", 
+        "engine_hull", 
+        "fuel_hull", 
+        "frame_hull"
+    ];
+
+    getAttrs(total_hull_array, values => {
+        const total_hull_int = Object.values(values).map(value => parseInt(value) || 0);
+        const total_hull = total_hull_int.reduce((total, value) => total + value);
+
+        setAttrs({ship_total_hull: total_hull});
+    });
+}
+
+const calculateCombatIntelligence = (new_value) => {
+    const value = parseInt(new_value) || 0;
+
+    const combat = (value * 10) + 10;
+    const intellect = (value * 10) + 30;
+
+    setAttrs({combat:combat,intellect:intellect});
+}
+
+const calculateSpeed = (new_value) => {
+    const value = parseInt(new_value) || 0;
+
+    const speed = value * 10;
+
+    setAttrs({speed:speed});
+}
+
+const calculateHullCost = (new_value) => {
+    const value = parseInt(new_value) || 0;
+
+    const hull = value;
+    const cost = value * 10;
+
+    setAttrs({ship_cost:cost, hull: hull, hull_max: hull});
+}
+
+const calculateFuel = (new_value) => {
+    const value = parseInt(new_value) || 0;
+
+    setAttrs({fuel:value, fuel_max:value});
+}
+
+const checkFuelValue = (new_value) => {
+    const value = parseInt(new_value) || 0;
+
+    getAttrs(["hull_25","hull_50","hull_75"], values => {
+        const hull_25 = values.hull_25;
+        const hull_50 = values.hull_50;
+        const hull_75 = values.hull_75;
+
+        let hull_toggle = "";
+
+        if (value <= hull_75) hull_toggle = 75; 
+        else if (value <= hull_50) hull_toggle = 50; 
+        else if (value <= hull_25) hull_toggle = 25;
+        
+        setAttrs({hull_toggle: hull_toggle});
+    });
+}
+
+const calculateHullValues = () => {
+    getAttrs(["hull_max"], values => {
+        const value = parseInt(values["hull_max"]) || 0;
+    
+        console.log(value);
+    
+        const n25 = Math.floor(value * 0.75);
+        const n50 = Math.floor(value * 0.5);
+        const n75 = Math.floor(value * 0.25);
+    
+        console.log(`${n25} : ${n50} : ${n75}`)
+        
+        setAttrs({
+            hull_25: n25,
+            hull_50: n50,
+            hull_75: n75,
+        }, callback => checkFuelValue(value));
+    });
+}
+
 // EVENT HANDLERS
 
 skillArray.forEach(skill => on(`change:${skill}`, eventInfo => toggleSkill(skill, eventInfo.newValue)));
@@ -334,3 +499,39 @@ skillArray.forEach(skill => on(`change:${skill}`, eventInfo => toggleSkill(skill
 on(`change:repeating_equipment:equipment_type`, eventInfo => addItem(eventInfo.newValue, eventInfo.previousValue, eventInfo.sourceAttribute));
 
 on(`change:class`, eventInfo => toggleClass(eventInfo.newValue, eventInfo.previousValue, eventInfo.sourceType));
+
+on(`change:ship_passengers`, eventInfo => calculateRow("lifesupport", eventInfo.newValue));
+on(`change:ship_officers`, eventInfo => calculateRow("command", eventInfo.newValue));
+on(`change:ship_armor_modules`, eventInfo => calculateRow("armor", eventInfo.newValue));
+on(`change:ship_jumpdrive_modules`, eventInfo => calculateRow("jumpdrives", eventInfo.newValue));
+on(`change:ship_computer_modules`, eventInfo => calculateRow("computer", eventInfo.newValue));
+on(`change:ship_galleys`, eventInfo => calculateRow("galley", eventInfo.newValue));
+on(`change:ship_weapons`, eventInfo => calculateRow("weaponmount", eventInfo.newValue));
+on(`change:ship_medbays`, eventInfo => calculateRow("medbays", eventInfo.newValue));
+on(`change:ship_cryopods`, eventInfo => calculateRow("cryochamber", eventInfo.newValue));
+on(`change:ship_livingquarters`, eventInfo => calculateRow("livingquarters", eventInfo.newValue));
+on(`change:ship_crew`, eventInfo => calculateRow("barracks", eventInfo.newValue));
+on(`change:ship_cargo`, eventInfo => calculateRow("cargoholds", eventInfo.newValue)); 
+on(`change:ship_sciencelabs`, eventInfo => calculateRow("sciencelabs", eventInfo.newValue)); 
+on(`change:ship_thrusters change:ship_thruster_hullreq`, eventInfo => calculateRow("thrusters", eventInfo.newValue)); 
+on(`change:ship_fuel_extra change:ship_fuel_min`, eventInfo => calculateRow("fuel", eventInfo.newValue));
+on(`change:ship_engine_hullreq change:ship_engine_thrusterreq change:ship_jumpdrive_modules`, eventInfo => calculateRow("engine", eventInfo.newValue));
+on(`change:ship_frame`, eventInfo => calculateRow("frame", eventInfo.newValue));
+
+on(`change:ship_computer_modules`, eventInfo => calculateCombatIntelligence(eventInfo.newValue));
+on(`change:ship_thrusters`, eventInfo => calculateSpeed(eventInfo.newValue));
+on(`change:ship_total_hull`, eventInfo => calculateHullCost(eventInfo.newValue));
+on(`change:fuel_hull`, eventInfo => calculateFuel(eventInfo.newValue));
+
+on(`change:hull`, eventInfo => checkFuelValue(eventInfo.newValue));
+on(`change:hull_max`, eventInfo => calculateHullValues());
+
+on(`clicked:startship`, eventInfo => setAttrs({shipbuild:"on"}));
+on(`clicked:completeship`, eventInfo => setAttrs({shipbuild:0}));
+
+
+["life_support_hull","command_hull","armor_hull","jump_drives_hull","computer_hull","galley_hull",
+"weapon_mount_hull","medical_bay_hull","cryochamber_hull","living_quarters_hull","barracks_hull",
+"cargo_hold_hull", "science_lab_hull"].forEach(hull => on(`change:${hull}`, eventInfo => recalculateBaseHull()));
+
+["base_hull", "thrusters_hull", "engine_hull", "fuel_hull", "frame_hull"].forEach(hull => on(`change:${hull}`, eventInfo => recalculateTotalHull()));
