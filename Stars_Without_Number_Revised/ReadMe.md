@@ -42,6 +42,35 @@ on Github.
 
 ## Changelog
 
+### 2.4.11
+
+* Fix a bug causing cyberware strain to not be updated when a cyberware was deleted.
+
+### 2.4.10
+
+* Fix a bug disallowing decimal encumbrance values.
+* Introduce a "bundled" toggle for equipment, which will bundle the items in packs of 3. This can be used instead of decimal encumbrance values.
+
+### 2.4.9
+
+* Fix a bug causing section headers and some fields to render incorrectly.
+
+### 2.4.8
+
+* Add range to NPC attacks.
+* Move bonus effort to psionics section for easier finding.
+* Change encumbrance step size from 0.01 to 1.
+
+### 2.4.7
+
+* Fix attribute boosts not being counted correctly for encumbrance and system strain.
+* Collapse attribute base and boosts fields into a single field in display mode.
+
+### 2.4.6
+
+* Add a box to keep track of attribute boosts.
+* Fix travel cost macro not calculating travel cost correctly.
+
 ### 2.4.5
 
 * Fixed an issue with the travel cost formula when the crew field was empty

@@ -7,49 +7,22 @@ const attributes = {
 	knights: ['old_knights', 'middle_aged_knights', 'young_knights']
 }
 
+const sheetSelect = eventinfo => {
+	const newValue = eventinfo.newValue;
+	let update = {}
 
-attributes.movement.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.movement, 'movement_rate');
-	});
-})
+	update.sheet_type = newValue === 'knight' || newValue === 'woman' ? 'character' : newValue;
+	update.character_type = newValue === 'woman' ? 'woman' : 'knight';
 
-attributes.damage.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.damage, 'damage');
-	});
-})
-
-attributes.healing.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		attributeSumDivide(attributes.healing, 'healing_rate');
-	});
-})
-
-attributes.hp.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		sumOfCalculator(attributes.hp, 'total_hit_points');
-	});
-})
-
-attributes.unconcious.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		unconciousCalculator(attributes.unconcious, 'unconcious');
-	});
-})
-
-attributes.knights.forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		sumOfCalculator(attributes.knights, 'total_family_knights');
-	});
-})
+	setAttrs(update);	
+}
 
 //When performing calculations in King Arthur Pendragon, round
 //0.5 and higher fractions upward and lesser fractions downward.
 //For example, a character with a Damage value of 4.43 would
 //have an effective value of 4, while a character with a Damage val-
 //ue of 4.5 would have a 5.
-const roundFraction = sum => sum >= 0.5 ? Math.ceil(sum) : Math.floor(sum)
+const roundFraction = sum => (sum % 1) >= 0.5 ? Math.ceil(sum) : Math.floor(sum)
 const divideBy = (sum, num) => sum/num;
 
 const totalAttributes = values => {
@@ -60,9 +33,9 @@ const totalAttributes = values => {
 
 const attributeSumDivide = (attributes, set) => {
     getAttrs(attributes, (values) => {
-    	const divide = 'damage' ? 6 : 10;
+    	const divide = set == 'damage' ? 6 : 10;
     	let sum = totalAttributes(values);
-    	sum = divideBy(sum, divide) ;
+			sum = divideBy(sum, divide);
 
 	    setAttrs({
 	    	[`${set}`]: roundFraction(sum)

@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.5";
+	const sheetVersion = "2.4.11";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -179,6 +179,7 @@
 				ship_mass_max: "50",
 				ship_power_max: "75",
 				ship_speed: "0",
+				ship_hull_price: "50000000",
 			},
 			bulk_freighter: {
 				ship_ac: "11",
@@ -191,6 +192,7 @@
 				ship_mass_max: "25",
 				ship_power_max: "15",
 				ship_speed: "0",
+				ship_hull_price: "5000000",
 			},
 			carrier: {
 				ship_ac: "14",
@@ -203,6 +205,7 @@
 				ship_mass_max: "100",
 				ship_power_max: "50",
 				ship_speed: "0",
+				ship_hull_price: "60000000",
 			},
 			corvette: {
 				ship_ac: "13",
@@ -215,6 +218,7 @@
 				ship_mass_max: "15",
 				ship_power_max: "15",
 				ship_speed: "2",
+				ship_hull_price: "4000000",
 			},
 			fleet_cruiser: {
 				ship_ac: "14",
@@ -227,6 +231,7 @@
 				ship_mass_max: "30",
 				ship_power_max: "50",
 				ship_speed: "1",
+				ship_hull_price: "10000000",
 			},
 			free_merchant: {
 				ship_ac: "14",
@@ -239,6 +244,7 @@
 				ship_mass_max: "15",
 				ship_power_max: "10",
 				ship_speed: "3",
+				ship_hull_price: "500000",
 			},
 			heavy_frigate: {
 				ship_ac: "15",
@@ -251,6 +257,7 @@
 				ship_mass_max: "20",
 				ship_power_max: "25",
 				ship_speed: "1",
+				ship_hull_price: "7000000",
 			},
 			large_station: {
 				ship_ac: "17",
@@ -263,6 +270,7 @@
 				ship_mass_max: "75",
 				ship_power_max: "125",
 				ship_speed: "",
+				ship_hull_price: "40000000",
 			},
 			patrol_boat: {
 				ship_ac: "14",
@@ -275,6 +283,7 @@
 				ship_mass_max: "10",
 				ship_power_max: "15",
 				ship_speed: "4",
+				ship_hull_price: "2500000",
 			},
 			small_station: {
 				ship_ac: "11",
@@ -287,6 +296,7 @@
 				ship_mass_max: "40",
 				ship_power_max: "50",
 				ship_speed: "",
+				ship_hull_price: "5000000",
 			},
 			strike_fighter: {
 				ship_ac: "16",
@@ -299,6 +309,7 @@
 				ship_mass_max: "2",
 				ship_power_max: "5",
 				ship_speed: "5",
+				ship_hull_price: "200000",
 			},
 			shuttle: {
 				ship_ac: "11",
@@ -311,6 +322,7 @@
 				ship_mass_max: "5",
 				ship_power_max: "3",
 				ship_speed: "3",
+				ship_hull_price: "200000",
 			},
 		},
 		// HD AC AB Damage #attacks move morale skills saves armor_type
@@ -806,54 +818,63 @@
 				defense_effect: `+1 ${translate("AC")}, +20 ${translate("MAXIMUM_HIT_POINTS").toLowerCase()}.`,
 				defense_mass: "2#",
 				defense_power: "5",
+				defense_price: "100000*",
 			},
 			augmented_plating: {
 				class: "FIGHTER",
 				defense_effect: `+2 ${translate("AC")}, -1 ${translate("SPEED")}.`,
 				defense_mass: "1#",
 				defense_power: "0",
+				defense_price: "25000*",
 			},
 			boarding_countermeasures: {
 				class: "FRIGATE",
 				defense_effect: translate("BOARDING_COUNTERMEASURES_DESC"),
 				defense_mass: "1#",
 				defense_power: "2",
+				defense_price: "25000*",
 			},
 			burst_ecm_generator: {
 				class: "FRIGATE",
 				defense_effect: translate("BURST_ECM_GENERATOR_DESC"),
 				defense_mass: "1#",
 				defense_power: "2",
+				defense_price: "25000*",
 			},
 			foxer_drones: {
 				class: "CRUISER",
 				defense_effect: translate("FOXER_DRONES_DESC"),
 				defense_mass: "1#",
 				defense_power: "2",
+				defense_price: "10000*",
 			},
 			grav_eddy_displacer: {
 				class: "FRIGATE",
 				defense_effect: translate("GRAV_EDDY_DISPLACER_DESC"),
 				defense_mass: "2#",
 				defense_power: "5",
+				defense_price: "50000*",
 			},
 			hardened_polyceramic_overlay: {
 				class: "FIGHTER",
 				defense_effect: translate("HARDENED_POLYCERAMIC_OVERLAY_DESC"),
 				defense_mass: "1#",
 				defense_power: "0",
+				defense_price: "25000*",
 			},
 			planetary_defense_array: {
 				class: "FRIGATE",
 				defense_effect: translate("PLANETARY_DEFENSE_ARRAY_DESC"),
 				defense_mass: "2#",
 				defense_power: "4",
+				defense_price: "50000*",
 			},
 			point_defense_lasers: {
 				class: "FRIGATE",
 				defense_effect: translate("POINT_DEFENSE_LASERS_DESC"),
 				defense_mass: "2#",
 				defense_power: "3",
+				defense_price: "10000*",
 			},
 		},
 		"ship-fittings": {
@@ -861,226 +882,271 @@
 				class: "FRIGATE",
 				fitting_mass: "2",
 				fitting_power: "1#",
+				fitting_price: "10000*",
 			},
 			advanced_nav_computer: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "1#",
+				fitting_price: "10000*",
 			},
 			amphibious_operation: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "1",
+				fitting_price: "25000*",
 			},
 			armory: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "0",
+				fitting_price: "10000*",
 			},
 			atmospheric_configuration: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "0",
+				fitting_price: "5000*",
 			},
 			auto_targeting_system: {
 				class: "FIGHTER",
 				fitting_mass: "0",
 				fitting_power: "1",
+				fitting_price: "50000",
 			},
 			automation_support: {
 				class: "FIGHTER",
 				fitting_mass: "1",
 				fitting_power: "2",
+				fitting_price: "10000*",
 			},
 			boarding_tubes: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "0",
+				fitting_price: "5000*",
 			},
 			cargo_lighter: {
 				class: "FRIGATE",
 				fitting_mass: "2",
 				fitting_power: "0",
+				fitting_price: "25000",
 			},
 			cargo_space: {
 				class: "FIGHTER",
 				fitting_mass: "1",
 				fitting_power: "0",
+				fitting_price: "",
 			},
 			cold_sleep_pods: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "1",
+				fitting_price: "5000*",
 			},
 			colony_core: {
 				class: "FRIGATE",
 				fitting_mass: "2#",
 				fitting_power: "4",
+				fitting_price: "100000*",
 			},
 			drill_course_regulator: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "1#",
+				fitting_price: "25000*",
 			},
 			spike_drive_2: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "1#",
+				fitting_price: "10000*",
 			},
 			spike_drive_3: {
 				class: "FIGHTER",
 				fitting_mass: "2#",
 				fitting_power: "2#",
+				fitting_price: "20000*",
 			},
 			spike_drive_4: {
 				class: "FRIGATE",
 				fitting_mass: "3#",
 				fitting_power: "2#",
+				fitting_price: "40000*",
 			},
 			spike_drive_5: {
 				class: "FRIGATE",
 				fitting_mass: "3#",
 				fitting_power: "3#",
+				fitting_price: "100000*",
 			},
 			spike_drive_6: {
 				class: "CRUISER",
 				fitting_mass: "4#",
 				fitting_power: "3#",
+				fitting_price: "500000*",
 			},
 			drop_pod: {
 				class: "FRIGATE",
 				fitting_mass: "2",
 				fitting_power: "0",
+				fitting_price: "300000",
 			},
 			emissions_dampers: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "1#",
+				fitting_price: "25000*",
 			},
 			exodus_bay: {
 				class: "CRUISER",
 				fitting_mass: "2#",
 				fitting_power: "1#",
+				fitting_price: "50000*",
 			},
 			extended_life_support: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "1#",
+				fitting_price: "5000*",
 			},
 			extended_medbay: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "1",
+				fitting_price: "5000*",
 			},
 			extended_store: {
 				class: "FIGHTER",
 				fitting_mass: "1#",
 				fitting_power: "0",
+				fitting_price: "2500*",
 			},
 			fuel_bunkers: {
 				class: "FIGHTER",
 				fitting_mass: "1",
 				fitting_power: "0",
+				fitting_price: "2500*",
 			},
 			fuel_scoops: {
 				class: "FRIGATE",
 				fitting_mass: "1#",
 				fitting_power: "2",
+				fitting_price: "5000*",
 			},
 			hydroponic_production: {
 				class: "CRUISER",
 				fitting_mass: "2#",
 				fitting_power: "1#",
+				fitting_price: "10000*",
 			},
 			lifeboats: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "0",
+				fitting_price: "2500*",
 			},
 			luxury_cabins: {
 				class: "FRIGATE",
 				fitting_mass: "1#",
 				fitting_power: "1",
+				fitting_price: "10000*",
 			},
 			mobile_extractor: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "2",
+				fitting_price: "50000",
 			},
 			mobile_factory: {
 				class: "CRUISER",
 				fitting_mass: "2#",
 				fitting_power: "3",
+				fitting_price: "50000*",
 			},
 			precognitive_nav_chamber: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "1",
+				fitting_price: "100000*",
 			},
 			psionic_anchorpoint: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "3",
+				fitting_price: "Special",
 			},
 			sensor_mask: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "1#",
+				fitting_price: "10000*",
 			},
 			ship_bay_fighter: {
 				class: "CRUISER",
 				fitting_mass: "2",
 				fitting_power: "0",
+				fitting_price: "200000",
 			},
 			ship_bay_frigate: {
 				class: "CAPITAL",
 				fitting_mass: "4",
 				fitting_power: "1",
+				fitting_price: "1000000",
 			},
 			ships_locker: {
 				class: "FRIGATE",
 				fitting_mass: "0",
 				fitting_power: "0",
+				fitting_price: "2000*",
 			},
 			shiptender_mount: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "1",
+				fitting_price: "25000*",
 			},
 			smugglers_hold: {
 				class: "FIGHTER",
 				fitting_mass: "1",
 				fitting_power: "0",
+				fitting_price: "2500*",
 			},
 			survey_sensor_array: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "2",
+				fitting_price: "5000*",
 			},
 			system_drive: {
 				class: "FIGHTER",
 				fitting_mass: "-2#",
 				fitting_power: "-1#",
+				fitting_price: "Special",
 			},
 			teleportation_pads: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "1",
+				fitting_price: "Special",
 			},
 			tractor_beams: {
 				class: "FRIGATE",
 				fitting_mass: "1",
 				fitting_power: "2",
+				fitting_price: "10000*",
 			},
 			vehicle_transport_fittings: {
 				class: "FRIGATE",
 				fitting_mass: "1#",
 				fitting_power: "0",
+				fitting_price: "2500*",
 			},
 			workshop: {
 				class: "FRIGATE",
 				fitting_mass: "0.5#",
 				fitting_power: "1",
+				fitting_price: "500*",
 			},
 		},
 		"ship-weapons": {
@@ -1090,6 +1156,7 @@
 				weapon_hardpoints: "2",
 				weapon_mass: "1",
 				weapon_power: "10",
+				weapon_price: "800000",
 				weapon_qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
 			},
 			flak_emitter_battery: {
@@ -1098,15 +1165,18 @@
 				weapon_hardpoints: "1",
 				weapon_mass: "3",
 				weapon_power: "5",
+				weapon_price: "500000",
 				weapon_qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
 			},
 			fractal_impact_charge: {
 				weapon_ammo: "4",
+				weapon_ammo_price: "500",
 				class: "FIGHTER",
 				weapon_damage: "2d6",
 				weapon_hardpoints: "1",
 				weapon_mass: "1",
 				weapon_power: "5",
+				weapon_price: "200000",
 				weapon_qualities: `${translate("AP")} 15`,
 			},
 			gravcannon: {
@@ -1115,6 +1185,7 @@
 				weapon_hardpoints: "3",
 				weapon_mass: "4",
 				weapon_power: "15",
+				weapon_price: "2000000",
 				weapon_qualities: `${translate("AP")} 20`,
 			},
 			lightning_charge_mantle: {
@@ -1123,24 +1194,29 @@
 				weapon_hardpoints: "2",
 				weapon_mass: "5",
 				weapon_power: "15",
+				weapon_price: "4000000",
 				weapon_qualities: `${translate("AP")} 5, ${translate("CLOUD")}`,
 			},
 			mag_spike_array: {
 				weapon_ammo: "5",
+				weapon_ammo_price: "5000",
 				class: "FRIGATE",
 				weapon_damage: "2d6+2",
 				weapon_hardpoints: "2",
 				weapon_mass: "2",
 				weapon_power: "5",
+				weapon_price: "1000000",
 				weapon_qualities: `${translate("AP")} 10, ${translate("FLAK")}`,
 			},
 			mass_cannon: {
 				weapon_ammo: "4",
+				weapon_ammo_price: "50000",
 				class: "CAPITAL",
 				weapon_damage: "2d20",
 				weapon_hardpoints: "4",
 				weapon_mass: "5",
 				weapon_power: "10",
+				weapon_price: "5000000",
 				weapon_qualities: `${translate("AP")} 20`,
 			},
 			multifocal_laser: {
@@ -1149,15 +1225,18 @@
 				weapon_hardpoints: "1",
 				weapon_mass: "1",
 				weapon_power: "5",
+				weapon_price: "100000",
 				weapon_qualities: `${translate("AP")} 20`,
 			},
 			nuclear_missiles: {
 				weapon_ammo: "5",
+				weapon_ammo_price: "5000",
 				class: "FRIGATE",
 				weapon_damage: "",
 				weapon_hardpoints: "2",
 				weapon_mass: "1",
 				weapon_power: "5",
+				weapon_price: "50000",
 				weapon_qualities: "",
 			},
 			plasma_beam: {
@@ -1166,6 +1245,7 @@
 				weapon_hardpoints: "2",
 				weapon_mass: "2",
 				weapon_power: "5",
+				weapon_price: "700000",
 				weapon_qualities: `${translate("AP")} 10`,
 			},
 			polyspectral_mes_beam: {
@@ -1174,6 +1254,7 @@
 				weapon_hardpoints: "1",
 				weapon_mass: "1",
 				weapon_power: "5",
+				weapon_price: "2000000",
 				weapon_qualities: `${translate("AP")} 25`,
 			},
 			reaper_battery: {
@@ -1182,6 +1263,7 @@
 				weapon_hardpoints: "1",
 				weapon_mass: "1",
 				weapon_power: "4",
+				weapon_price: "100000",
 				weapon_qualities: translate("CLUMSY"),
 			},
 			sandthrower: {
@@ -1190,6 +1272,7 @@
 				weapon_hardpoints: "1",
 				weapon_mass: "1",
 				weapon_power: "3",
+				weapon_price: "50000",
 				weapon_qualities: translate("FLAK"),
 			},
 			singularity_gun: {
@@ -1198,6 +1281,7 @@
 				weapon_hardpoints: "5",
 				weapon_mass: "10",
 				weapon_power: "25",
+				weapon_price: "20000000",
 				weapon_qualities: `${translate("AP")} 25`,
 			},
 			smart_cloud: {
@@ -1206,6 +1290,7 @@
 				weapon_hardpoints: "2",
 				weapon_mass: "5",
 				weapon_power: "10",
+				weapon_price: "2000000",
 				weapon_qualities: `${translate("CLOUD")}, ${translate("CLUMSY")}`,
 			},
 			spike_inversion_projector: {
@@ -1214,6 +1299,7 @@
 				weapon_hardpoints: "3",
 				weapon_mass: "3",
 				weapon_power: "10",
+				weapon_price: "2500000",
 				weapon_qualities: `${translate("AP")} 15`,
 			},
 			spinal_beam_cannon: {
@@ -1222,15 +1308,18 @@
 				weapon_hardpoints: "3",
 				weapon_mass: "5",
 				weapon_power: "10",
+				weapon_price: "1500000",
 				weapon_qualities: `${translate("AP")} 15, ${translate("CLUMSY")}`,
 			},
 			torpedo_launcher: {
 				weapon_ammo: "4",
+				weapon_ammo_price: "2500",
 				class: "FRIGATE",
 				weapon_damage: "3d8",
 				weapon_hardpoints: "1",
 				weapon_mass: "3",
 				weapon_power: "10",
+				weapon_price: "500000",
 				weapon_qualities: `${translate("AP")} 20`,
 			},
 			vortex_tunnel_inductor: {
@@ -1239,6 +1328,7 @@
 				weapon_hardpoints: "4",
 				weapon_mass: "10",
 				weapon_power: "20",
+				weapon_price: "5000000",
 				weapon_qualities: `${translate("AP")} 20, ${translate("CLUMSY")}`,
 			},
 		},
@@ -1896,7 +1986,7 @@
 				"npc", "AC", "innate_ac", "dexterity_mod",
 			];
 			getAttrs(sourceAttrs, v => {
-				if (v.npc == "1") return;
+				if (v.npc === "1") return;
 				const baseAC = Math.max(
 					parseInt(v.innate_ac) || 0,
 					...idArray.filter(id => v[`repeating_armor_${id}_armor_active`] === "1")
@@ -1922,7 +2012,7 @@
 	const calculateMaxStrain = () => {
 		getAttrs(["constitution", "strain_max"], v => {
 			mySetAttrs({
-				strain_max: v.constitution
+				strain_max: parseInt(v.constitution)
 			}, v);
 		});
 	};
@@ -1954,6 +2044,17 @@
 			});
 		});
 	};
+
+	const calculateAttr = (attr) => {
+		getAttrs([attr, `${attr}_base`, `${attr}_boosts`], v => {
+			const setting = {
+				[`${attr}`]: `${(parseInt(v[`${attr}_base`]) || 10) + (parseInt(v[`${attr}_boosts`]) || 0)}`
+			};
+			mySetAttrs(setting, v, null, () => {
+				calculateMod(attr);
+			});
+		});
+	}
 
 	const calculateMod = (attr) => {
 		getAttrs([attr, `${attr}_bonus`, `${attr}_mod`], v => {
@@ -1987,7 +2088,7 @@
 	};
 
 	const calculateNextLevelXP = () => {
-		var xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
+		const xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
 		getAttrs(["level", "setting_xp_scheme"], v => {
 			if (v.setting_xp_scheme === "xp") {
 				if (v.level < 10) {
@@ -2013,6 +2114,7 @@
 				...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
 				...gearIDs.map(id => `repeating_gear_${id}_gear_status`),
+				...gearIDs.map(id => `repeating_gear_${id}_gear_bundled`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_encumbrance_bonus`),
 				...armorIDs.map(id => `repeating_armor_${id}_armor_status`),
@@ -2036,10 +2138,14 @@
 					return m;
 				}, gearIDs.reduce((m, id) => {
 					const amount = parseInt(v[`repeating_gear_${id}_gear_amount`]) || 0;
+					let packingFactor = 1;
+					if (v[`repeating_gear_${id}_gear_bundled`] === "on") {
+						packingFactor = 3;
+					}
 					if (v[`repeating_gear_${id}_gear_status`] === "READIED")
-						m[0] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[0] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					else if (v[`repeating_gear_${id}_gear_status`] === "STOWED")
-						m[1] += Math.ceil(amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`])) || 0;
+						m[1] += Math.ceil((amount * parseFloat(v[`repeating_gear_${id}_gear_encumbrance`]))/packingFactor) || 0;
 					return m;
 				}, [0, 0])));
 
@@ -2047,7 +2153,7 @@
 					...armorIDs.filter(id => v[`repeating_armor_${id}_armor_status`] === "READIED")
 						.map(id => parseInt(v[`repeating_armor_${id}_armor_encumbrance_bonus`]) || 0)
 				);
-				const gear_stowed_max = (parseInt(v.strength) || 0) + armor_encumbrance_bonus;
+				const gear_stowed_max = parseInt(v.strength) + armor_encumbrance_bonus;
 				const gear_readied_max = Math.floor(gear_stowed_max / 2);
 				const setting = {
 					gear_readied,
@@ -2261,13 +2367,12 @@
 				const setting = idArray.reduce((m, id) => {
 					if (v.npc_roll_full_attack === "1") {
 						const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
-						const macro = [2, 3, 4, 5, 6, 7, 8].map(n => {
+						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = [2, 3, 4, 5, 6, 7, 8].map(n => {
 							if (n <= num)
 								return `{{attack${n}=[[1d20 + @{attack_ab} @{attack_burst} @{modifier_query}]]}} ` +
 									`{{damage${n}=[[@{attack_damage} @{attack_burst}]]}} `;
 							else return "";
 						}).join("");
-						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = macro;
 					} else {
 						m[`repeating_npc-attacks_${id}_attack_extra_macro`] = "";
 					}
@@ -2362,7 +2467,7 @@
 					...techniqueIDs.map(id => `repeating_techniques_${id}_technique_name`),
 				];
 				getAttrs(sourceAttrs, v => {
-					if (v.setting_super_type == "magic" || v.setting_super_type == "neither") return;
+					if (v.setting_super_type === "magic" || v.setting_super_type === "neither") return;
 					const macro_psionics = `${[
 						...skills.psionic.filter(skill => v[`skill_${skill}`] !== "-1").map(skillToMacro(v)),
 						...skillIDs.filter(id => v[`repeating_psychic-skills_${id}_skill`] !== "-1")
@@ -2388,7 +2493,7 @@
 					...spellIDs.map(id => `repeating_spells_${id}_spell_name`),
 				];
 				getAttrs(sourceAttrs, v => {
-					if (v.setting_super_type == "psionics" || v.setting_super_type == "neither") return;
+					if (v.setting_super_type === "psionics" || v.setting_super_type === "neither") return;
 					const macro_magic = `${[
 						...(v.skill_magic2_name ? ["magic", "magic2"] : ["magic"]).map(skillToMacro(v)),
 						...skillIDs.map(idToSkillMacro(v, "magic-skills"))
@@ -2433,7 +2538,7 @@
 				const macro_npc_attacks = idArray.map((id, index) => {
 					const title = v[`repeating_npc-attacks_${id}_attack_name`] +
 						` ${sign(v[`repeating_npc-attacks_${id}_attack_ab`])}` +
-						((v[`repeating_npc-attacks_${id}_attack_number`] != "1") ?
+						((v[`repeating_npc-attacks_${id}_attack_number`] !== "1") ?
 							` (${v[`repeating_npc-attacks_${id}_attack_number`]} attacks)` : "");
 					return buildLink(title, `repeating_npc-attacks_${id}_attack`, index + 1 === idArray.length);
 				}).join(" ");
@@ -2502,6 +2607,12 @@
 		else if ((shipClass || "").toLowerCase() === "capital") return 4;
 		else return 1;
 	};
+	const getShipPriceMultiplier = (shipClass) => {
+		if ((shipClass || "").toLowerCase() === "frigate") return 10;
+		else if ((shipClass || "").toLowerCase() === "cruiser") return 25;
+		else if ((shipClass || "").toLowerCase() === "capital") return 100;
+		else return 1;
+	}
 	const getAutofillData = (sName, v, data, label) => {
 		// Transforms the stored data to be suitable for
 		// inclusion into the sheet.
@@ -2581,7 +2692,8 @@
 				output.gear_description = translate(`${label.toUpperCase()}_DESC`);
 			}
 			if (output.gear_encumbrance === "1#") {
-				output.gear_encumbrance = ".33";
+				output.gear_encumbrance = "1";
+				output.gear_bundled = "on";
 			}
 		}
 		return output;
@@ -2616,8 +2728,7 @@
 				data.weapon_ab ? `, ${translate("ATTACK_BONUS_SHORT")} +${data.weapon_ab}` : ""}${
 				data.weapon_range ? `, ${translate("RANGE")} ${data.weapon_range}` : ""}${
 				data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
-				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}${
-				", +"}${getNamedAttrMod(data.weapon_attribute_mod)}${
+				data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}, +${getNamedAttrMod(data.weapon_attribute_mod)}${
 				data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}.`;
 		}
 		if (sName === "armor") {
@@ -2632,6 +2743,9 @@
 			else return `${translate("LEVEL")}-${data.level}.`;
 		}
 		if (sName === "gear") {
+			if (data.gear_bundled === "on") {
+				return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}#.`;
+			}
 			return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}.`;
 		}
 		return "";
@@ -2855,7 +2969,7 @@
 		const prefix = `repeating_drones_drone_fitting_${num}`;
 		getAttrs([`${prefix}_desc`, `${prefix}_name`], v => {
 			const fittingName = (v[`${prefix}_name`] || "").toLowerCase().trim().replace(/ /g, "_");
-			if (v[`${prefix}_desc`] == "" && autofillData.droneFittings.includes(fittingName)) {
+			if (v[`${prefix}_desc`] === "" && autofillData.droneFittings.includes(fittingName)) {
 				setAttrs({
 					[`${prefix}_desc`]: translate(`${fittingName.toUpperCase()}_DESC`)
 				});
@@ -2919,7 +3033,7 @@
 			 *  set ammo and shock checkboxes to reasonable values
 			 *  convert old format for gear readied/stowed
 			 **/
-			if (major == 2 && minor < 1) {
+			if (major === 2 && minor < 1) {
 				const upgradeFunction = _.after(4, () => {
 					// recalculate these things just to be sure, in case the v1.6.2 update
 					// missed them.
@@ -2992,7 +3106,7 @@
 			 *  convert single armor line to repeating armor
 			 *  Change @{attribute_query_none} to @{attribute_query}
 			 **/
-			else if (major == 2 && minor < 2) {
+			else if (major === 2 && minor < 2) {
 				const upgradeFunction = _.after(2, () => {
 					calculateStrDexMod();
 					calculateEffort();
@@ -3041,7 +3155,7 @@
 			/** v2.3.1
 			 *  Regenerate drone and weapon ABs
 			 **/
-			else if (major == 2 && (minor < 3 || (minor == 3 && patch == 0))) {
+			else if (major === 2 && (minor < 3 || (minor === 3 && patch === 0))) {
 				const upgradeFunction = _.after(1, () => {
 					upgradeSheet("2.3.1");
 				});
@@ -3053,10 +3167,23 @@
             /** v2.4.3
              * Regenerate Cyberware strain because it was bugged
              **/
-            else if (major == 2 && (minor < 4 || (minor == 4 && patch < 3))) {
+            else if (major === 2 && (minor < 4 || (minor === 4 && patch < 3))) {
                 calculateCyberwareStrain();
                 upgradeSheet("2.4.3");
             }
+			/** v2.4.7
+			 * Move attr to attr_base, and recalculate attr
+			 **/
+			else if (major === 2 && minor === 4 && patch < 7) {
+				attributes.forEach(attr => {
+					getAttrs([attr, `${attr}_base`], v => {
+						mySetAttrs({[`${attr}_base`]: parseInt(v[`${attr}`] || 10)}, v, null, () => {
+							calculateAttr(attr);
+						});
+					});
+				});
+				upgradeSheet("2.4.7");
+			}
 			/** Final upgrade clause, always leave this around */
 			else upgradeSheet(sheetVersion, false, true);
 		};
@@ -3467,6 +3594,7 @@
 
 	/* Character sheet */
 	on("change:class", fillClassStats);
+	attributes.forEach(attr => on(`change:${attr}_base change:${attr}_boosts`, () => calculateAttr(attr)));
 	attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
 	on(weaponDisplayEvent, generateWeaponDisplay);
@@ -3476,7 +3604,7 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
-	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);

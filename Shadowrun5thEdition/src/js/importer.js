@@ -21,7 +21,7 @@
 			,"height": "height"
 			,"initdice": "initiative_dice"
 			,"initvalue": "initiative_mod"
-			,"judgeintentions" : "judge_intentions"
+			,"judge_intentions" : "judge_intentions"
 			,"karma": "karma" 
 			,"liftandcarry": "lift_carry"
 			,"limitmental": "mental_limit"
@@ -75,7 +75,7 @@
 				update["attribute_2"]   = cyberdeck.sleaze;
 				update["attribute_3"]   = cyberdeck.dataprocessing;
 				update["attribute_4"]   = cyberdeck.firewall;
-				update["matrix_con"]   = 0;
+				update["matrix"]   = 0;
 			}
 
 			// PROCESS TOP LEVEL KEYS

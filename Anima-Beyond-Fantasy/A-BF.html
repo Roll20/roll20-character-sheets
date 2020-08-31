@@ -2714,7 +2714,86 @@
 		TAS.repeatingSimpleSum('spellcreature', "daily_spell_creature_cost", "daily_spell_creature_totalcost");
 	});
 	
-	
+	on('sheet:opened change:fameBravery change:fameCowardice change:fameHonor change:fameInfamy change:fameTalent',function()
+	{
+		getAttrs(["fameBravery", "fameCowardice", "fameHonor", "fameInfamy", "fameTalent"], function (v) 
+		{
+			const bravery = parseInt(v["fameBravery"], 10)||0;
+			const cowardice = parseInt(v["fameCowardice"], 10)||0;
+			const honor = parseInt(v["fameHonor"], 10)||0;
+			const infamy = parseInt(v["fameInfamy"], 10)||0;
+			const talent = parseInt(v["fameTalent"], 10)||0;
+			
+			var total = bravery + cowardice + honor + infamy + talent;
+			
+			
+			if(total < 10)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: 0,
+					["recognition"]: getTranslationByKey("unknown")
+				});
+			}
+			else if(total >= 10 && total < 20)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -1,
+					["recognition"]: getTranslationByKey("known")
+				});
+			}
+			else if(total >= 20 && total < 30)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -3,
+					["recognition"]: getTranslationByKey("popular")
+				});
+			}
+			else if(total >= 30 && total < 40)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -5,
+					["recognition"]: getTranslationByKey("renowned")
+				});
+			}
+			else if(total >= 40 && total < 50)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -10,
+					["recognition"]: getTranslationByKey("famous")
+				});
+			}
+			else if(total >= 50 && total < 70)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -15,
+					["recognition"]: getTranslationByKey("celebrated")
+				});
+			}
+			else if(total >= 70 && total < 100)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -25,
+					["recognition"]: getTranslationByKey("legendary")
+				});
+			}
+			else if(total >= 100)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: NA,
+					["recognition"]: getTranslationByKey("beyond-legend")
+				});
+			}
+		});
+	});
+		
 	on('sheet:opened',function()
 	{
 		getSectionIDs("repeating_classes", function (ids) 
@@ -2978,7 +3057,29 @@
 				
 				setAttrs({
 					lp:lpOld,
-					fatigue:fatigueOld				
+					fatigue:fatigueOld,
+					update_1:1
+				});
+			}
+		});
+		
+		getAttrs(["gold_option", "update_2"], function(values) 
+		{
+			var getUpdated = parseInt(values["update_2"], 10)||0;
+			
+			if(getUpdated != 1)
+			{
+				var gold = parseInt(values["gold_option"], 10)||0;
+				
+				if(gold != 0)
+				{
+					setAttrs({
+						gc_amount:gold	
+					});
+				}
+				
+				setAttrs({
+					update_2:1	
 				});
 			}
 		});
@@ -3825,7 +3926,7 @@
 					<input type="number" name="attr_attack_final" value="@{attack_base}+(@{attack_class})+@{dex_mod}+@{attack_special}+@{attack_temp}+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
 				</label>
 			</div>
-			<button type="roll" name="roll_attack" value="@{diceRollD100} {{subname=^{attack}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{attack_mastery}]]+[[@{attack_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+			<button type="roll" name="roll_attack" value="@{diceRollD100} {{subname=^{attack}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{attack_mastery}]] + 0) + abs([[@{fr}-@{attack_mastery}]] - 0)) / 2)]]+[[@{attack_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 		</div>
 	
 		<div class="abd">
@@ -3863,7 +3964,7 @@
 					<input type="number" name="attr_block_final" value="@{block_base}+(@{block_class})+@{dex_mod}+@{block_special}+@{block_temp}+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
 				</label>
 			</div>
-			<button type="roll" name="roll_block" value="@{diceRollD100} {{subname=^{block}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{block_mastery}]]+[[@{block_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+			<button type="roll" name="roll_block" value="@{diceRollD100} {{subname=^{block}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{block_mastery}]] + 0) + abs([[@{fr}-@{block_mastery}]] - 0)) / 2)]]+[[@{block_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 		</div>
 		
 		<div class="abd">
@@ -3901,7 +4002,7 @@
 					<input type="number" name="attr_dodge_final" value="@{dodge_base}+(@{dodge_class})+@{agi_mod}+@{dodge_special}+@{dodge_temp}+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
 				</label>
 			</div>
-			<button type="roll" name="roll_dodge" value="@{diceRollD100} {{subname=^{dodge}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{dodge_mastery}]]+[[@{dodge_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+			<button type="roll" name="roll_dodge" value="@{diceRollD100} {{subname=^{dodge}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{dodge_mastery}]] + 0) + abs([[@{fr}-@{dodge_mastery}]] - 0)) / 2)]]+[[@{dodge_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 		</div>
 	
 		<div class="initiative">
@@ -4047,7 +4148,7 @@
 			<div class="athletics" data-i18n-list-item="acrobatics">
 				<input type="hidden" name="attr_acro_option" value="0" />
 				<div>
-					<button type="roll" name="roll_acro" class="armorPenalty" value="@{diceRollD100} {{subname=^{acrobatics}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{acro_mastery}]]+[[@{acro_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_acro" class="armorPenalty" value="@{diceRollD100} {{subname=^{acrobatics}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{acro_mastery}]] + 0) + abs([[@{fr}-@{acro_mastery}]] - 0)) / 2)]]+[[@{acro_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="acrobatics">Acrobatics</span>
 						<span name="attr_acro_final"></span>
 						<input type="hidden" name="attr_acro_final" value="0" readonly />
@@ -4083,7 +4184,7 @@
 			<div class="athletics" data-i18n-list-item="athleticism">
 				<input type="hidden" name="attr_athl_option" value="0" />
 				<div>
-					<button type="roll" name="roll_athl" class="armorPenalty" value="@{diceRollD100} {{subname=^{athleticism}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{athl_mastery}]]+[[@{athl_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_athl" class="armorPenalty" value="@{diceRollD100} {{subname=^{athleticism}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{athl_mastery}]] + 0) + abs([[@{fr}-@{athl_mastery}]] - 0)) / 2)]]+[[@{athl_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="athleticism">Athleticism</span>
 						<span name="attr_athl_final"></span>
 						<input type="hidden" name="attr_athl_final" value="" readonly />
@@ -4119,7 +4220,7 @@
 			<div class="athletics" data-i18n-list-item="climb">
 				<input type="hidden" name="attr_clim_option" value="0" />
 				<div>
-					<button type="roll" name="roll_clim" class="armorPenalty" value="@{diceRollD100} {{subname=^{climb}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{clim_mastery}]]+[[@{clim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_clim" class="armorPenalty" value="@{diceRollD100} {{subname=^{climb}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{clim_mastery}]] + 0) + abs([[@{fr}-@{clim_mastery}]] - 0)) / 2)]]+[[@{clim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="climb">Climb</span>
 						<span name="attr_clim_final"></span>
 						<input type="hidden" name="attr_clim_final" value="0" readonly />
@@ -4155,7 +4256,7 @@
 			<div class="athletics" data-i18n-list-item="jump">
 				<input type="hidden" name="attr_jump_option" value="0" />
 				<div>
-					<button type="roll" name="roll_jump" class="armorPenalty" value="@{diceRollD100} {{subname=^{jump}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{jump_mastery}]]+[[@{jump_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_jump" class="armorPenalty" value="@{diceRollD100} {{subname=^{jump}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{jump_mastery}]] + 0) + abs([[@{fr}-@{jump_mastery}]] - 0)) / 2)]]+[[@{jump_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="jump">Jump</span>
 						<span name="attr_jump_final"></span>
 						<input type="hidden" name="attr_jump_final" value="0" readonly />
@@ -4191,7 +4292,7 @@
 			<div class="athletics" data-i18n-list-item="ride">
 				<input type="hidden" name="attr_ride_option" value="0" />
 				<div>
-					<button type="roll" name="roll_ride" class="armorPenalty" value="@{diceRollD100} {{subname=^{ride}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{ride_mastery}]]+[[@{ride_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_ride" class="armorPenalty" value="@{diceRollD100} {{subname=^{ride}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{ride_mastery}]] + 0) + abs([[@{fr}-@{ride_mastery}]] - 0)) / 2)]]+[[@{ride_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="ride">Ride</span>
 						<span name="attr_ride_final"></span>
 						<input type="hidden" name="attr_ride_final" value="0" readonly />
@@ -4227,7 +4328,7 @@
 			<div class="athletics" data-i18n-list-item="swim">
 				<input type="hidden" name="attr_swim_option" value="0" />
 				<div>
-					<button type="roll" name="roll_swim" class="armorPenalty" value="@{diceRollD100} {{subname=^{swim}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{swim_mastery}]]+[[@{swim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_swim" class="armorPenalty" value="@{diceRollD100} {{subname=^{swim}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{swim_mastery}]] + 0) + abs([[@{fr}-@{swim_mastery}]] - 0)) / 2)]]+[[@{swim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="swim">Swim</span>
 						<span name="attr_swim_final"></span>
 						<input type="hidden" name="attr_swim_final" value="0" readonly />
@@ -4282,7 +4383,7 @@
 			<div class="social" data-i18n-list-item="etiquette">
 				<input type="hidden" name="attr_etiq_option" value="0" />
 				<div>
-					<button type="roll" name="roll_etiq" value="@{diceRollD100} {{subname=^{etiquette}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{etiq_mastery}]]+[[@{etiq_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_etiq" value="@{diceRollD100} {{subname=^{etiquette}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{etiq_mastery}]] + 0) + abs([[@{fr}-@{etiq_mastery}]] - 0)) / 2)]]+[[@{etiq_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="etiquette">Etiquette</span>
 						<span name="attr_etiq_final"></span>
 						<input type="hidden" name="attr_etiq_final" value="0" readonly />
@@ -4318,7 +4419,7 @@
 			<div class="social" data-i18n-list-item="intimidate">
 				<input type="hidden" name="attr_inti_option" value="0" />
 				<div>
-					<button type="roll" name="roll_inti" value="@{diceRollD100} {{subname=^{intimidate}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{inti_mastery}]]+[[@{inti_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_inti" value="@{diceRollD100} {{subname=^{intimidate}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{inti_mastery}]] + 0) + abs([[@{fr}-@{inti_mastery}]] - 0)) / 2)]]+[[@{inti_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="intimidate">Intimidate</span>
 						<span name="attr_inti_final"></span>
 						<input type="hidden" name="attr_inti_final" value="0" readonly />
@@ -4354,7 +4455,7 @@
 			<div class="social" data-i18n-list-item="leadership">
 				<input type="hidden" name="attr_lead_option" value="0" />
 				<div>
-					<button type="roll" name="roll_lead" value="@{diceRollD100} {{subname=^{leadership}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{lead_mastery}]]+[[@{lead_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_lead" value="@{diceRollD100} {{subname=^{leadership}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{lead_mastery}]] + 0) + abs([[@{fr}-@{lead_mastery}]] - 0)) / 2)]]+[[@{lead_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="leadership">Leadership</span>
 						<span name="attr_lead_final"></span>
 						<input type="hidden" name="attr_lead_final" value="0" readonly />
@@ -4390,7 +4491,7 @@
 			<div class="social" data-i18n-list-item="persuasion">
 				<input type="hidden" name="attr_pers_option" value="0" />
 				<div>
-					<button type="roll" name="roll_pers" value="@{diceRollD100} {{subname=^{persuasion}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{pers_mastery}]]+[[@{pers_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_pers" value="@{diceRollD100} {{subname=^{persuasion}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{pers_mastery}]] + 0) + abs([[@{fr}-@{pers_mastery}]] - 0)) / 2)]]+[[@{pers_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="persuasion">Persuasion</span>
 						<span name="attr_pers_final"></span>
 						<input type="hidden" name="attr_pers_final" value="0" readonly />
@@ -4426,7 +4527,7 @@
 			<div class="social" data-i18n-list-item="streetwise">
 				<input type="hidden" name="attr_stre_option" value="0" />
 				<div>
-					<button type="roll" name="roll_stre" value="@{diceRollD100} {{subname=^{streetwise}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{stre_mastery}]]+[[@{stre_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_stre" value="@{diceRollD100} {{subname=^{streetwise}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{stre_mastery}]] + 0) + abs([[@{fr}-@{stre_mastery}]] - 0)) / 2)]]+[[@{stre_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="streetwise">Streetwise</span>
 						<span name="attr_stre_final"></span>
 						<input type="hidden" name="attr_stre_final" value="0" readonly />
@@ -4462,7 +4563,7 @@
 			<div class="social" data-i18n-list-item="style">
 				<input type="hidden" name="attr_styl_option" value="0" />
 				<div>
-					<button type="roll" name="roll_styl" value="@{diceRollD100} {{subname=^{style}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{styl_mastery}]]+[[@{styl_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_styl" value="@{diceRollD100} {{subname=^{style}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{styl_mastery}]] + 0) + abs([[@{fr}-@{styl_mastery}]] - 0)) / 2)]]+[[@{styl_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="style">Style</span>
 						<span name="attr_styl_final"></span>
 						<input type="hidden" name="attr_styl_final" value="0" readonly />
@@ -4498,7 +4599,7 @@
 			<div class="social" data-i18n-list-item="trading">
 				<input type="hidden" name="attr_trad_option" value="0" />
 				<div>
-					<button type="roll" name="roll_trad" value="@{diceRollD100} {{subname=^{trading}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{trad_mastery}]]+[[@{trad_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_trad" value="@{diceRollD100} {{subname=^{trading}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{trad_mastery}]] + 0) + abs([[@{fr}-@{trad_mastery}]] - 0)) / 2)]]+[[@{trad_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="trading">Trading</span>
 						<span name="attr_trad_final"></span>
 						<input type="hidden" name="attr_trad_final" value="0" readonly />
@@ -4553,7 +4654,7 @@
 			<div class="perceptive" data-i18n-list-item="notice">
 				<input type="hidden" name="attr_noti_option" value="0" />
 				<div>
-					<button type="roll" name="roll_noti" value="@{diceRollD100} {{subname=^{notice}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{noti_mastery}]]+[[@{noti_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_noti" value="@{diceRollD100} {{subname=^{notice}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{noti_mastery}]] + 0) + abs([[@{fr}-@{noti_mastery}]] - 0)) / 2)]]+[[@{noti_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="notice">Notice</span>
 						<span name="attr_noti_final"></span>
 						<input type="hidden" name="attr_noti_final" value="0" readonly />
@@ -4589,7 +4690,7 @@
 			<div class="perceptive" data-i18n-list-item="search">
 				<input type="hidden" name="attr_sear_option" value="0" />
 				<div>
-					<button type="roll" name="roll_sear" value="@{diceRollD100} {{subname=^{search}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{sear_mastery}]]+[[@{sear_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_sear" value="@{diceRollD100} {{subname=^{search}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{sear_mastery}]] + 0) + abs([[@{fr}-@{sear_mastery}]] - 0)) / 2)]]+[[@{sear_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="search">Search</span>
 						<span name="attr_sear_final"></span>
 						<input type="hidden" name="attr_sear_final" value="0" readonly />
@@ -4625,7 +4726,7 @@
 			<div class="perceptive" data-i18n-list-item="track">
 				<input type="hidden" name="attr_trac_option" value="0" />
 				<div>
-					<button type="roll" name="roll_trac" value="@{diceRollD100} {{subname=^{track}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{trac_mastery}]]+[[@{trac_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_trac" value="@{diceRollD100} {{subname=^{track}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{trac_mastery}]] + 0) + abs([[@{fr}-@{trac_mastery}]] - 0)) / 2)]]+[[@{trac_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="track">Track</span>
 						<span name="attr_trac_final"></span>
 						<input type="hidden" name="attr_trac_final" value="0" readonly />
@@ -4680,7 +4781,7 @@
 			<div class="intellectual" data-i18n-list-item="animals">
 				<input type="hidden" name="attr_anim_option" value="0" />
 				<div>
-					<button type="roll" name="roll_anim" value="@{diceRollD100} {{subname=^{animals}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{anim_mastery}]]+[[@{anim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_anim" value="@{diceRollD100} {{subname=^{animals}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{anim_mastery}]] + 0) + abs([[@{fr}-@{anim_mastery}]] - 0)) / 2)]]+[[@{anim_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="animals">Animals</span>
 						<span name="attr_anim_final"></span>
 						<input type="hidden" name="attr_anim_final" value="0" readonly />
@@ -4716,7 +4817,7 @@
 			<div class="intellectual" data-i18n-list-item="appraisal">
 				<input type="hidden" name="attr_appr_option" value="0" />
 				<div>
-					<button type="roll" name="roll_appr" value="@{diceRollD100} {{subname=^{appraisal}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{appr_mastery}]]+[[@{appr_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_appr" value="@{diceRollD100} {{subname=^{appraisal}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{appr_mastery}]] + 0) + abs([[@{fr}-@{appr_mastery}]] - 0)) / 2)]]+[[@{appr_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="appraisal">Appraisal</span>
 						<span name="attr_appr_final"></span>
 						<input type="hidden" name="attr_appr_final" value="0" readonly />
@@ -4752,7 +4853,7 @@
 			<div class="intellectual" data-i18n-list-item="architecture">
 				<input type="hidden" name="attr_arch_option" value="0" />
 				<div>
-					<button type="roll" name="roll_arch" value="@{diceRollD100} {{subname=^{architecture}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{arch_mastery}]]+[[@{arch_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_arch" value="@{diceRollD100} {{subname=^{architecture}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{arch_mastery}]] + 0) + abs([[@{fr}-@{arch_mastery}]] - 0)) / 2)]]+[[@{arch_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="architecture">Architecture</span>
 						<span name="attr_arch_final"></span>
 						<input type="hidden" name="attr_arch_final" value="0" readonly />
@@ -4788,7 +4889,7 @@
 			<div class="intellectual" data-i18n-list-item="herbal lore">
 				<input type="hidden" name="attr_herb_option" value="0" />
 				<div>
-					<button type="roll" name="roll_herb" value="@{diceRollD100} {{subname=^{herbal-lore}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{herb_mastery}]]+[[@{herb_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_herb" value="@{diceRollD100} {{subname=^{herbal-lore}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{herb_mastery}]] + 0) + abs([[@{fr}-@{herb_mastery}]] - 0)) / 2)]]+[[@{herb_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="herbal-lore">Herbal Lore</span>
 						<span name="attr_herb_final"></span>
 						<input type="hidden" name="attr_herb_final" value="0" readonly />
@@ -4824,7 +4925,7 @@
 			<div class="intellectual" data-i18n-list-item="history">
 				<input type="hidden" name="attr_hist_option" value="0" />
 				<div>
-					<button type="roll" name="roll_hist" value="@{diceRollD100} {{subname=^{history}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{hist_mastery}]]+[[@{hist_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_hist" value="@{diceRollD100} {{subname=^{history}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{hist_mastery}]] + 0) + abs([[@{fr}-@{hist_mastery}]] - 0)) / 2)]]+[[@{hist_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="history">History</span>
 						<span name="attr_hist_final"></span>
 						<input type="hidden" name="attr_hist_final" value="0" readonly />
@@ -4860,7 +4961,7 @@
 			<div class="intellectual" data-i18n-list-item="law">
 				<input type="hidden" name="attr_law_option" value="0" />
 				<div>
-					<button type="roll" name="roll_law" value="@{diceRollD100} {{subname=^{law}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{law_mastery}]]+[[@{law_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_law" value="@{diceRollD100} {{subname=^{law}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{law_mastery}]] + 0) + abs([[@{fr}-@{law_mastery}]] - 0)) / 2)]]+[[@{law_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="law">Law</span>
 						<span name="attr_law_final"></span>
 						<input type="hidden" name="attr_law_final" value="0" readonly />
@@ -4896,7 +4997,7 @@
 			<div class="intellectual" data-i18n-list-item="magic appraisal">
 				<input type="hidden" name="attr_mapp_option" value="0" />
 				<div>
-					<button type="roll" name="roll_mapp" value="@{diceRollD100} {{subname=^{magic-appraisal}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{mapp_mastery}]]+[[@{mapp_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_mapp" value="@{diceRollD100} {{subname=^{magic-appraisal}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{mapp_mastery}]] + 0) + abs([[@{fr}-@{mapp_mastery}]] - 0)) / 2)]]+[[@{mapp_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="magic-appraisal">Magic Appr.</span>
 						<span name="attr_mapp_final"></span>
 						<input type="hidden" name="attr_mapp_final" value="0" readonly />
@@ -4932,7 +5033,7 @@
 			<div class="intellectual" data-i18n-list-item="medicine">
 				<input type="hidden" name="attr_medi_option" value="0" />
 				<div>
-					<button type="roll" name="roll_medi" value="@{diceRollD100} {{subname=^{medicine}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{medi_mastery}]]+[[@{medi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_medi" value="@{diceRollD100} {{subname=^{medicine}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{medi_mastery}]] + 0) + abs([[@{fr}-@{medi_mastery}]] - 0)) / 2)]]+[[@{medi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="medicine">Medicine</span>
 						<span name="attr_medi_final"></span>
 						<input type="hidden" name="attr_medi_final" value="0" readonly />
@@ -4968,7 +5069,7 @@
 			<div class="intellectual" data-i18n-list-item="memorize">
 				<input type="hidden" name="attr_memo_option" value="0" />
 				<div>
-					<button type="roll" name="roll_memo" value="@{diceRollD100} {{subname=^{memorize}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{memo_mastery}]]+[[@{memo_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_memo" value="@{diceRollD100} {{subname=^{memorize}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{memo_mastery}]] + 0) + abs([[@{fr}-@{memo_mastery}]] - 0)) / 2)]]+[[@{memo_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="memorize">Memorize</span>
 						<span name="attr_memo_final"></span>
 						<input type="hidden" name="attr_memo_final" value="0" readonly />
@@ -5004,7 +5105,7 @@
 			<div class="intellectual" data-i18n-list-item="navigation">
 				<input type="hidden" name="attr_navi_option" value="0" />
 				<div>
-					<button type="roll" name="roll_navi" value="@{diceRollD100} {{subname=^{navigation}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{navi_mastery}]]+[[@{navi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_navi" value="@{diceRollD100} {{subname=^{navigation}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{navi_mastery}]] + 0) + abs([[@{fr}-@{navi_mastery}]] - 0)) / 2)]]+[[@{navi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="navigation">Navigation</span>
 						<span name="attr_navi_final"></span>
 						<input type="hidden" name="attr_navi_final" value="0" readonly />
@@ -5040,7 +5141,7 @@
 			<div class="intellectual" data-i18n-list-item="occult">
 				<input type="hidden" name="attr_occu_option" value="0" />
 				<div>
-					<button type="roll" name="roll_occu" value="@{diceRollD100} {{subname=^{occult}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{occu_mastery}]]+[[@{occu_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_occu" value="@{diceRollD100} {{subname=^{occult}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{occu_mastery}]] + 0) + abs([[@{fr}-@{occu_mastery}]] - 0)) / 2)]]+[[@{occu_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="occult">Occult</span>
 						<span name="attr_occu_final"></span>
 						<input type="hidden" name="attr_occu_final" value="0" readonly />
@@ -5076,7 +5177,7 @@
 			<div class="intellectual" data-i18n-list-item="sciences">
 				<input type="hidden" name="attr_scie_option" value="0" />
 				<div>
-					<button type="roll" name="roll_scie" value="@{diceRollD100} {{subname=^{sciences}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{scie_mastery}]]+[[@{scie_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_scie" value="@{diceRollD100} {{subname=^{sciences}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{scie_mastery}]] + 0) + abs([[@{fr}-@{scie_mastery}]] - 0)) / 2)]]+[[@{scie_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="sciences">Sciences</span>
 						<span name="attr_scie_final"></span>
 						<input type="hidden" name="attr_scie_final" value="0" readonly />
@@ -5112,7 +5213,7 @@
 			<div class="intellectual" data-i18n-list-item="tactics">
 				<input type="hidden" name="attr_tact_option" value="0" />
 				<div>
-					<button type="roll" name="roll_tact" value="@{diceRollD100} {{subname=^{tactics}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{tact_mastery}]]+[[@{tact_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_tact" value="@{diceRollD100} {{subname=^{tactics}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{tact_mastery}]] + 0) + abs([[@{fr}-@{tact_mastery}]] - 0)) / 2)]]+[[@{tact_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="tactics">Tactics</span>
 						<span name="attr_tact_final"></span>
 						<input type="hidden" name="attr_tact_final" value="0" readonly />
@@ -5167,7 +5268,7 @@
 			<div class="vigor" data-i18n-list-item="composure">
 				<input type="hidden" name="attr_comp_option" value="0" />
 				<div>
-					<button type="roll" name="roll_comp" value="@{diceRollD100} {{subname=^{composure}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{comp_mastery}]]+[[@{comp_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_comp" value="@{diceRollD100} {{subname=^{composure}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{comp_mastery}]] + 0) + abs([[@{fr}-@{comp_mastery}]] - 0)) / 2)]]+[[@{comp_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="composure">Composure</span>
 						<span name="attr_comp_final"></span>
 						<input type="hidden" name="attr_comp_final" value="0" readonly />
@@ -5203,7 +5304,7 @@
 			<div class="vigor" data-i18n-list-item="feats of strength">
 				<input type="hidden" name="attr_feat_option" value="0" />
 				<div>
-					<button type="roll" name="roll_feat" class="armorPenalty" value="@{diceRollD100} {{subname=^{feat-of-strength}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{feat_mastery}]]+[[@{feat_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_feat" class="armorPenalty" value="@{diceRollD100} {{subname=^{feats-of-strength}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{feat_mastery}]] + 0) + abs([[@{fr}-@{feat_mastery}]] - 0)) / 2)]]+[[@{feat_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="feats-of-strength">Feats of Str.</span>
 						<span name="attr_feat_final"></span>
 						<input type="hidden" name="attr_feat_final" value="0" readonly />
@@ -5239,7 +5340,7 @@
 			<div class="vigor" data-i18n-list-item="withstand pain">
 				<input type="hidden" name="attr_with_option" value="0" />
 				<div>
-					<button type="roll" name="roll_with" value="@{diceRollD100} {{subname=^{withstand-pain}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{with_mastery}]]+[[@{with_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_with" value="@{diceRollD100} {{subname=^{withstand-pain}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{with_mastery}]] + 0) + abs([[@{fr}-@{with_mastery}]] - 0)) / 2)]]+[[@{with_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="withstand-pain">Withst. Pain</span>
 						<span name="attr_with_final"></span>
 						<input type="hidden" name="attr_with_final" value="0" readonly />
@@ -5294,7 +5395,7 @@
 			<div class="subterfuge" data-i18n-list-item="disguise">
 				<input type="hidden" name="attr_disg_option" value="0" />
 				<div>
-					<button type="roll" name="roll_disg" value="@{diceRollD100} {{subname=^{disguise}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{disg_mastery}]]+[[@{disg_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_disg" value="@{diceRollD100} {{subname=^{disguise}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{disg_mastery}]] + 0) + abs([[@{fr}-@{disg_mastery}]] - 0)) / 2)]]+[[@{disg_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="disguise">Disguise</span>
 						<span name="attr_disg_final"></span>
 						<input type="hidden" name="attr_disg_final" value="0" readonly />
@@ -5330,7 +5431,7 @@
 			<div class="subterfuge" data-i18n-list-item="hide">
 				<input type="hidden" name="attr_hide_option" value="0" />
 				<div>
-					<button type="roll" name="roll_hide" class="armorPenalty" value="@{diceRollD100} {{subname=^{hide}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{hide_mastery}]]+[[@{hide_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_hide" class="armorPenalty" value="@{diceRollD100} {{subname=^{hide}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{hide_mastery}]] + 0) + abs([[@{fr}-@{hide_mastery}]] - 0)) / 2)]]+[[@{hide_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="hide">Hide</span>
 						<span name="attr_hide_final"></span>
 						<input type="hidden" name="attr_hide_final" value="0" readonly />
@@ -5366,7 +5467,7 @@
 			<div class="subterfuge" data-i18n-list-item="lockpicking">
 				<input type="hidden" name="attr_lock_option" value="0" />
 				<div>
-					<button type="roll" name="roll_lock" value="@{diceRollD100} {{subname=^{lockpicking}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{lock_mastery}]]+[[@{lock_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_lock" value="@{diceRollD100} {{subname=^{lockpicking}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{lock_mastery}]] + 0) + abs([[@{fr}-@{lock_mastery}]] - 0)) / 2)]]+[[@{lock_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="lockpicking">Lockpicking</span>
 						<span name="attr_lock_final"></span>
 						<input type="hidden" name="attr_lock_final" value="0" readonly />
@@ -5402,7 +5503,7 @@
 			<div class="subterfuge" data-i18n-list-item="poisons">
 				<input type="hidden" name="attr_pois_option" value="0" />
 				<div>
-					<button type="roll" name="roll_pois" value="@{diceRollD100} {{subname=^{poisons}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{pois_mastery}]]+[[@{pois_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_pois" value="@{diceRollD100} {{subname=^{poisons}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{pois_mastery}]] + 0) + abs([[@{fr}-@{pois_mastery}]] - 0)) / 2)]]+[[@{pois_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="poisons">Poisons</span>
 						<span name="attr_pois_final"></span>
 						<input type="hidden" name="attr_pois_final" value="0" readonly />
@@ -5438,7 +5539,7 @@
 			<div class="subterfuge" data-i18n-list-item="stealth">
 				<input type="hidden" name="attr_stea_option" value="0" />
 				<div>
-					<button type="roll" name="roll_stea" class="armorPenalty" value="@{diceRollD100} {{subname=^{stealth}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{stea_mastery}]]+[[@{stea_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_stea" class="armorPenalty" value="@{diceRollD100} {{subname=^{stealth}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{stea_mastery}]] + 0) + abs([[@{fr}-@{stea_mastery}]] - 0)) / 2)]]+[[@{stea_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="stealth">Stealth</span>
 						<span name="attr_stea_final"></span>
 						<input type="hidden" name="attr_stea_final" value="0" readonly />
@@ -5474,7 +5575,7 @@
 			<div class="subterfuge" data-i18n-list-item="theft">
 				<input type="hidden" name="attr_thef_option" value="0" />
 				<div>
-					<button type="roll" name="roll_thef" value="@{diceRollD100} {{subname=^{theft}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{thef_mastery}]]+[[@{thef_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_thef" value="@{diceRollD100} {{subname=^{theft}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{thef_mastery}]] + 0) + abs([[@{fr}-@{thef_mastery}]] - 0)) / 2)]]+[[@{thef_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="theft">Theft</span>
 						<span name="attr_thef_final"></span>
 						<input type="hidden" name="attr_thef_final" value="0" readonly />
@@ -5510,7 +5611,7 @@
 			<div class="subterfuge" data-i18n-list-item="trap lore">
 				<input type="hidden" name="attr_trap_option" value="0" />
 				<div>
-					<button type="roll" name="roll_trap" value="@{diceRollD100} {{subname=^{trap-lore}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{trap_mastery}]]+[[@{trap_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_trap" value="@{diceRollD100} {{subname=^{trap-lore}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{trap_mastery}]] + 0) + abs([[@{fr}-@{trap_mastery}]] - 0)) / 2)]]+[[@{trap_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="trap-lore">Trap Lore</span>
 						<span name="attr_trap_final"></span>
 						<input type="hidden" name="attr_trap_final" value="0" readonly />
@@ -5565,7 +5666,7 @@
 			<div class="creative" data-i18n-list-item="alchemy">
 				<input type="hidden" name="attr_alchemy_option" value="0" />
 				<div>
-					<button type="roll" name="roll_alchemy" value="@{diceRollD100} {{subname=^{alchemy}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{alchemy_mastery}]]+[[@{alchemy_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_alchemy" value="@{diceRollD100} {{subname=^{alchemy}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{alchemy_mastery}]] + 0) + abs([[@{fr}-@{alchemy_mastery}]] - 0)) / 2)]]+[[@{alchemy_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="alchemy">Alchemy</span>
 						<span name="attr_alchemy_final"></span>
 						<input type="hidden" name="attr_alchemy_final" value="0" readonly />
@@ -5601,7 +5702,7 @@
 			<div class="creative" data-i18n-list-item="animism">
 				<input type="hidden" name="attr_animisme_option" value="0" />
 				<div>
-					<button type="roll" name="roll_animisme" value="@{diceRollD100} {{subname=^{animism}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{animisme_mastery}]]+[[@{animisme_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_animisme" value="@{diceRollD100} {{subname=^{animism}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{animisme_mastery}]] + 0) + abs([[@{fr}-@{animisme_mastery}]] - 0)) / 2)]]+[[@{animisme_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="animism">Animism</span>
 						<span name="attr_animisme_final"></span>
 						<input type="hidden" name="attr_animisme_final" value="0" readonly />
@@ -5637,7 +5738,7 @@
 			<div class="creative" data-i18n-list-item="art">
 				<input type="hidden" name="attr_art_option" value="0" />
 				<div>
-					<button type="roll" name="roll_art" value="@{diceRollD100} {{subname=^{art}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{art_mastery}]]+[[@{art_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_art" value="@{diceRollD100} {{subname=^{art}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{art_mastery}]] + 0) + abs([[@{fr}-@{art_mastery}]] - 0)) / 2)]]+[[@{art_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="art">Art</span>
 						<span name="attr_art_final"></span>
 						<input type="hidden" name="attr_art_final" value="0" readonly />
@@ -5673,7 +5774,7 @@
 			<div class="creative" data-i18n-list-item="dance">
 				<input type="hidden" name="attr_danc_option" value="0" />
 				<div>
-					<button type="roll" name="roll_danc" class="armorPenalty" value="@{diceRollD100} {{subname=^{dance}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{danc_mastery}]]+[[@{danc_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_danc" class="armorPenalty" value="@{diceRollD100} {{subname=^{dance}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{danc_mastery}]] + 0) + abs([[@{fr}-@{danc_mastery}]] - 0)) / 2)]]+[[@{danc_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="dance">Dance</span>
 						<span name="attr_danc_final"></span>
 						<input type="hidden" name="attr_danc_final" value="0" readonly />
@@ -5709,7 +5810,7 @@
 			<div class="creative" data-i18n-list-item="forging">
 				<input type="hidden" name="attr_forg_option" value="0" />
 				<div>
-					<button type="roll" name="roll_forg" value="@{diceRollD100} {{subname=^{forging}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{forg_mastery}]]+[[@{forg_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_forg" value="@{diceRollD100} {{subname=^{forging}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{forg_mastery}]] + 0) + abs([[@{fr}-@{forg_mastery}]] - 0)) / 2)]]+[[@{forg_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="forging">Forging</span>
 						<span name="attr_forg_final"></span>
 						<input type="hidden" name="attr_forg_final" value="0" readonly />
@@ -5745,7 +5846,7 @@
 			<div class="creative" data-i18n-list-item="jewelry">
 				<input type="hidden" name="attr_jewel_option" value="0" />
 				<div>
-					<button type="roll" name="roll_jewel" value="@{diceRollD100} {{subname=^{jewelry}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{jewel_mastery}]]+[[@{jewel_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_jewel" value="@{diceRollD100} {{subname=^{jewelry}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{jewel_mastery}]] + 0) + abs([[@{fr}-@{jewel_mastery}]] - 0)) / 2)]]+[[@{jewel_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="jewelry">Jewelry</span>
 						<span name="attr_jewel_final"></span>
 						<input type="hidden" name="attr_jewel_final" value="0" readonly />
@@ -5781,7 +5882,7 @@
 			<div class="creative" data-i18n-list-item="music">
 				<input type="hidden" name="attr_musi_option" value="0" />
 				<div>
-					<button type="roll" name="roll_musi" value="@{diceRollD100} {{subname=^{music}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{musi_mastery}]]+[[@{musi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_musi" value="@{diceRollD100} {{subname=^{music}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{musi_mastery}]] + 0) + abs([[@{fr}-@{musi_mastery}]] - 0)) / 2)]]+[[@{musi_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="music">Music</span>
 						<span name="attr_musi_final"></span>
 						<input type="hidden" name="attr_musi_final" value="0" readonly />
@@ -5817,7 +5918,7 @@
 			<div class="creative" data-i18n-list-item="ritual calligraphy">
 				<input type="hidden" name="attr_ritc_option" value="0" />
 				<div>
-					<button type="roll" name="roll_ritc" value="@{diceRollD100} {{subname=^{ritual-calligraphy}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{ritc_mastery}]]+[[@{ritc_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_ritc" value="@{diceRollD100} {{subname=^{ritual-calligraphy}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{ritc_mastery}]] + 0) + abs([[@{fr}-@{ritc_mastery}]] - 0)) / 2)]]+[[@{ritc_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="ritual-calligraphy">Ritual Calligraphy</span>
 						<span name="attr_ritc_final"></span>
 						<input type="hidden" name="attr_ritc_final" value="0" readonly />
@@ -5853,7 +5954,7 @@
 			<div class="creative" data-i18n-list-item="rune">
 				<input type="hidden" name="attr_rune_option" value="0" />
 				<div>
-					<button type="roll" name="roll_rune" value="@{diceRollD100} {{subname=^{rune}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{rune_mastery}]]+[[@{rune_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_rune" value="@{diceRollD100} {{subname=^{rune}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{rune_mastery}]] + 0) + abs([[@{fr}-@{rune_mastery}]] - 0)) / 2)]]+[[@{rune_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="rune">Runes</span>
 						<span name="attr_rune_final"></span>
 						<input type="hidden" name="attr_rune_final" value="0" readonly />
@@ -5889,7 +5990,7 @@
 			<div class="creative" data-i18n-list-item="slight of hand">
 				<input type="hidden" name="attr_slig_option" value="0" />
 				<div>
-					<button type="roll" name="roll_slig" value="@{diceRollD100} {{subname=^{slight-of-hand}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{slig_mastery}]]+[[@{slig_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_slig" value="@{diceRollD100} {{subname=^{slight-of-hand}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{slig_mastery}]] + 0) + abs([[@{fr}-@{slig_mastery}]] - 0)) / 2)]]+[[@{slig_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="slight-of-hand">Sl. of Hand</span>
 						<span name="attr_slig_final"></span>
 						<input type="hidden" name="attr_slig_final" value="0" readonly />
@@ -5925,7 +6026,7 @@
 			<div class="creative" data-i18n-list-item="tailoring">
 				<input type="hidden" name="attr_tail_option" value="0" />
 				<div>
-					<button type="roll" name="roll_tail" value="@{diceRollD100} {{subname=^{tailoring}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{tail_mastery}]]+[[@{tail_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_tail" value="@{diceRollD100} {{subname=^{tailoring}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{tail_mastery}]] + 0) + abs([[@{fr}-@{tail_mastery}]] - 0)) / 2)]]+[[@{tail_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="tailoring">Tailoring</span>
 						<span name="attr_tail_final"></span>
 						<input type="hidden" name="attr_tail_final" value="0" readonly />
@@ -5969,7 +6070,6 @@
 				<span data-i18n="class">Class</span>
 				<span data-i18n="base-value">Base</span>
 				<span data-i18n="attribute-short">Atr.</span>
-				
 				<label>
 					<input type="checkbox" name="attr_custom_open" value="1" checked />
 					<span></span>
@@ -5981,7 +6081,7 @@
 				<fieldset class="repeating_secondaryabilities">
 					<input type="hidden" name="attr_custom_option" value="0" />
 					<div>
-						<button type="roll" name="roll_custom" value="@{diceRollD100} {{subname=@{custom_name}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{custom_mastery}]]+[[@{custom_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+						<button type="roll" name="roll_custom" value="@{diceRollD100} {{subname=@{custom_name}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{custom_mastery}]] + 0) + abs([[@{fr}-@{custom_mastery}]] - 0)) / 2)]]+[[@{custom_final}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 							<input type="text" name="attr_custom_name" readonly />
 							<span name="attr_custom_final"></span>
 							<input type="hidden" name="attr_custom_final" value="0" readonly />
@@ -6073,12 +6173,12 @@
 			<span data-i18n="final-value">Final</span>
 			<input type="number" name="attr_magicprojection_final" value="" readonly />
 		</label>
-		<button type="roll" name="roll_magicprojection_offensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{offensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{magicprojection_offensive_mastery}]]+[[@{magicprojection_offensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+		<button type="roll" name="roll_magicprojection_offensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{offensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{magicprojection_offensive_mastery}]] + 0) + abs([[@{fr}-@{magicprojection_offensive_mastery}]] - 0)) / 2)]]+[[@{magicprojection_offensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 			<span data-i18n="offensive">Off.</span>
 			<span name="attr_magicprojection_offensive_final"></span>
 			<input type="hidden" name="attr_magicprojection_offensive_final" value="0" readonly />
 		</button> 
-		<button type="roll" name="roll_magicprojection_defensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{defensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{magicprojection_defensive_mastery}]]+[[@{magicprojection_defensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+		<button type="roll" name="roll_magicprojection_defensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{defensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{magicprojection_defensive_mastery}]] + 0) + abs([[@{fr}-@{magicprojection_defensive_mastery}]] - 0)) / 2)]]+[[@{magicprojection_defensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 			<span data-i18n="defensive">Def.</span>
 			<span name="attr_magicprojection_defensive_final"></span>
 			<input type="hidden" name="attr_magicprojection_defensive_final" value="0" readonly />
@@ -6284,7 +6384,7 @@
 				<span></span>
 			</div>
 			<div>
-				<button type="roll" name="roll_summon" value="@{diceRollD100} {{subname=^{summon-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{summon_mastery}]]+[[@{summon_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+				<button type="roll" name="roll_summon" value="@{diceRollD100} {{subname=^{summon-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{summon_mastery}]] + 0) + abs([[@{fr}-@{summon_mastery}]] - 0)) / 2)]]+[[@{summon_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 					<span data-i18n="summon-ritual">Summon</span>
 				</button>
 				<input type="number" name="attr_summon_base" value="0" min="0"/>
@@ -6297,7 +6397,7 @@
 				</label>
 			</div>
 			<div>
-				<button type="roll" name="roll_control" value="@{diceRollD100} {{subname=^{control-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{control_mastery}]]+[[@{control_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+				<button type="roll" name="roll_control" value="@{diceRollD100} {{subname=^{control-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{control_mastery}]] + 0) + abs([[@{fr}-@{control_mastery}]] - 0)) / 2)]]+[[@{control_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 					<span data-i18n="control-ritual">Control</span>
 				</button>
 				<input type="number" name="attr_control_base" value="0" min="0"/>
@@ -6311,7 +6411,7 @@
 				</label>
 			</div>
 			<div>
-				<button type="roll" name="roll_bind" value="@{diceRollD100} {{subname=^{bind-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{bind_mastery}]]+[[@{bind_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+				<button type="roll" name="roll_bind" value="@{diceRollD100} {{subname=^{bind-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{bind_mastery}]] + 0) + abs([[@{fr}-@{bind_mastery}]] - 0)) / 2)]]+[[@{bind_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 					<span data-i18n="bind-ritual">Bind</span>
 				</button>
 				<input type="number" name="attr_bind_base" value="0" min="0"/>
@@ -6325,7 +6425,7 @@
 				</label>
 			</div>
 			<div>
-				<button type="roll" name="roll_banish" value="@{diceRollD100} {{subname=^{banish-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{banish_mastery}]]+[[@{banish_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+				<button type="roll" name="roll_banish" value="@{diceRollD100} {{subname=^{banish-ritual}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{banish_mastery}]] + 0) + abs([[@{fr}-@{banish_mastery}]] - 0)) / 2)]]+[[@{banish_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 					<span data-i18n="banish-ritual">Banish</span>
 				</button>
 				<input type="number" name="attr_banish_base" value="0" min="0"/>
@@ -6439,10 +6539,10 @@
 						<input type="checkbox" name="attr_spell_by_creature" value="1"/>
 						<span data-i18n-title="roll-as-full" title="Roll as"></span>
 					</label>
-					<button type="roll" name="roll_offensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{offensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{magicprojection_offensive_mastery}]]+[[@{magicprojection_offensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_offensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{offensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{magicprojection_offensive_mastery}]] + 0) + abs([[@{fr}-@{magicprojection_offensive_mastery}]] - 0)) / 2)]]+[[@{magicprojection_offensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="offensive">Off.</span>
 					</button>
-					<button type="roll" name="roll_defensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{defensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{magicprojection_defensive_mastery}]]+[[@{magicprojection_defensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_defensiveroll" value="@{diceRollD100} {{subname=^{magic-projection} (^{defensive})}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{magicprojection_defensive_mastery}]] + 0) + abs([[@{fr}-@{magicprojection_defensive_mastery}]] - 0)) / 2)]]+[[@{magicprojection_defensive_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="defensive">Def.</span>
 					</button>
 					<span data-i18n="description">Description</span>
@@ -6468,7 +6568,7 @@
 							<input type="hidden" name="attr_spell_by_creature" value="0"/>
 							<div class="rollas">
 								<span data-i18n="roll">Roll</span>
-								<input type="text" name="attr_spell_basic_roll" />
+								<input type="text" name="attr_spell_basic_roll" value="0" />
 								<span data-i18n="roll-as">as</span>
 								<input type="text" name="attr_spell_basic_name" />
 							</div>
@@ -6487,7 +6587,7 @@
 							<input type="hidden" name="attr_spell_by_creature" value="0"/>
 							<div class="rollas">
 								<span data-i18n="roll">Roll</span>
-								<input type="text" name="attr_spell_inter_roll" />
+								<input type="text" name="attr_spell_inter_roll" value="0" />
 								<span data-i18n="roll-as">as</span>
 								<input type="text" name="attr_spell_inter_name" />
 							</div>
@@ -6506,7 +6606,7 @@
 							<input type="hidden" name="attr_spell_by_creature" value="0"/>
 							<div class="rollas">
 								<span data-i18n="roll">Roll</span>
-								<input type="text" name="attr_spell_advan_roll" />
+								<input type="text" name="attr_spell_advan_roll" value="0" />
 								<span data-i18n="roll-as">as</span>
 								<input type="text" name="attr_spell_advan_name" />
 							</div>
@@ -6522,7 +6622,7 @@
 							<input type="hidden" name="attr_spell_by_creature" value="0"/>
 							<div class="rollas">
 								<span data-i18n="roll">Roll</span>
-								<input type="text" name="attr_spell_arcan_roll" />
+								<input type="text" name="attr_spell_arcan_roll" value="0" />
 								<span data-i18n="roll-as">as</span>
 								<input type="text" name="attr_spell_arcan_name" />
 							</div>
@@ -6697,7 +6797,7 @@
 			<span data-i18n="final-value">Final</span>
 			<input type="number" name="attr_potential_final" value="@{potential_spent}+@{potential_base}+@{potential_special}+@{potential_temp}+((@{max_xy}*10)-40)+((@{max_xy}*10)-140)*floor(@{max_xy}/15)+@{aap}" disabled />
 		</label>
-		<button type="roll" name="roll_psychic_potential" value="@{diceRollD100} {{subname=^{psychic-potential}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{potential_mastery}]]+[[@{potential_final}]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+		<button type="roll" name="roll_psychic_potential" value="@{diceRollD100} {{subname=^{psychic-potential}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{potential_mastery}]] + 0) + abs([[@{fr}-@{potential_mastery}]] - 0)) / 2)]]+[[@{potential_final}]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 	</div>
 
 	<div class="psychicProjection">
@@ -6731,7 +6831,7 @@
 			<span data-i18n="final-value">Final</span>
 			<input type="number" name="attr_projection_final" value="@{projection_base}+@{projection_special}+@{projection_temp}+@{dex_mod}+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
 		</label>
-		<button type="roll" name="roll_psychic_projection" value="@{diceRollD100} {{subname=^{psychic-projection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{projection_mastery}]]+[[@{projection_final}]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+		<button type="roll" name="roll_psychic_projection" value="@{diceRollD100} {{subname=^{psychic-projection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{projection_mastery}]] + 0) + abs([[@{fr}-@{projection_mastery}]] - 0)) / 2)]]+[[@{projection_final}]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 	</div>
 
 	<div class="psychicDisciplines">
@@ -6865,10 +6965,10 @@
 							<span name="attr_psychic_power_diff440"></span>
 						</div>
 					</label>
-					<button type="roll" name="roll_power_projection" value="@{diceRollD100} {{subname=^{psychic-projection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{projection_mastery}]]+[[@{projection_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_power_projection" value="@{diceRollD100} {{subname=^{psychic-projection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{projection_mastery}]] + 0) + abs([[@{fr}-@{projection_mastery}]] - 0)) / 2)]]+[[@{projection_final}]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="psychic-projection">Projection</span>
 					</button>
-					<button type="roll" name="roll_power_potential" value="@{diceRollD100} {{subname=^{psychic-potential}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{potential_mastery}]]+[[@{potential_final}]]+?{@{modifiersTrad} ?|0}+@{psychic_power_bonus}]]}}">
+					<button type="roll" name="roll_power_potential" value="@{diceRollD100} {{subname=^{psychic-potential}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{projection_mastery}]] + 0) + abs([[@{fr}-@{projection_mastery}]] - 0)) / 2)]]+[[@{potential_final}]]+?{@{modifiersTrad} ?|0}+@{psychic_power_bonus}]]}}">
 						<span data-i18n="psychic-potential">Potential</span>
 					</button>
 				</div>
@@ -6937,7 +7037,7 @@
 						<input type="hidden" name="attr_ki_detection" value="0" />
 						<span data-i18n="ki-detection">Ki Detection</span>
 						<input type="number" name="attr_ki_detection_value" value="round((@{noti_final} + @{mk_final})/2)+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
-						<button type="roll" name="roll_ki_detection" value="@{diceRollD100} {{subname=^{ki-detection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[@{ki_detection_value}]]+?{@{modifiersTrad} ?|0}]]}}"></button>
+						<button type="roll" name="roll_ki_detection" value="@{diceRollD100} {{subname=^{ki-detection}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[round(([[@{noti_final}]] + [[@{classe_DI_Sum}+@{mk_base}+@{mk_special}+@{mk_temp}]])/2)+@{aam}+(@{AMTransDraSceaux}*5)]]+?{@{modifiersTrad} ?|0}]]}}"></button>
 						<label class="btn-ki">
 							<input type="checkbox" name="attr_ki_detection" value="1" />
 							<span title="20"></span>
@@ -7290,7 +7390,7 @@
 						<input type="hidden" name="attr_ki_concealment" value="0" />
 						<span data-i18n="ki-concealment">Ki Concealment</span>
 						<input type="number" name="attr_ki_concealment_value" value="round((@{stea_final} + @{mk_final})/2)+@{aam}+(@{AMTransDraSceaux}*5)" disabled />
-						<button type='roll' name='roll_ki_concealment' value="@{diceRollD100} {{subname=^{ki-concealment}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[@{ki_concealment_value}]]+?{@{modifiersTrad} ?|0}]]}}" ></button> 
+						<button type='roll' name='roll_ki_concealment' value="@{diceRollD100} {{subname=^{ki-concealment}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[round((@{stea_final} + @{classe_DI_Sum})/2)+@{aam}+(@{AMTransDraSceaux}*5)]]+?{@{modifiersTrad} ?|0}]]}}" ></button> 
 						<label class="btn-ki">
 							<input type="checkbox" name="attr_ki_concealment" value="1" />
 							<span title="10"></span>
@@ -8364,17 +8464,17 @@
 			
 			<div class="extend">
 				<div>
-					<button type="roll" name="roll_weapon_attack" value="@{diceRollD100} {{subname=^{attack}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{attack_mastery}+[[(@{weapon_complex}-@{attack_mastery})*2]] ]]+[[@{weapon_attack}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_weapon_attack" value="@{diceRollD100} {{subname=^{attack}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{attack_mastery}+[[(@{weapon_complex}-@{attack_mastery})*2]] ]] + 0) + abs([[@{fr}-@{attack_mastery}+[[(@{weapon_complex}-@{attack_mastery})*2]] ]] - 0)) / 2)]]+[[@{weapon_quality}+@{attack_base}+((((@{classe_Att_Sum} + 50) - abs(@{classe_Att_Sum} - 50)) / 2))+@{dex_mod}+@{attack_special}+@{attack_temp}+@{aam}+(@{AMTransDraSceaux}*5)+@{weapon_attackmod}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="attack">Attack</span>
 					</button>
 					
 					<span data-i18n="shield">Shield</span>
 					
-					<button type="roll" name="roll_weapon_block" value="@{diceRollD100} {{subname=^{block}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{block_mastery}+[[(@{weapon_complex}-@{block_mastery})*2]] ]]+[[@{weapon_block}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_weapon_block" value="@{diceRollD100} {{subname=^{block}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{block_mastery}+[[(@{weapon_complex}-@{block_mastery})*2]] ]] + 0) + abs([[@{fr}-@{block_mastery}+[[(@{weapon_complex}-@{block_mastery})*2]] ]] - 0)) / 2)]]+[[@{weapon_quality}+@{weapon_shieldval}+@{block_base}+(((((@{classe_Par_Sum} + 50) - abs(@{classe_Par_Sum} - 50)) / 2)))+@{dex_mod}+@{block_special}+@{block_temp}+@{aam}+(@{AMTransDraSceaux}*5)+@{weapon_blockmod}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="block">Block</span>
 					</button>
 					
-					<button type="roll" name="roll_weapon_dodge" value="@{diceRollD100} {{subname=^{dodge}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}-@{dodge_mastery}]]+[[@{weapon_dodge}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
+					<button type="roll" name="roll_weapon_dodge" value="@{diceRollD100} {{subname=^{dodge}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[((([[@{fr}-@{dodge_mastery}]] + 0) + abs([[@{fr}-@{dodge_mastery}]] - 0)) / 2)]]+[[(@{dodge_base}+((((@{classe_Esq_Sum} + 50) - abs(@{classe_Esq_Sum} - 50)) / 2))+@{agi_mod}+@{dodge_special}+@{dodge_temp}+@{aam}+(@{AMTransDraSceaux}*5))+@{weapon_dodgemod}]]+[[(?{@{fatigueTrad} ?|0}*15)]]+?{@{modifiersTrad} ?|0}]]}}">
 						<span data-i18n="dodge">Dodge</span>
 					</button>
 				</div>
@@ -8755,7 +8855,7 @@
 		</div>
 		<fieldset class="repeating_classes">
 			<input type="text" name="attr_classe_nom" />
-			<input type="number" name="attr_classe_niveau" value="1" />
+			<input type="number" name="attr_classe_niveau" value="0" />
 			<label>
 				<input type="checkbox" name="attr_class_option" value="1" checked />
 				<span></span>
@@ -9294,7 +9394,7 @@
 			<input type="hidden" name="attr_classe_tail_Total" value="0" readonly />
 		</fieldset>
 		
-		<input type="hidden" name="attr_classe_Lvl_Sum" value="0" readonly />
+		<input type="hidden" name="attr_classe_Lvl_Sum" value="1" readonly />
 		<input type="hidden" name="attr_classe_Att_Sum" value="0" readonly />
 		<input type="hidden" name="attr_classe_Esq_Sum" value="0" readonly />
 		<input type="hidden" name="attr_classe_Par_Sum" value="0" readonly />
@@ -9385,12 +9485,12 @@
 			<div>
 				<label>
 					<span data-i18n="fame">Fame</span><span>:</span>
-					<input type="number" name="attr_fameTotal" value="0" disabled />
+					<input type="number" name="attr_fameTotal" value="0" readonly />
 				</label>
 				
 				<label>
 					<span data-i18n="difficulty">Difficulty</span><span>:</span>
-					<input type="number" name="attr_fameDifficulty" value="0" readonly />
+					<input type="text" name="attr_fameDifficulty" value="0" readonly />
 				</label>
 			</div>
 			<label>

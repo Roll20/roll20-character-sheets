@@ -1,16 +1,4 @@
-	%display-none { display: none; }
-	%display-inline { display: inline; }
 
-	%display-inline-grid { display: inline-grid; }
-
-	%display-grid { display: grid; }
-
-	.sheet-pictos { font-family: 'Pictos'; }
-
-	%display-inline-block,
-	.sheet-static {
-		display: inline-block;
-	}
 
 	/***** PC AND NPC *****/
 	@each $characterType in $characterTypes {
@@ -24,8 +12,13 @@
 
 	/***** TABS *****/
 	@each $tab in $tabs {
-		.sheet-#{$tab} { @extend %display-none; }
-		.sheet-options_toggle[value='#{$tab}'] ~ .sheet-#{$tab} { @extend %display-inline-block; }
+		.sheet-options_toggle[value='#{$tab}'] ~ .sheet-#{$tab} { 
+      @extend %display-inline-block;
+    }
+
+    .sheet-options_toggle:not([value='#{$tab}']) ~ .sheet-#{$tab} { 
+      @extend %display-none; 
+    }
 	}
 
 	/***** SWITCH BETWEEN DIFFERENT TABS *****/ 
@@ -41,19 +34,25 @@
 		@extend %display-inline;
 	}
 	
-	@each $magicTabs in 'spells', 'preps', 'rituals' {
-		.sheet-magic-#{$magicTabs} { @extend %display-none; }
-		.sheet-magic-toggle[value='#{$magicTabs}'] ~ .sheet-magic-#{$magicTabs} { @extend %display-inline; }
+	@each $magicTab in $magicTabs {
+		.sheet-magic-#{$magicTab} { @extend %display-none; }
+		.sheet-magic-toggle[value='#{$magicTab}'] ~ .sheet-magic-#{$magicTab} { @extend %display-inline; }
 	}
 
-	@each $qualityTabs in 'quality', 'martial' {
-		.sheet-#{$qualityTabs} { @extend %display-none; }
-		.sheet-tab-switch[value='#{$qualityTabs}'] ~ .sheet-#{$qualityTabs} { @extend %display-inline; }
+	@each $qualityTab in $qualityTabs {
+		.sheet-#{$qualityTab} { @extend %display-none; }
+		.sheet-tab-switch[value='#{$qualityTab}'] ~ .sheet-#{$qualityTab} { @extend %display-inline; }
+	}
+
+	@each $matrixTab in $matrixTypes {
+		.sheet-#{$matrixTab} { @extend %display-none; }
+		.sheet-matrix-toggle[value='#{$matrixTab}'] ~ .sheet-#{$matrixTab} { @extend %display-inline; }
 	}
 
 	/***** SETTINGS *****/				
-	div.sheet-collapse,
-	.sheet-settings { @extend %display-none; }
+	.sheet-settings { 
+    @extend %display-none; 
+  }
 
 	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-attribute .sheet-settings,
 	input[name='attr_stats_toggle'][value='settings'] ~ .sheet-body .sheet-column .sheet-settings,
@@ -63,18 +62,20 @@
 
 		/*** TOGGLE ***/
 		input.sheet-settings-toggle:checked ~ div.sheet-display,
-	    input.sheet-settings-toggle:checked ~ .sheet-attr-col .sheet-attr-und div.sheet-display,
-	    input.sheet-settings-toggle ~ .sheet-attr-lim div.sheet-settings,
-	    input.sheet-settings-toggle:checked ~ .sheet-attr-lim div.sheet-display,
-	    input.sheet-settings-toggle[value='settings'] ~ div.sheet-display,
-	    input.sheet-settings-toggle[value='display'] ~ div.sheet-settings,
-	    input.sheet-settings-toggle[value='display'] ~ div.sheet-settings-grid  {
-	    	@extend %display-none; 
-	    }
+		input.sheet-settings-toggle:checked ~ .sheet-attribute .sheet-col .sheet-attribute-row .sheet-col .sheet-row-long div.sheet-display,
+		input.sheet-settings-toggle:checked ~ .sheet-attribute .sheet-limits-row .sheet-limit .sheet-col div.sheet-display,
+		input.sheet-settings-toggle ~ .sheet-attr-lim div.sheet-settings,
+		input.sheet-settings-toggle:checked ~ .sheet-attr-lim div.sheet-display,
+		input.sheet-settings-toggle[value='settings'] ~ div.sheet-display,
+		input.sheet-settings-toggle[value='display'] ~ div.sheet-settings,
+		input.sheet-settings-toggle[value='display'] ~ div.sheet-settings-grid  {
+			@extend %display-none; 
+		}
 
 	.sheet-display,
 	input.sheet-settings-toggle:checked ~ div.sheet-settings,
-	input.sheet-settings-toggle:checked ~ .sheet-attr-col .sheet-attr-und div.sheet-settings,
+	input.sheet-settings-toggle:checked ~ .sheet-attribute .sheet-col .sheet-attribute-row .sheet-col .sheet-row-long div.sheet-settings,
+	input.sheet-settings-toggle:checked ~ .sheet-attribute .sheet-limits-row .sheet-limit .sheet-col div.sheet-settings,
 	input.sheet-settings-toggle:checked ~ .sheet-attr-lim div.sheet-settings {
 		background: none;
 		display   : inherit;
@@ -85,8 +86,9 @@
 
 	/* NEW REPEATING CONTAINER WAY TO SHOW & HIDE SETTINGS */
 	/* SLOWLY ELIMINATE ALL TRACES OF SETTINGS-TOGGLE WITH THIS WAY OF DOING THINGS */
-	input.sheet-settings-flag:checked ~ div.sheet-settings { display   : inherit; }
-	input.sheet-collapse-flag:checked ~ div.sheet-collapse { display: block; }
+	input.sheet-settings-flag:checked ~ div.sheet-settings {
+   display   : inherit; 
+ }
 
 	/* OLD WAY TO SHOW & HIDE THINGS */
     input.sheet-settings-toggle[value='display'] ~ .sheet-settings { @extend %display-none;  }
@@ -144,11 +146,11 @@
 	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-hide-magic,
 	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-npc .sheet-grunt.sheet-hide-magic,
 	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-hide-resonance,
-	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-grunt.sheet-hide-resonance,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-attribute .sheet-settings.sheet-hide-magic,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-attribute .sheet-settings.sheet-hide-resonance,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body .sheet-settings.sheet-hide-magic,
-	input[name='attr_stats_toggle']:not([value='settings']) ~ div.sheet-body .sheet-settings.sheet-hide-resonance {
+	input[name='attr_flag_special'][value='magic'] ~ div.sheet-npc .sheet-grunt.sheet-hide-resonance, 
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-resonance,
+	input[name='attr_flag_special'][value='mundane'] ~ div.sheet-magic,
+	input[name='attr_flag_special'][value='resonance'] ~ div.sheet-magic,
+	input[name='attr_flag_special'][value='magic'] ~ div.sheet-resonance {
 		@extend %display-none;
 	}
 
@@ -168,26 +170,26 @@
 	}
 
 	//- HIDE SPECIALIZATION BUTTONS IF THERE IS NO SPECIALIZATION
-	input[name='attr_display_specialization'][value=''] ~ button[name*='specialization'],
-	input[name='attr_display_specialization'][value=' '] ~ button[name*='specialization'],
-	input[name='attr_display_specialization'][value=''] ~ div.sheet-row-long div.sheet-buttons button[name*='specialization'],
-	input[name='attr_display_specialization'][value=' '] ~ div.sheet-row-long div.sheet-buttons button[name*='specialization']  {
+	input[name='attr_specialization'][value=''] ~ button[name*='specialization'],
+	input[name='attr_specialization'][value=' '] ~ button[name*='specialization'],
+	input[name='attr_specialization'][value=''] ~ div.sheet-row-long div.sheet-buttons button[name*='specialization'],
+	input[name='attr_specialization'][value=' '] ~ div.sheet-row-long div.sheet-buttons button[name*='specialization']  {
 		@extend %display-none;
 	}
 
 	//- NPC WEAPONS HIDE REACH OR RECOIL/AMMO BASED ON THE SELECTED RANGE
-	input[name='attr_weapon_range'][value='range'] ~ h2[data-i18n='reach'],
-	input[name='attr_weapon_range'][value='range'] ~ label[data-i18n-title='reach'] {
+	input[name='attr_weapon_range'][value='range'] ~ div.sheet-settings h2[data-i18n='reach'],
+	input[name='attr_weapon_range'][value='range'] ~ div.sheet-settings label[data-i18n-title='reach'] {
 		@extend %display-none;
 	}
 
-	input[name='attr_weapon_range'][value='melee'] ~ h2[data-i18n='modes'],
-	input[name='attr_weapon_range'][value='melee'] ~ h2[data-i18n='recoil'],
-	input[name='attr_weapon_range'][value='melee'] ~ h2[data-i18n='ammo'],
-	input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='modes'],
-	input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='recoil'],
-	input[name='attr_weapon_range'][value='melee'] ~ label[data-i18n-title='ammo'],
-	input[name='attr_weapon_range'][value='melee'] ~ span  {
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings h2[data-i18n='modes'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings h2[data-i18n='recoil'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings h2[data-i18n='ammo'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings label[data-i18n-title='modes'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings label[data-i18n-title='recoil'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings label[data-i18n-title='ammo'],
+	input[name='attr_weapon_range'][value='melee'] ~ div.sheet-settings span  {
 		@extend %display-none;
 	}
 
@@ -205,8 +207,11 @@
 		@extend %display-inline-block;
 	}
 
+	input[name='attr_flag_matrix']:not([value='matrix']) ~ div.sheet-matrix {
+		@extend %display-none;
+	}
+
 	%highlight-button {
 		background-color: $red;
-		box-shadow      : inset 0px 0px 3px 1px #e31715; 
-		color           : #fff;
+		box-shadow:  $box-shadow-red; 
 	}
