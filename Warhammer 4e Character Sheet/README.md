@@ -8,6 +8,12 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+August 24th 2020 v1.21
+
+- fencing skill roll fixed  ( issue #7214  )
+- hit location was not inverting target result fixed
+
+
 August 3rd 2020 v1.2
 
 NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.
