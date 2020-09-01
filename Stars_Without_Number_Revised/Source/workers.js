@@ -3619,7 +3619,7 @@
 
 	on("change:strain change:strain_permanent", validateStrain);
 	on("change:constitution", calculateMaxStrain);
-	on("change:repeating_cyberware", calculateCyberwareStrain);
+	on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 	on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 	on("change:level", calculateSaves);

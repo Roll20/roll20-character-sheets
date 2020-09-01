@@ -2,6 +2,44 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.3.0
+
+### Added
+
+- Add a reaction roll button to monster sheet
+- Add a Wisdom modifier next to saving throws on the character sheet
+- Add modifier queries to all saving throw rolls
+- Add a Patreon link to the sheet.json in case folks want to donate
+- Add French translation, courtesy of @elbj
+
+### Fixed
+
+- Fix a bug where saving throws were being reverted to zero due to transition code for old saving throw attributes
+
+### Removed
+
+- Remove (hidden) deprecated saving throw values that aren't necessary given the automatic saving throw values
+
+## 1.2.0
+
+### Added
+
+- Add an option to disable threshold modifier
+- Add monster, normal human, and custom classes as options
+- Add auto-calculating saves and BAB/THAC0 for monsters either as monster HD or as class and level
+- Add monsters in wilderness number appearing values
+
+### Changed
+
+- Change class input to a dropdown
+- Change monster attacks so there is no minimum damage
+- Change monster HD label and title to Number of Hit Dice for clarification
+
+### Fixed
+
+- Fix movementEncounter and movementOverland not being available to tokens (needed to be readonly versus disabled, which means it needed to be calculated via sheet workers and not in the value itself)
+- Fix a bug where monster attack descriptions were not shown
+
 ## 1.1.0
 
 ### Added
