@@ -42,6 +42,10 @@ on Github.
 
 ## Changelog
 
+### 2.4.11
+
+* Fix a bug causing Int to be added twice to drone attacks.
+
 ### 2.4.10
 
 * Fix a bug disallowing decimal encumbrance values.
