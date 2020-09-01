@@ -3,7 +3,7 @@
 	"use strict";
 	/* Data constants */
 	const sheetName = "Stars Without Number (revised)";
-	const sheetVersion = "2.4.11";
+	const sheetVersion = "2.4.12";
 	const translate = getTranslationByKey;
 	const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 	const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -3193,7 +3193,7 @@
 			/** v2.4.11
 			 * Recalculate drone attack to remove inncorrect double Int bonus
 			 */
-			else if (major == 2 && minor == 4 && patch < 11) {
+			else if (major == 2 && minor == 4 && patch < 12) {
 				getSectionIDs("repeating_drones", idArray => {
 					calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
 				})
