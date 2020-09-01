@@ -2982,12 +2982,15 @@
 				`${prefix}_drone_weapon1_ab`,
 				`${prefix}_drone_weapon1_active`,
 				`${prefix}_drone_weapon1_attack`,
+				`${prefix}_drone_weapon1_skill`,
 				`${prefix}_drone_weapon2_ab`,
 				`${prefix}_drone_weapon2_active`,
 				`${prefix}_drone_weapon2_attack`,
+				`${prefix}_drone_weapon2_skill`,
 				`${prefix}_drone_weapon3_ab`,
 				`${prefix}_drone_weapon3_active`,
 				`${prefix}_drone_weapon3_attack`,
+				`${prefix}_drone_weapon3_skill`,
 			]);
 		}, ["attack_bonus", "intelligence_mod", "skill_pilot", "skill_program"]);
 		getAttrs(sourceAttrs, v => {
@@ -2998,9 +3001,11 @@
 			const setting = prefixes.reduce((m, prefix) => {
 				[1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
 					.forEach(num => {
-						m[`${prefix}_drone_weapon${num}_attack`] = intMod +
-							((skillMod === -1) ? -2 : skillMod) + attackBonus +
+						m[`${prefix}_drone_weapon${num}_attack`] = intMod + attackBonus +
+							((skillMod === -1) ? -2 : skillMod) +
 							parseInt(v[[`${prefix}_drone_weapon${num}_ab`]] || 0);
+						m[`${prefix}_drone_weapon${num}_skill`] =
+							((skillMod === -1) ? -2 : skillMod);
 					});
 				return m;
 			}, {});
