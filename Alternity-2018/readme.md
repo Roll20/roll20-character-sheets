@@ -2,6 +2,8 @@
 
 This character sheet is designed to be used with the 2018 edition of the Alternity roleplaying game.
 
+![character sheet image](Alternity-2018.png)
+
 ## Alternity Disambiguation
 
 At the time of writing, there were two editions of Alternity:
@@ -15,19 +17,17 @@ At the time of writing, there were two editions of Alternity:
 
 The shared name is not a coincidence. The two systems share authors, rules and a general *vibe*.
 
-# Using the Sheet
+# Using this Sheet
 
-This sheet should be selectable when creating a new game on Roll20. For more information, see [here](https://roll20.zendesk.com/hc/en-us/articles/360037773373).
+[This article](https://roll20.zendesk.com/hc/en-us/articles/360037773373) explains how to load a sheet into your game. It also explains how to used a [modified version](https://roll20.zendesk.com/hc/en-us/articles/360037773373#HowtoUseCharacterSheets-ModifyingaCommunitySheet) of this sheet.
 
-Be aware there are multiple Alternity sheets. If you want to use this one, take care to select the 2018 edition.
+This sheet is in a folder called `Alternity-2018`.
 
 # Design Philosophy
 
-My motivation for creating this sheet was so I could run an Alternity 2018 game in Roll20. Since others could potentially benefit, I went to the effort of adding it to Roll20's sheet offerings.
+This sheet exists as a [minimum viable product](https://en.wikipedia.org/wiki/Minimum_viable_product). It has Roll20 "basics" like click-to-roll skills, but it isn't otherwise advanced in terms of style or automation.
 
-As a disciple of the [KISS principle](https://en.wikipedia.org/wiki/KISS_principle) I decided to create a fairly bare-bones sheet. I feel it does what's needed without skimping on basic Roll20-style features, such as roll-able skills.
-
-It is not as "intelligent" as other sheets. Users will notice that certain fields that could be auto-calculated are not. Skills need to be added manually rather than containing the entire list from the rulebook. These choices were partly made to keeping things simple. But they also allow flexibility in the event of new skills, or custom rules that tweak how skill scores work.
+This sheet may be improved over time, so check back for updates.
 
 # Useful Macros
 
