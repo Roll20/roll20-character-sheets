@@ -294,8 +294,8 @@
 										<option value="centaur">Centaur</option>
 										<option value="hexapod">Hexapod</option>
 										<option value="humanoid" selected="selected">Humanoid</option>
-										<option value="humanoid-low-tech">Humanoid Low-tech</option>
-										<option value="humanoid-martial-arts">Humanoid Martial Arts</option>
+										<option value="humanoid_low_tech">Humanoid Low-tech</option>
+										<option value="humanoid_martial_arts">Humanoid Martial Arts</option>
 										<option value="ichthyoid">Ichthyoid (fish)</option>
 										<option value="octopod">Octopod (octopus)</option>
 										<option value="quadruped">Quadruped</option>
@@ -315,7 +315,7 @@
 										</span>
 									</div>
 								</div>
-								<div>
+								<div class="select-hit-location">
 									<input type="hidden" name="attr_hit_location_type" />
 									<select name="attr_humanoid_location" title="macro: @{humanoid_location}" class="hit-location">
 										<option value="torso-0">0 : Torso</option>
@@ -461,7 +461,8 @@
 									</select>
 
 									<select name="attr_centaur_location" title="macro: @{centaur_location}" class="hit-location">
-										<option value="torso-0">0 : Torso</option>
+										<option value="human-torso-0">0 : Torso</option>
+										<option value="animal-torso-0">0 : Torso</option>
 										<option value="vitals-3">-3 : Vitals</option>
 										<option value="groin-3">-3 : Groin</option>
 										<option value="face-5">-5 : Face</option>
@@ -622,7 +623,7 @@
 								</div>
 								<div>
 									<select name="attr_grapple_modifier">
-										<option value=""></option>
+										<option value="-1"></option>
 										<option value="0">0 : 1 or 2 limbs</option>
 										<option value="2">+2 : 3 limbs</option>
 										<option value="4">+4 : 4 limbs</option>
@@ -11415,7 +11416,7 @@ See notes for weapon.</textarea>
 		["task_missing_items", {modifier: 0, description: "Missing items from equipment", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["task_damaged_equipment", {modifier: 0, description: "Damaged equipment", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["unfamiliar_equipment", {modifier: -2, description: "Unfamiliar Equipment", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
-		
+		["hit_location_modifier", {modifier: 0, description: "From hit_location field", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 	]);
 
 	const traitFields = [
@@ -11542,16 +11543,6 @@ See notes for weapon.</textarea>
 		"fog_penalty",
 		"blur_penalty",
 		"other_vision_penalty",
-		"target_size_modifier",
-		"hit_location_type",
-		"humanoid_location",
-		"arachnoid_location",
-		"avian_location",
-		"cancroid_location",
-		"centaur_location",
-		"grapple_modifier",
-		"has_shield",
-		"target_chink_in_armor",
 		"hit_location_modifier",
 		"hit_location",
 	];
@@ -18491,7 +18482,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	} 
 
-	let arrChangeSkillRollMods = [
+	const arrChangeSkillRollMods = [
 		"change:show_roll_modifiers", 
 		"change:shock_penalty",
 		"change:dialog_custom_roll_modifier",
@@ -18529,9 +18520,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 		"change:task_missing_items",
 		"change:task_damaged_equipment",
 		"change:unfamiliar_equipment",
+		"change:target_size_modifier",
+		"change:hit_location",
 	];
 
-	let changeSkillRollMods = arrChangeSkillRollMods.join(" ");
+	const changeSkillRollMods = arrChangeSkillRollMods.join(" ");
 
 	// total skill roll modifiers
 	on(changeSkillRollMods, (event) => {
@@ -18572,11 +18565,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 				break;
 		
 			case "technique":
-					modFields = techniqueModifierFields;
-					break;
+				fields = techniqueModifierFields;
+				break;
 			
 			case "melee":
-				modFields = meleeModifierFields;
+				fields = meleeModifierFields;
 				break;
 		
 			default:
@@ -18806,6 +18799,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 					// check for special description
 					if (key === "dialog_custom_roll_modifier" && values.dialog_custom_roll_modifier_reason) {
 						description = values.dialog_custom_roll_modifier_reason;
+					} else if (key === "hit_location_modifier" && values.hit_location) {
+						description = values.hit_location;
 					} else {
 						description = field.description;						
 					}
@@ -19059,6 +19054,236 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	});
 
-	
+	// check for change to hit location fields
+	// easier to read and change list of fields using this method
+	const arrChangeHitLocationFields = [
+		"change:hit_location_type",
+		"change:humanoid_location", 
+		"change:humanoid_low_tech_location",
+		"change:humanoid_martial_arts_location",
+		"change:arachnoid_location",
+		"change:avian_location", 
+		"change:cancroid_location",
+		"change:centaur_location",
+		"change:hexapod_location",
+		"change:ichthyoid_location",
+		"change:octopod_location",
+		"change:quadruped_location",
+		"change:vehicle_location",
+		"change:vermiform_location",
+		"change:weapon_location",
+		"change:grapple_modifier",
+		"change:has_shield",
+		"change:target_chink_in_armor",
+		"change:target_size_modifier",
+	];
+
+	const changeHitLocationFields = arrChangeHitLocationFields.join(" ");
+
+	on(changeHitLocationFields, event => {
+		
+		updateHitLocationModifiers();
+
+	});
+
+	/**
+	 * update the default drop-down based on selected type
+	 *
+	 * @param function callback function to run after update is completed
+	 **/
+	function updateHitLocationDropDownsByType(callback) {
+
+		getAttrs(["hit_location_type"], values => {
+
+			let type = values.hit_location_type;
+
+			let updateFields;
+
+			switch (type) {
+				case "humanoid":
+				case "arachnoid":
+				case "avian":
+				case "cancroid":
+				case "centaur":
+				case "hexapod":
+				case "octopod":
+				case "quadruped":
+				case "vermiform":
+					updateFields = {
+						[`${type}_location`]: "torso-0"
+					};
+					break;
+			
+				case "humanoid_martial_arts":
+				case "humanoid_low_tech":
+					updateFields = {
+						[`${type}_location`]: "chest-0"
+					};
+					break;
+				
+				case "vehicle":
+					updateFields = {
+						[`${type}_location`]: "body-0"
+					};
+					break;
+
+				case "weapon":
+					updateFields = {
+						[`${type}_location`]: "damage-reach-c-5"
+					};
+					break;
+
+				default:
+					break;
+			}
+
+			setAttrs(updateFields, {silent: true}, callback);
+
+		});
+
+	}
+
+	function updateHitLocationModifiers() {
+
+		const fields = [
+			"target_size_modifier",
+			"hit_location_type",
+			"humanoid_location", 
+			"humanoid_low_tech_location",
+			"humanoid_martial_arts_location",
+			"arachnoid_location",
+			"avian_location", 
+			"cancroid_location",
+			"centaur_location",
+			"hexapod_location",
+			"ichthyoid_location",
+			"octopod_location",
+			"quadruped_location",
+			"vehicle_location",
+			"vermiform_location",
+			"weapon_location",
+			"grapple_modifier",
+			"has_shield",
+			"target_chink_in_armor",
+		];
+
+		getAttrs(fields, values => {
+
+			let type = values.hit_location_type;
+
+			let location = values[`${type}_location`];
+
+			let grapple = Number(values.grapple_modifier);
+
+			let sizeModifier = Number(values.target_size_modifier);
+
+			let hasShield = Number(values.has_shield) === 1 ? true : false;
+
+			let chinkInArmor = Number(values.target_chink_in_armor) === 1 ? true : false;
+
+			// damage-reach-c-5
+			// split into an array
+			// [damage, reach, c, 5]
+			// last element is the penalty
+			let arrLocation = location.split("-");
+
+			// remove the last element fromt they array
+			// [damage, reach, c, 5]
+			// locationMod = 5
+			// arrLocation = [damage, reach, c, 5]
+			let locationMod = arrLocation.splice(arrLocation.length - 1, 1);
+
+			// convert to negative number
+			locationMod = Number(locationMod) * -1;
+
+			// now join the remaining pieces to get a description
+			// [damage, reach, c, 5]
+			// locationNote = "humanoid (SM 0)" + "damage reach c"
+
+			// NOTE: some types of underscores, like humanoid_nartial_arts.
+			let typeDescription = type.replace(/_/g, " ");
+
+			let locationNote = `${typeDescription} (SM ${sizeModifier}) ` + arrLocation.join(" ");
+
+			// check for shield modifier
+			if (hasShield && isHitLocationAffectedByShield(locationNote)) {
+
+				locationMod = locationMod * 2;
+				
+				locationNote += " with a shield";		
+
+			}
+
+			// check for grappling
+			if (grapple >= 0) {
+
+				// divid the modifier by half and update the note
+				locationMod = Math.floor(locationMod/2) + grapple;
+
+				locationNote = "Grappling " + locationNote;
+
+			}
+
+			// check for chink in armor
+			if (chinkInArmor && (arrLocation.includes("torso") || arrLocation.includes("chest") || arrLocation.includes("body") )) {
+
+				locationMod = -8;
+
+				locationNote += " chinks in armor. DR/2.";
+
+			} else if (chinkInArmor) {
+
+				locationMod = -10;
+
+				locationNote += " chinks in armor. DR/2.";
+
+			}
+			
+			let finalMod = sizeModifier + locationMod;
+
+			setAttrs({
+				hit_location_modifier: finalMod,
+				hit_location: locationNote,
+			});
+
+		});
+
+	}
+
+	/**
+	 * Determine if hit location can be affected by a shield
+	 * valid locations: arm, hand, leg, foot, pincer, wing, tail
+	 * 
+	 * @param string location Hit location being targeted
+	 *
+	 * @return bool
+	 */
+	function isHitLocationAffectedByShield(location) {
+		
+		let arrLocation = location.split(" ");
+
+		const limbs = [
+			"arm",
+			"hand",
+			"leg",
+			"foot",
+			"pincer",
+			"wing",
+			"tail"
+		];
+
+		let applyShield = false;
+
+		limbs.forEach(limb => {
+
+			if (arrLocation.includes(limb)) {
+				applyShield = true;
+			}
+			
+		});
+
+		return applyShield;
+
+	}
 
 </script>
