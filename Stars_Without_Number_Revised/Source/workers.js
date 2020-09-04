@@ -3043,8 +3043,8 @@
 				const data = Object.assign({}, autofillData.hulltypes[label]);
 				data.ship_hp_max = data.ship_hp;
 				Object.keys(data).forEach(key => {
-					//Commented out partly for testing. This may become permanent, since changing hull type is sometimes done.
-					//if (!(["", 0, "0"].includes(v[key]))) delete data[key];
+					//Might remove later. Unsure if desired feature.
+					if (!(["", 0, "0"].includes(v[key]))) delete data[key]; //Prevents changing Hull Type
 				});
 				mySetAttrs(data, v);
 				calculateShipStats();
