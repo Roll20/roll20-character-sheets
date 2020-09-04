@@ -1,5 +1,5 @@
 /* Empire of the Petal Throne Character Sheet CSS */
-/* Version 1.1 */
+/* Version 1.2 */
 
 
 /****************
@@ -47,10 +47,6 @@ h2, h2 span {
 	font-weight: 200;
 }
 
-p.small {
-  font-variant: small-caps;
-}
-
 .sheet-label {
 	text-transform: uppercase;
 }
@@ -76,6 +72,10 @@ p.small {
 
 .sheet-flex-row {
 	display: flex;
+	overflow: auto;
+}
+
+.sheet-flex-row.sheet-skillcheckset {
 	align-items: baseline;
 }
 
@@ -160,7 +160,11 @@ p.small {
 	line-height: 50px;
 }
 
-.sheet-ept input, .sheet-ept textarea, .sheet-ept select {
+.sheet-extra-space{
+	margin: 0 0 20px 0;
+}
+
+.sheet-ept input, .sheet-ept textarea, .sheet-ept select, .sheet-worker, .sheet-worker-text {
 	border: none;
 	margin: 0;
 	background: transparent;
@@ -171,18 +175,39 @@ p.small {
 	overflow: visible;
 }
 
-.sheet-ept input, .sheet-ept select {
+.sheet-worker, .sheet-worker-text {
+	line-height: 50px;
+	height: 50px;
+	overflow: hidden;
+}
+
+.sheet-ept input, .sheet-ept select, .sheet-worker, .sheet-worker-text {
 	padding: 0 8px;
 	border-radius: 0;
-	border-bottom: 2px solid #000;
+	border-bottom: 1.5px solid #000;
 }
 
-.sheet-ept input.sheet-thick {
+.sheet-ept select, .sheet-checklist input[type="checkbox"] {
+	-webkit-appearance:none;
+	height: 48px;
+}
+
+.sheet-checklist input[type="checkbox"] {
+	 width: 18px;
+	 height: 10px;
+	 border: 1px solid #000;
+	 border-radius: 6px;
+}
+.sheet-checklist input[type="checkbox"]:checked {
+	 background: #000;
+}
+
+.sheet-worker, .sheet-worker-text {
+	border-bottom: 2px dotted #000;
+}
+
+.sheet-worker.sheet-thick {
 	border-bottom: 4px solid #000;
-}
-
-.sheet-ept input:disabled {
-	color: #000;
 }
 
 .sheet-ept textarea, input.sheet-fill, .sheet-fill {
@@ -191,16 +216,12 @@ p.small {
 	overflow: auto;
 }
 
-::placeholder {
+::placeholder, .sheet-ept input[type=number], .sheet-center, .sheet-worker {
 	text-align: center;
 }
 
-.sheet-ept input[type=number] {
-	text-align: center;
-}
-
-.sheet-ept input::-webkit-outer-spin-button.sheet-nospin,
-.sheet-ept input::-webkit-inner-spin-button.sheet-nospin {
+.sheet-ept input[type=number].sheet-nospin::-webkit-outer-spin-button,
+.sheet-ept input[type=number].sheet-nospin::-webkit-inner-spin-button  {
    -webkit-appearance: none;
    margin: 0;
 }
@@ -222,21 +243,23 @@ p.small {
 
 /***** Skills  *****/
 
-/* I. Skills Switch: Lists <> Checkboxes */
+/* I. Skills Switches */
 
-.sheet-block-switch {
+/* Hide switch checkbox UI */
+.sheet-switch-list-check,
+.sheet-switch-edit-play {
 	display: none;
 }
+/* .sheet-switch input {display:none;} */
 
 label.sheet-switch {
   position: relative;
   display: inline-block;
-  width: 100px;
-  height: 20px;
-	top:3px;
+  width: 106px;
+  height: 24px;
+	top: 13px;
+	margin: 0 8px 0 0;
 }
-
-.sheet-switch input {display:none;}
 
 .sheet-slider {
   position: absolute;
@@ -246,6 +269,7 @@ label.sheet-switch {
   right: 0;
   bottom: 0;
   background-color: #000;
+	border: 2px solid #000;
   -webkit-transition: .4s;
   transition: .4s;
 }
@@ -255,30 +279,28 @@ label.sheet-switch {
   content: "";
   height: 14px;
   width: 14px;
-  left: 4px;
-  bottom: 4px;
-  background-color: #fff;
+  left: 3.75px;
+  bottom: 3.5px;
+  background-color: #f9fbed;
   -webkit-transition: .4s;
   transition: .4s;
 }
 
 input:checked + .sheet-slider {
-  background-color: #666;
+  background-color: #f9fbed;
 }
-
 
 input:checked + .sheet-slider:before {
-  transform: translateX(86px);
+  transform: translateX(88px);
+	background-color: #000;
 }
 
-.sheet-on
-{
+.sheet-on {
   display: none;
 }
 
-.sheet-on, .sheet-off
-{
-  color: #fff;
+.sheet-on, .sheet-off {
+  color: #f9fbed;
   position: absolute;
   transform: translate(-50%,-50%);
   top: 50%;
@@ -286,26 +308,63 @@ input:checked + .sheet-slider:before {
   font-size: 14px;
 }
 
-input:checked+ .sheet-slider .sheet-on
-{display: block;}
+input:checked + .sheet-slider .sheet-on {
+	display: block;
+	color: #000;
+}
 
-input:checked + .sheet-slider .sheet-off
-{display: none;}
+input:checked + .sheet-slider .sheet-off {
+	display: none;
+}
 
 /* Rounded sliders */
 .sheet-slider.sheet-round {
   border-radius: 34px;
 }
-
 .sheet-slider.sheet-round:before {
   border-radius: 50%;}
 
-/* II. Skills open text area option */
-.sheet-sheet-skills textarea.sheet-sheet-textarea-fill {
-	min-height: 300px;
+
+/* II. Skills Switch List <> Checkbox Mode */
+
+.sheet-skills-simple-list {
+  display: none;
 }
 
-/* III. Skill check box list option */
+/* Show hide Lists Checkbox */
+.sheet-switch-list-check:checked ~ * .sheet-skills-simple-list {
+  display: block;
+}
+
+.sheet-switch-list-check:checked ~ * .sheet-skills-checklist {
+  display: none;
+}
+
+/* Show hide Play<>Edit Swtich */
+label.sheet-switch.sheet-edit-play {
+  display: none;
+}
+
+.sheet-switch-list-check:not(:checked) ~ * .sheet-switch.sheet-edit-play {
+  display: inline-block;
+}
+
+
+/* III. Skills Play<>Edit Mode */
+
+/* Play mode: hide unchecked skills */
+.sheet-switch-edit-play:checked ~ * .sheet-skillcheckset .sheet-skill-checkbox:not(:checked) + label { display: none; }
+
+/* Play mode: hide all checkboxes and remove left margin */
+.sheet-switch-edit-play:checked ~ * .sheet-checklist label {
+	margin: 0;
+}
+.sheet-switch-edit-play:checked ~ * .sheet-skillcheckset input {
+	display: none;
+}
+
+
+/* II. Skill checkbox list styling + interactions */
 .sheet-checklist label {
 	margin: 0 0 0 8px;
 	padding: 0;
@@ -316,88 +375,8 @@ input:checked + .sheet-slider .sheet-off
 	font-weight: bold;
 }
 
-/* IV. Skill pretty Checkboxes */
+/* VII. Profess Skills  */
 
-/* To do */
-
-/* V. Professional skills, spells per day for each spell */
-
-/* To do */
-
-
-
-
-/* Edit mode */
-.sheet-skills-section-label {
-	display: inline-block;
-}
-
-.sheet-block-switch:checked ~ .sheet-grid-16 .sheet-skills-simple-list {
-  display: block;
-}
-.sheet-skills-checklist,
-.sheet-block-switch:checked ~ .sheet-skills-simple-list {
-  display: block;
-}
-.sheet-skills-simple-list,
-.sheet-block-switch:checked ~ .sheet-skills-checklist,
-.sheet-block-switch:checked ~ .sheet-grid-16 .sheet-skills-checklist {
-  display: none;
-}
-
-
-/**** Profess Skills Dropdown ****/
-/* Show menu more indicator */
-.sheet-professional .sheet-label-prof:after {
-  content: ".";
-	font-family: 'Pictos';
-	text-transform: none;
-	/* margin: 0 0 0 8px; */
-	margin: 0;
-	padding: 0;
-}
-.sheet-dropdown {
-  position: relative;
-  display: inline-block;
-}
-.sheet-dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f9f9f9;
-  width: 200px;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  padding: 12px 16px;
-  z-index: 1;
-}
-.sheet-dropdown:hover .sheet-dropdown-content {
-  display: block;
-}
-.sheet-prof-skill-select button {
-	display: block;
-	width: 188px;
-	padding: 6px;
-	border: none;
-	background: none;
-	text-align: left;
-	color: #000;
-}
-/* prof skills menu */
-.sheet-prof-skill-select button:hover {
-	background-color: #ccc;
-	font-weight: bold;
-}
-.sheet-prof-skill-select button:active {
-	font-weight: bold;
-	background-color: #999;
-}
-/* show which prof skill is selected */
-.sheet-prof-skill-select .sheet-professiontoggle[value="warrior"] ~ .sheet-prof-skill-select .sheet-prof-skill-select button,
-.sheet-prof-skill-select .sheet-professiontoggle[value="priest"] ~ .sheet-prof-skill-select .sheet-prof-skill-select button,
-.sheet-prof-skill-select .sheet-professiontoggle[value="magicuser"] ~ .sheet-prof-skill-select .sheet-prof-skill-select button {
-	font-weight: bold;
-	background-color: #000;
-	color: #fff;
-}
 /* SHOW/HIDE Prof Skills */
 /* hide all prof skills */
 .sheet-profession-warrior,
@@ -412,23 +391,80 @@ input:checked + .sheet-slider .sheet-off
 .sheet-label-profession-magicuser {
 	display: none;
 }
-
-
 /* show selected prof skills */
-.sheet-professiontoggle[value="warrior"] ~ * .sheet-profession-warrior,
-.sheet-professiontoggle[value="priest"] ~ * .sheet-profession-priest,
-.sheet-professiontoggle[value="priest"] ~ * .sheet-profession-bonus-spells,
-.sheet-professiontoggle[value="magicuser"] ~ * .sheet-profession-magicuser,
-.sheet-professiontoggle[value="magicuser"] ~ * .sheet-profession-bonus-spells{
+.sheet-profession-select[value="Warrior"] ~ * .sheet-profession-warrior,
+.sheet-profession-select[value="Priest"] ~ * .sheet-profession-priest,
+.sheet-profession-select[value="Priest"] ~ * .sheet-profession-bonus-spells,
+.sheet-profession-select[value="Magic-User"] ~ * .sheet-profession-magicuser,
+.sheet-profession-select[value="Magic-User"] ~ * .sheet-profession-bonus-spells{
 	display: block;
 }
 /* show selected prof skills labels*/
-.sheet-professiontoggle[value="warrior"] ~ * .sheet-label-profession-warrior,
-.sheet-professiontoggle[value="priest"] ~ * .sheet-label-profession-priest,
-.sheet-professiontoggle[value="magicuser"] ~ * .sheet-label-profession-magicuser{
+.sheet-profession-select[value="Warrior"] ~ * .sheet-label-profession-warrior,
+.sheet-profession-select[value="Priest"] ~ * .sheet-label-profession-priest,
+.sheet-profession-select[value="Magic-User"] ~ * .sheet-label-profession-magicuser{
 	display: block;
 }
 
+/* VIII. Professional skills, spells per day for each spell */
+
+/* To do */
+
+/* Property */
+
+.sheet-ept label.sheet-colheading, .sheet-colheading  {
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	text-align: left;
+}
+.sheet-ept input.sheet-proprow {
+	font-size: 18px;
+	padding: 0;
+	margin: 0;
+}
+.sheet-ept label.sheet-quant, .sheet-ept input.sheet-quant {
+	width: 50px;
+}
+.sheet-ept label.sheet-items, .sheet-ept input.sheet-items {
+	width: 154px;
+}
+.sheet-ept label.sheet-weight, .sheet-ept input.sheet-weight {
+	width: 50px;
+}
+.sheet-proprow .sheet-quant, .sheet-proprow .sheet-weight  {
+	text-align: right;
+}
 /* END Form Elements */
 
 /* Misc. */
+
+/* Show Hide old version */
+.sheet-update-notice {
+	background: black;
+	margin: 0;
+	padding: 4px;
+}
+.sheet-update-notice label {
+	color: white;
+	font-size: 16px;
+	margin: 0;
+	padding: 0;
+	line-height: normal;
+	font-weight: bold;
+}
+.sheet-update-notice input {
+	display: inline-block;
+	margin: 0 8px 0 0;
+}
+
+.sheet-old-data {
+	background: lightgrey;
+	padding: 10px;
+}
+/* .sheet-old-data {
+	display: none;
+}
+.sheet-old-switch[value="1"] + .sheet-old-data {
+  display: block;
+} */
