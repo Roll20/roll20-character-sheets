@@ -3825,7 +3825,10 @@
 
 	/* Ship sheet */
 	on("change:ship_hulltype", fillShipStats);
-	on("change:ship_class", setShipClass);
+	on("change:ship_class", () => {
+		setShipClass();
+		["ship-fittings", "ship-defenses"].forEach(sName => generateAutofillInfo(sName));
+	});
 	on(shipStatEvent, calculateShipStats);
 	on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
 		"remove:repeating_ship-weapons", buildShipWeaponsMenu);
