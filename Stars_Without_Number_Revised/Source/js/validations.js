@@ -25,7 +25,7 @@ const validateStrain = () => {
     getAttrs(["strain", "strain_permanent", "strain_max"], v => {
         const currentStrain = parseInt(v.strain) || 0,
             permanentStrain = parseInt(v.strain_permanent) || 0,
-            strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain));
+            strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain)) || 0;
 
         if (strain !== currentStrain) setAttrs({
             strain
