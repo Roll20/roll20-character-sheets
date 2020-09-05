@@ -783,6 +783,7 @@
           let isGenerated = values[attribute];
 
           if (isGenerated == "yes") {
+
             removeRepeatingRow(targetSection + "_" + ids[attribute]);  
           }
 
@@ -790,6 +791,9 @@
 
       });     
    });
+
+   /*reseting dice pool for consistency */
+   clearAll(true);
   }
 
   /* load pre-generated data on repeating section */
@@ -808,12 +812,11 @@
       newRowAttrs[targetSection + "_" + newId + "_" + targetAttribute] = getTranslationByKey(translationKey);
     }
     
-    console.log("loadingSpecialtyData");
-    console.log(newRowAttrs);
-    
     setAttrs(newRowAttrs);
   }
 
+  /* sets the selected value to the hidden selected_specialty attribute. 
+    this attribute is used to control wether the sheet will show the custom specialty input*/
   function changeSpecialtySelectedControl(selected) {
 
     setAttrs(
@@ -823,13 +826,56 @@
     );
   }
 
+  function updateDicePoolOfItemRemoved(eventInfo, chkName, targetPool) {
+    let chkAttribute = eventInfo.sourceAttribute + "_" + chkName;
+
+    /* if it is checked, then update the dice pool */
+    if (eventInfo.removedInfo[chkAttribute] == "1") {
+       updateDicePoolValue("0", 1, targetPool);
+    }
+  }
+
+  /*update dice pool when a destiny is deleted */
+  on("remove:repeating_destinies", function(eventInfo) {
+
+    updateDicePoolOfItemRemoved(eventInfo, "chk_destiny", "destinies-dice");
+
+  });
+
+  /*update dice pool when a special ability is deleted */
+  on("remove:repeating_specialty-abilities", function(eventInfo) {
+
+    updateDicePoolOfItemRemoved(eventInfo, "chk_specialty_ability", "specialty-dice");
+    
+  });
+
+  /*update dice pool when a special ability is deleted */
+  on("remove:repeating_belongings", function(eventInfo) {
+    let incrementToUpdate = 0;
+
+    /* if it is checked, then update the dice pool */
+    for (let i = 1; i <= 2; i++) {
+      let chkBelonging = eventInfo.sourceAttribute + "_chk_belonging" + i;
+      let belongingLevel = eventInfo.sourceAttribute + "_belonginglevel" + i;
+
+      if (eventInfo.removedInfo[chkBelonging] == "1") {
+        
+        incrementToUpdate += parseInt(eventInfo.removedInfo[belongingLevel])||0;;
+      }
+    }
+
+    if (incrementToUpdate > 0) {
+      updateDicePoolValue("0", incrementToUpdate, "belongings-dice");
+    }
+    
+  });
+
+
   /*specialty selection*/
   on("change:specialty_select", function(eventInfo) {
     const selected = eventInfo.newValue;
     let abilitiesSection = "repeating_specialty-abilities";
     let destiniesSection = "repeating_destinies";
-    console.log("specialty selected");
-    console.log(selected);
     
     changeSpecialtySelectedControl(selected);
 
@@ -882,8 +928,6 @@
       }
 
       targetObject["dicetotal"] = totalValue;
-      console.log("clearing dice totals");
-      console.log(targetObject);
 
       setAttrs(targetObject);
     });
