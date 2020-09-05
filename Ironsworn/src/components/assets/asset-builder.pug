@@ -1,0 +1,37 @@
+include ../../../data/translations
+include ../../../data/assets/combat-talents
+
+mixin combatTalentBuilder
+  input.asset-combat-talent.hide(type='checkbox' name='attr_assetcombat-talent')
+  .combat-talent.showhide
+    select.sub-dropdown(name='attr_assetdropdowncombattalent')
+      - var defaultTranslation = 'asset-dropdown-default'
+      option(data-i18n=defaultTranslation value='' disabled='' selected='')=translations[defaultTranslation]
+      each asset, key in combatTalents
+        option(data-i18n=`asset-title-${key}` value=key)=translations[`asset-title-${key}`]
+    
+    each asset, key in combatTalents
+      input(class=`hide ${key}` type='checkbox' name=`attr_assetcombattalentdiv${key}`)
+      div(class=`hide ${key}`)
+        .asset-description
+          - var translation = `asset-description-${key}`
+          if asset.requirement
+            .requirement-area(data-i18n=translation)=translations[translation]
+          else
+            .asset-description-text(data-i18n=translation)=translations[translation]
+        .flex-wrapper
+          .flex-container
+            if asset.firstAbilityRequired
+              input.asset-ability(type='checkbox' name=`attr_assetcheckbox_${asset.abilityId}1` checked='')
+            else
+              input.asset-ability(type='checkbox' name=`attr_assetcheckbox_${asset.abilityId}1`)
+            - var translation = `asset-${key}-ability-one`
+            .asset-ability(data-i18n=translation)=translations[translation]
+          .flex-container
+            input.asset-ability(type='checkbox' name=`attr_assetcheckbox_${asset.abilityId}2`)
+            - var translation = `asset-${key}-ability-two`
+            .asset-ability(data-i18n=translation)=translations[translation]
+          .flex-container
+            input.asset-ability(type='checkbox' name=`attr_assetcheckbox_${asset.abilityId}3`)
+            - var translation = `asset-${key}-ability-three`
+            .asset-ability(data-i18n=translation)=translations[translation]
