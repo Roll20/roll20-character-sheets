@@ -188,7 +188,7 @@ const calculateShellAttrs = () => {
 
         ];
         getAttrs(sourceAttrs, v => {
-            if (v.setting_transhuman_enable === "tranhuman" || v.setting_ai_enable === "ai"){
+            if (v.setting_transhuman_enable === "transhuman" || v.setting_ai_enable === "ai"){
                 let attributes = {};
                 physicalAttrs.forEach(attr => attributes[attr] = idArray
                     .filter(id => v[`repeating_shells_${id}_shell_active`] === "1")
