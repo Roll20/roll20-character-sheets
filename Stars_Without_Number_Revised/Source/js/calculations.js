@@ -176,6 +176,31 @@ const calculateStrDexMod = () => {
     });
 };
 
+const calculateShellAttrs = () => {
+    const physicalAttrs = ["strength", "dexterity", "constitution"];
+    getSectionIDs("repeating_shells", idArray => {
+        const sourceAttrs = [
+            ...idArray.map(id => `repeating_shells_${id}_shell_active`),
+            ...idArray.map(id => `repeating_shells_${id}_shell_strength`),
+            ...idArray.map(id => `repeating_shells_${id}_shell_dexterity`),
+            ...idArray.map(id => `repeating_shells_${id}_shell_constitution`),
+            ...physicalAttrs, "setting_transhuman_enable", "setting_ai_enable",
+
+        ];
+        getAttrs(sourceAttrs, v => {
+            if (v.setting_transhuman_enable === "tranhuman" || v.setting_ai_enable === "ai"){
+                let attributes = {};
+                physicalAttrs.forEach(attr => attributes[attr] = idArray
+                    .filter(id => v[`repeating_shells_${id}_shell_active`] === "1")
+                    .map(id => v[`repeating_shells_${id}_shell_${attr}`])[0])
+                mySetAttrs(attributes, v, null, () => {
+                    physicalAttrs.forEach(attr => calculateMod(attr));
+                });
+            }
+        })
+    })
+}
+
 const calculateNextLevelXP = () => {
     const xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
     getAttrs(["level", "setting_xp_scheme"], v => {
