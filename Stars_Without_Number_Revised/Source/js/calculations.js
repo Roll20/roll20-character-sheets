@@ -45,6 +45,27 @@ const calculateMagicEffort = () => {
     });
 };
 
+const calculateProcessing = () => {
+    getSectionIDs("repeating_processing-nodes", idArray => {
+        const sourceAttrs = [
+            ...idArray.map(id => `repeating_processing-nodes_${id}_node_value`),
+            ...idArray.map(id => `repeating_processing-nodes_${id}_node_connected`),
+            "wisdom_mod", "intelligence_mod", "ai_extra_processing", "ai_committed_processing_current", "ai_committed_processing_scene", "ai_committed_processing_day", "ai_total_processing"
+        ];
+        getAttrs(sourceAttrs, v => {
+            const maxProcessing = 1 + Math.max(parseInt(v.wisdom_mod), parseInt(v.intelligence_mod)) + Math.max(
+                ...idArray.filter(id => v[`repeating_processing-nodes_${id}_node_connected`] === "1")
+                    .map(id => parseInt(v[`repeating_processing-nodes_${id}_node_value`]) || 0), 0
+            );
+            const ai_total_processing = maxProcessing + parseInt(v.ai_extra_processing) - parseInt(v.ai_committed_processing_current) -
+                parseInt(v.ai_committed_processing_scene) - parseInt(v.ai_committed_processing_day);
+            mySetAttrs({
+                ai_total_processing
+            }, v);
+        });
+    });
+}
+
 const calculateAC = () => {
     getSectionIDs("repeating_armor", idArray => {
         const sourceAttrs = [

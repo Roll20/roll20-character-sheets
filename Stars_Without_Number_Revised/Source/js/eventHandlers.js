@@ -42,6 +42,8 @@ on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}
 
 on("change:magic_committed_effort_current change:magic_committed_effort_scene change:magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
 
+on("change:ai_committed_processing_current change:ai_committed_processing_scene change:ai_committed_processing_day change:ai_extra_processing change:repeating_processing-nodes", calculateProcessing);
+
 on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
 on("change:strength change:repeating_gear remove:repeating_gear change:repeating_weapons " +
