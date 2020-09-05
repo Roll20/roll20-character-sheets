@@ -32,6 +32,8 @@ on("change:repeating_shells", function(eventInfo) {
     }
 });
 
+on("change:setting_transhuman_enable change:setting_ai_enable", calculateShellAttrs)
+
 on(weaponDisplayEvent, generateWeaponDisplay);
 
 on("change:repeating_weapons:weapon_name", () => validateWeaponSkills());

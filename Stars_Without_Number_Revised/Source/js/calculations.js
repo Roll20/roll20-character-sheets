@@ -196,6 +196,8 @@ const calculateShellAttrs = () => {
                 mySetAttrs(attributes, v, null, () => {
                     physicalAttrs.filter(attr => attributes[attr] !== "None").forEach(attr => calculateMod(attr));
                 });
+            } else {
+                physicalAttrs.forEach(attr => calculateAttr(attr));
             }
         })
     })
