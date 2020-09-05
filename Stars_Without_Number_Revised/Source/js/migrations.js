@@ -176,6 +176,16 @@ const upgradeSheet = (version, firstTime = false, finalTime = false) => {
             });
             upgradeSheet("2.4.7");
         }
+
+        /** v2.4.11
+         * Recalculate drone attack to remove incorrect double Int bonus
+         */
+        else if (major == 2 && minor == 4 && patch < 12) {
+            getSectionIDs("repeating_drones", idArray => {
+                calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
+            })
+            upgradeSheet("2.4.12");
+        }
         /** Final upgrade clause, always leave this around */
         else upgradeSheet(sheetVersion, false, true);
     };
