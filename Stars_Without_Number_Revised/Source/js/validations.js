@@ -53,3 +53,24 @@ const validateWeaponSkills = (ids) => {
         setAttrs(setting);
     });
 };
+const validateShells = (e) => {
+    //Unchecks every shell 'active' toggle except the one toggle now.
+    console.log(e.sourceAttribute);
+    console.log(e.sourceAttribute.slice(17, -13));
+    console.log(e.sourceAttribute.slice(-6));
+    if (e.sourceAttribute.slice(-6) === "active") {
+        console.log("Changing");
+        getSectionIDs("repeating_shells", idArray => {
+            idArray = idArray.filter(item => item !== e.sourceAttribute.slice(17, -13))
+            const setting = {}
+            idArray.forEach(id => setting[`repeating_shells_${id}_shell_active`] = "0");
+            setAttrs(setting, () => {
+                calculateShellAttrs();
+            })
+        })
+    } else {
+        console.log("No change needed");
+        calculateShellAttrs();
+    }
+
+}

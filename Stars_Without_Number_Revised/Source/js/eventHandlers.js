@@ -26,6 +26,12 @@ on("change:class", fillClassStats);
 attributes.forEach(attr => on(`change:${attr}_base change:${attr}_boosts`, () => calculateAttr(attr)));
 attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
+on("change:repeating_shells", function(eventInfo) {
+    if (eventInfo.sourceType === "player") {
+        validateShells(eventInfo);
+    }
+});
+
 on(weaponDisplayEvent, generateWeaponDisplay);
 
 on("change:repeating_weapons:weapon_name", () => validateWeaponSkills());

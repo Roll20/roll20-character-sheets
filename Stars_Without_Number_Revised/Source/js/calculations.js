@@ -192,9 +192,9 @@ const calculateShellAttrs = () => {
                 let attributes = {};
                 physicalAttrs.forEach(attr => attributes[attr] = idArray
                     .filter(id => v[`repeating_shells_${id}_shell_active`] === "1")
-                    .map(id => v[`repeating_shells_${id}_shell_${attr}`])[0])
+                    .map(id => v[`repeating_shells_${id}_shell_${attr}`])[0] || "None")
                 mySetAttrs(attributes, v, null, () => {
-                    physicalAttrs.forEach(attr => calculateMod(attr));
+                    physicalAttrs.filter(attr => attributes[attr] !== "None").forEach(attr => calculateMod(attr));
                 });
             }
         })
