@@ -13,7 +13,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Fixed form label base align issue
 * Connected Profession drop-down to drive which Professional Skills are shown
 * Pretty checkboxes
-* Add Sheet worker for talent modifiers, struggle, bonus XP, skills
+* Add Sheet Worker for talent modifiers, struggle, bonus XP, skills, movement
 * Swapped Clan and Race fields
 * Better alignment of Saving Throw fields
 * Replace disabled inputs with Attribute-Backed span
