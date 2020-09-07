@@ -22,6 +22,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Miscellaneous notes now has separate lines per miscellaneous note.
 * Removed To Hit line in anticipation of adding future features and this is takes away from the GM's purview.
 * Add Roll Buttons for Savings Throws and Struggle
+* Revised Property section
 
 #### 1.1
 * Fixed CSS Flexbox issue in Firefox
@@ -44,7 +45,6 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Add space for Languages in Professional skills with a multi-select
 * Add items list from original sheet
 * Add attack Roll Buttons
-* Add Sheet Workers for Encumbrance and movement
 * Add Sheet Defaults for GM to pick which alignments to use
 * Add Sheet Defaults for GM to pick if players see Savings Throws
 * Add Sheet Defaults for GM to pick if players see Attack Rolls
@@ -52,7 +52,6 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Add Sheet Defaults for GM to set starting coin
 * Add Sheet Defaults for GM to set lists or checkboxes and which style for property (if I replicate the original)
 * Add option for "other" profession
-* Deal with all of the attr_ changes !!!!!!!
 
 ### Feedback
 If you have any problems, suggestions or features you'd like to see added to the sheet, please let me know either by  sending me a private message via roll20.  Please be patient when waiting for a reply.
