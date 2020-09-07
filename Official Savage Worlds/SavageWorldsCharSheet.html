@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.02"/>
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.03"/>
 <input type='hidden' name='attr_firstInit' value="0" />
 <script type="text/worker">
 
@@ -69,10 +69,10 @@
 
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
-    const sheetVersionPrefix = "Savage Worlds Official v";
-	const sheetVersion = "1.00.02";
+    const sheetVersionPrefix = "Official Savage Worlds v";
+	const sheetVersion = "1.00.03";
 
-	const upgradeSheet = function(version, versionone, versiontwo, versionthree) {
+	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
         //versione format 1 (int)
         //versiontwo format 1 or 1.01 (float)
@@ -80,18 +80,23 @@
         log("Upgrade","Made to the upgrade path","Lime");
         log("Version Number",versionthree,"lime");
         let setattrvals = {};
-        setattrvals["character_sheet"] = sheetVersionPrefix+sheetVersion;
+        let setSheetVersion = sheetVersionPrefix+sheetVersion;
+        log("shetSheetVersion",setSheetVersion,"lime");
+        setattrvals["character_sheet"] = setSheetVersion;
         getAttrs(['character_sheet','initializeStatblock','wci'], function(v) {
             if(v.wci === "") {
                 setattrvals["WCI"] = "✪";
             }
             //upgrade stuff goes here...
-            if(versionthree < 0.02) {
+            if(versionthree < 0.03) {
                 log("Version out of date",versionthree,"lime");
                 //make sure Fighting is still unhidden for existing sheets
                 setattrvals["staticFighting"] = "on";
                 setattrvals["newcontent"] = "unread";
                 setattrvals["newdocumentation"] = "unread";
+            }
+            else {
+                log("Upgrade",`Sheet already updgraded (${characterName})`,"lime");
             }
             setAttrs(setattrvals);
         });
@@ -123,18 +128,35 @@
 	};
 
 	on('sheet:opened', function() {
-		getAttrs(['character_sheet','initializeStatblock','wci'], function(v) {
+		getAttrs(['character_name','character_sheet','initializeStatblock','wci'], function(v) {
 			// v[character_sheet] will contain the current sheet version to know if an upgrade is necessary
 			let setattrvals = {};
+            let characterName = v.character_name;
 			if(v.wci === "") {
 				setattrvals["WCI"] = "✪";
 			}
+            log("Character Sheet",v.character_sheet,"lime");
             let charsheetName = v.character_sheet.substring(0,22);
             log("Sheet Name",charsheetName,"lime");
             let charsheetVersion = v.character_sheet.substring(24);
-            (charsheetName === "Savage Worlds Official" ? log("Sheet Type","Official","lime") : charsheetVersion = "1.00.00");
+            log("Character Sheet Version",charsheetVersion,"lime");
+            (charsheetName === "Official Savage Worlds" ? log("Sheet Type","Official","lime") : charsheetVersion = "1.00.00");
             let versionParts = charsheetVersion.split(".");
-            log("Version before Upgrade",parseFloat(versionParts[1]+'.'+versionParts[2]),"lime");
+            log("Version before Upgrade",parseFloat(parseFloat(versionParts[1])+'.'+parseFloat(versionParts[2])) + ` (${characterName})`,"lime");
+            //version format 1.00.01 (string)
+            //versione format 1 (int)
+            //versiontwo format 1 or 1.01 (float)
+            //versionthree format 0.01 (float)
+            let version = charsheetVersion;
+            let versionone = parseInt(versionParts[0]);
+            let versiontwo = parseFloat(versionParts[0]+"."+versionParts[1]);
+            let versionthree = parseFloat(versionParts[1]+"."+versionParts[2]);
+            log("Versino Parts",versionParts,"lime");
+            log("Version",version,"lime");
+            log("Version One",versionone,"lime");
+            log("versiontwo",versiontwo,"lime");
+            log("Version Three",versionthree,"lime");
+            upgradeSheet(version,versionone,versiontwo,versionthree,characterName);
 			// if (v.character_sheet !== "Official Savage Worlds v1.00.02") {
             //     setattrvals["character_sheet"] = "Official Savage Worlds v1.00.02";
             //     setattrvals["newcontent"] = "unread";
@@ -5834,8 +5856,10 @@
                 </div>
 
                 <div class='sheet-right sheet-logoblock'>
+                    <input class="sheet-showLogo" type="hidden" value="SavageWorlds" name="attr_logo" />
                 	<img class="sheet-logo" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png" />
-                	<img class="sheet-logo" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
+                	<img class="sheet-logo sheet-SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
+                    <img class="sheet-logo sheet-Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png" />
                     <input type='hidden' name='wilddie' value='6' />
                     <div class='sheet-condionsnew'>
                     	<!-- Conditions -->
@@ -6974,7 +6998,7 @@
                             <input type='text' class='sheet-ModDesc' name='attr_wealthwilddieinfo' placeholder='Wealth Wild Die die type' data-i18n-placeholder="wealth-wild-die-type" />
                         </div>
 						<label class="sheet-srmItem sheet-usewealthmod"><input type="checkbox" name="attr_useWealthMod" value="1" />&nbsp;<span data-i18n="use-wealth-modifier-field">Use the Wealth Modifier field</span></label>
-						<!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
+                        <!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -7030,6 +7054,13 @@
                         <label class='sheet-miscItem'>
             			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" value="✪" />
             			</label>
+                        <label class="sheet-miscItem">
+                            <span data-i18n="logo-to-show">Logo to show</span>
+                            <select class="sheet-gamelogo" name="attr_logo" title="@{logo}">
+                                <option value="SavageWorlds" data-i18n="savage-worlds" checked>Savage Worlds</option>
+                                <option value="Deadlands" data-i18n="deadlands">Deadlands</option>
+                            </select>
+                        </label>
             			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" style='width: 150px;' type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
     			    </div>
     			</div>
@@ -7082,6 +7113,44 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.03 -->
+				<label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10003' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.03</h4></span>
+				</label>
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10003' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Bug Fixes and a minor enhancement.
+					</p>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="swap-swade-logo-for-deadlands-logo">Added Added the ability to swap out the Savage Worlds logo for the Deadlands logo.</span></li>
+					</ul>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="skill-selection-list-firefox">Fixed a bug where the skill selection list spilled over into a third column on Firefox.</span></li>
+                        <li><span class="sheet-black" data-i18n="fighting-skill-on-older-sheets">Fighting skill should auto-show for sheets version lower than 1.00.03.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+						<li><span class='sheet-black' data-i18n="trademark-weapon">Support for Trademark Weapon</span></li>
+						<li><span class='sheet-black' data-i18n="variable-base-damage">Support for variable base damage for things such as Shotguns</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<p data-i18n="be-aware-info1">
+						This is the initial release of this sheet. If you are coming from a different sheet, you may experience some "data loss." This data loss should be minimal if you are coming from the Savage Worlds Tabbed sheet, but will is still possible (and, in some cases, likely).
+					</p>
+					<p data-i18n="be-aware-info2">
+						In the interest of getting this sheet out there so everyone can benefit from some of the enhanced features, we realize there are some things still missing, and some that aren't functioning exaclty right. These should be fringe cases, but wanted to make you aware. Here are some potential problems you may experience:
+					</p>
+					<ul class="sheet-releaseNotesList">
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+						<li><span class='sheet-black' data-i18n="statblock-to-chat-log">The stat block to chat output currently doesn't support custom/additional Derived Stats, or the Special Abilities container.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.02 -->
 				<label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10002' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.02</h4></span>
