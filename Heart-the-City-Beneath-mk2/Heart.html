@@ -77,7 +77,7 @@
     </div>
 
     <button type="roll" title="Receive fallout?" name="roll_fallout" data-i18n="fallout-test-label"
-      value="&{template:heart} {{title=^{fallout-label}}} {{name=@{character_name}}} {{fallout_against=[[@{total_stress}]]}} {{roll=[[1d12cs0cf0]] vs. [[@{total_stress}]]}}">Fallout</button>
+      value="&{template:heart} {{title=^{fallout-label}}} {{name=@{character_name}}} {{fallout_against=[[@{total_stress}]]}} {{roll=[[1d12cs0cf0]] vs [[@{total_stress}]]}}">Fallout</button>
 
     <div class="rollbutton grid-large">
       <select name="attr_roll_skill" class="skill-select">
@@ -118,10 +118,12 @@
         <option value="2" data-i18n="dangerous">Dangerous</option>
       </select>
       <button type="roll" title="roll dice" name="roll_normal" data-i18n="roll-label"
-        value="&{template:heart} {{title=@{roll_title}}} {{name=@{character_name}}} {{roll=@{roll_formula}}} {{details=@{roll_message}}}">Roll</button>
+        value="&{template:heart} {{title=@{roll_title}}} {{name=@{character_name}}} {{roll=@{roll_formula}}} {{roll_details=@{roll_formula_single}}} {{details=@{roll_message}}} {{showresult=1}} @{roll_zerodice}">Roll</button>
       <input type="hidden" name="attr_roll_formula" value="" />
+      <input type="hidden" name="attr_roll_formula_single" value="" />
       <input type="hidden" name="attr_roll_message" value="" />
       <input type="hidden" name="attr_roll_title" value="" />
+      <input type="hidden" name="attr_roll_zerodice" value="" />
       <div class="small-text">
         <b><span data-i18n="standard">Standard</span>:</b>
         <span data-i18n="standard-pool-label">use highest result</span>
@@ -440,9 +442,41 @@
   </div>
   <div class="name">{{name}}</div>
   <div class="roll">
-    {{roll}}
-    {{#fallout_against}}
-    <span>—</span>
+    <div class="main-roll">{{roll}}</div>
+    <div class="roll-details">{{roll_details}}</div>
+  </div>
+  {{#showresult}}<div class="result">
+    {{^zerodice}}
+    {{#rollTotal() roll 1}}
+    <span data-i18n="critical-failure-msg"></span>
+    {{/rollTotal() roll 1}}
+    {{#rollBetween() roll 2 5}}
+    <span data-i18n="failure-msg"></span>
+    {{/rollBetween() roll 2 5}}
+    {{#rollBetween() roll 6 7}}
+    <span data-i18n="success-at-a-cost-msg"></span>
+    {{/rollBetween() roll 6 7}}
+    {{#rollBetween() roll 8 9}}
+    <span data-i18n="success-msg"></span>
+    {{/rollBetween() roll 8 9}}
+    {{#rollTotal() roll 10}}
+    <span data-i18n="critical-success-msg"></span>
+    {{/rollTotal() roll 10}}
+    {{/zerodice}}
+    {{#zerodice}}
+    {{#rollTotal() roll 1}}
+    <span data-i18n="critical-failure-msg"></span>
+    {{/rollTotal() roll 1}}
+    {{#rollBetween() roll 2 9}}
+    <span data-i18n="failure-msg"></span>
+    {{/rollBetween() roll 2 9}}
+    {{#rollTotal() roll 10}}
+    <span data-i18n="success-at-a-cost-msg"></span>
+    {{/rollTotal() roll 10}}
+    {{/zerodice}}
+  </div>{{/showresult}}
+  {{#details}}<div class="details">{{details}}</div>{{/details}}
+  {{#fallout_against}}<div class="fallout">
     {{#rollGreater() roll fallout_against}}
     <span data-i18n="no-fallout"></span>.
     {{/rollGreater() roll fallout_against}}
@@ -450,9 +484,7 @@
     {{#rollGreater() roll 6}}<span data-i18n="take-major-fallout"></span>.{{/rollGreater() roll 6}}
     {{#^rollGreater() roll 6}}<span data-i18n="take-minor-fallout"></span>.{{/^rollGreater() roll 6}}
     {{/^rollGreater() roll fallout_against}}
-    {{/fallout_against}}
-  </div>
-  {{#details}}<div class="details">{{details}}</div>{{/details}}
+  </div>{{/fallout_against}}
 
 </rolltemplate>
 
@@ -494,7 +526,7 @@ const kRollAffectingAttributes = [
 ];
 
 function getTranslation(key) {
-  return getTranslationByKey(key) || "";
+  return key ? (getTranslationByKey(key) || "") : "";
 }
 
 // This is not very efficient, but it only runs at most once.
@@ -583,27 +615,36 @@ function calculateTotalStress() {
   });
 }
 
-function getDifficultyMessage(difficulty) {
+function getDifficultyMessage(difficulty, is_zero) {
+  let difficulty_str;
   switch (difficulty) {
     case 0:
-      return `**${getTranslation("standard")}:** ${getTranslation(
-        "standard-pool-label"
-      )}.`;
+      difficulty_str = getTranslation("standard");
+      break;
     case 1:
-      return `**${getTranslation("risky")}:** ${getTranslation(
-        "risky-pool-label"
-      )}.`;
+      difficulty_str = getTranslation("risky");
+      break;
     case 2:
-      return `**${getTranslation("dangerous")}:** ${getTranslation(
-        "dangerous-pool-label"
-      )}.`;
+      difficulty_str = getTranslation("dangerous");
+      break;
     default:
-      return "Error retrieving difficulty. This should never happen.";
+      difficulty_str = "Error retrieving difficulty. This should never happen.";
   }
+  return (
+    `**${getTranslation("difficulty")}:** ${difficulty_str}.` +
+    (is_zero ? ` **${getTranslation("zero-effective-dice")}**.` : "")
+  );
 }
 
-function computeFormula(number) {
-  return [...Array(number)].map(() => "[[d10]]").join(", ");
+function computeFormula(num_dice, difficulty) {
+  const rolls = [...Array(num_dice)].map(() => "[[d10]]").join(", ");
+  return `[[{${rolls}}dh${difficulty}kh${difficulty + 1}]]`;
+}
+
+function computeSingleDice(num_dice) {
+  return num_dice <= 1
+    ? ""
+    : [...Array(num_dice)].map((_, i) => `$[[${i}]]`).join("");
 }
 
 function buildDicePool() {
@@ -619,19 +660,24 @@ function buildDicePool() {
       parseInt(v["roll_mastery"], 10) +
       parseInt(v["roll_extra_dice"], 10);
     const is_zero = roll_dice - difficulty <= 0;
+    const number_of_dice = is_zero ? 1 : roll_dice;
 
-    const roll_formula = computeFormula(is_zero ? 1 : roll_dice);
-    const roll_message = is_zero
-      ? `**${getTranslation("zero-effective-dice")}:** ${
-        getTranslation("zero-dice-label")
-      }`
-      : getDifficultyMessage(difficulty);
+    const roll_formula = computeFormula(number_of_dice, difficulty);
+    const roll_formula_single = computeSingleDice(number_of_dice);
+    const roll_message = getDifficultyMessage(difficulty, is_zero);
     const roll_title =
       roll_skill && roll_domain
         ? `${getTranslation(roll_skill)} + ${getTranslation(roll_domain)}`
         : `${getTranslation(roll_skill)}${getTranslation(roll_domain)}`;
+    const roll_zerodice = is_zero ? "{{zerodice=1}}" : "";
 
-    setAttrs({ roll_formula, roll_message, roll_title });
+    setAttrs({
+      roll_formula,
+      roll_formula_single,
+      roll_zerodice,
+      roll_message,
+      roll_title,
+    });
   });
 }
 
