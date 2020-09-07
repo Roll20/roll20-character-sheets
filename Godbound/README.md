@@ -4,6 +4,10 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
+- v3.2
+  - Minor
+    * Add missing Effort entry for Invocations
+    * New Misc Effort entry for healing and other effects
 - v3.1
   - Minor
     * Small layout fixes and adjustments
