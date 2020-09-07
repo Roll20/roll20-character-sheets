@@ -21,6 +21,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Property now include separate lines for each item with number, item and weight fields
 * Miscellaneous notes now has separate lines per miscellaneous note.
 * Removed To Hit line in anticipation of adding future features and this is takes away from the GM's purview.
+* Add Roll Buttons for Savings Throws and Struggle
 
 #### 1.1
 * Fixed CSS Flexbox issue in Firefox
@@ -39,7 +40,6 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Sheet creation for Roll20
 
 #### Todo List
-* Add Roll Buttons for Savings Throws
 * Add spell slots for checked spells in Professional skills
 * Add space for Languages in Professional skills with a multi-select
 * Add items list from original sheet
