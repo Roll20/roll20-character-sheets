@@ -1,0 +1,411 @@
+let wiz1 = [];
+wiz1['Affect Normal Fires'] = {
+    'name': 'Affect Normal Fires',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '[[5*#LEVEL#]] yards',
+    'duration': '[[2*#LEVEL#]] rounds',
+    'aoe': '10-feet radius',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'Open fire',
+    'reference': 'PHB p. 170',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the wizard to cause nonmagical fires—from as small as a torch or lantern to as large as the area of effect—to reduce in size and brightness to become mere coals or increase in light to become as bright as full daylight and increase the illumination to double the normal radius. Note that this does not affect either fuel consumption or damage caused by the fire. The caster can affect any or all fires in the spell’s area. He can alter their intensities with a single gesture as long as the spell is in effect. The spell lasts until the caster cancels it, all fuel is burned, or the duration expires. The caster can also extinguish all flames in the area, which expends the spell immediately. The spell does not affect fire elementals or similar creatures.'
+};
+
+wiz1['Alarm'] = {
+    'name': 'Alarm',
+    'level': 'Level 1 Wizard',
+    'school': 'Abjuration, Evocation',
+    'range': '10 yards',
+    'duration': '[[4+(0.5*#LEVEL#)]] hours',
+    'aoe': 'Up tp 20-feet cube',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A tiny bell and a piece of very fine silver wire.',
+    'reference': 'PHB p. 170',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When an alarm spell is cast, the wizard causes a selected area to react to the presence of any creature larger than a normal rat—anything larger than about 1 ⁄ 2 cubic foot in volume or more than about three pounds in weight. The area of effect can be a portal, a section of floor, stairs, etc. As soon as any creature enters the warded area, touches it, or otherwise contacts it without speaking a password established by the caster, the alarm spell lets out a loud ringing that can be heard clearly within a 60-foot radius. (Reduce the radius by 10 feet for each interposing door and by 20 feet for each substantial interposing wall.) The sound lasts for one round and then ceases. Ethereal or astrally projected creatures do not trigger an alarm, but flying or levitating creatures, invisible creatures, or incorporeal or gaseous creatures do. The caster can dismiss the alarm with a single word.'
+};
+
+wiz1['Armor'] = {
+    'name': 'Armor',
+    'level': 'Level 1 Wizard',
+    'school': 'Conjuration',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A piece of finely cured leather that has been blessed by a priest.',
+    'reference': 'PHB p. 170',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the shield spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The armor spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than [[8+#LEVEL#]] points. (It is important to note that the armor does not absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the armor spell grants the wearer full benefits of the Armor Class gained.'
+};
+
+wiz1['Audible Glamer'] = {
+    'name': 'Audible Glamer',
+    'level': 'Level 1 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '[[60+(10*#LEVEL#)]] yards',
+    'duration': '[[3*#LEVEL#]] rounds',
+    'aoe': 'Hearing range',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'A bit of wool or a small lump of wax',
+    'reference': 'PHB p. 170',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the audible glamer spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The volume is based upon the lowest level at which the spell can be cast, 1st level. The noise of the audible glamer is that of [[4*#LEVEL#]] men. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an audible glamer spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men.\n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the phantasmal force spell.'
+};
+wiz1['Burning Hands'] = {
+    'name': 'Burning Hands',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': '½',
+    'materials': '',
+    'reference': 'PHB p. 170',
+    'damage': '[[1d3+([[{2*#LEVEL#, 20}kl1]])]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'When the wizard casts this spell, a jet of searing flame shoots from his fingertips. His hands must be held so as to send forth a fanlike sheet of flames: The wizard’s thumbs must touch each other and the fingers must be spread. The burning hands send out flame jets 5 feet long in a horizontal arc of about 120 degrees in front of the wizard. Any creature in the area of the flames suffers 1d3 points of damage, plus 2 points for each level of experience of the spellcaster, to a maximum of 1d3+20 points of fire damage. Those successfully saving vs. spell receive half damage. Flammable materials touched by the fire burn (for example, cloth, paper, parchment, thin wood, etc.). Such materials can be extinguished in the next round if no other action is taken.'
+};
+wiz1['Cantrip'] = {
+    'name': 'Cantrip',
+    'level': 'Level 1 Wizard',
+    'school': 'All Schools',
+    'range': '10 feet',
+    'duration': '[[#LEVEL#]] hours',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 171',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Cantrips are minor spells studied by wizards during their apprenticeship, regardless of school. The cantrip spell is a practice method for the apprentice, teaching him how to tap minute amounts of magical energy. Once cast, the cantrip spell enables the caster to create minor magical effects for the duration of the spell. However, these effects are so minor that they have severe limitations. They are completely unable to cause a loss of hit points, cannot affect the concentration of spellcasters, and can only create small, obviously magical materials. Furthermore, materials created by a cantrip are extremely fragile and cannot be used as tools of any sort. Lastly, a cantrip lacks the power to duplicate any other spell effects.\n&emsp;Whatever manifestation the cantrip takes, it remains in effect only as long as the wizard concentrates. Wizards typically use cantrips to impress common folk, amuse children, and brighten dreary lives. Common tricks with cantrips include tinklings of ethereal music, brightening faded flowers, glowing balls that float over the caster’s hand, puffs of wind to flicker candles, spicing up aromas and flavors of bland food, and little whirlwinds to sweep dust under rugs. Combined with the unseen servant spell, it’s a tool to make housekeeping and entertaining simpler for the wizard.'
+};
+wiz1['Change Self'] = {
+    'name': 'Change Self',
+    'level': 'Level 1 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '0',
+    'duration': '[[2d6+2*#LEVEL#]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 171',
+    'damage': '[[1d3+[[{2*#LEVEL#, 20}kl1]]]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'This spell enables the wizard to alter the appearance of his form—including clothing and equipment—to appear 1 foot shorter or taller; thin, fat, or in between; human, humanoid, or any other generally man-shaped bipedal creature. The caster cannot duplicate a specific individual. The spell does not provide the abilities or mannerisms of the chosen form. The duration of the spell is 2d6 rounds plus two additional rounds per level of experience of the spellcaster. The DM may allow a saving throw for disbelief under certain circumstances: for example, if the caster acts in a manner obviously inconsistent with his chosen role. The spell does not alter the perceived tactile (i.e., touch) properties of the caster or his equipment, and the ruse can be discovered in this way.'
+};
+
+wiz1['Charm Person'] = {
+    'name': 'Charm Person',
+    'level': 'Level 1 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '120 yards',
+    'duration': 'Special',
+    'aoe': '1 person',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 171',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell affects any single person it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not.\n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the charm is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw.\n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands).\n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a dispel magic spell is successfully cast upon the charmed person, the charm spell is broken.\n&emsp;If two or more charm effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells.\n&emsp;Note that the subject has full memory of the events that took place while he was charmed.'
+};
+
+wiz1['Chill Touch'] = {
+    'name': 'Chill Touch',
+    'level': 'Level 1 Wizard',
+    'school': 'Necromancy',
+    'range': '0',
+    'duration': '[[3+(#LEVEL#)]]',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 172',
+    'damage': '[[1d4]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the caster completes this spell, a blue glow encompasses his hand. This energy attacks the life force of any living creature upon which the wizard makes a successful melee attack. The touched creature must roll a successful saving throw vs. spell or suffer 1d4 points of damage and lose 1 point of Strength. If the save is successful, the creature remains unharmed. Creatures not rated for Strength suffer a –1 penalty to their attack rolls for every other successful touch. Lost Strength returns at the rate of 1 point per hour. Damage must be cured magically or healed naturally.\n&emsp;This spell has a special effect on undead creatures. Undead touched by the caster suffer no damage or Strength loss, but they must successfully save vs. spell or flee for 1d4 rounds + 1 round per level of the caster.'
+};
+
+wiz1['Color Spray'] = {
+    'name': 'Color Spray',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': '5 x 20 x 20 feet wedge',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'A pinch each of powder or sand that is colored red, yellow, and blue.',
+    'reference': 'PHB p. 172',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting this spell, the wizard causes a vivid, fan-shaped spray of clashing colors to spring forth from his hand. From one to six creatures ([[1d6]]) within the area are affected in order of increasing distance from the wizard. All creatures above the level of the spellcaster and all those of 6th level or 6 Hit Dice or more are entitled to a saving throw vs. spell. Blind or unseeing creatures are not affected by the spell.\\n&emsp;Creatures not allowed or failing saving throws, and whose Hit Dice or levels are less than or equal to the spellcaster’s level, are struck unconscious for 2d4 rounds; those with Hit Dice or levels 1 or 2 greater than the wizard’s level are blinded for 1d4 rounds; those with Hit Dice or levels 3 or more greater than that of the spellcaster are stunned (reeling and unable to think or act coherently) for one round.'
+};
+
+wiz1['Comprehend Languages'] = {
+    'name': 'Comprehend Languages',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[5*#LEVEL#]] rounds',
+    'aoe': '1 speaking creature or written text',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A pinch of soot and a few grains of salt.',
+    'reference': 'PHB p. 172',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard is able to understand the spoken words of a creature or read an otherwise incomprehensible written message (such as writing in another language). In either case, the wizard must touch the creature or the writing. Note that the ability to read does not necessarily impart understanding of the material, nor does the spell enable the caster to speak or write an unknown language. Written material can be read at the rate of one page or equivalent per round. Magical writing cannot be read, other than to know it is magical, but the spell is often useful when deciphering treasure maps. This spell can be foiled by certain warding magic (the 3rd-level secret page and illusionary script spells), and it does not reveal messages concealed in otherwise normal text.\n&emsp;The reverse of this spell, confuse languages, cancels a comprehend languages spell or renders a writing or a creature’s speech incomprehensible, for the same duration as above.'
+};
+
+wiz1['Dancing Lights'] = {
+    'name': 'Dancing Lights',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '[[40+(10*#LEVEL#)]]',
+    'duration': '[[2*#LEVEL#]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'either a bit of phosphorus or wychwood, or a glowworm.',
+    'reference': 'PHB p. 172',
+    'damage': '[[1d4]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a dancing lights spell is cast, the wizard creates, at his option, from one to four lights that resemble either torches or lanterns (and cast that amount of light), glowing spheres of light (such as evidenced by will-o-wisps), or one faintly glowing, vaguely manlike shape, somewhat similar to that of a creature from the Elemental Plane of Fire. The dancing lights move as the spellcaster desires, forward or back, straight or turning corners, without concentration upon such movement by the wizard. The spell cannot be used to cause blindness (see the 1st-level light spell), and it winks out if the range or duration is exceeded.'
+};
+
+wiz1['Detect Magic'] = {
+    'name': 'Detect Magic',
+    'level': 'Level 1 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[2*#LEVEL#]]',
+    'aoe': '10 x 60 feet',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 172',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the detect magic spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.'
+};
+
+wiz1['Detect Undead'] = {
+    'name': 'Detect Undead',
+    'level': 'Level 1 Wizard',
+    'school': 'Divination, Necromancy',
+    'range': '0',
+    'duration': '3 turns',
+    'aoe': '[[60+(10*#LEVEL#)]] feet',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A bit of earth from a grave.',
+    'reference': 'PHB p. 173',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to detect all undead creatures out to the limit of the spell. The area of effect extends in a path 10 feet wide and 60 feet long (plus 10 feet longer per level of the wizard), in the direction the caster is facing. Scanning a direction requires one round, and the caster must be motionless. While the spell indicates direction, it does not give specific location or distance. It detects undead through walls and obstacles but is blocked by 1 foot of solid stone, 1 yard of wood or loose earth, or a thin coating of metal. The spell does not indicate the type of undead detected, only that undead are present.'
+};
+
+wiz1['Enlarge'] = {
+    'name': 'Enlarge',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '[[5*#LEVEL#]] yards',
+    'duration': '[[5*LEVEL#]] rounds',
+    'aoe': '1 creature or object',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'Negate',
+    'materials': 'A pinch of powdered iron.',
+    'reference': 'PHB p. 173',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes instant growth of a creature or object, increasing both size and weight. It can be cast only upon a single creature (or a symbiotic or community entity) or upon a single object that does not exceed 10 cubic feet in volume per caster level. The object or creature must be seen to be affected. It grows by up to 10% per level of experience of the wizard, increasing this amount in height, width, and weight. Current growth: [[10*#LEVEL#]]%.\n&emsp;All equipment worn or carried by a creature is enlarged by the spell. Unwilling victims are entitled to a saving throw vs. spell. A successful saving throw means the spell fails. If insufficient room is available for the desired growth, the creature or object attains the maximum possible size, bursting weak enclosures in the process, but it is constrained without harm by stronger materials—the spell cannot be used to crush a creature by growth.\n&emsp;Magical properties are not increased by this spell—a huge sword +1 is still only +1, a staff-sized wand is still only capable of its normal functions, a giant-sized potion merely requires a greater fluid intake to make its magical effects operate, etc. Weight, mass, and strength are affected, though. Thus, a table blocking a door would be heavier and more effective, a hurled stone would have more mass (and cause more damage), chains would be more massive, doors thicker, a thin line turned to a sizeable, longer rope, and so on. A creature’s hit points, Armor Class, and attack rolls do not change, but damage rolls increase proportionately with size.For example, a fighter at 160% normal size hits with his long sword and rolls a 6 for damage. The adjusted damage roll is 10 (that is, 6 × 1.6 = 9.6, rounded up). Bonuses due to Strength, class, and magic are not altered.\n&emsp;The reverse spell, reduce, negates the enlarge spell or makes creatures or objects smaller. The creature or object loses 10% of its original size for every level of the caster, to a minimum of 10% of the original size. Thereafter, the size shrinks by 1-foot increments to less than 1 foot, by 1-inch increments to 1 inch, and by 1⁄10-inch increments to a minimum of 1⁄10 of an inch—the recipient cannot dwindle away to nothingness.\n&emsp;For example, a 16-foot-tall giant reduced by a 15th-level wizard (15 steps) would be reduced to 1.6 feet (in nine steps), then to 6⁄10 of a foot or 7.2 inches (in one step), and finally to 2.2 inches (in the last five steps). A shrinking object may damage weaker materials affixed to it, but an object will shrink only as long as the object itself is not damaged. Unwilling creatures are allowed a saving throw vs. spell.'
+};
+
+wiz1['Erase'] = {
+    'name': 'Erase',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '1 scroll or 2 pages',
+    'components': 'v, S',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 173',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The erase spell removes writings of either magical or mundane nature from a scroll or from one to two pages of paper, parchment, or similar surfaces. It removes explosive runes, glyphs of warding, sepia snake sigils, and wizard marks, but it does not remove illusory script or symbols (see those spells). Nonmagical writings are automatically erased if the caster is touching them; otherwise, the chance for success is 90%. Magical writings must be touched, and are only 30% likely to be erased, plus 5% per caster level, to a maximum of 90% (current chance: [[30+(5*#LEVEL#)]]%).'
+};
+
+wiz1['Feather Fall'] = {
+    'name': 'Feather Fall',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '[[10*#LEVEL#]] yards',
+    'duration': '[[#LEVEL#]] rounds',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 173',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the creature(s) or object(s) affected immediately assumes the mass of a piece of down. The rate of falling is instantly changed to a mere 2 feet per second (120 feet per round), and no damage is incurred upon landing while the spell is in effect. However, when the spell duration ceases, a normal rate of fall occurs. The spell can be cast upon the wizard or some other creature or object up to the maximum range and lasts for one round for each level of the wizard. The feather fall affects one or more objects or creatures in a 10-foot cube, as long as the maximum weight of the creatures or objects does not exceed a combined total of 200 pounds plus 200 pounds per level of the spellcaster.\n&emsp;Current weight limit: [[200+(200*#LEVEL#)]] pounds when casting this spell. The spell works only upon free-falling, flying, or propelled objects (such as missiles). It does not affect a sword blow or a charging creature. Note that the spell can be effectively combined with gust of wind and similar spells.'
+};
+
+wiz1['Find Familiar'] = {
+    'name': 'Find Familiar',
+    'level': 'Level 1 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '[[#LEVEL]] miles',
+    'duration': 'Special',
+    'aoe': '1 familiar',
+    'components': 'V, S, M',
+    'cast-time': '2d12 hours',
+    'saving-throw': 'Special',
+    'materials': '1000 gp worth of incense and herbs',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to attempt to summon a familiar to act as his aide and companion. Familiars are typically small creatures, such as cats, frogs, ferrets, crows, hawks, snakes, owls, ravens, toads, weasels, or even mice. A creature acting as a familiar can benefit a wizard, conveying its sensory powers to its master, conversing with him, and serving as a guard/scout/spy as well. A wizard can have only one familiar at a time, however, and he has no control over what sort of creature answers the summoning, if any at all come.\\n&emsp;The creature is always more intelligent than others of its type (typically by 2 or 3 Intelligence points), and its bond with the wizard confers upon it an exceptionally long life. The wizard receives the heightened senses of his familiar, which grants the wizard a +1 bonus to all surprise die rolls. Normal familiars have 2–4 hit points plus 1 hit point per caster level, and an Armor Class of 7 (due to size, speed, etc.).\\n&emsp;The wizard has an empathic link with the familiar and can issue it mental commands at a distance of up to 1 mile. Note that empathic responses from the familiar are generally fairly basic—while able to communicate simple thoughts, these are often overwhelmed by instinctual responses. Thus, a ferret familiar spying on a band of orcs in the woods might lose its train of thought upon sighting a mouse. Certainly its communications to its master would be tinged with fear of the “big ones” it was spying on! The caster cannot see through the familiar’s eyes.\\n&emsp;If separated from the caster, the familiar loses 1 hit point each day, and dies if reduced to 0 hit points. When the familiar is in physical contact with its wizard, it gains the wizard’s saving throws against special attacks. If a special attack would normally cause damage, the familiar suffers no damage if the saving throw is successful and half damage if the saving throw is failed. If the familiar dies, the wizard must successfully roll an immediate system shock check or die. Even if he survives this check, the wizard loses 1 point from his Constitution when the familiar dies.\\n&emsp;The power of the conjuration is such that it can be attempted but once per year. When the wizard decides to find a familiar, he must load a brass brazier with charcoal. When this is burning well, he adds 1,000 gp worth of incense and herbs. The spell incantation is then begun and must be continued until the familiar comes or the casting time is finished. The DM secretly determines all results. Note that most familiars are not inherently magical, nor does a dispel magic spell send them away.\\n&emsp;Deliberate mistreatment, failure to feed and care for the familiar, or continuous unreasonable demands have adverse effects on the familiar’s relationship with its master. Purposely arranging the death of one’s own familiar incurs great disfavor from certain powerful entities, with dire results.'
+};
+
+wiz1['Friends'] = {
+    'name': 'Friends',
+    'level': 'Level 1 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '0',
+    'duration': '[[1d4+(#LEVEL#)]] rounds',
+    'aoe': '60-feet radius',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'Chalk (or white flour), lampblack (or soot), and vermilion applied to the face before casting the spell.',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A friends spell causes the wizard to temporarily gain 2d4 points of Charisma. Intelligent creatures within the area of effect at the time the spell is cast must make immediate reaction checks based on the character’s new Charisma. Those with favorable reactions tend to be very impressed with the spellcaster and make an effort to be his friends and help him, as appropriate to the situation. Officious bureaucrats might decide to become helpful; surly gate guards might wax informative; attacking orcs might spare the caster’s life, taking him captive instead. When the spell wears off, the creatures realize that they have been influenced, and their reactions are determined by the DM.'
+};
+
+wiz1['Gaze Reflection'] = {
+    'name': 'Gaze Reflection',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[2+(#LEVEL)]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The gaze reflection spell creates a shimmering, mirrorlike area of air before the wizard that moves with the caster. Any gaze attack, such as that of a basilisk, eyes of charming, a vampire’s gaze, the 6th-level eyebite spell, and so on, is reflected back upon the gazer if the gazer tries to make eye contact with the spellcaster (the spellcaster suffers no effects from the gaze attack). Such creatures receive a saving throw vs. their own gaze effect. The spell does not affect vision or lighting and is not effective against creatures whose effect comes from being gazed upon (such as a medusa). Only active gaze attacks are blocked by this spell.'
+};
+
+wiz1['Grease'] = {
+    'name': 'Grease',
+    'level': 'Level 1 Wizard',
+    'school': 'Conjuration',
+    'range': '10 yards',
+    'duration': '[[3+(#LEVEL#)]] rounds',
+    'aoe': '10 x 10 feet',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'A bit of pork rind or butter.',
+    'reference': 'PHB p. 175',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A grease spell covers a material surface with a slippery layer of a fatty, greasy nature. Any creature entering the area or caught in it when the spell is cast must save vs. spell or slip, skid, and fall. Those who successfully save can reach the nearest nongreased surface by the end of the round. Those who remain in the area are allowed a saving throw each round until they escape the area. The DM should adjust saving throws by circumstance; for example, a creature charging down an incline that is suddenly greased has little chance to avoid the effect, but its ability to exit the affected area is almost assured! The spell can also be used to create a greasy coating on an item—a rope, ladder rungs, weapon handle, etc. Material objects not in use are always affected by this spell, while creatures wielding or employing items receive a saving throw vs. spell to avoid the effect. If the initial saving throw is failed, the creature immediately drops the item. A saving throw must be made each round the creature attempts to use the greased item. The caster can end the effect with a single utterance; otherwise, it lasts for three rounds plus one round per level.'
+};
+
+wiz1['Hold Portal'] = {
+    'name': 'Hold Portal',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '[[20*#LEVEL#]] yards',
+    'duration': '[[#LEVEL]] rounds',
+    'aoe': '[[20*#LEVEL#]] square feet',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell magically bars a door, gate, or valve of wood, metal, or stone. The magical closure holds the portal fast, just as if it were securely closed and locked. Any extraplanar creature (djinn, elemental, etc.) with 4 or more Hit Dice can shatter the spell and burst open the portal. A wizard of 4 or more experience levels higher than the spellcaster can open the held portal at will. A knock spell or a successful dispel magic spell can negate the hold portal. Held portals can be broken or physically battered down.'
+};
+
+wiz1['Hypnotism'] = {
+    'name': 'Hypnotism',
+    'level': 'Level 1 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '5 yards',
+    'duration': '[[1+(#LEVEL#)]] rounds',
+    'aoe': '30 feet cube',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The gestures of the wizard, along with his droning incantation, cause [[1d6]] creatures within the area to become susceptible to a suggestion—a brief and reasonable-sounding request (see the 3rd-level wizard suggestion spell). The request must be given after the hypnotism spell is cast. Until that time, the success of the spell is unknown. Note that the subsequent suggestion is not a spell, but simply a vocalized urging (the caster must speak a language the creature understands for this spell to work). Creatures that successfully roll their saving throws are not under hypnotic influence. Those who are exceptionally wary or hostile save with +1 to +3 bonuses. If the spell is cast at an individual creature that meets the caster’s gaze, the saving throw is made with a penalty of –2. A creature that fails its saving throw does not remember that the caster enspelled it.'
+};
