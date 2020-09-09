@@ -1,0 +1,524 @@
+// #############################################################################
+// BASIC SETUP
+// #############################################################################
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased !important;
+  text-rendering: optimizeLegibility !important;
+  transition: color .3s ease-in-out, transform .3s ease-in-out,
+              opacity .3s ease-in-out, border .3s ease-in-out;
+}
+
+textarea,
+select,
+button,
+fieldset,
+input,
+option,
+label {
+  display: flex;
+  background-color: transparent;
+  background-image: none;
+  font-weight: 400;
+  text-decoration: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0 !important;
+  box-shadow: none;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+
+  &::placeholder {
+    color: $c-text-gray;
+  }
+}
+
+button,
+label,
+input[type="checkbox"],
+input[type="radio"] {
+  cursor: pointer;
+}
+
+button,
+button span {
+  transition-duration: 0s;
+  transition-delay: 0s;
+
+  &:hover,
+  &:hover span {
+    color: $c-text-hover !important;
+  }
+}
+
+input[type="text"]:not(.sheet-hex) {
+  background-color: transparent;
+  color: $c-text;
+  font-size: $fs-s;
+  line-height: $content-base-height;
+  text-overflow: ellipsis;
+
+  &::placeholder {
+    font-size: $fs-xs;
+    line-height: $content-base-height;
+  }
+
+  &:not(.sheet-align-left) {
+    text-align: center;
+  }
+}
+
+input[type="hidden"] {
+  display: none;
+}
+
+textarea {
+  color: $c-text-light;
+  font-size: 9px;
+  line-height: 1.6;
+  width: 100%;
+  resize: none;
+}
+
+input[type="checkbox"].sheet-checkbox {
+  background-color: $c-white;
+  border: 1px solid $c-text-lighter;
+  border-radius: 2px;
+  height: 10px;
+  width: 10px;
+
+  &::before {
+    content: '';
+    display: block;
+    border-radius: 1px;
+    margin: 1px 0 0 1px;
+    height: 6px;
+    width: 6px;
+  }
+
+  &:checked::before {
+    background-color: $c-text-lighter;
+  }
+}
+
+.sheet-wrapper {
+  text-align: center;
+}
+
+.sheet-body {
+  color: $c-text;
+  font-size: $fs-s;
+  line-height: 1;
+  text-align: left;
+  background: {
+    image: linear-gradient(to right, #fbfbfb 1px, transparent 1px),
+           linear-gradient(to bottom, #fbfbfb 1px, transparent 1px);
+    size: 8px 8px;
+    position: -1px -1px;
+  }
+  padding-top: 8px;
+  margin: 0 auto;
+
+  > div {
+    margin: 0 auto;
+  }
+
+  ~ rolltemplate {
+    display: none;
+  }
+}
+
+.sheet-variant-radio {
+  display: inline-block;
+
+  &::after {
+    content: '';
+    display: inline-block;
+    padding: 3px;
+    border: 1px solid $c-outline;
+    border-radius: 50%;
+  }
+
+  &:checked::after {
+    background-color: $c-outline;
+  }
+
+  &--wildcard:checked ~ .sheet-body {
+    width: 800px;
+
+    .sheet-extra {
+      display: none;
+    }
+  }
+
+  &--extra:checked ~ .sheet-body {
+    width: 474px;
+
+    .sheet-wildcard {
+      display: none;
+    }
+  }
+}
+
+.sheet-wildcard {
+  .sheet-section {
+    display: flex;
+    justify-content: space-between;
+
+    > .sheet-left {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      width: 470px;
+    }
+
+    > .sheet-right {
+      flex-grow: 1;
+    }
+  }
+}
+
+// #############################################################################
+// GENERICS & COMMON
+// #############################################################################
+
+.sheet-hidden {
+  display: none;
+}
+
+.sheet-block {
+  position: relative;
+  margin-top: 40px;
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1px dotted $c-outline;
+  height: 16px;
+
+  &__title {
+    flex-grow: 1;
+    color: $c-text-light;
+    font-size: $fs-l;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  &__labels {
+    display: flex;
+    align-items: flex-end;
+    line-height: .5;
+    text-align: center;
+    text-transform: uppercase;
+    padding-right: 16px;
+  }
+}
+
+.sheet-label,
+.sheet-header__labels * {
+  color: $c-text-lightest;
+  font-size: $fs-xs;
+}
+
+.sheet-large-label {
+  color: $c-text-light;
+  font-size: $fs-l;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sheet-footer {
+  color: $c-text-light;
+  line-height: 16px;
+  height: 16px;
+}
+
+.sheet-toggle {
+  &:not(:checked):not(.sheet-toggle--special) + *,
+  &:not(:checked):not(.sheet-toggle--special) ~ .repcontainer,
+  &:not(:checked):not(.sheet-toggle--special) ~ .repcontrol {
+    display: none;
+  }
+
+  &::after {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $c-text-lighter;
+    line-height: 1;
+    height: $content-base-height;
+    width: 16px;
+  }
+
+  &:checked::after {
+    color: $c-text-light;
+  }
+
+  &--block {
+    display: none;
+  }
+
+  &--visibility {
+    position: absolute;
+    top: 4px;
+    right: 0;
+
+    &::after {
+      content: '`';
+      color: $c-text-gray;
+      font-size: $fs-s;
+      font-family: Pictos !important;
+      height: 10px;
+    }
+
+    &:checked::after {
+      color: $c-text-gray;
+    }
+
+    &:checked::after {
+      content: 'J';
+    }
+  }
+
+  &--arrow {
+    position: absolute;
+    right: 6px;
+    top: 0;
+
+    &::after {
+      content: '►';
+      font-size: $fs-xs;
+      line-height: 9px;
+      width: 8px;
+    }
+
+    &:checked::after {
+      transform: rotate(90deg);
+    }
+  }
+
+  &--note-box {
+    &::after {
+      content: 'n';
+      color: $c-text-lightest;
+      font-family: Pictos !important;
+      font-size: $fs-s;
+      padding-top: 2px;
+      width: 10px;
+    }
+  }
+
+  &--loss {
+    &::after {
+      content: 'Q';
+      color: $c-text-lightest;
+      font-family: Pictos !important;
+      font-size: $fs-s;
+      padding-top: 2px;
+    }
+  }
+
+  &--weight {
+    &::after {
+      content: '';
+      background: {
+        image: url('https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/img/weight.png');
+        repeat: no-repeat;
+        size: 9px auto;
+        position: center;
+      }
+      opacity: 0.25;
+    }
+
+    &:checked::after {
+      opacity: 0.5;
+    }
+  }
+
+  &--damage {
+    position: absolute;
+    top: -1px;
+    left: 170px;
+
+    &::after {
+      content: ';';
+      color: $c-text-gray;
+      font-size: 11px;
+      font-family: 'Pictos' !important;
+    }
+  }
+
+  &--spoiler {
+    &::after {
+      content: '&';
+      color: $c-text-light;
+      font-family: Pictos !important;
+      font-size: 10px;
+      height: 100%;
+    }
+
+    &:after::before {
+      content: '_';
+    }
+  }
+}
+
+.sheet-radio-track {
+  position: relative;
+  flex-shrink: 0;
+  background-color: $c-white;
+  box-shadow: $shadow;
+
+  &::before {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $c-white;
+    font-size: 9px;
+    height: 100%;
+    width: 100%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+    border-radius: inherit;
+    height: 0;
+    width: 0;
+    transform: translate(-50%, -50%);
+    transition: height .3s ease-in-out,
+                width .3s ease-in-out,
+                background-color .1s ease-in-out;
+  }
+
+  &:hover::after,
+  &:hover ~ .sheet-radio-track:not(:checked)::after {
+    background-color: $c-background-hover;
+    height: 60%;
+    width: 60%;
+  }
+
+  &:checked {
+    &::after,
+    ~ .sheet-radio-track:not(:checked)::after {
+      background-color: $c-background-dark;
+      height: 100%;
+      width: 100%;
+      transition-duration: .1s;
+    }
+  }
+}
+
+.sheet-tooltip {
+  pointer-events: none;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  background-color: $c-background-tooltip;
+  color: $c-white;
+  font-size: $fs-s;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 2px;
+  opacity: 0;
+
+  // Arrow
+  &::after {
+    content: '';
+    position: absolute;
+    height: 10px;
+    width: 10px;
+  }
+
+  &--left {
+    top: 50%;
+    left: -6px;
+    transform: translate(-100%, -50%);
+
+    &::after {
+      top: 50%;
+      right: -8px;
+      border: 5px solid transparent;
+      border-left-color: $c-background-tooltip;
+      transform: translateY(-50%);
+    }
+  }
+
+  &--top {
+    top: -6px;
+    left: 50%;
+    transform: translate(-50%, -100%);
+
+    &::after {
+      bottom: -8px;
+      left: 50%;
+      border: 5px solid transparent;
+      border-top-color: $c-background-tooltip;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+// #############################################################################
+// SETTING TOGGLES
+// #############################################################################
+
+.sheet-toggle-roboto:checked ~ .sheet-body {
+  *,
+  *::before,
+  *::after {
+    font-family: $f-roboto;
+  }
+}
+
+.sheet-toggle-dark-labels:checked ~ .sheet-body {
+  .sheet-header__labels *,
+  .sheet-label,
+  .sheet-hexfield__label {
+    color: $c-text-light !important;
+  }
+}
+
+.sheet-toggle-corners:not(:checked) ~ .sheet-body {
+  *:not(.sheet-icon):not(.sheet-color-cycle__radio) {
+    border-radius: 0 !important;
+
+    &::before,
+    &::after {
+      border-radius: 0 !important;
+    }
+  }
+}
+
+.sheet-toggle-transitions:not(:checked) ~ .sheet-body {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0s !important;
+  }
+}
+
+.sheet-toggle-delays:not(:checked) ~ .sheet-body {
+  *,
+  *::before,
+  *::after {
+    transition-delay: 0s !important;
+  }
+}
+
+.sheet-toggle-grid:not(:checked) ~ .sheet-body {
+  background: none;
+}
