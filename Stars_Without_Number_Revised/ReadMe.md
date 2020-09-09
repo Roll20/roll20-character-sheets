@@ -42,6 +42,10 @@ on Github.
 
 ## Changelog
 
+### 2.5.1
+
+* Fix a bug causing new sheets to incorrectly initialise as AI and Transhuman.
+
 ### 2.5.0
 
 * Support for Transhuman PCs with Shells and body-swapping.
