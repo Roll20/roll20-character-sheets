@@ -3,7 +3,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 
 ## Notable Features
 
-## Change Log
+## Latest Changes
 #### Version 1.0
 * Initial release
 
