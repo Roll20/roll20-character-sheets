@@ -10,7 +10,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
 * **Sleek:** The minimalist design is inspired by pencil layouts on graph paper.
 
-## Images
+## Images & Animations
 <details>
   <summary>Attributes</summary>
   
