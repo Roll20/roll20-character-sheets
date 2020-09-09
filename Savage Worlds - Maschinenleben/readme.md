@@ -10,6 +10,43 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
 * **Sleek:** The minimalist design is inspired by pencil layouts on graph paper.
 
+## Images
+<details>
+  <summary>Attributes</summary>
+  
+  ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/attributes.gif)
+</details>
+
+<details>
+  <summary>Edges & Hindrances</summary>
+  
+  ![Edges & Hindrances](https://github.com/Tetrakern/roll20-character-sheets/blob/master/Savage%20Worlds%20-%20Maschinenleben/gifs/features.gif)
+</details>
+
+<details>
+  <summary>Skills</summary>
+  
+  ![Skills](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/skills.gif)
+</details>
+
+<details>
+  <summary>Health</summary>
+  
+  ![Health](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/health.gif)
+</details>
+
+<details>
+  <summary>Augmentations & Integrity</summary>
+  
+  ![Augmentations & Integrity](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/augmentations.gif)
+</details>
+
+<details>
+  <summary>Vehicles</summary>
+  
+  ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/vehicles.gif)
+</details>
+
 ## Latest Changes
 #### Version 1.0
 * Initial release
