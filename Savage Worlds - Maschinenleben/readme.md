@@ -4,6 +4,8 @@ This character sheet was originally made for **Maschinenleben** (released later 
 ## Notable Features
 
 ## Change Log
+#### Version 1.0
+* Initial release
 
 ## Development
 The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started.html) templates with [SCSS/SASS](https://sass-lang.com/guide) (LibSass). You need both in order to contribute; do not directly modify the compiled HTML and CSS files because these changes will be overwritten and vanish!
