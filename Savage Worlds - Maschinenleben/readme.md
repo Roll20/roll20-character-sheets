@@ -2,6 +2,13 @@
 This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it may be used for many other settings as well.
 
 ## Notable Features
+* **Blocks:** Toggle various content blocks to adjust the sheet to your needs, such as allies, augmentations, programs, powers, and more. Repeating lists for vehicles, walkers, and power armor have sublists for weapons (0-10).
+* **Extra Sheet:** You can switch the main layout for a simplified and compact alternative. Good for non-player characters.
+* **Setting Agnostic:** The GM can toggle/rename most of the skills and labels and add up to two custom skills.
+* **Setting Rules:** Multiple rules and functions can be enabled or disabled.
+* **Roll Templates:** Rolls can display multiple dice (RoF 1-6) and have a custom (or no) Wild Die.
+* **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
+* **Sleek:** The minimalist design is inspired by pencil layouts on graph paper.
 
 ## Latest Changes
 #### Version 1.0
@@ -12,7 +19,7 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 
 ### Contribution Guidelines
 * Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
-* Follow the 8×8 pixel grid (starting top-left) and use padding if necessary. It must not be broken!
+* Follow the 8×8 pixel grid (starting top-left). The height of each block must be a multiple of 8!
 * The devil is in the detail. Align and size all elements as precise as possible, down to one pixel!
 * Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes.
 
