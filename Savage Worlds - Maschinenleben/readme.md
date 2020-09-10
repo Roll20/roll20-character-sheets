@@ -1,5 +1,5 @@
-# Maschinenleben Character Sheet (SWADE)
-This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it may be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
+# Savage Worlds - Graph Paper (SWADE)
+This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it can be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
 
 ## Notable Features
 * **Blocks:** Toggle various content blocks, such as Allies, Augmentations, Powers, Vehicles, and more.
