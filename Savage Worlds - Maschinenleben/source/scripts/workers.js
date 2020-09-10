@@ -161,7 +161,7 @@ const skills = ['academics', 'athletics', 'battle', 'boating', 'common-knowledge
                 'repair', 'research', 'riding', 'science', 'shooting', 'stealth',
                 'survival', 'taunt', 'thievery', 'gambling', 'hacking', 'faith',
                 'focus', 'language', 'occult', 'psionics', 'spellcasting',
-                'weird-science', 'custom-skill-1', 'custom-skill-2'];
+                'weird-science', 'custom-skill-1', 'custom-skill-2', 'unskilled'];
 
 const skillDice = ['d4-2', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
