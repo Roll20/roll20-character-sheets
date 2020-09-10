@@ -1,16 +1,17 @@
 # Maschinenleben Character Sheet (SWADE)
-This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it may be used for many other settings as well.
+This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it may be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
 
 ## Notable Features
-* **Blocks:** Toggle various content blocks to adjust the sheet to your needs, such as allies, augmentations, programs, powers, and more. Repeating lists for vehicles, walkers, and power armor have sublists for weapons (0-10).
+* **Blocks:** Toggle various content blocks, such as Allies, Augmentations, Powers, Vehicles, and more.
 * **Extra Sheet:** You can switch the main layout for a simplified and compact alternative. Good for non-player characters.
-* **Setting Agnostic:** The GM can toggle/rename most of the skills and labels and add up to two custom skills.
-* **Setting Rules:** Multiple rules and functions can be enabled or disabled.
+* **Setting Agnostic:** The GM can toggle/rename most of the labels and skills and add up to two custom skills.
+* **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
 * **Roll Templates:** Rolls can display multiple dice (RoF 1-6) and have a custom (or no) Wild Die.
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
 * **Sleek:** The minimalist design is inspired by pencil layouts on graph paper.
+* **Silhouettes:** They look fancy! You can also add color markers as indicators for any purpose.
 
-## Images & Animations
+## Previews
 <details>
   <summary>Attributes</summary>
   
