@@ -7,7 +7,7 @@ Roll20 character sheet for FFG Star Wars; compatible with FFG-SWRPG-Dice-Roller
 
 ## Version 1.0.1
 
-* Requires manual initialization of fields. Make sure to set all number fields you want to use to a value with a manual keyboard input the first time you use that field. Not doing so may cause some odd behavior with calculations dependent on those fields receiving an "undefined" value. This includes all Characteristics, Vital Stats, Weapon and Armor stats, and Item encumbrance. There is code to auto-init fields, but it currently won't trigger until Roll20 [fixes a bug](https://app.roll20.net/forum/post/8662526/sheet-workers-setattrs-inside-sheet-opened-event-doesnt-fire-a-change-event) with the sheet:opened event.
+* Requires manual initialization of fields. Make sure to set all number fields you want to use to a value with a manual keyboard input the first time you use that field. Not doing so may cause some odd behavior with calculations dependent on those fields receiving an "undefined" value. This includes all Characteristics, Vital Stats, Weapon and Armor stats, and Item encumbrance. There is code to auto-init fields, but it currently won't trigger until Roll20 fixes a bug with the sheet:opened event.
 
 ---------
 
@@ -15,4 +15,8 @@ This sheet is inspired by and an alternative to the [Star Wars FFG API-Compatibl
 
 Our group has only playtested this a handful of times so far and there are plenty bugs we haven't caught yet, I'm sure.  But it seems to have it's legs underneath it after a couple hundred hours of development and is learning to walk.
 
+<<<<<<< HEAD
 We also worked a custom branch of the [FFG-SWRPG-Dice-Roller](https://github.com/Roll20/roll20-api-scripts/tree/master/FFG-SWRPG-Dice-Roller) to integrate with the new sheet.  Since it has references objects in this sheet in particular and may not be compatible with other sheets, we have kept our own version for now and haven't tried a PR to the main branch of the dice roller.  It is in this respository with the name [diceroller.js](https://github.com/Roll20/roll20-character-sheets/blob/master/Star%20Wars%20FFG%20Alternate/diceroller.js).
+=======
+We also worked a custom branch of the [FFG-SWRPG-Dice-Roller](https://github.com/Roll20/roll20-api-scripts/tree/master/FFG-SWRPG-Dice-Roller) to integrate with the new sheet.  Since it has references objects in this sheet in particular and may not be compatible with other sheets, we have kept our own version for now and haven't tried a PR to the main branch of the dice roller.
+>>>>>>> parent of 61cf24027... Updated readme
