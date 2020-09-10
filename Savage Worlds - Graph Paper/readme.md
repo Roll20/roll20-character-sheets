@@ -16,37 +16,37 @@ This character sheet was originally made for **Maschinenleben** (released later 
 <details>
   <summary>Attributes</summary>
   
-  ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/attributes.gif)
+  ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/attributes.gif)
 </details>
 
 <details>
   <summary>Edges & Hindrances</summary>
   
-  ![Edges & Hindrances](https://github.com/Tetrakern/roll20-character-sheets/blob/master/Savage%20Worlds%20-%20Maschinenleben/gifs/features.gif)
+  ![Edges & Hindrances](https://github.com/Tetrakern/roll20-character-sheets/blob/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/features.gif)
 </details>
 
 <details>
   <summary>Skills</summary>
   
-  ![Skills](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/skills.gif)
+  ![Skills](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/skills.gif)
 </details>
 
 <details>
   <summary>Health</summary>
   
-  ![Health](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/health.gif)
+  ![Health](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/health.gif)
 </details>
 
 <details>
   <summary>Augmentations & Integrity</summary>
   
-  ![Augmentations & Integrity](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/augmentations.gif)
+  ![Augmentations & Integrity](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/augmentations.gif)
 </details>
 
 <details>
   <summary>Vehicles</summary>
   
-  ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Maschinenleben/gifs/vehicles.gif)
+  ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/vehicles.gif)
 </details>
 
 ## Latest Changes
