@@ -9,6 +9,30 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
+September 7th 2020 v1.22
+
+- Fixed issue which stoped the Initiative button from working correctly on a newly created character sheet.
+- Added numerious IL8N tags that were missing from alot of the new content. This is a work in progress to enable high quality custom translation to be added later. Italian translation is being worked on by the 3rd party.
+
+
+August 24th 2020 v1.21
+
+- fencing skill roll fixed  ( issue #7214  )
+- hit location was not inverting target result fixed
+
+
+August 3rd 2020 v1.2
+
+NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.
+
+- NPC pages 2,3 & 4 weapon/spell rolls fixed
+- Firefox spin button showing fixed
+- When rolling a critical in combat the roll template text will now show "Critical Hit" rather then just "Critical", when a Ranged weapon is used it will show "Critical Hit (Impaled)"
+- Combat Advantage +X display in the roll template is no longer value at locked
+- SL display in roll template extended to roll target of 259 (Maximum SL +25), critical failure will always be SL -1
+- Containers updated with worn checkbox, and vehicle toughness/wounds options.
+- Removed old 2e lines from the translations file
+
 July 27 2020 - v1.1
 
 NEW - Condition Tracking full implementation, now adds up Multiple Conditions correctly as per the rule book. Meaning only one (highest) condition will be added to the roll template Automatically. Also changed the setting description to clarify this.
@@ -203,10 +227,10 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future release wish list :
 
-- Add Physical/Mental Corruption Roll table button. (expanded list from Enemy within Companion) (v1.2)
+- More themes. (v1.3)
 - Talents Tab rework, with possible roll integration. (v1.3)
 - WFRP 4e Roll API with SL resolution API. (v1.x)
-- More themes. (v1.x)
+
 
 
 Enjoy.
