@@ -385,7 +385,7 @@ wiz1['Hold Portal'] = {
     'cast-time': '1',
     'saving-throw': 'None',
     'materials': '',
-    'reference': 'PHB p. 174',
+    'reference': 'PHB p. 175',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -403,9 +403,63 @@ wiz1['Hypnotism'] = {
     'cast-time': '1',
     'saving-throw': 'Negate',
     'materials': '',
-    'reference': 'PHB p. 174',
+    'reference': 'PHB p. 175',
     'damage': '',
     'damage-type': '',
     'healing': '',
     'effect': 'The gestures of the wizard, along with his droning incantation, cause [[1d6]] creatures within the area to become susceptible to a suggestion—a brief and reasonable-sounding request (see the 3rd-level wizard suggestion spell). The request must be given after the hypnotism spell is cast. Until that time, the success of the spell is unknown. Note that the subsequent suggestion is not a spell, but simply a vocalized urging (the caster must speak a language the creature understands for this spell to work). Creatures that successfully roll their saving throws are not under hypnotic influence. Those who are exceptionally wary or hostile save with +1 to +3 bonuses. If the spell is cast at an individual creature that meets the caster’s gaze, the saving throw is made with a penalty of –2. A creature that fails its saving throw does not remember that the caster enspelled it.'
+};
+
+wiz1['Identify'] = {
+    'name': 'Identify',
+    'level': 'Level 1 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[#LEVEL#]] rounds',
+    'aoe': '[[#LEVEL#]] items',
+    'components': 'V, S, M',
+    'cast-time': 'Special',
+    'saving-throw': 'None',
+    'materials': 'A pearl (of at least 100 gp value) and an owl feather steeped in wine;',
+    'reference': 'PHB p. 175',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When an identify spell is cast, magical items subsequently touched by the wizard can be identified. The eight hours immediately preceding the casting of the spell must be spent purifying the items and removing influences that would corrupt and blur their magical auras. If this period is interrupted, it must be begun again. When the spell is cast, each item must be handled in turn by the wizard. Any consequences of this handling fall fully upon the wizard and may end the spell, although the wizard is allowed any applicable saving throw.\\n&emsp;The chance of learning a piece of information about an item is [[{{(10*#LEVEL#),90}kl1}]]%, to a maximum of 90%, rolled by the DM. Any roll of 96–00 indicates a false reading (91–95 reveals nothing). Only one function of a multifunction item is discovered per handling (i.e., a 5th-level wizard could attempt to determine the nature of five different items, five different functions of a single item, or any combination of the two). If any attempt at reading fails, the caster cannot learn any more about that item until he advances a level. Note that some items, such as special magical tomes, cannot be identified with this spell.\\n&emsp;The item never reveals its exact attack or damage bonuses, although the fact that it has few or many bonuses can be determined. If it has charges, only a general indication of the number of charges remaining is learned: powerful (81% – 100% of the total possible charges), strong (61% – 80%), moderate (41% – 60%), weak (6% – 40%), or faint (five charges or less). The faint result takes precedence, so a fully charged ring of three wishes always appears to be only faintly charged.\\n&emsp;After casting the spell and determining what can be learned from it, the wizard loses 8 points of Constitution. He must rest for one hour to recover each point of Constitution. If the 8-point loss drops the spellcaster below a Constitution of 1, he falls unconscious. Consciousness is not regained until full Constitution is restored, which takes 24 hours (one point per three hours for an unconscious character).\\n&emsp;The material components infusion must be drunk prior to spellcasting. If a luckstone is powdered and added to the infusion, the divination becomes much more potent: Exact bonuses or charges can be determined, and the functions of a multifunctional item can be learned from a single reading. At the DM’s option, certain properties of an artifact or relic might also be learned.'
+};
+
+wiz1['Jump'] = {
+    'name': 'Jump',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[1d3+(#LEVEL#)]] rounds',
+    'aoe': 'Creature touched',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A grasshopper’s hind leg, to be broken by the caster when the spell is cast.',
+    'reference': 'PHB p. 176',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The individual touched when this spell is cast is empowered to leap once per round for the duration of the spell. Leaps can be up to 30 feet forward or straight upward or 10 feet backward. Horizontal leaps forward or backward have only a slight arc—about 2 feet per 10 feet of distance traveled. The jump spell does not ensure safety in landing or grasping at the end of the leap.'
+};
+
+wiz1['Light'] = {
+    'name': 'Light',
+    'level': 'Level 1 Wizard',
+    'school': 'Alteration',
+    'range': '60 yards',
+    'duration': '[[#LEVEL#]] turns',
+    'aoe': '20-feet radius',
+    'components': 'V, M',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'A firefly or a piece of phosphorescent moss.',
+    'reference': 'PHB p. 174',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates a luminous glow, equal to torchlight, within a fixed radius of the spell’s center. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight and unobstructed path for the spell when it is cast. Light can spring from air, rock, metal, wood, or almost any similar substance.\\n&emsp;The effect is immobile unless it is specifically centered on a moveable object or mobile creature. If this spell is cast upon a creature, the applicable magic resistance and saving throw rolls must be made. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. Light taken into an area of magical darkness does not function, but if cast directly against magical darkness negates it (but only for the duration of the light spell, if the darkness effect is continual).\\n&emsp;Light centered on the visual organs of a creature blinds it, reducing its attack rolls and saving throws by 4 and worsening its Armor Class by 4. The caster can end the spell at any time by uttering a single word.'
 };
