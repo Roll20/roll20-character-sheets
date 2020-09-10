@@ -46,6 +46,7 @@ on Github.
 
 * Fix a bug causing new sheets to incorrectly initialise as AI and Transhuman.
 * Fix a missing translation key for "Price".
+* Fix a bug to effort making some fields concatenate instead of add.
 
 ### 2.5.0
 

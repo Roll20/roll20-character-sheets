@@ -26,9 +26,9 @@ const calculateEffort = () => {
                     ...skills.psionic.map(x => parseInt(v[`skill_${x}`]) || 0),
                     ...idArray.map(id => parseInt(v[`repeating_psychic-skills_${id}_skill`]) || 0)
                 );
-            const psionics_total_effort = Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) || 0 -
-                parseInt(v.psionics_committed_effort_current) || 0 - parseInt(v.psionics_committed_effort_scene) || 0 -
-                parseInt(v.psionics_committed_effort_day) || 0;
+            const psionics_total_effort = (Math.max(1 + attrBonus + skillBonus, 1) + parseInt(v.psionics_extra_effort) -
+                parseInt(v.psionics_committed_effort_current) - parseInt(v.psionics_committed_effort_scene) -
+                parseInt(v.psionics_committed_effort_day)) || 0;
             mySetAttrs({
                 psionics_total_effort
             }, v);
@@ -37,9 +37,9 @@ const calculateEffort = () => {
 };
 
 const calculateMagicEffort = () => {
-    getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day", "magic_uncommitted_effort"], function(v) {
-        const magic_uncommitted_effort = parseInt(v.magic_total_effort) - (parseInt(v.magic_committed_effort_current) +
-            parseInt(v.magic_committed_effort_scene) + (v.magic_committed_effort_day)) || 0;
+    getAttrs(["magic_total_effort", "magic_committed_effort_current", "magic_committed_effort_scene", "magic_committed_effort_day", "magic_uncommitted_effort"], v => {
+        const magic_uncommitted_effort = (parseInt(v.magic_total_effort) - (parseInt(v.magic_committed_effort_current) +
+            parseInt(v.magic_committed_effort_scene) + parseInt(v.magic_committed_effort_day))) || 0;
         mySetAttrs({
             magic_uncommitted_effort
         }, v);
@@ -54,12 +54,14 @@ const calculateProcessing = () => {
             "wisdom_mod", "intelligence_mod", "ai_extra_processing", "ai_committed_processing_current", "ai_committed_processing_scene", "ai_committed_processing_day", "ai_total_processing"
         ];
         getAttrs(sourceAttrs, v => {
-            const maxProcessing = 1 + Math.max(parseInt(v.wisdom_mod) || 0, (parseInt(v.intelligence_mod)) || 0) + Math.max(
-                ...idArray.filter(id => v[`repeating_processing-nodes_${id}_node_connected`] === "1")
-                    .map(id => parseInt(v[`repeating_processing-nodes_${id}_node_value`]) || 0), 0
+            const maxProcessing = (1 + Math.max(parseInt(v.wisdom_mod) , parseInt(v.intelligence_mod)) || 0)
+                + Math.max(
+                    ...idArray.filter(id => v[`repeating_processing-nodes_${id}_node_connected`] === "1")
+                    .map(id => parseInt(v[`repeating_processing-nodes_${id}_node_value`]) || 0)
+                , 0
             );
-            const ai_total_processing = maxProcessing + parseInt(v.ai_extra_processing) - parseInt(v.ai_committed_processing_current) -
-                parseInt(v.ai_committed_processing_scene) - parseInt(v.ai_committed_processing_day) || 0;
+            const ai_total_processing = (maxProcessing + parseInt(v.ai_extra_processing) - parseInt(v.ai_committed_processing_current) -
+                parseInt(v.ai_committed_processing_scene) - parseInt(v.ai_committed_processing_day)) || 0;
             mySetAttrs({
                 ai_total_processing
             }, v);
