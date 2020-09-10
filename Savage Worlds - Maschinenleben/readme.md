@@ -8,7 +8,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
 * **Roll Templates:** Rolls can display multiple dice (RoF 1-6) and have a custom (or no) Wild Die.
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
-* **Sleek:** The minimalist design is inspired by pencil layouts on graph paper.
+* **Sleek:** The minimalist design is inspired by pencil-drawn sheets on graph paper.
 * **Silhouettes:** They look fancy! You can also add color markers as indicators for any purpose.
 * **Help:** The sheet features an extensive help section under the Settings tab.
 
