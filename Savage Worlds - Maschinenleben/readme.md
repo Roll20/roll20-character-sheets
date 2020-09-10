@@ -53,7 +53,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Initial release
 
 ## Development
-The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started.html) templates with [SCSS/SASS](https://sass-lang.com/guide) (LibSass). You need both in order to contribute; do not directly modify the compiled HTML and CSS files because these changes will be overwritten!
+The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started.html) templates with [SCSS/SASS](https://sass-lang.com/guide) (LibSass). You need both in order to contribute; do not directly modify the compiled HTML and CSS files because these changes will be overwritten! Use the `browser_preview.html` to get a local preview without the need to open Roll20 (non-functional, of course).
 
 ### Contribution Guidelines
 * Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
