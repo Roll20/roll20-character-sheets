@@ -9,9 +9,12 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-3.4 [Screenshot](co_v3.jpg)
+3.6 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v3.6 (2020-09-11)
+* Passage de cases à valeur pour les points de récupération
+
 ## v3.4 (2020-08-06)
 * Utilisation des modificateurs dans les options d'attaque
  * avantage et désavantage
