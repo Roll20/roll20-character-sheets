@@ -9,9 +9,57 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.5 [Screenshot](cog_v3.png)
+V3.11 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.11 (2020.08.15)
+* Amélioration de la logique d'import d'un statblock de PNJ ou de créature
+* Lancement de l'import du statblock via un bouton
+
+## V3.10 (2020.08.04)
+* Retour au schema de versionning sémantique classique (major.minor.patch)
+* Modification de la logique de migration/mise à jour du sheetworker
+
+## V2020.0525
+* Reprise des dernières modifications de la fiche COC
+* Nouveau fichier .html pour la fiche
+* Nouveau schema de versionning : AAAA.MMJJ
+
+## V3.8 (2019-10-10)
+* Ajout buff et calcul auto des PV
+* Modification du sheetworker pour éviter erreurs dans la console API
+* Homogénéisation des noms des roll buttons
+* Séparation des buffs circonstanciels de combat en deux champs : un pour le jet d'attaque et un pour le jet de dommages
+* Ajout de cases à cocher pour lancer ou nom le jet d'attaque et le jet de dommages sur les lignes d'armes de la fiche de vaisseau -- idem fiche PJ et PNJ (demande forum BBe)
+
+## V3.7 (2019-09-26)
+Modification de tous les roll-buttons :
+- name="roll\_<nomdujet>"
+- ajout/maj des title=""
+
+Permet de lancer tous les jets de dés de la fiche via %{<nomdujet>} dans le chat
+
+## V3.6 (2019-04-17)
+### Fiche de PJ
+
+* Possibilité d'appliquer plusieurs états préjudiciables en même temps
+* Gestion de l'encombrement (idem COF)
+* Ajout d'un champ de texte sous la liste d'attaques pour les buffs "temporaires"
+ * Possibilité d'indiquer des buffs aux jets d'attaque et de dommages en langage quasi-naturel : le premier mot est le type d'attaque concernée, le deuxième est le modificateur (avec possibilité de référencer un autre attribut de la fiche en l'encadrant entre crochets []) et à partir du troisième, la description du buff.
+ * Indiquer ATC (contact), ATD (distance), INT (PSY Intuition), INF (PSY Influence), pour les types d'attaques, ATT pour toutes les attaques existantes. Indiquer d'abord DM pour un buff aux dommages
+ * Plusieurs buffs peuvent être indiqués et séparés par un point-virgule (;)
+ * Exemple : `DM ATC +2d6 Attaque en traître ; ATD +[PER] Visée`
+ * Il est nécessaire de cliquer en dehors du champ de saisie AVANT de presser un bouton d'attaque afin que le script sheet-worker approprié puisse s'exécuter.
+* Ajout d'un bouton "Recycle" sur l'onglet Configuration pour forcer la fiche à recalculer quelques attributs (rangs atteints dans chaque voie, statbloc interne, encombrement)
+
+### Fiche de PNJ
+
+* Ajout Défense PSY
+* Ajout d'une liste de capacités / traits
+* Amélioration du script d'import de statblock
+* Ajout d'un script de conversion d'attributs PNJ => PJ
+
 ## V3.5 (2019-02-11)
 ### Remplacement des 5 champs de buffs par un champ unique 
 * Un nombre quasi illimité de buffs est désormais possible pour chaque attribut

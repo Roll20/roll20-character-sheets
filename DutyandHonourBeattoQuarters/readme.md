@@ -5,13 +5,15 @@ This is a character sheet for the Empire RPG, specifically the Duty and Honour R
 ## Author
 Written by MattBx8 (Roll20 User ID 115594).
 
-## Current Version
-1.00
 
 ###Changelog
 
-#### 1.00
-Modified Alternity RPG sheet.
+#### 1.11 2020-05-27
+* fixed a couple of attributes that wasn't saving
+* coniderable code cleanup, no changes in functionality
+
+#### 1.00 
+* Sheet created based on the Alternity RPG sheet.
 
 ### Credit Where Credit is Due
 * The HTML of this sheet is based partially on the Alternity RPG character sheet.

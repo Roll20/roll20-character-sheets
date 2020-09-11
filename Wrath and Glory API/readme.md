@@ -9,34 +9,100 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.4 (November 4th, 2018) 
+Version 3.1 (August 30th, 2020) Revised Release (3.1) fixes.
+this release focused on incorporating max wounds changes from errata, a wiley defect (logical error) in dice rolls, and the addition of dying around trauma.
 
 ### Thanks	
-Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play) over the past several weeks.
+Many thanks to my players (Dave, Brian, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes - literally - in the middle of play).
 
 Many thanks to the following individuals who reported defects and provided improvements: 
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
 2. Zoraste: update wounds to include wounds_max for token bar linking + notes field for Gear + minor spelling errors + request for private rolls + contributed code for automating trait calculations
 3. Fenrir: new layout was his work; full contributions in the API.
+4. Thomas: whose help in identifying the underlying issue with a bug fix and willingness to test was a great aid!
 
 ### Planned Releases
+3.2 Maintenance - refactor code to align with Roll20 standards.
 
-Next: Overhaul of inline dice rolls!
+### Current Release Changelog
 
-v2.0. Automate all calculated fields for performance and speed of character creation. 
-    - includes automated calculation of traits
-		DONE: conviction, corruption, resist corruption, passive awareness, resolve, defense, resilience, and soak
-		TO DO: Influence and Attribute adjusted rating & Skill Total for performance (no new functionality)
-				- when auto-calculating influence, need to allow the use of STR for Fel for influence for orks, and intellect in place of Fel for Mechanicus
-	
-v3.0. Redo NPC Layout with an order close to the core rulebook stat block. 
-	- Create capability to enter values in place of auto-calculating (this will be a variant capability)
+v3.1. Errata, Fixes, and Dying Enhancement
 
-v4.0. Refine Inline rolls 
-    - Add modifiers to each roll
-    - a 6 = two successes
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+
+Updates:
+01. New: Added Dying checkbox to align with how Traumatic wounds work.  The Wrath dice for Traumatic Wounds only apply when a player is dying.
+02. Fix: Additional wrath dice are only triggered if the Dying checkbox is checked.  Before it was triggered if the number of Traumatic wounds was greater than 0.  This is per RAW.
+03. Fix: Updated load to account for weapons field value that is not being reset for character sheets prior to 3.01.
+04. Fix: Under very specific circumstances, dice rolls for skills and weapon attacks were off by 1 to 2 dice.
+05. Fix: Number of dice being rolled for roll20 standard dice rolling mechanics for damage on attacks was not being properly updated - resulting in missing dice.
+06. New: Errata changes for calculating wounds - I opted to leave in the recovery roll for shock to allow groups to have that option if so desired.
 
 ### Changelog
+
+** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement** 
+
+
+** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition** 
+
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+
+Updates:
+01. Cosmetic: Replaced all references to BP and Buildpoints with XP and Experience Points respectively.
+02. Cosmetic: Updated references to Soak to Determination. Note till vehicle and voidship rules are updated I have left them with Soak.
+03. Cosmetic: References to Race changed to Species.
+04. Cosmetic: References to Malignancy/ies changed to Mutation/s.
+05. Cosmetic: relabled Defining Trait to Background Type, removed Keyword from the list and renamed Custom to Other.
+06. Cosmetic: swapped Faction (previously Framework) with Species/Gender
+07.	Cosmetic: added text in skills flagging those with optional use requirements.
+08.	Cosmetic: added text to DMOD insturcting to add +1 for Brutal and Melta Short weapons.
+09. Cosmetic: Moved Memoriable Injuries to Combat tab.
+10. Cosmetic: Switched presentation of Current and Max for Shock and Wounds.
+11. Cosmetic: Removed Hvy and Lght wounds; no longer in use.
+12. Fix: Brutal Roll for non-api die roller on weapon damage.
+13.	Fix: Total Corruption Adjusted value.
+14. Update: Per revised rules, removed ranks 4 and 5 and updated rank label accordingly.
+15. Update: removed defiance rolls - no longer used.
+16. NEW: Added Faith to first tab.
+17. NEW: Added Traumatic Injuries section next to memoriable injuries.
+18. NEW: created script workers to manage Traumatic Injury count - when you add counter goes up; when you remove counter goes down.
+19. NEW: Added a Melta dice roller for when using Melta vs structure and vehicles; too complex for adding to W&G dice roller at this point.
+20. NEW: Automated replacement of wrath dice with traumatic injuries for Attributes, Traits, Skills, Weapons, and Psychic Powers.  This does not include vehicle and voidship rules till those rules are released.
+21. NEW: On personal tab added fields for - Appearance, Age, Eyes, Hair, Height,Size, and Features.
+
+** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
+
+Updates:
+1. Cosmetic change: changed all dice to D6; teal buttons roll wrath, black/gold/red buttons have no wrath die.
+2. Cosmetic change: added spacing and thick dark teal line between psychic powers (PC and NPC)
+3. Cosmetic change: changed all references to Combat Rolls to Rolls (PC, NPC, Vehicle, Voidship)
+4. Cosmetic change: On PC Equipment sheet added thick dark teal line between vehicles and voidships.
+5. Cosmetic change: made all areas for lengthy text entry two lines in height.
+6. Cosmetic change: changed DN field for powers to text so values other than numbers can be entered - example is Defense.
+7. Fix: corrected layout of Heavily Wounded at label and field for Vehicles and Voidships.
+8. Update: Refined the inline dice rolls to now show critical on rolling standard pool and to show a critical when rolling a 1 on wrath die.
+9. Update: Added option for Weapon Skill + Agility in weapons; this accounts for use of a Pistol in Melee where an attack roll is Agility + Weapon Skill.
+10. New: Psychic powers now have an additional option to roll an alternative dice roll for shock, wounds, and mortal damage.
+11. New: Added d66 to psychic powers.  Future enhancement will convert this into a Peril of the Warp result.
+12. New: Added d3, d6, and d66 die roller on combat rolls for PC's and NPC's.
+13. New: Added Memorable Injuries as a repeating framework - can capture multiple memorable injuries - to Personal tab.
+14. New: Auto set rank title based on the selected rank; also automated to update existing character sheets.
+
+** June 30th, 2019: version 2.6 - Fixes** 
+
+Updates:
+1. Fixed NaN error when rolling psyker damage.
+2. Added Psychic Mastery as a hard skill on NPC's so Psychic power rolls are auto-calculated.
+3. Added to all tests a wrath outcome when using the API die roller so that a new ability in the API is included - it lists outcome of the die roll.
+
+** December 17th, 2018: version 2.5 - Fixes** 
+
+Updates:
+1. Fixed update to Conviction for older sheets.
+2. Fixed voidship wounds current; which was pointing to vehicle wounds current.
+3. Updated vehicle and voidship wounds to Roll20 standard of wound/wound_max.
+4. Calculated Heavily wounded for Vehicle and Voidships.
+5. Autoupdate old versions of charactersheets for vehicle wounds, voidship wounds, calculating heavily wounded for vehicles, and heavily wounded for voidships.
 
 ** November 4th, 2018: version 2.4 - API Message Layout Changes** 
 

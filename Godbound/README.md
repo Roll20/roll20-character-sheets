@@ -4,12 +4,34 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
 
 ## Features / Changelog
 
-- v2.2.0
+- v3.2
   - Minor
-    - Renamed Project Opposition to Resistance
-    - Corrected calculation for Project Cost
-    - Small teaks and spelling corrections
-- v2.1.0
+    * Add missing Effort entry for Invocations
+    * New Misc Effort entry for healing and other effects
+- v3.1
+  - Minor
+    * Small layout fixes and adjustments
+    * Fix missing style to "add" button for Weapon and Damage feildsets
+    * Faction Interests and Trouble changed to auto-expanding feilds
+    * Project descriptions changed to auto-expanding  and can be toggled to show or hide
+- v3.0
+  - Major
+    * Add a new tab for Strifes, Low Magic, and Theurgy
+  - Minor
+    * Spelling fixes and tweaks
+    * Line added to roll template describing type of roll
+    * Streamline sheet by removing superfluous html style codes
+- v2.3
+  - Minor
+    * Description fields for words, gifts, miracles, and artifacts changed to auto-expand
+    * Small adjustment to project layout
+    * Correction for styling of two  fieldset "add" buttons
+- v2.2
+  - Minor
+    * Renamed Project Opposition to Resistance
+    * Corrected calculation for Project Cost
+    * Small teaks and spelling corrections
+- v2.1
   - Minor
     - Renamed Headings for Clarity
       * Auto-Hit Attacks and Multi-Damage Rolls
@@ -18,7 +40,7 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
       * All damage die inputs now have dropdown selections for clarity of function (inputs reset)
     - New Armor Type
       * Divine Gift, Granted AC of 3
-- v2.0.0
+- v2.0
   - Major
     - General
       * New Author Axel Mellgren (@Axel), userid 88344
@@ -40,7 +62,7 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
     * Notes sections for all tabs
     * Difficulty for projects
     * Other tweaks to fit the new design overhaul
-- v1.1.0
+- v1.1
   - Major
     - General
       * Add tabs for Character, Faction, and NPC sheets
@@ -63,7 +85,7 @@ This sheet is created for use in Godbound games on Roll20, based on the Characte
       with name in sheet.
     * Fix bug in rolling saves (missing `}`)
     * All relevant rolls support a 'Modifier' prompt
-- v1.0.0
+- v1.0
   * Automatic Save and Modifier calculation
   * Automatic HP calculation (including CON modifier adjustment)
   * Automatic Resource Tracking

@@ -2,10 +2,17 @@
 
 This is a re-creation of the "green-sheet" for the D&D Basic Moldvay Red box game.  It was created for the Roll20 Moldvay Basic Contest.
 
+Macro example: `&{template:odnd}{{{combat=1}} {{name=@{selected|Name}}} {{title=@{selected|MissileWeaponName1} \n @{selected|RangedDistance1}}} {{rangedattack=[[@{selected|HitAC0}[THAC0] - (@{selected|toHitRoll}[Dice Roll] + @{selected|MissileToHit1}[Bonus] + 2[ElkClan] + (?{Bonus/Minus|0})[ADD'L BONUS])]]}} {{damage=[[@{selected|MissileDmg_Die1}+@{selected|MissileDmg_Bonus1}]]}}}`
+
 ## Current Version
-2.7
+2.71
 
 ### Changelog
+
+#### 2.71
+* Changed the page-switching tabs to be slightly larger so
+* Linked Readme in Sheet Description
+* Move macro example to Readme.
 
 #### 2.7
 * Adding in visible chance numbers to most "chance" rolls

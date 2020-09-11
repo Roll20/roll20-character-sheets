@@ -34,13 +34,48 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
-## Version 17.03.2018
-Fix for issue of browser cursor not detecting add control for equipment.  Reduced the width of the repeating section in case columns where overlapping.
 
-Changed the way version number was displayed .A attributes was removed but it will not effect the end user. 
+## 14.12.2019
+	Mobility and Coordination now reducing SR for Melee Weapons
 
-Changed the path for button images and roll templates images to point to images in Roll20 repository.
+## 17.07.2019
+	fixed bug adding more than 1 magic point storag item. Another mp storage section was added. New characters created will only show the new section.  Existing characters will have red notice for the user to copy item and direct them to a configuration section to hide the old section.
+	
+	fixed bug in Coordination spell
+	
+	Added support for Mobilty spell
+	
+	fix.  2nd mount/alley displaying 1st mount/ally name in roll templates
+	
 
+## 22.04.2019
+	Fix Move Quietly modifiers were being totalled now takes the highest.
+	
+	Tided up the Experience Roll button beside the category modifier, it now uses a Roll template and asks for a skill value to compare it against.
+
+	
+
+## 08.04.2019 Version 
+
+	fix SR for default natural weapons should be 4 not 3
+	
+	fix some users reporting  issues with power rune labels. Replaced graphics for power runes
+	
+	fix enc modifier not applied to stealth
+	
+	Added Move Quietly modifiers to equipment 
+	
+	Added macro code to roll with modifiers on Honor button.
+	
+	Added support for Coordination spell
+	
+	Added support to add turn order entries based on missile weapon strike ranks.
+	
+	Added support for Coordination spell
+	
+	
+	
+	
 
 ## Version 04.03.2019
 
@@ -52,7 +87,17 @@ I added a bunch of new hit locations including all the location tables  at the s
 
 Added fields for individual weapons skill modifiers or occasions such as Bladesharp cast.
 
+
+
 I also added checkboxes with the heading Spells Cast for Vigor, Strength  and Glamour they handle all the fudges listed under the spells,such as skill category  increases, damage die steps and max enc.So don't add the stat bonuses in the mod fields of the characteristics.The bonuses are automatically added to stat rolls. A message appears under the stats  reminding you to add the bonus when doing resistance table rolls.  There is probably better way of doing this but it would mean changing a lot of sheetworkers and/or adding a whole new column of mod fields
+
+
+## Version 17.03.2019
+Fix for issue of browser cursor not detecting add control for equipment.  Reduced the width of the repeating section in case columns where overlapping.
+
+Changed the way version number was displayed .A attribute was removed but it will not effect the end user. 
+
+Changed the path for button images and roll templates images to point to images in Roll20 repository.	
 
 
 
