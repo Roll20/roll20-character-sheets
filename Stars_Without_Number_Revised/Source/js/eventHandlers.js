@@ -92,6 +92,7 @@ autofillSections.forEach(sName => {
 
 /* Ship sheet */
 on("change:ship_hulltype", fillShipStats);
+on("change:ship_calculate_price", calculateShipStats)
 on("change:ship_class", () => {
     setShipClass();
     ["ship-fittings", "ship-defenses"].forEach(sName => generateAutofillInfo(sName));
