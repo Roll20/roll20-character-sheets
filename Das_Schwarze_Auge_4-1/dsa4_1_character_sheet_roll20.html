@@ -11272,7 +11272,7 @@
 				<span class="grid-label sheet-hideable-shield-active">Schild</span>
 				<div class="flex-container sheet-hideable-shield-active">
 					<div><span name="attr_shield_name"></span></div>
-					<div>AT: <span title="Implementation für Schildangriff sehr komplex, daher müssen die entsprechenden Attacken per Hand gewürfelt werden (siehe WdS 63).">X</span></div>
+					<div>AT: <span name="attr_shield_at"></span></div>
 					<div>PA: <span name="attr_shield_pa"></span></div>
 					<div>TP(A): <span name="attr_shield_tp"></span></div>
 					<div>TP/KK: <span name="attr_shield_tpkk"></span></div>
@@ -17367,7 +17367,7 @@ function calculateTpKKMod(values, weapon) {
 }
 
 // calculate shield attack value
-on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks", function(eventInfos) {
+on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:AT_raufen", function(eventInfos) {
     getAttrs(["activeShieldRowId"], function(rowIdValues) {
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
         if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
@@ -17393,6 +17393,8 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
 
         getAttrs(variablesToGet, function(values) {
             let result = calculateShieldAttack(values, activeShieldRowId);
+            console.log('calculated shield attack');
+            console.log(result);
             setAttrs({ shield_at: result.shieldAt, shield_at_available: result.shieldAtAvailable });
         });
 
@@ -17425,6 +17427,9 @@ function calculateShieldAttack(values, activeShieldRowId) {
         if (shieldAt < 0) {
             shieldAt = 0;
         }
+    }
+    if (!shieldAt) {
+        shieldAt = 0;
     }
     var shieldAtAvailable = shieldAt > 0 ? "on" : "0";
     return {shieldAt: shieldAt, shieldAtAvailable: shieldAtAvailable };
