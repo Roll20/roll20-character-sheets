@@ -51,6 +51,7 @@ on Github.
 * Add a description field to weapons/attacks, which shows up in the roll template.
 * Add toggle (default to off) to ship price autocalculation. Lots of existing ships don't have price info updated, and there's no place to write in price for new items.
 * Drones support for NPCs.
+* Add NPC Shock damage.
 
 ### 2.5.0
 
