@@ -56,7 +56,7 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 * Added repeating resistances / immunities
 * Added death saves and other saving throw options
 * Made initiative ability bonus modifiable
-* Added more text boxes for character and class expressions, and some repeating note boxes
+* Added more text boxes for more personal character and class expressions, plus some repeating note boxes
 * Moved incremental advances to make it more clear and added a few options that were missing previously
 * Radical alterations to the repeating power sections: including drop-down usage box, current / total power uses, recharge rate option, feats checkboxes, and colour-coded macro templates
 * Added spell slots
