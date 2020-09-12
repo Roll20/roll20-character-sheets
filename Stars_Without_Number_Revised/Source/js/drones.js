@@ -42,12 +42,20 @@ const calculateDroneAttack = (prefixes, callback) => {
             `${prefix}_drone_weapon3_attack`,
             `${prefix}_drone_weapon3_skill`,
         ]);
-    }, ["attack_bonus", "intelligence_mod", "skill_pilot", "skill_program"]);
+    }, ["attack_bonus", "intelligence_mod", "skill_pilot", "skill_program", "npc", "npc_attack_bonus"]);
     getAttrs(sourceAttrs, v => {
-        const skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0,
-            intMod = parseInt(v.intelligence_mod) || 0,
-            attackBonus = parseInt(v.attack_bonus) || 0;
-
+        let skillMod,
+            intMod,
+            attackBonus;
+        if (v.npc !== "1") {
+             skillMod = Math.max(parseInt(v.skill_pilot), parseInt(v.skill_program)) || 0;
+             intMod = parseInt(v.intelligence_mod) || 0;
+             attackBonus = parseInt(v.attack_bonus) || 0;
+        } else {
+            skillMod = 0;
+            intMod = 0;
+            attackBonus = parseInt(v.npc_attack_bonus) || 0;
+        }
         const setting = prefixes.reduce((m, prefix) => {
             [1, 2, 3].filter(num => v[`${prefix}_drone_weapon${num}_active`] === "1")
                 .forEach(num => {
@@ -58,7 +66,7 @@ const calculateDroneAttack = (prefixes, callback) => {
                         ((skillMod === -1) ? -2 : skillMod);
                 });
             return m;
-        }, {});
+            }, {});
         mySetAttrs(setting, v, callback);
     });
 };
