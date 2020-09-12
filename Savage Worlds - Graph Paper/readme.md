@@ -58,8 +58,9 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 
 ### Contribution Guidelines
 * Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
+* The sheet is optimized for 1440p or better resolutions. The future is now, old man!
 * Follow the 8×8 pixel grid (starting top-left). The height of each block must be a multiple of 8!
-* The devil is in the detail. Align and size all elements as precise as possible, down to one pixel!
+* The devil is in the detail. Align and size all elements as precise as possible.
 * Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes.
 * Use sheetworkers instead of auto-calculating fields.
 
