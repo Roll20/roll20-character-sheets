@@ -63,6 +63,7 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 * The devil is in the detail. Align and size all elements as precise as possible (Chrome leads).
 * Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Avoid redundancies as much as reasonable.
 * Use sheetworkers instead of auto-calculating fields.
+* Due to the renaming feature, some strings have to be translated manually by the GM.
 
 ### Legal
 The silhouette images were made from purchased assets and are only licensed for this sheet. Do not take them for any other purposes! This does not go for the human silhouettes which were made with the [HeroMachine 3](http://www.heromachine.com/heromachine-3-lab/) and are therefore free.
