@@ -60,8 +60,8 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 * Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
 * Follow the 8×8 pixel grid (starting top-left). The height of each block must be a multiple of 8!
 * The devil is in the detail. Align and size all elements as precise as possible (Chrome leads).
-* The default `font-size` is `10px`. Take 1440p as baseline resolution, but keep 1080p in mind as well.
-* Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Reuse as much as reasonable.
+* The default `font-size` is `10px`. Take 1440p (+) as baseline resolution, but keep 1080p in mind as well.
+* Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Avoid redundancies as much as reasonable.
 * Use sheetworkers instead of auto-calculating fields.
 
 ### Legal
