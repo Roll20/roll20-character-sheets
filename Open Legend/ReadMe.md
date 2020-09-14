@@ -4,6 +4,12 @@
 ## Tell YOUR story
 
 ### Changelog
+### 1.9.9 on 2019 August 19th
+* Worker Scripts for Boon Actions
+	- Rare error when certain fields updated, did not reflect correctly for Roll Output to chat for boons
+	- Added commands to run Function that assigns Boon values to output
+* Target Selection for Attack added
+	- Drop down menu added "Attack (Defend Interrupt)" as an option for a targeted Defense
 ### 1.9.8c on 2019 April 12th
 * Folder Rename
 	- Changing folder name in Roll20 github from "Open Legend Basic by Great Moustache" to "Open Legend"

@@ -1,18 +1,18 @@
 // Fix buggy issues, thanks Steve D., https://app.roll20.net/forum/post/1462045/help-with-setting-attribute-values
 createObjFix = function() {
     //Create Object Fix - Firebase.set failed
-
+        
     var obj = createObj.apply(this, arguments);
     var id = obj.id;
     var characterID = obj.get('characterid');
     var type = obj.get('type');
-
-    if (obj && !obj.fbpath && obj.changed) {
+        
+	if (obj && !obj.fbpath && obj.changed) {
         obj.fbpath = obj.changed._fbpath.replace(/([^\/]*\/){4}/, "/");
-    } else if (obj && !obj.changed && type == 'attribute') {
-        //fix for dynamic attribute after character created in game
-        // /char-attribs/char/characterID/attributeID
-        obj.fbpath = '/char-attribs/char/'+ characterID +'/'+ id;
+    } else if (obj && !obj.changed && type == 'attribute') { 
+		//fix for dynamic attribute after character created in game
+		// /char-attribs/char/characterID/attributeID
+        obj.fbpath = '/char-attribs/char/'+ characterID +'/'+ id;	
     }
     return obj;
 }
@@ -44,7 +44,7 @@ function setDamageBonusAndBuild(characterID) {
             current: '0'
         });
     }
-
+    
     var build = findObjs({_type: 'attribute', _characterid: characterID, name: 'build'})[0];
     if (! build) {
         var build = createObjFix('attribute', {
@@ -53,12 +53,12 @@ function setDamageBonusAndBuild(characterID) {
             current: '0'
         });
     }
-
+    
     var str = parseInt(getAttrByName(characterID, "str"));
     var siz = parseInt(getAttrByName(characterID, "siz"));
     var total = str + siz;
-
-
+    
+    
     if (total >= 525) {
         damageBonus.set({current: '10d6'});
         build.set({current: '+11'});

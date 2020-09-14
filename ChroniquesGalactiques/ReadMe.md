@@ -9,9 +9,37 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.6 [Screenshot](cog_v3.png)
+V3.11 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.11 (2020.08.15)
+* Amélioration de la logique d'import d'un statblock de PNJ ou de créature
+* Lancement de l'import du statblock via un bouton
+
+## V3.10 (2020.08.04)
+* Retour au schema de versionning sémantique classique (major.minor.patch)
+* Modification de la logique de migration/mise à jour du sheetworker
+
+## V2020.0525
+* Reprise des dernières modifications de la fiche COC
+* Nouveau fichier .html pour la fiche
+* Nouveau schema de versionning : AAAA.MMJJ
+
+## V3.8 (2019-10-10)
+* Ajout buff et calcul auto des PV
+* Modification du sheetworker pour éviter erreurs dans la console API
+* Homogénéisation des noms des roll buttons
+* Séparation des buffs circonstanciels de combat en deux champs : un pour le jet d'attaque et un pour le jet de dommages
+* Ajout de cases à cocher pour lancer ou nom le jet d'attaque et le jet de dommages sur les lignes d'armes de la fiche de vaisseau -- idem fiche PJ et PNJ (demande forum BBe)
+
+## V3.7 (2019-09-26)
+Modification de tous les roll-buttons :
+- name="roll\_<nomdujet>"
+- ajout/maj des title=""
+
+Permet de lancer tous les jets de dés de la fiche via %{<nomdujet>} dans le chat
+
 ## V3.6 (2019-04-17)
 ### Fiche de PJ
 

@@ -1,9 +1,32 @@
 ## Versioning
 Versions have two numbers Major.Minor
 
-**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundament changes in how parts of the sheet are managed.
+**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundamental changes in how parts of the sheet are managed.
 
 **Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
+
+## 2.7
+### Bug Fixes
+* Fixed formatting for Social Conflicts in Firefox
+### New Features
+* Added rollable hit tables
+
+## 2.6
+### New Features
+* Added Social Conflict Support
+
+## 2.5
+### Big Fixes
+* Fixed unarmed in Combat section
+
+### New Features
+* Added sheet option to enable Work Songs
+* Added sheet option to enable Artifice
+* Added sheet option to enable Alchemy
+* Added effect template
+* Added effect rolls to equipment
+* Added equipement and money to compact/mook sheets
+
 ## 2.4
 ### Bug Fixes
 * Fixed overflow in Firefox with Passions
