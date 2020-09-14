@@ -42,6 +42,17 @@ on Github.
 
 ## Changelog
 
+### 2.5.0
+
+* Support for Transhuman PCs with Shells and body-swapping.
+* Support for True AI PCs, with Processing and Routines, as well as Shells shared with Transhumans.
+* Ship price autocalculation during building (does not update with subsequent Hull Type changes)
+* Price information displayed for everything that currently supports autofilling.
+
+### 2.4.12
+
+* Fix a bug causing Int to be added twice to drone attacks.
+
 ### 2.4.11
 
 * Fix a bug causing cyberware strain to not be updated when a cyberware was deleted.

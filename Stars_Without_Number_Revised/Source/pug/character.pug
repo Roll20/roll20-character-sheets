@@ -96,6 +96,8 @@ input(type="hidden", name="attr_setting_super_type", value="psionics").super-typ
 input(type="hidden", name="attr_setting_foci_location", value="left").foci-loc
 input(type="hidden", name="attr_setting_skill_query", value="hover").skills-query
 input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
+input(type="hidden", name="attr_setting_ai_enable", value="ai").ai-setting
+input(type="hidden", name="attr_setting_transhuman_enable", value="transhuman").transhuman-setting
 
 //- Core
 .core.core-info.cols-2
@@ -165,10 +167,16 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 					tr
 						td(data-i18n=attr.toUpperCase(), data-i18n-title=`${attr.toUpperCase()}_DESC`)
 						td.edit
-							input(type="number", name=`attr_${attr}_base`, value="10")
+							if ["strength", "dexterity", "constitution"].includes(attr)
+								input(type="number", name=`attr_${attr}_base`, value="10").ai-disabled.transhuman-disabled
+							else
+								input(type="number", name=`attr_${attr}_base`, value="10")
 							//span(name=`attr_${attr}`).display
 						td.edit
-							input(type="number", name=`attr_${attr}_boosts`, value="0")
+							if ["strength", "dexterity", "constitution"].includes(attr)
+								input(type="number", name=`attr_${attr}_boosts`, value="0").ai-disabled.transhuman-disabled
+							else
+								input(type="number", name=`attr_${attr}_boosts`, value="0")
 							//span(name=`attr_${attr}_boosts`).display
 						td
 							//input(type="number", name=`attr_${attr}_boosts`, value="0").edit
@@ -317,10 +325,58 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 							span(data-i18n="AMMO")
 					+text-input("weapon_encumbrance", "ENCUMBRANCE_SHORT")(type="number", value="0").enc.center
 
+	//- Shells
+	.section.ai-enabled.transhuman-enabled
+		+sectionheader("show_shells", "SHELLS")
+		.shells
+			.grey-box
+				.flex-center
+					h3(data-i18n="SHELLS")
+					label.details-button
+						input(type="checkbox", name="attr_show_shell_details", value="1", checked)
+						span(data-i18n="EXPAND")
+				input(type="hidden", name="attr_show_shell_details", value="1").input-details
+				.table-header.shells-grid.rep-grid.notdetails
+					.active(data-i18n="ACTIVE?").notdetails
+					.str(data-i18n="STRENGTH_SHORT").notdetails
+					.dex(data-i18n="DEXTERITY_SHORT").notdetails
+					.con(data-i18n="CONSTITUTION_SHORT").notdetails
+					.affinity(data-i18n="AFFINITY?").notdetails
+					.name(data-i18n="NAME").notdetails
+				fieldset.repeating_shells
+					button.display.invisible-button(name="roll_Shell", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{info=^{SHELL} — STR @{shell_strength} - DEX @{shell_dexterity} - CON @{shell_constitution}}} {{title=@{shell_name}}} {{desc=^{BASIC_ABILITIES}:\n @{shell_ability} @{shell_affinity_active}}}")
+					.table-header.shells-grid.rep-grid.details.no-highlight
+						.active(data-i18n="ACTIVE?")
+						.str(data-i18n="STRENGTH_SHORT")
+						.dex(data-i18n="DEXTERITY_SHORT")
+						.con(data-i18n="CONSTITUTION_SHORT")
+						.affinity(data-i18n="AFFINITY?")
+						.name(data-i18n="NAME")
+					.shells-grid.rep-grid
+						+fake-text-input().center
+							input(type="checkbox", name="attr_shell_active", value="1").inline-input.rep-radio
+						+text-input("shell_strength")(type="number", value="0").center.inline-input
+						+text-input("shell_dexterity")(type="number", value="0").center.inline-input
+						+text-input("shell_constitution")(type="number", value="0").center.inline-input
+						+fake-text-input().center
+							input(type="checkbox", name="attr_shell_affinity_active" value="\n\n^{AFFINITY_ABILITIES}:\n @{shell_affinity}").inline-input
+						+text-input("shell_name").inline-input.edit
+						+text-input("shell_name").display
+					input(type="hidden", name="attr_shell_ability", value="").hide-empty
+					.rep-grid.details
+						.table-header
+							.shell-ability(data-i18n="BASIC_ABILITIES")
+						span(name="attr_shell_ability").display
+						textarea(name="attr_shell_ability").edit
+					.rep-grid.details
+						.table-header
+							.shell-affinity(data-i18n="AFFINITY_ABILITIES")
+						span(name="attr_shell_affinity").display
+						textarea(name="attr_shell_affinity").edit
 	//- Foci
 	.section.foci-left
 		+foci
-
+	//- Psionics and/or Space Magic
 	.section.super
 		+sectionheader("show_psionics", false)
 			span(data-i18n="PSYCHIC_SKILLS_TECHNIQUES").super-psionics-only
@@ -534,6 +590,7 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 								input.damage(type="text", name="attr_spell_damage", value="0")
 								textarea.details(name="attr_spell_description")
 
+
 .column
 	//- Skills
 	.section
@@ -568,6 +625,48 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 	//- Foci
 	.section.foci-right
 		+foci
+
+//- AI
+.section.cols-2.ai-enabled
+	+sectionheader("show_ai", "AI")
+	.ai.halfgrid
+		.column
+			.grey-box.ai-processing
+				h3(data-i18n="COMMITTED_PROCESSING")
+				+text-input("ai_extra_processing", "BONUS")(type="number", value="0").center
+				+text-input("ai_committed_processing_current", "CURRENT")(type="number", value="0", min="0").center
+				+text-input("ai_committed_processing_scene", "SCENE")(type="number", value="0", min="0").center
+				+text-input("ai_committed_processing_day", "DAY")(type="number", value="0", min="0").center
+				+text-input("ai_total_processing", "UNCOMMITTED")(type="number", value="1", readonly, data-i18n-title="MAXIMUM_EFFORT_DESC").center
+			.grey-box.ai-processing-nodes
+				h3(data-i18n="PROCESSING_NODES") Processing Nodes
+				.table-header.nodes-grid.rep-grid
+					.connected(data-i18n="CONNECTED?")
+					.value(data-i18n="PROCESSING")
+					.location(data-i18n="LOCATION")
+				fieldset.repeating_processing-nodes
+					.nodes-grid.rep-grid
+						+fake-text-input().center
+							input(type="checkbox" value="1" name="attr_node_connected")
+						+text-input("node_value")(type="number" value="0")
+						+text-input("node_location")
+		.column
+			.routines.grey-box.simple-repsection
+				.flex-center
+					h3(data-i18n="AI_ROUTINES") AI Routines
+					label.details-button
+						input(type="checkbox", name="attr_show_routines_details", value="1", checked)
+						span(data-i18n="EXPAND")
+				input(type="hidden", name="attr_show_routines_details", value="1").input-details
+				fieldset.repeating_routines
+					button.display.invisible-button(name="roll_Routine", type="roll", value!="&{template:swn-default} {{charname=@{character_name}}} {{info=^{AI_ROUTINE}}} {{title=@{routine_name}}} {{desc=@{routine_description}}}")
+					.display
+						.name.flex
+							span(name="attr_routine_name")
+						.details #[span(name="attr_routine_description")]
+					.edit.flex-wrap
+						input.name.grow(type="text", name="attr_routine_name", data-i18n-placeholder="ROUTINE")
+						textarea.details(name="attr_routine_description", data-i18n-placeholder="DESCRIPTION")
 
 //- Gear
 .section.cols-2
@@ -672,7 +771,7 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 					.amount #
 					.name(data-i18n="NAME")
 					.details(data-i18n="DESCRIPTION")
-					.enc(data-i18n="ENCUMBRANCE_SHORT")
+					.enc(data-i18n="ENCUMBRANCE_SHORT" data-i18n-title="ENCUMBRANCE")
 					.status(data-i18n="STATUS")
 					.bundled(data-i18n="BUNDLED")
 						Bundled
@@ -695,7 +794,7 @@ input(type="hidden", name="attr_magic_type", value="arcanist").magic-type
 						+text-input("gear_name")(data-i18n-placeholder="ITEM")
 						+fake-text-input()
 							textarea(name="attr_gear_description")
-						+text-input("gear_encumbrance")(type="number", value="0", step="any", "data-i18n-title"="ENCUMBRANCE").center
+						+text-input("gear_encumbrance")(type="number", value="0", step="any").center
 						+fake-text-input()
 							select.status(name="attr_gear_status")
 								option(value="", data-i18n="OTHER", selected)
