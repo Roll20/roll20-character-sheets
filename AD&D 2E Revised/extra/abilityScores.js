@@ -1,5 +1,4 @@
 /* ---- Attributes tables start ---- */
-
 const strengthTable = {};
 strengthTable['strengthhit'] = ['Error','-5','-3','-3','-2','-2','-1','-1','0','0','0','0','0','0','0','0','0','+1','+1','+3','+3','+4','+4','+5','+6','+7'];
 strengthTable['strengthhit']['18[01-50]'] = '+1';

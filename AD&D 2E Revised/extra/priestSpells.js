@@ -1,5 +1,4 @@
 /* ---- Priest spells start ---- */
-
 const pri1 = {}
 pri1['Animal Friendship'] = {
     'name': 'Animal Friendship',
@@ -419,4 +418,44 @@ pri1['Remove Fear'] = {
     'effect': 'The priest casting this spell instills courage in the spell recipient, raising the creature’s saving throw rolls against magical fear attacks by +4 for one turn. If the recipient has recently (that day) failed a saving throw against such an attack, the spell immediately grants another saving throw, with a +4 bonus to the die roll. For every four levels of the caster, one creature can be affected by the spell (one creature at levels 1 through 4, two creatures at levels 5 through 8, etc.). \\n&emsp;The reverse of the spell, cause fear, causes one creature to flee in panic at maximum movement speed away from the caster for 1d4 rounds. A successful saving throw against the reversed effect negates it, and any Wisdom adjustment also applies. Of course, cause fear can be automatically countered by remove fear and vice versa. \\n&emsp;Neither spell has any effect on undead of any sort.'
 };
 
+pri1['Sanctuary'] = {
+    'name': 'Sanctuary',
+    'level': 'Level 1 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Protection',
+    'range': 'Touch',
+    'duration': '[[2+#LEVEL#]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol and a small silver mirror.',
+    'reference': 'PHB p. 257',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the priest casts a sanctuary spell, any opponent attempting to strike or otherwise directly attack the protected creature must roll a saving throw vs. spell. If the saving throw is successful, the opponent can attack normally and is unaffected by that casting of the spell. If the saving throw is failed, the opponent loses track of and totally ignores the warded creature for the duration of the spell. Those not attempting to attack the subject remain unaffected. Note that this spell does not prevent the operation of area attacks (fireball, ice storm, etc.). While protected by this spell, the subject cannot take direct offensive action without breaking the spell, but may use nonattack spells or otherwise act in any way that does not violate the prohibition against offensive action. This allows a warded priest to heal wounds, for example, or to bless, perform an augury, chant, cast a light in the area (but not upon an opponent), and so on.'
+};
+
+pri1['Shillelagh'] = {
+    'name': 'Shillelagh',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Combat, Plant',
+    'range': 'Touch',
+    'duration': '[[4+#LEVEL#]] rounds',
+    'aoe': '1 oak club',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'a shamrock leaf and the caster’s holy symbol.',
+    'reference': 'PHB p. 257',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to change his own oak cudgel or unshod staff into a magical weapon that gains a +1 bonus to its attack roll and inflicts 2d4 points of damage on opponents up to man size, and 1d4+1 points of damage on larger opponents. The spell inflicts no damage to the staff or cudgel. The caster must wield the shillelagh, of course.'
+};
+
+const priestSpell = {};
+priestSpell['pri1'] = pri1;
 /* ---- Priest spells end ---- */
