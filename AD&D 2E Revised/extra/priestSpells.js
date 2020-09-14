@@ -93,3 +93,155 @@ pri1['Create Water'] = {
     'healing': '',
     'effect': 'When the priest casts a create water spell, up to 4 gallons of water are generated for every experience level of the caster (Currently up to [[4*#LEVEL#]] gallons). The water is clean and drinkable (it is just like rain water). The created water can be dispelled within a round of its creation; otherwise, its magic fades, leaving normal water that can be used, spilled, evaporated, etc. The reverse of the spell, destroy water, obliterates without trace (no vapor, mist, fog, or steam) a like quantity of water. Water can be created or destroyed in an area as small as will actually contain the liquid, or in an area as large as 27 cubic feet (1 cubic yard). \\n&emsp;Note that water can neither be created nor destroyed within a creature. For reference purposes, water weighs about 8½ pounds per gallon, and a cubic foot of water weighs approximately 64 pounds.'
 };
+
+pri1['Cure Light Wounds'] = {
+    'name': 'Cure Light Wounds',
+    'level': 'Level 1 Priest',
+    'school': 'Necromancy',
+    'sphere': 'Healing',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Creature touched',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 253',
+    'damage': '',
+    'damage-type': '',
+    'healing': '[[1d8]]',
+    'effect': 'When casting this spell and laying his hand upon a creature, the priest causes 1d8 points of wound or other injury damage to the creature’s body to be healed. This healing cannot affect creatures without corporeal bodies, nor can it cure wounds of creatures not living or of extraplanar origin. \\n&emsp;The reverse of the spell, cause light wounds, operates in the same manner, inflicting 1d8 points of damage. If a creature is avoiding this touch, an attack roll is needed to determine if the priest’s hand strikes the opponent and causes such a wound. \\n&emsp;Curing is permanent only insofar as the creature does not sustain further damage; caused wounds will heal—or can be cured—just as any normal injury.'
+};
+
+pri1['Detect Evil'] = {
+    'name': 'Detect Evil',
+    'level': 'Level 1 Priest',
+    'school': 'Divination',
+    'sphere': 'All',
+    'range': '0',
+    'duration': '1 turn + [[5*#LEVEL#]] rounds',
+    'aoe': '10 feet x 120 yards',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The use of the priest’s holy symbol as its material component, with the priest holding it before him.',
+    'reference': 'PHB p. 253',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell discovers emanations of evil, or of good in the case of the reverse spell, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil if intent upon appropriate actions. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. \\n&emsp;The degree of evil (dim, faint, moderate, strong, or overwhelming) and possibly its general nature (expectant, malignant, gloating, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level ([[10*#LEVEL#]]%) of detecting its general bent (lawful, neutral, or chaotic). The duration of a detect evil (or detect good) spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration. Current duration [[10+(5*#LEVEL#)]] rounds. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura— for at least one round to receive a reading.'
+};
+
+pri1['Detect Magic'] = {
+    'name': 'Detect Magic',
+    'level': 'Level 1 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': '1 turn',
+    'aoe': '10 feet x 30 yards',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The use of the priest’s holy symbol.',
+    'reference': 'PHB p. 253',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the detect magic spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*#LEVEL#]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.'
+};
+
+pri1['Detect Poison'] = {
+    'name': 'Detect Poison',
+    'level': 'Level 1 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': '1 turn + [[#LEVEL#]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'A strip of specially blessed vellum, which turns black if poison is present.',
+    'reference': 'PHB p. 254',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the priest to determine if an object has been poisoned or is poisonous. One object, or one 5-foot cubic mass, can be checked per round. The priest has a 5% chance per level of determining the exact type of poison. Currently [[5*#LEVEL#]]% of detecting the type of poison.'
+};
+
+pri1['Detect Snares & Pits'] = {
+    'name': 'Detect Snares & Pits',
+    'level': 'Level 1 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': '[[4*#LEVEL#]] rounds',
+    'aoe': '10 x 40 feet',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'The caster must have his holy symbol to complete the spell.',
+    'reference': 'PHB p. 254',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting this spell, the caster is able to detect snares, pits, deadfalls and similar hazards along a path 10 feet wide and 40 feet long. Such hazards include simple pits, deadfalls, snares of wilderness creatures (for example, trapdoor spiders, giant sundews, ant lions, etc.), and primitive traps constructed of natural materials (mantraps, missile trips, hunting snares, etc.). The spell is directional—the caster must face the desired direction to determine if a pit exists or a trap is laid in that direction. The caster experiences a feeling of danger from the direction of a detected hazard, which increases as the danger is approached. The caster learns the general nature of the danger (pit, snare, or deadfall) but not its exact operation, nor how to disarm it. Close examination, however, enables the caster to sense what intended actions might trigger it. The spell detects certain natural hazards— quicksand (snare), sinkholes (pit), or unsafe walls of natural rock (deadfall). Other hazards, such as a cavern that floods during rain, an unsafe construction, or a naturally poisonous plant, are not revealed. The spell does not detect magical traps (save those that operate by pit, deadfall, or snaring; see the 2ndlevel spell trip and the 3rd-level spell snare), nor those that are mechanically complex, nor those that have been rendered safe or inactive.'
+};
+
+pri1['Endure Cold/Endure Heat'] = {
+    'name': 'Endure Cold/Endure Heat',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Protection',
+    'range': 'Touch',
+    'duration': '[[1.5*#LEVEL#]] hours',
+    'aoe': 'Creature touched',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The create water spell requires at least a drop of water; the destroy water spell, at least a pinch of dust.',
+    'reference': 'PHB p. 254',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The creature receiving this spell is protected from normal extremes of cold or heat (depending on which application the priest selects at the time of casting). The creature can stand unprotected in temperatures as low as –30° F. or as high as 130° F. (-34° to 54° C) (depending on application) with no ill effect. Temperatures beyond these limits inflict 1 point of damage per hour of exposure for every degree beyond the limit. The spell is immediately cancelled if the recipient is affected by any non-normal heat or cold, such as magic, breath weapons, and so on. The cancellation occurs regardless of the application and regardless of whether a heat or cold effect hits the character (for example, an endure cold spell is cancelled by magical heat or fire as well as by magical cold). The recipient of the spell does not suffer the first 10 points of damage (after any applicable saving throws) from the heat or cold during the round in which the spell is broken. The spell ends instantly if either resist fire or resist cold is cast upon the recipient.'
+};
+
+pri1['Entangle'] = {
+    'name': 'Entangle',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': '80 yards',
+    'duration': '1 turn',
+    'aoe': '40-feet cube',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': '½',
+    'materials': 'The caster’s holy symbol.',
+    'reference': 'PHB p. 254',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster is able to cause plants in the area of effect to entangle creatures within the area. The grasses, weeds, bushes, and even trees wrap, twist, and entwine about the creatures, holding them fast for the duration of the spell. Any creature entering the area is subject to this effect. A creature that rolls a successful saving throw vs. spell can escape the area, moving at only 10 feet per round until out of the area. Exceptionally large (gargantuan) or strong creatures may suffer little or no distress from this spell, at the DM’s option, based on the strength of the entangling plants.'
+};
+
+pri1['Faerie Fire'] = {
+    'name': 'Faerie Fire',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Weather',
+    'range': '80 yards',
+    'duration': '[[4*#LEVEL#]] rounds',
+    'aoe': '[[10*#LEVEL#]] square feet within 40-feet radius',
+    'components': 'V, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'A small piece of foxfire',
+    'reference': 'PHB p. 254',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to outline one or more objects or creatures with a pale glowing light. The number of subjects outlined depends upon the number of square feet the caster can affect. Sufficient footage enables several objects or creatures to be outlined by the faerie fire spell, but one must be fully outlined before the next is begun, and all must be within the area of effect. Outlined objects or creatures are visible at 80 yards in the dark and 40 yards if the viewer is near a bright light source. Outlined creatures are easier to strike; thus, opponents gain a +2 bonus to attack rolls in darkness (including moonlit nights) and a +1 bonus in twilight or better. Note that outlining can render otherwise invisible creatures visible. However, it cannot outline noncorporeal, ethereal, or gaseous creatures. Nor does the light come anywhere close to sunlight. Therefore, it has no special effect on undead or dark-dwelling creatures. The faerie fire can be blue, green, or violet according to the word of the caster at the time of casting. The faerie fire does not cause any harm to the object or creature thus outlined.'
+};
