@@ -245,3 +245,174 @@ pri1['Faerie Fire'] = {
     'healing': '',
     'effect': 'This spell enables the caster to outline one or more objects or creatures with a pale glowing light. The number of subjects outlined depends upon the number of square feet the caster can affect. Sufficient footage enables several objects or creatures to be outlined by the faerie fire spell, but one must be fully outlined before the next is begun, and all must be within the area of effect. Outlined objects or creatures are visible at 80 yards in the dark and 40 yards if the viewer is near a bright light source. Outlined creatures are easier to strike; thus, opponents gain a +2 bonus to attack rolls in darkness (including moonlit nights) and a +1 bonus in twilight or better. Note that outlining can render otherwise invisible creatures visible. However, it cannot outline noncorporeal, ethereal, or gaseous creatures. Nor does the light come anywhere close to sunlight. Therefore, it has no special effect on undead or dark-dwelling creatures. The faerie fire can be blue, green, or violet according to the word of the caster at the time of casting. The faerie fire does not cause any harm to the object or creature thus outlined.'
 };
+
+pri1['Invisibility to Animals'] = {
+    'name': 'Invisibility to Animals',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Animal',
+    'range': 'Touch',
+    'duration': '1 turn + [[#LEVEL#]] rounds',
+    'aoe': '[[#LEVEL#]] creatures',
+    'components': 'S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'Holly rubbed over the recipient.',
+    'reference': 'PHB p. 255',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When an invisibility to animals spell is cast, the creature touched becomes totally undetectable by normal animals with Intelligences under 6. Normal animals includes giant-sized varieties, but it excludes any with magical abilities or powers. The enchanted individual is able to walk among such animals or pass through them as if he did not exist. For example, this individual could stand before the hungriest of lions or a tyrannosaurus rex and not be molested or even noticed. However, a nightmare, hell hound, or winter wolf would certainly be aware of the individual. For every level the caster has achieved, one creature can be rendered invisible. Any recipient attacking while this spell is in effect ends the spell immediately (for himself only).'
+};
+
+pri1['Invisibility to Undead'] = {
+    'name': 'Invisibility to Undead',
+    'level': 'Level 1 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': '6 rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'Special',
+    'materials': 'The priest’s holy symbol',
+    'reference': 'PHB p. 255',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes affected undead to lose track of and ignore the warded creature for the duration of the spell. Undead of 4 or fewer Hit Dice are automatically affected, but those with more Hit Dice receive a saving throw vs. spell to avoid the effect. Note that a priest protected by this spell cannot turn affected undead. The spell ends immediately if the recipient makes any attack, although casting spells such as cure light wounds, augury, or chant does not end the ward.'
+};
+
+pri1['Light'] = {
+    'name': 'Light',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'Sun',
+    'range': '120 yards',
+    'duration': '1 hour + [[#LEVEL#]] turns',
+    'aoe': '20-feet-radius globe',
+    'components': 'V, S',
+    'cast-time': '4',
+    'saving-throw': 'Special',
+    'materials': 'Holly rubbed over the recipient.',
+    'reference': 'PHB p. 255',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes a luminous glow within 20 feet of the spell’s center. The area of light thus caused is equal in brightness to torchlight. Objects in darkness beyond this sphere can be seen, at best, as vague and shadowy shapes. The spell is centered on a point selected by the caster, and he must have a line of sight or unobstructed path to that point when the spell is cast. Light can spring from air, rock, metal, wood, or almost any similar substance. The effect is immobile unless it is specifically centered on a movable object or mobile creature. If this spell is cast upon a creature, any applicable magic resistance and saving throws must be rolled. Successful resistance negates the spell, while a successful saving throw indicates that the spell is centered immediately behind the creature, rather than upon the creature itself. A light spell centered on the visual organs of a creature blinds it, reducing its attack and saving throw rolls by 4 and worsening its Armor Class by 4. The caster can extinguish the light at any time by uttering a single word. Light spells are not cumulative—multiple castings do not provide a brighter light. \\n&emsp;The spell is reversible, causing darkness in the same area and under the same conditions as the light spell, but with half the duration. Magical darkness is equal to that of an unlit interior room— pitch darkness. Any normal light source or magical light source of lesser intensity than full daylight does not function in magical darkness. A darkness spell cast directly against a light spell cancels both, and vice versa.'
+};
+
+pri1['Locate Animals or Plants'] = {
+    'name': 'Locate Animals or Plants',
+    'level': 'Level 1 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination (Animal, Plant)',
+    'range': '[[100+(20*#LEVEL#)]] yards',
+    'duration': '[[#LEVEL#]] rounds',
+    'aoe': '[[20*#LEVEL#]] yards x 20 feet',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The caster’s holy symbol.',
+    'reference': 'PHB p. 255',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The caster can find the direction and distance of any one type of animal or plant he desires. The caster, facing in a direction, thinks of the animal or plant, and then knows if any such animal or plant is within range. If so, the exact distance and approximate number present is learned. During each round of the spell’s duration, the caster can face in only one direction (i.e., only a 20-foot-wide path can be known). The spell lasts one round per level of experience of the caster, while the length of the path is 100 yards plus 20 yards per level of experience. (At the DM’s option, some casters may be able to locate only those animals [or plants] associated closely with their own mythos.) While the exact chance of locating a specific type of animal or plant depends on the details and circumstances of the locale, the general frequency of the subject can be used as a guideline: common = 50%, uncommon = 30%, rare = 15%, and very rare = 5%. Most herbs grow in temperate regions, while most spices grow in tropical regions. Most plants sought as spell components or for magical research are rare or very rare. The results of this spell are always determined by the DM.'
+};
+
+pri1['Magical Stone'] = {
+    'name': 'Magical Stone',
+    'level': 'Level 1 Priest',
+    'school': 'Enchantment',
+    'sphere': 'Combat',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '3 pebbles',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'the priest’s holy symbol and three small pebbles, unworked by tools or magic of any type.',
+    'reference': 'PHB p. 256',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By using this spell, the priest can temporarily enchant up to three small pebbles, no larger than sling bullets. The magical stones can then be hurled or slung at an opponent. If hurled, they can be thrown up to 30 yards, and all three can be thrown in one round. The character using them must roll normally to hit, although the magic of the stones enables any character to be proficient with them. The stones are considered +1 weapons for determining if a creature can be struck (those struck only by magical weapons, for instance), although they do not have an attack or damage bonus. Each stone that hits inflicts 1d4 points of damage (2d4 points against undead). The magic in each stone lasts only for half an hour, or until used.'
+};
+
+pri1['Pass Without Trace'] = {
+    'name': 'Pass Without Trace',
+    'level': 'Level 1 Priest',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': '[[#LEVEL#]] turns',
+    'aoe': '[[#LEVEL#]] creatures',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A sprig of pine or evergreen, which must be burned and the ashes powdered and scattered when the spell is cast.',
+    'reference': 'PHB p. 256',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the recipient can move through any type of terrain—mud, snow, dust, etc.—and leave neither footprints nor scent. The area that is passed over radiates magic for [[1d6]] turns after the affected creature passes. Thus, tracking a person or other creature covered by this spell is impossible by normal means. Of course, intelligent tracking techniques, such as using a spiral search pattern, can result in the trackers picking up the trail at a point where the spell has worn off.'
+};
+
+pri1['Protection From Evil'] = {
+    'name': 'Protection From Evil',
+    'level': 'Level 1 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Protection',
+    'range': 'Touch',
+    'duration': '[[3*#LEVEL#]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'Holy water or burning incense / A circle of unholy water or smoldering dung.',
+    'reference': 'PHB p. 256',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, it creates a magical barrier around the recipient at a distance of 1 foot. The barrier moves with the recipient and has three major effects: \\n&emsp;First, all attacks made by evil or evilly enchanted creatures against the protected creature receive a penalty of –2 to each attack roll, and any saving throws caused by such attacks are made by the protected creature with a +2 bonus. \\n&emsp;Second, any attempt to exercise mental control over the protected creature (if, for example, it has been charmed by a vampire) or to invade and take over its mind (as by a ghost’s magic jar attack) is blocked by this spell. Note that the protection does not prevent a vampire’s charm itself, nor end it, but it does prevent the vampire from exercising mental control through the barrier. Likewise, an outside life force is merely kept out, and would not be expelled if in place before the protection was cast. \\n&emsp;Third, the spell prevents bodily contact by creatures of an extraplanar or conjured nature (such as aerial servants, elementals, imps, invisible stalkers, salamanders, water weirds, xorn, and others). This causes the natural (body) weapon attacks of such creatures to fail and the creature to recoil if such attacks require touching the protected creature. Animals or monsters summoned or conjured by spells or similar magic are likewise hedged from the character. This protection ends if the protected character makes a melee attack against or tries to force the barrier against the blocked creature. \\n&emsp;This spell can be reversed to become protection from good, with the second and third benefits remaining unchanged.'
+};
+
+pri1['Purify Food & Drink'] = {
+    'name': 'Purify Food & Drink',
+    'level': 'Level 1 Priest',
+    'school': 'Alteration',
+    'sphere': 'All',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '[[#LEVEL#]] cube feet in 10 square feet',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A sprig of pine or evergreen, which must be burned and the ashes powdered and scattered when the spell is cast.',
+    'reference': 'PHB p. 256',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When cast, this spell makes spoiled, rotten, poisonous, or otherwise contaminated food and water pure and suitable for eating and drinking. Up to 1 cubic foot of food and drink per level can be thus made suitable for consumption. This spell does not prevent subsequent natural decay or spoilage. Unholy water and similar food and drink of significance is spoiled by purify food and drink, but the spell has no effect on creatures of any type nor upon magical potions. \\n&emsp;The reverse of the spell is putrefy food and drink. This spoils even holy water; however, it likewise has no effect upon creatures or potions.'
+};
+
+pri1['Remove Fear'] = {
+    'name': 'Remove Fear',
+    'level': 'Level 1 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Charm',
+    'range': '10 yards',
+    'duration': 'Special',
+    'aoe': '[[ceil(#LEVEL#/4)]] creatures',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'Special',
+    'materials': 'A sprig of pine or evergreen, which must be burned and the ashes powdered and scattered when the spell is cast.',
+    'reference': 'PHB p. 256',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest casting this spell instills courage in the spell recipient, raising the creature’s saving throw rolls against magical fear attacks by +4 for one turn. If the recipient has recently (that day) failed a saving throw against such an attack, the spell immediately grants another saving throw, with a +4 bonus to the die roll. For every four levels of the caster, one creature can be affected by the spell (one creature at levels 1 through 4, two creatures at levels 5 through 8, etc.). \\n&emsp;The reverse of the spell, cause fear, causes one creature to flee in panic at maximum movement speed away from the caster for 1d4 rounds. A successful saving throw against the reversed effect negates it, and any Wisdom adjustment also applies. Of course, cause fear can be automatically countered by remove fear and vice versa. \\n&emsp;Neither spell has any effect on undead of any sort.'
+};
