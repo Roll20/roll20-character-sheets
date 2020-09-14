@@ -1,3 +1,5 @@
+/* ---- Priest spells start ---- */
+
 const pri1 = {}
 pri1['Animal Friendship'] = {
     'name': 'Animal Friendship',
@@ -416,3 +418,5 @@ pri1['Remove Fear'] = {
     'healing': '',
     'effect': 'The priest casting this spell instills courage in the spell recipient, raising the creature’s saving throw rolls against magical fear attacks by +4 for one turn. If the recipient has recently (that day) failed a saving throw against such an attack, the spell immediately grants another saving throw, with a +4 bonus to the die roll. For every four levels of the caster, one creature can be affected by the spell (one creature at levels 1 through 4, two creatures at levels 5 through 8, etc.). \\n&emsp;The reverse of the spell, cause fear, causes one creature to flee in panic at maximum movement speed away from the caster for 1d4 rounds. A successful saving throw against the reversed effect negates it, and any Wisdom adjustment also applies. Of course, cause fear can be automatically countered by remove fear and vice versa. \\n&emsp;Neither spell has any effect on undead of any sort.'
 };
+
+/* ---- Priest spells end ---- */

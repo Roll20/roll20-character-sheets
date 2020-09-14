@@ -1,3 +1,5 @@
+/* ---- Wizard spells start ---- */
+
 const wiz1 = {};
 wiz1['Affect Normal Fires'] = {
     'name': 'Affect Normal Fires',
@@ -805,3 +807,5 @@ wiz1['Wizard Mark'] = {
     'healing': '',
     'effect': 'When this spell is cast, the wizard is able to inscribe, visibly or invisibly, his personal rune or mark, as well as up to six additional characters of smaller size. A wizard mark spell enables the caster to etch the rune upon stone, metal, or any softer substance without harm to the material upon which the mark is placed. If an invisible mark is made, a detect magic spell will cause it to glow and be visible (though not necessarily understandable). Detect invisibility, true seeing, a gem of seeing, or a robe of eyes will likewise expose an invisible wizard mark. A read magic spell will reveal the maker’s words, if any. The mark cannot be dispelled, but it can be removed by the caster or by an erase spell. If cast on a living being, normal wear gradually causes the mark to fade.'
 };
+
+/* ---- Wizard spells end ---- */
