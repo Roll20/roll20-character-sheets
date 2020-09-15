@@ -58,7 +58,7 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 
 ### Contribution Guidelines
 * Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
-* The default `font-size` is `10px` optimized for a 1440p or better resolution, but keep 1080p in mind.
+* The default `font-size` is `10px` optimized for a 1440p or better resolutions, but keep 1080p in mind.
 * Follow the 8×8 pixel grid (starting top-left). The height of each block must be a multiple of 8!
 * The devil is in the detail. Align and size all elements as precise as possible (Chrome leads).
 * Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Avoid redundancies as much as reasonable.
