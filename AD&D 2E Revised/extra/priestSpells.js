@@ -456,6 +456,6 @@ pri1['Shillelagh'] = {
     'effect': 'This spell enables the caster to change his own oak cudgel or unshod staff into a magical weapon that gains a +1 bonus to its attack roll and inflicts 2d4 points of damage on opponents up to man size, and 1d4+1 points of damage on larger opponents. The spell inflicts no damage to the staff or cudgel. The caster must wield the shillelagh, of course.'
 };
 
-const priestSpell = {};
-priestSpell['pri1'] = pri1;
+const priestSpells = {};
+priestSpells['pri1'] = pri1;
 /* ---- Priest spells end ---- */
