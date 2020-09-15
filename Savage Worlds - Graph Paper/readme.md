@@ -65,7 +65,7 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 * Use sheetworkers instead of auto-calculating fields.
 
 ### Translations
-Most of the sheet's strings can be changed via the translation.json, even placeholders. However, some strings need to be manually changed by the GM due to the renaming feature for traits. Note that certain sheetworker scripts depend on English strings, such as attribute appreviations (e.g. AGI, STR, ...) and die codes (e.g. d4, d6, ...) for the parsers. If you use Roll20's translation generation feature `i18nOutput`, make sure to add the following pairs afterwards since they will not be automatically included.
+Most of the sheet's strings can be changed via the translation.json, even placeholders. However, some strings need to be manually changed by the GM due to the renaming feature for traits. Note that certain sheetworker scripts depend on English strings, such as attribute appreviations (e.g. AGI, STR, ...) and die codes (e.g. d4, d6, ...) for parsers. If you use Roll20's translation generation feature `i18nOutput`, make sure to add the following pairs afterwards since they will not be automatically included.
 
 ```
 "settings-tab-styles": "Styles",
