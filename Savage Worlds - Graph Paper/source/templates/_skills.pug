@@ -11,11 +11,11 @@
                 ['Spellcasting', 'Sma'], ['Stealth', 'Agi'], ['Survival', 'Sma'],
                 ['Taunt', 'Sma'], ['Thievery', 'Agi'], ['Weird Science', 'Sma'],
                 ['Custom Skill 1', 'Custom'], ['Custom Skill 2', 'Custom']]
-                  
+
   var disabledSkills = ['faith', 'focus', 'language', 'occult', 'psionics',
                         'spellcasting', 'weird-science', 'custom-skill-1',
                         'custom-skill-2']
-  
+
   var steps = [['d4-2', '2', '1d4!cs2-2'], ['d4', '4', '1d4!cs2'], ['d6', '6', '1d6!cs2'],
                ['d8', '8', '1d8!cs2'], ['d10', '10', '1d10!cs2'], ['d12', '12', '1d12!cs2']].reverse()
 
@@ -23,23 +23,23 @@
   input.sheet-hidden(type='hidden',
                      name='attr_unskilled',
                      value='d4-2')
-                     
+
   input.sheet-hidden(type='hidden',
                      name='attr_unskilled-roll',
                      value='1d4!cs2 - 2')
-                     
+
   input.sheet-hidden(type='hidden',
                      name='attr_unskilled-wd-roll',
                      value='1d6!cs2 - 2')
-                    
+
   input.sheet-hidden(type='hidden',
                      name='attr_unskilled-extra-wd-roll',
                      value='-10000')
-                     
+
   input(type='checkbox',
         name='attr_skill-lock',
         class='sheet-skills__lock')
-        
+
   .sheet-skills__wrapper
     .sheet-header
       .sheet-header__labels
@@ -60,19 +60,19 @@
           span(data-i18n='skill-track-mod-u') MOD
         .sheet-skills__wd
           span(data-i18n='skill-track-wd-u') WD
-        
+
     each skill in skills
       - trait = skill[0].toLowerCase().replace('.', '').replace(/ /g, '-');
-      
+
       input(type='checkbox',
             name='attr_toggle-skill-rof',
             class='sheet-skills__toogle-rof')
-            
+
       input(type='checkbox',
             name='attr_toggle-skill-' + trait,
             checked= !disabledSkills.includes(trait),
             class='sheet-toggle sheet-toggle--block')
-            
+
       .sheet-skills__skill(class='sheet-skills__skill--' + trait)
         .sheet-skills__color-marker
           +color_circle(trait)
@@ -81,23 +81,25 @@
               placeholder='WD',
               data-i18n-placeholder='skill-track-wd-placeholder-u',
               class='sheet-skills__wd')
-              
+
         input(type='text',
               name='attr_' + trait + '-mod',
               placeholder='MOD',
               data-i18n-placeholder='skill-track-mod-placeholder-u',
               class='sheet-skills__mod')
-              
+
         .sheet-skills__plus +
-        
+
         .sheet-skills__track
           each step in steps
             input(type='radio',
                   name='attr_' + trait,
                   value=step[0],
+                  label=step[0].replace('d', ''),
+                  data-i18n-placeholder='skill-track-die-label-' + step[0],
                   class='sheet-radio-track sheet-' + step[0],
                   checked= step[0] == 'd4-2')
-                  
+
             - // Always roll with RoF query
             button(type='roll',
                    name='roll_' + trait + '-' + step[1],
@@ -111,32 +113,33 @@
           input.sheet-hidden(type='hidden',
                              name='attr_' + trait + '-roll',
                              value='1d4!cs2 - 2')
-                             
+
           input.sheet-hidden(type='hidden',
                              name='attr_' + trait + '-wd-roll',
                              value='1d6!cs2 - 2')
-                             
+
           input.sheet-hidden(type='hidden',
                              name='attr_' + trait + '-extra-wd-roll',
                              value='-10000')
-                             
+
           input.sheet-hidden(type='hidden',
                              name='attr_' + trait + '-rof',
                              value='1')
-                             
+
           input.sheet-hidden(type='hidden',
                              name='attr_rename-' + trait,
                              value= skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0])
-                            
+
           - // Roll without RoF query
           button(type='roll',
                  name='roll_' + trait,
                  value!='&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename-' + trait + '}}} {{traitdie=@{' + trait + '}}} {{flat=@{' + trait + '-mod}}} {{wounds=[[ @{wound-mod} ]]}} {{fatigue=[[ @{fatigue-mod} ]]}} {{rof=[[ 1 ]]}} {{modifier=?{Modifier|0}}} {{wd=@{' + trait + '-wd}}} {{traitroll1=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{traitroll2=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{traitroll3=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{traitroll4=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{traitroll5=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{traitroll6=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}} {{wdroll=[[ @{' + trait + '-wd-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{Modifier|0} ]]}}',
                  class='sheet-skills__button sheet-a')
-            .sheet-tooltip.sheet-tooltip--left= skill[1]
+            .sheet-tooltip.sheet-tooltip--left
+              span(name='attr_rename-' + skill[1].toLowerCase(), data-i18n=skill[1].toLowerCase() + '-u')= skill[1]
             span(name='attr_rename-' + trait)
               = skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0]
-              
+
           - // Roll with RoF query
           button(type='roll',
                  name='roll_' + trait,
