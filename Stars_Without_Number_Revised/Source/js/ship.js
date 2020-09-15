@@ -52,7 +52,7 @@ const calculateShipStats = () => {
             ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_mass`),
             ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
             "ship_power_max", "ship_mass_max", "ship_hardpoints_max",
-            "ship_power", "ship_mass", "ship_hardpoints", "ship_price", "ship_hull_price"
+            "ship_power", "ship_mass", "ship_hardpoints", "ship_price", "ship_hull_price", "ship_calculate_price"
         ];
         getAttrs(oldAttrs, v => {
             const ship_power = v.ship_power_max - sum([
@@ -67,17 +67,16 @@ const calculateShipStats = () => {
             ].map(x => v[x]));
             const ship_hardpoints = v.ship_hardpoints_max -
                 sum(weaponIDs.map(id => v[`repeating_ship-weapons_${id}_weapon_hardpoints`]));
-            const ship_price = new Intl.NumberFormat().format(parseInt(v.ship_hull_price) + sum([
-                ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
-                ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_price`),
-                ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
-            ].map(x => v[x])));
-            mySetAttrs({
-                ship_power,
-                ship_mass,
-                ship_hardpoints,
-                ship_price
-            }, v, {
+            const setting = {ship_power, ship_mass, ship_hardpoints}
+            if (v.ship_calculate_price === "1") {
+                setting.ship_price = new Intl.NumberFormat().format(parseInt(v.ship_hull_price) + sum([
+                    ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
+                    ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_price`),
+                    ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
+                ].map(x => v[x])));
+            }
+            console.log(setting)
+            mySetAttrs(setting, v, {
                 silent: true
             });
         });
