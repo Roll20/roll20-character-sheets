@@ -63,7 +63,27 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 * The devil is in the detail. Align and size all elements as precise as possible (Chrome leads).
 * Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Avoid redundancies as much as reasonable.
 * Use sheetworkers instead of auto-calculating fields.
-* Due to the renaming feature, some strings have to be translated manually by the GM.
+
+### Translations
+Most of the sheet's strings can be changed via the translation.json, even placeholders. However, some strings need to be manually changed by the GM due to the renaming feature for traits. Note that certain sheetworker scripts depend on English strings, such as attribute appreviations (e.g. AGI, STR, ...) and die codes (e.g. d4, d6, ...) for the parsers. If you use Roll20's translation generation feature `i18nOutput`, make sure to add the following pairs afterwards since they will not be automatically included.
+
+```
+"settings-tab-styles": "Styles",
+"settings-tab-setup": "Setup",
+"settings-tab-blocks": "Blocks",
+"settings-tab-skills": "Skills",
+"settings-tab-help": "Help",
+"tab-skills": "Skills",
+"tab-advancements": "Advancements",
+"tab-notebook": "Notebook",
+"tab-settings": "Settings",
+"skill-track-die-label-d4-2": "2",
+"skill-track-die-label-d4": "4",
+"skill-track-die-label-d6": "6",
+"skill-track-die-label-d8": "8",
+"skill-track-die-label-d10": "10",
+"skill-track-die-label-d12": "12",
+```
 
 ### Legal
 The silhouette images were made from purchased assets and are only licensed for this sheet. Do not take them for any other purposes! This does not go for the human silhouettes which were made with the [HeroMachine 3](http://www.heromachine.com/heromachine-3-lab/) and are therefore free.
