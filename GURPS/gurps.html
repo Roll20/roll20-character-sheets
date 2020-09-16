@@ -874,9 +874,9 @@
 										</div>
 										<div>
 											<div class="tooltip">
-												<span data-i18n="target-down-label">Target Down: -2</span>
+												<span data-i18n="target-prone-label">Target Prown: -2</span>
 												<span class="tooltiptext">
-													<span data-i18n="target-down-tooltip">If target is crouching, kneeling, sitting, or lying down, apply -2 to hit torso, groin, or legs.</span>
+													<span data-i18n="target-prone-tooltip">If target is crouching, kneeling, sitting, or lying down, apply -2 to hit torso, groin, or legs.</span>
 												</span>
 											</div>
 										</div>
@@ -12989,6 +12989,45 @@ See notes for weapon.</textarea>
 		"wild_swing",
 	];
 
+	/**
+	 * These fields modify a skill
+	 **/
+	 const rangedModifierFields = [
+		"shock_penalty",
+		"dialog_custom_roll_modifier",
+		"dialog_custom_roll_modifier_reason",
+		"night_vision",
+		"has_dark_vision",
+		"has_high_pain_threshold",
+		"has_low_pain_threshold",
+		"is_used_to_blindness",
+		"coughing_sneezing_iq",
+		"coughing_sneezing_dx",
+		"drowzy",
+		"tipsy",
+		"drunk",
+		"euphoria",
+		"distraction",
+		"pain_level",
+		"bad_footing",
+		"shield_close_combat_penalty",
+		"grappled",
+		"holding_large_shield",
+		"visiblity_condition",
+		"darkness_penalty",
+		"smoke_penalty",
+		"fog_penalty",
+		"blur_penalty",
+		"other_vision_penalty",
+		"hit_location_modifier",
+		"hit_location",
+		"tactics",
+		"backstab",
+		"weapon_hand",
+		"off_hand_training",
+		"dual_weapon_training",
+	];
+
 	/* Due to the change from auto-calc fields to helper scripts,
 	 * I'm running a "on open" to set various fields. At some point
 	 * in the future this might no longer be needed.
@@ -19844,8 +19883,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 				[`${section}_roll_allout_attack`]: values.roll_allout_attack,
 			};
 
-			console.log(updateFields);
-
 			setAttrs(updateFields, {silent: true});
 
 		});
@@ -19890,12 +19927,15 @@ The attacker may choose to hit the original target or the limb you used to parry
 				grapple_modifier: -1,
 				has_shield: 0,
 				target_chink_in_armor: 0,
+				target_light_cover: 0,
+				target_down: 0,
+				target_partly_exposed: 0,
+				target_intervening_figures: 0,
 			};
 
 			switch (modType) {
 				case "skill":
 				case "defense":
-				case "ranged":
 				case "spell":
 					modFields = skillModifierFields;	
 					break;
@@ -19906,6 +19946,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			
 				case "melee":
 					modFields = meleeModifierFields;
+					break;
+				
+				case "ranged":
+					modFields = rangedModifierFields;
 					break;
 				
 				default:
@@ -20047,7 +20091,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		switch (modifierType) {
 			case "skill":
 			case "defense":
-			case "ranged":
 			case "spell":
 				fields = skillModifierFields;
 				break;
@@ -20058,6 +20101,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			
 			case "melee":
 				fields = meleeModifierFields;
+				break;
+		
+			case "ranged":
+				fields = rangedModifierFields;
 				break;
 		
 			default:
@@ -20998,6 +21045,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 		"change:has_shield",
 		"change:target_chink_in_armor",
 		"change:target_size_modifier",
+		"change:target_light_cover",
+		"change:target_down",
+		"change:target_partly_exposed",
+		"change:target_intervening_figures",
 	];
 
 	const changeHitLocationFields = arrChangeHitLocationFields.join(" ");
@@ -21087,6 +21138,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			"grapple_modifier",
 			"has_shield",
 			"target_chink_in_armor",
+			"target_light_cover",
+			"target_down",
+			"target_partly_exposed",
+			"target_intervening_figures",
 		];
 
 		getAttrs(fields, values => {
@@ -21102,6 +21157,17 @@ The attacker may choose to hit the original target or the limb you used to parry
 			let hasShield = Number(values.has_shield) === 1 ? true : false;
 
 			let chinkInArmor = Number(values.target_chink_in_armor) === 1 ? true : false;
+
+			let partlyExposed = Number(values.target_partly_exposed) === 1 ? true : false;
+
+			let targetDown = Number(values.target_down) === 1 ? true : false;
+
+			let lightCover = Number(values.target_light_cover) === 1 ? true : false;
+
+			let interveningFigures = Number(values.target_intervening_figures);
+
+			// make sure it's an integer
+			interveningFigures = Math.floor(interveningFigures);
 
 			// damage-reach-c-5
 			// split into an array
@@ -21132,7 +21198,24 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				locationMod = locationMod * 2;
 				
-				locationNote += " with a shield";		
+				locationNote += " with a shield.";		
+
+			}
+
+			// check if target or hit location is partly exposed
+			if (partlyExposed) {
+				
+				locationMod = locationMod - 2;
+
+				locationNote += " Partly exposed.";
+			}
+
+			// check for proned target
+			if (targetDown && isHitLocationAffectedByProne(locationNote)) {
+
+				locationMod = locationMod - 2;
+
+				locationNote += " Target Prone.";
 
 			}
 
@@ -21160,7 +21243,25 @@ The attacker may choose to hit the original target or the limb you used to parry
 				locationNote += " chinks in armor. DR/2.";
 
 			}
+
+			// check for light cover
+			if (lightCover) {
+
+				locationMod += -2;
+
+				locationNote += " Light cover.";
+
+			}
 			
+			// check for intervening figures
+			if (interveningFigures) {
+
+				locationMod += interveningFigures * -4;
+
+				locationNote += ` ${interveningFigures} intervening figures.`;
+
+			}
+
 			let finalMod = sizeModifier + locationMod;
 
 			setAttrs({
@@ -21205,6 +21306,40 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 		return applyShield;
+
+	}
+
+	/**
+	 * Determine if hit location can be affected when a target is
+	 * kneeling, sitting, crouching, or lying down
+	 * valid locations: torso, chest, groin, leg
+	 * 
+	 * @param string location Hit location being targeted
+	 * 
+	 * @return bool
+	 */
+	 function isHitLocationAffectedByProne(location) {
+
+		let arrLocation = location.split(" ");
+
+		const locations = [
+			"leg",
+			"chest",
+			"groin",
+			"torso",
+		];
+
+		let applyProne = false;
+
+		locations.forEach(location => {
+
+			if (arrLocation.includes(location)) {
+				applyProne = true;
+			}
+			
+		});
+
+		return applyProne;
 
 	}
 
