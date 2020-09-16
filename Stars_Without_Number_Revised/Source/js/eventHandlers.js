@@ -92,6 +92,7 @@ autofillSections.forEach(sName => {
 
 /* Ship sheet */
 on("change:ship_hulltype", fillShipStats);
+on("change:ship_calculate_price", calculateShipStats)
 on("change:ship_class", () => {
     setShipClass();
     ["ship-fittings", "ship-defenses"].forEach(sName => generateAutofillInfo(sName));
@@ -105,7 +106,7 @@ on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weap
     on(`change:repeating_drones:drone_fitting_${num}_name`, () => fillDroneFitting(num));
 });
 on("change:repeating_drones:drone_model", fillDroneStats);
-on("change:attack_bonus change:intelligence_mod change:skill_pilot change:skill_program",
+on("change:attack_bonus change:intelligence_mod change:skill_pilot change:skill_program change:npc",
     () => getSectionIDs("repeating_drones", idArray => {
         calculateDroneAttack(idArray.map(id => `repeating_drones_${id}`));
     }));
