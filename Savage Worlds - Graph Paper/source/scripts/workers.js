@@ -134,6 +134,20 @@ var TETRA = TETRA || ( function() {
 }());
 
 /* #############################################################################
+TRANSLATION SETUP
+############################################################################# */
+
+on("sheet:opened", function(e){
+  setAttrs({
+    'query-rate-of-fire': getTranslationByKey('query-rate-of-fire'),
+    'query-modifier': getTranslationByKey('query-modifier'),
+    'query-wild-die': getTranslationByKey('query-wild-die'),
+    'ally': getTranslationByKey('ally'),
+    'none': getTranslationByKey('none')
+  });
+});
+
+/* #############################################################################
 ATTRIBUTE DICE (AND SOAK)
 ############################################################################# */
 
