@@ -103,9 +103,9 @@ intelligenceTable['intnotes'] = ['INVALID INTELLIGENCE','Communicate by Grunts &
 
 const wisdomTable = {};
 wisdomTable['wisdef'] = ['Error','-6','-4','-3','-2','-1','-1','-1','0','0','0','0','0','0','0','+1','+2','+3','+4','+4','+4','+4','+4','+4','+4','+4'];
-//wisdomTable['wisbonus'] = ['Error','','','','','','','','','','','','','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
-wisdomTable['wisbonus-prime'] = ['Error','','','','','','','','','','','','','1st','2x1st','2x1st, 2nd','2x1st, 2x2nd','2x1st, 2x2nd, 3rd','2x1st, 2x2nd, 3rd, 4th','3x1st, 2x2nd, 2x3rd, 4th','3x1st, 3x2nd, 2x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th'];
-wisdomTable['wisbonus-extra'] = ['Error','','','','','','','','','','','','','','','','','','','','','5th','2x5th','2x5th, 6th','3x5th, 2x6th','3x5th, 3x6th, 7th'];
+wisdomTable['wisbonus'] = ['Error','—','—','—','—','—','—','—','—','0','0','0','0','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
+// wisdomTable['wisbonus-prime'] = ['Error','','','','','','','','','','','','','1st','2x1st','2x1st, 2nd','2x1st, 2x2nd','2x1st, 2x2nd, 3rd','2x1st, 2x2nd, 3rd, 4th','3x1st, 2x2nd, 2x3rd, 4th','3x1st, 3x2nd, 2x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th'];
+// wisdomTable['wisbonus-extra'] = ['Error','','','','','','','','','','','','','','','','','','','','','5th','2x5th','2x5th, 6th','3x5th, 2x6th','3x5th, 3x6th, 7th'];
 wisdomTable['wisfail'] = ['Error','80','60','50','45','40','35','30','25','20','15','10','5','0','0','0','0','0','0','0','0','0','0','0','0','0'];
 wisdomTable['wisimmune'] = ['Error','','','','','','','','','','','','','','','','','','','cause fear, charm person, command, friends, hypnotism','forget, hold person, ray of enfeeblement, scare','fear','charm monster, confusion, emotion, fumble, suggestion','chaos, feeblemind, hold monster, magic jar, quest','geas, mass suggestion, rod of rulership','antipathy/sympathy, death spell, mass charm'];
 wisdomTable['wisnotes'] = ['INVALID WISDOM','','','','','','','','','','','','','','','','','','','','','','','','','',''];

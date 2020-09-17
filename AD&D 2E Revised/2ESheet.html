@@ -16523,9 +16523,9 @@ intelligenceTable['intnotes'] = ['INVALID INTELLIGENCE','Communicate by Grunts &
 
 const wisdomTable = {};
 wisdomTable['wisdef'] = ['Error','-6','-4','-3','-2','-1','-1','-1','0','0','0','0','0','0','0','+1','+2','+3','+4','+4','+4','+4','+4','+4','+4','+4'];
-//wisdomTable['wisbonus'] = ['Error','','','','','','','','','','','','','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
-wisdomTable['wisbonus-prime'] = ['Error','','','','','','','','','','','','','1st','2x1st','2x1st, 2nd','2x1st, 2x2nd','2x1st, 2x2nd, 3rd','2x1st, 2x2nd, 3rd, 4th','3x1st, 2x2nd, 2x3rd, 4th','3x1st, 3x2nd, 2x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th'];
-wisdomTable['wisbonus-extra'] = ['Error','','','','','','','','','','','','','','','','','','','','','5th','2x5th','2x5th, 6th','3x5th, 2x6th','3x5th, 3x6th, 7th'];
+wisdomTable['wisbonus'] = ['Error','—','—','—','—','—','—','—','—','0','0','0','0','1st','1st','2nd','2nd','3rd','4th','1st,3rd','2nd,4th','3rd,5th','4th,5th','1st,6th','5th,6th','6th,7th'];
+//wisdomTable['wisbonus-prime'] = ['Error','','','','','','','','','','','','','1st','2x1st','2x1st, 2nd','2x1st, 2x2nd','2x1st, 2x2nd, 3rd','2x1st, 2x2nd, 3rd, 4th','3x1st, 2x2nd, 2x3rd, 4th','3x1st, 3x2nd, 2x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 2x4th','3x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th','4x1st, 3x2nd, 3x3rd, 3x4th'];
+//wisdomTable['wisbonus-extra'] = ['Error','','','','','','','','','','','','','','','','','','','','','5th','2x5th','2x5th, 6th','3x5th, 2x6th','3x5th, 3x6th, 7th'];
 wisdomTable['wisfail'] = ['Error','80','60','50','45','40','35','30','25','20','15','10','5','0','0','0','0','0','0','0','0','0','0','0','0','0'];
 wisdomTable['wisimmune'] = ['Error','','','','','','','','','','','','','','','','','','','cause fear, charm person, command, friends, hypnotism','forget, hold person, ray of enfeeblement, scare','fear','charm monster, confusion, emotion, fumble, suggestion','chaos, feeblemind, hold monster, magic jar, quest','geas, mass suggestion, rod of rulership','antipathy/sympathy, death spell, mass charm'];
 wisdomTable['wisnotes'] = ['INVALID WISDOM','','','','','','','','','','','','','','','','','','','','','','','','','',''];
@@ -18049,6 +18049,62 @@ on('change:intelligence change:reason change:knowledge', function() {
 });
 
 // Set sub-attributes based on Wisdom, Intuition, and Willpower
+function parseWisBonus(abilityScore) {
+    if (abilityScore < 13) {
+        return {
+            '1st': 0,
+            '2nd': 0,
+            '3rd': 0,
+            '4th': 0,
+            '5th': 0,
+            '6th': 0,
+            '7th': 0,
+            'wisbonus': wisdomTable['wisbonus'][abilityScore],
+            'wisbonus-prime': wisdomTable['wisbonus'][abilityScore],
+            'wisbonus-extra': wisdomTable['wisbonus'][abilityScore],
+        };
+    }
+
+    // Combine all spell levels into one string
+    let bonusString = '';
+    for (let i = 13; i <= abilityScore; i++) {
+        bonusString += wisdomTable['wisbonus'][i];
+    }
+    
+    // Count instances of each spell level
+    let bonus = {
+        '1st': (bonusString.match(/1st/g) || []).length,
+        '2nd': (bonusString.match(/2nd/g) || []).length,
+        '3rd': (bonusString.match(/3rd/g) || []).length,
+        '4th': (bonusString.match(/4th/g) || []).length,
+        '5th': (bonusString.match(/5th/g) || []).length,
+        '6th': (bonusString.match(/6th/g) || []).length,
+        '7th': (bonusString.match(/7th/g) || []).length,
+    };
+    
+    function generateString(object, key) {
+        let count = object[key];
+        switch (count) {
+            case 0:
+                return '';
+            case 1:
+                return key;
+            default:
+                return `${count}x${key}`;
+        }
+    }
+    
+    // Generate bonus prime and bonus extra strings
+    let prime = [generateString(bonus, '1st'), generateString(bonus, '2nd'), generateString(bonus, '3rd') , generateString(bonus, '4th')].filter(Boolean).join(', ');
+    let extra = [generateString(bonus, '5th'), generateString(bonus, '6th'), generateString(bonus, '7th')].filter(Boolean).join(', ');
+    
+    bonus['wisbonus'] = [prime, extra].filter(Boolean).join(', ');
+    bonus['wisbonus-prime'] = prime;
+    bonus['wisbonus-extra'] = extra;
+    
+    return bonus;
+}
+
 on('change:wisdom change:intuition change:willpower', function() {
     getAttrs(['wisdom','intuition','willpower'], function(values) {
         let wisdomRaw = values.wisdom.replace(/\s+/g, '');
@@ -18060,23 +18116,21 @@ on('change:wisdom change:intuition change:willpower', function() {
             return;
         }
 
+        let bonusSpells;
         if (wisdom === 0) {
-            assignAttributes(0,0, 0, wisdomTable['wisbonus-prime'][0], wisdomTable['wisbonus-extra'][0], wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
+            bonusSpell = parseWisBonus(0);
+            assignAttributes(0, 0, 0, bonusSpells, wisdomTable['wisimmune'][0], wisdomTable['wisimmune'][0], wisdomTable['wisnotes'][0], wisdomTable['wisnotes'][0]);
             return;
         }
 
         let intuition = getLookupValue(intuitionRaw, wisdom);
         let willpower = getLookupValue(willpowerRaw, wisdom);
 
-        let wisbonusprime;
-        let wisbonusextra;
         let wisimm1;
         let wisimm2;
         let wisnotes;
         let wis2notes;
         if (intuitionRaw === '' && willpowerRaw === '') {
-            wisbonusprime = [wisdomTable['wisbonus-prime'][wisdom], wisdomTable['wisbonus-extra'][wisdom]].filter(Boolean).join(', ');
-            wisbonusextra = '';
             wisnotes = wisdomTable['wisnotes'][wisdom];
             wis2notes = '';
             wisimm2 = '';
@@ -18086,8 +18140,6 @@ on('change:wisdom change:intuition change:willpower', function() {
             }
             wisimm1 = wisImmuneArray.filter(Boolean).join(', ');
         } else {
-            wisbonusprime = wisdomTable['wisbonus-prime'][willpower];
-            wisbonusextra = wisdomTable['wisbonus-extra'][willpower];
             wisnotes = intuition === 0 ? 'INVALID INTUITION' : wisdomTable['wisnotes'][intuition];
             wis2notes = willpower === 0 ? 'INVALID WILLPOWER' : wisdomTable['wisnotes'][willpower];
             let wisImmuneArray = [];
@@ -18098,21 +18150,29 @@ on('change:wisdom change:intuition change:willpower', function() {
             wisimm1 = wisImmuneArray.slice(0, slicePoint).filter(Boolean).join(', ');
             wisimm2 = wisImmuneArray.slice(slicePoint).filter(Boolean).join(', ');
         }
+        bonusSpells = parseWisBonus(willpower);
 
-        assignAttributes(wisdom, intuition, willpower, wisbonusprime, wisbonusextra, wisimm1, wisimm2, wisnotes, wis2notes);
+        assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes);
 
-        function assignAttributes(wisdom, intuition, willpower, wisbonusprime, wisbonusextra, wisimm1, wisimm2, wisnotes, wis2notes) {
+        function assignAttributes(wisdom, intuition, willpower, bonusSpells, wisimm1, wisimm2, wisnotes, wis2notes) {
             setAttrs({
                 wisdef: wisdomTable['wisdef'][willpower],
-                wisbonus: wisbonusprime,
-                'wisbonus-prime': wisbonusprime,
-                'wisbonus-extra': wisbonusextra,
+                wisbonus: bonusSpells['wisbonus'],
+                'wisbonus-prime': bonusSpells['wisbonus-prime'],
+                'wisbonus-extra': bonusSpells['wisbonus-extra'],
                 wisfail: wisdomTable['wisfail'][intuition],
                 wisimm: wisimm1,
                 wisimm1: wisimm1,
                 wisimm2: wisimm2,
                 wisnotes: wisnotes,
                 wis2notes: wis2notes,
+                'spell-priest-level1-wisdom': bonusSpells['1st'] 
+                'spell-priest-level2-wisdom': bonusSpells['2nd']
+                'spell-priest-level3-wisdom': bonusSpells['3rd']
+                'spell-priest-level4-wisdom': bonusSpells['4th']
+                'spell-priest-level5-wisdom': bonusSpells['5th']
+                'spell-priest-level6-wisdom': bonusSpells['6th']
+                'spell-priest-level7-wisdom': bonusSpells['7th']
             });
         }
     });
