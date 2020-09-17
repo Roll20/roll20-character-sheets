@@ -10,7 +10,7 @@ wiz1['Affect Normal Fires'] = {
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',
-    'materials': 'Open fire',
+    'materials': 'Open fire or flame',
     'reference': 'PHB p. 170',
     'damage': '',
     'damage-type': '',
