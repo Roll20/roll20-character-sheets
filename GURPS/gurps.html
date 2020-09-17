@@ -393,15 +393,15 @@
 							<div class="item item15">
 								<div>
 									<div class="tooltip">
-										<span data-i18n="abbreviation-maximum-label">Max</span>
+										<span data-i18n="total-label">Total</span>
 										<span class="tooltiptext move-left">
 											<span data-i18n="targeting-systems-description">Combined totals from all targeting systems can't exceed weapon's base Accuracy. See B364</span>
 										</span>
 									</div>
 								</div>
 								<div>
-									<input type="hidden" name="attr_ranged_max_targeting" value="0" title="macro name: @{ranged_max_targeting}" />
-									<span name="attr_ranged_max_targeting"></span>
+									<input type="hidden" name="attr_ranged_targeting_system_modifier" value="0" title="macro name: @{ranged_targeting_system_modifier}" />
+									<span name="attr_ranged_targeting_system_modifier"></span>
 								</div>
 							</div>
 
@@ -1626,8 +1626,8 @@
 										</div>
 									</label>
 									<div>
-										<input type="number" name="attr_ranged_bulk" step="1" max="0" value="0" title="macro: @{ranged_bulk}" />
-										<input type="hidden" name="attr_ranged_move_default_or_bulk" value="-2" title="macro: @{ranged_move_default_or_bulk}" />
+										<input type="number" name="attr_ranged_bulk" step="1" max="0" value="-2" title="macro: @{ranged_bulk}" />
+										<input type="hidden" name="attr_ranged_move_default_or_bulk" value="0" title="macro: @{ranged_move_default_or_bulk}" />
 										<span data-i18n="bulk-label">Bulk</span>
 									</div>
 								</div>
@@ -12759,8 +12759,14 @@ See notes for weapon.</textarea>
                     	{r:7000, m:-21},
                     	{r:10000, m:-22},
                     	{r:15000, m:-23},
-                    	{r:20000, m:-24}
-                    ];
+						{r:20000, m:-24},
+						{r:30000, m:-25},
+						{r:50000, m:-26},
+						{r:70000, m:-27},
+						{r:100000, m:-28},
+						{r:150000, m:-29},
+						{r:200000, m:-30},
+					];
 
     /**
      * Create global function
@@ -12770,13 +12776,15 @@ See notes for weapon.</textarea>
      **/
     const getModBySpeedRange = (d) => {
     	
-    	// find first matching entry where range is greater than distance
+    	// find first matching entry where range is greater than or equal to distance
     	// Distance = 4, first entry where range is greater than 4. 
     	// Range = 5, which is greater than 4. return that object. Modifier = -2
     	const entry = modBySpeedRange.find((o)=>o.r>=d );
-    	
+		
+		// TODO: use formula. Each 10x increase in linear measurement, give +6 SM or -6 speed/range modifier
+		
     	// if no matches, return -24.
-    	return (entry != undefined ? entry.m : -24);
+    	return (entry != undefined ? entry.m : -30);
     
 	};
 	
@@ -12842,8 +12850,12 @@ See notes for weapon.</textarea>
 		["mounted_skill_difference", {modifier: 0, description: "Mount attack, difference between skills", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["mount_attacked", {modifier: -2, description: "Mount attacked last turn", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
 		["mount_has_velocity", {modifier: -1, description: "Mount relative velocity 7+. +1 damage, lances special damage", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
+		["ranged_accuracy_bonus", {modifier: 0, description: "Accuracy bonus.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["ranged_range_speed_modifier", {modifier: 0, description: "Range/Speed Modifier.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["ranged_aiming_bonus", {modifier: 0, description: "Aiming bonus.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["ranged_rof_modifier", {modifier: 0, description: "Rate of Fire.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
+		["ranged_targeting_system_modifier", {modifier: 0, description: "Targeting system.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["ranged_maneuver", {modifier: 0, description: "A function returns description.", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
-		["ranged_move_default_or_bulk", {modifier: 0, description: "Move/Attack penalty.", affectsVisibility: false, isDropDown: false, isMax9: false, isTrait: false, checkPain: false}],
 		["ranged_in_close_combat", {modifier: 0, description: "Close combat", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["ranged_damaged_weapon", {modifier: 0, description: "Damaged weapon", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
 		["ranged_strength_difference", {modifier: 0, description: "Strength Difference", affectsVisibility: false, isDropDown: true, isMax9: false, isTrait: false, checkPain: false}],
@@ -13042,6 +13054,11 @@ See notes for weapon.</textarea>
 		"ranged_weapon_hand",
 		"ranged_off_hand_training",
 		"ranged_dual_weapon_training",
+		"ranged_accuracy_bonus",
+		"ranged_range_speed_modifier",
+		"ranged_aiming_bonus",
+		"ranged_rof_modifier",
+		"ranged_targeting_system_modifier",
 		"ranged_maneuver",
 		"ranged_move_default_or_bulk",
 		"ranged_in_close_combat",
@@ -19572,7 +19589,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	/**
      * Create global function
-     * use: var mod = getModBySpeedRange(14);
+     * use: var mod = getDefenseNotesByCode("blah");
      * Uses the array of json object objects
      * to get the modifier based on speed/range
      **/
@@ -19942,6 +19959,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			let value = "";
 
+			// TODO: split this up modType.
 			let updateFields = {
 				roll_modifier: 0,
 				max_skill_nine: 0,
@@ -19961,6 +19979,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 				target_down: 0,
 				target_partly_exposed: 0,
 				target_intervening_figures: 0,
+				ranged_range_speed: 0,
+				ranged_rof: 0,
+				ranged_scope_bonus: 0,
+				ranged_laser_sight: 0,
+				ranged_bulk: -2,
+				ranged_move_default_or_bulk: 0,
 			};
 
 			switch (modType) {
@@ -20094,6 +20118,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 		"change:ranged_weapon_hand",
 		"change:ranged_off_hand_training",
 		"change:ranged_dual_weapon_training",
+		"change:ranged_accuracy_bonus",
+		"change:ranged_range_speed_modifier",
+		"change:ranged_aiming_bonus",
+		"change:ranged_rof_modifier",
+		"change:ranged_targeting_system_modifier",
 		"change:ranged_maneuver",
 		"change:ranged_move_default_or_bulk",
 		"change:ranged_in_close_combat",
@@ -20477,7 +20506,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 							key == "melee_height_difference" ||
 							key == "weapon_hand" || 
 							key == "ranged_weapon_hand" ||
-							key == "ranged_vehicle_conditions" ) {
+							key == "ranged_vehicle_conditions" ||
+							key == "ranged_maneuver" ) {
 
 					// we already have the description
 
@@ -21553,6 +21583,170 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 		return applyProne;
+
+	}
+
+	// if range/speed change, update the modifier
+	on("change:ranged_range_speed", event => {
+
+		updateRangeSpeedModifier();
+
+	});
+
+	/**
+	 * Update the speed/range modifier based on number of hexes
+	 * in attr_ranged_range_speed
+	 */
+	function updateRangeSpeedModifier() {
+		
+		getAttrs(["ranged_range_speed"], values => {
+
+			let hexes = Number(values.ranged_range_speed);
+
+			let modifier = getModBySpeedRange(hexes);
+
+			setAttrs({ranged_range_speed_modifier: modifier});
+
+		});
+	}
+
+	// if ranged rate of fire changed, update the modifier
+	on ("change:ranged_rof", event => {
+
+		getAttrs(["ranged_rof"], values => {
+
+			let modifier = getRateOfFireModifier(Number(values.ranged_rof));
+
+			setAttrs({ranged_rof_modifier: modifier});
+
+		});
+
+	});
+
+	// see: https://app.roll20.net/forum/post/7251390/slug%7D
+	const modByRateOfFire = [ 
+                    	{r:4, m:0},
+                    	{r:8, m:1},
+                    	{r:12, m:2},
+                    	{r:16, m:3},
+                    	{r:24, m:4},
+                    	{r:49, m:5},
+                    	{r:99, m:6},
+                    	{r:199, m:7},
+					];
+
+	function getRateOfFireModifier(rof) {
+
+		const entry = modByRateOfFire.find((o)=>o.r>=rof );
+		
+		// TODO: use formula. each x2 RoF add +1 to hit
+		
+    	// if no matches, return 8.
+    	return (entry != undefined ? entry.m : 8);
+
+	}
+
+	// check for change to hit location fields
+	// easier to read and change list of fields using this method
+	const arrChangeTargetingSystems = [
+		"change:ranged_scope_bonus",
+		"change:ranged_vehicle_targeting_bonus", 
+		"change:ranged_laser_sight",
+		"change:ranged_accuracy_bonus",
+		"change:vehicle_stability_rating",
+		"change:vehicle_weapon_unstabilized", 
+	];
+
+	const changeTargetingSystems = arrChangeTargetingSystems.join(" ");
+
+	on(changeTargetingSystems, event => {
+		
+		updateTargetingSystems();
+
+	});
+
+	function updateTargetingSystems() {
+
+		const fields = [
+			"ranged_scope_bonus",
+			"ranged_vehicle_targeting_bonus",
+			"ranged_laser_sight",
+			"ranged_accuracy_bonus",
+			"vehicle_stability_rating",
+			"vehicle_weapon_unstabilized",
+		];
+
+		getAttrs(fields, values => {
+
+			let modifier = 0;
+
+			let scope = Number(values.ranged_scope_bonus);
+
+			let targeting = Number(values.ranged_vehicle_targeting_bonus);
+
+			let laser = Number(values.ranged_laser_sight);
+
+			let stability = Number(values.vehicle_stability_rating);
+
+			let unstabilized = Number(values.vehicle_weapon_unstabilized);
+
+			let accuracy = Number(values.ranged_accuracy_bonus);
+
+			modifier = scope + targeting + laser;
+
+			// check for unstabilized vehicle weapon
+			if (unstabilized && modifier > stability) {
+
+				// targeting can't exceed the stability rating
+				modifier = stability;
+
+			} else if (modifier > accuracy) {
+				
+				// targeting can't exceed accuracy bonus
+				modifier = accuracy;
+
+			}
+
+			setAttrs({ranged_targeting_system_modifier: modifier});
+
+		});
+
+	}
+
+	// check for changes to move/attack and bulk
+	on("change:ranged_maneuver change:ranged_bulk change:ranged_move_default_or_bulk", event => {
+
+		updateRangedMoveAttackBulk();
+
+	});
+
+	function updateRangedMoveAttackBulk() {
+
+		let fields = [
+			"ranged_maneuver",
+			"ranged_bulk",
+		];
+
+		getAttrs(fields, values => {
+
+			let modifier = 0;
+
+			let bulk = Number(values.ranged_bulk);
+
+			if (values.ranged_maneuver == "move-attack-ranged") {
+
+				modifier = -2;
+
+				// check for bulky item
+				if (bulk < modifier) {
+					modifier = bulk;
+				}
+
+			}
+
+			setAttrs({ranged_move_default_or_bulk: modifier});
+
+		});
 
 	}
 
