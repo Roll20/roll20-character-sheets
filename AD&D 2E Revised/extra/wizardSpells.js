@@ -4,8 +4,8 @@ wiz1['Affect Normal Fires'] = {
     'name': 'Affect Normal Fires',
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
-    'range': '[[5*#LEVEL#]] yards',
-    'duration': '[[2*#LEVEL#]] rounds',
+    'range': '[[5*[[@{level-wizard}]]]] yards',
+    'duration': '[[2*[[@{level-wizard}]]]] rounds',
     'aoe': '10-feet radius',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -23,7 +23,7 @@ wiz1['Alarm'] = {
     'level': 'Level 1 Wizard',
     'school': 'Abjuration, Evocation',
     'range': '10 yards',
-    'duration': '[[4+(0.5*#LEVEL#)]] hours',
+    'duration': '[[4+(0.5*[[@{level-wizard}]])]] hours',
     'aoe': 'Up tp 20-feet cube',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -51,15 +51,15 @@ wiz1['Armor'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the shield spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The armor spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than [[8+#LEVEL#]] points. (It is important to note that the armor does not absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the armor spell grants the wearer full benefits of the Armor Class gained.'
+    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the shield spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The armor spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than [[8+[[@{level-wizard}]]]] points. (It is important to note that the armor does not absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the armor spell grants the wearer full benefits of the Armor Class gained.'
 };
 
 wiz1['Audible Glamer'] = {
     'name': 'Audible Glamer',
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
-    'range': '[[60+(10*#LEVEL#)]] yards',
-    'duration': '[[3*#LEVEL#]] rounds',
+    'range': '[[60+(10*[[@{level-wizard}]])]] yards',
+    'duration': '[[3*[[@{level-wizard}]]]] rounds',
     'aoe': 'Hearing range',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -69,7 +69,7 @@ wiz1['Audible Glamer'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the audible glamer spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The noise of the audible glamer is that of 4 men per level of the caster. Current noise is [[4*#LEVEL#]] men. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an audible glamer spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men. \n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the phantasmal force spell.'
+    'effect': 'When the audible glamer spell is cast, the wizard causes a volume of sound to arise, at whatever distance he desires (within range), and seem to recede, approach, or remain at a fixed place as desired. The volume of sound created, however, is directly related to the level of the spellcaster. The noise of the audible glamer is that of 4 men per level of the caster. Current noise is [[4*[[@{level-wizard}]]]] men. Thus, talking, singing, shouting, walking, marching, or running sounds can be created. The auditory illusion created by an audible glamer spell can be virtually any type of sound, but the relative volume must be commensurate with the level of the wizard casting the spell. A horde of rats running and squeaking is about the same volume as eight men running and shouting. A roaring lion is equal to the noise volume of 16 men, while a roaring dragon is equal to the noise volume of no fewer than 24 men. \n&emsp;A character stating that he does not believe the sound receives a saving throw, and if it succeeds, the character then hears a faint and obviously false sound, emanating from the caster’s direction. Note that this spell can enhance the effectiveness of the phantasmal force spell.'
 };
 wiz1['Burning Hands'] = {
     'name': 'Burning Hands',
@@ -83,7 +83,7 @@ wiz1['Burning Hands'] = {
     'saving-throw': '½',
     'materials': '',
     'reference': 'PHB p. 170',
-    'damage': '[[1d3+([[{2*#LEVEL#, 20}kl1]])]]',
+    'damage': '[[1d3+([[{2*[[@{level-wizard}]], 20}kl1]])]]',
     'damage-type': 'Fire',
     'healing': '',
     'effect': 'When the wizard casts this spell, a jet of searing flame shoots from his fingertips. His hands must be held so as to send forth a fanlike sheet of flames: The wizard’s thumbs must touch each other and the fingers must be spread. The burning hands send out flame jets 5 feet long in a horizontal arc of about 120 degrees in front of the wizard. Any creature in the area of the flames suffers 1d3 points of damage, plus 2 points for each level of experience of the spellcaster, to a maximum of 1d3+20 points of fire damage. Those successfully saving vs. spell receive half damage. Flammable materials touched by the fire burn (for example, cloth, paper, parchment, thin wood, etc.). Such materials can be extinguished in the next round if no other action is taken.'
@@ -93,7 +93,7 @@ wiz1['Cantrip'] = {
     'level': 'Level 1 Wizard',
     'school': 'All Schools',
     'range': '10 feet',
-    'duration': '[[#LEVEL#]] hours',
+    'duration': '[[[[@{level-wizard}]]]] hours',
     'aoe': 'Special',
     'components': 'V, S',
     'cast-time': '1',
@@ -110,7 +110,7 @@ wiz1['Change Self'] = {
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '0',
-    'duration': '[[2d6+2*#LEVEL#]] rounds',
+    'duration': '[[2d6+2*[[@{level-wizard}]]]] rounds',
     'aoe': 'The caster',
     'components': 'V, S',
     'cast-time': '1',
@@ -146,7 +146,7 @@ wiz1['Chill Touch'] = {
     'level': 'Level 1 Wizard',
     'school': 'Necromancy',
     'range': '0',
-    'duration': '[[3+#LEVEL#]]',
+    'duration': '[[3+[[@{level-wizard}]]]]',
     'aoe': 'The caster',
     'components': 'V, S',
     'cast-time': '1',
@@ -182,7 +182,7 @@ wiz1['Comprehend Languages'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': 'Touch',
-    'duration': '[[5*#LEVEL#]] rounds',
+    'duration': '[[5*[[@{level-wizard}]]]] rounds',
     'aoe': '1 speaking creature or written text',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -199,8 +199,8 @@ wiz1['Dancing Lights'] = {
     'name': 'Dancing Lights',
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
-    'range': '[[40+(10*#LEVEL#)]]',
-    'duration': '[[2*#LEVEL#]] rounds',
+    'range': '[[40+(10*[[@{level-wizard}]])]]',
+    'duration': '[[2*[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -218,7 +218,7 @@ wiz1['Detect Magic'] = {
     'level': 'Level 1 Wizard',
     'school': 'Divination',
     'range': '0',
-    'duration': '[[2*#LEVEL#]]',
+    'duration': '[[2*[[@{level-wizard}]]]]',
     'aoe': '10 x 60 feet',
     'components': 'V, S',
     'cast-time': '1',
@@ -237,7 +237,7 @@ wiz1['Detect Undead'] = {
     'school': 'Divination, Necromancy',
     'range': '0',
     'duration': '3 turns',
-    'aoe': '[[60+(10*#LEVEL#)]] feet',
+    'aoe': '[[60+(10*[[@{level-wizard}]])]] feet',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -253,7 +253,7 @@ wiz1['Enlarge'] = {
     'name': 'Enlarge',
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
-    'range': '[[5*#LEVEL#]] yards',
+    'range': '[[5*[[@{level-wizard}]]]] yards',
     'duration': '[[5*LEVEL#]] rounds',
     'aoe': '1 creature or object',
     'components': 'V, S, M',
@@ -264,7 +264,7 @@ wiz1['Enlarge'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes instant growth of a creature or object, increasing both size and weight. It can be cast only upon a single creature (or a symbiotic or community entity) or upon a single object that does not exceed 10 cubic feet in volume per caster level. The object or creature must be seen to be affected. It grows by up to 10% per level of experience of the wizard ([[10*#LEVEL#]]%), increasing this amount in height, width, and weight. \n&emsp;All equipment worn or carried by a creature is enlarged by the spell. Unwilling victims are entitled to a saving throw vs. spell. A successful saving throw means the spell fails. If insufficient room is available for the desired growth, the creature or object attains the maximum possible size, bursting weak enclosures in the process, but it is constrained without harm by stronger materials—the spell cannot be used to crush a creature by growth. \n&emsp;Magical properties are not increased by this spell—a huge sword +1 is still only +1, a staff-sized wand is still only capable of its normal functions, a giant-sized potion merely requires a greater fluid intake to make its magical effects operate, etc. Weight, mass, and strength are affected, though. Thus, a table blocking a door would be heavier and more effective, a hurled stone would have more mass (and cause more damage), chains would be more massive, doors thicker, a thin line turned to a sizeable, longer rope, and so on. A creature’s hit points, Armor Class, and attack rolls do not change, but damage rolls increase proportionately with size.For example, a fighter at 160% normal size hits with his long sword and rolls a 6 for damage. The adjusted damage roll is 10 (that is, 6 × 1.6 = 9.6, rounded up). Bonuses due to Strength, class, and magic are not altered. \n&emsp;The reverse spell, reduce, negates the enlarge spell or makes creatures or objects smaller. The creature or object loses 10% of its original size for every level of the caster, to a minimum of 10% of the original size. Thereafter, the size shrinks by 1-foot increments to less than 1 foot, by 1-inch increments to 1 inch, and by 1⁄10-inch increments to a minimum of 1⁄10 of an inch—the recipient cannot dwindle away to nothingness. \n&emsp;For example, a 16-foot-tall giant reduced by a 15th-level wizard (15 steps) would be reduced to 1.6 feet (in nine steps), then to 6⁄10 of a foot or 7.2 inches (in one step), and finally to 2.2 inches (in the last five steps). A shrinking object may damage weaker materials affixed to it, but an object will shrink only as long as the object itself is not damaged. Unwilling creatures are allowed a saving throw vs. spell.'
+    'effect': 'This spell causes instant growth of a creature or object, increasing both size and weight. It can be cast only upon a single creature (or a symbiotic or community entity) or upon a single object that does not exceed 10 cubic feet in volume per caster level. The object or creature must be seen to be affected. It grows by up to 10% per level of experience of the wizard ([[10*[[@{level-wizard}]]]]%), increasing this amount in height, width, and weight. \n&emsp;All equipment worn or carried by a creature is enlarged by the spell. Unwilling victims are entitled to a saving throw vs. spell. A successful saving throw means the spell fails. If insufficient room is available for the desired growth, the creature or object attains the maximum possible size, bursting weak enclosures in the process, but it is constrained without harm by stronger materials—the spell cannot be used to crush a creature by growth. \n&emsp;Magical properties are not increased by this spell—a huge sword +1 is still only +1, a staff-sized wand is still only capable of its normal functions, a giant-sized potion merely requires a greater fluid intake to make its magical effects operate, etc. Weight, mass, and strength are affected, though. Thus, a table blocking a door would be heavier and more effective, a hurled stone would have more mass (and cause more damage), chains would be more massive, doors thicker, a thin line turned to a sizeable, longer rope, and so on. A creature’s hit points, Armor Class, and attack rolls do not change, but damage rolls increase proportionately with size.For example, a fighter at 160% normal size hits with his long sword and rolls a 6 for damage. The adjusted damage roll is 10 (that is, 6 × 1.6 = 9.6, rounded up). Bonuses due to Strength, class, and magic are not altered. \n&emsp;The reverse spell, reduce, negates the enlarge spell or makes creatures or objects smaller. The creature or object loses 10% of its original size for every level of the caster, to a minimum of 10% of the original size. Thereafter, the size shrinks by 1-foot increments to less than 1 foot, by 1-inch increments to 1 inch, and by 1⁄10-inch increments to a minimum of 1⁄10 of an inch—the recipient cannot dwindle away to nothingness. \n&emsp;For example, a 16-foot-tall giant reduced by a 15th-level wizard (15 steps) would be reduced to 1.6 feet (in nine steps), then to 6⁄10 of a foot or 7.2 inches (in one step), and finally to 2.2 inches (in the last five steps). A shrinking object may damage weaker materials affixed to it, but an object will shrink only as long as the object itself is not damaged. Unwilling creatures are allowed a saving throw vs. spell.'
 };
 
 wiz1['Erase'] = {
@@ -282,15 +282,15 @@ wiz1['Erase'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'The erase spell removes writings of either magical or mundane nature from a scroll or from one to two pages of paper, parchment, or similar surfaces. It removes explosive runes, glyphs of warding, sepia snake sigils, and wizard marks, but it does not remove illusory script or symbols (see those spells). Nonmagical writings are automatically erased if the caster is touching them; otherwise, the chance for success is 90%. Magical writings must be touched, and are only 30% likely to be erased, plus 5% per caster level, to a maximum of 90% (current chance: [[30+(5*#LEVEL#)]]%).'
+    'effect': 'The erase spell removes writings of either magical or mundane nature from a scroll or from one to two pages of paper, parchment, or similar surfaces. It removes explosive runes, glyphs of warding, sepia snake sigils, and wizard marks, but it does not remove illusory script or symbols (see those spells). Nonmagical writings are automatically erased if the caster is touching them; otherwise, the chance for success is 90%. Magical writings must be touched, and are only 30% likely to be erased, plus 5% per caster level, to a maximum of 90% (current chance: [[30+(5*[[@{level-wizard}]])]]%).'
 };
 
 wiz1['Feather Fall'] = {
     'name': 'Feather Fall',
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
-    'range': '[[10*#LEVEL#]] yards',
-    'duration': '[[#LEVEL#]] rounds',
+    'range': '[[10*[[@{level-wizard}]]]] yards',
+    'duration': '[[[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V',
     'cast-time': '1',
@@ -300,14 +300,14 @@ wiz1['Feather Fall'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the creature(s) or object(s) affected immediately assumes the mass of a piece of down. The rate of falling is instantly changed to a mere 2 feet per second (120 feet per round), and no damage is incurred upon landing while the spell is in effect. However, when the spell duration ceases, a normal rate of fall occurs. The spell can be cast upon the wizard or some other creature or object up to the maximum range and lasts for one round for each level of the wizard. The feather fall affects one or more objects or creatures in a 10-foot cube, as long as the maximum weight of the creatures or objects does not exceed a combined total of 200 pounds plus 200 pounds per level of the spellcaster. \n&emsp;Current weight limit: [[200+(200*#LEVEL#)]] pounds when casting this spell. The spell works only upon free-falling, flying, or propelled objects (such as missiles). It does not affect a sword blow or a charging creature. Note that the spell can be effectively combined with gust of wind and similar spells.'
+    'effect': 'When this spell is cast, the creature(s) or object(s) affected immediately assumes the mass of a piece of down. The rate of falling is instantly changed to a mere 2 feet per second (120 feet per round), and no damage is incurred upon landing while the spell is in effect. However, when the spell duration ceases, a normal rate of fall occurs. The spell can be cast upon the wizard or some other creature or object up to the maximum range and lasts for one round for each level of the wizard. The feather fall affects one or more objects or creatures in a 10-foot cube, as long as the maximum weight of the creatures or objects does not exceed a combined total of 200 pounds plus 200 pounds per level of the spellcaster. \n&emsp;Current weight limit: [[200+(200*[[@{level-wizard}]])]] pounds when casting this spell. The spell works only upon free-falling, flying, or propelled objects (such as missiles). It does not affect a sword blow or a charging creature. Note that the spell can be effectively combined with gust of wind and similar spells.'
 };
 
 wiz1['Find Familiar'] = {
     'name': 'Find Familiar',
     'level': 'Level 1 Wizard',
     'school': 'Conjuration/Summoning',
-    'range': '[[#LEVEL#]] miles',
+    'range': '[[[[@{level-wizard}]]]] miles',
     'duration': 'Special',
     'aoe': '1 familiar',
     'components': 'V, S, M',
@@ -326,7 +326,7 @@ wiz1['Friends'] = {
     'level': 'Level 1 Wizard',
     'school': 'Enchantment/Charm',
     'range': '0',
-    'duration': '[[1d4+#LEVEL#]] rounds',
+    'duration': '[[1d4+[[@{level-wizard}]]]] rounds',
     'aoe': '60-feet radius',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -344,7 +344,7 @@ wiz1['Gaze Reflection'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '0',
-    'duration': '[[2+#LEVEL#]] rounds',
+    'duration': '[[2+[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S',
     'cast-time': '1',
@@ -362,7 +362,7 @@ wiz1['Grease'] = {
     'level': 'Level 1 Wizard',
     'school': 'Conjuration',
     'range': '10 yards',
-    'duration': '[[3+#LEVEL#]] rounds',
+    'duration': '[[3+[[@{level-wizard}]]]] rounds',
     'aoe': '10 x 10 feet',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -379,9 +379,9 @@ wiz1['Hold Portal'] = {
     'name': 'Hold Portal',
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
-    'range': '[[20*#LEVEL#]] yards',
-    'duration': '[[#LEVEL#]] rounds',
-    'aoe': '[[20*#LEVEL#]] square feet',
+    'range': '[[20*[[@{level-wizard}]]]] yards',
+    'duration': '[[[[@{level-wizard}]]]] rounds',
+    'aoe': '[[20*[[@{level-wizard}]]]] square feet',
     'components': 'V',
     'cast-time': '1',
     'saving-throw': 'None',
@@ -398,7 +398,7 @@ wiz1['Hypnotism'] = {
     'level': 'Level 1 Wizard',
     'school': 'Enchantment/Charm',
     'range': '5 yards',
-    'duration': '[[1+#LEVEL#]] rounds',
+    'duration': '[[1+[[@{level-wizard}]]]] rounds',
     'aoe': '30 feet cube',
     'components': 'V, S',
     'cast-time': '1',
@@ -416,8 +416,8 @@ wiz1['Identify'] = {
     'level': 'Level 1 Wizard',
     'school': 'Divination',
     'range': '0',
-    'duration': '[[#LEVEL#]] rounds',
-    'aoe': '[[#LEVEL#]] items',
+    'duration': '[[[[@{level-wizard}]]]] rounds',
+    'aoe': '[[[[@{level-wizard}]]]] items',
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
@@ -426,7 +426,7 @@ wiz1['Identify'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When an identify spell is cast, magical items subsequently touched by the wizard can be identified. The eight hours immediately preceding the casting of the spell must be spent purifying the items and removing influences that would corrupt and blur their magical auras. If this period is interrupted, it must be begun again. When the spell is cast, each item must be handled in turn by the wizard. Any consequences of this handling fall fully upon the wizard and may end the spell, although the wizard is allowed any applicable saving throw. \n&emsp;The chance of learning a piece of information about an item is equal to 10% per level of the caster, to a maximum of 90%, rolled by the DM. Current chance is [[{{(10*#LEVEL#),90}kl1}]]%. Any roll of 96–00 indicates a false reading (91–95 reveals nothing). Only one function of a multifunction item is discovered per handling (i.e., a 5th-level wizard could attempt to determine the nature of five different items, five different functions of a single item, or any combination of the two). If any attempt at reading fails, the caster cannot learn any more about that item until he advances a level. Note that some items, such as special magical tomes, cannot be identified with this spell. \n&emsp;The item never reveals its exact attack or damage bonuses, although the fact that it has few or many bonuses can be determined. If it has charges, only a general indication of the number of charges remaining is learned: powerful (81% – 100% of the total possible charges), strong (61% – 80%), moderate (41% – 60%), weak (6% – 40%), or faint (five charges or less). The faint result takes precedence, so a fully charged ring of three wishes always appears to be only faintly charged. \n&emsp;After casting the spell and determining what can be learned from it, the wizard loses 8 points of Constitution. He must rest for one hour to recover each point of Constitution. If the 8-point loss drops the spellcaster below a Constitution of 1, he falls unconscious. Consciousness is not regained until full Constitution is restored, which takes 24 hours (one point per three hours for an unconscious character). \n&emsp;The material components infusion must be drunk prior to spellcasting. If a luckstone is powdered and added to the infusion, the divination becomes much more potent: Exact bonuses or charges can be determined, and the functions of a multifunctional item can be learned from a single reading. At the DM’s option, certain properties of an artifact or relic might also be learned.'
+    'effect': 'When an identify spell is cast, magical items subsequently touched by the wizard can be identified. The eight hours immediately preceding the casting of the spell must be spent purifying the items and removing influences that would corrupt and blur their magical auras. If this period is interrupted, it must be begun again. When the spell is cast, each item must be handled in turn by the wizard. Any consequences of this handling fall fully upon the wizard and may end the spell, although the wizard is allowed any applicable saving throw. \n&emsp;The chance of learning a piece of information about an item is equal to 10% per level of the caster, to a maximum of 90%, rolled by the DM. Current chance is [[{{(10*[[@{level-wizard}]]),90}kl1}]]%. Any roll of 96–00 indicates a false reading (91–95 reveals nothing). Only one function of a multifunction item is discovered per handling (i.e., a 5th-level wizard could attempt to determine the nature of five different items, five different functions of a single item, or any combination of the two). If any attempt at reading fails, the caster cannot learn any more about that item until he advances a level. Note that some items, such as special magical tomes, cannot be identified with this spell. \n&emsp;The item never reveals its exact attack or damage bonuses, although the fact that it has few or many bonuses can be determined. If it has charges, only a general indication of the number of charges remaining is learned: powerful (81% – 100% of the total possible charges), strong (61% – 80%), moderate (41% – 60%), weak (6% – 40%), or faint (five charges or less). The faint result takes precedence, so a fully charged ring of three wishes always appears to be only faintly charged. \n&emsp;After casting the spell and determining what can be learned from it, the wizard loses 8 points of Constitution. He must rest for one hour to recover each point of Constitution. If the 8-point loss drops the spellcaster below a Constitution of 1, he falls unconscious. Consciousness is not regained until full Constitution is restored, which takes 24 hours (one point per three hours for an unconscious character). \n&emsp;The material components infusion must be drunk prior to spellcasting. If a luckstone is powdered and added to the infusion, the divination becomes much more potent: Exact bonuses or charges can be determined, and the functions of a multifunctional item can be learned from a single reading. At the DM’s option, certain properties of an artifact or relic might also be learned.'
 };
 
 wiz1['Jump'] = {
@@ -434,7 +434,7 @@ wiz1['Jump'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': 'Touch',
-    'duration': '[[1d3+#LEVEL#]] rounds',
+    'duration': '[[1d3+[[@{level-wizard}]]]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -452,7 +452,7 @@ wiz1['Light'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '60 yards',
-    'duration': '[[#LEVEL#]] turns',
+    'duration': '[[[[@{level-wizard}]]]] turns',
     'aoe': '20-feet radius',
     'components': 'V, M',
     'cast-time': '1',
@@ -469,7 +469,7 @@ wiz1['Magic Missile'] = {
     'name': 'Magic Missile',
     'level': 'Level 1 Wizard',
     'school': 'Evocation',
-    'range': '[[60+(10*#LEVEL#)]] yards',
+    'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Instantaneous',
     'aoe': '1-5 targets',
     'components': 'V, S',
@@ -480,7 +480,7 @@ wiz1['Magic Missile'] = {
     'damage': '?{Number of missiles?|1 missile, [[1d4+1]]|2 missiles, M1:[[1d4+1]] M2:[[1d4+1]]|3 missiles, M1:[[1d4+1]] M2:[[1d4+1]] M3:[[1d4+1]]|4 missiles, M1:[[1d4+1]] M2:[[1d4+1]] M3:[[1d4+1]] M4:[[1d4+1]]|5 missiles, M1:[[1d4+1]] M2:[[1d4+1]] M3:[[1d4+1]] M4:[[1d4+1]] M5:[[1d4+1]]}',
     'damage-type': '',
     'healing': '',
-    'effect': 'Use of the magic missile spell creates up to five missiles of magical energy that dart forth from the wizard’s fingertip and unerringly strike their target. This includes enemy creatures in a melee. The target creature must be seen or otherwise detected to be hit, however, so near-total concealment, such as that offered by arrow slits, can render the spell ineffective. Likewise, the caster must be able to identify the target. He cannot direct a magic missile to “Strike the commander of the legion,” unless he can single out the commander from the rest of the soldiers. Specific parts of a creature cannot be singled out. Inanimate objects (locks, etc.) cannot be damaged by the spell, and any attempt to do so wastes the missiles to no effect. Against creatures, each missile inflicts 1d4+1 points of damage. \n&emsp;For every two extra levels of experience, the wizard gains an additional missile—he has two at 3rd level, three at 5th level, four at 7th level, etc., up to a total of five missiles at 9th level. Current number of missiles [[1+([[{{floor((#LEVEL#-1)/2),4}kl1}]])]]. If the wizard has multiple missile capability, he can have them strike a single target creature or several creatures, as desired.'
+    'effect': 'Use of the magic missile spell creates up to five missiles of magical energy that dart forth from the wizard’s fingertip and unerringly strike their target. This includes enemy creatures in a melee. The target creature must be seen or otherwise detected to be hit, however, so near-total concealment, such as that offered by arrow slits, can render the spell ineffective. Likewise, the caster must be able to identify the target. He cannot direct a magic missile to “Strike the commander of the legion,” unless he can single out the commander from the rest of the soldiers. Specific parts of a creature cannot be singled out. Inanimate objects (locks, etc.) cannot be damaged by the spell, and any attempt to do so wastes the missiles to no effect. Against creatures, each missile inflicts 1d4+1 points of damage. \n&emsp;For every two extra levels of experience, the wizard gains an additional missile—he has two at 3rd level, three at 5th level, four at 7th level, etc., up to a total of five missiles at 9th level. Current number of missiles [[1+([[{{floor(([[@{level-wizard}]]-1)/2),4}kl1}]])]]. If the wizard has multiple missile capability, he can have them strike a single target creature or several creatures, as desired.'
 };
 
 wiz1['Mending'] = {
@@ -498,7 +498,7 @@ wiz1['Mending'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new. A hole in a leather sack or wineskin is completely healed over by a mending spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[#LEVEL#]] cubic feet.'
+    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new. A hole in a leather sack or wineskin is completely healed over by a mending spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[[[@{level-wizard}]]]] cubic feet.'
 };
 
 wiz1['Message'] = {
@@ -506,7 +506,7 @@ wiz1['Message'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '0',
-    'duration': '[[5*#LEVEL#]] rounds',
+    'duration': '[[5*[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -516,7 +516,7 @@ wiz1['Message'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[#LEVEL#]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Current range is [[30+(10*#LEVEL#)]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
+    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[[[@{level-wizard}]]]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Current range is [[30+(10*[[@{level-wizard}]])]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
 };
 
 wiz1['Mount'] = {
@@ -524,7 +524,7 @@ wiz1['Mount'] = {
     'level': 'Level 1 Wizard',
     'school': 'Conjuration/Summoning',
     'range': '10 yards',
-    'duration': '[[2+#LEVEL#]] hours',
+    'duration': '[[2+[[@{level-wizard}]]]] hours',
     'aoe': '1 mount',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -542,7 +542,7 @@ wiz1['Nystu\'s Magical Aura'] = {
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
-    'duration': '[[#LEVEL#]] days',
+    'duration': '[[[[@{level-wizard}]]]] days',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -552,16 +552,16 @@ wiz1['Nystu\'s Magical Aura'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, any one item of no more than five pounds weight per level of the spellcaster ([[#LEVEL#*5]] pounds) can be given an aura that is noticed by someone using magic detection. Furthermore, the caster can specify the type of magical aura that is detected (alteration, conjuration, etc.) and this effectively masks the item’s actual aura, if any, unless the item’s own aura is exceptionally powerful (if it is an artifact, for instance). If the object bearing Nystul’s magical aura has an identify spell cast on it or is similarly examined, the examiner has a 50% chance of recognizing that the aura has been placed to mislead the unwary. Otherwise, the aura is believed and no amount of testing reveals what the true magic is.'
+    'effect': 'By means of this spell, any one item of no more than five pounds weight per level of the spellcaster ([[[[@{level-wizard}]]*5]] pounds) can be given an aura that is noticed by someone using magic detection. Furthermore, the caster can specify the type of magical aura that is detected (alteration, conjuration, etc.) and this effectively masks the item’s actual aura, if any, unless the item’s own aura is exceptionally powerful (if it is an artifact, for instance). If the object bearing Nystul’s magical aura has an identify spell cast on it or is similarly examined, the examiner has a 50% chance of recognizing that the aura has been placed to mislead the unwary. Otherwise, the aura is believed and no amount of testing reveals what the true magic is.'
 };
 
 wiz1['Phantasmal Force'] = {
     'name': 'Phantasmal Force',
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
-    'range': '[[60+(10*#LEVEL#)]] yards',
+    'range': '[[60+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
-    'aoe': '[[400+(100*#LEVEL#)]] square feet',
+    'aoe': '[[400+(100*[[@{level-wizard}]])]] square feet',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'Special',
@@ -578,7 +578,7 @@ wiz1['Protection From Evil'] = {
     'level': 'Level 1 Wizard',
     'school': 'Abjuration',
     'range': 'Touch',
-    'duration': '[[2*#LEVEL#]] rounds',
+    'duration': '[[2*[[@{level-wizard}]]]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -596,7 +596,7 @@ wiz1['Read Magic'] = {
     'level': 'Level 1 Wizard',
     'school': 'Divination',
     'range': '0',
-    'duration': '[[2*#LEVEL#]] rounds',
+    'duration': '[[2*[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -614,7 +614,7 @@ wiz1['Shield'] = {
     'level': 'Level 1 Wizard',
     'school': 'Evocation',
     'range': '0',
-    'duration': '[[5*#LEVEL#]] rounds',
+    'duration': '[[5*[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S',
     'cast-time': '1',
@@ -639,10 +639,10 @@ wiz1['Shocking Grasp'] = {
     'saving-throw': 'None',
     'materials': '',
     'reference': 'PHB p. 178',
-    'damage': '[[1d8+#LEVEL#]]',
+    'damage': '[[1d8+[[@{level-wizard}]]]]',
     'damage-type': 'Lightning',
     'healing': '',
-    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[#LEVEL#]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
+    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[[[@{level-wizard}]]]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
 };
 
 wiz1['Sleep'] = {
@@ -650,7 +650,7 @@ wiz1['Sleep'] = {
     'level': 'Level 1 Wizard',
     'school': 'Enchantment/Charm',
     'range': '30 yards',
-    'duration': '[[5*#LEVEL#]] rounds',
+    'duration': '[[5*[[@{level-wizard}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -668,7 +668,7 @@ wiz1['Spider Climb'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': 'Touch',
-    'duration': '[[3+#LEVEL#]] rounds',
+    'duration': '[[3+[[@{level-wizard}]]]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -696,7 +696,7 @@ wiz1['Spook'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A spook spell enables the wizard to play upon natural fears to cause the target creature to perceive the spellcaster as someone or something inimical. Without actually knowing what this is, the wizard merely advances threateningly upon the creature. If the creature does not make a successful saving throw vs. spell, it turns and flees at maximum speed as far from the wizard as possible, though items carried are not dropped. The creature has a saving throw penalty of –1 for every two experience levels of the caster, to a maximum of –6 at 12th level. Current penalty [[{{[[floor(-#LEVEL#/2)]],-6}kh1}]]. Note that a natural (unmodified) roll of 20 automatically succeeds, regardless of saving throw penalties. Although the caster does not actually pursue the fleeing creature, a phantasm from its own mind does. Each round after the initial casting, the creature receives another saving throw, without penalty, until it successfully saves and the spell is broken. In any event, the spell functions only against creatures with Intelligences of 2 or more, and undead are not affected at all.'
+    'effect': 'A spook spell enables the wizard to play upon natural fears to cause the target creature to perceive the spellcaster as someone or something inimical. Without actually knowing what this is, the wizard merely advances threateningly upon the creature. If the creature does not make a successful saving throw vs. spell, it turns and flees at maximum speed as far from the wizard as possible, though items carried are not dropped. The creature has a saving throw penalty of –1 for every two experience levels of the caster, to a maximum of –6 at 12th level. Current penalty [[{{[[floor(-[[@{level-wizard}]]/2)]],-6}kh1}]]. Note that a natural (unmodified) roll of 20 automatically succeeds, regardless of saving throw penalties. Although the caster does not actually pursue the fleeing creature, a phantasm from its own mind does. Each round after the initial casting, the creature receives another saving throw, without penalty, until it successfully saves and the spell is broken. In any event, the spell functions only against creatures with Intelligences of 2 or more, and undead are not affected at all.'
 };
 
 wiz1['Taunt'] = {
@@ -722,7 +722,7 @@ wiz1['Tenser\'s Floating Disc'] = {
     'level': 'Level 1 Wizard',
     'school': 'Evocation',
     'range': '20 yards',
-    'duration': '[[3+#LEVEL#]] turns',
+    'duration': '[[3+[[@{level-wizard}]]]] turns',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -732,7 +732,7 @@ wiz1['Tenser\'s Floating Disc'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, the caster creates the slightly concave, circular plane of force known as Tenser’s floating disc (after the famed wizard whose greed and ability to locate treasure are well known). The disc is 3 feet in diameter and holds 100 pounds of weight per level of the wizard casting the spell. Current weight limit [[100*#LEVEL#]] pounds. The disc floats approximately 3 feet above the ground at all times and remains level. It floats along horizontally within its range of 20 yards at the command of the caster, and will accompany him at a movement rate of no more than 6. If unguided, it maintains a constant interval of 6 feet between itself and the wizard. If the spellcaster moves beyond range (by moving faster, by such means as a teleport spell, or by trying to take the disc more than 3 feet from the surface beneath it), or if the spell duration expires, the floating disc winks out of existence, and whatever it was supporting crashes to the surface beneath it.'
+    'effect': 'With this spell, the caster creates the slightly concave, circular plane of force known as Tenser’s floating disc (after the famed wizard whose greed and ability to locate treasure are well known). The disc is 3 feet in diameter and holds 100 pounds of weight per level of the wizard casting the spell. Current weight limit [[100*[[@{level-wizard}]]]] pounds. The disc floats approximately 3 feet above the ground at all times and remains level. It floats along horizontally within its range of 20 yards at the command of the caster, and will accompany him at a movement rate of no more than 6. If unguided, it maintains a constant interval of 6 feet between itself and the wizard. If the spellcaster moves beyond range (by moving faster, by such means as a teleport spell, or by trying to take the disc more than 3 feet from the surface beneath it), or if the spell duration expires, the floating disc winks out of existence, and whatever it was supporting crashes to the surface beneath it.'
 };
 
 wiz1['Unseen Servant'] = {
@@ -740,7 +740,7 @@ wiz1['Unseen Servant'] = {
     'level': 'Level 1 Wizard',
     'school': 'Conjuration/Summoning',
     'range': '0',
-    'duration': '1 hours + [[#LEVEL#]] turns',
+    'duration': '1 hours + [[[[@{level-wizard}]]]] turns',
     'aoe': '30-feet radius',
     'components': 'V, S, M',
     'cast-time': '1',
@@ -758,7 +758,7 @@ wiz1['Ventriloquism'] = {
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '[[{{[[10*#LEVLE#]],90}kl1}]] yards',
-    'duration': '[[4+#LEVEL#]] rounds',
+    'duration': '[[4+[[@{level-wizard}]]]] rounds',
     'aoe': '1 creature or object',
     'components': 'V, M',
     'cast-time': '1',
@@ -776,8 +776,8 @@ wiz1['Wall of Fog'] = {
     'level': 'Level 1 Wizard',
     'school': 'Evocation',
     'range': '30 yards',
-    'duration': '[[2d4+#LEVEL#]] rounds',
-    'aoe': '[[20+(10*#LEVEL#)]] feet cube',
+    'duration': '[[2d4+[[@{level-wizard}]]]] rounds',
+    'aoe': '[[20+(10*[[@{level-wizard}]])]] feet cube',
     'components': 'V, S, M',
     'cast-time': '1',
     'saving-throw': 'None',

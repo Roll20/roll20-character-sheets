@@ -16,7 +16,7 @@ pri1['Animal Friendship'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster is able to show any animal of animal intelligence to semi-intelligence (i.e., Intelligence 1–4) that he desires friendship. If the animal does not roll a successful saving throw vs. spell immediately when the spell is begun, it stands quietly while the caster finishes the spell. Thereafter, it follows the caster about. The spell functions only if the caster actually wishes to be the animal’s friend. If the caster has ulterior motives, the animal always senses them (for example, the caster intends to eat the animal, send it ahead to set off traps, etc.). \n&emsp;The caster can teach the befriended animal three specific tricks or tasks for each point of Intelligence it possesses. Typical tasks are those taught to a dog or similar pet (i.e., they cannot be complex). Training for each such trick must be done over a period of one week, and all must be done within three months of acquiring the creature. During the three-month period, the animal will not harm the caster, but if the creature is left alone for more than a week, it will revert to its natural state and act accordingly. \n&emsp;The caster can use this spell to attract up to 2 Hit Dice of animal(s) per experience level he possesses. This is also the maximum total Hit Dice of the animals that can be attracted and trained at one time: no more than twice the caster’s experience level. Current maximum [[2*#LEVEL#]] Hit Dice of animals. Only unaligned animals can be attracted, befriended, and trained.'
+    'effect': 'By means of this spell, the caster is able to show any animal of animal intelligence to semi-intelligence (i.e., Intelligence 1–4) that he desires friendship. If the animal does not roll a successful saving throw vs. spell immediately when the spell is begun, it stands quietly while the caster finishes the spell. Thereafter, it follows the caster about. The spell functions only if the caster actually wishes to be the animal’s friend. If the caster has ulterior motives, the animal always senses them (for example, the caster intends to eat the animal, send it ahead to set off traps, etc.). \n&emsp;The caster can teach the befriended animal three specific tricks or tasks for each point of Intelligence it possesses. Typical tasks are those taught to a dog or similar pet (i.e., they cannot be complex). Training for each such trick must be done over a period of one week, and all must be done within three months of acquiring the creature. During the three-month period, the animal will not harm the caster, but if the creature is left alone for more than a week, it will revert to its natural state and act accordingly. \n&emsp;The caster can use this spell to attract up to 2 Hit Dice of animal(s) per experience level he possesses. This is also the maximum total Hit Dice of the animals that can be attracted and trained at one time: no more than twice the caster’s experience level. Current maximum [[2*[[@{level-priest}]]]] Hit Dice of animals. Only unaligned animals can be attracted, befriended, and trained.'
 };
 
 pri1['Bless'] = {
@@ -92,7 +92,7 @@ pri1['Create Water'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the priest casts a create water spell, up to 4 gallons of water are generated for every experience level of the caster (Currently up to [[4*#LEVEL#]] gallons). The water is clean and drinkable (it is just like rain water). The created water can be dispelled within a round of its creation; otherwise, its magic fades, leaving normal water that can be used, spilled, evaporated, etc. The reverse of the spell, destroy water, obliterates without trace (no vapor, mist, fog, or steam) a like quantity of water. Water can be created or destroyed in an area as small as will actually contain the liquid, or in an area as large as 27 cubic feet (1 cubic yard). \n&emsp;Note that water can neither be created nor destroyed within a creature. For reference purposes, water weighs about 8½ pounds per gallon, and a cubic foot of water weighs approximately 64 pounds.'
+    'effect': 'When the priest casts a create water spell, up to 4 gallons of water are generated for every experience level of the caster (Currently up to [[4*[[@{level-priest}]]]] gallons). The water is clean and drinkable (it is just like rain water). The created water can be dispelled within a round of its creation; otherwise, its magic fades, leaving normal water that can be used, spilled, evaporated, etc. The reverse of the spell, destroy water, obliterates without trace (no vapor, mist, fog, or steam) a like quantity of water. Water can be created or destroyed in an area as small as will actually contain the liquid, or in an area as large as 27 cubic feet (1 cubic yard). \n&emsp;Note that water can neither be created nor destroyed within a creature. For reference purposes, water weighs about 8½ pounds per gallon, and a cubic foot of water weighs approximately 64 pounds.'
 };
 
 pri1['Cure Light Wounds'] = {
@@ -120,7 +120,7 @@ pri1['Detect Evil'] = {
     'school': 'Divination',
     'sphere': 'All',
     'range': '0',
-    'duration': '1 turn + [[5*#LEVEL#]] rounds',
+    'duration': '1 turn + [[5*[[@{level-priest}]]]] rounds',
     'aoe': '10 feet x 120 yards',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -130,7 +130,7 @@ pri1['Detect Evil'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell discovers emanations of evil, or of good in the case of the reverse spell, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil if intent upon appropriate actions. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. \n&emsp;The degree of evil (dim, faint, moderate, strong, or overwhelming) and possibly its general nature (expectant, malignant, gloating, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level ([[10*#LEVEL#]]%) of detecting its general bent (lawful, neutral, or chaotic). The duration of a detect evil (or detect good) spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration. Current duration [[10+(5*#LEVEL#)]] rounds. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura— for at least one round to receive a reading.'
+    'effect': 'This spell discovers emanations of evil, or of good in the case of the reverse spell, from any creature, object, or area. Character alignment, however, is revealed only under unusual circumstances: characters who are strongly aligned, who do not stray from their faith, and who are of at least 9th level might radiate good or evil if intent upon appropriate actions. Powerful monsters, such as rakshasas or ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enable them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. \n&emsp;The degree of evil (dim, faint, moderate, strong, or overwhelming) and possibly its general nature (expectant, malignant, gloating, etc.) can be noted. If the evil is overwhelming, the priest has a 10% chance per level ([[10*[[@{level-priest}]]]]%) of detecting its general bent (lawful, neutral, or chaotic). The duration of a detect evil (or detect good) spell is one turn plus five rounds per level of the priest. Thus, a 1st-level priest can cast a spell with a 15-round duration, a 2nd-level priest can cast a spell with a 20-round duration. Current duration [[10+(5*[[@{level-priest}]])]] rounds. The spell has a path of detection 10 feet wide in the direction the priest is facing. The priest must concentrate—stop, have quiet, and intently seek to detect the aura— for at least one round to receive a reading.'
 };
 
 pri1['Detect Magic'] = {
@@ -149,7 +149,7 @@ pri1['Detect Magic'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the detect magic spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*#LEVEL#]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.'
+    'effect': 'When the detect magic spell is cast, the priest detects magical radiations in a path 10 feet wide and up to 30 yards long, in the direction he is facing. The intensity of the magic can be detected (dim, faint, moderate, strong, or overwhelming). The caster has a 10% chance per level ([[10*[[@{level-priest}]]]]%) to determine the sphere of the magic, but unlike the wizard version of the spell, the type of magic (alteration, conjuration, etc.) cannot be divined. The caster can turn, scanning a 60° arc per round. The spell is blocked by solid stone at least 1 foot thick, solid metal at least 1 inch thick, or solid wood at least 1 yard thick.'
 };
 
 pri1['Detect Poison'] = {
@@ -158,7 +158,7 @@ pri1['Detect Poison'] = {
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
-    'duration': '1 turn + [[#LEVEL#]] rounds',
+    'duration': '1 turn + [[[[@{level-priest}]]]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -168,7 +168,7 @@ pri1['Detect Poison'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the priest to determine if an object has been poisoned or is poisonous. One object, or one 5-foot cubic mass, can be checked per round. The priest has a 5% chance per level of determining the exact type of poison. Currently [[5*#LEVEL#]]% of detecting the type of poison.'
+    'effect': 'This spell enables the priest to determine if an object has been poisoned or is poisonous. One object, or one 5-foot cubic mass, can be checked per round. The priest has a 5% chance per level of determining the exact type of poison. Currently [[5*[[@{level-priest}]]]]% of detecting the type of poison.'
 };
 
 pri1['Detect Snares & Pits'] = {
@@ -177,7 +177,7 @@ pri1['Detect Snares & Pits'] = {
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '0',
-    'duration': '[[4*#LEVEL#]] rounds',
+    'duration': '[[4*[[@{level-priest}]]]] rounds',
     'aoe': '10 x 40 feet',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -196,7 +196,7 @@ pri1['Endure Cold/Endure Heat'] = {
     'school': 'Alteration',
     'sphere': 'Protection',
     'range': 'Touch',
-    'duration': '[[1.5*#LEVEL#]] hours',
+    'duration': '[[1.5*[[@{level-priest}]]]] hours',
     'aoe': 'Creature touched',
     'components': 'V, S',
     'cast-time': '1 round',
@@ -234,8 +234,8 @@ pri1['Faerie Fire'] = {
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '80 yards',
-    'duration': '[[4*#LEVEL#]] rounds',
-    'aoe': '[[10*#LEVEL#]] square feet within 40-feet radius',
+    'duration': '[[4*[[@{level-priest}]]]] rounds',
+    'aoe': '[[10*[[@{level-priest}]]]] square feet within 40-feet radius',
     'components': 'V, M',
     'cast-time': '4',
     'saving-throw': 'None',
@@ -253,8 +253,8 @@ pri1['Invisibility to Animals'] = {
     'school': 'Alteration',
     'sphere': 'Animal',
     'range': 'Touch',
-    'duration': '1 turn + [[#LEVEL#]] rounds',
-    'aoe': '[[#LEVEL#]] creatures',
+    'duration': '1 turn + [[[[@{level-priest}]]]] rounds',
+    'aoe': '[[[[@{level-priest}]]]] creatures',
     'components': 'S, M',
     'cast-time': '4',
     'saving-throw': 'None',
@@ -291,7 +291,7 @@ pri1['Light'] = {
     'school': 'Alteration',
     'sphere': 'Sun',
     'range': '120 yards',
-    'duration': '1 hour + [[#LEVEL#]] turns',
+    'duration': '1 hour + [[[[@{level-priest}]]]] turns',
     'aoe': '20-feet-radius globe',
     'components': 'V, S',
     'cast-time': '4',
@@ -309,9 +309,9 @@ pri1['Locate Animals or Plants'] = {
     'level': 'Level 1 Priest',
     'school': 'Divination',
     'sphere': 'Divination (Animal, Plant)',
-    'range': '[[100+(20*#LEVEL#)]] yards',
-    'duration': '[[#LEVEL#]] rounds',
-    'aoe': '[[20*#LEVEL#]] yards x 20 feet',
+    'range': '[[100+(20*[[@{level-priest}]])]] yards',
+    'duration': '[[[[@{level-priest}]]]] rounds',
+    'aoe': '[[20*[[@{level-priest}]]]] yards x 20 feet',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -348,8 +348,8 @@ pri1['Pass Without Trace'] = {
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': 'Touch',
-    'duration': '[[#LEVEL#]] turns',
-    'aoe': '[[#LEVEL#]] creatures',
+    'duration': '[[[[@{level-priest}]]]] turns',
+    'aoe': '[[[[@{level-priest}]]]] creatures',
     'components': 'V, S, M',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -367,7 +367,7 @@ pri1['Protection From Evil'] = {
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': 'Touch',
-    'duration': '[[3*#LEVEL#]] rounds',
+    'duration': '[[3*[[@{level-priest}]]]] rounds',
     'aoe': '1 creature',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -387,7 +387,7 @@ pri1['Purify Food & Drink'] = {
     'sphere': 'All',
     'range': '30 yards',
     'duration': 'Permanent',
-    'aoe': '[[#LEVEL#]] cube feet in 10 square feet',
+    'aoe': '[[[[@{level-priest}]]]] cube feet in 10 square feet',
     'components': 'V, S',
     'cast-time': '1 round',
     'saving-throw': 'None',
@@ -406,7 +406,7 @@ pri1['Remove Fear'] = {
     'sphere': 'Charm',
     'range': '10 yards',
     'duration': 'Special',
-    'aoe': '[[ceil(#LEVEL#/4)]] creatures',
+    'aoe': '[[ceil([[@{level-priest}]]/4)]] creatures',
     'components': 'V, S',
     'cast-time': '1',
     'saving-throw': 'Special',
@@ -424,7 +424,7 @@ pri1['Sanctuary'] = {
     'school': 'Abjuration',
     'sphere': 'Protection',
     'range': 'Touch',
-    'duration': '[[2+#LEVEL#]] rounds',
+    'duration': '[[2+[[@{level-priest}]]]] rounds',
     'aoe': '1 creature',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -443,7 +443,7 @@ pri1['Shillelagh'] = {
     'school': 'Alteration',
     'sphere': 'Combat, Plant',
     'range': 'Touch',
-    'duration': '[[4+#LEVEL#]] rounds',
+    'duration': '[[4+[[@{level-priest}]]]] rounds',
     'aoe': '1 oak club',
     'components': 'V, S, M',
     'cast-time': '2',
