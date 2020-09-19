@@ -11,7 +11,9 @@
   <!-- Enf of tab block -->
 
 
-  <div class="tab tab-1">
+  <div class="tab-1">
+
+    <button type="action" name="act_activate">Activate!</button>
 
     <div class="container">
       <div class="section col-5 karakter values">
@@ -409,7 +411,7 @@
 
   </div>
 
-  <div class="tab tab-2">
+  <div class="tab-2">
     <div class="section karakterKepzettseg">
       <h2>Képzettségek</h2>
 
@@ -483,8 +485,6 @@
     </div>
   </div>
 
-
-
   <div class="tab-3">
     <div class="section karakterFelszereles">
       <h2>Felszerelés</h2>
@@ -498,12 +498,127 @@
 </div>
 
 <script type="text/worker">
-    const buttonlist = ["tab-1","tab-2","tab-3"];
-    buttonlist.forEach(button => {
-        on(`clicked:${button}`, function() {
-            setAttrs({
-                sheetTab: button
-            });
-        });
+  const buttonlist = ["tab-1","tab-2","tab-3"];
+  buttonlist.forEach(button => {
+    on(`clicked:${button}`, function() {
+      setAttrs({
+        sheetTab: button
+      });
     });
+  });
+</script>
+
+<script type="text/worker">
+  /**
+   * Migrating v1.0 to v1.1
+   *  Calculating KE, TE, VE, CE fields and persist them.
+   */
+  function migrateTo1_1() {
+    getAttrs([
+      "ugyesseg",
+      "gyorsasag",
+      "keAlap",
+      "kePerSzint",
+      "keMod",
+      "szint"
+    ], function(values) {
+      console.log("values", values);
+      const ke = calcKE(values.ugyesseg, values.gyorsasag, values.keAlap, values.kePerSzint, values.keMod, values.szint);
+      setAttrs({ke})
+    });
+
+    getAttrs([
+      "ero",
+      "ugyesseg",
+      "gyorsasag",
+      "teAlap",
+      "tePerSzint",
+      "teMod",
+      "szint"
+    ], function(values) {
+      console.log("values", values);
+      const te = calcTE(values.ero, values.ugyesseg, values.gyorsasag, values.teAlap, values.tePerSzint, values.teMod, values.szint);
+      setAttrs({te})
+    });
+
+    getAttrs([
+      "ugyesseg",
+      "gyorsasag",
+      "veAlap",
+      "vePerSzint",
+      "veMod",
+      "szint"
+    ], function(values) {
+      console.log("values", values);
+      const ve = calcVE(values.ugyesseg, values.gyorsasag, values.veAlap, values.vePerSzint, values.veMod, values.szint);
+      setAttrs({ve})
+    });
+
+    getAttrs([
+      "ugyesseg",
+      "ceAlap",
+      "cePerSzint",
+      "ceMod",
+      "szint"
+    ], function(values) {
+      console.log("values", values);
+      const ce = calcCE(values.ugyesseg, values.gyorsasag, values.ceAlap, values.cePerSzint, values.ceMod, values.szint);
+      setAttrs({ce})
+    });
+
+    setAttrs({migrated_1_0: "true"});
+  }
+
+  on("sheet:opened", function() {
+    getAttrs(["migrated_1_0"], function(values) {
+      if (values.migrated_1_0 != "true") {
+        console.info("Migrating from v1.0 to v1.1");
+        migrateTo1_1();
+      } else {
+        console.info("Has been migrated from v1.0 to v1.1")
+      }
+    });
+  });
+
+  function tizFelettiResz(tul) {
+    const result = tul - 10 < 0 ? 0 : tul - 10;
+    console.log(tul, "=>", result);
+    return result;
+  }
+
+  function calcKE(ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
+    console.log("ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "mod", mod, "szint", szint)
+
+    const ke = tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
+    console.log("KE", ke);
+
+    return ke;
+  }
+
+  function calcTE(ero, ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
+    console.log("ero", ero, "ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "szint", szint)
+
+    const te = tizFelettiResz(ero) + tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
+    console.log("TE", te);
+
+    return te;
+  }
+
+  function calcVE(ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
+    console.log("ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "szint", szint)
+
+    const ve = tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
+    console.log("VE", ve);
+
+    return ve;
+  }
+
+  function calcCE(ugyesseg, alap, perSzint, mod, szint) {
+    console.log("ugyesseg", ugyesseg, "alap", alap, "perSzint", perSzint, "szint", szint)
+
+    const ce = tizFelettiResz(ugyesseg) + Number(alap | 0) + Number(szint) * Number(perSzint | 0) + Number(mod);
+    console.log("CE", ce);
+
+    return ce;
+  }
 </script>
