@@ -2,9 +2,13 @@
 Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR in 1975.
 
 ## Current Version
-1.2
+1.3
 
 ### Change log
+
+#### 1.3
+* Fixed double quote issue in Rope making skill
+* Fixed error in Intelligence stats
 
 #### 1.2
 * Fixed hiding background for select input in Safari and Chrome
@@ -41,6 +45,12 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Sheet creation for Roll20
 
 #### Todo List
+* Check and if needed - Fix Professional skills auto calculation Sheet Worker
+* Simplify - removed Skills list
+* Make sure Warrior Professional Skills show up when a new sheet loads
+
+* Add Bonus Spells as check lists
+* Add mitigation of old Bonus Spells list
 * Add spell slots for checked spells in Professional skills
 * Add space for Languages in Professional skills with a multi-select
 * Add items list from original sheet
