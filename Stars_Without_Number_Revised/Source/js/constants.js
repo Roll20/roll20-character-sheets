@@ -47,7 +47,7 @@ const skills = {
     psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
 };
 const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship_crew_min",
-    "ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed"
+    "ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed", "ship_hull_price",
 ];
 const reverseHullTypes = {
     [translate("BATTLESHIP").toLowerCase()]: "battleship",
