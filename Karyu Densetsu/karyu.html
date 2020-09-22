@@ -313,8 +313,8 @@
             <input type="number" name="attr_CanMod" value="0" title="@{CanMod}" />
 
             <span class="label secondary-font" data-i18n="defense"
-              title="Aura + Razão ou Instinto (o que for maior) + Evasão" data-i18n-title="defenseformula">Defesa</span>
-            <input type="number" disabled=true value="@{aura}+@{def_aux}+@{evasao}+@{DefMod}" name="attr_Def"
+              title="Aura + Agilidade + Razão ou Instinto (o que for maior) + Evasão" data-i18n-title="defenseformula">Defesa</span>
+            <input type="number" disabled=true value="@{aura}+@{def_aux}+@{agi}+@{evasao}+@{DefMod}" name="attr_Def"
               title="@{Def}">
             <input type="hidden" name="attr_def_aux" value="0" />
             <span class="label secondary-font" data-i18n="mod">Mod</span>
@@ -512,9 +512,7 @@
       });
   });
 
-  /*Sets de defense hidden attribute to the higher value between Reason and Instinct*/
-  on("change:raz change:ins", function(eventInfo) {
-
+  function updateDefenseHiddenAttribute() {
     getAttrs(["raz", "ins"], function(values) {
       let higherValue = parseInt(values.raz)||0;
       let instinct =  parseInt(values.ins)||0;
@@ -528,6 +526,12 @@
       });
 
     });
+  }
+
+  /*Sets de defense hidden attribute to the higher value between Reason and Instinct*/
+  on("change:raz change:ins", function(eventInfo) {
+
+    updateDefenseHiddenAttribute();
   });
 
   /*config Roll Queries translations */
@@ -541,5 +545,10 @@
       
   });
   
+  /*updates defense threshold when the sheet is opened. This was made to fix this value on old sheets.*/
+  on('sheet:opened',function(){
+    
+    updateDefenseHiddenAttribute();
+  });
   
 </script>
