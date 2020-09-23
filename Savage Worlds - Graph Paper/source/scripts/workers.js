@@ -1,13 +1,50 @@
 
 /* #############################################################################
-CONSTANTS
+VARIABLES
 ############################################################################# */
 
 const dice = ['', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
-const parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
-                     str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
-                     d8: 'd8!', d10: 'd10!', d12: 'd12!' };
+const renamedAbbr = ['rename-agi', 'rename-sma', 'rename-spi', 'rename-str', 'rename-vig'];
+
+var parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
+                   str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
+                   d8: 'd8!', d10: 'd10!', d12: 'd12!' };
+
+/* #############################################################################
+TRANSLATION SETUP
+############################################################################# */
+
+on("sheet:opened", function(e){
+  // Translations for query strings
+  setAttrs({
+    'query-rate-of-fire': getTranslationByKey('query-rate-of-fire'),
+    'query-modifier': getTranslationByKey('query-modifier'),
+    'query-wild-die': getTranslationByKey('query-wild-die'),
+    'ally': getTranslationByKey('ally'),
+    'none': getTranslationByKey('none')
+  });
+
+  // Include renamed Trait abbreviations
+  getAttrs(renamedAbbr, (values) => {
+    parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
+                   str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
+                   d8: 'd8!', d10: 'd10!', d12: 'd12!' };
+
+    _.each(renamedAbbr, (a) => {
+      // Skip if not defined
+      if (_.isUndefined(values[a])) return;
+
+      // Remove erroneous whitsapces
+      let v = values[a].replaceAll(' ', '').toLowerCase();
+
+      // Skip if empty string
+      if (v.length < 1) return;
+
+      parseCodes[v] = parseCodes[a.replace('rename-', '')];
+    });
+  });
+});
 
 /* #############################################################################
 CUSTOM SHEET FUNCTIONS
@@ -36,8 +73,10 @@ var TETRA = TETRA || ( function() {
   parseDiceCode = function(code) {
     code = code.toLowerCase();
 
+    // Replace abbreviations with attribute references (naive)
     _.each(_.keys(parseCodes), (k) => {
-      code = code.replace(k, parseCodes[k]);
+      code = code.replaceAll('+' + k, '+' + parseCodes[k]);
+      code = code.replaceAll('-' + k, '-' + parseCodes[k]);
     });
 
     return code;
@@ -132,20 +171,6 @@ var TETRA = TETRA || ( function() {
     parseDiceCode: parseDiceCode
   };
 }());
-
-/* #############################################################################
-TRANSLATION SETUP
-############################################################################# */
-
-on("sheet:opened", function(e){
-  setAttrs({
-    'query-rate-of-fire': getTranslationByKey('query-rate-of-fire'),
-    'query-modifier': getTranslationByKey('query-modifier'),
-    'query-wild-die': getTranslationByKey('query-wild-die'),
-    'ally': getTranslationByKey('ally'),
-    'none': getTranslationByKey('none')
-  });
-});
 
 /* #############################################################################
 ATTRIBUTE DICE (AND SOAK)
