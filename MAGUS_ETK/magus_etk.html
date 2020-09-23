@@ -15,7 +15,8 @@
 
     <div class="container">
       <div class="section col-5 karakter values">
-        <input type='text' name='attr_nev' placeholder='Karakter neve' />
+        <label>Név</label>
+        <input type='text' name='attr_nev' placeholder='Karakter neve' class="emphasized"/>
         <label>Kaszt</label>
         <input type='text' name='attr_kaszt' placeholder='Kaszt' />
         <label>Faj</label>
@@ -30,6 +31,13 @@
         <input type='text' name='attr_iskola' placeholder='Iskola' />
         <label>Nem</label>
         <input type='text' name='attr_nem' placeholder='Nem' />
+
+        <label>Tp</label>
+        <input type='number' name='attr_tp' placeholder='Tp' min="0" class="full"/>
+        <label>Szint</label>
+        <input type='number' name='attr_szint' placeholder='TSz' min="1" class="emphasized full"/>
+        <label>Következő szint</label>
+        <input type='number' name='attr_tp_max' placeholder='Köv. szint' min="100" class="full"/>
       </div>
 
       <div class="section col-7">
@@ -158,40 +166,48 @@
             </div>
           </div>
         </div>
+
+        <input type="hidden" name="attr_ero10">
+        <input type="hidden" name="attr_gyorsasag10">
+        <input type="hidden" name="attr_ugyesseg10">
+        <input type="hidden" name="attr_allokepesseg10">
+        <input type="hidden" name="attr_egeszseg10">
+        <input type="hidden" name="attr_intelligencia10">
+        <input type="hidden" name="attr_akaratero10">
+        <input type="hidden" name="attr_asztral10">
       </div>
     </div>
 
     <div class="container">
-      <div class="section col-5 values tapasztalat">
-        <h2>Tapasztalat</h2>
-        <div>
-          <label>Tp</label>
-          <input type='number' name='attr_tp' placeholder='Tp' min="0" />
-        </div>
-        <div>
-          <label>Szint</label>
-          <input type='number' name='attr_szint' placeholder='TSz' min="1" class="emphasized"/>
-        </div>
-        <div>
-          <label>Következőhöz</label>
-          <input type='number' name='attr_tp_max' placeholder='Köv. szint' min="100" />
-        </div>
-      </div>
-      <div class="section col-7 values health">
+      <div class="section col-5 values health">
         <div>
           <div>
+            <label>Ép alap</label>
+            <input type='number' name='attr_epAlap' min="1"/>
+          </div>
+          <div>
             <label>Max. Ép</label>
-            <input type='number' name='attr_ep_max' min="1"/>
+            <input type='number' name='attr_ep_max' value="@{epAlap} + @{egeszseg10}" disabled="disabled"/>
           </div>
           <div>
             <label>Akt. Ép</label>
             <input type='number' name='attr_ep' min="0" class="emphasized" />
           </div>
         </div>
+      </div>
+      <div class="section col-7 values health">
         <div>
           <div>
+            <label>Fp alap</label>
+            <input type='number' name='attr_fpAlap' min="1"/>
+          </div>
+          <div>
+            <label>Fp szintlépéskor kapott</label>
+            <input type='number' name='attr_fpSzint' min="1"/>
+          </div>
+          <div>
             <label>Max. Fp</label>
-            <input type='number' name='attr_fp_max' min="1"/>
+            <input type='number' name='attr_fp_max' value="@{fpAlap} + @{allokepesseg10} + @{akaratero10} + @{fpSzint}" disabled="disabled"/>
           </div>
           <div>
             <label>Akt. Fp</label>
@@ -349,11 +365,11 @@
           <tr>
             <td>Fegyver nélkül</td>
             <td style="text-align: center">-</td>
-            <td><input type="number" name="attr_ke" min="0"></td>
-            <td><input type="number" name="attr_te" min="0"></td>
-            <td><input type="number" name="attr_ve" min="0"></td>
-            <td><input type="number" name="attr_ce" min="0"></td>
-            <td><input type="number" name="attr_sebzes" min="0"></td>
+            <td><input type="number" name="attr_ke" min="0" value="(@{ugyesseg10} + @{gyorsasag10} + @{keAlap} + @{kePerSzint} * @{szint} + @{keMod})" disabled="disabled"></td>
+            <td><input type="number" name="attr_te" min="0" value="(@{ero10} + @{ugyesseg10} + @{gyorsasag10} +@{teAlap} + @{tePerSzint} * @{szint} + @{teMod})" disabled="disabled"></td>
+            <td><input type="number" name="attr_ve" min="0" value="(@{ugyesseg10} + @{gyorsasag10} + @{veAlap} + @{vePerSzint} * @{szint} + @{veMod})" disabled="disabled"></td>
+            <td><input type="number" name="attr_ce" min="0" value="(@{ugyesseg10} + @{ceAlap} + @{cePerSzint} * @{szint} + @{ceMod})" disabled="disabled"></td>
+            <td><input type="number" name="attr_sebzes" min="0" value="(@{ero_sebzes} + @{sebzesPerSzint} * @{szint} + @{sebzesmod})" disabled="disabled"></td>
 
             <td style="padding: 0 5px; white-space: nowrap;">akt. SFÉ</td>
             <td style="text-align: center"><input type="number" name="attr_vertSfe" min="0"/></td>
@@ -388,7 +404,7 @@
               <div class="cell">
                 <button title="Kezdeményező Dobás" type='roll' value='&{template:default} {{name=Kezdeményezés - @{fegyverNev}}} {{Dobás=[[ d10 + @{ke} + @{fegyverKe} +?{+/- módosítók?|0} ]]}}'></button>
                 <button title="Támadó Dobás" type='roll' value='&{template:default} {{name=Támadás - @{fegyverNev}}} {{Dobás=[[ d100 + @{te} + @{fegyverTe} +?{+/- módosítók?|0} ]]}}'></button>
-                <button title="Sebzés" type='roll' value='&{template:default} {{name=Sebzés - @{fegyverNev}}} {{Dobás=[[ @{fegyverSebzesMulti}d@{fegyverSebzesOldal} + @{fegyverSebzesPlusz} + @{ero_sebzes} +?{+/- módosítók?|0} ]]}}'></button>
+                <button title="Sebzés" type='roll' value='&{template:default} {{name=Sebzés - @{fegyverNev}}} {{Dobás=[[ @{fegyverSebzesMulti}d@{fegyverSebzesOldal} + @{fegyverSebzesPlusz} + @{sebzes} +?{+/- módosítók?|0} ]]}}'></button>
               </div>
             </div>
           </fieldset>
@@ -523,116 +539,25 @@
 </script>
 
 <script type="text/worker">
-  /**
-   * Migrating v1.0 to v1.1
-   *  Calculating KE, TE, VE, CE fields and persist them.
-   */
-  function migrateTo1_1() {
-    getAttrs([
-      "ugyesseg",
-      "gyorsasag",
-      "keAlap",
-      "kePerSzint",
-      "keMod",
-      "szint"
-    ], function(values) {
-      console.log("values", values);
-      const ke = calcKE(values.ugyesseg, values.gyorsasag, values.keAlap, values.kePerSzint, values.keMod, values.szint);
-      setAttrs({ke})
-    });
-
-    getAttrs([
-      "ero",
-      "ugyesseg",
-      "gyorsasag",
-      "teAlap",
-      "tePerSzint",
-      "teMod",
-      "szint"
-    ], function(values) {
-      console.log("values", values);
-      const te = calcTE(values.ero, values.ugyesseg, values.gyorsasag, values.teAlap, values.tePerSzint, values.teMod, values.szint);
-      setAttrs({te})
-    });
-
-    getAttrs([
-      "ugyesseg",
-      "gyorsasag",
-      "veAlap",
-      "vePerSzint",
-      "veMod",
-      "szint"
-    ], function(values) {
-      console.log("values", values);
-      const ve = calcVE(values.ugyesseg, values.gyorsasag, values.veAlap, values.vePerSzint, values.veMod, values.szint);
-      setAttrs({ve})
-    });
-
-    getAttrs([
-      "ugyesseg",
-      "ceAlap",
-      "cePerSzint",
-      "ceMod",
-      "szint"
-    ], function(values) {
-      console.log("values", values);
-      const ce = calcCE(values.ugyesseg, values.gyorsasag, values.ceAlap, values.cePerSzint, values.ceMod, values.szint);
-      setAttrs({ce})
-    });
-
-    setAttrs({migrated_1_0: "true"});
+  function tizFelettiResz(value) {
+    return value - 10 < 0 ? 0 : value - 10;
   }
 
-  on("sheet:opened", function() {
-    getAttrs(["migrated_1_0"], function(values) {
-      if (values.migrated_1_0 != "true") {
-        console.info("Migrating from v1.0 to v1.1");
-        migrateTo1_1();
-      } else {
-        console.info("Has been migrated from v1.0 to v1.1")
-      }
-    });
-  });
+  function calc10(event) {
+    const attrName = `${event.sourceAttribute}10`;
+    const value10 = tizFelettiResz(event.newValue);
+    console.log({[attrName]: value10});
+    setAttrs({[attrName]: value10});
 
-  function tizFelettiResz(tul) {
-    const result = tul - 10 < 0 ? 0 : tul - 10;
-    console.log(tul, "=>", result);
-    return result;
   }
 
-  function calcKE(ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
-    console.log("ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "mod", mod, "szint", szint)
+  on("change:ero", calc10(e));
+  on("change:ugyesseg", calc10);
+  on("change:gyorsasag", calc10);
+  on("change:allokepesseg", calc10);
+  on("change:egeszseg", calc10);
+  on("change:intelligencia", calc10);
+  on("change:akaratero", calc10);
+  on("change:asztral", calc10);
 
-    const ke = tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
-    console.log("KE", ke);
-
-    return ke;
-  }
-
-  function calcTE(ero, ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
-    console.log("ero", ero, "ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "szint", szint)
-
-    const te = tizFelettiResz(ero) + tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
-    console.log("TE", te);
-
-    return te;
-  }
-
-  function calcVE(ugyesseg, gyorsasag, alap, perSzint, mod, szint) {
-    console.log("ugyesseg", ugyesseg, "gyorsasag", gyorsasag, "alap", alap, "perSzint", perSzint, "szint", szint)
-
-    const ve = tizFelettiResz(ugyesseg) + tizFelettiResz(gyorsasag) + Number(alap) + Number(szint) * Number(perSzint) + Number(mod);
-    console.log("VE", ve);
-
-    return ve;
-  }
-
-  function calcCE(ugyesseg, alap, perSzint, mod, szint) {
-    console.log("ugyesseg", ugyesseg, "alap", alap, "perSzint", perSzint, "szint", szint)
-
-    const ce = tizFelettiResz(ugyesseg) + Number(alap | 0) + Number(szint) * Number(perSzint | 0) + Number(mod);
-    console.log("CE", ce);
-
-    return ce;
-  }
 </script>
