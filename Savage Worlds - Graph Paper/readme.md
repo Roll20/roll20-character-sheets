@@ -68,7 +68,7 @@ The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started
 Most of the sheet's strings can be changed via the translation.json. However, some strings need to be manually changed by the GM due to the renaming feature for traits. Note that certain sheetworker scripts depend on English strings, such as the die codes (e.g. d4, d6, ...) for parsers. If you use [Roll20's translation generation](https://roll20.zendesk.com/hc/en-us/articles/360037773493-Character-Sheet-Translation#CharacterSheetTranslation-StepTwo,GeneratingtheTranslationFile) feature `i18nOutput`, make sure to add the following pairs afterward since they will not be automatically included. Order alphabetically.
 
 <details>
-  <summary>Pseudo-element labels</summary>
+  <summary>Pseudo-Element Labels</summary>
 
 ```
 "settings-tab-styles": "Styles",
