@@ -539,6 +539,23 @@
 </script>
 
 <script type="text/worker">
+
+  on('sheet:opened',function(){
+    getAttrs([
+      "ero", "gyorsasag", "ugyesseg", "allokepesseg", "egeszseg", "intelligencia", "akaratero", "asztral",
+      "ero10", "gyorsasag10", "ugyesseg10", "allokepesseg10", "egeszseg10", "intelligencia10", "akaratero10", "asztral10"
+    ], (values) => {
+      Object.keys(values).forEach(key => {
+        if (key.endsWith("10") && values[key] === "") {
+          const attrName = key.substring(0, key.length - 2)
+          const value = tizFelettiResz(values[attrName]);
+          console.log("setAttrs", {[key]: value})
+          setAttrs({[key]: value});
+        }
+      })
+    });
+  });
+
   function tizFelettiResz(value) {
     return value - 10 < 0 ? 0 : value - 10;
   }
@@ -551,7 +568,7 @@
 
   }
 
-  on("change:ero", calc10(e));
+  on("change:ero", calc10);
   on("change:ugyesseg", calc10);
   on("change:gyorsasag", calc10);
   on("change:allokepesseg", calc10);
