@@ -303,13 +303,16 @@ SIMPLE STATISTICS
 ############################################################################# */
 
 const simple = ['pace', 'flight', 'rads', 'power', 'power_consumed',
-                'power_max', 'armor_head', 'armor_torso', 'armor_arms',
-                'armor_legs', 'parry', 'toughness', 'integrity_max',
+                'power_maximum', 'armor_head', 'armor_torso', 'armor_arms',
+                'armor_legs', 'parry', 'toughness', 'integrity_maximum',
                 'carry_weight_max'];
 
 on('change:' + simple.join(' change:'), (e) => {
   // Parse input value as integer unless it is empty
   let value = TETRA.toInt(e.newValue, '');
+
+  console.log('source: ' + e.sourceAttribute);
+  console.log('value: ' + e.newValue);
 
   // Cannot be smaller than zero
   if (value != '') {
@@ -617,10 +620,10 @@ on('change:integrity_mod', (e) => {
 INTEGRITY CALCULATION
 ############################################################################# */
 
-on('change:augmentations_total_loss change:integrity_max change:integrity_mod', (e) => {
-  getAttrs(['augmentations_total_loss', 'integrity_max', 'integrity_mod'], (values) => {
+on('change:augmentations_total_loss change:integrity_maximum change:integrity_mod', (e) => {
+  getAttrs(['augmentations_total_loss', 'integrity_maximum', 'integrity_mod'], (values) => {
     let loss = TETRA.toFloat(values['augmentations_total_loss']),
-        max = TETRA.toFloat(values['integrity_max'], 80),
+        max = TETRA.toFloat(values['integrity_maximum'], 80),
         mod = TETRA.toFloat(values['integrity_mod']);
 
     setAttrs({ integrity: (max - loss + mod).toFixed(1) });
