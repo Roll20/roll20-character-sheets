@@ -20,10 +20,14 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 <details>
+  <summary>Extra Sheet</summary>
+  
+  ![Extra Sheet](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Extra.png)
+</details>
+
+<details>
   <summary>Attributes</summary>
   
-  ![Full Preview](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper.jpg)
-
   ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/attributes.gif)
 </details>
 
