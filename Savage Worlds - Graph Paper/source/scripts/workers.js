@@ -5,7 +5,7 @@ VARIABLES
 
 const dice = ['', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
-const renamedAbbr = ['rename-agi', 'rename-sma', 'rename-spi', 'rename-str', 'rename-vig'];
+const renamedAbbr = ['rename_agi', 'rename_sma', 'rename_spi', 'rename_str', 'rename_vig'];
 
 var parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
                    str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
@@ -18,10 +18,16 @@ TRANSLATION SETUP
 on("sheet:opened", function(e){
   // Translations for query strings
   setAttrs({
-    'query-rate-of-fire': getTranslationByKey('query-rate-of-fire'),
-    'query-modifier': getTranslationByKey('query-modifier'),
-    'query-wild-die': getTranslationByKey('query-wild-die'),
+    'query_rate_of_fire': getTranslationByKey('query-rate-of-fire'),
+    'query_modifier': getTranslationByKey('query_modifier'),
+    'query_wild_die': getTranslationByKey('query-wild-die'),
+    'query_roll_result': getTranslationByKey('query-roll-result'),
+    'query_target_number': getTranslationByKey('query-target-number'),
+    'query_damage_modifier': getTranslationByKey('query-damage-modifier'),
+    'raises': getTranslationByKey('raises'),
+    'vs_tn': getTranslationByKey('vs-tn'),
     'ally': getTranslationByKey('ally'),
+    'roll': getTranslationByKey('roll'),
     'none': getTranslationByKey('none')
   });
 
@@ -41,7 +47,7 @@ on("sheet:opened", function(e){
       // Skip if empty string
       if (v.length < 1) return;
 
-      parseCodes[v] = parseCodes[a.replace('rename-', '')];
+      parseCodes[v] = parseCodes[a.replace('rename_', '')];
     });
   });
 });
@@ -84,16 +90,16 @@ var TETRA = TETRA || ( function() {
 
   // Update the roll queries for a trait
   updateTraitRoll = function(trait) {
-    let traitAttributes = [trait, `${trait}-wd`, `${trait}-mod`];
+    let traitAttributes = [trait, `${trait}_wd`, `${trait}_mod`];
 
     // Get trait values: die, Wild Die, and modifier
     getAttrs(traitAttributes, (values) => {
       let die = values[trait],
-          wd = values[`${trait}-wd`],
+          wd = values[`${trait}_wd`],
           ewd = '-10000', // Extra Wild Die
-          mod = values[`${trait}-mod`] || '+ 0',
+          mod = values[`${trait}_mod`] || '+ 0',
           untrained = '',
-          code = toInt(values[`${trait}-mod`]);
+          code = toInt(values[`${trait}_mod`]);
 
       // Set up Wild Die
       if (dice.includes(wd) && wd != '') {
@@ -120,7 +126,7 @@ var TETRA = TETRA || ( function() {
 
       code = die + code;
 
-      code = ewd != '-10000' ? `${code} (${values[`${trait}-wd`]})` : code;
+      code = ewd != '-10000' ? `${code} (${values[`${trait}_wd`]})` : code;
 
       // Set up trait die
       die = `1${die}!cs2 `;
@@ -130,10 +136,10 @@ var TETRA = TETRA || ( function() {
           wdQuery = wd != '' ? wd + untrained : '',
           ewdQuery = ewd != '-10000' ? ewd + untrained : '-10000';
 
-      setAttrs({ [`${trait}-roll`]: traitQuery,
-                 [`${trait}-wd-roll`]: wdQuery,
-                 [`${trait}-extra-wd-roll`]: ewdQuery,
-                 [`${trait}-code`]: code });
+      setAttrs({ [`${trait}_roll`]: traitQuery,
+                 [`${trait}_wd_roll`]: wdQuery,
+                 [`${trait}_extra_wd_roll`]: ewdQuery,
+                 [`${trait}_code`]: code });
     });
   },
 
@@ -194,13 +200,13 @@ on('change:soak change:' + attributes.join(' change:'), (e) => {
 SKILL DICE
 ############################################################################# */
 
-const skills = ['academics', 'athletics', 'battle', 'boating', 'common-knowledge',
+const skills = ['academics', 'athletics', 'battle', 'boating', 'common_knowledge',
                 'driving', 'electronics', 'fighting', 'healing', 'intimidation',
                 'magic', 'notice', 'performance', 'persuasion', 'piloting',
                 'repair', 'research', 'riding', 'science', 'shooting', 'stealth',
                 'survival', 'taunt', 'thievery', 'gambling', 'hacking', 'faith',
                 'focus', 'language', 'occult', 'psionics', 'spellcasting',
-                'weird-science', 'custom-skill-1', 'custom-skill-2', 'unskilled'];
+                'weird_science', 'custom_skill_1', 'custom_skill_2', 'unskilled'];
 
 const skillDice = ['d4-2', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
@@ -220,7 +226,7 @@ on('change:' + skills.join(' change:'), (e) => {
 WILD DICE
 ############################################################################# */
 
-const wildTraits = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}-wd` });
+const wildTraits = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}_wd` });
 
 on('change:' + wildTraits.join(' change:'), (e) => {
   // Derive target attribute and check if input value is a valid die
@@ -231,14 +237,14 @@ on('change:' + wildTraits.join(' change:'), (e) => {
   // but with a callback to update the attribute's roll query
   setAttrs({ [e.sourceAttribute]: value },
            { silent: true },
-           TETRA.updateTraitRoll(e.sourceAttribute.replace('-wd', '')));
+           TETRA.updateTraitRoll(e.sourceAttribute.replace('_wd', '')));
 });
 
 /* #############################################################################
 NATURAL DICE
 ############################################################################# */
 
-const naturalTraits = attributes.map((s) => { return `${s}-natural` });
+const naturalTraits = attributes.map((s) => { return `${s}_natural` });
 
 on('change:' + naturalTraits.join(' change:'), (e) => {
   // Check if new value is valid
@@ -264,14 +270,14 @@ on('change:run', (e) => {
   let runRoll = value != '' ? value : 'd6';
 
   // Set attributes to new values, silent to avoid triggering worker again
-  setAttrs({ [e.sourceAttribute]: value, ['run-roll']: runRoll },
+  setAttrs({ [e.sourceAttribute]: value, ['run_roll']: runRoll },
            { silent: true });
 });
 
 /* #############################################################################
 MODIFIERS
 ############################################################################# */
-const modifiers = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}-mod` });
+const modifiers = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}_mod` });
 
 on('change:' + modifiers.join(' change:'), (e) => {
   // Parse input value as integer
@@ -289,17 +295,17 @@ on('change:' + modifiers.join(' change:'), (e) => {
   // Set attribute to new value, silent to avoid triggering worker again
   setAttrs({ [e.sourceAttribute]: value },
            { silent: true },
-           TETRA.updateTraitRoll(e.sourceAttribute.replace('-mod', '')));
+           TETRA.updateTraitRoll(e.sourceAttribute.replace('_mod', '')));
 });
 
 /* #############################################################################
 SIMPLE STATISTICS
 ############################################################################# */
 
-const simple = ['pace', 'flight', 'rads', 'power', 'power-consumed',
-                'power-max', 'armor-head', 'armor-torso', 'armor-arms',
-                'armor-legs', 'parry', 'toughness', 'integrity-max',
-                'carry-weight-max'];
+const simple = ['pace', 'flight', 'rads', 'power', 'power_consumed',
+                'power_max', 'armor_head', 'armor_torso', 'armor_arms',
+                'armor_legs', 'parry', 'toughness', 'integrity_max',
+                'carry_weight_max'];
 
 on('change:' + simple.join(' change:'), (e) => {
   // Parse input value as integer unless it is empty
@@ -318,10 +324,10 @@ on('change:' + simple.join(' change:'), (e) => {
 WOUND BOXES
 ############################################################################# */
 
-const woundToggles = _.range(1, 7).map((n) => { return `wound-toggle-${n.toString()}` });
+const woundToggles = _.range(1, 7).map((n) => { return `wound_toggle_${n.toString()}` });
 
-on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:'), (e) => {
-  let attributes = ['wounds', 'wound-mitigation'].concat(woundToggles);
+on('change:wounds change:wound_mitigation change:' + woundToggles.join(' change:'), (e) => {
+  let attributes = ['wounds', 'wound_mitigation'].concat(woundToggles);
 
   // Get all relevant attributes
   getAttrs(attributes, (values) => {
@@ -344,7 +350,7 @@ on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:
 
     // Deactive all subsequent wound boxes
     for (var i = firstInactiveNumber + 1; i < 7; ++i) {
-      setters[`wound-toggle-${i}`] = 'on';
+      setters[`wound_toggle_${i}`] = 'on';
     };
 
     // Limit active wounds to active wound boxes
@@ -355,20 +361,20 @@ on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:
     };
 
     // Update wound-mitigation
-    let wm = isNaN(parseInt(values['wound-mitigation'])) ? '' : parseInt(values['wound-mitigation']);
+    let wm = isNaN(parseInt(values['wound_mitigation'])) ? '' : parseInt(values['wound_mitigation']);
 
     if (wm != '') {
       wm = wm < 0 ? 0 : wm;
     }
 
-    setters['wound-mitigation'] = wm;
+    setters['wound_mitigation'] = wm;
 
     wm = isNaN(wm) ? 0 : wm;
 
-    // Update wound-mod
+    // Update wound_mod
     let wmod = setters['wounds'] - wm;
 
-    setters['wound-mod'] = wmod < 0 ? 0 : wmod;
+    setters['wound_mod'] = wmod < 0 ? 0 : wmod;
 
     setAttrs(setters, { silent: true });
   });
@@ -378,7 +384,7 @@ on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:
 FATIGUE BOXES
 ############################################################################# */
 
-const fatigueToggles = _.range(2, 4).map((n) => { return `fatigue-toggle-${n.toString()}` });
+const fatigueToggles = _.range(2, 4).map((n) => { return `fatigue_toggle_${n.toString()}` });
 
 on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
   let attributes = ['fatigue'].concat(fatigueToggles);
@@ -404,7 +410,7 @@ on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
 
     // Deactive all subsequent boxes
     for (var i = firstInactiveNumber + 1; i < 4; ++i) {
-      setters[`fatigue-toggle-${i}`] = 'on';
+      setters[`fatigue_toggle_${i}`] = 'on';
     };
 
     // Limit active fatigue to active boxes
@@ -414,10 +420,10 @@ on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
       setters['fatigue'] = values['fatigue'];
     };
 
-    // Update fatigue-mod
+    // Update fatigue_mod
     let fmod = TETRA.toInt(setters['fatigue']);
 
-    setters['fatigue-mod'] = fmod;
+    setters['fatigue_mod'] = fmod;
 
     setAttrs(setters, { silent: true });
   });
@@ -446,8 +452,8 @@ const letters = { 'A': 6.53, 'a': 5.45, 'B': 6.23, 'b': 5.63, 'C': 6.52,
                   '°': 3.75, '<': 5.09, '>': 5.23, '[': 2.66, ']': 2.66,
                   '{': 3.39, '}': 3.39, '$': 5.63, '"': 3.20 };
 
-on('change:repeating_features:feature-name', (e) => {
-  let target = e.sourceAttribute.replace('_feature-name', '_feature-size');
+on('change:repeating_features:feature_name', (e) => {
+  let target = e.sourceAttribute.replace('_feature_name', '_feature_size');
 
   getAttrs([e.sourceAttribute], (value) => {
     // Split string into array
@@ -486,7 +492,7 @@ on('change:integrity', (e) => {
   // Bar can only take numbers between 0 and 80
   progress = progress > 80 ? 80 : progress;
   progress = progress < 0 ? 0 : progress;
-  setters['integrity-bar-size'] = progress;
+  setters['integrity_bar_size'] = progress;
 
   // Set corresponding psychological states
   setters['discord'] = value < 70 ? 'on' : 'off';
@@ -496,7 +502,7 @@ on('change:integrity', (e) => {
   setters['seizures'] = value < 30 ? 'on' : 'off';
   setters['derealization'] = value < 20 ? 'on' : 'off';
   setters['depersonalization'] = value < 10 ? 'on' : 'off';
-  setters['ego-death'] = value < 1 ? 'on' : 'off';
+  setters['ego_death'] = value < 1 ? 'on' : 'off';
 
   setAttrs(setters, { silent: true });
 });
@@ -531,61 +537,61 @@ function colSum(values, target, multi = false) {
 on('change:repeating_weapons', (e) => {
   if (e.sourceAttribute.includes('damage')) {
     let code = TETRA.parseDiceCode(e.newValue);
-    setAttrs({ [`${e.sourceAttribute}-roll`]: code }, { silent: true });
+    setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
   }
 
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('weapons',
-                        ['weapon-weight', 'weapon-weight-toggle'],
-                        (v) => { colSum(v, 'carry-weight-weapons') });
+                        ['weapon_weight', 'weapon_weight_toggle'],
+                        (v) => { colSum(v, 'carry_weight_weapons') });
   }
 });
 
 on('remove:repeating_weapons', (e) => {
   TETRA.doWithRepList('weapons',
-                      ['weapon-weight', 'weapon-weight-toggle'],
-                      (v) => { colSum(v, 'carry-weight-weapons') });
+                      ['weapon_weight', 'weapon_weight_toggle'],
+                      (v) => { colSum(v, 'carry_weight_weapons') });
 });
 
 on('change:repeating_apparel', (e) => {
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('apparel',
-                        ['apparel-weight', 'apparel-weight-toggle'],
-                        (v) => { colSum(v, 'carry-weight-apparel') });
+                        ['apparel_weight', 'apparel_weight_toggle'],
+                        (v) => { colSum(v, 'carry_weight_apparel') });
   }
 });
 
 on('remove:repeating_apparel', (e) => {
   TETRA.doWithRepList('apparel',
-                      ['apparel-weight', 'apparel-weight-toggle'],
-                      (v) => { colSum(v, 'carry-weight-apparel') });
+                      ['apparel_weight', 'apparel_weight_toggle'],
+                      (v) => { colSum(v, 'carry_weight_apparel') });
 });
 
 on('change:repeating_inventory', (e) => {
   if (e.sourceAttribute.includes('weight') || e.sourceAttribute.includes('amount')) {
     TETRA.doWithRepList('inventory',
-                        ['inventory-weight', 'inventory-weight-toggle', 'inventory-amount'],
-                        (v) => { colSum(v, 'carry-weight-inventory', true) });
+                        ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
+                        (v) => { colSum(v, 'carry_weight_inventory', true) });
   }
 });
 
 on('remove:repeating_inventory', (e) => {
   TETRA.doWithRepList('inventory',
-                      ['inventory-weight', 'inventory-weight-toggle', 'inventory-amount'],
-                      (v) => { colSum(v, 'carry-weight-inventory', true) });
+                      ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
+                      (v) => { colSum(v, 'carry_weight_inventory', true) });
 });
 
-const carryWeights = ['carry-weight-apparel', 'carry-weight-weapons',
-                      'carry-weight-inventory', 'carry-weight-max'];
+const carryWeights = ['carry_weight_apparel', 'carry_weight_weapons',
+                      'carry_weight_inventory', 'carry_weight_max'];
 
 on('change:' + carryWeights.join(' change:'), (e) => {
   getAttrs(carryWeights, (value) => {
-    let weapons = TETRA.toFloat(value['carry-weight-weapons']),
-        apparel = TETRA.toFloat(value['carry-weight-apparel']),
-        inventory = TETRA.toFloat(value['carry-weight-inventory']),
+    let weapons = TETRA.toFloat(value['carry_weight_weapons']),
+        apparel = TETRA.toFloat(value['carry_weight_apparel']),
+        inventory = TETRA.toFloat(value['carry_weight_inventory']),
         total = (weapons + apparel + inventory).toFixed(1);
 
-    setAttrs({ ['carry-weight']: total }, { silent: true });
+    setAttrs({ ['carry_weight']: total }, { silent: true });
   });
 });
 
@@ -595,27 +601,27 @@ LOSS
 
 on('change:repeating_augmentations remove:repeating_augmentations', (e) => {
   TETRA.doWithRepList('augmentations',
-                      ['augmentation-loss', 'augmentation-loss-toggle'],
-                      (v) => { colSum(v, 'augmentations-total-loss') });
+                      ['augmentation_loss', 'augmentation_loss_toggle'],
+                      (v) => { colSum(v, 'augmentations_total_loss') });
 });
 
 /* #############################################################################
 INTEGRITY MOD
 ############################################################################# */
 
-on('change:integrity-mod', (e) => {
-  setAttrs({ ['integrity-mod']: TETRA.toInt(e.newValue, '') });
+on('change:integrity_mod', (e) => {
+  setAttrs({ ['integrity_mod']: TETRA.toInt(e.newValue, '') });
 });
 
 /* #############################################################################
 INTEGRITY CALCULATION
 ############################################################################# */
 
-on('change:augmentations-total-loss change:integrity-max change:integrity-mod', (e) => {
-  getAttrs(['augmentations-total-loss', 'integrity-max', 'integrity-mod'], (values) => {
-    let loss = TETRA.toFloat(values['augmentations-total-loss']),
-        max = TETRA.toFloat(values['integrity-max'], 80),
-        mod = TETRA.toFloat(values['integrity-mod']);
+on('change:augmentations_total_loss change:integrity_max change:integrity_mod', (e) => {
+  getAttrs(['augmentations_total_loss', 'integrity_max', 'integrity_mod'], (values) => {
+    let loss = TETRA.toFloat(values['augmentations_total_loss']),
+        max = TETRA.toFloat(values['integrity_max'], 80),
+        mod = TETRA.toFloat(values['integrity_mod']);
 
     setAttrs({ integrity: (max - loss + mod).toFixed(1) });
   });
@@ -627,7 +633,7 @@ REAPTING VEHICLES & POWER ARMOR
 
 on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
   // Weapon count was changed
-  if (e.sourceAttribute.includes('weapons-count')) {
+  if (e.sourceAttribute.includes('weapons_count')) {
     let value = TETRA.toInt(e.newValue, 0);
 
     // Value must be between 0 and 10
@@ -639,7 +645,7 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
 
   // Silhouette was changed
   if (e.sourceAttribute.includes('silhouette')) {
-    let target = e.sourceAttribute.replace('_vehicle-silhouette-cycle', '_vehicle-silhouette');
+    let target = e.sourceAttribute.replace('_vehicle_silhouette_cycle', '_vehicle_silhouette');
 
     getAttrs([target], (values) => {
       let silhouette = TETRA.toInt(_.values(values)[0], 0);

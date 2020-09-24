@@ -13,8 +13,8 @@
                 ['Custom Skill 1', 'Custom'], ['Custom Skill 2', 'Custom']]
 
   var disabledSkills = ['faith', 'focus', 'language', 'occult', 'psionics',
-                        'spellcasting', 'weird-science', 'custom-skill-1',
-                        'custom-skill-2']
+                        'spellcasting', 'weird_science', 'custom_skill_1',
+                        'custom_skill_2']
 
   var steps = [['d4-2', '2', '1d4!cs2-2'], ['d4', '4', '1d4!cs2'], ['d6', '6', '1d6!cs2'],
                ['d8', '8', '1d8!cs2'], ['d10', '10', '1d10!cs2'], ['d12', '12', '1d12!cs2']].reverse()
@@ -25,19 +25,19 @@
                      value='d4-2')
 
   input.sheet-hidden(type='hidden',
-                     name='attr_unskilled-roll',
+                     name='attr_unskilled_roll',
                      value='1d4!cs2 - 2')
 
   input.sheet-hidden(type='hidden',
-                     name='attr_unskilled-wd-roll',
+                     name='attr_unskilled_wd_roll',
                      value='1d6!cs2 - 2')
 
   input.sheet-hidden(type='hidden',
-                     name='attr_unskilled-extra-wd-roll',
+                     name='attr_unskilled_extra_wd_roll',
                      value='-10000')
 
   input(type='checkbox',
-        name='attr_skill-lock',
+        name='attr_skill_lock',
         class='sheet-skills__lock')
 
   .sheet-skills__wrapper
@@ -59,31 +59,32 @@
         .sheet-skills__mod
           span(data-i18n='skill-track-mod-u') MOD
         .sheet-skills__wd
-          span(data-i18n='skill-track-wd-u') WD
+          span(data-i18n='skill-track_wd-u') WD
 
     each skill in skills
-      - trait = skill[0].toLowerCase().replace('.', '').replace(/ /g, '-');
+      - trait = skill[0].toLowerCase().replace('.', '').replace(/ /g, '_')
 
       input(type='checkbox',
-            name='attr_toggle-skill-rof',
+            name='attr_toggle_skill_rof',
             class='sheet-skills__toogle-rof')
 
       input(type='checkbox',
-            name='attr_toggle-skill-' + trait,
+            name=`attr_toggle_skill_${trait}`,
             checked= !disabledSkills.includes(trait),
             class='sheet-toggle sheet-toggle--block')
 
-      .sheet-skills__skill(class='sheet-skills__skill--' + trait)
+      .sheet-skills__skill(class=`sheet-skills__skill--${trait}`)
         .sheet-skills__color-marker
           +color_circle(trait)
+          
         input(type='text',
-              name='attr_' + trait + '-wd',
+              name=`attr_${trait}_wd`,
               placeholder='WD',
-              data-i18n-placeholder='skill-track-wd-placeholder-u',
+              data-i18n-placeholder='skill-track_wd-placeholder-u',
               class='sheet-skills__wd')
 
         input(type='text',
-              name='attr_' + trait + '-mod',
+              name=`attr_${trait}_mod`,
               placeholder='MOD',
               data-i18n-placeholder='skill-track-mod-placeholder-u',
               class='sheet-skills__mod')
@@ -93,17 +94,17 @@
         .sheet-skills__track
           each step in steps
             input(type='radio',
-                  name='attr_' + trait,
+                  name=`attr_${trait}`,
                   value=step[0],
                   label=step[0].replace('d', ''),
-                  data-i18n-placeholder='skill-track-die-label-' + step[0],
-                  class='sheet-radio-track sheet-' + step[0],
+                  data-i18n-placeholder=`skill-track-die-label-${step[0]}`,
+                  class=`sheet-radio-track sheet-${step[0]}`,
                   checked= step[0] == 'd4-2')
 
             - // Always roll with RoF query
             button(type='roll',
-                   name='roll_' + trait + '-' + step[1],
-                   value!='&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename-' + trait + '}}} {{traitdie=' + step[0] + '}} {{flat=@{' + trait + '-mod}}} {{wounds=[[ @{wound-mod} ]]}} {{fatigue=[[ @{fatigue-mod} ]]}} {{rof=[[ ?{@{query-rate-of-fire}|@{' + trait + '-rof}} ]]}} {{modifier=?{@{query-modifier}|0}}} {{wd=@{' + trait + '-wd}}} {{traitroll1=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll2=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll3=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll4=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll5=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll6=[[ ' + step[2] + ' @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{wdroll=[[ @{' + trait + '-wd-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}}',
+                   name=`roll_${trait}_${step[1]}`,
+                   value!=`&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|@{${trait}_rof}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} {{traitroll1=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll2=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll3=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll4=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll5=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll6=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`,
                    class='sheet-skills__step-button')
               .sheet-tooltip.sheet-tooltip--top
                 span(data-i18n='roll-tooltip-prefix') Roll 
@@ -111,40 +112,40 @@
                 span(data-i18n='roll-tooltip-suffix') (RoF 1-6)
 
           input.sheet-hidden(type='hidden',
-                             name='attr_' + trait + '-roll',
+                             name=`attr_${trait}_roll`,
                              value='1d4!cs2 - 2')
 
           input.sheet-hidden(type='hidden',
-                             name='attr_' + trait + '-wd-roll',
+                             name=`attr_${trait}_wd_roll`,
                              value='1d6!cs2 - 2')
 
           input.sheet-hidden(type='hidden',
-                             name='attr_' + trait + '-extra-wd-roll',
+                             name=`attr_${trait}_extra_wd_roll`,
                              value='-10000')
 
           input.sheet-hidden(type='hidden',
-                             name='attr_' + trait + '-rof',
+                             name=`attr_${trait}_rof`,
                              value='1')
 
           input.sheet-hidden(type='hidden',
-                             name='attr_rename-' + trait,
+                             name=`attr_rename_${trait}`,
                              value= skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0])
 
           - // Roll without RoF query
           button(type='roll',
-                 name='roll_' + trait,
-                 value!='&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename-' + trait + '}}} {{traitdie=@{' + trait + '}}} {{flat=@{' + trait + '-mod}}} {{wounds=[[ @{wound-mod} ]]}} {{fatigue=[[ @{fatigue-mod} ]]}} {{rof=[[ 1 ]]}} {{modifier=?{@{query-modifier}|0}}} {{wd=@{' + trait + '-wd}}} {{traitroll1=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll2=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll3=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll4=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll5=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll6=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{wdroll=[[ @{' + trait + '-wd-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}}',
+                 name=`roll_${trait}`,
+                 value!=`&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ 1 ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} {{traitroll1=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll2=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll3=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll4=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll5=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll6=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`,
                  class='sheet-skills__button sheet-a')
             .sheet-tooltip.sheet-tooltip--left
-              span(name='attr_rename-' + skill[1].toLowerCase(), data-i18n=skill[1].toLowerCase() + '-u')= skill[1]
-            span(name='attr_rename-' + trait)
+              span(name=`attr_rename_${skill[1].toLowerCase()}`, data-i18n=`${skill[1].toLowerCase()}-u`)= skill[1]
+            span(name=`attr_rename_${trait}`)
               = skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0]
 
           - // Roll with RoF query
           button(type='roll',
-                 name='roll_' + trait,
-                 value!='&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename-' + trait + '}}} {{traitdie=@{' + trait + '}}} {{flat=@{' + trait + '-mod}}} {{wounds=[[ @{wound-mod} ]]}} {{fatigue=[[ @{fatigue-mod} ]]}} {{rof=[[ ?{@{query-rate-of-fire}|@{' + trait + '-rof}} ]]}} {{modifier=?{@{query-modifier}|0}}} {{wd=@{' + trait + '-wd}}} {{traitroll1=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll2=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll3=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll4=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll5=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{traitroll6=[[ @{' + trait + '-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}} {{wdroll=[[ @{' + trait + '-wd-roll} @{' + trait + '-mod} - @{fatigue-mod} - @{wound-mod} + ?{@{query-modifier}|0} ]]}}',
+                 name=`roll_${trait}`,
+                 value!=`&{template:TraitRoll} {{name=@{name}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|@{${trait}_rof}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} {{traitroll1=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll2=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll3=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll4=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll5=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{traitroll6=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`,
                  class='sheet-skills__button sheet-b')
             .sheet-tooltip.sheet-tooltip--left= skill[1]
-            span(name='attr_rename-' + trait)
+            span(name=`attr_rename_${trait}`)
               = skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0]
