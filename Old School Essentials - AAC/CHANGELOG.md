@@ -2,6 +2,51 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.2
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to new melee weapons
+- Fix a bug where strength and dexterity weapon modifiers didn't change when the attributes changed
+- Fix colored borders shown for skill rolls
+
+## 1.6.1
+
+### Fixed
+
+- Fix a bug where the roll templates were showing nothing
+
+## 1.6.0
+
+### Added
+
+- Add spells per level
+- Add memorized spell number input
+- Add attack value matrix to DAC sheet
+- Add option for individual initiative which accounts for both arbitrary bonus/penalty and dex bonus on players and arbitrary bonus/penalty for monsters
+
+### Changed
+
+- Update OSE Logo
+- Rename Critical Miss / Hit to Natural 1 / 20
+- Change default attributes to 10
+- Change encumbrance calculation to multiply quantity of items by their weight
+- Changed the contents of some placeholders and switched some placeholders to values to reduce confusion
+
+### Fixed
+
+- Fix incorrect or missing attack buttons for DAC sheet
+- Fix buttons not being draggable onto macro bar
+- Fix a bug where the worn checkbox didn't reduce the amount of armor worn when unchecked
+
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
+
 ## 1.5.0
 
 ### Added

@@ -15,12 +15,15 @@
 					<option value="fcore" data-i18n="fcore"></option>
 					<option value="fcon" data-i18n="fcon"></option>
 					<option value="fae" data-i18n="fae"></option>
+					<option value="threerocketeers" data-i18n="threerocketeers"></option>
 					<option value="robo" data-i18n="robo"></option>
 					<option value="dfa" data-i18n="dfa"></option>
 					<option value="foc" data-i18n="foc"></option>
 					<option value="kaijuinc" data-i18n="kaijuinc"></option>
+					<option value="ngen" data-i18n="ngen"></option>
 					<option value="cats" data-i18n="cats"></option>
 					<option value="shotc" data-i18n="shotc"></option>
+					<option value="tachyon" data-i18n="tachyon-squadron"></option>
 					<option value="venture" data-i18n="venture"></option>
 				</select>
 			</div>
@@ -70,6 +73,7 @@
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Skills" value="1" checked><span class="checker" data-i18n="skills">Skills</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Stress" value="1" checked><span class="checker" data-i18n="stress">Stress</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Stunts" value="1" checked><span class="checker" data-i18n="stunts">Stunts</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-Skillswaps" value="1"><span class="checker" data-i18n="swap-skills">Swappable Skillsets</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-TempAspects" value="1" checked><span class="checker" data-i18n="situation-aspects">Situation Aspects</span> </span>
 		<span>
 			<select name="attr_theme" class="compact">
@@ -78,6 +82,7 @@
 				<option value="purple">Toolkit Purple</option>
 				<option value="evilhat">Evil Hat</option>
 				<option value="cthulhu">Elder God</option>
+				<option value="orange">Golden</option>
 				<option value="gray">Gray</option>
 				<option value="shotc">Radical</option>
 			</select>
@@ -102,6 +107,16 @@
 				</div>
 				<div data-i18n="refresh">
 					Refresh
+				</div>
+			</div>
+		</div>
+		<div class="pronounbox">
+			<div>
+				<div>
+					<input name="attr_pronouns" type="text" class="compact pronouns">
+				</div>
+				<div data-i18n="pronouns">
+					Pronouns
 				</div>
 			</div>
 		</div>
@@ -253,6 +268,44 @@
 				</div>
 			</div> <!-- End Roles -->
 
+			<!-- Swappable Skillsets -->
+			<input type="hidden" name="attr_lastswapped" value="">
+			<input type="checkbox" class="triggerbox" name="attr_Show-Skillswaps" value="1">
+			<div class="SkillCell">
+				<div class="SectionHeader">
+					<span><span data-i18n="swap-skills">Swappable Skillsets</span> <span name="attr_lastswapped"></span> <span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditSwaps" value="1" checked><span class="pencilbox"/></span></span>
+				</div>
+				<div class="SkillFrame">
+					<input type="checkbox" class="triggerbox" name="attr_EditSwaps" value="1" checked>
+					<div class="SkillEdit">
+						<div class="EditTitleBar">
+							<span><span data-i18n="edit">Edit</span> <span data-i18n="swap-skills">Swappable Skillsets</span></span>
+							<span><input type="checkbox" class="checkbox" name="attr_EditSwaps" value="1" checked><span class="pencilbox"/></span>
+						</div>
+						<fieldset class="repeating_swaps">
+							<div>
+								<div class="fieldlabel" data-i18n="label">Label</div>
+							</div>
+							<input type="text" name="attr_label" value="">
+							<div>
+								<div class="fieldlabel" data-i18n="skills">Skills</div>
+							</div>
+							<div data-i18n="swap-skills-instruct"></div>
+							<textarea name="attr_skills"></textarea>
+							<button type="action" name="act_importswap"><span data-i18n="grab-current-skills"></span></button>
+						</fieldset>
+					</div>
+					<div class="SkillDisplay">
+						<input type="hidden" value="list">
+						<div class="SkillList">
+							<fieldset class="repeating_swaps">
+								<button type="action" name="act_loadswap"><span data-i18n="load-skillset"></span>: <b><span name="attr_label"></span></b></button>
+							</fieldset>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- / Swappable Skillsets -->
 
 			<!-- Skills -->
 
@@ -274,7 +327,7 @@
 						<fieldset class="repeating_skills">
 							<div class="SkillEditRow">
 								<input name="attr_skill" type="text" class="compact">
-								<input type="number" value="0" min="-4" max="8" name="attr_rating" class="ultracompact">
+								<input type="number" value="0" min="-4" max="10" name="attr_rating" class="ultracompact">
 								<input type="hidden" name="attr_bonus" value="0">
 								<div class="deeptriggered smalltext">+&nbsp;<span name="attr_bonus"></span>&nbsp;=</span></div>
 								<input name="attr_rating-word" type="hidden">
@@ -316,7 +369,69 @@
 						<div class="SkillNone">
 						</div>
 						<input type="hidden" name="attr_SkillStyle" value="">
+						<div class="SkillList">
+							<fieldset class="repeating_skills">
+								<input type="hidden" name="attr_skill"><input type="hidden" name="attr_bonus" value="0"><input type="hidden" name="attr_rating"><input type="hidden" name="attr_rating-word"><!-- with a type so it'll register as available to the button -->					
+								<button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill}}} {{roll=[[4dF+@{rating}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+									<b><span name="attr_skill"></span></b>:
+									<span name="attr_rating-word"></span>
+								</button>
+							</fieldset>
+						</div> <!-- /SkillList -->
+						<input type="hidden" name="attr_SkillStyle" value="">
 						<div class="SkillGrid">
+							<input type="hidden" name="attr_skill-row10" value="" class="hideIfNull">
+							<div>
+								<div class="SkillGridRating" data-i18n="rating10"></div>
+								<div>
+									<input type="hidden" name="attr_skill-row10-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-0}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-0"></span></button>
+									<input type="hidden" name="attr_skill-row10-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-1}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-1"></span></button>
+									<input type="hidden" name="attr_skill-row10-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-2}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-2"></span></button>
+									<input type="hidden" name="attr_skill-row10-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-3}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-3"></span></button>
+									<input type="hidden" name="attr_skill-row10-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-4}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-4"></span></button>
+									<input type="hidden" name="attr_skill-row10-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-5}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-5"></span></button>
+									<input type="hidden" name="attr_skill-row10-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-6}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-6"></span></button>
+									<input type="hidden" name="attr_skill-row10-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-7}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-7"></span></button>
+									<input type="hidden" name="attr_skill-row10-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-8}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-8"></span></button>
+									<input type="hidden" name="attr_skill-row10-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-9}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-9"></span></button>
+									<input type="hidden" name="attr_skill-row10-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-10}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-10"></span></button>
+									<input type="hidden" name="attr_skill-row10-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-11}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-11"></span></button>
+									<input type="hidden" name="attr_skill-row10-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-12}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-12"></span></button>
+									<input type="hidden" name="attr_skill-row10-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-13}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-13"></span></button>
+									<input type="hidden" name="attr_skill-row10-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-14}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-14"></span></button>
+									<input type="hidden" name="attr_skill-row10-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-15}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-15"></span></button>
+									<input type="hidden" name="attr_skill-row10-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-16}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-16"></span></button>
+									<input type="hidden" name="attr_skill-row10-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-17}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-17"></span></button>
+									<input type="hidden" name="attr_skill-row10-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-18}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-18"></span></button>
+									<input type="hidden" name="attr_skill-row10-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row10-19}}} {{roll=[[4dF+10+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row10-19"></span></button>
+								</div>
+							</div>
+							<input type="hidden" name="attr_skill-row9" value="" class="hideIfNull">
+							<div>
+								<div class="SkillGridRating" data-i18n="rating9"></div>
+								<div>
+									<input type="hidden" name="attr_skill-row9-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-0}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-0"></span></button>
+									<input type="hidden" name="attr_skill-row9-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-1}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-1"></span></button>
+									<input type="hidden" name="attr_skill-row9-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-2}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-2"></span></button>
+									<input type="hidden" name="attr_skill-row9-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-3}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-3"></span></button>
+									<input type="hidden" name="attr_skill-row9-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-4}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-4"></span></button>
+									<input type="hidden" name="attr_skill-row9-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-5}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-5"></span></button>
+									<input type="hidden" name="attr_skill-row9-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-6}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-6"></span></button>
+									<input type="hidden" name="attr_skill-row9-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-7}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-7"></span></button>
+									<input type="hidden" name="attr_skill-row9-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-8}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-8"></span></button>
+									<input type="hidden" name="attr_skill-row9-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-9}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-9"></span></button>
+									<input type="hidden" name="attr_skill-row9-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-10}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-10"></span></button>
+									<input type="hidden" name="attr_skill-row9-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-11}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-11"></span></button>
+									<input type="hidden" name="attr_skill-row9-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-12}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-12"></span></button>
+									<input type="hidden" name="attr_skill-row9-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-13}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-13"></span></button>
+									<input type="hidden" name="attr_skill-row9-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-14}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-14"></span></button>
+									<input type="hidden" name="attr_skill-row9-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-15}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-15"></span></button>
+									<input type="hidden" name="attr_skill-row9-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-16}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-16"></span></button>
+									<input type="hidden" name="attr_skill-row9-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-17}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-17"></span></button>
+									<input type="hidden" name="attr_skill-row9-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-18}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-18"></span></button>
+									<input type="hidden" name="attr_skill-row9-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row9-19}}} {{roll=[[4dF+9+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row9-19"></span></button>
+								</div>
+							</div>
 							<input type="hidden" name="attr_skill-row8" value="" class="hideIfNull">
 							<div>
 								<div class="SkillGridRating" data-i18n="rating8"></div>
@@ -555,117 +670,107 @@
 							<div>
 								<div class="SkillGridRating" data-i18n="rating-1"></div>
 								<div>
-									<input type="hidden" name="attr_skill-row-1-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-0}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-0"></span></button>
-									<input type="hidden" name="attr_skill-row-1-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-1}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-1"></span></button>
-									<input type="hidden" name="attr_skill-row-1-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-2}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-2"></span></button>
-									<input type="hidden" name="attr_skill-row-1-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-3}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-3"></span></button>
-									<input type="hidden" name="attr_skill-row-1-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-4}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-4"></span></button>
-									<input type="hidden" name="attr_skill-row-1-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-5}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-5"></span></button>
-									<input type="hidden" name="attr_skill-row-1-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-6}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-6"></span></button>
-									<input type="hidden" name="attr_skill-row-1-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-7}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-7"></span></button>
-									<input type="hidden" name="attr_skill-row-1-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-8}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-8"></span></button>
-									<input type="hidden" name="attr_skill-row-1-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-9}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-9"></span></button>
-									<input type="hidden" name="attr_skill-row-1-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-10}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-10"></span></button>
-									<input type="hidden" name="attr_skill-row-1-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-11}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-11"></span></button>
-									<input type="hidden" name="attr_skill-row-1-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-12}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-12"></span></button>
-									<input type="hidden" name="attr_skill-row-1-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-13}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-13"></span></button>
-									<input type="hidden" name="attr_skill-row-1-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-14}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-14"></span></button>
-									<input type="hidden" name="attr_skill-row-1-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-15}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-15"></span></button>
-									<input type="hidden" name="attr_skill-row-1-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-16}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-16"></span></button>
-									<input type="hidden" name="attr_skill-row-1-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-17}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-17"></span></button>
-									<input type="hidden" name="attr_skill-row-1-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-18}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-18"></span></button>
-									<input type="hidden" name="attr_skill-row-1-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-19}}} {{roll=[[4dF+-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-19"></span></button>
+									<input type="hidden" name="attr_skill-row-1-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-0}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-0"></span></button>
+									<input type="hidden" name="attr_skill-row-1-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-1}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-1"></span></button>
+									<input type="hidden" name="attr_skill-row-1-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-2}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-2"></span></button>
+									<input type="hidden" name="attr_skill-row-1-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-3}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-3"></span></button>
+									<input type="hidden" name="attr_skill-row-1-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-4}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-4"></span></button>
+									<input type="hidden" name="attr_skill-row-1-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-5}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-5"></span></button>
+									<input type="hidden" name="attr_skill-row-1-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-6}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-6"></span></button>
+									<input type="hidden" name="attr_skill-row-1-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-7}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-7"></span></button>
+									<input type="hidden" name="attr_skill-row-1-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-8}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-8"></span></button>
+									<input type="hidden" name="attr_skill-row-1-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-9}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-9"></span></button>
+									<input type="hidden" name="attr_skill-row-1-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-10}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-10"></span></button>
+									<input type="hidden" name="attr_skill-row-1-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-11}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-11"></span></button>
+									<input type="hidden" name="attr_skill-row-1-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-12}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-12"></span></button>
+									<input type="hidden" name="attr_skill-row-1-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-13}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-13"></span></button>
+									<input type="hidden" name="attr_skill-row-1-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-14}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-14"></span></button>
+									<input type="hidden" name="attr_skill-row-1-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-15}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-15"></span></button>
+									<input type="hidden" name="attr_skill-row-1-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-16}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-16"></span></button>
+									<input type="hidden" name="attr_skill-row-1-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-17}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-17"></span></button>
+									<input type="hidden" name="attr_skill-row-1-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-18}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-18"></span></button>
+									<input type="hidden" name="attr_skill-row-1-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-1-19}}} {{roll=[[4dF-1+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-1-19"></span></button>
 								</div>
 							</div>
 							<input type="hidden" name="attr_skill-row-2" value="" class="hideIfNull">
 							<div>
 								<div class="SkillGridRating" data-i18n="rating-2"></div>
 								<div>
-									<input type="hidden" name="attr_skill-row-2-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-0}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-0"></span></button>
-									<input type="hidden" name="attr_skill-row-2-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-1}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-1"></span></button>
-									<input type="hidden" name="attr_skill-row-2-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-2}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-2"></span></button>
-									<input type="hidden" name="attr_skill-row-2-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-3}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-3"></span></button>
-									<input type="hidden" name="attr_skill-row-2-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-4}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-4"></span></button>
-									<input type="hidden" name="attr_skill-row-2-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-5}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-5"></span></button>
-									<input type="hidden" name="attr_skill-row-2-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-6}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-6"></span></button>
-									<input type="hidden" name="attr_skill-row-2-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-7}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-7"></span></button>
-									<input type="hidden" name="attr_skill-row-2-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-8}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-8"></span></button>
-									<input type="hidden" name="attr_skill-row-2-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-9}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-9"></span></button>
-									<input type="hidden" name="attr_skill-row-2-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-10}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-10"></span></button>
-									<input type="hidden" name="attr_skill-row-2-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-11}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-11"></span></button>
-									<input type="hidden" name="attr_skill-row-2-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-12}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-12"></span></button>
-									<input type="hidden" name="attr_skill-row-2-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-13}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-13"></span></button>
-									<input type="hidden" name="attr_skill-row-2-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-14}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-14"></span></button>
-									<input type="hidden" name="attr_skill-row-2-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-15}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-15"></span></button>
-									<input type="hidden" name="attr_skill-row-2-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-16}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-16"></span></button>
-									<input type="hidden" name="attr_skill-row-2-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-17}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-17"></span></button>
-									<input type="hidden" name="attr_skill-row-2-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-18}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-18"></span></button>
-									<input type="hidden" name="attr_skill-row-2-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-19}}} {{roll=[[4dF+-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-19"></span></button>
+									<input type="hidden" name="attr_skill-row-2-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-0}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-0"></span></button>
+									<input type="hidden" name="attr_skill-row-2-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-1}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-1"></span></button>
+									<input type="hidden" name="attr_skill-row-2-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-2}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-2"></span></button>
+									<input type="hidden" name="attr_skill-row-2-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-3}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-3"></span></button>
+									<input type="hidden" name="attr_skill-row-2-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-4}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-4"></span></button>
+									<input type="hidden" name="attr_skill-row-2-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-5}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-5"></span></button>
+									<input type="hidden" name="attr_skill-row-2-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-6}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-6"></span></button>
+									<input type="hidden" name="attr_skill-row-2-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-7}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-7"></span></button>
+									<input type="hidden" name="attr_skill-row-2-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-8}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-8"></span></button>
+									<input type="hidden" name="attr_skill-row-2-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-9}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-9"></span></button>
+									<input type="hidden" name="attr_skill-row-2-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-10}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-10"></span></button>
+									<input type="hidden" name="attr_skill-row-2-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-11}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-11"></span></button>
+									<input type="hidden" name="attr_skill-row-2-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-12}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-12"></span></button>
+									<input type="hidden" name="attr_skill-row-2-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-13}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-13"></span></button>
+									<input type="hidden" name="attr_skill-row-2-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-14}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-14"></span></button>
+									<input type="hidden" name="attr_skill-row-2-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-15}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-15"></span></button>
+									<input type="hidden" name="attr_skill-row-2-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-16}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-16"></span></button>
+									<input type="hidden" name="attr_skill-row-2-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-17}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-17"></span></button>
+									<input type="hidden" name="attr_skill-row-2-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-18}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-18"></span></button>
+									<input type="hidden" name="attr_skill-row-2-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-2-19}}} {{roll=[[4dF-2+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-2-19"></span></button>
 								</div>
 							</div>
 							<input type="hidden" name="attr_skill-row-3" value="" class="hideIfNull">
 							<div>
 								<div class="SkillGridRating" data-i18n="rating-3"></div>
 								<div>
-									<input type="hidden" name="attr_skill-row-3-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-0}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-0"></span></button>
-									<input type="hidden" name="attr_skill-row-3-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-1}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-1"></span></button>
-									<input type="hidden" name="attr_skill-row-3-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-2}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-2"></span></button>
-									<input type="hidden" name="attr_skill-row-3-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-3}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-3"></span></button>
-									<input type="hidden" name="attr_skill-row-3-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-4}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-4"></span></button>
-									<input type="hidden" name="attr_skill-row-3-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-5}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-5"></span></button>
-									<input type="hidden" name="attr_skill-row-3-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-6}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-6"></span></button>
-									<input type="hidden" name="attr_skill-row-3-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-7}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-7"></span></button>
-									<input type="hidden" name="attr_skill-row-3-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-8}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-8"></span></button>
-									<input type="hidden" name="attr_skill-row-3-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-9}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-9"></span></button>
-									<input type="hidden" name="attr_skill-row-3-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-10}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-10"></span></button>
-									<input type="hidden" name="attr_skill-row-3-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-11}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-11"></span></button>
-									<input type="hidden" name="attr_skill-row-3-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-12}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-12"></span></button>
-									<input type="hidden" name="attr_skill-row-3-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-13}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-13"></span></button>
-									<input type="hidden" name="attr_skill-row-3-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-14}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-14"></span></button>
-									<input type="hidden" name="attr_skill-row-3-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-15}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-15"></span></button>
-									<input type="hidden" name="attr_skill-row-3-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-16}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-16"></span></button>
-									<input type="hidden" name="attr_skill-row-3-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-17}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-17"></span></button>
-									<input type="hidden" name="attr_skill-row-3-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-18}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-18"></span></button>
-									<input type="hidden" name="attr_skill-row-3-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-19}}} {{roll=[[4dF+-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-19"></span></button>
+									<input type="hidden" name="attr_skill-row-3-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-0}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-0"></span></button>
+									<input type="hidden" name="attr_skill-row-3-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-1}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-1"></span></button>
+									<input type="hidden" name="attr_skill-row-3-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-2}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-2"></span></button>
+									<input type="hidden" name="attr_skill-row-3-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-3}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-3"></span></button>
+									<input type="hidden" name="attr_skill-row-3-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-4}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-4"></span></button>
+									<input type="hidden" name="attr_skill-row-3-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-5}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-5"></span></button>
+									<input type="hidden" name="attr_skill-row-3-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-6}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-6"></span></button>
+									<input type="hidden" name="attr_skill-row-3-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-7}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-7"></span></button>
+									<input type="hidden" name="attr_skill-row-3-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-8}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-8"></span></button>
+									<input type="hidden" name="attr_skill-row-3-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-9}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-9"></span></button>
+									<input type="hidden" name="attr_skill-row-3-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-10}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-10"></span></button>
+									<input type="hidden" name="attr_skill-row-3-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-11}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-11"></span></button>
+									<input type="hidden" name="attr_skill-row-3-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-12}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-12"></span></button>
+									<input type="hidden" name="attr_skill-row-3-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-13}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-13"></span></button>
+									<input type="hidden" name="attr_skill-row-3-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-14}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-14"></span></button>
+									<input type="hidden" name="attr_skill-row-3-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-15}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-15"></span></button>
+									<input type="hidden" name="attr_skill-row-3-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-16}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-16"></span></button>
+									<input type="hidden" name="attr_skill-row-3-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-17}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-17"></span></button>
+									<input type="hidden" name="attr_skill-row-3-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-18}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-18"></span></button>
+									<input type="hidden" name="attr_skill-row-3-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-3-19}}} {{roll=[[4dF-3+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-3-19"></span></button>
 								</div>
 							</div>
 							<input type="hidden" name="attr_skill-row-4" value="" class="hideIfNull">
 							<div>
 								<div class="SkillGridRating" data-i18n="rating-4"></div>
 								<div>
-									<input type="hidden" name="attr_skill-row-4-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-0}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-0"></span></button>
-									<input type="hidden" name="attr_skill-row-4-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-1}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-1"></span></button>
-									<input type="hidden" name="attr_skill-row-4-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-2}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-2"></span></button>
-									<input type="hidden" name="attr_skill-row-4-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-3}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-3"></span></button>
-									<input type="hidden" name="attr_skill-row-4-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-4}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-4"></span></button>
-									<input type="hidden" name="attr_skill-row-4-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-5}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-5"></span></button>
-									<input type="hidden" name="attr_skill-row-4-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-6}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-6"></span></button>
-									<input type="hidden" name="attr_skill-row-4-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-7}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-7"></span></button>
-									<input type="hidden" name="attr_skill-row-4-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-8}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-8"></span></button>
-									<input type="hidden" name="attr_skill-row-4-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-9}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-9"></span></button>
-									<input type="hidden" name="attr_skill-row-4-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-10}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-10"></span></button>
-									<input type="hidden" name="attr_skill-row-4-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-11}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-11"></span></button>
-									<input type="hidden" name="attr_skill-row-4-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-12}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-12"></span></button>
-									<input type="hidden" name="attr_skill-row-4-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-13}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-13"></span></button>
-									<input type="hidden" name="attr_skill-row-4-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-14}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-14"></span></button>
-									<input type="hidden" name="attr_skill-row-4-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-15}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-15"></span></button>
-									<input type="hidden" name="attr_skill-row-4-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-16}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-16"></span></button>
-									<input type="hidden" name="attr_skill-row-4-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-17}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-17"></span></button>
-									<input type="hidden" name="attr_skill-row-4-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-18}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-18"></span></button>
-									<input type="hidden" name="attr_skill-row-4-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-19}}} {{roll=[[4dF+-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-19"></span></button>
+									<input type="hidden" name="attr_skill-row-4-0" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-0}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-0"></span></button>
+									<input type="hidden" name="attr_skill-row-4-1" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-1}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-1"></span></button>
+									<input type="hidden" name="attr_skill-row-4-2" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-2}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-2"></span></button>
+									<input type="hidden" name="attr_skill-row-4-3" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-3}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-3"></span></button>
+									<input type="hidden" name="attr_skill-row-4-4" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-4}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-4"></span></button>
+									<input type="hidden" name="attr_skill-row-4-5" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-5}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-5"></span></button>
+									<input type="hidden" name="attr_skill-row-4-6" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-6}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-6"></span></button>
+									<input type="hidden" name="attr_skill-row-4-7" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-7}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-7"></span></button>
+									<input type="hidden" name="attr_skill-row-4-8" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-8}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-8"></span></button>
+									<input type="hidden" name="attr_skill-row-4-9" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-9}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-9"></span></button>
+									<input type="hidden" name="attr_skill-row-4-10" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-10}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-10"></span></button>
+									<input type="hidden" name="attr_skill-row-4-11" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-11}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-11"></span></button>
+									<input type="hidden" name="attr_skill-row-4-12" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-12}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-12"></span></button>
+									<input type="hidden" name="attr_skill-row-4-13" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-13}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-13"></span></button>
+									<input type="hidden" name="attr_skill-row-4-14" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-14}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-14"></span></button>
+									<input type="hidden" name="attr_skill-row-4-15" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-15}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-15"></span></button>
+									<input type="hidden" name="attr_skill-row-4-16" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-16}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-16"></span></button>
+									<input type="hidden" name="attr_skill-row-4-17" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-17}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-17"></span></button>
+									<input type="hidden" name="attr_skill-row-4-18" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-18}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-18"></span></button>
+									<input type="hidden" name="attr_skill-row-4-19" value="" class="hideIfNull"><button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill-row-4-19}}} {{roll=[[4dF-4+@{Show-Diceprompts}]]}}" name="roll_SkillRoll"><span name="attr_skill-row-4-19"></span></button>
 								</div>
 							</div>
 						</div> <!-- /SkillGrid -->
-						<input type="hidden" name="attr_SkillStyle" value="">
-						<div class="SkillList">
-							<fieldset class="repeating_skills">
-								<input type="hidden" name="attr_skill"><input type="hidden" name="attr_bonus"><input type="hidden" name="attr_rating"><input type="hidden" name="attr_rating-word"><!-- with a type so it'll register as available to the button -->					
-								<button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{skill}}} {{roll=[[4dF+@{rating}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
-									<b><span name="attr_skill"></span></b>:
-									<span name="attr_rating-word"></span>
-								</button>
-							</fieldset>
-						</div> <!-- /SkillList -->
 					</div> <!-- /SkillDisplay -->
 
 				</div> <!-- /SkillFrame -->
@@ -684,10 +789,21 @@
 							<span><input type="checkbox" class="checkbox" name="attr_EditStunts" value="1" checked><span class="pencilbox"/></span>
 						</div>
 						<fieldset class="repeating_stunts">
-							<div class="fieldlabel" data-i18n="name">Name</div>
-							<input name="attr_name" type="text">
-							<div class="fieldlabel" data-i18n="desc">Description</div>
-							<textarea name="attr_desc" rows=3></textarea>
+							<div class="AspectSeparator">
+								<div class="fieldlabel" data-i18n="name">Name</div>
+								<input name="attr_name" type="text">
+								<div class"fieldlabel"><input type="checkbox" name="attr_rollable" value="1"> <span class="fieldlabel" data-i18n="rollable">Rollable</span></div>
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<div>
+									<div class="fieldlabel" data-i18n="bonus">Bonus</div>
+									<input name="attr_bonus" type="number" value="0">
+									<div class="fieldlabel" data-i18n="skill">Skill</div>
+									<input name="attr_skill" type="text" value="">
+									<input name="attr_skillvalue" type="hidden" value="0">
+								</div>
+								<div class="fieldlabel" data-i18n="desc">Description</div>
+								<textarea name="attr_desc" rows=3></textarea>
+							</div>
 						</fieldset>
 					</div> <!-- /StuntEdit -->
 					
@@ -698,6 +814,14 @@
 								<span name="attr_desc" class="desc"></span>
 								<input type="hidden" name="attr_name" value="">
 								<input type="hidden" name="attr_desc" value=""><button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{stunt}}} {{text=**@{name}:** @{desc}}}"></button>
+								<input type="hidden" name="attr_skill" value="">
+								<input type="hidden" name="attr_skillvalue" value="0">
+								<input type="hidden" name="attr_bonus" value="0">
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<span><br/><button type="roll" class="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{name} (@{skill})}} {{roll=[[4dF+@{skillvalue}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+									<b><span data-i18n="roll"></span>
+									<span name="attr_skill"></span></b> = <span name="attr_skillvalue"></span> + <span name="attr_bonus"></span> &nbsp;
+								</button></span>
 							</div>
 						</fieldset>
 					</div>
@@ -834,8 +958,28 @@
 									<select class="compact" name="attr_icon">
 										<option value="" data-i18n="none"></option>
 										<option value="plus" data-i18n="plusdie"></option>
-										<option value="minus" data-i18n="blankdie"></option>
-										<option value="blank" data-i18n="minusdie"></option>
+										<option value="blank" data-i18n="blankdie"></option>
+										<option value="minus" data-i18n="minusdie"></option>
+									</select>
+								</div>
+									<input type="hidden" class="hideIfNull" name="attr_icon" value="">
+								<div>
+									<b style="font-size: 80%;"><span data-i18n="label-icon"></span> 2:</b>
+									<select class="compact" name="attr_icon2">
+										<option value="" data-i18n="none"></option>
+										<option value="plus" data-i18n="plusdie"></option>
+										<option value="blank" data-i18n="blankdie"></option>
+										<option value="minus" data-i18n="minusdie"></option>
+									</select>
+								</div>
+									<input type="hidden" class="hideIfNull" name="attr_icon2" value="">
+								<div>
+									<b style="font-size: 80%;"><span data-i18n="label-icon"></span> 3:</b>
+									<select class="compact" name="attr_icon3">
+										<option value="" data-i18n="none"></option>
+										<option value="plus" data-i18n="plusdie"></option>
+										<option value="blank" data-i18n="blankdie"></option>
+										<option value="minus" data-i18n="minusdie"></option>
 									</select>
 								</div>
 							</div>
@@ -845,13 +989,22 @@
 							</div>
 							<div class="skill"  style="font-size: 80%;">
 								<b><span data-i18n="rating"></span>:</b>
-								<input type="number" name="attr_rating" value="0" min="-4" max="8" class="compact">
+								<input type="number" name="attr_rating" value="0" min="-4" max="10" class="compact">
 								<input type="hidden" name="attr_word" value="">
 								<span name="attr_word"></span>
 							</div>
 							<div class="stunt">
 								<b style="font-size: 80%;"><span data-i18n="name"></span>:</b>
 								<input type="text" name="attr_name" value="" class="compact" data-i18n-placeholder="stunt" placeholder="stunt">
+								<div class"fieldlabel"><input type="checkbox" name="attr_rollable" value="1"> <span class="fieldlabel" data-i18n="rollable">Rollable</span></div>
+								<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+								<div>
+									<div class="fieldlabel" data-i18n="bonus">Bonus</div>
+									<input name="attr_bonus" type="number" value="0">
+									<div class="fieldlabel" data-i18n="skill">Skill</div>
+									<input name="attr_skill" type="text" value="">
+									<input name="attr_skillvalue" type="hidden" value="0">
+								</div>
 							</div>
 							<div class="rating">
 								<b style="font-size: 80%;"><span data-i18n="name"></span>:</b>
@@ -888,7 +1041,23 @@
 						<div>
 							<select name="attr_addextra">
 								<option value="" data-i18n="add...">Add...</option>
-								<option value="blackfish">SF-46D Blackfish</option>
+								<optgroup label="3 Rocketeers" data-i18n-label="threerocketeers">
+									<option value="swordplay">Swordplay Template</option>
+								</optgroup>
+								<optgroup label="Tachyon Squadron" data-i18n-label="tachyon-squadron">
+									<option value="blackfish">SF-46D Blackfish</option>
+									<option value="ship00">Ship Template: Scale 0, Quality 0+</option>
+									<option value="ship0-1">Ship Template: Scale 0, Poor Quality</option>
+									<option value="ship10">Ship Template: Scale 1, Quality 0+</option>
+									<option value="ship1-1">Ship Template: Scale 1, Poor Quality</option>
+									<option value="ship20">Ship Template: Scale 2, Quality 0+</option>
+									<option value="ship2-1">Ship Template: Scale 2, Poor Quality</option>
+									<option value="ship30">Ship Template: Scale 3, Quality 0+</option>
+									<option value="ship3-1">Ship Template: Scale 3, Poor Quality</option>
+									<option value="ship40">Ship Template: Scale 4, Quality 0+</option>
+									<option value="ship4-1">Ship Template: Scale 4, Poor Quality</option>
+									<option value="turretdamage">Turret Damage Track (if module installed)</option>
+								</optgroup>
 								<option value="template">Template</option>
 							</select>
 						</div>
@@ -943,6 +1112,14 @@
 									<span name="attr_text"></span>
 									<input type="hidden" name="attr_name" value=""><input type="hidden" name="attr_text" value="">
 									<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{extra} ^{stunt}}} {{text=**@{name}:** @{text}}}"></button>
+									<input type="hidden" name="attr_skill" value="">
+									<input type="hidden" name="attr_skillvalue" value="0">
+									<input type="hidden" name="attr_bonus" value="0">
+									<input type="checkbox" class="triggerbox" name="attr_rollable" value="1">
+									<span><br/><button type="roll" class="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{name} (@{skill})}} {{roll=[[4dF+@{skillvalue}+@{bonus}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+										<b><span data-i18n="roll"></span>
+										<span name="attr_skill"></span></b> = <span name="attr_skillvalue"></span> + <span name="attr_bonus"></span> &nbsp;
+									</button></span>
 								</div>
 							</div>
 							<div class="rating space-below clear-all">
@@ -958,6 +1135,8 @@
 							<div class="track space-below clear-all">
 								<input type="hidden" class="hideIfNull" name="attr_label" value=""><div class="fieldlabel">
 									<input type="hidden" class="hideIfNull icon" name="attr_icon" value=""><span class="icon"></span>
+									<input type="hidden" class="hideIfNull icon" name="attr_icon2" value=""><span class="icon"></span>
+									<input type="hidden" class="hideIfNull icon" name="attr_icon3" value=""><span class="icon"></span>
 									<b><span name="attr_label"></span></b>
 								</div>
 								<div class="indented">
@@ -1025,7 +1204,12 @@
 			<input type="checkbox" class="triggerbox" checked name="attr_Show-Aspects" value="1">
 			<div class="AspectCell">
 				<div class="SectionHeader">
-					<span data-i18n="aspects">Aspects</span><span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditAspects" value="1" checked><span class="pencilbox"/></span>
+					<span data-i18n="aspects">Aspects</span>
+					<span class="boxcorner">
+						<input type="hidden" name="attr_aspectlist" value="">
+						<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: ^{aspects}}} {{breaks=@{aspectlist}}}"></button>
+						<input type="checkbox" class="checkbox" name="attr_EditAspects" value="1" checked><span class="pencilbox"/>
+					</span>
 				</div>
 				<div class="AspectFrame">
 					<input type="checkbox" class="triggerbox" name="attr_EditAspects" value="1" checked>
@@ -1537,9 +1721,12 @@
 		{{#text}}
 			<div class="text">{{text}}</div>
 		{{/text}}
-		{{#allprops() name text theme}}
+		{{#breaks}}
+			<div class="breaks">{{breaks}}</div>
+		{{/breaks}}
+		{{#allprops() name text theme breaks}}
 			<div class="space-above">**{{key}}:** {{value}} </div>
-		{{/allprops() name text theme}}
+		{{/allprops() name text theme breaks}}
 	</div>
 </rolltemplate>
 
@@ -1552,14 +1739,38 @@
 			<div class="roll">
 				{{roll}}
 				<div class="word">
-					{{#rollGreater() roll 8}}
+					{{#rollGreater() roll 16}}
 						<span data-i18n="beyond">Beyond</span>
 						<span data-i18n="rating-word8">Legendary</span>
-					{{/rollGreater() roll 8}}
-					{{#rollLess() roll -4}}
+					{{/rollGreater() roll 16}}
+					{{#rollLess() roll -8}}
 						<span data-i18n="below">Below</span>
 						<span data-i18n="rating-word-4">Horrifying</span>
-					{{/rollLess() roll -4}}
+					{{/rollLess() roll -8}}
+					{{#rollBetween() roll 16 16}}
+						<span data-i116n="rating-word16">Legendary+8</span>
+					{{/rollBetween() roll 16 16}}
+					{{#rollBetween() roll 15 15}}
+						<span data-i115n="rating-word15">Legendary+7</span>
+					{{/rollBetween() roll 15 15}}
+					{{#rollBetween() roll 14 14}}
+						<span data-i114n="rating-word14">Legendary+6</span>
+					{{/rollBetween() roll 14 14}}
+					{{#rollBetween() roll 13 13}}
+						<span data-i113n="rating-word13">Legendary+5</span>
+					{{/rollBetween() roll 13 13}}
+					{{#rollBetween() roll 12 12}}
+						<span data-i112n="rating-word12">Legendary+4</span>
+					{{/rollBetween() roll 12 12}}
+					{{#rollBetween() roll 11 11}}
+						<span data-i111n="rating-word11">Legendary+3</span>
+					{{/rollBetween() roll 11 11}}
+					{{#rollBetween() roll 10 10}}
+						<span data-i110n="rating-word10">Legendary+2</span>
+					{{/rollBetween() roll 10 10}}
+					{{#rollBetween() roll 9 9}}
+						<span data-i19n="rating-word9">Legendary+1</span>
+					{{/rollBetween() roll 9 9}}
 					{{#rollBetween() roll 8 8}}
 						<span data-i18n="rating-word8">Legendary</span>
 					{{/rollBetween() roll 8 8}}
@@ -1599,6 +1810,18 @@
 					{{#rollBetween() roll -4 -4}}
 						<span data-i18n="rating-word-4">Horrifying</span>
 					{{/rollBetween() roll -4 -4}}
+					{{#rollBetween() roll -5 -5}}
+						<span data-i18n="rating-word-5">Horrifying-1</span>
+					{{/rollBetween() roll -5 -5}}
+					{{#rollBetween() roll -6 -6}}
+						<span data-i18n="rating-word-6">Horrifying-2</span>
+					{{/rollBetween() roll -6 -6}}
+					{{#rollBetween() roll -7 -7}}
+						<span data-i18n="rating-word-7">Horrifying-3</span>
+					{{/rollBetween() roll -7 -7}}
+					{{#rollBetween() roll -8 -8}}
+						<span data-i18n="rating-word-8">Horrifying-4</span>
+					{{/rollBetween() roll -8 -8}}
 				</div>
 			</div>
 		{{/roll}}
@@ -1623,6 +1846,8 @@
 // These skills, aspect labels, and stress labels are translation keys, but if no translation is found it'll default to the key-as-given for the name.
 
 var skillsets = {
+	ngen: [ "Athletics", "Contacts", "Deceive", "Empathy", "Fight", "Heart", "Humanity", "Investigate", "Kindness", "Notice", "Provoke", "Resources", "Shapeshift", "Stealth", "Strength", "Thieving", "Will", "Wisdom" ],
+	tachyon: [ "Athletics", "Discipline", "Empathy", "Fight", "Gunnery", "Investigate", "Notice", "Pilot", "Provoke", "Rapport", "Shoot", "Sneak", "Tactics", "Technology" ],
 	kaijuinc: [ "Ambition", "Combat", "Empathy", "Fitness", "Kaiju Studies", "Networking", "Operate", "Provoke", "Rapport", "Spin", "Technology", "Tradecraft" ], 
 	robo: [ "Athletics", "Burglary", "Combat", "Contacts", "Deceive", "Empathy", "Notice", "Physique", "Provoke", "Rapport", "Stealth", "Vehicles", "Will" ],
 	m12: [ "Bureaucracy", "Tactics", "Teslology", "Transdimensional Tesliana", "Neuro-Electric Tesliana" ],
@@ -1650,6 +1875,31 @@ var gamesets = {
 		conditions: [],
 		skills: [],
 		settings: {}
+	},
+	ngen: {
+		addskills: "ngen",
+		addstress: "esc", 
+		stresskeys: ["physical","mental"], 
+		stresslength: 2,
+		addconsequence: "all",
+		addswaps: [ "Immaterial", "Animal", "Plant", "Human" ],
+		aspects: [ "High Concept", "Weakness", "Immaterial Form", "Plant Form", "Animal Form", "Human Form", "Bond", "Free Aspect" ],
+		settings: {
+			"SkillStyle": "pyramid",
+			"Show-Aspects": 1,
+			"Show-Conditions": 0,
+			"Show-Consequences": 1,
+			"Show-Corruption": 0,
+			"Show-FP": 1,
+			"Show-Notes": 1,
+			"Show-Powers": 0,
+			"Show-Refresh": 1,
+			"Show-Skills": 1,
+			"Show-Skillswaps": 1,
+			"Show-Stress": 1,
+			"Show-Stunts": 1,
+			"Show-TempAspects": 1
+		}
 	},
 	fcore: { 
 		addskills: "fcore",
@@ -1850,7 +2100,7 @@ var gamesets = {
 			"Show-Corruption": 0,
 			"Show-FP": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 1,
 			"Show-Skills": 1,
@@ -1875,12 +2125,68 @@ var gamesets = {
 			"Show-FP": 1,
 			"Show-Modes": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 0,
 			"Show-Skills": 1,
 			"Show-Stress": 1,
 			"Show-Stunts": 1,
+			"Show-TempAspects": 1
+		}
+	},
+	threerocketeers: {
+		addstress: "esc", 
+		stresskeys: ["physical","mental"], 
+		stresslength: 2,
+		addconsequence: "all",
+		aspects: [ "Rocketeer", "Trouble", "Swordplay", "Family", "Open", "Open" ],
+		aspectvalues: [ 2, 1, 1, 1, 1, 1 ],
+		settings: {
+			"SkillStyle": "list",
+			"Show-Aspects": 1,
+			"Show-Conditions": 0,
+			"Show-Consequences": 1,
+			"Show-Corruption": 0,
+			"Show-Extras": 1,
+			"Show-FP": 1,
+			"Show-Modes": 0,
+			"Show-Notes": 1,
+			"Show-Powers": 0,
+			"Show-Refresh": 1,
+			"Show-Roles": 0,
+			"Show-Skills": 0,
+			"Show-Stress": 1,
+			"Show-Stunts": 1,
+			"Show-RollableAspects": 1,
+			"Show-TempAspects": 1
+		}
+	},
+	tachyon: {
+		addskills: "tachyon",
+		addstress: "flat", 
+		stresskeys: ["stress"], 
+		stresslength: 5,
+		addconsequence: "all",
+		aspects: [ "High Concept", "Decompression", "Relationship", "Relationship", "Other" ],
+		settings: {
+			"theme": "evilhat",
+			"addextra": "blackfish",
+			"SkillStyle": "pyramid",
+			"Show-Aspects": 1,
+			"Show-Conditions": 0,
+			"Show-Consequences": 1,
+			"Show-Corruption": 0,
+			"Show-Extras": 1,
+			"Show-FP": 1,
+			"Show-Modes": 0,
+			"Show-Notes": 1,
+			"Show-Powers": 0,
+			"Show-Refresh": 1,
+			"Show-Roles": 0,
+			"Show-Skills": 1,
+			"Show-Stress": 1,
+			"Show-Stunts": 1,
+			"Show-RollableAspects": 0,
 			"Show-TempAspects": 1
 		}
 	},
@@ -1901,7 +2207,7 @@ var gamesets = {
 			"Show-FP": 1,
 			"Show-Modes": 1,
 			"Show-Notes": 1,
-			"Show-Powers": 1,
+			"Show-Powers": 0,
 			"Show-Refresh": 1,
 			"Show-Roles": 0,
 			"Show-Skills": 1,
@@ -1958,12 +2264,24 @@ var extras = {
 	blackfish: [
 		{ element: "title", name: "SF-46D Blackfish" },
 		{ element: "aspect", text: "Old But Reliable" },
-		{ element: "stunt", label: "Stunts", 
-			name: "Well Armed", text: "Gain Weapon:1 to Gunnery attacks." },
-		{ element: "stunt", name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
-		{ element: "rating", label: "Notes", 
+		{ element: "rating", label: "Stats", 
 			name: "Scale", rating: 1 },
-		{ element: "rating", name: "Modular Equipment Bays", rating: 2 },
+		{ element: "rating", 
+			name: "Quality", rating: 1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 2 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: 0, text: "+0 to Pilot rolls." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades (2)", text: "Weapon:1 (main gun), +1 Shields" },
+		{ element: "rating", name: "Weapon (main gun)", rating: 1 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
 		{ element: "track", label: "Shields", 
 			track: 3, track1: 1, track2: 1, track3: 1 },
 		{ element: "track", label: "Computer System Damage", icon: "plus", 
@@ -1980,6 +2298,411 @@ var extras = {
 			name: "Life Support Damaged", track: 1, track1: 2 },
 		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
 		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship00": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 0 },
+		{ element: "rating", 
+			name: "Quality", rating: 0 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 0 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: 0, text: "+0 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", rollable: 1, skill: "Pilot", bonus: 1, text: "+1 to Pilot for Defend actions only." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "track", label: "Shields", 
+			track: 2, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Minimize 1 die on Technology actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Minimize 1 die on Tactics actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship0-1": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 0 },
+		{ element: "rating", 
+			name: "Quality", rating: -1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 0 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: -1, text: "-1 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: -1, text: "-1 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: -1, text: "-1 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -1, text: "-1 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", rollable: 1, skill: "Pilot", bonus: 0, text: "+1 to Pilot for Defend actions only." },
+		{ element: "stunt", label: "Systems", 
+			name: "Upgrades (0)", text: "None" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "track", label: "Shields", 
+			track: 1, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Minimize 1 die on Technology and Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Minimize 1 die on Tactics and Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit, Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship10": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 1 },
+		{ element: "rating", 
+			name: "Quality", rating: 0 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 2 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: 0, text: "+0 to Pilot rolls." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 2, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Minimize 1 die on Technology actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Minimize 1 die on Tactics actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship1-1": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 1 },
+		{ element: "rating", 
+			name: "Quality", rating: -1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 2 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: -1, text: "-1 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: -1, text: "-1 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: -1, text: "-1 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -1, text: "-1 to Pilot rolls." },
+		{ element: "stunt", label: "Systems", 
+			name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 1, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Minimize 1 die on Technology and Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Minimize 1 die on Tactics and Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit, Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship20": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 2 },
+		{ element: "rating", 
+			name: "Quality", rating: 0 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 3 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -1, text: "-1 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-1 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 2, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship2-1": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 1 },
+		{ element: "rating", 
+			name: "Quality", rating: -1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 3 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: -1, text: "-1 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: -1, text: "-1 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: -1, text: "-1 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -2, text: "-2 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-1 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 1, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology and Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics and Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 1, track2: 2, track3: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit, Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship30": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 3 },
+		{ element: "rating", 
+			name: "Quality", rating: 0 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 4 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -2, text: "-2 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-2 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "stunt", name: "Bay 4", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 2, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship3-1": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 3 },
+		{ element: "rating", 
+			name: "Quality", rating: -1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 4 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: -1, text: "-1 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: -1, text: "-1 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: -1, text: "-1 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -3, text: "-3 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-2 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "stunt", name: "Bay 4", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 1, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology and Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics and Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit, Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship40": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 3 },
+		{ element: "rating", 
+			name: "Quality", rating: 0 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 5 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: 0, text: "+0 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: 0, text: "+0 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: 0, text: "+0 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -3, text: "-3 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-3 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Automated Ejection System", text: "See Tachyon Squadron page 46" },
+		{ element: "stunt", name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "stunt", name: "Bay 4", text: "" },
+		{ element: "stunt", name: "Bay 5", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 2, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "blank", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "minus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"ship4-1": [
+		{ element: "title", name: "Ship Name" },
+		{ element: "aspect", text: "Big Ship" },
+		{ element: "rating", label: "Stats", 
+			name: "Scale", rating: 3 },
+		{ element: "rating", 
+			name: "Quality", rating: -1 },
+		{ element: "rating", 
+			name: "Modular Equipment Bays", rating: 5 },
+		{ element: "stunt", label: "Modifiers", name: "Technology (Detection)", rollable: 1, skill: "Technology", bonus: -1, text: "-1 to Technology rolls." },
+		{ element: "stunt", name: "Tactics (Maneuver)", rollable: 1, skill: "Tactics", bonus: -1, text: "-1 to Tactics rolls." },
+		{ element: "stunt", name: "Gunnery (Attack)", rollable: 1, skill: "Gunnery", bonus: -1, text: "-1 to Gunnery rolls." },
+		{ element: "stunt", name: "Pilot (Defend)", rollable: 1, skill: "Pilot", bonus: -4, text: "-4 to Pilot rolls." },
+		{ element: "stunt", name: "Scale Modifier", text: "-3 to all Pilot actions (included above)." },
+		{ element: "stunt", label: "Systems", 
+			name: "Upgrades ( )", text: "" },
+		{ element: "rating", name: "Weapon", rating: 0 },
+		{ element: "rating", name: "Armor", rating: 0 },
+		{ element: "stunt", label: "Modular Equipment Bays",
+			name: "Bay 1", text: "" },
+		{ element: "stunt", name: "Bay 2", text: "" },
+		{ element: "stunt", name: "Bay 3", text: "" },
+		{ element: "stunt", name: "Bay 4", text: "" },
+		{ element: "stunt", name: "Bay 5", text: "" },
+		{ element: "track", label: "Shields", 
+			track: 1, track1: 1, track2: 1, track3: 1, track4: 1, track5: 1 },
+		{ element: "track", label: "Computer System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Technology and Gunnery actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Sensors and targeting systems offline: Minimize 1 die on Technology and Gunnery actions, Shots in the Dark.", track: 1, track1: 2 },
+		{ element: "track", name: "Flash fire! Punch out!", track: 1 },
+		{ element: "track", label: "Propulsion System Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Minimize 1 die on Tactics and Pilot actions.", track: 1, track1: 2 },
+		{ element: "track", name: "Critical damage to drives: Minimize 1 die on Tactics and Pilot actions, Drives Ready to Give Out.", track: 1, track1: 2 },
+		{ element: "track", name: "Catastrophic explosion! Punch out!", track: 1 },
+		{ element: "track", label: "Critical Systems Damage", icon: "plus", 
+			name: "Cosmetic damage", track: 1, track1: 2, track2: 2, track3: 2 },
+		{ element: "track", name: "Cockpit hit, pilot sustains damage equal to the amount the ship sustained in this hit, Life Support Damaged.", track: 1, track1: 2 },
+		{ element: "track", name: "Structural disintegration! Punch out!", track: 1 }
+	],
+	"turretdamage": [
+		{ element: "track", label: "Turret System Damage (if targeted)", 
+			name: "Turret is locked in its current position and can only attack in the direction on the maneuver chart (above, below, or lateral) it last fired.", track: 1, track1: 2 },
+		{ element: "track", name: "Minimize 1 die on all Gunnery rolls.", track: 1, track1: 2 },
+		{ element: "track", name: "Turret is inoperative and its gunner takes a mild consequence.", track: 1, track1: 2 },
+	],
+	swordplay: [
+		{ element: "title", name: "Swordplay" },
+		{ element: "stunt", name: "Appearance", text: "" },
+		{ element: "stunt", name: "Edge", text: "" },
+		{ element: "stunt", name: "Main Hand", text: "" },
+		{ element: "stunt", name: "Off Hand", text: "" }
 	],
 	template: [
 		{ element: "title", name: "Title" },
@@ -2131,10 +2854,23 @@ var loadGameProcess  = function(set) {
 	if ( typeof set.aspects !== "undefined" ) {
 		addAspect(set);
 	}
+	if ( typeof set.addswaps !== "undefined" ) {
+		var attrs = {};
+		for ( var i = 0; i < set.addswaps.length; i++ ) {
+			var newid = generateActuallyUniqueRowID();
+			var lid = "repeating_swaps_" + newid + "_label";
+			var ltext = getTranslationByKey(set.addswaps[i]);
+			if ( ltext === false ) {
+				ltext = set.addswaps[i];
+ 			}
+			attrs[lid] = ltext;
+		}
+		setAttrs(attrs);
+	}
 };
 
-var loadSkills = function() {
-	log("ENTER loadSkills() called");
+var loadSkills = function(caller) {
+	log("ENTER loadSkills() called by " + caller);
 	getSectionIDs("skills", function(list) {
 		// log("ENTER loadSkills() getSectionIDs()");
 		var fieldlist = [];
@@ -2149,7 +2885,7 @@ var loadSkills = function() {
 			fieldlist,
 			function(obj) {
 				// log("ENTER loadSkills() getAttrs");
-				skillGrid = {	"row8": [],	"row7": [],	"row6": [],	"row5": [],	"row4": [],	"row3": [],	"row2":[],	"row1": [],	"row0": [],	"row-1": [],	"row-2": [],	"row-3": [],	"row-4": []};
+				skillGrid = {	"row10": [], "row9": [], "row8": [],	"row7": [],	"row6": [],	"row5": [],	"row4": [],	"row3": [],	"row2":[],	"row1": [],	"row0": [],	"row-1": [],	"row-2": [],	"row-3": [],	"row-4": []};
 				var attrs = { skillcount: 0 };
 				for(var [id,value] of Object.entries(obj) ) {
 					let isSkill = /_skill$/.test(id);
@@ -2168,6 +2904,7 @@ var loadSkills = function() {
 						value = Number(value) + bonus;
 						gridrow = "row" + value;
 						skillRatingByNameID[skillid] = value;
+						attrs["Skill-"+skillNameByID[skillid]] = value; // Externalize the skill rating in an attribute that can be addressed by macros
 						skillRatingByName[skillNameByID[skillid]] = value;
 						var wordid = id + "-word";
 						attrs[wordid] = "";
@@ -2195,8 +2932,71 @@ var loadSkills = function() {
 					attrs[attrnamelist] = listform;
 				}
 				// log(attrs);
-				setAttrs(attrs); 
+				setAttrs(attrs,{silent:true}); // We don't need to trigger any cascades here, this contains modifications of some fields in repeating_skills but we're already processing the whole thing in here
 				// log("EXIT loadSkills() getAttrs");
+
+				// As a coda to this, we go and make sure that stunts with incorporated skills are recorded properly.
+
+				getSectionIDs("stunts", function(stunts) {
+					log("stunts"+" skill integration begins");
+					var sfields = [ "rolltally" ];
+					for(var i=0; i < stunts.length; i++ ) {
+						sfields[i+1] = "repeating_" + "stunts" + "_" + stunts[i] + "_skill";
+					}
+					// get the stunt's skill setting, check skillRatingByName to see if there's a match, if there is, set the skillvalue attribute of that row to the value of said skill.
+					getAttrs(sfields, function(sf) {
+						var sattrs = {};
+						for(var [id,value] of Object.entries(sf) ) {
+							if ( id !== "rolltally" && value !== "" ) {
+								// Then we have a named skill. It must match exactly.
+								var sval = "N/A";
+								if ( typeof skillRatingByName[value] !== "undefined" ) {
+									sval = skillRatingByName[value];
+								}
+								var sfkey = id + "value";
+								sattrs[sfkey] = sval;
+							} else if ( id !== "rolltally" ) { // This is for rollable aspects
+								// Then we default to the value of the aspects total.
+								var sfkey = id + "value";
+								sattrs[sfkey] = sf["rolltally"];
+							}
+						}
+						setAttrs(sattrs);
+						log(sattrs);
+						log("stunts"+" skill integration ends");
+					});
+				});
+
+				getSectionIDs("extras", function(stunts) {
+					log("extras"+" skill integration begins");
+					var sfields = [ "rolltally" ];
+					for(var i=0; i < stunts.length; i++ ) {
+						sfields[i+1] = "repeating_" + "extras" + "_" + stunts[i] + "_skill";
+					}
+					// get the stunt's skill setting, check skillRatingByName to see if there's a match, if there is, set the skillvalue attribute of that row to the value of said skill.
+					getAttrs(sfields, function(sf) {
+						var sattrs = {};
+						for(var [id,value] of Object.entries(sf) ) {
+							if ( id !== "rolltally" && value !== "" ) {
+								// Then we have a named skill. It must match exactly.
+								var sval = "N/A";
+								if ( typeof skillRatingByName[value] !== "undefined" ) {
+									sval = skillRatingByName[value];
+								}
+								var sfkey = id + "value";
+								sattrs[sfkey] = sval;
+							} else if ( id !== "rolltally" ) { // This is for rollable aspects
+								// Then we default to the value of the aspects total.
+								var sfkey = id + "value";
+								sattrs[sfkey] = sf["rolltally"];
+							}
+						}
+						setAttrs(sattrs);
+						log(sattrs);
+						log("extras"+" skill integration ends");
+					});
+				});
+
 			}
 		);
 
@@ -2325,7 +3125,7 @@ var addSkills = function(values) {
 						log("NOT INSERTED: I believe that " + skillname + " is already in the skill list, so, nope.");
 					}
 				}
-				setAttrs(attrs,"silent",function() { log("addSkills callback to loadSkills"); loadSkills(); }); // doing loadSkills() as a callback so it'll happen after all the attrs are set
+				setAttrs(attrs,{silent:true},function() { log("addSkills callback to loadSkills"); loadSkills("addSkills"); }); // doing loadSkills() as a callback so it'll happen after all the attrs are set
 
 			}
 		);
@@ -2495,6 +3295,10 @@ var addCondition = function(values) {
 
 var addAspect = function(values) {
 	var list = values.aspects;
+	var rv = [];
+	if ( typeof values.aspectvalues !== "undefined" ) {
+		rv = values.aspectvalues;
+	}
 	var attrs = {};
 	for (i=0; i < list.length; i++) {
 		var newid = generateActuallyUniqueRowID();
@@ -2503,6 +3307,9 @@ var addAspect = function(values) {
 			label = list[i];
 		}
 		attrs["repeating_aspects_" + newid + "_label"] = label;
+		if ( typeof rv[i] !== "undefined" ) {
+			attrs["repeating_aspects_" + newid + "_rollvalue"] = rv[i];
+		}
 	}
 	setAttrs(attrs);
 }
@@ -2556,7 +3363,7 @@ var addConsequence = function(values) {
 
 on("sheet:opened", function() {
 	log("Event: Sheet Opened");
-	loadSkills();
+	loadSkills("sheet:opened");
 });
 
 on("change:addextra", function() {
@@ -2612,7 +3419,7 @@ on("change:repeating_roles remove:repeating_roles sheet:opened", function() {
 							}
 							log("Attrs ready to set:");
 							log(attrs);
-							setAttrs(attrs,"quiet",function() { loadSkills(); });
+							setAttrs(attrs,{silent:true},function() { loadSkills("change:repeating_roles remove:repeating_roles sheet:opened"); });
 						});
 					});
 				});
@@ -2688,7 +3495,7 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 							}
 							log("Attrs ready to set:");
 							log(attrs);
-							setAttrs(attrs,"quiet",function() { loadSkills(); });
+							setAttrs(attrs,{silent:true},function() { loadSkills("change:repeating_modes remove:repeating_modes sheet:opened"); });
 						});
 					});
 				});
@@ -2697,18 +3504,251 @@ on("change:repeating_modes remove:repeating_modes sheet:opened", function() {
 	});
 });
 
-on("change:repeating_skills remove:repeating_skills change:skillstyle", function() {
-	loadSkills();
+on("sheet:opened change:repeating_aspects remove:repeating_aspects", function() {
+	getSectionIDs("aspects", function(list) {
+		log("Parsing aspect list");
+		var gets = [];
+		for( var i = 0; i < list.length; i++ ) {
+			gets[i*4] = "repeating_aspects_" + list[i] + "_aspect";
+			gets[i*4+1] = "repeating_aspects_" + list[i] + "_label";
+			gets[i*4+2] = "repeating_aspects_" + list[i] + "_flags";
+			gets[i*4+3] = "repeating_aspects_" + list[i] + "_notes";
+		}
+		getAttrs(gets, function(a) {
+			var atext = "";
+			var lcount = {};
+			var attrs = {}
+			for( var i = 0; i < list.length; i++ ) {
+				var lmod = "Unlabeled";
+				var aspect = a["repeating_aspects_" + list[i] + "_aspect"];
+				var label = a["repeating_aspects_" + list[i] + "_label"];
+				var flags = a["repeating_aspects_" + list[i] + "_flags"];
+				var notes = a["repeating_aspects_" + list[i] + "_notes"];
+				if ( atext !== "" ) {
+					atext = atext + "\n\n";
+				}
+				if ( typeof label !== "undefined" && label !== "" ) {
+					atext = atext + "**" + label;
+					if ( typeof flags !== "undefined" && flags !== "" ) {
+						atext = atext + " (" + flags + ")";
+					}
+					atext = atext + ":**\n";
+					lmod = label.replace(/\s+/g,"");
+				}
+				atext = atext + "***" + aspect + "***";
+				if ( typeof notes !== "undefined" && notes !== "" ) {
+					atext = atext + "\n"+ notes ;
+				}
+				if ( typeof lcount[lmod] === "undefined" ) {
+					lcount[lmod] = 0;
+				}
+				lcount[lmod]++;
+				var lkey = lmod + lcount[lmod];
+				if ( lcount[lmod] == 1 ) {
+					lkey = lmod;
+				}
+				lkey = "Aspect-" + lkey;
+				attrs[lkey] = aspect;
+			}
+			attrs["aspectlist"] = atext;
+			log("Done parsing aspect list"); log(attrs);
+			setAttrs(attrs);
+		});
+	});
+});
+
+on("change:repeating_skills:skill change:repeating_skills:rating change:repeating_skills:bonus remove:repeating_skills change:skillstyle change:repeating_stunts:skill change:repeating_extras:skill change:rolltally", function() {
+	loadSkills("change:repeating_skills:skill change:repeating_skills:rating change:repeating_skills:bonus remove:repeating_skills change:skillstyle change:repeating_stunts:skill change:repeating_extras:skill change:rolltally");
 });
 
 on("sheet:opened change:repeating_stunts remove:repeating_stunts", function() {
 	log("Event: Stunts change");
 	getSectionIDs("stunts", function(list) {
-		setAttrs({
-			stuntcount: list.length
+		log("parsing stunt list");
+		var attrs = { stuntcount: list.length };
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*2] = "repeating_stunts_" + list[i] + "_name";
+			slist[i*2+1] = "repeating_stunts_" + list[i] + "_desc";
+		}
+		getAttrs(slist,function(stunts) {
+			for ( var i = 0; i < list.length; i++ ) {
+				var stuntkey = "repeating_stunts_" + list[i] + "_name";
+				var desckey = "repeating_stunts_" + list[i] + "_desc";
+				var snum = i + 1;
+				var atstunt = "Stunt-Name-" + snum;
+				var atstuntd = "Stunt-Desc-" + snum;
+				var atstuntf = "Stunt-" + snum;
+				attrs[atstunt] = stunts[stuntkey];
+				attrs[atstuntd] = stunts[desckey];
+				attrs[atstuntf] = stunts[stuntkey] + ": " + stunts[desckey];
+			}			
+			setAttrs(attrs);
+			log("stunt list parsed"); log(attrs);
 		});
 	});
 });
+
+on("sheet:opened change:repeating_consequences remove:repeating_consequences", function() {
+	log("Event: Consequences change");
+	getSectionIDs("consequences", function(list) {
+		log("parsing consequence list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*4] = "repeating_consequences_" + list[i] + "_label";
+			slist[i*4+1] = "repeating_consequences_" + list[i] + "_track";
+			slist[i*4+2] = "repeating_consequences_" + list[i] + "_trackcheck";
+			slist[i*4+3] = "repeating_consequences_" + list[i] + "_aspect";
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var ckey = "repeating_consequences_" + list[i] + "_label";
+				var tkey = "repeating_consequences_" + list[i] + "_track";
+				var akey = "repeating_consequences_" + list[i] + "_aspect";
+				var tckey = "repeating_consequences_" + list[i] + "_trackcheck";
+				var checked = false;
+				if ( c[tckey] == "1" ) {
+					checked = true;
+				}
+				var aspect = c[akey];
+				var value = Number(c[tkey]);
+				var remaining = value;
+				if ( checked ) { remaining = 0; }
+				var label = c[ckey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Consequence-" + label;
+				attrs[label] = aspect;
+				attrs[label+"-Total"] = value;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Marked"] = checked;
+			}
+			setAttrs(attrs);
+			log("consequence list parsed"); log(attrs);
+		});
+	});
+});
+
+on("sheet:opened change:repeating_stress remove:repeating_stress", function() {
+	log("Event: Stress change");
+	getSectionIDs("stress", function(list) {
+		log("parsing stress list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*20] = "repeating_stress_" + list[i] + "_label";
+			slist[i*20+1] = "repeating_stress_" + list[i] + "_track";
+			for ( var j = 1; j < 10; j++ ) {
+				slist[i*20+j*2] = "repeating_stress_" + list[i] + "_track" + j;
+				slist[i*20+j*2+1] = "repeating_stress_" + list[i] + "_check" + j;
+			}
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var lkey = "repeating_stress_" + list[i] + "_label";
+				var tkey = "repeating_stress_" + list[i] + "_track";
+				var tally = 0; var remaining = 0;
+				for ( var j = 1; j <= Number(c[tkey]); j++ ) {
+					var vakey = "repeating_stress_" + list[i] + "_track" + j;
+					var chkey = "repeating_stress_" + list[i] + "_check" + j;
+					var value = Number(c[vakey]);
+					if ( isNaN(value) || value == 0 ) {
+						value = 1;
+					}
+					var count = 1;
+					if ( c[chkey] == "1" ) {
+						count = 0;
+					}
+					tally += value;
+					remaining += value*count;
+				}
+				var label = c[lkey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( label == "" ) { label = "Track"; }
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Stress-" + label;
+				attrs[label+"-Total"] = tally;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Used"] = tally - remaining;
+				attrs[label+"-Length"] = c[tkey];
+			}
+			setAttrs(attrs);
+			log("stress list parsed"); log(attrs);
+		});
+	});
+});
+
+on("sheet:opened change:repeating_conditions remove:repeating_conditions", function() {
+	log("Event: Condition change");
+	getSectionIDs("conditions", function(list) {
+		log("parsing conditions list");
+		var attrs = {};
+		var slist = [];
+		for ( var i = 0; i < list.length; i++ ) {
+			slist[i*20] = "repeating_conditions_" + list[i] + "_label";
+			slist[i*20+1] = "repeating_conditions_" + list[i] + "_track";
+			for ( var j = 1; j < 10; j++ ) {
+				slist[i*20+j*2] = "repeating_conditions_" + list[i] + "_track" + j;
+				slist[i*20+j*2+1] = "repeating_conditions_" + list[i] + "_check" + j;
+			}
+		}
+		getAttrs(slist,function(c) {
+			var lcheck = {};
+			for ( var i = 0; i < list.length; i++ ) {
+				var lkey = "repeating_conditions_" + list[i] + "_label";
+				var tkey = "repeating_conditions_" + list[i] + "_track";
+				var tally = 0; var remaining = 0;
+				for ( var j = 1; j <= Number(c[tkey]); j++ ) {
+					var vakey = "repeating_conditions_" + list[i] + "_track" + j;
+					var chkey = "repeating_conditions_" + list[i] + "_check" + j;
+					var value = Number(c[vakey]);
+					if ( isNaN(value) || value == 0 ) {
+						value = 1;
+					}
+					var count = 1;
+					if ( c[chkey] == "1" ) {
+						count = 0;
+					}
+					tally += value;
+					remaining += value*count;
+				}
+				var label = c[lkey];
+				label = label.replace(/[^A-Za-z0-9]/g,"");
+				if ( label == "" ) { label = "Track"; }
+				if ( typeof lcheck[label] === "undefined" ) {
+					lcheck[label] = 0;
+				}
+				lcheck[label]++;
+				if ( lcheck[label] > 1 ) {
+					label = label + lcheck[label];
+				}
+				label = "Condition-" + label;
+				attrs[label+"-Total"] = tally;
+				attrs[label+"-Remaining"] = remaining;
+				attrs[label+"-Used"] = tally - remaining;
+				attrs[label+"-Length"] = c[tkey];
+			}
+			setAttrs(attrs);
+			log("conditions list parsed"); log(attrs);
+		});
+	});
+});
+
 
 on("change:addskills", function() {
 	log("Event: addskills change");
@@ -2809,7 +3849,7 @@ on("change:repeating_powers:sfxmenu", function(e) {
 				}
 				newtext = newtext + text + " ";
 				attrs[fxid] = newtext;
-				setAttrs(attrs,"silent"); // Silent because we don't need to trigger a second run through this same handler
+				setAttrs(attrs,{silent:true}); // Silent because we don't need to trigger a second run through this same handler
 			});
 		}
 	}
@@ -2860,6 +3900,85 @@ on("change:repeating_aspects:rollthis", function(e) {
 				}
 			}
 			setAttrs(attrs);
+		});
+	});
+});
+
+on("clicked:repeating_swaps:importswap", function(e) {
+	const rowprefix = (e.sourceAttribute).slice(0,-10); // Strips off the importswap
+	const skillsid = rowprefix + "skills";
+	getSectionIDs("skills", function(s) {
+		var fields = [];
+		for(var i=0; i < s.length; i++) {
+			fields[i*2] = "repeating_skills_" + s[i] + "_skill";
+			fields[i*2+1] = "repeating_skills_" + s[i] + "_rating";
+		}
+		getAttrs(fields, function(v) {
+			var attrs = {};
+			attrs[skillsid] = "";
+			for(var i=0; i < s.length; i++) {
+				const sid = "repeating_skills_" + s[i] + "_skill";
+				const rid = "repeating_skills_" + s[i] + "_rating";
+				if ( i > 0 ) {
+					attrs[skillsid] += ", ";
+				}
+				attrs[skillsid] += v[sid] + ":" + v[rid];
+			}
+			setAttrs(attrs);
+		});
+	});
+});
+
+on("change:repeating_swaps:skills", function(e) {
+	log("change:repeating_swaps:skills");
+	log(e);
+	const skillsid = e.sourceAttribute;
+	getAttrs([skillsid], function(s) {
+		var stext = s[skillsid];
+		stext = stext.replace(/\n/g," ");
+		stext = stext.replace(/  */g," ");
+		stext = stext.replace(/^  */,"");
+		stext = stext.replace(/  *$/,"");
+		var attrs = {};
+		attrs[skillsid] = stext;
+		setAttrs(attrs,{silent:true});
+	});
+})
+
+on("clicked:repeating_swaps:loadswap", function(e) {
+	const rowprefix = (e.sourceAttribute).slice(0,-8); // Strips off the loadswap
+	const skillsid = rowprefix + "skills";
+	getAttrs([skillsid], function(l) {
+		var list = l[skillsid].toString().split(/\s*,\s*/);
+		var rates = {};
+		for(var i = 0; i < list.length; i++) {
+			var parts = list[i].toString().split(/\s*:\s*/);
+			rates[parts[0]] = Number(parts[1]);
+		}
+		getSectionIDs("skills", function(s) {
+			const lid = rowprefix + "label";
+			var fields = [ lid ];
+			for(var i=0; i < s.length; i++) {
+				fields[1+i*2] = "repeating_skills_" + s[i] + "_skill";
+				fields[1+i*2+1] = "repeating_skills_" + s[i] + "_rating";
+			}
+			getAttrs(fields, function(v) {
+				var attrs = { "lastswapped": "(" + v[lid] + ")" };
+				for(var i=0; i < s.length; i++) {
+					const sid = "repeating_skills_" + s[i] + "_skill";
+					const rid = "repeating_skills_" + s[i] + "_rating";
+					const skill = v[sid];
+					const rating = Number(v[rid]);
+					if ( typeof rates[skill] !== "undefined") {
+						// Then we have a skill that matches one of the loadable's skills
+						if ( rating != rates[skill] ) {
+							attrs[rid] = rates[skill];
+							log("Changing "+skill+" rating to "+rates[skill]);
+						}
+					}
+				}
+				setAttrs(attrs,{silent:true},function() { loadSkills("clicked:repeating_swaps:loadswap") });
+			});
 		});
 	});
 });
