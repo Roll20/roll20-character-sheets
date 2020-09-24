@@ -28,12 +28,16 @@ mixin checkboxSymbol(name, symbol)
 mixin textarea(name)
 	textarea(name=`attr_${attrName(name)}` data-i18n-placeholder=name)
 
-mixin rollButton(name)
-	button.text-left.ellipsis.font-weight-bold(data-i18n=name name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{dice=[[1d20[Roll]]]}}`)
+- const rollTemplate = modifier => `1d12+(${modifier})+(?{Modifiers +/-|0})`
+mixin traitButton(name)
+	button.ellipsis(data-i18n=name name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=^{${name}}}} {{dice=[[${rollTemplate(`@{${name}_modifier}`)}]]}}`)
+
+mixin skillButton(name)
+	button.text-left.ellipsis.font-weight-bold(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} {{dice=[[${rollTemplate('@{trait_modifier}+@{rank}+@{modifier}')}]]}}`)
+		span(name='attr_name')
 
 mixin repeatingRollButton(name)
-	- const desc = name.includes('skills') ? '{{desc=@{specialization}}}' : ''
-	button.text-left.ellipsis.font-weight-bold(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} {{dice=@{description}}} ${desc}`)
+	button.text-left.ellipsis.font-weight-bold(name=`roll_${buttonName(name)}` type='roll' value!=`&{template:rolls} {{header=@{name}}} {{desc=@{description}}}`)
 		span(name='attr_name')
 
 mixin repeatingText(name)
