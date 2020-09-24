@@ -19,7 +19,7 @@ on("sheet:opened", function(e){
   // Translations for query strings
   setAttrs({
     'query_rate_of_fire': getTranslationByKey('query-rate-of-fire'),
-    'query_modifier': getTranslationByKey('query_modifier'),
+    'query_modifier': getTranslationByKey('query-modifier'),
     'query_wild_die': getTranslationByKey('query-wild-die'),
     'query_roll_result': getTranslationByKey('query-roll-result'),
     'query_target_number': getTranslationByKey('query-target-number'),
