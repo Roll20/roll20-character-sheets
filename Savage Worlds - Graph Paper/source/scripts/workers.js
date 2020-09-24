@@ -75,8 +75,8 @@ var TETRA = TETRA || ( function() {
 
     // Replace abbreviations with attribute references (naive)
     _.each(_.keys(parseCodes), (k) => {
-      code = code.replaceAll('+' + k, '+' + parseCodes[k]);
-      code = code.replaceAll('-' + k, '-' + parseCodes[k]);
+      code = code.replaceAll(`+${k}`, `+${parseCodes[k]}`);
+      code = code.replaceAll(`-${k}`, `-${parseCodes[k]}`);
     });
 
     return code;
@@ -84,20 +84,20 @@ var TETRA = TETRA || ( function() {
 
   // Update the roll queries for a trait
   updateTraitRoll = function(trait) {
-    let traitAttributes = [trait, trait + '-wd', trait + '-mod'];
+    let traitAttributes = [trait, `${trait}-wd`, `${trait}-mod`];
 
     // Get trait values: die, Wild Die, and modifier
     getAttrs(traitAttributes, (values) => {
       let die = values[trait],
-          wd = values[trait + '-wd'],
-          ewd = '-10000',
-          mod = values[trait + '-mod'] || '+ 0',
+          wd = values[`${trait}-wd`],
+          ewd = '-10000', // Extra Wild Die
+          mod = values[`${trait}-mod`] || '+ 0',
           untrained = '',
-          code = toInt(values[trait + '-mod']);
+          code = toInt(values[`${trait}-mod`]);
 
       // Set up Wild Die
       if (dice.includes(wd) && wd != '') {
-        wd = '1' + wd + '!cs2 ';
+        wd = `1${wd}!cs2 `;
         ewd = wd;
       } else if (wd == '') {
         wd = '1d6!cs2 ';
@@ -113,33 +113,33 @@ var TETRA = TETRA || ( function() {
       }
 
       if (code != 0) {
-        code = code > 0 ? '+' + code : code.toString();
+        code = code > 0 ? `+${code}` : code.toString();
       } else {
         code = '';
       }
 
       code = die + code;
 
-      code = ewd != '-10000' ? code + ' (' + values[trait + '-wd'] + ')' : code;
+      code = ewd != '-10000' ? `${code} (${values[`${trait}-wd`]})` : code;
 
       // Set up trait die
-      die = '1' + die + '!cs2 ';
+      die = `1${die}!cs2 `;
 
       // Build roll queries (including Wild Die for extras)
       let traitQuery = die + untrained,
           wdQuery = wd != '' ? wd + untrained : '',
           ewdQuery = ewd != '-10000' ? ewd + untrained : '-10000';
 
-      setAttrs({ [trait + '-roll']: traitQuery,
-                 [trait + '-wd-roll']: wdQuery,
-                 [trait + '-extra-wd-roll']: ewdQuery,
-                 [trait + '-code']: code });
+      setAttrs({ [`${trait}-roll`]: traitQuery,
+                 [`${trait}-wd-roll`]: wdQuery,
+                 [`${trait}-extra-wd-roll`]: ewdQuery,
+                 [`${trait}-code`]: code });
     });
   },
 
   // Apply custom function to attributes in all rows of repeating section
   doWithRepList = function(section, attributes, func = (v) => { return v }) {
-    let fullSection = section.includes('repeating_') ? section : 'repeating_' + section;
+    let fullSection = section.includes('repeating_') ? section : `repeating_${section}`;
 
     attributes = _.isArray(attributes) ? attributes : [attributes];
 
@@ -149,7 +149,7 @@ var TETRA = TETRA || ( function() {
       // List of all requested attributes from all rows
       _.each(idArray, (id) => {
         _.each(attributes, (a) => {
-          attributeArray.push(fullSection + '_' + id + '_' + a);
+          attributeArray.push(`${fullSection}_${id}_${a}`);
         });
       });
 
@@ -220,7 +220,7 @@ on('change:' + skills.join(' change:'), (e) => {
 WILD DICE
 ############################################################################# */
 
-const wildTraits = ['soak'].concat(attributes).concat(skills).map((s) => { return s + '-wd' });
+const wildTraits = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}-wd` });
 
 on('change:' + wildTraits.join(' change:'), (e) => {
   // Derive target attribute and check if input value is a valid die
@@ -238,7 +238,7 @@ on('change:' + wildTraits.join(' change:'), (e) => {
 NATURAL DICE
 ############################################################################# */
 
-const naturalTraits = attributes.map((s) => { return s + '-natural' });
+const naturalTraits = attributes.map((s) => { return `${s}-natural` });
 
 on('change:' + naturalTraits.join(' change:'), (e) => {
   // Check if new value is valid
@@ -271,7 +271,7 @@ on('change:run', (e) => {
 /* #############################################################################
 MODIFIERS
 ############################################################################# */
-const modifiers = ['soak'].concat(attributes).concat(skills).map((s) => { return s + '-mod' });
+const modifiers = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}-mod` });
 
 on('change:' + modifiers.join(' change:'), (e) => {
   // Parse input value as integer
@@ -283,7 +283,7 @@ on('change:' + modifiers.join(' change:'), (e) => {
   // Positive or negative prefix (required for roll query)
   if (value != '') {
     let s = String(value);
-    value = value > -1 && s.charAt(0) != '+' ? '+' + s : s;
+    value = value > -1 && s.charAt(0) != '+' ? `+${s}` : s;
   }
 
   // Set attribute to new value, silent to avoid triggering worker again
@@ -318,7 +318,7 @@ on('change:' + simple.join(' change:'), (e) => {
 WOUND BOXES
 ############################################################################# */
 
-const woundToggles = _.range(1, 7).map((n) => { return 'wound-toggle-' + n });
+const woundToggles = _.range(1, 7).map((n) => { return `wound-toggle-${n.toString()}` });
 
 on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:'), (e) => {
   let attributes = ['wounds', 'wound-mitigation'].concat(woundToggles);
@@ -344,7 +344,7 @@ on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:
 
     // Deactive all subsequent wound boxes
     for (var i = firstInactiveNumber + 1; i < 7; ++i) {
-      setters['wound-toggle-' + i] = 'on';
+      setters[`wound-toggle-${i}`] = 'on';
     };
 
     // Limit active wounds to active wound boxes
@@ -378,7 +378,7 @@ on('change:wounds change:wound-mitigation change:' + woundToggles.join(' change:
 FATIGUE BOXES
 ############################################################################# */
 
-const fatigueToggles = _.range(2, 4).map((n) => { return 'fatigue-toggle-' + n.toString() });
+const fatigueToggles = _.range(2, 4).map((n) => { return `fatigue-toggle-${n.toString()}` });
 
 on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
   let attributes = ['fatigue'].concat(fatigueToggles);
@@ -404,7 +404,7 @@ on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
 
     // Deactive all subsequent boxes
     for (var i = firstInactiveNumber + 1; i < 4; ++i) {
-      setters['fatigue-toggle-' + i] = 'on';
+      setters[`fatigue-toggle-${i}`] = 'on';
     };
 
     // Limit active fatigue to active boxes
@@ -531,7 +531,7 @@ function colSum(values, target, multi = false) {
 on('change:repeating_weapons', (e) => {
   if (e.sourceAttribute.includes('damage')) {
     let code = TETRA.parseDiceCode(e.newValue);
-    setAttrs({ [e.sourceAttribute + '-roll']: code }, { silent: true });
+    setAttrs({ [`${e.sourceAttribute}-roll`]: code }, { silent: true });
   }
 
   if (e.sourceAttribute.includes('weight')) {
