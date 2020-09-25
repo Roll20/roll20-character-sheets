@@ -3977,6 +3977,7 @@
 				<ul>
 					<li>Bug fix. Remove mystery characters, <b>$[[3]]</b> that was added to all the translation files for the modifier label translation.</li>
 					<li>Roll Modifier Tool. Added an Encumbered modifier, useful skills like Stealth, that may be affected by encumbrance level. Based on original suggestion by <i>Ian</i>.</li>
+					<li>Performance Improvement. Refactored events for Spells, Techniques, and Skills that should improve responsiveness.</li>
 				</ul>
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
@@ -15164,85 +15165,62 @@ See notes for weapon.</textarea>
 		
 	});
 	
-	// update row ids and then update mirrored skill level when repeating row is updated
-	on("change:repeating_skills", function(event) {
-	    
-	    get_update_row_ids("repeating_skills", function(ids) {
-	        
-	        updateSkillLevel("repeating_skills", ids);
-	        
-	    });
-	    
-	});
-	
-	// update row id field and update mirrored skill level when repeating row is updated
-	on("change:repeating_spells", function(event) {
-	    
-	    var sectionName = "repeating_spells";
-	    
-	    get_update_row_ids(sectionName, function(ids) {
-	        
-	        // get the base spell level and bonus
-    	    getAttrs(["spell_base", "spell_bonus"], function(values) {
-    	        
-    	        var spellBase = values.spell_base;
-    	        
-    	        var spellBonus = parseInt(values.spell_bonus);
-    	        
-    	        if ( isNaN(spellBonus) ) {
-    	            spellBonus = 0;
-    	        }
-    	        
-    	        updateSpellLevel( sectionName, ids, spellBase, spellBonus );   
-    	        
-    	    });
-	        
-	    });
-	    
-	});
-	
-	// update row id field
-	on("change:repeating_techniquesrevised", function(event) {
-	    
-	    get_update_row_ids("repeating_techniquesrevised", function(ids) {
+	// watches for a change in a single row, updates row id and skill level
+	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
+	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised", event => {
 
-			// do nothing
+		let source = event.sourceType;
 
-		});
-	    
+		if (event.sourceAttribute === event.triggerName) {
+			//console.log("exit. row is being deleted.")
+			return;
+		}
+		
+		let row = event.triggerName;
+
+		let [section, rowId] = getSectionRowIdFromChangeEvent(event);
+
+		switch (section) {
+			case "repeating_spells":
+				updateRowIdDisplay(section, rowId, updateSpellLevelForRow(section, rowId));
+				break;
+		
+			case "repeating_skills":
+				updateRowIdDisplay(section, rowId, updateSkillLevelForRow(section, rowId));
+				break;
+
+			case "repeating_techniquesrevised":
+				updateRowIdDisplay(section, rowId);
+				break;
+		}
+		
 	});
-	
+
 	/**
-	 * get rows ids and update display field
+	 * Updates the display row id for a repeating section
 	 * 
-	 * @param string sectionId Repeating section id
+	 * @param string   section  Repeating section name
+	 * @param string   rowId    Row id of repeating section
+	 * @param function callback Optional callback function
+	 *
+	 * @return void
 	 */
-	function get_update_row_ids(sectionId, callback) {
-	    
-	    getSectionIDs(sectionId, function(ids) {
-            
-            if (ids.length === 0) return;
-            
-            const items = {}; // initialize an object to hold fields to update.
-            
-            for(var i=0; i < ids.length; i++) {
-                
-                //Do something with the IDs
-                var rowId = ids[i];
-                
-                // set the field value
-                items[`${sectionId}_${rowId}_row_id`] = rowId;
-                
-            }
-           
-           // update the field values
-           // callback returns the row ids to function that made the call
-           setAttrs(items, '', callback(ids));
-           
-        });
-	    
+	function updateRowIdDisplay(section, rowId, callback) {
+
+		// check for optional callback function
+		callback = callback || noop;
+
+		// initialize an object to hold fields to update.
+		const items = {};
+
+		// set the field value
+		items[`${section}_${rowId}_row_id`] = rowId;
+              
+		// update the field values
+		setAttrs(items, {silent: true}, callback);
+
 	}
-	
+
 	// Update the total cost of Techniques
 	on('change:repeating_techniques:points remove:repeating_techniques', function (e) {
 		sumRepeating('repeating_techniques', 'points', function(v) {
@@ -19172,7 +19150,36 @@ See notes for weapon.</textarea>
         
         return rowId;
         
-    }
+	}
+	
+	/**
+	 * Simplified function to get section name and row id based on event
+	 * see: https://roll20.zendesk.com/hc/en-us/articles/360037773513-Sheet-Worker-Scripts#events-0-3
+	 * 
+	 * @param object event Event Info triggered by an action
+	 *
+	 * @return array [sectioName, rowId]
+	 */
+	function getSectionRowIdFromChangeEvent(event) {
+
+		// example: repeating_spells_-mi2gev09xkxzckxltdw
+		let triggerName = event.triggerName;
+
+		// split into an array
+		// example: ["repeating", "spells", "-mi2gev09xkxzckxltdw"]
+		let arrName = triggerName.split("_");
+
+		let rowId = arrName.pop();
+
+		rowId = rowId.toLowerCase();
+
+		let sectionName = `${arrName[0]}_${arrName[1]}`;
+
+		sectionName = sectionName.toLowerCase();
+
+		return [sectionName, rowId];
+
+	}
     
     // if linked data for repeating range changes update the skill level
 	on('change:repeating_ranged:ranged_row_type change:repeating_ranged:ranged_skill_row_id change:repeating_ranged:ranged_skill_row_id_modifier change:repeating_ranged:ranged_skill_row_id_toggle', function(event){
@@ -19870,6 +19877,82 @@ See notes for weapon.</textarea>
 	    });
 	    
 	}
+
+	/**
+	 * Updates the skill level and the display of the row id
+	 * 
+	 * @param string section Repeating section name
+	 * @param string rowId   Row id
+	 *
+	 * @return void
+	 */
+	function updateSkillLevelForRow(sectionName, rowId) {
+
+		let baseFieldName = `${sectionName}_${rowId}_base`;
+	        
+		let difficultyFieldName = `${sectionName}_${rowId}_difficulty`;
+		
+		let bonusFieldName = `${sectionName}_${rowId}_bonus`;
+		
+		let wildcardSkillPointsFieldName = `${sectionName}_${rowId}_wildcard_skill_points`;
+		
+		let useWildcardPointsFieldName = `${sectionName}_${rowId}_use_wildcard_points`;
+		
+		let pointsFieldName = `${sectionName}_${rowId}_points`;
+		
+		let useNormalPointsFieldName = `${sectionName}_${rowId}_use_normal_points`;
+		
+		fields = [
+			baseFieldName,
+			difficultyFieldName,
+			bonusFieldName,
+			wildcardSkillPointsFieldName,
+			useWildcardPointsFieldName,
+			pointsFieldName,
+			useNormalPointsFieldName,
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower"
+		];
+		
+		getAttrs(fields, function(values) {
+			
+			let base = getBaseSkillLevel(values[baseFieldName], values);
+			
+			let difficulty = values[difficultyFieldName];
+			
+			let bonus = +values[bonusFieldName];
+			
+			let wildcardSkillPoints = +values[wildcardSkillPointsFieldName];
+			
+			let useWildcardSkillPoints = +values[useWildcardPointsFieldName];
+			
+			let points = +values[pointsFieldName];
+			
+			let useNormalPoints = +values[useNormalPointsFieldName];
+			
+			// check for wildcard
+			if ( String(difficulty) === "-5 + 1") {
+				difficulty = -4;
+			} else {
+				difficulty = +difficulty; 
+			}
+			
+			let skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, wildcardSkillPoints, useWildcardSkillPoints, points, useNormalPoints);
+			
+			let fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
+
+			let updateFields = {};
+			
+			updateFields[fieldToUpdate] = skillLevel;
+
+			setAttrs(updateFields, {silent: false});
+			
+		});
+	}
 	
 	function getBaseSkillLevel(baseFieldName, values) {
 	    
@@ -19938,7 +20021,7 @@ See notes for weapon.</textarea>
 	    });
 	     
 	}
-	
+
 	function updateSpellLevel(sectionName, ids, spellBase, spellBonus) {
 	    
 	    _.each(ids,function(id) {
@@ -19987,6 +20070,66 @@ See notes for weapon.</textarea>
 	        
 	    });
 	    
+	}
+
+	/**
+	 * Update the spell level and display row id
+	 * 
+	 * @param string sectionName Repeating section name
+	 * @param string rowId       Row Id that was updated
+	 * 
+	 * @return void
+	 */
+	function updateSpellLevelForRow(sectionName, rowId) {
+
+		let difficultyFieldName = `${sectionName}_${rowId}_difficulty`;
+	        
+		let bonusFieldName = `${sectionName}_${rowId}_spell_modifier`;
+		
+		let pointsFieldName = `${sectionName}_${rowId}_points`;
+		
+		fields = [
+			difficultyFieldName,
+			bonusFieldName,
+			pointsFieldName,
+			"strength",
+			"dexterity",
+			"intelligence",
+			"health",
+			"perception",
+			"willpower",
+			"spell_base",
+			"spell_bonus",
+		];
+		
+		getAttrs(fields, function(values) {
+			
+			let spellBonus = parseInt(values.spell_bonus);
+	        
+	        if ( isNaN(spellBonus) ) {
+	            spellBonus = 0;
+	        }
+
+			let base = getBaseSkillLevel(values.spell_base, values);
+			
+			let difficulty = +values[difficultyFieldName];
+			
+			let bonus = +values[bonusFieldName] + spellBonus;
+			
+			let points = +values[pointsFieldName];
+			
+			let skillLevel = getSkillLevelUsingRaw(base, difficulty, bonus, 0, false, points, true);
+			
+			let fieldToUpdate = `${sectionName}_${rowId}_level_mirror`;
+
+			let updateFields = {};
+			
+			updateFields[fieldToUpdate] = skillLevel;
+				
+			setAttrs(updateFields, {silent: false});
+			
+		});
+
 	}
 	
 	/**
