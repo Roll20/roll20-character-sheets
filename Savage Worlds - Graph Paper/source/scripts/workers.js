@@ -305,7 +305,7 @@ SIMPLE STATISTICS
 const simple = ['pace', 'flight', 'rads', 'power', 'power_consumed',
                 'power_maximum', 'armor_head', 'armor_torso', 'armor_arms',
                 'armor_legs', 'parry', 'toughness', 'integrity_maximum',
-                'carry_weight_max'];
+                'carry_weight_maximum'];
 
 on('change:' + simple.join(' change:'), (e) => {
   // Parse input value as integer unless it is empty
@@ -582,7 +582,7 @@ on('remove:repeating_inventory', (e) => {
 });
 
 const carryWeights = ['carry_weight_apparel', 'carry_weight_weapons',
-                      'carry_weight_inventory', 'carry_weight_max'];
+                      'carry_weight_inventory', 'carry_weight_maximum'];
 
 on('change:' + carryWeights.join(' change:'), (e) => {
   getAttrs(carryWeights, (value) => {
