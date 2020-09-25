@@ -3974,11 +3974,15 @@
 					<span data-i18n="sheet-version-title">GURPS Character Sheet Version:</span>
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
+
 				<ul>
 					<li>Bug fix. Remove mystery characters, <b>$[[3]]</b> that was added to all the translation files for the modifier label translation.</li>
 					<li>Roll Modifier Tool. Added an Encumbered modifier, useful skills like Stealth, that may be affected by encumbrance level. Based on original suggestion by <i>Ian</i>.</li>
 					<li>Performance Improvement. Refactored events for Spells, Techniques, and Skills that should improve responsiveness.</li>
+					<li>If a new character sheet is created, the latest announcements will not be displayed.</li>
+					<li>Bug fix - General Tab. Fix calculation errors for <b>Turning and Velocity Modifiers</b></li>
 				</ul>
+
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
 				<button type="action" name="act_view_updates_tab" class="reset"><span data-i18n="view-all-updates">View All Updates</span></button>
 			</div>
@@ -11667,7 +11671,11 @@ For more information, see B409.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
-				<li>Bug fix. Remove mystery characters, <b>$[[3]]</b> that was added to all the translation files for the modifier label translation.</li>	
+				<li>Bug fix. Remove mystery characters, <b>$[[3]]</b> that was added to all the translation files for the modifier label translation.</li>
+				<li>Roll Modifier Tool. Added an Encumbered modifier, useful skills like Stealth, that may be affected by encumbrance level. Based on original suggestion by <i>Ian</i>.</li>
+				<li>Performance Improvement. Refactored events for Spells, Techniques, and Skills that should improve responsiveness.</li>
+				<li>If a new character sheet is created, the latest announcements will not be displayed.</li>
+				<li>Bug fix - General Tab. Fix calculation errors for <b>Turning and Velocity Modifiers</b></li>
 			</ul>
 
 			<h4>Version: 2.3.11</h4>
@@ -14307,14 +14315,21 @@ See notes for weapon.</textarea>
 			}
 			
 			if (!v.sheet_version || v.sheet_version != version) {
-			    
+				
+				let hide = 0;
+
+				// if this is a brand new sheet. don't show announcements
+				if (!v.sheet_version) {
+					hide = 1;
+				}
+				
 				// Set sheet version:
 				// show announcements div
 				setAttrs({ 
                     sheet_version: version,
                     announcement_version: version,
                     latest_changes: latestChangesDate,
-                    announcements_hide: 0,
+                    announcements_hide: hide,
                     announcements_show: 0
                 });
 
@@ -15172,7 +15187,7 @@ See notes for weapon.</textarea>
 		let source = event.sourceType;
 
 		if (event.sourceAttribute === event.triggerName) {
-			//console.log("exit. row is being deleted.")
+			//exit. row is being deleted
 			return;
 		}
 		
@@ -18647,22 +18662,23 @@ See notes for weapon.</textarea>
                         baseMove = getBaseMove(values.enhanced_move_current);
                         
                         // enhanced move has tight turn penalty
-                        tightTurnPenalty = getTightTurnPenalty(velocityFinal, values.enhanced_move_current);
+                        tightTurnPenalty = getTightTurnPenalty(velocityFinal, baseMove);
                         
                     }
                     break;
                     
                 case "air":
                     
-                    baseMove = getBaseMove(values.current_air);
-                    
-                    tightTurnPenalty = getTightTurnPenalty(velocityFinal, values.current_air);
-                    break;
+					baseMove = getBaseMove(values.current_air);
+					
+                    tightTurnPenalty = getTightTurnPenalty(velocityFinal, baseMove);
+					
+					break;
                     
                 case "water":
                     baseMove = getBaseMove(values.current_water);
                     
-                    tightTurnPenalty = getTightTurnPenalty(velocityFinal, values.current_water);
+                    tightTurnPenalty = getTightTurnPenalty(velocityFinal, baseMove);
                     break;
                 
                 default:
@@ -18670,7 +18686,7 @@ See notes for weapon.</textarea>
                     
                     tightTurnPenalty = 0;
             }
-            
+			
             // --
             if (velocityChange < 0) {
             
@@ -18680,8 +18696,8 @@ See notes for weapon.</textarea>
                 
                 decelerationPenalty = 0;
                 
-            }
-            
+			}
+			
             // --
             if (baseMove && velocityFinal) {
                 
@@ -18701,7 +18717,7 @@ See notes for weapon.</textarea>
                 "final_velocity": velocityFinal,
                 "deceleration_penalty": decelerationPenalty,
                 "turn_radius": turnRadius,
-                "tight_turn_penalty": tightTurnPenalty
+                "tight_turn_penalty": tightTurnPenalty,
             });
             
         });
@@ -18709,55 +18725,38 @@ See notes for weapon.</textarea>
     }
     
     /**
-     * Calculate deceleration penalty
-     * example: deceleration = 10, baseMove = 3
-     *          removesafe = 10 - 3 = 7
-     *          penalty = -1 * (7/2) = -3
+	 * Calculate deceleration penalty
+	 * See B395
+     * -1 per two full yards/second beyond basic move
      * 
      * @param int deceleration How much is thing/vehicle slows down by
      * @param int baseMove     base move. 
-     * @param int maxMove      Deceleration can't more than maxMove
      * 
      * @return int
      */
-    function getDecelerationPenalty(deceleration, baseMove, maxMove) {
+    function getDecelerationPenalty(deceleration, baseMove) {
         
         // deceleration needs to be a postive number
         if (deceleration < 0) {
             deceleration = -1 * deceleration;
         }
         
-        var safeDeceleration = 0;
+        let difference = 0;
         
-        var maxDeceleration = 0;
-        
-        var penalty = 0;
-        
-        // make sure we don't exceed max move
-        if (deceleration < maxMove) {
-            
-            maxDeceleration = deceleration;
-            
-        } else {
-            
-            maxDeceleration = maxMove;
-        }
-        
-        if (maxDeceleration == 0 || 
-            baseMove == 0 || 
-            maxDeceleration <= baseMove) {
-            
-            return 0;
-            
-        }
-        
-        // example: deceleration = 10, baseMove = 3
-        //          removesafe = 10 - 3 = 7
-        //          penalty = 7/2 = -3
-        safeDeceleration = maxDeceleration - baseMove;
-        
-        // note: decelerationDivisor is a constant declared at top of javascript 
-        penalty = -1 * Math.floor(safeDeceleration/decelerationDivisor);
+        let penalty = 0;
+		
+		// only get penalty if deceleration is greater than base move
+		if (deceleration > baseMove) {
+
+			// example: deceleration = 10, baseMove = 3
+			//          difference = 10 - 3 = 7
+			//          penalty = 7/2 = -3
+			difference = deceleration - baseMove;
+			
+			// note: decelerationDivisor is a constant declared at top of javascript 
+			penalty = -1 * Math.floor(difference/decelerationDivisor);
+			
+		}
         
         return penalty;
     }
@@ -18847,51 +18846,25 @@ See notes for weapon.</textarea>
      * Determines the tight turn penalty
      * 
      * @param int    velocity  Current velocity
-     * @param string moveValue Base move used to determine turn penalty
+     * @param string baseMove Base move used to determine turn penalty
      * 
      * @return int
      */
-    function getTightTurnPenalty(velocity, moveValue) {
+    function getTightTurnPenalty(velocity, baseMove) {
         
         var penalty = 0;
         
-        var arrMoveValue;
-        
-        var baseMove = 0;
-        
-        var maxMove = 0;
-        
-        var temp = 0;
-        
-        if ( moveValue.toString().includes("/") ) {
-                
-            // split the value
-            // move = 8/16
-            // 8 = base move
-            // 16 = max move
-            arrMoveValue = moveValue.split("/");
-            
-            baseMove = +arrMoveValue[0];
-            
-            maxMove = +arrMoveValue[1];
-            
-        } else {
-            
-            baseMove = +moveValue;
-            
-            maxMove = +moveValue;
-            
-        }
-        
-        if ( baseMove === maxMove ) {
+		var arrMoveValue;
+		
+        if ( velocity <= baseMove ) {
             
             penalty = 0;
             
         } else {
             
-            temp = velocity - baseMove;
+            let difference = velocity - baseMove;
             
-            penalty = Math.floor(temp/baseMove) * -1;
+            penalty = Math.floor(difference/baseMove) * -1;
             
         }
         
