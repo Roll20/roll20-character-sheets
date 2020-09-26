@@ -1,10 +1,14 @@
 # Savage Worlds - Graph Paper (SWADE)
 This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it can be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/Y8Y8111H4)
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=JD4THSYQ57Y4A&source=url)
+
 ## Notable Features
 * **Blocks:** Toggle various content blocks, such as Allies, Augmentations, Powers, Vehicles, and more.
 * **Extra Sheet:** You can switch the main layout for a simplified and compact alternative. Good for non-player characters.
-* **Setting Agnostic:** The GM can toggle/rename most of the labels and skills and add up to two custom skills.
+* **Customization:** The GM can toggle/rename most of the labels and skills and add up to two custom skills.
 * **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
 * **Roll Templates:** Rolls can display multiple dice (RoF 1-6) and have a custom (or no) Wild Die.
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
