@@ -61,6 +61,12 @@ This character sheet was originally made for **Maschinenleben** (released later 
   ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/vehicles.gif)
 </details>
 
+<details>
+  <summary>Settings</summary>
+
+  ![Settings](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/settings.gif)
+</details>
+
 ## Latest Changes
 #### Version 1.0
 * Initial release
