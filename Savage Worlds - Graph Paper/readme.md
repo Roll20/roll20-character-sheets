@@ -26,6 +26,12 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 <details>
+  <summary>Roll Template</summary>
+  
+  ![Roll Template](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Roll.png)
+</details>
+
+<details>
   <summary>Attributes</summary>
   
   ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/attributes.gif)
