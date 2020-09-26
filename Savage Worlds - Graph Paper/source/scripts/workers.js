@@ -126,6 +126,7 @@ var TETRA = TETRA || ( function() {
 
       code = die + code;
 
+      // Die (Wild Die)
       code = ewd != '-10000' ? `${code} (${values[`${trait}_wd`]})` : code;
 
       // Set up trait die
@@ -160,7 +161,7 @@ var TETRA = TETRA || ( function() {
       });
 
       getAttrs(attributeArray, (values) => {
-        func(values); // Pass all attributes values to custom function
+        func(values); // Pass all attribute values to custom function
       });
     }
 
