@@ -79,7 +79,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 
 ## Latest Changes
 #### Version 1.0.1
-* Made lightest text color a bit darker.
+* Made lightest text color a bit darker
 * Moved `transition` property to class scopes
 * Dice parser now captures references at the beginning
 #### Version 1.0
