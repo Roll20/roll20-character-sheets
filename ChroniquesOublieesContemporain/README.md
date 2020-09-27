@@ -10,9 +10,19 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.5 [Screenshot](coc_v2.png)
+3.6 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.6 (2020-09-04)
+
+- Case à cocher sur l'onglet Capacités de la fiche de PJ permettant de basculer entre :
+  - le mode Affichage, avec nom et description textuelle complète des capacités
+  - le mode Edition, où l'utilisateur peut entrer le texte des capacités (la première ligne de texte est toujours considérée comme étant le nom de la capacité).
+- Possibilité d'importer la liste des voies et des capacités du profil du personnage. Consulter la [documentation](https://stephaned68.github.io/ChroniquesContemporaines/import-abilities) pour plus de détails.
+- Possibilité de lier un jet de capacité avec l'une des capacités de la grille, en indiquant le numéro de voie et le rang correspondant. Cette information est principalement utilisée par le script API COlib.
+
+Le script API compagnon [COlib](https://github.com/stephaned68/COlib) permet un import des données, non seulement dans la fiche de personnage mais aussi dans le journal Roll20. Consulter la [documentation](https://stephaned68.github.io/COlib/commands) pour plus de détails.
 
 ## v3.5 (2020-08-22)
 
