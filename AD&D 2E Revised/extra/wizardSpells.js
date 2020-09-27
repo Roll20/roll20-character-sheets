@@ -51,7 +51,7 @@ wiz1['Armor'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the shield spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The armor spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than [[8+[[@{level-wizard}]]]] points. (It is important to note that the armor does not absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the armor spell grants the wearer full benefits of the Armor Class gained.'
+    'effect': 'By means of this spell, the wizard creates a magical field of force that serves as if it were scale mail armor (AC 6). The spell has no effect on a person already armored or a creature with Armor Class 6 or better. It is not cumulative with the shield spell, but it is cumulative with Dexterity and, in case of fighter/mages, with the shield bonus. The armor spell does not hinder movement or prevent spellcasting, and adds no weight or encumbrance. It lasts until successfully dispelled or until the wearer sustains cumulative damage totaling greater than 8 points + 1 per level of the caster ([[8+[[@{level-wizard}]]]] points). (It is important to note that the armor does not absorb this damage. The armor merely grants an AC of 6; the wearer still suffers full damage from any successful attacks.) Thus, the wearer might suffer 8 points from an attack, then several minutes later sustain an additional 1 point of damage. Unless the spell were cast by a wizard of 2nd level or higher, it would be dispelled at this time. Until it is dispelled, the armor spell grants the wearer full benefits of the Armor Class gained.'
 };
 
 wiz1['Audible Glamer'] = {
@@ -93,7 +93,7 @@ wiz1['Cantrip'] = {
     'level': 'Level 1 Wizard',
     'school': 'All Schools',
     'range': '10 feet',
-    'duration': '[[[[@{level-wizard}]]]] hours',
+    'duration': '[[@{level-wizard}]] hours',
     'aoe': 'Special',
     'components': 'V, S',
     'cast-time': '1',
@@ -290,7 +290,7 @@ wiz1['Feather Fall'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '[[10*[[@{level-wizard}]]]] yards',
-    'duration': '[[[[@{level-wizard}]]]] rounds',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
     'components': 'V',
     'cast-time': '1',
@@ -307,7 +307,7 @@ wiz1['Find Familiar'] = {
     'name': 'Find Familiar',
     'level': 'Level 1 Wizard',
     'school': 'Conjuration/Summoning',
-    'range': '[[[[@{level-wizard}]]]] miles',
+    'range': '[[@{level-wizard}]] miles',
     'duration': 'Special',
     'aoe': '1 familiar',
     'components': 'V, S, M',
@@ -380,7 +380,7 @@ wiz1['Hold Portal'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '[[20*[[@{level-wizard}]]]] yards',
-    'duration': '[[[[@{level-wizard}]]]] rounds',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[20*[[@{level-wizard}]]]] square feet',
     'components': 'V',
     'cast-time': '1',
@@ -416,8 +416,8 @@ wiz1['Identify'] = {
     'level': 'Level 1 Wizard',
     'school': 'Divination',
     'range': '0',
-    'duration': '[[[[@{level-wizard}]]]] rounds',
-    'aoe': '[[[[@{level-wizard}]]]] items',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[@{level-wizard}]] items',
     'components': 'V, S, M',
     'cast-time': 'Special',
     'saving-throw': 'None',
@@ -452,7 +452,7 @@ wiz1['Light'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration',
     'range': '60 yards',
-    'duration': '[[[[@{level-wizard}]]]] turns',
+    'duration': '[[@{level-wizard}]] turns',
     'aoe': '20-feet radius',
     'components': 'V, M',
     'cast-time': '1',
@@ -498,7 +498,7 @@ wiz1['Mending'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new. A hole in a leather sack or wineskin is completely healed over by a mending spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[[[@{level-wizard}]]]] cubic feet.'
+    'effect': 'This spell repairs small breaks or tears in objects. It will weld a broken ring, chain link, medallion, or slender dagger, providing but one break exists. Ceramic or wooden objects with multiple breaks can be invisibly rejoined to be as strong as new. A hole in a leather sack or wineskin is completely healed over by a mending spell. This spell does not, by itself, repair magical items of any type. One turn after the spell is cast, the magic of the joining fades, and the effect cannot be magically dispelled. The maximum volume of material the caster can mend is 1 cubic foot per level. Current maximum volume is [[@{level-wizard}]] cubic feet.'
 };
 
 wiz1['Message'] = {
@@ -516,7 +516,7 @@ wiz1['Message'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[[[@{level-wizard}]]]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Current range is [[30+(10*[[@{level-wizard}]])]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
+    'effect': 'When this spell is cast, the wizard can whisper messages and receive replies with little chance of being overheard. When the spell is cast, the wizard secretly or openly points his finger at each creature to be included in the spell effect. Up to one creature per level can be included. Currently [[@{level-wizard}]] creatures. When the wizard whispers, the whispered message travels in a straight line and is audible to all of the involved creatures within 30 feet, plus 10 feet per level of the caster. Current range is [[30+(10*[[@{level-wizard}]])]] feet. The creatures who receive the message can whisper a reply that is heard by the spellcaster. Note that there must be an unobstructed path between the spellcaster and the recipients of the spell. The message must be in a language the caster speaks; this spell does not by itself confer understanding upon the recipients. This spell is most often used to conduct quick and private conferences when the caster does not wish to be overheard.'
 };
 
 wiz1['Mount'] = {
@@ -542,7 +542,7 @@ wiz1['Nystu\'s Magical Aura'] = {
     'level': 'Level 1 Wizard',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
-    'duration': '[[[[@{level-wizard}]]]] days',
+    'duration': '[[@{level-wizard}]] days',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 round',
@@ -642,7 +642,7 @@ wiz1['Shocking Grasp'] = {
     'damage': '[[1d8+[[@{level-wizard}]]]]',
     'damage-type': 'Lightning',
     'healing': '',
-    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[[[@{level-wizard}]]]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
+    'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[@{level-wizard}]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
 };
 
 wiz1['Sleep'] = {
@@ -740,7 +740,7 @@ wiz1['Unseen Servant'] = {
     'level': 'Level 1 Wizard',
     'school': 'Conjuration/Summoning',
     'range': '0',
-    'duration': '1 hours + [[[[@{level-wizard}]]]] turns',
+    'duration': '1 hours + [[@{level-wizard}]] turns',
     'aoe': '30-feet radius',
     'components': 'V, S, M',
     'cast-time': '1',
