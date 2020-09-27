@@ -19,25 +19,25 @@ This character sheet was originally made for **Maschinenleben** (released later 
 ## Previews
 <details>
   <summary>Full Preview</summary>
-  
+
   ![Full Preview](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper.jpg)
 </details>
 
 <details>
   <summary>Extra Sheet</summary>
-  
+
   ![Extra Sheet](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Extra.png)
 </details>
 
 <details>
   <summary>Roll Template</summary>
-  
+
   ![Roll Template](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Roll.png)
 </details>
 
 <details>
   <summary>Attributes</summary>
-  
+
   ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/attributes.gif)
 </details>
 
@@ -78,6 +78,10 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.0.1
+* Made lightest text color a bit darker.
+* Moved `transition` property to class scopes
+* Dice parser now captures references at the beginning
 #### Version 1.0
 * Initial release
 
