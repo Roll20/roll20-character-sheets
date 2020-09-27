@@ -36,7 +36,8 @@
 				.horz-line
 				each val, key in statsObject
 					//- const statRollValue = `@{gm_toggle} &{template:rolls} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}`;
-					- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+					//without modifier - const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+					- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{stat=[[@{${key+'_score'}}+round(?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}/10)]]}} {{score=[[@{${key}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}`;
 					button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
 						h3.aligned-left(data-i18n=key)= key
 						span.para(data-i18n=val)=   val 
@@ -67,11 +68,14 @@
 						- const presetValue =  (val === 'HP' || val === 'WP') ? 0 : (val === 'SAN') ? 0 : (val === 'BP') ? 0: 50;
 						- const attrName = key.replace(' ','_');
 						if (val === 'SAN') 
-							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							//without modifier button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}}`)
+							
 								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
 								span.para(data-i18n=val)=  val 
 						else if (val==='Luck')
-							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							//without modifier button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}]]}} {{dice=[[1d100]]}}`)
+							button(name=val type='roll' value=`@{gm_toggle} &{template:rolls} {{header=^{${val}}}} {{subheader=@{${attrName}}}} {{rating=[[@{${attrName}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{dice=[[1d100]]}}`)
 								h3.aligned-left(data-i18n=key data-i18n-title=key)= key
 						else
 							.derived-attr.nbsp
@@ -147,8 +151,8 @@
 					.horz-line
 					fieldset.repeating_skills
 						.grid.section-repeating.border-bottom
-							//- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}}`;
-							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
+							//without modifier - const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
+							- const skillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{rank}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}}`;
 							label.styled-checkbox(data-i18n-title='skill fail checkbox' title='skill fail checkbox')
 								input(name='attr_fail' title='@{repeating_skills_${x}_fail}' type='checkbox')
 							label(data-i18n-title='skill name' title='skill name')
@@ -159,6 +163,8 @@
 								input(data-i18n-placeholder='0' name='attr_rank' title='@{repeating_skills_${x}_rank}' placeholder='0' type='number' value='')
 			.section-directions.center 
 				span(data-i18n='Check a box when you attempt to use a skill and fail. After the session, add 1d4-1 to each checked skill and erase all checks.') Check a box when you attempt to use a skill and fail. After the session, add 1d4-1 to each checked skill and erase all checks.
+				button(name='act_levelup' type='action')
+					h3.aligned-center(data-i18n='Update' data-i18n-title='Update')= Update
 
 	//INJURIES
 	.grid.header-body.injuries.border
@@ -193,8 +199,8 @@
 			.repeating-container.border-bottom
 				fieldset.repeating_weapons
 					.grid.section-weapons.border-bottom
-						//- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d10]]}} {{dice2=[[1d10]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
-						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+						//without modifier - const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+						- const weaponRollValue = `@{gm_toggle} &{template:rolls} {{header=@{weapons}}} {{subheader=@{skill_percent}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{skill_percent}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
 						each weapon in weaponsAttrs
 							- const attrName = weapon.replace(' ', '_').replace('%', 'percent')
 							- const type = weapon.includes('%') || weapon === 'ammo' ? 'number' : 'text';
