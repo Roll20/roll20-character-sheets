@@ -448,7 +448,7 @@ pri1['Shillelagh'] = {
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
-    'materials': 'a shamrock leaf and the caster’s holy symbol.',
+    'materials': 'A shamrock leaf and the caster’s holy symbol.',
     'reference': 'PHB p. 257',
     'damage': '',
     'damage-type': '',
