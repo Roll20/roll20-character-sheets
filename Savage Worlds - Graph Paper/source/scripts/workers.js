@@ -83,7 +83,7 @@ var TETRA = TETRA || ( function() {
     _.each(_.keys(parseCodes), (k) => {
       code = code.replaceAll(`+${k}`, `+${parseCodes[k]}`);
       code = code.replaceAll(`-${k}`, `-${parseCodes[k]}`);
-      code = code.replaceAll(`${k}-`, `${parseCodes[k]}+`);
+      code = code.replaceAll(`${k}+`, `${parseCodes[k]}+`);
       code = code.replaceAll(`${k}-`, `${parseCodes[k]}-`);
     });
 
