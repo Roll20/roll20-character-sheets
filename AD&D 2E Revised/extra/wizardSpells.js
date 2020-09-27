@@ -146,7 +146,7 @@ wiz1['Chill Touch'] = {
     'level': 'Level 1 Wizard',
     'school': 'Necromancy',
     'range': '0',
-    'duration': '[[3+[[@{level-wizard}]]]]',
+    'duration': '[[3+[[@{level-wizard}]]]] rounds',
     'aoe': 'The caster',
     'components': 'V, S',
     'cast-time': '1',
@@ -228,7 +228,7 @@ wiz1['Detect Magic'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When the detect magic spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.'
+    'effect': 'When the detect magic spell is cast, the wizard detects magical radiations in a path 10 feet wide and up to 60 feet long, in the direction he is facing. The intensity of the magic can be determined (dim, faint, moderate, strong, overwhelming), and the wizard has a 10% chance per level ([[10*[[@{level-wizard}]]]]%) to recognize if a certain type of magic (alteration, conjuration, etc.) is present. The caster can turn, scanning a 60-degree arc per round. A stone wall of 1 foot or more thickness, solid metal of 1 inch thickness, or a yard or more of solid wood blocks the spell. Magical areas, multiple types of magic, or strong local magical emanations may confuse or conceal weaker radiations. Note that this spell does not reveal the presence of good or evil, or reveal alignment. Otherplanar creatures are not necessarily magical.'
 };
 
 wiz1['Detect Undead'] = {
