@@ -6,7 +6,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * **Extra Sheet:** You can switch the main layout for a simplified and compact alternative. Good for non-player characters.
 * **Customization:** The GM can toggle/rename most of the labels and skills and add up to two custom skills.
 * **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
-* **Roll Templates:** Rolls can display multiple dice (RoF 1-6) and have a custom (or no) Wild Die.
+* **Roll Templates:** Rolls can display multiple dice (RoF 1-8) and have a custom (or no) Wild Die.
 * **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
 * **Sleek:** The minimalist design is inspired by pencil-drawn sheets on graph paper.
 * **Silhouettes:** They look fancy! You can also add color markers as indicators for any purpose.
