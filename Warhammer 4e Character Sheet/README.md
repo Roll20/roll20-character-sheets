@@ -8,6 +8,19 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+
+September 7th 2020 v1.22
+
+- Fixed issue which stoped the Initiative button from working correctly on a newly created character sheet.
+- Added numerious IL8N tags that were missing from alot of the new content. This is a work in progress to enable high quality custom translation to be added later. Italian translation is being worked on by the 3rd party.
+
+
+August 24th 2020 v1.21
+
+- fencing skill roll fixed  ( issue #7214  )
+- hit location was not inverting target result fixed
+
+
 August 3rd 2020 v1.2
 
 NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.
