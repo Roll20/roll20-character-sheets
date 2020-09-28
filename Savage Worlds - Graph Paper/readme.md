@@ -74,6 +74,8 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.0.2
+* Increased Rate of Fire range from 6 to 8
 #### Version 1.0.1
 * Made lightest text color a bit darker
 * Moved `transition` property to class scopes
