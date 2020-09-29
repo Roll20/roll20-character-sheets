@@ -659,3 +659,62 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
     });
   }
 });
+
+/* #############################################################################
+AMMUNITION & BUTTONS
+############################################################################# */
+
+const ammoMods = ['1', '3', '5', '10'];
+
+function changeAmmo(triggerName) {
+  let mod = TETRA.toInt(triggerName.replace('clicked:ammunition_', '')),
+      attributes = ['ammunition_select',
+                    'ammunition_container_1',
+                    'ammunition_container_2',
+                    'ammunition_container_3'];
+
+  getAttrs(attributes, (values) => {
+    let target = values['ammunition_select'],
+        current = TETRA.toInt(values[target]); // The selector value is the attribute name of the box
+
+    // Add ammunition modifier
+    updated = current + mod;
+
+    // No negative ammunition
+    updated = updated < 0 ? 0 : updated;
+
+    setAttrs({ [target]: updated }, { silent: true });
+  });
+}
+
+on(`clicked:${ammoMods.map((s) => { return `ammunition_+${s}` }).join(' clicked:')}`, (e) => {
+  changeAmmo(e.triggerName);
+});
+
+on(`clicked:${ammoMods.map((s) => { return `ammunition_-${s}` }).join(' clicked:')}`, (e) => {
+  changeAmmo(e.triggerName);
+});
+
+on(`clicked:ammunition_set`, (e) => {
+  getAttrs(['ammunition_select'], (value) => {
+    let target = `${value['ammunition_select']}_max`;
+
+    getAttrs([value['ammunition_select']], (current) => {
+      update = TETRA.toInt(current[value['ammunition_select']]);
+
+      setAttrs({ [target]: update }, { silent: true });
+    });
+  });
+});
+
+on(`clicked:ammunition_reset`, (e) => {
+  getAttrs(['ammunition_select'], (value) => {
+    let target = value['ammunition_select'];
+
+    getAttrs([`${target}_max`], (max) => {
+      update = TETRA.toInt(max[`${target}_max`]);
+
+      setAttrs({ [target]: update }, { silent: true });
+    });
+  });
+});

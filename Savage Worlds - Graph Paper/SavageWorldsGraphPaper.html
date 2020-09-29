@@ -661,6 +661,65 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
   }
 });
 
+/* #############################################################################
+AMMUNITION & BUTTONS
+############################################################################# */
+
+const ammoMods = ['1', '3', '5', '10'];
+
+function changeAmmo(triggerName) {
+  let mod = TETRA.toInt(triggerName.replace('clicked:ammunition_', '')),
+      attributes = ['ammunition_select',
+                    'ammunition_container_1',
+                    'ammunition_container_2',
+                    'ammunition_container_3'];
+
+  getAttrs(attributes, (values) => {
+    let target = values['ammunition_select'],
+        current = TETRA.toInt(values[target]); // The selector value is the attribute name of the box
+
+    // Add ammunition modifier
+    updated = current + mod;
+
+    // No negative ammunition
+    updated = updated < 0 ? 0 : updated;
+
+    setAttrs({ [target]: updated }, { silent: true });
+  });
+}
+
+on(`clicked:${ammoMods.map((s) => { return `ammunition_+${s}` }).join(' clicked:')}`, (e) => {
+  changeAmmo(e.triggerName);
+});
+
+on(`clicked:${ammoMods.map((s) => { return `ammunition_-${s}` }).join(' clicked:')}`, (e) => {
+  changeAmmo(e.triggerName);
+});
+
+on(`clicked:ammunition_set`, (e) => {
+  getAttrs(['ammunition_select'], (value) => {
+    let target = `${value['ammunition_select']}_max`;
+
+    getAttrs([value['ammunition_select']], (current) => {
+      update = TETRA.toInt(current[value['ammunition_select']]);
+
+      setAttrs({ [target]: update }, { silent: true });
+    });
+  });
+});
+
+on(`clicked:ammunition_reset`, (e) => {
+  getAttrs(['ammunition_select'], (value) => {
+    let target = value['ammunition_select'];
+
+    getAttrs([`${target}_max`], (max) => {
+      update = TETRA.toInt(max[`${target}_max`]);
+
+      setAttrs({ [target]: update }, { silent: true });
+    });
+  });
+});
+
 </script><span class="sheet-hidden" data-i18n="query-rate-of-fire">Rate of Fire</span><span class="sheet-hidden" data-i18n="query-modifier">Modifier</span><span class="sheet-hidden" data-i18n="query-wild-die">Wild Die</span><span class="sheet-hidden" data-i18n="query_target_number">Target Number</span><span class="sheet-hidden" data-i18n="query_roll_result">Roll Result</span><span class="sheet-hidden" data-i18n="query_damage_modifier">Damage Modifier</span><span class="sheet-hidden" data-i18n="ally">Ally</span><span class="sheet-hidden" data-i18n="roll">Roll</span><span class="sheet-hidden" data-i18n="raises">raises</span><span class="sheet-hidden" data-i18n="vs_tn">vs. TN</span><span class="sheet-hidden" data-i18n="none">None</span>
 <div class="sheet-wrapper">
   <input class="sheet-hidden sheet-toggle-grid" type="checkbox" name="attr_toggle_style_grid" checked="checked"/>
@@ -674,7 +733,7 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
   <input class="sheet-variant-radio sheet-variant-radio--extra" type="radio" name="attr_sheet_variant" value="extra"/>
   <div class="sheet-body">
     <div class="sheet-wildcard">
-      <div class="sheet-section">
+      <div class="sheet-section sheet-section--header">
         <div class="sheet-left">
           <div class="sheet-meta">
             <div class="sheet-container">
@@ -778,7 +837,7 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
           </div>
         </div>
       </div>
-      <div class="sheet-section">
+      <div class="sheet-section sheet-section--center">
         <div class="sheet-left">
           <div class="sheet-section--traits">
             <div class="sheet-attributes">
@@ -3299,6 +3358,18 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
               </label>
             </div>
             <div class="sheet-settings__page sheet-settings__page--blocks">
+              <label class="sheet-settings__item"><span name="attr_rename_block_ammunition" data-i18n="ammunition">Ammunition</span>
+                <input class="sheet-checkbox" type="checkbox" name="attr_toggle_ammunition_block" checked="checked"/>
+              </label>
+              <label class="sheet-settings__item sheet-settings__item--text-input"><span data-i18n="settings-ammunition-container-1-label">[Ammo #1]</span>
+                <input class="sheet-align-left" type="text" name="attr_rename_ammunition_container_1" placeholder="Ammo #1" data-i18n-placeholder="settings-ammunition-container-1-placeholder" value="Ammo #1" spellcheck="false"/><span></span>
+              </label>
+              <label class="sheet-settings__item sheet-settings__item--text-input"><span data-i18n="settings-ammunition-container-2-label">[Ammo #2]</span>
+                <input class="sheet-align-left" type="text" name="attr_rename_ammunition_container_2" placeholder="Ammo #2" data-i18n-placeholder="settings-ammunition-container-2-placeholder" value="Ammo #2" spellcheck="false"/><span></span>
+              </label>
+              <label class="sheet-settings__item sheet-settings__item--text-input"><span data-i18n="settings-ammunition-container-3-label">[Ammo #3]</span>
+                <input class="sheet-align-left" type="text" name="attr_rename_ammunition_container_3" placeholder="Ammo #3" data-i18n-placeholder="settings-ammunition-container-3-placeholder" value="Ammo #3" spellcheck="false"/><span></span>
+              </label>
               <label class="sheet-settings__item"><span name="attr_rename_block_augmentations" data-i18n="augmentations">Augmentations</span>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_augmentations_block" checked="checked"/>
               </label>
@@ -3370,11 +3441,11 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
               <label class="sheet-settings__item"><span name="attr_rename_weird_science">Weird Science</span>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_skill_weird_science"/>
               </label>
-              <label class="sheet-settings__item sheet-settings__item--text-input">
+              <label class="sheet-settings__item sheet-settings__item--text-input"><span data-i18n="settings-custom-skill-1-label">[Custom Skill #1]</span>
                 <input class="sheet-align-left" type="text" name="attr_rename_custom_skill_1" placeholder="Custom Skill 1" data-i18n-placeholder="settings-custom-skill-1-placeholder" value="Custom Skill 1" spellcheck="false"/>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_skill_custom_skill_1"/>
               </label>
-              <label class="sheet-settings__item sheet-settings__item--text-input">
+              <label class="sheet-settings__item sheet-settings__item--text-input"><span data-i18n="settings-custom-skill-2-label">[Custom Skill #2]</span>
                 <input class="sheet-align-left" type="text" name="attr_rename_custom_skill_2" placeholder="Custom Skill 2" data-i18n-placeholder="settings-custom-skill-2-placeholder" value="Custom Skill 2" spellcheck="false"/>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_skill_custom_skill_2"/>
               </label>
@@ -3428,7 +3499,7 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
           </div>
         </div>
       </div>
-      <div class="sheet-section">
+      <div class="sheet-section sheet-section--footer">
         <div class="sheet-left">
           <div class="sheet-block sheet-weapons">
             <div class="sheet-header">
@@ -4431,6 +4502,44 @@ on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
           </div>
         </div>
         <div class="sheet-right">
+          <input class="sheet-hidden sheet-toggle sheet-toggle-block" type="checkbox" name="attr_toggle_ammunition_block" checked="checked"/>
+          <div class="sheet-ammunition">
+            <div class="sheet-header">
+              <div class="sheet-header__title"><span name="attr_rename_block_ammunition" data-i18n="ammunition">Ammunition</span></div>
+            </div>
+            <input class="sheet-toggle sheet-toggle--visibility" type="checkbox" name="attr_ammunition_visibility_toggle" checked="checked"/>
+            <div class="sheet-ammunition__content">
+              <div class="sheet-ammunition__container sheet-ammunition__container--1">
+                <input type="radio" name="attr_ammunition_select" value="ammunition_container_1" checked="checked"/>
+                <input type="text" name="attr_ammunition_container_1" placeholder="30"/><span name="attr_rename_ammunition_container_1">Ammo #1</span>
+              </div>
+              <div class="sheet-ammunition__container sheet-ammunition__container--1">
+                <input type="radio" name="attr_ammunition_select" value="ammunition_container_2"/>
+                <input type="text" name="attr_ammunition_container_2" placeholder="30"/><span name="attr_rename_ammunition_container_2">Ammo #2</span>
+              </div>
+              <div class="sheet-ammunition__container sheet-ammunition__container--1">
+                <input type="radio" name="attr_ammunition_select" value="ammunition_container_3"/>
+                <input type="text" name="attr_ammunition_container_3" placeholder="30"/><span name="attr_rename_ammunition_container_3">Ammo #3</span>
+              </div>
+              <div class="sheet-ammunition__buttons">
+                <div class="sheet-top">
+                  <button type="action" name="act_ammunition_+1">+1</button>
+                  <button type="action" name="act_ammunition_+3">+3</button>
+                  <button type="action" name="act_ammunition_+5">+5</button>
+                  <button type="action" name="act_ammunition_+10">+10</button>
+                  <button type="action" name="act_ammunition_set" data-i18n="ammunition-set">S</button>
+                </div>
+                <div class="sheet-bottom">
+                  <button type="action" name="act_ammunition_-1">−1</button>
+                  <button type="action" name="act_ammunition_-3">−3</button>
+                  <button type="action" name="act_ammunition_-5">−5</button>
+                  <button type="action" name="act_ammunition_-10">−10</button>
+                  <button type="action" name="act_ammunition_reset" data-i18n="ammunition-reset">R</button>
+                </div>
+              </div>
+            </div>
+            <div class="sheet-footer"></div>
+          </div>
           <input class="sheet-hidden sheet-toggle sheet-toggle-block" type="checkbox" name="attr_toggle_quick_notes_block" checked="checked"/>
           <div class="sheet-quick-notes">
             <div class="sheet-header">
