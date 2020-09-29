@@ -134,7 +134,7 @@ Most of the sheet's strings can be changed via the translation.json. However, so
   <summary>Sheet Defaults Translations</summary>
 
 ```
-"defaults-block-show-allies": "[Block] Show Allies",
+  "defaults-block-show-allies": "[Block] Show Allies",
   "defaults-block-show-allies-description": "Keep track of allied characters with a barebone mini sheet.",
   "defaults-block-show-ammunition": "[Block] Show Ammunition",
   "defaults-block-show-ammunition-description": "Keep track of your loaded ammunition for three weapons.",
