@@ -68,12 +68,22 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 <details>
+  <summary>Ammunition</summary>
+
+  ![Ammunition](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/ammunition.gif)
+</details>
+
+<details>
   <summary>Settings</summary>
 
   ![Settings](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/settings.gif)
 </details>
 
 ## Latest Changes
+#### Version 1.1
+* Added Ammunition block
+* Added options to rename ammunition magazines
+* Added new help section, *Ammunition: You can keep track of up to three named "magazines" in the Ammunition block. The buttons allow you to quickly add to or subtract from the values. You can save a value with [S] and restore it with [R].*
 #### Version 1.0.2
 * Increased Rate of Fire range from 6 to 8
 #### Version 1.0.1
