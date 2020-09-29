@@ -12,7 +12,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * **Silhouettes:** They look fancy! You can also add color markers as indicators for any purpose.
 * **Help:** The sheet features an extensive help section under the Settings tab.
 
-## Previews
+## Previews & Gifs
 <details>
   <summary>Full Preview</summary>
 
