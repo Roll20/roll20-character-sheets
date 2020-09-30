@@ -40,16 +40,15 @@
             <div class="sheet-row">
                 <label class="sheet-redbg">Spieler-Name</label><input type="text" name="attr_SpielerName" />
             </div>
-            <div class="sheet-row">
-                <div class="sheet-twice"><label class="sheet-redbg">Volk</label><input type="text" name="attr_Volk" />
+            <div class="sheet-row sheet-twice">
+                <div><label class="sheet-redbg">Volk</label><input type="text" name="attr_Volk" />
                 </div>
-                <div class="sheet-twice sheet-beruf">
+                <div class="sheet-beruf">
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_toggle_beruf" value="1" checked />
                         <span class="sheet-slider"></span>
                     </label>
                     <label class="sheet-redbg">Beruf</label>
-                    <input style="display: none;" type="checkbox" name="attr_toggle_beruf" value="1" />
                     <input type="text" name="attr_beruf" />
                     <select name="attr_beruf">
                         <option value="Barde">Barde</option>
@@ -58,24 +57,34 @@
                         <option value="Priester">Priester</option>
                         <option value="Schamane">Schamane</option>
                         <option value="Waldläufer">Waldläufer</option>
-                        <option value="Zauber">Zauber</option>
+                        <option value="Zauberer">Zauberer</option>
                     </select>
                 </div>
             </div>
             <div class="sheet-row sheet-settings">
-                <div class="sheet-twice">
+                <div>
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_calcmoney" value="1" checked />
                         <span class="sheet-slider"></span>
                     </label>
                     Geldberechnung
                 </div>
-                <div class="sheet-twice">
+                <div>
                     <label class="sheet-switch">
                         <input type="checkbox" name="attr_calcleben" value="1" checked />
                         <span class="sheet-slider"></span>
                     </label>
                     Lebensberechnung
+                </div>
+                <div>
+
+                </div>
+                <div>
+                    <label class="sheet-switch">
+                        <input type="checkbox" name="attr_calcmana" value="1" checked />
+                        <span class="sheet-slider"></span>
+                    </label>
+                    Manaberechnung
                 </div>
             </div>
         </div>
@@ -254,7 +263,7 @@
                         </div>
                         <div><input type="number" name="attr_list" value="0" /></div>
                         <div><button type="roll" name="roll_list"
-                                value="@{abilityroll} würfelt List mit dem Ergebnis [[1d10! + @{athletik_attribut} + @{athletik} + ?{Modifier?|0}]]"></button>
+                                value="@{abilityroll} würfelt List mit dem Ergebnis [[1d10! + @{list_attribut} + @{list} + ?{Modifier?|0}]]"></button>
                         </div>
                     </div>
                     <div class="repitem">
@@ -360,7 +369,6 @@
                 <div>Attribut</div>
                 <div>Fertigkeit</div>
                 <div>KB</div>
-                <div>OB</div>
                 <div>Schaden</div>
                 <div>Ini-Bonus</div>
                 <div>Init.</div>
@@ -377,14 +385,13 @@
                     <div><input class="sheet-textcenter" type="text" name="attr_kampf_fertigkeit"
                             placeholder="Kurze Klingenwaffe" /></div>
                     <div><input type="number" name="attr_kampf_kb" value="0" /></div>
-                    <div><input type="number" name="attr_kampf_ob" value="0" /></div>
                     <div><input type="number" name="attr_kampf_schaden" value="0" /></div>
                     <div><input type="number" name="attr_kampf_inib" value="0" /></div>
                     <div><button type="roll" name="roll_kampf_init"
-                            value="@{abilityroll} nutzt @{kampf_waffenname} \n  mit einer Initiative von [[@{geb} + @{kampf_inib} &{tracker}]]"></button>
+                            value="@{abilityroll} nutzt @{kampf_waffenname} mit einer Initiative von [[@{geb} + @{kampf_inib} &{tracker}]]"></button>
                     </div>
                     <div><button type="roll" name="roll_kampf_angr"
-                            value="@{abilityroll} greift mit @{kampf_waffenname} an \n würfelt eine [[1d10! + @{kampf_ob} + ?{Kampf-Modifier?|0}]] mit [[@{kampf_schaden} + ?{Schaden-Modifier?|0}]] Schaden. Der DB beträgt [[floor(@{kampf_KB}-@{kampf_OB})]]"></button>
+                            value="@{abilityroll} greift mit @{kampf_waffenname} an würfelt eine [[1d10! + ?{Offensivbonus?|@{kampf_kb}} + ?{Kampf-Modifier?|0}]] mit [[@{kampf_schaden} + ?{Schaden-Modifier?|0}]] Schaden. Der DB beträgt [[floor(@{kampf_KB}-?{Offensivbonus?})]]"></button>
                     </div>
                 </fieldset>
             </div>
@@ -393,16 +400,13 @@
         <div class="sheet-clear"></div>
 
         <div class="sheet-float sheet-half sheet-inventar">
-            <label class="sheet-switch">
-                <input type="checkbox" name="attr_show_textbox" value="1" checked />
-                <span class="sheet-slider"></span>
-            </label>
-            <input style="display: none;" type="checkbox" name="attr_show_textbox" value="1" />
             <div class="sheet-redbg">Inventar</div>
             <fieldset class="repeating_inventar">
                 <div class="sheet-options sheet-inventar-row">
-                    <input type="text" name="attr_name" placeholder="Gegenstand" />
-                    <input type="text" name="attr_wight" placeholder="Gewicht" />
+                    <input class="sheet-options-flag" name="attr_options-flag" type="checkbox"
+                        title="Show/hide options"><span>y</span>
+                    <input type="text" name="attr_name" placeholder="Gegenstand/Rüstung" />
+                    <input type="text" name="attr_wight" placeholder="Info/Rüstwert" />
                     <input type="number" name="attr_costs" placeholder="Anzahl" />
                     <textarea name="attr_description" placeholder="Beschreibung"></textarea>
                 </div>
@@ -413,6 +417,8 @@
             <div class="sheet-redbg">Notizen</div>
             <fieldset class="repeating_notes">
                 <div class="sheet-options sheet-notes-row">
+                    <input class="sheet-options-flag" name="attr_options-flag" type="checkbox"
+                        title="Show/hide options"><span>y</span>
                     <input type="text" name="attr_title" placeholder="Titel" />
                     <textarea name="attr_body" placeholder="Inhalt"></textarea>
                 </div>
@@ -540,7 +546,7 @@
     
     on("change:in", function() {
         getAttrs(["in"], function(values) {
-            let int = parseintt(values.in) || 0;
+            let int = parseInt(values.in) || 0;
             if (int == 1) {
                 setAttrs({ inb: -3 });
             }
@@ -681,17 +687,17 @@
                     leben_max: Math.floor((4 + kob) * stufe)
                 });
             }
-            if (beruf == "Barde" || beruf == "Dieb" || beruf == "Schamane" && calcleben == 1) {
+            if (beruf == "Barde" && calcleben == 1 || beruf == "Dieb" && calcleben == 1 || beruf == "Schamane" && calcleben == 1) {
                 setAttrs({
                     leben_max: Math.floor((6 + kob) * stufe)
                 });
             }
-            if (beruf == "Priester" || beruf == "Waldläufer" && calcleben == 1) {
+            if (beruf == "Priester" && calcleben == 1 || beruf == "Waldläufer" && calcleben == 1) {
                 setAttrs({
                     leben_max: Math.floor((8 + kob) * stufe)
                 });
             }
-            if (beruf == "Krieger" && calcleben == 1) {
+            if (beruf == "Krieger" && calcleben == 1 && calcleben == 1) {
                 setAttrs({
                     leben_max: Math.floor((10 + kob) * stufe)
                 });
@@ -699,18 +705,19 @@
         });
     });
 
-    on("change:beruf change:inb change:chb change:mag", function() {
-        getAttrs(["beruf", "inb", "chb", "mag"], function(values) {
+    on("change:beruf change:inb change:chb change:mag change:calcmana", function() {
+        getAttrs(["beruf", "inb", "chb", "mag", "calcmana"], function(values) {
+            let calcmana = parseInt(values.calcmana) || 0;
             let beruf = values.beruf || 0;
             let inb = parseInt(values.inb) || 0;
             let chb = parseInt(values.chb) || 0;
             let mag = parseInt(values.mag) || 0;
-            if (beruf == "Dieb" || beruf == "Krieger" || beruf == "Waldläufer" || beruf == "Zauberer") {
+            if (beruf == "Dieb" && calcmana == 1 || beruf == "Krieger" && calcmana == 1 || beruf == "Waldläufer" && calcmana == 1 || beruf == "Zauberer" && calcmana == 1) {
                 setAttrs({
                     mana_max: Math.floor((inb + 3) * mag)
                 });
             }
-            if (beruf == "Barde" || beruf == "Priester" || beruf == "Schamane") {
+            if (beruf == "Barde" && calcmana == 1 || beruf == "Priester" && calcmana == 1 || beruf == "Schamane" && calcmana == 1) {
                 setAttrs({
                     mana_max: Math.floor((chb + 3) * mag)
                 });
