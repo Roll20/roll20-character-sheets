@@ -24,10 +24,6 @@ on("sheet:opened", function(e){
     'query_roll_result': getTranslationByKey('query-roll-result'),
     'query_target_number': getTranslationByKey('query-target-number'),
     'query_damage_modifier': getTranslationByKey('query-damage-modifier'),
-    'raises': getTranslationByKey('raises'),
-    'vs_tn': getTranslationByKey('vs-tn'),
-    'ally': getTranslationByKey('ally'),
-    'roll': getTranslationByKey('roll'),
     'none': getTranslationByKey('none')
   });
 
