@@ -82,6 +82,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 ## Latest Changes
 #### Version 1.1.1
 * Added reroll button to Roll Templates
+* Added additional toggles for skills
 #### Version 1.1.0
 * Added Ammunition block
 * Added options to rename ammunition magazines
