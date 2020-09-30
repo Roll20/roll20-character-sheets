@@ -22,61 +22,61 @@ This character sheet was originally made for **Maschinenleben** (released later 
 <details>
   <summary>Extra Sheet</summary>
 
-  ![Extra Sheet](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Extra.png)
+  ![Extra Sheet](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/extra_sheet.png)
 </details>
 
 <details>
   <summary>Roll Template</summary>
 
-  ![Roll Template](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/SavageWorldsGraphPaper_Roll.png)
+  ![Roll Template](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/roll_template.png)
 </details>
 
 <details>
   <summary>Attributes</summary>
 
-  ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/attributes.gif)
+  ![Attributes](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/attributes.gif)
 </details>
 
 <details>
   <summary>Edges & Hindrances</summary>
 
-  ![Edges & Hindrances](https://github.com/Tetrakern/roll20-character-sheets/blob/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/features.gif)
+  ![Edges & Hindrances](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/features.gif)
 </details>
 
 <details>
   <summary>Skills</summary>
 
-  ![Skills](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/skills.gif)
+  ![Skills](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/skills.gif)
 </details>
 
 <details>
   <summary>Health</summary>
 
-  ![Health](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/health.gif)
+  ![Health](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/health.gif)
 </details>
 
 <details>
   <summary>Augmentations & Integrity</summary>
 
-  ![Augmentations & Integrity](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/augmentations.gif)
+  ![Augmentations & Integrity](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/augmentations.gif)
 </details>
 
 <details>
   <summary>Vehicles</summary>
 
-  ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/vehicles.gif)
+  ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/vehicles.gif)
 </details>
 
 <details>
   <summary>Ammunition</summary>
 
-  ![Ammunition](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/ammunition.gif)
+  ![Ammunition](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/ammunition.gif)
 </details>
 
 <details>
   <summary>Settings</summary>
 
-  ![Settings](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/gifs/settings.gif)
+  ![Settings](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/settings.gif)
 </details>
 
 ## Latest Changes
