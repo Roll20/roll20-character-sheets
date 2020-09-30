@@ -80,7 +80,9 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
-#### Version 1.1
+#### Version 1.1.1
+* Added reroll button to roll templates
+#### Version 1.1.0
 * Added Ammunition block
 * Added options to rename ammunition magazines
 * Added new help section, *Ammunition: You can keep track of up to three named "magazines" in the Ammunition block. The buttons allow you to quickly add to or subtract from the values. You can save a value with [S] and restore it with [R].*
