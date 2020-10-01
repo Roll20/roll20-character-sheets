@@ -45,6 +45,8 @@ const skills = {
         "vehicle_land", "vehicle_space", "vehicle_water"
     ],
     psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
+    magic: ["know_magic", "use_magic", "sunblade"],
+    wwn: ["administer", "connect", "convince", "craft", "exert", "heal", "know", "lead", "magic", "notice", "perform", "pray", "punch", "ride", "sail", "shoot", "sneak", "stab", "survive", "trade", "work"],
 };
 const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship_crew_min",
     "ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed", "ship_hull_price",
