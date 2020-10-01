@@ -714,3 +714,30 @@ on(`clicked:ammunition_reset`, (e) => {
     });
   });
 });
+
+/* #############################################################################
+REPEATING LIST LINKED SKILL ROLLS
+############################################################################# */
+
+function changeSkillRoll(e) {
+  let target = e.sourceAttribute.replace('_skill_name', '_skill'),
+      array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
+
+  getAttrs(array, (values) => {
+    // Find corresponding attribute
+    let renameAttribute = Object.keys(values).find(key => values[key] === e.newValue),
+        update = {};
+
+    if (_.isUndefined(renameAttribute)) {
+      update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
+    } else {
+      update[target] = `@{roll_full_${renameAttribute.replace('rename_', '')}}`;
+    }
+
+    setAttrs(update, { silent: true });
+  });
+}
+
+on(`change:repeating_powers:power_skill_name`, (e) => {
+  changeSkillRoll(e);
+});
