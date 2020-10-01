@@ -85,9 +85,9 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Enhanced usability of damage roll toggles for repeating lists
 * Damage codes of powers are now processed by the dice parser
 * Added setting menu with options to some interactive list items
-* > Powers: Show Damage, Show Trapping, Roll Button (Input)
-* > Engrams: Roll Button
-* > Weapons: Show Trapping, Roll Button (Input)
+  * Powers: Show Damage, Show Trapping, Roll Button (Input)
+  * Engrams: Roll Button (Input)
+  * Weapons: Show Trapping, Roll Button (Input)
 * Added set maximum capacity to ammunition magazines
 * Updated the sheet’s help section
 #### Version 1.1.1
