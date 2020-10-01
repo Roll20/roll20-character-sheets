@@ -903,7 +903,7 @@
 	};
 	
 	on(
-	"change:armure sheet:opened"
+	"change:armure"
 	, function() 
 	{
 		getAttrs(["armure"], function(value)
@@ -1379,20 +1379,28 @@
 	
 	//DEFENSE
 	on(
-	"change:fichePNJ change:armure change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive sheet:opened"
+	"change:fichePNJ change:armure change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ sheet:opened"
 	, function() 
 	{
-		getAttrs(["fichePNJ", "armure", "defense", "defBM", "bonusDefense", "defenseODBonus", "defenseModifPerso", "barbarianDef", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive"], function(value)
+		getAttrs(["fichePNJ", "armure", "defense", "defBM", "bonusDefense", "defenseODBonus", "defenseModifPerso", "barbarianDef", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive", "MasquePNJAE", "MasquePNJAEMaj", "defensePNJ", "defenseModifPNJ"], function(value)
 		{
 			const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
+			const bonusDefense = parseInt(value["bonusDefense"], 10)||0;
+			const defenseModifPerso = parseInt(value["defenseModifPerso"], 10)||0;
+			const AE = parseInt(value["MasquePNJAE"], 10)||0;
+			const AEM = parseInt(value["MasquePNJAEMaj"], 10)||0;
+			const defensePNJ = parseInt(value["defensePNJ"], 10)||0;
+			
+			var defenseM = 0;
+			var defenseT = 0;
+			
 			if(fichePNJ == 0)
 			{				
 				const armure = value["armure"];
 				const defense = parseInt(value["defense"], 10)||0;
 				const defBM = parseInt(value["defBM"], 10)||0;
-				const bonusDefense = parseInt(value["bonusDefense"], 10)||0;
+				
 				const defenseODBonus = parseInt(value["defenseODBonus"], 10)||0;
-				const defenseModifPerso = parseInt(value["defenseModifPerso"], 10)||0;
 				
 				const barbarianDef = parseInt(value["barbarianDef"], 10)||0;
 				
@@ -1403,9 +1411,6 @@
 				
 				const warmasterEP = parseInt(value["warmasterImpEPersonnel"], 10)||0;
 				const warmasterE = value["warmasterImpEsquive"];
-				
-				var defenseM = 0;
-				var defenseT = 0;
 				
 				switch(armure)
 				{
@@ -1453,31 +1458,54 @@
 				}
 				
 				defenseT += Math.max(defense+defenseM+defenseModifPerso, 0)
-				
-				setAttrs({
-					defenseModif: defenseM,
-					defenseTotal: defenseT
-				});
 			}
+			if(fichePNJ == 1 || fichePNJ == 2)
+			{
+				defenseM += bonusDefense;
+				defenseM += AE;
+				defenseM += AEM;
+				
+				defenseT += Math.max(defensePNJ+defenseM+defenseModifPerso, 0);
+			}
+			if(fichePNJ == 3)
+			{
+				defenseM += AE;
+				defenseM += AEM;
+				
+				defenseT += Math.max(defensePNJ+defenseM+defenseModifPerso, 0);
+			}
+			
+			setAttrs({
+				defenseModif: defenseM,
+				defenseTotal: defenseT
+			});
 		});
 	});
 	
 	//REACTION
 	on(
-	"change:fichePNJ change:armure change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive sheet:opened"
+	"change:fichePNJ change:armure change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ sheet:opened"
 	, function() 
 	{
-		getAttrs(["fichePNJ", "armure", "reaction", "rctBM", "bonusReaction", "reactionODBonus", "reactionModifPerso", "barbarianRea", "paladinWatchtower", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive"], function(value)
+		getAttrs(["fichePNJ", "armure", "reaction", "rctBM", "bonusReaction", "reactionODBonus", "reactionModifPerso", "barbarianRea", "paladinWatchtower", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive", "MachinePNJAE", "MachinePNJAEMaj", "reactionPNJ"], function(value)
 		{
 			const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
+			const bonusReaction = parseInt(value["bonusReaction"], 10)||0;
+			const reactionModifPerso = parseInt(value["reactionModifPerso"], 10)||0;
+			const AE = parseInt(value["MachinePNJAE"], 10)||0;
+			const AEM = parseInt(value["MachinePNJAEMaj"], 10)||0;
+			const reactionPNJ = parseInt(value["reactionPNJ"], 10)||0;
+			
+			var reactionM = 0;
+			var reactionT = 0;
+				
 			if(fichePNJ == 0)
 			{				
 				const armure = value["armure"];
 				const reaction = parseInt(value["reaction"], 10)||0;
 				const rctBM = parseInt(value["rctBM"], 10)||0;
-				const bonusReaction = parseInt(value["bonusReaction"], 10)||0;
+				
 				const reactionODBonus = parseInt(value["reactionODBonus"], 10)||0;
-				const reactionModifPerso = parseInt(value["reactionModifPerso"], 10)||0;
 				
 				const barbarianRea = parseInt(value["barbarianRea"], 10)||0;
 				
@@ -1490,9 +1518,6 @@
 				
 				const warmasterEP = parseInt(value["warmasterImpEPersonnel"], 10)||0;
 				const warmasterE = value["warmasterImpEsquive"];
-				
-				var reactionM = 0;
-				var reactionT = 0;
 				
 				switch(armure)
 				{
@@ -1546,12 +1571,27 @@
 					reactionM += Math.ceil(0-(reactionT/2));
 					reactionT = Math.max(reaction+reactionM+reactionModifPerso, 0);
 				}
-				
-				setAttrs({
-					reactionModif: reactionM,
-					reactionTotal: reactionT
-				});
 			}
+			if(fichePNJ == 1 || fichePNJ == 2)
+			{
+				reactionM += bonusReaction;
+				reactionM += AE;
+				reactionM += AEM;
+				
+				reactionT += Math.max(reactionPNJ+reactionM+reactionModifPerso, 0);
+			}
+			if(fichePNJ == 3)
+			{
+				reactionM += AE;
+				reactionM += AEM;
+				
+				reactionT += Math.max(reactionPNJ+reactionM+reactionModifPerso, 0);
+			}
+
+			setAttrs({
+				reactionModif: reactionM,
+				reactionTotal: reactionT
+			});
 		});
 	});
 	
@@ -5004,7 +5044,7 @@
 			monkSalvePortee: getTranslationByKey("portee-moyenne"),
 			monkRayonPortee: getTranslationByKey("portee-moyenne"),
 			wizardBEffets: getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("degats-continus")+" 3",
-			wizardOEffets: getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("wizard-affecte-uniquement-anatheme")
+			wizardOEffets: getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("lumiere") +" 2 / "+getTranslationByKey("wizard-affecte-uniquement-anatheme")
 		});
 	});
 </script>
@@ -5036,23 +5076,15 @@
 						<span data-i18n="total">Total</span>
 					</div>
 					<div>
-						<div class="fichePJ">
-							<input type="number" name="attr_defense" value="0" readonly />
+						<div class="fichePJ fichePNJ ficheCreature ficheBande">
+							<input type="number" class="fichePNJ ficheCreature ficheBande" name="attr_defensePNJ" value="0" />
+							<input type="number" class="fichePJ" name="attr_defense" value="0" readonly />
 							<span>+</span>
 							<input type="number" name="attr_defenseModif" value="0" readonly />
 							<span>+</span>
 							<input type="number" name="attr_defenseModifPerso" value="0" />
 							<span>=</span>
 							<input type="number" name="attr_defenseTotal" value="0" readonly />
-						</div>
-						<div class="fichePNJ ficheCreature ficheBande">
-							<input type="number" name="attr_defensePNJ" value="0" />
-							<span>+</span>
-							<input type="number" name="attr_defenseModifPNJ" value="0+@{bonusDefense}+@{MasquePNJAE}+@{MasquePNJAEMaj}" disabled />
-							<span>+</span>
-							<input type="number" name="attr_defenseModifPerso" value="0" />
-							<span>=</span>
-							<input type="number" name="attr_defenseTotalPNJ" value="((((@{defensePNJ}+@{defenseModifPNJ}+@{defenseModifPerso}) + 0) + abs((@{defensePNJ}+@{defenseModifPNJ}+@{defenseModifPerso}) - 0)) / 2)" disabled />
 						</div>
 					</div>
 				</div>
@@ -5078,23 +5110,15 @@
 						<span data-i18n="total">Total</span>
 					</div>
 					<div>
-						<div class="fichePJ">
-							<input type="number" name="attr_reaction" value="0" readonly />
+						<div class="fichePJ fichePNJ ficheCreature ficheBande">
+							<input type="number" class="fichePNJ ficheCreature ficheBande" name="attr_reactionPNJ" value="0" />
+							<input type="number" class="fichePJ" name="attr_reaction" value="0" readonly />
 							<span>+</span>
 							<input type="number" name="attr_reactionModif" value="0" readonly />
 							<span>+</span>
 							<input type="number" name="attr_reactionModifPerso" value="0" />
 							<span>=</span>
 							<input type="number" name="attr_reactionTotal" value="0" readonly />
-						</div>
-						<div class="fichePNJ ficheCreature ficheBande">
-							<input type="number" name="attr_reactionPNJ" value="0" />
-							<span>+</span>
-							<input type="number" name="attr_reactionModifPNJ" value="0+@{bonusReaction}+@{MachinePNJAE}+@{MachinePNJAEMaj}" disabled />
-							<span>+</span>
-							<input type="number" name="attr_reactionModifPerso" value="0" class="center" />
-							<span>=</span>
-							<input type="number" name="attr_reactionTotalPNJ" value="((((@{reactionPNJ}+@{reactionModifPNJ}+@{reactionModifPerso}) + 0) + abs((@{reactionPNJ}+@{reactionModifPNJ}+@{reactionModifPerso}) - 0)) / 2)" disabled />
 						</div>
 					</div>
 				</div>
@@ -5138,7 +5162,7 @@
 	<div class="topRight">
 		<div class="topLine">
 			<label class="selector">
-				<input type="hidden" name="attr_fichePNJ" value="4" />
+				<input type="hidden" name="attr_fichePNJ" value="0" />
 				<input type="radio" name="attr_fichePNJ" value="0" data-i18n-title="fiche-vehicule" title="Fiche Véhicule" checked />
 				<input type="radio" name="attr_fichePNJ" value="1" data-i18n-title="fiche-pj" title="Fiche PJ" />
 				<input type="radio" name="attr_fichePNJ" value="2"  data-i18n-title="fiche-pnj" title="Fiche PNJ" />
@@ -5252,7 +5276,7 @@
 		</div>
 	
 		<div class="menu">
-			<input type="hidden" name="attr_fichePNJ" class="ficheType" value="1" />
+			<input type="hidden" name="attr_fichePNJ" class="ficheType" value="0" />
 			<input type="hidden" name="attr_tabCarteDestin" class="Heroisme" value="0" />
 			<input type="hidden" name="attr_tabCapaciteHeroique" class="Heroisme" value="0" />
 			<input type="hidden" name="attr_tabIA" class="IA" value="0" />
@@ -5420,7 +5444,7 @@
 					<textarea name="attr_motivationMajeure"></textarea>
 				</div>
 				<h1 class="fichePJ" data-i18n="motivations-mineures">Motivations Mineures</h1>
-				<button type="roll" name="roll_recuperation" value="@{jetGM} &{template:base} {{Nom=@{name}}} {{type=Motivation mineure}} {{jet=[[1d6]]}}" data-i18n="recuperation">Récupération</button>
+				<button type="roll" class="fichePJ" name="roll_recuperation" value="@{jetGM} &{template:base} {{Nom=@{name}}} {{type=Motivation mineure}} {{jet=[[1d6]]}}" data-i18n="recuperation">Récupération</button>
 				<div class="fichePJ">
 					<fieldset class="repeating_motMineure">
 						<div class="autoex autoex40">
@@ -5504,7 +5528,7 @@
 						<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 						<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 						<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-						<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+						<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 						<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 						<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 						<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -6587,7 +6611,7 @@
 						<input type="text" name="attr_barbarianGoliath" readonly />
 					</div>
 					<div>
-						<span data-i18n="degats-contact">Dégâts (contact)</span>
+						<span data-i18n="degats-violence-contact">Dégâts (contact)</span>
 						<span data-i18n="champ-de-force">Champs de Force</span>
 					</div>
 					<div>
@@ -6618,7 +6642,7 @@
 						<textarea name="attr_fauxEtresBard"></textarea>
 					</div>
 					<h1 class="bard250" data-i18n="bard-desactivation-explosive">Désactivation explosive</h1>
-					<button type="roll" name="attr_bardJetAttSpe" class="bard250" value="@{jetGM} &{template:attaque} {{Nom=@{name}}} {{Arme=^{bard-desactivation-explosive}}} {{Degats=[[@{bardAttSpe}]]}} {{Violence=[[@{bardAttSpe}]]}} {{ignoreArmure=^{ignore-armure}}} {{ignoreCdF=^{ignore-champ-de-force}}}  {{dispersion=^{dispersion} 6}} {{choc=^{choc} 1 (^{choc-automatique-si-chair} < 12)}}" ></button>
+					<button type="roll" name="attr_bardJetAttSpe" class="bard250" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{Arme=^{bard-desactivation-explosive}}} {{Degats=[[@{bardAttSpe}]]}} {{Violence=[[@{bardAttSpe}]]}} {{ignoreArmure=^{ignore-armure}}} {{ignoreCdF=^{ignore-champ-de-force}}}  {{dispersion=^{dispersion} 6}} {{choc=^{choc} 1 (^{choc-automatique-si-chair} < 12)}}" ></button>
 					<div class="bard250">
 						<span data-i18n="degats/violence">Dégâts / Violence</span>
 						<input type="text" name="attr_bardAttSpe" value="3D6+6" readonly />
@@ -6871,7 +6895,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7057,7 +7081,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7140,7 +7164,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7352,7 +7376,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7460,7 +7484,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7849,7 +7873,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -7895,9 +7919,9 @@
 				<div class="wizard wizardOriflamme">
 					<input type="hidden" name="attr_wizard250PG" value="0" />
 					
-					<h1 data-i18n="mode-oriflamme">Mode Oriflamme</h1>
-					<button type="roll" name="roll_wizaO" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-courte}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus}"></button>
-					<button type="roll" name="roll_wizaO250" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-moyenne}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus}"></button>
+					<h1 data-i18n="wizard-mode-oriflamme">Mode Oriflamme</h1>
+					<button type="roll" name="roll_wizaO" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{oriflamme=orflamme}} {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-courte}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus} {{lumiere=^{lumiere} 2}}"></button>
+					<button type="roll" name="roll_wizaO250" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{oriflamme=orflamme}} {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-moyenne}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus} {{lumiere=^{lumiere} 2}}"></button>
 					<div>
 						<span data-i18n="degats">Dégâts</span>
 						<span data-i18n="violence">Violence</span>
@@ -7909,7 +7933,7 @@
 						<input type="text" name="attr_wizardOPortee" value="Courte" readonly />
 					</div>
 					<div>
-						<input type="text" name="attr_wizardOEffets" value="Anti-Anathème / Affecte uniquement les créatures de l'Anathème" readonly />
+						<input type="text" name="attr_wizardOEffets" value="Anti-Anathème / Lumière 2 / Affecte uniquement les créatures de l'Anathème" readonly />
 					</div>
 				</div>
 			
@@ -9371,7 +9395,7 @@
 						<input type="hidden" name="attr_styleDgtBMRanger" value="{{styleDgtBM=[[ [[{ [[@{rangerArmeDegat}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						<input type="hidden" name="attr_styleViolBMRanger" value="{{styleViolBM=[[ [[{floor([[@{rangerArmeViolence}+@{chargeurGrappesRanger}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]]/2), 0}kh1]]d6]]}}" />
 						
-						<input type="hidden" name="attr_styleDgtEvolBMRanger" value="{{styleDgtBM=[[ [[{ f[[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
+						<input type="hidden" name="attr_styleDgtEvolBMRanger" value="{{styleDgtBM=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						<input type="hidden" name="attr_styleViolEvolBMRanger" value="{{styleViolBM=[[ [[{floor([[@{rangerArmeViolenceEvol}+@{chargeurGrappesRanger}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]]/2), 0}kh1]]d6]]}}" />
 						
 						<input type="hidden" name="attr_effetsRanger" value="@{rangerFureur} @{rangerUltraViolence} @{rangerAntiAnatheme} @{rangerAntiVehicule} @{rangerArtillerie} {{assistanceAttaque=Assistance à l'attaque}} @{rangerChoc} @{rangerDispersion} @{rangerDegatContinue} @{rangerDemoralisant} @{rangerDesignation} @{rangerEnChaine} @{rangerIgnoreArmure} {{lourd=[[1]]}} {{rangerEvol=[[@{ranger50PG3}]]}}  @{rangerLumiere} @{rangerPenetrant} @{rangerPenetrant10} @{rangerPerceArmure} @{rangerPerceArmure60} @{rangerSilencieux} @{discretionDegatsBonus}" />
@@ -9416,7 +9440,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -9751,7 +9775,7 @@
 		</div>
 	</div>
 	
-	<div class="tab3 tabCombat">
+ 	<div class="tab3 tabCombat">
 		<div class="left">
 			<div class="fichePJ">
 				<div class="armure dataArmure">
@@ -9887,7 +9911,7 @@
 							<b>/</b>
 							<input type="number" value="3" name="attr_nodsSoin_max" />
 						</div>
-						<button type="roll" name="roll_nodsSoin" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{nod-soin}}} {{Motif=^{Récupération}}} {{Total=[[3D6]]}}"></button>
+						<button type="roll" name="roll_nodsSoin" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{nod-soin}}} {{Motif=^{recuperation}}} {{Total=[[3D6]]}}"></button>
 					</div>
 					<div>
 						<span data-i18n="nods-armure">Armure</span>
@@ -9896,7 +9920,7 @@
 							<b>/</b>
 							<input type="number" value="3" name="attr_nodsArmure_max" />
 						</div>
-						<button type="roll" name="roll_nodsArmure" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{Nod-d'armure}}} {{Motif=^{Récupération}}}  {{Total=[[3D6]]}}" />
+						<button type="roll" name="roll_nodsArmure" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{nod-d'armure}}} {{Motif=^{recuperation}}}  {{Total=[[3D6]]}}" />
 					</div>
 					<div>
 						<span data-i18n="nods-energie">Energie</span>
@@ -9905,7 +9929,7 @@
 							<b>/</b>
 							<input type="number" value="3" name="attr_nodsEnergie_max" />
 						</div>
-						<button type="roll" name="roll_nodsEnergie" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{Nod-d'energie}}} {{Motif=^{Récupération}}}  {{Total=[[3D6]]}}" />
+						<button type="roll" name="roll_nodsEnergie" value="@{jetGM} &{template:special} {{Nom=@{name}}} {{Titre=^{nod-d'energie}}} {{Motif=^{recuperation}}}  {{Total=[[3D6]]}}" />
 					</div>
 				</div>
 			
@@ -9953,6 +9977,31 @@
 						<span name="attr_styleCombatDescr"></span>
 						<textarea name="attr_styleCombatDescr" readonly></textarea>
 					</div>
+				</div>
+			</div>
+			
+			<div class="ficheCreature portee">
+				<h1 data-i18n="portee">Portée</h1>
+				<div>
+					<span data-i18n="portee-contact">Contact</span>
+					<span data-i18n="portee-courte">Courte</span>
+					<span data-i18n="portee-moyenne">Moyenne</span>
+					<span data-i18n="portee-longue">Longue</span>
+					<span data-i18n="portee-lointaine">Lointaine</span>
+				</div>
+				<div>
+					<span data-i18n="portee-0-2">0 à 2m</span>
+					<span data-i18n="portee-2-15">2 à 15m</span>
+					<span data-i18n="portee-15-50">15 à 50m</span>
+					<span data-i18n="portee-50-300">50 à 300m</span>
+					<span data-i18n="portee-+300">+ de 300m</span>
+				</div>
+			</div>
+			
+			<div class="ficheCreature oneLineBonusMalusJet">
+				<div>
+					<span data-i18n="bonus/malus-jets">Bonus/Malus aux Jets</span>
+					<input type="number" name="attr_jetModifDes" value="0" />
 				</div>
 			</div>
 		</div>
@@ -10019,7 +10068,7 @@
 						<input type="text" name="attr_barbarianGoliath" readonly />
 					</div>
 					<div>
-						<span data-i18n="degats-contact">Dégâts (contact)</span>
+						<span data-i18n="degats-violence-contact">Dégâts (contact)</span>
 						<span data-i18n="champ-de-force">Champs de Force</span>
 					</div>
 					<div>
@@ -11434,7 +11483,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -11610,7 +11659,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -11693,7 +11742,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -11802,7 +11851,7 @@
 							<input type="hidden" name="attr_styleDgtBMRanger" value="{{styleDgtBM=[[ [[{ [[@{rangerArmeDegat}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							<input type="hidden" name="attr_styleViolBMRanger" value="{{styleViolBM=[[ [[{floor([[@{rangerArmeViolence}+@{chargeurGrappesRanger}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]]/2), 0}kh1]]d6]]}}" />
 							
-							<input type="hidden" name="attr_styleDgtEvolBMRanger" value="{{styleDgtBM=[[ [[{ f[[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
+							<input type="hidden" name="attr_styleDgtEvolBMRanger" value="{{styleDgtBM=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}+@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							<input type="hidden" name="attr_styleViolEvolBMRanger" value="{{styleViolBM=[[ [[{floor([[@{rangerArmeViolenceEvol}+@{chargeurGrappesRanger}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]]/2), 0}kh1]]d6]]}}" />
 							
 							<input type="hidden" name="attr_effetsRanger" value="@{rangerFureur} @{rangerUltraViolence} @{rangerAntiAnatheme} @{rangerAntiVehicule} @{rangerArtillerie} {{assistanceAttaque=Assistance à l'attaque}} @{rangerChoc} @{rangerDispersion} @{rangerDegatContinue} @{rangerDemoralisant} @{rangerDesignation} @{rangerEnChaine} @{rangerIgnoreArmure} {{lourd=[[1]]}} {{rangerEvol=[[@{ranger50PG3}]]}}  @{rangerLumiere} @{rangerPenetrant} @{rangerPenetrant10} @{rangerPerceArmure} @{rangerPerceArmure60} @{rangerSilencieux} @{discretionDegatsBonus}" />
@@ -11847,7 +11896,7 @@
 								<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 								<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 								<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-								<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+								<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 								<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 								<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 								<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -12247,7 +12296,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -12355,7 +12404,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -12734,7 +12783,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -12780,9 +12829,9 @@
 				<div class="wizard wizardOriflamme">
 					<input type="hidden" name="attr_wizard250PG" value="0" />
 					
-					<h1 data-i18n="mode-oriflamme">Mode Oriflamme</h1>
-					<button type="roll" name="attr_jetWizaO" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{Arme=Mode Oriflamme}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=Courte}} {{antiAnathème=Anti Anathème}} {{note=Affecte uniquement les créatures de l'Anathème}} @{discretionDegatsBonus}"></button>
-					<button type="roll" name="attr_jetWizaO250" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{Arme=Mode Oriflamme}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=Moyenne}} {{antiAnathème=Anti Anathème}} {{note=Affecte uniquement les créatures de l'Anathème}} @{discretionDegatsBonus}"></button>
+					<h1 data-i18n="wizard-mode-oriflamme">Mode Oriflamme</h1>
+					<button type="roll" name="roll_wizaO" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{oriflamme=orflamme}}  {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-courte}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus} {{lumiere=^{lumiere} 2}}"></button>
+					<button type="roll" name="roll_wizaO250" value="@{jetGM} &{template:distance} {{Nom=@{name}}} {{oriBorealis=oriBorealis}} {{oriflamme=orflamme}} {{Arme=^{wizard-mode-oriflamme}}} {{styleViolBM=[[3D6]]}} {{styleDgtBM=[[6D6]]}} {{Degats=[[6d6+6]]}} {{Violence=[[ 6D6+12 ]]}} {{Portee=^{portee-moyenne}}} {{antiAnathème=^{anti-anatheme}}} {{note=^{wizard-affecte-uniquement-anatheme}}} @{discretionDegatsBonus} {{lumiere=^{lumiere} 2}}"></button>
 					<div>
 						<span data-i18n="degats">Dégâts</span>
 						<span data-i18n="violence">Violence</span>
@@ -12842,7 +12891,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -12953,7 +13002,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -13110,7 +13159,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -13601,7 +13650,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -14091,7 +14140,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -14600,7 +14649,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -15016,7 +15065,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -15431,7 +15480,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -15871,7 +15920,7 @@
 					<input type="text" name="attr_dgts1" value="4D6" readonly />
 					<input type="text" name="attr_violence1" value="4D6" readonly />
 					<input type="number" name="attr_utilisation1" value="3" readonly />
-					<button type="roll" name="roll_AI1" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts1}]]}} {{Violence=[[@{violence1}]]}} @{AIstyles} @{AIstylesDB1} @{AIstylesVB1} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI1" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts1}]]}} {{Violence=[[@{violence1}]]}} @{AIstyles} @{AIstylesDB1} @{AIstylesVB1} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI2" value="1" readonly />
@@ -15884,7 +15933,7 @@
 					<input type="text" name="attr_dgts2" value="2D6" readonly />
 					<input type="text" name="attr_violence2" value="5D6" readonly />
 					<input type="number" name="attr_utilisation2" value="1" readonly />
-					<button type="roll" name="roll_AI2" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts2}]]}} {{Violence=[[@{violence2}]]}} @{AIstyles} @{AIstylesDB2} @{AIstylesVB2} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI2" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts2}]]}} {{Violence=[[@{violence2}]]}} @{AIstyles} @{AIstylesDB2} @{AIstylesVB2} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI3" value="1" readonly />
@@ -15897,7 +15946,7 @@
 					<input type="text" name="attr_dgts3" value="4D6" readonly />
 					<input type="text" name="attr_violence3" value="4D6" readonly />
 					<input type="number" name="attr_utilisation3" value="2" readonly />
-					<button type="roll" name="roll_AI3" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts3}]]}} {{Violence=[[@{violence3}]]}} @{AIstyles} @{AIstylesDB3} @{AIstylesVB3} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI3" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts3}]]}} {{Violence=[[@{violence3}]]}} @{AIstyles} @{AIstylesDB3} @{AIstylesVB3} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI4" value="2" readonly />
@@ -15910,7 +15959,7 @@
 					<input type="text" name="attr_dgts4" value="6D6" readonly />
 					<input type="text" name="attr_violence4" value="4D6" readonly />
 					<input type="number" name="attr_utilisation4" value="3" readonly />
-					<button type="roll" name="roll_AI4" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts4}]]}} {{Violence=[[@{violence4}]]}} @{AIstyles} @{AIstylesDB4} @{AIstylesVB4} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI4" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts4}]]}} {{Violence=[[@{violence4}]]}} @{AIstyles} @{AIstylesDB4} @{AIstylesVB4} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI5" value="2" readonly />
@@ -15923,7 +15972,7 @@
 					<input type="text" name="attr_dgts5" value="4D6" readonly />
 					<input type="text" name="attr_violence5" value="6D6" readonly />
 					<input type="number" name="attr_utilisation5" value="1" readonly />
-					<button type="roll" name="roll_AI5" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} @{AIstyles} @{AIstylesDB5} @{AIstylesVB5} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI5" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} @{AIstyles} @{AIstylesDB5} @{AIstylesVB5} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI5" value="2" readonly />
@@ -15936,7 +15985,7 @@
 					<input type="text" name="attr_dgts5" value="5D6" readonly />
 					<input type="text" name="attr_violence5" value="5D6" readonly />
 					<input type="number" name="attr_utilisation5" value="2" readonly />
-					<button type="roll" name="roll_AI5" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} @{AIstyles} @{AIstylesDB5} @{AIstylesVB5} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI5" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} @{AIstyles} @{AIstylesDB5} @{AIstylesVB5} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI6" value="3" readonly />
@@ -15949,7 +15998,7 @@
 					<input type="text" name="attr_dgts6" value="7D6" readonly />
 					<input type="text" name="attr_violence6" value="5D6" readonly />
 					<input type="number" name="attr_utilisation6" value="3" readonly />
-					<button type="roll" name="roll_AI6" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts6}]]}} {{Violence=[[@{violence6}]]}} @{AIstyles} @{AIstylesDB6} @{AIstylesVB6} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI6" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts6}]]}} {{Violence=[[@{violence6}]]}} @{AIstyles} @{AIstylesDB6} @{AIstylesVB6} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI7" value="3" readonly />
@@ -15962,7 +16011,7 @@
 					<input type="text" name="attr_dgts7" value="5D6" readonly />
 					<input type="text" name="attr_violence7" value="7D6" readonly />
 					<input type="number" name="attr_utilisation7" value="1" readonly />
-					<button type="roll" name="roll_AI7" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts7}]]}} {{Violence=[[@{violence7}]]}} @{AIstyles} @{AIstylesDB7} @{AIstylesVB7} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI7" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts7}]]}} {{Violence=[[@{violence7}]]}} @{AIstyles} @{AIstylesDB7} @{AIstylesVB7} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI8" value="3" readonly />
@@ -15975,7 +16024,7 @@
 					<input type="text" name="attr_dgts8" value="6D6" readonly />
 					<input type="text" name="attr_violence8" value="6D6" readonly />
 					<input type="number" name="attr_utilisation8" value="2" readonly />
-					<button type="roll" name="roll_AI8" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts8}]]}} {{Violence=[[@{violence8}]]}} @{AIstyles} @{AIstylesDB8} @{AIstylesVB8} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI8" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts8}]]}} {{Violence=[[@{violence8}]]}} @{AIstyles} @{AIstylesDB8} @{AIstylesVB8} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI9" value="4" readonly />
@@ -15988,7 +16037,7 @@
 					<input type="text" name="attr_dgts9" value="7D6" readonly />
 					<input type="text" name="attr_violence9" value="9D6" readonly />
 					<input type="number" name="attr_utilisation9" value="1" readonly />
-					<button type="roll" name="roll_AI9" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts9}]]}} {{Violence=[[@{violence9}]]}} @{AIstyles} @{AIstylesDB9} @{AIstylesVB9} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI9" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts9}]]}} {{Violence=[[@{violence9}]]}} @{AIstyles} @{AIstylesDB9} @{AIstylesVB9} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI10" value="4" readonly />
@@ -16001,7 +16050,7 @@
 					<input type="text" name="attr_dgts10" value="8D6" readonly />
 					<input type="text" name="attr_violence10" value="8D6" readonly />
 					<input type="number" name="attr_utilisation10" value="2" readonly />
-					<button type="roll" name="roll_AI10" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts10}]]}} {{Violence=[[@{violence10}]]}} @{AIstyles} @{AIstylesDB10} @{AIstylesVB10} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI10" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts10}]]}} {{Violence=[[@{violence10}]]}} @{AIstyles} @{AIstylesDB10} @{AIstylesVB10} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI11" value="5" readonly />
@@ -16014,7 +16063,7 @@
 					<input type="text" name="attr_dgts11" value="10D6" readonly />
 					<input type="text" name="attr_violence11" value="12D6" readonly />
 					<input type="number" name="attr_utilisation11" value="1" readonly />
-					<button type="roll" name="roll_AI11" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts11}]]}} {{Violence=[[@{violence11}]]}} @{AIstyles} @{AIstylesDB11} @{AIstylesVB11} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI11" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts11}]]}} {{Violence=[[@{violence11}]]}} @{AIstyles} @{AIstylesDB11} @{AIstylesVB11} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 				<div>
 					<input type="text" name="attr_ODAI12" value="5" readonly />
@@ -16027,7 +16076,7 @@
 					<input type="text" name="attr_dgts12" value="11D6" readonly />
 					<input type="text" name="attr_violence12" value="11D6" readonly />
 					<input type="number" name="attr_utilisation12" value="2" readonly />
-					<button type="roll" name="roll_AI12" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts12}]]}} {{Violence=[[@{violence12}]]}} @{AIstyles} @{AIstylesDB12} @{AIstylesVB12} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
+					<button type="roll" name="roll_AI12" value="@{jetGM} @{utilisationArmeAI} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Portee=^{portee-contact}}} {{Degats=[[@{dgts12}]]}} {{Violence=[[@{violence12}]]}} @{AIstyles} @{AIstylesDB12} @{AIstylesVB12} {{warriorSoldier=[[@{warriorSoldierA}]]}} {{warriorHunter=[[@{warriorHunterA}]]}} {{warriorScholar=[[@{warriorScholarA}]]}} {{warriorHerald=[[@{warriorHeraldA}]]}} {{warriorScout=[[@{warriorScoutA}]]}} {{situationnel=[[@{jetModifDes}]]}} {{@{armure}=@{armure}}} @{AIlisteOD}" />
 				</div>
 			</div>
 		
@@ -18965,7 +19014,7 @@
 					<input type="text" name="attr_dgts1" value="4D6" readonly />
 					<input type="text" name="attr_violence1" value="4D6" readonly />
 					<input type="number" name="attr_utilisation1" value="3" readonly />
-					<button type="roll" name="roll_AIPNJ1" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts1}]]}} {{Violence=[[@{violence1}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ1" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts1}]]}} {{Violence=[[@{violence1}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI2" value="1/2" readonly />
@@ -18973,7 +19022,7 @@
 					<input type="text" name="attr_dgts2" value="2D6" readonly />
 					<input type="text" name="attr_violence2" value="5D6" readonly />
 					<input type="number" name="attr_utilisation2" value="1" readonly />
-					<button type="roll" name="roll_AIPNJ2" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts2}]]}} {{Violence=[[@{violence2}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ2" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts2}]]}} {{Violence=[[@{violence2}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI3" value="1/2" readonly />
@@ -18981,7 +19030,7 @@
 					<input type="text" name="attr_dgts3" value="4D6" readonly />
 					<input type="text" name="attr_violence3" value="4D6" readonly />
 					<input type="number" name="attr_utilisation3" value="2" readonly />
-					<button type="roll" name="roll_AIPNJ3" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts3}]]}} {{Violence=[[@{violence3}]]}} @{AIstyles} @{AIstylesDB3} @{AIstylesVB3}{{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ3" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts3}]]}} {{Violence=[[@{violence3}]]}} @{AIstyles} @{AIstylesDB3} @{AIstylesVB3}{{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI4" value="3/4" readonly />
@@ -18989,7 +19038,7 @@
 					<input type="text" name="attr_dgts4" value="6D6" readonly />
 					<input type="text" name="attr_violence4" value="4D6" readonly />
 					<input type="number" name="attr_utilisation4" value="3" readonly />
-					<button type="roll" name="roll_AIPNJ4" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts4}]]}} {{Violence=[[@{violence4}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ4" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts4}]]}} {{Violence=[[@{violence4}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI5" value="3/4" readonly />
@@ -18997,7 +19046,7 @@
 					<input type="text" name="attr_dgts5" value="4D6" readonly />
 					<input type="text" name="attr_violence5" value="6D6" readonly />
 					<input type="number" name="attr_utilisation5" value="1" readonly />
-					<button type="roll" name="roll_AIPNJ5" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ5" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI5" value="3/4" readonly />
@@ -19005,7 +19054,7 @@
 					<input type="text" name="attr_dgts5" value="5D6" readonly />
 					<input type="text" name="attr_violence5" value="5D6" readonly />
 					<input type="number" name="attr_utilisation5" value="2" readonly />
-					<button type="roll" name="roll_AIPNJ5" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ5" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts5}]]}} {{Violence=[[@{violence5}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI6" value="5/6" readonly />
@@ -19013,7 +19062,7 @@
 					<input type="text" name="attr_dgts6" value="7D6" readonly />
 					<input type="text" name="attr_violence6" value="5D6" readonly />
 					<input type="number" name="attr_utilisation6" value="3" readonly />
-					<button type="roll" name="roll_AIPNJ6" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts6}]]}} {{Violence=[[@{violence6}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ6" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts6}]]}} {{Violence=[[@{violence6}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI7" value="5/6" readonly />
@@ -19021,7 +19070,7 @@
 					<input type="text" name="attr_dgts7" value="5D6" readonly />
 					<input type="text" name="attr_violence7" value="7D6" readonly />
 					<input type="number" name="attr_utilisation7" value="1" readonly />
-					<button type="roll" name="roll_AIPNJ7" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts7}]]}} {{Violence=[[@{violence7}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ7" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts7}]]}} {{Violence=[[@{violence7}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI8" value="5/6" readonly />
@@ -19029,7 +19078,7 @@
 					<input type="text" name="attr_dgts8" value="6D6" readonly />
 					<input type="text" name="attr_violence8" value="6D6" readonly />
 					<input type="number" name="attr_utilisation8" value="2" readonly />
-					<button type="roll" name="roll_AIPNJ8" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts8}]]}} {{Violence=[[@{violence8}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ8" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts8}]]}} {{Violence=[[@{violence8}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI9" value="7/8" readonly />
@@ -19037,7 +19086,7 @@
 					<input type="text" name="attr_dgts9" value="7D6" readonly />
 					<input type="text" name="attr_violence9" value="9D6" readonly />
 					<input type="number" name="attr_utilisation9" value="1" readonly />
-					<button type="roll" name="roll_AIPNJ9" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts9}]]}} {{Violence=[[@{violence9}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ9" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts9}]]}} {{Violence=[[@{violence9}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI10" value="7/8" readonly />
@@ -19045,7 +19094,7 @@
 					<input type="text" name="attr_dgts10" value="8D6" readonly />
 					<input type="text" name="attr_violence10" value="8D6" readonly />
 					<input type="number" name="attr_utilisation10" value="2" readonly />
-					<button type="roll" name="roll_AIPNJ10" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts10}]]}} {{Violence=[[@{violence10}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ10" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts10}]]}} {{Violence=[[@{violence10}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI11" value="9/10" readonly />
@@ -19053,7 +19102,7 @@
 					<input type="text" name="attr_dgts11" value="10D6" readonly />
 					<input type="text" name="attr_violence11" value="12D6" readonly />
 					<input type="number" name="attr_utilisation11" value="1" readonly />
-					<button type="roll" name="roll_AIPNJ11" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts11}]]}} {{Violence=[[@{violence11}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ11" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts11}]]}} {{Violence=[[@{violence11}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 				<div>
 					<input type="text" name="attr_ChairAI12" value="9/10" readonly />
@@ -19061,7 +19110,7 @@
 					<input type="text" name="attr_dgts12" value="11D6" readonly />
 					<input type="text" name="attr_violence12" value="11D6" readonly />
 					<input type="number" name="attr_utilisation12" value="2" readonly />
-					<button type="roll" name="roll_AIPNJ12" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{arme-improvisee}}} {{Degats=[[@{dgts12}]]}} {{Violence=[[@{violence12}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
+					<button type="roll" name="roll_AIPNJ12" value="@{jetGM} @{utilisationArmeAIPNJ} {{Nom=@{name}}} {{Arme=^{armes-improvisees}}} {{Degats=[[@{dgts12}]]}} {{Violence=[[@{violence12}]]}} {{situationnel=[[@{jetModifDes}]]}}"></button>
 				</div>
 			</div>
 			
@@ -19462,7 +19511,7 @@
 			</div>
 		
 			<div class="right">
-				<div class="portee">
+				<div class="fichePNJ portee">
 					<h1 data-i18n="portee">Portée</h1>
 					<div>
 						<span data-i18n="portee-contact">Contact</span>
@@ -20919,7 +20968,8 @@
 				<h1 data-i18n="vehicule">Véhicule</h1>
 				<label>
 					<span data-i18n="vehicule">Véhicule</span>
-					<input type="text" name="attr_vehicule_name" value="Moto Steed" />
+					<input type="text" class="fichePJ" name="attr_vehicule_name" value="Moto Steed" />
+					<input type="text" class="ficheVehicule" name="attr_character_name" value="Moto Steed" />
 				</label>
 				<label>
 					<span data-i18n="vehicule-manoeuvrabilite">Manoeuvrabilité</span>
@@ -20999,7 +21049,7 @@
 						<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 						<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 						<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-						<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+						<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 						<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 						<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 						<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -21173,7 +21223,7 @@
 							<option value="{{carac3=^{hargne}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{hargneOD}]]}} {{jCarac3=[[ {@{hargne}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="hargne">Hargne</option>
 							<option value="{{carac3=^{combat}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{combOD}]]}} {{jCarac3=[[ {@{combat}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="combat">Combat</option>
 							<option value="{{carac3=^{instinct}}} {{bonusWarrOD3=[[@{warriorHunterA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{instOD}]]}} {{jCarac3=[[ {@{instinct}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="instinct">Instinct</option>
-							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {[[{@{tir}+" data-i18n="tir">Tir</option>
+							<option value="{{carac3=^{tir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{tirOD}]]}} {{jCarac3=[[ {@{tir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="tir">Tir</option>
 							<option value="{{carac3=^{savoir}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{savoirOD}]]}} {{jCarac3=[[ {@{savoir}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="savoir">Savoir</option>
 							<option value="{{carac3=^{technique}}} {{bonusWarrOD3=[[@{warriorScholarA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{technOD}]]}} {{jCarac3=[[ {@{technique}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="technique">Technique</option>
 							<option value="{{carac3=^{aura}}} {{bonusWarrOD3=[[@{warriorHeraldA}]]}} {{bonusBarb3=[[0]]}} {{OD3=[[@{auraOD}]]}} {{jCarac3=[[ {@{aura}d6cs2cs4cs6cf1cf3cf5s%2}=0 ]]}}" data-i18n="aura">Aura</option>
@@ -22093,7 +22143,7 @@
 	<h2>{{Special}}</h2>
 	{{#warrior}}
 		{{#rollGreater() warriorSoldier 0}}
-			<h3 data-i18n="warrior-type-solider">Type Soldier</h3>
+			<h3 data-i18n="warrior-type-soldier">Type Soldier</h3>
 		{{/rollGreater() warriorSoldier 0}}
 		{{#rollGreater() warriorHunter 0}}
 			<h3 data-i18n="warrior-type-hunter">Type Hunter</h3>
@@ -22297,11 +22347,11 @@
 		<span>
 			{{qualiteApprenti}}
 		</span>
-		<h2><span data-i18n="art-qualite-apprenti">Initié</span> <span data-i18n="art-qualite-apprenti-score">(6 à 8)</span></h2>
+		<h2><span data-i18n="art-qualite-initie">Initié</span> <span data-i18n="art-qualite-initie-score">(6 à 8)</span></h2>
 		<span>
 			{{qualiteInitie}}
 		</span>
-		<h2><span data-i18n="art-qualite-apprenti">Maître</span> <span data-i18n="art-qualite-apprenti-score">(9+)</span></h2>
+		<h2><span data-i18n="art-qualite-maitre">Maître</span> <span data-i18n="art-qualite-maitre-score">(9+)</span></h2>
 		<span>
 			{{qualiteMaitre}}
 		</span>
@@ -22320,19 +22370,19 @@
 	<h1>{{Nom}}</h1>
 	{{#warrior}}
 		{{#rollGreater() warriorSoldier 0}}
-			<h3 data-i18n="warrior-template-type-solider">Type Soldier</h3>
+			<h3 data-i18n="warrior-type-soldier">Type Soldier</h3>
 		{{/rollGreater() warriorSoldier 0}}
 		{{#rollGreater() warriorHunter 0}}
-			<h3 data-i18n="warrior-template-type-hunter">Type Hunter</h3>
+			<h3 data-i18n="warrior-type-hunter">Type Hunter</h3>
 		{{/rollGreater() warriorHunter 0}}
 		{{#rollGreater() warriorScholar 0}}
-			<h3 data-i18n="warrior-template-type-scholar">Type Scholar</h3>
+			<h3 data-i18n="warrior-type-scholar">Type Scholar</h3>
 		{{/rollGreater() warriorScholar 0}}
 		{{#rollGreater() warriorHerald 0}}
-			<h3 data-i18n="warrior-template-type-herald">Type Herald</h3>
+			<h3 data-i18n="warrior-type-herald">Type Herald</h3>
 		{{/rollGreater() warriorHerald 0}}
 		{{#rollGreater() warriorScout 0}}
-			<h3 data-i18n="warrior-template-type-scout">Type Scout</h3>
+			<h3 data-i18n="warrior-type-scout">Type Scout</h3>
 		{{/rollGreater() warriorScout 0}}
 	{{/warrior}}
 	<h2 data-i18n="initiative">Initiative</h2>
@@ -22353,19 +22403,19 @@
 	{{/Special}}
 	{{#warrior}}
 		{{#rollGreater() warriorSoldier 0}}
-			<h3 data-i18n="warrior-template-type-solider">Type Soldier</h3>
+			<h3 data-i18n="warrior-type-soldier">Type Soldier</h3>
 		{{/rollGreater() warriorSoldier 0}}
 		{{#rollGreater() warriorHunter 0}}
-			<h3 data-i18n="warrior-template-type-hunter">Type Hunter</h3>
+			<h3 data-i18n="warrior-type-hunter">Type Hunter</h3>
 		{{/rollGreater() warriorHunter 0}}
 		{{#rollGreater() warriorScholar 0}}
-			<h3 data-i18n="warrior-template-type-scholar">Type Scholar</h3>
+			<h3 data-i18n="warrior-type-scholar">Type Scholar</h3>
 		{{/rollGreater() warriorScholar 0}}
 		{{#rollGreater() warriorHerald 0}}
-			<h3 data-i18n="warrior-template-type-herald">Type Herald</h3>
+			<h3 data-i18n="warrior-type-herald">Type Herald</h3>
 		{{/rollGreater() warriorHerald 0}}
 		{{#rollGreater() warriorScout 0}}
-			<h3 data-i18n="warrior-template-type-scout">Type Scout</h3>
+			<h3 data-i18n="warrior-type-scout">Type Scout</h3>
 		{{/rollGreater() warriorScout 0}}
 	{{/warrior}}
 	
@@ -22387,174 +22437,182 @@
 	{{#style}}
 		<h3><span data-i18n="style">Style</span> {{style}}</h3>
 	{{/style}}
-	
-	{{#^rollTotal() situationnel 0}}
-		<div>
-			<span data-i18n="malus/bonus">Malus/Bonus</span>
-			<span>{{situationnel}}</span>
-		</div>
-	{{/^rollTotal() situationnel 0}}
-	
-	<h2>{{carac1}} - {{carac2}}</h2>
-	<div class="success">
-		<span data-i18n="succes">Succès</span>
-		<span>{{jet}}</span>
-	</div>
-	{{^guardian}}
-		{{^sans}}
-				<div>
-					<span>+<span data-i18n="od">OD</span></span>
-					<span>{{OD1}} + {{OD2}}</span>
-				</div>
-		{{/sans}}
-	{{/guardian}}
-	
-	{{#barbarian}}			
-		{{#rollGreater() bonusBarb1 0}}
+	{{^oriflamme}} 
+		{{#^rollTotal() situationnel 0}}
 			<div>
-				<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
-				<span>{{bonusBarb1}} + {{bonusBarb2}}</span>
+				<span data-i18n="malus/bonus">Malus/Bonus</span>
+				<span>{{situationnel}}</span>
 			</div>
-		{{/rollGreater() bonusBarb1 0}}
+		{{/^rollTotal() situationnel 0}}
 		
-		{{#^rollGreater() bonusBarb1 0}}
-			{{#rollGreater() bonusBarb2 0}}
-				<div>
-					<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
-					<span>{{bonusBarb1}} + {{bonusBarb2}}</span>
-				</div>
-			{{/rollGreater() bonusBarb2 0}}
-		{{/^rollGreater() bonusBarb1 0}}
-	{{/barbarian}}
-	
-	{{#rogue}}
-		{{#silencieux}}
-			{{#modeGhost}}
-				<div>
-					<span>+<span data-i18n="mode-ghost">Mode Ghost</span></span>
-					<span>{{modeGhostTotal}}</span>
-				</div>
-			{{/modeGhost}}
-		{{/silencieux}}
-		{{^silencieux}}
-			{{#munitionsSubsoniques}}
-				{{#modeGhost}}
+		{{#carac1}}
+			<h2>{{carac1}} - {{carac2}}</h2>
+		{{/carac1}}
+		{{^carac1}}
+			{{#carac2}}
+				<h2>{{carac1}} - {{carac2}}</h2>
+			{{/carac2}}
+		{{/carac1}}
+		{{#jet}}
+			<div class="success">
+				<span data-i18n="succes">Succès</span>
+				<span>{{jet}}</span>
+			</div>
+			{{^guardian}}
+				{{^sans}}
+						<div>
+							<span>+<span data-i18n="od">OD</span></span>
+							<span>{{OD1}} + {{OD2}}</span>
+						</div>
+				{{/sans}}
+			{{/guardian}}
+			
+			{{#barbarian}}			
+				{{#rollGreater() bonusBarb1 0}}
 					<div>
-						<span>+<span data-i18n="mode-ghost">Mode Ghost</span></span>
-						<span>{{modeGhostTotal}}</span>
+						<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
+						<span>{{bonusBarb1}} + {{bonusBarb2}}</span>
 					</div>
-				{{/modeGhost}}
-			{{/munitionsSubsoniques}}
-		{{/silencieux}}
-	{{/rogue}}
-	
-	{{#warrior}}
-		{{#rollGreater() bonusWarrOD1 0}}
+				{{/rollGreater() bonusBarb1 0}}
+				
+				{{#^rollGreater() bonusBarb1 0}}
+					{{#rollGreater() bonusBarb2 0}}
+						<div>
+							<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
+							<span>{{bonusBarb1}} + {{bonusBarb2}}</span>
+						</div>
+					{{/rollGreater() bonusBarb2 0}}
+				{{/^rollGreater() bonusBarb1 0}}
+			{{/barbarian}}
+			
+			{{#rogue}}
+				{{#silencieux}}
+					{{#modeGhost}}
+						<div>
+							<span>+<span data-i18n="mode-ghost">Mode Ghost</span></span>
+							<span>{{modeGhostTotal}}</span>
+						</div>
+					{{/modeGhost}}
+				{{/silencieux}}
+				{{^silencieux}}
+					{{#munitionsSubsoniques}}
+						{{#modeGhost}}
+							<div>
+								<span>+<span data-i18n="mode-ghost">Mode Ghost</span></span>
+								<span>{{modeGhostTotal}}</span>
+							</div>
+						{{/modeGhost}}
+					{{/munitionsSubsoniques}}
+				{{/silencieux}}
+			{{/rogue}}
+			
+			{{#warrior}}
+				{{#rollGreater() bonusWarrOD1 0}}
+					<div>
+						<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
+						<span>{{bonusWarrOD1}} + {{bonusWarrOD2}}</span>
+					</div>
+				{{/rollGreater() bonusWarrOD1 0}}		
+				
+				{{#^rollGreater() bonusWarrOD1 0}}
+					{{#rollGreater() bonusWarrOD2 0}}
+						<div>
+							<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
+							<span>{{bonusWarrOD1}} + {{bonusWarrOD2}}</span>
+						</div>
+					{{/rollGreater() bonusWarrOD2 0}}
+				{{/^rollGreater() bonusWarrOD1 0}}
+			{{/warrior}}
+		{{/jet}}
+		{{#rollTotal() carSup 1}}
 			<div>
-				<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
-				<span>{{bonusWarrOD1}} + {{bonusWarrOD2}}</span>
+				<span>+{{carac3}}</span>
+				<span>{{jCarac3}}</span>
 			</div>
-		{{/rollGreater() bonusWarrOD1 0}}		
-		
-		{{#^rollGreater() bonusWarrOD1 0}}
-			{{#rollGreater() bonusWarrOD2 0}}
-				<div>
-					<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
-					<span>{{bonusWarrOD1}} + {{bonusWarrOD2}}</span>
-				</div>
-			{{/rollGreater() bonusWarrOD2 0}}
-		{{/^rollGreater() bonusWarrOD1 0}}
-	{{/warrior}}
-	
-	{{#rollTotal() carSup 1}}
-		<div>
-			<span>+{{carac3}}</span>
-			<span>{{jCarac3}}</span>
-		</div>
-		{{^guardian}}
-			{{^sans}}
-				<div>
-					<span class="espaceSupp">+{{carac3}} <span data-i18n="od">OD</span></span>
-					<span>{{OD3}}</span>
-				</div>
-				{{#warrior}}
-					{{#rollGreater() bonusWarrOD3 0}}
-						<div>
-							<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
-							<span>{{bonusWarrOD3}}</span>
-						</div>
-					{{/rollGreater() bonusWarrOD3 0}}
-				{{/warrior}}
-				{{#barbarian}}			
-					{{#rollGreater() bonusBarb3 0}}
-						<div>
-							<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
-							<span>{{bonusBarb3}}</span>
-						</div>
-					{{/rollGreater() bonusBarb3 0}}
-				{{/barbarian}}
-			{{/sans}}
-		{{/guardian}}
-	{{/rollTotal() carSup 1}}
-	{{#rollTotal() carSup 2}}
-		<div>
-			<span>+{{carac3}}</span>
-			<span>{{jCarac3}}</span>
-		</div>
-		{{^guardian}}
-			{{^sans}}
-				<div>
-					<span class="espaceSupp">+{{carac3}} <span data-i18n="od">OD</span></span>
-					<span>{{OD3}}</span>
-				</div>
-				{{#warrior}}
-					{{#rollGreater() bonusWarrOD3 0}}
-						<div>
-							<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
-							<span>{{bonusWarrOD3}}</span>
-						</div>
-					{{/rollGreater() bonusWarrOD3 0}}
-				{{/warrior}}
-				{{#barbarian}}			
-					{{#rollGreater() bonusBarb3 0}}
-						<div>
-							<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
-							<span>{{bonusBarb3}}</span>
-						</div>
-					{{/rollGreater() bonusBarb3 0}}
-				{{/barbarian}}
-			{{/sans}}
-		{{/guardian}}
-		<div>
-			<span>+{{carac4}}</span>
-			<span>{{jCarac4}}</span>
-		</div>
-		{{^guardian}}
-			{{^sans}}
-				<div>
-					<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
-					<span>{{OD4}}</span>
-				</div>
-				{{#warrior}}
-					{{#rollGreater() bonusWarrOD4 0}}
-						<div>
-							<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
-							<span>{{bonusWarrOD4}}</span>
-						</div>
-					{{/rollGreater() bonusWarrOD4 0}}
-				{{/warrior}}
-				{{#barbarian}}			
-					{{#rollGreater() bonusBarb4 0}}
-						<div>
-							<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
-							<span>{{bonusBarb4}}</span>
-						</div>
-					{{/rollGreater() bonusBarb4 0}}
-				{{/barbarian}}
-			{{/sans}}
-		{{/guardian}}
-	{{/rollTotal() carSup 2}}
-	
+			{{^guardian}}
+				{{^sans}}
+					<div>
+						<span class="espaceSupp">+{{carac3}} <span data-i18n="od">OD</span></span>
+						<span>{{OD3}}</span>
+					</div>
+					{{#warrior}}
+						{{#rollGreater() bonusWarrOD3 0}}
+							<div>
+								<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
+								<span>{{bonusWarrOD3}}</span>
+							</div>
+						{{/rollGreater() bonusWarrOD3 0}}
+					{{/warrior}}
+					{{#barbarian}}			
+						{{#rollGreater() bonusBarb3 0}}
+							<div>
+								<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
+								<span>{{bonusBarb3}}</span>
+							</div>
+						{{/rollGreater() bonusBarb3 0}}
+					{{/barbarian}}
+				{{/sans}}
+			{{/guardian}}
+		{{/rollTotal() carSup 1}}
+		{{#rollTotal() carSup 2}}
+			<div>
+				<span>+{{carac3}}</span>
+				<span>{{jCarac3}}</span>
+			</div>
+			{{^guardian}}
+				{{^sans}}
+					<div>
+						<span class="espaceSupp">+{{carac3}} <span data-i18n="od">OD</span></span>
+						<span>{{OD3}}</span>
+					</div>
+					{{#warrior}}
+						{{#rollGreater() bonusWarrOD3 0}}
+							<div>
+								<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
+								<span>{{bonusWarrOD3}}</span>
+							</div>
+						{{/rollGreater() bonusWarrOD3 0}}
+					{{/warrior}}
+					{{#barbarian}}			
+						{{#rollGreater() bonusBarb3 0}}
+							<div>
+								<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
+								<span>{{bonusBarb3}}</span>
+							</div>
+						{{/rollGreater() bonusBarb3 0}}
+					{{/barbarian}}
+				{{/sans}}
+			{{/guardian}}
+			<div>
+				<span>+{{carac4}}</span>
+				<span>{{jCarac4}}</span>
+			</div>
+			{{^guardian}}
+				{{^sans}}
+					<div>
+						<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
+						<span>{{OD4}}</span>
+					</div>
+					{{#warrior}}
+						{{#rollGreater() bonusWarrOD4 0}}
+							<div>
+								<span>+<span data-i18n="bonus-warrior">Bonus Warrior</span></span>
+								<span>{{bonusWarrOD4}}</span>
+							</div>
+						{{/rollGreater() bonusWarrOD4 0}}
+					{{/warrior}}
+					{{#barbarian}}			
+						{{#rollGreater() bonusBarb4 0}}
+							<div>
+								<span>+<span data-i18n="bonus-goliath">Bonus Goliath</span></span>
+								<span>{{bonusBarb4}}</span>
+							</div>
+						{{/rollGreater() bonusBarb4 0}}
+					{{/barbarian}}
+				{{/sans}}
+			{{/guardian}}
+		{{/rollTotal() carSup 2}}
+	{{/oriflamme}} 
 	{{#pointeurLaser}}
 		<div>
 			<span>+<span data-i18n="pointeur-laser">Pointeur Laser</span></span>
@@ -23087,19 +23145,19 @@
 	{{/Special}}
 	{{#warrior}}
 		{{#rollGreater() warriorSoldier 0}}
-			<h3 data-i18n="warrior-template-type-solider">Type Soldier</h3>
+			<h3 data-i18n="warrior-type-soldier">Type Soldier</h3>
 		{{/rollGreater() warriorSoldier 0}}
 		{{#rollGreater() warriorHunter 0}}
-			<h3 data-i18n="warrior-template-type-hunter">Type Hunter</h3>
+			<h3 data-i18n="warrior-type-hunter">Type Hunter</h3>
 		{{/rollGreater() warriorHunter 0}}
 		{{#rollGreater() warriorScholar 0}}
-			<h3 data-i18n="warrior-template-type-scholar">Type Scholar</h3>
+			<h3 data-i18n="warrior-type-scholar">Type Scholar</h3>
 		{{/rollGreater() warriorScholar 0}}
 		{{#rollGreater() warriorHerald 0}}
-			<h3 data-i18n="warrior-template-type-herald">Type Herald</h3>
+			<h3 data-i18n="warrior-type-herald">Type Herald</h3>
 		{{/rollGreater() warriorHerald 0}}
 		{{#rollGreater() warriorScout 0}}
-			<h3 data-i18n="warrior-template-type-scout">Type Scout</h3>
+			<h3 data-i18n="warrior-type-scout">Type Scout</h3>
 		{{/rollGreater() warriorScout 0}}
 	{{/warrior}}
 	

@@ -4,6 +4,10 @@ This is the source code for the A Fistful of Darkness character sheet on Roll20.
 
 ## Changelog
 
+### 1.2
+
+* Fine Hellstone fixed (was 2 not connected boxes, now 3 connected boxes)
+
 ### 1.1
 
 * Improved colors for Location Cards (black / red)
