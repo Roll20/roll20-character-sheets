@@ -45,6 +45,7 @@ on Github.
 ### 2.5.2
 
 * Fix a bug preventing ship price from ever being calculated.
+* First support for Worlds Without Number in the form of an alternate skill list.
 
 ### 2.5.1
 
