@@ -62,6 +62,12 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 <details>
+  <summary>Repeating Lists & Options</summary>
+
+  ![Repeating Lists & Options](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/power_options.gif)
+</details>
+
+<details>
   <summary>Vehicles</summary>
 
   ![Vehicles](https://raw.githubusercontent.com/Tetrakern/roll20-character-sheets/master/Savage%20Worlds%20-%20Graph%20Paper/previews/vehicles.gif)
