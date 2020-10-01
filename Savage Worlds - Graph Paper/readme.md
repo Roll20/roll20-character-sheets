@@ -94,7 +94,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
   * Powers: Show Damage, Show Trapping, Roll Button (Input)
   * Engrams: Roll Button (Input)
   * Weapons: Show Trapping, Roll Button (Input)
-* Added set maximum capacity to ammunition magazines
+* Added the saved maximum capacity to ammunition magazines
 * Updated the sheet’s help section
 #### Version 1.1.1
 * Added reroll button to Roll Templates
