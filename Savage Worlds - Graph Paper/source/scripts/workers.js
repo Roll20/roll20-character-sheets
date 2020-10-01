@@ -751,3 +751,11 @@ function changeSkillRoll(e) {
 on(`change:repeating_powers:power_skill_name`, (e) => {
   changeSkillRoll(e);
 });
+
+on(`change:repeating_weapons:weapon_skill_name`, (e) => {
+  changeSkillRoll(e);
+});
+
+on(`change:repeating_engrams:engram_skill_name`, (e) => {
+  changeSkillRoll(e);
+});
