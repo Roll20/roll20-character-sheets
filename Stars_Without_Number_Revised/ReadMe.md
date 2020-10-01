@@ -42,6 +42,10 @@ on Github.
 
 ## Changelog
 
+### 2.5.2
+
+* Fix a bug preventing ship price from ever being calculated.
+
 ### 2.5.1
 
 * Fix a bug causing new sheets to incorrectly initialise as AI and Transhuman.
