@@ -8,8 +8,9 @@ const dice = ['', 'd4', 'd6', 'd8', 'd10', 'd12'];
 const renamedAbbr = ['rename_agi', 'rename_sma', 'rename_spi', 'rename_str', 'rename_vig'];
 
 var parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
-                   str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
-                   d8: 'd8!', d10: 'd10!', d12: 'd12!' };
+                   str: '@{strength}!', vig: '@{vigor}!' };
+
+const parseDieCodes = { d4: 'd4!', d6: 'd6!', d8: 'd8!', d10: 'd10!', d12: 'd12!' };
 
 /* #############################################################################
 TRANSLATION SETUP
@@ -30,8 +31,7 @@ on("sheet:opened", function(e){
   // Include renamed Trait abbreviations
   getAttrs(renamedAbbr, (values) => {
     parseCodes = { agi: '@{agility}!', sma: '@{smarts}!', spi: '@{spirit}!',
-                   str: '@{strength}!', vig: '@{vigor}!', d4: 'd4!', d6: 'd6!',
-                   d8: 'd8!', d10: 'd10!', d12: 'd12!' };
+                   str: '@{strength}!', vig: '@{vigor}!' };
 
     _.each(renamedAbbr, (a) => {
       // Skip if not defined
@@ -81,6 +81,11 @@ var TETRA = TETRA || ( function() {
       code = code.replaceAll(`-${k}`, `-${parseCodes[k]}`);
       code = code.replaceAll(`${k}+`, `${parseCodes[k]}+`);
       code = code.replaceAll(`${k}-`, `${parseCodes[k]}-`);
+    });
+
+    // Add exclamation mark (!) to make dice explode (naive)
+    _.each(_.keys(parseDieCodes), (k) => {
+      code = code.replaceAll(`${k}`, `${parseDieCodes[k]}`);
     });
 
     return code;
@@ -534,6 +539,11 @@ function colSum(values, target, multi = false) {
 
   setAttrs({ [target]: sum.toFixed(1) });
 }
+
+on('change:repeating_powers:power_damage', (e) => {
+  let code = TETRA.parseDiceCode(e.newValue);
+  setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
+});
 
 on('change:repeating_weapons', (e) => {
   if (e.sourceAttribute.includes('damage')) {
