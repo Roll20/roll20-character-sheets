@@ -86,6 +86,12 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.1
+* Improved handling for Rate of Fire
+* Fixed critical bug in Rate of Fire handling
+* Dice roller codes are now parsed
+* Added [Query RoF] option to Engrams, Powers, and Weapons
+* Improved performance
 #### Version 1.2.0
 * Various improvements, refactoring, and bug/style fixes
 * Enhanced usability of damage roll toggles for repeating lists
