@@ -92,6 +92,8 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Dice roller codes are now parsed
 * Added [Query RoF] option to Engrams, Powers, and Weapons
 * Improved performance
+* Fixed sheet default settings not being applied
+* Added setting option to apply Fatigue to run rolls
 #### Version 1.2.0
 * Various improvements, refactoring, and bug/style fixes
 * Enhanced usability of damage roll toggles for repeating lists
