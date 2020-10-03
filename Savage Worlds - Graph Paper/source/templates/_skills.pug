@@ -91,7 +91,7 @@
             - // Always roll with RoF query
             button(type='roll',
                    name=`roll_${trait}_${step[1]}`,
-                   value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|@{${trait}_rof}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait}_${step[1]})}}`,
+                   value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|1}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait}_${step[1]})}}`,
                    class='sheet-skills__step-button')
               .sheet-tooltip.sheet-tooltip--top
                 span(data-i18n='roll-tooltip-prefix') Roll 
@@ -102,31 +102,21 @@
           input(type='hidden', name=`attr_${trait}_roll`, value='1d4!cs2 - 2')
           input(type='hidden', name=`attr_${trait}_wd_roll`, value='1d6!cs2 - 2')
           input(type='hidden', name=`attr_${trait}_extra_wd_roll`, value='-10000')
-          input(type='hidden', name=`attr_${trait}_rof`, value='1')
 
           input(type='hidden',
                 name=`attr_rename_${trait}`,
                 value= skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0])
 
-          - // Roll without RoF query
+          input(type='hidden',
+                name=`attr_roll_${trait}`,
+                value= `{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait})}}`)
+
           button(type='roll',
                  name=`roll_${trait}`,
-                 value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ 1 ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} {{traitroll1=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait})}}`,
-                 class='sheet-skills__button sheet-a')
+                 value=`&{template:TraitRoll} {{rof=[[ 0 + @{query_skill_rof} ]]}} @{roll_${trait}}`,
+                 class='sheet-skills__button')
             .sheet-tooltip.sheet-tooltip--left
-              span(name=`attr_rename_${skill[1].toLowerCase()}`, data-i18n=`${skill[1].toLowerCase()}-u`)= skill[1]
-            span(name=`attr_rename_${trait}`)
-              = skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0]
-
-          - // Roll with RoF query
-          input(type='hidden',
-                name=`attr_roll_full_${trait}`,
-                value= `&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|@{${trait}_rof}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait}_rof)}}`)
-
-          button(type='roll',
-                 name=`roll_${trait}_rof`,
-                 value=`@{roll_full_${trait}}`,
-                 class='sheet-skills__button sheet-b')
-            .sheet-tooltip.sheet-tooltip--left= skill[1]
+              span(name=`attr_rename_${skill[1].toLowerCase()}`,
+                   data-i18n=`${skill[1].toLowerCase()}-u`)= skill[1]
             span(name=`attr_rename_${trait}`)
               = skill[0] == 'Common Knowledge' ? 'Common Knowl.' : skill[0]

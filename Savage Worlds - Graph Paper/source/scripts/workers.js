@@ -741,7 +741,7 @@ function changeSkillRoll(e) {
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[target] = `@{roll_full_${renameAttribute.replace('rename_', '')}}`;
+      update[target] = `@{roll_${renameAttribute.replace('rename_', '')}}`;
     }
 
     setAttrs(update, { silent: true });
@@ -767,4 +767,13 @@ HELPER BUTTONS
 on('change:dice_roller_input', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
   setAttrs({ ['dice_roller_code']: code }, { silent: true });
+});
+
+/* #############################################################################
+SETTINGS
+############################################################################# */
+
+on('change:toggle_skill_rof', (e) => {
+  let update = e.newValue == 'on' ? '?{@{query_rate_of_fire}|1}' : '1';
+  setAttrs({ ['query_skill_rof']: update }, { silent: true });
 });
