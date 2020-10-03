@@ -759,3 +759,12 @@ on(`change:repeating_weapons:weapon_skill_name`, (e) => {
 on(`change:repeating_engrams:engram_skill_name`, (e) => {
   changeSkillRoll(e);
 });
+
+/* #############################################################################
+HELPER BUTTONS
+############################################################################# */
+
+on('change:dice_roller_input', (e) => {
+  let code = TETRA.parseDiceCode(e.newValue);
+  setAttrs({ ['dice_roller_code']: code }, { silent: true });
+});
