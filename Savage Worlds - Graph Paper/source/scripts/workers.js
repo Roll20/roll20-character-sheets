@@ -764,6 +764,7 @@ HELPER BUTTONS
 
 on('change:dice_roller_input', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
+
   setAttrs({ ['dice_roller_code']: code }, { silent: true });
 });
 
@@ -773,5 +774,24 @@ SETTINGS
 
 on('change:toggle_skill_rof', (e) => {
   let update = e.newValue == 'on' ? '?{@{query_rate_of_fire}|1}' : '1';
+
   setAttrs({ ['query_skill_rof']: update }, { silent: true });
+});
+
+on('change:toggle_run_wounds', (e) => {
+  let update = e.newValue == 'on' ? '0' : '@{wound_mod}';
+
+  setAttrs({ ['run_wounds']: update }, { silent: true });
+});
+
+on('change:toggle_run_fatigue', (e) => {
+  let update = e.newValue == 'on' ? '@{fatigue_mod}' : '0';
+
+  setAttrs({ ['run_fatigue']: update }, { silent: true });
+});
+
+on('change:toggle_run_explode', (e) => {
+  let update = e.newValue == 'on' ? '@{run_roll}!' : '@{run_roll}';
+
+  setAttrs({ ['run_code']: update }, { silent: true });
 });

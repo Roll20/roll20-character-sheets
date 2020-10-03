@@ -765,6 +765,7 @@ HELPER BUTTONS
 
 on('change:dice_roller_input', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
+
   setAttrs({ ['dice_roller_code']: code }, { silent: true });
 });
 
@@ -774,7 +775,26 @@ SETTINGS
 
 on('change:toggle_skill_rof', (e) => {
   let update = e.newValue == 'on' ? '?{@{query_rate_of_fire}|1}' : '1';
+
   setAttrs({ ['query_skill_rof']: update }, { silent: true });
+});
+
+on('change:toggle_run_wounds', (e) => {
+  let update = e.newValue == 'on' ? '0' : '@{wound_mod}';
+
+  setAttrs({ ['run_wounds']: update }, { silent: true });
+});
+
+on('change:toggle_run_fatigue', (e) => {
+  let update = e.newValue == 'on' ? '@{fatigue_mod}' : '0';
+
+  setAttrs({ ['run_fatigue']: update }, { silent: true });
+});
+
+on('change:toggle_run_explode', (e) => {
+  let update = e.newValue == 'on' ? '@{run_roll}!' : '@{run_roll}';
+
+  setAttrs({ ['run_code']: update }, { silent: true });
 });
 
 </script><span class="sheet-hidden" data-i18n="query-rate-of-fire">Rate of Fire</span><span class="sheet-hidden" data-i18n="query-modifier">Modifier</span><span class="sheet-hidden" data-i18n="query-wild-die">Wild Die</span><span class="sheet-hidden" data-i18n="query_target_number">Target Number</span><span class="sheet-hidden" data-i18n="query_roll_result">Roll Result</span><span class="sheet-hidden" data-i18n="query_damage_modifier">Damage Modifier</span><span class="sheet-hidden" data-i18n="none">None</span>
@@ -874,24 +894,20 @@ on('change:toggle_skill_rof', (e) => {
           <div class="sheet-buttons">
             <div class="sheet-dice-roller">
               <input type="hidden" name="attr_dice_roller_code" value="0"/>
+              <input type="hidden" name="attr_dice_roller_template" value="{{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}}"/>
               <input class="sheet-dice-roller__input" type="text" name="attr_dice_roller_input" placeholder="2d6!+2" data-i18n-placeholder="dice-roller-code-placeholder"/>
-              <button type="roll" name="roll_dice_roller_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_damage)}}"><span data-i18n="dice-roller-damage">Damage</span></button>
-              <button type="roll" name="roll_dice_roller_hidden" value="/w gm &{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_hidden)}}"><span data-i18n="dice-roller-hidden">Hidden</span></button>
-              <button type="roll" name="roll_dice_roller_open" value="&{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_open)}}"><span data-i18n="dice-roller-roll">Roll</span></button>
+              <button type="roll" name="roll_dice_roller_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_damage)}}"><span data-i18n="dice-roller-damage">Damage</span></button>
+              <button type="roll" name="roll_dice_roller_hidden" value="/w gm &{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_hidden)}}"><span data-i18n="dice-roller-hidden">Hidden</span></button>
+              <button type="roll" name="roll_dice_roller_open" value="&{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_open)}}"><span data-i18n="dice-roller-roll">Roll</span></button>
             </div>
             <div class="sheet-raise-calculator">
               <button type="roll" name="roll_raise_calculator" value="&{template:InfoBox} {{content=^{roll-of} (?{@{query_roll_result}}) ^{vs-tn} (?{@{query_target_number}|4}) = [[ floor((?{@{query_roll_result}} - ?{@{query_target_number}|4}) / 4) ]] ^{raises}}}"><span data-i18n="raise-calculator">Raise Calculator</span></button>
             </div>
-            <input class="sheet-buttons__toggle-run-explode" type="checkbox" name="attr_toggle_run_explode"/>
-            <div class="sheet-run-roller sheet-a">
-              <input class="sheet-buttons__toggle-run-wounds" type="checkbox" name="attr_toggle_run_wounds"/>
-              <button class="sheet-a" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll} + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) - ^{wounds} (@{wound_mod}) + @{run_roll}}}"><span data-i18n="dice-roller-run">Run</span></button>
-              <button class="sheet-b" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll} + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) + @{run_roll}}}"><span data-i18n="dice-roller-run">Run</span></button>
-            </div>
-            <div class="sheet-run-roller sheet-b">
-              <input class="sheet-buttons__toggle-run-wounds" type="checkbox" name="attr_toggle_run_wounds"/>
-              <button class="sheet-a" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll}! + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) - ^{wounds} (@{wound_mod}) + @{run_roll}!}}"><span data-i18n="dice-roller-run-ace">Run!</span></button>
-              <button class="sheet-b" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll}! + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) + @{run_roll}!}}"><span data-i18n="dice-roller-run-ace">Run!</span></button>
+            <div class="sheet-run-roller">
+              <input type="hidden" name="attr_run_wounds" value="@{wound_mod}"/>
+              <input type="hidden" name="attr_run_fatigue" value="0"/>
+              <input type="hidden" name="attr_run_code" value="@{run_roll}"/>
+              <button type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_code} + @{pace} - @{run_wounds} - @{run_fatigue} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{content=^{run} (@{pace} + @{run_code}) + ^{mod} (?{@{query_modifier}|0}) - ^{penalty} ([[ @{run_wounds} + @{run_fatigue} ]])}}"><span data-i18n="dice-roller-run">Run</span></button>
             </div>
           </div>
         </div>
@@ -3307,6 +3323,9 @@ on('change:toggle_skill_rof', (e) => {
               <label class="sheet-settings__item"><span data-i18n="settings-function-running-ignores-wounds">Running Ignores Wounds</span>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_run_wounds"/>
               </label>
+              <label class="sheet-settings__item"><span data-i18n="settings-function-running-applies-fatigue">Running Applies Fatigue</span>
+                <input class="sheet-checkbox" type="checkbox" name="attr_toggle_run_fatigue"/>
+              </label>
               <label class="sheet-settings__item"><span><span data-i18n="settings-misc-extent-prefix">Extend&nbsp;</span><span name="attr_rename_block_quick_notes" data-i18n="quick-notes">Quick Notes</span></span>
                 <input class="sheet-checkbox" type="checkbox" name="attr_toggle_quick_notes_extension"/>
               </label>
@@ -4704,24 +4723,20 @@ on('change:toggle_skill_rof', (e) => {
       <div class="sheet-buttons">
         <div class="sheet-dice-roller">
           <input type="hidden" name="attr_dice_roller_code" value="0"/>
+          <input type="hidden" name="attr_dice_roller_template" value="{{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}}"/>
           <input class="sheet-dice-roller__input" type="text" name="attr_dice_roller_input" placeholder="2d6!+2" data-i18n-placeholder="dice-roller-code-placeholder"/>
-          <button type="roll" name="roll_dice_roller_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_damage)}}"><span data-i18n="dice-roller-damage">Damage</span></button>
-          <button type="roll" name="roll_dice_roller_hidden" value="/w gm &{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_hidden)}}"><span data-i18n="dice-roller-hidden">Hidden</span></button>
-          <button type="roll" name="roll_dice_roller_open" value="&{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{roll1=[[ @{dice_roller_code} ]]}} {{roll2=[[ @{dice_roller_code} ]]}} {{roll3=[[ @{dice_roller_code} ]]}} {{roll4=[[ @{dice_roller_code} ]]}} {{roll5=[[ @{dice_roller_code} ]]}} {{roll6=[[ @{dice_roller_code} ]]}} {{roll7=[[ @{dice_roller_code} ]]}} {{roll8=[[ @{dice_roller_code} ]]}} {{reroll=[r](~dice_roller_open)}}"><span data-i18n="dice-roller-roll">Roll</span></button>
+          <button type="roll" name="roll_dice_roller_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_damage)}}"><span data-i18n="dice-roller-damage">Damage</span></button>
+          <button type="roll" name="roll_dice_roller_hidden" value="/w gm &{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_hidden)}}"><span data-i18n="dice-roller-hidden">Hidden</span></button>
+          <button type="roll" name="roll_dice_roller_open" value="&{template:DiceRoller} {{header=@{name} ^{rolls} @{dice_roller_input}}} @{dice_roller_template} {{reroll=[r](~dice_roller_open)}}"><span data-i18n="dice-roller-roll">Roll</span></button>
         </div>
         <div class="sheet-raise-calculator">
           <button type="roll" name="roll_raise_calculator" value="&{template:InfoBox} {{content=^{roll-of} (?{@{query_roll_result}}) ^{vs-tn} (?{@{query_target_number}|4}) = [[ floor((?{@{query_roll_result}} - ?{@{query_target_number}|4}) / 4) ]] ^{raises}}}"><span data-i18n="raise-calculator">Raise Calculator</span></button>
         </div>
-        <input class="sheet-buttons__toggle-run-explode" type="checkbox" name="attr_toggle_run_explode"/>
-        <div class="sheet-run-roller sheet-a">
-          <input class="sheet-buttons__toggle-run-wounds" type="checkbox" name="attr_toggle_run_wounds"/>
-          <button class="sheet-a" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll} + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) - ^{wounds} (@{wound_mod}) + @{run_roll}}}"><span data-i18n="dice-roller-run">Run</span></button>
-          <button class="sheet-b" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll} + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) + @{run_roll}}}"><span data-i18n="dice-roller-run">Run</span></button>
-        </div>
-        <div class="sheet-run-roller sheet-b">
-          <input class="sheet-buttons__toggle-run-wounds" type="checkbox" name="attr_toggle_run_wounds"/>
-          <button class="sheet-a" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll}! + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) - ^{wounds} (@{wound_mod}) + @{run_roll}!}}"><span data-i18n="dice-roller-run-ace">Run!</span></button>
-          <button class="sheet-b" type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_roll}! + @{pace} - @{wound_mod} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{mod=?{@{query_modifier}|0}}} {{content=^{pace} (@{pace}) + ^{query-modifier} (?{@{query_modifier}|0}) + @{run_roll}!}}"><span data-i18n="dice-roller-run-ace">Run!</span></button>
+        <div class="sheet-run-roller">
+          <input type="hidden" name="attr_run_wounds" value="@{wound_mod}"/>
+          <input type="hidden" name="attr_run_fatigue" value="0"/>
+          <input type="hidden" name="attr_run_code" value="@{run_roll}"/>
+          <button type="roll" name="roll_run" value="&{template:RunRoll} {{header=@{name} ^{runs-ellipsis} [[ @{run_code} + @{pace} - @{run_wounds} - @{run_fatigue} + ?{@{query_modifier}|0} ]]^{exclamation-mark}}} {{content=^{run} (@{pace} + @{run_code}) + ^{mod} (?{@{query_modifier}|0}) - ^{penalty} ([[ @{run_wounds} + @{run_fatigue} ]])}}"><span data-i18n="dice-roller-run">Run</span></button>
         </div>
       </div>
       <div class="sheet-block sheet-extra-attributes">
