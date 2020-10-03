@@ -726,10 +726,12 @@ on(`clicked:ammunition_reset`, (e) => {
 });
 
 /* #############################################################################
-REPEATING LIST LINKED SKILL ROLLS
+REPEATING LISTS & OPTIONS
 ############################################################################# */
 
-function changeSkillRoll(e) {
+const listItems = ['engram', 'power', 'weapon'];
+
+on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) => {
   let target = e.sourceAttribute.replace('_skill_name', '_skill'),
       array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
 
@@ -746,18 +748,14 @@ function changeSkillRoll(e) {
 
     setAttrs(update, { silent: true });
   });
-}
-
-on(`change:repeating_powers:power_skill_name`, (e) => {
-  changeSkillRoll(e);
 });
 
-on(`change:repeating_weapons:weapon_skill_name`, (e) => {
-  changeSkillRoll(e);
-});
+on(listItems.map(s => `change:repeating_${s}s:${s}_skill_rof_query_toggle`).join(' '), (e) => {
+  let d = e.sourceAttribute.includes('weapon') ? '@{weapon_rof}' : '1',
+      update = e.newValue == 'on' ? `?{@{query_rate_of_fire}|${d}}` : '1',
+      target = e.sourceAttribute.replace('_toggle', '');
 
-on(`change:repeating_engrams:engram_skill_name`, (e) => {
-  changeSkillRoll(e);
+  setAttrs({ [target]: update }, { silent: true });
 });
 
 /* #############################################################################

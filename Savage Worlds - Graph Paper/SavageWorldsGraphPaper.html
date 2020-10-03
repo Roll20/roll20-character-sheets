@@ -727,10 +727,12 @@ on(`clicked:ammunition_reset`, (e) => {
 });
 
 /* #############################################################################
-REPEATING LIST LINKED SKILL ROLLS
+REPEATING LISTS & OPTIONS
 ############################################################################# */
 
-function changeSkillRoll(e) {
+const listItems = ['engram', 'power', 'weapon'];
+
+on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) => {
   let target = e.sourceAttribute.replace('_skill_name', '_skill'),
       array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
 
@@ -747,18 +749,14 @@ function changeSkillRoll(e) {
 
     setAttrs(update, { silent: true });
   });
-}
-
-on(`change:repeating_powers:power_skill_name`, (e) => {
-  changeSkillRoll(e);
 });
 
-on(`change:repeating_weapons:weapon_skill_name`, (e) => {
-  changeSkillRoll(e);
-});
+on(listItems.map(s => `change:repeating_${s}s:${s}_skill_rof_query_toggle`).join(' '), (e) => {
+  let d = e.sourceAttribute.includes('weapon') ? '@{weapon_rof}' : '1',
+      update = e.newValue == 'on' ? `?{@{query_rate_of_fire}|${d}}` : '1',
+      target = e.sourceAttribute.replace('_toggle', '');
 
-on(`change:repeating_engrams:engram_skill_name`, (e) => {
-  changeSkillRoll(e);
+  setAttrs({ [target]: update }, { silent: true });
 });
 
 /* #############################################################################
@@ -3513,7 +3511,7 @@ on('change:toggle_skill_rof', (e) => {
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
                   <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_weapon_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_weapon_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|@{weapon_rof}} ]]}} @{weapon_skill}">9</button>
+                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_weapon_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_skill}">9</button>
                   <input class="sheet-align-left sheet-weapons__name sheet-stretch" type="text" name="attr_weapon_name" placeholder="Weapon (Ammo)" data-i18n-placeholder="weapons-name-placeholder" spellcheck="false"/>
                   <div class="sheet-damage-button-overlay">
                     <input type="hidden" name="attr_weapon_damage_roll" value="0"/>
@@ -3543,6 +3541,10 @@ on('change:toggle_skill_rof', (e) => {
                         <input type="hidden" name="attr_weapon_skill" value="@{roll_shooting}"/>
                         <input type="checkbox" name="attr_weapon_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                         <input class="sheet-label-toggle__input" type="text" name="attr_weapon_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
+                      </label>
+                      <input type="hidden" name="attr_weapon_skill_rof_query" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
+                      <label class="sheet-label-toggle">
+                        <input type="checkbox" name="attr_weapon_skill_rof_query_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
                       </label>
                     </div>
                   </div>
@@ -3696,7 +3698,7 @@ on('change:toggle_skill_rof', (e) => {
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
                   <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_engram_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_engram_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} @{engram_skill}">9</button>
+                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_engram_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_skill}">9</button>
                   <input class="sheet-align-left sheet-engrams__name sheet-stretch" type="text" name="attr_engram_name" placeholder="Engram" data-i18n-placeholder="engrams-name-placeholder" spellcheck="false"/>
                   <input class="sheet-engrams__penalty" type="text" name="attr_engram_penalty" placeholder="-1" spellcheck="false"/>
                   <input class="sheet-align-left sheet-engrams__description" type="text" name="attr_engram_description" placeholder="e.g. entangle (SWADE 161) power but resisted by Smarts" data-i18n-placeholder="engrams-description-placeholder" spellcheck="false"/>
@@ -3712,6 +3714,10 @@ on('change:toggle_skill_rof', (e) => {
                         <input type="hidden" name="attr_engram_skill" value="@{roll_hacking}"/>
                         <input type="checkbox" name="attr_engram_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                         <input class="sheet-label-toggle__input" type="text" name="attr_engram_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
+                      </label>
+                      <input type="hidden" name="attr_engram_skill_rof_query" value="1"/>
+                      <label class="sheet-label-toggle">
+                        <input type="checkbox" name="attr_engram_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
                       </label>
                     </div>
                   </div>
@@ -3748,7 +3754,7 @@ on('change:toggle_skill_rof', (e) => {
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
                   <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} @{power_skill}">9</button>
+                  <button class="sheet-repitem__skill-roll" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_skill}">9</button>
                   <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
                   <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/>
                   <div class="sheet-damage-button-overlay">
@@ -3782,6 +3788,10 @@ on('change:toggle_skill_rof', (e) => {
                         <input type="hidden" name="attr_power_skill" value="@{roll_spellcasting}"/>
                         <input type="checkbox" name="attr_power_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                         <input class="sheet-label-toggle__input" type="text" name="attr_power_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
+                      </label>
+                      <input type="hidden" name="attr_power_skill_rof_query" value="1"/>
+                      <label class="sheet-label-toggle">
+                        <input type="checkbox" name="attr_power_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
                       </label>
                     </div>
                   </div>
@@ -5770,7 +5780,7 @@ on('change:toggle_skill_rof', (e) => {
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
               <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_weapon_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll" type="roll" name="roll_weapon_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|@{weapon_rof}} ]]}} @{weapon_skill}">9</button>
+              <button class="sheet-repitem__skill-roll" type="roll" name="roll_weapon_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_skill}">9</button>
               <input class="sheet-align-left sheet-weapons__name sheet-stretch" type="text" name="attr_weapon_name" placeholder="Weapon (Ammo)" data-i18n-placeholder="weapons-name-placeholder" spellcheck="false"/>
               <div class="sheet-damage-button-overlay">
                 <input type="hidden" name="attr_weapon_damage_roll" value="0"/>
@@ -5800,6 +5810,10 @@ on('change:toggle_skill_rof', (e) => {
                     <input type="hidden" name="attr_weapon_skill" value="@{roll_shooting}"/>
                     <input type="checkbox" name="attr_weapon_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                     <input class="sheet-label-toggle__input" type="text" name="attr_weapon_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
+                  </label>
+                  <input type="hidden" name="attr_weapon_skill_rof_query" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
+                  <label class="sheet-label-toggle">
+                    <input type="checkbox" name="attr_weapon_skill_rof_query_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
                   </label>
                 </div>
               </div>
@@ -5904,7 +5918,7 @@ on('change:toggle_skill_rof', (e) => {
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
               <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_engram_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll" type="roll" name="roll_engram_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} @{engram_skill}">9</button>
+              <button class="sheet-repitem__skill-roll" type="roll" name="roll_engram_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_skill}">9</button>
               <input class="sheet-align-left sheet-engrams__name sheet-stretch" type="text" name="attr_engram_name" placeholder="Engram" data-i18n-placeholder="engrams-name-placeholder" spellcheck="false"/>
               <input class="sheet-engrams__penalty" type="text" name="attr_engram_penalty" placeholder="-1" spellcheck="false"/>
               <input class="sheet-align-left sheet-engrams__description" type="text" name="attr_engram_description" placeholder="e.g. entangle (SWADE 161) power but resisted by Smarts" data-i18n-placeholder="engrams-description-placeholder" spellcheck="false"/>
@@ -5920,6 +5934,10 @@ on('change:toggle_skill_rof', (e) => {
                     <input type="hidden" name="attr_engram_skill" value="@{roll_hacking}"/>
                     <input type="checkbox" name="attr_engram_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                     <input class="sheet-label-toggle__input" type="text" name="attr_engram_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
+                  </label>
+                  <input type="hidden" name="attr_engram_skill_rof_query" value="1"/>
+                  <label class="sheet-label-toggle">
+                    <input type="checkbox" name="attr_engram_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
                   </label>
                 </div>
               </div>
@@ -5956,7 +5974,7 @@ on('change:toggle_skill_rof', (e) => {
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
               <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} @{power_skill}">9</button>
+              <button class="sheet-repitem__skill-roll" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_skill}">9</button>
               <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
               <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/>
               <div class="sheet-damage-button-overlay">
@@ -5990,6 +6008,10 @@ on('change:toggle_skill_rof', (e) => {
                     <input type="hidden" name="attr_power_skill" value="@{roll_spellcasting}"/>
                     <input type="checkbox" name="attr_power_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
                     <input class="sheet-label-toggle__input" type="text" name="attr_power_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
+                  </label>
+                  <input type="hidden" name="attr_power_skill_rof_query" value="1"/>
+                  <label class="sheet-label-toggle">
+                    <input type="checkbox" name="attr_power_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
                   </label>
                 </div>
               </div>
