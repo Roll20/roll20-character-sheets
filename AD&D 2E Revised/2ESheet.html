@@ -18288,6 +18288,72 @@ on('change:repeating_spells-pri1 remove:repeating_spells-pri1', function(){
         .execute();
 });
 
+// Iterative test to sum all cast-value for spells.
+let level2Spells = ['4', '5', '6'];
+level2Spells.forEach(section => {
+    on(`change:repeating_spells${section}:cast-value${section} remove:repeating_spells${section}`, function(){
+        
+        console.log(`Summing started by section spell${section}`);
+        let sum = 0;
+        
+        level2Spells.forEach(num => {
+            console.log(`Iteration started for spells${num}. Current sum is ${sum}`);
+
+            TAS.repeating(`spells${num}`)
+                .fields(`cast-value${num}`)
+                .reduce(function(m,r){
+                    m['cast-value']+=(r.I[`cast-value${num}`]);
+                    return m;
+                },{['cast-value']:0, desc: []},function(m,r){
+                    sum+=m['cast-value'];
+                    console.log(`Iteration spells${num} updated sum to ${sum}`);
+                })
+                .execute();
+            
+            console.log(`Iteration ended for spells${num}. Current sum is ${sum}`);
+        });
+        
+        console.log(`Summing ended by section spell${section}. Final sum is ${sum}`);
+    });
+});
+
+// Recursive test to sum all cast-value for spells
+function recursiveSum(tail, acc) {
+
+    let head = tail.shift();
+    if (head === undefined) {
+        return;
+    }
+
+    console.log(`Recursion started for spells${head}. Current sum is ${acc}`);
+
+    TAS.repeating(`spells${head}`)
+        .fields(`cast-value${head}`)
+        .reduce(function(m,r){
+            m['cast-value']+=(r.I[`cast-value${head}`]);
+            return m;
+        },{['cast-value']:0, desc: []},function(m,r){
+            acc+=m['cast-value'];
+            console.log(`Recursion spells${head} updated sum to ${acc}`);
+        })
+        .execute(recursiveSum(tail, acc));
+
+    console.log(`Recursion ended for spells${head}. Current sum is ${acc}`);
+}
+
+let level3Spells = ['7', '8', '9'];
+level3Spells.forEach(section => {
+    on(`change:repeating_spells${section}:cast-value${section} remove:repeating_spells${section}`, function(){
+
+        console.log(`Summing started by section spell${section}`);
+        let accumulator = 0;
+
+        recursiveSum(level3Spells, accumulator);
+
+        console.log(`Summing ended by section spell${section}. Final sum is ${accumulator}`);
+    });
+});
+
 //Level 1 Wizard Spells
 on('change:repeating_spells remove:repeating_spells', function(){
     
