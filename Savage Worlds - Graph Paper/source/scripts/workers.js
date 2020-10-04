@@ -531,7 +531,7 @@ function colSum(values, target, multi = false) {
         multiplier = 1;
 
     if (multi) {
-      multiplier = TETRA.toInt(values.shift()[1]);
+      multiplier = TETRA.toFloat(values.shift()[1]);
     }
 
     sum += toggle == 'on' ? value * multiplier : 0.0;
@@ -612,8 +612,8 @@ LOSS
 
 on('change:repeating_augmentations remove:repeating_augmentations', (e) => {
   TETRA.doWithRepList('augmentations',
-                      ['augmentation_loss', 'augmentation_loss_toggle'],
-                      (v) => { colSum(v, 'augmentations_total_loss') });
+                      ['augmentation_loss', 'augmentation_loss_toggle', 'augmentation_multiplier'],
+                      (v) => { colSum(v, 'augmentations_total_loss', true) });
 });
 
 /* #############################################################################
@@ -760,7 +760,7 @@ on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (
 });
 
 on(listItems.map(s => `change:repeating_${s}s:wd_override_die`).join(' '), (e) => {
-  console.log('test');
+  // Make sure the input is valid; not implemented yet
 });
 
 on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {

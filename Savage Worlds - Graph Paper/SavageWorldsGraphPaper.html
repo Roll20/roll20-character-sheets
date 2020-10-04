@@ -532,7 +532,7 @@ function colSum(values, target, multi = false) {
         multiplier = 1;
 
     if (multi) {
-      multiplier = TETRA.toInt(values.shift()[1]);
+      multiplier = TETRA.toFloat(values.shift()[1]);
     }
 
     sum += toggle == 'on' ? value * multiplier : 0.0;
@@ -613,8 +613,8 @@ LOSS
 
 on('change:repeating_augmentations remove:repeating_augmentations', (e) => {
   TETRA.doWithRepList('augmentations',
-                      ['augmentation_loss', 'augmentation_loss_toggle'],
-                      (v) => { colSum(v, 'augmentations_total_loss') });
+                      ['augmentation_loss', 'augmentation_loss_toggle', 'augmentation_multiplier'],
+                      (v) => { colSum(v, 'augmentations_total_loss', true) });
 });
 
 /* #############################################################################
@@ -761,7 +761,7 @@ on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (
 });
 
 on(listItems.map(s => `change:repeating_${s}s:wd_override_die`).join(' '), (e) => {
-  console.log('test');
+  // Make sure the input is valid; not implemented yet
 });
 
 on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {
@@ -3757,8 +3757,19 @@ on('change:toggle_run_explode', (e) => {
                 </div>
                 <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_augmentation_notes_toggle"/>
                 <div class="sheet-repitem__secondary">
+                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_multiplier_toggle" checked="checked"/>
+                  <div class="sheet-repitem__note-label"><span data-i18n="augmentations-multiplier-label">Multiplier:</span></div>
+                  <input class="sheet-augmentations__multiplier" type="text" name="attr_augmentation_multiplier" value="1.0" placeholder="1.0"/>
                   <div class="sheet-repitem__note-label"><span data-i18n="augmentations-notes-label">Notes:</span></div>
                   <input class="sheet-align-left sheet-repitem__note sheet-stretch" type="text" name="attr_augmentation_notes" placeholder="Effect/Description" data-i18n-placeholder="augmentations-notes-placeholder" spellcheck="false"/>
+                  <input class="sheet-toggle sheet-toggle--settings" type="checkbox" name="attr_settings_toggle"/>
+                  <div class="sheet-repitem__settings">
+                    <div class="sheet-repitem__settings-content">
+                      <label class="sheet-label-toggle">
+                        <input type="checkbox" name="attr_multiplier_toggle" checked="checked"/><span data-i18n="multiplier">Multiplier</span>
+                      </label>
+                    </div>
+                  </div>
                   <input class="sheet-toggle sheet-toggle--special sheet-toggle--loss" type="checkbox" name="attr_augmentation_loss_toggle" checked="checked" title="Loss/Strain On/Off" data-i18n-title="augmentations-toggle-title"/>
                   <input class="sheet-toggle sheet-toggle--note-box" type="checkbox" name="attr_augmentation_note_box_toggle"/>
                   <div class="sheet-repitem__note-box">
@@ -5955,8 +5966,19 @@ on('change:toggle_run_explode', (e) => {
             </div>
             <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_augmentation_notes_toggle"/>
             <div class="sheet-repitem__secondary">
+              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_multiplier_toggle" checked="checked"/>
+              <div class="sheet-repitem__note-label"><span data-i18n="augmentations-multiplier-label">Multiplier:</span></div>
+              <input class="sheet-augmentations__multiplier" type="text" name="attr_augmentation_multiplier" value="1.0" placeholder="1.0"/>
               <div class="sheet-repitem__note-label"><span data-i18n="augmentations-notes-label">Notes:</span></div>
               <input class="sheet-align-left sheet-repitem__note sheet-stretch" type="text" name="attr_augmentation_notes" placeholder="Effect/Description" data-i18n-placeholder="augmentations-notes-placeholder" spellcheck="false"/>
+              <input class="sheet-toggle sheet-toggle--settings" type="checkbox" name="attr_settings_toggle"/>
+              <div class="sheet-repitem__settings">
+                <div class="sheet-repitem__settings-content">
+                  <label class="sheet-label-toggle">
+                    <input type="checkbox" name="attr_multiplier_toggle" checked="checked"/><span data-i18n="multiplier">Multiplier</span>
+                  </label>
+                </div>
+              </div>
               <input class="sheet-toggle sheet-toggle--special sheet-toggle--loss" type="checkbox" name="attr_augmentation_loss_toggle" checked="checked" title="Loss/Strain On/Off" data-i18n-title="augmentations-toggle-title"/>
               <input class="sheet-toggle sheet-toggle--note-box" type="checkbox" name="attr_augmentation_note_box_toggle"/>
               <div class="sheet-repitem__note-box">
