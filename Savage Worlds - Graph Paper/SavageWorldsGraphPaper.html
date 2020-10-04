@@ -732,9 +732,8 @@ REPEATING LISTS & OPTIONS
 
 const listItems = ['engram', 'power', 'weapon'];
 
-on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) => {
-  let target = e.sourceAttribute.replace('_skill_name', ''),
-      array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
+on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
+  let array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
 
   getAttrs(array, (values) => {
     // Find corresponding attribute
@@ -744,17 +743,29 @@ on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) =
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[`${target}_skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
-      update[`${target}_extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
+      update[`extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`skill_mod`] = `@{${renameAttribute.replace('rename_', '')}_mod}`;
     }
 
     setAttrs(update, { silent: true });
   });
 });
 
-on(listItems.map(s => `change:repeating_${s}s:${s}_skill_rof_query_toggle`).join(' '), (e) => {
+on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (e) => {
   let d = e.sourceAttribute.includes('weapon') ? '@{weapon_rof}' : '1',
       update = e.newValue == 'on' ? `?{@{query_rate_of_fire}|${d}}` : '1',
+      target = e.sourceAttribute.replace('_toggle', '');
+
+  setAttrs({ [target]: update }, { silent: true });
+});
+
+on(listItems.map(s => `change:repeating_${s}s:wd_override_die`).join(' '), (e) => {
+  console.log('test');
+});
+
+on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {
+  let update = e.newValue == 'on' ? `{{wd=@{wd_override_die}}} {{wdroll=[[ @{wd_override_die}!cs2 @{skill_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}` : '',
       target = e.sourceAttribute.replace('_toggle', '');
 
   setAttrs({ [target]: update }, { silent: true });
@@ -3576,9 +3587,9 @@ on('change:toggle_run_explode', (e) => {
             <fieldset class="repeating_weapons">
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
-                  <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_weapon_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_weapon_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_skill} {{reroll=[r](~repeating_weapons_weapon_skill)}}">9</button>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_weapon_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_extra_skill} {{reroll=[r](~repeating_weapons_weapon_extra_skill)}}">9</button>
+                  <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_weapons_skill)}}">9</button>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_weapons_extra_skill)}}">9</button>
                   <input class="sheet-align-left sheet-weapons__name sheet-stretch" type="text" name="attr_weapon_name" placeholder="Weapon (Ammo)" data-i18n-placeholder="weapons-name-placeholder" spellcheck="false"/>
                   <div class="sheet-damage-button-overlay">
                     <input type="hidden" name="attr_weapon_damage_roll" value="0"/>
@@ -3593,7 +3604,7 @@ on('change:toggle_run_explode', (e) => {
                 </div>
                 <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_weapon_notes_toggle"/>
                 <div class="sheet-repitem__secondary">
-                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_weapon_trapping_toggle" checked="checked"/>
+                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_trapping_toggle" checked="checked"/>
                   <div class="sheet-repitem__note-label"><span data-i18n="weapons-trapping-label">Trapping:</span></div>
                   <input class="sheet-align-left sheet-weapons__trapping" type="text" name="attr_weapon_trapping" placeholder="Piercing/etc." data-i18n-placeholder="weapons-trapping-placeholder" spellcheck="false"/>
                   <div class="sheet-repitem__note-label"><span data-i18n="weapons-notes-label">Notes:</span></div>
@@ -3602,17 +3613,23 @@ on('change:toggle_run_explode', (e) => {
                   <div class="sheet-repitem__settings">
                     <div class="sheet-repitem__settings-content">
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_weapon_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
+                        <input type="checkbox" name="attr_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
                       </label>
                       <label class="sheet-label-toggle">
-                        <input type="hidden" name="attr_weapon_skill" value="@{shooting_template}"/>
-                        <input type="hidden" name="attr_weapon_extra_skill" value="@{shooting_extra_template}"/>
-                        <input type="checkbox" name="attr_weapon_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                        <input class="sheet-label-toggle__input" type="text" name="attr_weapon_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
+                        <input type="hidden" name="attr_skill" value="@{shooting_template}"/>
+                        <input type="hidden" name="attr_extra_skill" value="@{shooting_extra_template}"/>
+                        <input type="hidden" name="attr_skill_mod" value="@{shooting_mod}"/>
+                        <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                        <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
                       </label>
-                      <input type="hidden" name="attr_weapon_skill_rof_query" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_weapon_skill_rof_query_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
+                        <input type="hidden" name="attr_rof_override" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
+                        <input type="checkbox" name="attr_rof_override_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
+                      </label>
+                      <label class="sheet-label-toggle">
+                        <input type="hidden" name="attr_wd_override" value=""/>
+                        <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                        <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                       </label>
                     </div>
                   </div>
@@ -3765,9 +3782,9 @@ on('change:toggle_run_explode', (e) => {
             <fieldset class="repeating_engrams">
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
-                  <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_engram_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_engram_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_skill} {{reroll=[r](~repeating_engrams_engram_skill)}}">9</button>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_engram_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_extra_skill} {{reroll=[r](~repeating_engrams_engram_extra_skill)}}">9</button>
+                  <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_engram_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_skill)}}">9</button>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_engram_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_extra_skill)}}">9</button>
                   <input class="sheet-align-left sheet-engrams__name sheet-stretch" type="text" name="attr_engram_name" placeholder="Engram" data-i18n-placeholder="engrams-name-placeholder" spellcheck="false"/>
                   <input class="sheet-engrams__penalty" type="text" name="attr_engram_penalty" placeholder="-1" spellcheck="false"/>
                   <input class="sheet-align-left sheet-engrams__description" type="text" name="attr_engram_description" placeholder="e.g. entangle (SWADE 161) power but resisted by Smarts" data-i18n-placeholder="engrams-description-placeholder" spellcheck="false"/>
@@ -3780,14 +3797,20 @@ on('change:toggle_run_explode', (e) => {
                   <div class="sheet-repitem__settings">
                     <div class="sheet-repitem__settings-content">
                       <label class="sheet-label-toggle">
-                        <input type="hidden" name="attr_engram_skill" value="@{hacking_template}"/>
-                        <input type="hidden" name="attr_engram_extra_skill" value="@{hacking_extra_template}"/>
-                        <input type="checkbox" name="attr_engram_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                        <input class="sheet-label-toggle__input" type="text" name="attr_engram_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
+                        <input type="hidden" name="attr_skill" value="@{hacking_template}"/>
+                        <input type="hidden" name="attr_extra_skill" value="@{hacking_extra_template}"/>
+                        <input type="hidden" name="attr_skill_mod" value="@{hacking_mod}"/>
+                        <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                        <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
                       </label>
-                      <input type="hidden" name="attr_engram_skill_rof_query" value="1"/>
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_engram_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                        <input type="hidden" name="attr_rof_override" value="1"/>
+                        <input type="checkbox" name="attr_rof_override_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                      </label>
+                      <label class="sheet-label-toggle">
+                        <input type="hidden" name="attr_wd_override" value=""/>
+                        <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                        <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                       </label>
                     </div>
                   </div>
@@ -3823,11 +3846,11 @@ on('change:toggle_run_explode', (e) => {
             <fieldset class="repeating_powers">
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
-                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_skill} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_extra_skill} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
+                  <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
                   <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
-                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/>
+                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_damage_input_toggle" checked="checked"/>
                   <div class="sheet-damage-button-overlay">
                     <input type="hidden" name="attr_power_damage_roll" value="0"/>
                     <button type="roll" name="roll_power_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{power_damage}}} {{source_label=^{source}}} {{source=@{power_name}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{modifier=?{@{query_damage_modifier}}}} {{range=@{power_range}}} {{ap=@{power_ap}}} {{trapping=@{power_trapping}}} {{roll1=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll2=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll3=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll4=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll5=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll6=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll7=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll8=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{reroll=[r](~repeating_powers_power_damage)}}"></button>
@@ -3841,7 +3864,7 @@ on('change:toggle_run_explode', (e) => {
                 </div>
                 <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_power_notes_toggle"/>
                 <div class="sheet-repitem__secondary">
-                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_trapping_toggle" checked="checked"/>
+                  <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_trapping_toggle" checked="checked"/>
                   <div class="sheet-repitem__note-label"><span data-i18n="powers-trapping-label">Trapping:</span></div>
                   <input class="sheet-align-left sheet-powers__trapping" type="text" name="attr_power_trapping" placeholder="Fire, Light, etc." data-i18n-placeholder="powers-trapping-placeholder" spellcheck="false"/>
                   <div class="sheet-repitem__note-label"><span data-i18n="powers-notes-label">Notes:</span></div>
@@ -3850,20 +3873,26 @@ on('change:toggle_run_explode', (e) => {
                   <div class="sheet-repitem__settings">
                     <div class="sheet-repitem__settings-content">
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/><span data-i18n="damage">Damage</span>
+                        <input type="checkbox" name="attr_damage_input_toggle" checked="checked"/><span data-i18n="damage">Damage</span>
                       </label>
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_power_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
+                        <input type="checkbox" name="attr_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
                       </label>
                       <label class="sheet-label-toggle">
-                        <input type="hidden" name="attr_power_skill" value="@{spellcasting_template}"/>
-                        <input type="hidden" name="attr_power_extra_skill" value="@{spellcasting_extra_template}"/>
-                        <input type="checkbox" name="attr_power_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                        <input class="sheet-label-toggle__input" type="text" name="attr_power_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
+                        <input type="hidden" name="attr_skill" value="@{spellcasting_template}"/>
+                        <input type="hidden" name="attr_extra_skill" value="@{spellcasting_extra_template}"/>
+                        <input type="hidden" name="attr_skill_mod" value="@{spellcasting_mod}"/>
+                        <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                        <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
                       </label>
-                      <input type="hidden" name="attr_power_skill_rof_query" value="1"/>
                       <label class="sheet-label-toggle">
-                        <input type="checkbox" name="attr_power_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                        <input type="hidden" name="attr_rof_override" value="1"/>
+                        <input type="checkbox" name="attr_rof_override_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                      </label>
+                      <label class="sheet-label-toggle">
+                        <input type="hidden" name="attr_wd_override" value=""/>
+                        <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                        <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                       </label>
                     </div>
                   </div>
@@ -5805,9 +5834,9 @@ on('change:toggle_run_explode', (e) => {
         <fieldset class="repeating_weapons">
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
-              <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_weapon_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_weapon_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_skill} {{reroll=[r](~repeating_weapons_weapon_skill)}}">9</button>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_weapon_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{weapon_skill_rof_query} ]]}} @{weapon_extra_skill} {{reroll=[r](~repeating_weapons_weapon_extra_skill)}}">9</button>
+              <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_weapons_skill)}}">9</button>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_weapons_extra_skill)}}">9</button>
               <input class="sheet-align-left sheet-weapons__name sheet-stretch" type="text" name="attr_weapon_name" placeholder="Weapon (Ammo)" data-i18n-placeholder="weapons-name-placeholder" spellcheck="false"/>
               <div class="sheet-damage-button-overlay">
                 <input type="hidden" name="attr_weapon_damage_roll" value="0"/>
@@ -5822,7 +5851,7 @@ on('change:toggle_run_explode', (e) => {
             </div>
             <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_weapon_notes_toggle"/>
             <div class="sheet-repitem__secondary">
-              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_weapon_trapping_toggle" checked="checked"/>
+              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_trapping_toggle" checked="checked"/>
               <div class="sheet-repitem__note-label"><span data-i18n="weapons-trapping-label">Trapping:</span></div>
               <input class="sheet-align-left sheet-weapons__trapping" type="text" name="attr_weapon_trapping" placeholder="Piercing/etc." data-i18n-placeholder="weapons-trapping-placeholder" spellcheck="false"/>
               <div class="sheet-repitem__note-label"><span data-i18n="weapons-notes-label">Notes:</span></div>
@@ -5831,17 +5860,23 @@ on('change:toggle_run_explode', (e) => {
               <div class="sheet-repitem__settings">
                 <div class="sheet-repitem__settings-content">
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_weapon_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
+                    <input type="checkbox" name="attr_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
                   </label>
                   <label class="sheet-label-toggle">
-                    <input type="hidden" name="attr_weapon_skill" value="@{shooting_template}"/>
-                    <input type="hidden" name="attr_weapon_extra_skill" value="@{shooting_extra_template}"/>
-                    <input type="checkbox" name="attr_weapon_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                    <input class="sheet-label-toggle__input" type="text" name="attr_weapon_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
+                    <input type="hidden" name="attr_skill" value="@{shooting_template}"/>
+                    <input type="hidden" name="attr_extra_skill" value="@{shooting_extra_template}"/>
+                    <input type="hidden" name="attr_skill_mod" value="@{shooting_mod}"/>
+                    <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                    <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Shooting" data-i18n-placeholder="weapons-skill-placeholder" value="Shooting" spellcheck="false"/>
                   </label>
-                  <input type="hidden" name="attr_weapon_skill_rof_query" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_weapon_skill_rof_query_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
+                    <input type="hidden" name="attr_rof_override" value="?{@{query_rate_of_fire}|@{weapon_rof}}"/>
+                    <input type="checkbox" name="attr_rof_override_toggle" checked="checked"/><span data-i18n="query-rof">Query RoF</span>
+                  </label>
+                  <label class="sheet-label-toggle">
+                    <input type="hidden" name="attr_wd_override" value=""/>
+                    <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                    <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                   </label>
                 </div>
               </div>
@@ -5945,9 +5980,9 @@ on('change:toggle_run_explode', (e) => {
         <fieldset class="repeating_engrams">
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
-              <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_engram_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_engram_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_skill} {{reroll=[r](~repeating_engrams_engram_skill)}}">9</button>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_engram_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{engram_skill_rof_query} ]]}} @{engram_extra_skill} {{reroll=[r](~repeating_engrams_engram_extra_skill)}}">9</button>
+              <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_engram_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_skill)}}">9</button>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_engram_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_extra_skill)}}">9</button>
               <input class="sheet-align-left sheet-engrams__name sheet-stretch" type="text" name="attr_engram_name" placeholder="Engram" data-i18n-placeholder="engrams-name-placeholder" spellcheck="false"/>
               <input class="sheet-engrams__penalty" type="text" name="attr_engram_penalty" placeholder="-1" spellcheck="false"/>
               <input class="sheet-align-left sheet-engrams__description" type="text" name="attr_engram_description" placeholder="e.g. entangle (SWADE 161) power but resisted by Smarts" data-i18n-placeholder="engrams-description-placeholder" spellcheck="false"/>
@@ -5960,14 +5995,20 @@ on('change:toggle_run_explode', (e) => {
               <div class="sheet-repitem__settings">
                 <div class="sheet-repitem__settings-content">
                   <label class="sheet-label-toggle">
-                    <input type="hidden" name="attr_engram_skill" value="@{hacking_template}"/>
-                    <input type="hidden" name="attr_engram_extra_skill" value="@{hacking_extra_template}"/>
-                    <input type="checkbox" name="attr_engram_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                    <input class="sheet-label-toggle__input" type="text" name="attr_engram_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
+                    <input type="hidden" name="attr_skill" value="@{hacking_template}"/>
+                    <input type="hidden" name="attr_extra_skill" value="@{hacking_extra_template}"/>
+                    <input type="hidden" name="attr_skill_mod" value="@{hacking_mod}"/>
+                    <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                    <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Hacking" data-i18n-placeholder="engrams-skill-placeholder" value="Hacking" spellcheck="false"/>
                   </label>
-                  <input type="hidden" name="attr_engram_skill_rof_query" value="1"/>
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_engram_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                    <input type="hidden" name="attr_rof_override" value="1"/>
+                    <input type="checkbox" name="attr_rof_override_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                  </label>
+                  <label class="sheet-label-toggle">
+                    <input type="hidden" name="attr_wd_override" value=""/>
+                    <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                    <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                   </label>
                 </div>
               </div>
@@ -6003,11 +6044,11 @@ on('change:toggle_run_explode', (e) => {
         <fieldset class="repeating_powers">
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
-              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_skill} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{power_skill_rof_query} ]]}} @{power_extra_skill} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
+              <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
               <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
-              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/>
+              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_damage_input_toggle" checked="checked"/>
               <div class="sheet-damage-button-overlay">
                 <input type="hidden" name="attr_power_damage_roll" value="0"/>
                 <button type="roll" name="roll_power_damage" value="&{template:DamageRoll} {{header=@{name} ^{rolls} ^{damage}}} {{code=@{power_damage}}} {{source_label=^{source}}} {{source=@{power_name}}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1} ]]}} {{modifier=?{@{query_damage_modifier}}}} {{range=@{power_range}}} {{ap=@{power_ap}}} {{trapping=@{power_trapping}}} {{roll1=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll2=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll3=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll4=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll5=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll6=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll7=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{roll8=[[ @{power_damage_roll} + ?{@{query_damage_modifier}} ]]}} {{reroll=[r](~repeating_powers_power_damage)}}"></button>
@@ -6021,7 +6062,7 @@ on('change:toggle_run_explode', (e) => {
             </div>
             <input class="sheet-toggle sheet-toggle--arrow" type="checkbox" name="attr_power_notes_toggle"/>
             <div class="sheet-repitem__secondary">
-              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_power_trapping_toggle" checked="checked"/>
+              <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_trapping_toggle" checked="checked"/>
               <div class="sheet-repitem__note-label"><span data-i18n="powers-trapping-label">Trapping:</span></div>
               <input class="sheet-align-left sheet-powers__trapping" type="text" name="attr_power_trapping" placeholder="Fire, Light, etc." data-i18n-placeholder="powers-trapping-placeholder" spellcheck="false"/>
               <div class="sheet-repitem__note-label"><span data-i18n="powers-notes-label">Notes:</span></div>
@@ -6030,20 +6071,26 @@ on('change:toggle_run_explode', (e) => {
               <div class="sheet-repitem__settings">
                 <div class="sheet-repitem__settings-content">
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_power_damage_input_toggle" checked="checked"/><span data-i18n="damage">Damage</span>
+                    <input type="checkbox" name="attr_damage_input_toggle" checked="checked"/><span data-i18n="damage">Damage</span>
                   </label>
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_power_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
+                    <input type="checkbox" name="attr_trapping_toggle" checked="checked"/><span data-i18n="trapping">Trapping</span>
                   </label>
                   <label class="sheet-label-toggle">
-                    <input type="hidden" name="attr_power_skill" value="@{spellcasting_template}"/>
-                    <input type="hidden" name="attr_power_extra_skill" value="@{spellcasting_extra_template}"/>
-                    <input type="checkbox" name="attr_power_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
-                    <input class="sheet-label-toggle__input" type="text" name="attr_power_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
+                    <input type="hidden" name="attr_skill" value="@{spellcasting_template}"/>
+                    <input type="hidden" name="attr_extra_skill" value="@{spellcasting_extra_template}"/>
+                    <input type="hidden" name="attr_skill_mod" value="@{spellcasting_mod}"/>
+                    <input type="checkbox" name="attr_roll_button_toggle"/><span data-i18n="roll-button">Roll Button</span>
+                    <input class="sheet-label-toggle__input" type="text" name="attr_skill_name" placeholder="Spellcasting" data-i18n-placeholder="powers-skill-placeholder" value="Spellcasting" spellcheck="false"/>
                   </label>
-                  <input type="hidden" name="attr_power_skill_rof_query" value="1"/>
                   <label class="sheet-label-toggle">
-                    <input type="checkbox" name="attr_power_skill_rof_query_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                    <input type="hidden" name="attr_rof_override" value="1"/>
+                    <input type="checkbox" name="attr_rof_override_toggle"/><span data-i18n="query-rof">Query RoF</span>
+                  </label>
+                  <label class="sheet-label-toggle">
+                    <input type="hidden" name="attr_wd_override" value=""/>
+                    <input type="checkbox" name="attr_wd_override_toggle"/><span data-i18n="wild-die-override">WD Override</span>
+                    <input class="sheet-label-toggle__input sheet-label-toggle__input--tiny" type="text" name="attr_wd_override_die" value="" spellcheck="false"/>
                   </label>
                 </div>
               </div>

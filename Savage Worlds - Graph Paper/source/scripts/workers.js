@@ -731,9 +731,8 @@ REPEATING LISTS & OPTIONS
 
 const listItems = ['engram', 'power', 'weapon'];
 
-on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) => {
-  let target = e.sourceAttribute.replace('_skill_name', ''),
-      array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
+on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
+  let array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
 
   getAttrs(array, (values) => {
     // Find corresponding attribute
@@ -743,17 +742,29 @@ on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) =
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[`${target}_skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
-      update[`${target}_extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
+      update[`extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`skill_mod`] = `@{${renameAttribute.replace('rename_', '')}_mod}`;
     }
 
     setAttrs(update, { silent: true });
   });
 });
 
-on(listItems.map(s => `change:repeating_${s}s:${s}_skill_rof_query_toggle`).join(' '), (e) => {
+on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (e) => {
   let d = e.sourceAttribute.includes('weapon') ? '@{weapon_rof}' : '1',
       update = e.newValue == 'on' ? `?{@{query_rate_of_fire}|${d}}` : '1',
+      target = e.sourceAttribute.replace('_toggle', '');
+
+  setAttrs({ [target]: update }, { silent: true });
+});
+
+on(listItems.map(s => `change:repeating_${s}s:wd_override_die`).join(' '), (e) => {
+  console.log('test');
+});
+
+on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {
+  let update = e.newValue == 'on' ? `{{wd=@{wd_override_die}}} {{wdroll=[[ @{wd_override_die}!cs2 @{skill_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}` : '',
       target = e.sourceAttribute.replace('_toggle', '');
 
   setAttrs({ [target]: update }, { silent: true });
