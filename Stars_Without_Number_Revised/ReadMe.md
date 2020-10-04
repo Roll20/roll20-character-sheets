@@ -47,6 +47,7 @@ on Github.
 * Fix a bug preventing ship price from ever being calculated.
 * First support for Worlds Without Number in the form of an alternate skill list.
 * Fix a bug causing some calculations to not update when a repeating row was removed.
+* Fix some items displaying as "NaN" price because their price was dependent on tech level or similar.
 
 ### 2.5.1
 
