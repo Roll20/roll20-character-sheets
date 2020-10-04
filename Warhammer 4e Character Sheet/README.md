@@ -9,6 +9,13 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
+October 5th 2020 v1.23
+
+- Futher modification of how Armor tab works. Worn? check will now add/remove ENC and AP appropriatly. Some descriptive text has been added to these sections too.
+- Continued adding IL8N tags that were missing from alot of the new content. This is a work is now complete.
+- Workable Italian translation is now implemented (Translation credit to Andrezzo/Roll20). (change language to italian on Roll20 website/account config, then start server to see it). I am more then willing to work with others to implement more languages, but can not do this by myself.
+
+
 September 7th 2020 v1.22
 
 - Fixed issue which stoped the Initiative button from working correctly on a newly created character sheet.
