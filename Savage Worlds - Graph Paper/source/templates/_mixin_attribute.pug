@@ -2,10 +2,23 @@ mixin attribute(name, short)
   - var trait = name.toLowerCase()
 
   .sheet-attribute(class=`sheet-attribute--${trait}`)
+  
+    input(type='hidden', name=`attr_rename_${trait}`, value=name)
+    input(type='hidden', name=`attr_${trait}_roll`, value='1d4!cs2')
+    input(type='hidden', name=`attr_${trait}_wd_roll`, value='1d6!cs2')
+    input(type='hidden', name=`attr_${trait}_extra_wd_roll`, value='-10000')
+  
+    input(type='hidden',
+          name=`attr_${trait}_template`,
+          value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
+
+    input(type='hidden',
+          name=`attr_${trait}_extra_template`,
+          value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_extra_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
 
     button(type='roll',
            name=`roll_${trait}`,
-           value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1}} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=@{${trait}_wd}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait})}}`,
+           value!=`&{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1}} ]]}} @{${trait}_template} {{reroll=[r](~${trait})}}`,
            class='sheet-attribute__button')
       span(name=`attr_rename_${short.toLowerCase()}`, data-i18n=`${short.toLowerCase()}-u`)= short
 
@@ -15,11 +28,6 @@ mixin attribute(name, short)
           value='d4',
           spellcheck='false',
           class='sheet-hex sheet-hex--48 sheet-hexfield__input')
-
-    input(type='hidden', name=`attr_rename_${trait}`, value=name)
-    input(type='hidden', name=`attr_${trait}_roll`, value='1d4!cs2')
-    input(type='hidden', name=`attr_${trait}_wd_roll`, value='1d6!cs2')
-    input(type='hidden', name=`attr_${trait}_extra_wd_roll`, value='-10000')
 
     +hexfield(`${trait}_natural`, 'Natural', 'left', 'd4', '', 'sheet-hide-until-needed sheet-hexfield-gray sheet-hexfield--nat')
 

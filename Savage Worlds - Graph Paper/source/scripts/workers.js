@@ -732,7 +732,7 @@ REPEATING LISTS & OPTIONS
 const listItems = ['engram', 'power', 'weapon'];
 
 on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) => {
-  let target = e.sourceAttribute.replace('_skill_name', '_skill'),
+  let target = e.sourceAttribute.replace('_skill_name', ''),
       array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
 
   getAttrs(array, (values) => {
@@ -743,7 +743,8 @@ on(listItems.map(s => `change:repeating_${s}s:${s}_skill_name`).join(' '), (e) =
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[target] = `@{roll_${renameAttribute.replace('rename_', '')}}`;
+      update[`${target}_skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
+      update[`${target}_extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
     }
 
     setAttrs(update, { silent: true });
