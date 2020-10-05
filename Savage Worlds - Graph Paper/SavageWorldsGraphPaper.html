@@ -74,6 +74,8 @@ var TETRA = TETRA || ( function() {
   },
 
   parseDiceCode = function(code) {
+    if (_.isUndefined(code)) return '';
+
     code = code.toLowerCase();
 
     // Replace abbreviations with attribute references (naive)
@@ -518,7 +520,7 @@ on('change:integrity', (e) => {
 REPEATING WEIGHT & DAMAGE
 ############################################################################# */
 
-function colSum(values, target, multi = false) {
+function twoColSum(values, target, multi = false) {
   let sum = 0.0;
 
   // Turn into two-dimensional array
@@ -543,54 +545,60 @@ function colSum(values, target, multi = false) {
 
 on('change:repeating_powers:power_damage', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
+
+  code = code == '' ? '0' : code;
+
   setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
 });
 
 on('change:repeating_weapons', (e) => {
   if (e.sourceAttribute.includes('damage')) {
     let code = TETRA.parseDiceCode(e.newValue);
+
+    code = code == '' ? '0' : code;
+
     setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
   }
 
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('weapons',
                         ['weapon_weight', 'weapon_weight_toggle'],
-                        (v) => { colSum(v, 'carry_weight_weapons') });
+                        (v) => { twoColSum(v, 'carry_weight_weapons') });
   }
 });
 
 on('remove:repeating_weapons', (e) => {
   TETRA.doWithRepList('weapons',
                       ['weapon_weight', 'weapon_weight_toggle'],
-                      (v) => { colSum(v, 'carry_weight_weapons') });
+                      (v) => { twoColSum(v, 'carry_weight_weapons') });
 });
 
 on('change:repeating_apparel', (e) => {
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('apparel',
                         ['apparel_weight', 'apparel_weight_toggle'],
-                        (v) => { colSum(v, 'carry_weight_apparel') });
+                        (v) => { twoColSum(v, 'carry_weight_apparel') });
   }
 });
 
 on('remove:repeating_apparel', (e) => {
   TETRA.doWithRepList('apparel',
                       ['apparel_weight', 'apparel_weight_toggle'],
-                      (v) => { colSum(v, 'carry_weight_apparel') });
+                      (v) => { twoColSum(v, 'carry_weight_apparel') });
 });
 
 on('change:repeating_inventory', (e) => {
   if (e.sourceAttribute.includes('weight') || e.sourceAttribute.includes('amount')) {
     TETRA.doWithRepList('inventory',
                         ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
-                        (v) => { colSum(v, 'carry_weight_inventory', true) });
+                        (v) => { twoColSum(v, 'carry_weight_inventory', true) });
   }
 });
 
 on('remove:repeating_inventory', (e) => {
   TETRA.doWithRepList('inventory',
                       ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
-                      (v) => { colSum(v, 'carry_weight_inventory', true) });
+                      (v) => { twoColSum(v, 'carry_weight_inventory', true) });
 });
 
 const carryWeights = ['carry_weight_apparel', 'carry_weight_weapons',
@@ -614,7 +622,7 @@ LOSS
 on('change:repeating_augmentations remove:repeating_augmentations', (e) => {
   TETRA.doWithRepList('augmentations',
                       ['augmentation_loss', 'augmentation_loss_toggle', 'augmentation_multiplier'],
-                      (v) => { colSum(v, 'augmentations_total_loss', true) });
+                      (v) => { twoColSum(v, 'augmentations_total_loss', true) });
 });
 
 /* #############################################################################
@@ -1220,7 +1228,7 @@ on('change:toggle_run_explode', (e) => {
           <div class="sheet-section--features">
             <div class="sheet-features">
               <div class="sheet-header">
-                <div class="sheet-header__title"><span data-i18n="edges-and-hindrances">Edges & Hindrances</span></div>
+                <div class="sheet-header__title" data-i18n="edges-and-hindrances">Edges & Hindrances</div>
               </div>
               <fieldset class="repeating_features">
                 <div class="sheet-repitem">
@@ -3844,8 +3852,8 @@ on('change:toggle_run_explode', (e) => {
               <div class="sheet-repitem">
                 <div class="sheet-repitem__primary">
                   <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
-                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}} {{damageroll=[t](~repeating_powers_power_damage)}}">9</button>
+                  <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}} {{damageroll=[t](~repeating_powers_power_damage)}}">9</button>
                   <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
                   <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_damage_input_toggle" checked="checked"/>
                   <div class="sheet-damage-button-overlay">
@@ -5785,7 +5793,7 @@ on('change:toggle_run_explode', (e) => {
       </div>
       <div class="sheet-features">
         <div class="sheet-header">
-          <div class="sheet-header__title"><span data-i18n="edges-and-hindrances">Edges & Hindrances</span></div>
+          <div class="sheet-header__title" data-i18n="edges-and-hindrances">Edges & Hindrances</div>
         </div>
         <fieldset class="repeating_features">
           <div class="sheet-repitem">
@@ -6048,8 +6056,8 @@ on('change:toggle_run_explode', (e) => {
           <div class="sheet-repitem">
             <div class="sheet-repitem__primary">
               <input class="sheet-hidden sheet-toggle sheet-toggle--list-roll" type="checkbox" name="attr_roll_button_toggle"/>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}}">9</button>
-              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}}">9</button>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard" type="roll" name="roll_power_skill" value="&amp;{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_powers_power_skill)}} {{damageroll=[t](~repeating_powers_power_damage)}}">9</button>
+              <button class="sheet-repitem__skill-roll sheet-repitem__skill-roll--extra" type="roll" name="roll_power_extra_skill" value="&{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_powers_power_extra_skill)}} {{damageroll=[t](~repeating_powers_power_damage)}}">9</button>
               <input class="sheet-align-left sheet-powers__name sheet-stretch" type="text" name="attr_power_name" placeholder="Power" data-i18n-placeholder="powers-name-placeholder" spellcheck="false"/>
               <input class="sheet-hidden sheet-toggle" type="checkbox" name="attr_damage_input_toggle" checked="checked"/>
               <div class="sheet-damage-button-overlay">

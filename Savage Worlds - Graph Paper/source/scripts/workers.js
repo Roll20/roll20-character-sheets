@@ -73,6 +73,8 @@ var TETRA = TETRA || ( function() {
   },
 
   parseDiceCode = function(code) {
+    if (_.isUndefined(code)) return '';
+
     code = code.toLowerCase();
 
     // Replace abbreviations with attribute references (naive)
@@ -517,7 +519,7 @@ on('change:integrity', (e) => {
 REPEATING WEIGHT & DAMAGE
 ############################################################################# */
 
-function colSum(values, target, multi = false) {
+function twoColSum(values, target, multi = false) {
   let sum = 0.0;
 
   // Turn into two-dimensional array
@@ -542,54 +544,60 @@ function colSum(values, target, multi = false) {
 
 on('change:repeating_powers:power_damage', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
+
+  code = code == '' ? '0' : code;
+
   setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
 });
 
 on('change:repeating_weapons', (e) => {
   if (e.sourceAttribute.includes('damage')) {
     let code = TETRA.parseDiceCode(e.newValue);
+
+    code = code == '' ? '0' : code;
+
     setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
   }
 
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('weapons',
                         ['weapon_weight', 'weapon_weight_toggle'],
-                        (v) => { colSum(v, 'carry_weight_weapons') });
+                        (v) => { twoColSum(v, 'carry_weight_weapons') });
   }
 });
 
 on('remove:repeating_weapons', (e) => {
   TETRA.doWithRepList('weapons',
                       ['weapon_weight', 'weapon_weight_toggle'],
-                      (v) => { colSum(v, 'carry_weight_weapons') });
+                      (v) => { twoColSum(v, 'carry_weight_weapons') });
 });
 
 on('change:repeating_apparel', (e) => {
   if (e.sourceAttribute.includes('weight')) {
     TETRA.doWithRepList('apparel',
                         ['apparel_weight', 'apparel_weight_toggle'],
-                        (v) => { colSum(v, 'carry_weight_apparel') });
+                        (v) => { twoColSum(v, 'carry_weight_apparel') });
   }
 });
 
 on('remove:repeating_apparel', (e) => {
   TETRA.doWithRepList('apparel',
                       ['apparel_weight', 'apparel_weight_toggle'],
-                      (v) => { colSum(v, 'carry_weight_apparel') });
+                      (v) => { twoColSum(v, 'carry_weight_apparel') });
 });
 
 on('change:repeating_inventory', (e) => {
   if (e.sourceAttribute.includes('weight') || e.sourceAttribute.includes('amount')) {
     TETRA.doWithRepList('inventory',
                         ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
-                        (v) => { colSum(v, 'carry_weight_inventory', true) });
+                        (v) => { twoColSum(v, 'carry_weight_inventory', true) });
   }
 });
 
 on('remove:repeating_inventory', (e) => {
   TETRA.doWithRepList('inventory',
                       ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
-                      (v) => { colSum(v, 'carry_weight_inventory', true) });
+                      (v) => { twoColSum(v, 'carry_weight_inventory', true) });
 });
 
 const carryWeights = ['carry_weight_apparel', 'carry_weight_weapons',
@@ -613,7 +621,7 @@ LOSS
 on('change:repeating_augmentations remove:repeating_augmentations', (e) => {
   TETRA.doWithRepList('augmentations',
                       ['augmentation_loss', 'augmentation_loss_toggle', 'augmentation_multiplier'],
-                      (v) => { colSum(v, 'augmentations_total_loss', true) });
+                      (v) => { twoColSum(v, 'augmentations_total_loss', true) });
 });
 
 /* #############################################################################
