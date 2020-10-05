@@ -86,6 +86,18 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.2
+* Added damage (re-)roll buttons to Roll Templates
+* Roll Templates now have hooks for descriptions and three custom fields
+* Added injection hook to list rolls to allow custom code
+* Added setting toggles for list roll descriptions and injections
+* Added [Multiplier] option to Augmentations
+* Added [Wild Die Override] option to Engrams, Powers, and Weapons
+* Added [Roll Description] option to Engrams, Powers, and Weapons
+* Added [Roll Injection] option to Engrams, Powers, and Weapons
+* Added help entries for extra sheet, list item options, and raise damage
+* Updated older help entries and translations
+* Reduced HTML and CSS
 #### Version 1.2.1
 * Improved handling for Rate of Fire
 * Fixed critical bug in Rate of Fire handling
