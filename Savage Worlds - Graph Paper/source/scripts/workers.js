@@ -778,6 +778,20 @@ on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e
   setAttrs({ [target]: update }, { silent: true });
 });
 
+on(listItems.map(s => `change:repeating_${s}s:roll_description_toggle`).join(' '), (e) => {
+  let update = e.newValue == 'on' ? `@{roll_description_input}` : '',
+      target = e.sourceAttribute.replace('_toggle', '');
+
+  setAttrs({ [target]: update }, { silent: true });
+});
+
+on(listItems.map(s => `change:repeating_${s}s:roll_injection_toggle`).join(' '), (e) => {
+  let update = e.newValue == 'on' ? `@{roll_injection_input}` : '',
+      target = e.sourceAttribute.replace('_toggle', '');
+
+  setAttrs({ [target]: update }, { silent: true });
+});
+
 /* #############################################################################
 HELPER BUTTONS
 ############################################################################# */
