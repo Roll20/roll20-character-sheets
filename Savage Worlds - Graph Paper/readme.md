@@ -2,15 +2,15 @@
 This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it can be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
 
 ## Notable Features
-* **Blocks:** Toggle various content blocks, such as Allies, Augmentations, Powers, Vehicles, and more.
-* **Extra Sheet:** You can switch the main layout for a simplified and compact alternative. Good for non-player characters.
-* **Customization:** The GM can toggle/rename most of the labels and skills and add up to two custom skills.
+* **Blocks:** Allies, Augmentations, Integrity/Sanity, Powers, Vehicles, and more.
+* **Fields On Demand:** Show only what you really need to keep the view tidy.
+* **Extra Sheet:** Alternative sheet with a simplified layout for non-player characters.
+* **Customization:** Optional rules and functions, custom skills, and renaming.
 * **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
-* **Roll Templates:** Rolls can display multiple dice (RoF 1-8) and have a custom (or no) Wild Die.
-* **Failures/Botches:** Dice that show a [1] or [2] are colored in red or gray respectively.
-* **Sleek:** The minimalist design is inspired by pencil-drawn sheets on graph paper.
-* **Silhouettes:** They look fancy! You can also add color markers as indicators for any purpose.
-* **Help:** The sheet features an extensive help section under the Settings tab.
+* **Template Rolls:** Multiple dice for multiple targets (RoF 1-8) with a custom Wild Die.
+* **Failures/Botches:** Dice that show a [1] or [2] are colored red or gray respectively.
+* **Health/Conditions:** Manage Wounds, Fatigue, and more with a simple click.
+* **Silhouettes:** They look fancy! You can also add color markers as indicators.
 
 ## Previews & Gifs
 <details>
