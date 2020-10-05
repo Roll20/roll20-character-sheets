@@ -21,7 +21,7 @@
 			,"height": "height"
 			,"initdice": "initiative_dice"
 			,"initvalue": "initiative_mod"
-			,"judgeintentions" : "judge_intentions"
+			,"judge_intentions" : "judge_intentions"
 			,"karma": "karma" 
 			,"liftandcarry": "lift_carry"
 			,"limitmental": "mental_limit"
