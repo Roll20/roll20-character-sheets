@@ -2,15 +2,15 @@
 This character sheet was originally made for **Maschinenleben** (released later this year), a fan product for the **Savage Worlds Adventure Edition** (SWADE) about cyborgs struggling with their loss of self. Due to its extensive build and customization options, it can be used for many other settings as well. Join the [support game](https://app.roll20.net/join/8488284/oQJGfg) for bug reports and requests.
 
 ## Notable Features
-* **Blocks:** Allies, Augmentations, Integrity/Sanity, Powers, Vehicles, and more.
-* **Fields On Demand:** Show only what you really need to keep the view tidy.
-* **Extra Sheet:** Alternative sheet with a simplified layout for non-player characters.
-* **Customization:** Optional rules and functions, custom skills, and renaming.
+* **Blocks:** Allies, Augmentations, Integrity/Sanity, Powers, Vehicles, and more
+* **Fields On Demand:** Show only what you really need to keep the view tidy
+* **Extra Sheet:** Alternative sheet with a simplified layout for non-player characters
+* **Customization:** Optional rules and functions, custom skills, and renaming
 * **Setting Rules:** Enable/Disable optional rules and functions, such as *No Power Points* or *Explode Run Die*
-* **Template Rolls:** Multiple dice for multiple targets (RoF 1-8) with a custom Wild Die.
-* **Failures/Botches:** Dice that show a [1] or [2] are colored red or gray respectively.
-* **Health/Conditions:** Manage Wounds, Fatigue, and more with a simple click.
-* **Silhouettes:** They look fancy! You can also add color markers as indicators.
+* **Template Rolls:** Multiple dice for multiple targets (RoF 1-8) with a custom Wild Die
+* **Failures/Botches:** Dice that show a [1] or [2] are colored red or gray respectively
+* **Health/Conditions:** Manage Wounds, Fatigue, and more with a simple click
+* **Silhouettes:** They look fancy! You can also add color markers as indicators
 
 ## Previews & Gifs
 <details>
@@ -141,14 +141,14 @@ This character sheet was originally made for **Maschinenleben** (released later 
 The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started.html) templates with [SCSS/SASS](https://sass-lang.com/guide) (LibSass). You need both in order to contribute; do not directly modify the compiled HTML and CSS files because these changes will be overwritten! Use the `browser_preview.html` to get a local preview without the need to open Roll20 (non-functional, of course).
 
 ### Contribution Guidelines
-* Make sure to always delete `@charset "UTF-8";` from the compiled CSS! Roll20 will not load it otherwise.
-* Make sure the compiled HTML has an Unix line ending.
-* The default `font-size` is `10px` optimized for 1440p or better resolutions, but keep 1080p in mind.
-* Follow the 8×8 pixel grid (starting top-left). The height of each block must be a multiple of 8!
-* The devil is in the detail. Align and size all elements as precisely as possible (Chrome leads).
-* Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes. Avoid redundancies as much as reasonable.
-* Use sheetworkers instead of auto-calculating fields.
-* Always go the "extra mile".
+* Make sure to always delete `@charset "UTF-8";` from the compiled CSS; Roll20 will not load it otherwise
+* Make sure the compiled HTML has an Unix line ending
+* The default `font-size` is `10px` optimized for 1440p or better resolutions, but keep 1080p in mind
+* Follow the 8×8 pixel grid (starting top-left); the height of each block must be a multiple of 8
+* The devil is in the detail; align and size all elements as precisely as possible (Chrome leads)
+* Use [Block Element Modifiers](http://getbem.com/naming/) to name CSS classes; avoid redundancies as much as reasonable
+* Use sheetworkers instead of auto-calculating fields
+* Always go the "extra mile"
 
 ### Translations
 Most of the sheet's strings can be changed via the translation.json. However, some strings need to be manually changed by the GM due to the renaming feature for Traits. Note that certain sheetworker scripts depend on English strings, such as the die codes (e.g. d4, d6, ...) for parsers. If you use [Roll20's translation generation](https://roll20.zendesk.com/hc/en-us/articles/360037773493-Character-Sheet-Translation#CharacterSheetTranslation-StepTwo,GeneratingtheTranslationFile) feature `i18nOutput`, make sure to add the following pairs afterward since they will not be automatically included. Order alphabetically and use `&nbsp;` for trailing whitespaces. Put CSS adjustments due to differing word lengths in `_translation_overrides.scss`.
