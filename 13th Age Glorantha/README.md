@@ -12,7 +12,7 @@ In **Ability Setup** you can choose the layout of abilities. Do you want the sta
 
 Along-side **Incremental Advances** is a subheader called Meta-currency, when you can keep track of Fate or Inspiration, or EXP if you want to use a more traditional levelling system.
 
-The **Custom Info. Fields** are used to change the character summary labels at the top of the character sheet. And the Extra Subsections buttons will reveal three more fields on the main sheet for usual class options, additional customizability, and meta-game interactions.
+The **Custom Info. Fields** are used to change the character summary labels at the top of the character sheet. And the Extra Subsections buttons will reveal three more fields on the main sheet for unusual class options, additional customizability, and meta-game interactions.
 
 The options available in **Rules & Macros** are more advanced, and best summarised by the statement about the sheet's design philosophy, below. The option that an average player will most likely need to tweak is the Tier Multiplier, which increases damage and recoveries, when they reach level 5 (x2) and level 8 (x3).
 
@@ -40,7 +40,7 @@ Additional customizations can be made in the Macro drop-down, such as changing t
 &{template:13G_red} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}} {{Result=[[[[1D20]]+[[5]]]]=$[[0]]+$[[1]]}} {{Hit=[[1D6+5]]}} {{Miss=[[@{level}]]}}
 ```
 
-Only `name`, `type`, `usage`, and `text` have specific functions assigned to them within the template. You can title any other row with anything you like. And you can change the color to any of the following: `red`, `green`, `blue`, `orange`, `teal`, `purple`, `black`, `grey`, or `white`.
+Only `name`, `type`, `usage`, and `text` have specific functions assigned to them within the template. You can title any other row with anything you like. And you can change the color to any of the following: `_red`, `_green`, `_blue`, `_orange`, `_teal`, `_purple`, `_black`, `_grey`, or `_white`.
 
 If you selected the 'Specials' and/or 'Minions' buttons in the Options tab, then they appear in the Powers tab. If you accidentally press 'X' on either one, fear not, your data is not lost: simply re-click to reveal the hidden section.
 
