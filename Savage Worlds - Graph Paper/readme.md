@@ -116,21 +116,26 @@ This character sheet was originally made for **Maschinenleben** (released later 
   * Weapons: Show Trapping, Roll Button (Input)
 * Added the saved maximum capacity to ammunition magazines
 * Updated the sheet’s help section
-#### Version 1.1.1
-* Added reroll button to Roll Templates
-* Added additional toggles for skills
-#### Version 1.1.0
-* Added Ammunition block
-* Added options to rename ammunition magazines
-* Added new help section, *Ammunition: You can keep track of up to three named "magazines" in the Ammunition block. The buttons allow you to quickly add to or subtract from the values. You can save a value with [S] and restore it with [R].*
-#### Version 1.0.2
-* Increased Rate of Fire range from 6 to 8
-#### Version 1.0.1
-* Made lightest text color a bit darker
-* Moved `transition` property to class scopes
-* Dice parser now captures leading attribute shortcodes
-#### Version 1.0
-* Initial release
+
+<details>
+  <summary>Previous Versions</summary>
+
+  #### Version 1.1.1
+  * Added reroll button to Roll Templates
+  * Added additional toggles for skills
+  #### Version 1.1.0
+  * Added Ammunition block
+  * Added options to rename ammunition magazines
+  * Added new help section, *Ammunition: You can keep track of up to three named "magazines" in the Ammunition block. The buttons allow you to quickly add to or subtract from the values. You can save a value with [S] and restore it with [R].*
+  #### Version 1.0.2
+  * Increased Rate of Fire range from 6 to 8
+  #### Version 1.0.1
+  * Made lightest text color a bit darker
+  * Moved `transition` property to class scopes
+  * Dice parser now captures leading attribute shortcodes
+  #### Version 1.0
+  * Initial release
+</details>
 
 ## Development
 The character sheet is compiled from [Pug](https://pugjs.org/api/getting-started.html) templates with [SCSS/SASS](https://sass-lang.com/guide) (LibSass). You need both in order to contribute; do not directly modify the compiled HTML and CSS files because these changes will be overwritten! Use the `browser_preview.html` to get a local preview without the need to open Roll20 (non-functional, of course).
