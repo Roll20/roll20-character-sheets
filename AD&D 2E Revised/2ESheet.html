@@ -18338,34 +18338,36 @@ function recursiveSum(tail, acc) {
     console.log(`Recursion ended for spells${head}. Current sum is ${acc}`);
 }
 
-function spellCastSum(sections) {
-    sections.forEach(section => {
-        on(`change:repeating_spells${section}:cast-value${section} remove:repeating_spells${section}`, function () {
+function setupSpellCastSum(allSections) {
+    allSections.forEach(levelSections => {
+        levelSections.forEach(section => {
+            on(`change:repeating_spells${section}:cast-value${section} remove:repeating_spells${section}`, function () {
 
-            console.log(`Summing started by section spell${section}`);
-            let levelsCopy = [...sections];
-            let accumulator = 0;
+                console.log(`Summing started by section spell${section}`);
+                let levelsCopy = [...levelSections];
+                let accumulator = 0;
 
-            recursiveSum(levelsCopy, accumulator);
+                recursiveSum(levelsCopy, accumulator);
 
-            console.log(`Summing ended by section spell${section}. Final sum is ${accumulator}`);
+                console.log(`Summing ended by section spell${section}. Final sum is ${accumulator}`);
+            });
         });
     });
 }
 
-spellCastSum(wizardSpellSections);
-spellCastSum(priestSpellSections);
+setupSpellCastSum(wizardSpellSections);
+setupSpellCastSum(priestSpellSections);
 
-function spellSlotsTotal (levels, prefix, uniqueField) {
+function setupSpellSlotsTotal (levels, prefix, uniqueField) {
     levels.forEach(level => {
-        let castable = `${prefix}${level}-castable`;
-        let uniqueField = `${prefix}${level}-${uniqueField}`;
-        let misc = `${prefix}${level}-misc`;
-        on(`change:${castable} change:${uniqueField} change:${misc}`, function (){
-            getAttrs([castable, uniqueField, misc], function (values) {
-                let intCastable = parseInt(values[castable]) || 0;
-                let intUniqueField = parseInt(values[uniqueField]) || 0;
-                let intMisc = parseInt(values[misc]) || 0;
+        let castableFieldName = `${prefix}${level}-castable`;
+        let uniqueFieldName = `${prefix}${level}-${uniqueField}`;
+        let miscFieldName = `${prefix}${level}-misc`;
+        on(`change:${castableFieldName} change:${uniqueFieldName} change:${miscFieldName}`, function (){
+            getAttrs([castableFieldName, uniqueFieldName, miscFieldName], function (values) {
+                let intCastable = parseInt(values[castableFieldName]) || 0;
+                let intUniqueField = parseInt(values[uniqueFieldName]) || 0;
+                let intMisc = parseInt(values[miscFieldName]) || 0;
 
                 let total = intCastable + intUniqueField + intMisc;
                 console.log(total);
@@ -18380,8 +18382,8 @@ function spellSlotsTotal (levels, prefix, uniqueField) {
 
 let wizardLevels = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
 let priestLevels = ['1', '2', '3', '4', '5', '6', '7', 'q'];
-spellSlotsTotal(wizardLevels, 'spell-level', 'specialist');
-spellSlotsTotal(priestLevels, 'spell-priest-level', 'wisdom');
+setupSpellSlotsTotal(wizardLevels, 'spell-level', 'specialist');
+setupSpellSlotsTotal(priestLevels, 'spell-priest-level', 'wisdom');
 
 //Level 1 Wizard Spells
 on('change:repeating_spells remove:repeating_spells', function(){
