@@ -21,4 +21,4 @@
     * the generic square checkboxes resemble the Earth rune, and they turn Maligned when clicked
     * the triangular checkbox for showing macros and game-rules resembles the Law rune when clicked
     * instead of slashes in headers, three I's are used to represent Harmony
-  * A commitment to a 'folio style' character sheet, with useful character information separated into two columns on ever tab for easier readability
+  * A commitment to a 'folio style' character sheet, with useful character information separated into two columns on every tab for easier readability
