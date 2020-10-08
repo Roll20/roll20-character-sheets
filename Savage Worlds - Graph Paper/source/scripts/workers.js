@@ -146,6 +146,7 @@ var TETRA = TETRA || ( function() {
       setAttrs({ [`${trait}_roll`]: traitQuery,
                  [`${trait}_wd_roll`]: wdQuery,
                  [`${trait}_extra_wd_roll`]: ewdQuery,
+                 [`${trait}_untrained_mod`]: untrained == '' ? '+0' : untrained,
                  [`${trait}_code`]: code });
     });
   },
@@ -741,7 +742,8 @@ REPEATING LISTS & OPTIONS
 const listItems = ['engram', 'power', 'weapon'];
 
 on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
-  let array = skills.map((s) => { return `rename_${s}` }); // All rename_<skill> attributes
+  let array = skills.map((s) => { return `rename_${s}` }),
+      id = e.sourceAttribute.replace('skill_name', ''); // All rename_<skill> attributes
 
   getAttrs(array, (values) => {
     // Find corresponding attribute
@@ -751,9 +753,9 @@ on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[`skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
-      update[`extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
-      update[`skill_mod`] = `@{${renameAttribute.replace('rename_', '')}_mod}`;
+      update[`${id}skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
+      update[`${id}extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`${id}skill_mod`] = `@{${renameAttribute.replace('rename_', '')}_mod}`;
     }
 
     setAttrs(update, { silent: true });
