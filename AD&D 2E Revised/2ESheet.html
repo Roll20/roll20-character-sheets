@@ -18134,17 +18134,16 @@ on('change:repeating_customrogue remove:repeating_customrogue', function(){
         .attrs('newskill')
         .fields('crl')
         .reduce(function(m,r){
-            m.crl+=(r.F.crl);
-            r.D[0].newskill=(r.F.crl);
+            m.crl+=(r.I.crl);
             return m;
             
-        },{crl:0, desc: []},function(m,r,a){
-            a.D[0].newskill=m.crl;
+        },{crl:0},function(m,r,a){
+            a.newskill=m.crl;
         })
         .execute();
 });
 
-function isNewSection(section) {
+function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
 
@@ -18157,11 +18156,12 @@ function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
         setAttrs({
             [resultFieldName] : acc
         });
+        return;
     }
 
     let repeatingName;
     let fieldName;
-    if (isNewSection(head)) {
+    if (isNewSpellSection(head)) {
         repeatingName = `spells-${head}`
         fieldName = newField;
     } else {
@@ -18184,7 +18184,7 @@ function setupSpellSumming(spellLevel, oldField, newField, resultFieldName) {
     spellLevel.sections.forEach(section => {
         let repeatingName;
         let fieldName;
-        if (isNewSection(section)) {
+        if (isNewSpellSection(section)) {
             repeatingName = `spells-${section}`
             fieldName = newField;
         } else {
@@ -18221,19 +18221,20 @@ function setupSpellSlotsRemaining(totalField, sumField, remainingField) {
     });
 }
 
-function setupSpellSlotsTotal(castableFieldName, uniqueFieldName, miscFieldName) {
-    on(`change:${castableFieldName} change:${uniqueFieldName} change:${miscFieldName}`, function () {
-        getAttrs([castableFieldName, uniqueFieldName, miscFieldName], function (values) {
-            let intCastable = parseInt(values[castableFieldName]) || 0;
-            let intUniqueField = parseInt(values[uniqueFieldName]) || 0;
-            let intMisc = parseInt(values[miscFieldName]) || 0;
+function setupCalculateTotal(totalFieldName, fieldsToSum) {
+    let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
+    on(onChange, function () {
+        getAttrs(fieldsToSum, function (values) {
+            let total = 0;
+            fieldsToSum.forEach(field => {
+                total += parseInt(values[field]) || 0;
+            });
 
-            let total = intCastable + intUniqueField + intMisc;
             console.log(total);
 
             setAttrs({
-                [`${prefix}${level}-total`]: total
-            })
+                [totalFieldName]: total
+            });
         });
     });
 }
@@ -18269,7 +18270,7 @@ let priestSpellLevelsSections = [
 
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
-    setupSpellSlotsTotal(`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`);
+    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
     setupSpellSumming(spellLevel, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupSpellSumming(spellLevel, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
@@ -18278,7 +18279,7 @@ wizardSpellLevelsSections.forEach(spellLevel => {
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
-    setupSpellSlotsTotal(`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`);
+    setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
     setupSpellSumming(spellLevel, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
     setupSpellSumming(spellLevel, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
