@@ -17993,8 +17993,8 @@ function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
         .execute(() => recursiveSpellSum(tail, acc, oldField, newField, resultFieldName)); // Fat arrow function to lazy load value.
 }
 
-function setupSpellSumming(spellLevel, oldField, newField, resultFieldName) {
-    spellLevel.sections.forEach(section => {
+function setupSpellSumming(sections, oldField, newField, resultFieldName) {
+    sections.forEach(section => {
         let repeatingName;
         let fieldName;
         if (isNewSpellSection(section)) {
@@ -18010,7 +18010,7 @@ function setupSpellSumming(spellLevel, oldField, newField, resultFieldName) {
         on(onChange, function () {
 
             console.log(`Summing started by section ${repeatingName}`);
-            let levelsCopy = [...spellLevel.sections];
+            let levelsCopy = [...sections];
             let accumulator = 0;
 
             recursiveSpellSum(levelsCopy, accumulator, oldField, newField, resultFieldName);
@@ -18019,7 +18019,7 @@ function setupSpellSumming(spellLevel, oldField, newField, resultFieldName) {
 }
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
-function setupSpellSlotsRemaining(totalField, sumField, remainingField) {
+function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
         getAttrs([totalField, sumField], function (values) {
            let intTotal = parseInt(values[totalField]);
@@ -18034,7 +18034,7 @@ function setupSpellSlotsRemaining(totalField, sumField, remainingField) {
     });
 }
 
-function setupCalculateTotal(totalFieldName, fieldsToSum) {
+function setupCalculateTotal(totalField, fieldsToSum) {
     let onChange = fieldsToSum.map(field => `change:${field}`).join(' ');
     on(onChange, function () {
         getAttrs(fieldsToSum, function (values) {
@@ -18046,7 +18046,7 @@ function setupCalculateTotal(totalFieldName, fieldsToSum) {
             console.log(total);
 
             setAttrs({
-                [totalFieldName]: total
+                [totalField]: total
             });
         });
     });
@@ -18081,23 +18081,45 @@ let priestSpellLevelsSections = [
     {level: 'q', sections: ['49', '50', '51']},
 ];
 
+// --- Start setup Spell Slots --- //
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
-    setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
-    setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
+    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
+    setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 });
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
-    setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
-    setupSpellSlotsRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
+    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
+    setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 });
+// --- End setup Spell Slots --- //
+
+// --- Start setup Spell Points, Arc, and Wind --- //
+let wizardSpellPoints = 'spell-points';
+let arc = 'total-arc';
+let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
+setupCalculateTotal(`${wizardSpellPoints}-total`, [wizardSpellPoints, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
+setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`);
+setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
+setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
+setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+
+let priestSpellPoints = 'spell-points-priest';
+let wind = 'total-wind';
+let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
+setupCalculateTotal(`${priestSpellPoints}-total`, [priestSpellPoints, `${priestSpellPoints}-wis`]);
+setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`);
+setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
+setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
+setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+// --- End setup Spell Points, Arc, and Wind --- //
 
 //Granted Powers
 on('change:repeating_spells67 remove:repeating_spells67', function(){
