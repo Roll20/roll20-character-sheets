@@ -206,8 +206,6 @@ Most of the sheet's strings can be changed via the translation.json. However, so
 "defaults-block-show-walkers-description": "Walkers/Mechs and their modifications/weapons.<h4 style='margin-top: 24px;'>Show/Hide Skills</h4><p style='margin-bottom: 16px; max-width: 640px;'>You can show or hide skills from the list in accordance with the played Game Setting. This can also be done manually for each individual sheet in its Settings tab. There are two custom skills that can be renamed and modified within the sheet as well, for example to make specialized skills (e.g. specific weapons with custom bonus or Wild Die).</p>",
 "defaults-function-explode-run-die": "[Function] Explode Run Die",
 "defaults-function-explode-run-die-description": "Makes the run die Ace.",
-"defaults-function-query-skill-dice-rof": "[Function] Query Skill Dice/RoF",
-"defaults-function-query-skill-dice-rof-description": "Skill rolls will always query the amount of skill dice.",
 "defaults-function-running-ignores-wounds": "[Function] Running Ignores Wounds",
 "defaults-function-running-ignores-wounds-description": "Wound penalties are not subtracted from the run roll.",
 "defaults-function-running-applies-fatigue": "[Function] Running Applies Fatigue",
@@ -401,7 +399,7 @@ Most of the sheet's strings can be changed via the translation.json. However, so
 "defaults-skill-show-spellcasting": "[Skill] Show Spellcasting Skill",
 "defaults-skill-show-spellcasting-description": "Show the Spellcasting (Smarts) skill.",
 "defaults-skill-show-weird-science": "[Skill] Show Weird Science Skill",
-"defaults-skill-show-weird-science-description": "Show the Weird Science (Smarts) skill."
+"defaults-skill-show-weird-science-description": "Show the Weird Science (Smarts) skill.
 ```
 </details>
 
