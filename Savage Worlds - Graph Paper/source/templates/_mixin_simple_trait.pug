@@ -1,4 +1,4 @@
-mixin simple_trait(name, label, value='d4', classes='', rename=false)
+mixin simple_trait(name, label, value='d4-2', classes='', rename=false)
   - var trait = name.toLowerCase()
   - var trait_name = rename ? `@{rename_${trait}}` : label
 
@@ -11,7 +11,7 @@ mixin simple_trait(name, label, value='d4', classes='', rename=false)
     - // Label roll
     button(type='roll',
            name=`roll_simple_${trait}`,
-           value!=`&{template:TraitRoll} {{rof=[[ 1 ]]}} @{${trait}_extra_template} {{reroll=[r](~simple_${trait})}}`,
+           value!=`&{template:TraitRoll} {{rof=[[ 0 + @{query_global_rof} ]]}} @{${trait}_extra_template} {{reroll=[r](~simple_${trait})}}`,
            class='sheet-simple-trait__roll')
       if rename
         span(name=`attr_rename_${trait}`)!= label
@@ -26,7 +26,7 @@ mixin simple_trait(name, label, value='d4', classes='', rename=false)
           - // Die button rolls
           button(type='roll',
                  name=`roll_simple_${trait}_${die}`,
-                 value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=d${die}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|1}} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ 1d${die}!cs2 @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_extra_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~simple_${trait}_${die})}}`,
+                 value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=d${die}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ 0 + @{query_global_rof} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ 1d${die}!cs2 @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_extra_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} @{${trait}_global_wd_roll} {{reroll=[r](~simple_${trait}_${die})}}`,
                  class='sheet-simple-trait__custom-roll')= `d${die}`
 
     span.sheet-simple-trait__label(name=`attr_${trait}_code`)= value

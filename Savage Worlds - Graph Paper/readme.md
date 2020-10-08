@@ -86,6 +86,11 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.3
+* Added helper button to toggle global Wild Die query
+* Added helper button to toggle global Rate of Fire query
+* Added helper button to toggle global Bonus Wild Die query
+* Fixed critical bug that broke nearly all rolls
 #### Version 1.2.2
 * Added damage (re-)roll buttons to Roll Templates
 * Roll Templates now have hooks for descriptions and three custom fields

@@ -87,7 +87,7 @@ input(type='checkbox',
             - // Track roll
             button(type='roll',
                    name=`roll_${trait}_${step[1]}`,
-                   value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|1}} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~${trait}_${step[1]})}}`,
+                   value!=`&{template:TraitRoll} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{rof=[[ ?{@{query_rate_of_fire}|1}} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${step[2]} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} @{${trait}_global_wd_roll} {{reroll=[r](~${trait}_${step[1]})}}`,
                    class='sheet-skills__step-button')
               .sheet-tooltip.sheet-tooltip--top
                 span(data-i18n='roll-tooltip-prefix') Roll 
@@ -102,19 +102,23 @@ input(type='checkbox',
           input(type='hidden', name=`attr_${trait}_roll`, value='1d4!cs2 - 2')
           input(type='hidden', name=`attr_${trait}_wd_roll`, value='1d6!cs2 - 2')
           input(type='hidden', name=`attr_${trait}_extra_wd_roll`, value='-10000')
+          
+          input(type='hidden', name=`attr_${trait}_global_wd_roll`, value=`{{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
+          
+          input(type='hidden', name=`attr_${trait}_global_bonus_wd_roll`, value=`{{bonus_wd=@{query_global_bonus_wd}}} {{bonus_wdroll=[[ @{query_global_bonus_wd}!cs2 @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
 
           input(type='hidden',
                 name=`attr_${trait}_template`,
-                value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
+                value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} @{${trait}_global_wd_roll} @{${trait}_global_bonus_wd_roll}`)
 
           input(type='hidden',
                 name=`attr_${trait}_extra_template`,
-                value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_extra_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`)
+                value!=`{{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_extra_wd_roll} @{${trait}_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}} @{${trait}_global_wd_roll} @{${trait}_global_bonus_wd_roll}`)
 
           -// Label roll
           button(type='roll',
                  name=`roll_${trait}`,
-                 value=`&{template:TraitRoll} {{rof=[[ 0 + @{query_skill_rof} ]]}} @{${trait}_template} {{reroll=[r](~${trait})}}`,
+                 value=`&{template:TraitRoll} {{rof=[[ 0 + @{query_global_rof} ]]}} @{${trait}_template} {{reroll=[r](~${trait})}}`,
                  class='sheet-skills__button')
             .sheet-tooltip.sheet-tooltip--left
               span(name=`attr_rename_${skill[1].toLowerCase()}`,

@@ -19,12 +19,13 @@ TRANSLATION SETUP
 on("sheet:opened", function(e){
   // Translations for query strings
   setAttrs({
-    'query_rate_of_fire': getTranslationByKey('query-rate-of-fire'),
-    'query_modifier': getTranslationByKey('query-modifier'),
-    'query_wild_die': getTranslationByKey('query-wild-die'),
-    'query_roll_result': getTranslationByKey('query-roll-result'),
-    'query_target_number': getTranslationByKey('query-target-number'),
-    'query_damage_modifier': getTranslationByKey('query-damage-modifier'),
+    'query_rate_of_fire': getTranslationByKey('rate-of-fire'),
+    'query_modifier': getTranslationByKey('modifier'),
+    'query_wild_die': getTranslationByKey('wild-die'),
+    'query_roll_result': getTranslationByKey('roll-result'),
+    'query_target_number': getTranslationByKey('target-number'),
+    'query_damage_modifier': getTranslationByKey('damage-modifier'),
+    'query_bonus_wild_die': getTranslationByKey('bonus-wild-die'),
     'none': getTranslationByKey('none')
   });
 
@@ -806,10 +807,22 @@ on('change:dice_roller_input', (e) => {
 SETTINGS
 ############################################################################# */
 
-on('change:toggle_skill_rof', (e) => {
+on('change:toggle_global_rof', (e) => {
   let update = e.newValue == 'on' ? '?{@{query_rate_of_fire}|1}' : '1';
 
-  setAttrs({ ['query_skill_rof']: update }, { silent: true });
+  setAttrs({ ['query_global_rof']: update }, { silent: true });
+});
+
+on('change:toggle_global_wd', (e) => {
+  let update = e.newValue == 'on' ? '?{@{query_wild_die}|d8|d4|d6|d10|d12|@{none},-10000-d20}' : '-10000-d20';
+
+  setAttrs({ ['query_global_wd']: update }, { silent: true });
+});
+
+on('change:toggle_global_bonus_wd', (e) => {
+  let update = e.newValue == 'on' ? '?{@{query_bonus_wild_die}|d4|d6|d8|d10|d12|@{none},-10000-d20}' : '-10000-d20';
+
+  setAttrs({ ['query_global_bonus_wd']: update }, { silent: true });
 });
 
 on('change:toggle_run_wounds', (e) => {
