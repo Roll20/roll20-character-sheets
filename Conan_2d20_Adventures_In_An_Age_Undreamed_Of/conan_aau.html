@@ -17,10 +17,12 @@
     <div class="area-left-content">
         <div class="area-weapons">
             <div class="weapons-banner">Primary Attacks</div>
+            <!--
             <span>
                 <b>GM needs to create a rollable table called "Combat-Dice" with name values of "1","2","-","-","1 +
                 Special Event","1 + Special Event"</b>
             </span>
+            -->
             <div class="weapons-bonus-grid">
                 <div class="weapons-bonus-hdr-background field-border-wide">
                     <div class="weapons-bonus-hdr-label">BONUS DAMAGE</div>
@@ -40,7 +42,7 @@
                     <div class="weapons-weapon-grid-button-group">
                         DMG:
                         <button type='roll' name="roll_Combat-Dice"
-                            value="&{template:conan-default} {{title=@{character_name}'s Damage}} {{subtitle1=@{weapon_name}}} {{Range/Reach=@{weapon_reach}}} {{size=@{weapon_size}}} {{Weapon Damage=@{weapon_damage}}}{{bonusdamage=@{weapon_type}}}{{totaldamage=[[(@{weapon_damage}+@{weapon_type})t[Combat-Dice]]]}} {{areastruck=[[t[Hit-Location-Table]]]}} {{qualities=@{weapon_qualities}}}{{gridLH=1}}">
+                            value="&{template:conan-default} {{title=@{character_name}'s Damage}} {{subtitle1=@{weapon_name}}} {{Range/Reach=@{weapon_reach}}} {{size=@{weapon_size}}} {{Weapon Damage=@{weapon_damage}}}{{Bonus Damage=@{weapon_type}}}{{Total Damage=[[(@{weapon_damage}+@{weapon_type})t[Combat-Dice]]]}} {{areastruck=[[t[Hit-Location-Table]]]}} {{qualities=@{weapon_qualities}}}{{gridLH=1}}">
                         </button>
                     </div>
                     <div class="weapons-weapon-labels field-border-narrow">Type</div>
@@ -1297,13 +1299,27 @@
     <div class="area-footer">
     </div>
 
+    <!-- LOG NOTES SHEET PANEL -->
     <input type="checkbox" style="display: none;" class="sheet-check-top-menu" name="attr_log-one"/>
-    <div class="sheet-log-one">
-        <fieldset class="repeating_lognotes">
-            <span>Date:</span>
-            <input type="text" name="attr_logdate" />
-            <textarea type="text" style="width: 75%; height:30px" name="attr_lognote"></textarea>
-        </fieldset>
+    <div class="log-notes-sheet">
+        <div class="log-note-sheet-grid">
+            <div></div>
+            <div class="log-notes-fieldset">
+                <fieldset class="repeating_lognotes">
+                    <div class="sheet-log-note-field-grid">
+                        <div>
+                            <span>Date:</span>
+                            <input type="text" name="attr_logdate" />
+                        </div>
+                        <div class="log-note-expander">
+                            <span name="attr_lognote"></span>
+                            <textarea type="text" name="attr_lognote"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div></div>
+        </div>
     </div>
 
 
@@ -1725,11 +1741,18 @@
     on('sheet:opened',function(){
         console.log('Starting Conan sheet...');
         
-        prePopulateSection("weapons", 2, "weapon_Name");
-        prePopulateSection("belongings", 3, "weapon_Name");
-        prePopulateSection("talents", 5, "weapon_Name");
-        prePopulateSection("magic", 2, "weapon_Name");
-        prePopulateSection("npc", 1, "weapon_Name");
+        prePopulateSection("weapons", 2, "weapon_name");
+        prePopulateSection("belongings", 3, "belongings-item-type");
+        prePopulateSection("talents", 5, "talent_base");
+        prePopulateSection("magic", 2, "magic_name");
+        prePopulateSection("npc", 1, "npccharacter_name");
+
+        //init the log note sheet 
+        getAttrs(['log-one'], function(value) {
+            if (value['log-one'] != 'on' || value['log-one'] != 'off')
+                setAttrs({'log-one':'off'});
+        });
+
 
     });
 
