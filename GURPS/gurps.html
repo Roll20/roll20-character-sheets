@@ -4194,6 +4194,8 @@
 
 				<ul>
 					<li>Combat tab: Added sub tabs for Defense, Attack, and Tools. Preliminary updates to improving Armor section of defense tab.</li>
+					<li>Combat tab -> Combat Tools: Remove redundant elevation direction, replaced by simple elevation field, if you're above the target, enter a positive number. If below the target, enter a negative number.</li>
+					<li>Gravity Field. Added a gravity field that can be applied to jumping distance and total inventory weight. <b>Note:</b> Gravity value can be updated in three places; Combat Tab -> Tools, Thrown Weapon. Inventory Tab on the totals line. General tab under the Jumping feat.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -5701,7 +5703,8 @@ every second that your encumbrance is over 10xBL<br />
 								<span data-i18n="current-label">Current</span> (<span name="attr_encumbrance_level" value=""></span>)
 							</div>
 							<div class="cell colAll">
-								<input type="text" step=".001" name="attr_total_weight" value="" readonly="readonly" title="Macro name: total_weight" />
+								<input type="hidden" name="attr_total_weight" value="" />
+								<input type="text" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{total_weight_gravity}" />
 							</div>
 							<div class="cell colAll">
 								<input type="text" name="attr_current_move" value="" readonly="readonly" title="Macro name: current_move" />
@@ -6042,6 +6045,25 @@ instead of Basic Move to calculate jumping distances. B352
 								</div>
 								<div class="cell col1">
 									<input type="text" name="attr_jump_skill" value="" class="editable" title="Macro name: jump_skill" />
+								</div>
+								<div class="cell col2">
+									&nbsp;
+								</div>
+								<div class="cell col3">
+									&nbsp;
+								</div>
+							</div> <!-- .row -->
+							<div class="row row-flight-advantage">
+								<div class="cell col0 label">
+									<div class="popup">
+										<span data-i18n="gravity-label">Gravity</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="jump-gravity-tooltip">Affects jumping distance. See B350.</span>
+									</span>
+								</div>
+								<div class="cell col1">
+									<input type="number" value="1" min="0" step=".01" name="attr_gravity" class="editable" title="Macro: @{gravity}" />
 								</div>
 								<div class="cell col2">
 									&nbsp;
@@ -8511,7 +8533,8 @@ visualize what it will look like in chat.
 									<input type="number" name="attr_encumbrance_level" value="" readonly="readonly" title="Macro: @{encumbrance_level}" />
 								</div>
 								<div class="item item9">
-									<input type="text" name="attr_total_weight" value="" readonly="readonly" title="Macro name: total_weight" />
+									<input type="hidden" name="attr_total_weight" value="" />
+									<input type="text" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{total_weight_gravity}" />
 								</div>
 								<div class="item item10">
 									<input type="text" name="attr_current_move" value="" readonly="readonly" title="Macro name: current_move" />
@@ -10618,6 +10641,14 @@ visualize what it will look like in chat.
 								</div>
 								<div class="cell col5">
 									<div class="popup">
+										<span data-i18n="abbreviation-gravity-label">GRAV</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="gravity-thrown-tooltip">Gravity, affects throwing distance. See B350.<br /></span>
+									</span>
+								</div>					
+								<div class="cell col5">
+									<div class="popup">
 										<span data-i18n="abbreviation-range-label">RNG</span>
 									</div>
 									<span class="tooltip">
@@ -10728,6 +10759,9 @@ visualize what it will look like in chat.
 											<input type="number" step="1" name="attr_thrown_object_acc" value="0" title="Macro name: thrown_object_acc" />
 										</div>
 										<div class="cell col5 thrown-object-input">
+											<input type="number" name="attr_gravity" value="1" min="0" step=".01" title="Macro: @{gravity}" />
+										</div>
+										<div class="cell col5 thrown-object-input">
 											<input type="text" name="attr_thrown_object_range" readonly="readonly" value="10" title="Macro name: thrown_object_range" />
 										</div>
 										<div class="cell col6">
@@ -10810,30 +10844,12 @@ visualize what it will look like in chat.
 								<div class="cell size">
 									<span data-i18n="abbreviation-size-modifier-label">Size Mod</span>
 								</div>
-								<div class="cell fire-direction">
-									<div class="popup">
-										<span data-i18n="position-label">Position</span>
-									</div>
-									<div class="tooltip">
-										<span data-i18n="firing-up-down-position-tooltipo">
-			Your vertical position relative to the target.<br />
-			Ignore up/down for beam type weapons like lasers.<br />
-			See <b>FIRING UPWARD AND DOWNWARD</b> B407.<br />
-			Firing downward decreases distance.<br />
-			<i>For every 2 yards <b>above</b> your target, subtract 1 from distance.</i><br />
-			Firing upward increases distance.<br />
-			<i>Example:</i> Distance 40 yards, you are 10 yards <b>above</b> the target, so <b>subtract</b> 5 yards. Final distance is 35 yards.<br />
-			<i>For every 1 yard <b>below</b>> your target, add 1 to distance.</i><br />
-			<i>Example:</i> Distance 40 yards, you are 10 yards <b>below</b> the target, so <b>add</b> 10 yards. Final distance is 50 yards.<br />
-										</span>
-									</div>
-								</div>
 								<div class="cell fire-up-dwn-distance">
 									<div class="popup">
 										<span data-i18n="elevation-label">Elevation</span>
 									</div>
 									<div class="tooltip">
-										<span data-i18n="firing-up-down-elevation-tooltip">The number of yards you are above or below the target.</span>
+										<span data-i18n="ranged-elevation-label">If you're above the target, enter a positive number of hexes. If you're below the target, enter a negative number of hexes. See B407.</span>
 									</div>
 								</div>
 								<div class="cell new-range">
@@ -10859,15 +10875,8 @@ visualize what it will look like in chat.
 									<div class="cell size">
 										<input type="number" step="1" value="0" name="attr_firing_size_mod" title="Macro name: firing_size_mod" />
 									</div>
-									<div class="cell fire-direction">
-										<select name="attr_firing_direction" title="Macro name: firing_direction">
-											<option value="linear"><span data-i18n="option-same-height">Same Height</span></option>
-											<option value="dn"><span data-i18n="option-above-target">Above Target</span></option>
-											<option value="up"><span data-i18n="option-below-target">Below Target</span></option>
-										</select>
-									</div>
 									<div class="cell fire-up-dwn-distance">
-										<input type="number" step="1" value="0" min="0" name="attr_firing_up_dwn_distance" title="Macro name: firing_up_dwn_distance" />
+										<input type="number" step="1" value="0" min="0" name="attr_firing_elevation" title="Macro name: firing_elevation" />
 									</div>
 									<div class="cell new-range">
 										<input type="number" step="1" value="0" min="0" name="attr_firing_new_range" readonly="readonly" title="Macro name: firing_new_range" />
@@ -10962,7 +10971,7 @@ visualize what it will look like in chat.
 										<input type="number" step="1" value="1" min="1" name="attr_yards_fallen" title="Macro name: yards_fallen" />
 									</div>
 									<div class="cell gravity">
-										<input type="number" value="1" min="0" name="attr_gravity" title="Macro name: gravity" />
+										<input type="number" value="1" min="0" step=".01" name="attr_gravity" title="Macro name: gravity" />
 									</div>
 									<div class="cell atmosphere">
 										<input type="number" value="1" min="0" name="attr_atmosphere" title="Macro name: atmosphere" />
@@ -11359,7 +11368,7 @@ visualize what it will look like in chat.
 								</div>
 								<div class="cell range">
 									<div class="popup">
-										1/2 <span data-i18n="range-label">Range</span>
+										<span class="one-half">1/2</span> <span data-i18n="range-label">Range</span>
 									</div>
 									<div class="tooltip">
 										<span data-i18n="shotgun-half-damage-tooltip">Enter half-damage range of shotgun.</span>
@@ -11589,11 +11598,16 @@ visualize what it will look like in chat.
 				</fieldset> <!-- .repeating_item -->
 				<div class="row row-totals">
 					<div class="cell col0">
-					    <div style="text-align: right; font-weight: bold;" class="popup"><span data-i18n="inventory-totals-label">TOTALS:</span></div>
-						<div class="tooltip">
-							<span data-i18n="inventory-totals-tooltip">
-								Totals for all fields.
-							</span>
+						<div class="cell" style="width: 50px;">
+							<div class="popup" style="font-weight: bold;">
+								<span data-i18n="gravity-label">Gravity</span><span>:</span>
+							</div>
+							<div class="tooltip">
+								<span data-i18n="gravity-tooltip">Standard gravity is based on 1G, earth normal.<br />If gravity is over 1G, then add <i>your</i> weight and encumberance then multiply by Gravity - 1. Add this value to your encumbrance.<br />If gravity is less than 1G, multiply the weight of your gear by the Gravity value, this is your new encumbrance.<br />See B350.</span>
+							</div>
+						</div>
+						<div class="cell" style="width: 35px;">
+							<input type="number" value="1" step=".01" min=".01" name="attr_gravity" title="Macro: @{gravity}" />
 						</div>
 					</div>
 					<div class="cell col1">
@@ -11620,7 +11634,8 @@ visualize what it will look like in chat.
 						</div>
 					</div>
 					<div class="cell col4">
-						<input type="number" style="font-weight: bold; text-align: center;" step=".001" name="attr_total_weight" value="0" readonly="readonly" title="Macro name: total_weight" />
+						<input type="hidden" name="attr_total_weight" value="" />
+						<input type="text" style="font-weight: bold; text-align: center;" name="attr_total_weight_gravity" value="" readonly="readonly" title="Macro: @{total_weight_gravity}" />
 					</div>
 					<div class="cell col5">
 						<div style="text-align: right; font-weight: bold;" class="popup">
@@ -12103,6 +12118,8 @@ visualize what it will look like in chat.
 
 			<ul>
 				<li>Combat tab: Added sub tabs for Defense, Attack, and Tools. Preliminary updates to improving Armor section of defense tab.</li>
+				<li>Combat tab -> Combat Tools: Remove redundant elevation direction, replaced by simple elevation field, if you're above the target, enter a positive number. If below the target, enter a negative number.</li>
+				<li>Gravity Field. Added a gravity field that can be applied to jumping distance and total inventory weight. <b>Note:</b> Gravity value can be updated in three places; Combat Tab -> Tools, Thrown Weapon. Inventory Tab on the totals line. General tab under the Jumping feat.</li>
 			</ul>
 
 			<p>Pull Request: 9/29/2020</p>
@@ -15683,18 +15700,61 @@ See notes for weapon.</textarea>
 	});
 
 	// Get Encumbrance Level:
-	on('change:total_weight change:basic_lift', function (e) {
+	on('change:total_weight change:weight change:basic_lift change:gravity', function (e) {
 		updateEncLevel();
 	});
 
+	// factor in gravity difference
 	function updateEncLevel(callback) {
-		getAttrs(['basic_lift', 'total_weight'], function(v) {
+
+		getAttrs(['basic_lift', 'total_weight', 'gravity', 'weight'], function(v) {
+			
 			callback = callback || noop;
-			var basicLift = +v.basic_lift;
-			var encumbranceLevel = Math.floor(v.total_weight / basicLift);
-			if (encumbranceLevel > 0 && (v.total_weight % basicLift) === 0) {
-				encumbranceLevel--;
+			
+			let basicLift = Number(v.basic_lift);
+
+			let totalWeight = Number(v.total_weight);
+
+			let totalGravityWeight = totalWeight;
+
+			let gravity = Number(v.gravity);
+
+			let characterWeight = Number(v.weight);
+
+			// don't factor in grand total weight
+			let grandTotalWeight = characterWeight + totalWeight;
+
+			// round to three decimal places
+            grandTotalWeight =  Math.round( grandTotalWeight * 1000) / 1000;
+            
+            // remove trailing zeros
+            grandTotalWeight = grandTotalWeight.toString(); 
+            
+            // make sure it's a number again
+			grandTotalWeight = Number(grandTotalWeight);  
+			
+			if (gravity < 1 ) {
+
+				totalGravityWeight = totalWeight * gravity;
+
+				totalGravityWeight = Number(Math.round(totalGravityWeight * 1000) / 1000).toFixed(3)
+
+			} else if (gravity > 1) {
+
+				let gravityMod = (totalWeight + characterWeight) * (gravity - 1);
+
+				totalGravityWeight = totalWeight + gravityMod;
+
+				totalGravityWeight = Number(Math.round(totalGravityWeight * 1000) / 1000).toFixed(3)
+
 			}
+			
+			var encumbranceLevel = Math.floor(totalGravityWeight / basicLift);
+			
+			if (encumbranceLevel > 0 && (totalGravityWeight % basicLift) === 0) {
+				encumbranceLevel--;
+			} 
+			
 			if (encumbranceLevel >= 10) {
 				encumbranceLevel = 4;
 			} else if (encumbranceLevel >= 6) {
@@ -15702,11 +15762,16 @@ See notes for weapon.</textarea>
 			} else if (encumbranceLevel >= 3) {
 				encumbranceLevel = 3;
 			}
-			setAttrs(
-				{ encumbrance_level: encumbranceLevel },
-				{silent: false},
+
+			setAttrs({ 
+					encumbrance_level: encumbranceLevel,
+					total_weight_gravity: totalGravityWeight,
+					grand_total_weight: grandTotalWeight
+				},
+				{silent: true},
 				callback
 			);
+
 		});
 	}
 
@@ -16916,7 +16981,7 @@ See notes for weapon.</textarea>
     }
     
     // check for changes that affect jump distance
-    on("change:use_st_for_jump change:jump_skill change:basic_move change:enhanced_ground_move change:super_jump_entered_level change:super_jump_points change:jump_encumbrance change:encumbrance_level change:jump_concentration change:running_jump_yards_moved change:running_high_jump_yards_moved change:strength change:encumbrance_level change:hit_points change:fatigue_points", function(e) {
+    on("change:use_st_for_jump change:jump_skill change:basic_move change:enhanced_ground_move change:super_jump_entered_level change:super_jump_points change:jump_encumbrance change:encumbrance_level change:jump_concentration change:running_jump_yards_moved change:running_high_jump_yards_moved change:strength change:encumbrance_level change:hit_points change:fatigue_points change:gravity", function(e) {
         
         updateJumpDistanceValues();
         
@@ -16927,110 +16992,124 @@ See notes for weapon.</textarea>
      */
     function updateJumpDistanceValues() {
         
-        console.log('***** UPDATE JUMP VALUES *****');
+		console.log('***** UPDATE JUMP VALUES *****');
+		
+		let fields = [
+			"use_st_for_jump", 
+			"jump_skill", 
+			"basic_move", 
+			"enhanced_ground_move", 
+			"super_jump_entered_level", 
+			"super_jump_points", 
+			"strength", 
+			"jump_concentration", 
+			"running_jump_yards_moved", 
+			"running_high_jump_yards_moved", 
+			"encumbrance_level", 
+			"hit_points", 
+			"hit_points_max", 
+			"fatigue_points", 
+			"fatigue_points_max", 
+			"jump_encumbrance", 
+			"gravity",
+		];
 		    
-        getAttrs(["use_st_for_jump", "jump_skill", "basic_move", "enhanced_ground_move", "super_jump_entered_level", 
-                  "super_jump_points", "strength", "jump_concentration", "running_jump_yards_moved", "running_high_jump_yards_moved", 
-                  "encumbrance_level", "hit_points", "hit_points_max", "fatigue_points", "fatigue_points_max", "jump_encumbrance"], function(values) {
-            
-            var jumpSkill = +values.jump_skill;
+		getAttrs(fields, function(values) {
+			
+			let gravity = Number(values.gravity);
+
+			let gravityRatio = 1 / gravity;
+
+            let jumpSkill = Number(values.jump_skill);
             
             if (jumpSkill < 0) {
                 jumpSkill = 0;
             }
             
-            var jumpST = +values.strength;
+            let jumpST = Number(values.strength);
             
             if (jumpST < 0) {
                 jumpST = 0;
             }
             
-            // + sign converts value to a number
-            var superJumpPoints = +values.super_jump_points;
+            let superJumpPoints = Number(values.super_jump_points);
             
             // ensure valid superJumpPoints
             if (superJumpPoints < 0) {
                 superJumpPoints = 0;
             }
             
-            var superJumpEnteredLevel = +values.super_jump_entered_level;
+            let superJumpEnteredLevel = Number(values.super_jump_entered_level);
             
             if (superJumpEnteredLevel < 0) {
                 superJumpEnteredLevel = 0;
             }
             
-            var basicMove = +values.basic_move;
-            
-            // ensure valid basicWaterMoveMod
-            if (basicMove < 0) {
-                basicMove = 0;    
-            }
+            let basicMove = Number(values.basic_move);
             
             // check for super move
-            var enhancedGroundMove = +values.enhanced_ground_move;
+            let enhancedGroundMove = Number(values.enhanced_ground_move);
             
             if (enhancedGroundMove < 0) {
                 enhancedGroundMove = 0;
             }
             
             // check for running jump
-            var runningJumpYardsMoved = +values.running_jump_yards_moved;
+            let runningJumpYardsMoved = Number(values.running_jump_yards_moved);
             
             runningJumpYardsMoved = Math.floor(runningJumpYardsMoved);
             
-            var runningHighJumpYardsMoved = +values.running_high_jump_yards_moved;
+            let runningHighJumpYardsMoved = Number(values.running_high_jump_yards_moved);
             
             runningHighJumpYardsMoved = Math.floor(runningHighJumpYardsMoved);
             
-            var runningMoveToUse = 0;
+            let runningMoveToUse = 0;
             
-            var runningHighMoveToUse = 0;
+            let runningHighMoveToUse = 0;
             
-            var jumpBroadFeet = 0;
+            let jumpBroadFeet = 0;
             
-            var jumpBroadYards = 0;
+            let jumpBroadYards = 0;
             
-            var runningBroadJumpFeet = 0;
+            let runningBroadJumpFeet = 0;
             
-            var runningBroadJumpYards = 0;
+            let runningBroadJumpYards = 0;
             
-            var jumpHighFeet = 0;
+            let jumpHighFeet = 0;
             
-            var jumpHighYards = 0;
+            let jumpHighYards = 0;
             
-            var runningHighJumpFeet = 0;
+            let runningHighJumpFeet = 0;
             
-            var runningHighJumpYards = 0;
+            let runningHighJumpYards = 0;
             
-            var superJumpLevelFromPoints = 0;
+            let superJumpLevelFromPoints = 0;
             
-            var totalSuperJumpLevel = 0;
+            let totalSuperJumpLevel = 0;
             
-            var encumberedDisplayMove0 = "";
+            let encumberedDisplayMove0 = "";
             
-            var encumberedDisplayMove1 = "";
+            let encumberedDisplayMove1 = "";
             
-            var encumberedDisplayMove2 = "";
+            let encumberedDisplayMove2 = "";
             
-            var encumberedDisplayMove3 = "";
+            let encumberedDisplayMove3 = "";
             
-            var encumberedDisplayMove4 = "";
+            let encumberedDisplayMove4 = "";
             
-            var encumberedDisplayMove5 = "";
+            let encumberedDisplayMove5 = "";
             
-            var totalSuperJumpLevel = 0;
+            let injuryFatigueMoveModifier = 1;
             
-            var injuryFatigueMoveModifier = 1;
+            let jumpMoveSpeed = 0;
             
-            var jumpMoveSpeed = 0;
+            let finalJumpMoveSpeed = 0;
             
-            var finalJumpMoveSpeed = 0;
+            let statUsedForJump = "";
             
-            var statUsedForJump = "";
+            let statUsedForRunningJump = "";
             
-            var statUsedForRunningJump = "";
-            
-            var baseJumpMove = "";
+            let baseJumpMove = "";
             
             // calculate broad and high jump
             if (jumpSkill > 0) {
@@ -17045,7 +17124,9 @@ See notes for weapon.</textarea>
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
                 }
-                
+				
+				jumpBroadFeet = jumpBroadFeet * gravityRatio;
+
                 statUsedForJump = "Jump Skill/2 = " + jumpBroadFeet;
                 
                 jumpBroadFeet = (jumpBroadFeet * 2) - 3;
@@ -17053,25 +17134,26 @@ See notes for weapon.</textarea>
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
                 }
-                
+				
                 // calc. running broad jump
                 if (enhancedGroundMove > Math.floor(jumpSkill/2)) {
                     
                     // use enhanced move instead of jump skill
                     statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
                     
-                    runningMoveToUse = enhancedGroundMove;
+                    runningMoveToUse = enhancedGroundMove * gravityRatio
                     
-                    runningHighMoveToUse = enhancedGroundMove;
+                    runningHighMoveToUse = enhancedGroundMove * gravityRatio;
                     
                 } else {
                     
                     // use jump skill for running jump
                     statUsedForRunningJump = statUsedForJump + " + Yards Run";
                     
-                    runningMoveToUse = Math.floor(jumpSkill/2) + runningJumpYardsMoved;
-                    
-                    runningHighMoveToUse = Math.floor(jumpSkill/2) + runningHighJumpYardsMoved;
+                    runningMoveToUse = (Math.floor(jumpSkill/2) + runningJumpYardsMoved) * gravityRatio;
+					
+					// do not apply gravity ratio to running start
+                    runningHighMoveToUse = (Math.floor(jumpSkill/2 ) * gravityRatio) + runningHighJumpYardsMoved;
                     
                 }
                 
@@ -17089,7 +17171,9 @@ See notes for weapon.</textarea>
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
                 }
-                
+				
+				jumpHighFeet = jumpHighFeet * gravityRatio;
+				
                 jumpHighFeet = (6 * jumpHighFeet) - 10;
                 
                 if (jumpHighFeet <= 0) {
@@ -17101,8 +17185,8 @@ See notes for weapon.</textarea>
                 
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
-                }
-                
+				}
+				
                 // calc. running high jump
                 runningHighJumpFeet = (6 * runningHighMoveToUse) - 10;
                 
@@ -17136,7 +17220,9 @@ See notes for weapon.</textarea>
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
                 }
-                
+				
+				jumpBroadFeet = jumpBroadFeet * gravityRatio;
+
                 statUsedForJump = "ST / 4 = " + jumpBroadFeet;
                 
                 jumpBroadFeet = (jumpBroadFeet * 2) - 3;
@@ -17151,17 +17237,18 @@ See notes for weapon.</textarea>
                     // use enhanced move instead of strength
                     statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
                     
-                    runningMoveToUse = enhancedGroundMove;
+                    runningMoveToUse = enhancedGroundMove * gravityRatio;
                     
-                    runningHighMoveToUse = enhancedGroundMove;
+                    runningHighMoveToUse = enhancedGroundMove * gravityRatio;
                     
                 } else {
                     
                     statUsedForRunningJump = statUsedForJump + " + Yards Run";
                     
-                    runningMoveToUse = Math.floor(jumpST/4) + runningJumpYardsMoved;
-                    
-                    runningHighMoveToUse = Math.floor(jumpST/2) + runningHighJumpYardsMoved;
+                    runningMoveToUse = (Math.floor(jumpST/4) + runningJumpYardsMoved) * gravityRatio;
+					
+					// do not apply gravity ratio to running start
+                    runningHighMoveToUse = (Math.floor(jumpST/2) * gravityRatio) + runningHighJumpYardsMoved;
                 }
                 
                 runningBroadJumpFeet = (runningMoveToUse * 2) - 3;
@@ -17178,7 +17265,9 @@ See notes for weapon.</textarea>
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
                 }
-                
+				
+				jumpHighFeet = jumpHighFeet * gravityRatio;
+
                 jumpHighFeet = (6 * jumpHighFeet) - 10;
                 
                 if (jumpHighFeet <= 0) {
@@ -17187,11 +17276,7 @@ See notes for weapon.</textarea>
                 
                 // convert to feet
                 jumpHighFeet = jumpHighFeet / 12;
-                
-                if (jumpHighFeet <= 0) {
-                    jumpHighFeet = 1;
-                }
-                
+            
                 // calc. running high jump
                 runningHighJumpFeet = (6 * runningHighMoveToUse) - 10;
                 
@@ -17226,7 +17311,9 @@ See notes for weapon.</textarea>
                 
                 if (jumpBroadFeet <= 0) {
                     jumpBroadFeet = 1;
-                }
+				}
+				
+				jumpBroadFeet = jumpBroadFeet * gravityRatio;
                 
                 // calc. running broad jump
                 if (enhancedGroundMove > basicMove) {
@@ -17234,17 +17321,18 @@ See notes for weapon.</textarea>
                     // use enhanced move instead of strength
                     statUsedForRunningJump = "Basic Move * (2 ^ Enh MV Mod)";
                     
-                    runningMoveToUse = enhancedGroundMove;
+                    runningMoveToUse = enhancedGroundMove * gravityRatio;
                     
-                    runningHighMoveToUse = enhancedGroundMove;
+                    runningHighMoveToUse = enhancedGroundMove * gravityRatio;
                     
                 } else {
                     
                     statUsedForRunningJump = statUsedForJump + " + Yards Run";
                     
-                    runningMoveToUse = basicMove + runningJumpYardsMoved;
-                    
-                    runningHighMoveToUse = basicMove + runningHighJumpYardsMoved;
+                    runningMoveToUse = (basicMove + runningJumpYardsMoved) * gravityRatio;
+					
+					// do not apply gravity ratio to running start
+					runningHighMoveToUse = (basicMove * gravityRatio) + runningHighJumpYardsMoved;
                     
                 }
                 
@@ -17267,13 +17355,11 @@ See notes for weapon.</textarea>
                 if (jumpHighFeet <= 0) {
                     jumpHighFeet = 1;
                 }
-                
+				
+				jumpHighFeet = jumpHighFeet * gravityRatio;
+				
                 // convert to feet
                 jumpHighFeet = jumpHighFeet / 12;
-                
-                if (jumpHighFeet <= 0) {
-                    jumpHighFeet = 1;
-                }
                 
                 // calc. running high jump
                 runningHighJumpFeet = (6 * runningHighMoveToUse) - 10;
@@ -17775,7 +17861,7 @@ See notes for weapon.</textarea>
 	}
 	
 	// check for changes that affect thrown object stats
-	on('change:thrown_object_weight change:basic_lift change:thrust change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod', function(event) {
+	on('change:thrown_object_weight change:basic_lift change:thrust change:super_throw_level change:thrown_object_strength_mod change:thrown_object_damage_mod change:gravity', function(event) {
 	    
 	    updateThrownObjectStats();
 	    
@@ -17795,7 +17881,8 @@ See notes for weapon.</textarea>
             'super_throw_level',
             'thrust',
             'basic_lift',
-            'thrown_object_damage_mod'
+			'thrown_object_damage_mod',
+			'gravity'
         ];
 	    
 	    getAttrs(fields, function (values) {
@@ -17812,7 +17899,9 @@ See notes for weapon.</textarea>
 	        
 	        var enteredDamageMod = parseInt(values.thrown_object_damage_mod);
 	        
-	        var damageMod = 0;
+			var damageMod = 0;
+			
+			let gravity = Number(values.gravity);
 	        
 	        throwingST = throwingST + throwingStMod;
 	        
@@ -17848,9 +17937,12 @@ See notes for weapon.</textarea>
 	        // check to see if they entered a modifier
 	        if (enteredDamageMod != 0) {
 	            damageMod = damageMod + enteredDamageMod; 
-	        }
+			}
+			
+			// factor in gravity
+			let gravityRatio = 1 / gravity;
 	        
-	        distance = Math.floor(distance);
+	        distance = Math.floor(distance * gravityRatio);
 	        
 	        var finalDamage = getModifiedDamage(values.thrust, damageMod);
 	        
@@ -18053,14 +18145,13 @@ See notes for weapon.</textarea>
 	            "firing_distance": 0,
 	            "firing_speed_difference": 0,
 	            "firing_size_mod": 0,
-	            "firing_direction": "linear",
-	            "firing_up_dwn_distance": 0
+	            "firing_elevation": 0
 	        });
 	    
 	}
 	
 	// Range Calculator
-	on('change:firing_distance change:firing_speed_difference change:firing_size_mod change:firing_direction change:firing_up_dwn_distance', function(event) {
+	on('change:firing_distance change:firing_speed_difference change:firing_size_mod change:firing_elevation', function(event) {
 	    
 	    updateRangeModifier();
 	    
@@ -18076,9 +18167,8 @@ See notes for weapon.</textarea>
 	        "firing_distance",
 	        "firing_speed_difference",
 	        "firing_size_mod",
-	        "firing_direction",
-	        "firing_up_dwn_distance"
-	        ];
+	        "firing_elevation"
+	    ];
 	        
 	   getAttrs(fields, function(values) {
 	       
@@ -18088,7 +18178,7 @@ See notes for weapon.</textarea>
 	       
 	       var speed = +values.firing_speed_difference;
 	       
-	       var elevation = +values.firing_up_dwn_distance;
+	       var elevation = +values.firing_elevation;
 	       
 	       var elevationDown = 0;
 	       
@@ -18102,11 +18192,11 @@ See notes for weapon.</textarea>
 	       if (linearDistance < 0) 
 	           linearDistance = 0;
 	       
-	       if (elevation > 0 && values.firing_direction == "up") {
+	       if (elevation < 0) {
 	           
 	           rangeToTarget = linearDistance + elevation;
 	           
-	       } else if (elevation > 0 && values.firing_direction == "dn") {
+	       } else if (elevation > 0) {
 	           
 	           elevationDown = Math.floor(elevation/2);
 	           
@@ -20907,49 +20997,6 @@ See notes for weapon.</textarea>
             demo_how_big_type: "TNT",
             demo_how_big_ref: 1.0,
             demo_how_big_weight: 1
-        });
-        
-    });
-    
-    on("change:total_value change:total_weight change:weight", function(event) {
-        
-        getAttrs(["weight", "total_weight"], function (values) {
-            
-            var characterWeight = 0;
-            
-            var carriedWeight = +values.total_weight;
-            
-            var grandTotalWeight = 0;
-            
-            // if someone entered a text for character weight.
-            // then set value to zero
-            if ( isNaN(+values.weight) ) {
-                
-                characterWeight = 0;
-                
-            } else {
-                
-                // else it's a number, we can convert
-                characterWeight = +values.weight;
-                
-            }
-            
-            grandTotalWeight = characterWeight + carriedWeight;
-            
-            // round to three decimal places
-            grandTotalWeight =  Math.round( grandTotalWeight * 1000) / 1000;
-            
-            // remove trailing zeros
-            grandTotalWeight = grandTotalWeight.toString(); 
-            
-            // make sure it's a number again
-            grandTotalWeight = +grandTotalWeight;    
-            
-            // conver to string to remove trailing zeros
-            setAttrs({
-                grand_total_weight: grandTotalWeight
-            });
-            
         });
         
     });
