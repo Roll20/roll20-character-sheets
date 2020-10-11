@@ -9377,10 +9377,10 @@
 </table>
 <fieldset name="repeating_gem6" class="repeating_gem6"><table>
         <tr>
-            <td><input type="text" name="attr_gemdesc6" title="@{repeating_gem_$X_gemdesc6}" class="sheet-medium" placeholder="Item Name"></td>
-            <td><input type="text" name="attr_gemvalue6" title="@{repeating_gem_$X_gemvalue6}" class="sheet-short" placeholder="GP"></td>
-            <td><input type="number" name="attr_gemqty6" title="@{repeating_gem_$X_gemqty6}" class="sheet-short" value="0"></td>
-            <td><input type="text" name="attr_gemsizecut6" title="@{repeating_gem_$X_gemsizecut6}" class="sheet-medium" placeholder="Size/Cut details"></td>
+            <td><input type="text" name="attr_gemdesc6" title="@{repeating_gem6_$X_gemdesc6}" class="sheet-medium" placeholder="Item Name"></td>
+            <td><input type="text" name="attr_gemvalue6" title="@{repeating_gem6_$X_gemvalue6}" class="sheet-short" placeholder="GP"></td>
+            <td><input type="number" name="attr_gemqty6" title="@{repeating_gem6_$X_gemqty6}" class="sheet-short" value="0"></td>
+            <td><input type="text" name="attr_gemsizecut6" title="@{repeating_gem6_$X_gemsizecut6}" class="sheet-medium" placeholder="Size/Cut details"></td>
     </tr>
 </table></fieldset>
 <h4><b>Total GP value from gems:</b></h4><input type="text" name="attr_gemstotalvalue6" title="@{gemstotalvalue6}" value="0" class="sheet-sym" readonly><br><br>
@@ -18234,7 +18234,7 @@ newPriestSections.forEach(section => {
 });
 
 //Weapon proficiency slots
-on('change:repeating_weaponprofs remove:repeating_weaponprofs change:weapprofnum', function(){
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprofnum', function(){
 
     TAS.repeating('weaponprofs')
         .attrs('weapprofslotssum','weapprofnum')  
@@ -18251,7 +18251,7 @@ on('change:repeating_weaponprofs remove:repeating_weaponprofs change:weapprofnum
 });
 
 //Nonweapon proficiency slots
-on('change:repeating_profs remove:repeating_profs change:profslots', function(){
+on('change:repeating_profs:profslots remove:repeating_profs change:profslots', function(){
 
     TAS.repeating('profs')
         .attrs('profslotssum','profslots')
@@ -18268,7 +18268,7 @@ on('change:repeating_profs remove:repeating_profs change:profslots', function(){
 });
 
 //Equipment Carried Section
-on('change:repeating_gear remove:repeating_gear change:gearweight change:gearqty', function(){
+on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear change:gearweight change:gearqty', function(){
 
     TAS.repeating('gear')
         .attrs('gearweighttotal','gearqty','gearweight')  
@@ -18286,7 +18286,7 @@ on('change:repeating_gear remove:repeating_gear change:gearweight change:gearqty
 
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
-on('change:repeating_gear-stored remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
+on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
     
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total','on-mount','gear-stored-weight','gear-stored-qty')
@@ -18305,106 +18305,26 @@ on('change:repeating_gear-stored remove:repeating_gear-stored change:on-mount ch
     .execute();
 })
 
-//Standard Currency
-on('change:repeating_gem remove:repeating_gem change:gemvalue change:gemqty', function(){
-    
-    TAS.repeating('gem')
-        .attrs('gemstotalvalue','gemvalue','gemqty')
-        .fields('gemvalue','gemqty')
-        .reduce(function(m,r){
-            m.gemvalue+=(r.F.gemvalue*r.I.gemqty);
-            return m;
-            
-        },{gemvalue:0, desc: []},function(m,r,a){
-            m.gemvalue+=(a.F.gemvalue*a.I.gemqty);
-            a.gemstotalvalue=m.gemvalue;
-        })
-        .execute();
-});
+function setupCalculateTotalGems(totalField, valueField, multiplierField, repeatingSection) {
+    let onChange = `change:${valueField} change:${multiplierField} change:${repeatingSection}:${valueField} change:${repeatingSection}:${multiplierField} remove:${repeatingSection}`
+    on(onChange, function(){
+        TAS.repeating(repeatingSection)
+            .attrs(totalField, valueField, multiplierField)
+            .fields(valueField, multiplierField)
+            .reduce(function(m,r){
+                m.total+=(r.F[valueField]*r.I[multiplierField]);
+                return m;
+            },{total:0},function(m,r,a){
+                m.total+=(a.F[valueField]*a.I[multiplierField]);
+                a[totalField]=m.total;
+            })
+            .execute();
+    });
+}
 
-//Dragonlance Currency
-on('change:repeating_gem2 remove:repeating_gem2 change:gemvalue2 change:gemqty2', function(){
-    
-    TAS.repeating('gem2')
-        .attrs('gemstotalvalue2','gemvalue2','gemqty2')
-        .fields('gemvalue2','gemqty2')
-        .reduce(function(m,r){
-            m.gemvalue2+=(r.F.gemvalue2*r.I.gemqty2);
-            return m;
-            
-        },{gemvalue2:0, desc: []},function(m,r,a){
-            m.gemvalue2+=(a.F.gemvalue2*a.I.gemqty2);
-            a.gemstotalvalue2=m.gemvalue2;
-        })
-        .execute();
-});
-
-//Dark Sun Currency
-on('change:repeating_gem3 remove:repeating_gem3 change:gemvalue3 change:gemqty3', function(){
-    
-    TAS.repeating('gem3')
-        .attrs('gemstotalvalue3','gemvalue3','gemqty3')
-        .fields('gemvalue3','gemqty3')
-        .reduce(function(m,r){
-            m.gemvalue3+=(r.F.gemvalue3*r.I.gemqty3);
-            return m;
-            
-        },{gemvalue3:0, desc: []},function(m,r,a){
-            m.gemvalue3+=(a.F.gemvalue3*a.I.gemqty3);
-            a.gemstotalvalue3=m.gemvalue3;
-        })
-        .execute();
-});
-
-//Ravenloft Currency
-on('change:repeating_gem4 remove:repeating_gem4 change:gemvalue4 change:gemqty4', function(){
-    
-    TAS.repeating('gem4')
-        .attrs('gemstotalvalue4','gemvalue4','gemqty4')
-        .fields('gemvalue4','gemqty4')
-        .reduce(function(m,r){
-            m.gemvalue4+=(r.F.gemvalue4*r.I.gemqty4);
-            return m;
-            
-        },{gemvalue4:0, desc: []},function(m,r,a){
-            m.gemvalue4+=(a.F.gemvalue4*a.I.gemqty4);
-            a.gemstotalvalue4=m.gemvalue4;
-        })
-        .execute();
-});
-
-//Maztica Currency
-on('change:repeating_gem5 remove:repeating_gem5 change:gemvalue5 change:gemqty5', function(){
-    
-    TAS.repeating('gem5')
-        .attrs('gemstotalvalue5','gemvalue5','gemqty5')
-        .fields('gemvalue5','gemqty5')
-        .reduce(function(m,r){
-            m.gemvalue5+=(r.F.gemvalue5*r.I.gemqty5);
-            return m;
-            
-        },{gemvalue5:0, desc: []},function(m,r,a){
-            m.gemvalue5+=(a.F.gemvalue5*a.I.gemqty5);
-            a.gemstotalvalue5=m.gemvalue5;
-        })
-        .execute();
-});
-
-//Birthright Currency
-on('change:repeating_gem6 remove:repeating_gem6 change:gemvalue6 change:gemqty6', function(){
-    
-    TAS.repeating('gem6')
-        .attrs('gemstotalvalue6','gemvalue6','gemqty6')
-        .fields('gemvalue6','gemqty6')
-        .reduce(function(m,r){
-            m.gemvalue6+=(r.F.gemvalue6*r.I.gemqty6);
-            return m;
-            
-        },{gemvalue6:0, desc: []},function(m,r,a){
-            m.gemvalue6+=(a.F.gemvalue6*a.I.gemqty6);
-            a.gemstotalvalue6=m.gemvalue6;
-        })
-        .execute();
+let gemSections = ['', '1', '2', '3', '4', '5', '6'];
+gemSections.forEach(i => {
+    setupCalculateTotalGems(`gemstotalvalue${i}`, `gemvalue${i}`, `gemqty${i}`, `gem${i}`);
 });
 
 var sheetName = 'AD&D 2E Revised';
