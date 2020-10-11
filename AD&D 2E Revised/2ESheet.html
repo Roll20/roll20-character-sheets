@@ -3660,7 +3660,7 @@
         <table class="sheet-default-header-first-row sheet-default-header-first-column">
             <tr>
                 <td></td>
-                <td>Base</td>
+                <td>Level</td>
                 <td class="sheet-padding-right">Specialist</td>
                 <td class="sheet-padding-right">Intelligence</td>
                 <td>Total</td>
@@ -3669,7 +3669,7 @@
             </tr>
             <tr>
                 <td>Spell Points</td>
-                <td><input type="number" name="attr_spell-points" title="@{spell-points}" class="sheet-short" value="0"></td>
+                <td><input type="number" name="attr_spell-points-lvl" title="@{spell-points-lvl}" class="sheet-short" value="0"></td>
                 <td><input type="number" name="attr_spell-points-spc" title="@{spell-points-spc}" class="sheet-table-dynamic" value="0"></td>
                 <td><input type="number" name="attr_spell-points-int" title="@{spell-points-int}" class="sheet-table-dynamic" value="0"></td>
                 <td><input type="text" name="attr_spell-points-total" title="@{spell-points-total}" class="sheet-short" value="0" readonly></td>
@@ -6051,7 +6051,7 @@
         <table class="sheet-default-header-first-row sheet-default-header-first-column">
             <tr>
                 <td></td>
-                <td>Base</td>
+                <td>Level</td>
                 <td class="sheet-padding-right">Wisdom</td>
                 <td>Total</td>
                 <td class="sheet-centering-padding-5">|</td>
@@ -6059,7 +6059,7 @@
             </tr>
             <tr>
                 <td>Spell Points</td>
-                <td><input type="number" name="attr_spell-points-priest" title="@{spell-points-priest}" class="sheet-short" value="0"></td>
+                <td><input type="number" name="attr_spell-points-priest-lvl" title="@{spell-points-priest-lvl}" class="sheet-short" value="0"></td>
                 <td><input type="number" name="attr_spell-points-priest-wis" title="@{spell-points-priest-wis}" class="sheet-table-dynamic" value="0"></td>
                 <td><input type="text" name="attr_spell-points-priest-total" title="@{spell-points-priest-total}" class="sheet-short" value="0" readonly></td>
                 <td class="sheet-centering">|</td>
@@ -18102,7 +18102,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${wizardSpellPoints}-total`, [wizardSpellPoints, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
+setupCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
 setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`);
 setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
@@ -18111,7 +18111,7 @@ setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
-setupCalculateTotal(`${priestSpellPoints}-total`, [priestSpellPoints, `${priestSpellPoints}-wis`]);
+setupCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
 setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`);
 setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
@@ -18281,7 +18281,7 @@ gemSections.forEach(i => {
 // --- End setup gem total value calculation for all settings --- //
 
 var sheetName = 'AD&D 2E Revised';
-var sheetVersion = '3.2.0';
+var sheetVersion = '3.2.1';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -18292,9 +18292,42 @@ on('sheet:opened', function(){
         // do something with sheet_name and sheet_version, if you might be converting
 
         if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
+            console.log('Updating character sheet version');
             setAttrs({
                 character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):'')
             },{silent:true});
+            
+            getAttrs(['spell-points', 'spell-points-priest'], function(values) {
+                let sp = parseInt(values['spell-points']) || 0;
+                let psp = parseInt(values['spell-points-priest']) || 0;
+                
+                console.log(`Old spell points: ${sp}`);
+                console.log(`Old spell points priest: ${psp}`);
+                
+                let newValue = {};
+                if (sp > 0) {
+                    newValue['spell-points-lvl'] = sp;
+                    newValue['spell-points'] = '';
+                }
+                
+                if (psp > 0) {
+                    newValue['spell-points-priest-lvl'] = psp;
+                    newValue['spell-points-priest'] = '';
+                }
+                
+                setAttrs(newValue);
+            });
+            
+            TAS.repeating('spells')
+                .fields('spell-points', 'spell-points1', 'arc', 'arc1')
+                .each(function (r) {
+                    console.log('Updating repeating spells-points and arc');
+                    r['spell-points'] = (r.I['spell-points1']);
+                    r['spell-points1'] = '';
+                    r['arc'] = (r.I['arc1']);
+                    r['arc1'] = '';
+                })
+                .execute();
         }
     });
 });
