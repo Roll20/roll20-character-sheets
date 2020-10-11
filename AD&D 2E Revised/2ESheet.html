@@ -7355,17 +7355,12 @@
             <td>Powers Remaining</td>
         </tr>
         <tr>
-            <td><input type="text" name="attr_spell-power-available" title="@{spell-power-available}" value="(@{spell-power-sum1}+@{spell-power-sum2}+@{spell-power-sum3})" class="sheet-table-dynamic" disabled></td>
+            <td><input type="text" name="attr_spell-power-available" title="@{spell-power-available}" value="0" class="sheet-table-dynamic" readonly></td>
             <td class="sheet-centering">|</td>
-            <td><input type="text" name="attr_spell-power-remaining" title="@{spell-power-remaining}" value="@{spell-power-available}-(@{spell-power-integer1}+@{spell-power-integer2}+@{spell-power-integer3})" class="sheet-table-dynamic" disabled></td>
+            <td><input type="text" name="attr_spell-power-remaining" title="@{spell-power-remaining}" value="0" class="sheet-table-dynamic" readonly></td>
         </tr>
     </table>
-    <input style="display: none;" name="attr_spell-power-sum1" class="sheet-short" value="0">
-    <input style="display: none;" name="attr_spell-power-sum2" class="sheet-short" value="0">
-    <input style="display: none;" name="attr_spell-power-sum3" class="sheet-short" value="0">
-    <input style="display: none;" type="text" name="attr_spell-power-integer1" class="sheet-short" value="0">
-    <input style="display: none;" type="text" name="attr_spell-power-integer2" class="sheet-short" value="0">
-    <input style="display: none;" type="text" name="attr_spell-power-integer3" class="sheet-short" value="0">
+    <input style="display: none;" name="attr_spell-power-sum" class="sheet-short" value="0">
     
     <br><br>
 
@@ -18123,57 +18118,13 @@ setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
 // --- End setup Spell Points, Arc, and Wind --- //
 
-//Granted Powers
-on('change:repeating_spells67 remove:repeating_spells67', function(){
-    
-    TAS.repeating('spells67')
-        .attrs('spell-power-integer1','spell-power-sum1')
-        .fields('cast-value67','cast-max67')
-        .reduce(function(m,r){
-            m['cast-value67']+=(r.F['cast-value67']);
-            m['cast-max67']+=(r.F['cast-max67']);
-            return m;
-            
-        },{['cast-value67']:0,['cast-max67']:0, desc: []},function(m,r,a){
-            a['spell-power-integer1']=m['cast-value67'];
-            a['spell-power-sum1']=m['cast-max67'];
-        })
-        .execute();
-});
-
-on('change:repeating_spells68 remove:repeating_spells68', function(){
-    
-    TAS.repeating('spells68')
-        .attrs('spell-power-integer2','spell-power-sum2')
-        .fields('cast-value68','cast-max68')
-        .reduce(function(m,r){
-            m['cast-value68']+=(r.F['cast-value68']);
-            m['cast-max68']+=(r.F['cast-max68']);
-            return m;
-            
-        },{['cast-value68']:0,['cast-max68']:0, desc: []},function(m,r,a){
-            a['spell-power-integer2']=m['cast-value68'];
-            a['spell-power-sum2']=m['cast-max68'];
-        })
-        .execute();
-});
-
-on('change:repeating_spells69 remove:repeating_spells69', function(){
-    
-    TAS.repeating('spells69')
-        .attrs('spell-power-integer3','spell-power-sum3')
-        .fields('cast-value69','cast-max69')
-        .reduce(function(m,r){
-            m['cast-value69']+=(r.F['cast-value69']);
-            m['cast-max69']+=(r.F['cast-max69']);
-            return m;
-            
-        },{['cast-value69']:0,['cast-max69']:0, desc: []},function(m,r,a){
-            a['spell-power-integer3']=m['cast-value69'];
-            a['spell-power-sum3']=m['cast-max69'];
-        })
-        .execute();
-});
+// --- Start setup Granted Powers --- //
+let powerSpellSections = ['67', '68', '69'];
+let spellPower = 'spell-power';
+setupSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
+setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
+setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
+// --- End setup Granted Powers --- //
 
 // Auto set spell info function
 let newWizardSections = ['wiz1'];
@@ -18322,10 +18273,12 @@ function setupCalculateTotalGems(totalField, valueField, multiplierField, repeat
     });
 }
 
+// --- Start setup gem total value calculation for all settings --- //
 let gemSections = ['', '1', '2', '3', '4', '5', '6'];
 gemSections.forEach(i => {
     setupCalculateTotalGems(`gemstotalvalue${i}`, `gemvalue${i}`, `gemqty${i}`, `gem${i}`);
 });
+// --- End setup gem total value calculation for all settings --- //
 
 var sheetName = 'AD&D 2E Revised';
 var sheetVersion = '3.2.0';
