@@ -86,6 +86,9 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.4
+* Added three configurable custom buttons to Settings > Setup
+* Fixed some minor CSS issues
 #### Version 1.2.3
 * Added helper button to toggle global Wild Die query
 * Added helper button to toggle global Rate of Fire query
