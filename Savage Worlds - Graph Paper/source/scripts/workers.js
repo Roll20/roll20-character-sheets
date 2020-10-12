@@ -544,45 +544,22 @@ function twoColSum(values, target, multi = false) {
   setAttrs({ [target]: sum.toFixed(1) });
 }
 
-on('change:repeating_powers:power_damage', (e) => {
+on('change:repeating_powers:power_damage change:repeating_weapons:weapon_damage', (e) => {
   let code = TETRA.parseDiceCode(e.newValue);
 
+  code = code.replaceAll('!', '@{explode_damage}'); // Toggle exploding damage dice
   code = code == '' ? '0' : code;
 
   setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
 });
 
-on('change:repeating_weapons', (e) => {
-  if (e.sourceAttribute.includes('damage')) {
-    let code = TETRA.parseDiceCode(e.newValue);
-
-    code = code == '' ? '0' : code;
-
-    setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
-  }
-
-  if (e.sourceAttribute.includes('weight')) {
-    TETRA.doWithRepList('weapons',
-                        ['weapon_weight', 'weapon_weight_toggle'],
-                        (v) => { twoColSum(v, 'carry_weight_weapons') });
-  }
-});
-
-on('remove:repeating_weapons', (e) => {
+on('remove:repeating_weapons change:repeating_weapons:weapon_weight change:repeating_weapons:weapon_weight_toggle', (e) => {
   TETRA.doWithRepList('weapons',
                       ['weapon_weight', 'weapon_weight_toggle'],
                       (v) => { twoColSum(v, 'carry_weight_weapons') });
 });
 
-on('change:repeating_apparel', (e) => {
-  if (e.sourceAttribute.includes('weight')) {
-    TETRA.doWithRepList('apparel',
-                        ['apparel_weight', 'apparel_weight_toggle'],
-                        (v) => { twoColSum(v, 'carry_weight_apparel') });
-  }
-});
-
-on('remove:repeating_apparel', (e) => {
+on('remove:repeating_apparel change:repeating_apparel:apparel_weight change:repeating_apparel:apparel_weight_toggle', (e) => {
   TETRA.doWithRepList('apparel',
                       ['apparel_weight', 'apparel_weight_toggle'],
                       (v) => { twoColSum(v, 'carry_weight_apparel') });
@@ -770,10 +747,6 @@ on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (
   setAttrs({ [target]: update }, { silent: true });
 });
 
-on(listItems.map(s => `change:repeating_${s}s:wd_override_die`).join(' '), (e) => {
-  // Make sure the input is valid; not implemented yet
-});
-
 on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {
   let update = e.newValue == 'on' ? `{{wd=@{wd_override_die}}} {{wdroll=[[ @{wd_override_die}!cs2 @{skill_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}` : '',
       target = e.sourceAttribute.replace('_toggle', '');
@@ -790,6 +763,13 @@ on(listItems.map(s => `change:repeating_${s}s:roll_description_toggle`).join(' '
 
 on(listItems.map(s => `change:repeating_${s}s:roll_injection_toggle`).join(' '), (e) => {
   let update = e.newValue == 'on' ? `@{roll_injection_input}` : '',
+      target = e.sourceAttribute.replace('_toggle', '');
+
+  setAttrs({ [target]: update }, { silent: true });
+});
+
+on('change:repeating_weapons:explode_damage_toggle change:repeating_powers:explode_damage_toggle', (e) => {
+  let update = e.newValue == 'on' ? '!' : '',
       target = e.sourceAttribute.replace('_toggle', '');
 
   setAttrs({ [target]: update }, { silent: true });
