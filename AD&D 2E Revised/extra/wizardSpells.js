@@ -1,4 +1,4 @@
-/* ---- Wizard spells start ---- */
+/* ---- Wizard first level spells start ---- */
 const wiz1 = {};
 wiz1['Affect Normal Fires'] = {
     'name': 'Affect Normal Fires',
@@ -807,6 +807,224 @@ wiz1['Wizard Mark'] = {
     'effect': 'When this spell is cast, the wizard is able to inscribe, visibly or invisibly, his personal rune or mark, as well as up to six additional characters of smaller size. A *wizard mark* spell enables the caster to etch the rune upon stone, metal, or any softer substance without harm to the material upon which the mark is placed. If an invisible mark is made, a *detect magic* spell will cause it to glow and be visible (though not necessarily understandable). *Detect invisibility*, *true seeing*, a *gem of seeing*, or a *robe of eyes* will likewise expose an invisible wizard mark. A *read magic* spell will reveal the maker’s words, if any. The mark cannot be dispelled, but it can be removed by the caster or by an *erase* spell. If cast on a living being, normal wear gradually causes the mark to fade.'
 };
 
+let wiz2 = {};
+
+wiz2['Alter Self'] = {
+    'name': 'Alter Self',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[3d4+(2*[[@{level-wizard}]])]]',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 180',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard can alter his appearance and form—including clothing and equipment—to appear taller or shorter; thin, fat, or in between; human, humanoid, or any other generally man-shaped bipedal creature. The caster’s body can undergo a limited physical alteration and his size can be changed up to 50%. If the form selected has wings, the wizard can actually fly, but at only onethird the speed of a true creature of that type, and with a loss of two maneuverability classes (to a minimum of E). If the form has gills, the caster can breathe under water as long as the spell lasts. However, the caster does not gain any multiple attack routines or additional damage allowed to an assumed form. \\n&emsp;The caster’s attack rolls, Armor Class, and saving throws do not change. The spell does not confer special abilities, attack forms, or defenses. Once the new form is chosen, it remains for the duration of the spell. The caster can change back into his own form at will; this ends the spell immediately. A caster who is slain automatically returns to his normal form.'
+};
+
+wiz2['Bind'] = {
+    'name': 'Bind',
+    'level': 'Level 2 Wizard',
+    'school': 'Enchantment',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[50+(5*[[@{level-wizard}]])]] feet',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is employed, the wizard can command any nonliving ropelike object, including string, yarn, cord, line, rope, or even a cable. The spell affects 50 feet of normal rope (with a 1 inch diameter), plus 5 feet per caster level. This length is reduced by 50% for every additional inch of thickness and increased by 50% for each half-inch less. The possible commands are Coil (form a neat, coiled stack), Coil & Knot, Loop, Loop & Knot, Tie & Knot, and the reverses of all of the above (Uncoil, etc.). One command can be given each round. \\n&emsp;The rope can only enwrap a creature or an object within 1 foot of it—it does not snake outward—so it must be thrown or hurled near the intended target. Note that the rope itself, and any knots tied in it, are not magical. A typical rope might be AC 6 and take 4 points of slashing damage before breaking. The rope does not inflict damage of any type, but it can be used as a trip line or to entangle a single opponent who fails a saving throw vs. spell.'
+};
+
+wiz2['Blindness'] = {
+    'name': 'Blindness',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '[[30+(10*[[@{level-wizard}]])]] yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *blindness* spell causes the victim to become blind, able to see only a grayness before its eyes. Various *cure* spells will not remove this effect, and only a *dispel magic* or the spellcaster can do away with the blindness if the creature fails its initial saving throw vs. spell. A blinded creature suffers a –4 penalty to its attack rolls, and its opponents gain a +4 bonus to their attack rolls.'
+};
+
+wiz2['Blur'] = {
+    'name': 'Blur',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '0',
+    'duration': '[[3+[[@{level-wizard}]] ]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *blur* spell is cast, the wizard causes the outline of his form to become blurred, shifting and wavering. This distortion causes all missile and melee combat attacks against the caster to be made with –4 penalties on the first attempt and –2 penalties on all successive attacks. It also grants the wizard a +1 bonus to his saving throw for any direct magical attack. A *detect invisibility* spell will not counter this effect, but the 5th-level priest spell *true seeing* and similar magic will.'
+};
+
+wiz2['Continual Light'] = {
+    'name': 'Continual Light',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '60 yards',
+    'duration': 'Permanent',
+    'aoe': '60-feet radius',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is similar to a *light* spell, except that it is as bright as full daylight and lasts until negated by magical darkness or by a *dispel magic* spell. Creatures who suffer penalties in bright light suffer them in this spell’s area of effect. As with the *light* spell, it can be cast into the air, onto an object, or at a creature. When cast at a creature, the target gets a saving throw vs. spell; success indicates that the spell affects the space about 1 foot behind the creature instead. Note that this spell can also blind a creature if it is successfully cast upon the creature’s visual organs, reducing its attack rolls, saving throws, and Armor Class by 4. If the spell is cast on a small object that is then placed in a light-proof covering, the spell’s effects are blocked until the covering is removed. \\n&emsp;A continual light brought into an area of magical darkness (or vice versa) is temporarily negated so that the otherwise prevailing light conditions exist in the overlapping areas of effect. A direct casting of *continual light* against a similar or weaker magical darkness cancels both. \\n&emsp;This spell eventually consumes the material it is cast upon, but the process takes far longer than the time in the typical campaign. Extremely hard and expensive materials can last hundreds or even thousands of years.'
+};
+
+wiz2['Darkness, 15\' Radius'] = {
+    'name': 'Darkness, 15\' Radius',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '1 turn + [[@{level-wizard}]] rounds',
+    'aoe': '15-feet radius',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'A bit of bat fur and either a drop of pitch or a piece of coal.',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes total, impenetrable darkness in the area of effect. Infravision is useless. Neither normal nor magical light works unless a *light* or *continual light* spell is used. In the former event, the *darkness* spell is negated by the *light* spell, and vice versa.'
+};
+
+wiz2['Deafness'] = {
+    'name': 'Deafness',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '60 yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'Beeswax',
+    'reference': 'PHB p. 181',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *deafness* spell causes the recipient to become totally deaf and unable to hear any sounds. The victim is allowed a saving throw vs. spell. An affected creature has a –1 penalty to its surprise rolls unless its other senses are unusually keen. Deafened spellcasters have a 20% chance to miscast any spell with a verbal component. This *deafness* can be done away with only by means of a *dispel magic* spell or by the spellcaster.'
+};
+
+wiz2['Deeppockets'] = {
+    'name': 'Deeppockets',
+    'level': 'Level 2 Wizard',
+    'school': 'Ateration, Enchantment',
+    'range': 'Touch',
+    'duration': '[[12+[[@{level-wizard}]] ]] hours',
+    'aoe': '1 garment',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'In addition to the garment, which is reusable, the material components of this spell are a tiny golden needle and a strip of fine cloth given a half-twist and fastened at the ends.',
+    'reference': 'PHB p. 182',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the wizard to specially prepare a garment so as to hold far more than it normally could. A finely sewn gown or robe of high-quality material (at least 50 gp value) is fashioned so as to contain numerous hand-sized pockets. One dozen is the minimum number. The *deeppockets* spell then enables these pockets to hold a total of 100 pounds (5 cubic feet in volume) as if it were only 10 pounds of weight. Furthermore, there are no discernible bulges where the special pockets are. At the time of casting, the caster can instead choose to have 10 pockets each holding 10 pounds (1⁄2 cubic foot volume each). If the robe or like garment is sewn with 100 or more pockets (200 gp minimum cost), 100 pockets can be created to contain one pound of weight and 1⁄6 cubic foot volume each. Each special pocket is actually an extradimensional holding space. \\n&emsp;If the spell duration expires while there is material within the enchanted pockets, or if a successful *dispel magic* is cast upon the enchanted garment, all the material suddenly appears around the wearer and immediately falls to the ground. The caster can also cause all the pockets to empty with a single command.'
+};
+
+wiz2['Detect Evil'] = {
+    'name': 'Detect Evil',
+    'level': 'Level 2 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
+    'aoe': '10 x 180 feet',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 182',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell discovers emanations of evil (or of good in the case of the reverse spell) from any creature, object, or area. Character alignment is *not* revealed under most circumstances: Characters who are strongly aligned, do not stray from their faith, and who are at least 9th level might radiate good or evil if they are intent upon appropriate actions. Powerful monsters, such as ki-rin, send forth emanations of evil or good, even if polymorphed. Aligned undead radiate evil, for it is this power and negative force that enables them to continue existing. An evilly cursed object or unholy water radiates evil, but a hidden trap or an unintelligent viper does not. The degree of evil (faint, moderate, strong, overwhelming) can be noted. Note that priests have a more powerful version of this spell. The spell has a path of detection 10 feet wide and 60 yards long in the direction in which the wizard is facing. The wizard must concentrate— stop, have quiet, and intently seek to detect the aura—for at least one round to receive a reading.'
+};
+
+wiz2['Detect Invisibility'] = {
+    'name': 'Detect Invisibility',
+    'level': 'Level 2 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
+    'aoe': '[[10*[[@{level-wizard}]] ]] yards',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'A pinch of talc and a small sprinkling of powdered silver.',
+    'reference': 'PHB p. 182',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the wizard casts a *detect invisibility* spell, he is able to see clearly any objects or beings that are invisible, as well as any that are astral, ethereal, or out of phase. In addition, it enables the wizard to detect hidden or concealed creatures (for example, thieves in shadows, halflings in underbrush, and so on). It does not reveal the method of concealment or invisibility, except in the case of astral travelers (where the silver cord can be seen). It does not reveal illusions or enable the caster to see through physical objects. Detection is a path 10 ft. wide along the wizard’s line of sight to the range limit.'
+};
+
+wiz2['ESP'] = {
+    'name': 'ESP',
+    'level': 'Level 2 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[{{5*[[@{level-wizard}]],90}kl1}]] yards\n(90 yds. maximum)',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'A copper piece.',
+    'reference': 'PHB p. 182',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When an *ESP* spell is used, the caster is able to detect the surface thoughts of any creatures in range—except for those of undead and creatures without minds (as we know them). The ESP is stopped by 2 feet of rock, 2 inches of any metal other than lead, or a thin sheet of lead foil. \\n&emsp;The wizard employing the spell is able to probe the surface thoughts of one creature per round, getting simple instinctual thoughts from lower order creatures. Probes can continue on the same creature from round to round or can move on to other creatures. The caster can use the spell to help determine if a creature lurks behind a door, for example, but the ESP does not always reveal what sort of creature it is. If used as part of a program of interrogation, an intelligent and wary subject receives an initial saving throw. If successful, the creature successfully resists and the spell reveals no additional information. If the saving throw is failed, the caster may learn additional information, according to the DM’s ruling. The creature’s Wisdom adjustment applies, as may additional bonuses up to +4, based on the sensitivity of the information sought.'
+};
+
+wiz2['Flaming Sphere'] = {
+    'name': 'Flaming Sphere',
+    'level': 'Level 2 Wizard',
+    'school': 'Evocation',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '3-feet radius',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'A bit of tallow, a pinch of sulphur, and a dusting of powdered iron.',
+    'reference': 'PHB p. 182',
+    'damage': 'Direct contact: 2d4 Fire.\n5 feet proximity: 1d4',
+    'damage-type': 'Heat',
+    'healing': '',
+    'effect': 'A *flaming sphere* spell creates a burning globe of fire within 10 yards of the caster. This sphere rolls in whichever direction the wizard points, at a rate of 30 feet per round. It rolls over barriers less than 4 feet tall, such as furniture, low walls, etc. Flammable substances are set afire by contact with the sphere. Creatures in contact with the globe must successfully save vs. spell or suffer 2d4 points of fire damage. Those within 5 feet of the sphere’s surface must also save or suffer 1d4 points of heat damage. A successful saving throw means no damage is suffered. The DM may adjust the saving throws if there is little or no room to dodge the sphere. \\n&emsp;The sphere moves as long as the spellcaster actively directs it; otherwise, it merely stays at rest and burns. It can be extinguished by the same means as any normal fire of its size. The surface of the sphere has a spongy, yielding consistency and so does not cause damage except by its flame. It cannot push unwilling creatures aside or batter down large obstacles.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
-/* ---- Wizard spells end ---- */
+/* ---- Wizard first level spells end ---- */
