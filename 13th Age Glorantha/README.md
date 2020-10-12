@@ -31,7 +31,7 @@ In the Combat tab, the default settings assume your character is unarmed and thr
 
 The switch for Icons and Runes is there for players who want to ignore all the Gloranthan features and use this sheet just to play a normal game of 13th Age. But for those that like to use *both* Runes and Icons, the Icons list is also repeated in the Lifestyle tab. As is Wealth, which comes with a handy-dandy calculator macro, and the ability to quote your money to the chat (which can also double as a resources system if you prefer to roll dice instead of track individual coins).
 
-### Powers
+### Powers Tab
 
 This tab houses all of your character's **Features**, **Talents**, **Spells / Powers**, and **Gifts / Items**, with spell-slot and gift trackers to boot. The layout of these repeating sections is similar to the way it will display in the chat template, and each is color-coded (Features are green, Talents are orange, Spells are purple, and Gifts are teal). The Feats checkboxes are for tracking which powers you've upgraded. And the drop-down description box can be used to copy over from the SRD or your rules .pdf.
 
@@ -40,19 +40,19 @@ Additional customizations can be made in the Macro drop-down, such as changing t
 &{template:13G_red} {{name=@{name}}} {{type=@{type}}} {{usage=@{usage}}} {{text=@{description}}} {{Result=[[[[1D20]]+[[5]]]]=$[[0]]+$[[1]]}} {{Hit=[[1D6+5]]}} {{Miss=[[@{level}]]}}
 ```
 
-Only `name`, `type`, `usage`, and `text` have specific functions assigned to them within the template. You can title any other row with anything you like. And you can change the color to any of the following: `_red`, `_green`, `_blue`, `_orange`, `_teal`, `_purple`, `_black`, `_grey`, or `_white`.
+Only `name`, `type`, `usage`, and `text` have specific functions assigned to them within the template. You can title any other row with anything you like. And you can change the color to any of the following: `_red`, `_green`, `_blue`, `_orange`, `_teal`, `_purple`, `_black`, `_gray`, or `_white`.
 
 If you selected the 'Specials' and/or 'Minions' buttons in the Options tab, then they appear in the Powers tab. If you accidentally press 'X' on either one, fear not, your data is not lost: simply re-click to reveal the hidden section.
 
 The Minions block is slightly different from the rest of the sheet powers, as it gives options for the creatures statblock and one basic attack. There are also feats checkboxes and a description box, since most summoned creatures are technically class powers.
 
-### Lifestyle
+### Lifestyle Tab
 
 This Tab gives you lots of space to write about your character, their appearance, backstory, or their adventures and the people they've met. As mentioned, the Icons and Wealth blocks are also repeated here for your convenience, since this tab will probably most frequently be used during downtime. The **Additional Notes** block is a large repeating segment with even more space, and the option to color code all your notes and quote them to chat, for those particularly meticulous players.
 
 If you selected the 'Factions' buttons in the Options tab, then it will appear in the Lifestyle tab. The Factions section is for interacting with a meta-game layer, typically during downtime, and tracking those interactions. Examples of it's use would include: constructing a fortress, running a cult, keeping up with a noble court, or tinkering with a powerful magic item. All the boxes are left open on this repeating segment so you can use it for whatever you wish.
 
-### Bestiary
+### Bestiary Tab
 
 This Tab is mostly for use by gamemasters. It let's you write information and describe statblocks for your non-player characters, monsters, and other beasties. Most of the sections here are repeats of earlier ones. The **Mooks** repeating segment, for example, is a reprint of Minions, without the feats: so that you can have a main villain and all their cronies listed in one place. The conditions checkboxes in this instance only apply to the main NPC's basic attacks though, conditions on mooks must be tracked manually.
 
@@ -65,7 +65,7 @@ This sheet has been built with *rules representation* first in mind, rather than
 Similarly though, these features have also been designed to be unintrusive for users who only care to play the game as written, so you never have to look at them again if you don't want to — except when making a new character.
 
 ### Secret Feature
-If you hover over almost any element on the sheet you'll be shown a tooltip which tells you it's name and how to reference it. Usually with and at sign `@` and curly braces `{}`. Elements that end with `-label` or `-header` can be edited from their default value by creating an Attribute of the same name in the Roll 20 'Attributes & Abilities' tab and giving it a new value.
+If you hover over almost any element on the sheet you'll be shown a tooltip which tells you it's name and how to reference it. Usually with an at sign `@` and curly braces `{}`. Elements that end with `-label` or `-header` can be edited from their default value by creating an Attribute of the same name in the Roll 20 'Attributes & Abilities' tab and giving it a new value.
 
 For example, maybe you would prefer to use a standard skills list, instead of 13th Age's Backgrounds system. You can change the `@{backgrounds-label}` by creating the Attribute 'backgrounds-label' and then entering 'Skills' as it's value. The change is only superficial, internal references will still be named `backgrounds`, but a different name can mean a lot.
 
