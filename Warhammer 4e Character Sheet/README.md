@@ -8,6 +8,11 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+October 12th 2020 v1.23
+
+- translation.json update, attempting to fix the translation issue which was introduced last week which prevent the new json from use on the live server sheet.
+- Fixed issue with Heavy Head armor capping at 1 carried Enc.
+
 
 October 5th 2020 v1.23
 
