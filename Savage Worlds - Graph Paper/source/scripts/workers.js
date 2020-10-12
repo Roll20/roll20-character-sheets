@@ -769,7 +769,7 @@ on(listItems.map(s => `change:repeating_${s}s:roll_injection_toggle`).join(' '),
 });
 
 on('change:repeating_weapons:explode_damage_toggle change:repeating_powers:explode_damage_toggle', (e) => {
-  let update = e.newValue == 'on' ? '!' : '',
+  let update = e.newValue == 'on' ? '!' : ' ',
       target = e.sourceAttribute.replace('_toggle', '');
 
   setAttrs({ [target]: update }, { silent: true });
