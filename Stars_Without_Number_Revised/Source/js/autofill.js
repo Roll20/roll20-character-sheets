@@ -122,18 +122,18 @@ const getAutofillInfo = (sName, v, inputData, label) => {
     // Generates info text from the stored data
     if (sName === "ship-defenses") {
         return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.defense_power}, ${
-            translate("MASS_INIT")}: ${data.defense_mass}, ${translate("CREDITS")}: ${formatter.format(data.defense_price)}. ${data.defense_effect}`;
+            translate("MASS_INIT")}: ${data.defense_mass}, ${translate("CREDITS")}: ${formatter.format(data.defense_price) !== "NaN" ? formatter.format(data.defense_price) : data.defense_price}. ${data.defense_effect}`;
     }
     if (sName === "ship-fittings") {
         return `${translate(data.class)}+. ${translate("POWER_INIT")}: ${data.fitting_power}, ${
-            translate("MASS_INIT")}: ${data.fitting_mass}, ${translate("CREDITS")}: ${formatter.format(data.fitting_price)} ${data.fitting_effect}`;
+            translate("MASS_INIT")}: ${data.fitting_mass}, ${translate("CREDITS")}: ${formatter.format(data.fitting_price) !== "NaN" ? formatter.format(data.fitting_price) : data.fitting_price}. ${data.fitting_effect}`;
     }
     if (sName === "ship-weapons") {
         return `${translate(data.class)}+. ${
             translate("POWER_INIT")}: ${data.weapon_power}, ${
             translate("MASS_INIT")}: ${data.weapon_mass}, ${
             translate("HARDPOINTS_INIT")}: ${data.weapon_hardpoints}, ${
-            translate("CREDITS")}: ${formatter.format(data.weapon_price)}. ${
+            translate("CREDITS")}: ${formatter.format(data.weapon_price) !== "NaN" ? formatter.format(data.weapon_price) : data.weapon_price}. ${
             translate("DAMAGE_SHORT")} ${data.weapon_damage}. ${
             data.weapon_qualities}${
             (data.weapon_ammo ? `, ${translate("AMMO")}: ${data.weapon_ammo}`: "")}.`;
@@ -150,14 +150,14 @@ const getAutofillInfo = (sName, v, inputData, label) => {
             data.weapon_ammo ? `, ${translate("AMMO")} ${data.weapon_ammo}` : ""}${
             data.weapon_shock ? `, ${data.weapon_shock_damage} ${translate("SHOCK_DAMAGE_AGAINST_AC_LEQ")} ${data.weapon_shock_ac}` : ""}, +${getNamedAttrMod(data.weapon_attribute_mod)}${
             data.weapon_encumbrance ? `, ${translate("ENCUMBRANCE_SHORT")} ${data.weapon_encumbrance}` : ""}${
-            data.weapon_price ? `, ${translate("CREDITS")}: ${formatter.format(data.weapon_price)}` : ""}.`
+            data.weapon_price ? `, ${translate("CREDITS")}: ${formatter.format(data.weapon_price) !== "NaN" ? formatter.format(data.weapon_price) : data.weapon_price}` : ""}.`
     }
     if (sName === "armor") {
         return `${translate("AC")} ${data.armor_ac}, ${translate(data.armor_type)
-        }, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}, ${translate("CREDITS")}: ${formatter.format(data.armor_price)}.`;
+        }, ${translate("ENCUMBRANCE_SHORT")} ${data.armor_encumbrance}, ${translate("CREDITS")}: ${formatter.format(data.armor_price) !== "NaN" ? formatter.format(data.armor_price) : data.armor_price}.`;
     }
     if (sName === "cyberware") {
-        return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${formatter.format(data.cyberware_price)}.`;
+        return `${translate("STRAIN")}: ${data.cyberware_strain}, ${translate("CREDITS")}: ${formatter.format(data.cyberware_price) !== "NaN" ? formatter.format(data.cyberware_price) : data.cyberware_price}.`;
     }
     if (sName === "techniques") {
         if (data.level === "0") return `${translate("CORE_TECHNIQUE")}.`;
@@ -165,7 +165,7 @@ const getAutofillInfo = (sName, v, inputData, label) => {
     }
     if (sName === "gear") {
         return `${translate("ENCUMBRANCE_SHORT")} ${data.gear_encumbrance}${data.gear_bundled === "on" ? "#" : ""}${
-            data.gear_price ? `, ${translate("CREDITS")}: ${formatter.format(data.gear_price)}` : ""
+            data.gear_price ? `, ${translate("CREDITS")}: ${formatter.format(data.gear_price) !== "NaN" ? formatter.format(data.gear_price) : data.gear_price}` : ""
         }.`
     }
     return "";
