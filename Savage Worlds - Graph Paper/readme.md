@@ -91,6 +91,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Extended [Button] option in lists with a modifier field
 * Added [Ace Damage] toggle to Engrams, Powers, and Weapons
 * Added helper button to toggle global GM rolls
+* Added Abilities block
 #### Version 1.2.4
 * Added three configurable custom buttons to Settings > Setup
 * Fixed some minor CSS issues
