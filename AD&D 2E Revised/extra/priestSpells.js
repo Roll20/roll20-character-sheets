@@ -235,7 +235,7 @@ pri1['Faerie Fire'] = {
     'sphere': 'Weather',
     'range': '80 yards',
     'duration': '[[4*[[@{level-priest}]] ]] rounds',
-    'aoe': '[[10*[[@{level-priest}]] ]] square feet within 40-feet radius',
+    'aoe': '[[10*[[@{level-priest}]] ]] square feet within 40-foot radius',
     'components': 'V, M',
     'cast-time': '4',
     'saving-throw': 'None',
