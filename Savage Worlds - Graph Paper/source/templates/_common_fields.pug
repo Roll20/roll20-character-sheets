@@ -1,4 +1,13 @@
 input(type='hidden', name='attr_unskilled', value='d4-2')
-input(type='hidden', name='attr_unskilled_roll', value='1d4!cs2 - 2')
-input(type='hidden', name='attr_unskilled_wd_roll', value='1d6!cs2 - 2')
+input(type='hidden', name='attr_unskilled_untrained_mod', value='-2')
+input(type='hidden', name='attr_unskilled_roll', value='1d4')
+input(type='hidden', name='attr_unskilled_wd_roll', value='1d6')
 input(type='hidden', name='attr_unskilled_extra_wd_roll', value='-10000')
+
+input(type='hidden', name=`attr_unskilled_global_wd_roll`, value=`{{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 + (@{unskilled_untrained_mod})[Untrained] + (@{unskilled_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+input(type='hidden', name=`attr_unskilled_global_bonus_wd_roll`, value=`{{bonus_wd=@{query_global_bonus_wd}}} {{bonus_wdroll=[[ @{query_global_bonus_wd}!cs2 + (@{unskilled_untrained_mod})[Untrained] + (@{unskilled_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+input(type='hidden',
+      name=`attr_unskilled_roll_body`,
+      value!=`@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{query_global_rof} ]]}} {{header=@{name} ^{rolls} ^{unskilled}}} {{trait=^{unskilled}}} {{traitdie=@{unskilled}}} {{flat=@{unskilled_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{unskilled_roll}!cs2 + (@{unskilled_untrained_mod})[Untrained] + (@{unskilled_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{unskilled_global_wd_roll} @{unskilled_global_bonus_wd_roll}`)
