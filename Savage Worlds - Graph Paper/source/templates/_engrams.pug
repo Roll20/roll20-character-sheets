@@ -32,13 +32,13 @@ input(type='checkbox',
               class='sheet-hidden sheet-toggle sheet-toggle--list-roll')
 
         button(type='roll',
-               name='roll_engram_skill',
-               value!='@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_skill)}} {{description=@{roll_description}}} @{roll_injection}',
+               name='roll_skill',
+               value!=`@{skill_roll_body} {{wd=@{skill_wd}}} {{wdroll=[[ @{skill_wd_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} @{wd_override} {{reroll=[r](~repeating_engrams_skill)}} {{description=@{roll_description}}} @{roll_injection}`,
                class='sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard') 9
-               
+
         button(type='roll',
-               name='roll_engram_extra_skill',
-               value!='@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_engrams_engram_extra_skill)}} {{description=@{roll_description}}} @{roll_injection}',
+               name='roll_extra_skill',
+               value!=`@{skill_roll_body} {{wd=@{skill_wd}}} {{wdroll=[[ @{skill_extra_wd_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} @{wd_override} {{reroll=[r](~repeating_engrams_skill)}} {{description=@{roll_description}}} @{roll_injection}`,
                class='sheet-repitem__skill-roll sheet-repitem__skill-roll--extra') 9
 
         input(type='text',
@@ -106,9 +106,21 @@ input(type='checkbox',
                     class='sheet-label-toggle__input')
 
             label.sheet-label-toggle
-              input(type='hidden', name='attr_skill', value='@{hacking_template}')
-              input(type='hidden', name='attr_extra_skill', value='@{hacking_extra_template}')
+              input(type='hidden', name='attr_skill_wd', value='@{hacking_wd}')
               input(type='hidden', name='attr_skill_mod', value='@{hacking_mod}')
+              input(type='hidden', name='attr_skill_untrained_mod', value='@{hacking_untrained_mod}')
+              input(type='hidden', name='attr_skill_roll', value='@{hacking_roll}')
+              input(type='hidden', name='attr_skill_wd_roll', value='@{hacking_wd_roll}')
+              input(type='hidden', name='attr_skill_extra_wd_roll', value='@{hacking_wd_roll}')
+
+              input(type='hidden', name=`attr_skill_global_wd_roll`, value=`{{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+              input(type='hidden', name=`attr_skill_global_bonus_wd_roll`, value=`{{bonus_wd=@{query_global_bonus_wd}}} {{bonus_wdroll=[[ @{query_global_bonus_wd}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+              input(type='hidden',
+                    name=`attr_skill_roll_body`,
+                    value!=`@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} {{header=@{name} ^{rolls} @{skill_name}}} {{trait=@{skill_name}}} {{source_label=^{source}}} {{source=@{engram_name}}} {{traitdie=@{skill_roll}}} {{flat=@{skill_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}@{skill_bonus}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{skill_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{skill_global_wd_roll} @{skill_global_bonus_wd_roll}`)
+
               input(type='checkbox', name='attr_roll_button_toggle')
               span(data-i18n='roll-button') Roll Button
               input(type='text',
@@ -118,6 +130,10 @@ input(type='checkbox',
                     value='Hacking',
                     spellcheck='false',
                     class='sheet-label-toggle__input')
+              input(type='text',
+                    name='attr_skill_bonus',
+                    placeholder='+0',
+                    class='sheet-label-toggle__input sheet-label-toggle__input--tiny')
 
             label.sheet-label-toggle
               input(type="hidden", name='attr_rof_override', value='1')

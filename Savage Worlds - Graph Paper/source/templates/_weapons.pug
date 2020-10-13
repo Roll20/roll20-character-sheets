@@ -42,12 +42,12 @@
 
         button(type='roll',
                name='roll_skill',
-               value!='@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} {{source_label=^{weapon}}} {{source=@{weapon_name}}} @{skill} @{wd_override} {{reroll=[r](~repeating_weapons_skill)}} {{damageroll=[t](~repeating_weapons_weapon_damage)}} {{description=@{roll_description}}} @{roll_injection}',
+               value!=`@{skill_roll_body} {{wd=@{skill_wd}}} {{wdroll=[[ @{skill_wd_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} @{wd_override} {{reroll=[r](~repeating_weapons_skill)}} {{damageroll=[t](~repeating_weapons_weapon_damage)}} {{description=@{roll_description}}} @{roll_injection}`,
                class='sheet-repitem__skill-roll sheet-repitem__skill-roll--wildcard') 9
 
         button(type='roll',
                name='roll_extra_skill',
-               value!='@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} {{source_label=^{weapon}}} {{source=@{weapon_name}}} @{extra_skill} @{wd_override} {{reroll=[r](~repeating_weapons_extra_skill)}} {{damageroll=[t](~repeating_weapons_weapon_damage)}} {{description=@{roll_description}}} @{roll_injection}',
+               value!=`@{skill_roll_body} {{wd=@{skill_wd}}} {{wdroll=[[ @{skill_extra_wd_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} @{wd_override} {{reroll=[r](~repeating_weapons_skill)}} {{damageroll=[t](~repeating_weapons_weapon_damage)}} {{description=@{roll_description}}} @{roll_injection}`,
                class='sheet-repitem__skill-roll sheet-repitem__skill-roll--extra') 9
 
         input(type='text',
@@ -166,9 +166,21 @@
               span(data-i18n='trapping') Trapping
 
             label.sheet-label-toggle
-              input(type='hidden', name='attr_skill', value='@{shooting_template}')
-              input(type='hidden', name='attr_extra_skill', value='@{shooting_extra_template}')
+              input(type='hidden', name='attr_skill_wd', value='@{shooting_wd}')
               input(type='hidden', name='attr_skill_mod', value='@{shooting_mod}')
+              input(type='hidden', name='attr_skill_untrained_mod', value='@{shooting_untrained_mod}')
+              input(type='hidden', name='attr_skill_roll', value='@{shooting_roll}')
+              input(type='hidden', name='attr_skill_wd_roll', value='@{shooting_wd_roll}')
+              input(type='hidden', name='attr_skill_extra_wd_roll', value='@{shooting_wd_roll}')
+
+              input(type='hidden', name=`attr_skill_global_wd_roll`, value=`{{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+              input(type='hidden', name=`attr_skill_global_bonus_wd_roll`, value=`{{bonus_wd=@{query_global_bonus_wd}}} {{bonus_wdroll=[[ @{query_global_bonus_wd}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
+
+              input(type='hidden',
+                    name=`attr_skill_roll_body`,
+                    value!=`@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{rof_override} ]]}} {{header=@{name} ^{rolls} @{skill_name}}} {{trait=@{skill_name}}} {{source_label=^{weapon}}} {{source=@{weapon_name}}} {{traitdie=@{skill_roll}}} {{flat=@{skill_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}@{skill_bonus}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{skill_roll}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{skill_global_wd_roll} @{skill_global_bonus_wd_roll}`)
+              
               input(type='checkbox', name='attr_roll_button_toggle')
               span(data-i18n='roll-button') Roll Button
               input(type='text',
@@ -178,6 +190,10 @@
                     value='Shooting',
                     spellcheck='false',
                     class='sheet-label-toggle__input')
+              input(type='text',
+                    name='attr_skill_bonus',
+                    placeholder='+0',
+                    class='sheet-label-toggle__input sheet-label-toggle__input--tiny')
 
             label.sheet-label-toggle
               input(type="hidden", name='attr_rof_override', value='?{@{query_rate_of_fire}|@{weapon_rof}}')

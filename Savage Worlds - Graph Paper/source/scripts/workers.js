@@ -103,16 +103,15 @@ var TETRA = TETRA || ( function() {
       let die = values[trait],
           wd = values[`${trait}_wd`],
           ewd = '-10000', // Extra Wild Die
-          mod = values[`${trait}_mod`] || '+ 0',
-          untrained = '',
-          code = toInt(values[`${trait}_mod`]);
+          mod = values[`${trait}_mod`] || '0',
+          untrained = '0',
+          code = toInt(mod);
 
       // Set up Wild Die
       if (dice.includes(wd) && wd != '') {
-        wd = `1${wd}!cs2 `;
         ewd = wd;
       } else if (wd == '') {
-        wd = '1d6!cs2 ';
+        wd = '1d6';
       } else {
         wd = '-10000'; // Rolltemplate will not show results below -1000
       }
@@ -121,32 +120,26 @@ var TETRA = TETRA || ( function() {
       if (die == 'd4-2') {
         die = 'd4';
         code -= 2;
-        untrained = ' - 2 ';
+        untrained = '-2';
       }
 
+      // Stringify code
       if (code != 0) {
         code = code > 0 ? `+${code}` : code.toString();
       } else {
         code = '';
       }
 
+      // Build base code
       code = die + code;
 
-      // Die (Wild Die)
-      code = ewd != '-10000' ? `${code} (${values[`${trait}_wd`]})` : code;
+      // Add custom Wild Die to code
+      code = ewd != '-10000' ? `${code} [${wd}]` : code;
 
-      // Set up trait die
-      die = `1${die}!cs2 `;
-
-      // Build roll queries (including Wild Die for extras)
-      let traitQuery = die + untrained,
-          wdQuery = wd != '' ? wd + untrained : '',
-          ewdQuery = ewd != '-10000' ? ewd + untrained : '-10000';
-
-      setAttrs({ [`${trait}_roll`]: traitQuery,
-                 [`${trait}_wd_roll`]: wdQuery,
-                 [`${trait}_extra_wd_roll`]: ewdQuery,
-                 [`${trait}_untrained_mod`]: untrained == '' ? '+0' : untrained,
+      setAttrs({ [`${trait}_roll`]: die,
+                 [`${trait}_wd_roll`]: wd,
+                 [`${trait}_extra_wd_roll`]: ewd,
+                 [`${trait}_untrained_mod`]: untrained,
                  [`${trait}_code`]: code });
     });
   },
@@ -518,7 +511,7 @@ on('change:integrity', (e) => {
 });
 
 /* #############################################################################
-REPEATING WEIGHT & DAMAGE
+REPEATING WEIGHT
 ############################################################################# */
 
 function twoColSum(values, target, multi = false) {
@@ -544,15 +537,6 @@ function twoColSum(values, target, multi = false) {
   setAttrs({ [target]: sum.toFixed(1) });
 }
 
-on('change:repeating_powers:power_damage change:repeating_weapons:weapon_damage', (e) => {
-  let code = TETRA.parseDiceCode(e.newValue);
-
-  code = code.replaceAll('!', '@{explode_damage}'); // Toggle exploding damage dice
-  code = code == '' ? '0' : code;
-
-  setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
-});
-
 on('remove:repeating_weapons change:repeating_weapons:weapon_weight change:repeating_weapons:weapon_weight_toggle', (e) => {
   TETRA.doWithRepList('weapons',
                       ['weapon_weight', 'weapon_weight_toggle'],
@@ -565,15 +549,7 @@ on('remove:repeating_apparel change:repeating_apparel:apparel_weight change:repe
                       (v) => { twoColSum(v, 'carry_weight_apparel') });
 });
 
-on('change:repeating_inventory', (e) => {
-  if (e.sourceAttribute.includes('weight') || e.sourceAttribute.includes('amount')) {
-    TETRA.doWithRepList('inventory',
-                        ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
-                        (v) => { twoColSum(v, 'carry_weight_inventory', true) });
-  }
-});
-
-on('remove:repeating_inventory', (e) => {
+on('remove:repeating_inventory change:repeating_inventory:inventory_weight change:repeating_inventory:inventory_weight_toggle change:repeating_inventory:inventory_amount', (e) => {
   TETRA.doWithRepList('inventory',
                       ['inventory_weight', 'inventory_weight_toggle', 'inventory_amount'],
                       (v) => { twoColSum(v, 'carry_weight_inventory', true) });
@@ -626,7 +602,7 @@ on('change:augmentations_total_loss change:integrity_maximum change:integrity_mo
 });
 
 /* #############################################################################
-REAPTING VEHICLES & POWER ARMOR
+REAPTING VEHICLE WEAPONS & SILHOUETTES
 ############################################################################# */
 
 on('change:repeating_vehicles change:repeating_powerarmors', (e) => {
@@ -718,6 +694,15 @@ REPEATING LISTS & OPTIONS
 
 const listItems = ['engram', 'power', 'weapon'];
 
+on(listItems.map(s => `change:repeating_${s}s:${s}_damage`).join(' '), (e) => {
+  let code = TETRA.parseDiceCode(e.newValue);
+
+  code = code.replaceAll('!', '@{explode_damage}'); // Toggle exploding damage dice
+  code = code == '' ? '0' : code;
+
+  setAttrs({ [`${e.sourceAttribute}_roll`]: code }, { silent: true });
+});
+
 on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
   let array = skills.map((s) => { return `rename_${s}` }),
       id = e.sourceAttribute.replace('skill_name', ''); // All rename_<skill> attributes
@@ -730,9 +715,12 @@ on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
     if (_.isUndefined(renameAttribute)) {
       update[e.sourceAttribute] = e.previousValue; // Reset if input is invalid
     } else {
-      update[`${id}skill`] = `@{${renameAttribute.replace('rename_', '')}_template}`;
-      update[`${id}extra_skill`] = `@{${renameAttribute.replace('rename_', '')}_extra_template}`;
+      update[`${id}skill_wd`] = `@{${renameAttribute.replace('rename_', '')}_wd}`;
       update[`${id}skill_mod`] = `@{${renameAttribute.replace('rename_', '')}_mod}`;
+      update[`${id}skill_untrained_mod`] = `@{${renameAttribute.replace('rename_', '')}_untrained_mod}`;
+      update[`${id}skill_roll`] = `@{${renameAttribute.replace('rename_', '')}_roll}`;
+      update[`${id}skill_wd_roll`] = `@{${renameAttribute.replace('rename_', '')}_wd_roll}`;
+      update[`${id}skill_extra_wd_roll`] = `@{${renameAttribute.replace('rename_', '')}_extra_wd_roll}`;
     }
 
     setAttrs(update, { silent: true });
@@ -748,7 +736,7 @@ on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (
 });
 
 on(listItems.map(s => `change:repeating_${s}s:wd_override_toggle`).join(' '), (e) => {
-  let update = e.newValue == 'on' ? `{{wd=@{wd_override_die}}} {{wdroll=[[ @{wd_override_die}!cs2 @{skill_mod} - @{fatigue_mod} - @{wound_mod} + ?{@{query_modifier}|0} ]]}}` : '',
+  let update = e.newValue == 'on' ? `{{wd=@{wd_override_die}}} {{wdroll=[[ @{wd_override_die}!cs2 + (@{skill_untrained_mod})[Untrained] + (@{skill_mod}+0)[Flat] + (@{skill_bonus}+0)[Bonus] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}` : '',
       target = e.sourceAttribute.replace('_toggle', '');
 
   setAttrs({ [target]: update }, { silent: true });
@@ -768,7 +756,7 @@ on(listItems.map(s => `change:repeating_${s}s:roll_injection_toggle`).join(' '),
   setAttrs({ [target]: update }, { silent: true });
 });
 
-on('change:repeating_weapons:explode_damage_toggle change:repeating_powers:explode_damage_toggle', (e) => {
+on(listItems.map(s => `change:repeating_${s}s:explode_damage_toggle`).join(' '), (e) => {
   let update = e.newValue == 'on' ? '!' : ' ',
       target = e.sourceAttribute.replace('_toggle', '');
 
