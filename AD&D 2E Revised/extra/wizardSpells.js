@@ -1585,4 +1585,5 @@ wiz2['Wizard Lock'] = {
 
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
+wizardSpells['wiz2'] = wiz2;
 /* ---- Wizard first level spells end ---- */
