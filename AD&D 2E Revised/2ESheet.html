@@ -2603,10 +2603,10 @@
                         <td><input type="text" name="attr_crt" title="@{repeating_customrogue_$X_crt}" class="sheet-min" value="0" readonly/>%</td>
                         <td><button type="roll" name="roll_cr" title="%{repeating_customrogue_$X_cr}" value="/gmroll [[1d100cs<1cf>96+(?{Misc. modifier|0})]]&le;[[(@{crt})]] [@{customskill} (in Leather Armor)]">Leather</button></td>
                         <td><input type="text" name="attr_crnoarmorb" title="@{repeating_customrogue_$X_crnoarmorb}" class="sheet-min" value="0"/>%</td>
-                        <td><input type="text" name="attr_crnoarmort" title="@{repeating_customrogue_$X_crnoarmort}" class="sheet-min" value="(@{crt})+(@{crnoarmorb})" readonly/>%</td>
+                        <td><input type="text" name="attr_crnoarmort" title="@{repeating_customrogue_$X_crnoarmort}" class="sheet-min" value="0" readonly/>%</td>
                         <td><button type="roll" name="roll_crnoarmor" title="%{repeating_customrogue_$X_crnoarmor}" value="/gmroll [[1d100cs<1cf>96+(?{Misc. modifier|0})]]&le;[[(@{crnoarmort})]] [@{customskill} (in No Armor)]">No Armor</button></td>
                         <td><input type="text" name="attr_crarmorp" title="@{repeating_customrogue_$X_crarmorp}" class="sheet-min" value="-0"/>%</td>
-                        <td><input type="text" name="attr_crarmort" title="@{repeating_customrogue_$X_crarmort}" class="sheet-min" value="(@{crt})+(@{crarmorp})" readonly/>%</td>
+                        <td><input type="text" name="attr_crarmort" title="@{repeating_customrogue_$X_crarmort}" class="sheet-min" value="0" readonly/>%</td>
                         <td><button type="roll" name="roll_crarmor" title="%{repeating_customrogue_$X_crarmorp}" value="/gmroll [[1d100cs<1cf>96+(?{Misc. modifier|0})]]&le;[[(@{crarmort})]] [@{customskill} (in @{armorname})]">Heavy Armor</button></td>
                     </tr>
                 </table>
@@ -18031,18 +18031,23 @@ function setupCalculateTotal(totalField, fieldsToSum) {
 }
 
 function setupRepeatingCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName) {
+    console.log(repeatingFieldsToSum);
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
+    console.log(onChange);
+    console.log(allFields);
     on(`${onChange} remove:repeating_${repeatingName}`, function(){
         TAS.repeating(repeatingName)
             .fields(allFields)
             .reduce(function(m,r) {
                 repeatingFieldsToSum.forEach(column => {
                     m.total += r.I[column];
+                    console.log(m);
                 });
                 return m;
             }, {total: 0}, function (m,r) {
+                console.log(m);
                 r[repeatingTotalField] = m.total;
             })
             .execute();
