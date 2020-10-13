@@ -1115,6 +1115,330 @@ wiz2['Hypnotic Pattern'] = {
     'effect': 'When this spell is cast, the wizard creates a weaving, twisting pattern of subtle colors in the air. This pattern causes any creature looking at it to become fascinated and stand gazing at it as long as the spellcaster maintains the display, plus two rounds thereafter. The spell can captivate a maximum of 24 levels, or Hit Dice, of creatures (for example, 24 creatures with 1 Hit Die each, 12 with 2 Hit Dice, etc.). All creatures affected must be within the area of effect, and each is entitled to a saving throw vs. spell. A damage-inflicting attack on an affected creature frees it from the spell immediately. \\n&emsp;The wizard need not utter a sound, but he must gesture appropriately while holding a glowing stick of incense or a crystal rod filled with phosphorescent material.'
 };
 
+wiz2['Improved Phantasmal Force'] = {
+    'name': 'Improved Phantasmal Force',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '[[60+(10*[[@{level-wizard}]])]] yards',
+    'duration': 'Special',
+    'aoe': '[[200+(50*[[@{level-wizard}]])]] square feet',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': 'A bit of fleece.',
+    'reference': 'PHB p. 184',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Like the 1st-level *phantasmal force* spell, this spell creates the illusion of any object, creature, or force, as long as it is within the spell’s area of effect. The spellcaster can maintain the illusion with minimal concentration; thus, he can move at half normal speed (but not cast other spells). Some minor sounds are included in the effects of the spell, but not understandable speech. Also, the improved phantasm continues for two rounds after the wizard ceases to concentrate upon it.'
+};
+
+wiz2['Invisibility'] = {
+    'name': 'Invisibility',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Creature touched',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter.',
+    'reference': 'PHB p. 184',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes the creature touched to vanish from sight and be undetectable by normal vision or even infravision. Of course, the invisible creature is not magically silenced, and certain other conditions can render the creature detectable. Even allies cannot see the invisible creature or his gear, unless these allies can normally see invisible things or employ magic to do so. Items dropped or put down by the invisible creature become visible; items picked up disappear if tucked into the clothing or pouches worn by the creature. Note, however, that light never becomes invisible, although a source of light can become so (thus, the effect is that of a light with no visible source). \\n&emsp;The spell remains in effect until it is magically broken or dispelled, until the wizard or recipient cancels it, until the recipient attacks any creature, or until 24 hours have passed. Thus, the invisible being can open doors, talk, eat, climb stairs, etc., but if he attacks, he immediately becomes visible, although the invisibility enables him to attack first. Note that the priest spells *bless*, *chant*, and *prayer* are not attacks for this purpose. All highly Intelligent (Intelligence 13 or more) creatures with 10 or more Hit Dice or levels of experience have a chance to detect invisible objects (they roll saving throws vs. spell; success means they noticed the invisible object).'
+};
+
+wiz2['Irritation'] = {
+    'name': 'Irritation',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '1-4 creatures in a 15-feet radius',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'A leaf from poison ivy, oak, or sumac.',
+    'reference': 'PHB p. 184',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'An *irritation* spell affects the epidermis of the subject creatures. Creatures with very thick or insensitive skins (such as buffalo, elephants, scaled creatures, etc.) are basically unaffected. There are two versions of the spell, either of which can be cast from the standard preparation: \\n&emsp;*Itching*. When cast, this causes each subject to feel an instant itching sensation on some portion of its body. If one round is not immediately spent scratching the irritated area, the creature is so affected that the next three rounds are spent squirming and twisting, effectively worsening its Armor Class by 4 and its attack rolls by 2 during this time. Spell preparations are ruined in the first round this spell is in effect, but not in the following three rounds. Doing nothing but scratching the itch for a full round prevents the rest of the effect. If cast at one creature, the saving throw has a –3 penalty; if cast at two creatures, the saving throw has a –1 penalty; and if cast at three or four creatures, the saving throw is normal. \\n&emsp;*Rash*. When a rash is cast, the subject notices nothing for 1d4 rounds, but thereafter its entire skin breaks out in red welts that itch. The rash persists until either a *cure disease* or *dispel magic* spell is cast upon it. It lowers Charisma by 1 point per day for each of four days (i.e., maximum Charisma loss is 4 points). After one week, Dexterity is lowered by 1 point also. Symptoms vanish immediately upon the removal of the rash, and all statistics return to normal. This can be cast at one creature only, with a saving throw penalty of –2.'
+};
+
+wiz2['Knock'] = {
+    'name': 'Knock',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '60yards',
+    'duration': 'Special',
+    'aoe': '[[10*[[@{level-wizard}]] ]] feet',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 184',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *knock* spell opens stuck, barred, locked, held, or wizardlocked doors. It opens secret doors, as well as locked or trick-opening boxes or chests. It also loosens welds, shackles, or chains. If used to open a wizard-locked door, the spell does not remove the former spell, but simply suspends its functioning for one turn. In all other cases, it permanently opens locks or welds—although the former could be closed and locked again later. It does not raise barred gates or similar impediments (such as a portcullis), nor does it affect ropes, vines, and the like. Note that the effect is limited by the area; a 3rd-level wizard can cast a knock spell on a door of 30 square feet or less (for example, a standard 4-ft. × 7-ft. door). Each spell can undo up to two means of preventing egress through a portal. Thus if a door is locked, barred, and held, or triple locked, opening it requires two *knock* spells. In all cases, the location of the door or item must be known—the spell cannot be used against a wall in hopes of discovering a secret door. \\n&emsp;The reverse spell, *lock*, closes and locks a door or similar closure, provided there is a physical mechanism. It does not create a weld, but it locks physically operated locking mechanisms, set bars, and so on, up to two functions. It cannot affect a portcullis.'
+};
+
+wiz2['Know Alignment'] = {
+    'name': 'Know Alignment',
+    'level': 'Level 2 Wizard',
+    'school': 'Divination',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '1 creature or object per 2 rounds',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 185',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *know alignment* spell enables the wizard to read the aura of a creature or an aligned object (unaligned objects reveal nothing). The caster must remain stationary and concentrate on the subject for two full rounds. A creature is allowed a saving throw vs. spell and, if successful, the caster learns nothing about that particular creature from the casting. If the caster concentrates on a creature or object for only one round, he can learn only its alignment with respect to law and chaos. Certain magical devices negate the *know alignment* spell. \\n&emsp;The reverse, *undetectable alignment*, conceals the alignment of an object or creature for 24 hours—even from a know alignment spell.'
+};
+
+wiz2['Leomund\'s Trap'] = {
+    'name': 'Leomund\'s Trap',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Object touched',
+    'components': 'V, S, M',
+    'cast-time': '3 rounds',
+    'saving-throw': 'None',
+    'materials': 'A piece of iron pyrite.',
+    'reference': 'PHB p. 185',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This false trap is designed to fool a thief or other character attempting to pilfer the spellcaster’s goods. The wizard places the spell upon any small mechanism or device, such as a lock, hinge, hasp, screw-on cap, ratchet, etc. Any character able to detect traps, or who uses any spell or device enabling trap detection, is 100% certain a real trap exists. Of course, the spell is illusory and nothing happens if the trap is sprung; its primary purpose is to frighten away thieves or make them waste precious time. \\n&emsp;The material component of the spell is a piece of iron pyrite touched to the object to be trapped while the object is sprinkled with a special dust requiring 200 gp to prepare. If another *Leomund’s trap* is within 50 feet when the spell is cast, the casting fails.'
+};
+
+wiz2['Levitate'] = {
+    'name': 'Levitate',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '[[20*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': '1 creature or object',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'Either a small leather loop or a piece of golden wire bent into a cup shape with a long shank on one end.',
+    'reference': 'PHB p. 185',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *levitate* spell is cast, the wizard can place it upon his person, an object, or a single creature, subject to a maximum weight limit of 100 pounds per level of experience (for example, a 3rd-level wizard can levitate a maximum of 300 pounds. Current max: [[100*[[@{level-wizard}]] ]] pounds). If the spell is cast upon the wizard, he can move vertically up or down at a movement rate of 2 per round. If cast upon an object or another creature, the wizard can levitate it at the same speed, according to his command. This spell does not empower horizontal movement, but the recipient could push along the face of a cliff, for example, to move laterally. The spellcaster can cancel the spell as desired. If the subject of the spell is unwilling, or the object is in the possession of a creature, a saving throw vs. spell is allowed to determine if the *levitate* spell affects it. \\n&emsp;Once cast, the spell requires no concentration, except when changing height. A levitating creature attempting to use a missile weapon finds himself increasingly unstable; the first attack has an attack roll penalty of –1, the second –2, the third –3, etc., up to a maximum of –5. A full round spent stabilizing allows the creature to begin again at –1. Lack of leverage makes it impossible to cock a medium or heavy crossbow.'
+};
+
+wiz2['Locate Object'] = {
+    'name': 'Locate Object',
+    'level': 'Level 2 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[20*[[@{level-wizard}]] ]] yards',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '*Locate object*:A forked twig. / *Obscure object*: A chameleon skin.',
+    'reference': 'PHB p. 185',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell aids in locating a known or familiar object. The wizard casts the spell, slowly turns, and senses when he is facing in the direction of the object to be located, provided the object is within range (i.e., 60 yards for 3rd-level wizards, 80 yards for 4th, 100 yards for 5th, etc.). The spell can locate such objects as apparel, jewelry, furniture, tools, weapons, or even a ladder or stairway. Note that attempting to find a specific item, such as jewelry or a crown, requires an accurate mental image; if the image is not close enough to the actual, the spell does not work. Desired but unique objects cannot be located by this spell unless they are known by the caster. The spell is blocked by lead. Creatures cannot be found by this spell. \\n&emsp;The reversal, obscure object, hides an object from location by spell, crystal ball, or similar means for eight hours. Creatures cannot be affected by this spell.'
+};
+
+wiz2['Magic Mouth'] = {
+    'name': 'Magic Mouth',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '10 yards',
+    'duration': 'Special',
+    'aoe': '1 object',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'A small bit of honeycomb.',
+    'reference': 'PHB p. 185',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard imbues the chosen object with an enchanted mouth that suddenly appears and speaks its message when a specified event occurs. The message, which must be of 25 words or less, can be in any language known by the spellcaster, and can be delivered over a period of one turn. The mouth cannot speak magical spells or use command words. It does, however, move to the words articulated—if it is placed upon a statue, the mouth of the statue would actually move and appear to speak. Of course, the magic mouth can be placed upon a tree, rock, door, or any other object, excluding intelligent members of the animal or vegetable kingdoms. \\n&emsp;The spell functions when specific conditions are fulfilled, according to the command of the spellcaster. Some examples are to speak “to the first creature that touches you,” or “to the first creature that passes within 30 feet.” Commands can be as general or as detailed as desired, although only visual and audible triggers can be used, such as the following: “Speak only when a venerable female human carrying a sack of groat clusters sits crosslegged within 1 foot.” Such visual triggers can react to a character using the *disguise* ability. Command range is 5 yards per level of the wizard ([[5*[[@{level-wizard}]] ]] yards), so a 6th-level wizard can command the magic mouth to speak at a maximum encounter range of 30 yards (“Speak when a winged creature comes within 30 yards.”). The spell lasts until the speak command can be fulfilled; thus, the spell duration is variable. A magic mouth cannot distinguish invisible creatures, alignments, level, Hit Dice, or class, except by external garb. If desired, the effect can be keyed to a specific noise or spoken word.'
+};
+
+wiz2['Melf\'s Acid Arrow'] = {
+    'name': 'Melf\'s Acid Arrow',
+    'level': 'Level 2 Wizard',
+    'school': 'Conjuration',
+    'range': '180 yards',
+    'duration': 'Special',
+    'aoe': '1 target',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': 'A dart, powdered rhubarb leaf, and an adder’s stomach.',
+    'reference': 'PHB p. 186',
+    'damage': '2d4',
+    'damage-type': 'Acid',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard creates a magical arrow that speeds to its target as if fired from the bow of a fighter of the same level as the wizard. No modifiers for range, nonproficiency, or specialization are used. The arrow has no attack or damage bonus, but it inflicts 2d4 points of acid damage (with saving throws for items on the target); there is no splash damage. For every three levels that the caster has achieved, the acid, unless somehow neutralized, lasts for another round, inflicting another 2d4 points of damage each round. So at 3rd–5th level, the acid lasts two rounds; at 6th–8th level, the acid lasts for three rounds, etc. Currently [[1+floor([[@{level-wizard}]]/3)]] rounds.'
+};
+
+wiz2['Mirror Image'] = {
+    'name': 'Mirror Image',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '0',
+    'duration': '[[3*[[@{level-wizard}]] ]] rounds',
+    'aoe': '6-feet radius',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 186',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *mirror image* spell is invoked, the spellcaster causes from two to eight exact duplicates of himself to come into being around him. These images do exactly what the wizard does. Since the spell causes a blurring and slight distortion when it is cast, it is impossible for opponents to be certain which are the illusions and which is the actual wizard. When an image is struck by a melee or missile attack, magical or otherwise, it disappears, but any other existing images remain intact until struck. The images seem to shift from round to round, so that if the actual wizard is struck during one round, he cannot be picked out from among his images the next. To determine the number of images that appear, roll 1d4 and add 1 for every three levels of experience the wizard has achieved, to a maximum of eight images ([[{{[[1d4+floor([[@{level-wizard}]]/3)]],8}kl1}]] images). At the end of the spell duration, all surviving images wink out.'
+};
+
+wiz2['Misdirection'] = {
+    'name': 'Misdirection',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '30 yards',
+    'duration': '8 hours',
+    'aoe': '1 creature or object',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 186',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard misdirects the information from a detection spell (*detect charm, detect evil, detect invisibility, detect lie, detect magic, detect snares and pits*, etc.). While the detection spell functions, it indicates the wrong area, creature, or the opposite of the truth with respect to *detect evil* or *detect lie*. The wizard directs the spell effect upon the object of the detection spell. If the caster of the detection spell fails his saving throw vs. spell, the misdirection takes place. Note that this spell does not affect other types of divination (*know alignment, augury, ESP, clairvoyance*, etc.).'
+};
+
+wiz2['Protection From Cantrips'] = {
+    'name': 'Protection From Cantrips',
+    'level': 'Level 2 Wizard',
+    'school': 'Abjuration',
+    'range': 'Touch',
+    'duration': '[[5+[[@{level-wizard}]] ]] hours',
+    'aoe': 'Creature or object touched',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 186',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the wizard receives immunity to the effects of cantrips cast by other wizards, apprentices, or creatures that use the *cantrip* spell. The spell protects the caster, or one item or person that he touches (such as a spell book or a drawer containing spell components). Any cantrip cast against the protected person or item dissipates with an audible popping sound. This spell is often used by a wizard who has mischievous apprentices, or one who wishes apprentices to clean or shine an area using elbow grease rather than magic. Any unwilling target of this spell must be touched (via an attack roll) and is allowed a saving throw vs. spell to escape the effect.'
+};
+
+wiz2['Pyrotechnics'] = {
+    'name': 'Pyrotechnics',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '120 yards',
+    'duration': 'Special',
+    'aoe': '1 fire source',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'One fire source within a 20-foot cube',
+    'reference': 'PHB p. 186',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *pyrotechnics* spell draws on an existing fire source to produce one of two effects, at the option of the caster. First, it can produce a flashing and fiery burst of glowing, colored aerial fireworks that lasts one round. This effect temporarily blinds those creatures in, under, or within 120 feet of the area and that have an unobstructed line of sight to the burst. Creatures viewing this are blinded for 1d4+1 rounds unless they successfully save vs. spell. The fireworks fill a volume 10 times greater than that of the original fire source. \\n&emsp;This spell can also cause a thick, writhing stream of smoke to arise from the source and form a choking cloud that lasts for one round per experience level of the caster. This covers a roughly spherical volume from the ground or floor up (or conforming to the shape of a confined area) that totally obscures vision beyond 2 feet. The smoke fills a volume 100 times that of the fire source. All within the cloud must roll successful saving throws vs. spell or suffer –2 penalties to all combat rolls and Armor Class. \\n&emsp;The spell uses one fire source within a 20-foot cube, which is immediately extinguished. An extremely large fire used as a source might be only partially extinguished. Magical fires are not extinguished, although a fire-based creature (such as a fire elemental) used as a source suffers 1 point of damage per caster level.'
+};
+
+wiz2['Ray of Enfeeblement'] = {
+    'name': 'Ray of Enfeeblement',
+    'level': 'Level 2 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[10+(5*[[@{level-wizard}]])]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 187',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of a *ray of enfeeblement*, a wizard weakens an opponent, reducing its Strength and thereby the attacks that rely upon it. Humans, demihumans, and humanoids of man-size or less are reduced to an effective Strength of 5, losing all Strength bonuses and suffering an attack roll penalty of –2 and a –1 penalty to damage. Other creatures suffer a penalty of –2 on attack rolls. Furthermore, they have a –1 penalty for each die of damage they inflict. (But no damage roll can inflict less than 1 point per die of damage.) Your DM will determine any other effects appropriate to the affected creature. If the target creature makes its saving throw, the spell has no effect. This spell does not affect combat bonuses due to magical items, and those conferring increased Strength function normally.'
+};
+
+wiz2['Rope Tricks'] = {
+    'name': 'Rope Tricks',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[2*[[@{level-wizard}]] ]] turns',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': 'Powdered corn extract and a twisted loop of parchment.',
+    'reference': 'PHB p. 187',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast upon a piece of rope from 5 to 30 feet long, one end of the rope rises into the air until the whole rope hangs perpendicular, as if affixed at the upper end. The upper end is, in fact, fastened to an extradimensional space. The spellcaster and up to seven others can climb up the rope and disappear into this place of safety where no creature can find them. The rope can be taken into the extradimensional space if fewer than eight persons have climbed it; otherwise, it simply stays hanging in the air (extremely strong creatures might be able to remove it, at the DM’s option). Spells cannot be cast across the interdimensional interface, nor can area effects cross it. Those in the extradimensional space can see out of it as if there were a 3-foot × 5-foot window centered on the rope. The persons in the extradimensional space must climb down prior to the end of the spell, or they are dropped from the height at which they entered the extradimensional space. The rope can be climbed by only one person at a time. Note that the *rope trick* spell enables climbers to reach a normal place if they do not climb all the way to the extradimensional space. Also note that creating or taking extradimensional spaces into an existing extradimensional space is hazardous.'
+};
+
+wiz2['Scare'] = {
+    'name': 'Scare',
+    'level': 'Level 2 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[30+(10*[[@{level-wizard}]])]] yards',
+    'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
+    'aoe': '15-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': 'A bit of bone from an undead skeleton, zombie, ghoul, ghast, or mummy.',
+    'reference': 'PHB p. 187',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes creatures with fewer than 6 Hit Dice or levels of experience to fall into fits of trembling and shaking. The frightened creatures have a –2 reaction adjustment and may drop items held if encumbered. If cornered, they fight, but with –1 penalties to attack rolls, damage rolls, and saving throws. \\n&emsp;Only elves, half-elves, and priests are allowed saving throws against this spell. Note that this spell has no effect on the undead (skeletons, zombies, ghouls, and so on), or on upper or lower planar creatures of any sort.'
+};
+
+wiz2['Shatter'] = {
+    'name': 'Shatter',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '[[30+(10*[[@{level-wizard}]])]] yards',
+    'duration': 'Instantaneous',
+    'aoe': '3-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'A chip of mica.',
+    'reference': 'PHB p. 188',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *shatter* spell is a sound-based attack that affects nonmagical objects of crystal, glass, ceramic, or porcelain, such as vials, bottles, flasks, jugs, windows, mirrors, etc. All such objects within a 3-foot radius of the center of the spell effect are smashed into dozens of pieces by the spell. Objects weighing more than one pound per level of the caster ([[@{level-wizard}]] pounds) are not affected, but all other objects of the appropriate composition must save vs. crushing blow or be shattered. Alternatively, the spell can be focused against a single item of up to 10 pounds per caster level. Crystalline creatures usually suffer 1d6 points of damage per caster level to a maximum of 6d6, with a saving throw vs. spell for half damage.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 /* ---- Wizard first level spells end ---- */
