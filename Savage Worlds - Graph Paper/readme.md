@@ -186,6 +186,8 @@ Most of the sheet's strings can be changed via the translation.json. However, so
 "skill-track-die-label-d8": "8",
 "skill-track-die-label-d10": "10",
 "skill-track-die-label-d12": "12",
+"{": "{",
+"}": "}"
 ```
 </details>
 
@@ -193,6 +195,8 @@ Most of the sheet's strings can be changed via the translation.json. However, so
   <summary>Sheet Defaults Translations</summary>
 
 ```
+"defaults-block-show-abilities": "[Block] Show Abilities",
+"defaults-block-show-abilities-description": "List special abilities or monstrous powers.",
 "defaults-block-show-allies": "[Block] Show Allies",
 "defaults-block-show-allies-description": "Keep track of allied characters with a barebone mini sheet.",
 "defaults-block-show-ammunition": "[Block] Show Ammunition",
@@ -215,10 +219,10 @@ Most of the sheet's strings can be changed via the translation.json. However, so
 "defaults-block-show-walkers-description": "Walkers/Mechs and their modifications/weapons.<h4 style='margin-top: 24px;'>Show/Hide Skills</h4><p style='margin-bottom: 16px; max-width: 640px;'>You can show or hide skills from the list in accordance with the played Game Setting. This can also be done manually for each individual sheet in its Settings tab. There are two custom skills that can be renamed and modified within the sheet as well, for example to make specialized skills (e.g. specific weapons with custom bonus or Wild Die).</p>",
 "defaults-function-explode-run-die": "[Function] Explode Run Die",
 "defaults-function-explode-run-die-description": "Makes the run die Ace.",
-"defaults-function-running-ignores-wounds": "[Function] Running Ignores Wounds",
-"defaults-function-running-ignores-wounds-description": "Wound penalties are not subtracted from the run roll.",
 "defaults-function-running-applies-fatigue": "[Function] Running Applies Fatigue",
 "defaults-function-running-applies-fatigue-description": "Fatigue penalties are subtracted from the run roll.<h4 style='margin-top: 24px;'>Show/Hide Blocks</h4><p style='margin-bottom: 16px; max-width: 640px;'>You can show or hide content blocks in accordance with the played Game Setting. This can also be done manually for each individual sheet in its Settings tab. Some blocks that were designed for Maschinenleben, such as Augmentations and Engrams, can be adapted for other purposes as well.</p>",
+"defaults-function-running-ignores-wounds": "[Function] Running Ignores Wounds",
+"defaults-function-running-ignores-wounds-description": "Wound penalties are not subtracted from the run roll.",
 "defaults-rename-attribute-agi": "[Rename] Attribute: AGI to&nbsp;",
 "defaults-rename-attribute-agi-description": "Renamed via the attribute <b style='user-select: all; font-family: monospace; white-space: nowrap;'>rename_agi</b>.",
 "defaults-rename-attribute-agility": "[Rename] Attribute: Agility to&nbsp;",
@@ -408,7 +412,7 @@ Most of the sheet's strings can be changed via the translation.json. However, so
 "defaults-skill-show-spellcasting": "[Skill] Show Spellcasting Skill",
 "defaults-skill-show-spellcasting-description": "Show the Spellcasting (Smarts) skill.",
 "defaults-skill-show-weird-science": "[Skill] Show Weird Science Skill",
-"defaults-skill-show-weird-science-description": "Show the Weird Science (Smarts) skill.
+"defaults-skill-show-weird-science-description": "Show the Weird Science (Smarts) skill."
 ```
 </details>
 
