@@ -1,4 +1,4 @@
-/* ---- Wizard first level spells start ---- */
+/* ---- Wizard spells start ---- */
 const wiz1 = {};
 wiz1['Affect Normal Fires'] = {
     'name': 'Affect Normal Fires',
@@ -808,7 +808,6 @@ wiz1['Wizard Mark'] = {
 };
 
 let wiz2 = {};
-
 wiz2['Alter Self'] = {
     'name': 'Alter Self',
     'level': 'Level 2 Wizard',
@@ -1586,4 +1585,4 @@ wiz2['Wizard Lock'] = {
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
-/* ---- Wizard first level spells end ---- */
+/* ---- Wizard spells end ---- */

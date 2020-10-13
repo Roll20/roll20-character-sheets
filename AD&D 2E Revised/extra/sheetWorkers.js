@@ -627,7 +627,7 @@ setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spell
 // --- End setup Granted Powers --- //
 
 // Auto set spell info function
-let newWizardSections = ['wiz1'];
+let newWizardSections = ['wiz1', 'wiz2'];
 newWizardSections.forEach(section => {
     on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
 
