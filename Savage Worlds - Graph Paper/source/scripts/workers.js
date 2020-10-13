@@ -727,6 +727,14 @@ on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
   });
 });
 
+on(listItems.map(s => `change:repeating_${s}s:skill_bonus`).join(' '), (e) => {
+  let update = TETRA.toInt(e.newValue);
+
+  update = update == 0 ? '' : update > 0 ? `+${update}` : update;
+
+  setAttrs({ [e.sourceAttribute]: update }, { silent: true });
+});
+
 on(listItems.map(s => `change:repeating_${s}s:rof_override_toggle`).join(' '), (e) => {
   let d = e.sourceAttribute.includes('weapon') ? '@{weapon_rof}' : '1',
       update = e.newValue == 'on' ? `?{@{query_rate_of_fire}|${d}}` : '1',
