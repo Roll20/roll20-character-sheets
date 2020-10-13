@@ -995,7 +995,7 @@ wiz2['ESP'] = {
     'school': 'Divination',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
-    'aoe': '[[{{5*[[@{level-wizard}]],90}kl1}]] yards\n(90 yds. maximum)',
+    'aoe': '[[{{5*[[@{level-wizard}]],90}kl1}]] yards. (90 yards maximum)',
     'components': 'V, S, M',
     'cast-time': '2',
     'saving-throw': 'None',
@@ -1019,10 +1019,100 @@ wiz2['Flaming Sphere'] = {
     'saving-throw': 'Negate',
     'materials': 'A bit of tallow, a pinch of sulphur, and a dusting of powdered iron.',
     'reference': 'PHB p. 182',
-    'damage': 'Direct contact: 2d4 Fire.\n5 feet proximity: 1d4',
+    'damage': 'Direct contact: 2d4 Fire. 5 feet proximity: 1d4',
     'damage-type': 'Heat',
     'healing': '',
-    'effect': 'A *flaming sphere* spell creates a burning globe of fire within 10 yards of the caster. This sphere rolls in whichever direction the wizard points, at a rate of 30 feet per round. It rolls over barriers less than 4 feet tall, such as furniture, low walls, etc. Flammable substances are set afire by contact with the sphere. Creatures in contact with the globe must successfully save vs. spell or suffer 2d4 points of fire damage. Those within 5 feet of the sphere’s surface must also save or suffer 1d4 points of heat damage. A successful saving throw means no damage is suffered. The DM may adjust the saving throws if there is little or no room to dodge the sphere. \\n&emsp;The sphere moves as long as the spellcaster actively directs it; otherwise, it merely stays at rest and burns. It can be extinguished by the same means as any normal fire of its size. The surface of the sphere has a spongy, yielding consistency and so does not cause damage except by its flame. It cannot push unwilling creatures aside or batter down large obstacles.'
+    'effect': 'A *flaming sphere* spell creates a burning globe of fire within 10 yards of the caster. This sphere rolls in whichever direction the wizard points, at a rate of 30 feet per round. It rolls over barriers less than 4 feet tall, such as furniture, low walls, etc. Flammable substances are set afire by contact with the sphere. Creatures in contact with the globe must successfully save vs. spell or suffer 2d4 points of fire damage. Those within 5 feet of the sphere’s surface must also save or suffer 1d4 points of heat damage. A successful saving throw means no damage is suffered. The DM may adjust the saving throws if there is little or no room to dodge the sphere. \n&emsp;The sphere moves as long as the spellcaster actively directs it; otherwise, it merely stays at rest and burns. It can be extinguished by the same means as any normal fire of its size. The surface of the sphere has a spongy, yielding consistency and so does not cause damage except by its flame. It cannot push unwilling creatures aside or batter down large obstacles.'
+};
+
+wiz2['Fog Cloud'] = {
+    'name': 'Fog Cloud',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '10 yards',
+    'duration': '[[4+[[@{level-wizard}]] ]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 183',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *fog cloud* spell can be cast in one of two ways, at the caster’s option: as a large, stationary bank of normal fog, or as a harmless fog that resembles the 5th-level wizard spell *cloudkill*. \\n&emsp;As a fog bank, this spell creates a fog of any size and shape up to a maximum 20-foot cube per caster level. The fog obscures all sight, normal and infravision, beyond 2 feet. \\n&emsp;As a cloudkill-like fog, this is a billowing mass of ghastly, yellowishgreen vapors, measuring 40 feet × 20 feet × 20 feet. This moves away from the caster at 10 feet per round. The vapors are heavier than air and sink to the lowest level, even pouring down sinkholes and den openings. Very thick vegetation breaks up the fog after it has moved 20 feet into the vegetation. \\n&emsp;The only effect of either version is to obscure vision. A strong breeze will disperse either effect in one round, while a moderate breeze will reduce the spell duration by 50%. The spell cannot be cast under water.'
+};
+
+wiz2['Fools\' Gold'] = {
+    'name': 'Fools\' Gold',
+    'level': 'Level 2 Wizard',
+    'school': 'Alteration',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': '[[10*[[@{level-wizard}]] ]] cubic inches',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'Copper coins or brass items.',
+    'reference': 'PHB p. 183',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Copper coins can temporarily be changed to gold pieces, or brass items turned to solid gold, for the spell duration by means of this magic. The area of effect is 10 cubic inches per level—i.e., a 1-inch × 1-inch × 10-inch volume or equivalent, equal to about 150 gold coins. (Current max is about [[150*[[@{level-wizard}]] ]]). Any creature viewing the “gold” is entitled to a saving throw vs. spell, which can be modified by the creature’s Wisdom; for every level of the wizard, the creature must subtract 1 from his dice roll. Thus, it is unlikely that fools’ gold will be detected if created by a high-level caster. If the “gold” is struck hard by an object of cold-wrought iron, there is a slight chance it will revert to its natural state, depending on the material component used to create the “gold.” If a 25-gp citrine is powdered and sprinkled over the metal as this spell is cast, the chance that cold iron will return it to its true nature is 30%; if a 50-gp amber stone is powdered and used, the chance drops to 25%; if a 250-gp topaz is powdered and used, the chance drops to 10%; and if a 500-gp oriental (corundum) topaz is powdered and used, there is only a 1% chance that the cold iron will reveal that it is fools’ gold.'
+};
+
+wiz2['Forget'] = {
+    'name': 'Forget',
+    'level': 'Level 2 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '1-4 creatures in a 20-feet cube',
+    'components': 'V, S',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 183',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the spellcaster causes creatures within the area of effect to forget the events of the previous minute (the one minute of time previous to the utterance of the spell). For every three levels of experience of the spellcaster, another minute of past time is forgotten ([[1+floor([[@{level-wizard}]]/3)]] minutes). This does not negate *charm*, *suggestion*, *geas*, *quest*, or similar spells, but it is possible that the being who placed such magic upon the recipient could be forgotten. From one to four creatures can be affected, at the discretion of the caster. If only one is to be affected, the recipient saves vs. spell with a –2 penalty; if two, they save with –1 penalties; if three or four are to be affected, they save normally. All saving throws are adjusted by Wisdom. A priest’s *heal* or *restoration* spell, if specially cast for this purpose, will restore the lost memories, as will a *limited wish* or *wish*, but no other means will do so.'
+};
+
+wiz2['Glitterdust'] = {
+    'name': 'Glitterdust',
+    'level': 'Level 2 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '20 feet cube',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': 'Special',
+    'materials': 'Ground mica',
+    'reference': 'PHB p. 183',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates a cloud of glittering golden particles within the area of effect. Those in the area must roll a successful saving throw vs. spell or be blinded (–4 penalties to attack rolls, saving throws, and Armor Class) for [[1d4+1]] rounds. In addition, all within the area are covered by the dust, which cannot be removed and continues to sparkle until it fades. Note that this reveals invisible creatures. The dust fades in 1d4 rounds plus one round per caster level. Thus, glitterdust cast by a 3rd-level wizard lasts for four to seven rounds. Dust fades in [[1d4+[[@{level-wizard}]] ]] rounds.'
+};
+
+wiz2['Hypnotic Pattern'] = {
+    'name': 'Hypnotic Pattern',
+    'level': 'Level 2 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': '30-feet cube',
+    'components': 'S, M',
+    'cast-time': '2',
+    'saving-throw': 'Negate',
+    'materials': 'A glowing stick of incense or a crystal rod filled with phosphorescent material.',
+    'reference': 'PHB p. 183',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard creates a weaving, twisting pattern of subtle colors in the air. This pattern causes any creature looking at it to become fascinated and stand gazing at it as long as the spellcaster maintains the display, plus two rounds thereafter. The spell can captivate a maximum of 24 levels, or Hit Dice, of creatures (for example, 24 creatures with 1 Hit Die each, 12 with 2 Hit Dice, etc.). All creatures affected must be within the area of effect, and each is entitled to a saving throw vs. spell. A damage-inflicting attack on an affected creature frees it from the spell immediately. \\n&emsp;The wizard need not utter a sound, but he must gesture appropriately while holding a glowing stick of incense or a crystal rod filled with phosphorescent material.'
 };
 
 const wizardSpells = {};
