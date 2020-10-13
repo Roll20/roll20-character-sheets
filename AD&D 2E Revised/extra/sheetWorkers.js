@@ -460,6 +460,38 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 }
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
+function setupAutoFillSpellInfo(section, spellsTable) {
+    on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
+
+        let spell = spellsTable[section][eventInfo.newValue];
+        if (spell === undefined)
+            return;
+
+        let spellInfo ={
+            [`repeating_spells-${section}_spell-name`]         : spell['name'],
+            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+            [`repeating_spells-${section}_spell-level`]        : spell['level'],
+            [`repeating_spells-${section}_spell-school`]       : spell['school'],
+            [`repeating_spells-${section}_spell-components`]   : spell['components'],
+            [`repeating_spells-${section}_spell-range`]        : spell['range'],
+            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+        }
+        if (section.startsWith('pri')) {
+            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+        }
+
+        setAttrs(spellInfo);
+    });
+}
+
 function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
         getAttrs([totalField, sumField], function (values) {
@@ -517,41 +549,9 @@ function setupRepeatingCalculateTotal(repeatingTotalField, repeatingFieldsToSum,
     });
 }
 
-// --- Start setup Rogue skills total --- //
-let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'db', 'cw', 'rl', 'ib'];
-let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
-rogueStandardSkills.forEach(skill => {
-    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`));
-    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`]);
-    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`]);
-});
-
-// Setup custom rogue skills total
-setupRepeatingCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
-setupRepeatingCalculateTotal('carmort', ['crt', 'crarmorp'], 'customrogue');
-// --- End setup Rogue skills total --- //
-
-//Rogue Custom Skills level sum
-on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
-
-    TAS.repeating('customrogue')
-        .attrs('newskill')
-        .fields('crl')
-        .reduce(function(m,r){
-            m.crl+=(r.I.crl);
-            return m;
-
-        },{crl:0},function(m,r,a){
-            a.newskill=m.crl;
-        })
-        .execute();
-});
-// --- End setup Rogue skills total --- //
-
 let wizardSpellLevelsSections = [
     {level: 1, sections: ['', '2', '3', 'wiz1']},
-    {level: 2, sections: ['4', '5', '6']},
+    {level: 2, sections: ['4', '5', '6', 'wiz2']},
     {level: 3, sections: ['7', '8', '9']},
     {level: 4, sections: ['10', '11', '12']},
     {level: 5, sections: ['70', '71', '72']}, //... legacy naming convention
@@ -586,6 +586,12 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
+
+    // Auto set spell info function
+    let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
+    if (isNewSpellSection(lastSection)) {
+        setupAutoFillSpellInfo(lastSection, wizardSpells);
+    }
 });
 
 priestSpellLevelsSections.forEach(spellLevel => {
@@ -595,6 +601,12 @@ priestSpellLevelsSections.forEach(spellLevel => {
     setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
+
+    // Auto set spell info function
+    let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
+    if (isNewSpellSection(lastSection)) {
+        setupAutoFillSpellInfo(lastSection, priestSpells);
+    }
 });
 // --- End setup Spell Slots --- //
 
@@ -626,63 +638,37 @@ setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`)
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
 // --- End setup Granted Powers --- //
 
-// Auto set spell info function
-let newWizardSections = ['wiz1', 'wiz2'];
-newWizardSections.forEach(section => {
-    on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
-
-        let spell = wizardSpells[section][eventInfo.newValue];
-        if (spell === undefined)
-            return;
-
-        setAttrs({
-            [`repeating_spells-${section}_spell-name`]         : spell['name'],
-            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]        : spell['level'],
-            [`repeating_spells-${section}_spell-school`]       : spell['school'],
-            [`repeating_spells-${section}_spell-components`]   : spell['components'],
-            [`repeating_spells-${section}_spell-range`]        : spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-        });
-    });
+// --- Start setup Rogue skills total --- //
+let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'db', 'cw', 'rl', 'ib'];
+let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
+rogueStandardSkills.forEach(skill => {
+    setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`));
+    setupCalculateTotal(`${skill}noarmort`, [`${skill}t`, `${skill}noarmorb`]);
+    setupCalculateTotal(`${skill}armort`, [`${skill}t`, `${skill}armorp`]);
 });
 
-let newPriestSections = ['pri1'];
-newPriestSections.forEach(section => {
-    on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
+// Setup custom rogue skills total
+setupRepeatingCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
+setupRepeatingCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
+setupRepeatingCalculateTotal('carmort', ['crt', 'crarmorp'], 'customrogue');
+// --- End setup Rogue skills total --- //
 
-        let spell = priestSpells[section][eventInfo.newValue];
-        if (spell === undefined)
-            return;
+//Rogue Custom Skills level sum
+on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
-        setAttrs({
-            [`repeating_spells-${section}_spell-name`]         : spell['name'],
-            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]        : spell['level'],
-            [`repeating_spells-${section}_spell-school`]       : spell['school'],
-            [`repeating_spells-${section}_spell-sphere`]       : spell['sphere'],
-            [`repeating_spells-${section}_spell-components`]   : spell['components'],
-            [`repeating_spells-${section}_spell-range`]        : spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-        });
-    });
+    TAS.repeating('customrogue')
+        .attrs('newskill')
+        .fields('crl')
+        .reduce(function(m,r){
+            m.crl+=(r.I.crl);
+            return m;
+
+        },{crl:0},function(m,r,a){
+            a.newskill=m.crl;
+        })
+        .execute();
 });
+// --- End setup Rogue skills total --- //
 
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprofnum', function(){
@@ -780,4 +766,4 @@ gemSections.forEach(i => {
 });
 // --- End setup gem total value calculation for all settings --- //
 
-// --- ALL SHEET WORKERS END --- ///
+// --- ALL SHEET WORKERS END --- //
