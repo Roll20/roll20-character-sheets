@@ -17537,6 +17537,8 @@ const priestSpells = {};
 priestSpells['pri1'] = pri1;
 /* ---- Priest spells end ---- */
 
+// --- ALL SHEET WORKERS START --- //
+
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
@@ -17795,7 +17797,7 @@ function parseWisBonus(abilityScore) {
     for (let i = 13; i <= abilityScore; i++) {
         bonusString += wisdomTable['wisbonus'][i];
     }
-    
+
     // Count instances of each spell level
     let bonus = {
         '1st': (bonusString.match(/1st/g) || []).length,
@@ -17806,12 +17808,12 @@ function parseWisBonus(abilityScore) {
         '6th': (bonusString.match(/6th/g) || []).length,
         '7th': (bonusString.match(/7th/g) || []).length,
     };
-    
+
     // Generate bonus prime and bonus extra strings
     bonus['wisbonus-prime'] = wisdomTable['wisbonus-prime'][abilityScore];
     bonus['wisbonus-extra'] = wisdomTable['wisbonus-extra'][abilityScore];
     bonus['wisbonus'] = [bonus['wisbonus-prime'], bonus['wisbonus-extra']].filter(Boolean).join(', ');
-    
+
     return bonus;
 }
 
@@ -17960,7 +17962,7 @@ function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
     }
 
     console.timeLog('Summing time');
-    
+
     TAS.repeating(repeatingName)
         .fields(fieldName)
         .each(function (r) {
@@ -18000,14 +18002,14 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 function setupCalculateRemaining(totalField, sumField, remainingField) {
     on(`change:${totalField} change:${sumField}`, function () {
         getAttrs([totalField, sumField], function (values) {
-           let intTotal = parseInt(values[totalField]);
-           let intSum = parseInt(values[sumField]);
-           
-           console.log(`Setting ${remainingField} with value from ${totalField}: ${intTotal} and ${sumField}: ${intSum}`);
-           
-           setAttrs({
-               [remainingField]: intTotal - intSum
-           });
+            let intTotal = parseInt(values[totalField]);
+            let intSum = parseInt(values[sumField]);
+
+            console.log(`Setting ${remainingField} with value from ${totalField}: ${intTotal} and ${sumField}: ${intSum}`);
+
+            setAttrs({
+                [remainingField]: intTotal - intSum
+            });
         });
     });
 }
@@ -18043,8 +18045,8 @@ function setupRepeatingCalculateTotal(repeatingTotalField, repeatingFieldsToSum,
             .reduce(function(m,r) {
                 repeatingFieldsToSum.forEach(column => {
                     m.total += r.I[column];
-                    console.log(m);
                 });
+                console.log(m);
                 return m;
             }, {total: 0}, function (m,r) {
                 console.log(m);
@@ -18067,6 +18069,7 @@ rogueStandardSkills.forEach(skill => {
 setupRepeatingCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
 setupRepeatingCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
 setupRepeatingCalculateTotal('carmort', ['crt', 'crarmorp'], 'customrogue');
+// --- End setup Rogue skills total --- //
 
 //Rogue Custom Skills level sum
 on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
@@ -18077,7 +18080,7 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
         .reduce(function(m,r){
             m.crl+=(r.I.crl);
             return m;
-            
+
         },{crl:0},function(m,r,a){
             a.newskill=m.crl;
         })
@@ -18224,12 +18227,12 @@ newPriestSections.forEach(section => {
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprofnum', function(){
 
     TAS.repeating('weaponprofs')
-        .attrs('weapprofslotssum','weapprofnum')  
-        .fields('weapprofnum') 
+        .attrs('weapprofslotssum','weapprofnum')
+        .fields('weapprofnum')
         .reduce(function(m,r){
             m.weapprofnum+=(r.I.weapprofnum);
             return m;
-            
+
         },{weapprofnum:0, desc: []},function(m,r,a){
             m.weapprofnum+=(a.I.weapprofnum);
             a.I.weapprofslotssum=(m.weapprofnum);
@@ -18242,11 +18245,11 @@ on('change:repeating_profs:profslots remove:repeating_profs change:profslots', f
 
     TAS.repeating('profs')
         .attrs('profslotssum','profslots')
-        .fields('profslots') 
+        .fields('profslots')
         .reduce(function(m,r){
             m.profslots+=(r.I.profslots);
             return m;
-            
+
         },{profslots:0, desc: []},function(m,r,a){
             m.profslots+=(a.I.profslots);
             a.I.profslotssum=(m.profslots);
@@ -18258,12 +18261,12 @@ on('change:repeating_profs:profslots remove:repeating_profs change:profslots', f
 on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear change:gearweight change:gearqty', function(){
 
     TAS.repeating('gear')
-        .attrs('gearweighttotal','gearqty','gearweight')  
-        .fields('gearqty','gearweight') 
+        .attrs('gearweighttotal','gearqty','gearweight')
+        .fields('gearqty','gearweight')
         .reduce(function(m,r){
             m.gearweight+=(r.F.gearweight*r.I.gearqty);
             return m;
-            
+
         },{gearweight:0, desc: []},function(m,r,a){
             m.gearweight+=(a.F.gearweight*a.I.gearqty);
             a.D[2].gearweighttotal=m.gearweight;
@@ -18274,7 +18277,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
-    
+
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total','on-mount','gear-stored-weight','gear-stored-qty')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -18282,14 +18285,14 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
             m.allgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']);
             m.mountgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']*r.I['on-mount']);
             return m;
-        
-    },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
-        m.allgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']);
-        m.mountgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']*a.I['on-mount']);
-        a.D[2]['mount-gear-weight-total']=m.mountgearweight;
-        a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
-    })
-    .execute();
+
+        },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
+            m.allgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']);
+            m.mountgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']*a.I['on-mount']);
+            a.D[2]['mount-gear-weight-total']=m.mountgearweight;
+            a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
+        })
+        .execute();
 })
 
 function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, repeatingSection) {
@@ -18315,6 +18318,8 @@ gemSections.forEach(i => {
     setupCalculateTotalGemsValue(`gemstotalvalue${i}`, `gemvalue${i}`, `gemqty${i}`, `gem${i}`);
 });
 // --- End setup gem total value calculation for all settings --- //
+
+// --- ALL SHEET WORKERS END --- ///
 
 var sheetName = 'AD&D 2E Revised';
 var sheetVersion = '3.2.1';
