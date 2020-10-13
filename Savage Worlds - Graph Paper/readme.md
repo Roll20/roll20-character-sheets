@@ -86,6 +86,11 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.5
+* Refactored all skill rolls
+* Extended [Button] option in lists with a modifier field
+* Added [Ace Damage] toggle to Engrams, Powers, and Weapons
+* Added helper button to toggle global GM rolls
 #### Version 1.2.4
 * Added three configurable custom buttons to Settings > Setup
 * Fixed some minor CSS issues
@@ -106,27 +111,28 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Added help entries for extra sheet, list item options, and raise damage
 * Updated older help entries and translations
 * Reduced HTML and CSS
-#### Version 1.2.1
-* Improved handling for Rate of Fire
-* Fixed critical bug in Rate of Fire handling
-* Dice roller codes are now parsed
-* Added [Query RoF] option to Engrams, Powers, and Weapons
-* Improved performance
-* Fixed sheet default settings not being applied
-* Added setting option to apply Fatigue to run rolls
-#### Version 1.2.0
-* Various improvements, refactoring, and bug/style fixes
-* Enhanced usability of damage roll toggles for repeating lists
-* Damage codes of powers are now processed by the dice parser
-* Added setting menu with options to some interactive list items
-  * Powers: Show Damage, Show Trapping, Roll Button (Input)
-  * Engrams: Roll Button (Input)
-  * Weapons: Show Trapping, Roll Button (Input)
-* Added the saved maximum capacity to ammunition magazines
-* Updated the sheet’s help section
 
 <details>
   <summary>Previous Versions</summary>
+
+  #### Version 1.2.1
+  * Improved handling for Rate of Fire
+  * Fixed critical bug in Rate of Fire handling
+  * Dice roller codes are now parsed
+  * Added [Query RoF] option to Engrams, Powers, and Weapons
+  * Improved performance
+  * Fixed sheet default settings not being applied
+  * Added setting option to apply Fatigue to run rolls
+  #### Version 1.2.0
+  * Various improvements, refactoring, and bug/style fixes
+  * Enhanced usability of damage roll toggles for repeating lists
+  * Damage codes of powers are now processed by the dice parser
+  * Added setting menu with options to some interactive list items
+    * Powers: Show Damage, Show Trapping, Roll Button (Input)
+    * Engrams: Roll Button (Input)
+    * Weapons: Show Trapping, Roll Button (Input)
+  * Added the saved maximum capacity to ammunition magazines
+  * Updated the sheet’s help section
 
   #### Version 1.1.1
   * Added reroll button to Roll Templates
