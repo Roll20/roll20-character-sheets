@@ -86,6 +86,13 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.6
+* Improved roll macros
+* Improved dice codes in Roll Templates
+* Fixed Soak button using outdated macro
+* Added width constrains to translatable elements
+* Added setting toggle to reduce untrained skill penalty
+* Minor style improvements
 #### Version 1.2.5
 * Refactored all skill rolls
 * Extended [Button] option in lists with a modifier field
