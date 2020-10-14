@@ -18963,25 +18963,19 @@ function setupCalculateTotal(totalField, fieldsToSum) {
     });
 }
 
-function setupRepeatingCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName) {
-    console.log(repeatingFieldsToSum);
+function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToSum, repeatingName) {
     let onChange = repeatingFieldsToSum.map(field => `change:repeating_${repeatingName}:${field}`).join(' ');
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
-    console.log(onChange);
-    console.log(allFields);
-    on(`${onChange} remove:repeating_${repeatingName}`, function(){
+    on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
         TAS.repeating(repeatingName)
             .fields(allFields)
-            .reduce(function(m,r) {
-                repeatingFieldsToSum.forEach(column => {
-                    m.total += r.I[column];
-                });
-                console.log(m);
-                return m;
-            }, {total: 0}, function (m,r) {
-                console.log(m);
-                r[repeatingTotalField] = m.total;
+            .tap(function(rowSet) {
+                console.log(eventInfo);
+                console.log(rowSet);
+                // repeatingFieldsToSum.forEach(column => {
+                //     m.total += r.I[column];
+                // });
             })
             .execute();
     });
@@ -19086,9 +19080,9 @@ rogueStandardSkills.forEach(skill => {
 });
 
 // Setup custom rogue skills total
-setupRepeatingCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
-setupRepeatingCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
-setupRepeatingCalculateTotal('carmort', ['crt', 'crarmorp'], 'customrogue');
+setupRepeatingRowCalculateTotal('crt', rogueStandardColumns.map(column => `cr${column}`), 'customrogue');
+setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogue');
+setupRepeatingRowCalculateTotal('carmort', ['crt', 'crarmorp'], 'customrogue');
 // --- End setup Rogue skills total --- //
 
 //Rogue Custom Skills level sum
