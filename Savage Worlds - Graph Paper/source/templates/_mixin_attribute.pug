@@ -7,6 +7,7 @@ mixin attribute(name, short)
     input(type='hidden', name=`attr_${trait}_roll`, value='1d4')
     input(type='hidden', name=`attr_${trait}_wd_roll`, value='1d6')
     input(type='hidden', name=`attr_${trait}_extra_wd_roll`, value='-10000')
+    input(type='hidden', name=`attr_${trait}_code`, value='d4')
 
     input(type='hidden', name=`attr_${trait}_global_wd_roll`, value=`{{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`)
 
@@ -14,11 +15,11 @@ mixin attribute(name, short)
 
     input(type='hidden',
           name=`attr_${trait}_roll_body`,
-          value!=`@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{query_global_rof} ]]}} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll}!cs2 + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{${trait}_global_wd_roll} @{${trait}_global_bonus_wd_roll}`)
+          value!=`@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + @{query_global_rof} ]]}} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=@{${trait}_code}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ @{${trait}_roll}!cs2 + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{${trait}_global_wd_roll} @{${trait}_global_bonus_wd_roll}`)
 
     button(type='roll',
            name=`roll_${trait}`,
-           value!=`@{${trait}_roll_body} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll}!cs2 + (@{${trait}_mod}+0)[Flat] - @{fatigue_mod}[FTG] - @{wound_mod}[WND] + (?{@{query_modifier}|0})[Modifier] ]]}} {{reroll=[r](~${trait})}}`,
+           value!=`@{${trait}_roll_body} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll}!cs2 + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} {{reroll=[r](~${trait})}}`,
            class='sheet-attribute__button')
       span(name=`attr_rename_${short.toLowerCase()}`, data-i18n=`${short.toLowerCase()}-u`)= short
 
