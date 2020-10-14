@@ -120,7 +120,7 @@ var TETRA = TETRA || ( function() {
       if (die == 'd4-2') {
         die = 'd4';
         code -= 2;
-        untrained = '-2';
+        untrained = '-2@{untrained_adjust}';
       }
 
       // Stringify code
