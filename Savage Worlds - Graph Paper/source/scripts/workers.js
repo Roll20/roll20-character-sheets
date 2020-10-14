@@ -17,6 +17,38 @@ TRANSLATION SETUP
 ############################################################################# */
 
 on("sheet:opened", (e) => {
+  // System & Updates
+  getAttrs(['sheet_update'], (values) => {
+    let updateNumber = values['sheet_update'];
+
+    if (updateNumber == '0') {
+      // Apply new macros and fields to Traits
+      _.each(['soak'].concat(traitAttributes).concat(skills), (trait) => {
+        TETRA.updateTraitRoll(trait);
+      });
+
+      function updateListSkills(values) {
+        values = Object.entries(values);
+
+        let updates = {};
+
+        _.each(values, (item) => {
+          updates[item[0]] = item[1];
+        });
+
+        setAttrs(updates);
+      }
+
+      TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
+      TETRA.doWithRepList('powers', ['skill_name'], (v) => { updateListSkills(v) });
+      TETRA.doWithRepList('weapons', ['skill_name'], (v) => { updateListSkills(v) });
+
+      setAttrs({ ['sheet_update']: '1' });
+
+      console.log('test');
+    }
+  });
+
   // Translations for query strings
   setAttrs({
     'query_rate_of_fire': getTranslationByKey('rate-of-fire'),
@@ -96,10 +128,10 @@ var TETRA = TETRA || ( function() {
 
   // Update the roll queries for a trait
   updateTraitRoll = function(trait) {
-    let traitAttributes = [trait, `${trait}_wd`, `${trait}_mod`, 'adjust_untrained'];
+    let attributes = [trait, `${trait}_wd`, `${trait}_mod`, 'adjust_untrained'];
 
     // Get trait values: die, Wild Die, and modifier
-    getAttrs(traitAttributes, (values) => {
+    getAttrs(attributes, (values) => {
       let die = values[trait],
           wd = values[`${trait}_wd`],
           ewd = '-10000', // Extra Wild Die
@@ -186,9 +218,9 @@ var TETRA = TETRA || ( function() {
 ATTRIBUTE DICE (AND SOAK)
 ############################################################################# */
 
-const attributes = ['agility', 'smarts', 'spirit', 'strength', 'vigor'];
+const traitAttributes = ['agility', 'smarts', 'spirit', 'strength', 'vigor'];
 
-on('change:soak change:' + attributes.join(' change:'), (e) => {
+on('change:soak change:' + traitAttributes.join(' change:'), (e) => {
   // Derive target attribute and check if input value is a valid die
   let value = _.isUndefined(e.newValue) ? 'd4' : e.newValue;
   value = dice.includes(value) && value != '' ? value : 'd4';
@@ -236,7 +268,7 @@ on('change:adjust_untrained', (e) => {
 WILD DICE
 ############################################################################# */
 
-const wildTraits = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}_wd` });
+const wildTraits = ['soak'].concat(traitAttributes).concat(skills).map((s) => { return `${s}_wd` });
 
 on('change:' + wildTraits.join(' change:'), (e) => {
   // Derive target attribute and check if input value is a valid die
@@ -254,7 +286,7 @@ on('change:' + wildTraits.join(' change:'), (e) => {
 NATURAL DICE
 ############################################################################# */
 
-const naturalTraits = attributes.map((s) => { return `${s}_natural` });
+const naturalTraits = traitAttributes.map((s) => { return `${s}_natural` });
 
 on('change:' + naturalTraits.join(' change:'), (e) => {
   // Check if new value is valid
@@ -287,7 +319,7 @@ on('change:run', (e) => {
 /* #############################################################################
 MODIFIERS
 ############################################################################# */
-const modifiers = ['soak'].concat(attributes).concat(skills).map((s) => { return `${s}_mod` });
+const modifiers = ['soak'].concat(traitAttributes).concat(skills).map((s) => { return `${s}_mod` });
 
 on('change:' + modifiers.join(' change:'), (e) => {
   // Parse input value as integer
