@@ -44,8 +44,6 @@ on("sheet:opened", (e) => {
       TETRA.doWithRepList('weapons', ['skill_name'], (v) => { updateListSkills(v) });
 
       setAttrs({ ['sheet_update']: '1' });
-
-      console.log('test');
     }
   });
 
