@@ -84,11 +84,12 @@ input(type='checkbox',
           - var i = 0
 
           while i < 6
-            - var die = rolls[i] == 2 ? 'd4!cs2-2' : `d${rolls[i]}!cs2`
+            - var die = rolls[i] == 2 ? 'd4' : `d${rolls[i]}`
+            - var untrained = rolls[i] == 2 ? '-2' : ''
 
             button(type='roll',
-                   name=`roll_ally_roll_${die.replace('!cs2', '')}`,
-                   value!=`&{template:TraitRoll} {{header=[^{ally}] @{ally_name} ^{rolls}: ${die.replace('!cs2', '')}}} {{commander=@{name}}} {{rof=[[ ?{@{query_rate_of_fire}|1} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=?{@{query_wild_die}|@{none},-10000|d4|d6|d8|d10|d12}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${die} + ?{@{query_modifier}|0} ]]}}`).join(' ')} {{wdroll=[[ ?{@{query_wild_die}|@{none},-10000|d4|d6|d8|d10|d12}!cs2 + ?{@{query_modifier}|0} ]]}} {{reroll=[r](~repeating_allies_ally_roll_${die.replace('!cs2', '')})}}`)
+                   name=`roll_ally_roll_${rolls[i]}`,
+                   value!=`@{gm_roll} &{template:TraitRoll} {{header=[^{ally}] @{ally_name} ^{rolls}: ${die}${untrained}}} {{commander=@{name}}} {{rof=[[ ?{@{query_rate_of_fire}|1} ]]}} {{modifier=?{@{query_modifier}|0}}} {{wd=?{@{query_wild_die}|@{none},-10000|d4|d6|d8|d10|d12}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${die}!cs2 ${untrained} + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} {{wdroll=[[ ?{@{query_wild_die}|@{none},-10000|d4|d6|d8|d10|d12}!cs2 - ${untrained} + (?{@{query_modifier}|0})[Modifier] ]]}} {{reroll=[r](~repeating_allies_ally_roll_${rolls[i]})}}`)
              span(data-i18n=`die-button-number-${rolls[i]}`)= rolls[i]
 
             - ++i
