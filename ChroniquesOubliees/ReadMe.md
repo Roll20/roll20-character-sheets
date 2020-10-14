@@ -6,12 +6,19 @@ Chroniques Oubli&eacute;es Fantasy est un jeu de r&ocirc;le m&eacute;di&eacute;v
 
 Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 
+Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règles des Terres d'Arran.
+
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-3.7 [Screenshot](co_v3.jpg)
+4.00 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v4.00 (2020-10-14)
+* Support des règles des Terres d'Arran
+* Ajout d'une ligne d'effets pour les consommables
+* Affichage des compétences en mode édition et non-éditable pour un meilleur rendu.
+
 ## v3.7 (2020-09-16)
 * Utilisation du même attribut en mode PJ et PNJ pour les PVs, les DM temporaires et la RD
 
