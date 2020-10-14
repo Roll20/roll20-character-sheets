@@ -13,6 +13,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Added Languages in Professional skills
 * Added Deities
 * Added Checks (e.g., Find secret doors, detect traps, chance of spell working) with Roll Buttons
+* Show/Hide Bonus Spells depending on which Groups are usable based on Talents
 * More Sheet Workers to automate much of the above
 
 #### 1.3
@@ -56,7 +57,6 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 #### Todo List
 * Add items list from original sheet
 * Add attack Roll Buttons
-* Hide unusable bonus spells
 * Add Sheet Defaults for GM to pick which alignments to use
 * Add Sheet Defaults for GM to pick if players see Savings Throws, Attack Rolls and Checks
 * Add Sheet Defaults for GM to set starting coin
