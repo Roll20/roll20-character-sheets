@@ -534,10 +534,16 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
             .fields(allFields)
             .tap(function(rowSet) {
                 console.log(eventInfo);
-                console.log(rowSet);
-                // repeatingFieldsToSum.forEach(column => {
-                //     m.total += r.I[column];
-                // });
+                let rowId = eventInfo.sourceAttribute.split('_')[2];
+                let row = rowSet[rowId];
+                console.log(rowId);
+                console.log(row);
+                let total = 0;
+                repeatingFieldsToSum.forEach(column => {
+                    total += row.I[column];
+                });
+                row[repeatingTotalField] = total;
+                console.log(total);
             })
             .execute();
     });
