@@ -96,7 +96,7 @@ var TETRA = TETRA || ( function() {
 
   // Update the roll queries for a trait
   updateTraitRoll = function(trait) {
-    let traitAttributes = [trait, `${trait}_wd`, `${trait}_mod`];
+    let traitAttributes = [trait, `${trait}_wd`, `${trait}_mod`, 'adjust_untrained'];
 
     // Get trait values: die, Wild Die, and modifier
     getAttrs(traitAttributes, (values) => {
@@ -105,13 +105,15 @@ var TETRA = TETRA || ( function() {
           ewd = '-10000', // Extra Wild Die
           mod = values[`${trait}_mod`] || '0',
           untrained = '0',
-          code = toInt(mod);
+          untrainedAdjust = toInt(values['adjust_untrained']),
+          code = toInt(mod),
+          full_code = ''; // Includes WD
 
       // Set up Wild Die
       if (dice.includes(wd) && wd != '') {
         ewd = wd;
       } else if (wd == '') {
-        wd = '1d6';
+        wd = 'd6';
       } else {
         wd = '-10000'; // Rolltemplate will not show results below -1000
       }
@@ -119,8 +121,8 @@ var TETRA = TETRA || ( function() {
       // Account for untrained skill
       if (die == 'd4-2') {
         die = 'd4';
-        code -= 2;
-        untrained = '-2@{untrained_adjust}';
+        code = code - (2 - untrainedAdjust);
+        untrained = '-2@{adjust_untrained}';
       }
 
       // Stringify code
@@ -134,13 +136,14 @@ var TETRA = TETRA || ( function() {
       code = die + code;
 
       // Add custom Wild Die to code
-      code = ewd != '-10000' ? `${code} [${wd}]` : code;
+      full_code = ewd != '-10000' ? `${code} [${wd}]` : code;
 
       setAttrs({ [`${trait}_roll`]: die,
                  [`${trait}_wd_roll`]: wd,
                  [`${trait}_extra_wd_roll`]: ewd,
                  [`${trait}_untrained_mod`]: untrained,
-                 [`${trait}_code`]: code });
+                 [`${trait}_code`]: code,
+                 [`${trait}_full_code`]: full_code });
     });
   },
 
@@ -221,6 +224,12 @@ on('change:' + skills.join(' change:'), (e) => {
   setAttrs({ [e.sourceAttribute]: value },
            { silent: true },
            TETRA.updateTraitRoll(e.sourceAttribute));
+});
+
+on('change:adjust_untrained', (e) => {
+  _.each(skills, (skill) => {
+    TETRA.updateTraitRoll(skill);
+  });
 });
 
 /* #############################################################################
@@ -819,4 +828,10 @@ on('change:toggle_run_explode', (e) => {
   let update = e.newValue == 'on' ? '@{run_roll}!' : '@{run_roll}';
 
   setAttrs({ ['run_code']: update }, { silent: true });
+});
+
+on('change:toggle_halve_untrained', (e) => {
+  let update = e.newValue == 'on' ? '+1' : '';
+
+  setAttrs({ ['adjust_untrained']: update });
 });
