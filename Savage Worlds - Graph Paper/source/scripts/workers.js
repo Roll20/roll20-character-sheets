@@ -713,8 +713,8 @@ on(listItems.map(s => `change:repeating_${s}s:${s}_damage`).join(' '), (e) => {
 });
 
 on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
-  let array = skills.map((s) => { return `rename_${s}` }),
-      id = e.sourceAttribute.replace('skill_name', ''); // All rename_<skill> attributes
+  let array = skills.map((s) => { return `rename_${s}` }), // All rename_<skill> attributes
+      id = e.sourceAttribute.replace('skill_name', '');
 
   getAttrs(array, (values) => {
     // Find corresponding attribute
@@ -730,6 +730,7 @@ on(listItems.map(s => `change:repeating_${s}s:skill_name`).join(' '), (e) => {
       update[`${id}skill_roll`] = `@{${renameAttribute.replace('rename_', '')}_roll}`;
       update[`${id}skill_wd_roll`] = `@{${renameAttribute.replace('rename_', '')}_wd_roll}`;
       update[`${id}skill_extra_wd_roll`] = `@{${renameAttribute.replace('rename_', '')}_extra_wd_roll}`;
+      update[`${id}skill_code`] = `@{${renameAttribute.replace('rename_', '')}_code}`;
     }
 
     setAttrs(update, { silent: true });
