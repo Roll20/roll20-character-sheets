@@ -16,7 +16,7 @@
                         'spellcasting', 'weird_science', 'custom_skill_1',
                         'custom_skill_2']
 
-  var steps = [['d4-2', '4'], ['d4', '4'], ['d6', '6'],
+  var steps = [['d4-2', '2'], ['d4', '4'], ['d6', '6'],
                ['d8', '8'], ['d10', '10'], ['d12', '12']].reverse()
 
 input(type='checkbox',
@@ -76,6 +76,8 @@ input(type='checkbox',
 
         .sheet-skills__track
           each step in steps
+            - var die = step[1] == '2' ? 'd4' : `d${step[1]}`
+
             input(type='radio',
                   name=`attr_${trait}`,
                   value=step[0],
@@ -87,7 +89,7 @@ input(type='checkbox',
             - // Track roll
             button(type='roll',
                    name=`roll_${trait}_${step[1]}`,
-                   value!= `@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1}} ]]}} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ 1d${step[1]}!cs2 + (${ step[0] != 'd4-2' ? `@{${trait}_untrained_mod}` : `-2` })[Untrained] + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} @{${trait}_global_wd_roll} @{${trait}_global_bonus_wd_roll} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll}!cs2 + (@{${trait}_untrained_mod})[Untrained] + (@{${trait}_mod}+0)[Flat] - @{fatigue_mod}[FTG] - @{wound_mod}[WND] + (?{@{query_modifier}|0})[Query] ]]}} {{reroll=[r](~${trait}_${step[1]})}}`,
+                   value!= `@{gm_roll} &{template:TraitRoll} {{rof=[[ 0 + ?{@{query_rate_of_fire}|1}} ]]}} {{header=@{name} ^{rolls} @{rename_${trait}}}} {{trait=@{rename_${trait}}}} {{traitdie=${step[0]}}} {{flat=@{${trait}_mod}}} {{wounds=[[ @{wound_mod} ]]}} {{fatigue=[[ @{fatigue_mod} ]]}} {{modifier=?{@{query_modifier}|0}}} ${maxRof.map(n => `{{traitroll${n}=[[ ${die}!cs2 + (${step[1] == `2` ? `-2` : `0`})[Untrained] + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}}`).join(' ')} {{global_wd=@{query_global_wd}}} {{global_wdroll=[[ @{query_global_wd}!cs2 + (${step[1] == `2` ? `-2` : `0`})[Untrained] + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} {{bonus_wd=@{query_global_bonus_wd}}} {{bonus_wdroll=[[ @{query_global_bonus_wd}!cs2 + (${step[1] == `2` ? `-2` : `0`})[Untrained] + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} {{wd=@{${trait}_wd}}} {{wdroll=[[ @{${trait}_wd_roll}!cs2 + (${step[1] == `2` ? `-2` : `0`})[Untrained] + (@{${trait}_mod}+0)[Flat] - (@{fatigue_mod})[Fatigue] - (@{wound_mod})[Wounds] + (?{@{query_modifier}|0})[Modifier] ]]}} {{reroll=[r](~${trait}_${step[1]})}}`,
                    class='sheet-skills__step-button')
               .sheet-tooltip.sheet-tooltip--top
                 span(data-i18n='roll-tooltip-prefix') Roll 
