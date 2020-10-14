@@ -27,22 +27,6 @@ on("sheet:opened", (e) => {
         TETRA.updateTraitRoll(trait);
       });
 
-      function updateListSkills(values) {
-        values = Object.entries(values);
-
-        let updates = {};
-
-        _.each(values, (item) => {
-          updates[item[0]] = item[1];
-        });
-
-        setAttrs(updates);
-      }
-
-      TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
-      TETRA.doWithRepList('powers', ['skill_name'], (v) => { updateListSkills(v) });
-      TETRA.doWithRepList('weapons', ['skill_name'], (v) => { updateListSkills(v) });
-
       setAttrs({ ['sheet_update']: '1' });
     }
   });
