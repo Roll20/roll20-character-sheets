@@ -16,7 +16,7 @@ const parseDieCodes = { d4: 'd4!', d6: 'd6!', d8: 'd8!', d10: 'd10!', d12: 'd12!
 TRANSLATION SETUP
 ############################################################################# */
 
-on("sheet:opened", function(e){
+on("sheet:opened", (e) => {
   // Translations for query strings
   setAttrs({
     'query_rate_of_fire': getTranslationByKey('rate-of-fire'),
