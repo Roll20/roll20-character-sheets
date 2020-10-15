@@ -28,18 +28,15 @@ on("sheet:opened", (e) => {
       });
 
       function updateListSkills(values) {
-        values = Object.entries(values);
+        let references = [];
 
-        let references = [],
-            updates = {};
-
-        _.each(values, (item) => {
+        _.each(Object.entries(values), (item) => {
           references.push(item[0].replace('skill_name', 'skill_mod'));
         });
 
-        getAttrs(references, (values) => {
+        getAttrs(references, (vals) => {
           _.each(references, (item) => {
-            let code = values[item].replace('_mod', '_code');
+            let code = vals[item].replace('_mod', '_code');
 
             setAttrs({ [item.replace('skill_mod', 'skill_code')]: code }, { silent: true });
           });
