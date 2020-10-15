@@ -12,6 +12,7 @@ https://discord.gg/F24Ka8E
 - Added 1/combat as an option for move frequencies
 - Added Pokemon moves section to the Trainer sheet, since Trainers often use moves. Now this section is on all sheets.
 - Revamped how move usage is tracked, to use buttons instead of checkboxes. Added this same tracker to Features.
+- Changed Nature selection to a dropdown
 
 ### Oct 3, 2020
 - Max HP now references the built in _max that allows it to be used for token health bars.
@@ -29,7 +30,7 @@ https://discord.gg/F24Ka8E
 
 
 ## To do list
+- Display the full bonus to skill checks
 - Allow modifications to movement (maybe just an extra box)
-- Change Nature to a dropdown
-- Check how roll20 handles min/max, if it's good then add to crit range
-- Handle temp stat changes somehow
+- Prevent critical range from going below 0 or above 20, maybe do similar to other fields
+- Handle temp stat changes somehow, this may be a lot of work
