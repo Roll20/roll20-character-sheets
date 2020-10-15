@@ -28,6 +28,29 @@ on("sheet:opened", (e) => {
         TETRA.updateTraitRoll(trait);
       });
 
+      function updateListSkills(values) {
+        values = Object.entries(values);
+
+        let references = [],
+            updates = {};
+
+        _.each(values, (item) => {
+          references.push(item[0].replace('skill_name', 'skill_mod'));
+        });
+
+        getAttrs(references, (values) => {
+          _.each(references, (item) => {
+            let code = values[item].replace('_mod', '_code');
+
+            setAttrs({ [item.replace('skill_mod', 'skill_code')]: code }, { silent: true });
+          });
+        });
+      }
+
+      TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
+      TETRA.doWithRepList('powers', ['skill_name'], (v) => { updateListSkills(v) });
+      TETRA.doWithRepList('weapons', ['skill_name'], (v) => { updateListSkills(v) });
+
       setAttrs({ ['sheet_update']: '1' });
     }
   });
