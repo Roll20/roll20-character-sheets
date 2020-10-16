@@ -15,6 +15,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Added Checks (e.g., Find secret doors, detect traps, chance of spell working) with Roll Buttons
 * Show/Hide Bonus Spells depending on which Groups are usable based on Talents
 * More Sheet Workers to automate much of the above
+* Property area now includes +/- for Armour, Weight capacity for bags and auto-calculates encumbrance
 
 #### 1.3
 * Fixed double quote issue in Rope making skill
