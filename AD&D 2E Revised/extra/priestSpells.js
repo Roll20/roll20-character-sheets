@@ -456,6 +456,102 @@ pri1['Shillelagh'] = {
     'effect': 'This spell enables the caster to change his own oak cudgel or unshod staff into a magical weapon that gains a +1 bonus to its attack roll and inflicts 2d4 points of damage on opponents up to man size, and 1d4+1 points of damage on larger opponents. The spell inflicts no damage to the staff or cudgel. The caster must wield the shillelagh, of course.'
 };
 
+let pri2 = {};
+pri2['Aid'] = {
+    'name': 'Aid',
+    'level': 'Level 2 Priest',
+    'school': 'Necromancy, Conjuration',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': '[[1+[[@{level-priest}]] ]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A tiny strip of white cloth with a sticky substance (such as tree sap) on the ends, plus the priest’s holy symbol.',
+    'reference': 'PHB p. 257',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The recipient of this spell gains the benefit of a *bless* spell (+1 to attack rolls and saving throws) and a special bonus of [[1d8]] additional hit points for the duration of the spell. The *aid* spell enables the recipient to actually have more hit points than his full normal total. The bonus hit points are lost first when the recipient takes damage; they cannot be regained by curative magic. \n&emsp;For example, a 1st-level fighter has 8 hit points, suffers 2 points of damage (8–2 = 6), and then receives an aid spell that gives 5 additional hit points. The fighter now has 11 hit points, 5 of which are temporary. If he is then hit for 7 points of damage, 2 normal hit points and all 5 temporary hit points are lost. He then receives a *cure light wounds* spell that heals 4 points of damage, restoring him to his original 8 hit points. \n&emsp;Note that the operation of the spell is unaffected by permanent hit point losses due to energy drain, Hit Die losses, the loss of a familiar, or the operation of certain artifacts; the temporary hit point gain is figured from the new, lower total.'
+};
+
+pri2['Augury'] = {
+    'name': 'Augury',
+    'level': 'Level 2 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': 'A set of gem-inlaid sticks, dragon bones, or similar tokens of at least 1,000 gp value (which are not expended in casting).',
+    'reference': 'PHB p. 257',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest casting an *augury* spell seeks to divine whether an action in the immediate future (within one-half hour) will benefit or harm the party. For example, if a party is considering the destruction of a weird seal that closes a portal, an *augury* spell can be used to find if weal or woe will be the immediate result. If the spell is successful, the DM yields some indication of the probable outcome: “weal,” “woe,” or possibly a cryptic puzzle or rhyme. The base chance for receiving a meaningful reply is 70%, plus 1% for each level of the priest casting the spell ([[70+[[@{level-priest}]]]]); for example, 71% at 1st level, 72% at 2nd, etc. Your DM determines any adjustments for the particular conditions of each augury. For example, if the question is “Will we do well if we venture to the third level?” and a terrible troll guarding 10,000 sp and a shield +1 lurks near the entrance to the level (which the DM estimates the party could beat after a hard fight), the augury might be: “Great risk brings great reward.” If the troll is too strong for the party, the augury might be: “Woe and destruction await!” Likewise, a party casting several auguries about the same action in quick succession might receive identical answers, regardless of the dice rolls.'
+};
+
+pri2['Barkskin'] = {
+    'name': 'Barkskin',
+    'level': 'Level 2 Priest',
+    'school': 'Alteration',
+    'sphere': 'Protection, Plant',
+    'range': 'Touch',
+    'duration': '[[4+[[@{level-priest}]] ]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A handful of bark from an oak and the priest’s holy symbol.',
+    'reference': 'PHB p. 258',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a priest casts the *barkskin* spell upon a creature, its skin becomes as tough as bark, increasing its base Armor Class to AC 6, plus 1 AC for every four levels of the priest ([[6-floor([[@{level-priest}]]/4)]] AC): Armor Class 5 at 4th level, Armor Class 4 at 8th, and so on. This spell does not function in combination with normal armor or any magical protection. In addition, saving throw rolls vs. all attack forms except magic gain a +1 bonus. This spell can be placed on the caster or on any other creature he touches.'
+};
+
+pri2['Chant'] = {
+    'name': 'Chant',
+    'level': 'Level 2 Priest',
+    'school': 'Conjuring/Summoning',
+    'sphere': 'Combat',
+    'range': '0',
+    'duration': 'Time of chanting',
+    'aoe': '30-foot radius',
+    'components': 'V, S',
+    'cast-time': '2 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 258',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of the *chant* spell, the priest brings special favor upon himself and his party, and causes harm to his enemies. When the *chant* spell is completed, all attack and damage rolls and saving throws made by those in the area of effect who are friendly to the priest gain +1 bonuses, while those of the priest’s enemies suffer –1 penalties. This bonus/penalty continues as long as the caster continues to chant the mystic syllables and is stationary. However, an interruption (such as an attack that succeeds and causes damage, grappling with the chanter, or a *silence* spell) breaks the spell. Multiple chants are not cumulative; however, if the 3rd-level *prayer* spell is spoken while a priest of the same religious persuasion (not merely alignment) is chanting, the effect is increased to +2 and –2.'
+};
+
+pri2['Charm Person orMammal'] = {
+    'name': 'Charm Person orMammal',
+    'level': 'Level 2 Priest',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Animal',
+    'range': '80 yards',
+    'duration': 'Special',
+    'aoe': '1 person or mammal',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 258',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell affects any single person or mammal it is cast upon. The creature then regards the caster as a trusted friend and ally to be heeded and protected. The term *person* includes any bipedal human, demihuman or humanoid of man size or smaller, including brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter is included, while an ogre is not. \n&emsp;The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed creature would not obey a suicide command, but might believe the caster if assured that the only chance to save the caster’s life is for the creature to hold back an onrushing red dragon for “just a minute or two” and if the charmed creature’s view of the situation suggests that this course of action still allows a reasonable chance of survival. \n&emsp;The subject’s attitudes and priorities are changed with respect to the caster, but basic personality and alignment are not. A request that a victim make itself defenseless, give up a valued item, or even use a charge from a valued item (especially against former associates or allies) might allow an immediate saving throw to see if the charm is thrown off. Likewise, a charmed creature does not necessarily reveal everything it knows or draw maps of entire areas. Any request may be refused, if such refusal is in character and does not directly harm the caster. The victim’s regard for the caster does not necessarily extend to the caster’s friends or allies. The victim does not react well to the charmer’s allies making suggestions such as, “Ask him this question. . .,” nor does the charmed creature put up with verbal or physical abuse from the charmer’s associates, if this is out of character. \n&emsp;Note also that the spell does not empower the caster with linguistic capabilities beyond those he normally has. The duration of the spell is a function of the charmed creature’s Intelligence, and it is tied to the saving throw. A successful saving throw breaks the spell. This saving throw is checked on a periodic basis according to the creature’s Intelligence, even if the caster has not overly strained the relationship. \n**Intelligence**&emsp;&emsp;**Period Between** \n**Score**&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;**Checks** \n3 or less&emsp;&emsp;&emsp;&emsp;&ensp;3 months \n4–6&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;2 months \n7–9&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;1 month \n10–12&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;3 weeks \n13–14&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;2 weeks \n15–16&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;1 week \n17&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;3 days \n18&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;2 days \n19&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;or more 1 day \n&emsp;If the caster harms, or attempts to harm, the charmed creature by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed creature, the charm is broken automatically. \n&emsp;If the subject of the *charm person or mammal* spell successfully rolls its saving throw vs. the spell, the effect is negated. \n&emsp;This spell, if used in conjunction with the *animal friendship* spell, can keep the animal near the caster’s home base, if the caster must leave for an extended period.'
+};
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 /* ---- Priest spells end ---- */
