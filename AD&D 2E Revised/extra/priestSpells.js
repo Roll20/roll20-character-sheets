@@ -602,7 +602,7 @@ pri2['Enthrall'] = {
     'cast-time': '1 round',
     'saving-throw': 'Negate',
     'materials': '',
-    'reference': 'PHB p. 258',
+    'reference': 'PHB p. 259',
     'damage': '',
     'damage-type': '',
     'healing': '',
@@ -639,7 +639,7 @@ pri2['Fire Trap'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': '½',
-    'materials': 'Holly berries..',
+    'materials': 'Holly berries.',
     'reference': 'PHB p. 260',
     'damage': '1d4+[[@{level-priest}]]',
     'damage-type': 'Fire',
@@ -972,4 +972,5 @@ pri2['Wyvern Watch'] = {
 
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
+priestSpells['pri2'] = pri2;
 /* ---- Priest spells end ---- */
