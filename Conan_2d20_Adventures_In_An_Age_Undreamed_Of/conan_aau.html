@@ -1311,18 +1311,22 @@
                             <span>Date:</span>
                             <button type="action" name="act_logadddate" class="button-logadd-date"></button>
                             <button type="action" name="act_logaddtime" class="button-logadd-time"></button>
-                            <input type="text" name="attr_logdate" class="log-date" />
+                            <div class="log-datetime-expander">
+                                <span name="attr_logdate"></span>
+                                <textarea type="text" name="attr_logdate" spellcheck="false"></textarea>
+                                <!--<input type="text" name="attr_logdate" class="log-date" style="height: 20px;" /> -->
+                            </div>
                         </div>
                         <div class="log-note-fields-grid">
-                            <span class="sheet-log-note-grid-span">Title:</span>
+                            <span>Title:</span>
                             <input type="text" name="attr_logtitle" class="log-title" />
-                            <span class="sheet-log-note-grid-span" style="text-align: right;">Amt/Value:</span>
+                            <span style="text-align: right;">Value/Amt:</span>
                             <input type="text" name="attr_logamtvalue" class="log-amtvalue" />
-                            <button type="action" name="act_logadd-amt" class="button-logadd-amt"></button>
-                            <button type="action" name="act_logadd-value" class="button-logadd-value"></button>
+                            <button type="action" name="act_logadditem" class="button-logadditem"></button>
+                            <button type="action" name="act_logaddgold" class="button-logaddgold"></button>
                             <div class="log-note-expander col-span-1-6">
                                 <span name="attr_lognote"></span>
-                                <textarea type="text" name="attr_lognote"></textarea>
+                                <textarea type="text" name="attr_lognote" spellcheck="false"></textarea>
                             </div>
                         </div>
                     </div>
@@ -1611,6 +1615,23 @@
         console.log(eventInfo.removedInfo);
     }
 
+    getFormattedDate = function() {
+        var d = new Date();
+        return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate();
+    }
+
+    getFormattedTime = function() {
+        var s = '';
+        var d = new Date();
+        var m = '00'+d.getMinutes().toString();
+        m = m.substr(m.length-2,2);
+        if (d.getHours() < 13) 
+            s = d.getHours().toString() + ':' + m + 'AM'
+        else
+            s = (d.getHours()-12).toString() + ':' + m + 'PM'
+        return s;
+    }
+
 
     //***** CHANGE EVENTS *********************************************
 
@@ -1620,7 +1641,7 @@
     on('change:repeating_talents', handleChangeAttribute);
     on('change:repeating_magic', handleChangeAttribute);
     on('change:repeating_npc', handleChangeAttribute);
-    on('change:repeating_belongings:belongings-item-weight remove:repeating_belongings', function() {
+    on('change:repeating_belongings:belongings-item-weight remove:repeating_belongings', function(eventInfo) {
         updateBelongings("total_encumberance","repeating_belongings","belongings-item-weight");
     });
     on('change:repeating_belongings:belongings-item-value remove:repeating_belongings', function() {
@@ -1732,16 +1753,52 @@
     on('clicked:fortunedown', function(){ adjustFortune(-1); });
     on('clicked:spend_upkeep', function(){ spendUpkeep(); });
     on('clicked:cast_spell', function(eventInfo) { 
-        console.log("Casting...");
         castSpell(eventInfo);
     });
     on('clicked:openlog', function(eventInfo) {
         getAttrs(['log-one'], function(value) {
             setAttrs({'log-one':value['log-one'] == 'off' ? 'on' : 'off'});
         });
-
     });
-
+    on('clicked:repeating_lognotes:logadddate', function(eventInfo) {
+        getAttrs(['repeating_lognotes_logdate'], function(value) {
+            setAttrs({'repeating_lognotes_logdate':getFormattedDate()});
+        });
+    });
+    on('clicked:repeating_lognotes:logaddtime', function(eventInfo) {
+        getAttrs(['repeating_lognotes_logdate'], function(value) {
+            var s = value['repeating_lognotes_logdate']||'';
+            if (s.toString().indexOf(':') < 0) {
+                s = s.toString().trim() + ' ';
+                s += getFormattedTime();
+                setAttrs({'repeating_lognotes_logdate':s});
+            } 
+        });
+    });
+    on('clicked:repeating_lognotes:logadditem', function(eventInfo) {
+        getAttrs(['repeating_lognotes_lognote','repeating_lognotes_logtitle','repeating_lognotes_logamtvalue'], function(values) {
+            var newrowid = generateRowID();
+            var newattrs = {};
+            newattrs['repeating_lognotes_lognote'] = '* ' + getFormattedDate() + ' ' + 
+                                                        getFormattedTime() + ' added item: ' + 
+                                                        values['repeating_lognotes_logtitle'] + '\n' +
+                                                        values['repeating_lognotes_lognote'];
+            newattrs['repeating_belongings_' + newrowid + '_belongings-item-value'] = values['repeating_lognotes_logamtvalue'];
+            newattrs['repeating_belongings_' + newrowid + '_belongings-item-desc'] = values['repeating_lognotes_logtitle'];
+            setAttrs(newattrs);
+        });
+    });
+    on('clicked:repeating_lognotes:logaddgold', function(eventInfo) {
+        getAttrs(['repeating_lognotes_lognote','repeating_lognotes_logamtvalue','GoldTotal'], function(values) {
+            var newattrs = {};
+            newattrs['repeating_lognotes_lognote'] = '* ' + getFormattedDate() + ' ' + 
+                                                        getFormattedTime() + ' added gold: ' + 
+                                                        values['repeating_lognotes_logamtvalue'] + '\n' +
+                                                        values['repeating_lognotes_lognote'];
+            newattrs['GoldTotal'] = (parseInt(values['GoldTotal'])||0) + (parseInt(values['repeating_lognotes_logamtvalue'])||0);
+            setAttrs(newattrs);
+        });
+    });
 
 
     //**** OPEN EVENT ****************************************
@@ -1759,8 +1816,6 @@
             if (value['log-one'] != 'on' || value['log-one'] != 'off')
                 setAttrs({'log-one':'off'});
         });
-
-
     });
 
 
