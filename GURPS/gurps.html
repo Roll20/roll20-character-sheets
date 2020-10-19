@@ -22113,8 +22113,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	on("change:size", (event) => {
 
-		console.log(event);
-
 		sizeDiff = Number(event.newValue) - Number(event.previousValue);
 
 		updateReach();
@@ -24314,7 +24312,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	// if ranged rate of fire changed, update the modifier
-	on ("change:ranged_rof", event => {
+	on("change:ranged_rof", event => {
 
 		getAttrs(["ranged_rof"], values => {
 
@@ -24627,6 +24625,142 @@ The attacker may choose to hit the original target or the limb you used to parry
 				});
 
 			});
+
+		});
+
+	}
+
+	// check if a hit location layor value changes. If so, update the armor summary
+	[1, 2, 3, 4].forEach(layerId => {
+
+		on(`change:repeating_hitlocation:layer_${layerId}_front change:repeating_hitlocation:layer_${layerId}_back`, event => {
+
+			updateArmorSummary();
+
+		});
+
+	});
+
+	function updateArmorSummary() {
+		
+		// get all the values for each layer in this row
+		let fields = [
+				"repeating_hitlocation_layer_1_front",
+				"repeating_hitlocation_layer_1_back",
+				"repeating_hitlocation_layer_2_front",
+				"repeating_hitlocation_layer_2_back",
+				"repeating_hitlocation_layer_3_front",
+				"repeating_hitlocation_layer_3_back",
+				"repeating_hitlocation_layer_4_front",
+				"repeating_hitlocation_layer_4_back",
+		];
+
+		getAttrs(fields, values => {
+
+			let updates = {};
+
+			// process the front then back locations
+			["front", "back"].forEach(direction => {
+
+				let isFlexible = false;
+
+				let isSplit = false;
+
+				let arrPrimaryArmor = [];
+
+				let arrSplitArmor = [];
+
+				let splitTypes = "";
+
+				// sum up the total DR values. Can only do one split DR at this time
+				[1, 2, 3, 4].forEach(layerNo => {
+
+					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
+
+					let armor = values[propName].toString();
+
+					let firstDR = 0;
+
+					let secondDR = 0;
+
+					if (armor.indexOf("*") != -1) {
+						
+						isFlexible = true;
+
+						// be sure to remove *
+						armor = armor.replace("*", "");
+					}
+
+					// check for split DR
+					if (armor.indexOf("/") != -1) {
+
+						isSplit = true;
+
+						let arrArmor = armor.split("/");
+
+						firstDR = Number(arrArmor[0]);
+
+						if (isNaN(firstDR)) {
+							firstDR = 0;
+						}
+
+						arrPrimaryArmor.push(firstDR);
+
+						let arrSecondDR = arrArmor[1].split(" ");
+
+						// pull out the first array, which should be DR
+						secondDR = Number(arrSecondDR.splice(0, 1));
+
+						if (isNaN(secondDR)) {
+							secondDR = 0;
+						}
+
+						arrSplitArmor.push(secondDR);
+
+						splitTypes = arrSecondDR.join(" ");
+
+					} else {
+
+						firstDR = Number(armor);
+
+						if (isNaN(firstDR)) {
+							firstDR = 0;
+						}
+
+						arrPrimaryArmor.push(firstDR);
+
+						arrSplitArmor.push(firstDR);
+
+					}
+
+				});
+
+				// see: https://stackoverflow.com/questions/1230233/how-to-find-the-sum-of-an-array-of-numbers
+				let baseDR = arrPrimaryArmor.reduce((a, b) => a + b, 0);
+
+				let splitDR = arrSplitArmor.reduce((a, b) => a + b, 0);
+
+				let layerSummary = baseDR;
+
+				if (splitDR !== baseDR && isFlexible) {
+
+					layerSummary += `/${splitDR}* ${splitTypes}`;
+
+				} else if (splitDR !== baseDR) {
+
+					layerSummary += `/${splitDR} ${splitTypes}`;
+
+				} else if (isFlexible) {
+
+					layerSummary += `*`;
+
+				}
+				
+				updates[`repeating_hitlocation_layer_summary_${direction}`] = layerSummary;
+
+			});
+
+			setAttrs(updates, {silent: true});
 
 		});
 
