@@ -1450,14 +1450,14 @@
               <input type="text" style="width:320px;" name="attr_BOURSE" placeholder="Rien ? C'est la pauvreté !" />
             </div>
             <fieldset class="repeating_equipement">
-              <input class="options-flag" name="attr_equipoptflag" type="checkbox" title="Montrer/cacher les options" /><span>y</span>
+              <input class="options-flag" style="right:-10px;" name="attr_equipoptflag" type="checkbox" title="Montrer/cacher les options" /><span style="right:-10px;">y</span>
               <div class="boxvoie">
                 <input type="text" style="width:310px;" name="attr_equip-nom" title="Équipement" />
                 &nbsp;<span class="textbase">Qté</span>
                 <input type="number" name="attr_equip-qte" value="1" title="Quantité" />
               </div>
               <div class="options boxvoie">
-                &nbsp;<span class="textbase">Effet :</span><input class="nobox" type="text" style="width:340px;" name="attr_equip-effet" title="Équipement" />
+                &nbsp;<span class="textbase">Effet :</span><textarea style="width:340px;" name="attr_equip-effet" title="Commande API" spellcheck="false" ></textarea>
               </div>
             </fieldset>
             <table>
@@ -2774,8 +2774,47 @@
 
   var patternStats = buildRegexp(statsReconnues);
 
+  var listeArmes = [{
+    keys: ['épée', 'epee', 'hache'],
+    typeattaque: 'Arme 1 main',
+    typedegats: 'tranchant',
+    modificateurs: ''
+  }, {
+    keys: ['bâton', 'baton'],
+    typeattaque: 'Arme 2 mains',
+    typedegats: 'contondant',
+    modificateurs: 'choc'
+  }, {
+    keys: ['dague', 'rapière', 'rapiere'],
+    typeattaque: 'Arme 1 main',
+    typedegats: 'percant',
+    modificateurs: ''
+  }, {
+    keys: ['arc', 'arbalète', 'arbalete'],
+    typeattaque: 'Arme 2 mains',
+    typedegats: 'percant',
+    modificateurs: ''
+  }, {
+    keys: ['masse', 'marteau', 'fronde'],
+    typeattaque: 'Arme 1 main',
+    typedegats: 'contondant',
+    modificateurs: ''
+  }, {
+    keys: ['lance'],
+    typeattaque: 'Arme 2 mains',
+    typedegats: 'percant',
+    modificateurs: ''
+  }];
+
+  var mapArmes = listeArmes.reduce(function(res, s) {
+    s.keys.forEach(function(k) {
+      res[k] = s;
+    });
+    return res;
+  }, {});
+
   on('change:statblock', function(eventinfo) {
-    getAttrs(['max_attack_label'], function(values) {
+    getAttrs(['max_attack_label', 'scriptVersion'], function(values) {
       var maxAttack = parseInt(values.max_attack_label);
       if (isNaN(maxAttack)) maxAttack = 0;
       var stats = eventinfo.newValue;
@@ -2830,6 +2869,11 @@
           }
           var index = currentRow.search(/\bDM\b/i);
           var specAtt = currentRow.substring(0, index).trim();
+          var specInAttackName = /\([^\)]*\)/i.exec(nomAttaque);
+          if (specInAttackName) {
+            nomAttaque = nomAttaque.substring(0, specInAttackName.index).trim();
+            specAtt += ' ' + specInAttackName[0].substring(1, specInAttackName[0].length - 1);
+          }
           if (!portee) {
             //parfois la portée n'est pas placée juste après le nom de l'attaque et se retrouve dans le champ spécial
             portee = /\(\d+\s*m\)/i.exec(specAtt);
@@ -2897,6 +2941,22 @@
           newAttrs[prefix + 'dm'] = bonusDM;
           newAttrs[prefix + 'spec'] = specAtt;
           if (portee) newAttrs[prefix + 'portee'] = portee;
+          if (values.scriptVersion && values.scriptVersion !== '')
+            newAttrs[prefix + 'optflag'] = 'on';
+          // On essaie de trouver des valeurs pour le type de l'attaque
+          var na = nomAttaque.toLowerCase();
+          na.split(' ').forEach(function(mot) {
+            mot = mot.trim();
+            if (mot === '') return;
+            var s = mapArmes[mot];
+            if (s) {
+              newAttrs[prefix + 'typeattaque'] = s.typeattaque;
+              newAttrs[prefix + 'modificateurs'] = s.modificateurs;
+              newAttrs[prefix + 'typedegats'] = s.typedegats;
+            }
+          });
+          if (na.includes('2 mains') || na.includes('deux mains'))
+            newAttrs[prefix + 'typeattaque'] = 'Arme 2 mains';
           lastPrefix = prefix;
           previousContainsDM = false;
           previousLine = '';
@@ -3528,8 +3588,7 @@
           attrs.mod_atkmag = 2;
           break;
         default:
-          attrs.mod_atktir = 0;
-          attrs.mod_atkmag = 0;
+          return;
       }
       attrs.mod_atktir -= Math.floor(malusArmure / 2);
       attrs.mod_atkmag -= malusArmure;
