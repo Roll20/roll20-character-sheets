@@ -1,6 +1,12 @@
 # Quest RPG Roll20 Character Sheet
 UnofficialCharacter Sheet Template for T.C. Sottek's tabletop game, [Quest](https://www.adventure.game/).
 
+
+## Version 1.1
+(Andreas J.) 0ct. 2020
+
+Made sheet more compact, updated the roll template, added button for rolls, minor fixes & adjustments.
+
 ## Version 1.0
 (Andrew S.)
 
