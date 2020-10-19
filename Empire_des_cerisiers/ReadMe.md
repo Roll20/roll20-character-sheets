@@ -2,9 +2,13 @@
 Player sheet for L'Empire des cerisiers by Olivier Sanfilippo published by Arkhane Asylum in 2020. Sheet is based on 2020 Arkhane Asylum's designed player sheet.
 
 ## Current Version
-1.1
+1.1-1
 
 ### Change log
+
+#### 1.1-1 
+* Added : missing options in skill / magic calculator
+* Fixed : wrong formula on Mental resistance roll
 
 #### 1.1
 * Added : magic tab
