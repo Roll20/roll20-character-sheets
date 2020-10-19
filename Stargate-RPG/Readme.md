@@ -4,6 +4,12 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Quickstart/B
 
 ### Changelog
 
+**v.1.50(2020-10-20)**
+* add Stargate Phoenix image to roll template
+* integrate ChatSetAttr commands to Short/Long Rest buttons<
+* added whisper toggle to Saves
+* added link to sheet wiki page inside the sheet (Button on settings page)
+
 **v.1.45(2020-10-13)**
 
 * add tooltip info to most rolls/attributes
