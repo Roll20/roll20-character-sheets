@@ -29,15 +29,19 @@ on("sheet:opened", (e) => {
       });
 
       function updateListSkills(values) {
-        values = Object.entries(values);
+        let references = [];
 
-        let updates = {};
-
-        _.each(values, (item) => {
-          updates[item[0]] = item[1];
+        _.each(Object.entries(values), (item) => {
+          references.push(item[0].replace('skill_name', 'skill_mod'));
         });
 
-        setAttrs(updates);
+        getAttrs(references, (vals) => {
+          _.each(references, (item) => {
+            let code = vals[item].replace('_mod', '_code');
+
+            setAttrs({ [item.replace('skill_mod', 'skill_code')]: code }, { silent: true });
+          });
+        });
       }
 
       TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
@@ -3756,7 +3760,7 @@ on('change:toggle_halve_untrained', (e) => {
               </div>
               <div class="sheet-settings__item sheet-settings__item--help"><span data-i18n="settings-help-raise-damage">Raise Damage</span>
                 <input class="sheet-toggle sheet-toggle--spoiler" type="checkbox"/>
-                <div class="sheet-bottom" data-i18n="settings-help-raise-damage-description">There is no general function or field to apply raise damage since this modifier is too flexible. But nothing stops you from entering "1d6" when prompted to add a damage modifier. You could also add "2d4+2" or whatever modifier may apply.</div>
+                <div class="sheet-bottom" data-i18n="settings-help-raise-damage-description">There is no general function or field to apply raise damage since this modifier is too flexible. But nothing can stop you from entering "d6!" when prompted for a damage modifier. You could also add "2d4!+2" or whatever may apply in your case. Do not forget to add the exclamation mark after the die or the roll will not explode.</div>
               </div>
               <div class="sheet-settings__item sheet-settings__item--help"><span data-i18n="settings-help-rate-of-fire">Rate of Fire (Multiple Dice)</span>
                 <input class="sheet-toggle sheet-toggle--spoiler" type="checkbox"/>
