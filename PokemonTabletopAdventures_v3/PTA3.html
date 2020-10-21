@@ -696,6 +696,84 @@
     <textarea spellcheck="false" name="attr_notes"></textarea>
 </div>
 
+<!-- ROLL TEMPLATES -->
+<div class="rolltemplates">
+    <rolltemplate class="sheet-rolltemplate-move_roll">
+        <div class="container sheet-rolltemplate-color-setting-{{sheet_style}}-move">
+            <table class="result">
+                <tr>
+                    <th colspan="2">{{move_name}}</th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="subhead">[{{character_name}}](https://journal.roll20.net/character/{{character_id}}" name="name_link")</td>
+                </tr>
+
+                <!-- Accuracy Check -->
+                <tr>
+                    <td class="label"><span>Accuracy Check:</span></td>
+                    <td class="accuracy-roll">
+                        {{accuracy}}
+                        {{#target}}
+                        <span class="targeted-defense">VS {{target}}</span>
+                        {{/target}}
+                    </td>
+                </tr>
+                <!-- Effectiveness -->
+                {{#^rollTotal() effectiveness_roll 2}}
+                <tr>
+                    <!--<td class="label"><span>Effect:</span></td>-->
+                    <td class="effectiveness-text" colspan="2">
+                        <span>
+                            <!-- Shielded -->
+                            {{#rollTotal() effectiveness_roll 0}}
+                            It was *really* ineffective...
+                            {{/rollTotal() effectiveness_roll 0}}
+                            <!-- Resisted -->
+                            {{#rollTotal() effectiveness_roll 1}}
+                            It wasn't very effective...
+                            {{/rollTotal() effectiveness_roll 1}}
+                            <!-- Super -->
+                            {{#rollTotal() effectiveness_roll 3}}
+                            The attack was super effective!
+                            {{/rollTotal() effectiveness_roll 3}}
+                            <!-- Extreme -->
+                            {{#rollTotal() effectiveness_roll 4}}
+                            The attack was extremely effective!
+                            {{/rollTotal() effectiveness_roll 4}}
+                        </span>
+                    </td>
+                </tr>
+                {{/^rollTotal() effectiveness_roll 2}}
+                <!-- Damage Roll -->
+                <tr>
+                    <td class="label"><span>{{damage-type}} Damage:</span></td>
+                    <td>
+                        <span class="damage-roll {{effectiveness}}-effectiveness-color">
+                            {{#rollWasCrit() accuracy}}
+                            {{critical-damage}}
+                            <span class="crit-damage-text {{effectiveness}}-effectiveness-text-color">
+                                Critical Hit!
+                            </span>
+                            {{/rollWasCrit() accuracy}}
+                            {{#^rollWasCrit() accuracy}}
+                            {{damage}}
+                            {{/^rollWasCrit() accuracy}}
+                        </span>
+                    </td>
+                </tr>
+                <!-- Additional Notes - if there are any -->
+                {{#notes}}
+                <tr>
+                    <td class="notes-text" colspan="2"><span>{{notes}}</span></td>
+                </tr>
+                {{/notes}}
+            </table>
+        </div>
+    </rolltemplate>
+</div>
+
+<!-- SCRIPTS -->
+
 <script type="text/worker">
     on("change:ATK sheet:opened", function() {  
         getAttrs(["ATK"], function(values) {
