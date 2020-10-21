@@ -572,6 +572,7 @@
 
     <b>Moves</b>
     <fieldset class="repeating_moves">
+        <input type="text" name="attr_move_category_defense" class="hidden-setting"></input>
         <input type="checkbox" name="attr_style-bug-move" class="hidden-setting color-setting-bug-move"></input>
         <input type="checkbox" name="attr_style-dark-move" class="hidden-setting color-setting-dark-move"></input>
         <input type="checkbox" name="attr_style-dragon-move" class="hidden-setting color-setting-dragon-move"></input>
@@ -639,7 +640,7 @@
                     <option value="water">Water</option>
                 </select>
                 <select name="attr_move_category" class="move-text">
-                    <option value="">Category</option>
+                    <option value="0">Category</option>
                     <option value="1">Attack</option>
                     <option value="2">Special Attack</option>
                     <option value="3">Effect</option>
@@ -776,6 +777,34 @@
                 }
             })
             setAttrs(typeAttrs);
+        });
+    });
+    
+    defenses=["", "Defense", "Special Defense", "Speed"];
+    on("sheet:opened", function (eventInfo) {
+        getSectionIDs("repeating_moves", function (idArray) {
+            const categories = idArray.map(id => `repeating_moves_${id}_move_category`);
+
+            getAttrs([...categories], function (values) {
+                const rows = categories.reduce((obj, rowName) => {
+                    const cat = parseInt(values[rowName]) || 0;
+                    const defense = defenses[cat];
+
+                    obj[rowName + '_defense'] = defense;
+                    return obj;
+                }, {});
+                if(rows) setAttrs(rows);
+            });
+        });
+    });
+
+    on("change:repeating_moves:move_category", function(event) {
+        getAttrs(["repeating_moves_move_name", "repeating_moves_move_category"], function(values) {
+            console.log(values.repeating_moves_move_name + " category value: " + values.repeating_moves_move_category);
+            var attrs = {};
+            let cat = parseInt(values.repeating_moves_move_category) || 0;
+            attrs["repeating_moves_move_category_defense"] = defenses[cat];
+            setAttrs(attrs);
         });
     });
     
