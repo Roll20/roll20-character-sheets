@@ -676,7 +676,7 @@
             
             <div class="move-notes-roller">
                 <textarea spellcheck="false" name="attr_move_effect" placeholder="Additional Effects" class="3row-textarea"></textarea>
-                <button type='roll' value='&{template:move_roll} {{sheet_style=@{move_type}}} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{move_name=@{move_name}}} {{accuracy=[[ d20cs>@{move_critthreshold} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2} + @{SPDMOD} * {{@{move_category}, 0}=3} ]] + @{move_acmod} + ?{Temp Accuracy Bonus|0} ]] ]]}} {{target=@{move_category_defense}}} {{crit_threshold=@{move_critthreshold}}} {{effectiveness=?{Effectiveness|Neutral, 0|Super Effective, 1|Extremely Effective, 2|Resisted, -1|Shielded, -2}}} {{effectiveness_roll=[[ 1d1 + 1 + ?{Effectiveness} ]]}} {{critical-damage=[[ ([[ @{move_dicenumber} + ?{Effectiveness} ]]) * @{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus|0} ]] ]]}} {{damage=[[ ([[@{move_dicenumber} + ?{Effectiveness}]])d@{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1}+@{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus}]] ]]}} {{damage-type=@{move_type}}} {{notes=@{move_effect}}}'
+                <button type='roll' value='&{template:move-roll} {{move-type=@{move_type}}} {{character-name=@{character_name}}} {{character-id=@{character_id}}} {{move-name=@{move_name}}} {{accuracy=[[ d20cs>@{move_critthreshold} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2} + @{SPDMOD} * {{@{move_category}, 0}=3} ]] + @{move_acmod} + ?{Temp Accuracy Bonus|0} ]] ]]}} {{target=@{move_category_defense}}} {{effectiveness=?{Effectiveness|Neutral, 0|Super Effective, 1|Extremely Effective, 2|Resisted, -1|Shielded, -2}}} {{effectiveness-roll=[[ 1d1 + 1 + ?{Effectiveness} ]]}} {{critical-damage=[[ ([[ @{move_dicenumber} + ?{Effectiveness} ]]) * @{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus|0} ]] ]]}} {{damage=[[ ([[@{move_dicenumber} + ?{Effectiveness}]])d@{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1}+@{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus}]] ]]}} {{notes=@{move_effect}}}'
                     name='roll-movetemplate' class='attack-rollers'> Roll Attack </button>
             </div>
         </div>
@@ -688,14 +688,14 @@
 
 <!-- ROLL TEMPLATES -->
 <div class="rolltemplates">
-    <rolltemplate class="sheet-rolltemplate-move_roll">
-        <div class="container sheet-rolltemplate-color-setting-{{sheet_style}}-move">
+    <rolltemplate class="sheet-rolltemplate-move-roll">
+        <div class="container sheet-rolltemplate-color-setting-{{move-type}}-move">
             <table class="result">
                 <tr>
-                    <th colspan="2">{{move_name}}</th>
+                    <th colspan="2">{{move-name}}</th>
                 </tr>
                 <tr>
-                    <td colspan="2" class="subhead">[{{character_name}}](https://journal.roll20.net/character/{{character_id}}" name="name_link")</td>
+                    <td colspan="2" class="subhead">[{{character-name}}](https://journal.roll20.net/character/{{character-id}}" name="name-link")</td>
                 </tr>
 
                 <!-- Accuracy Check -->
@@ -709,34 +709,34 @@
                     </td>
                 </tr>
                 <!-- Effectiveness -->
-                {{#^rollTotal() effectiveness_roll 2}}
+                {{#^rollTotal() effectiveness-roll 2}}
                 <tr>
                     <!--<td class="label"><span>Effect:</span></td>-->
                     <td class="effectiveness-text" colspan="2">
                         <span>
                             <!-- Shielded -->
-                            {{#rollTotal() effectiveness_roll 0}}
+                            {{#rollTotal() effectiveness-roll 0}}
                             It was *really* ineffective...
-                            {{/rollTotal() effectiveness_roll 0}}
+                            {{/rollTotal() effectiveness-roll 0}}
                             <!-- Resisted -->
-                            {{#rollTotal() effectiveness_roll 1}}
+                            {{#rollTotal() effectiveness-roll 1}}
                             It wasn't very effective...
-                            {{/rollTotal() effectiveness_roll 1}}
+                            {{/rollTotal() effectiveness-roll 1}}
                             <!-- Super -->
-                            {{#rollTotal() effectiveness_roll 3}}
+                            {{#rollTotal() effectiveness-roll 3}}
                             The attack was super effective!
-                            {{/rollTotal() effectiveness_roll 3}}
+                            {{/rollTotal() effectiveness-roll 3}}
                             <!-- Extreme -->
-                            {{#rollTotal() effectiveness_roll 4}}
+                            {{#rollTotal() effectiveness-roll 4}}
                             The attack was extremely effective!
-                            {{/rollTotal() effectiveness_roll 4}}
+                            {{/rollTotal() effectiveness-roll 4}}
                         </span>
                     </td>
                 </tr>
-                {{/^rollTotal() effectiveness_roll 2}}
+                {{/^rollTotal() effectiveness-roll 2}}
                 <!-- Damage Roll -->
                 <tr>
-                    <td class="label"><span>{{damage-type}} Damage:</span></td>
+                    <td class="label"><span>{{move-type}} Damage:</span></td>
                     <td>
                         <span class="damage-roll {{effectiveness}}-effectiveness-color">
                             {{#rollWasCrit() accuracy}}
@@ -868,7 +868,6 @@
 
     on("change:repeating_moves:move_category", function(event) {
         getAttrs(["repeating_moves_move_name", "repeating_moves_move_category"], function(values) {
-            console.log(values.repeating_moves_move_name + " category value: " + values.repeating_moves_move_category);
             var attrs = {};
             let cat = parseInt(values.repeating_moves_move_category) || 0;
             attrs["repeating_moves_move_category_defense"] = defenses[cat];
