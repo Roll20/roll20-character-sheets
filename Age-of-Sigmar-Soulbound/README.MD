@@ -16,6 +16,17 @@ added npc sheet (toggle between player and npc switch in options menu)
 
 fixed issue with wounds, sheetworker will update existing sheets
 
+### V3.0 - Party sheet
+
+added party sheet
+
+added npc initiative to tracker
+
+added initiative rolls, can choose between none, d6 and 2d6
+
+made defaults for sheet type (only player/npc) and initiative dice
+
+
 ## Contributing/Issues
 For issues or contributions consider raising an issue on the [development repo](https://github.com/CloverFox/roll20-soulbound-sheet)
 
