@@ -486,7 +486,6 @@
 										<option value="quadruped">Quadruped</option>
 										<option value="vehicle">Vehicle</option>
 										<option value="vermiform">Vermiform (snake)</option>
-										<option value="weapon">Weapon</option>
 									</select>
 								</div>
 							</div>
@@ -578,7 +577,7 @@
 										<option value="right-leg-joint-5">-5 : Right Leg Joint</option>
 										<option value="right-leg-veins-5">-5 : Right Leg Veins</option>
 										<option value="right-foot-4">-4 : Right Foot</option>
-										<option value="right-foot-joint-4">-4 : Right Foot Joint</option>
+										<option value="right-foot-joint-4">-7 : Right Foot Joint</option>
 										<option value="tail-3">-3 : Tail</option>
 									</select>
 
@@ -647,7 +646,7 @@
 
 									<select name="attr_centaur_location" title="macro: @{centaur_location}" class="hit-location">
 										<option value="human-torso-0">0 : Torso</option>
-										<option value="animal-torso-0">0 : Torso</option>
+										<option value="animal-torso-0">0 : Animal Torso</option>
 										<option value="vitals-3">-3 : Vitals</option>
 										<option value="groin-3">-3 : Groin</option>
 										<option value="face-5">-5 : Face</option>
@@ -719,6 +718,8 @@
 										<option value="face-5">-5 : Face</option>
 										<option value="neck-5">-5 : Neck</option>
 										<option value="brain-7">-7 : brain</option>
+										<option value="left-eye-8">-8 : Left Eye</option>
+										<option value="right-eye-8">-8 : Right Eye</option>
 										<option value="arm-#1-2">-2 : Arm #1</option>
 										<option value="arm-#2-2">-2 : Arm #2</option>
 										<option value="arm-#3-2">-2 : Arm #3</option>
@@ -4193,9 +4194,7 @@
 				</h4>
 
 				<ul>
-					<li>Combat tab: Added sub tabs for Defense, Melee, Ranged, and Tools. Preliminary updates to improving Damage and Armor sections.</li>
-					<li>Combat tab -> Combat Tools: Remove redundant elevation direction, replaced by simple elevation field, if you're above the target, enter a positive number. If below the target, enter a negative number.</li>
-					<li>Gravity Field. Added a gravity field that can be applied to jumping distance and total inventory weight. <b>Note:</b> Gravity value can be updated in three places; Combat Tab -> Tools, Thrown Weapon. Inventory Tab on the totals line. General tab under the Jumping feat.</li>
+					<li>Combat tab: First iteration of Combat sub tab. This tab contains a hit location table and layored armor. You can select a hit location type and update the table. There are options for how many layers to display and if you want to use a back armor location.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8336,7 +8335,11 @@ visualize what it will look like in chat.
 			
 			<!-- tabs -->
 			<label>
-				<input type="radio" name="attr_combat_tabs" value="defense" class="tab-control" checked />
+				<input type="radio" name="attr_combat_tabs" value="damage" class="tab-control" checked />
+				<span data-i18n="damage-label">Damage</span>
+			</label>
+			<label>
+				<input type="radio" name="attr_combat_tabs" value="defense" class="tab-control" />
 				<span data-i18n="defense-label">Defense</span>
 			</label>
 			<label>
@@ -8353,7 +8356,7 @@ visualize what it will look like in chat.
 			</label>
 
 			<!-- tabbed section to display | value changes based on selected radio button -->
-			<input type="hidden" name="attr_combat_tabs" value="defense" />
+			<input type="hidden" name="attr_combat_tabs" value="damage" />
 			<div class="tabs">
 
 				<div class="tabbed-header">
@@ -8367,13 +8370,19 @@ visualize what it will look like in chat.
 								<!-- row 1 -->
 								<div class="item item1">
 									<div class="popup">
+										<span data-i18n="two-letter-abbreviation-size-modifier-label">SM</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="target-size-modifier-tooltip">Size Modifier of target. The modifier is applied AFTER location, grapple, shield, chinks in armor have been applied.</span>
+									</span>
+								</div>
+								
+								<div class="item item2">
+									<div class="popup">
 										<span data-i18n="abbreviation-hit-points">HP</span>
 									</div>
 									<span class="tooltip">
-										<span data-i18n="current-hit-points-tooltip">
-	Current Hit Points<br />
-	When your HP is low, you take penalties. (B419)
-										</span>
+										<span data-i18n="current-hit-points-tooltip">Current Hit Points<br />When your HP is low, you take penalties. (B419)</span>
 										<table>
 											<tbody>
 											<tbody>
@@ -8460,11 +8469,15 @@ visualize what it will look like in chat.
 								</div>
 
 								<!-- row 2 -->
-								<div class="item item2">
+								<div class="item item4">
+									<input type="number" name="attr_size" value="0" title="Macro name: @{size}" />
+								</div>
+								
+								<div class="item item5">
 									<input type="number" name="attr_hit_points" value="10" title="Macro name: hit_points" />
 								</div>
 								
-								<div class="item item4">
+								<div class="item item6">
 									<input type="number" name="attr_hit_points_max" value="10" readonly="readonly" title="Macro name: hit_points_max" />
 								</div>
 
@@ -8562,6 +8575,308 @@ visualize what it will look like in chat.
 
 					</div>
 					
+				</div>
+
+				<div class="damage">
+					
+					<h3>
+						<span data-i18n="hit-location-armor-title">Hit Location & Armor Table</span>
+					</h3>
+					
+					<div class="armor-layer-controller-grid">
+
+						<!-- row1 -->
+						<div class="item heading">
+							<div class="popup">
+								<span data-i18n="type-label">Type</span>:
+							</div>
+							<span class="tooltip" style="margin-left: 0;">
+								<span data-i18n="character-armor-type-tooltip">Select the hit location type and click the <b>Apply</b> button.<br /><b>ALERT:</b> This will delete the current hit locations!</span>
+							</span>
+						</div>
+						<div class="item">
+							<select name="attr_armor_hit_location_type" title="macro: @{armor_hit_location_type}">
+								<option selected>Select</option>
+								<option value="arachnoid">Arachnoid (spider)</option>
+								<option value="avian">Avian</option>
+								<option value="cancroid">Cancroid (crab)</option>
+								<option value="centaur">Centaur</option>
+								<option value="hexapod">Hexapod</option>
+								<option value="humanoid">Humanoid</option>
+								<option value="humanoid_low_tech">Humanoid Low-tech</option>
+								<option value="humanoid_martial_arts">Humanoid Martial Arts</option>
+								<option value="ichthyoid">Ichthyoid (fish)</option>
+								<option value="octopod">Octopod (octopus)</option>
+								<option value="quadruped">Quadruped</option>
+								<option value="vermiform">Vermiform (snake)</option>
+								<option value="wagon">Wagon</option>
+								<option value="automobile">Automobile</option>
+								<option value="rowboat">Rowboat</option>
+								<option value="speedboat">Speedboat</option>
+								<option value="biplane">Biplane</option>
+								<option value="monoplane">Monoplane</option>
+								<option value="helicopter">Helicopter</option>
+								<option value="tank">Tank</option>
+							</select>
+						</div>
+						<div class="item">
+							<button type="action" name="act_armor_apply" class="reset" title="Apply the selected hit location type"><span data-i18n="apply-label">Apply</span></button>
+						</div>
+						<div class="item">&nbsp;</div>
+						<div class="item heading">
+							<div class="popup">
+								<span data-i18n="layers-label">Layers</span>:
+							</div>
+							<span class="tooltip" style="margin-left: 0;">
+								<span data-i18n="armor-layers-tooltip">Select the number of armor layers to display.</span>
+							</span>
+						</div>
+						<div class="item">
+							<select name="attr_armor_layers" title="Macro: @{armor_layers}">
+								<option selected>1</option>
+								<option>2</option>
+								<option>3</option>
+								<option>4</option>
+							</select>
+						</div>
+						<div class="item">
+							<label>
+								<div>
+									<input type="checkbox" name="attr_armor_show_back" title="Macro: @{armor_show_back}" />
+								</div>
+								<div>
+									<span data-i18n="show-back-armor-label">Show Back Armor</span>
+								</div>
+							</label>
+						</div>
+
+					</div>
+
+					<div class="hit-location-container">
+
+						<input type="hidden" name="attr_armor_show_back" />
+						<input type="hidden" name="attr_armor_layers" />
+						<div class="hit-location-grid">
+
+							<!-- header row -->
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<span data-i18n="location-label">Location</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="abbreviation-penalty-label">Pen</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-penalty-tooltip">Penalty to hit this location.<br /><b>NOTE:</b> Size Modifier is factored in on <i>Applying</i> location type or changing <i>Size Modifier</i>.</span>
+								</span>
+							</div>
+							<div class="item grid-header layer layer-1">
+								<div class="popup">
+									<span data-i18n="layer-1-label">Layer 1</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
+									<div>
+										<span data-i18n="armor-layor1-tooltip">"Layer 1 <i>(Inner most)</i> is good for natural DR or concealable armor, such as cloth armor under a breastplate.</span>
+									</div>
+								</span>
+								<div class="front">
+									<span data-i18n="front-label">Front</span>
+								</div>
+								<div class="back">
+									<span data-i18n="back-label">Back</span>
+								</div>
+							</div>
+							<div class="item grid-header layer layer-2">
+								<div class="popup">
+									<span data-i18n="layer-2-label">Layer 2</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
+									<div>
+										<span data-i18n="armor-layor2-tooltip">Layer 2 is good for your primary armor, like helmet, leather armor, gloves, etc.</span>
+									</div>
+								</span>
+								<div class="front">
+									<span data-i18n="front-label">Front</span>
+								</div>
+								<div class="back">
+									<span data-i18n="back-label">Back</span>
+								</div>
+							</div>
+							<div class="item grid-header layer layer-3">
+								<div class="popup">
+									<span data-i18n="layer-3-label">Layer 3</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.</span>
+									<div>
+										<span data-i18n="armor-layor3-tooltip">Layer 3 is good for force shields, magic DR, etc.</span>
+									</div>
+								</span>
+								<div class="front">
+									<span data-i18n="front-label">Front</span>
+								</div>
+								<div class="back">
+									<span data-i18n="back-label">Back</span>
+								</div>
+							</div>
+							<div class="item grid-header layer layer-4">
+								<div class="popup">
+									<span data-i18n="layer-4-label">Layer 4</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-layor-tooltip">Enter DR for this location.<br />* = flexible<br />You can split the DR using with these suggested abbreviations.<br />cr = crush<br />pi = pierce<br />cut = cutting<br />imp = impaling<br />bu = burning<br /><b>Alert:</b> To enter a split DR, the first number must be the primary DR, while the second number are the exceptions, this is required in order to know how to split the armor.<br /><b>NOTE:</b> Only <b>one</b> layer per row may have split armor.</span>
+									<div>
+										<span data-i18n="armor-layor4-tooltip">Layer 4 <i>(Outer most)</i> is also good for force shields, magic DR, etc.</span>
+									</div>
+								</span>
+								<div class="back">
+									<span data-i18n="back-label">Back</span>
+								</div>
+							</div>
+							<div class="item grid-header layer summary">
+								<div class="popup">
+									<span data-i18n="summary-label">Summary</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="armor-summary-tooltip">This sums up each layer, from layer 1 <i>(inner)</i> to layer 4 <i>(outer)</i>.<br />* = flexible armor.<br /><b>Alert: </b> Only <b>one</b> layer per row may have split armor.</span>
+								</span>
+								<div class="front">
+									<span data-i18n="front-label">Front</span>
+								</div>
+								<div class="back">
+									<span data-i18n="back-label">Back</span>
+								</div>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="abbreviation-defense-bonus-label">DB</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="defense-bonus-tooltip">Apply the defense bonus of a shield, cloak, spell (B252), or Meta-trait (Supers34). See B374<br /><b>Shield/Cloak:</b> Used against attacks from front or from your shield side. Can't be used against firearms <b>unless</b> you're using the <i>Damage to Shields</i> option.<br /><b>Shield Spell:</b> Protects from <i>frontal</i> attacks and is cumulative with a normal shield.</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="abbreviation-damage-label">DMG</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="hitlocation-damage-tooltip">Enter the amount of damage this location has taken.<br /><b>NOTE:</b> The damage will <i>note</i> affect the current Hit Points.</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="abbreviation-divisor-label">DIV</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="hitlocation-divisor-tooltip">Hit Point Divisor. If the number is 2 or higher, that means the location can be disabled and a value will be updated in the next column. See B421.</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="abbreviation-disabled-label">DIS</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="hitlocation-disabled-tooltip">Disabled/Crippled Threshold.<br />If a <b>single</b> injury meets or exceeds this value, the extremity or structure is disabled.<br /><b>NOTE:</b> In most cases, if disabled/crippled in one injury, the excess damage is lost, except where noted, such as the <b>eyes.</b><br /><b>Dismemberment:</b> If injury is <i>twice</i> the threshold, then extremity is destroyed. <i>Cutting</i> or <i>Explosion</i> will sever the limb.<br />See B421</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<div class="popup">
+									<span data-i18n="wounds-label">Wounds</span>
+								</div>
+								<span class="tooltip">
+									<span data-i18n="hitlocation-wounds-tooltip">Enter individual wounds here, if limb is crippled, bleeding, etc.<br />Example: -6 pi (major wound), -2 burn.</span>
+								</span>
+							</div>
+							<div class="item grid-header">
+								<h4 class="spacer">&nbsp;</h4>
+								<span data-i18n="notes-label">Notes</span>
+							</div>
+
+						</div>
+
+						<fieldset class="repeating_hitlocation">
+
+							<div class="hit-location-grid">
+								<div class="item">
+									<input type="text" name="attr_where" title="Macro: @{repeating_hitlocation_$[row #]_where}" />
+									<input type="hidden" name="attr_key" />
+								</div>
+								<div class="item">
+									<input type="number" step="1" value="0" name="attr_penalty" title="Macro: @{repeating_hitlocation_$[row #]_penalty}" />
+								</div>
+								<div class="item layer layer-1">
+									<div class="front">
+										<input type="text" name="attr_layer_1_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_front}" />
+									</div>
+									<div class="back">
+										<input type="text" name="attr_layer_1_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_back}" />
+									</div>
+								</div>
+								<div class="item layer layer-2">
+									<div class="front">
+										<input type="text" name="attr_layer_2_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_2_front}" />
+									</div>
+									<div class="back">
+										<input type="text" name="attr_layer_2_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_2_back}" />
+									</div>
+								</div>
+								<div class="item layer layer-3">
+									<div class="front">
+										<input type="text" name="attr_layer_3_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_3_front}" />
+									</div>
+									<div class="back">
+										<input type="text" name="attr_layer_3_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_3_back}" />
+									</div>
+								</div>
+								<div class="item layer layer-4">
+									<div class="front">
+										<input type="text" name="attr_layer_4_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_4_front}" />
+									</div>
+									<div class="back">
+										<input type="text" name="attr_layer_4_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_4_back}" />
+									</div>
+								</div>
+								<div class="item layer summary">
+									<div class="front">
+										<input type="text" name="attr_layer_summary_front" readonly="readonly" title="Macro: @{repeating_hitlocation_$[row #]_layer_summary_front}" />
+									</div>
+									<div class="back">
+										<input type="text" name="attr_layer_summary_back" readonly="readonly" title="Macro: @{repeating_hitlocation_$[row #]_layer_summary_back}" />
+									</div>
+								</div>
+								<div class="item">
+									<input type="number" value="0" step="1" min="0" name="attr_defense_bonus" title="Macro: @{repeating_hitlocation_$[row #]_defense_bonus}" />
+								</div>
+								<div class="item">
+									<input type="number" value="0" step="1" max="0" name="attr_damage" title="Macro: @{repeating_hitlocation_$[row #]_damage}" />
+								</div>
+								<div class="item">
+									<input type="number" value="1" step="1" min="1" name="attr_divisor" title="Macro: @{repeating_hitlocation_$[row #]_divisor}" />
+								</div>
+								<div class="item">
+									<input type="text" name="attr_crippled" readonly="readonly" title="Macro: @{repeating_hitlocation_$[row #]_crippled}" />
+								</div>
+								<div class="item">
+									<input type="text" name="attr_wounds" title="Macro: @{repeating_hitlocation_$[row #]_wounds}" />
+								</div>
+								<div class="item">
+									<input type="text" name="attr_notes" title="Macro: @{repeating_hitlocation_$[row #]_notes}" />
+								</div>
+							</div>
+							
+						</fieldset>
+
+					</div>
+
 				</div>
 
 				<div class="defense">
@@ -12122,6 +12437,14 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
+			<h4>Version: 2.4.0</h4>
+
+			<ul>
+				<li>Combat tab: First iteration of Combat sub tab. This tab contains a hit location table and layored armor. You can select a hit location type and update the table. There are options for how many layers to display and if you want to use a back armor location.</li>
+			</ul>
+
+			<p>PUll Request: 10/13/2020</p>
+
 			<ul>
 				<li>Combat tab: Added sub tabs for Defense, Melee, Ranged, and Tools. Preliminary updates to improving Damage and Armor sections.</li>
 				<li>Combat tab -> Combat Tools: Remove redundant elevation direction, replaced by simple elevation field, if you're above the target, enter a positive number. If below the target, enter a negative number.</li>
@@ -14177,7 +14500,7 @@ See notes for weapon.</textarea>
 
 	var version = "2.4.0";  
 
-	var latestChangesDate = "10/13/2020";
+	var latestChangesDate = "10/20/2020";
 
 	var modCascade = true;
 	
@@ -14684,7 +15007,318 @@ See notes for weapon.</textarea>
 		"spell_long_distance",
 		"spell_natures_strength",
 	];
-	
+
+	// predefined hit locations
+	const HIT_LOCATIONS_JSON = new Map([
+		["arachnoid", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "brain", display: "Brain", penalty: -7, DR: 0, hp_divisor: 1, notes:""},
+			{key: "eye-1", display: "Eye #1", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "eye-2", display: "Eye #2", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "eye-3", display: "Eye #3", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "eye-4", display: "Eye #4", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "eye-5", display: "Eye #5", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "eye-6", display: "Eye #6", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "leg-1", display: "Leg #1", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-2", display: "Leg #2", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-3", display: "Leg #3", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-4", display: "Leg #4", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-5", display: "Leg #5", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-6", display: "Leg #6", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-7", display: "Leg #7", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-8", display: "Leg #8", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+		]],
+		["avian", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-leg", display: "Left Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foot", display: "Left Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-leg", display: "Right Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foot", display: "Right Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["cancroid", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-pincer", display: "Left Pincer", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-pincer", display: "Right Pincer", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-1", display: "Leg #1", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-2", display: "Leg #2", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-3", display: "Leg #3", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-4", display: "Leg #4", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-5", display: "Leg #5", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-6", display: "Leg #6", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-7", display: "Leg #7", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "leg-8", display: "Leg #8", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["centaur", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "animal-torso", display: "Animal Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-arm", display: "Left Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hand", display: "Left Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-arm", display: "Right Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hand", display: "Right Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-foreleg", display: "Left Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foreleg-foot", display: "Left Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-foreleg", display: "Right Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foreleg-foot", display: "Right Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-hind-leg", display: "Left Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hind-foot", display: "Left Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-hind-leg", display: "Right Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hind-foot", display: "Right Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["hexapod", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foreleg", display: "Left Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foreleg-foot", display: "Left Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-foreleg", display: "Right Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foreleg-foot", display: "Right Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-mid-leg", display: "Left Mid Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-mid-foot", display: "Left Mid Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-mid-leg", display: "Right Mid Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-mid-foot", display: "Right Mid Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-hind-leg", display: "Left Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hind-foot", display: "Left Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-hind-leg", display: "Right Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hind-foot", display: "Right Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["humanoid", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-arm", display: "Left Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hand", display: "Left Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-arm", display: "Right Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hand", display: "Right Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-leg", display: "Left Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foot", display: "Left Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-leg", display: "Right Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foot", display: "Right Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["humanoid_low_tech", [
+			{key: "chest", display: "Chest", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "abdomen", display: "Abdomen", penalty: -1, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-arm", display: "Left Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hand", display: "Left Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-arm", display: "Right Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hand", display: "Right Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-leg", display: "Left Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foot", display: "Left Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-leg", display: "Right Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foot", display: "Right Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["humanoid_martial_arts", [
+			{key: "chest", display: "Chest", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "abdomen", display: "Abdomen", penalty: -1, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck-veins", display: "Neck Veins", penalty: -8, DR: 0, hp_divisor: 1, notes:""},
+			{key: "jaw", display: "Jaw", penalty: -6, DR: 0, hp_divisor: 1, notes:""},
+			{key: "nose", display: "Nose", penalty: -7, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "spine", display: "Spine", penalty: -8, DR: 0, hp_divisor: 1, notes:""},
+			{key: "left-ear", display: "Left Ear", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+			{key: "right-ear", display: "Right Ear", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-arm", display: "Left Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-arm-joints", display: "Left Arm Joints", penalty: -5, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-arm-veins", display: "Left Arm Veins", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "left-hand", display: "Left Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-hand-joints", display: "Left Hand Joints", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+			{key: "right-arm", display: "Right Arm", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-arm-joints", display: "Right Arm Joints", penalty: -5, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-arm-veins", display: "Right Arm Veins", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "right-hand", display: "Right Hand", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-hand-joints", display: "Right Hand Joints", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+			{key: "left-leg", display: "Left Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-leg-joints", display: "Left Leg Joints", penalty: -5, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-leg-veins", display: "Left Leg Veins", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "left-foot", display: "Left Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-foot-joint", display: "Left Foot Joint", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+			{key: "right-leg", display: "Right Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-leg-joints", display: "Right Leg Joints", penalty: -5, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-leg-veins", display: "Right Leg Veins", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "right-foot", display: "Right Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-foot-joint", display: "Right Foot Joint", penalty: -7, DR: 0, hp_divisor: 4, notes:""},
+		]],
+		["ichthyoid", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-fin", display: "Left Fin", penalty: -2, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-fin", display: "Right Fin", penalty: -2, DR: 0, hp_divisor: 3, notes:""},
+			{key: "top-fin", display: "Top Fin", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "bottom-fin", display: "Bottom Fin", penalty: -2, DR: 0, hp_divisor: 3, notes:""},
+			{key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["octopod", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "brain", display: "Brain", penalty: -7, DR: 0, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+			{key: "arm-1", display: "Arm #1", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-2", display: "Arm #2", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-3", display: "Arm #3", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-4", display: "Arm #4", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-5", display: "Arm #5", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-6", display: "Arm #6", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-7", display: "Arm #7", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "arm-8", display: "Arm #8", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+		]],
+		["quadruped", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -9, DR: 0, hp_divisor: 10, notes:""},
+			{key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foreleg", display: "Left Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-foreleg-foot", display: "Left Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-foreleg", display: "Right Foreleg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-foreleg-foot", display: "Right Foreleg Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "left-hind-leg", display: "Left Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "left-hind-foot", display: "Left Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-hind-leg", display: "Right Hind Leg", penalty: -2, DR: 0, hp_divisor: 2, notes:""},
+			{key: "right-hind-foot", display: "Right Hind Foot", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "tail", display: "Tail", penalty: -3, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["vermiform", [
+			{key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			{key: "vitals", display: "Vitals", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "groin", display: "Groin", penalty: -3, DR: 0, hp_divisor: 1, notes:""},
+			{key: "face", display: "Face", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "neck", display: "Neck", penalty: -5, DR: 0, hp_divisor: 1, notes:""},
+			{key: "skull", display: "Skull", penalty: -7, DR: 2, hp_divisor: 1, notes:""},
+			{key: "left-eye", display: "Left Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+			{key: "right-eye", display: "Right Eye", penalty: -8, DR: 0, hp_divisor: 10, notes:""},
+		]],
+		["wagon", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "wheel-1", display: "Wheel #1", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-2", display: "Wheel #2", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-3", display: "Wheel #3", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-3", display: "Wheel #3", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+		]],
+		["automobile", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "large-windows", display: "Large Windows", penalty: -3, DR: 0, hp_divisor: 1, notes:"1/2 DR. Check occupant hit."},
+			{key: "wheel-1", display: "Wheel #1", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-2", display: "Wheel #2", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-3", display: "Wheel #3", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-3", display: "Wheel #3", penalty: -4, DR: 0, hp_divisor: 8, notes:"If damaged, roll HT to avoid flat tire."},
+		]],
+		["rowboat", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "open-body", display: "Open Body", penalty: -3, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "open-body", display: "Open Body", penalty: -3, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+		]],
+		["speedboat", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "open-body", display: "Open Body", penalty: -3, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+		]],
+		["biplane", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "open-body", display: "Open Body", penalty: -3, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "wheel-1", display: "Wheel #1", penalty: -4, DR: 0, hp_divisor: 4, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-2", display: "Wheel #2", penalty: -4, DR: 0, hp_divisor: 4, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:"If disabled, lose control and crash."},
+			{key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:"If disabled, lose control and crash."},
+		]],
+		["monoplane", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "large-windows", display: "Large Windows", penalty: -3, DR: 0, hp_divisor: 1, notes:"1/2 DR. Check occupant hit."},
+			{key: "wheel-1", display: "Wheel #1", penalty: -4, DR: 0, hp_divisor: 4, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "wheel-2", display: "Wheel #2", penalty: -4, DR: 0, hp_divisor: 4, notes:"If damaged, roll HT to avoid flat tire."},
+			{key: "left-wing", display: "Left Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:"If disabled, lose control and crash."},
+			{key: "right-wing", display: "Right Wing", penalty: -2, DR: 0, hp_divisor: 2, notes:"If disabled, lose control and crash."},
+		]],
+		["helicopter", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "large-windows", display: "Large Windows", penalty: -3, DR: 0, hp_divisor: 1, notes:"1/2 DR. Check occupant hit."},
+			{key: "rotor-main", display: "Main Rotor", penalty: -2, DR: 0, hp_divisor: 2, notes:"If disabled, lose control and crash."},
+			{key: "rotor-tail", display: "Tail Rotor", penalty: -2, DR: 0, hp_divisor: 3, notes:"If disabled, lose control and crash."},
+			{key: "left-skid", display: "Left Skid", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+			{key: "right-skid", display: "Right Skid", penalty: -4, DR: 0, hp_divisor: 3, notes:""},
+		]],
+		["tank", [
+			{key: "body", display: "Body", penalty: 0, DR: 0, hp_divisor: 1, notes:"Check occupant hit."},
+			{key: "vital-area", display: "Vital Area", penalty: -3, DR: 0, hp_divisor: 1, notes:"Tight-beam burning x2 damage. Impaling/piercing x3 damage."},
+			{key: "caterpillar-track-left", display: "Left Track", penalty: -2, DR: 0, hp_divisor: 2, notes:"If track disabled, move is 0."},
+			{key: "caterpillar-track-left", display: "Main Rotor", penalty: -2, DR: 0, hp_divisor: 2, notes:"If track disabled, move is 0."},
+			{key: "main-turrent", display: "Main Turrent", penalty: -2, DR: 0, hp_divisor: 2, notes:"If major wound and failed HT roll, turret is knocked out."},
+			{key: "exposed-weapon", display: "Exposed Weapon", penalty: -7, DR: 0, hp_divisor: 5, notes:""},
+		]],
+	]);
+
 	/* Due to the change from auto-calc fields to helper scripts,
 	 * I'm running a "on open" to set various fields. At some point
 	 * in the future this might no longer be needed.
@@ -21549,9 +22183,20 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	on("change:size", (event) => {
 
+		sizeDiff = Number(event.newValue) - Number(event.previousValue);
+
 		updateReach();
 
+		updateRepeatingHitLocationPenaltyCrippledValues(sizeDiff);
+
 	});
+
+	on("change:hit_points_max", (event) => {
+
+		updateRepeatingHitLocationPenaltyCrippledValues(0);
+
+	});
+
 
 	function updateReach() {
 
@@ -21624,7 +22269,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 	}
-
+	
 	/* ROLL MODIFIERS BOX */
 
 	// close roll modifiers, no updates
@@ -23737,7 +24382,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	// if ranged rate of fire changed, update the modifier
-	on ("change:ranged_rof", event => {
+	on("change:ranged_rof", event => {
 
 		getAttrs(["ranged_rof"], values => {
 
@@ -23871,6 +24516,321 @@ The attacker may choose to hit the original target or the limb you used to parry
 			}
 
 			setAttrs({ranged_move_default_or_bulk: modifier});
+
+		});
+
+	}
+
+	// handle armor hit location call to action
+	on("clicked:armor_apply", (event) => {
+	   
+		clearArmorHitLocations();
+
+		addArmorHitLocations();
+	    
+	});
+
+	/**
+	 * delete all the hit locations from the locations table
+     *
+	 */
+	function clearArmorHitLocations() {
+
+		getSectionIDs("repeating_hitlocation", (ids) => {
+
+            // loop through the rows
+			for (var i = 0; i < ids.length; i++) {
+		
+                removeRepeatingRow("repeating_hitlocation_" + ids[i]);
+				
+			}
+
+		});
+
+	}
+
+	/**
+	 * Add the hit locations based on the selected hit location type
+	 */
+	function addArmorHitLocations() {
+
+		let fields = [
+			"armor_hit_location_type",
+			"hit_points_max",
+			"size",
+		];
+
+		getAttrs(fields, values => {
+
+			let type = values.armor_hit_location_type;
+
+			let hitPoints = Number(values.hit_points_max);
+
+			let sizeMod = Number(values.size);
+
+			let locations = HIT_LOCATIONS_JSON.get(type);
+
+			let rows = {};
+
+			// loop through each location object in the array
+			// location = {key: "torso", display: "Torso", penalty: 0, DR: 0, hp_divisor: 1, notes:""},
+			locations.forEach(location => {
+
+				let id = generateRowID();
+
+				let penalty = sizeMod + Number(location.penalty);
+
+				let divisor = Number(location.hp_divisor);
+
+				let crippled = 0;
+
+				if (divisor > 1) {
+					crippled = Math.floor(hitPoints/divisor) + 1;
+				}
+
+				rows[`repeating_hitlocation_${id}_key`] = location.key;
+
+				rows[`repeating_hitlocation_${id}_where`] = location.display;
+
+				rows[`repeating_hitlocation_${id}_layer_1_front`] = location.DR;
+
+				rows[`repeating_hitlocation_${id}_layer_1_back`] = location.DR;
+
+				rows[`repeating_hitlocation_${id}_layer_summary_front`] = location.DR;
+
+				rows[`repeating_hitlocation_${id}_layer_summary_back`] = location.DR;
+
+				rows[`repeating_hitlocation_${id}_penalty`] = penalty;
+
+				rows[`repeating_hitlocation_${id}_divisor`] = location.hp_divisor;
+
+				rows[`repeating_hitlocation_${id}_crippled`] = crippled;
+
+				rows[`repeating_hitlocation_${id}_notes`] = location.notes;
+
+			});
+
+			setAttrs(rows, {silent: true});
+
+		});
+
+		
+	}
+
+	/**
+	 * Updates hit location table's penalty and crippled values
+	 * we have to get all the IDs for each row. 
+	 * Get original penalty value
+	 * then update the final penalty, divisor, and disabled hit points
+	 *
+	 * @param int sizeDiff The size difference.
+	 */
+	function updateRepeatingHitLocationPenaltyCrippledValues(sizeDiff) {
+
+		let fields = [
+			"hit_points_max",
+		];
+
+		getAttrs(fields, values => {
+
+			let hitPoints = Number(values.hit_points_max);
+
+			// get all the section id numbers
+			getSectionIDs("repeating_hitlocation", (ids) => {
+
+				let repeatingFields = [];
+
+				// get a list of values we need from the table rows
+				for (var i = 0; i < ids.length; i++) {
+				
+					let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
+
+					let divisorProp = `repeating_hitlocation_${ids[i]}_divisor`;
+
+					repeatingFields.push(penaltyProp);
+
+					repeatingFields.push(divisorProp);
+				
+				}
+			
+				// get the values
+				getAttrs(repeatingFields, function (repeatingValues) {
+
+					let updates = {};
+
+					// loop through ids and create a list value to update
+					for (var i = 0; i < ids.length; i++) {
+				
+						let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
+
+						let penalty = repeatingValues[penaltyProp];
+
+						let divisorProp = `repeating_hitlocation_${ids[i]}_divisor`;
+
+						let divisor = repeatingValues[divisorProp];
+
+						let newPenalty = sizeDiff + penalty;
+
+						if (divisor < 0) {
+							divisor = 1;
+						}
+
+						let crippled = 0;
+
+						// only apply cripple valor if divisor is over 1.
+						if (divisor > 1) {
+							crippled = Math.floor(hitPoints / divisor) + 1;
+						}
+
+						let crippledProp = `repeating_hitlocation_${ids[i]}_crippled`;
+
+						updates[penaltyProp] = newPenalty;
+
+						updates[crippledProp] = crippled;
+					
+					}
+
+					setAttrs(updates, {silent: true});
+					
+				});
+
+			});
+
+		});
+
+	}
+
+	// check if a hit location layor value changes. If so, update the armor summary
+	[1, 2, 3, 4].forEach(layerId => {
+
+		on(`change:repeating_hitlocation:layer_${layerId}_front change:repeating_hitlocation:layer_${layerId}_back`, event => {
+
+			updateArmorSummary();
+
+		});
+
+	});
+
+	function updateArmorSummary() {
+		
+		// get all the values for each layer in this row
+		let fields = [
+				"repeating_hitlocation_layer_1_front",
+				"repeating_hitlocation_layer_1_back",
+				"repeating_hitlocation_layer_2_front",
+				"repeating_hitlocation_layer_2_back",
+				"repeating_hitlocation_layer_3_front",
+				"repeating_hitlocation_layer_3_back",
+				"repeating_hitlocation_layer_4_front",
+				"repeating_hitlocation_layer_4_back",
+		];
+
+		getAttrs(fields, values => {
+
+			let updates = {};
+
+			// process the front then back locations
+			["front", "back"].forEach(direction => {
+
+				let isFlexible = false;
+
+				let isSplit = false;
+
+				let arrPrimaryArmor = [];
+
+				let arrSplitArmor = [];
+
+				let splitTypes = "";
+
+				// sum up the total DR values. Can only do one split DR at this time
+				[1, 2, 3, 4].forEach(layerNo => {
+
+					let propName = `repeating_hitlocation_layer_${layerNo}_${direction}`;
+
+					let armor = values[propName].toString();
+
+					let firstDR = 0;
+
+					let secondDR = 0;
+
+					if (armor.indexOf("*") != -1) {
+						
+						isFlexible = true;
+
+						// be sure to remove *
+						armor = armor.replace("*", "");
+					}
+
+					// check for split DR
+					if (armor.indexOf("/") != -1) {
+
+						isSplit = true;
+
+						let arrArmor = armor.split("/");
+
+						firstDR = Number(arrArmor[0]);
+
+						if (isNaN(firstDR)) {
+							firstDR = 0;
+						}
+
+						arrPrimaryArmor.push(firstDR);
+
+						let arrSecondDR = arrArmor[1].split(" ");
+
+						// pull out the first array, which should be DR
+						secondDR = Number(arrSecondDR.splice(0, 1));
+
+						if (isNaN(secondDR)) {
+							secondDR = 0;
+						}
+
+						arrSplitArmor.push(secondDR);
+
+						splitTypes = arrSecondDR.join(" ");
+
+					} else {
+
+						firstDR = Number(armor);
+
+						if (isNaN(firstDR)) {
+							firstDR = 0;
+						}
+
+						arrPrimaryArmor.push(firstDR);
+
+						arrSplitArmor.push(firstDR);
+
+					}
+
+				});
+
+				// see: https://stackoverflow.com/questions/1230233/how-to-find-the-sum-of-an-array-of-numbers
+				let baseDR = arrPrimaryArmor.reduce((a, b) => a + b, 0);
+
+				let splitDR = arrSplitArmor.reduce((a, b) => a + b, 0);
+
+				let layerSummary = baseDR;
+
+				if (splitDR !== baseDR && isFlexible) {
+
+					layerSummary += `/${splitDR}* ${splitTypes}`;
+
+				} else if (splitDR !== baseDR) {
+
+					layerSummary += `/${splitDR} ${splitTypes}`;
+
+				} else if (isFlexible) {
+
+					layerSummary += `*`;
+
+				}
+				
+				updates[`repeating_hitlocation_layer_summary_${direction}`] = layerSummary;
+
+			});
+
+			setAttrs(updates, {silent: true});
 
 		});
 

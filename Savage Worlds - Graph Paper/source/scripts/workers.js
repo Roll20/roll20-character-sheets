@@ -28,15 +28,19 @@ on("sheet:opened", (e) => {
       });
 
       function updateListSkills(values) {
-        values = Object.entries(values);
+        let references = [];
 
-        let updates = {};
-
-        _.each(values, (item) => {
-          updates[item[0]] = item[1];
+        _.each(Object.entries(values), (item) => {
+          references.push(item[0].replace('skill_name', 'skill_mod'));
         });
 
-        setAttrs(updates);
+        getAttrs(references, (vals) => {
+          _.each(references, (item) => {
+            let code = vals[item].replace('_mod', '_code');
+
+            setAttrs({ [item.replace('skill_mod', 'skill_code')]: code }, { silent: true });
+          });
+        });
       }
 
       TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
