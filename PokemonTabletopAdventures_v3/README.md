@@ -18,6 +18,10 @@ https://discord.gg/F24Ka8E
   - Miscellaneous notes concerning the move can be added and are displayed after the damage field
 - Each roll template varies its header colour based on either the base attribute for skills or the elemental type of the attack
 - The buttons for rolling an attack have been removed, and a button for rolling an attack using the new roll template has been added to the character sheet
+- Propagates color throughout most static fields of the character sheet
+  - Placeholders, input labels, and static text are given a color matching the chosen type of the character or move depending on their location
+  - User-entered text, such as character name, move effects, and the inventory, are given a dark gray color to ensure they're more easily readable.
+
 
 ### Oct 14, 2020
 - Added Readme with Changelog and other details
