@@ -4194,7 +4194,8 @@
 				</h4>
 
 				<ul>
-					<li>Combat tab: First iteration of Combat sub tab. This tab contains a hit location table and layored armor. You can select a hit location type and update the table. There are options for how many layers to display and if you want to use a back armor location.</li>
+					<li>Combat tab > Defense. Increased the width of the original <b>Hit Location</b> table. Requested by <i>PL M.</i></li>
+					<li>Combat tab > Damage sub-tab. Fix: When updating HP Divisor for a hit location update the Disabled HP column.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -12437,13 +12438,22 @@ visualize what it will look like in chat.
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
-			<h4>Version: 2.4.0</h4>
+			<ul>
+				<li>Combat tab > Damage sub-tab. </li>
+			</ul>
+
+			<h4>Version: 2.5.0</h4>
+
+			<p>Pull Request: 10/20/2020</p>
 
 			<ul>
 				<li>Combat tab: First iteration of Combat sub tab. This tab contains a hit location table and layored armor. You can select a hit location type and update the table. There are options for how many layers to display and if you want to use a back armor location.</li>
 			</ul>
 
-			<p>PUll Request: 10/13/2020</p>
+			
+			<h4>Version: 2.4.0</h4>
+
+			<p>Pull Request: 10/13/2020</p>
 
 			<ul>
 				<li>Combat tab: Added sub tabs for Defense, Melee, Ranged, and Tools. Preliminary updates to improving Damage and Armor sections.</li>
@@ -14490,6 +14500,7 @@ See notes for weapon.</textarea>
 </div>
 
 <script type="text/worker">
+
 	// this type is required by roll20, be sure to set before uploading
 	// type="text/worker"
 	
@@ -14498,9 +14509,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.4.0";  
+	var version = "2.5.1";  
 
-	var latestChangesDate = "10/20/2020";
+	var latestChangesDate = "10/27/2020";
 
 	var modCascade = true;
 	
@@ -15319,6 +15330,8 @@ See notes for weapon.</textarea>
 		]],
 	]);
 
+	const rawDefenseNotes = getRawActiveDefensesNotes();
+
 	/* Due to the change from auto-calc fields to helper scripts,
 	 * I'm running a "on open" to set various fields. At some point
 	 * in the future this might no longer be needed.
@@ -15327,8 +15340,6 @@ See notes for weapon.</textarea>
 	    
 		console.log('********* Sheet Opened *********');
 		
-		const rawDefenseNotes = getRawActiveDefensesNotes();
-
 		setAttrs({inventory_fixed_digits: 1}); 
 
 		sumRepeating('repeating_item', 'weighttotal', function(v) {
@@ -21949,7 +21960,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		const blockCriticalFailureNotes = `Lose your grip on the your shield and you must take a turn to ready it before you can use it to block again. See B382.`;
 
-		rawDefenseNotes = [
+		const notes = [
 			{code: "dodge_success_notes",                  value: dodgeSuccessNotes},
 			{code: "dodge_critical_success_notes",         value: dodgeCriticalSuccessNotes},
 			{code: "dodge_fail_notes",                     value: dodgeFailNotes},
@@ -21968,7 +21979,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			{code: "block_critical_failure_notes",         value: blockCriticalFailureNotes},
 		];
 
-		return rawDefenseNotes; 
+		return notes; 
 
 	}
 
@@ -24834,6 +24845,47 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		});
 
+	}
+
+	// check if a hit locations damage divisor changed
+	on(`change:repeating_hitlocation:divisor`, event => {
+
+			updateHitLocationDisabledColumn();
+
+	});
+
+	/**
+	 * Update the hit location disabled column for row that changed
+	 * based on divisor and max hit points
+	 */
+	function updateHitLocationDisabledColumn() {
+
+		let fields = [
+			"hit_points_max",
+			"repeating_hitlocation_divisor"
+		];
+
+		getAttrs(fields, values => {
+
+			let hitPoints = Number(values.hit_points_max);
+
+			let divisor = Number(values.repeating_hitlocation_divisor);
+
+			let crippled = 0;
+
+			if (divisor > 1) {
+
+				crippled = Math.floor(hitPoints/divisor) + 1;
+
+				let updates = {
+					repeating_hitlocation_crippled: crippled
+				};
+
+				setAttrs(updates, {silent: true});
+
+			}
+
+		});
 	}
 
 </script>
