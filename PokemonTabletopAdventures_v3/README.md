@@ -50,3 +50,4 @@ https://discord.gg/F24Ka8E
 - Allow modifications to movement (maybe just an extra box)
 - Prevent critical range from going below 0 or above 20, maybe do similar to other fields
 - Handle temp stat changes somehow, this may be a lot of work
+- Add a Settings page
