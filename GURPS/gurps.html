@@ -4197,8 +4197,11 @@
 					<li>Combat tab > Defense. Increased the width of the original <b>Hit Location</b> table. Requested by <i>PL M.</i></li>
 					<li>Combat tab > Damage sub-tab. 
 						<ul>
-							<li>Fix: When updating HP Divisor for a hit location update the Disabled HP column. </li>
+							<li>Add: Major wound field and tooltip.</li>
+							<li>Add: When updating HP Divisor for a hit location update the Disabled HP column.</li>
 							<li>Renamed Type to Template</li>
+							<li>Bugfix: When updating Max Hit Points the penalty for a hit location may be set to nothing or set to repeating zeros.</li>
+							<li>Bugfix: When changing size modifier, fix bug where penalty for a hit location did not total correctly.</li>
 						</ul>
 					</li>
 				</ul>
@@ -4998,7 +5001,7 @@ Cost reduced by -10% per SM+1 (B15)
 								</span>
 							</div>
 							<div class="cell col1">
-								<input type="number" name="attr_hit_points_max" value="10" readonly="readonly" title="Macro name: hit_points_max" />
+								<input type="number" name="attr_hit_points_max" value="10" readonly="readonly" title="Macro: @{hit_points_max}" />
 							</div>
 							<div class="cell col2">
 								<input type="number" name="attr_hit_points_mod" value="0" step="1" title="Macro name: hit_points_max_mod" />
@@ -5093,7 +5096,7 @@ another multiple of your max HP.
 								</span>
 							</div>
 							<div class="cell col1">
-								<input type="number" name="attr_hit_points" value="10" title="Macro name: hit_points" />
+								<input type="number" name="attr_hit_points" value="10" title="Macro: @{hit_points}" />
 							</div>
 							<div class="cell col2">
 								<input type="hidden" class="hit-points-notes" name="attr_hit_points_notes" value="0" />
@@ -8474,17 +8477,30 @@ visualize what it will look like in chat.
 									</span>
 								</div>
 
-								<!-- row 2 -->
 								<div class="item item4">
-									<input type="number" name="attr_size" value="0" title="Macro name: @{size}" />
+									<div class="popup">
+										<span data-i18n="abbreviation-major-label">MAJ</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="major-wounds-tooltip">Major wound threshold. <i>Any</i> single injury of greater than 1/2 your HP. If using hit location, any injury that disables a limb is a <b>Major Wound</b>.<br />Roll HT to avoid Knockdown and Stunning or use the <b>K Down</b> trait on the general tab. See B420.</span>
+									</span>
 								</div>
-								
+
+								<!-- row 2 -->
 								<div class="item item5">
-									<input type="number" name="attr_hit_points" value="10" title="Macro name: hit_points" />
+									<input type="number" name="attr_size" value="0" title="Macro: @{size}" />
 								</div>
 								
 								<div class="item item6">
-									<input type="number" name="attr_hit_points_max" value="10" readonly="readonly" title="Macro name: hit_points_max" />
+									<input type="number" name="attr_hit_points" value="10" title="Macro: @{hit_points}" />
+								</div>
+								
+								<div class="item item7">
+									<input type="number" name="attr_hit_points_max" value="10" readonly="readonly" title="Macro: @{hit_points_max}" />
+								</div>
+
+								<div class="item item8">
+									<input type="number" name="attr_major_wound_threshold" value="10" readonly="readonly" title="Macro: @{major_wound_threshold}" />
 								</div>
 
 							</div>
@@ -8821,10 +8837,10 @@ visualize what it will look like in chat.
 								</div>
 								<div class="item layer layer-1">
 									<div class="front">
-										<input type="text" name="attr_layer_1_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_front}" />
+										<input type="text" value="0" name="attr_layer_1_front" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_front}" />
 									</div>
 									<div class="back">
-										<input type="text" name="attr_layer_1_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_back}" />
+										<input type="text" value="0" name="attr_layer_1_back" title="Macro: @{repeating_hitlocation_$[row #]_layer_1_back}" />
 									</div>
 								</div>
 								<div class="item layer layer-2">
@@ -8869,7 +8885,7 @@ visualize what it will look like in chat.
 									<input type="number" value="1" step="1" min="1" name="attr_divisor" title="Macro: @{repeating_hitlocation_$[row #]_divisor}" />
 								</div>
 								<div class="item">
-									<input type="text" name="attr_crippled" readonly="readonly" title="Macro: @{repeating_hitlocation_$[row #]_crippled}" />
+									<input type="text" name="attr_crippled" value="0" readonly="readonly" title="Macro: @{repeating_hitlocation_$[row #]_crippled}" />
 								</div>
 								<div class="item">
 									<input type="text" name="attr_wounds" title="Macro: @{repeating_hitlocation_$[row #]_wounds}" />
@@ -15753,13 +15769,17 @@ See notes for weapon.</textarea>
 		
 		getAttrs(['strength', 'strength_base', 'hit_points_points', 'hit_points_mod'], function(v) {
 		
-			var base = (modCascadeAll ? +v.strength : +v.strength_base) +
-				((+v.hit_points_points || 0) / 2 | 0);
+			let base = (modCascadeAll ? +v.strength : +v.strength_base) + ((+v.hit_points_points || 0) / 2 | 0);
 		
-			var mod = +v.hit_points_mod;
+			let mod = +v.hit_points_mod;
+
+			let hitPoints = base + mod;
+
+			let majorWound = Math.floor(hitPoints/2) + 1;
 		
 			setAttrs({
-				hit_points_max: base + mod
+				hit_points_max: hitPoints,
+				major_wound_threshold: majorWound
 			}, {silent: false}, callback);
 		
 		});
@@ -24679,11 +24699,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 				
 						let penaltyProp = `repeating_hitlocation_${ids[i]}_penalty`;
 
-						let penalty = repeatingValues[penaltyProp];
+						let penalty = Number(repeatingValues[penaltyProp]);
 
 						let divisorProp = `repeating_hitlocation_${ids[i]}_divisor`;
 
-						let divisor = repeatingValues[divisorProp];
+						let divisor = Number(repeatingValues[divisorProp]);
 
 						let newPenalty = sizeDiff + penalty;
 
