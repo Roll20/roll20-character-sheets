@@ -8,6 +8,31 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+October 12th 2020 v1.23
+
+- translation.json update, attempting to fix the translation issue which was introduced last week which prevent the new json from use on the live server sheet.
+- Fixed issue with Heavy Head armor capping at 1 carried Enc.
+
+
+October 5th 2020 v1.23
+
+- Further modification of how Armor tab works. Worn? check will now add/remove ENC and AP appropriately. Some descriptive text has been added to these sections too.
+- Continued adding IL8N tags that were missing from a lot of the new content. This work is now mostly complete.
+- Workable Italian translation is now implemented (Translation credit to Andrezzo/Roll20). (change language to Italian on Roll20 website/account config, then start server to see it). I am more then willing to work with others to implement more languages, but can not do this by myself.
+
+
+September 7th 2020 v1.22
+
+- Fixed issue which stoped the Initiative button from working correctly on a newly created character sheet.
+- Added numerious IL8N tags that were missing from alot of the new content. This is a work in progress to enable high quality custom translation to be added later. Italian translation is being worked on by the 3rd party.
+
+
+August 24th 2020 v1.21
+
+- fencing skill roll fixed  ( issue #7214  )
+- hit location was not inverting target result fixed
+
+
 August 3rd 2020 v1.2
 
 NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.

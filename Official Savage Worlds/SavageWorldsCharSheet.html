@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.00"/>
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.03"/>
 <input type='hidden' name='attr_firstInit' value="0" />
 <script type="text/worker">
 
@@ -69,10 +69,37 @@
 
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
-	const sheetVersion = "1.00.01";
-	const sheetVersionPrefix = "Savage Worlds Official v";
+    const sheetVersionPrefix = "Official Savage Worlds v";
+	const sheetVersion = "1.00.03";
 
-	// const upgradeSheet = function(version, versionone, versiontwo, versionthree) {
+	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
+        //version format 1.00.01 (string)
+        //versione format 1 (int)
+        //versiontwo format 1 or 1.01 (float)
+        //versionthree format 0.01 (float)
+        log("Upgrade","Made to the upgrade path","Lime");
+        log("Version Number",versionthree,"lime");
+        let setattrvals = {};
+        let setSheetVersion = sheetVersionPrefix+sheetVersion;
+        log("shetSheetVersion",setSheetVersion,"lime");
+        setattrvals["character_sheet"] = setSheetVersion;
+        getAttrs(['character_sheet','initializeStatblock','wci'], function(v) {
+            if(v.wci === "") {
+                setattrvals["WCI"] = "✪";
+            }
+            //upgrade stuff goes here...
+            if(versionthree < 0.03) {
+                log("Version out of date",versionthree,"lime");
+                //make sure Fighting is still unhidden for existing sheets
+                setattrvals["staticFighting"] = "on";
+                setattrvals["newcontent"] = "unread";
+                setattrvals["newdocumentation"] = "unread";
+            }
+            else {
+                log("Upgrade",`Sheet already updgraded (${characterName})`,"lime");
+            }
+            setAttrs(setattrvals);
+        });
 	// 	if (version < 3.0) {
 	// 		Do stuff here
 	// 	}
@@ -98,21 +125,44 @@
 	// 		console.log("!!! Sheet Already Upgraded !!!");
 	// 	}
 	// 	console.log("<===== End Sheet Upgrade Conversion Process =====>");
-	// };
+	};
 
 	on('sheet:opened', function() {
-		getAttrs(['character_sheet','initializeStatblock','wci'], function(v) {
+		getAttrs(['character_name','character_sheet','initializeStatblock','wci'], function(v) {
 			// v[character_sheet] will contain the current sheet version to know if an upgrade is necessary
 			let setattrvals = {};
+            let characterName = v.character_name;
 			if(v.wci === "") {
 				setattrvals["WCI"] = "✪";
 			}
-			if (v.character_sheet !== "Official Savage Worlds v1.00.01") {
-                setattrvals["character_sheet"] = "Official Savage Worlds v1.00.01";
-                setattrvals["newcontent"] = "unread";
-                setattrvals["newdocumentation"] = "unread";
-            }
-			setAttrs(setattrvals);
+            log("Character Sheet",v.character_sheet,"lime");
+            let charsheetName = v.character_sheet.substring(0,22);
+            log("Sheet Name",charsheetName,"lime");
+            let charsheetVersion = v.character_sheet.substring(24);
+            log("Character Sheet Version",charsheetVersion,"lime");
+            (charsheetName === "Official Savage Worlds" ? log("Sheet Type","Official","lime") : charsheetVersion = "1.00.00");
+            let versionParts = charsheetVersion.split(".");
+            log("Version before Upgrade",parseFloat(parseFloat(versionParts[1])+'.'+parseFloat(versionParts[2])) + ` (${characterName})`,"lime");
+            //version format 1.00.01 (string)
+            //versione format 1 (int)
+            //versiontwo format 1 or 1.01 (float)
+            //versionthree format 0.01 (float)
+            let version = charsheetVersion;
+            let versionone = parseInt(versionParts[0]);
+            let versiontwo = parseFloat(versionParts[0]+"."+versionParts[1]);
+            let versionthree = parseFloat(versionParts[1]+"."+versionParts[2]);
+            log("Versino Parts",versionParts,"lime");
+            log("Version",version,"lime");
+            log("Version One",versionone,"lime");
+            log("versiontwo",versiontwo,"lime");
+            log("Version Three",versionthree,"lime");
+            upgradeSheet(version,versionone,versiontwo,versionthree,characterName);
+			// if (v.character_sheet !== "Official Savage Worlds v1.00.02") {
+            //     setattrvals["character_sheet"] = "Official Savage Worlds v1.00.02";
+            //     setattrvals["newcontent"] = "unread";
+            //     setattrvals["newdocumentation"] = "unread";
+            // }
+			// setAttrs(setattrvals);
 		});
 	});
 	/* ---- End Sheet Version Validation & Update ---- */
@@ -292,6 +342,7 @@
 			log("totVigor",totVigor,"lime");
 			log("Toughness Formula Result",totVigor + 2 + Size,"lime");
 			var toughFormulaResult = totVigor + 2 + Size;
+            (toughFormulaResult < 1 ? toughFormulaResult = 1 : log("Toughness doesn't need to be adjusted","lime"));
 			setAttrs({ toughness: toughFormulaResult });
 			setToughness();
 		});
@@ -332,7 +383,9 @@
 			let tness = parseInt(value.toughness)||0;
 			let tnessmod = parseInt(value.tufnessMod)||0;
 			let tnessarmor = parseInt(value.toughnessArmor)||0;
-			setAttrs({toughnesscur: tness+tnessmod+tnessarmor});
+            let currentToughness = tness+tnessmod+tnessarmor;
+            (currentToughness < 1 ? currentToughness = 1 : log("Don't need to change Current Toughness","lime"));
+			setAttrs({toughnesscur: currentToughness});
 		});
 	}
 
@@ -658,7 +711,7 @@
 					if (b === 6 && rof > 6 && xconfig !== "2"){
 						console.log("!!! Using the Roll Query !!!");
 						console.log(`b: ${b} || rof: ${rof} || xconfig: ${xconfig}`);
-						multiattackformula += `{{skill_rollall=^{plus-the-next} [[${rollquery}-5]]}} `;
+						// multiattackformula += `{{skill_rollall=^{plus-the-next} [[${rollquery}-5]]}} `;
 					}
 					multiattackformula += `{{skill_roll${b}=[[@{${weaponskill}rollformula}]]}} `;
 				}
@@ -994,7 +1047,7 @@
 	});
 
 	//Select all Skills if "All" is selected
-	const static = ['staticcore','staticacademics','staticathletics','staticbattle','staticboating','staticcommonknowledge','staticdriving','staticelectronics','staticfaith','staticfocus','staticgambling','statichacking','statichealing','staticintimidation','staticlanguage','staticnotice','staticoccult','staticperformance','staticpersuasion','staticpiloting','staticpsionics','staticrepair','staticresearch','staticriding','staticscience','staticshooting','staticspellcasting','staticstealth','staticsurvival','statictaunt','staticthievery','staticweirdscience','staticKnowledgeOther'];
+	const static = ['staticcore','staticacademics','staticathletics','staticbattle','staticboating','staticcommonknowledge','staticdriving','staticelectronics','staticfaith','staticfighting','staticfocus','staticgambling','statichacking','statichealing','staticintimidation','staticlanguage','staticnotice','staticoccult','staticperformance','staticpersuasion','staticpiloting','staticpsionics','staticrepair','staticresearch','staticriding','staticscience','staticshooting','staticspellcasting','staticstealth','staticsurvival','statictaunt','staticthievery','staticweirdscience','staticKnowledgeOther'];
 	on("change:staticall",function(eventInfo){
 		let sattr = {};
 		if (eventInfo.newValue === "1") {
@@ -1167,6 +1220,18 @@
 			});
 		});
 	});
+
+    on("change:staticfighting", function(eventInfo){
+        let modValue;
+        (eventInfo.newValue === 'on' ? modValue = "0" : modValue = "-2");
+        setAttrs({fightingmod: modValue});
+    });
+
+    on("change: change:showFightingByDefault", function(eventInfo) {
+        let modValue;
+        (eventInfo.newValue === '1' ? modValue = "on" : modValue = "0");
+        setAttrs({staticFighting: modValue});
+    });
 
 	const setEncPenalty = function() {
 		getAttrs(["loadlimit", "totalloadcarried", "strength", "strengthmod", "encumbrancerules", "loadlimitdietypedelta", "loadlimitmulitplier", "loadlimitmod"], function(lvalue) {
@@ -2948,6 +3013,7 @@
 </script>
 <input type='hidden' name='attr_dopay' value="init" />
 <input type='text' style='display: none;' name='attr_wdNum' value='1' />
+<input type='checkbox' style="display: none;" name="attr_showFightingByDefault" value="1" />
 <!-- Stat Block Fields -->
 <input type="hidden" name="attr_initstatblock" value="0" />
 <input type="hidden" name="attr_initdesc" value="0" />
@@ -3007,6 +3073,8 @@
                 <div class="sheet-functions">
                     <input class="sheet-isWC" type="hidden" name="attr_is_npc" value="1" />
                     <button class="sheet-statblock" type="roll" name="roll_fullstatblock" data-i18n-title="send-statblock-chatlog" value="@{whisperstatblock} &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"></button>
+                    <input type="checkbox" class="sheet-showFear" name="attr_showFear" value="1" checked />
+                    <button class="sheet-topbuttons sheet-fearButton" type="roll" name="roll_fearRoll" data-i18n-title="fear-roll" value="&{template:info} {{name=Fear Table}} {{item=Result for @{character_name}}} {{fear=[[1d20+?{Fear Roll Modifier|0}]]}} {{heartattack=[[2d6]]}}">&#128561;</button>
                 </div>
                 <div class="sheet-docbuttons">
                 	<input type='hidden' class="sheet-tabselected" name='attr_sheetTab' value='1' />
@@ -3237,6 +3305,7 @@
 								<span data-i18n-list-item="driving" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticDriving" /><span></span> <span name="attr_drivingname"></span></label></span>
 								<span data-i18n-list-item="electronics" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticElectronics" /><span></span> <span name="attr_electronicsname"></span></label></span>
 								<span data-i18n-list-item="faith" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticFaith" /><span></span> <span name="attr_faithname"></span></label></span>
+                                <span data-i18n-list-item="fighting" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticFighting" /><span></span> <span name="attr_fightingname"></span></label></span>
 								<span data-i18n-list-item="focus" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticFocus" /><span></span> <span name="attr_focusname"></span></label></span>
 								<span data-i18n-list-item="gambling" class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticGambling" /><span></span> <span name="attr_gamblingname"></span></label></span>
 								<!-- <span class="sheet-skillItem"><label class="sheet-SkillListLabel"><input class="sheet-StaticSkill" type="checkbox" name="attr_staticGuts" /><span></span> <span name="attr_gutsname"></span></label></span> -->
@@ -3306,9 +3375,9 @@
 	    						</div>
 	    						<input type='hidden' name='attr_unskilled_rank' value='1d4!-2+@{JackOfAllTrades}[Jack of All Trades Mod]' />
 	    						<input type='hidden' name='attr_unskilled_display' value='1d4-2' />
-	    						<input type='hidden' name='attr_rolltUnskilled' value='{{name=@{character_name} }} {{trait=^{unskilled}}} {{skill_rank=@{unskilled_display} }} {{skill_roll=[[@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + (@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty]]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{unskilledwilddie}! -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ModSum}[Modifiers] +(@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty]]] }} @{templateConditions}' />
+	    						<input type='hidden' name='attr_rolltUnskilled' value='{{name=@{character_name} }} {{trait=^{unskilled}}} {{skill_rank=@{unskilled_display} }} {{skill_roll=[[@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{unskilledwilddie}! -2[Unskilled Penalty] + {0,@{JackOfAllTrades}}kh1[Jack of All Trades Modifier] + @{ModSum}[Modifiers] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]][Encumbrance Penalty]]] }} @{templateConditions}' />
 	    						<input type="hidden" name="attr_unskilledencumbrancebutton" value="@{setmods}" />
-								<input type="hidden" name="attr_unskilledrollformula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + (@{UnskilledEncumbrance}*@{encumbrance})[Encumbrance Penalty]" />
+								<input type="hidden" name="attr_unskilledrollformula" value="@{unskilled_rank} + @{ModSum}[Wounds, Fatigue, Distracted] + @{traitmods} + [[@{UnskilledEncumbrance}*@{encumbrance}]] [Encumbrance Penalty]" />
 	                        </div>
 							<!-- Academics Skill -->
 	                        <input class="sheet-StaticSkill" type="checkbox" name="attr_staticAcademics" style='display:none;'/>
@@ -3739,6 +3808,7 @@
 	    						</div>
 	                        </div>
 	                        <!-- Fighting -->
+                            <input class="sheet-StaticSkill" type="checkbox" name="attr_staticFighting"  style='display:none;'/>
 	                        <div class='sheet-basetrait sheet-staticFighting' data-i18n-list-item="fighting">
 	                            <input class='sheet-deltabutton' type='hidden' name='attr_fighting_delta' value='0' />
 	                            <button class="sheet-skillbutton sheet-skillflexattbutton" type='roll' name='roll_tFightingRoll' title="@{tFightingRoll}" value='@{fightingRollValue}'> <span name='attr_fightingname'></span> <span class='sheet-linkedAtt' data-i18n="agl-u">(AGL)</span></button>
@@ -3760,7 +3830,7 @@
 	                            	</div>
 	                            	+
 	                            </div>
-								<input class="sheet-otraitmod" type="number" name="attr_fightingmod" title="@{fightingmod}" value="0" />
+								<input class="sheet-otraitmod" type="number" name="attr_fightingmod" title="@{fightingmod}" value="-2" />
 	                            <input class='sheet-moremods' type='checkbox' name='attr_showFightingRollMod' /><span>y</span>
 	    						<div class='sheet-basetrait sheet-traitmodplus'>
 	                                <input type='text' class='sheet-ModDesc' name='attr_fightingModType' placeholder='Modifier due to edges, hindrances, etc' data-i18n-placeholder="att-mod-description" />
@@ -5100,6 +5170,7 @@
 						<input class="sheet-staticDriving" type="checkbox" name="attr_staticDriving" />
 						<input class="sheet-staticElectronics" type="checkbox" name="attr_staticElectronics" />
 						<input class="sheet-staticFaith" type="checkbox" name="attr_staticFaith" />
+                        <input class="sheet-staticFighting" type="checkbox" name="attr_staticFighting" />
 						<input class="sheet-staticFocus" type="checkbox" name="attr_staticFocus" />
 						<input class="sheet-staticGambling" type="checkbox" name="attr_staticGambling" />
 						<input class="sheet-staticHacking" type="checkbox" name="attr_staticHacking" />
@@ -5691,7 +5762,7 @@
 					        <div class="sheet-derivebase"><input type="number" class="sheet-derivedStat" name="attr_loadlimitmod" style="text-align:center;" title="@{loadlimitmod}" value="0"/></div>
 							<div class="sheet-derivemod"><input type="number" class="sheet-derivedStat" name="attr_loadlimit" title="@{loadlimit}" readonly /></div>
 							<div class="sheet-derivecurrent"><input type="number" class="sheet-derivedStat" name="attr_totalloadcarried" title="@{totalloadcarried}" readonly /></div>
-							<div class="sheet-derivemisc"><input type="number" class="sheet-derivedStat" name="attr_encumbrance" title="@{encumbrance}" readonly /></div>
+							<div class="sheet-derivemisc"><input type="number" class="sheet-derivedStat" name="attr_encumbrance" title="@{encumbrance}" value="0" readonly /></div>
 					    </div>
 					    <input class='sheet-loadmods sheet-showLoadConfig' type='checkbox' name='attr_showLoadconfig' /><span>y</span>
     					<div class='sheet-loadconfig sheet-basetrait'>
@@ -5785,8 +5856,10 @@
                 </div>
 
                 <div class='sheet-right sheet-logoblock'>
+                    <input class="sheet-showLogo" type="hidden" value="SavageWorlds" name="attr_logo" />
                 	<img class="sheet-logo" src="https://raw.githubusercontent.com/finderski/SWT/master/PEG_LOGO_White.png" />
-                	<img class="sheet-logo" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
+                	<img class="sheet-logo sheet-SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
+                    <img class="sheet-logo sheet-Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png" />
                     <input type='hidden' name='wilddie' value='6' />
                     <div class='sheet-condionsnew'>
                     	<!-- Conditions -->
@@ -5997,7 +6070,7 @@
 						<span class="sheet-weaponHeader sheet-weaponItem sheet-weaponcarried" data-i18n="carried">Carried</span>
 						<hr class="sheet-weaponItem sheet-hr" />
 						<input type='hidden' name='attr_vbonusdamage' value='1d6' />
-						<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" style="display: none;" />
+						<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" checked />
 						<input class="sheet-AthleticsStaticSkill sheet-hiddenButton" type="checkbox" name="attr_staticAthletics" />
 						<input class="sheet-ShootingStaticSkill sheet-hiddenButton" type="checkbox" name="attr_staticShooting" />
 						<input class="sheet-WSStaticSkill sheet-hiddenButton" type="checkbox" name="attr_staticWeirdScience" />
@@ -6101,6 +6174,7 @@
 								<!-- Build the Damage Roll Template Info -->
 								<input type='hidden' name='attr_weapondmg' value="@{strength_rank}+1d4!" /> <!-- the damage formula -->
 								<input type='hidden' name='attr_weaponsbonusdmg' value='@{vbonusdamage}' /> <!-- This will either equal @{vbonusdamage} (the default) or @{weaponsbdt} -->
+                                <!-- <input type='hidden' name='attr_weaponsbonusDie' value='{{bonus_die=[[@{weaponsbdt}!]]}}' /> -->
 								<input type='hidden' name='attr_weaponsbonusDie' value='{{bonus_die=[[@{weaponsbonusdmg}!]]}}' />
 								<!-- how to call a button roll: ^{reroll-damage}(~repeating_weapons_dmg) -->
 								<input type='hidden' name='attr_dmgTemplate' value='@{whisperweapon} &{template:damage} {{name=@{character_name}}} {{source=@{weapon} }} {{dmg_rank=@{weapondamage}}} {{dmg_roll=[[@{weapondmg} + @{damagemods}]]}} @{weaponsbonusDie} {{showap=[[1d0+@{weaponap}]]}} {{ap=@{weaponap}}} {{notes=@{weaponnotes}}} {{button=y}} {{DmgRoll=^{reroll-damage}(~repeating_weapons_dmg) }} @{gritty} {{GrittyRoll=[Roll Injury](~repeating_weapons_grittyroll)}}' />
@@ -6304,7 +6378,7 @@
         					    <h4 class="sheet-repeatingHeader sheet-duration" data-i18n="duration">Duration</h4>
         					    <h4 class="sheet-repeatingHeader sheet-invested"><span name="attr_ppabbr"></span> <span data-18n="invested">Invested</span></h4>
     					    </div>
-							<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" style="display: none;" />
+							<input class="sheet-vdamage" type="checkbox" name="attr_RaiseHBRule" value="2" checked />
                             <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
                             <input class="sheet-AthleticsStaticSkill sheet-hiddenButton" type="checkbox" name="attr_staticAthletics" />
 							<input class="WSStaticSkill sheet-hiddenButton" type="checkbox" name="attr_staticWeirdScience" />
@@ -6474,7 +6548,7 @@
     					<hr class="sheet-sectionSeperator" />
 					</div>
 				</div>
-				<div class="sheet-bottomHalf">
+				<div class="sheet-base sheet-bottomHalf">
 					<!-- ----------- -->
 					<!-- -- Armor -- -->
 					<!-- ----------- -->
@@ -6910,7 +6984,7 @@
                         <label class="sheet-srmItem"><input type="checkbox" class="sheet-useCharisma" name="attr_paceignoreswounds" /> <span data-i18n="pace-ignores-wounds">Pace Ignores Wounds</span></label>
 						<input type="checkbox" class="sheet-usexp" name="attr_usexp" value="1" style="display: none;" checked />
     				    <label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="1" /> <span data-i18n="variable-bonus-damage-raise-based">Variable Bonus Damage (Raise based)</span></label>
-						<label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="2" /> <span data-i18n="variable-bonus-damage-edge-based">Variable Bonus Damage (Edge based)</span></label>
+						<label class="sheet-srmItem" data-i18n-title="variable-bonus-damage-die"><input type="checkbox" class="sheet-useRaiseHB" name="attr_RaiseHBRule" value="2" checked /> <span data-i18n="variable-bonus-damage-edge-based">Variable Bonus Damage (Edge based)</span></label>
 						<label class="sheet-srmItem"><input type="checkbox" name="attr_usewealth" /> <span data-i18n="use-the-wealth-system">Use the Wealth System</span></label>
                         <input class="sheet-optional sheet-usewealth" type="checkbox" name="attr_usewealth" />
                         <div class="sheet-srmItem sheet-showwealthwilddie">
@@ -6924,7 +6998,7 @@
                             <input type='text' class='sheet-ModDesc' name='attr_wealthwilddieinfo' placeholder='Wealth Wild Die die type' data-i18n-placeholder="wealth-wild-die-type" />
                         </div>
 						<label class="sheet-srmItem sheet-usewealthmod"><input type="checkbox" name="attr_useWealthMod" value="1" />&nbsp;<span data-i18n="use-wealth-modifier-field">Use the Wealth Modifier field</span></label>
-						<!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
+                        <!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -6932,13 +7006,14 @@
     			    <h3 class='sheet-configSectionTitle' data-i18n="other-sheet-tweaks">Other Sheet Tweaks</h3>
     			    <div class="sheet-miscconfig">
 						<select name="attr_atkxconfig" title="May need to change your ROF for changes to take affect.">
-							<option value="0" selected>Atk^ roll query sorted High to Low</option>
-							<option value="1">Atk^ roll query sorted Low to High</option>
-							<option value="2">Atk^ always roll max (no roll query)</option>
+							<option value="0" selected data-i18n="attack-abbr-roll-query-sorted-high-to-low">Atk^ roll query sorted High to Low</option>
+							<option value="1" data-i18n="attack-abbr-roll-query-sorted-low-to-high">Atk^ roll query sorted Low to High</option>
+							<option value="2" data-i18n="attack-abbr-always-roll-max-no-roll-query">Atk^ always roll max (no roll query)</option>
 						</select>
                         <label class='sheet-miscItem'><input type="checkbox" name="attr_useAlphaNum" value="1" /> <span data-i18n="use-alphanumeric-for-traits">Use Alphanumeric lables for Trait Ranks (instead of dice icons)</span></label>
                         <label class='sheet-miscItem'><input type="checkbox" class="sheet-attsatdsix" name="attr_attsatdsix" value="1" style="width: 15px;"> <span data-i18n="attributes-start-at-d6">Attributes start at d6</span></label>
-                        <label class='sheet-miscItem'><input type="checkbox" class="sheet-fightingUnskilled" name="attr_fightingunskilled" value="1" style="width: 15px;"> <span data-i18n="start-fighting-as-unskilled">Start Fighting as Unskilled</span></label>
+                        <!-- <label class='sheet-miscItem'><input type="checkbox" class="sheet-fightingUnskilled" name="attr_fightingunskilled" value="1" style="width: 15px;"> <span data-i18n="start-fighting-as-unskilled">Start Fighting as Unskilled</span></label> -->
+                        <label class='sheet-miscItem'><input type="checkbox" name="attr_showFear" value="1" checked /> <span data-i18n="show-fear-roll-button">Show Fear Roll Button</span></label>
                         <label class='sheet-miscItem'><input type="checkbox" class="sheet-autorollbonusdmg" name="attr_autorollbonusdmg" value="1" checked> <span data-i18n="auto-roll-bonus-damage">Auto-roll bonus damage</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" class="sheet-hideArcanum" name="attr_ArcanumTab" style="width: 15px;"> <span data-i18n="hide-powers-section">Hide Powers Section</span></label>
     			        <label class='sheet-miscItem'><input type="checkbox" name="attr_promptmods" title="Wounds, Fatigue, Distracted, and Encumbrance are not part of Misc. Modifiers and are accounted for automatically" /> <span data-i18n="prompt-modifiers-text">Prompt for Misc. Modifiers</span></label>
@@ -6979,6 +7054,13 @@
                         <label class='sheet-miscItem'>
             			    <span data-i18n="wild-card-icon">Wild Card Icon</span>: <input type='text' class="sheet-wci" name='attr_WCI' maxlength="2" value="✪" />
             			</label>
+                        <label class="sheet-miscItem">
+                            <span data-i18n="logo-to-show">Logo to show</span>
+                            <select class="sheet-gamelogo" name="attr_logo" title="@{logo}">
+                                <option value="SavageWorlds" data-i18n="savage-worlds" checked>Savage Worlds</option>
+                                <option value="Deadlands" data-i18n="deadlands">Deadlands</option>
+                            </select>
+                        </label>
             			<label class="sheet-miscItem"><button type="roll" class="sheet-APIOutput" name="roll_apifield" value="!deal-init --help">i</button><span data-i18n="api-initiative-edge">API Iniative Edges</span> <input class="sheet-standard" style='width: 150px;' type="text" title="@{InitEdges}" name="attr_InitEdges"/></label>
     			    </div>
     			</div>
@@ -7031,6 +7113,87 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.03 -->
+				<label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10003' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.03</h4></span>
+				</label>
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10003' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Bug Fixes and a minor enhancement.
+					</p>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="swap-swade-logo-for-deadlands-logo">Added Added the ability to swap out the Savage Worlds logo for the Deadlands logo.</span></li>
+					</ul>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="skill-selection-list-firefox">Fixed a bug where the skill selection list spilled over into a third column on Firefox.</span></li>
+                        <li><span class="sheet-black" data-i18n="fighting-skill-on-older-sheets">Fighting skill should auto-show for sheets version lower than 1.00.03.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+						<li><span class='sheet-black' data-i18n="trademark-weapon">Support for Trademark Weapon</span></li>
+						<li><span class='sheet-black' data-i18n="variable-base-damage">Support for variable base damage for things such as Shotguns</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<p data-i18n="be-aware-info1">
+						This is the initial release of this sheet. If you are coming from a different sheet, you may experience some "data loss." This data loss should be minimal if you are coming from the Savage Worlds Tabbed sheet, but will is still possible (and, in some cases, likely).
+					</p>
+					<p data-i18n="be-aware-info2">
+						In the interest of getting this sheet out there so everyone can benefit from some of the enhanced features, we realize there are some things still missing, and some that aren't functioning exaclty right. These should be fringe cases, but wanted to make you aware. Here are some potential problems you may experience:
+					</p>
+					<ul class="sheet-releaseNotesList">
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+						<li><span class='sheet-black' data-i18n="statblock-to-chat-log">The stat block to chat output currently doesn't support custom/additional Derived Stats, or the Special Abilities container.</span></li>
+					</ul>
+				</div>
+                <!-- Release 1.00.02 -->
+				<label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10002' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.02</h4></span>
+				</label>
+				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10002' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Bug Fixes and a minor enhancement.
+					</p>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="fear-table-support">Added a button to roll on the Fear Table. If you don't want this button showing, it can be hidden by unchecking the box on the Configuration page, under the 'Other Sheet Tweaks' setion.</span></li>
+					</ul>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="armor-expansion-icon">Armor expansion (unhide) icon - this icon was misplaced and overlapped with the Armor heading. This has been corrected.</span></li>
+                        <li><span class="sheet-black" data-i18n="toughness-going-lower-than-1">Toughness going lower than 1 - if Size (or other modifiers) could cause Toughness to go lower than one (1). This has been corrected and the lowest Toughness will go is 1.</span></li>
+                        <li><span class="sheet-black" data-i18n="variable-bonus-damage-die-type-not-working">Variable bonus damage die type not working - while not strictly a bug, it was confusing, because the die type selection was always visible. Using the variable bonus die type is now selected by default so that field will always work.</span></li>
+                        <li><span class="sheet-black" data-i18n="fighting-skill-visibility">Fighting skill always showing - having this skill always showing was causing confusion, the skill is now hidden by default. The character sheet has an Sheet Settings option to show this skill by default.</span></li>
+                        <li><span class="sheet-black" data-i18n="rof-greater-than-six">Rate of Fire 6+ - when using the Atk^x button option with a ROF greater than 6 odd things were being displayed. This has been corrected.</span></li>
+                        <li><span class="sheet-black" data-i18n="unskilled-rolls-missing-misc-modifiers">Unskilled Wild Die Rolls missing the Misc. Modifiers - when making an unskilled roll with additional modifiers, those modifiers were not being applied to the Wild Die roll. This has been corrected.</span></li>
+                        <li><span class="sheet-black" data-i18n="bonus-damage-roll-not-exploding">Bonus damage not exploding - the additional d6 bonus damage was not exploding if a 6 was rolled. This has been corrected.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+						<li><span class='sheet-black' data-i18n="trademark-weapon">Support for Trademark Weapon</span></li>
+						<li><span class='sheet-black' data-i18n="variable-base-damage">Support for variable base damage for things such as Shotguns</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<p data-i18n="be-aware-info1">
+						This is the initial release of this sheet. If you are coming from a different sheet, you may experience some "data loss." This data loss should be minimal if you are coming from the Savage Worlds Tabbed sheet, but will is still possible (and, in some cases, likely).
+					</p>
+					<p data-i18n="be-aware-info2">
+						In the interest of getting this sheet out there so everyone can benefit from some of the enhanced features, we realize there are some things still missing, and some that aren't functioning exaclty right. These should be fringe cases, but wanted to make you aware. Here are some potential problems you may experience:
+					</p>
+					<ul class="sheet-releaseNotesList">
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+						<li><span class='sheet-black' data-i18n="statblock-to-chat-log">The stat block to chat output currently doesn't support custom/additional Derived Stats, or the Special Abilities container.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.01 -->
 				<label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10001' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.01</h4></span>
@@ -7358,7 +7521,7 @@
 					{{#skill_roll5}}<span class="sheet-rollContainer">{{skill_roll5}}</span>{{/skill_roll5}}
 				{{/rollGreater() numrolls 4}}
 				{{#rollGreater() numrolls 5}}
-					{{#allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls}}<span class="sheet-rollContainer">{{value}}</span>{{/allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls}}
+					{{#allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken}}<span class="sheet-rollContainer">{{value}}</span>{{/allprops() skill_rank mook showtt showwounds showfatigue showdistracted showenc skill_roll skill_roll2 skill_roll3 skill_roll4 skill_roll5 name trait source PowerTemplate wild_die wild_die2 wild_die3 wild_die4 wild_die5 mods ttmod wounds fatigue distracted encumbrance notes button DmgRoll numrolls wcicon distracteds vulnerable stunned unshake ReRoll vigorStunned unshakeTemplate ap getgritty GrittyRoll skill_rollall trappings bonus_die wci showspec showap wildcard shaken}}
 				{{/rollGreater() numrolls 5}}
 			</div>
 			<div class="sheet-templateRoll sheet-trollRight">
@@ -7455,11 +7618,25 @@
 
 <rolltemplate class="sheet-rolltemplate-info">
     <div class="sheet-templateMain">
-        <h2 class="sheet-templateheader">{{#rollTotal() wildcard 0}}{{#wcicon}}{{wcicon}}{{/wcicon}}{{/rollTotal() wildcard 0}}{{name}}</h2>
-        <h3 class="sheet-templatesubheader">{{item}}{{#type}} ({{type}}){{/type}}</h3>
+        <div class="sheet-templateHeaderRow">
+            <h2 class="sheet-templateheader">{{#rollTotal() wildcard 0}}{{#wcicon}}{{wcicon}}{{/wcicon}}{{/rollTotal() wildcard 0}}{{name}}</h2>
+        </div>
+        {{#item}}<h3 class="sheet-templatesubheader">{{item}}{{#type}} ({{type}}){{/type}}</h3>{{/item}}
         <div class="sheet-templatedescription">
             {{#description}}{{description}}{{/description}}
-			{{#allprops() description item type}}<p><strong>{{key}}:</strong> {{value}}</p>{{/allprops() description item type}}
+            {{#fear}}
+                {{#rollLess() fear 4}}<span data-i18n="fear-table-adrenaline-surge-description" data-i18n-vars="{{fear}}"><strong>Adrenaline Surge</strong> ({{0}}): The hero’s "fight" response takes over. He acts as if he had a Joker this action!</span>{{/rollLess() fear 4}}
+                {{#rollBetween() fear 4 6}}<span data-i18n="fear-table-distracted-description" data-i18n-vars="{{fear}}"><strong>Distracted</strong> ({{0}}): The hero is Distracted until the end of his next turn.</span>{{/rollBetween() fear 4 6}}
+                {{#rollBetween() fear 7 9}}<span data-i18n="fear-table-vulnerable-description" data-i18n-vars="{{fear}}"><strong>Vulnerable</strong> ({{0}}): The target is Vulnerable until the end of his next turn.</span>{{/rollBetween() fear 7 9}}
+                {{#rollBetween() fear 10 12}}<span data-i18n="fear-table-shaken-description" data-i18n-vars="{{fear}}"><strong>Shaken</strong> ({{0}}): The character is Shaken.</span>{{/rollBetween() fear 10 12}}
+                {{#rollTotal() fear 13}}<span data-i18n="fear-table-mark-of-fear-description" data-i18n-vars="{{fear}}"><strong>The Mark of Fear</strong> ({{0}}): The hero is Stunned and suffers some cosmetic physical alteration—a white streak forms in his hair, his eyes twitch constantly, or some other minor physical alteration manifests.</span>{{/rollTotal() fear 13}}
+                {{#rollBetween() fear 14 15}}<span data-i18n="fear-table-frightened-description" data-i18n-vars="{{fear}}"><strong>Frightened</strong> ({{0}}): The character gains the Hesitant Hindrance for the remainder of the encounter. If he already has it, he’s Panicked instead.</span>{{/rollBetween() fear 14 15}}
+                {{#rollBetween() fear 16 17}}<span data-i18n="fear-table-panicked-description" data-i18n-vars="{{fear}}"><strong>Panicked</strong> ({{0}}): The character immediately moves his full Pace plus running die away from the danger and is Shaken.</span>{{/rollBetween() fear 16 17}}
+                {{#rollBetween() fear 18 19}}<span data-i18n="fear-table-minor-phobia-description" data-i18n-vars="{{fear}}"><strong>Minor Phobia</strong> ({{0}}): The character gains a Minor Phobia Hindrance somehow associated with the trauma.</span>{{/rollBetween() fear 18 19}}
+                {{#rollBetween() fear 20 21}}<span data-i18n="fear-table-major-phobia-description" data-i18n-vars="{{fear}}"><strong>Major Phobia</strong> ({{0}}): The character gains the Major Phobia Hindrance.</span>{{/rollBetween() fear 20 21}}
+                {{#rollGreater() fear 21}}<span data-i18n="fear-table-heart-attack-description" data-i18n-vars="{{fear}}|{{heartattack}}"><strong>Heart Attack</strong> ({{0}}): The hero is so overwhelmed with fear that his heart stutters. He must make an immediate Vigor roll at –2. If successful, he's Stunned. If he fails, he's Incapacitated and dies in {{1}} rounds. In the latter case, a Healing roll at –4 saves his life, but he remains Incapacitated. He may be treated normally thereafter.</span>{{/rollGreater() fear 21}}
+            {{/fear}}
+			{{#allprops() description item type wildcard fear heartattack}}<p><strong>{{key}}:</strong> {{value}}</p>{{/allprops() description item type wildcard fear heartattack}}
         </div>
     </div>
 </rolltemplate>
