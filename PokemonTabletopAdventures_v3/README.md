@@ -21,7 +21,7 @@ https://discord.gg/F24Ka8E
 - Propagates color throughout most static fields of the character sheet
   - Placeholders, input labels, and static text are given a color matching the chosen type of the character or move depending on their location
   - User-entered text, such as character name, move effects, and the inventory, are given a dark gray color to ensure they're more easily readable.
-
+- Adds a new attribute to each move section that indicates the total static damage bonus applied to a roll, and uses that within the roll template for moves. This is intended to make creating custom macros for rolling damage way easier than needing to calculate the correct bonus.
 
 ### Oct 14, 2020
 - Added Readme with Changelog and other details

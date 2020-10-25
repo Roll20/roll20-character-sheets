@@ -653,29 +653,30 @@
             </div>
             <div class="pokemon-move-info-grid-2">
                 <span>
-                    <b>Accuracy Modifier</b><input type="number" name="attr_move_acmod"
-                        class="top-information thin-number" value="0" />
+                    <b>Accuracy Modifier</b><input type="number" name="attr_move_acmod" class="top-information thin-number" value="0" />
                 </span>
 
                 <span>
-                    <b>STAB Damage</b><input type="number" name="attr_move_stabbonus" class="top-information thin-number"
-                        value="0" />
+                    <b>Critical Threshold</b><input type="number" name="attr_move_critthreshold" class="top-information thin-number" value="20" />
+                </span>
+
+                <span>
+                    <b>STAB Damage</b><input type="number" name="attr_move_stabbonus" class="top-information thin-number" value="0" />
                 </span>
 
                 <span>
                     <b>Extra Damage</b><input type="number" name="attr_move_damagebonus" class="top-information thin-number" value="0" />
                 </span>
 
-                <span>
-                    <b>Critical Threshold</b><input type="number" name="attr_move_critthreshold"
-                        class="top-information thin-number" value="20" />
+                <span class="readonly-field">
+                    <b>Total Damage:</b><input type="number" name="attr_move_totaldamage" readonly class="top-information thin-number" value="0" />
                 </span>
 
             </div>
             
             <div class="move-notes-roller">
                 <textarea spellcheck="false" name="attr_move_effect" placeholder="Additional Effects" class="3row-textarea"></textarea>
-                <button type='roll' value='&{template:move-roll} {{move-type=@{move_type}}} {{character-name=@{character_name}}} {{character-id=@{character_id}}} {{move-name=@{move_name}}} {{accuracy=[[ d20cs>@{move_critthreshold} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2} + @{SPDMOD} * {{@{move_category}, 0}=3} ]] + @{move_acmod} + ?{Temp Accuracy Bonus|0} ]] ]]}} {{target=@{move_category_defense}}} {{effectiveness=?{Effectiveness|Neutral, 0|Super Effective, 1|Extremely Effective, 2|Resisted, -1|Shielded, -2}}} {{effectiveness-roll=[[ 1d1 + 1 + ?{Effectiveness} ]]}} {{critical-damage=[[ ([[ @{move_dicenumber} + ?{Effectiveness} ]]) * @{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus|0} ]] ]]}} {{damage=[[ ([[@{move_dicenumber} + ?{Effectiveness}]])d@{damage_dice} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1}+@{SPATKMOD} * {{@{move_category}, 0}=2}]] + @{move_stabbonus} + @{move_damagebonus} + ?{Temp Damage Bonus}]] ]]}} {{notes=@{move_effect}}}'
+                <button type='roll' value='&{template:move-roll} {{move-type=@{move_type}}} {{character-name=@{character_name}}} {{character-id=@{character_id}}} {{move-name=@{move_name}}} {{accuracy=[[ d20cs>@{move_critthreshold} + [[ [[ @{ATKMOD} * {{@{move_category}, 0}=1} + @{SPATKMOD} * {{@{move_category}, 0}=2} + @{SPDMOD} * {{@{move_category}, 0}=3} ]] + @{move_acmod} + ?{Temp Accuracy Bonus|0} ]] ]]}} {{target=@{move_category_defense}}} {{effectiveness=?{Effectiveness|Neutral, 0|Super Effective, 1|Extremely Effective, 2|Resisted, -1|Shielded, -2}}} {{effectiveness-roll=[[ 1d1 + 1 + ?{Effectiveness} ]]}} {{critical-damage=[[ ([[ @{move_dicenumber} + ?{Effectiveness} ]]) * @{damage_dice} + [[ @{move_totaldamage} + ?{Temp Damage Bonus|0} ]] ]]}} {{damage=[[ ([[@{move_dicenumber} + ?{Effectiveness}]])d@{damage_dice} + [[ @{move_totaldamage} + ?{Temp Damage Bonus}]] ]]}} {{notes=@{move_effect}}}'
                     name='roll-movetemplate' class='move-roller'>T</button>
             </div>
         </div>
@@ -879,7 +880,7 @@
                     obj[rowName + '_defense'] = defense;
                     return obj;
                 }, {});
-                if(rows) setAttrs(rows);
+                if (rows) setAttrs(rows);
             });
         });
     });
@@ -946,5 +947,90 @@
             });
        });
     });
+    
+    // Calculating the Move Damage Bonus
+    
+    categoryDamageModifiers = ["", "ATKMOD", "SPATKMOD", ""];
+    on("change:ATK change:SPATK sheet:opened", function (eventInfo) {
+        // Get all the section IDs for each move
+        getSectionIDs("repeating_moves", function (idArray) {
+            
+            // Get all the section IDs mapped into an array including the repeating_moves_ prefix, so we can read and set attributes correctly
+            const rowNames = idArray.map(id => `repeating_moves_${id}`);
+            
+            // Create arrays of all the Category, Extra Bonus, and STAB Bonus attribute names of each move
+            const categories = idArray.map(id => `repeating_moves_${id}_move_category`);
+            const extraBonuses = idArray.map(id => `repeating_moves_${id}_move_damagebonus`);
+            const stabBonuses = idArray.map(id => `repeating_moves_${id}_move_stabbonus`);
+            
+            
+            // Get the ATK and SPATK modifier attributes, as well the values for each moves category, extra bonus, and stab bonus.
+            getAttrs([`ATKMOD`, `SPATKMOD`, ...categories, ...extraBonuses, ...stabBonuses], function (values) {
+                
+                const rows = rowNames.reduce((obj, rowName) => {
+                    
+                    // For each move, get the value of its relevant attributes stored as a local var - default to 0 for easier maths
+                    const category = parseInt(values[rowName + `_move_category`]) || 0;
+                    const extra = parseInt(values[rowName + '_move_damagebonus']) || 0;
+                    const stab = parseInt(values[rowName + '_move_stabbonus']) || 0;
+                    
+                    // Get the modifier for the category selected 
+                    const categoryModifier = parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
+                    const total = categoryModifier + extra + stab;
+                    
+                    // Assign the calculated damage bonus to the relevant move's total damage bonus attribute
+                    obj[rowName + '_move_totaldamage'] = total;
+                    return obj;
+                }, {});
+                if (rows) setAttrs(rows);
+            });
+        });
+    });
+    
+    on("change:repeating_moves:move_category change:repeating_moves:move_damagebonus change:repeating_moves:move_stabbonus", function(eventInfo) {
+        getAttrs(["ATKMOD", "SPATKMOD", "repeating_moves_move_category", "repeating_moves_move_damagebonus", "repeating_moves_move_stabbonus"], function(values) {
+            const category = parseInt(values.repeating_moves_move_category) || 0;
+            const extra = parseInt(values.repeating_moves_move_damagebonus) || 0;
+            const stab = parseInt(values.repeating_moves_move_stabbonus) || 0;
+            
+            const categoryModifier = parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
+            const total = categoryModifier + extra + stab;
+            
+            setAttrs({
+                'repeating_moves_move_total_damage_bonus': total
+            });
+        });
+    });
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
