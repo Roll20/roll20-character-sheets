@@ -458,13 +458,13 @@ const wfrpDragAndDrop = ( () => {
 
             const trait = compendium_pages;
     
-            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue)/gi)) {
+            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue|claw)/gi)) {
     
                 const attack = parseAttack(name, trait.data.Description);
     
                 updateAttrs = {...updateAttrs, ...attack};
     
-            } else {
+            } else if (trait) {
                 const repeating_id = generateRowID();    
                 const row = `repeating_traits_${repeating_id}`;
     

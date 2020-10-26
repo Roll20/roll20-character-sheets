@@ -6682,6 +6682,10 @@
               <input class="wfrp-npcsettings__input" name="attr_intuition" type="number"/>
             </div>
             <div class="wfrp-npcsettings__skill">
+              <div class="wfrp-npcsettings__label" data-i18n="Language (Magick)"> </div>
+              <input class="wfrp-npcsettings__input" name="attr_Magick" type="number"/>
+            </div>
+            <div class="wfrp-npcsettings__skill">
               <div class="wfrp-npcsettings__label" data-i18n="Leadership"></div>
               <input class="wfrp-npcsettings__input" name="attr_leadership" type="number"/>
             </div>
@@ -7172,6 +7176,22 @@
                     <select class="wfrp-settings__input" name="attr_attack_type">
                       <option data-i18n="Weapon Skill"></option>
                       <option data-i18n="Ballistic Skill"></option>
+                      <option data-i18n="Melee (Basic)"></option>
+                      <option data-i18n="Melee (Brawling)"></option>
+                      <option data-i18n="Melee (Cavalry)"></option>
+                      <option data-i18n="Melee (Fencing)"></option>
+                      <option data-i18n="Melee (Flail)"></option>
+                      <option data-i18n="Melee (Parry)"></option>
+                      <option data-i18n="Melee (Polearm)"></option>
+                      <option data-i18n="Melee (Two-Handed)"></option>
+                      <option data-i18n="Ranged (Blackpowder)"></option>
+                      <option data-i18n="Ranged (Bow)"></option>
+                      <option data-i18n="Ranged (Crossbow)"></option>
+                      <option data-i18n="Ranged (Engineering)"></option>
+                      <option data-i18n="Ranged (Entangling)"></option>
+                      <option data-i18n="Ranged (Explosives)"></option>
+                      <option data-i18n="Ranged (Sling)"></option>
+                      <option data-i18n="Ranged (Throwing)"></option>
                       <option data-i18n="Custom"></option>
                     </select>
                   </div>
@@ -9857,21 +9877,48 @@
 
         const request = [
             `${repeating_id}_attack_type`,
-            `weapon_skill`,
-            `ballistic_skill`
+            "weapon_skill",
+            "ballistic_skill",
+            "basic",
+            "brawling",
+            "cavalry",
+            "fencing",
+            "flail",
+            "parry",
+            "polearm",
+            "two-handed",
+            "blackpowder",
+            "bow",
+            "crossbow",
+            "engineering",
+            "entangling",
+            "explosives",
+            "sling",
+            "throwing"
         ];
 
         getAttrs(request, values => {
-            const {
-                [`${repeating_id}_attack_type`]:type,
-                weapon_skill,
-                ballistic_skill
-            } = values;
+            const type = values[`${repeating_id}_attack_type`];
             
-            if (type.toLowerCase() === "weapon skill") {
-                setAttrs({[`${repeating_id}_attack_target`]:weapon_skill});
-            } else {                
-                setAttrs({[`${repeating_id}_attack_target`]:ballistic_skill});
+            if (type.toLowerCase() === "custom") {
+                setAttrs({[`${repeating_id}_attack_target`]:0});
+            } else {  
+                const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                              .toLowerCase() :
+                                                         type.split("(")[1]
+                                                             .replace(/\)/g, "")
+                                                             .replace(/ /, "_")
+                                                             .toLowerCase();
+                                                             
+                const value = values[type_parsed];
+
+                const update = {};
+
+                update[`${repeating_id}_attack_target`] = value;
+
+                console.log(update)
+
+                setAttrs(update);
             }
         });
     }
@@ -9881,7 +9928,23 @@
         getSectionIDs("attacks", ids => {
             const attrs = [
                 "weapon_skill",
-                "ballistic_skill"
+                "ballistic_skill",
+                "basic",
+                "brawling",
+                "cavalry",
+                "fencing",
+                "flail",
+                "parry",
+                "polearm",
+                "two-handed",
+                "blackpowder",
+                "bow",
+                "crossbow",
+                "engineering",
+                "entangling",
+                "explosives",
+                "sling",
+                "throwing"
             ];
             
             for (const id of ids) {
@@ -9891,14 +9954,18 @@
             getAttrs(attrs, values => {
                 const update = [];
 
-                const {weapon_skill, ballistic_skill} = values;
-
                 for (const id of ids) {
-                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();
+                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();  
+                    const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                                  .toLowerCase() :
+                                                             type.split("(")[1]
+                                                                 .replace(/\)/g, "")
+                                                                 .replace(/ /, "_")
+                                                                 .toLowerCase();
                     const target = `repeating_attacks_${id}_attack_target`; 
                     
-                    if (type === "ranged") update[target] = ballistic_skill;
-                    if (type === "melee") update[target] = weapon_skill; 
+                    if (type_parsed === "custom") return;
+                    else update[target] = values[type_parsed];
                 }
 
                 setAttrs(update);
@@ -10030,7 +10097,10 @@ wfrpModule.wfrp.skills.forEach(skill => {
 });
 
 wfrpModule.wfrp.specialisations.forEach(specialisation => {
-    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {wfrpModule.calculateSpecialisation(specialisation)});
+    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {
+        wfrpModule.calculateSpecialisation(specialisation);
+        wfrpModule.cascadeNPCAttacks();
+    });
 });
 
 wfrpModule.wfrp.repeating_skills.forEach(section => {
@@ -10597,13 +10667,13 @@ const wfrpDragAndDrop = ( () => {
 
             const trait = compendium_pages;
     
-            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue)/gi)) {
+            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue|claw)/gi)) {
     
                 const attack = parseAttack(name, trait.data.Description);
     
                 updateAttrs = {...updateAttrs, ...attack};
     
-            } else {
+            } else if (trait) {
                 const repeating_id = generateRowID();    
                 const row = `repeating_traits_${repeating_id}`;
     

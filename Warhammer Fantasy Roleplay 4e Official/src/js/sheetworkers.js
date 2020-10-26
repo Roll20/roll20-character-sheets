@@ -1494,21 +1494,48 @@ const wfrpModule = ( () => {
 
         const request = [
             `${repeating_id}_attack_type`,
-            `weapon_skill`,
-            `ballistic_skill`
+            "weapon_skill",
+            "ballistic_skill",
+            "basic",
+            "brawling",
+            "cavalry",
+            "fencing",
+            "flail",
+            "parry",
+            "polearm",
+            "two-handed",
+            "blackpowder",
+            "bow",
+            "crossbow",
+            "engineering",
+            "entangling",
+            "explosives",
+            "sling",
+            "throwing"
         ];
 
         getAttrs(request, values => {
-            const {
-                [`${repeating_id}_attack_type`]:type,
-                weapon_skill,
-                ballistic_skill
-            } = values;
+            const type = values[`${repeating_id}_attack_type`];
             
-            if (type.toLowerCase() === "weapon skill") {
-                setAttrs({[`${repeating_id}_attack_target`]:weapon_skill});
-            } else {                
-                setAttrs({[`${repeating_id}_attack_target`]:ballistic_skill});
+            if (type.toLowerCase() === "custom") {
+                setAttrs({[`${repeating_id}_attack_target`]:0});
+            } else {  
+                const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                              .toLowerCase() :
+                                                         type.split("(")[1]
+                                                             .replace(/\)/g, "")
+                                                             .replace(/ /, "_")
+                                                             .toLowerCase();
+                                                             
+                const value = values[type_parsed];
+
+                const update = {};
+
+                update[`${repeating_id}_attack_target`] = value;
+
+                console.log(update)
+
+                setAttrs(update);
             }
         });
     }
@@ -1518,7 +1545,23 @@ const wfrpModule = ( () => {
         getSectionIDs("attacks", ids => {
             const attrs = [
                 "weapon_skill",
-                "ballistic_skill"
+                "ballistic_skill",
+                "basic",
+                "brawling",
+                "cavalry",
+                "fencing",
+                "flail",
+                "parry",
+                "polearm",
+                "two-handed",
+                "blackpowder",
+                "bow",
+                "crossbow",
+                "engineering",
+                "entangling",
+                "explosives",
+                "sling",
+                "throwing"
             ];
             
             for (const id of ids) {
@@ -1528,14 +1571,18 @@ const wfrpModule = ( () => {
             getAttrs(attrs, values => {
                 const update = [];
 
-                const {weapon_skill, ballistic_skill} = values;
-
                 for (const id of ids) {
-                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();
+                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();  
+                    const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                                  .toLowerCase() :
+                                                             type.split("(")[1]
+                                                                 .replace(/\)/g, "")
+                                                                 .replace(/ /, "_")
+                                                                 .toLowerCase();
                     const target = `repeating_attacks_${id}_attack_target`; 
                     
-                    if (type === "ranged") update[target] = ballistic_skill;
-                    if (type === "melee") update[target] = weapon_skill; 
+                    if (type_parsed === "custom") return;
+                    else update[target] = values[type_parsed];
                 }
 
                 setAttrs(update);
@@ -1667,7 +1714,10 @@ wfrpModule.wfrp.skills.forEach(skill => {
 });
 
 wfrpModule.wfrp.specialisations.forEach(specialisation => {
-    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {wfrpModule.calculateSpecialisation(specialisation)});
+    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {
+        wfrpModule.calculateSpecialisation(specialisation);
+        wfrpModule.cascadeNPCAttacks();
+    });
 });
 
 wfrpModule.wfrp.repeating_skills.forEach(section => {
