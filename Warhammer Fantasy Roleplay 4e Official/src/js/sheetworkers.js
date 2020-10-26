@@ -86,7 +86,7 @@ const wfrpModule = ( () => {
             "fencing",
             "flail",
             "parry",
-            "pole-arm",
+            "polearm",
             "two-handed",
             "blackpowder",
             "bow",
@@ -381,26 +381,38 @@ const wfrpModule = ( () => {
     // Characteristic Functions
 
     const calculateCharacteristic = (characteristic) => {
-
-        getAttrs(["npc"], check => {
-
-            if (check["npc"] === "on") return;
         
-            const attrs = [
-                `${characteristic}_initial`,
-                `${characteristic}_advances`,
-                `${characteristic}_modifier`,
-                `${characteristic}_custom_mod`,
-                `${characteristic}_bonusmod`,
-            ];
+        const attrs = [
+            `npc`,
+            `${characteristic}`,
+            `${characteristic}_initial`,
+            `${characteristic}_advances`,
+            `${characteristic}_modifier`,
+            `${characteristic}_custom_mod`,
+            `${characteristic}_bonusmod`,
+        ];
+
+        getAttrs(attrs, values => {
+            const base = parseInt(values[`${characteristic}`]) || 0;
+            const initial = parseInt(values[`${characteristic}_initial`]) || 0;
+            const advances = parseInt(values[`${characteristic}_advances`]) || 0;
+            const modifier = parseInt(values[`${characteristic}_modifier`]) || 0;
+            const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
+            const bonusmod = parseInt(values[`${characteristic}_bonusmod`]) || 0;
+
+            if (values["npc"] === "on") {
     
-            getAttrs(attrs, values => {
-                const initial = parseInt(values[`${characteristic}_initial`]) || 0;
-                const advances = parseInt(values[`${characteristic}_advances`]) || 0;
-                const modifier = parseInt(values[`${characteristic}_modifier`]) || 0;
-                const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
-                const bonusmod = parseInt(values[`${characteristic}_bonusmod`]) || 0;
+                const updateAttrs = {};
+                
+                const bonus = Math.floor(base / 10) + bonusmod;
+
+                updateAttrs[`${characteristic}_bonus`] = bonus;
     
+                setAttrs(updateAttrs);
+    
+                return;
+            } else {
+
                 const current = initial + advances + modifier + custom_mod;
     
                 const bonus = Math.floor(current / 10) + bonusmod;
@@ -411,8 +423,8 @@ const wfrpModule = ( () => {
                 updateAttrs[`${characteristic}_bonus`] = bonus;
     
                 setAttrs(updateAttrs);
-    
-            });
+
+            }
 
         });
     }
@@ -514,35 +526,41 @@ const wfrpModule = ( () => {
     }
 
     const calculateSpecialisation = (specialisation) => {
+
+        getAttrs(["npc"], check => {
+
+            if (check["npc"] === "on") return;
         
-        const attrs = [
-            `${specialisation}_characteristic`
-        ];
-
-        getAttrs(attrs, values => {
-            const base = values[`${specialisation}_characteristic`];
-
             const attrs = [
-                `${base}`,
-                `${specialisation}_advances`,
-                `${specialisation}_modifier`,
-                `${specialisation}_bonus`
+                `${specialisation}_characteristic`,
+                `npc`
             ];
 
             getAttrs(attrs, values => {
-                const characteristic = parseInt(values[`${base}`]) || 0;
-                const advances = parseInt(values[`${specialisation}_advances`]) || 0;
-                const modifier = parseInt(values[`${specialisation}_modifier`]) || 0;
-                const bonus = parseInt(values[`${specialisation}_bonus`]) || 0;
+                const base = values[`${specialisation}_characteristic`];
 
-                const total = characteristic + advances + modifier + bonus;
+                const attrs = [
+                    `${base}`,
+                    `${specialisation}_advances`,
+                    `${specialisation}_modifier`,
+                    `${specialisation}_bonus`
+                ];
 
-                const updateAttrs = {};
+                getAttrs(attrs, values => {
+                    const characteristic = parseInt(values[`${base}`]) || 0;
+                    const advances = parseInt(values[`${specialisation}_advances`]) || 0;
+                    const modifier = parseInt(values[`${specialisation}_modifier`]) || 0;
+                    const bonus = parseInt(values[`${specialisation}_bonus`]) || 0;
 
-                updateAttrs[`${specialisation}`] = total;
+                    const total = characteristic + advances + modifier + bonus;
 
-                setAttrs(updateAttrs);
+                    const updateAttrs = {};
 
+                    updateAttrs[`${specialisation}`] = total;
+
+                    setAttrs(updateAttrs);
+
+                });
             });
         });
     }
@@ -1235,7 +1253,7 @@ const wfrpModule = ( () => {
     }
 
     const calculateMaxEncumbrance = () => {
-        const attrs = ["strength_bonus", "toughness_bonus", "encumbrance_bonus"];
+        const attrs = ["strength_bonus", "toughness_bonus", "encumbrance_bonus", "encumbrance_mod"];
 
         getAttrs(attrs, values => {
             const strength_bonus = parseInt(values["strength_bonus"]) || 0;
@@ -1297,10 +1315,10 @@ const wfrpModule = ( () => {
                         trappings_array.forEach(id => {
                             const enc = parseInt(values[`repeating_trappings_${id}_trappings_enc`]) || 0;
                             const amount = parseInt(values[`repeating_trappings_${id}_trappings_amount`]) || 1;
-                            const worn = parseInt(values[`repeating_trappings_${id}_trappings_worn`]) || false;
+                            const worn = values[`repeating_trappings_${id}_trappings_worn`] || false;
                             const inenc = values[`repeating_trappings_${id}_trappings_inenc`] || "0";
 
-                            const total = (worn === "on") ? (enc -1) * amount : enc * amount;
+                            const total = (worn === "on") ? (enc - 1) * amount : enc * amount;
 
                             if (inenc === "on") total_enc += total;
                         });
@@ -1476,21 +1494,48 @@ const wfrpModule = ( () => {
 
         const request = [
             `${repeating_id}_attack_type`,
-            `weapon_skill`,
-            `ballistic_skill`
+            "weapon_skill",
+            "ballistic_skill",
+            "basic",
+            "brawling",
+            "cavalry",
+            "fencing",
+            "flail",
+            "parry",
+            "polearm",
+            "two-handed",
+            "blackpowder",
+            "bow",
+            "crossbow",
+            "engineering",
+            "entangling",
+            "explosives",
+            "sling",
+            "throwing"
         ];
 
         getAttrs(request, values => {
-            const {
-                [`${repeating_id}_attack_type`]:type,
-                weapon_skill,
-                ballistic_skill
-            } = values;
+            const type = values[`${repeating_id}_attack_type`];
             
-            if (type.toLowerCase() === "weapon skill") {
-                setAttrs({[`${repeating_id}_attack_target`]:weapon_skill});
-            } else {                
-                setAttrs({[`${repeating_id}_attack_target`]:ballistic_skill});
+            if (type.toLowerCase() === "custom") {
+                setAttrs({[`${repeating_id}_attack_target`]:0});
+            } else {  
+                const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                              .toLowerCase() :
+                                                         type.split("(")[1]
+                                                             .replace(/\)/g, "")
+                                                             .replace(/ /, "_")
+                                                             .toLowerCase();
+                                                             
+                const value = values[type_parsed];
+
+                const update = {};
+
+                update[`${repeating_id}_attack_target`] = value;
+
+                console.log(update)
+
+                setAttrs(update);
             }
         });
     }
@@ -1500,7 +1545,23 @@ const wfrpModule = ( () => {
         getSectionIDs("attacks", ids => {
             const attrs = [
                 "weapon_skill",
-                "ballistic_skill"
+                "ballistic_skill",
+                "basic",
+                "brawling",
+                "cavalry",
+                "fencing",
+                "flail",
+                "parry",
+                "polearm",
+                "two-handed",
+                "blackpowder",
+                "bow",
+                "crossbow",
+                "engineering",
+                "entangling",
+                "explosives",
+                "sling",
+                "throwing"
             ];
             
             for (const id of ids) {
@@ -1510,14 +1571,18 @@ const wfrpModule = ( () => {
             getAttrs(attrs, values => {
                 const update = [];
 
-                const {weapon_skill, ballistic_skill} = values;
-
                 for (const id of ids) {
-                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();
+                    const type = values[`repeating_attacks_${id}_attack_type`].toLowerCase();  
+                    const type_parsed = (!type.match(/\(/)) ? type.replace(/ /, "_")
+                                                                  .toLowerCase() :
+                                                             type.split("(")[1]
+                                                                 .replace(/\)/g, "")
+                                                                 .replace(/ /, "_")
+                                                                 .toLowerCase();
                     const target = `repeating_attacks_${id}_attack_target`; 
                     
-                    if (type === "ranged") update[target] = ballistic_skill;
-                    if (type === "melee") update[target] = weapon_skill; 
+                    if (type_parsed === "custom") return;
+                    else update[target] = values[type_parsed];
                 }
 
                 setAttrs(update);
@@ -1649,7 +1714,10 @@ wfrpModule.wfrp.skills.forEach(skill => {
 });
 
 wfrpModule.wfrp.specialisations.forEach(specialisation => {
-    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {wfrpModule.calculateSpecialisation(specialisation)});
+    on(`change:${specialisation} change:${specialisation}_advances change:${specialisation}_bonus change:${specialisation}_characteristic`, eventInfo => {
+        wfrpModule.calculateSpecialisation(specialisation);
+        wfrpModule.cascadeNPCAttacks();
+    });
 });
 
 wfrpModule.wfrp.repeating_skills.forEach(section => {

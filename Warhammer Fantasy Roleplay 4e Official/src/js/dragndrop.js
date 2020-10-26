@@ -334,7 +334,7 @@ const wfrpDragAndDrop = ( () => {
 
             let name = trait;
             let damage = "";
-            let type = "Melee";
+            let type = "Weapon Skill";
             let range = "Touch";
             let attacks = "1";
 
@@ -343,7 +343,7 @@ const wfrpDragAndDrop = ( () => {
                 if (trait.match(/range/gi) && trait.match(/\(/)) {
                     [trait, range] = trait.split("(");
                     range = range.substr(0,range.length-1);
-                    type = "Ranged";
+                    type = "Ballistic Skill";
                 }
                 
                 if (trait.match(/[0-9]+X/)) {
@@ -458,13 +458,13 @@ const wfrpDragAndDrop = ( () => {
 
             const trait = compendium_pages;
     
-            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue)/gi)) {
+            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue|claw)/gi)) {
     
                 const attack = parseAttack(name, trait.data.Description);
     
                 updateAttrs = {...updateAttrs, ...attack};
     
-            } else {
+            } else if (trait) {
                 const repeating_id = generateRowID();    
                 const row = `repeating_traits_${repeating_id}`;
     
