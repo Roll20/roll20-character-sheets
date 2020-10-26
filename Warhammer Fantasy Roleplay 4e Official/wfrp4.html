@@ -8744,26 +8744,38 @@
     // Characteristic Functions
 
     const calculateCharacteristic = (characteristic) => {
-
-        getAttrs(["npc"], check => {
-
-            if (check["npc"] === "on") return;
         
-            const attrs = [
-                `${characteristic}_initial`,
-                `${characteristic}_advances`,
-                `${characteristic}_modifier`,
-                `${characteristic}_custom_mod`,
-                `${characteristic}_bonusmod`,
-            ];
+        const attrs = [
+            `npc`,
+            `${characteristic}`,
+            `${characteristic}_initial`,
+            `${characteristic}_advances`,
+            `${characteristic}_modifier`,
+            `${characteristic}_custom_mod`,
+            `${characteristic}_bonusmod`,
+        ];
+
+        getAttrs(attrs, values => {
+            const base = parseInt(values[`${characteristic}`]) || 0;
+            const initial = parseInt(values[`${characteristic}_initial`]) || 0;
+            const advances = parseInt(values[`${characteristic}_advances`]) || 0;
+            const modifier = parseInt(values[`${characteristic}_modifier`]) || 0;
+            const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
+            const bonusmod = parseInt(values[`${characteristic}_bonusmod`]) || 0;
+
+            if (values["npc"] === "on") {
     
-            getAttrs(attrs, values => {
-                const initial = parseInt(values[`${characteristic}_initial`]) || 0;
-                const advances = parseInt(values[`${characteristic}_advances`]) || 0;
-                const modifier = parseInt(values[`${characteristic}_modifier`]) || 0;
-                const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
-                const bonusmod = parseInt(values[`${characteristic}_bonusmod`]) || 0;
+                const updateAttrs = {};
+                
+                const bonus = Math.floor(base / 10) + bonusmod;
+
+                updateAttrs[`${characteristic}_bonus`] = bonus;
     
+                setAttrs(updateAttrs);
+    
+                return;
+            } else {
+
                 const current = initial + advances + modifier + custom_mod;
     
                 const bonus = Math.floor(current / 10) + bonusmod;
@@ -8774,8 +8786,8 @@
                 updateAttrs[`${characteristic}_bonus`] = bonus;
     
                 setAttrs(updateAttrs);
-    
-            });
+
+            }
 
         });
     }
@@ -8877,35 +8889,41 @@
     }
 
     const calculateSpecialisation = (specialisation) => {
+
+        getAttrs(["npc"], check => {
+
+            if (check["npc"] === "on") return;
         
-        const attrs = [
-            `${specialisation}_characteristic`
-        ];
-
-        getAttrs(attrs, values => {
-            const base = values[`${specialisation}_characteristic`];
-
             const attrs = [
-                `${base}`,
-                `${specialisation}_advances`,
-                `${specialisation}_modifier`,
-                `${specialisation}_bonus`
+                `${specialisation}_characteristic`,
+                `npc`
             ];
 
             getAttrs(attrs, values => {
-                const characteristic = parseInt(values[`${base}`]) || 0;
-                const advances = parseInt(values[`${specialisation}_advances`]) || 0;
-                const modifier = parseInt(values[`${specialisation}_modifier`]) || 0;
-                const bonus = parseInt(values[`${specialisation}_bonus`]) || 0;
+                const base = values[`${specialisation}_characteristic`];
 
-                const total = characteristic + advances + modifier + bonus;
+                const attrs = [
+                    `${base}`,
+                    `${specialisation}_advances`,
+                    `${specialisation}_modifier`,
+                    `${specialisation}_bonus`
+                ];
 
-                const updateAttrs = {};
+                getAttrs(attrs, values => {
+                    const characteristic = parseInt(values[`${base}`]) || 0;
+                    const advances = parseInt(values[`${specialisation}_advances`]) || 0;
+                    const modifier = parseInt(values[`${specialisation}_modifier`]) || 0;
+                    const bonus = parseInt(values[`${specialisation}_bonus`]) || 0;
 
-                updateAttrs[`${specialisation}`] = total;
+                    const total = characteristic + advances + modifier + bonus;
 
-                setAttrs(updateAttrs);
+                    const updateAttrs = {};
 
+                    updateAttrs[`${specialisation}`] = total;
+
+                    setAttrs(updateAttrs);
+
+                });
             });
         });
     }
