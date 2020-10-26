@@ -1,11 +1,27 @@
 # Pokemon Tabletop Adventures 3
-This is the roll20 character sheet for the Pokemon Tabletop Adventures 3
+This is the Roll20 character sheet for the Pokemon Tabletop Adventures 3
 system written by DrMrStark.
 
 Much of the development discussion takes place on the PTA3 Discord:
 https://discord.gg/F24Ka8E
 
 ## Changelog
+
+### Oct 22, 2020
+- Introduces roll templates to the character sheet
+- The skill-roll template is used for skill rolls by Trainer-type characters
+- The move-roll template is used for rolling attacks by all types of characters. This has variable fields, depending on how the move section of the character sheet is configured
+  - The Accuracy Check and Damage fields will always be visible
+  - The Accuracy Check field has a note concerning the relevant defense the attack is targeting when the move is configured correctly
+  - A note concerning the attack's effectiveness appears when not neutral
+  - A note indicating a critical hit has occurred appears beside the damage roll
+  - Miscellaneous notes concerning the move can be added and are displayed after the damage field
+- Each roll template varies its header colour based on either the base attribute for skills or the elemental type of the attack
+- The buttons for rolling an attack have been removed, and a button for rolling an attack using the new roll template has been added to the character sheet
+- Propagates color throughout most static fields of the character sheet
+  - Placeholders, input labels, and static text are given a color matching the chosen type of the character or move depending on their location
+  - User-entered text, such as character name, move effects, and the inventory, are given a dark gray color to ensure they're more easily readable.
+- Adds a new attribute to each move section that indicates the total static damage bonus applied to a roll, and uses that within the roll template for moves. This is intended to make creating custom macros for rolling damage way easier than needing to calculate the correct bonus.
 
 ### Oct 14, 2020
 - Added Readme with Changelog and other details
@@ -34,3 +50,4 @@ https://discord.gg/F24Ka8E
 - Allow modifications to movement (maybe just an extra box)
 - Prevent critical range from going below 0 or above 20, maybe do similar to other fields
 - Handle temp stat changes somehow, this may be a lot of work
+- Add a Settings page
