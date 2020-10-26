@@ -94,7 +94,7 @@ const updateRepeatingSkillLimit = eventinfo => {
   const repRowID = processingFunctions.getReprowid(eventinfo.triggerName)
   if (eventinfo.newValue === "none") {
     processingFunctions.setAttributes({[`${repRowID}_display_limit`]: ' '})
-  } else {
+  } else if (eventinfo.newValue != undefined) {
     const translationKey = processingFunctions.sliceAttr(eventinfo.newValue)
     const translation = getTranslationByKey(translationKey);
     processingFunctions.setAttributes({
