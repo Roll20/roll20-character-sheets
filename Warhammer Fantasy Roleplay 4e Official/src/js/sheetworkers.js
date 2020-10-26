@@ -86,7 +86,7 @@ const wfrpModule = ( () => {
             "fencing",
             "flail",
             "parry",
-            "pole-arm",
+            "polearm",
             "two-handed",
             "blackpowder",
             "bow",
@@ -1253,7 +1253,7 @@ const wfrpModule = ( () => {
     }
 
     const calculateMaxEncumbrance = () => {
-        const attrs = ["strength_bonus", "toughness_bonus", "encumbrance_bonus"];
+        const attrs = ["strength_bonus", "toughness_bonus", "encumbrance_bonus", "encumbrance_mod"];
 
         getAttrs(attrs, values => {
             const strength_bonus = parseInt(values["strength_bonus"]) || 0;
@@ -1296,6 +1296,8 @@ const wfrpModule = ( () => {
 
                     getAttrs(attrs, values => {
 
+                        console.log(values);
+
                         let total_enc = 0;
 
                         armour_array.forEach(id => {
@@ -1315,10 +1317,10 @@ const wfrpModule = ( () => {
                         trappings_array.forEach(id => {
                             const enc = parseInt(values[`repeating_trappings_${id}_trappings_enc`]) || 0;
                             const amount = parseInt(values[`repeating_trappings_${id}_trappings_amount`]) || 1;
-                            const worn = parseInt(values[`repeating_trappings_${id}_trappings_worn`]) || false;
+                            const worn = values[`repeating_trappings_${id}_trappings_worn`] || false;
                             const inenc = values[`repeating_trappings_${id}_trappings_inenc`] || "0";
 
-                            const total = (worn === "on") ? (enc -1) * amount : enc * amount;
+                            const total = (worn === "on") ? (enc - 1) * amount : enc * amount;
 
                             if (inenc === "on") total_enc += total;
                         });
