@@ -1296,8 +1296,6 @@ const wfrpModule = ( () => {
 
                     getAttrs(attrs, values => {
 
-                        console.log(values);
-
                         let total_enc = 0;
 
                         armour_array.forEach(id => {
