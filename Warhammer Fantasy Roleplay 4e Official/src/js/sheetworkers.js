@@ -1612,7 +1612,7 @@ const wfrpModule = ( () => {
                                                              .replace(/\)/g, "")
                                                              .replace(/ /, "_")
                                                              .toLowerCase();
-                                                             
+
                 const value = values[type_parsed];
 
                 const update = {};
@@ -1673,6 +1673,34 @@ const wfrpModule = ( () => {
 
             });
         })
+    }
+
+    const updateNPCButtons = () => {
+
+        const attrs = [
+            "npc",
+            "dodge",
+            "endurance",
+            "intuition",
+            "perception",
+            "cool",
+            ...wfrp.characteristics
+        ];
+
+        getAttrs(attrs, values => {
+            if (values[`NPC`] === "0") return;
+            const update = {};
+
+            if (!values[`dodge`]) update[`dodge`] = values[`agility`];
+            if (!values[`endurance`]) update[`endurance`] = values[`toughness`];
+            if (!values[`intuition`]) update[`intuition`] = values[`initiative`];
+            if (!values[`perception`]) update[`perception`] = values[`initiative`];
+            if (!values[`cool`]) update[`cool`] = values[`willpower`];
+
+            setAttrs(update);
+
+        });
+
     }
 
     // MODULE INTERFACE 
@@ -1741,6 +1769,7 @@ const wfrpModule = ( () => {
         // NPC Functions
         getAttackValue:getAttackValue,
         cascadeNPCAttacks:cascadeNPCAttacks,
+        updateNPCButtons:updateNPCButtons,
     };
 
 })();
@@ -1907,6 +1936,12 @@ on(`change:repeating_spells:spell_type change:repeating_spells:spell_lore change
 on(`change:repeating_attacks:attack_name change:repeating_attacks:attack_type`, eventInfo => wfrpModule.getAttackValue(eventInfo.sourceAttribute));
 
 on(`change:weapon_skill change:ballistic_skill`, eventInfo => wfrpModule.cascadeNPCAttacks());
+
+wfrpModule.wfrp.characteristics.forEach(characteristic => {
+    on(`change:${characteristic} change:${characteristic}_bonus`, eventInfo => wfrpModule.updateNPCButtons())
+});
+
+on(`change:npc sheet:opened`, eventInfo => wfrpModule.updateNPCButtons())
 
 //# sourceURL=sheetworkers.js
 
