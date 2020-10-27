@@ -208,6 +208,13 @@ const wfrpModule = ( () => {
         setAttrs({roll_init:init});
     }
 
+    const toggleWhisper = (new_value) => {
+        const whisper = (new_value === "2") ? `/w gm` : 
+                                            ``;
+        
+        setAttrs({roll_whisper:whisper});
+    }
+
     const parseModField = (new_value="", previous_value) => {
         const mods = new_value.toLowerCase().split(",").map(item=>item.trim());
         const prev_mods = (previous_value) ? previous_value.toLowerCase().split(",").map(item=>item.trim()) : [];
@@ -840,8 +847,6 @@ const wfrpModule = ( () => {
 
             const attrs = [];
 
-            console.log(ids);
-
             for (const id of ids.careers) {
 
                 for (const characteristic of wfrp.characteristics) {
@@ -1149,8 +1154,6 @@ const wfrpModule = ( () => {
             });
     
             getAttrs(attrs, values => {
-                console.log(values)
-
                 const talent_list = Object.entries(values);
                 const names = talent_list.filter(([key, value]) => key.match(/name/g) && value !== "");
 
@@ -1616,8 +1619,6 @@ const wfrpModule = ( () => {
 
                 update[`${repeating_id}_attack_target`] = value;
 
-                console.log(update)
-
                 setAttrs(update);
             }
         });
@@ -1686,6 +1687,7 @@ const wfrpModule = ( () => {
         toggleRollBonus:toggleRollBonus,
         toggleRollCrits:toggleRollCrits,
         toggleInitOption:toggleInitOption,
+        toggleWhisper:toggleWhisper,
         parseModField:parseModField,
 
         // Class and Species Controls
@@ -1755,6 +1757,7 @@ on(`change:setting_diff_option`, eventInfo => wfrpModule.toggleRollDifficulty(ev
 on(`change:setting_bonus_option`, eventInfo => wfrpModule.toggleRollBonus(eventInfo.newValue));
 on(`change:setting_crit_option`, eventInfo => wfrpModule.toggleRollCrits(eventInfo.newValue));
 on(`change:setting_init_option`, eventInfo => wfrpModule.toggleInitOption(eventInfo.newValue));
+on(`change:setting_whisper`, eventInfo => wfrpModule.toggleWhisper(eventInfo.newValue));
 
 [
     "repeating_talent:talent_mods", 
