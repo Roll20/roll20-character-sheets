@@ -836,11 +836,13 @@ const wfrpModule = ( () => {
 
     const recalculateSpentXP = () => {
 
-        getSectionIDs(`repeating_careers`, ids => {
+        helperFunctions.aggregateRepeatingIDs([`careers`, `experience`], ids => {
 
             const attrs = [];
 
-            for (const id of ids) {
+            console.log(ids);
+
+            for (const id of ids.careers) {
 
                 for (const characteristic of wfrp.characteristics) {
                     attrs.push(`repeating_careers_${id}_career_${characteristic}_advances`);
@@ -858,6 +860,10 @@ const wfrpModule = ( () => {
                     }
                 }
             }
+
+            for (const id of ids.experience) {
+                attrs.push(`repeating_experience_${id}_experience_amount`);
+            }
             
             getAttrs(attrs, values => {
 
@@ -865,7 +871,7 @@ const wfrpModule = ( () => {
                 const skill_advances = new Map();
                 const talent_advances = new Map();
 
-                for (const id of ids) {
+                for (const id of ids.careers) {
     
                     for (const characteristic of wfrp.characteristics) {
                         const value = parseInt(values[`repeating_careers_${id}_career_${characteristic}_advances`]);
@@ -918,6 +924,12 @@ const wfrpModule = ( () => {
                 skill_advances.forEach((value) => xp += calculateSkillXP(value));
                 talent_advances.forEach((value) => xp += calculateTalentXP(value));
 
+                for (const id of ids.experience) {
+                    const value = parseInt(values[`repeating_experience_${id}_experience_amount`]);
+                    
+                    if (value < 0) xp -= value;
+                }
+
                 const updateAttrs = {};
     
                 updateAttrs[`spent_xp`] = xp;
@@ -939,8 +951,10 @@ const wfrpModule = ( () => {
                 attrs.push(`repeating_experience_${id}_experience_amount`);
             });
 
+            attrs.push(`experience_mod`);
+
             getAttrs(attrs, values => {
-                const int_values = Object.values(values).map(item => parseInt(item) || 0);
+                const int_values = Object.values(values).map(item => parseInt(item) || 0).filter(item => item > 0);
                 const total_xp = int_values.reduce((a,b) => a+b, 0);
 
                 setAttrs({total_xp: total_xp}, recalculateCurrentXP());
@@ -1825,7 +1839,7 @@ on(`change:repeating_careers:career_level_current`, eventInfo => wfrpModule.upda
 
 // EXPERIENCE CHANGES
 
-on(`change:repeating_experience`, eventInfo => wfrpModule.recalculateEarnedXP());
+on(`change:repeating_experience change:experience_mod`, eventInfo => wfrpModule.recalculateEarnedXP());
 
 on(`change:current_xp change:spent_xp change:total_xp`, eventInfo => wfrpModule.recalculateCurrentXP());
 
@@ -1873,7 +1887,7 @@ on(`change:strength_bonus change:toughness_bonus change:encumbrance_bonus change
 
 on(`change:strength_bonus change:toughness_bonus change:willpower_bonus change:wound_mod change:size`, eventInfo => wfrpModule.calculateMaxWounds());
 
-on(`change:strength_bonus change:toughness_bonus change:encumbrance_bonus`, eventInfo => wfrpModule.calculateMaxEncumbrance());
+on(`change:strength_bonus change:toughness_bonus change:encumbrance_mod`, eventInfo => wfrpModule.calculateMaxEncumbrance());
 
 on(`clicked:increment_advantage`, eventInfo => wfrpModule.incrementAdvantage());
 
