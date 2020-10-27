@@ -733,7 +733,7 @@ const wfrpModule = ( () => {
 
         const attrs = [];
 
-        wfrp.characteristics.forEach(characteristic => attrs.push(`${repeating_id}_career_${characteristic}_advances`))
+        wfrp.characteristics.forEach(characteristic => attrs.push(`${repeating_id}_career_${characteristic}_advances`));
 
         for (let i = 1; i <= 4; i++) {
             for (let j = 1; j <= 10; j++) {
@@ -757,22 +757,11 @@ const wfrpModule = ( () => {
             let total_skills_advances = skills_values.reduce((a,b) => a+b);
             let total_talents_advances = talents_values.reduce((a,b) => a+b);
 
-            const xp = [];
-
-            wfrp.characteristics.forEach(characteristic => xp.push(calculateCharacteristicXP(values[`${repeating_id}_career_${characteristic}_advances`])));
-
-            skills_values.forEach(skill => xp.push(calculateSkillXP(skill)));
-
-            talents_values.forEach(talent => xp.push(calculateTalentXP(talent)));
-
-            const total_xp = (xp.length > 0) ? xp.reduce((a,b) => a+b) : "" || "";
-
             const abs_total = total_skills_advances + total_talents_advances || "";
 
             const updateAttrs = {};
 
             updateAttrs[`${repeating_id}_career_advances`] = (abs_total > 0) ? abs_total : "";
-            updateAttrs[`${repeating_id}_career_xp`] = total_xp;
 
             setAttrs(updateAttrs, recalculateSpentXP());
         });
@@ -846,21 +835,99 @@ const wfrpModule = ( () => {
     }
 
     const recalculateSpentXP = () => {
-        const attrs = [];
 
-        getSectionIDs("careers", id_array => {
+        getSectionIDs(`repeating_careers`, ids => {
 
-            id_array.forEach(id => {
-                attrs.push(`repeating_careers_${id}_career_xp`);
-            });
+            const attrs = [];
 
+            for (const id of ids) {
+
+                for (const characteristic of wfrp.characteristics) {
+                    attrs.push(`repeating_careers_${id}_career_${characteristic}_advances`);
+                }
+
+                for (let i = 1; i <= 4; i++) {
+                    for (let j = 1; j <= 10; j++) {
+                        attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_name`); 
+                        attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_advances`); 
+                    }
+        
+                    for (let k = 1; k <= 5; k++) {
+                        attrs.push(`repeating_careers_${id}_career_talent_${i}_${k}_name`);
+                        attrs.push(`repeating_careers_${id}_career_talent_${i}_${k}_advances`);
+                    }
+                }
+            }
+            
             getAttrs(attrs, values => {
-                const int_values = Object.values(values).map(item => parseInt(item) || 0);
-                const total_xp = (int_values.length > 0) ? int_values.reduce((a,b) => a+b) : "" || "";
 
-                setAttrs({spent_xp: total_xp})
+                const characteristic_advances = new Map();
+                const skill_advances = new Map();
+                const talent_advances = new Map();
+
+                for (const id of ids) {
+    
+                    for (const characteristic of wfrp.characteristics) {
+                        const value = parseInt(values[`repeating_careers_${id}_career_${characteristic}_advances`]);
+
+                        if (value) {
+                            if (characteristic_advances.has(characteristic)) {
+                                const current = characteristic_advances.get(characteristic);
+                                const total = current + value;
+                                characteristic_advances.set(characteristic, total);
+                            } else {
+                                characteristic_advances.set(characteristic, value);
+                            }
+                        }
+                    }
+    
+                    for (let i = 1; i <= 4; i++) {
+                        for (let j = 1; j <= 10; j++) {
+                            const skill = values[`repeating_careers_${id}_career_skill_${i}_${j}_name`];
+                            const value = parseInt(values[`repeating_careers_${id}_career_skill_${i}_${j}_advances`]);
+                            if (value) {
+                                if (skill_advances.has(skill)) {
+                                    const current = skill_advances.get(skill);
+                                    const total = current + value;
+                                    skill_advances.set(skill, total);
+                                } else {
+                                    skill_advances.set(skill, value);
+                                }
+                            } 
+                        }
+            
+                        for (let k = 1; k <= 5; k++) {
+                            const talent = values[`repeating_careers_${id}_talent_skill_${i}_${k}_name`];
+                            const value = parseInt(values[`repeating_careers_${id}_career_talent_${i}_${k}_advances`]);
+                            if (value) {
+                                if (talent_advances.has(talent)) {
+                                    const current = talent_advances.get(skill);
+                                    const total = current + value;
+                                    talent_advances.set(skill, total);
+                                } else {
+                                    talent_advances.set(skill, value);
+                                }
+                            } 
+                        }
+                    }
+                }
+
+                let xp = 0;
+
+                characteristic_advances.forEach((value) => xp += calculateCharacteristicXP(value));
+                skill_advances.forEach((value) => xp += calculateSkillXP(value));
+                talent_advances.forEach((value) => xp += calculateTalentXP(value));
+
+                const updateAttrs = {};
+    
+                updateAttrs[`spent_xp`] = xp;
+    
+                setAttrs(updateAttrs, recalculateCurrentXP());
+
             });
+
         });
+
     }
 
     const recalculateEarnedXP = () => {
@@ -1062,12 +1129,14 @@ const wfrpModule = ( () => {
                     for (let j = 1; j <= 5; j++) {
                         attrs.push(`repeating_careers_${id}_career_talent_${i}_${j}_name`); 
                         attrs.push(`repeating_careers_${id}_career_talent_${i}_${j}_advances`); 
-                        if (index === 1) attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_init`); 
+                        if (index === 0) attrs.push(`repeating_careers_${id}_career_talent_${i}_${j}_init`); 
                     }
                 }
             });
     
             getAttrs(attrs, values => {
+                console.log(values)
+
                 const talent_list = Object.entries(values);
                 const names = talent_list.filter(([key, value]) => key.match(/name/g) && value !== "");
 
