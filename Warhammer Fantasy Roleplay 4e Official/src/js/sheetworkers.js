@@ -1004,12 +1004,14 @@ const wfrpModule = ( () => {
             const attrs = [];
 
             id_array.forEach(id => {
-                attrs.push(`repeating_careers_${id}_career_${characteristic}_advances`);   
+                attrs.push(`repeating_careers_${id}_career_${characteristic}_advances`); 
+                attrs.push(`repeating_careers_${id}_career_${characteristic}_init`);     
             });
 
             attrs.push(`${characteristic}_noncareer`);
 
             getAttrs(attrs, values => {
+                console.log(values)
                 const int_values = Object.values(values).map(item => parseInt(item) || 0);
                 const total_advances = int_values.reduce((a,b) => a+b);
 
@@ -1744,6 +1746,7 @@ const wfrpModule = ( () => {
         calculateTotalAdvances:calculateTotalAdvances,
         recalculateEarnedXP:recalculateEarnedXP,
         recalculateCurrentXP:recalculateCurrentXP,
+        recalculateSpentXP:recalculateSpentXP,
         calculateCharacteristicAdvances:calculateCharacteristicAdvances,
         calculateSkillAdvances:calculateSkillAdvances,
         calculateTalentAdvances:calculateTalentAdvances,
@@ -1871,12 +1874,14 @@ on(`change:repeating_careers:career_level_current`, eventInfo => wfrpModule.upda
 
 // EXPERIENCE CHANGES
 
-on(`change:repeating_experience change:experience_mod`, eventInfo => wfrpModule.recalculateEarnedXP());
+on(`change:repeating_experience change:experience_mod remove:repeating_experience`, eventInfo => wfrpModule.recalculateEarnedXP());
 
-on(`change:current_xp change:spent_xp change:total_xp`, eventInfo => wfrpModule.recalculateCurrentXP());
+on(`change:current_xp change:spent_xp change:total_xp remove:repeating_experience`, eventInfo => wfrpModule.recalculateCurrentXP());
+
+on(`change:repeating_experience change:spent_xp change:total_xp remove:repeating_experience`, eventInfo => wfrpModule.recalculateSpentXP());
 
 wfrpModule.wfrp.characteristics.forEach(characteristic => {
-    on(`change:repeating_careers:career_${characteristic}_advances`, eventInfo => wfrpModule.calculateCharacteristicAdvances(characteristic))
+    on(`change:repeating_careers:career_${characteristic}_advances change:repeating_careers:career_${characteristic}_init`, eventInfo => wfrpModule.calculateCharacteristicAdvances(characteristic))
 });
 
 [1,2,3,4].forEach(level => {
