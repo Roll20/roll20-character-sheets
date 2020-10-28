@@ -1,10 +1,25 @@
 ## Stargate RPG
-Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Full release: Aug 2020, Quickstart: February 2020)
+Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Quickstart/Beta Sheet: February 2020, GenCon Release: Aug 2020) created by Andreas J. [@anduh_](https://twitter.com/anduh_)
 
 
 ### Changelog
 
-**v.1.41**
+**v.1.50(2020-10-20)**
+* add Stargate Phoenix image to roll template
+* integrate ChatSetAttr commands to Short/Long Rest buttons<
+* added whisper toggle to Saves
+* added link to sheet wiki page inside the sheet (Button on settings page)
+
+**v.1.45(2020-10-13)**
+
+* add tooltip info to most rolls/attributes
+* add buttons for hit dice, tension dice, long rest
+* tracker for Eureka Points
+* update Custom dice examples, add 4th custom
+* tracker for some npc stats
+* minor typos
+
+**v.1.41(2020-10-04)**
 
 * Roll buttons & hover highlight made more distinct
 * roll templates updated, now mentions character name, works better for descriptions
