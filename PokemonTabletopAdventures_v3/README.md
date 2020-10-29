@@ -7,6 +7,17 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Oct 28, 2020
+- Extends the move roll template functionality to make it even easier for players and GMs to resolve attacks
+  - Correctly handles critical hits for high critical hit rate moves such as Slash and Karate Chop being based on the total of the accuracy check, rather than just the raw dice roll
+  - Indicates when moves such as Poison Sting and Thunder Punch should apply their secondary effects 
+- Adds fields to the move section of the character sheet to enable assignment of secondary effects of moves, and declaration of critical hit ranges based on the accuracy roll rather than the individual dice roll
+- Resolves an issue with the total damage bonus not updating when the move fields are changed
+- Resolves an issue with the special defense target text appearing on two lines with the default Roll20 spacing of the chat log
+  - Advice for future incarnations of this is to extend the chat log a little bit; it's hopefully not an issue anymore but only the Sith deal in absolutes...
+- Updates the total damage bonus field, and adds a similar accuracy field, to show the base roll information
+  - The raw total bonus can still be accessed with the correct attributes names
+
 ### Oct 22, 2020
 - Introduces roll templates to the character sheet
 - The skill-roll template is used for skill rolls by Trainer-type characters
