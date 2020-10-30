@@ -89,21 +89,25 @@ on("change:strength change:strength_fractional sheet:opened", function() {
   });
 });
 
-on("change:repeating_weapon:start_working1 sheet:opened", function() {
+
+on("change:repeating_weapon:start_working1", function() {
         getAttrs(["repeating_weapon_start_working1"], function(values) {
             const sw1 = int(values.repeating_weapon_start_working1);
+            let dsm = "0";
             console.log(sw1);
             if (sw1 <= 3) start_working= "1d8!p";
             else if (sw1 <=5) start_working= "1d10!p";
             else if (sw1 <=7) start_working= "1d12!p";
             else if (sw1 <=9) start_working= "1d20";
-            else start_working="1d20-4";
+            else {
+                start_working="1d20-4";
+                dsm = "0";}
         setAttrs({
-            repeating_weapon_start_working: start_working
+            repeating_weapon_start_working: start_working,
+            reapeating_weapon_dice_size_mod: dsm
         });
     });
 });
-
 
 on("change:repeating_rangedweapons:target_size change:repeating_rangedweapons:zero_range change:repeating_rangedweapons:four_range change:repeating_rangedweapons:six_range change:repeating_rangedweapons:adv_sighting change:repeating_rangedweapons:eight_range ", function() {
         getAttrs(["repeating_rangedweapons_target_size","repeating_rangedweapons_adv_sighting","repeating_rangedweapons_eight_range","repeating_rangedweapons_six_range","repeating_rangedweapons_zero_range","repeating_rangedweapons_four_range"], function(values) {
@@ -620,7 +624,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-16"><input type="number" name="attr_weapon_damage_mod_total" value="@{fatigue_damage}+@{weapon_misc_damage}+@{weapon_style_damage}+@{weapon_stat_bonus_damage}+@{weapon_spec_damage}+@{weapon_talent_damage}+@{weapon_magic_bonus}" disabled="disabled"/></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{atk_roll=[[1d20 +@{weapon_attack_mod_total}]]}}{{perf=[[19+@{weapon_attack_mod_total}]]}}'>ATK</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} hits!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_base_damage}+@{weapon_damage_mod_total}]]}}{{type= @{weapon_dmg_type}}}'>DMG</button></div>
-            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{start_working} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_dr}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}]]}}{{perf=[[19+@{weapon_defense_mod_total}+@{crit_value}]]}}'>DEF</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{start_working} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_def_switch}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}+@{dice_size_mod}]]}}{{perf=[[19+@{weapon_defense_mod_total}+@{crit_value}]]}}'>DEF</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} is blocked!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_shield_damage}+@{weapon_damage_mod_total}]]}}{{type= @{weapon_dmg_type}}}'>SHD</button></div>
             <div>
             <div class="sheet-col-1-8"><span>Hidden Details</span></div>
@@ -688,9 +692,9 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-8 sheet-vert-bottom">Base Speed</div>
             <div class="sheet-col-1-16"><input type="number" name="attr_base_weapon_speed"></div>
             <div class="sheet-col-1-8"><select name="attr_weapon_dmg_type">
-					<option value="Bludgeoning">Bludgeoning</option>
+					<option value="Bludgeoning"> Crushing</option>
 					<option value="Hacking"> Hacking </option>
-                    <option value="Piercing"> Piercing</option>
+                    <option value="Piercing"> Puncturing</option>
 				</select></div>
            
             <div class="sheet-col-1-8 sheet-vert-bottom">Talents</div>
@@ -777,6 +781,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-16">Defense Dice</div>
             <input type="hidden" name="attr_start_working" value="0" />
             <input type="hidden" name="attr_crit_value" value="0" />
+            <input type="hidden" name="attr_dice_size_mod" value="0" />
             <div class="sheet-col-2-16">               
                 <select name="attr_start_working1">
                     <option value="2">d8</option>
@@ -1106,7 +1111,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <button type="action" name="act_character" >Character Traits</button>
             <button type="action" name="act_spellstab" >Spells</button>
                 </div>
-                <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
+                <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='spellstab'  />
                 
                 <div class='sheet-fatigue'>
                   <h4>Fatigue</h4>
@@ -1232,7 +1237,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <fieldset class="repeating_spell">
-    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name}}} {{caster=@{character_name}}} {{level=@{spell_level}}} {{components=@{spell_components}}} {{speed=@{spell_speed}}} {{cost=@{spell_points}}}{{save= @{spell_save} }}{{details= @{spell_notes} }}'>CAST</button></div>
+    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name} }} {{caster=@{character_name} }} {{level=@{spell_level} }} {{cost=@{spell_points} }} {{components=@{spell_components} }} {{speed=@{spell_speed} }} {{Srange=@{spell_range} }} {{voe=@{spell_voe} }} {{duration= @{spell_duration} }} {{pointschedule=@{spell_pointschedule} }} {{save= @{spell_save} }} {{details= @{spell_notes} }}'>CAST</button></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_level"></div>
                     <div class="sheet-col-7-16"><input type="text" name="attr_spell_name"/></div>
                     <div class="sheet-col-1-6"><input type="text" name="attr_spell_components"/></div>
@@ -1243,6 +1248,12 @@ on("change:skill_dice_switch sheet:opened", function() {
                     <input type="checkbox" class="wombat-show arrow" name="attr_wombat_show" title="Show/Hide" value="1">
                     <span></span>
                     <div class="wombat">
+                    <div class="sheet-col-1-4">Range</div><div class="sheet-col-1-4"><input type="text" name="attr_spell_range"/></div>
+                    <div class="sheet-col-1-2"></div>
+                    <div class="sheet-col-1-4">Volume of Effect</div><div class="sheet-col-1-4"><input type="text" name="attr_spell_voe"/></div>
+                    <div class="sheet-col-1-2"></div>
+                    <div class="sheet-col-1-4">Duration</div><div class="sheet-col-1-4"><input type="text" name="attr_spell_duration"/></div>
+                    <div class="sheet-col-1-2"></div>
                     <div class="sheet-col-1-4">Spell Save</div>
                     <div class="sheet-col-1-4">
                         <select name="attr_spell_save">
@@ -1252,7 +1263,9 @@ on("change:skill_dice_switch sheet:opened", function() {
                             <option value="Mental vs [[1d20+@{level}]] ">Mental</option>
 				        </select>
 				    </div>
-                    <div class="sheet-col-1-2"></div>
+				    <div class="sheet-col-1-2"></div>
+				    <div class="sheet-col-1-4">Additional Spell Point Schedule</div>
+                    <div class="sheet-col-3-4"><textarea name="attr_spell_pointschedule"></textarea></div>
                     <div class="sheet-col-1-4">Spell Notes</div>
                     <div class="sheet-col-3-4"><textarea name="attr_spell_notes"></textarea></div>
                     </div>
@@ -1872,16 +1885,18 @@ on("change:skill_dice_switch sheet:opened", function() {
             <tr><td><span class="tcat">Damage Roll: </span>{{damage}}<img src="https://i.imgur.com/N8POrfv.png"></td></tr>
         {{/damage}}
 		{{#dr}}
-            <tr><td><span class="tcat">DR: </span>{{dr}}{{#sdr}} + {{sdr}}<img src="https://i.imgur.com/AYeAO4C.png">{{/sdr}}</td></tr>
+                <tr><td><span class="tcat">DR: </span>{{dr}}{{#sdr}} +  {{sdr}}<img src="https://i.imgur.com/AYeAO4C.png">{{/sdr}}</td></tr>
+
+            
         {{/dr}}
         
         {{#type}}
             <tr><td><span class="tcat">Type: </span>{{type}}</td></tr>
         {{/type}}
         
-        {{#allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf type}}
+        {{#allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf type }}
             <tr><td><span class="tcat">{{key}}: </span>{{value}}</td></tr>
-        {{/allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf type}}
+        {{/allprops() name weapon speed reach atk_roll def_roll damage dr sdr fatigue perf type }}
     </table>
 
 </rolltemplate>
@@ -1897,7 +1912,11 @@ on("change:skill_dice_switch sheet:opened", function() {
         {{#cost}}<tr><td><span class="tcat">Base SP Cost: </span>{{cost}}</td></tr>{{/cost}}
         {{#components}}<tr><td><span class="tcat">Components: </span>{{components}}</td></tr>{{/components}}
         {{#speed}}<tr><td><span class="tcat">Casting Time: </span>{{speed}}</td></tr>{{/speed}}
+        {{#range}}<tr><td><span class="tcat">Range: </span>{{range}}</td></tr>{{/range}}
+        {{#voe}}<tr><td><span class="tcat">Volume of Effect: </span>{{voe}}</td></tr>{{/voe}}
+        {{#duration}}<tr><td><span class="tcat">Duration: </span>{{duration}}</td></tr>{{/duration}}
         {{#save}}<tr><td><span class="tcat">Save: </span>{{save}}</td></tr>{{/save}}
+        {{#pointschedule}}<tr><td><span class="tcat">Additional Spell Points: </span>{{pointschedule}}</td></tr>{{/pointschedule}}
         {{#details}}<tr><td><span class="tcat">Details: </span>{{details}}</td></tr>{{/details}}
     </table>
 
