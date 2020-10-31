@@ -91,7 +91,7 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Added option to rename Apparel and Weapons blocks within the sheet
 * Added option to rename non-default skills within the sheet
 * Added four more custom skills for a total of six
-* Fixed incorrect unskilled modifier to track-rolls on the Extra Sheet
+* Fixed incorrect unskilled modifier in track-rolls on the Extra Sheet
 * Fixed custom button roll templates missing control attributes
 #### Version 1.2.6
 * Improved roll macros
