@@ -244,7 +244,8 @@ const skills = ['academics', 'athletics', 'battle', 'boating', 'common_knowledge
                 'repair', 'research', 'riding', 'science', 'shooting', 'stealth',
                 'survival', 'taunt', 'thievery', 'gambling', 'hacking', 'faith',
                 'focus', 'language', 'occult', 'psionics', 'spellcasting',
-                'weird_science', 'custom_skill_1', 'custom_skill_2', 'unskilled'];
+                'weird_science', 'custom_skill_1', 'custom_skill_2', 'custom_skill_3',
+                'custom_skill_4', 'custom_skill_5', 'custom_skill_6', 'unskilled'];
 
 const skillDice = ['d4-2', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
