@@ -42,6 +42,10 @@ on Github.
 
 ## Changelog
 
+### 2.5.3
+
+* Fix a bug causing the Magic "Quick Menu" to just completely not work.
+
 ### 2.5.2
 
 * Fix a bug preventing ship price from ever being calculated.
