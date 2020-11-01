@@ -128,7 +128,8 @@
 					<option data-i18n="dash" value="5">Ruée x5</option>
 				</select>
 			<label data-i18n="hitdice" style="width: 82px;">Dé de vie</label><input type="text" name='attr_des_vie' style="width: 52px;"><button type='roll' name='roll_testattack' value='&{template:custom} {{title=^{hitdice}}} {{^{result}=[[d@{des_vie}]]}}'></button>
-			<label data-i18n="developmentpoints" style="width: 82px;">Pts de Dév</label><input type="text" name='attr_pdev' value="(@{dev_constitution}+@{dev_agilite}+@{dev_autodiscipline}+@{dev_memoire}+@{dev_raisonnement})" disabled="true" style="width: 52px;">
+			<label data-i18n="developmentpoints" style="width: 82px;">Pts de Dév</label><input type="text" name='attr_pdevused' style="width: 52px;"> / <input type="text" name='attr_pdev' style="width: 52px;">
+			<label data-i18n="secundarydevelopmentpoints" style="width: 82px;">PdD Sec.</label><input type="text" name='attr_secpdevused' style="width: 52px;"> / <input type="text" name='attr_secpdev' style="width: 52px;">
 		</div>	
 	</div>
 </div>
@@ -303,19 +304,39 @@
 
 <div class='sheet-settings'>
 	
-	<label data-i18n="totalhpcalcmode" style="width: 200px;"/>Total HP calculation mode:</label>
+	<label data-i18n="totalhpcalcmode" style="width: 200px;"/>Total HP calculation mode</label>
 	<select name="attr_totalhpcalculation">
 		<option data-i18n="legacycalc" value="1" selected="selected">Legacy calculations</option>
 		<option data-i18n="nocalc" value="0">No calculations</option>
 	</select>
 	<p data-i18n="hpcalcdescription">Choose the Total HP calculation. In Legacy, the Total HP equals the Base HP + Base HP * (constitution bonus / 100). If you choose No Calculations, Total HP is not automatically calculated and you will need to enter the value manually. If you do that, you don't have to use the Base HP value.</p>
 
-	<label data-i18n="professionbonusmode" style="width: 200px;"/>Profession bonus mode:</label>
+	<label data-i18n="professionbonusmode" style="width: 200px;"/>Profession bonus mode</label>
 	<select name="attr_professionbonuscalcmode">
 		<option data-i18n="legacyprofbonus" value="0" selected="selected">Legacy profession bonus</option>
 		<option data-i18n="flatprofbonus" value="1">Flat profession bonus</option>
 	</select>
 	<p data-i18n="profbonusmodedescription">Choose the mode of professional bonus calculations. By the legacy rules, the professional bonus is multiplied by the character level. You can also choice the flat bonus option, in this case, the professional bonus don't scale with the caracter level.</p>
+	
+	<label data-i18n="skilldevmode" style="width: 200px;"/>Skill development mode</label>
+	<select name="attr_skilldevmode">
+		<option data-i18n="legacyskilldev" value="0" selected="selected">Legacy development points</option>
+		<option data-i18n="flatskilldev" value="1">Flat development points</option>
+	</select>
+	<p data-i18n="skilldevmodedescription">Choose the mode of development points acquisition. In legacy rules, development points are derived from the 5 first attributes and depend of the temporary score. You can choose a flat development points too and enter the desired development points manually.</p>
+
+	<label data-i18n="secondaryskilldevmode" style="width: 200px;"/>Secondary skill dev bonus</label>
+	<select name="attr_secondaryskilldevmode">
+		<option data-i18n="flatskilldev" value="0" selected="selected">Fixed development points</option>
+		<option data-i18n="10bonus" value="10" >10% bonus</option>
+		<option data-i18n="20bonus" value="20" >20% bonus</option>
+		<option data-i18n="25bonus" value="25" >25% bonus</option>
+		<option data-i18n="30bonus" value="30" >30% bonus</option>
+		<option data-i18n="40bonus" value="40" >40% bonus</option>
+		<option data-i18n="50bonus" value="50" >50% bonus</option>
+	</select>
+	<p data-i18n="secondaryskilldevmodedescription">Choose the secondary skill development bonus. You can choose a fixed bonus or a pourcentage of the primary development points. The pourcentage bonus work only correctly of you use the legacy development points mode on the above option.</p>
+
 </div>
 
 <!-- ##############################################
@@ -355,9 +376,9 @@
             });
         });
     });
-/* **************************************
-   *    EQUIPMENT WEIGHT CALCULATIONS   *
-   **************************************/
+/* *********************************************
+   *    REPEATING LIST TOTAL (WEITHT, DP...)   *
+   *********************************************/
 	const repeatingSum = (destinations, section, fields, ...extras) => {
     const isNumber = value => parseFloat(value).toString() === value.toString();
     const isOption = value => [...checks.valid, ...checks.roundtypes].includes(value);
@@ -415,13 +436,21 @@
         }); 
     }); 
 };
-		on('change:repeating_equipment:poids_equipment remove:repeating_equipment change:weighttotal', function() {
-		repeatingSum('weighttotal','equipment','poids_equipment','round:2');
+	on('change:repeating_equipment:poids_equipment remove:repeating_equipment change:weighttotal', function() {
+	repeatingSum('weighttotal','equipment','poids_equipment','round:2');
+	});
+	
+	on('change:repeating_skills:dev_skillname remove:repeating_skills change:pdevused', function() {
+	repeatingSum('pdevused','skills','dev_skillname');
+	});
+	
+	on('change:repeating_secondaryskills:dev_skillname remove:repeating_secondaryskills change:secpdevused', function() {
+	repeatingSum('secpdevused','secondaryskills','dev_skillname');
 	});
 
-// *************************
-// *    HP CALCULATIONS    *
-// *************************	
+/* *************************
+   *    HP CALCULATIONS    *
+   *************************/	
 	on('change:hp_base change:base_constitution change:race_constitution change:totalhpcalculation change:hp_max', () => {
 		getAttrs(['hp_base','base_constitution','race_constitution','totalhpcalculation'], values => {
 			const base = parseInt( values.hp_base) || 0;
@@ -439,9 +468,53 @@
 		});
 	});
 	
-// **********************************
-// *    PROFESSIONAL SKILL BONUS    *
-// **********************************
+/* ***************************
+   *   PRIMARY DEV POINTS    *
+   ***************************/	
+	on('change:dev_constitution change:dev_agilite change:dev_autodiscipline change:dev_memoire change:dev_raisonnement change:skilldevmode change:pdev', () => {
+		getAttrs(['dev_constitution','dev_agilite','dev_autodiscipline','dev_memoire','dev_raisonnement', 'skilldevmode'], values => {
+			const devco = parseInt( values.dev_constitution) || 0;
+			const devag = parseInt( values.dev_agilite) || 0;
+			const devad = parseInt( values.dev_autodiscipline) || 0;
+			const devme = parseInt( values.dev_memoire) || 0;
+			const devrs = parseInt( values.dev_raisonnement) || 0;
+			const devmode = parseInt( values.skilldevmode) || 0;
+			// check to see if calculation is on or off. If off, end the sheet worker.
+			if(devmode==1) return;
+			// calculate dev points
+			const devpts = devco+devag+devad+devme+devrs;
+			// update hp attribute on sheet.
+			setAttrs({
+				pdev: devpts
+			});
+		});
+	});
+	
+/* *****************************
+   *   SECONDARY DEV POINTS    *
+   *****************************/	
+	on('change:dev_constitution change:dev_agilite change:dev_autodiscipline change:dev_memoire change:dev_raisonnement change:secondaryskilldevmode change:secpdev', () => {
+		getAttrs(['dev_constitution','dev_agilite','dev_autodiscipline','dev_memoire','dev_raisonnement', 'secondaryskilldevmode'], values => {
+			const secdevco = parseInt( values.dev_constitution) || 0;
+			const secdevag = parseInt( values.dev_agilite) || 0;
+			const secdevad = parseInt( values.dev_autodiscipline) || 0;
+			const secdevme = parseInt( values.dev_memoire) || 0;
+			const secdevrs = parseInt( values.dev_raisonnement) || 0;
+			const secdevmode = parseInt( values.secondaryskilldevmode) || 0;
+			// check to see if calculation is on or off. If off, end the sheet worker.
+			if(secdevmode==0) return;
+			// calculate dev points
+			const secdevpts = Math.round((secdevco+secdevag+secdevad+secdevme+secdevrs) * secdevmode / 100);
+			// update hp attribute on sheet.
+			setAttrs({
+				secpdev: secdevpts
+			});
+		});
+	});
+	
+/* *****************************************
+  *    PROFESSIONAL PRIMARY SKILL BONUS    *
+  ******************************************/
 	on('change:repeating_skills:prof_skillname change:professionbonuscalcmode change:niveau', () => {
     getSectionIDs('repeating_skills', ids => {
         // get an array of names for the skillname attribute across all rows.
@@ -477,9 +550,9 @@
     });    
 });
 
-// **********************************
-// *    PROFESSIONAL SKILL BONUS    *
-// **********************************
+/* ********************************************
+   *    PROFESSIONAL SECONDARY SKILL BONUS    *
+   ********************************************/
 
 	on('change:repeating_secondaryskills:prof_skillname change:professionbonuscalcmode change:niveau', () => {
     getSectionIDs('repeating_secondaryskills', ids => {
