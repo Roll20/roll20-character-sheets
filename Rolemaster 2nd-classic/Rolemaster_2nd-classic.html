@@ -27,6 +27,13 @@
 
 <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab'  value='character'  />
 <input type='hidden' name='attr_totalhpcalculation' value='1'/>
+
+
+<!-- ##############################################
+     #                CHARACTER TAB               #
+     ############################################## -->
+
+
 <div class='sheet-character'>
 <span>
 <hr/>
@@ -156,6 +163,10 @@
 </div>
 </span>
 
+<!-- ##############################################
+     #               EQUIPMENT TAB                #
+     ############################################## -->
+
 <div class='sheet-equipment'>
 	<span>
 		<div class="2colrow" > 
@@ -184,6 +195,10 @@
 		</div>
 	</span>
 </div>
+
+<!-- ##############################################
+     #                   MAGIC TAB                #
+     ############################################## -->
 
 <div class='sheet-magic'>
 	<span>
@@ -273,6 +288,10 @@
 	</span>
 </div>
 
+<!-- ##############################################
+     #                 SETTINGS TAB               #
+     ############################################## -->
+
 <div class='sheet-settings'>
 	
 	<label data-i18n="totalhpcalcmode" style="width: 200px;"/>Total HP calculation mode:</label>
@@ -290,6 +309,10 @@
 	<p data-i18n="profbonusmodedescription">Placeholder</p>
 </div>
 
+<!-- ##############################################
+     #          ROLL TEMPLACE SECTION             #
+     ############################################## -->
+
 <rolltemplate class="sheet-rolltemplate-custom">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
@@ -306,10 +329,15 @@
   </div>
 </rolltemplate>
 
+<!-- ##############################################
+     #               SCRIPTS SECTION              #
+     ############################################## -->
+
+
 <script type="text/worker">
-// *******************************
-// *         TAB SYSTEM          *
-// *******************************
+/* *******************************
+   *         TAB SYSTEM          *
+   *******************************/
     const buttonlist = ["character","equipment","magic", "settings"];
     buttonlist.forEach(button => {
         on(`clicked:${button}`, function() {
@@ -318,9 +346,9 @@
             });
         });
     });
-// **************************************
-// *    EQUIPMENT WEIGHT CALCULATIONS   *
-// **************************************
+/* **************************************
+   *    EQUIPMENT WEIGHT CALCULATIONS   *
+   **************************************/
 	const repeatingSum = (destinations, section, fields, ...extras) => {
     const isNumber = value => parseFloat(value).toString() === value.toString();
     const isOption = value => [...checks.valid, ...checks.roundtypes].includes(value);
@@ -381,7 +409,10 @@
 		on('change:repeating_equipment:poids_equipment remove:repeating_equipment change:weighttotal', function() {
 		repeatingSum('weighttotal','equipment','poids_equipment','round:2');
 	});
-	
+
+// *************************
+// *    HP CALCULATIONS    *
+// *************************	
 	on('change:hp_base change:base_constitution change:race_constitution change:totalhpcalculation change:hp_max', () => {
 		getAttrs(['hp_base','base_constitution','race_constitution','totalhpcalculation'], values => {
 			const base = parseInt( values.hp_base) || 0;
@@ -399,7 +430,9 @@
 		});
 	});
 	
-	
+// **********************************
+// *    PROFESSIONAL SKILL BONUS    *
+// **********************************
 	on('change:repeating_skills:prof_skillname change:professionbonuscalcmode change:niveau', () => {
     getSectionIDs('repeating_skills', ids => {
         // get an array of names for the skillname attribute across all rows.
@@ -434,6 +467,10 @@
         });
     });    
 });
+
+// **********************************
+// *    PROFESSIONAL SKILL BONUS    *
+// **********************************
 
 	on('change:repeating_secondaryskills:prof_skillname change:professionbonuscalcmode change:niveau', () => {
     getSectionIDs('repeating_secondaryskills', ids => {
