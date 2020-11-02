@@ -7,12 +7,21 @@ This sheet is designed for use with the Burning Wheel system written by Luke Cra
 
 # Change log
 
-## v2.2 (2020-11-03)
+### v2.2.1 (2020-11-03)
+Early bug fixes by Seraaron (147454).
 
+* Users in the public test of the preview build reported browser incompatibility issues with Chrome. Specifically, the difficulty tracker buttons for stats and wounds couldn't be selected properly. In the process of fixing this bug, it was required to fit most stats and attributes into <div>s, and generally beautify the HTML code and CSS to be more legible (many long sections of code were written on one line which looked horrible) (this is also the main reason that the number of lines of code in this PR basically just doubled)
+* Fixed a styling issue where columns would wrap onto themselves and look very bad at certain browser zoom levels.
+* Put test trackers in separate boxes, and a few other things for a prettier general aesthetic.
+* Added some non-proprietary fonts to the stack for better Mac and Linux support. The new default font is an open-license font called 'Crimson Pro' by Jacques Le Bailly, which fits in with the style and theme of BW quite nicely. But there are plenty of fallback fonts now too.
+* Changed page tab style to newer sheet-worker format, as recommended in the Roll20 CSS Wizardry wiki
+* Fixed background image stretching on long page tabs by splitting it into a top, middle, and bottom segment, where the middle repeats until it reaches the bottom.
+* Corrected an implementation of the 'Being Learned' autocalc that would use the average Aptitude as your skill total, rather than the first chosen Root (see BWG pg 49). And also made tax affect these rolls.
+* User request fulfilled: Added option to make every stat and attribute taxable to support more homebrew mechanics
+
+## v2.2 (public test / preview build)
 Tweaked design and code by Seraaron (147454).
 
-* Added some non-proprietary fonts to the stack for better Mac and Linux support
-* Fitted stats and attributes into <div>s for broader browser compatibitly
 * Added dropdown menu in the wound tolerance scale that can actually go grey or white
 * Improved injury tracking with automated segments
 * Added a dropdown menu in the Combat tab to remind players how 'Shrugging it Off' works
@@ -45,7 +54,7 @@ Tweaked design and code by Seraaron (147454).
 * Adjusted Character Burner section to make transferral of skills and traits easier
 * User request fulfilled: Added Age-Table support for Great Spiders (from the old Monster Burner) and the Kerrn and Kukhadish (from Burning Empires)
 
-### Minor Breaking changes
+### Minor Breaking changes in v2.2
 The following changes affect current sheet users, but the impact will be minimal, because all of these changes only alter single values that are easily looked up again and replaced:
 
 * Changed the checkboxes on Beliefs and Instincts into number inputs for better long-term tracking
@@ -90,6 +99,6 @@ Update designed by Jordan W. (806426) and coded by Natha (75857).
 * New "Tough" (trait) checkbox to round up when factoring Mortal Wound
 * Roll with Resources 0 is now possible
 
-## v1.0 - v1.x
+## v1.0 - v1.9
 
 Sheet created by Steve K.(5047).
