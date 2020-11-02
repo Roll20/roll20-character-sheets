@@ -24,7 +24,7 @@ Enjoy!
 ### v2.2.1 (2020-11-03)
 Early bug fixes by Seraaron (147454).
 
-* Users in the public test of the preview build reported browser incompatibility issues with Chrome. Specifically, the difficulty tracker buttons for stats and wounds couldn't be selected properly. In the process of fixing this bug, it was required to fit most stats and attributes into <div>s, and generally beautify the HTML code and CSS to be more legible (many long sections of code were written on one line which looked horrible) (this is also the main reason that the number of lines of code in this PR basically just doubled)
+* Users in the public test of the preview build reported browser incompatibility issues with Chrome. Specifically, the difficulty tracker buttons for stats and wounds couldn't be selected properly. In the process of fixing this bug, it was required to fit most stats and attributes into `<div>` elements, and generally beautify the HTML code and CSS to be more legible (many long sections of code were written on one line which looked horrible) (this is also the main reason that the number of lines of code in this PR basically just doubled)
 * Fixed a styling issue where columns would wrap onto themselves and look very bad at certain browser zoom levels.
 * Put test trackers in separate boxes, and a few other things for a prettier general aesthetic.
 * Added some non-proprietary fonts to the stack for better Mac and Linux support. The new default font is an open-license font called 'Crimson Pro' by Jacques Le Bailly, which fits in with the style and theme of BW quite nicely. But there are plenty of fallback fonts now too.
