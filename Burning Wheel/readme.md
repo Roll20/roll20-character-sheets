@@ -1,6 +1,20 @@
 # Burning Wheel
 
-This sheet is designed for use with the Burning Wheel system written by Luke Crane and produced with permission for use on Roll20. Much of the Character Burner process has been enhanced with auto calculating values and many of the final results translate to the rest of the sheet. Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Stats/Skills/Attributes names in order to make use of the roll template. In the roll query you'll be asked for a Modifier which represents dice that affect the comparison to Obs, Artha (such as Persona or Deeds dice) that add to the roll but don't compare to the Obs, and the base Obs. Wound dice and Obs penalties from wounds are automatically calculated from the Combat tab into rolls that are affected by wound penatlies. The checkbox to the right of an exponent mark the roll as Open Ended and will cause the text in the roll template to turn gold. Enjoy!
+This sheet is designed for use with the Burning Wheel system written by Luke Crane and produced with permission for use on Roll20. Much of the Character Burner process has been enhanced with auto calculating values and many of the final results translate to the rest of the sheet.
+
+Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Stats/Skills/Attributes names in order to make use of the roll template. In the roll query you'll be asked for a Modifier which represents dice that affect the comparison to Obs, Artha (such as Persona or Deeds dice) that add to the roll but don't compare to the Obs, and the base Obs.
+
+Wound dice and Obs penalties from wounds are automatically calculated from the Combat tab into rolls that are affected by wound penatlies. The hidden 'star ✦ symbol' to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode. 
+
+To the far right of each skill is a hidden 'mod ⌘ symbol' which will turn that skill instead a group separator instead. 
+
+There is also now a Magic tab to put your spells in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also. 
+
+For the best user experience we reccomend that you install the two open-license fonts [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) and [Open Sans](https://fonts.google.com/specimen/Open+Sans).
+
+Please direct major issues, suggestions, or complains to user [Seraaron](https://github.com/Seraaron/roll20-character-sheets/issues) on GitHub.
+
+Enjoy!
 
 ## Preview v2.2.1
 ![Screenshot](https://raw.githubusercontent.com/Seraaron/roll20-character-sheets/master/Burning%20Wheel/Burning%20Wheel.png)
