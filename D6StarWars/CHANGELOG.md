@@ -1,3 +1,8 @@
+### Version 2.31 (2020-10-03):
+- removed broken logo at top
+- revamp of starship section
+- add new roll templates, used in ship weapon damage rolls
+
 ### Version 2.16 (2020-05-13):
 
 - add roll button names to attrs/skills
