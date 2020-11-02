@@ -11,9 +11,13 @@ Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règl
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-4.00 [Screenshot](co_v3.jpg)
+4.02 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v4.02 (2020-10-28)
+* Ajout de l'équipement pour les PNJs
+* Attributs plus fins pour les richesses
+
 ## v4.00 (2020-10-14)
 * Support des règles des Terres d'Arran
 * Ajout d'une ligne d'effets pour les consommables
