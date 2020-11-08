@@ -63,8 +63,10 @@ https://discord.gg/F24Ka8E
 
 
 ## To-Do:
+Things we want to add to the character sheet, presented in no particular order of priority.
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
 - [x] ~~Display the full bonus to skill checks~~
-- [ ] Allow modifications to movement (maybe just an extra box)
-- [ ] Handle temp stat changes somehow, this may be a lot of work
 - [ ] Add a Settings page
+- [ ] Allow formula calculations for the extra damage fields
+- [ ] Allow modifications to movement (maybe just an extra box)
+- [ ] Handle temporary stat changes somehow, this may be a lot of work
