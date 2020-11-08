@@ -3,6 +3,17 @@ Official Character Sheet
 
 # Changelog
 
+## V.1.75 (2020-10-20)
+* fix duplicate page number on Ability 3
+* add `&{template:hsd2}` roll template to sheet. Syntax: `&{template:hsd2} {{title=big title}} {{subtitle=optional subtitle}} {{color=white}} {{normal=section like default roll template}} {{rollexample =[[2d10+2]] }} {{desc=wide section better suited for descriptions. color section is optional, defaults to grey. Other color options are white, black, red}}`
+* add initiative button
+* update page names
+* update sheet desciption
+
+## V.1.70 (2020-05-27)
+* add Default sheet settings for `EXP`, `credits` and number of `techniques`
+* updated `sheet.json`'s "instructions"
+
 ## V.1.61 (2019-11-26)
 * Small bugfix for a unresponsive checkbox(Mind Stat "2 Profs") in Exp Table
 * change Battlescore default to zero from previous arbitrary "20"
