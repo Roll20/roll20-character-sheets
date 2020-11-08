@@ -6,6 +6,7 @@
     Emberind is made by Nomnivore Games
     <br />
     <a href="https://www.emberwindgame.com/"><strong>Emberwind »</strong></a>
+    <img src="https://raw.githubusercontent.com/lexibrown/roll20-character-sheets/master/Emberwind/emberwind.png" alt="Character Sheet">
     <br />
   </p>
 </p>
