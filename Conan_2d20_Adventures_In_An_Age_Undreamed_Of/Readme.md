@@ -1,5 +1,13 @@
-readme markdown: https://www.markdownguide.org/cheat-sheet/
+# Conan Adventures In An Age Undreamed Of
+---
+Character sheet for the 2D20 version of the game by Modiphius.  
 
-sheet versioning: https://wiki.roll20.net/Sheet_Author_Tips#Sheet_Versioning
+(https://www.modiphius.net/collections/conan)
 
-https://wiki.roll20.net/Sheet_Author_Tips
+Sheet construction and coding by Eric Carmody. Original art work by Robert Waker.
+
+# Release Notes
+---
+
+### v1.0 (2020-11-08)
+First release.

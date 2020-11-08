@@ -631,9 +631,14 @@
                 </fieldset>
                 <div class="field-border-wide belongings-totals">
                     <div>Total Worth: <span name="attr_total_worth">0</span></div>
-                    <div>Total Encumberance: <span name="attr_total_encumberance">0</span>
+                    <div class="encumbrance-group">Total Encumberance:
+                        <span name="attr_total_encumberance">0</span>
                         <input type="checkbox" style="display: none;" class="sheet-checkbox-encumbered" name="attr_checkbox-encumbered"/>
-                        <img class="belongings-encumbered" src="">
+                        <img class="sheet-belongings-encumbered" src="https://raw.githubusercontent.com/Riccarr/roll20-character-sheets/master/Conan_2d20_Adventures_In_An_Age_Undreamed_Of/img/heavy-icon.jpg">
+                        <div class="sheet-encumbered-tip">
+                            <h3>You are encumbered!</h3>
+                            <span>Your encumbrance limit is your Brawn x 2</span>
+                        </div>
                     </div> 
                 </div>
         </div>
@@ -1406,12 +1411,12 @@
             <input type="checkbox" style="display: none;" class="sheet-checkbox-scroll-close-info" name="attr_checkbox-scroll-close-info"/>
             <div class="scroll-sheet-header">
                 <div style="padding-top: 25px;">
-                    <span>Help & Information</span>                
+                    <span class="infoheader">Help & Information</span>                
                     <button type="action" name="act_closescroll-info" class="sheet-button-scroll-close-info"></button>
                 </div>
             </div>
             <div class="scroll-sheet-info-body">
-                <h1>Welcome to the Conan Adventures in an Age Undreamed of roll20 character sheet!</h1> 
+                <h1>Welcome to the Conan Adventures In An Age Undreamed Of roll20 character sheet!</h1> 
                 <br>
                 <h2>Keyboard Shortcuts</h2>
                 <p>Please note these keyboard shortcuts. On Windows these shortcuts will typically be <span>ALT+key</span> or else <span>ALT+SHIFT+key</span>.  
@@ -1424,7 +1429,7 @@
                 The Log button can be seen in the top left of the character sheet, shown as a scroll image. The button for this help/info can be seen in the upper right
                 of the character sheet, shown as round shield with an "i" character in it.  The XP button can be seen beside the "XP Total/Spent/Avail" label in
                 the character details section.
-                <br>
+                <br><br>
                 <h2>Attributes & Skills</h2>
                 <ul>
                     <li><span>Base Attribute Roll</span> - The yellow die beside the attribute is used to roll an unmodified attribute skill test.</li>
@@ -1469,6 +1474,12 @@
                     <li><span>Upkeep</span> - Enter a value (in gold) that represents your current Carousing/Upkeep cost. Whenever required during gameplay,
                     click the <span>Spend</span> button and the GOLD value will automtically be reduce.  Also, a <span>Log</span> entry will automatically
                     be created.</li>
+                    <li><span>Bulk/Container Notation</span> - The concept of having a bag, backpack, chest, bank, etc, can be implemented by specifying an appropriate
+                        <span>Location</span> identifier, such as "Backpack" and then listing all the objects in that container in the <span>Description</span> field.
+                        It should be noted that if the container is carried on the person then the <span>Weight</span> field should have an approximate value of 
+                        the weight sum of all objects in that container. Furthermore, if a total value was to be tracked for the contents of the container, then
+                        describe the value beside each item in the Description and sum those values into the <span>Value</span> field.
+                    </li>
                 </ul>
                 <h2>Adventure Log</h2>
                 The Adventure Log is the place to capture and track all the game activites that the player wishes to keep for historic and story enhancing
@@ -1754,13 +1765,11 @@
                         total += parseInt(value.GoldTotal)||0;
                     t[destination] = total;
                     if (destination == 'total_encumberance') {
-                        console.log("Checking encumbrance " + total + " against brawn:" + value.Brawn);
-                        if (total > (value.Brawn * 2))
+                        if (total > ((parseInt(value.Brawn)||0) * 2))
                             t['checkbox-encumbered'] = 'on';
                         else
                             t['checkbox-encumbered'] = 'off';                    
                     }
-                    console.log("Setting to:" + t['checkbox-encumbered']);
                     setAttrs(t);
                 });
             });
@@ -1958,18 +1967,21 @@
 
     on('clicked:spend_upkeep', function(){ 
         getAttrs(['GoldTotal', 'GoldUpkeep'], function(values) {
-            var attrs = {};
-            var remainingGold = (parseInt(values['GoldTotal'])||0) - (parseInt(values['GoldUpkeep'])||0);
-            //remainingGold = remainingGold < 0? 0:remainingGold;   //allow to go into negative as debt?
-            attrs['GoldTotal'] = remainingGold;
-            var newrowid = generateRowID();
-            attrs['repeating_lognotes_' + newrowid + '_logdate'] = getFormattedDate();
-            attrs['repeating_lognotes_' + newrowid + '_logtitle'] = 'Carousing';
-            attrs['repeating_lognotes_' + newrowid + '_lognote'] = '* ' + getFormattedDate() + ' ' + 
-                                                                         getFormattedTime() + ' Carousing spend: ' + 
-                                                                         values['GoldUpkeep'];
-            setAttrs(attrs);
-            });
+            if ((parseInt(values['GoldUpkeep'])||0) > 0) {
+                var attrs = {};
+                var remainingGold = (parseInt(values['GoldTotal'])||0) - (parseInt(values['GoldUpkeep'])||0);
+                //remainingGold = remainingGold < 0? 0:remainingGold;   //allow to go into negative as debt?
+                attrs['GoldTotal'] = remainingGold;
+                //add entry to the log
+                var newrowid = generateRowID();
+                attrs['repeating_lognotes_' + newrowid + '_logdate'] = getFormattedDate();
+                attrs['repeating_lognotes_' + newrowid + '_logtitle'] = 'Carousing';
+                attrs['repeating_lognotes_' + newrowid + '_lognote'] = '* ' + getFormattedDate() + ' ' + 
+                                                                            getFormattedTime() + ' Carousing spend: ' + 
+                                                                            values['GoldUpkeep'];
+                setAttrs(attrs);
+            }
+        });
     });
 
     on('clicked:openlog clicked:closescroll-log', function(eventInfo) {
