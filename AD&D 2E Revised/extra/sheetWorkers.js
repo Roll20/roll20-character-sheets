@@ -639,7 +639,7 @@ setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spell
 // --- End setup Granted Powers --- //
 
 // --- Start setup Rogue skills total --- //
-let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'db', 'cw', 'rl', 'ib'];
+let rogueStandardSkills = ['pp', 'ol', 'rt', 'ms', 'hs', 'dn', 'cw', 'rl', 'ib'];
 let rogueStandardColumns = ['b', 'r', 'd', 'k', 'm', 'l'];
 rogueStandardSkills.forEach(skill => {
     setupCalculateTotal(`${skill}t`, rogueStandardColumns.map(column => `${skill}${column}`));
