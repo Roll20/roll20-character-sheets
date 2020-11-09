@@ -47,7 +47,8 @@ include src/pug/_objects.pug
 			label.row(data-i18n-title='enter npc description' title='enter npc description')
 				textarea(name='attr_npc_description' placeholder='description')
 			each val, key in statsObject
-				- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+				//without modifiers - const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}} {{stat=[[@{${key+'_score'}}]]}} {{score=[[@{${key}}]]}}`;
+				- const statRollValue = `@{gm_toggle} &{template:stats} {{header=^{${key}}}} {{subheader=@{${key}}}} {{dice=[[1d100]]}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{stat=[[@{${key+'_score'}}+round(?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}})]]}} {{score=[[@{${key}}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}`;
 				button(name=key data-i18n-title=key + ' roll' title=key + ' roll' type='roll' value!=statRollValue)
 					h1.align-left(data-i18n=val)=val
 				if (val === 'POW' || val === 'STR' || val === 'CON' )
@@ -72,21 +73,43 @@ include src/pug/_objects.pug
 				span.center(name='attr_willpower_points_max' title='@{' + key + '}')
 				span.slash /
 				input.text-align-left.short(data-i18n-placeholder='-' style='width:50%' name='attr_willpower_points' placeholder='-' title='@{willpower_points}' type='number' value='')
+			h1(data-i18n='SAN') SAN
+			label(data-i18n-title='enter sanity points' title='enter sanity points')
+				span.center(name='attr_sanity_points_max' title='@{' + key + '}')
+				span.slash /
+				input.text-align-left.short(data-i18n-placeholder='-' style='width:50%' name='attr_sanity_points' placeholder='-' title='@{willpower_points}' type='number' value='')
+			h1(data-i18n='BP') BP
+			label(data-i18n-title='enter breaking points' title='enter breaking point')
+				span.center(name='attr_breaking_point_max' title='@{' + key + '}')
+				span.slash /
+				input.text-align-left.short(data-i18n-placeholder='-' style='width:50%' name='attr_breaking_point' placeholder='-' title='@{willpower_points}' type='number' value='')
 			.grid.section.sanloss
-				- const statRollValue = `@{gm_toggle} &{template:sanloss} {{type=^{@{san_type}}}} {{success=@{san_success}}}  {{failure=@{san_failure}}} {{roll1=[[@{san_success}]]}} {{roll2=[[@{san_failure}]]}}  {{hasminsan=[[@{has_san_success}]]}} {{hasmaxsan=[[@{has_san_failure}]]}}`;
-				button(name='san loss roll' data-i18n-title='san loss roll' title='san loss roll' type='roll' value!=statRollValue)
-					h1(data-i18n='SAN LOSS') SAN LOSS
+				input.switchblock.none( name='attr_whatsanroll'  title='@{target_san_loss}' type='checkbox' value='target') 
+				span.switch-a
+					- const statRollValue = `@{gm_toggle} &{template:sanloss} {{type=^{@{san_type}}}} {{success=@{san_success}}}  {{failure=@{san_failure}}} {{roll1=[[@{san_success}]]}} {{roll2=[[@{san_failure}]]}}  {{hasminsan=[[@{has_san_success}]]}} {{hasmaxsan=[[@{has_san_failure}]]}}`;
+					button(name='san loss roll' data-i18n-title='san loss roll' title='san loss roll' type='roll' value!=statRollValue)
+						h1(data-i18n='SAN LOSS') SAN LOSS
+				span.switch-b
+					//without modifiers - const statRollValue2 = `@{gm_toggle} &{template:sanloss1} {{minloss=@{minsanloss}}} {{maxloss=@{maxsanloss}}} {{name=@{target|name} }} {{dice=[[1d100]]}} {{subheader=@{target|sanity_points}}} {{rating=[[@{target|sanity_points}]]}} {{type=^{@{san_type}}}} {{success=@{san_success}}}  {{failure=@{san_failure}}} {{rsuccess=[@{san_success}](~rsuccess)}} {{rfailure=[@{san_failure}](~rfailure)}}  {{hasminsan=[[@{has_san_success}]]}} {{hasmaxsan=[[@{has_san_failure}]]}}`;
+					- const statRollValue2 = `@{gm_toggle} &{template:sanloss1} {{minloss=@{minsanloss}}} {{maxloss=@{maxsanloss}}} {{name=@{target|name} }} {{dice=[[1d100]]}} {{subheader=@{target|sanity_points}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{target|sanity_points}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{type=^{@{san_type}}}} {{success=@{san_success}}}  {{failure=@{san_failure}}} {{rsuccess=[@{san_success}](~rsuccess)}} {{rfailure=[@{san_failure}](~rfailure)}}  {{hasminsan=[[@{has_san_success}]]}} {{hasmaxsan=[[@{has_san_failure}]]}}`;
+					button(name='san loss roll' data-i18n-title='san loss roll' title='san loss roll' type='roll' value!=statRollValue2)
+						h1(data-i18n='SAN LOSS') SAN LOSS
+					button.none(name='roll_rsuccess' type='roll' value='@{gm_toggle} &{template:damage} {{header=Success}} {{subheader=@{san_success}}} {{damage=[[@{san_success}+0]]}} ')
+					button.none(name='roll_rfailure' type='roll' value='@{gm_toggle} &{template:damage} {{header=Failure}} {{subheader=@{san_failure}}} {{damage=[[@{san_failure}+0]]}} ')
 				input.text-align-left(data-i18n-placeholder='0' name='attr_san_success' placeholder='0' title='@{san_success}' type='text' value='0') 
 				input.text-align-left(name='attr_has_san_success'  type='hidden' value='1') 
 				span.slash /
 				input.text-align-left(data-i18n-placeholder='1' name='attr_san_failure' placeholder='1' title='@{san_failure}' type='text' value='1')
 				input.text-align-left(name='attr_has_san_failure'  type='hidden' value='1') 
+				input(name='attr_minsanloss' type='hidden' value='0')
+				input(name='attr_maxsanloss' type='hidden' value='1')
 				select(name='attr_san_type')
 					optgroup(label='Sanity Type')
 						option(data-i18n='unnatural' value='unnatural') unnatural
 						option(data-i18n='violence' value='violence') violence
 						option(data-i18n='helplessness' value='helplessness') helplessness
-				
+				input.center( name='attr_whatsanroll'  title='@{target_san_loss}' type='checkbox' value='target') 
+				span.slash Target the selected token
 			h1(data-i18n='armor') ARMOR
 			label(data-i18n-title='enter armor text' title='enter armor text')
 				input(data-i18n-placeholder='8 points of thick hide' name='attr_armor' placeholder='8 points of thick hide' title='@{armor}' type='text' value='')
@@ -99,7 +122,8 @@ include src/pug/_objects.pug
 					h2(data-i18n='roll') roll
 				fieldset.repeating_skills
 					.grid.section-skills.border-bottom
-						- const npcSkillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
+						//without modifiers - const npcSkillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}} {{rating=[[@{rank}]]}} {{dice=[[1d100]]}}`;
+						- const npcSkillRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}}} {{subheader=@{rank}}}  {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}}  {{rating=[[@{rank}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}}`;
 						label(data-i18n-title='skill name' title='skill name')
 							input.center(data-i18n-placeholder='skill name' name='attr_name' placeholder='skill name' title='@{repeating_skills_${x}_name}' type='text' value='')
 						label(data-i18n-title='skill rank' title='skill rank')
@@ -119,8 +143,8 @@ include src/pug/_objects.pug
 					h2(data-i18n='roll') roll
 				fieldset.repeating_weapons
 					.grid.section-weapons.border-bottom
-						//- const attackRollValue = `@{gm_toggle} &{template:rolls} {{header=@{name}+'|'+@{weapons}}} {{subheader=@{skill_percent}}} {{dice=[[1d100]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}`; 
-						- const attackRollValue = `@{gm_toggle} &{template:rolls} {{name=@{name}}} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+						//without modifiers- const attackRollValue = `@{gm_toggle} &{template:rolls} {{name=@{name}}} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{rating=[[@{skill_percent}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
+						- const attackRollValue = `@{gm_toggle} &{template:rolls} {{name=@{name}}} {{header=@{weapons}}} {{subheader=@{skill_percent}}} {{modifier=[[?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{rating=[[@{skill_percent}+?{Modifier|,0|+20%,20|+40%,40|-20%,-20|-40%,-40|custom (%),?{custom (%)}}]]}} {{dice=[[1d100]]}} {{hasdamage=[[@{hasdamage}]]}} {{damage=^{damage} [@{damage}](~repeating_weapons_damage)}}  {{damage_critical=^{damage (×2)} [@{damage}](~repeating_weapons_damage_critical)}} {{haslethality=[[@{haslethality}]]}} {{lethality=^{lethality} [@{lethality_percent}%](~repeating_weapons_lethality)}} {{lethality_critical=^{lethality (×2)} [@{lethality_percent}%](~repeating_weapons_lethality_critical)}} {{AP=[[@{armor_piercing}+0]]}}`; 
 						each attack in attackAttrs
 							- const attrName = attack.replace(' ', '_').replace('%', 'percent')
 							- const type = attack.includes('%') || attack === 'ammo' ? 'number' : 'text';

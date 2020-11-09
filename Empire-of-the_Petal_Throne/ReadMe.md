@@ -2,9 +2,24 @@
 Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR in 1975.
 
 ## Current Version
-1.2
+1.4
 
 ### Change log
+
+#### 1.4
+* Fixed validation checking for Talent scores
+* Added Bonus Spells as check lists
+* Added spell slots for checked spells in Professional skills
+* Added Languages in Professional skills
+* Added Deities
+* Added Checks (e.g., Find secret doors, detect traps, chance of spell working) with Roll Buttons
+* Show/Hide Bonus Spells depending on which Groups are usable based on Talents
+* More Sheet Workers to automate much of the above
+* Property area now includes +/- for Armour, Weight capacity for bags and auto-calculates encumbrance
+
+#### 1.3
+* Fixed double quote issue in Rope making skill
+* Fixed error in Intelligence stats
 
 #### 1.2
 * Fixed hiding background for select input in Safari and Chrome
@@ -41,17 +56,12 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Sheet creation for Roll20
 
 #### Todo List
-* Add spell slots for checked spells in Professional skills
-* Add space for Languages in Professional skills with a multi-select
 * Add items list from original sheet
 * Add attack Roll Buttons
 * Add Sheet Defaults for GM to pick which alignments to use
-* Add Sheet Defaults for GM to pick if players see Savings Throws
-* Add Sheet Defaults for GM to pick if players see Attack Rolls
-* Add Sheet Defaults for GM to limit race to human
+* Add Sheet Defaults for GM to pick if players see Savings Throws, Attack Rolls and Checks
 * Add Sheet Defaults for GM to set starting coin
 * Add Sheet Defaults for GM to set lists or checkboxes and which style for property (if I replicate the original)
-* Add option for "other" profession
 
 ### Feedback
 If you have any problems, suggestions or features you'd like to see added to the sheet, please let me know either by  sending me a private message via roll20.  Please be patient when waiting for a reply.
