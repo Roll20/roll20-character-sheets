@@ -1,6 +1,12 @@
 # Get the folder names from the list of files in the latest commit
-last_commit=$(curl -Ss -u "${CIRCLECI_CHARSHEETS_API_KEY}:" "https://circleci.com/api/v1.1/project/github/Roll20/roll20-character-sheets?filter=completed&limit=1" | jq -r '.[0]["vcs_revision"]')
+last_commit=$(cat circleci-workspace/persist/last-commit)
+echo "LAST COMMIT: ${last_commit}"
 changed_files="$(git diff-tree --pretty="" -r --name-only ${last_commit} HEAD)"
+echo "LAST COMMIT"
+echo ">> ${last_commit}"
+echo "CHANGED FILES"
+echo ">> ${changed_files}"
+
 folders=()
 folder_regex='(^.*?)\/'
 IFS=$'\n'

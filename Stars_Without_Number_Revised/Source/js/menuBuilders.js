@@ -93,7 +93,7 @@ const buildMagicMenu = () => {
     getSectionIDs("repeating_spells", spellIDs => {
         getSectionIDs("repeating_magic-skills", skillIDs => {
             const sourceAttrs = [
-                "skill_magic", "skill_magic2", "skill_magic2_name",
+                "skill_know_magic", "skill_use_magic", "skill_sunblade_magic", "skill_fight", "skill_magic2", "skill_magic2_name",
                 "setting_super_type", "macro_magic",
                 ...skillIDs.map(id => `repeating_magic-skills_${id}_skill_name`),
                 ...skillIDs.map(id => `repeating_magic-skills_${id}_skill`),
@@ -102,7 +102,7 @@ const buildMagicMenu = () => {
             getAttrs(sourceAttrs, v => {
                 if (v.setting_super_type === "psionics" || v.setting_super_type === "neither") return;
                 const macro_magic = `${[
-                    ...(v.skill_magic2_name ? ["magic", "magic2"] : ["magic"]).map(skillToMacro(v)),
+                    ...(v.skill_magic2_name ? ["know_magic", "use_magic", "fight", "sunblade", "magic2"] : ["know_magic", "use_magic", "fight", "sunblade"]).map(skillToMacro(v)),
                     ...skillIDs.map(idToSkillMacro(v, "magic-skills"))
                 ].map(buildSkillMacro).join(" ")}${spellIDs.length ? "\n\n" : ""}${
                     spellIDs.map(id => buildLink(v[`repeating_spells_${id}_spell_name`], `repeating_spells_${id}_spell`))

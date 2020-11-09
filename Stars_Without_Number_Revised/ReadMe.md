@@ -42,6 +42,17 @@ on Github.
 
 ## Changelog
 
+### 2.5.3
+
+* Fix a bug causing the Magic "Quick Menu" to just completely not work.
+
+### 2.5.2
+
+* Fix a bug preventing ship price from ever being calculated.
+* First support for Worlds Without Number in the form of an alternate skill list.
+* Fix a bug causing some calculations to not update when a repeating row was removed.
+* Fix some items displaying as "NaN" price because their price was dependent on tech level or similar.
+
 ### 2.5.1
 
 * Fix a bug causing new sheets to incorrectly initialise as AI and Transhuman.

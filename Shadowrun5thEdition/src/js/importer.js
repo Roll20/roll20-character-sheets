@@ -6,7 +6,7 @@
 
 	const importChummer = (character) => {
 		//Match Chummer JSON keys with their sheet attribute. 
-		//Chummer name is on the left, Roll20 sheet atribute on right.
+		//Chummer name is the key, Roll20 sheet atribute is the value.
 		const jsonKeys = {
 			"name": "name"
 			,"adept": "flag_special"
@@ -21,7 +21,7 @@
 			,"height": "height"
 			,"initdice": "initiative_dice"
 			,"initvalue": "initiative_mod"
-			,"judge_intentions" : "judge_intentions"
+			,"judgeintentions" : "judge_intentions"
 			,"karma": "karma" 
 			,"liftandcarry": "lift_carry"
 			,"limitmental": "mental_limit"
@@ -31,11 +31,9 @@
 			,"memory": "memory"
 			,"nuyen":"primary_nuyen"
 			,"physicalcm": "physical_max"
-			//,"physicalcmfilled": "physical_damage" //RESULTING IN INFINATE LOOP
 			,"playername": "player_name"
 			,"sex": "sex"
 			,"stuncm": "stun_max"
-			//,"stuncmfilled": "stun_damage"
 			,"technomancer": "flag_special"
 			,"totaless": "essence"
 			,"totalkarma": "total_karma"
@@ -58,7 +56,6 @@
 		};
 
 		const processChummer = new Promise((resolve, reject) => {
-			console.log(`%c CHUMMER IMPORTER`, "color: purple; font-weight:bold");
 			const sortedKeys = alphabatizeKeys(jsonKeys);
 			let setText = {
 				"error": "",
@@ -121,7 +118,7 @@
 			let attributeTotals = { 
 				"essence": update["essence"] 
 			}; // USED FOR LIMITS BELOW
-			attributes.forEach((object) => {
+			attributes.forEach(object => {
 				try {
 					const charSheetAttr = attributeKeys[object.name];
 					if (charSheetAttr === "edge") {
@@ -171,12 +168,12 @@
 			// LOOP THROUGHT QUALITIES
 			if (character.qualities != null && character.qualities.quality != null) {
 				const qualitiesList = getArray(character.qualities.quality);
-				qualitiesList.forEach((quality) => {
+				qualitiesList.forEach(quality => {
 					try {
 						const id = generateRowID();
 						update[`repeating_quality_${id}_flag`] = "display";
 						update[`repeating_quality_${id}_quality`] = quality.name;
-						update[`repeating_quality_${id}_type`] = (quality.qualitytype === "Positive") ? "P" : "N";
+						update[`repeating_quality_${id}_type`] = quality.qualitytype == "Positive" ? "P" : "N";
 					} catch (error) {
 						setText["error"] += addFeedback(JSON.stringify(quality), error);
 					};
@@ -462,8 +459,6 @@
 				});
 			};
 
-			console.log(character);
-
 			// GEAR
 			if (character.gears != null && character.gears.gear != null) {
 				const gearsList = getArray(character.gears.gear);
@@ -669,9 +664,9 @@
 			};
 
 			// VEHICLES
-		/*	if (character.vehicles != null && character.vehicles.vehicle != null) {
+			if (character.vehicles != null && character.vehicles.vehicle != null) {
 				const vehicleList = getArray(character.vehicles.vehicle);
-				vehicleList.forEach((vehicle) => {
+				vehicleList.forEach(vehicle => {
 					try {
 						const id = generateRowID();
 						const section = `repeating_vehicle_${id}`;
@@ -679,37 +674,36 @@
 
 						update[`${section}_name`] = vehicle.name;
 						update[`${section}_flag`] = "display";
-						Object.keys(vehicleKeys).forEach((key) => {
-							if (vehicle[`${key}`] && vehicle[`${key}`] != null) {
-								update[`${section}_${vehicleKeys[`${key}`]}`] = 
-									(vehicle[`${key}`].includes("/")) ? getSplitNum(vehicle[`${key}`]) : 
-									vehicle[`${key}`];
-							};
-						}); 
+
+						for (const [chummerKey, roll20Attr] of Object.entries(vehicleKeys)) {
+							if (vehicle[`${chummerKey}`] && vehicle[`${chummerKey}`] != null) {
+								update[`${section}_${roll20Attr}`] = checkForModifiedAttribute(vehicle[`${chummerKey}`])
+							}
+						}
 
 						["attack", "sleaze", "dataprocessing", "firewall", "devicerating"].forEach((matrixAttr) => {
-							vehicleNotes += (matrixAttr === "devicerating") ? `Device Rating (${vehicle[`${matrixAttr}`]}) ` : 
-								(matrixAttr === "firewall") ? `${vehicle[`${matrixAttr}`]} ` : `${vehicle[`${matrixAttr}`]}/`;
+							vehicleNotes += 
+								matrixAttr === "devicerating" ? `Device Rating (${vehicle[`${matrixAttr}`]}) ` : 
+								matrixAttr === "firewall" ? `${vehicle[`${matrixAttr}`]} ` : 
+								`${vehicle[`${matrixAttr}`]}/`;
 						}); 
 
 						if (vehicle.mods != null && vehicle.mods.mod != null) {
 							const vehicleModsList = getArray(vehicle.mods.mod);
 							vehicleNotes += "Mods: "
-							vehicleModsList.forEach((mod) => {
-								vehicleNotes += (mod.fullname != null) ? `${mod.fullname}, ` : `${mod.name}, `;
+							vehicleModsList.forEach(mod => {
+								vehicleNotes += mod.fullname != null ? `${mod.fullname}, ` : `${mod.name}, `;
 							});
 						}
 				
 						if (vehicle.gears != null && vehicle.gears.gear != null) {
 							const vehicleGearList = getArray(vehicle.gears.gear);
 							vehicleNotes += "Gear: "
-							vehicleGearList.forEach((gear) => {
+							vehicleGearList.forEach(gear => {
 								if (gear.children != null && gear.children.gear != null) {
 									const vehicleChildrenList = getArray(gear.children.gear);
 									let vehicleChildrenNotes = "";
-									vehicleChildrenList.forEach((child) => {
-										vehicleChildrenNotes += `${child.name}, `;
-									});
+									vehicleChildrenList.forEach(child => vehicleChildrenNotes += `${child.name}, `);
 									vehicleNotes += `${gear.name} (${vehicleChildrenNotes}), `;
 								} else {
 									vehicleNotes += `${gear.name}, `;
@@ -724,12 +718,47 @@
 				});
 			}
 
-		*/
+			//COMPLEX FORMS
+			if (character.complexforms != null && character.complexforms.complexform != null) {
+				const complexFormsList = getArray(character.complexforms.complexform);
+				complexFormsList.forEach(chummerForm => {
+					try {
+						const section = `repeating_forms_${generateRowID()}`;
+						const convertAbbreviation = duration => {
+							switch(duration) {
+								case "E":
+									return "extended"
+									break;
+								case "I":
+									return "instant"
+									break;
+								case "P":
+									return "permanent"
+									break;
+								case "S":
+									return "sustained"
+									break;
+								default:
+									return "other"
+							}
+						}
+
+						const splitFade = value => value.includes('L+') || value.includes('L-') ? value.slice(1) : value
+
+						update[`${section}_name`] = chummerForm.name
+						update[`${section}_target`] = chummerForm.target.toLowerCase()
+						update[`${section}_duration`] = convertAbbreviation(chummerForm.duration)
+						update[`${section}_fade`] = splitFade(chummerForm.fv)
+						update[`${section}_flag`] = "display";
+
+					} catch (error)  {
+						setText["error"] += addFeedback(JSON.stringify(form.name), error);
+					}
+				})
+			}
 
 			setCharmancerText(setText);
 			resolve(update);
-
-			console.log(update);
 		}).then((update) => {
 			let setText = {
 				"hidden": ""
@@ -768,8 +797,6 @@
 
     	clean();
 		setAttrs(mancerValues, () => {
-			console.log(`%c APPLY IMPORTER:`, "color: blue; font-weight:bold");
-			console.log(mancerValues);
 			deleteCharmancerData(["importer"]);
 			finishCharactermancer();
 		});
