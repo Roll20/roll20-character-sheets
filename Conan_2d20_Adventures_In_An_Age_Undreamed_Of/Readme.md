@@ -29,24 +29,24 @@ Sheet construction and coding by Eric Carmody. Original art work by Robert Waker
 In order for the Skills rolls and weapon damage rolls to work properly there are two required roll tables that the GM needs to make.
 ### Hit-Location
 The GM needs to create a table named Hit-Location.  This table will need to have the following six entries:
+`
     - Head
     - Right Arm
     - Left Arm
     - Torso
     - Right Leg
-    - Left Leg                    
-                
+    - Left Leg
+ `
 ### Combat-Dice
 The GM will also need to create a second table named Combat-Dice.  This table will need to have the following six entries:
-
+`
     - 1
     - 2
     - 0
     - 0
     - 1+Effect
     - 1+Effect
-
-
+`
 # Release Notes
 
 
