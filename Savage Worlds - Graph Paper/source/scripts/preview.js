@@ -1,4 +1,4 @@
-// Syncronize inputs in the browser preview (not Roll20!)
+// Synchronize inputs in the browser preview (not Roll20!)
 $('input[type=text]').on('change', function() {
   $(`input[name=${$(this).attr('name')}]`).val($(this).val());
 });
