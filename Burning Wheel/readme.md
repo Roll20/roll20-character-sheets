@@ -4,11 +4,11 @@ This sheet is designed for use with the Burning Wheel system written by Luke Cra
 
 Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Stats/Skills/Attributes names in order to make use of the roll template. In the roll query you'll be asked for a Modifier which represents dice that affect the comparison to Obs, Artha (such as Persona or Deeds dice) that add to the roll but don't compare to the Obs, and the base Obs.
 
-Wound dice and Obs penalties from wounds are automatically calculated from the Combat tab into rolls that are affected by wound penatlies. The hidden 'star ✦ symbol' to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode. 
+Wound dice and Obs penalties from wounds are automatically calculated from the Combat tab into rolls that are affected by wound penatlies. The hidden 'star ✦ symbol' to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode.
 
-To the far right of each skill is a hidden 'mod ⌘ symbol' which will turn that skill instead a group separator instead. 
+To the far right of each skill is a hidden 'mod ⌘ symbol' which will turn that skill instead a group separator instead.
 
-There is also now a Magic tab to put your spells in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also. 
+There is also now a Magic tab to put your spells in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also.
 
 For the best user experience we reccomend that you install the two open-license fonts [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) and [Open Sans](https://fonts.google.com/specimen/Open+Sans).
 
@@ -31,7 +31,8 @@ Early bug fixes by Seraaron (147454).
 * Changed page tab style to newer sheet-worker format, as recommended in the Roll20 CSS Wizardry wiki
 * Fixed background image stretching on long page tabs by splitting it into a top, middle, and bottom segment, where the middle repeats until it reaches the bottom.
 * Corrected an implementation of the 'Being Learned' autocalc that would use the average Aptitude as your skill total, rather than the first chosen Root (see BWG pg 49). And also made tax affect these rolls.
-* User request fulfilled: Added option to make every stat and attribute taxable to support more homebrew mechanics
+* User request fulfilled: Added option to make every stat and attribute renamable and taxable to support more homebrew mechanics (see the 'Additional Taxes' dropdown in the new Magic tab)
+* Similarly, all magic spells' subtitles are renamable, meaning that the Magic tab could ostensibly be used to list vehicles or other custom powers or objects from systems like Burning Empires. 
 
 ## v2.2 (public test / preview build)
 Tweaked design and code by Seraaron (147454).
