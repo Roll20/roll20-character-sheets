@@ -1798,7 +1798,7 @@
 								</div>
 							</div>
 						</div>
-						<div class="collapsable">  
+						<div class="collapsable">
 							<div class="desc"><span name="attr_notes"></span></div>
 						</div>
 					</div>
@@ -2140,19 +2140,19 @@
       <div class="rows vehicle">
         <div class="rows">
           <h2 data-i18n="data_processing">key</h2>
-          <label class="settings" data-i18n-title="data_processing" title="data_processing"> 
+          <label class="settings" data-i18n-title="data_processing" title="data_processing">
             <input name="attr_data_processing" min="0" placeholder="0" title="@{data_processing}" type="number" value=""/>
           </label><span class="settings tiny-span">=</span><span name="attr_data_processing"></span>
         </div>
         <div class="rows">
           <h2 data-i18n="firewall">key</h2>
-          <label class="settings" data-i18n-title="firewall" title="firewall"> 
+          <label class="settings" data-i18n-title="firewall" title="firewall">
             <input name="attr_firewall" min="0" placeholder="0" title="@{firewall}" type="number" value=""/>
           </label><span class="settings tiny-span">=</span><span name="attr_firewall"></span>
         </div>
         <div class="rows">
           <h2 data-i18n="devicerating">key</h2>
-          <label class="settings" data-i18n-title="devicerating" title="devicerating"> 
+          <label class="settings" data-i18n-title="devicerating" title="devicerating">
             <input name="attr_device_rating" min="0" placeholder="0" title="@{device_rating}" type="number" value=""/>
           </label><span class="settings tiny-span">=</span><span name="attr_device_rating"></span>
         </div>
@@ -2378,7 +2378,7 @@
             <option data-i18n="sleaze" value="@{sleaze}">Sleaze</option>
           </select>
           <h2 class="full-row" data-i18n="specialization">specialization</h2>
-          <label class="full-row" data-i18n-title="specialization" title="specialization"> 
+          <label class="full-row" data-i18n-title="specialization" title="specialization">
             <input name="attr_specialization" placeholder="Specalizations" title="@{repeating_active_${x}_specialization}" type="text"/>
           </label>
         </div>
@@ -2433,7 +2433,7 @@
             <option data-i18n="sleaze" value="@{sleaze}">Sleaze</option>
           </select>
           <h2 class="full-row" data-i18n="specialization">specialization</h2>
-          <label class="full-row" data-i18n-title="specialization" title="specialization"> 
+          <label class="full-row" data-i18n-title="specialization" title="specialization">
             <input name="attr_specialization" placeholder="Specalizations" title="@{repeating_knowledge_${x}_specialization}" type="text"/>
           </label>
         </div>
@@ -2488,7 +2488,7 @@
             <option data-i18n="sleaze" value="@{sleaze}">Sleaze</option>
           </select>
           <h2 class="full-row" data-i18n="specialization">specialization</h2>
-          <label class="full-row" data-i18n-title="specialization" title="specialization"> 
+          <label class="full-row" data-i18n-title="specialization" title="specialization">
             <input name="attr_specialization" placeholder="Specalizations" title="@{repeating_language_${x}_specialization}" type="text"/>
           </label>
         </div>
@@ -3065,7 +3065,7 @@
 	    setAttrs({
 	    	attribute_roll: attribute_roll
 	    });
-	});			
+	});
 
     const versioning = (version) => {
     	console.log(`%c Shadowrun 5th Edition versioning, ${version}`, "color: blue; font-weight:bold");
@@ -3126,13 +3126,13 @@
 	["active", "knowledge", "language"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:skill`, (eventinfo) => {
 			settingsToggle(eventinfo);
-		}); 
+		});
 	});
 
 	["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"].forEach((attr) => {
 		on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
 			settingsToggle(eventinfo);
-		}); 
+		});
 	});
 
 	const settingsToggle = (eventinfo) => {
@@ -3158,7 +3158,7 @@
 
 		on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
 			const source = eventinfo.sourceAttribute;
-			update_common_rolls(["body", "strength", "lift_carry_modifier"]);
+			update_common_rolls(["body", "willpower", "lift_carry_modifier"]);
 			//STRENGTH & BODY RUN THIS
 			(source.includes("strength") || source.includes("body")) ? update_limit("physical") : false;
 			//ONLY RUN ON BODY CHANGE
@@ -3176,12 +3176,12 @@
 			//REACTION UPDATES PHYSICAL, INTUITION UPDATES MENTAL
 			(source.includes("reaction")) ? update_limit("physical") : update_limit("mental");
 			//ONLY RUN ON INTUITION CHANGE
-			(source.includes("intuition")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
+			(source.includes("intuition")) ? update_common_rolls(["willpower", "intuition", "judge_intentions_modifier"]) : false;
 		});
 
 		on("change:willpower", () => {
 			update_common_rolls(["charisma", "willpower", "composure_modifier"]);
-			update_common_rolls(["logic", "willpower", "memory_modifier"]);
+			update_common_rolls(["body", "willpower", "lift_carry_modifier"]);
 			update_track("stun");
 			update_limit("social");
 			update_limit("mental");
@@ -3189,9 +3189,14 @@
 
 		on("change:logic change:memory_modifier", (eventinfo) => {
 			const source = eventinfo.sourceAttribute;
-			update_common_rolls(["logic", "willpower", "memory_modifier"]);
+			update_common_rolls(["logic", "intuition", "memory_modifier"]);
 			//LOGIC UPDATES LIMIT
 			(source.includes("logic")) ? update_limit("mental") : false;
+		});
+
+		on("change:intuition change:memory_modifier", (eventinfo) => {
+			const source = eventinfo.sourceAttribute;
+			update_common_rolls(["logic", "intuition", "memory_modifier"]);
 		});
 
 		on("change:charisma change:composure_modifier change:judge_intentions_modifier", (eventinfo) => {
@@ -3199,7 +3204,7 @@
 			//CHARISMA & COMPOSURE UPDATE COMPOSURE
 			(source.includes("charisma") || source.includes("composure")) ? update_common_rolls(["charisma", "willpower", "composure_modifier"]) : false;
 			//CHARISMA & JUDGE INTENTIONS UPDATE JUDGE INTENTIONS
-			(source.includes("charisma") || source.includes("judge")) ? update_common_rolls(["charisma", "intuition", "judge_intentions_modifier"]) : false;
+			(source.includes("charisma") || source.includes("judge")) ? update_common_rolls(["willpower", "intuition", "judge_intentions_modifier"]) : false;
 			//ONLY CHARISMA UPDATES SOCIAL LIMIT
 			(source.includes("charisma")) ? update_limit("social") : false;
 		});
@@ -3259,7 +3264,7 @@
 	        });
 	    });
 
-	//Calculaute limts
+	//Calculate limts
 		const update_limit = (type)  => {
 			let attrs = [`${type}_limit_modifier`, `${type}_limit_temp`, `${type}_limit_temp_flag`];
 
@@ -3352,7 +3357,7 @@
 		};
 	});
 
-	// COMMON ROLLS: MEOMORY, JUDGE INTETIONS, COMPOSURE, LIFT & CARRY, OVERFLOW, DEFENSE, & SOAK ROLLS
+	// COMMON ROLLS: MEMORY, JUDGE INTENTIONS, COMPOSURE, LIFT & CARRY, OVERFLOW, DEFENSE, & SOAK ROLLS
 	const update_common_rolls = (attrs) => {
 		getAttrs(attrs, (v) => {
 			const found = attrs.find((mod) => { return mod.includes("_modifier") });
@@ -3444,13 +3449,16 @@
 	const update_wounds = () => {
 		getAttrs(["stun_damage", "physical_damage", "pain_tolerance"], (v) => {
 			const stu = parseInt(v.stun_damage) || 0, phy = parseInt(v.physical_damage) || 0, pai = parseInt(v.pain_tolerance) || 0;
-			lowP = (pai < 0) ? 2 : 3;
-			highPhy = (pai > 0) ? phy - pai : phy;
-			highStu = (pai > 0) ? stu - pai : stu;
-			pMod = (phy > 0) ? (Math.floor(highPhy/lowP)) : 0;
-			sMod = (stu > 0) ? (Math.floor(highStu/lowP)) : 0;
+			pMod = (phy > 0) ? (Math.floor(phy/3)) : 0;
+			sMod = (stu > 0) ? (Math.floor(stu/3)) : 0;
+
 			wou = Math.floor(-(pMod) + -(sMod));
-			
+			if(pai < 0) {
+				wou = wou * 2;
+			} else if(pai > 0 && wou < 0) {
+				wou = wou + 1;
+			}
+
 			setAttrs({wounds: wou});
 		});
 	};
@@ -3521,7 +3529,7 @@
 				const dic = parseInt(v.matrix_dice_modifier) || 0;
 				let update = {};
 
-				dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic : 
+				dice = 	(v.sheet_type === "grunt" && v.edge_toggle == 0) ? 4 + dic :
 						((v.sheet_type === "grunt" && v.edge_toggle != 0) ? 5 :
 						4);
 
@@ -3572,7 +3580,7 @@
 
 				setAttrs(update);
 			});
-		});	
+		});
 
 	on("clicked:cond_reset_physical clicked:cond_reset_stun", (eventinfo) => {
 		const attr = eventinfo.triggerName.split("_")[2];
@@ -3666,7 +3674,7 @@
 				const drain = (dra > 0) ? `F+${dra} ` : (dra < 0) ? `F${dra} ` :"F ";
 				const info = `[${typ}${ran}${dam}${dur}${drain}${not}]`;
 
-				display = (com === "Direct, Force ") ? ` (Direct) ${info}` : 
+				display = (com === "Direct, Force ") ? ` (Direct) ${info}` :
 					(com === "Indirect, Force ?{Force|}, AP -") ? ` (Indirect) ${info}` : `${info}`;
 		        setAttrs({repeating_NPCspell_spell: display});
 		    });
@@ -3678,7 +3686,7 @@
 		    	const tar = `Target ${v.repeating_form_form_target}, `;
 				const dur = `Duration ${v.repeating_form_form_duration}, `;
 				const not = `, ${v.repeating_form_form_note}` || '';
-				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` : 
+				const fad = (v.repeating_form_form_fade > 0) ? `L+${v.repeating_form_form_fade}` :
 							(v.repeating_form_form_fade < 0) ? `L${v.repeating_form_form_fade}` : "L";
 
 		        setAttrs({
@@ -3726,7 +3734,7 @@
 
 	//REFACTORED Skills
 	  	['repeating_active','repeating_knowledge','repeating_language'].forEach(field => {
-	        on(`change:${field}`, (eventinfo) => { 
+	        on(`change:${field}`, (eventinfo) => {
 				const source = eventinfo.sourceAttribute;
 				const type   = eventinfo.sourceType;
 
@@ -3760,7 +3768,7 @@
 	                       [`${field}_display_limit`]: `${translation} ${eventinfo.newValue}`
 	                    });
 	        		}
-	        	} else if (source.includes("specialization") && type === "player")  {	
+	        	} else if (source.includes("specialization") && type === "player")  {
 	        		getAttrs([`${source}`], (v) => {
 						const bas   = v[`${source}`];
 						const size  = bas.length;
@@ -3792,7 +3800,7 @@
 	        		console.log(`Change to ${field} did not set attr`);
 	        	};
 	        });
-	    }); 
+	    });
 
 
 	   	//Setting the Default attribute name for default skill
@@ -3830,7 +3838,7 @@
 
 	            if (source.includes('primary')) {
 	                if (newV === 'primary') {
-	                	//Shared attributes names. 
+	                	//Shared attributes names.
 	                	let array = ["dicepool", "weapon", "damage", "acc", "ap", "skill"];
 	                	//Add the range or melee specific ones
 	                	(type === "range") ? array.push("ammo", "ammo_max", "mode", "recoil") : array.push("reach");
@@ -3919,7 +3927,7 @@
 			getAttrs(["repeating_contacts_name"], (v) => {
 				const name = (v.repeating_contacts_name);
 
-				((name).length > 0 && (name).length <= 30) ? setAttrs({repeating_contacts_display: (name)}) : 
+				((name).length > 0 && (name).length <= 30) ? setAttrs({repeating_contacts_display: (name)}) :
 					((name).length > 30) ? setAttrs({repeating_contacts_display: (name).slice(0, 30) + "..."}) :
 					setAttrs({repeating_contacts_display: " "});
 			});
@@ -3977,10 +3985,10 @@
 	    if (mancerValues.jsonData) {
 	    	const parsedData = JSON.parse(mancerValues.jsonData) || false;
 	    	setText[`import-feedback`] = "";
-	    	// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback 
+	    	// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback
 	    	if (parsedData) {
 	    		setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
-		      // Send the parsed data to the selected importer or let users know something went wrong 
+		      // Send the parsed data to the selected importer or let users know something went wrong
 		      if (mancerValues.builder && mancerValues.builder === "Chummer") {
 				if (parsedData.characters && parsedData.characters.character) {
 					importChummer(parsedData.characters.character);
@@ -4016,7 +4024,7 @@
 				<li>Copy the JSON in the file</li>
 				<li>Paste it into the textfield below</li>
 				<li>Click the Import button</li>
-				<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li> 
+				<li>Review the data. Use the checkbox <strong>Show Hidden Inputs</strong> to fix data.</li>
 				<li>Click Apply to <u>overwrite</u> information on the character sheet</li>
 			</ol>`;
 
