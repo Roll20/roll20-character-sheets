@@ -8272,7 +8272,7 @@
                     };
                 });
             }
-
+            if(currentData.npc && currentData.npc == 1) update['npcspellcastingflag'] = 1;
             update[`repeating_spell-${lvl}_${id}_spelllevel`] = lvl;
             update[`repeating_spell-${lvl}_${id}_spell_ability`] = (page.data["spellcasting_ability"]) ? `@{${page.data["spellcasting_ability"].toLowerCase()}_mod}+` : "spell";
             (page.name) ? update[`repeating_spell-${lvl}_${id}_spellname`] = page.name : false;
@@ -17590,7 +17590,62 @@
         });
         /* */
     });
- //# sourceURL=dnd5e.js
+    const classRelatedAttrs = ['class', 'subclass', 'base_level', 'multiclass1_flag', 'multiclass1', 'multiclass1_subclass', 'multiclass1_lvl', 'multiclass2_flag','multiclass2', 'multiclass2_subclass', 'multiclass2_lvl', 'multiclass3_flag', 'multiclass3', 'multiclass3_subclass', 'multiclass3_lvl'];
+const getTalentPointsMax = callback => {
+    getAttrs(classRelatedAttrs, values => {
+        let level = 0;
+        const talentPointPerClass = {
+            'adept': 1,
+            'cybermancer': 1,
+            'melder': 1,
+            'artifice': 1/3,
+            'justicar': 1/3
+        };
+        let characterClassAttributes = {
+            mainclass: {
+                class: 'class',
+                subclass: 'subclass',
+                level: 'base_level'
+            }
+        };
+        for(let i=1; i<=3; i++) {
+            characterClassAttributes[`multiclass_${i}`] = {
+                enabled: `multiclass${i}_flag`,
+                class: `multiclass${i}`,
+                subclass: `multiclass${i}_subclass`,
+                level: `multiclass${i}_lvl`
+            }
+        }
+        const pointsPerLevel = ['',4,6,14,17,27,32,38,44,57,64,73,78,83,88,94,100,107,114,123,133];
+        const getLevel = (charClass, values) => {
+            let charLevel = 0;
+            if(!characterClassAttributes[charClass]) return charLevel;
+            if(!characterClassAttributes[charClass]['enabled'] || (values[characterClassAttributes[charClass]['enabled']] && values[characterClassAttributes[charClass]['enabled']] == 1)) {
+                const subclass = values[characterClassAttributes[charClass]['subclass']] || '';
+                const level = (values[characterClassAttributes[charClass]['level']]) ? parseInt(values[characterClassAttributes[charClass]['level']]) : 0;
+                charClass = (subclass.toLowerCase() == 'artifice' || subclass.toLowerCase() == 'justicar') ? subclass : values[characterClassAttributes[charClass]['class']];
+                const classIndex = Object.keys(talentPointPerClass).indexOf(charClass.toLowerCase());
+                if(classIndex > -1) {
+                    return Math.floor(level * talentPointPerClass[Object.keys(talentPointPerClass)[classIndex]]);
+                }
+            }
+            return charLevel;
+        }
+        Object.keys(characterClassAttributes).forEach(charClass => {
+            level += getLevel(charClass, values);
+        });
+        callback(pointsPerLevel[level]);
+    });
+};
+classRelatedAttrs.forEach(attr => {
+    on(`change:${attr}`, evenInfo => {
+        getTalentPointsMax(talentPoints => {
+            console.log('CALCULATING TALENT POINTS');
+            setAttrs({tp_max:talentPoints});
+        });
+    });
+});
+ //# sourceURL=espergenesis.js
 </script><charmancer class="sheet-repeating-topbar">
     <div class="topbar-container">
         <div class="sheet-attr-container">

@@ -86,6 +86,11 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.8
+* Improved container width adaption for Edges/Hindrances
+* Improved container height adaption for Abilities
+* Added container height adaption to Quick Notes
+* Added new Custom Skills to Game Settings
 #### Version 1.2.7
 * Added visibility toggles for Apparel, Quick Notes, and Weapons blocks
 * Added option to rename Apparel and Weapons blocks within the sheet
