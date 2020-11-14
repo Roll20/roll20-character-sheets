@@ -3,7 +3,7 @@ const wfrpModule = ( () => {
     // Global Variables
 
     const wfrp = {
-        sheet_version: "1.0.0",
+        sheet_version: "1.0.3",
 
         characteristics: [
             "weapon_skill",
@@ -148,6 +148,18 @@ const wfrpModule = ( () => {
         recalculateEarnedXP();
 
         calculateArmour();
+
+        getAttrs(["setting_init_option","setting_whisper","setting_bonus_option","setting_crit_option"], values => {
+
+            toggleInitOption(values["setting_init_option"]);
+    
+            toggleWhisper(values["setting_whisper"]);
+    
+            toggleRollBonus(values["setting_bonus_option"]);
+    
+            toggleRollCrits(values["setting_crit_option"]);
+
+        })
     }
 
     const updateSheet = (version) => {
@@ -166,14 +178,16 @@ const wfrpModule = ( () => {
         const difficulty = (new_value === "1") ? `?{Difficulty|Average (+20), 20|Very Easy (+60), 60|Easy (+40), 40|Average (+20), 20|Challenging (0), 0|Difficult (-10), -10|Hard (-20), -20|Very Hard (-30), -30}` :
                            0;
         
-        setAttrs({difficulty_query:difficulty});
+        setAttrs({
+            difficulty_query:difficulty
+        });
     }
 
     const toggleRollBonus = (new_value) => {
         let query = 0;
         let slbonus = "";
 
-        if (new_value === 1) {
+        if (new_value === "1") {
             query = "?{Bonus|0}";
             slbonus = "{{sl_bonus=?{SL Bonus|0}}}"
         }
@@ -196,7 +210,10 @@ const wfrpModule = ( () => {
                    (new_value === "3") ? 1 :
                    5;
 
-        setAttrs({roll_cs:cs, roll_cf:cf});
+        setAttrs({
+            roll_cs:cs, 
+            roll_cf:cf
+        });
     }
 
     const toggleInitOption = (new_value) => {
@@ -343,46 +360,121 @@ const wfrpModule = ( () => {
         
         new_value = new_value.toLowerCase();
 
+        const update = {
+            fate: 0,
+            resilience: 0,
+            movement: 0,
+            size: 0
+        }
+
         if (new_value === "human") {
-            setAttrs({
-                fate: 2,
-                resilience: 1,
-                movement: 4,
-                size: "average"
-            });
+            update["fate"] = 2;
+            update["resilience"] = 1;
+            update["movement"] = 4;
+            update["size"] = "average";
         }
         if (new_value === "dwarf") {
-            setAttrs({
-                fate: 0,
-                resilience: 2,
-                movement: 3,
-                size: "average"
-            });
+            update["fate"] = 0;
+            update["resilience"] = 2;
+            update["movement"] = 3;
+            update["size"] = "average";
         }
         if (new_value === "halfling") {
-            setAttrs({
-                fate: 0,
-                resilience: 2,
-                movement: 3,
-                size: "average"
-            });
+            update["fate"] = 0;
+            update["resilience"] = 2;
+            update["movement"] = 3;
+            update["size"] = "small";
         }
-        if (new_value === "elf") {
-            setAttrs({
-                fate: 0,
-                resilience: 0,
-                movement: 5,
-                size: "average"
-            });
+        if (new_value === "wood elf") {
+            update["fate"] = 0;
+            update["resilience"] = 0;
+            update["movement"] = 4;
+            update["size"] = "average";
         }
         if (new_value === "high elf") {
-            setAttrs({
-                fate: 0,
-                resilience: 0,
-                movement: 5,
-                size: "average"
-            });
+            update["fate"] = 0;
+            update["resilience"] = 0;
+            update["movement"] = 5;
+            update["size"] = "average";
         }
+
+        if (new_value !== "custom") {
+
+            getCompendiumPage(`Species:${new_value}`, page => {
+                const skills = helperFunctions.parseJSON(page.data.Skills);
+                const talents = helperFunctions.parseJSON(page.data.Talents);
+    
+                const skills_fixed = skills.Fixed.split(",").map(item=>item.trim()) || [];
+                const talents_fixed = talents.Fixed.split(",").map(item=>item.trim()) || [];
+    
+                let talents_choices = [];
+    
+                let skill_index = 1;
+                let talent_index = 1;
+                
+                if (talents.Choices) talents.Choices.forEach(choice => talents_choices = [...talents_choices, ...choice]);
+    
+                for (let index = 1; index <= 12; index++) {
+                    update[`species_skill_${index}_name`] = "";
+                    update[`species_skill_${index}_advances`] = "0";
+                }
+    
+                for (let index = 1; index <= 10; index++) {
+                    update[`species_talent_${index}_name`] = "";
+                    update[`species_talent_${index}_advances`] = "0";
+                }
+    
+                for (const skill of skills_fixed) {
+                    update[`species_skill_${skill_index}_name`] = skill;
+                    update[`species_talent_${skill_index}_advances`] = "0";
+                    skill_index++;
+                }
+    
+                for (const talent of talents_fixed) {
+                    update[`species_talent_${talent_index}_name`] = talent;
+                    update[`species_talent_${talent_index}_advances`] = "1";
+                    talent_index++;
+                }
+    
+                for (const talent of talents_choices) {
+                    update[`species_talent_${talent_index}_name`] = talent;
+                    update[`species_talent_${talent_index}_advances`] = "0";
+                    talent_index++;
+                }
+    
+                setAttrs(update, {silent:true}, callback => calculateTalentAdvances());
+            });
+
+        } else {
+            setAttrs(update);
+        }
+    }
+
+    const checkSpeciesAdvances = () => {
+        const attrs = [];
+
+        for (let i = 1; i <= 12; i++) {
+            attrs.push(`species_skill_${i}_advances`);
+        }
+
+        getAttrs(attrs, values => {
+            let threes = 0;
+            let fives = 0;
+
+            Object.values(values).forEach(value => {
+                if (value === "3") threes++;
+                if (value === "5") fives++;
+            });
+
+            const update = {};
+
+            update["species_disable3"] = (threes >= 3) ? 1 : 0;
+            update["species_disable5"] = (fives >= 3) ? 1 : 0;
+
+            setAttrs(update);
+            
+        });
+        
     }
 
     // Characteristic Functions
@@ -745,10 +837,12 @@ const wfrpModule = ( () => {
         for (let i = 1; i <= 4; i++) {
             for (let j = 1; j <= 10; j++) {
                 attrs.push(`${repeating_id}_career_skill_${i}_${j}_advances`); 
+                attrs.push(`${repeating_id}_career_skill_${i}_${j}_init`); 
             }
 
             for (let k = 1; k <= 5; k++) {
                 attrs.push(`${repeating_id}_career_talent_${i}_${k}_advances`);
+                attrs.push(`${repeating_id}_career_talent_${i}_${j}_init`); 
             }
         }
 
@@ -774,67 +868,77 @@ const wfrpModule = ( () => {
         });
     }
 
-    const calculateCharacteristicXP = (value) => {
-
-        let int = parseInt(value);
+    const calculateCharacteristicXP = (value, free) => {
+        let int = parseInt(value) + parseInt(free);
+        let countdown = parseInt(free);
         let accumulator = 0;
 
         while (int > 0) {
-            accumulator +=
-                (int <= 5) ? 25 :
-                (int <= 10) ? 30 :
-                (int <= 15) ? 40 :
-                (int <= 20) ? 50 :
-                (int <= 25) ? 70 :
-                (int <= 30) ? 90 :
-                (int <= 35) ? 120 :
-                (int <= 40) ? 150 :
-                (int <= 45) ? 190 :
-                (int <= 50) ? 230 :
-                (int <= 55) ? 280 :
-                (int <= 60) ? 330 :
-                (int <= 65) ? 390 :
-                (int <= 70) ? 450 :
-                520;
+            if (int > countdown) {
+                accumulator +=
+                    (int <= 5) ? 25 :
+                    (int <= 10) ? 30 :
+                    (int <= 15) ? 40 :
+                    (int <= 20) ? 50 :
+                    (int <= 25) ? 70 :
+                    (int <= 30) ? 90 :
+                    (int <= 35) ? 120 :
+                    (int <= 40) ? 150 :
+                    (int <= 45) ? 190 :
+                    (int <= 50) ? 230 :
+                    (int <= 55) ? 280 :
+                    (int <= 60) ? 330 :
+                    (int <= 65) ? 390 :
+                    (int <= 70) ? 450 :
+                    520;
+            }
+
             int--;
         }
 
         return accumulator;
     }
 
-    const calculateSkillXP = (value) => {
-        let int = parseInt(value);
+    const calculateSkillXP = (value, free) => {
+        let int = parseInt(value) + parseInt(free);
+        let countdown = parseInt(free);
         let accumulator = 0;
 
         while (int > 0) {
-            accumulator +=
-                (int <= 5) ? 10 :
-                (int <= 10) ? 15 :
-                (int <= 15) ? 20 :
-                (int <= 20) ? 30 :
-                (int <= 25) ? 40 :
-                (int <= 30) ? 60 :
-                (int <= 35) ? 80 :
-                (int <= 40) ? 110 :
-                (int <= 45) ? 140 :
-                (int <= 50) ? 180 :
-                (int <= 55) ? 220 :
-                (int <= 60) ? 270 :
-                (int <= 65) ? 320 :
-                (int <= 70) ? 380 :
-                440;
+            if (int > countdown) {
+                accumulator +=
+                    (int <= 5) ? 10 :
+                    (int <= 10) ? 15 :
+                    (int <= 15) ? 20 :
+                    (int <= 20) ? 30 :
+                    (int <= 25) ? 40 :
+                    (int <= 30) ? 60 :
+                    (int <= 35) ? 80 :
+                    (int <= 40) ? 110 :
+                    (int <= 45) ? 140 :
+                    (int <= 50) ? 180 :
+                    (int <= 55) ? 220 :
+                    (int <= 60) ? 270 :
+                    (int <= 65) ? 320 :
+                    (int <= 70) ? 380 :
+                    440;
+            }
+
             int--;
         }
 
         return accumulator;
     }
 
-    const calculateTalentXP = (value) => {
-        let int = parseInt(value);
+    const calculateTalentXP = (value, free) => {
+        let int = parseInt(value) + parseInt(free);
+        let countdown = parseInt(free);
         let accumulator = 0;
 
         while (int > 0) {
-            accumulator += int * 100
+
+            if (int > countdown) accumulator += int * 100
+
             int--;
         }
 
@@ -843,7 +947,7 @@ const wfrpModule = ( () => {
 
     const recalculateSpentXP = () => {
 
-        helperFunctions.aggregateRepeatingIDs([`careers`, `experience`], ids => {
+        helperFunctions.aggregateRepeatingIDs([`careers`, `experience`, `experiencespent`], ids => {
 
             const attrs = [];
 
@@ -851,88 +955,137 @@ const wfrpModule = ( () => {
 
                 for (const characteristic of wfrp.characteristics) {
                     attrs.push(`repeating_careers_${id}_career_${characteristic}_advances`);
+                    attrs.push(`repeating_careers_${id}_career_${characteristic}_init`);
                 }
 
                 for (let i = 1; i <= 4; i++) {
                     for (let j = 1; j <= 10; j++) {
                         attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_name`); 
                         attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_advances`); 
+                        attrs.push(`repeating_careers_${id}_career_skill_${i}_${j}_init`); 
                     }
         
                     for (let k = 1; k <= 5; k++) {
                         attrs.push(`repeating_careers_${id}_career_talent_${i}_${k}_name`);
                         attrs.push(`repeating_careers_${id}_career_talent_${i}_${k}_advances`);
+                        attrs.push(`repeating_careers_${id}_career_talent_${i}_${k}_init`);
                     }
                 }
+            }
+
+            for (let i = 1; i <= 10; i++) {
+                attrs.push(`species_talent_${i}_name`); 
+                attrs.push(`species_talent_${i}_advances`);
+            }
+
+            for (let i = 1; i <= 12; i++) {
+                attrs.push(`species_skill_${i}_name`); 
+                attrs.push(`species_skill_${i}_advances`);
             }
 
             for (const id of ids.experience) {
                 attrs.push(`repeating_experience_${id}_experience_amount`);
             }
+
+            console.log(ids.experiencespent)
+
+            for (const id of ids.experiencespent) {
+                attrs.push(`repeating_experiencespent_${id}_experience_amount`);
+
+            }
             
             getAttrs(attrs, values => {
+                const entries = Object.entries(values).filter(([key, value]) => value !== "");
 
                 const characteristic_advances = new Map();
+                const characteristic_advances_free = new Map();
+
                 const skill_advances = new Map();
+                const skill_advances_free = new Map();
+                
                 const talent_advances = new Map();
+                const talent_advances_free = new Map();
 
                 for (const id of ids.careers) {
-    
-                    for (const characteristic of wfrp.characteristics) {
-                        const value = parseInt(values[`repeating_careers_${id}_career_${characteristic}_advances`]);
 
-                        if (value) {
-                            if (characteristic_advances.has(characteristic)) {
-                                const current = characteristic_advances.get(characteristic);
-                                const total = current + value;
-                                characteristic_advances.set(characteristic, total);
-                            } else {
-                                characteristic_advances.set(characteristic, value);
-                            }
-                        }
-                    }
+                    wfrp.characteristics.forEach(characteristic => {
+                        const value = parseInt(values[`repeating_careers_${id}_career_${characteristic}_advances`]) || 0;
+                        const current = characteristic_advances.get(characteristic) || 0; 
+                        const total = value + current;
+
+                        const value_free = parseInt(values[`repeating_careers_${id}_career_${characteristic}_init`]) || 0;
+                        const current_free = characteristic_advances_free.get(characteristic) || 0; 
+                        const total_free = value_free + current_free;
+
+                        characteristic_advances.set(characteristic, total);
+                        characteristic_advances_free.set(characteristic, total_free);
+                    });
     
                     for (let i = 1; i <= 4; i++) {
                         for (let j = 1; j <= 10; j++) {
                             const skill = values[`repeating_careers_${id}_career_skill_${i}_${j}_name`];
-                            const value = parseInt(values[`repeating_careers_${id}_career_skill_${i}_${j}_advances`]);
-                            if (value) {
-                                if (skill_advances.has(skill)) {
-                                    const current = skill_advances.get(skill);
-                                    const total = current + value;
-                                    skill_advances.set(skill, total);
-                                } else {
-                                    skill_advances.set(skill, value);
-                                }
-                            } 
+
+                            const value = parseInt(values[`repeating_careers_${id}_career_skill_${i}_${j}_advances`]) || 0;
+                            const current = skill_advances.get(skill) || 0;
+                            const total = current + value;
+
+                            const value_free = parseInt(values[`repeating_careers_${id}_career_skill_${i}_${j}_init`]) || 0;
+                            const current_free = skill_advances_free.get(skill) || 0;
+                            const total_free = current_free + value_free;
+
+                            skill_advances.set(skill, total);
+                            skill_advances_free.set(skill, total_free);
                         }
             
                         for (let k = 1; k <= 5; k++) {
-                            const talent = values[`repeating_careers_${id}_talent_skill_${i}_${k}_name`];
-                            const value = parseInt(values[`repeating_careers_${id}_career_talent_${i}_${k}_advances`]);
-                            if (value) {
-                                if (talent_advances.has(talent)) {
-                                    const current = talent_advances.get(skill);
-                                    const total = current + value;
-                                    talent_advances.set(skill, total);
-                                } else {
-                                    talent_advances.set(skill, value);
-                                }
-                            } 
+                            const talent = values[`repeating_careers_${id}_career_talent_${i}_${k}_name`];
+
+                            const value = parseInt(values[`repeating_careers_${id}_career_talent_${i}_${k}_advances`]) || 0;
+                            const current = talent_advances.get(talent) || 0;
+                            const total = current + value;
+
+                            const value_free = parseInt(values[`repeating_careers_${id}_career_talent_${i}_${k}_init`]) || 0;
+                            const current_free = talent_advances_free.get(talent) || 0;
+                            const total_free = current_free + value_free;
+
+                            talent_advances.set(talent, total);
+                            talent_advances_free.set(talent, total_free);
                         }
                     }
                 }
 
+                for (let i = 1; i <= 12; i++) {
+                    const skill = values[`species_skill_${i}_name`];
+
+                    const value_free = parseInt(values[`species_skill_${i}_advances`]) || 0;
+                    const current_free = skill_advances_free.get(skill) || 0;
+                    const total_free = current_free + value_free;
+
+                    skill_advances_free.set(skill, total_free);
+                }
+
+                for (let i = 1; i <= 10; i++) {
+                    const talent = values[`species_talent_${i}_name`];
+
+                    const value_free = parseInt(values[`species_talent_${i}_advances`]) || 0;
+                    const current_free = talent_advances_free.get(talent) || 0;
+                    const total_free = current_free + value_free;
+                }
+
                 let xp = 0;
 
-                characteristic_advances.forEach((value) => xp += calculateCharacteristicXP(value));
-                skill_advances.forEach((value) => xp += calculateSkillXP(value));
-                talent_advances.forEach((value) => xp += calculateTalentXP(value));
+                characteristic_advances.forEach((value, key) => xp += calculateCharacteristicXP(value, characteristic_advances_free.get(key)));
+                skill_advances.forEach((value, key) => xp += calculateSkillXP(value, skill_advances_free.get(key)));
+                talent_advances.forEach((value, key) => xp += calculateTalentXP(value, talent_advances_free.get(key)));
 
-                for (const id of ids.experience) {
-                    const value = parseInt(values[`repeating_experience_${id}_experience_amount`]);
-                    
-                    if (value < 0) xp -= value;
+                console.log(ids.experiencespent)
+
+                for (const id of ids.experiencespent) {
+                    const value = parseInt(values[`repeating_experiencespent_${id}_experience_amount`]);
+
+                    console.log(value)
+
+                    xp += value;
                 }
 
                 const updateAttrs = {};
@@ -1011,7 +1164,6 @@ const wfrpModule = ( () => {
             attrs.push(`${characteristic}_noncareer`);
 
             getAttrs(attrs, values => {
-                console.log(values)
                 const int_values = Object.values(values).map(item => parseInt(item) || 0);
                 const total_advances = int_values.reduce((a,b) => a+b);
 
@@ -1042,6 +1194,11 @@ const wfrpModule = ( () => {
                     attrs.push(`repeating_noncareer-skills_${id}_advance_name`)
                     attrs.push(`repeating_noncareer-skills_${id}_advance_advances`)
                 });
+
+                for (let i = 1; i <= 12; i++) {
+                    attrs.push(`species_skill_${i}_name`); 
+                    attrs.push(`species_skill_${i}_advances`);
+                }
         
                 getAttrs(attrs, values => {
                     const skill_list = Object.entries(values);
@@ -1063,7 +1220,6 @@ const wfrpModule = ( () => {
                     const updateAttrs = {};
 
                     skills.forEach((value, key) => {
-
                         let parsed_key = key.replace(/ /g,"-").toLowerCase();
 
                         if (wfrp.skills.includes(parsed_key)) {
@@ -1154,6 +1310,11 @@ const wfrpModule = ( () => {
                     }
                 }
             });
+
+            for (let i = 1; i <= 10; i++) {
+                attrs.push(`species_talent_${i}_name`); 
+                attrs.push(`species_talent_${i}_advances`);
+            }
     
             getAttrs(attrs, values => {
                 const talent_list = Object.entries(values);
@@ -1173,7 +1334,6 @@ const wfrpModule = ( () => {
                 });
 
                 talents.forEach((value, key) => {
-
                     if (value !== 0) {
 
                         getSectionIDs("talent", id_array => {
@@ -1191,29 +1351,33 @@ const wfrpModule = ( () => {
 
                                 const key_array = Object.keys(values).filter(item => item !== "");
 
-                                if (value_array_test.includes(key.toLowerCase())) {
-                                    const index = value_array_test.indexOf(key.toLowerCase());
+                                let page_name = key.split("(")[0].trim() || key;
+
+                                if (value_array_test.includes(page_name.toLowerCase())) {
+                                    const index = value_array_test.indexOf(page_name.toLowerCase());
                                     const array_key = key_array[index];
                                     const new_key = `${array_key.substring(0, array_key.length-5)}_ranks`;
                                     
                                     updateAttrs[new_key] = value;
                                 } else if (value > 0) {
 
-                                    getCompendiumPage(key, page => {
+                                    getCompendiumPage(`Talents:${page_name}`, page => {
                                         
-                                        if (page.expansion !== 0) {
-                                            wfrpDragAndDrop.handleDrop({drop_name:page.name, drop_content:page.content, drop_data:page.data});
+                                        if (page.expansion !== 0 && page.expansion) {
+
+                                            wfrpDragAndDrop.handleDrop({drop_name:page.name, drop_content:page.content, drop_data:page.data}, key);
+                                        
                                         } else {
                                             const new_id = generateRowID();
 
                                             updateAttrs[`repeating_talent_${new_id}_talent_name`] = key;
                                             updateAttrs[`repeating_talent_${new_id}_talent_ranks`] = value;
+
+                                            setAttrs(updateAttrs);
                                         }
 
                                     });
                                 }
-
-                                setAttrs(updateAttrs);
                                 
                             });
                         });
@@ -1251,7 +1415,7 @@ const wfrpModule = ( () => {
 
         getAttrs(attrs, values => {
             const spent = Object.values(values).filter(item => item !== "").map(item => parseInt(item));
-            const total = spent.reduce((a,b) => a+b);
+            const total = spent.reduce((a,b) => a+b) || 0;
             const maximum_allowed = (source_type === "skill") ? 40 : 1;
             
             if (total > maximum_allowed) {
@@ -1722,6 +1886,7 @@ const wfrpModule = ( () => {
 
         // Class and Species Controls
         changeSpecies:changeSpecies,
+        checkSpeciesAdvances:checkSpeciesAdvances,
 
         // Characteristic Functions
         calculateCharacteristic: calculateCharacteristic,
@@ -1811,6 +1976,10 @@ on(`clicked:remove_custom_species`, eventInfo => setAttrs({"species":""}));
 
 on(`change:species`, eventInfo => wfrpModule.changeSpecies(eventInfo.newValue));
 
+for (let index = 1; index <= 12; index++) {
+    on(`change:species_skill_${index}_advances`, eventInfo => wfrpModule.checkSpeciesAdvances());
+} 
+
 // CHARACTERISTIC CALCULATIONS
 
 wfrpModule.wfrp.characteristics.forEach(characteristic => {
@@ -1874,11 +2043,11 @@ on(`change:repeating_careers:career_level_current`, eventInfo => wfrpModule.upda
 
 // EXPERIENCE CHANGES
 
-on(`change:repeating_experience change:experience_mod remove:repeating_experience`, eventInfo => wfrpModule.recalculateEarnedXP());
+on(`change:repeating_experience change:repeating_experiencespent change:experience_mod remove:repeating_experiencespent remove:repeating_experience`, eventInfo => wfrpModule.recalculateEarnedXP());
 
 on(`change:current_xp change:spent_xp change:total_xp remove:repeating_experience`, eventInfo => wfrpModule.recalculateCurrentXP());
 
-on(`change:repeating_experience change:spent_xp change:total_xp remove:repeating_experience`, eventInfo => wfrpModule.recalculateSpentXP());
+on(`change:repeating_experience change:repeating_experiencespent change:experience_mod remove:repeating_experiencespent remove:repeating_experience`, eventInfo => wfrpModule.recalculateSpentXP());
 
 wfrpModule.wfrp.characteristics.forEach(characteristic => {
     on(`change:repeating_careers:career_${characteristic}_advances change:repeating_careers:career_${characteristic}_init`, eventInfo => wfrpModule.calculateCharacteristicAdvances(characteristic))
@@ -1900,7 +2069,23 @@ wfrpModule.wfrp.characteristics.forEach(characteristic => {
     });
 });
 
+for (let index = 1; index <= 12; index++) {
+    on(`clicked:remove_skill_${index}`, eventInfo => setAttrs({[`species_skill_${index}_advances`]:"0"}));
+
+    on(`change:species_skill_${index}_advances`, eventInfo => wfrpModule.calculateSkillAdvances());
+} 
+
+for (let index = 1; index <= 10; index++) {
+    on(`change:species_talent_${index}_advances`, eventInfo => wfrpModule.calculateTalentAdvances())
+};
+
 on(`clicked:combinexp`, eventInfo => wfrpModule.consolidateXP());
+
+on(`clicked:advance`, eventInfo => wfrpModule.advanceXP());
+
+on(`clicked:career_incomplete`, eventInfo => wfrpModule.incompleteCareerXP());
+
+on(`clicked:career_complete`, eventInfo => wfrpModule.completeCareerXP());
 
 on(`change:repeating_noncareer-skills delete:repeating_noncareer-skills`, eventInfo => wfrpModule.calculateSkillAdvances());
 
@@ -1946,7 +2131,7 @@ wfrpModule.wfrp.characteristics.forEach(characteristic => {
     on(`change:${characteristic} change:${characteristic}_bonus`, eventInfo => wfrpModule.updateNPCButtons())
 });
 
-on(`change:npc sheet:opened`, eventInfo => wfrpModule.updateNPCButtons())
+on(`change:npc sheet:opened`, eventInfo => wfrpModule.updateNPCButtons());
 
 //# sourceURL=sheetworkers.js
 
