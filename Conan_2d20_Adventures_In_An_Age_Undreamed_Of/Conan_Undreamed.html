@@ -5,7 +5,7 @@
     </div>
 
     <div class="help-info">
-        <button type="action" class="info-button" name="act_openinfo" accesskey="i"></button>
+        <button type="action" class="info-button" name="act_openinfo" accesskey="i">Info</button>
     </div>
 
     <div class="area-header"></div>
@@ -1363,8 +1363,9 @@
             <div class="scroll-sheet-body">
                 <div class="scroll-fieldset">
                     <fieldset class="repeating_lognotes">
+                        <input type="checkbox" name="attr_hidelogrow" style="display: none;" class="sheet-log-hide-checkbox"/>
                         <div class="log-note-grid">
-                            <div style="width: 100%;">                            
+                            <div class="log-note-date">
                                 <span>Date:</span>
                                 <!--
                                 <button type="action" name="act_logadddate" class="sheet-button-logadd-date">
@@ -1393,7 +1394,13 @@
                     </fieldset>
                 </div>
             </div>
-            <div></div>
+            <div class="scroll-sheet-footer">
+                <div style="height: 25px;">
+                    <input type="text" class="log-search-field" name="attr_searchvalue" />
+                    <button type="action" name="act_searchlog">Search</button>
+                    <button type="action" name="act_clearlogsearch">Clear</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1412,9 +1419,7 @@
             <div class="scroll-sheet-info-body">
                 <h1>Welcome to the Roll20 character sheet for<br><span>Conan: Adventures in an Age Undreamed Of</span></h1> 
                 <br>
-                <p><span>Please note</span> this help/info screen can be access with the shortcut key "i" or this icon 
-                <img style="width: 25px;height: 20px;" src="https://github.com/Riccarr/roll20-character-sheets/raw/master/Conan_2d20_Adventures_In_An_Age_Undreamed_Of/img/helpinfoicon.png">
-                 in upper right corner of sheet.
+                <p><span>Please note</span> this help/info screen can be access with the shortcut key "i" or the Info scroll icon in upper right corner of sheet.
                 </p>
                 <p>Below is a list of features and information on sheet behaviors to be aware of. Also at bottom is a description of the <span>two required tables</span> that the GM needs to create.</p>
                 <h2>Keyboard Shortcuts</h2>
@@ -1508,9 +1513,9 @@
                 Note, the Date will automatically be populated the first time a value is entered into any of the other fields. It can be edited for custom purposes.
                 <br><br>
                 <h2>Roll Tables</h2>
-                In order for the Skills rolls and weapon damage rolls to work properly there are two required roll tables that the GM needs to make.
+                <p>In order for the Skills rolls and weapon damage rolls to work properly there are two required roll tables that the GM needs to make.</p>
                 <h3>Hit-Location</h3>
-                The GM needs to create a table named Hit-Location.  This table will need to have the following six entries:
+                The GM needs to create a table named <span>Hit-Location</span>.  This table will need to have the following six entries:
                 <ul>
                     <li>Head</li>
                     <li>Right Arm</li>
@@ -1520,7 +1525,7 @@
                     <li>Left Leg</li>                    
                 </ul>                
                 <h3>Combat-Dice</h3>
-                The GM will also need to create a second table named Combat-Dice.  This table will need to have the following six entries:
+                The GM will also need to create a second table named <span>Combat-Dice</span>.  This table will need to have the following six entries:
                 <ul>
                     <li>1</li>
                     <li>2</li>
@@ -2073,6 +2078,51 @@
             setAttrs(newattrs);
         });
     });
+
+    on('clicked:searchlog', function(eventInfo) {
+        getSectionIDs('repeating_lognotes', function(idarray) {
+            var rowIds = [];
+            for(var id=0; id < idarray.length; id++) {
+                rowIds.push(`repeating_lognotes_${idarray[id]}_hidelogrow`);
+                rowIds.push(`repeating_lognotes_${idarray[id]}_logdate`);
+                rowIds.push(`repeating_lognotes_${idarray[id]}_logtitle`);
+                rowIds.push(`repeating_lognotes_${idarray[id]}_logamtvalue`);
+                rowIds.push(`repeating_lognotes_${idarray[id]}_lognote`);
+            }
+            rowIds.push('searchvalue'); //need to also get the search field value
+            getAttrs(rowIds, function(values){
+                var attrs = {};
+                var currentRowId = '';
+                for (const property in values) {
+                    if (property != 'searchvalue') {
+                        var currentId = property; 
+                        //ie. "repeating_lognotes_-mm2orwqu5v6yksxkbeo_lognote"
+                        currentId = currentId.substr(19, currentId.indexOf("_", 20)-19);
+                        if (currentRowId != currentId) {
+                            attrs[`repeating_lognotes_${currentId}_hidelogrow`] = 'on';
+                            currentRowId = currentId;
+                        }
+                        if (values[property].toLowerCase().indexOf(values['searchvalue'].toLowerCase()) > -1) {
+                            //found search term; set display on
+                            attrs[`repeating_lognotes_${currentId}_hidelogrow`] = 'off';
+                        }
+                    }
+                }
+                setAttrs(attrs);
+            });
+         });
+    });
+
+    on('clicked:clearlogsearch', function(eventInfo) {
+        getSectionIDs('repeating_lognotes', function(idarray) {
+            var attrs = {};
+            for(var id=0; id < idarray.length; id++) {
+                attrs[`repeating_lognotes_${idarray[id]}_hidelogrow`] = 'off';
+            }
+            setAttrs(attrs);
+         });
+    });
+    
 
 
     //**** OPEN EVENT ****************************************
