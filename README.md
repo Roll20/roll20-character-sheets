@@ -12,6 +12,8 @@ Pull requests are processed weekly and should be **submitted no later than 6am P
 
 ## Internationalization &amp; Translations
 
+Update 10/30/2020: We’re making some changes to the way translations work. Check out [our forum post](https://app.roll20.net/forum/post/9382237/translation-and-crowdin-changes) for additional details!
+
 Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations.
 
 **The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** 

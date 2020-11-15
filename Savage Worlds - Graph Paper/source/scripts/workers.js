@@ -28,15 +28,19 @@ on("sheet:opened", (e) => {
       });
 
       function updateListSkills(values) {
-        values = Object.entries(values);
+        let references = [];
 
-        let updates = {};
-
-        _.each(values, (item) => {
-          updates[item[0]] = item[1];
+        _.each(Object.entries(values), (item) => {
+          references.push(item[0].replace('skill_name', 'skill_mod'));
         });
 
-        setAttrs(updates);
+        getAttrs(references, (vals) => {
+          _.each(references, (item) => {
+            let code = vals[item].replace('_mod', '_code');
+
+            setAttrs({ [item.replace('skill_mod', 'skill_code')]: code }, { silent: true });
+          });
+        });
       }
 
       TETRA.doWithRepList('engrams', ['skill_name'], (v) => { updateListSkills(v) });
@@ -240,7 +244,8 @@ const skills = ['academics', 'athletics', 'battle', 'boating', 'common_knowledge
                 'repair', 'research', 'riding', 'science', 'shooting', 'stealth',
                 'survival', 'taunt', 'thievery', 'gambling', 'hacking', 'faith',
                 'focus', 'language', 'occult', 'psionics', 'spellcasting',
-                'weird_science', 'custom_skill_1', 'custom_skill_2', 'unskilled'];
+                'weird_science', 'custom_skill_1', 'custom_skill_2', 'custom_skill_3',
+                'custom_skill_4', 'custom_skill_5', 'custom_skill_6', 'unskilled'];
 
 const skillDice = ['d4-2', 'd4', 'd6', 'd8', 'd10', 'd12'];
 
@@ -466,58 +471,6 @@ on('change:fatigue change:' + fatigueToggles.join(' change:'), (e) => {
     setters['fatigue_mod'] = fmod;
 
     setAttrs(setters, { silent: true });
-  });
-});
-
-/* #############################################################################
-AUTO SIZE EDGES + HINDRANCES
-############################################################################# */
-
-// 10px Roboto
-// Since Roll20 does not allow DOM access, yes, this BS is necessary.
-// Don't take this as something to learn from! Stars above, no!
-const letters = { 'A': 6.53, 'a': 5.45, 'B': 6.23, 'b': 5.63, 'C': 6.52,
-                  'c': 5.23, 'D': 6.56, 'd': 5.64, 'E': 6.69, 'e': 5.31,
-                  'F': 5.53, 'f': 3.48, 'G': 6.81, 'g': 5.63, 'H': 7.14,
-                  'h': 5.52, 'I': 2.72, 'i': 2.44, 'J': 5.53, 'j': 2.39,
-                  'K': 6.28, 'k': 5.08, 'L': 5.39, 'l': 2.44, 'M': 8.73,
-                  'm': 8.77, 'N': 7.14, 'n': 5.53, 'O': 6.88, 'o': 5.70,
-                  'P': 6.31, 'p': 5.63, 'Q': 6.88, 'q': 5.69, 'R': 6.17,
-                  'r': 3.39, 'S': 5.94, 's': 5.16, 'T': 5.97, 't': 3.28,
-                  'U': 6.48, 'u': 5.52, 'V': 6.38, 'v': 4.84, 'W': 8.88,
-                  'w': 7.52, 'X': 6.28, 'x': 4.97, 'Y': 8.88, 'y': 7.52,
-                  'Z': 6.28, 'z': 4.97, '#': 6.17, '&': 6.22, '(': 3.42,
-                  ')': 3.48, '+': 5.67, '-': 2.77, '=': 5.50, '*': 4.31,
-                  '!': 2.58, '.': 2.64, ',': 1.97, '@': 8.98, ' ': 2.48,
-                  '?': 4.73, '_': 4.52, '%': 7.33, 'Ä': 6.53, 'ä': 5.45,
-                  'Ö': 6.88, 'ö': 5.70, 'Ü': 6.48, 'ü': 5.52, 'ß': 5.95,
-                  '°': 3.75, '<': 5.09, '>': 5.23, '[': 2.66, ']': 2.66,
-                  '{': 3.39, '}': 3.39, '$': 5.63, '"': 3.20 };
-
-on('change:repeating_features:feature_name', (e) => {
-  let target = e.sourceAttribute.replace('_feature_name', '_feature_size');
-
-  getAttrs([e.sourceAttribute], (value) => {
-    // Split string into array
-    let chars = value[Object.keys(value)[0]].split(''),
-        stringWidth = 0.0;
-
-    // Sum up the width of each character
-    _.each(chars, (c) => {
-      stringWidth += _.has(letters, c) ? letters[c] : 5.0;
-    });
-
-    // Remove decimal points by rounding up
-    stringWidth = Math.ceil(stringWidth);
-
-    let offset = 4 - (stringWidth % 4),
-        elementWidth = stringWidth + offset;
-
-    // Maximum/minimum width
-    elementWidth = elementWidth > 180 ? 180 : elementWidth;
-    elementWidth = elementWidth < 32 ? 32 : elementWidth;
-
-    setAttrs({ [target]: elementWidth }, { silent: true });
   });
 });
 
