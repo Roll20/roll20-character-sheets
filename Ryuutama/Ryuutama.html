@@ -2,6 +2,67 @@
 
 <html>
     <script type="text/worker">
+        var translationLang = getTranslationLanguage();
+
+        function compareDieToBase(baseDie, newDie) {
+            if(newDie < baseDie) {
+                return "reduced"
+            } else if (newDie > baseDie) {
+                return "increased"
+            } else {
+                return "default"
+            }
+        }
+
+        function htmlEncodeString(string){
+            var codedLetters = "";
+            for (let letter of string) {
+                codedLetters = codedLetters + `&#${letter.charCodeAt()};`
+            }
+            return codedLetters;
+        }
+
+        function sheetVersionUpdater(currentVersion){
+            if (currentVersion < 1) {
+                console.log("Updating to version 1")
+                getSectionIDs("repeating_skills", skillsArray => {
+                    skillsArray.forEach( id => {
+                        updateRepeatingSkill("A", id)
+                        updateRepeatingSkill("B", id)
+                    });
+                });
+                getAttrs(["version"], function(values) {setAttrs({version: 1});});
+            }
+        }
+
+        function formatStatLetters(statA, statB) {
+            console.log(statB)
+            if (statA == 'empty-string' && statB == 'empty-string'){
+                return ""
+            } else {
+                return  " [" + getTranslationByKey(statA) + "+" + getTranslationByKey(statB) + "]"
+            }
+        }
+
+        function updateRepeatingSkill(letter, id=null) {
+            let base;
+            id ? base = `repeating_skills_${id}` : base = `repeating_skills`
+            getAttrs([`${base}_skillName${letter}`,`${base}_skillName${letter}Button`,`${base}_skillDie1${letter}`,`${base}_skillDie2${letter}` ],
+                function(values) {
+                    newName = values[`${base}_skillName${letter}`] + formatStatLetters(values[`${base}_skillDie1${letter}`], values[`${base}_skillDie2${letter}`])
+                    setAttrs({
+                        [`${base}_skillName${letter}Button`]: newName
+                    });
+                }
+            );
+        }
+
+        on('sheet:opened', () => {
+            getAttrs(['version'], v => {
+                sheetVersionUpdater(parseFloat(v.version) || 0);
+            });
+        });
+
         on("change:injury change:condition", function() {
             getAttrs(["condition", "injury"], function(values) {
                 setAttrs({
@@ -45,30 +106,70 @@
             });
         });
         on("change:str change:poisoned change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["str", "poisoned", "sick", "shocked", "bonus", "condition", "strDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.str)
+                            - parseInt(values.poisoned)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentStr: Math.min(12, Math.max(4, parseInt(values.str)-parseInt(values.poisoned)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'STR' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentStr: newDiceCalc,
+                    strDieStatus: compareDieToBase(values.str, newDiceCalc)
                 });
             });
         });
         on("change:dex change:injured change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["dex", "injured", "sick", "shocked", "bonus", "condition", "dexDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.dex)
+                            - parseInt(values.injured)
+                            - parseInt(values.sick)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.shocked))
+                            + (values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentDex: Math.min(12, Math.max(4, parseInt(values.dex)-parseInt(values.injured)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'DEX' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentDex: newDiceCalc,
+                    dexDieStatus: compareDieToBase(values.dex, newDiceCalc)
                 });
             });
         });
         on("change:int change:muddled change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["int", "muddled", "sick", "shocked", "bonus", "condition", "intDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                        4, parseInt(values.int)
+                            - parseInt(values.muddled)
+                            - (translationLang == 'fr' ? 0 : parseInt(values.sick))
+                            - parseInt(values.shocked)
+                            + (values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)
+                        )
+                    )
                 setAttrs({
-                    currentInt: Math.min(12, Math.max(4, parseInt(values.int)-parseInt(values.muddled)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'INT' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentInt: newDiceCalc,
+                    intDieStatus: compareDieToBase(values.int, newDiceCalc)
                 });
             });
         });
         on("change:spi change:exhausted change:sick change:shocked change:bonus change:condition", function() {
-            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition"], function(values) {
+            getAttrs(["spi", "exhausted", "sick", "shocked", "bonus", "condition", "spiDieStatus"], function(values) {
+                const newDiceCalc = Math.min(
+                    12, Math.max(
+                            4, parseInt(values.spi)
+                                - parseInt(values.exhausted)
+                                - (translationLang == 'fr' ? 0 : parseInt(values.sick))
+                                - parseInt(values.shocked)
+                                + (values.bonus == 'SPI' && parseInt(values.condition) >= 10 ? 2 : 0)
+                            )
+                        )
                 setAttrs({
-                    currentSpi: Math.min(12, Math.max(4, parseInt(values.spi)-parseInt(values.exhausted)-parseInt(values.sick)-parseInt(values.shocked)+(values.bonus == 'SPI' && parseInt(values.condition) >= 10 ? 2 : 0)))
+                    currentSpi: newDiceCalc,
+                    spiDieStatus: compareDieToBase(values.spi, newDiceCalc)
                 });
             });
         });
@@ -400,7 +501,12 @@
                 });
             });
         });
-
+        on("change:repeating_skills:skillNameA change:repeating_skills:skillDie1A change:repeating_skills:skillDie2A", function(event) {
+            updateRepeatingSkill('A')
+        });
+        on("change:repeating_skills:skillNameB change:repeating_skills:skillDie1B change:repeating_skills:skillDie2B", function(event) {
+            updateRepeatingSkill('B')
+        });
         on("sheet:opened", () => {
             getAttrs(["npc_switch"], v => {
                 if (v.npc_switch == "on") {
@@ -410,6 +516,17 @@
                 } else if (parseInt(v.npc_switch) == 0 ) {
                     setAttrs({
                         npc_switch: 1
+                    });
+                };
+            });
+        });
+
+        on("sheet:opened", () => {
+            getAttrs(["character_name", "safeCharacterName"], v => {
+                encodedName = htmlEncodeString(v.character_name)
+                if (encodedName != v.safeCharacterName){
+                    setAttrs({
+                        safeCharacterName: encodedName
                     });
                 };
             });
@@ -436,6 +553,7 @@
         <div class="sheet-block-a characterSheet">
             <!-- Hidden Fields -->
             <div class="hidden">
+                <input type="number" name="attr_version" value="0"/>
                 <input type="number" name="attr_typeInitiativeMod" value="0"/>
                 <input type="number" name="attr_typeDamageMod" value="0"/>
                 <input type="number" name="attr_classTravelMod" value="0"/>
@@ -448,6 +566,7 @@
                 <input type="number" name="attr_concentrationBonus" value="0"/>
                 <input type="number" name="attr_speciesConditionMod" value="0"/>
                 <input type="number" name="attr_speciesInitiativeMod" value="0"/>
+                <input type="hidden" name="attr_safeCharacterName" value=""/>
             </div>
             <!-- End Hidden Fields -->
 
@@ -459,7 +578,7 @@
             <input type="radio" class="sheet-tab sheet-tab3" name="attr_core-tab" value="3" title="Stats"/>
             <span class="sheet-tab sheet-tab3" data-i18n="tab-stats">Stats</span>
             <input type="radio" class="sheet-tab sheet-tab4" name="attr_core-tab" value="4" title="Checks"/>
-            <span class="sheet-tab sheet-tab4" data-i18n="tab-checks">Checks</span>
+            <span class="sheet-tab sheet-tab4" data-i18n="tab-modifiers">Modifiers</span>
             <input type="radio" class="sheet-tab sheet-tab5" name="attr_core-tab" value="5" title="Equipment"/>
             <span class="sheet-tab sheet-tab5" data-i18n="tab-inv">Inventory</span>
             <input type="radio" class="sheet-tab sheet-tab6" name="attr_core-tab" value="6" title="Settings"/>
@@ -727,7 +846,7 @@
                         <div class="sheet-spellRow">
 
                         <div class="spell-details">
-                            <button class="spellName skill-check-button" type="roll" value="&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{character_name}}}" name="roll_repeatingSpellCard">
+                            <button class="spellName skill-check-button" type="roll" value="&{template:spell} {{name=@{spellName}}} {{cost=@{spellCost}}} {{duration=@{spellDuration}}} {{target=@{spellTarget}}} {{range=@{spellRange}}} {{effect=@{spellEffect}}} {{charname=@{safeCharacterName}}}" name="roll_repeatingSpellCard">
                                 <span name="attr_spellName"></span>
                             </button>
                             <span class="spellCost" name="attr_spellCost"></span>
@@ -737,10 +856,10 @@
                             <span class="spellTypes" name="attr_spellType" data-i18n-dynamic></span>
                         </div>
 
-                        <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-                        <span class="spell-toggles settings-toggle ">p</span>
-                        <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-                        <span class="spell-toggles collapse-toggle">i</span>
+                        <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                        <span class="config-toggles settings-toggle ">p</span>
+                        <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                        <span class="config-toggles collapse-toggle">i</span>
 
                         <div class="flex settings full-width">
                             <div class="flex-column">
@@ -766,7 +885,7 @@
                             <div class="flex-column">
                                 <span data-i18n="type">Type</span>
                                 <select name="attr_spellType" class="sheet-spellTypes">
-                                    <option value="empty-space"></option>
+                                    <option value="empty-string"         data-i18n="empty-string"></option>
                                     <option value="incantation"          data-i18n="incantation">Incantation</option>
                                     <option value="incantation-ritual"   data-i18n="incantation-ritual">Incantation (Ritual)</option>
                                     <option value="music"                data-i18n="music">Music</option>
@@ -774,9 +893,9 @@
                                     <option value="season-spring-ritual" data-i18n="season-spring-ritual">Spring (Ritual)</option>
                                     <option value="season-summer"        data-i18n="season-summer">Summer</option>
                                     <option value="season-summer-ritual" data-i18n="season-summer-ritual">Summer (Ritual)</option>
-                                    <option value="fall"                 data-i18n="season-fall">Fall</option>
+                                    <option value="season-fall"          data-i18n="season-fall">Fall</option>
                                     <option value="season-fall-ritual"   data-i18n="season-fall-ritual">Fall (Ritual) </option>
-                                    <option value="winter"               data-i18n="season-winter">Winter</option>
+                                    <option value="season-winter"        data-i18n="season-winter">Winter</option>
                                     <option value="season-winter-ritual" data-i18n="season-winter-ritual">Winter (Ritual)</option>
                                     <option value="Other"                data-i18n="other">Other</option>
                                 </select>
@@ -862,6 +981,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_strDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentStr" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -881,6 +1001,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_dexDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentDex" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -900,6 +1021,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_intDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentInt" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -919,6 +1041,7 @@
                                 <span data-i18n="base">Base</span>
                             </div>
                             <div class="coreStatCurrentDie flex-column">
+                                <input class="diceAdjustment" name="attr_spiDieStatus" type="hidden" value="default"/>
                                 <input type="number" name="attr_currentSpi" value="4" min="4" step="2" max="12"/>
                                 <span data-i18n="current">Current</span>
                             </div>
@@ -926,232 +1049,197 @@
                     </div>
                 </div>
                 <hr>
-                <div class="sheet-3colrow">
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-injury">Injury</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_injured" value="2"/>
-                        <input type="number" name="attr_injury" value="0" min="0"/> <span data-i18n="status-lowerdex">lowers DEX die size</span>
+                <div class="flex">
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-injury">Injury</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/bandaids.png" alt="bandaids" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_injured" value="2"/>
+                            <input type="number" name="attr_injury" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerdex">lowers DEX die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-poison">Poison</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_poisoned" value="2"/>
-                        <input type="number" name="attr_poison" value="0" min="0"/> <span data-i18n="status-lowerstr">lowers STR die size</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-poison">Poison</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/skullcrossbones.png" alt="skullcrossbones" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_poisoned" value="2"/>
+                            <input type="number" name="attr_poison" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerstr">lowers STR die size</span>
                     </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-sickness">Sickness</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_sick" value="2"/>
-                        <input type="number" name="attr_sickness" value="0" min="0"/> <span data-i18n="status-lowerall">lowers all dice sizes</span>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-sickness">Sickness</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/bedmeds.png" alt="bed" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_sick" value="2"/>
+                            <input type="number" name="attr_sickness" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerall">lowers all dice sizes</span>
+                    </div>
+
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-exhaustion">Exhaustion</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/moonstars.png" alt="exhaustion" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_exhausted" value="2"/>
+                            <input type="number" name="attr_exhaustion" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerspi">lowers SPI die size</span>
+                    </div>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-muddled">Muddled</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/questionmarks.png" alt="questionmarks" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_muddled" value="2"/>
+                            <input type="number" name="attr_muddle" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerint">lowers INT die size</span>
+                    </div>
+                    <div class="flex-column">
+                        <label class="header" data-i18n="status-shock">Shock</label>
+                        <div>
+                            <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Ryuutama/images/brokenheart.png" alt="brokenheart" class="icon icon-small">
+                            <input type="checkbox" class="penaltyCondition" name="attr_shocked" value="2"/>
+                            <input type="number" name="attr_shock" value="0" min="0"/>
+                        </div>
+                        <span class="font-12" data-i18n="status-lowerall">lowers all dice sizes</span>
                     </div>
                 </div>
 
-                <div class="sheet-3colrow">
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-exhaustion">Exhaustion</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_exhausted" value="2"/>
-                        <input type="number" name="attr_exhaustion" value="0" min="0"/> <span data-i18n="status-lowerspi">lowers SPI die size</span>
-                    </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-muddled">Muddled</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_muddled" value="2"/>
-                        <input type="number" name="attr_muddle" value="0" min="0"/> <span data-i18n="status-lowerint">lowers INT die size</span>
-                    </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="status-shock">Shock</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_shocked" value="2"/>
-                        <input type="number" name="attr_shock" value="0" min="0"/> <span data-i18n="status-lowerall">lowers all dice sizes</span>
-                    </div>
-                </div>
                 <hr>
-                <div class="sheet-row">
-                    <div class="sheet-col">
-                        <label class="header headerLabel checkLabel terrainLabel" data-i18n="terrain-modifiers">Terrain Modifiers</label>
-                        <span class="pictos notesIcon">i</span>
-                        <input type="checkbox" name="attr_terrainNotesToggle" class="notesToggle sheet-hider">
-                        <div class="terrainNotes">
-                                <textarea name="attr_terrainNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
+
+                <div class="journeyRules">
+                    <div class="journeyRulesGrid">
+                        <div class="journeyRulesTitle" data-i18n="journey-rules">Journey Rules</div>
+                        <div class="journeyRulesTravelCheck">
+                            <button class="skill-check-button " type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{travel}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{travelMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classTravelMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{armorPenalty}-@{overburdenPenalty}[Overburden]]]}}" name="roll_travelRoll">
+                                1) <span data-i18n="travel">Travel</span> [<span data-i18n="str">STR</span>+<span data-i18n="dex">DEX</span>] +
+                            </button>
+                            <input type="number" name="attr_travelMod" value="0"/>
                         </div>
-                        <table>
-                            <tr>
-                                <th><span data-i18n="level">Level</span> 1=>6</th>
-                                <th><span data-i18n="level">Level</span> 2=>8</th>
-                                <th><span data-i18n="level">Level</span> 3=>10</th>
-                                <th><span data-i18n="level">Level</span> 4=>12</th>
-                                <th><span data-i18n="level">Level</span> 5=>14</th>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_grasslandMod" value="0"/> <span data-i18n="terrain-grassland">Grassland</span></td>
-                                <td><input type="number" name="attr_woodsMod" value="0"/> <span data-i18n="terrain-woods">Woods</span></td>
-                                <td><input type="number" name="attr_deepForestMod" value="0"/> <span data-i18n="terrain-deepforest">Deep Forest</span></td>
-                                <td><input type="number" name="attr_desertMod" value="0"/> <span data-i18n="terrain-desert">Desert</span></td>
-                                <td style="white-space: nowrap;"><input type="number" name="attr_alpineMod" value="0"/> <span data-i18n="terrain-alpine">Alpine</span></td>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_wastelandMod" value="0"/> <span data-i18n="terrain-wasteland">Wasteland</span></td>
-                                <td><input type="number" name="attr_highlandsMod" value="0"/> <span data-i18n="terrain-highlands">Highlands</span></td>
-                                <td><input type="number" name="attr_swampMod" value="0"/> <span data-i18n="terrain-swamp">Swamp</span></td>
-                                <td><input type="number" name="attr_jungleMod" value="0"/> <span data-i18n="terrain-jungle">Jungle</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td></td>
-                                <td><input type="number" name="attr_rockyTerrainMod" value="0"/> <span data-i18n="terrain-rocky">Rocky Terrain</span></td>
-                                <td><input type="number" name="attr_mountainMod" value="0"/> <span data-i18n="terrain-mountain">Mountain</span></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </table>
+                        <div class="journeyRulesDirectionCheck">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{direction}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{directionMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classDirectionMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_directionRoll">
+                                2) <span data-i18n="direction">Direction</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>] +
+                            </button>
+                            <input type="number" name="attr_directionMod" value="0"/>
+                        </div>
+                        <div class="journeyRulesCampCheck">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{camp}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{campMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classCampMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_campRoll">
+                                3) <span data-i18n="camp">Camp</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>] +
+                            </button>
+                            <input type="number" name="attr_campMod" value="0"/>
+                        </div>
                     </div>
                 </div>
 
-                <div class="sheet-row">
-                    <div class="sheet-col">
-                        <label class="header headerLabel checkLabel weatherLabel" data-i18n="weather-modifiers">Weather Modifiers</label>
-                        <span class="pictos notesIcon">i</span>
-                        <input type="checkbox" name="attr_weatherNotesToggle" class="notesToggle sheet-hider">
-                        <div class="terrainNotes">
-                                <textarea name="attr_weatherNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
+                <hr>
+
+                <div class="flex" data-i18n-list="skills-list">
+                    <div class="flex-column skillCheckColumn">
+                        <div data-i18n-list-item="condition" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{condition}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{conditionMod}[Skill Mod]+@{classConditionMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]+@{speciesConditionMod}-@{overburdenPenalty}[Overburden]]]}}" name="roll_conditionRoll">
+                                <span data-i18n="condition">Condition</span> [<span data-i18n="str">STR</span>+<span data-i18n="spi">SPI</span>]
+                            </button>
+                            <input type="number" name="attr_conditionMod" value="0" class="journeyMod"/>
                         </div>
-                        <table cellpadding=3>
-                            <tr>
-                                <th><span data-i18n="weather">Weather</span> +1</th>
-                                <th><span data-i18n="weather">Weather</span> +3</th>
-                                <th><span data-i18n="weather">Weather</span> +5</th>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_rainMod" value="0"/> <span data-i18n="weather-rain">Rain</span></td>
-                                <td><input type="number" name="attr_hardRainMod" value="0"/> <span data-i18n="weather-hardrain">Hard Rain</span></td>
-                                <td><input type="number" name="attr_hurricaneMod" value="0"/> <span data-i18n="weather-hurricane">Hurricane</span></td>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_strongWindMod" value="0"/> <span data-i18n="weather-strongwind">Strong Wind</span></td>
-                                <td><input type="number" name="attr_snowMod" value="0"/> <span data-i18n="weather-snow">Snow</span></td>
-                                <td><input type="number" name="attr_blizzardMod" value="0"/> <span data-i18n="weather-blizzard">Blizzard</span></td>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_fogMod" value="0"/> <span data-i18n="weather-fog">Fog</span></td>
-                                <td><input type="number" name="attr_deepFogMod" value="0"/> <span data-i18n="weather-deepfog">Deep Fog</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_hotMod" value="0"/> <span data-i18n="weather-hot">Hot</span></td>
-                                <td><input type="number" name="attr_darkMod" value="0"/> <span data-i18n="weather-dark">Dark</span></td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td><input type="number" name="attr_coldMod" value="0"/> <span data-i18n="weather-cold">Cold</span></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </table>
+                        <div data-i18n-list-item="delicate-work" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{delicate-work}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{delicateWorkMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_delicateWorkRoll">
+                                <span data-i18n="delicate-work">Delicate Work</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="spi">SPI</span>]
+                            </button>
+                            <input type="number" name="attr_delicateWorkMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="dodge" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{dodge}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{dodgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_dodgeRoll">
+                                <span data-i18n="dodge">Dodge</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_dodgeMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="drinking" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{drinking}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{drinkingMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_drinkingRoll">
+                                <span data-i18n="drinking">Drinking</span> [<span data-i18n="str">STR</span>+<span data-i18n="spi">SPI</span>]</button>
+                            <input type="number" name="attr_drinkingMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="hard-exercise" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{hard-exercise}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{hardExerciseMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_hardExerciseRoll">
+                                <span data-i18n="hard-exercise">Hard Exercise</span> [<span data-i18n="str">STR</span>+<span data-i18n="dex">DEX</span>]
+                            </button>
+                            <input type="number" name="attr_hardExerciseMod" value="0" class="journeyMod"/>
+                        </div>
+                    </div>
+
+                    <div class="flex-column skillCheckColumn">
+                        <div data-i18n-list-item="initiative" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:oneDieCheck} {{season=@{currentSeason}}} {{name=@{character_name} ^{initiative}}} {{result=[[1d@{currentDex}+1d@{currentInt}+@{initiativeMod}+@{typeInitiativeMod}[Skill Mod]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]+@{speciesInitiativeMod}-@{armorPenalty}-@{overburdenPenalty}[Overburden] &{tracker}]]}}" name="roll_initiativeRoll">
+                                <span data-i18n="initiative">Initiative</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_initiativeMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="job-knowledge" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{job-knowledge}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{jobKnowledgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_jobKnowledgeRoll">
+                                <span data-i18n="job-knowledge">Job Knowledge</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_jobKnowledgeMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="magic" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{magic}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{magicCheckMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_magicRoll">
+                                <span data-i18n="magic">Magic</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
+                            </button>
+                            <input type="number" name="attr_magicCheckMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="monster-knowledge" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{monster-knowledge}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{monsterKnowledgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_monsterKnowledgeRoll">
+                                <span data-i18n="monster-knowledge">Monster Knowledge</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_monsterKnowledgeMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="negotiation" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{negotiation}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{negotiationMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classNegotiationMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_negotiationRoll">
+                                <span data-i18n="negotiation">Negotiation</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
+                            </button>
+                            <input type="number" name="attr_negotiationMod" value="0" class="journeyMod"/>
+                        </div>
+                    </div>
+
+                    <div class="flex-column skillCheckColumn">
+                        <div data-i18n-list-item="perception" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{perception}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{perceptionMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_perceptionRoll">
+                                <span data-i18n="perception">Perception</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_perceptionMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="search-for-food" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{search-for-food}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{foragingMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_foragingRoll">
+                                <span data-i18n="search-for-food">Search for Food</span> [<span data-i18n="str">STR</span>+<span data-i18n="int">INT</span>]
+                            </button>
+                            <input type="number" name="attr_foragingMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="sense" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{sense}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{senseMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_senseRoll">
+                                <span data-i18n="sense">Sense</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
+                            </button>
+                            <input type="number" name="attr_senseMod" value="0" class="journeyMod"/>
+                        </div>
+                        <div data-i18n-list-item="stealth" class="flex-between">
+                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{stealth}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{stealthMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_stealthRoll">
+                                <span data-i18n="stealth">Stealth</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="dex">DEX</span>]
+                            </button>
+                            <input type="number" name="attr_stealthMod" value="0" class="journeyMod"/>
+                        </div>
                     </div>
                 </div>
-            </span>
 
-            <span class="characterChecks">
-                <div class="sheet-2colrow">
-                    <div class="sheet-col flex">
-                        <label class="header headerLabel healthLabel" data-i18n="fumble-points">Fumble Points</label>
-                        <input type="number" name="attr_fumble" value="0" min="0"/>
-                        <span data-i18n="apply-concentration" title="*Can't apply concentration to initiative, condition, or damage rolls." data-i18n-title="concentration-note">Apply Concentration to next roll?</span>
-                    </div>
-                    <div class="sheet-col">
-                        <label class="header headerLabel healthLabel" data-i18n="overburden-penalties">Overburden Penalties</label>
-                        <input type="checkbox" class="penaltyCondition" name="attr_overburdened" value="1"/>
-                        <input type="number" name="attr_overburdenPenalty" class="overburdenPenalty" value="0"/>
-                    </div>
-                </div>
-
-                <div class="sheet-2colrow">
-                    <div class="sheet-col">
-                        <label class="checkboxLabel">
-                            <input type="checkbox" name="attr_concentrationMP" value="1">&nbsp;
-                            <span data-i18n="use-mp">Use MP</span>
-                        </label>
-                        <label class="checkboxLabel">
-                            <input type="checkbox" name="attr_concentrationFumble" value="1">&nbsp;
-                            <span data-i18n="use-fumble">Use Fumble Point</span>
-                        </label>
-                    </div>
-                    <div class="sheet-col">
-                        <label class="checkboxLabel"><input type="checkbox" name="attr_applyOverburdenPenalty" value="1" checked="true">&nbsp;<span data-i18n="apply-overburden">Apply overburden penalties</span></label>
-                    </div>
-                </div>
-
-                <span class="characterChecks">
-                    <label class="header headerLabel loweredHeaderLabel" data-i18n="optional-modifiers">Optional Modifiers</label>
-                    <div class="sheet-3colrow">
-                        <div class="sheet-col">
-                            <span data-i18n="current-season">Current Season</span>:
-                            <select name="attr_currentSeason" class="terrain">
-                                <option value=""></option>
-                                <option value="Spring" data-i18n="season-spring">Spring</option>
-                                <option value="Summer" data-i18n="season-summer">Summer</option>
-                                <option value="Fall" data-i18n="season-fall">Fall</option>
-                                <option value="Winter" data-i18n="season-winter">Winter</option>
-                            </select>
-                        </div>
-                        <div class="sheet-col">
-                            <span data-i18n="current-terrain">Current Terrain</span>:
-                            <select name="attr_terrain" class="terrain" data-i18n-list="terrain-list">
-                                <option value="0"></option>
-                                <option value="@{alpineMod}" data-i18n-list-item="terrain-alpine" data-i18n="terrain-alpine">Alpine</option>
-                                <option value="@{deepForestMod}" data-i18n-list-item="terrain-deepforest" data-i18n="terrain-deepforest">Deep Forest</option>
-                                <option value="@{desertMod}" data-i18n-list-item="terrain-desert" data-i18n="terrain-desert">Desert</option>
-                                <option value="@{grasslandMod}" data-i18n-list-item="terrain-grassland" data-i18n="terrain-grassland">Grassland</option>
-                                <option value="@{highlandsMod}" data-i18n-list-item="terrain-highlands" data-i18n="terrain-highlands">Highlands</option>
-                                <option value="@{jungleMod}" data-i18n-list-item="terrain-jungle" data-i18n="terrain-jungle">Jungle</option>
-                                <option value="@{mountainMod}" data-i18n-list-item="terrain-mountain" data-i18n="terrain-mountain">Mountain</option>
-                                <option value="@{rockyTerrainMod}" data-i18n-list-item="terrain-rocky" data-i18n="terrain-rocky">Rocky Terrain</option>
-                                <option value="@{swampMod}" data-i18n-list-item="terrain-swamp" data-i18n="terrain-swamp">Swamp</option>
-                                <option value="@{wastelandMod}" data-i18n-list-item="terrain-wasteland" data-i18n="terrain-wasteland">Wasteland</option>
-                                <option value="@{woodsMod}" data-i18n-list-item="terrain-woods" data-i18n="terrain-woods">Woods</option>
-                            </select>
-                        </div>
-                        <div class="sheet-col">
-                            <span data-i18n="current-weather">Current Weather</span>:
-                            <select name="attr_weather" class="terrain" data-i18n-list="weather-list">
-                                <option value="0"></option>
-                                <option value="@{blizzardMod}" data-i18n-list-item="weather-blizzard" data-i18n="weather-blizzard">Blizzard</option>
-                                <option value="@{coldMod}" data-i18n-list-item="weather-cold" data-i18n="weather-cold">Cold</option>
-                                <option value="@{darkMod}" data-i18n-list-item="weather-dark" data-i18n="weather-dark">Dark</option>
-                                <option value="@{deepFogMod}" data-i18n-list-item="weather-deepfog" data-i18n="weather-deepfog">Deep Fog</option>
-                                <option value="@{fogMod}" data-i18n-list-item="weather-fog" data-i18n="weather-fog">Fog</option>
-                                <option value="@{hardRainMod}" data-i18n-list-item="weather-hardrain" data-i18n="weather-hardrain">Hard Rain</option>
-                                <option value="@{deepFogMod}" data-i18n-list-item="weather-hot" data-i18n="weather-hot">Hot</option>
-                                <option value="@{hurricaneMod}" data-i18n-list-item="weather-hurricane" data-i18n="weather-hurricane">Hurricane</option>
-                                <option value="@{rainMod}" data-i18n-list-item="weather-rain" data-i18n="weather-rain">Rain</option>
-                                <option value="@{snowMod}" data-i18n-list-item="weather-snow" data-i18n="weather-snow">Snow</option>
-                                <option value="@{strongWindMod}" data-i18n-list-item="weather-strongwind" data-i18n="weather-strongwind">Strong Wind</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="sheet-3colrow bonusPenaltyPreferences">
-                        <div class="sheet-col"></div> <!--Empty column on purpose to move others under the right inputs-->
-                        <div class="sheet-col">
-                            <label class="checkboxLabel"><input type="checkbox" name="attr_applyTerrain" value="@{terrain}"> <span data-i18n="apply-terrain">Apply terrain bonuses/penalties</span></label>
-                        </div>
-                        <div class="sheet-col">
-                            <label class="checkboxLabel"><input type="checkbox" name="attr_applyWeather" value="@{weather}"> <span data-i18n="apply-weather">Apply weather bonuses/penalties</span></label>
-                        </div>
-                    </div>
-
+                <span>
                     <input type="checkbox" class="showDiv" name="attr_showFarmerSkills" value="1">
-                    <div class="sheet-3colrow">
-                        <label class="header headerLabel itemLabel" data-i18n="side-job">Side Job</label>
-                        <div class="sheet-col">
+                    <div class="flex-column">
+                        <label class="header headerLabel itemLabel"><span data-i18n="side-job">Side Job</span></label>
+                        <span data-i18n="automatic-negativeone"></span>
+                        <div>
                             <span data-i18n="name">Name</span>:
                             <input type="text" name="attr_farmerSkillName"/>
-                        </div>
-                        <div class="sheet-col">
                             <span data-i18n="effect">Effect</span>:
                             <input type="text" name="attr_farmerSkillEffect" class="spellEffect"/>
-                        </div>
-                    </div>
 
-                    <div class="sheet-row">
-                        <div class="sheet-col skillCheck classSkillRoll">
-                            <span data-i18n="roll">Roll</span>:
                             <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{farmerSkillName}}} {{die1=[[1d@{farmerSkillDie1}]]}} {{die2=[[1d@{farmerSkillDie2}]]}} {{bonusesAndPenalties=[[@{farmerSkillMod}-1[Skill Mod]+@{classSkillBonus}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_farmerSkillRoll"></button>
                             <select name="attr_farmerSkillDie1" class="attributeType">
                                 <option value="@{currentStr}" data-i18n="str">STR</option>
@@ -1165,7 +1253,7 @@
                                 <option value="@{currentInt}" data-i18n="int">INT</option>
                                 <option value="@{currentSpi}" data-i18n="spi">SPI</option>
                             </select> +
-                            <input type="number" name="attr_farmerSkillMod" value="0"/> <span class="sideJobPenalty" data-i18n="automatic-negativeone">(automatic -1 is applied)</span>
+                            <input type="number" name="attr_farmerSkillMod" value="0"/>
                         </div>
                     </div>
                 </span>
@@ -1327,180 +1415,258 @@
                     </div>
                 </span>
 
-                <label class="header headerLabel checkLabel" data-i18n="common-checks">Common Checks</label>
-                <div class="journeyRules">
-                    <div class="journeyRulesGrid">
-                        <div class="journeyRulesTitle" data-i18n="journey-rules">Journey Rules</div>
-                        <div class="journeyRulesTravelCheck">
-                            <button class="skill-check-button " type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{travel}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{travelMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classTravelMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{armorPenalty}-@{overburdenPenalty}[Overburden]]]}}" name="roll_travelRoll">
-                                1) <span data-i18n="travel">Travel</span> [<span data-i18n="str">STR</span>+<span data-i18n="dex">DEX</span>] +
-                            </button>
-                            <input type="number" name="attr_travelMod" value="0"/>
-                        </div>
-                        <div class="journeyRulesDirectionCheck">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{direction}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{directionMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classDirectionMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_directionRoll">
-                                2) <span data-i18n="direction">Direction</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>] +
-                            </button>
-                            <input type="number" name="attr_directionMod" value="0"/>
-                        </div>
-                        <div class="journeyRulesCampCheck">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{camp}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{campMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classCampMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_campRoll">
-                                3) <span data-i18n="camp">Camp</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>] +
-                            </button>
-                            <input type="number" name="attr_campMod" value="0"/>
-                        </div>
-                    </div>
-                </div>
-
-                <hr>
-
-                <div class="flex" data-i18n-list="skills-list">
-                    <div class="flex-column skillCheckColumn">
-                        <div data-i18n-list-item="condition" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{condition}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{conditionMod}[Skill Mod]+@{classConditionMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]+@{speciesConditionMod}-@{overburdenPenalty}[Overburden]]]}}" name="roll_conditionRoll">
-                                <span data-i18n="condition">Condition</span> [<span data-i18n="str">STR</span>+<span data-i18n="spi">SPI</span>]
-                            </button>
-                            <input type="number" name="attr_conditionMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="delicate-work" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{delicate-work}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{delicateWorkMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_delicateWorkRoll">
-                                <span data-i18n="delicate-work">Delicate Work</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="spi">SPI</span>]
-                            </button>
-                            <input type="number" name="attr_delicateWorkMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="dodge" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{dodge}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{dodgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_dodgeRoll">
-                                <span data-i18n="dodge">Dodge</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_dodgeMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="drinking" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{drinking}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{drinkingMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_drinkingRoll">
-                                <span data-i18n="drinking">Drinking</span> [<span data-i18n="str">STR</span>+<span data-i18n="spi">SPI</span>]</button>
-                            <input type="number" name="attr_drinkingMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="hard-exercise" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{hard-exercise}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{hardExerciseMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_hardExerciseRoll">
-                                <span data-i18n="hard-exercise">Hard Exercise</span> [<span data-i18n="str">STR</span>+<span data-i18n="dex">DEX</span>]
-                            </button>
-                            <input type="number" name="attr_hardExerciseMod" value="0" class="journeyMod"/>
-                        </div>
-                    </div>
-
-                    <div class="flex-column skillCheckColumn">
-                        <div data-i18n-list-item="initiative" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:oneDieCheck} {{season=@{currentSeason}}} {{name=@{character_name} ^{initiative}}} {{result=[[1d@{currentDex}+1d@{currentInt}+@{initiativeMod}+@{typeInitiativeMod}[Skill Mod]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]+@{speciesInitiativeMod}-@{armorPenalty}-@{overburdenPenalty}[Overburden] &{tracker}]]}}" name="roll_initiativeRoll">
-                                <span data-i18n="initiative">Initiative</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_initiativeMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="job-knowledge" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{job-knowledge}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{jobKnowledgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_jobKnowledgeRoll">
-                                <span data-i18n="job-knowledge">Job Knowledge</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_jobKnowledgeMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="magic" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{magic}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{magicCheckMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_magicRoll">
-                                <span data-i18n="magic">Magic</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
-                            </button>
-                            <input type="number" name="attr_magicCheckMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="monster-knowledge" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{monster-knowledge}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{monsterKnowledgeMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_monsterKnowledgeRoll">
-                                <span data-i18n="monster-knowledge">Monster Knowledge</span> [<span data-i18n="int">INT</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_monsterKnowledgeMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="negotiation" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{negotiation}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{negotiationMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{classNegotiationMod}[Class Bonus]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_negotiationRoll">
-                                <span data-i18n="negotiation">Negotiation</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
-                            </button>
-                            <input type="number" name="attr_negotiationMod" value="0" class="journeyMod"/>
-                        </div>
-                    </div>
-
-                    <div class="flex-column skillCheckColumn">
-                        <div data-i18n-list-item="perception" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{perception}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{perceptionMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_perceptionRoll">
-                                <span data-i18n="perception">Perception</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_perceptionMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="search-for-food" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{search-for-food}}} {{die1=[[1d@{currentStr}]]}} {{die2=[[1d@{currentInt}]]}} {{bonusesAndPenalties=[[@{foragingMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_foragingRoll">
-                                <span data-i18n="search-for-food">Search for Food</span> [<span data-i18n="str">STR</span>+<span data-i18n="int">INT</span>]
-                            </button>
-                            <input type="number" name="attr_foragingMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="sense" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{sense}}} {{die1=[[1d@{currentInt}]]}} {{die2=[[1d@{currentSpi}]]}} {{bonusesAndPenalties=[[@{senseMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_senseRoll">
-                                <span data-i18n="sense">Sense</span> [<span data-i18n="int">INT</span>+<span data-i18n="spi">SPI</span>]
-                            </button>
-                            <input type="number" name="attr_senseMod" value="0" class="journeyMod"/>
-                        </div>
-                        <div data-i18n-list-item="stealth" class="flex-between">
-                            <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=^{stealth}}} {{die1=[[1d@{currentDex}]]}} {{die2=[[1d@{currentDex}]]}} {{bonusesAndPenalties=[[@{stealthMod}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_stealthRoll">
-                                <span data-i18n="stealth">Stealth</span> [<span data-i18n="dex">DEX</span>+<span data-i18n="dex">DEX</span>]
-                            </button>
-                            <input type="number" name="attr_stealthMod" value="0" class="journeyMod"/>
-                        </div>
-                    </div>
-                </div>
-
                 <label class="header headerLabel itemLabel" data-i18n="additional-checks">Additional Checks</label>
                 <fieldset class="repeating_skills">
                     <div class="sheet-2colrow">
-                        <div class="sheet-col">
-                            <span data-i18n="name">Name</span>:
-                            <input type="text" name="attr_skillNameA"/>
-                            <div class="skillCheck classSkillRoll">
-                                <span data-i18n="roll">Roll</span>:
-                                <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA"></button>
-                                <select name="attr_skillDie1A" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
-                                <select name="attr_skillDie2A" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
+                        <div class="col">
+                            <input class="config-toggles config-checkbox add-skill-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                            <div class="flex-between">
+                                <button class="skill-check-button" type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameA}}} {{die1=[[1d@{skillDie1A}]]}} {{die2=[[1d@{skillDie2A}]]}} {{bonusesAndPenalties=[[@{skillModA}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA">
+                                    <span name="attr_skillNameAButton"></span>
+                                </button>
                                 <input type="number" name="attr_skillModA" value="0"/>
                             </div>
+
+                            <div class="flex flex-vertical-center settings">
+                                <input type="text" name="attr_skillNameA" data-i18n-placeholder="name" placeholder="name"/>
+                                <div class="skillCheck classSkillRoll">
+                                    <select name="attr_skillDie1A" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select> +
+                                    <select name="attr_skillDie2A" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                        <div class="sheet-col">
-                            <span data-i18n="name">Name</span>:
-                            <input type="text" name="attr_skillNameB"/>
-                            <div class="skillCheck classSkillRoll">
-                                <span data-i18n="roll">Roll</span>:
-                                <button type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA"></button>
-                                <select name="attr_skillDie1B" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
-                                <select name="attr_skillDie2B" class="attributeType">
-                                    <option value="@{currentStr}" data-i18n="str">STR</option>
-                                    <option value="@{currentDex}" data-i18n="dex">DEX</option>
-                                    <option value="@{currentInt}" data-i18n="int">INT</option>
-                                    <option value="@{currentSpi}" data-i18n="spi">SPI</option>
-                                </select> +
+                        <div class="col">
+                            <input class="config-toggles config-checkbox add-skill-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+                            <span class="config-toggles settings-toggle add-skill-icon">p</span>
+                            <div class="flex-between">
+                                    <button class="skill-check-button"  type="roll" value="&{template:skillCheck} {{season=@{currentSeason}}} {{name=@{skillNameB}}} {{die1=[[1d@{skillDie1B}]]}} {{die2=[[1d@{skillDie2B}]]}} {{bonusesAndPenalties=[[@{skillModB}[Skill Mod]+@{concentrationBonus}[Concentration]+@{applyTerrain}[Terrain]+@{applyWeather}[Weather]-@{overburdenPenalty}[Overburden]]]}}" name="roll_otherRollA">
+                                    <span name="attr_skillNameBButton"></span>
+                                </button>
                                 <input type="number" name="attr_skillModB" value="0"/>
+                            </div>
+
+                            <div class="flex flex-vertical-center settings">
+                                <input type="text" name="attr_skillNameB" data-i18n-placeholder="name" placeholder="name"/>
+                                <div class="skillCheck classSkillRoll">
+                                    <select name="attr_skillDie1B" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select> +
+                                    <select name="attr_skillDie2B" class="attributeType">
+                                        <option value="empty-string" data-i18n="empty-string" selected></option>
+                                        <option value="@{currentStr}" data-i18n="str">STR</option>
+                                        <option value="@{currentDex}" data-i18n="dex">DEX</option>
+                                        <option value="@{currentInt}" data-i18n="int">INT</option>
+                                        <option value="@{currentSpi}" data-i18n="spi">SPI</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </fieldset>
             </span>
 
-            <span class="characterEquipment">
-                <label class="header headerLabel itemLabel" data-i18n="currency">Currency</label>
-                <input type="number" name="attr_currency" value="0" min="0" style="width:70px"/>
+            <span class="characterChecks">
+                <div class="sheet-2colrow">
+                    <div class="sheet-col flex">
+                        <label class="header headerLabel healthLabel" data-i18n="fumble-points">Fumble Points</label>
+                        <img src="https://raw.githubusercontent.com/jlvgit/roll20-character-sheets/ryuutama-restructuring/Ryuutama/images/fumble.png" alt="fumble" class="icon">
+                        <input type="number" name="attr_fumble" value="0" min="0"/>
+                        <span data-i18n="apply-concentration" title="*Can't apply concentration to initiative, condition, or damage rolls." data-i18n-title="concentration-note">Apply Concentration to next roll?</span>
+                    </div>
+                    <div class="sheet-col">
+                        <div>
+                            <label class="header headerLabel healthLabel" data-i18n="overburden-penalties">Overburden Penalties</label>
+                            <input type="number" name="attr_overburdenPenalty" class="overburdenPenalty" value="0"/>
+                            <input type="checkbox" class="penaltyCondition" name="attr_overburdened" value="1"/>
+                            <label class="checkboxLabel">
+                                <input type="checkbox" name="attr_applyOverburdenPenalty" value="1" checked="true">&nbsp;
+                                <span data-i18n="apply-overburden">Apply overburden penalties</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
 
+                <div class="sheet-2colrow">
+                    <div class="sheet-col">
+                        <label class="checkboxLabel">
+                            <input type="checkbox" name="attr_concentrationMP" value="1">&nbsp;
+                            <span data-i18n="use-mp">Use MP</span>
+                        </label>
+                        <label class="checkboxLabel">
+                            <input type="checkbox" name="attr_concentrationFumble" value="1">&nbsp;
+                            <span data-i18n="use-fumble">Use Fumble Point</span>
+                        </label>
+                    </div>
+                    <div class="sheet-col">
+                    </div>
+                </div>
+
+                <label class="header headerLabel loweredHeaderLabel" data-i18n="optional-modifiers">Optional Modifiers</label>
+                <div class="sheet-3colrow">
+                    <div class="sheet-col">
+                        <span data-i18n="current-season">Current Season</span>:
+                        <select name="attr_currentSeason" class="terrain">
+                            <option value=""></option>
+                            <option value="Spring" data-i18n="season-spring">Spring</option>
+                            <option value="Summer" data-i18n="season-summer">Summer</option>
+                            <option value="Fall" data-i18n="season-fall">Fall</option>
+                            <option value="Winter" data-i18n="season-winter">Winter</option>
+                        </select>
+                    </div>
+                    <div class="sheet-col">
+                        <span data-i18n="current-terrain">Current Terrain</span>:
+                        <select name="attr_terrain" class="terrain" data-i18n-list="terrain-list">
+                            <option value="0"></option>
+                            <option value="@{alpineMod}" data-i18n-list-item="terrain-alpine" data-i18n="terrain-alpine">Alpine</option>
+                            <option value="@{deepForestMod}" data-i18n-list-item="terrain-deepforest" data-i18n="terrain-deepforest">Deep Forest</option>
+                            <option value="@{desertMod}" data-i18n-list-item="terrain-desert" data-i18n="terrain-desert">Desert</option>
+                            <option value="@{grasslandMod}" data-i18n-list-item="terrain-grassland" data-i18n="terrain-grassland">Grassland</option>
+                            <option value="@{highlandsMod}" data-i18n-list-item="terrain-highlands" data-i18n="terrain-highlands">Highlands</option>
+                            <option value="@{jungleMod}" data-i18n-list-item="terrain-jungle" data-i18n="terrain-jungle">Jungle</option>
+                            <option value="@{mountainMod}" data-i18n-list-item="terrain-mountain" data-i18n="terrain-mountain">Mountain</option>
+                            <option value="@{rockyTerrainMod}" data-i18n-list-item="terrain-rocky" data-i18n="terrain-rocky">Rocky Terrain</option>
+                            <option value="@{swampMod}" data-i18n-list-item="terrain-swamp" data-i18n="terrain-swamp">Swamp</option>
+                            <option value="@{wastelandMod}" data-i18n-list-item="terrain-wasteland" data-i18n="terrain-wasteland">Wasteland</option>
+                            <option value="@{woodsMod}" data-i18n-list-item="terrain-woods" data-i18n="terrain-woods">Woods</option>
+                        </select>
+                    </div>
+                    <div class="sheet-col">
+                        <span data-i18n="current-weather">Current Weather</span>:
+                        <select name="attr_weather" class="terrain" data-i18n-list="weather-list">
+                            <option value="0"></option>
+                            <option value="@{blizzardMod}" data-i18n-list-item="weather-blizzard" data-i18n="weather-blizzard">Blizzard</option>
+                            <option value="@{coldMod}" data-i18n-list-item="weather-cold" data-i18n="weather-cold">Cold</option>
+                            <option value="@{darkMod}" data-i18n-list-item="weather-dark" data-i18n="weather-dark">Dark</option>
+                            <option value="@{deepFogMod}" data-i18n-list-item="weather-deepfog" data-i18n="weather-deepfog">Deep Fog</option>
+                            <option value="@{fogMod}" data-i18n-list-item="weather-fog" data-i18n="weather-fog">Fog</option>
+                            <option value="@{hardRainMod}" data-i18n-list-item="weather-hardrain" data-i18n="weather-hardrain">Hard Rain</option>
+                            <option value="@{deepFogMod}" data-i18n-list-item="weather-hot" data-i18n="weather-hot">Hot</option>
+                            <option value="@{hurricaneMod}" data-i18n-list-item="weather-hurricane" data-i18n="weather-hurricane">Hurricane</option>
+                            <option value="@{rainMod}" data-i18n-list-item="weather-rain" data-i18n="weather-rain">Rain</option>
+                            <option value="@{snowMod}" data-i18n-list-item="weather-snow" data-i18n="weather-snow">Snow</option>
+                            <option value="@{strongWindMod}" data-i18n-list-item="weather-strongwind" data-i18n="weather-strongwind">Strong Wind</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sheet-3colrow bonusPenaltyPreferences">
+                    <div class="sheet-col"></div> <!--Empty column on purpose to move others under the right inputs-->
+                    <div class="sheet-col">
+                        <label class="checkboxLabel"><input type="checkbox" name="attr_applyTerrain" value="@{terrain}"> <span data-i18n="apply-terrain">Apply terrain bonuses/penalties</span></label>
+                    </div>
+                    <div class="sheet-col">
+                        <label class="checkboxLabel"><input type="checkbox" name="attr_applyWeather" value="@{weather}"> <span data-i18n="apply-weather">Apply weather bonuses/penalties</span></label>
+                    </div>
+                </div>
+
+                <div class="sheet-row">
+                    <div class="sheet-col">
+                        <label class="header headerLabel checkLabel terrainLabel" data-i18n="terrain-modifiers">Terrain Modifiers</label>
+                        <span class="pictos notesIcon">W</span>
+                        <input type="checkbox" name="attr_terrainNotesToggle" class="notesToggle sheet-hider">
+                        <div class="terrainNotes">
+                                <textarea name="attr_terrainNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
+                        </div>
+                        <table>
+                            <tr>
+                                <th><span data-i18n="level">Level</span> 1=>6</th>
+                                <th><span data-i18n="level">Level</span> 2=>8</th>
+                                <th><span data-i18n="level">Level</span> 3=>10</th>
+                                <th><span data-i18n="level">Level</span> 4=>12</th>
+                                <th><span data-i18n="level">Level</span> 5=>14</th>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_grasslandMod" value="0"/> <span data-i18n="terrain-grassland">Grassland</span></td>
+                                <td><input type="number" name="attr_woodsMod" value="0"/> <span data-i18n="terrain-woods">Woods</span></td>
+                                <td><input type="number" name="attr_deepForestMod" value="0"/> <span data-i18n="terrain-deepforest">Deep Forest</span></td>
+                                <td><input type="number" name="attr_desertMod" value="0"/> <span data-i18n="terrain-desert">Desert</span></td>
+                                <td style="white-space: nowrap;"><input type="number" name="attr_alpineMod" value="0"/> <span data-i18n="terrain-alpine">Alpine</span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_wastelandMod" value="0"/> <span data-i18n="terrain-wasteland">Wasteland</span></td>
+                                <td><input type="number" name="attr_highlandsMod" value="0"/> <span data-i18n="terrain-highlands">Highlands</span></td>
+                                <td><input type="number" name="attr_swampMod" value="0"/> <span data-i18n="terrain-swamp">Swamp</span></td>
+                                <td><input type="number" name="attr_jungleMod" value="0"/> <span data-i18n="terrain-jungle">Jungle</span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td><input type="number" name="attr_rockyTerrainMod" value="0"/> <span data-i18n="terrain-rocky">Rocky Terrain</span></td>
+                                <td><input type="number" name="attr_mountainMod" value="0"/> <span data-i18n="terrain-mountain">Mountain</span></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="sheet-row">
+                    <div class="sheet-col">
+                        <label class="header headerLabel checkLabel weatherLabel" data-i18n="weather-modifiers">Weather Modifiers</label>
+                        <span class="pictos notesIcon">W</span>
+                        <input type="checkbox" name="attr_weatherNotesToggle" class="notesToggle sheet-hider">
+                        <div class="terrainNotes">
+                                <textarea name="attr_weatherNotes" class="notesArea" placeholder="Notes" data-i18n-placeholder="notes"></textarea>
+                        </div>
+                        <table cellpadding=3>
+                            <tr>
+                                <th><span data-i18n="weather">Weather</span> +1</th>
+                                <th><span data-i18n="weather">Weather</span> +3</th>
+                                <th><span data-i18n="weather">Weather</span> +5</th>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_rainMod" value="0"/> <span data-i18n="weather-rain">Rain</span></td>
+                                <td><input type="number" name="attr_hardRainMod" value="0"/> <span data-i18n="weather-hardrain">Hard Rain</span></td>
+                                <td><input type="number" name="attr_hurricaneMod" value="0"/> <span data-i18n="weather-hurricane">Hurricane</span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_strongWindMod" value="0"/> <span data-i18n="weather-strongwind">Strong Wind</span></td>
+                                <td><input type="number" name="attr_snowMod" value="0"/> <span data-i18n="weather-snow">Snow</span></td>
+                                <td><input type="number" name="attr_blizzardMod" value="0"/> <span data-i18n="weather-blizzard">Blizzard</span></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_fogMod" value="0"/> <span data-i18n="weather-fog">Fog</span></td>
+                                <td><input type="number" name="attr_deepFogMod" value="0"/> <span data-i18n="weather-deepfog">Deep Fog</span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_hotMod" value="0"/> <span data-i18n="weather-hot">Hot</span></td>
+                                <td><input type="number" name="attr_darkMod" value="0"/> <span data-i18n="weather-dark">Dark</span></td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td><input type="number" name="attr_coldMod" value="0"/> <span data-i18n="weather-cold">Cold</span></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </span>
+
+            <span class="characterEquipment">
+                <div class="sheet-2colrow">
+                    <div class="col">
+                        <label class="header headerLabel itemLabel" data-i18n="currency">Currency</label>
+                        <input type="number" name="attr_currency" value="0" min="0" style="width:70px"/>
+                    </div>
+                </div>
                 <div class="sheet-2colrow">
                     <div class="sheet-col">
                         <label class="header headerLabel headerLabel-eq itemLabel" data-i18n="capacity-weapon-armor">Equipped Weapon & Armor Capacity</label>
@@ -1634,56 +1800,56 @@
                 <div>
                     <span data-i18n="background-color">Background color</span>:
                     <select name="attr_mainBgColorSelect" value="default">
-                        <option value="default" selected="selected" data-i18n="default">Default</option>
-                        <option value="white" data-i18n="white">White</option>
-                        <option value="lilac" data-i18n="lilac">Lilac</option>
-                        <option value="grayscale" data-i18n="grayscale">Grayscale</option>
-                        <option value="book" data-i18n="book">Book</option>
-                        <option value="summer" data-i18n="season-summer">Summer</option>
-                        <option value="fall" data-i18n="season-fall">Fall</option>
-                        <option value="winter" data-i18n="season-winter">Winter</option>
-                        <option value="spring" data-i18n="season-spring">Spring</option>
+                        <option value="default"   data-i18n="default"       style="background-color: #eeffff;" selected="selected">Default</option>
+                        <option value="white"     data-i18n="white"         style="background-color: #fff;">White</option>
+                        <option value="lilac"     data-i18n="lilac"         style="background-color: #fbeeff;">Lilac</option>
+                        <option value="grayscale" data-i18n="grayscale"     style="background-color: #f3f3f3;">Grayscale</option>
+                        <option value="book"      data-i18n="book"          style="background-color: #f3efe6;">Book</option>
+                        <option value="summer"    data-i18n="season-summer" style="background-color: #fef7ed;">Summer</option>
+                        <option value="fall"      data-i18n="season-fall"   style="background-color: #fde7e8;">Fall</option>
+                        <option value="winter"    data-i18n="season-winter" style="background-color: #fafefe;">Winter</option>
+                        <option value="spring"    data-i18n="season-spring" style="background-color: #f8f9f3;">Spring</option>
                     </select>
                 </div>
                 <div>
                     <span data-i18n="header-color">Header color</span>:
                     <select name="attr_headerColorSelect" value="default">
-                        <option value="default" selected="selected" data-i18n="default">Default</option>
-                        <option value="blue" data-i18n="blue">Blue</option>
-                        <option value="lilac" data-i18n="lilac">Lilac</option>
-                        <option value="grayscale" data-i18n="grayscale">Grayscale</option>
-                        <option value="book" data-i18n="book">Book</option>
-                        <option value="summer" data-i18n="season-summer">Summer</option>
-                        <option value="fall" data-i18n="season-fall">Fall</option>
-                        <option value="winter" data-i18n="season-winter">Winter</option>
-                        <option value="spring" data-i18n="season-spring">Spring</option>
+                        <option value="default"   data-i18n="default"       style="background-color: #aaeeaa;" selected="selected">Default</option>
+                        <option value="blue"      data-i18n="blue"          style="background-color: #45619e; color: white;">Blue</option>
+                        <option value="lilac"     data-i18n="lilac"         style="background-color: #b394d8; color: white;">Lilac</option>
+                        <option value="grayscale" data-i18n="grayscale"     style="background-color: #6d6d6d; color: white;">Grayscale</option>
+                        <option value="book"      data-i18n="book"          style="background-color: #f5edac;">Book</option>
+                        <option value="summer"    data-i18n="season-summer" style="background-color: #e0861b; color: white;">Summer</option>
+                        <option value="fall"      data-i18n="season-fall"   style="background-color: #d1425e; color: white;">Fall</option>
+                        <option value="winter"    data-i18n="season-winter" style="background-color: #318baa; color: white;">Winter</option>
+                        <option value="spring"    data-i18n="season-spring" style="background-color: #9ece84; color: white;">Spring</option>
                     </select>
                 </div>
                 <div>
                     <span data-i18n="icon-color">Icon background color</span>:
                     <select name="attr_iconBgColorSelect" value="default">
-                        <option value="default" selected="selected" data-i18n="default">Default</option>
-                        <option value="lilac" data-i18n="lilac">Lilac</option>
-                        <option value="grayscale" data-i18n="grayscale">Grayscale</option>
-                        <option value="book" data-i18n="book">Book</option>
-                        <option value="summer" data-i18n="season-summer">Summer</option>
-                        <option value="fall" data-i18n="season-fall">Fall</option>
-                        <option value="winter" data-i18n="season-winter">Winter</option>
-                        <option value="spring" data-i18n="season-spring">Spring</option>
+                        <option value="default"   data-i18n="default"       style="background-color: #88394d; color: white;" selected="selected">Default</option>
+                        <option value="lilac"     data-i18n="lilac"         style="background-color: #915173; color: white;">Lilac</option>
+                        <option value="grayscale" data-i18n="grayscale"     style="background-color: #8f8f8f; color: white;">Grayscale</option>
+                        <option value="book"      data-i18n="book"          style="background-color: #5bb2b6; color: white;">Book</option>
+                        <option value="summer"    data-i18n="season-summer" style="background-color: #c40b45; color: white;">Summer</option>
+                        <option value="fall"      data-i18n="season-fall"   style="background-color: #e3801d; color: white;">Fall</option>
+                        <option value="winter"    data-i18n="season-winter" style="background-color: #0d7075; color: white;">Winter</option>
+                        <option value="spring"    data-i18n="season-spring" style="background-color: #87ceeb; color: white;">Spring</option>
                     </select>
                 </div>
                 <div>
                     <span data-i18n="selection-color">Selection color</span>:
                     <select name="attr_radioBgColorSelect" value="default">
-                        <option value="default" selected="selected" data-i18n="default">Default</option>
-                        <option value="blue" data-i18n="blue">Blue</option>
-                        <option value="lilac" data-i18n="lilac">Lilac</option>
-                        <option value="grayscale" data-i18n="grayscale">Grayscale</option>
-                        <option value="book" data-i18n="book">Book</option>
-                        <option value="summer" data-i18n="season-summer">Summer</option>
-                        <option value="fall" data-i18n="season-fall">Fall</option>
-                        <option value="winter" data-i18n="season-winter">Winter</option>
-                        <option value="spring" data-i18n="season-spring">Spring</option>
+                        <option value="default"   data-i18n="default"       style="background-color: #299;    color: white;" selected="selected" >Default</option>
+                        <option value="blue"      data-i18n="blue"          style="background-color: #45619e; color: white;">Blue</option>
+                        <option value="lilac"     data-i18n="lilac"         style="background-color: #865abb; color: white;">Lilac</option>
+                        <option value="grayscale" data-i18n="grayscale"     style="background-color: #585858; color: white;">Grayscale</option>
+                        <option value="book"      data-i18n="book"          style="background-color: #9f8156; color: white;">Book</option>
+                        <option value="summer"    data-i18n="season-summer" style="background-color: #f1c076; color: white;">Summer</option>
+                        <option value="fall"      data-i18n="season-fall"   style="background-color: #bd3b55; color: white;">Fall</option>
+                        <option value="winter"    data-i18n="season-winter" style="background-color: #028493; color: white;">Winter</option>
+                        <option value="spring"    data-i18n="season-spring" style="background-color: #72aa75; color: white;">Spring</option>
                     </select>
                 </div>
                 <hr>
@@ -1902,10 +2068,10 @@
                                     <span class="gmpc-repeatingName" name="attr_benedictionName"></span>
                                 </label>
 
-                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-				                <span class="spell-toggles settings-toggle ">p</span>
-                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-				                <span class="spell-toggles collapse-toggle">i</span>
+                                <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="config-toggles settings-toggle ">p</span>
+                                <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+				                <span class="config-toggles collapse-toggle">i</span>
 
                                 <div class="settings">
                                     <div class="flex-column">
@@ -1931,10 +2097,10 @@
                                     <span data-i18n="lp-cost">LP Cost</span>:<span class="reveilCost" name="attr_reveilCost"></span>
                                 </div>
 
-                                <input class="spell-toggles spell-checkbox" name="attr_settings" type="checkbox" value="settings"/>
-				                <span class="spell-toggles settings-toggle ">p</span>
-                                <input class="spell-toggles collapse-toggle spell-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
-                                <span class="spell-toggles collapse-toggle">i</span>
+                                <input class="config-toggles config-checkbox" name="attr_settings" type="checkbox" value="settings"/>
+				                <span class="config-toggles settings-toggle ">p</span>
+                                <input class="config-toggles collapse-toggle config-checkbox" name="attr_collapse" type="checkbox" value="collapse"/>
+                                <span class="config-toggles collapse-toggle">i</span>
 
                                 <div class="settings">
                                     <div class="flex-column">
