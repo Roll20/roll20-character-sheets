@@ -19,6 +19,7 @@ Sheet construction and coding by Eric Carmody. Original art work by Robert Waker
 - Experience points tracker with auto-calc for spents/remaining
 - Log entries auto date stamped and expanding text area
 - Log features to auto add item to Belongings and Gold
+- Log search by keyword
 - Reusable template
 - Key-combo shortcuts for Log Entries, XP tracker, & Help/Info screen
 
