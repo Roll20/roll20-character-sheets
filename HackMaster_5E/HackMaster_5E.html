@@ -109,6 +109,25 @@ on("change:repeating_weapon:start_working1", function() {
     });
 });
 
+on("change:repeating_weapon:shield_def_switch change:shield_defense_bonus change:shield_dr", function () {
+    getSectionIDs('repeating_weapon', ids => {
+        const fieldnames = [];
+        ids.forEach(id => fieldnames.push(`repeating_weapon_${id}_shield_def_switch`));
+        getAttrs([...fieldnames, "shield_defense_bonus", "shield_dr"], function (values) {
+            const shield_dr = int(values.shield_dr);
+            const shield_def = int(values.shield_defense_bonus);
+            const output = {};
+            ids.forEach(id => {
+                const toggle = int(values[`repeating_weapon_${id}_shield_def_switch`]);
+                output[`repeating_weapon_${id}_shield_dr_inuse`] = toggle ? shield_dr : 0;
+                output[`repeating_weapon_${id}_shield_def_inuse`] = toggle ? shield_def : 0;
+            });
+            setAttrs(output);
+        });
+    });
+});
+
+
 on("change:repeating_rangedweapons:target_size change:repeating_rangedweapons:zero_range change:repeating_rangedweapons:four_range change:repeating_rangedweapons:six_range change:repeating_rangedweapons:adv_sighting change:repeating_rangedweapons:eight_range ", function() {
         getAttrs(["repeating_rangedweapons_target_size","repeating_rangedweapons_adv_sighting","repeating_rangedweapons_eight_range","repeating_rangedweapons_six_range","repeating_rangedweapons_zero_range","repeating_rangedweapons_four_range"], function(values) {
             const adv_sighting = float(values.repeating_rangedweapons_adv_sighting);
@@ -620,11 +639,11 @@ on("change:skill_dice_switch sheet:opened", function() {
         	<div class="sheet-col-1-16"><input type="number" name="attr_weapon_attack_mod_total" value="@{fatigue_attack}+@{weapon_misc_attack}+@{weapon_style_attack}+@{level_attack_bonus}+@{intelligence_attack_mod}+@{dexterity_attack_mod}+@{weapon_magic_bonus}+@{weapon_spec_attack}+@{weapon_talent_attack}" disabled="disabled"/></div>
             <input type="hidden" name="attr_weapon_jab_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_jab_speed}+@{level_speed_bonus}+@{level_melee_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/>
             <div class="sheet-col-1-16"><input type="number" name="attr_weapon_speed_mod_total" value="@{fatigue_speed}+@{weapon_misc_speed}+@{weapon_style_speed}+@{base_weapon_speed}+@{level_speed_bonus}+@{level_melee_speed_bonus}+@{armor_speed_modifier}+@{weapon_spec_speed}+@{weapon_talent_speed}+@{encumbrance_speed_mod}" disabled="disabled"/></div>
-            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_defense_mod_total" value="@{fatigue_defense}+@{weapon_misc_defense}+@{weapon_style_defense}+@{wisdom_defense_mod}+@{dexterity_defense_mod}+@{weapon_spec_defense}+@{weapon_talent_defense}+@{armor_defense_bonus}+@{shield_def_switch}+@{natural_defense_bonus}+@{encumbrance_defense_mod}" disabled="disabled"/></div>
+            <div class="sheet-col-1-16"><input type="number" name="attr_weapon_defense_mod_total" value="@{fatigue_defense}+@{weapon_misc_defense}+@{weapon_style_defense}+@{wisdom_defense_mod}+@{dexterity_defense_mod}+@{weapon_spec_defense}+@{weapon_talent_defense}+@{armor_defense_bonus}+@{shield_def_inuse}+@{natural_defense_bonus}+@{encumbrance_defense_mod}" disabled="disabled"/></div>
             <div class="sheet-col-1-16"><input type="number" name="attr_weapon_damage_mod_total" value="@{fatigue_damage}+@{weapon_misc_damage}+@{weapon_style_damage}+@{weapon_stat_bonus_damage}+@{weapon_spec_damage}+@{weapon_talent_damage}+@{weapon_magic_bonus}" disabled="disabled"/></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_attack' value='&{template:hm_std} {{name=@{character_name} attacks!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{atk_roll=[[1d20 +@{weapon_attack_mod_total}]]}}{{perf=[[19+@{weapon_attack_mod_total}]]}}'>ATK</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} hits!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_base_damage}+@{weapon_damage_mod_total}]]}}{{type= @{weapon_dmg_type}}}'>DMG</button></div>
-            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{start_working} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_def_switch}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}+@{dice_size_mod}]]}}{{perf=[[19+@{weapon_defense_mod_total}+@{crit_value}]]}}'>DEF</button></div>
+            <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_defense' value='&{template:hm_std} {{name=@{character_name} defends!!}}{{def_roll=[[ @{start_working} +@{weapon_defense_mod_total}]]}} {{dr=[[@{dr}]]}} {{sdr=[[@{shield_dr_inuse}]]}}{{fatigue=[[@{current_fatigue}+@{weapon_defense_mod_total}+@{dice_size_mod}]]}}{{perf=[[19+@{weapon_defense_mod_total}+@{crit_value}]]}}'>DEF</button></div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} is blocked!}} {{weapon=@{weapon}}} {{speed=@{weapon_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_shield_damage}+@{weapon_damage_mod_total}]]}}{{type= @{weapon_dmg_type}}}'>SHD</button></div>
             <div>
             <div class="sheet-col-1-8"><span>Hidden Details</span></div>
@@ -762,13 +781,14 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-col-1-8">Jab Roll</div>
             <div class="sheet-col-1-16"><button type='roll' name='roll_weapon_damage' value='&{template:hm_std} {{name=@{character_name} jabs you!}} {{weapon=@{weapon}}} {{speed=@{weapon_jab_speed_mod_total}}} {{reach=@{weapon_reach}}} {{damage=[[@{weapon_jab_damage}+@{weapon_damage_mod_total}]]}}{{type= Piercing}}'>DMG</button></div>
-              
-        <div class="sheet-row sheet-stat-row sheet-padl">
+            <div class="sheet-row sheet-stat-row sheet-padl">
             <div class="sheet-col-1-8 sheet-vert-bottom">Shield Use</div>
+            <input type="hidden" name="attr_shield_def_inuse" value="0" />
+            <input type="hidden" name="attr_shield_dr_inuse" value="0" />
             <div class="sheet-col-1-16" title="Choose if this weapon uses a shield">
 				<select name="attr_shield_def_switch">
 					<option value="0">N</option>
-					<option value="@{shield_defense_bonus}">Y</option>
+					<option value="1">Y</option>
 				</select>
 			</div>
             <div class="sheet-col-1-16"></div>
@@ -779,6 +799,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_defense" value="0"/></div>
             <div class="sheet-col-1-16 sheet-vert-bottom"><input type="number" name="attr_weapon_misc_damage" value="0"/></div>
             <div class="sheet-col-1-16">Defense Dice</div>
+            
             <input type="hidden" name="attr_start_working" value="0" />
             <input type="hidden" name="attr_crit_value" value="0" />
             <input type="hidden" name="attr_dice_size_mod" value="0" />
@@ -990,6 +1011,24 @@ on("change:skill_dice_switch sheet:opened", function() {
 		</div>
 	</fieldset>
     </div>
+</div>
+
+<h3>Defense vs Ranged Attacks </h3>
+<div class="sheet-section-combat">
+    <div class="sheet-row sheet-stat-row sheet-padl">
+		<div class="sheet-col-3-16 sheet-vert-bottom">Weapon</div>
+		<div class="sheet-col-1-8 sheet-vert-bottom">Base Damage</div>
+		<div class="sheet-col-1-8 sheet-vert-bottom">Shield Damage</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Ammo</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Speed</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Damage</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack Roll</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -4</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">Attack with -6</div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">d12/div>
+        <div class="sheet-col-1-16 sheet-vert-bottom">d20</div>
+	</div>
 </div>
 
 <div class="sheet-section-healthandskills">
@@ -1240,7 +1279,7 @@ on("change:skill_dice_switch sheet:opened", function() {
             
             <div class="sheet-row sheet-stat-row">
                 <fieldset class="repeating_spell">
-    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name} }} {{caster=@{character_name} }} {{level=@{spell_level} }} {{components=@{spell_components} }} {{speed=@{spell_speed} }} {{Srange=@{spell_range} }} {{voe=@{spell_voe} }} {{duration= @{spell_duration} }} {{save= @{spell_save} }} {{details= @{spell_notes} }}'>CAST</button></div>
+    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name} }} {{caster=@{character_name} }} {{level=@{spell_level} }} {{cost=@{spell_points} }} {{components=@{spell_components} }} {{speed=@{spell_speed} }} {{Srange=@{spell_range} }} {{voe=@{spell_voe} }} {{duration= @{spell_duration} }} {{pointschedule=@{spell_pointschedule} }} {{save= @{spell_save} }} {{details= @{spell_notes} }}'>CAST</button></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_level"></div>
                     <div class="sheet-col-7-16"><input type="text" name="attr_spell_name"/></div>
                     <div class="sheet-col-1-6"><input type="text" name="attr_spell_components"/></div>
@@ -1296,8 +1335,8 @@ on("change:skill_dice_switch sheet:opened", function() {
             </div>
             
             <div class="sheet-row sheet-stat-row">
-                <fieldset class="repeating_spell">
-    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name} }} {{caster=@{character_name} }} {{level=@{spell_level} }} {{cost=@{spell_points} }} {{components=@{spell_components} }} {{speed=@{spell_speed} }} {{Srange=@{spell_range} }} {{voe=@{spell_voe} }} {{duration= @{spell_duration} }} {{pointschedule=@{spell_pointschedule} }} {{save= @{spell_save} }} {{details= @{spell_notes} }}'>CAST</button></div>
+                <fieldset class="repeating_clericspell">
+    		        <div class="sheet-col-1-8 sheet-vert-middle"><button class="sheet-spell-roll" type='roll' name='roll_spell' value='&{template:hm_spell} {{name=@{spell_name} }} {{caster=@{character_name} }} {{level=@{spell_level} }} {{components=@{spell_components} }} {{speed=@{spell_speed} }} {{Srange=@{spell_range} }} {{voe=@{spell_voe} }} {{duration= @{spell_duration} }} {{save= @{spell_save} }} {{details= @{spell_notes} }}'>CAST</button></div>
                     <div class="sheet-col-1-16"><input type="text" name="attr_spell_level"></div>
                     <div class="sheet-col-7-16"><input type="text" name="attr_spell_name"/></div>
                     <div class="sheet-col-1-6"><input type="text" name="attr_spell_components"/></div>
