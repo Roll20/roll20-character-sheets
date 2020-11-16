@@ -175,17 +175,34 @@
                     <div class="hodnoty"><span name="attr_ucutoc" class="ucoc">0</span><label>útočnost</label></div>
                 </div>
                 <div class="section-small flex-center ucoc">
-                    <div class="setradio flex-down">
+                    <div class="flex-down">
+                        <button name="roll_obrana_oz" type="roll" class="btnObrana" value="&{template:Obrana} {{name=Obrana}} {{voz=[[@{ocoz_base}]]}} {{ozvolba=[[1]]}}  {{zbran=@{boj_jmeno}}} {{Result=[[(@{oc}) + 1d6! + (@{ocopr}) + (@{ocoz_base}) ]]}}"></button>
+                        <div><input type="radio" name="attr_oz_volba" class="oz_volba" value="1" checked="true"> OZ </div>
+                    </div> 
+                    <div class="flex-down">
+                        <button name="roll_obrana_bez" type="roll" class="btnObrana" value="&{template:Obrana} {{name=Obrana}} {{voz=[[-3]]}} {{ozvolba=[[-3]]}}  {{zbran=@{boj_jmeno}}} {{Result=[[(@{oc}) + 1d6! + (@{ocopr}) + (-3) ]]}}"></button>
+                        <div><input type="radio" name="attr_oz_volba" class="oz_volba" value="-3"> bez</div>
+                    </div>
+                    <div class="flex-down">
+                        <button name="roll_obrana_strel" type="roll" class="btnObrana" value="&{template:Obrana} {{name=Obrana}} {{voz=[[0]]}} {{ozvolba=[[0]]}}  {{zbran=@{boj_jmeno}}} {{Result=[[(@{oc}) + 1d6! + (@{ocopr}) ]]}}"></button>
+                        <div><input type="radio" name="attr_oz_volba" class="oz_volba" value="0"> střel.</div>
+                    </div>
+<!--                    <div class="setradio flex-down">
                         <div><input type="radio" name="attr_oz_volba" value="1" checked="true"> OZ </div>
                         <div><input type="radio" name="attr_oz_volba" value="-3"> -3</div>
                         <div><input type="radio" name="attr_oz_volba" value="0"> 0</div>
                     </div>
+                    
                     <button name="roll_obrana" type="roll" class="attack" value="&{template:Obrana} {{name=Obrana}} {{voz=[[@{boj_oz}]]}} {{ozvolba=[[@{oz_volba}]]}}  {{zbran=@{boj_jmeno}}} {{Result=[[(@{oc}) + 1d6! + (@{ocopr}) + (@{ocoz}) ]]}}"><span class="small">Obrana</span></button>
+-->
                     <div class="hodnoty"><span name="attr_oc" class="ucoc">0</span><label>základ</label></div>
                     <div class="hodnoty"><span name="attr_ocopr" class="ucoc">0</span><label>oprava</label></div>
                     <div class="hodnoty"><span name="attr_ocoz" class="ucoc">0</span><label>OZbraně</label></div>
                 </div>
-                <button name="roll_init" type="roll" class="iniciativa" value="&{template:k10Vlastnost} {{name=Iniciativa}} {{Result=[[d6]]}} &{tracker}"><span>Iniciativa</span></button>
+                <div class="flex-center"  style="background-color:white; width:265px; height:20px">
+                    <label style="font-size:1.4em; font-weight:normal; margin:0px; padding-left:50px;">Obrana</label>
+                    <button name="roll_init" type="roll" class="iniciativa" value="&{template:k10Vlastnost} {{name=Iniciativa}} {{Result=[[d6]]}} &{tracker}"><span>Iniciativa</span></button>
+                </div>
             </div>   
         </div>
         
@@ -935,7 +952,7 @@ var setZbran = function(_zbran) {
 	getAttrs([_zbran, _zbran+"_uc", _zbran+"_uto", _zbran+"_oz", _zbran+"_2h",_zbran+"_maly",_zbran+"_stredni",_zbran+"_velky","rasa","velikost",
 			"zbroj1_use","zbroj1_stit","zbroj1_oc","zbroj2_use","zbroj2_stit","zbroj2_oc","zbroj3_use","zbroj3_stit","zbroj3_oc"], function(values) {
 		var rasa = values["rasa"];
-		
+		console.log("aktualizuju zbran");
 		var Zbran = [];
 		Zbran["id"] = _zbran;
         if( typeof(values[_zbran]) == "undefined") { Zbran["jmeno"] = "Bezejmenná";} else { Zbran["jmeno"] = values[_zbran]; };
@@ -987,7 +1004,7 @@ var setZbran = function(_zbran) {
 		
 
 		if( Zbran["tvt"] == 1 ){
-		    var tabOpravVelikossti = ["A+2,B+3,C+4,E-2","A0-2,B+1,C+2,E-1","A0-3,A-1,C+1,D+2","A0-4,A-2,B-1,D+1,E+2","A0-5,A-3,B-2,C-1,E+1","A0-7,A-4,B-3,C-2,D-1"];
+		    var tabOpravVelikossti = ["A-2,B-3,C-4,D-5,E-7","A0+2,B-1,C-2,D-3,E-4","A0+3,A+1,C-1,D-2,E-3","A0+4,A+2,B+1,D-1,E-2","B+2,C+1,E-1","A0-2,A-1,C+2,D+1"];
 		    Zbran["rozdilvelikosti"] = "+ rozdil velikosti: " + tabOpravVelikossti[int(values.velikost)];
 		} else {
 		    Zbran["rozdilvelikosti"] = "+ velikost cíle (A0: -1 až -2)(D,E: +1)";
@@ -1035,7 +1052,6 @@ var setZbranFromTemp = function(jmeno, pozice) {
         aktZbran["zbran"] = pozice;
         
     	setAttrs(aktZbran);
-    	setZbran(pozice);
     };
     if(pozice.includes("strel")==true){
         var aktZbran = {};
@@ -1050,7 +1066,6 @@ var setZbranFromTemp = function(jmeno, pozice) {
         aktZbran["zbran"] = pozice;
         
     	setAttrs(aktZbran);
-    	setZbran(pozice);
     };
     
     
@@ -1234,15 +1249,37 @@ on("change:Nehybny_volba", function() {
 });
 
 /* ********* zmena zbrane ******* */
-on("change:zbran change:zbroj1_use change:zbroj2_use change:zbroj3_use", function() {
+on("change:zbran change:zbroj1_use change:zbroj2_use change:zbroj3_use  change:velikost", function() {
     getAttrs(["zbran"], function(values) {
 		setZbran(values["zbran"]);
     });
 });
 
-/* ******* OČ a UČ **********************************/
+["tvt1_oz", "tvt1_uc", "tvt1_uto", "tvt1_2h","tvt2_oz", "tvt2_uc", "tvt2_uto", "tvt2_2h","tvt3_oz", "tvt3_uc", "tvt3_uto", "tvt3_2h","tvt4_oz", "tvt4_uc", "tvt4_uto", "tvt4_2h","tvt5_oz", "tvt5_uc", "tvt5_uto", "tvt5_2h",
+"strel1_uc", "strel1_uto", "strel1_2h","strel1_maly","strel1_stredni","strel1_velky","strel2_uc", "strel2_uto", "strel2_2h","strel2_maly","strel2_stredni","strel2_velky",
+"strel3_uc", "strel3_uto", "strel3_2h","strel3_maly","strel3_stredni","strel3_velky","strel4_uc", "strel4_uto", "strel4_2h","strel4_maly","strel4_stredni","strel4_velky",].forEach(stat => {
+    on(`change:${stat}`, () => {
+        console.log("zmena parametru zbrane");
+        getAttrs(["zbran"], function(values) {
+            setZbran(values.zbran);
+        });
+    });
+});
 
-on("change:sil_mod change:obr_mod change:pretizeni_mod change:bojeschopnost_mod change:boj_id change:boj_oc change:boj_ocstit change:nehybny_volba change:vyrazeny_volba change:oz_volba", function() {
+/*
+["_uc", "_uto", "_2h","_maly","_stredni","_velky"].forEach(stat => {
+    ["strel1", "strel2", "strel3", "strel4"].forEach(pos => {
+        on(`change:${pos}${stat}`, () => {
+            getAttrs(["zbran"], function(values) {
+                if(values["zbran"].includes(pos)) setZbran(values["zbran"]);
+            });
+        });
+    });
+});
+
+ ******* OČ a UČ **********************************/
+
+on("change:sil_mod change:obr_mod change:pretizeni_mod change:bojeschopnost_mod change:boj_id change:boj_uc change:boj_uto change:boj_oz change:boj_oc change:boj_ocstit change:nehybny_volba change:vyrazeny_volba change:oz_volba", function() {
 	var ids = ["boj_id","boj_jmeno","boj_uc","boj_uto","boj_oz","boj_tvt","boj_bez","boj_h2","boj_rod","boj_ocstit","boj_oc"];
 	getAttrs(["sil_mod","obr_mod","pretizeni_mod","bojeschopnost_mod","rasa","oz_volba","nehybny_volba","vyrazeny_volba",
 	        "boj_id","boj_jmeno","boj_uc","boj_uto","boj_oz","boj_tvt","boj_bez","boj_h2","boj_rod","boj_ocstit","boj_oc"], function(values) {
@@ -1292,10 +1329,6 @@ on("change:sil_mod change:obr_mod change:pretizeni_mod change:bojeschopnost_mod 
 			OCopr = OCopr +	Boj["boj_ocstit"]
 			OCopr = OCopr + int(values["pretizeni_mod"]) + int(values["bojeschopnost_mod"]);
 			
-			if(OZv < 1) {
-			    // prime prirayeni bonusu vyberem
-				OCoz = OZv; 
-			} else 
 			if(Boj["boj_bez"] == 1 && Boj["boj_ocstit"] > 0) {
 			    // bezezbrane se stitem
 				OCoz = 0;
