@@ -7,6 +7,7 @@
 ### Added
 
 - Add retainers tab for charisma based retainer modifiers
+- Add prompt for Wisdom bonus on saving throws
 
 ### Fixed
 

@@ -215,7 +215,7 @@
     <div class="saving roll flex">
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveD"
-          value="&{template:greater} {{roll=^{death-poison-full}}} {{result=[[ [[1d20]]>@{saveD}+@{modQuery} ]]}} {{check=[[@{saveD}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{death-poison-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}>+@{modQuery}@{saveD} ]]}} {{check=[[@{saveD}]]}}"
           data-i18n="death-poison">
           Death, Poison
         </button>
@@ -223,7 +223,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveW"
-          value="&{template:greater} {{roll=^{magic-wands-full}}} {{result=[[ [[1d20]]>@{saveW}+@{modQuery} ]]}} {{check=[[@{saveW}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{magic-wands-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveW} ]]}} {{check=[[@{saveW}]]}}"
           data-i18n="magic-wands">
           Magic wands
         </button>
@@ -231,7 +231,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveP"
-          value="&{template:greater} {{roll=^{paralysis-petrification-full}}} {{result=[[ [[1d20]]>@{saveP}+@{modQuery} ]]}} {{check=[[@{saveP}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{paralysis-petrification-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveP} ]]}} {{check=[[@{saveP}]]}}"
           data-i18n="paralysis-petrification">
           Paralysis, Petrification
         </button>
@@ -239,7 +239,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveB"
-          value="&{template:greater} {{roll=^{breath-attacks-full}}} {{result=[[ [[1d20]]>@{saveB}+@{modQuery} ]]}} {{check=[[@{saveB}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{breath-attacks-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveB} ]]}} {{check=[[@{saveB}]]}}"
           data-i18n="breath-attacks">
           Breath attacks
         </button>
@@ -247,7 +247,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveS"
-          value="&{template:greater} {{roll=^{spells-rods-staves-full}}} {{result=[[ [[1d20]]>@{saveS}+@{modQuery} ]]}} {{check=[[@{saveS}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{spells-rods-staves-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveS} ]]}} {{check=[[@{saveS}]]}}"
           data-i18n="spells-rods-staves">
           Spells, Rods, Staves
         </button>
@@ -1396,7 +1396,7 @@
         getTranslationByKey("charisma-modifier") +
         "|0}[" +
         getTranslationByKey("charisma-abbr") +
-        "]",
+        "]"
     });
   });
 
@@ -1458,7 +1458,21 @@
   });
   on("sheet:opened change:wis", function () {
     getAttrs(["wis"], function (values) {
-      setAttrs({ wisMod: getModifiers(values.wis) });
+      const wisMod = getModifiers(values.wis);
+      setAttrs({
+        wisMod,
+        wisdomSaveQuery: (wisMod === 0)
+          ? 0
+          : "?{" +
+            getTranslationByKey("wisdom-save-apply") +
+            "|" +
+            getTranslationByKey("no") +
+            ",0|" +
+            getTranslationByKey("yes") +
+            ",@{wisMod}}[" +
+            getTranslationByKey("wisdom-abbr") +
+            "]"
+        });
     });
   });
   on("sheet:opened change:cha", function () {
