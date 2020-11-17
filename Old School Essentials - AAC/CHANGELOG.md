@@ -2,7 +2,11 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
-## 1.6.3
+## 1.7.0
+
+### Added
+
+- Add retainers tab for charisma based retainer modifiers
 
 ### Fixed
 

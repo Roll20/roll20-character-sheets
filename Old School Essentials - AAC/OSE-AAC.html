@@ -14,6 +14,7 @@
   <button type="action" name="act_character" data-i18n="character">
     Character
   </button>
+  <button type="action" name="act_retainers" data-i18n="retainers">Retainers</button>
   <button type="action" name="act_monster" data-i18n="monster">Monster</button>
   <button type="action" name="act_notes" data-i18n="notes">Notes</button>
   <button type="action" name="act_settings" data-i18n="settings">
@@ -645,6 +646,26 @@
   <div class="sheet-notes-section">
     <h1 data-i18n="notes">Notes</h1>
     <textarea name="attr_characterNotes"></textarea>
+  </div>
+</div>
+
+<div class="sheet-retainers">
+  <div>
+    <h1 data-i18n="retainer-modifiers">Retainer Modifiers</h1>
+    <div class="flex">
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="npc-reaction">NPC Reaction</span>
+        <input type="number" readOnly name="attr_chaMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="max-retainers">Max Retainers</span>
+        <input type="number" readOnly name="attr_retainersMax" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="loyalty">Loyalty</span>
+        <input type="number" readOnly name="attr_retainersLoyalty" value="0" />
+      </label>
+    </div>
   </div>
 </div>
 
@@ -1380,7 +1401,7 @@
   });
 
   // Tabs
-  const buttonlist = ["character", "monster", "notes", "settings"];
+  const buttonlist = ["character", "retainers", "monster", "notes", "settings"];
   buttonlist.forEach((button) => {
     on(`clicked:${button}`, function (event) {
       setAttrs({ sheetTab: button });
@@ -1440,6 +1461,20 @@
       setAttrs({ wisMod: getModifiers(values.wis) });
     });
   });
+  on("sheet:opened change:cha", function () {
+    getAttrs(["cha"], function (values) {
+      const [chaMod, retainersMax, retainersLoyalty] = getModifiers(values.cha, [
+        [-2, 1, 4],
+        [-1, 2, 5],
+        [-1, 3, 6],
+        [0, 4, 7],
+        [1, 5, 8],
+        [1, 6, 9],
+        [2, 7, 10]
+      ]);
+      setAttrs({ chaMod, retainersMax, retainersLoyalty })
+    })
+  })
 
   /**
    * Given a value and set of modifiers, return the correct modifiers
