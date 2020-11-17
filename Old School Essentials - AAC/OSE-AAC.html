@@ -1491,15 +1491,15 @@
               });
             }
           } else if (attackType.toLowerCase() === 'melee') {
-              setAttrs({
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
-              });
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+            });
           } else if (attackType.toLowerCase() === 'ranged') {
-              setAttrs({
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
-              });
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+            });
           }
         });
       });
@@ -1520,15 +1520,19 @@
   // Armor Calculation
   on("sheet:opened change:dex change:repeating_armor remove:repeating_armor",
     function () {
-      repeatingSum("ArmorWorn", "armor", "armorWorn", { callback: () => {
-        repeatingSum("ArmorTotal", "armor", ["armorValue", "armorWorn"], { callback: () => {
-          getAttrs(["ArmorWorn", "ArmorTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function(values) {
-            const aacAc = values.ArmorWorn > 0 ? values.ArmorTotal + values.BonusDEX : values.aacAcUnarmored;
-            const dacAc = values.ArmorWorn > 0 ? values.ArmorTotal - values.BonusDEX : values.dacAcUnarmored;
-            setAttrs({ aacAc, dacAc });
-          })
-        }});
-      }});
+      repeatingSum("ArmorWorn", "armor", "armorWorn", {
+        callback: () => {
+          repeatingSum("ArmorTotal", "armor", ["armorValue", "armorWorn"], {
+            callback: () => {
+              getAttrs(["ArmorWorn", "ArmorTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
+                const aacAc = values.ArmorWorn > 0 ? values.ArmorTotal + values.BonusDEX : values.aacAcUnarmored;
+                const dacAc = values.ArmorWorn > 0 ? values.ArmorTotal - values.BonusDEX : values.dacAcUnarmored;
+                setAttrs({ aacAc, dacAc });
+              })
+            }
+          });
+        }
+      });
     }
   );
 
@@ -1599,7 +1603,7 @@
   });
   function setAttackMatrix(thac0) {
     const matrix = {};
-    for (let ac = 0; ac < 10; ac++) {
+    for (let ac = 0; ac < 10; ac++) {
       matrix[`attackMatrix${ac}`] = Math.min(thac0 - ac, 20);
     }
     setAttrs(matrix);
@@ -1620,7 +1624,7 @@
   });
   function setAttackMatrix(thac0, type = 'attackMatrix') {
     const matrix = {};
-    for (let ac = 0; ac < 10; ac++) {
+    for (let ac = 0; ac < 10; ac++) {
       matrix[`${type}${ac}`] = Math.min(thac0 - ac, 20);
     }
     setAttrs(matrix);
