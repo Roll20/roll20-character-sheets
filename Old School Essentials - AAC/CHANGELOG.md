@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.6.3
+
+### Fixed
+
+- Fix a bug where the spell level input was wider than the space in the grid
+
 ## 1.6.2
 
 ### Fixed
