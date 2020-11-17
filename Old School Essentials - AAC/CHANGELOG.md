@@ -7,6 +7,7 @@
 ### Fixed
 
 - Fix a bug where the spell level input was wider than the space in the grid
+- Fix a bug where setting the default sheet to DAC wouldn't create DAC characters
 
 ## 1.6.2
 
