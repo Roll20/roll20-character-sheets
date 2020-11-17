@@ -7,16 +7,21 @@ input(name="attr_setting_button_hide", type="hidden")
             +character-field(field)
 
 .wfrp-navigation.wfrp-panel
-    each item in navigation 
-        - 
-            const settings = (item === "settings") ? "wfrp-navigation__item--settings" : "wfrp-navigation__item";
+    .wfrp-navigation__roll
+        label.wfrp-navigation__item
+            input(name="attr_setting_whisper", type="checkbox", value="2")
+            span(data-i18n="Whisper to GM")
+    .wfrp-navigation__items
+        each item in navigation 
+            - 
+                const settings = (item === "settings") ? "wfrp-navigation__item--settings" : "wfrp-navigation__item";
 
-        label(class=settings)
-            input(name="attr_nav", type="radio", value=item)
-            if (item === "settings")
-                span y
-            else 
-                span=item
+            label(class=settings)
+                input(name="attr_nav", type="radio", value=item)
+                if (item === "settings")
+                    span y
+                else 
+                    span(data-i18n=item)
 
 .wfrp-characteristics.wfrp-panel.page__main
     input(name="attr_control_hide--characteristics", type="hidden")
@@ -117,44 +122,18 @@ input(name="attr_setting_button_hide", type="hidden")
             .wfrp-corruptiontable__cell--last
         +repeating-section("corruption","corruption-row")
 
-.wfrp-ambitions.wfrp-panel.page__main
+.wfrp-ambitions.wfrp-panel.page__main--grid
     h1.wfrp-panel__header(data-i18n="Ambitions")
     each ambition in ambitions 
         +generic-textarea(ambition.name, "1-25", ambition.attr)
 
-.wfrp-party.wfrp-panel.page__main
+.wfrp-party.wfrp-panel.page__main--grid
     h1.wfrp-panel__header(data-i18n="Party")
     each ambition in party
         if (ambition.field === "text") 
             +generic-field(ambition, "text", "1-25", ambition.attr)
         else 
             +generic-textarea(ambition.name, "1-25", ambition.attr)
-
-.wfrp-careers.wfrp-panel.page__careers
-    input(name="attr_control_hide--characteristics", type="hidden")
-    h1.wfrp-panel__header(data-i18n="Careers")
-    .wfrp-careertable__row--head
-        .wfrp-careertable__cell(data-i18n="Career")
-        .wfrp-careertable__cell(data-i18n="Level")
-        .wfrp-careertable__cell(data-i18n="Status")
-        .wfrp-careertable__cell--last(data-i18n="Advances")
-    +repeating-section("careers","careers-row")
-
-.wfrp-experience--alt.page__careers--flex
-    .wfrp-panel
-        h1.wfrp-panel__header(data-i18n="Experience")
-        each field in experience 
-            +generic-display(field, "text", "2-1")
-
-    .wfrp-panel.wfrp-panel--awards.page__careers
-        h1.wfrp-panel__header(data-i18n="Experience Awards")
-        .wfrp-experiencetable__row--head
-            .wfrp-experiencetable__cell(data-i18n="Source")
-            .wfrp-experiencetable__cell--last(data-i18n="XP")
-        +repeating-section("experience","experience-row")
-        .wfrp-panel__footer.wfrp-controls
-            .wfrp-controls__button
-                button(data-i18n="Consolidate Rewards", name="act_combinexp", type="action") 
 
 .wfrp-trappings.page__combat--flex
     .wfrp-panel.wfrp-panel--trappings
@@ -268,11 +247,9 @@ input(name="attr_setting_button_hide", type="hidden")
 
 .wfrp-wounds.wfrp-panel.page__combat
     h1.wfrp-panel__header(data-i18n="Wounds")
-    .wfrp-wounds__current
-        +generic-field({name:"Current Wounds", attr:"wounds"},"number","2-1")
-    .wfrp-wounds__max
-        +generic-display({name:"Max Wounds", attr:"wounds_max"}, "number", "2-1")
     input(name="attr_wounds_mod", type="hidden")
+    +generic-field({name:"Current Wounds", attr:"wounds"},"number","2-1")
+    +generic-display({name:"Max Wounds", attr:"wounds_max"}, "number", "2-1")
         
 .wfrp-wounds.wfrp-panel.page__combat
     h1.wfrp-panel__header(data-i18n="Critical Wounds")
@@ -306,7 +283,7 @@ input(name="attr_setting_button_hide", type="hidden")
     .wfrp-weapontable
         +repeating-section("weapons","weapon-row")
 
-.wfrp-spells.wfrp-panel.page__spells
+.wfrp-spells.wfrp-panel.page__magic
     h1.wfrp-panel__header(data-i18n="Spells & Prayers")
     .wfrp-spelltable
         .wfrp-spelltable__row--head
@@ -321,5 +298,42 @@ input(name="attr_setting_button_hide", type="hidden")
         +repeating-section("spells","spell-row")
     .wfrp-spell__sin
         +generic-field({name:"Sin", attr:"sin"}, "number", "1-1")
+
+.wfrp-careers.page__advances--grid
+    .wfrp-panel
+        input(name="attr_control_hide--characteristics", type="hidden")
+        h1.wfrp-panel__header(data-i18n="Careers")
+        .wfrp-careertable__row--head
+            .wfrp-careertable__cell(data-i18n="Career")
+            .wfrp-careertable__cell(data-i18n="Level")
+            .wfrp-careertable__cell(data-i18n="Status")
+            .wfrp-careertable__cell--last(data-i18n="Advances")
+        +repeating-section("careers","careers-row")
+
+    .wfrp-panel
+        input(name="attr_control_hide--characteristics", type="hidden")
+        h1.wfrp-panel__header(data-i18n="Species")
+        +species("spells","spell-row")
+
+.wfrp-experience--alt.page__advances--flex
+    .wfrp-panel
+        h1.wfrp-panel__header(data-i18n="Experience")
+        each field in experience 
+            +generic-display(field, "text", "2-1")
+
+    .wfrp-panel.wfrp-panel--awards.page__advances
+        h1.wfrp-panel__header(data-i18n="Experience Awards")
+        .wfrp-experiencetable__row--head
+            .wfrp-experiencetable__cell(data-i18n="Source")
+            .wfrp-experiencetable__cell--last(data-i18n="XP")
+        +repeating-section("experience","experience-row")
+        .wfrp-panel__footer.wfrp-controls
+            .wfrp-controls__button
+                button(data-i18n="Consolidate Rewards", name="act_combinexp", type="action") 
+        h1.wfrp-panel__header(data-i18n="Experience Spends")
+        .wfrp-experiencetable__row--head
+            .wfrp-experiencetable__cell(data-i18n="Use")
+            .wfrp-experiencetable__cell--last(data-i18n="XP")
+        +repeating-section("experiencespent","experience-row")
 
 include settings.pug
