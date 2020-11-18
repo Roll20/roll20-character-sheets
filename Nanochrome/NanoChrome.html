@@ -1,0 +1,1888 @@
+<script type="text/worker">
+	/* ---- BEGIN: TheAaronSheet.js ---- */
+	// Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
+	// By:       The Aaron, Arcane Scriptomancer
+	// Contact:  https://app.roll20.net/users/104025/the-aaron
+
+	var TAS = TAS || (function(){
+		'use strict';
+
+		var version = '0.2.5',
+			lastUpdate = 1504710542,
+
+			loggingSettings = {
+				debug: {
+					key:     'debug',
+					title:   'DEBUG',
+					color: {
+						bgLabel: '#7732A2',
+						label:   '#F2EF40',
+						bgText:  '#FFFEB7',
+						text:    '#7732A2'
+					}
+				},
+				error: {
+					key:     'error',
+					title:   'Error',
+					color: {
+						bgLabel: '#C11713',
+						label:   'white',
+						bgText:  '#C11713',
+						text:    'white'
+					}
+				},
+				warn: {
+					key:     'warn',
+					title:   'Warning',
+					color: {
+						bgLabel: '#F29140',
+						label:   'white',
+						bgText:  '#FFD8B7',
+						text:    'black'
+					}
+				},
+				info: {
+					key:     'info',
+					title:   'Info',
+					color: {
+						bgLabel: '#413FA9',
+						label:   'white',
+						bgText:  '#B3B2EB',
+						text:    'black'
+					}
+				},
+				notice: {
+					key:     'notice',
+					title:   'Notice',
+					color: {
+						bgLabel: '#33C133',
+						label:   'white',
+						bgText:  '#ADF1AD',
+						text:    'black'
+					}
+				},
+				log: {
+					key:     'log',
+					title:   'Log',
+					color: {
+						bgLabel: '#f2f240',
+						label:   'black',
+						bgText:  '#ffff90',
+						text:    'black'
+					}
+				},
+				callstack: {
+					key:     'TAS',
+					title:   'function',
+					color: {
+						bgLabel: '#413FA9',
+						label:   'white',
+						bgText:  '#B3B2EB',
+						text:    'black'
+					}
+				},
+				callstack_async: {
+					key:     'TAS',
+					title:   'ASYNC CALL',
+					color: {
+						bgLabel: '#413FA9',
+						label:   'white',
+						bgText:  '#413FA9',
+						text:    'white'
+					}
+				},
+				TAS: {
+					key:     'TAS',
+					title:   'TAS',
+					color: {
+						bgLabel: 'grey',
+						label:   'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)',
+						bgText:  'grey',
+						text:    'black;background:linear-gradient(#304352,#d7d2cc,#d7d2cc,#d7d2cc,#304352)'
+					}
+				}
+			},
+
+
+			config = {
+				debugMode: false,
+				logging: {
+					log: true,
+					notice: true,
+					info: true,
+					warn: true,
+					error: true,
+					debug: false
+				}
+			},
+
+			callstackRegistry = [],
+			queuedUpdates = {}, //< Used for delaying saves till the last moment.
+
+		complexType = function(o){
+			switch(typeof o){
+				case 'string':
+					return 'string';
+				case 'boolean':
+					return 'boolean';
+				case 'number':
+					return (_.isNaN(o) ? 'NaN' : (o.toString().match(/\./) ? 'decimal' : 'integer'));
+				case 'function':
+					return 'function: '+(o.name ? o.name+'()' : '(anonymous)');
+				case 'object':
+					return (_.isArray(o) ? 'array' : (_.isArguments(o) ? 'arguments' : ( _.isNull(o) ? 'null' : 'object')));
+				default:
+					return typeof o;
+			}
+		},
+
+		dataLogger = function(primaryLogger,secondaryLogger,data){
+			_.each(data,function(m){
+				var type = complexType(m);
+				switch(type){
+					case 'string':
+						primaryLogger(m);
+						break;
+					case 'undefined':
+					case 'null':
+					case 'NaN':
+						primaryLogger('['+type+']');
+						break;
+					case 'number':
+					case 'not a number':
+					case 'integer':
+					case 'decimal':
+					case 'boolean':
+						primaryLogger('['+type+']: '+m);
+						break;
+					default:
+						primaryLogger('['+type+']:=========================================');
+						secondaryLogger(m);
+						primaryLogger('=========================================================');
+						break;
+				}
+			});
+		},
+
+
+		colorLog = function(options){
+			var coloredLoggerFunction,
+				key = options.key,
+				label = options.title || 'TAS',
+				lBGColor = (options.color && options.color.bgLabel) || 'blue',
+				lTxtColor = (options.color && options.color.label) || 'white',
+				mBGColor = (options.color && options.color.bgText) || 'blue',
+				mTxtColor = (options.color && options.color.text) || 'white';
+
+			coloredLoggerFunction = function(message){
+				/* eslint-disable no-console */
+				console.log(
+					'%c '+label+': %c '+message + ' ',
+					'background-color: '+lBGColor+';color: '+lTxtColor+'; font-weight:bold;',
+					'background-color: '+mBGColor+';color: '+mTxtColor+';'
+				); 
+				/* eslint-enable no-console */
+			};
+			return function(){
+				if('TAS'===key || config.logging[key]){
+					/* eslint-disable no-console */
+				   dataLogger(coloredLoggerFunction,function(m){console.log(m);},_.toArray(arguments)); 
+					/* eslint-enable no-console */
+				}
+			};
+		},
+
+		logDebug  = colorLog(loggingSettings.debug),
+		logError  = colorLog(loggingSettings.error),
+		logWarn   = colorLog(loggingSettings.warn),
+		logInfo   = colorLog(loggingSettings.info),
+		logNotice = colorLog(loggingSettings.notice),
+		logLog    = colorLog(loggingSettings.log),
+		log       = colorLog(loggingSettings.TAS),
+		logCS     = colorLog(loggingSettings.callstack),
+		logCSA    = colorLog(loggingSettings.callstack_async),
+
+		registerCallstack = function(callstack,label){
+			var idx=_.findIndex(callstackRegistry,function(o){
+				return (_.difference(o.stack,callstack).length === _.difference(callstack,o.stack).length) &&
+					_.difference(o.stack,callstack).length === 0 &&
+					o.label === label;
+			});
+			if(-1 === idx){
+				idx=callstackRegistry.length;
+				callstackRegistry.push({
+					stack: callstack,
+					label: label
+				});
+			}
+			return idx;
+		},
+
+		setConfigOption = function(options){
+			var newconf =_.defaults(options,config);
+			newconf.logging=_.defaults(
+				(options && options.logging)||{},
+				config.logging
+			);
+			config=newconf;
+		},
+		
+		isDebugMode = function(){
+			return config.debugMode;
+		},
+
+		debugMode = function(){
+			config.logging.debug=true;
+			config.debugMode = true;
+		},
+
+		getCallstack = function(){
+			var e = new Error('dummy'),
+				stack = _.map(_.rest(e.stack.replace(/^[^(]+?[\n$]/gm, '')
+				.replace(/^\s+at\s+/gm, '')
+				.replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
+				.split('\n')),function(l){
+					return l.replace(/\s+.*$/,'');
+				});
+			return stack;
+		},
+		logCallstackSub = function(cs){
+			var matches, csa;
+			_.find(cs,function(line){
+				matches = line.match(/TAS_CALLSTACK_(\d+)/);
+				if(matches){
+				   csa=callstackRegistry[matches[1]];
+				   logCSA( '===================='+(csa.label ? '> '+csa.label+' <' : '')+'====================');
+				   logCallstackSub(csa.stack);
+				   return true;
+				} 
+				logCS(line);
+				return false;
+			});
+		},
+		logCallstack = function(){
+			var cs;
+			if(config.debugMode){
+				cs = getCallstack();
+				cs.shift();
+				log('==============================> CALLSTACK <==============================');
+				logCallstackSub(cs);
+				log('=========================================================================');
+			}
+		},
+
+
+		wrapCallback = function (label, callback, context){
+			var callstack;
+			if('function' === typeof label){
+				context=callback;
+				callback=label;
+				label=undefined;
+			}
+			if(!config.debugMode){
+				return (function(cb,ctx){
+					return function(){
+						cb.apply(ctx||{},arguments);
+					};
+				}(callback,context));
+			}
+			
+			callstack = getCallstack();
+			callstack.shift();
+			
+			return (function(cb,ctx,cs,lbl){
+				var ctxref=registerCallstack(cs,lbl);
+
+				/*jshint -W054 */
+				return new Function('cb','ctx','TASlog',
+					"return function TAS_CALLSTACK_"+ctxref+"(){"+
+						"var start,end;"+
+						"TASlog('Entering: '+(cb.name||'(anonymous function)'));"+
+						"start=_.now();"+
+						"cb.apply(ctx||{},arguments);"+
+						"end=_.now();"+
+						"TASlog('Exiting: '+(cb.name||'(anonymous function)')+' :: '+(end-start)+'ms elapsed');"+
+					"};")(cb,ctx,log);
+				/*jshint +W054 */
+			}(callback,context,callstack,label));
+		},
+
+
+		prepareUpdate = function( attribute, value ){
+			queuedUpdates[attribute]=value;
+		},
+
+		applyQueuedUpdates = function() {
+		  setAttrs(queuedUpdates);
+		  queuedUpdates = {};
+		},
+
+		namesFromArgs = function(args,base){
+			return _.chain(args)
+				.reduce(function(memo,attr){
+					if('string' === typeof attr) {
+						memo.push(attr);
+					} else if(_.isArray(args) || _.isArguments(args)){
+						memo = namesFromArgs(attr,memo);
+					}
+					return memo;
+				},(_.isArray(base) && base) || [])
+				.uniq()
+				.value();
+		},
+
+		addId = function(obj,value){
+			Object.defineProperty(obj,'id',{
+				value: value,
+				writable: false,
+				enumerable: false
+			});
+		},
+
+		addProp = function(obj,prop,value,fullname){
+			(function(){
+				var pname=(_.contains(['S','F','I','D'],prop) ? '_'+prop : prop),
+					full_pname = fullname || prop,
+					pvalue=value;
+
+				_.each(['S','I','F'],function(p){
+					if( !_.has(obj,p)){
+						Object.defineProperty(obj, p, {
+							value: {},
+							enumerable: false,
+							readonly: true
+						});
+					}
+				});
+				if( !_.has(obj,'D')){
+					Object.defineProperty(obj, 'D', {
+						value: _.reduce(_.range(10),function(m,d){
+								Object.defineProperty(m, d, {
+									value: {},
+									enumerable: true,
+									readonly: true
+								});
+								return m;
+							},{}),
+						enumerable: false,
+						readonly: true
+					});
+				}
+
+
+				// Raw value
+				Object.defineProperty(obj, pname, {
+					enumerable: true,
+					set: function(v){
+						if(v!==pvalue) {
+							pvalue=v;
+							prepareUpdate(full_pname,v);
+						}
+					},
+					get: function(){
+						return pvalue;
+					}
+				});
+				
+				// string value
+				Object.defineProperty(obj.S, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=v.toString();
+						if(val !== pvalue) {
+							pvalue=val;
+							prepareUpdate(full_pname,val);
+						}
+					},
+					get: function(){
+						return pvalue.toString();
+					}
+				});
+
+				// int value
+				Object.defineProperty(obj.I, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=parseInt(v,10) || 0;
+						if(val !== pvalue){
+							pvalue=val;
+							prepareUpdate(full_pname,val);
+						}
+					},
+					get: function(){
+						return parseInt(pvalue,10) || 0;
+					}
+				});
+
+				// float value
+				Object.defineProperty(obj.F, pname, {
+					enumerable: true,
+					set: function(v){
+						var val=parseFloat(v) || 0;
+						if(val !== pvalue) {
+							pvalue=val;
+							prepareUpdate(full_pname,val);
+						}
+					},
+					get: function(){
+						return parseFloat(pvalue) || 0;
+					}
+				});
+				_.each(_.range(10),function(d){
+					Object.defineProperty(obj.D[d], pname, {
+						enumerable: true,
+						set: function(v){
+							var val=(parseFloat(v) || 0).toFixed(d);
+							if(val !== pvalue){
+								pvalue=val;
+								prepareUpdate(full_pname,val);
+							}
+						},
+						get: function(){
+							return (parseFloat(pvalue) || 0).toFixed(d);
+						}
+					});
+				});
+
+			}());
+		},
+		
+		repeating = function( section ) {
+			return (function(s){
+				var sectionName = s,
+					attrNames = [],
+					fieldNames = [],
+					operations = [],
+					after = [],
+				
+				repAttrs = function TAS_Repeating_Attrs(){
+					attrNames = namesFromArgs(arguments,attrNames);
+					return this;
+				},
+				repFields = function TAS_Repeating_Fields(){
+					fieldNames = namesFromArgs(arguments,fieldNames);
+					return this;
+				},
+				repReduce = function TAS_Repeating_Reduce(func, initial, final, context) { 
+					operations.push({
+						type: 'reduce',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						memo: (_.isUndefined(initial) && 0) || initial,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repMap = function TAS_Repeating_Map(func, final, context) {
+					operations.push({
+						type: 'map',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repEach = function TAS_Repeating_Each(func, final, context) {
+					operations.push({
+						type: 'each',
+						func: (func && _.isFunction(func) && func) || _.noop,
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repTap = function TAS_Repeating_Tap(final, context) {
+					operations.push({
+						type: 'tap',
+						final: (final && _.isFunction(final) && final) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repAfter = function TAS_Repeating_After(callback,context) {
+					after.push({
+						callback: (callback && _.isFunction(callback) && callback) || _.noop,
+						context: context || {}
+					});
+					return this;
+				},
+				repExecute = function TAS_Repeating_Execute(callback,context){
+					var rowSet = {},
+						attrSet = {},
+						fieldIds = [],
+						fullFieldNames = [];
+
+					repAfter(callback,context);
+
+					// call each operation per row.
+					// call each operation's final
+					getSectionIDs("repeating_"+sectionName,function(ids){
+						fieldIds = ids;
+						fullFieldNames = _.reduce(fieldIds,function(memo,id){
+							return memo.concat(_.map(fieldNames,function(name){
+								return 'repeating_'+sectionName+'_'+id+'_'+name;  
+							}));
+						},[]);
+						getAttrs( _.uniq(attrNames.concat(fullFieldNames)), function(values){
+							_.each(attrNames,function(aname){
+								if(values.hasOwnProperty(aname)){
+									addProp(attrSet,aname,values[aname]);
+								}
+							});
+
+							rowSet = _.reduce(fieldIds,function(memo,id){
+								var r={};
+								addId(r,id);
+								_.each(fieldNames,function(name){
+									var fn = 'repeating_'+sectionName+'_'+id+'_'+name;  
+									addProp(r,name,values[fn],fn);
+								});
+
+								memo[id]=r;
+
+								return memo;
+							},{});
+
+							_.each(operations,function(op){
+								var res;
+								switch(op.type){
+									case 'tap':
+										_.bind(op.final,op.context,rowSet,attrSet)();
+										break;
+
+									case 'each':
+										_.each(rowSet,function(r){
+											_.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,rowSet,attrSet)();
+										break;
+
+									case 'map':
+										res = _.map(rowSet,function(r){
+											return _.bind(op.func,op.context,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,res,rowSet,attrSet)();
+										break;
+
+									case 'reduce':
+										res = op.memo;
+										_.each(rowSet,function(r){
+											res = _.bind(op.func,op.context,res,r,attrSet,r.id,rowSet)();
+										});
+										_.bind(op.final,op.context,res,rowSet,attrSet)();
+										break;
+								}
+							});
+
+							// finalize attrs
+							applyQueuedUpdates();
+							_.each(after,function(op){
+								_.bind(op.callback,op.context)();
+							});
+						});
+					});
+				};
+					
+				return {
+					attrs: repAttrs,
+					attr: repAttrs,
+
+					column: repFields,
+					columns: repFields,
+					field: repFields,
+					fields: repFields,
+
+					reduce: repReduce,
+					inject: repReduce,
+					foldl: repReduce,
+
+					map: repMap,
+					collect: repMap,
+
+					each: repEach,
+					forEach: repEach,
+
+					tap: repTap,
+					'do': repTap,
+
+					after: repAfter,
+					last: repAfter,
+					done: repAfter,
+
+					execute: repExecute,
+					go: repExecute,
+					run: repExecute
+				};
+			}(section));
+		},
+
+
+		repeatingSimpleSum = function(section, field, destination){
+			repeating(section)
+				.attr(destination)
+				.field(field)
+				.reduce(function(m,r){
+					return m + (r.F[field]);
+				},0,function(t,r,a){
+					a.S[destination]=t;
+				})
+				.execute();
+		};
+
+		/* eslint-disable no-console */
+		console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  The Aaron Sheet  v'+version+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+		console.log('%c•.¸¸.•*´¨`*•.¸¸.•*´¨`*•.¸  Last update: '+(new Date(lastUpdate*1000))+'  ¸.•*´¨`*•.¸¸.•*´¨`*•.¸¸.•','background: linear-gradient(to right,green,white,white,green); color:black;text-shadow: 0 0 8px white;');
+		/* eslint-enable no-console */
+
+
+		return {
+			/* Repeating Sections */
+			repeatingSimpleSum: repeatingSimpleSum,
+			repeating: repeating,
+
+			/* Configuration */
+			config: setConfigOption,
+
+			/* Debugging */
+			callback: wrapCallback,
+			callstack: logCallstack,
+			debugMode: debugMode,
+			isDebugMode: isDebugMode,
+			_fn: wrapCallback,
+
+			/* Logging */
+			debug: logDebug,
+			error: logError,
+			warn: logWarn,
+			info: logInfo,
+			notice: logNotice,
+			log: logLog
+		};
+	}());
+
+
+	on("change:repeating_protection remove:repeating_protection sheet:opened", function() 
+	{
+		TAS.repeatingSimpleSum("protection", "protProtection", "defense_protection");
+	});
+	
+	on("change:repeating_competences remove:repeating_competences sheet:opened", function() 
+	{
+		TAS.repeatingSimpleSum("competences", "competenceUtilisee", "competences");
+	});
+	
+	on("change:constitution change:bonusBlessure change:version sheet:opened", function() 
+	{
+		getAttrs(["constitution", "bonusBlessure", "version"], function(values) 
+		{
+			const con = parseInt(values["constitution"], 10)||0;
+			const bCon = parseInt(values["bonusBlessure"], 10)||0;
+			const version = parseInt(values["version"], 10)||0;
+			
+			var total = con + bCon;
+			
+			if(version == 1)
+				total += 1;
+			
+			setAttrs({
+				blessuresConstitution: total
+			});
+		});
+	});
+	
+	on("change:affiliation change:version sheet:opened", function() 
+	{
+		getAttrs(["affiliation", "version"], function(values) 
+		{
+			const version = parseInt(values["version"], 10)||0;
+			var affiliation = values["affiliation"];
+			var nom = "";
+			var description = "";
+			
+			if(version == 0)
+			{
+				if(affiliation == "/C")
+				{
+					nom = "/C";
+					description = "Vous appartenez à l’une des nombreuses contrecultures qui fleurissent ici et là – altnerds, nomades, borgs, puristes, immobiles, néoniks, etc. Pour un point d’héroïsme, vous réussissez automatiquement un jet, sans lancer les dés (sauf le dé de couleur éventuellement).";
+				}
+				else if(affiliation == "Corporatiste")
+				{
+					nom = "Corporatiste";
+					description = "Vous appartenez aux couches sociales supérieures de la société. Vous avez fait de bonnes études et vos parents ont de l'argent. Pour un point d’héroïsme, vous pouvez faire état de vos privilèges : faire sauter une accusation ou une amende, passer un checkpoint, obtenir une table sans réservation ou entrer dans le carré VIP d’une boite à la mode.";
+				}
+				else if(affiliation == "Ganger")
+				{
+					nom = "Ganger";
+					description = "Vous avez grandi dans la rue, abandonné à vous-même, et vous avez trouvé une famille et des couleurs au sein d’un gang. Pour un point d’héroïsme, vous pouvez faire appel à une faveur auprès des membres de votre gang, par exemple pour recevoir de l’aide, trouver un refuge ou récupérer du matériel.";
+				}
+				else if(affiliation == "Independant")
+				{
+					nom = "Indépendant";
+					description = "Vous vous fondez dans les interstices du monde, là où personne ne semble vous remarquer. Vous êtes un anonyme, un zombie, un élément de décor. Rien de flashy, rien de remarquable. Pour un point d’héroïsme, vous passez complètement inaperçu, même en pleine vue.";
+				}
+			}
+			
+			if(version == 1)
+			{
+				if(affiliation == "/C")
+				{
+					nom = "/C";
+					description = "Vous appartenez à l’une des nombreuses contre-cultures qui fleurissent ici et là – altnerds, nomades, borgs, puristes, immobiles, néoniks, etc. Décrivez votre /C au meneur de jeu et aux autres joueurs ; trouvez des détails qui vous placent un peu aux marges de la société et qui vous rendent un peu bizarre. Chaque point de connexion que vous dépensez sur une action vous donne un bonus de +2 au jet.";
+				}
+				else if(affiliation == "Corporatiste")
+				{
+					nom = "Corporatiste";
+					description = "Vous appartenez aux couches sociales supérieures de la société. Vous avez fait de bonnes études, vous avez de l’argent de côté. Vous pouvez utiliser des points de connexion pour faire état de vos privilèges : faire sauter une accusation ou une amende, passer un checkpoint, obtenir une table sans réservation ou entrer dans le carré VIP d’une boite à la mode (cf. page 218).";
+				}
+				else if(affiliation == "Ganger")
+				{
+					nom = "Ganger";
+					description = "Vous avez grandi dans la rue, livré à vousmême, et vous avez trouvé une famille et des couleurs au sein d’un gang. Vous avez une relation spéciale avec les membres de votre gang, même si vous n’en faites plus partie, et pouvez dépenser des points de connexion pour, par exemple, recevoir de l’aide, trouver un refuge ou récupérer du matériel (cf. page 156).";
+				}
+				else if(affiliation == "Independant")
+				{
+					nom = "Indépendant";
+					description = "Vous vous fondez dans les interstices du monde, là où personne ne semble vous remarquer. Vous êtes un anonyme, un élément de décors. Rien de flashy, rien de remarquable. Vous pouvez utiliser vos points de connexion pour effacer vos traces, vous fondre dans la masse – pratiquement, vous n’obtenez rien, mais vous empêchez les autres d’obtenir des choses sur vous.";
+				}
+			}
+			
+			setAttrs({
+				capaciteAffiliation:nom,
+				capaciteDescriptionAffiliation:description 
+			});
+			
+			console.log(affiliation);
+		});
+		
+		
+	});
+	
+	on("change:occupation change:version sheet:opened", function() 
+	{
+		getAttrs(["occupation", "version"], function(values) 
+		{
+			var occupation = values["occupation"];
+			var version = values["version"];
+			var nom1 = "";
+			var description1 = "";
+			var nom2 = "";
+			var description2 = "";
+			var bonusConnexion = 0;
+			var bonusPV = 0;
+			
+			if(version == 0)
+			{
+				if(occupation == "Codeur")
+				{
+					nom1 = "Connexion";
+					description1 = "Vous êtes constamment branché sur la matrice. Vous avez 3 points de connexion supplémentaires.";
+					bonusConnexion = 3;
+					
+					nom2 = "Débrouillard";
+					description2 = "Ajoutez votre total actuel de points d’héroïsme à toutes vos actions en dehors du combat.";
+				}
+				else if(occupation == "Intermediaire")
+				{
+					nom1 = "Informé";
+					description1 = "Ajoutez votre total actuel de points de connexion à tous vos jets en rapport avec des relations sociales ou pour vous rappeler d'une information importante.";
+					
+					nom2 = "Relations";
+					description2 = "Vous connaissez du monde et eux vous connaissent. Vous pouvez dépenser vos points de connexion pour faire appel à des contacts ou nouer de nouvelles amitiés.";
+				}
+				else if(occupation == "Sabreur")
+				{
+					nom1 = "Dur au mal";
+					description1 = "Vous avez habitué votre corps aux exercices et aux douleurs les plus diverses. Vous avez 10 points de vie supplémentaires.";
+					bonusPV = 10;
+					
+					nom2 = "Formation militaire";
+					description2 = "Vous avez un bonus de +2 à tous vos jets d’attaque et de dégâts soit au corps à corps, soit à distance, selon vos préférences. Vous pouvez acheter cette capacité une deuxième fois avec de l'expérience pour compléter votre formation.";
+				}
+			}
+			
+			if(version == 1)
+			{
+				if(occupation == "Cable")
+				{
+					nom1 = "Drônes";
+					description1 = "Vous avez toujours à disposition trois drones spécialisés que vous pouvez chevaucher rapidement. En cas de destruction, vous les récupérez à la fin du cycle. Si vous reprenez cette capacité, vous avez un drone supplémentaire.";
+					
+					nom2 = "Transfert";
+					description2 = "Lorsque vous vous connectez à un véhicule, vous vous immergez totalement, devenant ce véhicule avec toutes ses capacités et possibilités, même si vous n’êtes pas directement à bord.";
+				}
+				else if(occupation == "Codeur")
+				{
+					nom1 = "Connexion";
+					description1 = "Vous êtes constamment branché sur la matrice. Vous avez 3 points de connexion supplémentaires.";
+					bonusConnexion = 3;
+					
+					nom2 = "Nerf d'acier";
+					description2 = "En dépensant un point de chance, vous pouvez réussir automatiquement une action hors combat comme si vous aviez obtenu un triple-6 aux dés.";
+				}
+				else if(occupation == "Intermediaire")
+				{
+					nom1 = "Improvisation";
+					description1 = "Vous pouvez utiliser vos points de connexion comme des points de plan (cf. page 216), même si vous n’avez pas réellement eu le temps de préparer quoi que ce soit.";
+					
+					nom2 = "Relations";
+					description2 = "Vous pouvez créer à la volée un contact temporaire en lui donnant un nom et un domaine d’activité et de service, puis faire appel à lui en dépensant des points de connexion.";
+				}
+				else if(occupation == "Sabreur")
+				{
+					nom1 = "Dur au mal";
+					description1 = "Vous avez habitué votre corps aux exercices et aux douleurs les plus diverses. Vous avez 15 points de vie supplémentaires.";
+					bonusPV = 15;
+					
+					nom2 = "Formation militaire";
+					description2 = "Vous avez un bonus de +2 à tous vos jets d’attaque et de dégâts au corps à corps ou à distance, au choix. Vous pourrez racheter cette capacité pour finir votre formation.";
+				}
+			}
+			
+			setAttrs({
+				capaciteOccupation1:nom1,
+				capaciteDescriptionOccupation1:description1,
+				capaciteOccupation2:nom2,
+				capaciteDescriptionOccupation2:description2,
+				pv_bonusCapacites:bonusPV,
+				connexion_bonusCapacites:bonusConnexion 
+			});
+		});
+	});
+	
+	on("change:repeating_armementcac:nomArmementCaC", function() 
+	{
+		getAttrs(["repeating_armementcac_nomArmementCaC"], function(values) 
+		{
+			var nom = values["repeating_armementcac_nomArmementCaC"];
+			var dgt = 0;
+			var discretion = "";
+			var option = "";
+			
+			if(nom == "Nanolame courte")
+			{
+				discretion = "Invisible";
+			}
+			else if(nom == "Nanolame longue")
+			{
+				dgt = 3;
+				discretion = "Visible";
+			}
+			else if(nom == "Tonfa & Cestes")
+			{
+				dgt = 3;
+				discretion = "Visible";
+			}
+			else if(nom == "Tasers")
+			{
+				discretion = "Invisible";
+				option = "Non létal/Spécial";
+			}
+			
+			setAttrs({
+				repeating_armementcac_dgtsArmementCaC:dgt,
+				repeating_armementcac_discArmementCaC:discretion,
+				repeating_armementcac_optionsArmementCaC:option
+			});
+		});
+	});
+	
+	on("change:repeating_armementdistance:nomArmementDistance", function() 
+	{
+		getAttrs(["repeating_armementdistance_nomArmementDistance"], function(values) 
+		{
+			var nom = values["repeating_armementdistance_nomArmementDistance"];
+			var dgt = 0;
+			var discretion = "";
+			
+			if(nom == "Arme de poing")
+			{
+				discretion = "Invisible";
+			}
+			else if(nom == "Fusil d'assaut et shotgun")
+			{
+				dgt = 3;
+				discretion = "Visible";
+			}
+			else if(nom == "Carabine de précision")
+			{
+				dgt = 3;
+				discretion = "Visible (montée), invisible (démontée)";
+			}
+			else if(nom == "Canon d'assaut et mitrailleuse lourde")
+			{
+				dgt = 5;
+				discretion = "Évidente";
+			}
+			
+			setAttrs({
+				repeating_armementdistance_dgtsArmementDistance:dgt,
+				repeating_armementdistance_discArmementDistance:discretion
+			});
+		});
+	});
+	
+	on("change:version", function() 
+	{
+		getAttrs(["version"], function(values) 
+		{
+			var version = parseInt(values["version"], 10)||0;
+			var nomChance = "";
+			var malusBlessureV1 = "";
+			var malusBlessureV2 = "";
+			
+			if(version == 0)
+			{
+				nomChance = "Héroïsme";
+				malusBlessureV1 = "-@{blessures}[Blessures]";
+			}
+				
+			if(version == 1)
+			{
+				nomChance = "Chance";
+			}
+			
+			setAttrs({
+				nomenclature:nomChance,
+				malusBlessureV1:malusBlessureV1,
+				Occupation:""
+			});
+		});
+	});
+</script>
+<div class="top">
+	<div class="version">
+		<input type="hidden" name="attr_version" value="0" />
+		<input type="radio" name="attr_version" value="0" checked />
+		<input type="radio" name="attr_version" value="1" />
+		<span title="V1"></span>
+		<span title="V2"></span>
+	</div>
+
+	<div class="typeFiche">
+		<input type="hidden" name="attr_typeFiche" value="1" />
+		<input type="radio" name="attr_typeFiche" value="1" checked />
+		<input type="radio" name="attr_typeFiche" value="2" />
+		<span title="Fiche PJ"></span>
+		<span title="Fiche PNJ"></span>
+	</div>
+</div>
+
+<input type="hidden" name="attr_version" class="versionFiche" value="0" />
+
+<input type="hidden" name="attr_nomenclature" value="Héroïsme" />
+<input type="hidden" name="attr_competences" value="0" />
+<input type="hidden" name="attr_malusBlessureV1" value="-@{blessures}[Blessures]">
+<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nanochrome/img/nanochrome_2.png" class="ideogramme2" />
+<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nanochrome/img/nanochrome.png" class="ideogramme" />
+<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nanochrome/img/logo.png" class="logo" />
+
+<input type="hidden" name="attr_typeFiche" class="typeFiche" value="1" />
+
+<div class="fichePJ">
+	<div class="header">
+		<label>
+			<input type="text" name="attr_character_name" />
+			<span>Nom</span>
+		</label>
+		
+		<label>
+			<select name="attr_affiliation">
+				<option value="" selected></option>
+				<option value="/C">/C</option>
+				<option value="Corporatiste">Corporatiste</option>
+				<option value="Ganger">Ganger</option>
+				<option value="Independant">Indépendant</option>
+			</select>
+			<span>Affiliation</span>
+		</label>
+		
+		<label>
+			<input type="hidden" name="attr_version" value="0" />
+			<select name="attr_occupation">
+				<option value="" selected></option>
+				<option value="Codeur">Codeur</option>
+				<option value="Intermediaire">Intermédiaire</option>
+				<option value="Sabreur">Sabreur</option>
+			</select>
+			<select name="attr_occupation">
+				<option value="" selected></option>
+				<option value="Cable">Câblé</option>
+				<option value="Codeur">Codeur</option>
+				<option value="Intermediaire">Intermédiaire</option>
+				<option value="Sabreur">Sabreur</option>
+			</select>
+			<span>Occupation</span>
+		</label>
+	</div>
+
+	<div class="caracteristiques">
+		<div>
+			<button type="roll" name="roll_force" value="@{gm} &{template:base} {{nom=For}} {{jet=[[3D6+@{force}[For]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">For</button>
+			<div>
+				<input type="number" name="attr_force" value="0" />
+			</div>
+		</div>
+		<div>
+			<button type="roll" name="roll_dexterite" value="@{gm} &{template:base} {{nom=Dex}} {{jet=[[3D6+@{dexterite}[Dex]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">Dex</button>
+			<div>
+				<input type="number" name="attr_dexterite" value="0" />
+			</div>
+		</div>
+		<div>
+			<button type="roll" name="roll_constitution" value="@{gm} &{template:base} {{nom=Con}} {{jet=[[3D6+@{constitution}[Con]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">Con</button>
+			<div>
+				<input type="number" name="attr_constitution" value="0" />
+			</div>
+		</div>
+		<div>
+			<button type="roll" name="roll_intelligence" value="@{gm} &{template:base} {{nom=Int}} {{jet=[[3D6+@{intelligence}[Int]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">Int</button>
+			<div>
+				<input type="number" name="attr_intelligence" value="0" />
+			</div>
+		</div>
+		<div>
+			<button type="roll" name="roll_sagesse" value="@{gm} &{template:base} {{nom=Sag}} {{jet=[[3D6+@{sagesse}[Sag]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">Sag</button>
+			<div>
+				<input type="number" name="attr_sagesse" value="0" />
+			</div>
+		</div>
+		<div>
+			<button type="roll" name="roll_charisme" value="@{gm} &{template:base} {{nom=Cha}} {{jet=[[3D6+@{charisme}[Cha]+@{bonus}[Bonus]+@{competences}[Compétences]@{malusBlessureV1}]]}}">Cha</button>
+			<div>
+				<input type="number" name="attr_charisme" value="0" />
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="PV">
+			<input type="hidden" name="attr_expandPV" value="0" />
+			<input type="hidden" name="attr_blessuresConstitution" value="0" />
+			<input type="hidden" name="attr_blessuresExpand" value="0" />
+			<span>PV</span>
+			<label>
+				<input type="checkbox" name="attr_expandPV" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_pv" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_pv_max" value="@{pv_bonusConstitution}+@{pv_bonusCyber}+@{pv_bonusCapacites}+(@{version}*5)-((@{version}*@{blessures})*5)" disabled />
+			</label>
+			<div>
+				<input type="hidden" name="attr_blessures" value="0" />
+				<label>
+					<input type="radio" name="attr_blessures" value="1" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="2" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="3" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="4" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="5" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="6" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="7" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="8" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="9" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="10" />
+					<span></span>
+				</label>
+				<label>
+					<input type="radio" name="attr_blessures" value="0" />
+					<span></span>
+				</label>
+				<span>
+					Blessures
+					<label>
+						<input type="checkbox" name="attr_blessuresExpand" value="1" />
+						<span></span>
+					</label>
+				</span>
+			</div>
+			<div>
+				<label>
+					<input type="number" name="attr_bonusBlessure" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+			<div>
+				<label>
+					<input type="number" name="attr_pv_max" value="@{pv_bonusConstitution}+@{pv_bonusCyber}+@{pv_bonusCapacites}+(@{version}*5)-((@{version}*@{blessures})*5)" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_pv_bonusConstitution" value="(@{constitution}*5)" disabled />
+					<span>Constitution</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_pv_bonusCyber" value="0" />
+					<span>Cyber</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_pv_bonusCapacites" value="0" />
+					<span>Capacités</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="connexion">
+			<input type="hidden" name="attr_expandConnexion" value="0" />
+			<span>Connexion</span>
+			<label>
+				<input type="checkbox" name="attr_expandConnexion" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_connexion" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_connexion_max" value="@{connexion_bonusIntelligence}+@{connexion_bonusNexus}+@{connexion_bonusCyber}+@{connexion_bonusCapacites}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_connexion_max" value="@{connexion_bonusIntelligence}+@{connexion_bonusNexus}+@{connexion_bonusCyber}+@{connexion_bonusCapacites}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexion_bonusIntelligence" value="@{intelligence}" disabled />
+					<span>Intelligence</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexion_bonusNexus" value="0" />
+					<span>Nexus</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexion_bonusCyber" value="0" />
+					<span>Cyber</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexion_bonusCapacites" value="0" />
+					<span>Capacités</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="initiative">
+			<input type="hidden" name="attr_expandInitiative" value="0" />
+			<span>Initiative</span>
+			<label>
+				<input type="checkbox" name="attr_expandInitiative" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_initiative" value="@{initiative_bonusIntelligence}+@{initiative_bonusD6}" disabled />
+			</label>
+			<button type="roll" name="roll_initiative" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[3D6+[[@{initiative}]]+@{bonus} &{tracker}]]}}" ></button>
+			<div>
+				<label>
+					<input type="number" name="attr_initiative" value="@{initiative_bonusIntelligence}+@{initiative_bonusD6}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiative_bonusIntelligence" value="@{intelligence}" disabled />
+					<span>Intelligence</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiative_bonusD6" value="0" />
+					<span>Bonus D6</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="defense">
+			<input type="hidden" name="attr_expandDefense" value="0" />
+			<span>Défense</span>
+			<label>
+				<input type="checkbox" name="attr_expandDefense" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_defense" value="10-(@{version}*3)+@{defense_bonusSagesse}+@{defense_protection}+@{defense_cyber}+@{defense_capacites}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_defense" value="10+@{defense_bonusSagesse}+@{defense_protection}+@{defense_cyber}+@{defense_capacites}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defense_bonusSagesse" value="@{sagesse}" disabled />
+					<span>Sagesse</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defense_protection" value="0" readonly />
+					<span>Protection</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defense_cyber" value="0" />
+					<span>Cyber</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defense_capacites" value="0" />
+					<span>Capacités</span>
+				</label>
+			</div>
+		</div>
+		
+		<input type="hidden" name="attr_version" class="versionFicheColor" value="0" />
+		<div class="heroisme">
+			<input type="hidden" name="attr_expandHeroisme" value="0" />
+			<input type="hidden" name="attr_heroismeHelp" value="0" />
+			<span name="attr_nomenclature">Héroïsme</span>
+			<label>
+				<input type="checkbox" name="attr_expandHeroisme" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_heroisme" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_heroisme_max" value="@{heroisme_bonusCharisme}+@{heroisme_capacites}" disabled />
+			</label>
+			<label>
+				<input type="checkbox" name="attr_heroismeHelp" value="1" />
+				<span></span>
+			</label>
+			<div>
+				<input type="hidden" name="attr_version" value="0" />
+				<span>Relancer un jet raté</span>
+				<span>Annuler une attaque</span>
+				<span>Récupérer 5 points de vie</span>
+				<span>Récupérer tous vos points de connexion</span>
+				<span>Utiliser la capacité de votre affiliation</span>
+				<span>Inventer un élément important de l’histoire</span>
+				<span>Inventer un élément de l’histoire</span>
+				<span>Utiliser une capacité à usage limité que vous avez déjà utilisée durant cette aventure</span>
+				<span>Utiliser une capacité que vous avez déjà utilisée durant ce cycle.</span>
+			</div>
+			<div>
+				<label>
+					<input type="number" name="attr_heroisme_max" value="@{heroisme_bonusCharisme}+@{heroisme_capacites}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_heroisme_bonusCharisme" value="@{charisme}" disabled />
+					<span>Charisme</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_heroisme_capacites" value="0" />
+					<span>Capacités</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="pareFeu">
+			<div>
+				<span>Pare-Feu</span>
+				<label>
+					<input type="number" name="attr_pareFeu" value="0"/>
+				</label>
+			</div>
+			<div></div>
+			<div>
+				<span>Améliorations Nexus</span>
+				<div class="autoex autoex22">
+					<span name="attr_pareFeuAmeliorations"></span>
+					<textarea name="attr_pareFeuAmeliorations"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="menu">
+		<label>
+			<input type="radio" name="attr_menu" value="1" checked />
+			<span title="Equipement"></span>
+		</label>
+		
+		<label>
+			<input type="radio" name="attr_menu" value="2" />
+			<span title="Compétences et Capacités"></span>
+		</label>
+		
+		<div>
+			<input type="checkbox" name="attr_parametresJets" value="2" />
+			<span title="Paramètres des jets"></span>
+			<div>
+				<label>
+					<span>Jets privés ?</span>
+					<select name="attr_gm">
+						<option value="" selected>Non</option>
+						<option value="/w gm" >Oui</option>
+					</select>
+				</label>
+				<label>
+					<span>Bonus</span>
+					<input type="number" name="attr_bonus" value="0" />
+				</label>
+			</div>
+		</div>
+	</div>
+
+	<input type="hidden" name="attr_menu" class="menu" value="1" />
+
+	<div class="tab1">
+		<div class="armement">
+			<span>Armes de corps à corps</span>
+			<span>Att.</span>
+			<span>Dgts</span>
+			<span>Discrétion</span>
+			<span>Options</span>
+			<fieldset class="repeating_armementcac">
+				<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
+				<button type="roll" name="roll_armementCaC" value="@{gm} &{template:base} {{nom=@{nomArmementCaC}}} {{attaque=[[2D6+@{force}[For]+@{attArmementCaC}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{force}+@{dgtsArmementCaC}]]}} {{relance=[Relance dégâts](~repeating_armementcac_buttonRelance)}}" ></button>
+				<select name="attr_nomArmementCaC">
+					<option value=""></option>
+					<option value="Nanolame courte">Nanolame courte</option>
+					<option value="Nanolame longue">Nanolame longue</option>
+					<option value="Tonfa & Cestes">Tonfa & Cestes</option>
+					<option value="Tasers">Tasers</option>
+				</select>
+				<input type="number" name="attr_attArmementCaC" value="0" />
+				<input type="number" name="attr_dgtsArmementCaC" value="0" />
+				<input type="text" name="attr_discArmementCaC" />
+				<input type="text" name="attr_optionsArmementCaC" />
+			</fieldset>
+		</div>
+		
+		<div class="armement">
+			<span>Armes à distance</span>
+			<span>Att.</span>
+			<span>Dgts</span>
+			<span>Discrétion</span>
+			<span>Options</span>
+			<fieldset class="repeating_armementdistance">
+				<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
+				<button type="roll" name="roll_armementDistance" value="@{gm} &{template:base} {{nom=@{nomArmementDistance}}} {{attaque=[[2D6+@{dexterite}[Dex]+@{attArmementDistance}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{dexterite}+@{dgtsArmementDistance}]]}} {{relance=[Relance dégâts](~repeating_armementdistance_buttonRelance)}}" ></button>
+				<select name="attr_nomArmementDistance">
+					<option value=""></option>
+					<option value="Arme de poing">Arme de poing</option>
+					<option value="Fusil d'assaut et shotgun">Fusil d'assaut et shotgun</option>
+					<option value="Carabine de précision">Carabine de précision</option>
+					<option value="Canon d'assaut et mitrailleuse lourde">Canon d'assaut et mitrailleuse lourde</option>
+				</select>
+				<input type="number" name="attr_attArmementDistance" value="0" />
+				<input type="number" name="attr_dgtsArmementDistance" value="0" />
+				<input type="text" name="attr_discArmementDistance" />
+				<input type="text" name="attr_optionsArmementDistance" />
+			</fieldset>
+		</div>
+		
+		<div class="protection">
+			<span>Protections</span>
+			<span>Prot.</span>
+			<span>Discrétion</span>
+			<span>Options</span>
+			<fieldset class="repeating_protection">
+				<input type="text" name="attr_nomProtection" />
+				<input type="number" name="attr_protProtection" value="0" />
+				<input type="text" name="attr_discProtection" />
+				<input type="text" name="attr_optionsProtection" />
+			</fieldset>
+		</div>
+		
+		<div class="bottom">
+			<div class="equipementAutre">
+				<span>Autres</span>
+				<fieldset class="repeating_equipementAutre">
+					<div class="autoex autoex22">
+						<span name="attr_autreEquipement"></span>
+						<textarea name="attr_autreEquipement"></textarea>
+					</div>
+				</fieldset>
+			</div>
+			
+			<div class="cybernetique">
+				<span>Cybernétique</span>
+				<fieldset class="repeating_cybernetique">
+					<input type="text" name="attr_nomCybernetique" />
+					<div class="autoex autoex22">
+						<span name="attr_descriptionCybernetique"></span>
+						<textarea name="attr_descriptionCybernetique"></textarea>
+					</div>
+				</fieldset>
+			</div>
+		</div>
+		
+		<input type="hidden" name="attr_version" class="versionFicheColor" value="0" />
+		<div class="credits">
+			<span>¥</span>
+			<input type="number" name="attr_credits" value="0" />
+			<label>
+				<input type="checkbox" name="attr_creditHelp" value="1" />
+				<span></span>
+			</label>
+			<input type="hidden" name="attr_creditHelp" value="0" />
+			<div>
+				<span>1¥</span>
+				<span>Vous gagnez +10 XP</span>
+				<span>1¥</span>
+				<span>Vous achetez une dose d’accélérateur</span>
+				<span>2¥</span>
+				<span>Vous regagnez un point d’héroïsme/de chance</span>
+				<span>3¥</span>
+				<span>Vous trouvez du matériel temporaire, comme une arme jetable ou des nanodrones – il faudra sans doute passer par des relations dans le marché noir...</span>
+				<span>4¥</span>
+				<span>Vous soignez une blessure</span>
+				<span>4¥</span>
+				<span>Vous achetez une option pour un véhicule ou une augmentation</span>
+				<span>6¥ et plus</span>
+				<span>Vous trouvez des informations importantes sur la suite de l’aventure</span>
+				<span>8¥</span>
+				<span>Vous achetez une arme ou une protection</span>
+				<span>12¥</span>
+				<span>Vous achetez une nouvelle augmentation cybernétique ou un véhicule</span>
+			</div>
+		</div>
+		
+		<div class="vehicule">
+			<span>Véhicules</span>
+			<fieldset class="repeating_vehicule">
+				<input type="text" name="attr_nomVehicule" />
+				<div class="autoex autoex22">
+					<span name="attr_descriptionVehicule"></span>
+					<textarea name="attr_descriptionVehicule"></textarea>
+				</div>
+			</fieldset>
+		</div>
+	</div>
+
+	<div class="tab2">
+		<div class="competences">
+			<span>Compétences</span>
+			<fieldset class="repeating_competences">
+				<input type="text" name="attr_competence" />
+				<label>
+					<input type="checkbox" name="attr_competenceUtilisee" value="4" />
+					<span title="Non Utilisée"></span>
+					<span title="Utilisée"></span>
+				</label>
+			</fieldset>
+		</div>
+		
+		<div class="capacites">
+			<span>Capacités</span>
+			<input type="hidden" name="attr_affiliation" />
+			<input type="hidden" name="attr_occupation" />
+			<div>
+				<label>
+					<input type="checkbox" name="attr_expandCapaciteAffiliation" value="1" checked />
+					<span></span>
+				</label>
+				<input type="hidden" name="attr_expandCapaciteAffiliation" value="1" />
+				<input type="text" name="attr_capaciteAffiliation" readonly />
+				<div class="autoex autoex22">
+					<span name="attr_capaciteDescriptionAffiliation"></span>
+					<textarea name="attr_capaciteDescriptionAffiliation" ></textarea>
+				</div>
+			</div>
+			<div>
+				<label>
+					<input type="checkbox" name="attr_expandCapaciteOccupation1" value="1" checked />
+					<span></span>
+				</label>
+				<input type="hidden" name="attr_expandCapaciteOccupation1" value="1" />
+				<input type="text" name="attr_capaciteOccupation1" readonly />
+				<div class="autoex autoex22">
+					<span name="attr_capaciteDescriptionOccupation1"></span>
+					<textarea name="attr_capaciteDescriptionOccupation1" ></textarea>
+				</div>
+			</div>
+			<div>
+				<label>
+					<input type="checkbox" name="attr_expandCapaciteOccupation2" value="1" checked />
+					<span></span>
+				</label>
+				<input type="hidden" name="attr_expandCapaciteOccupation2" value="1" />
+				<input type="text" name="attr_capaciteOccupation2" readonly />
+				<div class="autoex autoex22">
+					<span name="attr_capaciteDescriptionOccupation2"></span>
+					<textarea name="attr_capaciteDescriptionOccupation2" ></textarea>
+				</div>
+			</div>
+			<fieldset class="repeating_capacites">
+				<label>
+					<input type="checkbox" name="attr_expandCapacite" value="1" checked />
+					<span></span>
+				</label>
+				<input type="hidden" name="attr_expandCapacite" value="1" />
+				<input type="text" name="attr_capacite" />
+				<div class="autoex autoex22">
+					<span name="attr_capaciteDescription"></span>
+					<textarea name="attr_capaciteDescription" placeholder="Descriptions / Notes"></textarea>
+				</div>
+			</fieldset>
+		</div>
+
+		<input type="hidden" name="attr_version" class="versionFicheColor" value="0" />
+		<div class="XP">
+			<input type="number" name="attr_XP" value="0" />
+			<span>XP</span>
+			<label>
+				<input type="checkbox" name="attr_creditHelp" value="1" />
+				<span></span>
+			</label>
+			<input type="hidden" name="attr_creditHelp" value="0" />
+			<div>
+				<span>100XP</span>
+				<span>Gagner un point de caractéristique (maximum +7)</span>
+				<span>100XP</span>
+				<span>Acheter une nouvelle compétence</span>
+				<span>100XP</span>
+				<span>Acheter une nouvelle capacité</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="fichePNJ">
+	<div class="header">
+		<label>
+			<input type="text" name="attr_character_name" />
+			<span>Nom</span>
+		</label>
+		
+		<label>
+			<input type="text" name="attr_affiliation" />
+			<span>Archétype</span>
+		</label>
+		
+		<label>
+			<input type="text" name="attr_occupation" />
+			<span>Profil</span>
+		</label>
+	</div>
+	
+	<div class="container">
+		<div class="puissance">
+			<input type="hidden" name="attr_expandPuissance" value="0" />
+			<span>Puissance</span>
+			<label>
+				<input type="checkbox" name="attr_expandPuissance" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_puissancePNJ" value="@{puissancePNJ_base}+@{puissancePNJ_bonus}" disabled />
+			</label>
+			<button type="roll" name="roll_puissancePNJ" value="@{gm} &{template:base} {{nom=Puissance}} {{jet=[[3D6+[[@{puissancePNJ}]]+@{bonus}]]}}" ></button>
+			<div>
+				<label>
+					<input type="number" name="attr_puissancePNJ" value="@{puissancePNJ_base}+@{puissancePNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_puissancePNJ_base" value="0" />
+					<span>Base</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_puissancePNJ_bonus" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="PVPNJ">
+			<input type="hidden" name="attr_expandPV" value="0" />
+			<span>PV</span>
+			<label>
+				<input type="checkbox" name="attr_expandPV" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_pvPNJ" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_pvPNJ_max" value="@{pvPNJ_base}+@{pvPNJ_bonus}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_pvPNJ_max" value="@{pvPNJ_base}+@{pvPNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_pvPNJ_base" value="0" />
+					<span>Base</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_pvPNJ_bonus" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="connexion">
+			<input type="hidden" name="attr_expandConnexion" value="0" />
+			<span>Connexion</span>
+			<label>
+				<input type="checkbox" name="attr_expandConnexion" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_connexionPNJ" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_connexionPNJ_max" value="@{connexionPNJ_base}+@{connexionPNJ_bonus}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_connexionPNJ_max" value="@{connexionPNJ_base}+@{connexionPNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexionPNJ_base" value="0" />
+					<span>Base</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_connexionPNJ_bonus" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="initiative">
+			<input type="hidden" name="attr_expandInitiative" value="0" />
+			<span>Initiative</span>
+			<label>
+				<input type="checkbox" name="attr_expandInitiative" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_initiativePNJ" value="@{initiativePNJ_puissance}+@{initiativePNJ_bonus}" disabled />
+			</label>
+			<button type="roll" name="roll_initiativePNJ" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[3D6+[[@{initiativePNJ}]]+@{bonus} &{tracker}]]}}" ></button>
+			<div>
+				<label>
+					<input type="number" name="attr_initiativePNJ" value="@{initiativePNJ_puissance}+@{initiativePNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiativePNJ_puissance" value="@{puissancePNJ}" disabled />
+					<span>Puissance</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiativePNJ_bonus" value="0" />
+					<span>Bonus D6</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="defense">
+			<input type="hidden" name="attr_expandDefense" value="0" />
+			<span>Défense</span>
+			<label>
+				<input type="checkbox" name="attr_expandDefense" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_defensePNJ" value="@{defensePNJ_base}+@{defensePNJ_bonus}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_defensePNJ" value="@{defensePNJ_base}+@{defensePNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defensePNJ_base" value="0" />
+					<span>Base</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_defensePNJ_bonus" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+		</div>
+		
+		<div class="heroisme">
+			<input type="hidden" name="attr_expandHeroisme" value="0" />
+			<span>Héroïsme</span>
+			<label>
+				<input type="checkbox" name="attr_expandHeroisme" value="1" />
+				<span></span>
+			</label>
+			<label>
+				<input type="number" name="attr_heroismePNJ" value="0"/>
+				<span>/</span>
+				<input type="number" name="attr_heroismePNJ_max" value="@{heroismePNJ_base}+@{heroismePNJ_bonus}" disabled />
+			</label>
+			<div>
+				<label>
+					<input type="number" name="attr_heroismePNJ_max" value="@{heroismePNJ_base}+@{heroismePNJ_bonus}" disabled />
+					<span>Total</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_heroismePNJ_base" value="0" />
+					<span>Base</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_heroismePNJ_bonus" value="0" />
+					<span>Bonus</span>
+				</label>
+			</div>
+		</div>
+	</div>
+	
+	<div class="armementPNJ">
+		<span>Armes de corps à corps</span>
+		<span>Att.</span>
+		<span>Dgts</span>
+		<span>Discrétion</span>
+		<span>Options</span>
+		<fieldset class="repeating_armementcacpnj">
+			<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
+			<button type="roll" name="roll_armementCaC" value="@{gm} &{template:base} {{nom=@{nomArmementCaC}}} {{attaque=[[2D6+[[@{puissancePNJ}]]+@{attArmementCaC}+@{bonus}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{force}+@{dgtsArmementCaC}]]}} {{relance=[Relance dégâts](~repeating_armementcacpnj_buttonRelance)}}" ></button>
+			<input type="text" name="attr_nomArmementCaC" />
+			<input type="number" name="attr_attArmementCaC" value="0" />
+			<input type="number" name="attr_dgtsArmementCaC" value="0" />
+			<input type="text" name="attr_discArmementCaC" />
+			<input type="text" name="attr_optionsArmementCaC" />
+		</fieldset>
+	</div>
+	
+	<div class="armementPNJ">
+		<span>Armes à distance</span>
+		<span>Att.</span>
+		<span>Dgts</span>
+		<span>Discrétion</span>
+		<span>Options</span>
+		<fieldset class="repeating_armementdistancepnj">
+			<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
+			<button type="roll" name="roll_armementDistancePNJ" value="@{gm} &{template:base} {{nom=@{nomArmementDistance}}} {{attaque=[[2D6+[[@{puissancePNJ}]]+@{attArmementDistance}+@{bonus}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{dexterite}+@{dgtsArmementDistance}]]}} {{relance=[Relance dégâts](~repeating_armementdistancepnj_buttonRelance)}}" ></button>
+			<input type="text" name="attr_nomArmementDistance" />
+			<input type="number" name="attr_attArmementDistance" value="0" />
+			<input type="number" name="attr_dgtsArmementDistance" value="0" />
+			<input type="text" name="attr_discArmementDistance" />
+			<input type="text" name="attr_optionsArmementDistance" />
+		</fieldset>
+	</div>
+	
+	<div class="protection">
+		<span>Protections</span>
+		<span>Prot.</span>
+		<span>Discrétion</span>
+		<span>Options</span>
+		<fieldset class="repeating_protection">
+			<input type="text" name="attr_nomProtection" />
+			<input type="number" name="attr_protProtection" value="0" />
+			<input type="text" name="attr_discProtection" />
+			<input type="text" name="attr_optionsProtection" />
+		</fieldset>
+	</div>
+	
+	<div class="equipementAutre">
+		<span>Autres</span>
+		<fieldset class="repeating_equipementAutre">
+			<div class="autoex autoex22">
+				<span name="attr_autreEquipement"></span>
+				<textarea name="attr_autreEquipement"></textarea>
+			</div>
+		</fieldset>
+	</div>
+	
+	<div class="cybernetique">
+		<span>Cybernétique</span>
+		<fieldset class="repeating_cybernetique">
+			<input type="text" name="attr_nomCybernetique" />
+			<div class="autoex autoex22">
+				<span name="attr_descriptionCybernetique"></span>
+				<textarea name="attr_descriptionCybernetique"></textarea>
+			</div>
+		</fieldset>
+	</div>
+
+	
+	<div class="menuPNJ">		
+		<div>
+			<input type="checkbox" name="attr_parametresJets" value="2" />
+			<span title="Paramètres des jets"></span>
+			<div>
+				<label>
+					<span>Jets privés ?</span>
+					<select name="attr_gm">
+						<option value="" selected>Non</option>
+						<option value="/w gm" >Oui</option>
+					</select>
+				</label>
+				<label>
+					<span>Bonus</span>
+					<input type="number" name="attr_bonus" value="0" />
+				</label>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<rolltemplate class="sheet-rolltemplate-base">
+	<span>{{nom}}</span>
+	{{#jet}}
+		<div>
+			<span>Résultat</span>
+			<span>{{jet}}</span>
+		</div>
+	{{/jet}}
+	{{#attaque}}
+		<div>
+			<span>Attaque (2D + bonus)</span>
+			<span>{{attaque}}</span>
+		</div>
+		<div>
+			<span>Attaque (1D Spécial)</span>
+			<span>{{deSpecial}}</span>
+		</div>
+		<div>
+			<span>Dégâts</span>
+			<span>{{degats}} + {{deSpecial}}</span>
+		</div>
+		{{#rollTotal() deSpecial 6}}
+			{{relance}}
+		{{/rollTotal() deSpecial 6}}
+	{{/attaque}}
+	
+</rolltemplate>
