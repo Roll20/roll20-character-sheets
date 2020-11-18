@@ -16,10 +16,19 @@ Please direct major issues, suggestions, or complains to user [Seraaron](https:/
 
 Enjoy!
 
-## Preview v2.2.1
+## Preview v2.2
 ![Screenshot](https://raw.githubusercontent.com/Seraaron/roll20-character-sheets/master/Burning%20Wheel/Burning%20Wheel.png)
 
 # Change log
+
+### v2.2.2 (2020-11-18)
+Update by Seraaron (147454).
+
+* Fixed Attribute 'routine tests needed' incorrect calculation, and added special case for second emotional attribute that stays at 5 once you're at exponent 5 and above, for Greed and Corruption
+* Added new 'quote' macro template that lets you quote parts of the sheet to the chat log, such as beliefs, special traits, and magic spells. (Look for the 'thought bubble symbol'). You can also style the quoted text with basic formatting `**bold**` and `*italic*`.
+* Slightly altered appearance of belief, instinct, and trait artha trackers, and added two new repeating segments for bonus beliefs and instincts
+* Moved old belief and instinct 4th slots to the 'Character Burner' tab for posterity, so that there are no breaking changes for existing users
+* Added roll button to repeating magic segment, so that they can be better used for elven spell songs with less page flipping
 
 ### v2.2.1 (2020-11-03)
 Early bug fixes by Seraaron (147454).
@@ -32,7 +41,7 @@ Early bug fixes by Seraaron (147454).
 * Fixed background image stretching on long page tabs by splitting it into a top, middle, and bottom segment, where the middle repeats until it reaches the bottom.
 * Corrected an implementation of the 'Being Learned' autocalc that would use the average Aptitude as your skill total, rather than the first chosen Root (see BWG pg 49). And also made tax affect these rolls.
 * User request fulfilled: Added option to make every stat and attribute renamable and taxable to support more homebrew mechanics (see the 'Additional Taxes' dropdown in the new Magic tab)
-* Similarly, all magic spells' subtitles are renamable, meaning that the Magic tab could ostensibly be used to list vehicles or other custom powers or objects from systems like Burning Empires. 
+* Similarly, all magic spells' subtitles are renamable, meaning that the Magic tab could ostensibly be used to list vehicles or other custom powers or objects from systems like Burning Empires.
 
 ## v2.2 (public test / preview build)
 Tweaked design and code by Seraaron (147454).
