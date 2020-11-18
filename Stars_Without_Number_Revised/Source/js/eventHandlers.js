@@ -81,7 +81,7 @@ on([
 
 on("change:setting_super_type change:repeating_spells remove:repeating_spells " +
     "change:repeating_magic-skills remove:repeating_magic-skills " +
-    "change:skill_magic change:skill_magic2_name change:skill_magic2", buildMagicMenu);
+    "change:skill_know_magic change:skill_use_magic change:skill_fight change:skill_sunblade change:skill_magic2_name change:skill_magic2", buildMagicMenu);
 
 /* Repeating autofill */
 autofillSections.forEach(sName => {
