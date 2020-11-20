@@ -1,0 +1,81 @@
+//- Semantic Versioning MAJOR.MINORPATCH
+input(name='attr_version' type='hidden' value='1.11')
+
+//- Do not manually change this. Hidden attribute used by versioning script
+input(name='attr_latest_versioning_upgrade' type='hidden' value='1')
+
+//- INCLUDES
+  =============================
+include src/pug/abstracts/mixins.pug
+
+//- VARIABLES
+ =============================
+- const personalityTraits = {'chaste':'lustful', 'energetic':'lazy', 'forgiving':'vengeful','generous':'selfish','honest':'deceitful','just':'arbitrary','merciful':'cruel','modest':'proud','prudent':'reckless','spiritual':'wordly','temperate':'indulgent','trusting':'suspicious','valorous':'cowardly'};
+- const attributes = ['size', 'dex', 'str', 'con', 'app'];
+- const skills = ['awareness', 'boating', 'chirurgery', 'compose', 'courtesy', 'dancing', 'faerie lore', 'falconry', 'fashion', 'first aid', 'flirting', 'folk lore', 'gaming', 'heraldry', 'hunting', 'industry', 'intrigue', 'orate', 'play', 'read', 'recognize', 'religion', 'romance', 'singing', 'stewardship', 'swimming', 'tourney'];
+- const gmCharacters = ['name', 'glory', 'app',  'courtesy', 'flirting', 'intrigue', 'chaste', 'modest', 'temperate'];
+- const imageSource = `https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Shadowrun5thEdition/src/imgs/`
+
+//- TABS
+  =============================
+input(name='attr_settings_toggle' type='hidden' value='settings')
+input(name='attr_sheet_type' type='hidden' value='character')
+input(name='attr_character_type' type='hidden' value='knight')
+
+//-NPC SHEET
+  =============================
+.npc
+  .box.npc-flex
+    p NPC STUFF
+  .box.npc-flex
+    p MORE NPC STUFF 
+
+//-PC SHEET
+  =============================
+.grid.tabs
+  .col.sheet-type.grid
+    each val in ['character', 'holdings', 'entourage']
+      - const defaultSelected = val === 'character' ? true : false
+      +tabButtons(val, 'character', defaultSelected)
+    each val in ['feast record', 'gamemaster characters']
+      - const defaultSelected = val === 'feast record' ? true : false
+      +tabButtons(val, 'feast', defaultSelected)
+
+  .col.settings.grid
+    label(data-i18n-title=`sheet: settings`)
+      input(name=`attr_settings_toggle` title=`@{settings_toggle}` type='checkbox' value='settings')
+      span.pictos.text-lowercase.text-center y
+
+include src/pug/pages/character.pug
+
+include src/pug/pages/entourage.pug
+
+include src/pug/pages/holdings.pug
+
+include src/pug/pages/feast.pug
+
+include src/pug/pages/settings.pug
+
+//-FOOTER
+  =============================
+.footer
+  .div
+    span ©2016 Nocturnal Media. Permission granted to copy for personal use only. 
+  .div  
+    span Roll20 character sheet created by Emerald Producttions, LLC. emeraldproductionsllc.com
+    img(alt='Emerald Productins, LLC' src=`${imageSource}/EProd_Emerald_Gloss.png`)
+  .div
+    span Version
+    span(name='attr_version')
+
+//-ROLL TEMPLATE
+  =============================
+include src/pug/vendor/rolltemplate.pug
+
+
+//- SCRIPTS
+script(type="text/worker")
+  include src/js/scripts.js
+  include src/js/helpers.js
+  include src/js/eventhandlers.js
+  include src/js/versioning.js

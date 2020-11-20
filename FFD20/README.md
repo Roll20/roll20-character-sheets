@@ -17,6 +17,16 @@ The Monster sheet type is meant for monsters, to be used exclusively by the DM. 
 
 ### Changelog
 
+__Version 1.4 (pushed 6/21/2020)__
+
+##### This update was realized by TamedFlame
+
+Universal
+
+* The background color gradient is now customisable from the Options section. You can select a color for each corner, and the sheet shall use those to generate a new background gradient. These options are set per character, and as such each PC, Monster, or NPC can have a style of their own. These settings also affect the backgrounds for the rolls in the chat, and as such you can use them to identify characters. 
+
+>  #### User discretion is advised when selcting colors, consider talking to your fellow players if any of them has difficulties with certain combinations.
+
 __Version 1.3 (pushed 2/23/2019)__
 
 Character Sheet

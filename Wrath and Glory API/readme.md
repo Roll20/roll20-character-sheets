@@ -9,10 +9,11 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 2.6 (June 30th, 2019) 
+Version 3.0 (May 18th, 2020) Wrath & Glory Revision Updates.
+This release has a significant number of updates to align with the revised edition.  The major change revolves around traumatic injuries and replacement of dice with wrath dice = to number of traumatic injuries.
 
 ### Thanks	
-Many thanks to my players (Dave, Brian, Charles, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes in the middle of play).
+Many thanks to my players (Dave, Brian, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes - literally - in the middle of play).
 
 Many thanks to the following individuals who reported defects and provided improvements: 
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
@@ -20,23 +21,56 @@ Many thanks to the following individuals who reported defects and provided impro
 3. Fenrir: new layout was his work; full contributions in the API.
 
 ### Planned Releases
+3.1 After update to Wrath & Glory handling of additional wrath dice for Injuries (swapping them out) will update all rolls to feed Trauma Count (introduced in 3.0) to all dice rolls using wrath.
 
-Next: Overhaul of inline dice rolls!
+### Current Release Changelog
 
-v2.0. Automate all calculated fields for performance and speed of character creation. 
-    - includes automated calculation of traits
-		DONE: conviction, corruption, resist corruption, passive awareness, resolve, defense, resilience, and soak
-		TO DO: Influence and Attribute adjusted rating & Skill Total for performance (no new functionality)
-				- when auto-calculating influence, need to allow the use of STR for Fel for influence for orks, and intellect in place of Fel for Mechanicus
-	
-v3.0. Redo NPC Layout with an order close to the core rulebook stat block. 
-	- Create capability to enter values in place of auto-calculating (this will be a variant capability)
+v3.0. Revisions to Align with Cubicle 7 Revised Edition
 
-v4.0. Refine Inline rolls 
-    - Add modifiers to each roll
-    - a 6 = two successes
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+
+Updates:
+01. Cosmetic: Replaced all references to BP and Buildpoints with XP and Experience Points respectively.
+02. Cosmetic: Updated references to Soak to Determination. Note till vehicle and voidship rules are updated I have left them with Soak.
+03. Cosmetic: References to Race changed to Species.
+04. Cosmetic: References to Malignancy/ies changed to Mutation/s.
+05. Cosmetic: relabled Defining Trait to Background Type, removed Keyword from the list and renamed Custom to Other.
+06. Cosmetic: swapped Faction (previously Framework) with Species/Gender
+07.	Cosmetic: added text in skills flagging those with optional use requirements.
+08.	Cosmetic: added text to DMOD insturcting to add +1 for Brutal and Melta Short weapons.
+09. Cosmetic: Moved Memoriable Injuries to Combat tab.
+10. Cosmetic: Switched presentation of Current and Max for Shock and Wounds.
+11. Cosmetic: Removed Hvy and Lght wounds; no longer in use.
+12. Fix: Brutal Roll for non-api die roller on weapon damage.
+13.	Fix: Total Corruption Adjusted value.
+14. Update: Per revised rules, removed ranks 4 and 5 and updated rank label accordingly.
+15. Update: removed defiance rolls - no longer used.
+16. NEW: Added Faith to first tab.
+17. NEW: Added Traumatic Injuries section next to memoriable injuries.
+18. NEW: created script workers to manage Traumatic Injury count - when you add counter goes up; when you remove counter goes down.
+19. NEW: Added a Melta dice roller for when using Melta vs structure and vehicles; too complex for adding to W&G dice roller at this point.
+20. NEW: Automated replacement of wrath dice with traumatic injuries for Attributes, Traits, Skills, Weapons, and Psychic Powers.  This does not include vehicle and voidship rules till those rules are released.
+21. NEW: On personal tab added fields for - Appearance, Age, Eyes, Hair, Height,Size, and Features.
 
 ### Changelog
+
+** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
+
+Updates:
+1. Cosmetic change: changed all dice to D6; teal buttons roll wrath, black/gold/red buttons have no wrath die.
+2. Cosmetic change: added spacing and thick dark teal line between psychic powers (PC and NPC)
+3. Cosmetic change: changed all references to Combat Rolls to Rolls (PC, NPC, Vehicle, Voidship)
+4. Cosmetic change: On PC Equipment sheet added thick dark teal line between vehicles and voidships.
+5. Cosmetic change: made all areas for lengthy text entry two lines in height.
+6. Cosmetic change: changed DN field for powers to text so values other than numbers can be entered - example is Defense.
+7. Fix: corrected layout of Heavily Wounded at label and field for Vehicles and Voidships.
+8. Update: Refined the inline dice rolls to now show critical on rolling standard pool and to show a critical when rolling a 1 on wrath die.
+9. Update: Added option for Weapon Skill + Agility in weapons; this accounts for use of a Pistol in Melee where an attack roll is Agility + Weapon Skill.
+10. New: Psychic powers now have an additional option to roll an alternative dice roll for shock, wounds, and mortal damage.
+11. New: Added d66 to psychic powers.  Future enhancement will convert this into a Peril of the Warp result.
+12. New: Added d3, d6, and d66 die roller on combat rolls for PC's and NPC's.
+13. New: Added Memorable Injuries as a repeating framework - can capture multiple memorable injuries - to Personal tab.
+14. New: Auto set rank title based on the selected rank; also automated to update existing character sheets.
 
 ** June 30th, 2019: version 2.6 - Fixes** 
 
