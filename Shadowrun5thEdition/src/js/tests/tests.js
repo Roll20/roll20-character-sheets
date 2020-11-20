@@ -250,3 +250,43 @@ QUnit.test('Shadowrun should entries with the reprowid added to the attribute na
   const actual = shadowrunFunctions.addRepRow('repeating_range_-m1czg68yzicwhfdpyys', ['ammo'])
   assert.ok(actual, ['repeating_range_-m1czg68yzicwhfdpyys_ammo'])
 })
+
+QUnit.test('Shadowrun should entries with the reprowid added to the attribute name', assert => {
+  const actual = shadowrunFunctions.addRepRow('repeating_range_-m1czg68yzicwhfdpyys', ['ammo'])
+  assert.ok(actual, ['repeating_range_-m1czg68yzicwhfdpyys_ammo'])
+})
+
+QUnit.test('determineMatrixDice should return 5 if edge toggle is on', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({edge: true})
+  assert.equal(actual, 5)
+})
+
+QUnit.test('determineMatrixDice should return 5 if edge toggle is on', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({edge: true})
+  assert.equal(actual, 5)
+})
+
+QUnit.test('determineMatrixDice should return hot sim dice as default', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({modifer: 0})
+  assert.equal(actual, 4)
+})
+
+QUnit.test('determineMatrixDice should return cold sim dice if mode is set to cold', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({mode: 'cold', modifer: 0})
+  assert.equal(actual, 3)
+})
+
+QUnit.test('determineMatrixDice should return cold sim dice + modifier', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({mode: 'cold', modifer: 1})
+  assert.equal(actual, 4)
+})
+
+QUnit.test('determineMatrixDice should return 5 if modifier is higher than 5', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({dice: 1, modifer: 105 })
+  assert.equal(actual, 5)
+})
+
+QUnit.test('determineMatrixDice should return 1 if modifier is lower than 1', assert => {
+  const actual = shadowrunFunctions.determineMatrixDice({dice: 1, modifer: -105 })
+  assert.equal(actual, 1)
+})

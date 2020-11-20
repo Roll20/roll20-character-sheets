@@ -8,8 +8,6 @@ const processingFunctions = {
     return numbers
   },
   findRepeatingField: trigger => trigger.split('_')[1],
-  //Roll20 does not allow for Promises
-  //getAttributes: array => new Promise((resolve, reject) => array ? getAttrs(array, v => resolve(v)) : reject(errorMessage('Function failed'))),
   getReprowid: trigger => {
     const split = trigger.split('_');
     return `${split[0]}_${split[1]}_${split[2]}`
