@@ -21,6 +21,12 @@ Enjoy!
 
 # Change log
 
+## v2.3 (2020-11-20)
+Update by Seraaron (147454).
+
+* Added new 'Rogues' tab for tracking PC bodyguards and animal companions, multiple NPCs within an organisation, or simple creature stat-blocks as described in BWG pp 565-571.
+* Updated image hosting links to official Roll20 repo.
+
 ### v2.2.2 (2020-11-18)
 Update by Seraaron (147454).
 
