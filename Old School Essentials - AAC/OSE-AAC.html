@@ -452,8 +452,8 @@
     </div>
     <input type="hidden" name="attr_armorClassType" value="aac" />
     <fieldset class="repeating_weapons">
-      <input type="hidden" name="attr_weaponAttributeBonus" value="0" />
-      <input type="hidden" name="attr_weaponAttributeBonusDamage" value="0" />
+      <input type="hidden" name="attr_weaponAttributeBonus" value="@{BonusSTR}" />
+      <input type="hidden" name="attr_weaponAttributeBonusDamage" value="@{BonusSTR}" />
       <input class="expand" type="checkbox" name="attr_expandWeapon" data-i18n-title="expand-collapse"
         title="Expand/Collapse" /><span></span>
       <div class="weapons-grid">
@@ -1302,33 +1302,7 @@
     });
 
     // Set attackType based on heuristics of the bonus damage (0 for ranged, otherwise STR bonus)
-    getSectionIDs("repeating_weapons", function (idArray) {
-      idArray.forEach(function (id) {
-        const attributes = ["attackType", "weaponAttributeBonusDamage"]
-          .map((name) => `repeating_weapons_${id}_${name}`)
-          .concat(["BonusSTR", "BonusDEX"]);
-        getAttrs(attributes, function (values) {
-          if (!values[`repeating_weapons_${id}_attackType`]) {
-            if (
-              values.BonusSTR !== 0 &&
-              values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0
-            ) {
-              setAttrs({
-                [`repeating_weapons_${id}_attackType`]: "Ranged",
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
-              });
-            } else {
-              setAttrs({
-                [`repeating_weapons_${id}_attackType`]: "Melee",
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
-              });
-            }
-          }
-        });
-      });
-    });
+    updateWeaponBonuses();
 
     // Set armorValue per armorBenefit if >= 2
     getSectionIDs("repeating_armor", function (idArray) {
@@ -1415,6 +1389,8 @@
 
   // Attribute Changes
   on("sheet:opened change:dex", function () {
+    updateWeaponBonuses();
+
     getAttrs(["dex"], function (values) {
       // dexMod applies both to AC and Missile Attacks
       const [dexMod, initMod] = getModifiers(values.dex, [
@@ -1438,6 +1414,8 @@
     });
   });
   on("change:str", function () {
+    updateWeaponBonuses();
+
     getAttrs(["str"], function (values) {
       const [BonusSTR, OpenDoor] = getModifiers(values.str, [
         [-3, 1],
@@ -1485,6 +1463,47 @@
     } else {
       return modifiers[6];
     }
+  }
+
+  function updateWeaponBonuses() {
+    getSectionIDs("repeating_weapons", function (idArray) {
+      idArray.forEach(function (id) {
+        const attributes = ["attackType", "weaponAttributeBonusDamage"]
+          .map((name) => `repeating_weapons_${id}_${name}`)
+          .concat(["BonusSTR", "BonusDEX"]);
+        getAttrs(attributes, function (values) {
+          const attackType = values[`repeating_weapons_${id}_attackType`];
+          if (!attackType) {
+            if (
+              values.BonusSTR !== 0 &&
+              values[`repeating_weapons_${id}_weaponAttributeBonusDamage`] === 0
+            ) {
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Ranged",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+              });
+            } else {
+              setAttrs({
+                [`repeating_weapons_${id}_attackType`]: "Melee",
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+              });
+            }
+          } else if (attackType.toLowerCase() === 'melee') {
+              setAttrs({
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+              });
+          } else if (attackType.toLowerCase() === 'ranged') {
+              setAttrs({
+                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+              });
+          }
+        });
+      });
+    });
   }
 
   // Set speeds based on Exploration Speed

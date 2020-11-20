@@ -655,6 +655,9 @@ on(`change:hull_max`, eventInfo => calculateHullValues());
 on(`clicked:startship`, eventInfo => setAttrs({shipbuild:"on"}));
 on(`clicked:completeship`, eventInfo => setAttrs({shipbuild:0}));
 
+on(`clicked:editname_on`, eventInfo => setAttrs({npcname_toggle:"on"}));
+on(`clicked:editname_off`, eventInfo => setAttrs({npcname_toggle:0}));
+
 on("change:drop_name", (eventInfo) => {
     getAttrs(["drop_name", "drop_content", "drop_data", "drop_category"], (values) => {
         dropHandler(values);
