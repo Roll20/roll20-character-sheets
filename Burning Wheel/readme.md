@@ -8,7 +8,7 @@ Wound dice and Obs penalties from wounds are automatically calculated from the C
 
 To the far right of each skill is a hidden 'mod ⌘ symbol' which will turn that skill instead a group separator instead.
 
-There is also now a Magic tab to put your spells in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also.
+There is now also a 'Magic' tab to put your spells and songs in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also. And there's a new 'Rogues' tab for tracking PC bodyguards and animal companions, multiple NPCs within an organisation, or simple creature stat-blocks as described in BWG pp 565-571.
 
 For the best user experience we reccomend that you install the two open-license fonts [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) and [Open Sans](https://fonts.google.com/specimen/Open+Sans).
 
@@ -26,6 +26,8 @@ Update by Seraaron (147454).
 
 * Added new 'Rogues' tab for tracking PC bodyguards and animal companions, multiple NPCs within an organisation, or simple creature stat-blocks as described in BWG pp 565-571.
 * Updated image hosting links to official Roll20 repo.
+* Minor bug fixes, tweaks, and usability improvements.
+* Added a 'quote README to chat' button in the Character Burner tab to redirect users to this page.
 
 ### v2.2.2 (2020-11-18)
 Update by Seraaron (147454).
