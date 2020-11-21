@@ -199,6 +199,16 @@ const updateDerivedAttribute = derivedAttribute => {
   })
 }
 
+const updateInitiativeDice = () => {
+  getAttrs(['reaction', 'intuition', "initiative_dice_modifier", "edge_toggle", "initiative_dice_temp", "initiative_dice_temp_flag"], values => {
+    const edgeFlag = values.edge_toggle === "@{edge}" ? true : false;
+    const temp = parseInt(values.initiative_dice_temp) || 0;
+    const bonus = parseInt(values.initiative_dice_modifier) || 0;
+    processingFunctions.setAttributes({
+      initiative_dice: edgeFlag ? 5 : Math.min(bonus+temp+1,5)
+    })
+  })
+}
 
 //Calculate Astral Initiatve
 const updateAstralInitiative = () => {
@@ -212,6 +222,17 @@ const updateAstralInitiative = () => {
     });
   });
 };
+
+const updateAstralInitiativeDice = () => {
+  getAttrs(["astral_dice_modifier", "edge_toggle"], v => {
+    const edgeFlag = v.edge_toggle === "@{edge}" ? true : false;
+    const bonus = parseInt(v.astral_dice_modifier) || 0;
+
+    setAttrs({
+      astral_dice: edgeFlag ? 5 : Math.min(bonus+3,5)
+    })
+  })
+}
 
 const resetConditionTrack = eventinfo => {
   const attr = eventinfo.triggerName.split("_").pop()

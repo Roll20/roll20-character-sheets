@@ -39,7 +39,7 @@
 	sheetAttributes.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
   sheetAttributes.repeatingSkills.forEach(field => {
-    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
+    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName || ''))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
     on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))
@@ -72,7 +72,13 @@
 
 	on('change:astral_dice_modifier change:edge_toggle', () => updateAstralInitiativeDice())
 
-	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level change:matrix_dice_modifier change:edge_toggle', () => updateMatrixInitiative())
+	on('change:host_rating change:data_processing change:pilot change:intuition change:matrix_mod_modifier change:level', () => {
+		updateMatrixInitiative()
+	})
+
+  on('change:matrix_dice_modifier change:edge_toggle change:matrix_mode_toggle', () => updateMatrixInitiativeDice())
+  
+  on('change:matrix_mode_toggle', () => updateHotSimsBonus())
 
   on("clicked:cond_reset", () => resetNpcCondition()); 
 
@@ -83,4 +89,3 @@
   on("change:host_rating", eventinfo => updateHostAttributes(eventinfo.newValue))
 
   on("change:default_attribute", eventinfo => updateDefaultAttribute(eventinfo.newValue))
-

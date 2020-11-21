@@ -8,6 +8,47 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+November 2nd th 2020 v1.23.3
+
+- Added translation tag for modifier text in the roll template.
+
+
+October 12th 2020 v1.23.2
+
+- translation.json update, attempting to fix the translation issue which was introduced last week which prevent the new json from use on the live server sheet.
+- Fixed issue with Heavy Head armor capping at 1 carried Enc.
+
+
+October 5th 2020 v1.23.1
+
+- Further modification of how Armor tab works. Worn? check will now add/remove ENC and AP appropriately. Some descriptive text has been added to these sections too.
+- Continued adding IL8N tags that were missing from a lot of the new content. This work is now mostly complete.
+- Workable Italian translation is now implemented (Translation credit to Andrezzo/Roll20). (change language to Italian on Roll20 website/account config, then start server to see it). I am more then willing to work with others to implement more languages, but can not do this by myself.
+
+
+September 7th 2020 v1.22
+
+- Fixed issue which stoped the Initiative button from working correctly on a newly created character sheet.
+- Added numerious IL8N tags that were missing from alot of the new content. This is a work in progress to enable high quality custom translation to be added later. Italian translation is being worked on by the 3rd party.
+
+
+August 24th 2020 v1.21
+
+- fencing skill roll fixed  ( issue #7214  )
+- hit location was not inverting target result fixed
+
+
+August 3rd 2020 v1.2
+
+NEW - Mutation Roll button added for Physical/Mental Mutation rolls, with a selection between all chaos powers or individual gods. Also includes Fixation table roll selection.
+
+- NPC pages 2,3 & 4 weapon/spell rolls fixed
+- Firefox spin button showing fixed
+- When rolling a critical in combat the roll template text will now show "Critical Hit" rather then just "Critical", when a Ranged weapon is used it will show "Critical Hit (Impaled)"
+- Combat Advantage +X display in the roll template is no longer value at locked
+- SL display in roll template extended to roll target of 259 (Maximum SL +25), critical failure will always be SL -1
+- Containers updated with worn checkbox, and vehicle toughness/wounds options.
+- Removed old 2e lines from the translations file
 
 July 27 2020 - v1.1
 
@@ -203,10 +244,11 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future release wish list :
 
-- Add Physical/Mental Corruption Roll table button. (expanded list from Enemy within Companion) (v1.2)
+- Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe)
+- More themes. (v1.3)
 - Talents Tab rework, with possible roll integration. (v1.3)
-- WFRP 4e Roll API with SL resolution API. (v1.x)
-- More themes. (v1.x)
+- WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x)
+
 
 
 Enjoy.
