@@ -14,6 +14,7 @@
   <button type="action" name="act_character" data-i18n="character">
     Character
   </button>
+  <button type="action" name="act_retainers" data-i18n="retainers">Retainers</button>
   <button type="action" name="act_monster" data-i18n="monster">Monster</button>
   <button type="action" name="act_notes" data-i18n="notes">Notes</button>
   <button type="action" name="act_settings" data-i18n="settings">
@@ -214,7 +215,7 @@
     <div class="saving roll flex">
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveD"
-          value="&{template:greater} {{roll=^{death-poison-full}}} {{result=[[ [[1d20]]>@{saveD}+@{modQuery} ]]}} {{check=[[@{saveD}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{death-poison-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}>+@{modQuery}@{saveD} ]]}} {{check=[[@{saveD}]]}}"
           data-i18n="death-poison">
           Death, Poison
         </button>
@@ -222,7 +223,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveW"
-          value="&{template:greater} {{roll=^{magic-wands-full}}} {{result=[[ [[1d20]]>@{saveW}+@{modQuery} ]]}} {{check=[[@{saveW}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{magic-wands-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveW} ]]}} {{check=[[@{saveW}]]}}"
           data-i18n="magic-wands">
           Magic wands
         </button>
@@ -230,7 +231,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveP"
-          value="&{template:greater} {{roll=^{paralysis-petrification-full}}} {{result=[[ [[1d20]]>@{saveP}+@{modQuery} ]]}} {{check=[[@{saveP}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{paralysis-petrification-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveP} ]]}} {{check=[[@{saveP}]]}}"
           data-i18n="paralysis-petrification">
           Paralysis, Petrification
         </button>
@@ -238,7 +239,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveB"
-          value="&{template:greater} {{roll=^{breath-attacks-full}}} {{result=[[ [[1d20]]>@{saveB}+@{modQuery} ]]}} {{check=[[@{saveB}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{breath-attacks-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveB} ]]}} {{check=[[@{saveB}]]}}"
           data-i18n="breath-attacks">
           Breath attacks
         </button>
@@ -246,7 +247,7 @@
       </label>
       <label class="inline-flex inline-flex-wide-label">
         <button type="roll" name="attr_rollSaveS"
-          value="&{template:greater} {{roll=^{spells-rods-staves-full}}} {{result=[[ [[1d20]]>@{saveS}+@{modQuery} ]]}} {{check=[[@{saveS}+@{modQuery}]]}}"
+          value="&{template:greater} {{roll=^{spells-rods-staves-full}}} {{result=[[ [[1d20]]+@{wisdomSaveQuery}+@{modQuery}>@{saveS} ]]}} {{check=[[@{saveS}]]}}"
           data-i18n="spells-rods-staves">
           Spells, Rods, Staves
         </button>
@@ -302,7 +303,7 @@
           </label>
         </div>
         <!-- Armor Class Fields are dependent on AAC vs DAC -->
-        <input type="hidden" name="attr_armorClassType" value="aac" />
+        <input type="hidden" name="attr_armorClassType" />
         <div class="flex armor armor-aac">
           <label class="inline-flex">
             <span data-i18n="armor-class-abbr" title="Armor Class" data-i18n-title="armor-class">AC</span>
@@ -391,7 +392,7 @@
         </label>
       </div>
     </div>
-    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <input type="hidden" name="attr_armorClassType" />
     <div class="matrix">
       <h2>Attack Value Matrix</h2>
       <div class="flex grid-spacing">
@@ -450,7 +451,7 @@
       <span data-i18n="damage-modifier">+Damage</span>
       <span data-i18n="weight">Weight</span>
     </div>
-    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <input type="hidden" name="attr_armorClassType" />
     <fieldset class="repeating_weapons">
       <input type="hidden" name="attr_weaponAttributeBonus" value="@{BonusSTR}" />
       <input type="hidden" name="attr_weaponAttributeBonusDamage" value="@{BonusSTR}" />
@@ -561,7 +562,7 @@
           value="0" />
         <input type="text" name="attr_spellName" placeholder="Spell Name"
           data-i18n-placeholder="spell-name-placeholder" />
-        <input type="input" min="1" name="attr_spellLevel" value="1" />
+        <input type="number" min="1" name="attr_spellLevel" value="1" />
         <input type="text" name="attr_spellDuration" />
         <input type="text" name="attr_spellRange" />
         <input type="text" name="attr_spellDescription" placeholder="Description" data-i18n-placeholder="description" />
@@ -645,6 +646,26 @@
   <div class="sheet-notes-section">
     <h1 data-i18n="notes">Notes</h1>
     <textarea name="attr_characterNotes"></textarea>
+  </div>
+</div>
+
+<div class="sheet-retainers">
+  <div>
+    <h1 data-i18n="retainer-modifiers">Retainer Modifiers</h1>
+    <div class="flex">
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="npc-reaction">NPC Reaction</span>
+        <input type="number" readOnly name="attr_chaMod" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="max-retainers">Max Retainers</span>
+        <input type="number" readOnly name="attr_retainersMax" value="0" />
+      </label>
+      <label class="inline-flex inline-flex-wide-label">
+        <span data-i18n="loyalty">Loyalty</span>
+        <input type="number" readOnly name="attr_retainersLoyalty" value="0" />
+      </label>
+    </div>
   </div>
 </div>
 
@@ -787,7 +808,7 @@
             </button>
             <input type="number" name="attr_initiative" value="0" />
           </label>
-          <input type="hidden" name="attr_armorClassType" value="aac" />
+          <input type="hidden" name="attr_armorClassType" />
           <label class="inline-flex show-aac">
             <span data-i18n="base-attack-bonus-abbr" title="Base Attack Bonus"
               data-i18n-title="base-attack-bonus">BAB</span>
@@ -827,7 +848,7 @@
         </table>
       </div>
     </div>
-    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <input type="hidden" name="attr_armorClassType" />
     <div class="matrix">
       <h2>Attack Value Matrix</h2>
       <div class="flex grid-spacing">
@@ -885,7 +906,7 @@
       <span data-i18n="damage">Damage</span>
       <span data-i18n="description">Description</span>
     </div>
-    <input type="hidden" name="attr_armorClassType" value="aac" />
+    <input type="hidden" name="attr_armorClassType" />
     <fieldset class="repeating_weapons">
       <div class="weapons-grid">
         <!-- AAC Attack -->
@@ -1021,7 +1042,7 @@
   <label class="setting">
     <span data-i18n="armor-class-type">Armor Class Type</span>
     <select name="attr_armorClassType">
-      <option value="aac" selected data-i18n="ascending-armor-class">Ascending Armor Class</option>
+      <option value="aac" data-i18n="ascending-armor-class">Ascending Armor Class</option>
       <option value="dac" data-i18n="descending-armor-class">Descending Armor Class</option>
     </select>
   </label>
@@ -1375,12 +1396,12 @@
         getTranslationByKey("charisma-modifier") +
         "|0}[" +
         getTranslationByKey("charisma-abbr") +
-        "]",
+        "]"
     });
   });
 
   // Tabs
-  const buttonlist = ["character", "monster", "notes", "settings"];
+  const buttonlist = ["character", "retainers", "monster", "notes", "settings"];
   buttonlist.forEach((button) => {
     on(`clicked:${button}`, function (event) {
       setAttrs({ sheetTab: button });
@@ -1437,9 +1458,37 @@
   });
   on("sheet:opened change:wis", function () {
     getAttrs(["wis"], function (values) {
-      setAttrs({ wisMod: getModifiers(values.wis) });
+      const wisMod = getModifiers(values.wis);
+      setAttrs({
+        wisMod,
+        wisdomSaveQuery: (wisMod === 0)
+          ? 0
+          : "?{" +
+            getTranslationByKey("wisdom-save-apply") +
+            "|" +
+            getTranslationByKey("no") +
+            ",0|" +
+            getTranslationByKey("yes") +
+            ",@{wisMod}}[" +
+            getTranslationByKey("wisdom-abbr") +
+            "]"
+        });
     });
   });
+  on("sheet:opened change:cha", function () {
+    getAttrs(["cha"], function (values) {
+      const [chaMod, retainersMax, retainersLoyalty] = getModifiers(values.cha, [
+        [-2, 1, 4],
+        [-1, 2, 5],
+        [-1, 3, 6],
+        [0, 4, 7],
+        [1, 5, 8],
+        [1, 6, 9],
+        [2, 7, 10]
+      ]);
+      setAttrs({ chaMod, retainersMax, retainersLoyalty })
+    })
+  })
 
   /**
    * Given a value and set of modifiers, return the correct modifiers
@@ -1491,15 +1540,15 @@
               });
             }
           } else if (attackType.toLowerCase() === 'melee') {
-              setAttrs({
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
-              });
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusSTR,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: values.BonusSTR,
+            });
           } else if (attackType.toLowerCase() === 'ranged') {
-              setAttrs({
-                [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
-                [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
-              });
+            setAttrs({
+              [`repeating_weapons_${id}_weaponAttributeBonus`]: values.BonusDEX,
+              [`repeating_weapons_${id}_weaponAttributeBonusDamage`]: "0",
+            });
           }
         });
       });
@@ -1520,15 +1569,19 @@
   // Armor Calculation
   on("sheet:opened change:dex change:repeating_armor remove:repeating_armor",
     function () {
-      repeatingSum("ArmorWorn", "armor", "armorWorn", { callback: () => {
-        repeatingSum("ArmorTotal", "armor", ["armorValue", "armorWorn"], { callback: () => {
-          getAttrs(["ArmorWorn", "ArmorTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function(values) {
-            const aacAc = values.ArmorWorn > 0 ? values.ArmorTotal + values.BonusDEX : values.aacAcUnarmored;
-            const dacAc = values.ArmorWorn > 0 ? values.ArmorTotal - values.BonusDEX : values.dacAcUnarmored;
-            setAttrs({ aacAc, dacAc });
-          })
-        }});
-      }});
+      repeatingSum("ArmorWorn", "armor", "armorWorn", {
+        callback: () => {
+          repeatingSum("ArmorTotal", "armor", ["armorValue", "armorWorn"], {
+            callback: () => {
+              getAttrs(["ArmorWorn", "ArmorTotal", "BonusDEX", "aacAcUnarmored", "dacAcUnarmored"], function (values) {
+                const aacAc = values.ArmorWorn > 0 ? values.ArmorTotal + values.BonusDEX : values.aacAcUnarmored;
+                const dacAc = values.ArmorWorn > 0 ? values.ArmorTotal - values.BonusDEX : values.dacAcUnarmored;
+                setAttrs({ aacAc, dacAc });
+              })
+            }
+          });
+        }
+      });
     }
   );
 
@@ -1599,7 +1652,7 @@
   });
   function setAttackMatrix(thac0) {
     const matrix = {};
-    for (let ac = 0; ac < 10; ac++) {
+    for (let ac = 0; ac < 10; ac++) {
       matrix[`attackMatrix${ac}`] = Math.min(thac0 - ac, 20);
     }
     setAttrs(matrix);
@@ -1620,7 +1673,7 @@
   });
   function setAttackMatrix(thac0, type = 'attackMatrix') {
     const matrix = {};
-    for (let ac = 0; ac < 10; ac++) {
+    for (let ac = 0; ac < 10; ac++) {
       matrix[`${type}${ac}`] = Math.min(thac0 - ac, 20);
     }
     setAttrs(matrix);
