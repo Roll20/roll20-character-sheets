@@ -16420,6 +16420,7 @@ function calculateCombatValues() {
         getAttrs(variablesToGet, function(values) {
             var attrsToChange = {};
 
+            // Used for AT, PA and TP calc
             let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
 
             // Berechne Waffen-AT
@@ -17166,12 +17167,16 @@ on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_
 
     var weaponsToCalculate = [];
     let attrsToGet = [ "kk" ];
+
+    // Gather all affected melee weapons (NKW)
+    // Changes to KK (strength) can affect all weapons
     if (eventInfo.sourceAttribute === "kk") {
         for (var weapon = 1; weapon <= 4; weapon++) {
             weaponsToCalculate.push(weapon);
             attrsToGet.push("NKW" + weapon + "_Schwellenwert");
             attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
         }
+    // Use the slot (number) of the weapon which just got changed
     } else {
         let matchResult = eventInfo.sourceAttribute.match(/nkw(\d)_.*/i);
         let weapon = matchResult[1];
@@ -17179,7 +17184,7 @@ on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_
         attrsToGet.push("NKW" + weapon + "_Schwellenwert");
         attrsToGet.push("NKW" + weapon + "_SchwellenwertKK");
     }
-        
+
     getAttrs(attrsToGet, function(values) {
         let attrsToChange = {};
         for (var i = 0; i < weaponsToCalculate.length; i++) {
@@ -17190,6 +17195,56 @@ on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_
     })
 });
 
+/* TP/KK modifies (usually only) TP, but sometimes also AT and PA
+Pair of values separated by a slash.
+First value (A): Strength required for optimal wielding of the weapon.
+Second value (B): Damage steps (but complicated, see below) or threshold
+
+How This Modifier Works
+* Take first value.
+* Subtract/add the second value: A - B, A, A + B
+** If strength is A, the modifier is 0.
+** If strength is A + B, the modifier is +1.
+** If strength is A - B, the modifier is -1.
+** If strength is between A - B and A + B (= not either of the values), the modifier is 0.
+* Negative modifier gets applied to AT, PA and TP.
+* Positive modifier gets applied to TP only.
+* This goes on indefinitely for all further intervals A - n * B, A - (n - 1) * B, ... , A - 2 * B, A - B, A, A + B, A + 2 * B, ... , A + (n - 1) * B, A + n * B
+
+Examples:
+* TP/KK: 10/3
+* Range for + 2 is 10 + 2 * 3 to 10 + 3 * 3 - 1 or 16 to 18
+* Range for + 1 is 10 + 3 to 10 + 2 * 3 - 1 or 13 to 15
+* Range for ± 0 is 10 - 3 + 1 to 10 + 3 - 1 or 8 to 12
+* Range for - 1 is 10 - 2 * 3 + 1 to 10 - 3 or 5 to 7
+* Range for - 2 is 10 - 3 * 3 + 1 to 10 - 2 * 3 or 2 to 4
+
+Yes, it's a mess.
+
+Note: TP/KK is just a shorthand, so "TP" does not correspond to the first and "KK" does not correspond to the second value. The first value actually is a "KK", the second a threshold.
+
+Algorithm
+* Difference between strength and threshold
+* Round down the fraction of the absolute difference and the threshold
+* If the difference was negative, the modifier also becomes negative.
+
+Example TP/KK = 10/3
+Str. Dif. Flo. Res.
+  4   -6    2   -2
+  5   -5    1   -1
+  6   -4    1   -1
+  7   -3    1   -1
+  8   -2    0    0
+  9   -1    0    0
+ 10    0    0    0
+ 11    1    0    0
+ 12    2    0    0
+ 13    3    1    1
+ 14    4    1    1
+ 15    5    1    1
+ 16    6    2    2
+
+*/
 function calculateTpKKMod(values, weapon) {
     let KK = parseInt(values["kk"]);
     let weaponKK = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
