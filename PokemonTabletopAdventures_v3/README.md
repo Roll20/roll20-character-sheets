@@ -7,6 +7,9 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Nov 25, 2020
+- Fixed a bug in Bluff/Deception where it never pulls the correct stat
+
 ### Nov 8, 2020
 - Combined the skill roll button with the skill name
   - Added fancy colors for the new skill roll button so that it matches the stat field when hovered over to help highlight which stat it uses
