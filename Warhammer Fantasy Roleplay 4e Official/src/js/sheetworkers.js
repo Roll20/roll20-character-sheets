@@ -842,7 +842,7 @@ const wfrpModule = ( () => {
 
             for (let k = 1; k <= 5; k++) {
                 attrs.push(`${repeating_id}_career_talent_${i}_${k}_advances`);
-                attrs.push(`${repeating_id}_career_talent_${i}_${j}_init`); 
+                attrs.push(`${repeating_id}_career_talent_${i}_${k}_init`); 
             }
         }
 
@@ -987,8 +987,6 @@ const wfrpModule = ( () => {
                 attrs.push(`repeating_experience_${id}_experience_amount`);
             }
 
-            console.log(ids.experiencespent)
-
             for (const id of ids.experiencespent) {
                 attrs.push(`repeating_experiencespent_${id}_experience_amount`);
 
@@ -1078,12 +1076,8 @@ const wfrpModule = ( () => {
                 skill_advances.forEach((value, key) => xp += calculateSkillXP(value, skill_advances_free.get(key)));
                 talent_advances.forEach((value, key) => xp += calculateTalentXP(value, talent_advances_free.get(key)));
 
-                console.log(ids.experiencespent)
-
                 for (const id of ids.experiencespent) {
                     const value = parseInt(values[`repeating_experiencespent_${id}_experience_amount`]);
-
-                    console.log(value)
 
                     xp += value;
                 }
