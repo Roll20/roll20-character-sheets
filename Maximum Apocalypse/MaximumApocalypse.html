@@ -1,8 +1,18 @@
+<input type="hidden" name="attr_mod_bool_one_if_adv" value="({[[{?{adv|0}, 0}kh1]], 1}kl1)"/>
+<input type="hidden" name="attr_mod_bool_one_if_dis" value="([[{[[{?{adv|0}, 0}kl1]], -1}kh1]]*-1)"/>
+<input type="hidden" name="attr_mod_bool_one_if_nomod" value="(1-@{mod_bool_one_if_adv}+-@{mod_bool_one_if_dis})"/>
+<input type="hidden" name="attr_roll_perc_adv" value="(([[@{mod_bool_one_if_adv}+1*@{mod_bool_one_if_adv}]]d10kh1cs>0cf<0-[[1*@{mod_bool_one_if_adv}]])*10)"/>
+<input type="hidden" name="attr_roll_perc_dis" value="(([[@{mod_bool_one_if_dis}+1*@{mod_bool_one_if_dis}]]d10kl1cs>0cf<0-[[1*@{mod_bool_one_if_dis}]])*10)"/>
+<input type="hidden" name="attr_roll_perc_nomod" value="(([[1*@{mod_bool_one_if_nomod}]]d10cs>0cf<0-[[1*@{mod_bool_one_if_nomod}]])*10)"/>
+<input type="hidden" name="attr_roll_perc" value="@{roll_perc_adv}+@{roll_perc_dis}+@{roll_perc_nomod}+(1d10cs>0cf<0)"/>
 <div class="main">
     <div class="character section">
         <div class="character-name-input data-entry"><input name="attr_character_name" type="text"/></div>
         <div class="character-name-label"><label data-i18n="character_name">Character Name.</label></div>
-        <div class="logo"><img height="500px" width="500px" src="https://raw.githubusercontent.com/dtsm12/roll20-character-sheets/Maximum-Apocalypse-v1/Maximum%20Apocalypse/ma-logo.png" alt="Maxiumum Apocalypse"/></div>
+        <div class="logo">
+            <img height="500px" width="500px" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Maximum%20Apocalypse/ma-logo.png" alt="Maxiumum Apocalypse"/>
+            <span>Modifier popup for rolls ? <input type="checkbox" name="attr_roll_mod" value="?{Advantages?|0|1|2|3}+?{Disadvantages?|0|1|2|3}"></span>
+        </div>
         <div class="player-name-input data-entry"><input name="attr_player_name" type="text"/></div>
         <div class="player-name-label"><label data-i18n="player_name">Player Name.</label></div>
         <div class="archetype-primary-input data-entry">
@@ -69,7 +79,11 @@
     <div class="stats-grid">
         <div class="stat str">
             <div class="stat-labels str-labels">
-                <div class="banner"><span data-i18n="strength" class="banner">Strength.</span></div>
+                <div class="banner">
+                    <button data-i18n="strength" value="&{template:maxapoc} {{color=green}} {{subtitle=Strength}} {{title=@{character_name}}} {{lvl1=[[@{str}+1]]}}  {{lvl=[[@{str}]]}} {{lvlhalf1=[[@{str_half}+1]]}} {{lvlhalf=[[@{str_half}]]}} {{lvlquarter1=[[@{str_quarter}+1]]}} {{lvlquarter=[[@{str_quarter}]]}} {{profroll=[[@{roll_perc}]]}}" type="roll" class="blank-roll-button">
+                        Strength.
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(STR)</span></div>
             </div>
             <div class="str-input"><input class="stat" type="number" name="attr_str"/></div>
@@ -179,7 +193,12 @@
           <input type="hidden" name="attr_athletics_half"/>
           <input type="hidden" name="attr_athletics_quarter"/>
       </div>
-      <div class="athletics-label"><label data-i18n="athletics" class="skill-label top-skill">Athletics.</label></div>
+      <div class="athletics-label">
+          <button data-i18n="athletics" value="&{template:maxapoc} {{color=green}} {{subtitle=Athletics}} {{title=@{character_name}}} {{lvl1=[[@{athletics}+1]]}} {{lvl=[[@{athletics}]]}} {{lvlhalf1=[[@{athletics_half}+1]]}} {{lvlhalf=[[@{athletics_half}]]}} {{lvlquarter1=[[@{athletics_quarter}+1]]}} {{lvlquarter=[[@{athletics_quarter}]]}} {{profroll=[[@{roll_perc}]]}} {{prof=@{athletics_prof}}}" type="roll" class="blank-roll-button">
+            Athletics.
+          </button>
+          <!--label data-i18n="athletics" class="skill-label top-skill">Athletics.</label-->
+      </div>
       <div class="archery-prof">
           <select class="prof" name="attr_archery_prof">
               <option value="-">-</option>
@@ -1248,4 +1267,48 @@ on('change:repeating_gear:gear_cp remove:repeating_gear', function() {
 
 /* END OF REPEATING SUMS */
 
+/*
+&{template:custom} 
+{{color=green}} 
+{{title=Strength}} 
+{{lvl=@{str} }} 
+{{lvlhalf=@{str_half} }} 
+{{lvlquarter=@{str_quarter} }} 
+{{profroll=[[1d100]] }}
+8?
+
 </script>
+
+<rolltemplate class="sheet-rolltemplate-maxapoc">
+  <div class="sheet-container sheet-color-{{color}}">
+    <div class="sheet-header">
+      {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+      {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+    </div>
+    <div class="sheet-content">
+      <div class="sheet-key">Stat</div><div class="sheet-value">{{lvl}}</div>
+      {{#prof}}<div class="sheet-key">Proficiency</div><div class="sheet-value">{{prof}}</div>{{/prof}}
+      <div class="sheet-key">&frac12; stat</div><div class="sheet-value">{{lvlhalf}}</div>
+      <div class="sheet-key">&frac14; stat</div><div class="sheet-value">{{lvlquarter}}</div>
+      <div class="sheet-key">Roll</div><div class="sheet-value">{{profroll}}</div>
+      {{#rollLess() profroll 2}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Critical Success !!!</div>
+      {{/rollLess() profroll 2}}
+      {{#rollBetween() profroll 2 lvlquarter}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Amazing Success !!</div>
+      {{/rollBetween() profroll 2 lvlquarter}}
+      {{#rollBetween() profroll lvlquarter1 lvlhalf}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Great Success !</div>
+      {{/rollBetween() profroll lvlquarter1 lvlhalf}}
+      {{#rollBetween() profroll lvlhalf1 lvl}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Success</div>
+      {{/rollBetween() profroll lvlhalf1 lvl}}
+      {{#rollBetween() profroll lvl1 99}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Failure</div>
+      {{/rollBetween() profroll lvl1 99}}
+      {{#rollGreater() profroll 99}}
+      <div class="sheet-key">Result</div><div class="sheet-value">Critical Failure !!!!</div>
+      {{/rollGreater() profroll 99}}
+    </div>
+  </div>
+</rolltemplate>
