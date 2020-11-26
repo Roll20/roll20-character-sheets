@@ -2,12 +2,14 @@
 
 Building the sheet from scratch, while learning Roll20 custom sheet conventions & CCS grids along the way.
 
-Haven't actually played a game of Maximum Apocalypse yet; using this project as a way to become familiar with the mechanics.
+Haven't actually played a game of Maximum Apocalypse yet, but it look like a really fun setting with interesting chracter, roll & inventory mechanics.
+
+I'm using this project as a way to become familiar with the mechanics.
 
 ## Usage Notes
 
 - Structure very close to to core rulebook
-- Changes made to provide enough room for Special Ability and Gear descriptions
+- Deviations implemented to provide enough room for Special Ability and Gear descriptions
 - Drop down selections for archetypes, apocalypse & skill proficiencies
 - Special Ability and Gear descriptions can be expanded/contracted to see the full text when needed
 - The sheet will automatically calculate all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
