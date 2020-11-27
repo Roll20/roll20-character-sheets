@@ -4272,6 +4272,7 @@
 
 				<ul>
 					<li>Combat Tab > Melee table. Display swing & thrust damage. Requested by PL M.</li>
+					<li>combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -10105,6 +10106,7 @@ visualize what it will look like in chat.
 												<option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 												<option value="Technique"><span data-i18n="option-technique">Technique</span></option>
 												<option value="Spell"><span data-i18n="option-spell">Spell</span></option>
+												<option value="Melee"><span data-i18n="option-melee-weapon">Melee Weapon</span></option>
 												<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
 												<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
 												<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
@@ -10484,6 +10486,23 @@ visualize what it will look like in chat.
 									</div>
 								</div> <!-- .row -->
 								<div class="melee-notebox">
+
+									<div class="row">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="row-id-label">Row ID:</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-row-id-tooltip">Use the melee row id to link an active defense to this skill.<br />This allows you to use your enhanced skill with this weapon for parries.</span>
+											</span> 
+										</div>
+										<div class="cell">
+											<input type="text" readonly="readonly" name="attr_row_id" value="" />
+										</div>
+										
+									</div> <!-- .row -->
+
+
 									<div class="row">
 										<!-- hidden input is used to show/hide Row ID: based on selection -->
 										<input type="hidden" name="attr_melee_row_type" value="Skill" />
@@ -12642,6 +12661,7 @@ visualize what it will look like in chat.
 
 			<ul>
 				<li>Combat Tab > Melee table. Display swing & thrust damage. Requested by PL M.</li>
+				<li>combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
 			</ul>
 
 			<h4>Version: 2.5.2</h4>
@@ -15776,9 +15796,7 @@ See notes for weapon.</textarea>
 		updateRepeatingDefenseNotes();
 		
 		// use underscore wrap to update skills, then update melee/ranged linked skills
-		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function(firstFunction) {
-		    
-		    firstFunction();
+		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function() {
 		    
 		    thenUpdateLinkedAttacksSkills(); 
 		    
@@ -15786,9 +15804,7 @@ See notes for weapon.</textarea>
 		
 		runUpdateRepeatingSkillLevels();
 		
-		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function(thisFunction) {
-		    
-		    thisFunction();
+		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function() {
 		    
 		    thenUpdateLinkedAttacksSpells(); 
 		    
@@ -16483,7 +16499,7 @@ See notes for weapon.</textarea>
 	
 	// watches for a change in a single row, updates row id and skill level
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
-	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised", event => {
+	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised change:repeating_melee", event => {
 
 		let source = event.sourceType;
 
@@ -16506,6 +16522,10 @@ See notes for weapon.</textarea>
 				break;
 
 			case "repeating_techniquesrevised":
+				updateRowIdDisplay(section, rowId);
+				break;
+			
+			case "repeating_melee":
 				updateRowIdDisplay(section, rowId);
 				break;
 		}
@@ -20399,6 +20419,15 @@ See notes for weapon.</textarea>
 
 	});
 
+	// check if melee level changed
+    on("change:repeating_melee:skill", function(event) {
+        
+		var rowId = getRowIdFromEventInfo(event, "repeating_melee");
+        
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+        
+	});
+
 	/**
 	 * Checks to see if the knockback defense skill is linked to this rowId
 	 *
@@ -20748,7 +20777,11 @@ See notes for weapon.</textarea>
 			
 		    let skillRowId = values[skillRowIdFieldName];
 		    
-		    let skillMod = +values[skillRowModFieldName];
+			let skillMod = +values[skillRowModFieldName];
+			
+			if (isNaN(skillMod)) {
+				skillMod = 0;
+			}
 		    
 		    // if updating using a repeating field make sure there's a row id to search for
 		    if (updateMethod != "attribute" && skillRowId.length === 0 ) {
@@ -20835,6 +20868,10 @@ See notes for weapon.</textarea>
 				table = "repeating_spells";
 	            break;
 	            
+			case "Melee":
+				table = "repeating_melee";
+	            break;
+	            
 	        case "Skill":
 	        default:
 				table = "repeating_skills";
@@ -20852,7 +20889,7 @@ See notes for weapon.</textarea>
 	}
 	
 	/**
-	 * Update the selected weapon skill by linking to another skill, technique, or spell
+	 * Update the selected weapon skill by linking to another skill, technique, spell, or melee weapon
 	 * 
 	 * @param string   sectionName               Name of section that is getting udpated
 	 * @param string   weaponSkillFieldName      For Weapon that is getting updated
@@ -20876,10 +20913,14 @@ See notes for weapon.</textarea>
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
 		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised") {
+		if (repeatingTableToUse == "repeating_techniquesrevised" ) {
 
 			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		
+		} else if (repeatingTableToUse == "repeating_melee") {
+
+			skillFieldName = `${repeatingTableToUse}_${skillRowId}_skill`;
+
 		}
 		
 		// update the skill level for weapon.
@@ -21605,7 +21646,7 @@ See notes for weapon.</textarea>
     	    // loop through each row
     	    _.each(ids,function(id) {
             
-				let rowType = `${sectionName}_${id}_${subName}_row_type`;
+				let rowType = `${sectionName}_${id}_${subName}`;
 	   
 	            let linkedRowId = `${sectionName}_${id}_${subName}_skill_row_id`;
 	            
