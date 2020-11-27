@@ -4272,7 +4272,8 @@
 
 				<ul>
 					<li>Combat Tab > Melee table. Display swing & thrust damage. Requested by PL M.</li>
-					<li>combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+					<li>Combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+					<li>New Rolltemplate. A generic, simple template for use with macros. Click on <b>View All Updates</b> for details.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -12661,7 +12662,44 @@ visualize what it will look like in chat.
 
 			<ul>
 				<li>Combat Tab > Melee table. Display swing & thrust damage. Requested by PL M.</li>
-				<li>combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+				<li>Combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+				<li>New Rolltemplate. A generic, simple template for use with macros. See below.</li>
+			</ul>
+
+			<h5>Rolltemplate for Macros</h5>
+
+			<h6>Example Macro</h6>
+
+			<div style="padding: 5px; background: #ccc;">
+				&{template:macro}  {{templateType=dnd5e}} {{sheetStyle=4}} {{roll=[[3d6]]}} {{target=[[13]]}} {{title=Drake}} {{subtitle=Attacks Orc}} {{Damage=[[1d6-1]] crush}} {{Location=[[3d6]]}} {{Note=Groin shots don't count}} {{desc=**Roll** HT-2 to avoid stun. If stunned roll HT each turn to recover.}}
+			</div>
+
+			<ul style="margin-top: 20px; margin-bottom: 20px;">
+				<li>templateType = basic | dnd5e | pathfinder.</li>
+				<li>sheetStyle = #. Matches the Sheet Style drop-down option on the character sheet. 
+					<ul>
+						<li>0 = Green</li>
+						<li>1 = Blue</li>
+						<li>2 = Beige</li>
+						<li>3 = Gray</li>
+						<li>4 = Class White</li>
+						<li>5 = Pastel Pink</li>
+						<li>6 = Pastel Earth</li>
+						<li>7 = Purple</li>
+						<li>8 = Fabric</li>
+					</ul>
+				</li>
+				<li>title = Main title</li>
+				<li>subtitle = Sub Title</li>
+				<li>desc = Description, full-width, placed at the bottom of the template.</li>
+				<li>All other properties will be automatically added to the template as key/value pairs. Key = Label, Value = displayed in second column.
+					<ul>
+						<li>Example: {{note=This is a test}}</li>
+						<li><b>note</b> is the <i>key</i> and would populate the first column.</li>
+						<li><b>This is a test</b> is the <i>value</i> would populate the second column.</li>
+						<li><b style="color: red;">Important</b> The key would need to be a single word, no spaces.</li>
+					</ul>
+				</li>
 			</ul>
 
 			<h4>Version: 2.5.2</h4>
@@ -14753,6 +14791,61 @@ See notes for weapon.</textarea>
 				{{/noteBoxFourShow}}
 
             </table>
+        </div>
+	</rolltemplate>
+	
+	<rolltemplate class="sheet-rolltemplate-macro">
+        <div class="container template-{{templateType}} rolltemplate-color-setting-{{sheetStyle}}">
+			
+			<div class="header">
+				{{#title}}
+				<div class="title">
+					<div class="text">{{title}}</div>
+				</div>
+				{{/title}}
+				{{#subtitle}}
+				<div class="subtitle">
+					<div class="text">{{subtitle}}</div>
+				</div>
+				{{/subtitle}}
+			</div>
+
+			<div class="arrow-container">
+				<div class="arrow-right"></div>
+			</div>
+
+			<div class="content">
+
+				{{#roll}}
+				{{#target}}
+				<div class="key">Roll</div>
+				<div class="value">
+					<span class="roll">{{roll}}</span> <span class="versus">vs</span> <span class="target">{{target}}</span>
+				</div>
+				{{/target}}
+				{{/roll}}
+				
+				{{#roll}}
+				{{#^target}}
+				<div class="key">Roll</div>
+				<div class="value">
+					<span class="roll">{{roll}}</span>
+				</div>
+				{{/^target}}
+				{{/roll}}
+				
+				<!-- list all the other properties that were not defined -->
+				{{#allprops() title subtitle roll target desc templateType sheetStyle}}
+				<div class="key">{{key}}</div>
+      			<div class="value">{{value}}</div>
+				{{/allprops() title subtitle roll target desc templateType sheetStyle}}
+
+				{{#desc}}
+				<div class="sheet-desc">{{desc}}</div>
+				{{/desc}}
+
+			</div>
+
         </div>
     </rolltemplate>
     
