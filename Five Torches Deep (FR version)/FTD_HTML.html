@@ -524,11 +524,45 @@
     <input name="attr_togmcheck" type="checkbox" value="1" style="position: relative; top:14px; left:10px"><span style="color: white"></span>
     <h2>Always roll with advantage?</h2> 
     <input name="attr_config_advantage" type="checkbox" value="1"class="sheet-block-switch-advantage" style="position: relative; top:14px; left:10px"><span style="color: white"></span>
-    <h2>Meters of feet?</h2> 
+    <h2>Meters or feet?</h2> 
     <select name="attr_config_unit" type="text">
     	<option value="m">Meters</option>
     	<option value="ft">Feet</option>
     </select>
+    <h2>Perception, arcane and divine attributes</h2>
+    	<div>
+	    	<span>Perception</span>
+	    	<select name="attr_pc_perception_attribute" style="width: 150px">
+	                    <option value="1" data-i18n="strength">Force</option>
+	                    <option value="2" data-i18n="dexterity">Dextérité</option>
+	                    <option value="3" data-i18n="constitution">Constitution</option>
+	                    <option value="4" data-i18n="intelligence">Intelligence</option>
+	                    <option value="5" data-i18n="wisdom" selected="selected">Sagesse</option>
+	                    <option value="6" data-i18n="charisma">Charisme</option>
+	        </select>
+    	</div>
+    	<div>
+	    	<span>Arcane</span>
+	    	<select name="attr_pc_arcane_attribute" style="width: 150px">
+	                    <option value="1" data-i18n="strength">Force</option>
+	                    <option value="2" data-i18n="dexterity">Dextérité</option>
+	                    <option value="3" data-i18n="constitution">Constitution</option>
+	                    <option value="4" data-i18n="intelligence" selected="selected">Intelligence</option>
+	                    <option value="5" data-i18n="wisdom">Sagesse</option>
+	                    <option value="6" data-i18n="charisma">Charisme</option>
+	        </select>
+    	</div>
+    	<div>
+	    	<span>Divine</span>
+	    	<select name="attr_pc_divine_attribute" style="width: 150px">
+	                    <option value="1" data-i18n="strength">Force</option>
+	                    <option value="2" data-i18n="dexterity">Dextérité</option>
+	                    <option value="3" data-i18n="constitution">Constitution</option>
+	                    <option value="4" data-i18n="intelligence">Intelligence</option>
+	                    <option value="5" data-i18n="wisdom" selected="selected">Sagesse</option>
+	                    <option value="6" data-i18n="charisma">Charisme</option>
+	        </select>
+    	</div>
     <h2>Use rolltable for magical mishaps</h2>
     	<input name="attr_config_mishap" type="checkbox" value="1" style="position: relative; top:14px; left:10px"><span style="color: white"></span>
     	<div>
@@ -812,9 +846,15 @@ on("change:pc_intelligence", function() {
 });
 
 // === Arcane CALC
-on("change:pc_intelligenceMod change:pc_proficiency change:pc_class", function() {  
-    getAttrs(["pc_intelligenceMod", "pc_proficiency", "pc_class"], function(values) {
-        let INT = parseInt(values.pc_intelligenceMod,10)||0;
+on("change:pc_arcane_attribute change:pc_strengthMod change:pc_dexterityMod change:pc_constitutionMod change:pc_intelligenceMod change:pc_wisdomMod change:pc_charismaMod change:pc_proficiency change:pc_class", function() {  
+    getAttrs(["pc_arcane_attribute", "pc_proficiency", "pc_strengthMod", "pc_dexterityMod", "pc_constitutionMod", "pc_intelligenceMod", "pc_wisdomMod", "pc_charismaMod", "pc_class"], function(values) {
+        let SELECT = parseInt(values.pc_arcane_attribute,10)||0;
+        if (SELECT === 1) INT = parseInt(values.pc_strengthMod);
+        if (SELECT === 2) INT = parseInt(values.pc_dexterityMod);
+        if (SELECT === 3) INT = parseInt(values.pc_constitutionMod);
+        if (SELECT === 4) INT = parseInt(values.pc_intelligenceMod);
+        if (SELECT === 5) INT = parseInt(values.pc_wisdomMod);
+        if (SELECT === 6) INT = parseInt(values.pc_charismaMod);
         let PROF = parseInt(values.pc_proficiency,10)||0;
         let CLAS = values.pc_class;
         let arc = INT;
@@ -826,11 +866,17 @@ on("change:pc_intelligenceMod change:pc_proficiency change:pc_class", function()
 });
 
 // === Perception CALC
-on("change:pc_wisdomMod change:pc_proficiency change:pc_arc", function() {  
-    getAttrs(["pc_wisdomMod", "pc_proficiency", "pc_arc"], function(values) {
-        let WIS = parseInt(values.pc_wisdomMod,10)||0;
+on("change:pc_perception_attribute change:pc_strengthMod change:pc_dexterityMod change:pc_constitutionMod change:pc_intelligenceMod change:pc_wisdomMod change:pc_charismaMod change:pc_proficiency change:pc_arch", function() {  
+    getAttrs(["pc_perception_attribute", "pc_proficiency", "pc_arch", "pc_strengthMod", "pc_dexterityMod", "pc_constitutionMod", "pc_intelligenceMod", "pc_wisdomMod", "pc_charismaMod"], function(values) {
+        let SELECT = parseInt(values.pc_perception_attribute,10)||0;
         let PROF = parseInt(values.pc_proficiency,10)||0;
-        let ARC = values.pc_arc;
+        let ARC = values.pc_arch;
+        if (SELECT === 1) WIS = parseInt(values.pc_strengthMod);
+        if (SELECT === 2) WIS = parseInt(values.pc_dexterityMod);
+        if (SELECT === 3) WIS = parseInt(values.pc_constitutionMod);
+        if (SELECT === 4) WIS = parseInt(values.pc_intelligenceMod);
+        if (SELECT === 5) WIS = parseInt(values.pc_wisdomMod);
+        if (SELECT === 6) WIS = parseInt(values.pc_charismaMod);
         let per = WIS;
         if (ARC === "Rôdeur") per = WIS + PROF;
         setAttrs({                            
@@ -840,9 +886,15 @@ on("change:pc_wisdomMod change:pc_proficiency change:pc_arc", function() {
 });
 
 // === Divine CALC
-on("change:pc_wisdomMod change:pc_proficiency change:pc_class", function() {  
-    getAttrs(["pc_wisdomMod", "pc_proficiency", "pc_class"], function(values) {
-        let WIS = parseInt(values.pc_wisdomMod,10)||0;
+on("change:pc_divine_attribute change:pc_strengthMod change:pc_dexterityMod change:pc_constitutionMod change:pc_intelligenceMod change:pc_wisdomMod change:pc_charismaMod change:pc_proficiency change:pc_class", function() {  
+    getAttrs(["pc_divine_attribute", "pc_proficiency", "pc_strengthMod", "pc_dexterityMod", "pc_constitutionMod", "pc_intelligenceMod", "pc_wisdomMod", "pc_charismaMod", "pc_class"], function(values) {
+        let SELECT = parseInt(values.pc_divine_attribute,10)||0;
+        if (SELECT === 1) WIS = parseInt(values.pc_strengthMod);
+        if (SELECT === 2) WIS = parseInt(values.pc_dexterityMod);
+        if (SELECT === 3) WIS = parseInt(values.pc_constitutionMod);
+        if (SELECT === 4) WIS = parseInt(values.pc_intelligenceMod);
+        if (SELECT === 5) WIS = parseInt(values.pc_wisdomMod);
+        if (SELECT === 6) WIS = parseInt(values.pc_charismaMod);
         let PROF = parseInt(values.pc_proficiency,10)||0;
         let CLAS = values.pc_class;
         let div = WIS;
