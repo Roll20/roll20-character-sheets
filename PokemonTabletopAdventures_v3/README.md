@@ -7,6 +7,14 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Nov 28, 2020
+- Added support for temporary bonuses!
+
+### Nov 25, 2020
+- Changed the header of the talent checkboxes to Talent to make it easier to identify their purpose
+- Fixed a bug where the sheet would reacting to attribute score changes rather than modifiers, which meant attribute changes sometimes did not propagate through to any associated values
+- Fixed a bug where the Bluff/Deception skill wasn't fetching the Special Defense modifier
+
 ### Nov 8, 2020
 - Combined the skill roll button with the skill name
   - Added fancy colors for the new skill roll button so that it matches the stat field when hovered over to help highlight which stat it uses
@@ -63,10 +71,11 @@ https://discord.gg/F24Ka8E
 
 
 ## To-Do:
-Things we want to add to the character sheet, presented in no particular order of priority.
-- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
+Things we want to add to the character sheet, presented in no particular order of priority:
 - [x] ~~Display the full bonus to skill checks~~
+- [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
+- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
 - [ ] Add a Settings page
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Allow modifications to movement (maybe just an extra box)
-- [ ] Handle temporary stat changes somehow, this may be a lot of work
+- [ ] Display the adjusted stat score when temporary stat changes are provided
