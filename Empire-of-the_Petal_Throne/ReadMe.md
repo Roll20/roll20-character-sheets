@@ -6,6 +6,9 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 
 ### Change log
 
+#### 1.5.1
+* Fixed Magic User ad Priest XP Bonus calculations
+
 #### 1.5
 * Fixed Revivification check scores for below 61
 * Skills now integrates use of checkboxes and adding additional skills
