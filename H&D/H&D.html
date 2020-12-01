@@ -249,6 +249,59 @@
 			});
 		});
 	});
+	
+	on("sheet:opened", function () 
+	{
+		getAttrs(["version"], function (values) 
+		{
+			const bonus = parseInt(values["version"], 10)||0;
+			
+			if(version != 2)
+			{
+				getSectionIDs("repeating_armes", function(idarray) 
+				{
+					_.each(idarray, function(currentID, i)
+					{
+						getAttrs(
+							[
+							'repeating_armes_' + currentID + '_caracteristique',
+							'repeating_armes_' + currentID + '_caracteristiqueDegats'
+							], function(v) 
+						{
+							const carac = v['repeating_armes_' + currentID + '_caracteristique'];
+							const dgts = v['repeating_armes_' + currentID + '_caracteristiqueDegats'];
+							
+							if(carac == "")
+							{
+								if(dgts == "")
+								{
+									setAttrs({
+										caracteristique:0,
+										caracteristiqueDegats:0
+									});
+								}
+								else
+								{
+									setAttrs({
+										caracteristique:0
+									});
+								}
+							}
+							else if(dgts == "")
+							{
+								setAttrs({
+									caracteristiqueDegats:0
+								});
+							}
+						});
+					});
+				});
+				
+				setAttrs({
+					version:2
+				});
+			}
+	});
 </script>
 
 <div class="container">
@@ -1306,7 +1359,7 @@
 					<button type="roll" name="roll_arme" value="@{prive} &{template:base} {{type=@{arme}}} {{jet=[[1D20+@{caracteristique}+ @{armeMaitrise}[Maîtrise] ]]}} {{jet2=[[1D20+@{caracteristique}+ @{armeMaitrise}[Maîtrise] ]]}} {{degats=[[@{degats}+@{caracteristiqueDegats}+@{bonusDegats}]]}} {{critique=[[@{degats}+@{caracteristiqueDegats}+@{bonusDegats}]]}} {{special=@{special}}}"></button>
 					<input type="text" name="attr_arme" />
 					<select name="attr_caracteristique">
-						<option value=""></option>
+						<option value="0"></option>
 						<option value="[[floor((@{force}-10)/2)]][Modificateur] +@{force_bonus}[Bonus]">Force</option>
 						<option value="[[floor((@{constitution}-10)/2)]][Modificateur] +@{constitution_bonus}[Bonus]">Constitution</option>
 						<option value="[[floor((@{dexterite}-10)/2)]][Modificateur] +@{dexterite_bonus}[Bonus]">Dextérité</option>
@@ -1318,7 +1371,7 @@
 					<div>
 						<span>Bonus dégâts</span>
 						<select name="attr_caracteristiqueDegats">
-							<option value=""></option>
+							<option value="0"></option>
 							<option value="[[floor((@{force}-10)/2)]][Modificateur] +@{force_bonus}[Bonus]">Force</option>
 							<option value="[[floor((@{constitution}-10)/2)]][Modificateur] +@{constitution_bonus}[Bonus]">Constitution</option>
 							<option value="[[floor((@{dexterite}-10)/2)]][Modificateur] +@{dexterite_bonus}[Bonus]">Dextérité</option>
@@ -1415,6 +1468,11 @@
 						<input type="checkbox" name="attr_sortsN0" value="1" />
 						<span title="Niveau 0"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN0_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN0_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN0" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN0">
@@ -1464,6 +1522,11 @@
 						<input type="checkbox" name="attr_sortsN1" value="1" />
 						<span title="Niveau 1"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN1_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN1_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN1" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN1">
@@ -1513,6 +1576,11 @@
 						<input type="checkbox" name="attr_sortsN2" value="1" />
 						<span title="Niveau 2"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN2_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN2_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN2" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN2">
@@ -1562,6 +1630,11 @@
 						<input type="checkbox" name="attr_sortsN3" value="1" />
 						<span title="Niveau 3"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN3_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN3_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN3" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN3">
@@ -1611,6 +1684,11 @@
 						<input type="checkbox" name="attr_sortsN4" value="1" />
 						<span title="Niveau 4"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN4_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN4_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN4" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN4">
@@ -1660,6 +1738,11 @@
 						<input type="checkbox" name="attr_sortsN5" value="1" />
 						<span title="Niveau 5"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN5_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN5_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN5" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN5">
@@ -1704,10 +1787,16 @@
 							</div>
 						</fieldset>
 					</div>
+					
 					<label>
 						<input type="checkbox" name="attr_sortsN6" value="1" />
 						<span title="Niveau 6"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN6_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN6_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN6" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN6">
@@ -1757,6 +1846,11 @@
 						<input type="checkbox" name="attr_sortsN7" value="1" />
 						<span title="Niveau 7"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN7_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN7_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN7" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN7">
@@ -1806,6 +1900,11 @@
 						<input type="checkbox" name="attr_sortsN8" value="1" />
 						<span title="Niveau 8"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN8_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN8_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN8" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN8">
@@ -1855,6 +1954,11 @@
 						<input type="checkbox" name="attr_sortsN9" value="1" />
 						<span title="Niveau 9"></span>
 					</label>
+					<div>
+						<input type="number" name="attr_sortN9_parJour" value="0" title="Sorts restants/jour" />
+						<span>/</span>
+						<input type="number" name="attr_sortN9_parJour_max" value="0" title="Sorts maximum/jour" />
+					</div>
 					<input type="hidden" name="attr_sortsN9" value="0" />
 					<div>
 						<fieldset class="repeating_sortsN9">

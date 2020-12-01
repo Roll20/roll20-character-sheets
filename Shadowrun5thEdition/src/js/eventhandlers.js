@@ -39,7 +39,7 @@
 	sheetAttributes.woundCalculation.forEach(attr => on(`change:${attr}`, () => updateWounds()))
 
   sheetAttributes.repeatingSkills.forEach(field => {
-    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName))
+    on(`change:repeating_${field}:rating change:repeating_${field}:rating_modifier`, eventinfo => updateRepeatingSkillRating(eventinfo.triggerName || ''))
     on(`change:repeating_${field}:attribute`, eventinfo => updateRepeatingSkillAttribute(eventinfo))
     on(`change:repeating_${field}:limit`, eventinfo => updateRepeatingSkillLimit(eventinfo))
     on(`change:repeating_${field}:dicepool`, eventinfo => updateRepeatingSkillDicepool(eventinfo))

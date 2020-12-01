@@ -2,9 +2,28 @@
 Player sheet for L'Empire des cerisiers by Olivier Sanfilippo published by Arkhane Asylum in 2020. Sheet is based on 2020 Arkhane Asylum's designed player sheet.
 
 ## Current Version
-1.1
+1.2-1
 
 ### Change log
+
+### 1.2-1
+
+* Fix : non working selector on ritual tab.
+* Updated : re styling of gmroll button.
+* Added : currencies.
+
+### 1.2
+
+* Added : players can now check for gm roll on top of the character sheet
+* Added : bonus on armor
+* Updated : change on some labels
+* Updated : players can now equip multiple pieces of armor
+* Updated : when using arrows for selecting associated field, players can now select "blank" to remove association
+* Updated : split skill and ritual calculator in two separated forms
+
+#### 1.1-1 
+* Added : missing options in skill / magic calculator
+* Fixed : wrong formula on Mental resistance roll
 
 #### 1.1
 * Added : magic tab

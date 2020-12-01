@@ -2484,30 +2484,30 @@
                     <div class="column">
                         <span data="em_rank">6th</span>
                         <div class="sub-button">
-                            <input type="checkbox" name="attr_mastery_conf">
+                            <input type="checkbox" name="attr_mastery_6th" value="1">
                         </div>
-                        <input type="checkbox" name="attr_mastery_6th">
+                        <input type="checkbox" name="attr_mastery_6th_used" value="1">
                     </div>
                     <div class="column">
                         <span data="em_rank">7th</span>
                         <div class="sub-button">
-                            <input type="checkbox" name="attr_mastery_conf">
+                            <input type="checkbox" name="attr_mastery_7th" value="1">
                         </div>
-                        <input type="checkbox" name="attr_mastery_7th">
+                        <input type="checkbox" name="attr_mastery_7th_used" value="1">
                     </div>
                     <div class="column">
                         <span data="em_rank">8th</span>
                         <div class="sub-button">
-                            <input type="checkbox" name="attr_mastery_conf">
+                            <input type="checkbox" name="attr_mastery_8th" value="1">
                         </div>
-                        <input type="checkbox" name="attr_mastery_8th">
+                        <input type="checkbox" name="attr_mastery_8th_used" value="1">
                     </div>
                     <div class="column">
                         <span data="em_rank">9th</span>
                         <div class="sub-button">
-                            <input type="checkbox" name="attr_mastery_conf">
+                            <input type="checkbox" name="attr_mastery_9th" value="1">
                         </div>
-                        <input type="checkbox" name="attr_mastery_9th">
+                        <input type="checkbox" name="attr_mastery_9th_used" value="1">
                     </div>
                      <span class="label" style="margin-top: 8px; margin-bottom: -3px;" data-i18n="esper-mastery-u">ESPER MASTERY</span>
                 </div>
@@ -8272,7 +8272,7 @@
                     };
                 });
             }
-
+            if(currentData.npc && currentData.npc == 1) update['npcspellcastingflag'] = 1;
             update[`repeating_spell-${lvl}_${id}_spelllevel`] = lvl;
             update[`repeating_spell-${lvl}_${id}_spell_ability`] = (page.data["spellcasting_ability"]) ? `@{${page.data["spellcasting_ability"].toLowerCase()}_mod}+` : "spell";
             (page.name) ? update[`repeating_spell-${lvl}_${id}_spellname`] = page.name : false;
@@ -17590,7 +17590,81 @@
         });
         /* */
     });
- //# sourceURL=dnd5e.js
+    const classRelatedAttrs = ['class', 'subclass', 'base_level', 'multiclass1_flag', 'multiclass1', 'multiclass1_subclass', 'multiclass1_lvl', 'multiclass2_flag','multiclass2', 'multiclass2_subclass', 'multiclass2_lvl', 'multiclass3_flag', 'multiclass3', 'multiclass3_subclass', 'multiclass3_lvl'];
+const getTalentPointsAndMastery = callback => {
+    getAttrs(classRelatedAttrs, values => {
+        let level = 0;
+        let mastery = 0;
+        const talentPointPerClass = {
+            'adept': 1,
+            'cybermancer': 1,
+            'melder': 1,
+            'artifice': 1/3,
+            'justicar': 1/3
+        };
+        const hasMastery = Object.keys(talentPointPerClass).filter(c => { return talentPointPerClass[c] === 1; });
+        let characterClassAttributes = {
+            mainclass: {
+                class: 'class',
+                subclass: 'subclass',
+                level: 'base_level'
+            }
+        };
+        for(let i=1; i<=3; i++) {
+            characterClassAttributes[`multiclass_${i}`] = {
+                enabled: `multiclass${i}_flag`,
+                class: `multiclass${i}`,
+                subclass: `multiclass${i}_subclass`,
+                level: `multiclass${i}_lvl`
+            }
+        }
+        const pointsPerLevel = ['',4,6,14,17,27,32,38,44,57,64,73,78,83,88,94,100,107,114,123,133];
+        const getLevelInfo = (charClass, values) => {
+            let charLevel = {
+                level: 0,
+                mastery: 0
+            };
+            if(!characterClassAttributes[charClass]) return charLevel;
+            if(!characterClassAttributes[charClass]['enabled'] || (values[characterClassAttributes[charClass]['enabled']] && values[characterClassAttributes[charClass]['enabled']] == 1)) {
+                const subclass = values[characterClassAttributes[charClass]['subclass']] || '';
+                const level = (values[characterClassAttributes[charClass]['level']]) ? parseInt(values[characterClassAttributes[charClass]['level']]) : 0;
+                charClass = (subclass.toLowerCase() == 'artifice' || subclass.toLowerCase() == 'justicar') ? subclass : values[characterClassAttributes[charClass]['class']];
+                const classIndex = Object.keys(talentPointPerClass).indexOf(charClass.toLowerCase());
+                if(classIndex > -1) {
+                    charLevel.level = Math.floor(level * talentPointPerClass[Object.keys(talentPointPerClass)[classIndex]]);
+                    charLevel.mastery = (hasMastery.indexOf(charClass.toLowerCase()) > -1) ? Math.ceil(Math.min(Math.max(level-10, 0), 7)/2) : 0;
+                }
+            }
+            return charLevel;
+        }
+        Object.keys(characterClassAttributes).forEach(charClass => {
+            const levelInfo = getLevelInfo(charClass, values);
+            level += levelInfo.level;
+            mastery = Math.max(mastery, levelInfo.mastery);
+        });
+        callback(pointsPerLevel[level], mastery);
+    });
+};
+classRelatedAttrs.forEach(attr => {
+    on(`change:${attr}`, evenInfo => {
+        getTalentPointsAndMastery((talentPoints, mastery) => {
+            console.log('CALCULATING TALENT POINTS AND ESPER MASTERY');
+            let update = {
+                tp_max:talentPoints,
+                mastery_6th: 0,
+                mastery_7th: 0,
+                mastery_8th: 0,
+                mastery_9th: 0
+            }
+            for(let i=0; i<mastery; i++) {
+                const masteryLevel = `mastery_${i+6}th`;
+                update[masteryLevel] = 1;
+            }
+            setAttrs(update);
+        });
+    });
+});
+ //# sourceURL=espergenesis.js
 </script><charmancer class="sheet-repeating-topbar">
     <div class="topbar-container">
         <div class="sheet-attr-container">
