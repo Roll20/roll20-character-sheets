@@ -1,17 +1,20 @@
-<input type="hidden" name="attr_mod_bool_one_if_adv" value="({[[{?{adv|0}, 0}kh1]], 1}kl1)"/>
-<input type="hidden" name="attr_mod_bool_one_if_dis" value="([[{[[{?{adv|0}, 0}kl1]], -1}kh1]]*-1)"/>
+<input type="hidden" name="attr_mod_query" value="?{Modifiers|None, 0|1 Advantage, 1|1 Disadvantage, -1|2 Advantages, 2|2 Disadvantage, -2|3 Advantages, 3|3 Disadvantage, -3}"/>
+<input type="hidden" name="attr_mod_query_-" value="?{Modifiers|Disadvantage, -1|None, 0|2 Disadvantage, -2|3 Disadvantage, -3}"/>
+<input type="hidden" name="attr_mod_bool_one_if_adv" value="({[[{@{mod_query}, 0}kh1]], 1}kl1)"/>
+<input type="hidden" name="attr_mod_bool_one_if_dis" value="([[{[[{@{mod_query}, 0}kl1]], -1}kh1]]*-1)"/>
 <input type="hidden" name="attr_mod_bool_one_if_nomod" value="(1-@{mod_bool_one_if_adv}+-@{mod_bool_one_if_dis})"/>
-<input type="hidden" name="attr_roll_perc_adv" value="(([[@{mod_bool_one_if_adv}+1*@{mod_bool_one_if_adv}]]d10kh1cs>0cf<0-[[1*@{mod_bool_one_if_adv}]])*10)"/>
-<input type="hidden" name="attr_roll_perc_dis" value="(([[@{mod_bool_one_if_dis}+1*@{mod_bool_one_if_dis}]]d10kl1cs>0cf<0-[[1*@{mod_bool_one_if_dis}]])*10)"/>
+<input type="hidden" name="attr_roll_perc_adv" value="(([[@{mod_bool_one_if_adv}+1*@{mod_bool_one_if_adv}]]d10kl1cs>0cf<0-[[1*@{mod_bool_one_if_adv}]])*10)"/>
+<input type="hidden" name="attr_roll_perc_dis" value="(([[@{mod_bool_one_if_dis}+1*@{mod_bool_one_if_dis}]]d10kh1cs>0cf<0-[[1*@{mod_bool_one_if_dis}]])*10)"/>
 <input type="hidden" name="attr_roll_perc_nomod" value="(([[1*@{mod_bool_one_if_nomod}]]d10cs>0cf<0-[[1*@{mod_bool_one_if_nomod}]])*10)"/>
 <input type="hidden" name="attr_roll_perc" value="@{roll_perc_adv}+@{roll_perc_dis}+@{roll_perc_nomod}+(1d10cs>0cf<0)"/>
+<input type="hidden" name="attr_roll_thresh_mod" value="(({@{mod_query}, 1}kh1-1)*5)"/>
 <div class="main">
     <div class="character section">
         <div class="character-name-input data-entry"><input name="attr_character_name" type="text"/></div>
         <div class="character-name-label"><label data-i18n="character_name">Character Name.</label></div>
         <div class="logo">
             <img height="500px" width="500px" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Maximum%20Apocalypse/ma-logo.png" alt="Maxiumum Apocalypse"/>
-            <span>Modifier popup for rolls ? <input type="checkbox" name="attr_roll_mod" value="?{Advantages?|0|1|2|3}+?{Disadvantages?|0|1|2|3}"></span>
+            <!--span>Modifier popup for rolls ? <input type="checkbox" name="attr_roll_mod" value="?{Advantages?|0|1|2|3}+?{Disadvantages?|0|1|2|3}"></span-->
         </div>
         <div class="player-name-input data-entry"><input name="attr_player_name" type="text"/></div>
         <div class="player-name-label"><label data-i18n="player_name">Player Name.</label></div>
@@ -80,8 +83,8 @@
         <div class="stat str">
             <div class="stat-labels str-labels">
                 <div class="banner">
-                    <button data-i18n="strength" value="&{template:maxapoc} {{color=green}} {{subtitle=Strength}} {{title=@{character_name}}} {{lvl1=[[@{str}+1]]}}  {{lvl=[[@{str}]]}} {{lvlhalf1=[[@{str_half}+1]]}} {{lvlhalf=[[@{str_half}]]}} {{lvlquarter1=[[@{str_quarter}+1]]}} {{lvlquarter=[[@{str_quarter}]]}} {{profroll=[[@{roll_perc}]]}}" type="roll" class="blank-roll-button">
-                        Strength.
+                    <button value="&{template:maxapoc} {{subtitle=^{strength}}} {{firstdegree1=[[@{str}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{str}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{str}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{str}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{str}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{str}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="strength">Strength.</span>
                     </button>
                 </div>
                 <div class="code dark"><span class="code">(STR)</span></div>
@@ -94,7 +97,11 @@
         </div>
         <div class="stat for">
             <div class="stat-labels for-labels">
-                <div class="banner"><span data-i18n="fortitude" class="banner">Fortitude.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{fortitude}}} {{firstdegree1=[[@{for}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{for}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{for}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{for}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{for}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{for}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="fortitude">Fortitude.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(FOR)</span></div>
             </div>
             <div class="for-input"><input class="stat" type="number" name="attr_for"/></div>
@@ -105,7 +112,11 @@
         </div>        
         <div class="stat agi">
             <div class="stat-labels agi-labels">
-                <div class="banner"><span data-i18n="agility" class="banner">Agility.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{agility}}} {{firstdegree1=[[@{agi}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{agi}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{agi}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{agi}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{agi}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{agi}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="agility">Agility.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(AGI)</span></div>
             </div>
             <div class="agi-input"><input class="stat" type="number" name="attr_agi"/></div>
@@ -116,7 +127,11 @@
         </div>
         <div class="stat int">
             <div class="stat-labels int-labels">
-                <div class="banner"><span data-i18n="agility" class="banner">Intelligence.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{intelligence}}} {{firstdegree1=[[@{int}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{int}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{int}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{int}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{int}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{int}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="intelligence">Intelligence.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(INT)</span></div>
             </div>
             <div class="int-input"><input class="stat" type="number" name="attr_int"/></div>
@@ -127,7 +142,11 @@
         </div>
         <div class="stat ins">
             <div class="stat-labels ins-labels">
-                <div class="banner"><span data-i18n="instinct" class="banner">Instinct.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{instinct}}} {{firstdegree1=[[@{ins}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{ins}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{ins}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{ins}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{ins}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{ins}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="instinct">Instinct.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(INS)</span></div>
             </div>
             <div class="ins-input"><input class="stat" type="number" name="attr_ins"/></div>
@@ -138,7 +157,11 @@
         </div>
         <div class="stat cha">
             <div class="stat-labels cha-labels">
-                <div class="banner"><span data-i18n="charisma" class="banner">Charisma.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{charisma}}} {{firstdegree1=[[@{cha}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{cha}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{cha}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{cha}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{cha}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{cha}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="charisma">Charisma.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(CHA)</span></div>
             </div>
             <div class="cha-input"><input class="stat" type="number" name="attr_cha"/></div>
@@ -149,7 +172,11 @@
         </div>
         <div class="stat fs">
             <div class="stat-labels fs-labels">
-                <div class="banner"><span data-i18n="fighting_skill" class="banner">Fighting Skill.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{fighting_skill}}} {{firstdegree1=[[@{fs}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{fs}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{fs}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{fs}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{fs}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{fs}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="fighting_skill">Fighting Skill.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(FS)</span></div>
             </div>
             <div class="fs-input"><input class="stat" type="number" name="attr_fs"/></div>
@@ -160,7 +187,11 @@
         </div>
         <div class="stat bs">
             <div class="stat-labels bs-labels">
-                <div class="banner"><span data-i18n="ballistic_skill" class="banner">Ballistic Skill.</span></div>
+                <div class="banner">
+                    <button value="&{template:maxapoc} {{subtitle=^{ballistic_skill}}} {{firstdegree1=[[@{bs}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{bs}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{bs}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{bs}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{bs}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{bs}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button stat-roll">
+                        <span data-i18n="ballistic_skill">Ballistic Skill.</span>
+                    </button>
+                </div>
                 <div class="code dark"><span class="code">(BS)</span></div>
             </div>
             <div class="bs-input"><input class="stat" type="number" name="attr_bs"/></div>
@@ -181,7 +212,7 @@
       <div class="skill-fs code">(FS)</div>
       <div class="skill-bs code">(BS)</div>
 <!-- SKILLS ROW 1 -->
-      <div class="athletics-prof">
+      <div class="athletics-prof prof">
           <select class="prof" name="attr_athletics_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -190,16 +221,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_athletics"/>
-          <input type="hidden" name="attr_athletics_half"/>
-          <input type="hidden" name="attr_athletics_quarter"/>
+          <input type="hidden" name="attr_athletics_prof_desc"/>
       </div>
       <div class="athletics-label">
-          <button data-i18n="athletics" value="&{template:maxapoc} {{color=green}} {{subtitle=Athletics}} {{title=@{character_name}}} {{lvl1=[[@{athletics}+1]]}} {{lvl=[[@{athletics}]]}} {{lvlhalf1=[[@{athletics_half}+1]]}} {{lvlhalf=[[@{athletics_half}]]}} {{lvlquarter1=[[@{athletics_quarter}+1]]}} {{lvlquarter=[[@{athletics_quarter}]]}} {{profroll=[[@{roll_perc}]]}} {{prof=@{athletics_prof}}}" type="roll" class="blank-roll-button">
-            Athletics.
+          <button value="&{template:maxapoc} {{subtitle=^{athletics}}} {{profdesc=@{athletics_prof_desc}}} {{firstdegree1=[[@{athletics}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{athletics}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{athletics}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{athletics}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{athletics}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{athletics}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="athletics">Athletics.</span>
           </button>
-          <!--label data-i18n="athletics" class="skill-label top-skill">Athletics.</label-->
       </div>
-      <div class="archery-prof">
+      <div class="archery-prof prof">
           <select class="prof" name="attr_archery_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -208,11 +237,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_archery"/>
-          <input type="hidden" name="attr_archery_half"/>
-          <input type="hidden" name="attr_archery_quarter"/>
+          <input type="hidden" name="attr_archery_prof_desc"/>
       </div>
-      <div class="archery-label"><label data-i18n="archery" class="skill-label top-skill">Archery.</label></div>
-      <div class="academics-prof">
+      <div class="archery-label">
+          <button value="&{template:maxapoc} {{subtitle=^{archery}}} {{profdesc=@{archery_prof_desc}}} {{firstdegree1=[[@{archery}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{archery}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{archery}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{archery}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{archery}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{archery}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="archery">Archery.</span>
+          </button>
+      </div>
+      <div class="academics-prof prof">
           <select class="prof" name="attr_academics_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -221,11 +253,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_academics"/>
-          <input type="hidden" name="attr_academics_half"/>
-          <input type="hidden" name="attr_academics_quarter"/>
+          <input type="hidden" name="attr_academics_prof_desc"/>
       </div>
-      <div class="academics-label"><label data-i18n="academics" class="skill-label top-skill">Academics.</label></div>
-      <div class="crafting-prof">
+      <div class="academics-label">
+          <button value="&{template:maxapoc} {{subtitle=^{academics}}} {{profdesc=@{academics_prof_desc}}} {{firstdegree1=[[@{academics}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{academics}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{academics}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{academics}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{academics}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{academics}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="academics">Academics.</span>
+          </button>
+      </div>
+      <div class="crafting-prof prof">
           <select class="prof" name="attr_crafting_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -234,11 +269,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_crafting"/>
-          <input type="hidden" name="attr_crafting_half"/>
-          <input type="hidden" name="attr_crafting_quarter"/>
+          <input type="hidden" name="attr_crafting_prof_desc"/>
       </div>
-      <div class="crafting-label"><label data-i18n="crafting" class="skill-label top-skill">Crafting.</label></div>
-      <div class="animalken-prof">
+      <div class="crafting-label">
+          <button value="&{template:maxapoc} {{subtitle=^{crafting}}} {{profdesc=@{crafting_prof_desc}}} {{firstdegree1=[[@{crafting}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{crafting}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{crafting}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{crafting}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{crafting}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{crafting}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="crafting">Crafting.</span>
+          </button>
+      </div>
+      <div class="animalken-prof prof">
           <select class="prof" name="attr_animalken_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -247,11 +285,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_animalken"/>
-          <input type="hidden" name="attr_animalken_half"/>
-          <input type="hidden" name="attr_animalken_quarter"/>
+          <input type="hidden" name="attr_animalken_prof_desc"/>
       </div>
-      <div class="animalken-label"><label data-i18n="animal_ken" class="skill-label top-skill">Animal Ken.</label></div>
-      <div class="blades-prof">
+      <div class="animalken-label">
+          <button value="&{template:maxapoc} {{subtitle=^{animal_ken}}} {{profdesc=@{animalken_prof_desc}}} {{firstdegree1=[[@{animalken}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{animalken}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{animalken}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{animalken}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{animalken}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{animalken}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="animal_ken">Animal Ken.</span>
+          </button>
+      </div>
+      <div class="blades-prof prof">
           <select class="prof" name="attr_blades_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -260,11 +301,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_blades"/>
-          <input type="hidden" name="attr_blades_half"/>
-          <input type="hidden" name="attr_blades_quarter"/>
+          <input type="hidden" name="attr_blades_prof_desc"/>
       </div>
-      <div class="blades-label"><label data-i18n="blades" class="skill-label top-skill">Blades.</label></div>
-      <div class="firearms-prof">
+      <div class="blades-label">
+          <button value="&{template:maxapoc} {{subtitle=^{blades}}} {{profdesc=@{blades_prof_desc}}} {{firstdegree1=[[@{blades}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{blades}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{blades}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{blades}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{blades}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{blades}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="blades">Blades.</span>
+          </button>
+      </div>
+      <div class="firearms-prof prof">
           <select class="prof" name="attr_firearms_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -273,12 +317,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_firearms"/>
-          <input type="hidden" name="attr_firearms_half"/>
-          <input type="hidden" name="attr_firearms_quarter"/>
+          <input type="hidden" name="attr_firearms_prof_desc"/>
       </div>
-      <div class="firearms-label"><label data-i18n="firearms" class="skill-label top-skill">Firearms.</label></div>
+      <div class="firearms-label">
+          <button value="&{template:maxapoc} {{subtitle=^{firearms}}} {{profdesc=@{firearms_prof_desc}}} {{firstdegree1=[[@{firearms}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{firearms}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{firearms}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{firearms}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{firearms}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{firearms}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="firearms">Firearms.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 2 -->
-      <div class="lockpick-prof">
+      <div class="lockpick-prof prof">
           <select class="prof" name="attr_lockpick_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -287,11 +334,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_lockpick"/>
-          <input type="hidden" name="attr_lockpick_half"/>
-          <input type="hidden" name="attr_lockpick_quarter"/>
+          <input type="hidden" name="attr_lockpick_prof_desc"/>
       </div>
-      <div class="lockpick-label"><label data-i18n="lockpick" class="skill-label">Lockpick.</label></div>
-      <div class="mechanics-prof">
+      <div class="lockpick-label">
+          <button value="&{template:maxapoc} {{subtitle=^{lockpick}}} {{profdesc=@{lockpick_prof_desc}}} {{firstdegree1=[[@{lockpick}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{lockpick}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{lockpick}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{lockpick}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{lockpick}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{lockpick}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="lockpick">Lockpick.</span>
+          </button>
+      </div>
+      <div class="mechanics-prof prof">
           <select class="prof" name="attr_mechanics_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -300,11 +350,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_mechanics"/>
-          <input type="hidden" name="attr_mechanics_half"/>
-          <input type="hidden" name="attr_mechanics_quarter"/>
+          <input type="hidden" name="attr_mechanics_prof_desc"/>
       </div>
-      <div class="mechanics-label"><label data-i18n="mechanics" class="skill-label">Mechanics.</label></div>
-      <div class="drive-prof">
+      <div class="mechanics-label">
+          <button value="&{template:maxapoc} {{subtitle=^{mechanics}}} {{profdesc=@{mechanics_prof_desc}}} {{firstdegree1=[[@{mechanics}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{mechanics}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{mechanics}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{mechanics}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{mechanics}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{mechanics}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="mechanics">Mechanics.</span>
+          </button>
+      </div>
+      <div class="drive-prof prof">
           <select class="prof" name="attr_drive_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -313,11 +366,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_drive"/>
-          <input type="hidden" name="attr_drive_half"/>
-          <input type="hidden" name="attr_drive_quarter"/>
+          <input type="hidden" name="attr_drive_prof_desc"/>
       </div>
-      <div class="drive-label"><label data-i18n="drive" class="skill-label">Drive.</label></div>
-      <div class="charm-prof">
+      <div class="drive-label">
+          <button value="&{template:maxapoc} {{subtitle=^{drive}}} {{profdesc=@{drive_prof_desc}}} {{firstdegree1=[[@{drive}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{drive}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{drive}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{drive}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{drive}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{drive}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="drive">Drive.</span>
+          </button>
+      </div>
+      <div class="charm-prof prof">
           <select class="prof" name="attr_charm_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -326,11 +382,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_charm"/>
-          <input type="hidden" name="attr_charm_half"/>
-          <input type="hidden" name="attr_charm_quarter"/>
+          <input type="hidden" name="attr_charm_prof_desc"/>
       </div>
-      <div class="charm-label"><label data-i18n="charm" class="skill-label">Charm.</label></div>
-      <div class="brawl-prof">
+      <div class="charm-label">
+          <button value="&{template:maxapoc} {{subtitle=^{charm}}} {{profdesc=@{charm_prof_desc}}} {{firstdegree1=[[@{charm}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{charm}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{charm}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{charm}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{charm}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{charm}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="charm">Charm.</span>
+          </button>
+      </div>
+      <div class="brawl-prof prof">
           <select class="prof" name="attr_brawl_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -339,11 +398,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_brawl"/>
-          <input type="hidden" name="attr_brawl_half"/>
-          <input type="hidden" name="attr_brawl_quarter"/>
+          <input type="hidden" name="attr_brawl_prof_desc"/>
       </div>
-      <div class="brawl-label"><label data-i18n="brawl" class="skill-label">Brawl.</label></div>
-      <div class="heavyweapons-prof">
+      <div class="brawl-label">
+          <button value="&{template:maxapoc} {{subtitle=^{brawl}}} {{profdesc=@{brawl_prof_desc}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="brawl">Brawl.</span>
+          </button>
+      </div>
+      <div class="heavyweapons-prof prof">
           <select class="prof" name="attr_heavyweapons_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -352,12 +414,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_heavyweapons"/>
-          <input type="hidden" name="attr_heavyweapons_half"/>
-          <input type="hidden" name="attr_heavyweapons_quarter"/>
+          <input type="hidden" name="attr_heavyweapons_prof_desc"/>
       </div>
-      <div class="heavyweapons-label"><label data-i18n="heavy_weapons" class="skill-label">Heavy Weapons.</label></div>
+      <div class="heavyweapons-label">
+          <button value="&{template:maxapoc} {{subtitle=^{heavy_weapons}}} {{profdesc=@{heavyweapons_prof_desc}}} {{firstdegree1=[[@{heavyweapons}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{heavyweapons}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{heavyweapons}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{heavyweapons}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{heavyweapons}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{heavyweapons}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="heavy_weapons">Heavy Weapons.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 3 -->
-      <div class="palming-prof">
+      <div class="palming-prof prof">
           <select class="prof" name="attr_palming_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -366,11 +431,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_palming"/>
-          <input type="hidden" name="attr_palming_half"/>
-          <input type="hidden" name="attr_palming_quarter"/>
+          <input type="hidden" name="attr_palming_prof_desc"/>
       </div>
-      <div class="palming-label"><label data-i18n="palming" class="skill-label">Palming.</label></div>
-      <div class="medicine-prof">
+      <div class="palming-label">
+          <button value="&{template:maxapoc} {{subtitle=^{palming}}} {{profdesc=@{palming_prof_desc}}} {{firstdegree1=[[@{palming}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{palming}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{palming}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{palming}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{palming}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{palming}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="palming">Palming.</span>
+          </button>
+      </div>
+      <div class="medicine-prof prof">
           <select class="prof" name="attr_medicine_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -379,11 +447,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_medicine"/>
-          <input type="hidden" name="attr_medicine_half"/>
-          <input type="hidden" name="attr_medicine_quarter"/>
+          <input type="hidden" name="attr_medicine_prof_desc"/>
       </div>
-      <div class="medicine-label"><label data-i18n="medicine" class="skill-label">Medicine.</label></div>
-      <div class="navigation-prof">
+      <div class="medicine-label">
+          <button value="&{template:maxapoc} {{subtitle=^{medicine}}} {{profdesc=@{medicine_prof_desc}}} {{firstdegree1=[[@{medicine}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{medicine}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{medicine}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{medicine}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{medicine}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{medicine}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="medicine">Medicine.</span>
+          </button>
+      </div>
+      <div class="navigation-prof prof">
           <select class="prof" name="attr_navigation_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -392,11 +463,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_navigation"/>
-          <input type="hidden" name="attr_navigation_half"/>
-          <input type="hidden" name="attr_navigation_quarter"/>
+          <input type="hidden" name="attr_navigation_prof_desc"/>
       </div>
-      <div class="navigation-label"><label data-i18n="navigation" class="skill-label">Navigation.</label></div>
-      <div class="command-prof">
+      <div class="navigation-label">
+          <button value="&{template:maxapoc} {{subtitle=^{navigation}}} {{profdesc=@{navigation_prof_desc}}} {{firstdegree1=[[@{navigation}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{navigation}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{navigation}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{navigation}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{navigation}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{navigation}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="navigation">Navigation.</span>
+          </button>
+      </div>
+      <div class="command-prof prof">
           <select class="prof" name="attr_command_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -405,11 +479,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_command"/>
-          <input type="hidden" name="attr_command_half"/>
-          <input type="hidden" name="attr_command_quarter"/>
+          <input type="hidden" name="attr_command_prof_desc"/>
       </div>
-      <div class="command-label"><label data-i18n="command" class="skill-label">Command.</label></div>
-      <div class="clubs-prof">
+      <div class="command-label">
+          <button value="&{template:maxapoc} {{subtitle=^{command}}} {{profdesc=@{command_prof_desc}}} {{firstdegree1=[[@{command}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{command}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{command}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{command}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{command}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{command}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="command">Command.</span>
+          </button>
+      </div>
+      <div class="clubs-prof prof">
           <select class="prof" name="attr_clubs_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -418,12 +495,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_clubs"/>
-          <input type="hidden" name="attr_clubs_half"/>
-          <input type="hidden" name="attr_clubs_quarter"/>
+          <input type="hidden" name="attr_clubs_prof_desc"/>
       </div>
-      <div class="clubs-label"><label data-i18n="clubs" class="skill-label">Clubs.</label></div>
+      <div class="clubs-label">
+          <button value="&{template:maxapoc} {{subtitle=^{clubs}}} {{profdesc=@{clubs_prof_desc}}} {{firstdegree1=[[@{clubs}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{clubs}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{clubs}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{clubs}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{clubs}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{clubs}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="clubs">Clubs.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 4 -->
-      <div class="stealth-prof">
+      <div class="stealth-prof prof">
           <select class="prof" name="attr_stealth_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -432,11 +512,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_stealth"/>
-          <input type="hidden" name="attr_stealth_half"/>
-          <input type="hidden" name="attr_stealth_quarter"/>
+          <input type="hidden" name="attr_stealth_prof_desc"/>
       </div>
-      <div class="stealth-label"><label data-i18n="stealth" class="skill-label">Stealth.</label></div>
-      <div class="science-prof">
+      <div class="stealth-label">
+          <button value="&{template:maxapoc} {{subtitle=^{stealth}}} {{profdesc=@{stealth_prof_desc}}} {{firstdegree1=[[@{stealth}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{stealth}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{stealth}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{stealth}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{stealth}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{stealth}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="stealth">Stealth.</span>
+          </button>
+      </div>
+      <div class="science-prof prof">
           <select class="prof" name="attr_science_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -445,11 +528,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_science"/>
-          <input type="hidden" name="attr_science_half"/>
-          <input type="hidden" name="attr_science_quarter"/>
+          <input type="hidden" name="attr_science_prof_desc"/>
       </div>
-      <div class="science-label"><label data-i18n="science" class="skill-label">Science.</label></div>
-      <div class="perception-prof">
+      <div class="science-label">
+          <button value="&{template:maxapoc} {{subtitle=^{science}}} {{profdesc=@{science_prof_desc}}} {{firstdegree1=[[@{science}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{science}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{science}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{science}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{science}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{science}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="science">Science.</span>
+          </button>
+      </div>
+      <div class="perception-prof prof">
           <select class="prof" name="attr_perception_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -458,11 +544,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_perception"/>
-          <input type="hidden" name="attr_perception_half"/>
-          <input type="hidden" name="attr_perception_quarter"/>
+          <input type="hidden" name="attr_perception_prof_desc"/>
       </div>
-      <div class="perception-label"><label data-i18n="perception" class="skill-label">Perception.</label></div>
-      <div class="interrogate-prof">
+      <div class="perception-label">
+          <button value="&{template:maxapoc} {{subtitle=^{perception}}} {{profdesc=@{perception_prof_desc}}} {{firstdegree1=[[@{perception}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{perception}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{perception}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{perception}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{perception}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{perception}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="perception">Perception.</span>
+          </button>
+      </div>
+      <div class="interrogate-prof prof">
           <select class="prof" name="attr_interrogate_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -471,12 +560,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_interrogate"/>
-          <input type="hidden" name="attr_interrogate_half"/>
-          <input type="hidden" name="attr_interrogate_quarter"/>
+          <input type="hidden" name="attr_interrogate_prof_desc"/>
       </div>
-      <div class="interrogate-label"><label data-i18n="interrogate" class="skill-label">Interrogate.</label></div>
+      <div class="interrogate-label">
+          <button value="&{template:maxapoc} {{subtitle=^{interrogate}}} {{profdesc=@{interrogate_prof_desc}}} {{firstdegree1=[[@{interrogate}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{interrogate}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{interrogate}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{interrogate}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{interrogate}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{interrogate}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="interrogate">Interrogate.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 5 -->
-      <div class="wrangle-prof">
+      <div class="wrangle-prof prof">
           <select class="prof" name="attr_wrangle_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -485,11 +577,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_wrangle"/>
-          <input type="hidden" name="attr_wrangle_half"/>
-          <input type="hidden" name="attr_wrangle_quarter"/>
+          <input type="hidden" name="attr_wrangle_prof_desc"/>
       </div>
-      <div class="wrangle-label"><label data-i18n="wrangle" class="skill-label">Wrangle.</label></div>
-      <div class="techuse-prof">
+      <div class="wrangle-label">
+          <button value="&{template:maxapoc} {{subtitle=^{wrangle}}} {{profdesc=@{wrangle_prof_desc}}} {{firstdegree1=[[@{wrangle}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{wrangle}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{wrangle}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{wrangle}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{wrangle}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{wrangle}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="wrangle">Wrangle.</span>
+          </button>
+      </div>
+      <div class="techuse-prof prof">
           <select class="prof" name="attr_techuse_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -498,11 +593,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_techuse"/>
-          <input type="hidden" name="attr_techuse_half"/>
-          <input type="hidden" name="attr_techuse_quarter"/>
+          <input type="hidden" name="attr_techuse_prof_desc"/>
       </div>
-      <div class="techuse-label"><label data-i18n="tech_use" class="skill-label">Tech Use.</label></div>
-      <div class="survival-prof">
+      <div class="techuse-label">
+          <button value="&{template:maxapoc} {{subtitle=^{tech_use}}} {{profdesc=@{techuse_prof_desc}}} {{firstdegree1=[[@{techuse}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{techuse}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{techuse}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{techuse}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{techuse}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{techuse}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="tech_use">Tech Use.</span>
+          </button>
+      </div>
+      <div class="survival-prof prof">
           <select class="prof" name="attr_survival_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -511,11 +609,14 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_survival"/>
-          <input type="hidden" name="attr_survival_half"/>
-          <input type="hidden" name="attr_survival_quarter"/>
+          <input type="hidden" name="attr_survival_prof_desc"/>
       </div>
-      <div class="survival-label"><label data-i18n="survival" class="skill-label">Survival.</label></div>
-      <div class="intimidate-prof">
+      <div class="survival-label">
+          <button value="&{template:maxapoc} {{subtitle=^{survival}}} {{profdesc=@{survival_prof_desc}}} {{firstdegree1=[[@{survival}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{survival}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{survival}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{survival}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{survival}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{survival}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="survival">Survival.</span>
+          </button>
+      </div>
+      <div class="intimidate-prof prof">
           <select class="prof" name="attr_intimidate_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -524,12 +625,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_intimidate"/>
-          <input type="hidden" name="attr_intimidate_half"/>
-          <input type="hidden" name="attr_intimidate_quarter"/>
+          <input type="hidden" name="attr_intimidate_prof_desc"/>
       </div>
-      <div class="intimidate-label"><label data-i18n="intimidate" class="skill-label">Intimidate.</label></div>
+      <div class="intimidate-label">
+          <button value="&{template:maxapoc} {{subtitle=^{intimidate}}} {{profdesc=@{intimidate_prof_desc}}} {{firstdegree1=[[@{intimidate}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{intimidate}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{intimidate}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{intimidate}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{intimidate}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{intimidate}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="intimidate">Intimidate.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 6 -->
-      <div class="tracking-prof">
+      <div class="tracking-prof prof">
           <select class="prof" name="attr_tracking_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -538,12 +642,15 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_tracking"/>
-          <input type="hidden" name="attr_tracking_half"/>
-          <input type="hidden" name="attr_tracking_quarter"/>
+          <input type="hidden" name="attr_tracking_prof_desc"/>
       </div>
-      <div class="tracking-label"><label data-i18n="tracking" class="skill-label">Tracking.</label></div>
+      <div class="tracking-label">
+          <button value="&{template:maxapoc} {{subtitle=^{tracking}}} {{profdesc=@{tracking_prof_desc}}} {{firstdegree1=[[@{tracking}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{tracking}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{tracking}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{tracking}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{tracking}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{tracking}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <span data-i18n="tracking">Tracking.</span>
+          </button>
+      </div>
 <!-- SKILLS ROW 7 -->
-      <div class="xenotechuse-prof">
+      <div class="xenotechuse-prof prof">
           <select class="prof" name="attr_xenotechuse_prof">
               <option value="-">-</option>
               <option value="p">P</option>
@@ -552,10 +659,13 @@
               <option value="m">M</option>
           </select>
           <input type="hidden" name="attr_xenotechuse"/>
-          <input type="hidden" name="attr_xenotechuse_half"/>
-          <input type="hidden" name="attr_xenotechuse_quarter"/>
+          <input type="hidden" name="attr_xenotechuse_prof_desc"/>
       </div>
-      <div class="xenotechuse-label"><label data-i18n="xenotech_use" class="skill-label">Xenotech Use.</label></div>
+      <div class="xenotechuse-label">
+          <button value="&{template:maxapoc} {{subtitle=^{xenotech_use}}} {{profdesc=@{xenotechuse_prof_desc}}} {{firstdegree1=[[@{xenotechuse}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{xenotechuse}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{xenotechuse}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{xenotechuse}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{xenotechuse}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{xenotechuse}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
+            <!--span data-i18n="xenotech_use">Xenotech Use.</span-->Xenotech Use.
+          </button>
+      </div>
       <div class="prof-desc">
           <div class="prof-circle"><select class="prof" disabled/></div>
           <div class="prof-code-not code">-</div> 
@@ -692,7 +802,11 @@
       <div class="saves">
           <div class="save-salvage stat">
             <div class="stat-labels salvage-labels">
-                <div class="subheading"><span data-i18n="salvage" class="subheading">Salvage.</span></div>
+                <div class="subheading">
+                  <button value="&{template:maxapoc} {{subtitle=^{salvage}}} {{firstdegree1=[[@{salvage}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{salvage}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{salvage}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{salvage}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{salvage}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{salvage}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button">
+                    <span data-i18n="salvage" class="subheading">Salvage.</span>
+                  </button>
+                </div>
                 <div class="footing"><span class="footing">(INS + LUCK) / 2</span></div>
             </div>
             <div class="salvage-input"><input class="stat" type="number" name="attr_salvage" readonly/></div>
@@ -703,7 +817,11 @@
           </div>
           <div class="save-resilience stat">
             <div class="stat-labels resilience-labels">
-                <div class="subheading"><span data-i18n="resilience" class="subheading">Resilience.</span></div>
+                <div class="subheading">
+                  <button value="&{template:maxapoc} {{subtitle=^{resilience}}} {{firstdegree1=[[@{resilience}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{resilience}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{resilience}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{resilience}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{resilience}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{resilience}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button">
+                    <span data-i18n="resilience" class="subheading">Resilience.</span>
+                  </button>
+                </div>
                 <div class="footing"><span class="footing">(STR + FORT) / 2</span></div>
             </div>
             <div class="resilience-input"><input class="stat" type="number" name="attr_resilience" readonly/></div>
@@ -714,7 +832,11 @@
           </div>
           <div class="save-resolve stat">
             <div class="stat-labels resolve-labels">
-                <div class="subheading"><span data-i18n="resolve" class="subheading">Resolve.</span></div>
+                <div class="subheading">
+                  <button value="&{template:maxapoc} {{subtitle=^{resolve}}} {{firstdegree1=[[@{resolve}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{resolve}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{resolve}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{resolve}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{resolve}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{resolve}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button">
+                    <span data-i18n="resolve" class="subheading">Resolve.</span>
+                  </button>
+                </div>
                 <div class="footing"><span class="footing">(INT + INS) / 2</span></div>
             </div>
             <div class="resolve-input"><input class="stat" type="number" name="attr_resolve" readonly/></div>
@@ -725,7 +847,11 @@
           </div>
           <div class="save-immunity stat">
             <div class="stat-labels immunity-labels">
-                <div class="subheading"><span data-i18n="immunity" class="subheading">Immunity.</span></div>
+                <div class="subheading">
+                  <button value="&{template:maxapoc} {{subtitle=^{immunity}}} {{firstdegree1=[[@{immunity}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{immunity}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{immunity}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{immunity}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{immunity}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{immunity}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button">
+                    <span data-i18n="immunity" class="subheading">Immunity.</span>
+                  </button>
+                </div>
                 <div class="footing"><span class="footing">(FOR + LUCK) / 2</span></div>
             </div>
             <div class="immunity-input"><input class="stat" type="number" name="attr_immunity" readonly/></div>
@@ -1028,10 +1154,7 @@ const multistats = {
 
 const stats = ['str', 'for', 'agi', 'int', 'ins', 'cha', 'fs', 'bs', 
 'salvage', 'resilience', 'resolve', 'immunity', 'crafting', 'mechanics', 'science', 'medicine',
-'dodge', 'full_dodge', 'parry', 'riposte', 'athletics', 'archery', 'academics', 'crafting' , 
-'animalken', 'blades', 'firearms', 'lockpick', 'mechanics', 'drive', 'charm', 'brawl' , 'heavyweapons',
-'palming', 'medicine', 'navigation' , 'command', 'clubs', 'stealth', 'science', 'perception', 'interrogate',
-'wrangle', 'techuse', 'survival', 'intimidate', 'tracking', 'xenotechuse'];
+'dodge', 'full_dodge', 'parry', 'riposte'];
 stats.forEach(stat => {
     multistats[`${stat}_half`] = {rule: 'half', attributes: [stat]};
     multistats[`${stat}_quarter`] = {rule: 'quarter', attributes: [stat]};
@@ -1043,16 +1166,16 @@ navigation: 'ins' , command: 'cha', clubs: 'fs', stealth: 'agi', science: 'int',
 wrangle: 'agi', techuse: 'int', survival: 'ins', intimidate: 'cha', tracking: 'ins', xenotechuse: 'ins'};
 
 Object.entries(skills).forEach(([skill,stat]) => {
-      multistats[skill] = 
-          {rule: 'prof', values: -1, attributes: [stat, skill+'_prof']};
+      multistats[skill] = {rule: 'prof', values: -1, attributes: [stat, skill+'_prof']};
+      multistats[skill+"_prof_desc"] = {rule: 'prof_desc', values: -1, attributes: [skill+'_prof']};
 });
 
 const prof_mods = {};
-prof_mods['-'] = 0;
-prof_mods['p'] = 0;
-prof_mods['s'] = 5;
-prof_mods['t'] = 10;
-prof_mods['m'] = 15;
+prof_mods['-'] = {mod:0,desc:'Not Proficient'};
+prof_mods['p'] = {mod:0,desc:'Proficient'};
+prof_mods['s'] = {mod:5,desc:'Skilled'};
+prof_mods['t'] = {mod:10,desc:'Trained'};
+prof_mods['m'] = {mod:15,desc:'Master'};
 
 
 const multifunctions = {
@@ -1069,7 +1192,11 @@ const multifunctions = {
     prof: function(arr) {
         let stat_val = parseInt(arr[0]) || 0;
         let prof_mod = prof_mods[arr[1]];
-        return stat_val + prof_mod;
+        return stat_val + prof_mod.mod;
+    },
+    prof_desc: function(arr) {
+        let prof_mod = prof_mods[arr[0]];
+        return prof_mod.desc;
     },
     special_stat: function(arr, divisor) {
     	let sum = multifunctions.sum(arr);
@@ -1267,48 +1394,136 @@ on('change:repeating_gear:gear_cp remove:repeating_gear', function() {
 
 /* END OF REPEATING SUMS */
 
-/*
-&{template:custom} 
-{{color=green}} 
-{{title=Strength}} 
-{{lvl=@{str} }} 
-{{lvlhalf=@{str_half} }} 
-{{lvlquarter=@{str_quarter} }} 
-{{profroll=[[1d100]] }}
-8?
-
 </script>
 
 <rolltemplate class="sheet-rolltemplate-maxapoc">
-  <div class="sheet-container sheet-color-{{color}}">
+  <div class="sheet-container">
     <div class="sheet-header">
       {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
       {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
     </div>
     <div class="sheet-content">
-      <div class="sheet-key">Stat</div><div class="sheet-value">{{lvl}}</div>
-      {{#prof}}<div class="sheet-key">Proficiency</div><div class="sheet-value">{{prof}}</div>{{/prof}}
-      <div class="sheet-key">&frac12; stat</div><div class="sheet-value">{{lvlhalf}}</div>
-      <div class="sheet-key">&frac14; stat</div><div class="sheet-value">{{lvlquarter}}</div>
+        
+      <!-- DEBUG -->
+      {{#debug}}
+      <div class="sheet-desc">DEBUG START</div>
+      {{#allprops() attack}}
+      <div>{{key}}</div><div>{{value}}</div>
+      {{/allprops() attack}}
+      <div class="sheet-desc">DEBUG END</div>
+      {{/debug}}
+      
+      <!-- PROFICIENCY -->
+      {{#profdesc}}<div class="sheet-key">Proficiency</div><div class="sheet-value">{{profdesc}}</div>{{/profdesc}}
+        
+      <!-- MODIFIER -->
+      <div class="sheet-key">Modifier</div>
+      {{#rollGreater() mod 0}}
+        <div class="sheet-value">{{mod}} Advantage(s)</div>
+      {{/rollGreater() mod 0}}
+      {{#rollTotal() mod 0}}
+        <div class="sheet-value">None</div>
+      {{/rollTotal() mod 0}}
+      {{#rollLess() mod 0}}
+        <div class="sheet-value">{{absmod}} Disadvantage(s)</div>
+      {{/rollLess() mod 0}}
+        
+      <!-- DEGREES OF SUCCESS -->
+      <div class="sheet-key">Required Success</div>
+      {{#rollGreater() mod -2}}
+        <div class="sheet-value">Normal</div>
+      {{/rollGreater() mod -2}}
+      {{#rollTotal() mod -2}}
+        <div class="sheet-value">Great</div>
+      {{/rollTotal() mod -2}}
+      {{#rollTotal() mod -3}}
+        <div class="sheet-value">Amazing</div>
+      {{/rollTotal() mod -3}}
+        
+      <!-- SUCCESS TARGETS -->
+      <div class="sheet-desc">Success Targets</div>
+      
+        <!-- 1 DISADVANTAGE OR LESS -->
+      {{#rollGreater() mod -2}}
+      <div class="sheet-key">Normal</div><div class="sheet-value">{{firstdegree}}</div>
+      <div class="sheet-key">Great</div><div class="sheet-value">{{seconddegree}}</div>
+      {{/rollGreater() mod -2}}
+      
+        <!-- 2 DISADVANTAGES -->
+      {{#rollTotal() mod -2}}
+      <div class="sheet-key">Normal</div><div class="sheet-value">N/A</div>
+      <div class="sheet-key">Great</div><div class="sheet-value">{{seconddegree}}</div>
+      {{/rollTotal() mod -2}}
+      
+        <!-- 3 DISADVANTAGES -->
+      {{#rollTotal() mod -3}}
+      <div class="sheet-key">Normal</div><div class="sheet-value">N/A</div>
+      <div class="sheet-key">Great</div><div class="sheet-value">N/A</div>
+      {{/rollTotal() mod -3}}
+        
+      <!-- END: SUCCESS TARGETS -->
+        
+      <!-- ROLL -->
+      <div class="sheet-key">Amazing</div><div class="sheet-value">{{thirddegree}}</div>
+        
+      <!-- ROLL OUTCOME -->
+      <div class="sheet-desc">Result</div>
       <div class="sheet-key">Roll</div><div class="sheet-value">{{profroll}}</div>
-      {{#rollLess() profroll 2}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Critical Success !!!</div>
+      <div class="sheet-key">Outcome</div>
+
+      <!-- CRITICAL SUCCESS -->      
+      {{#rollLess() profroll 2}}<div class="sheet-value">Critical Success !!!</div>
       {{/rollLess() profroll 2}}
-      {{#rollBetween() profroll 2 lvlquarter}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Amazing Success !!</div>
-      {{/rollBetween() profroll 2 lvlquarter}}
-      {{#rollBetween() profroll lvlquarter1 lvlhalf}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Great Success !</div>
-      {{/rollBetween() profroll lvlquarter1 lvlhalf}}
-      {{#rollBetween() profroll lvlhalf1 lvl}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Success</div>
-      {{/rollBetween() profroll lvlhalf1 lvl}}
-      {{#rollBetween() profroll lvl1 99}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Failure</div>
-      {{/rollBetween() profroll lvl1 99}}
+      
+        <!-- 1 DISADVANTAGE OR LESS -->
+      {{#rollGreater() mod -2}}
+          {{#rollBetween() profroll 2 thirddegree}}
+                                        <div class="sheet-value">Amazing Success !!</div>
+          {{/rollBetween() profroll 2 thirddegree}}
+          {{#rollBetween() profroll thirddegree1 seconddegree}}
+                                        <div class="sheet-value">Great Success !</div>
+          {{/rollBetween() profroll thirddegree1 seconddegree}}
+          {{#rollBetween() profroll seconddegree1 firstdegree}}
+                                        <div class="sheet-value">Success</div>
+          {{/rollBetween() profroll seconddegree1 firstdegree}}
+      {{/rollGreater() mod -2}}
+      
+        <!-- 2 DISADVANTAGES -->
+      {{#rollTotal() mod -2}}
+          {{#rollBetween() profroll 2 thirddegree}}
+                                        <div class="sheet-value">Amazing Success !!</div>
+          {{/rollBetween() profroll 2 thirddegree}}
+          {{#rollBetween() profroll thirddegree1 seconddegree}}
+                                        <div class="sheet-value">Great Success !</div>
+          {{/rollBetween() profroll thirddegree1 seconddegree}}
+          {{#rollBetween() profroll seconddegree1 firstdegree}}
+                                        <div class="sheet-value">Failure</div>
+          {{/rollBetween() profroll seconddegree1 firstdegree}}
+      {{/rollTotal() mod -2}}
+      
+        <!-- 3 DISADVANTAGES -->
+      {{#rollTotal() mod -3}}
+          {{#rollBetween() profroll 2 thirddegree}}
+                                        <div class="sheet-value">Amazing Success !!</div>
+          {{/rollBetween() profroll 2 thirddegree}}
+          {{#rollBetween() profroll thirddegree1 seconddegree}}
+                                        <div class="sheet-value">Failure</div>
+          {{/rollBetween() profroll thirddegree1 seconddegree}}
+          {{#rollBetween() profroll seconddegree1 firstdegree}}
+                                        <div class="sheet-value">Failure</div>
+          {{/rollBetween() profroll seconddegree1 firstdegree}}
+      {{/rollTotal() mod -3}}
+        
+      <!-- END: ROLL OUTCOME -->
+
+      {{#rollBetween() profroll firstdegree1 99}}
+                                        <div class="sheet-value">Failure</div>
+      {{/rollBetween() profroll firstdegree1 99}}
+      
       {{#rollGreater() profroll 99}}
-      <div class="sheet-key">Result</div><div class="sheet-value">Critical Failure !!!!</div>
+                                        <div class="sheet-value">Critical Failure !!!!</div>
       {{/rollGreater() profroll 99}}
+      
     </div>
   </div>
 </rolltemplate>
