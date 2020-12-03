@@ -6,6 +6,10 @@ Player sheet for L'Empire des cerisiers by Olivier Sanfilippo published by Arkha
 
 ### Change log
 
+### 1.2-2
+
+* Fix : bug on rolltemplate when ritual bonus is not set.
+
 ### 1.2-1
 
 * Fix : non working selector on ritual tab.

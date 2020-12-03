@@ -4271,10 +4271,9 @@
 				</h4>
 
 				<ul>
-					<li>Current Move Bug. Fix issue where current move wasn't updated when inventory total changes. Reported by Adam .</li>
-					<li>Combat Tab > Defense Sub-tab > Roll Modifier Tool. Add Defense Bonus modifier.</li>
-					<li>Bugfix: Roll template Pastelle Pink not showing correctly for rolls and dex rolls. Reported by Ian.</li>
-					<li>New Sheet and Campaign Option: <b>Show casting details on roll template</b>. If checked, detailed notes like casting time, duration, cost, maintain, resisted by, and class will be shown on the roll results template.</li>
+					<li>Combat Tab > Melee table. Display swing & thrust damage, also widened the damage column a little to make easier to enter field values and formulas. Requested by PL M.</li>
+					<li>Combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+					<li>New Rolltemplate. A generic, simple template for use with macros. Click on <b>View All Updates</b> for details.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -8666,6 +8665,42 @@ visualize what it will look like in chat.
 							</div>
 						</div>
 
+						<div class="item item3">
+
+							<div class="thrust-swing-damage">
+
+								<!-- row 1 -->
+								<div class="item item1">
+									<div class="popup">
+										<span data-i18n="attribute-thrust">Thrust</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="melee-thrust-tooltip">Thrust damage based on Striking ST. You can use the macro name in a weapons damage column and apply basic math. <b>Example:</b> Damage = @{thrust}+1</span>
+									</span>
+								</div>
+								
+								<div class="item item2">
+									<div class="popup">
+										<span data-i18n="attribute-swing">Swing</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="melee-swing-tooltip">Swing damage based on Striking ST. You can use the macro name in a weapons damage column and apply basic math. <b>Example:</b> Damage = @{swing}+1</span>
+									</span>
+								</div>
+
+								<!-- row 2 -->
+								<div class="item item3">
+									<input type="text" name="attr_thrust" value="" title="Macro: @{thrust}">
+								</div>
+								
+								<div class="item item4">
+									<input type="text" name="attr_swing" value="" title="Macro: @{swing}">
+								</div>
+								
+							</div>
+
+						</div>
+
 					</div>
 					
 				</div>
@@ -10072,6 +10107,7 @@ visualize what it will look like in chat.
 												<option value="Skill"><span data-i18n="option-skill">Skill</span></option>
 												<option value="Technique"><span data-i18n="option-technique">Technique</span></option>
 												<option value="Spell"><span data-i18n="option-spell">Spell</span></option>
+												<option value="Melee"><span data-i18n="option-melee-weapon">Melee Weapon</span></option>
 												<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
 												<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
 												<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
@@ -10294,6 +10330,48 @@ visualize what it will look like in chat.
 
 				<div class="melee">
 
+					<div class="box speed-range-images" style="display: none;">
+						
+						<div class="select-token">
+							<div class="group">
+								<div>
+									<button type="roll" name="act_select_token" value="@{roll}&{template:macro} {{sheetStyle=@{sheetstyle}}} {{title=Selected Token}} {{Name=@{selected|token_name}}}" class="btn" title="Select a token"><span data-i18n="select-label">Select</span></button>
+								</div>
+								<div>
+									<div class="popup">
+										<span class="help-icon">?</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="select-token-tooltip">Click the button to <b>select</b> a token that you control before the skill roll.<br />The token name will appear in the results.<br />You can enter a secondary token field or character attribute to include in in the display.</span>
+									</span>
+								</div>
+							</div>
+							<div>
+								Selected token info here
+							</div>
+						</div>
+
+						<div class="target-token">
+							<div class="group">
+								<div>
+									<button type="action" name="act_target_token" value="@{target|token_name}" class="btn" title="Target a token"><span data-i18n="target-label">Target</span></button>
+								</div>
+								<div>
+									<div class="popup">
+										<span class="help-icon">?</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="target-token-tooltip">Click the button to <b>target</b> a token before the skill roll.<br />The token name will appear in the results.<br />You can enter a secondary token field or character attribute to include in in the display.</span>
+									</span>
+								</div>
+							</div>
+							<div>
+								Target token info here
+							</div>
+						</div>
+
+					</div>
+
 					<!-- _____ _____ MELEE ATTACKS BOX _____ _____ -->
 					<div class="box melee-attacks">
 						<div class="table">
@@ -10447,10 +10525,27 @@ visualize what it will look like in chat.
 										<input type="text" name="attr_skill" title="Macro table name: repeating_melee. Field name: skill" />
 									</div>
 									<div class="cell col6">
-										<button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{melee_roll_modifier}, @{melee_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_melee_modifier_tool}]]}} {{maxNine=[[@{melee_roll_max_nine}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{rollTraitSummary=@{melee_roll_trait_summary}}} {{hitLocation=@{melee_roll_hit_location}}} {{maneuver=@{melee_roll_maneuver}}} {{allOutAttack=@{melee_roll_allout_attack}}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
+										<button type="roll" class="template-attack-roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Melee Attack}} {{against=@{target|token_name}}} {{activeDefense=[[0]]}} {{isSkillRoll=[[1]]}} {{showHitLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=@{name}}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[{@{skill} + @{modifier} + @{melee_roll_modifier}, @{melee_roll_max_nine_value} }kl1]]}} {{useModToll=[[@{use_melee_modifier_tool}]]}} {{maxNine=[[@{melee_roll_max_nine}]]}} {{rollModifier=[[@{melee_roll_modifier}]]}} {{rollModifierSummary=@{melee_roll_modifier_summary}}} {{rollTraitSummary=@{melee_roll_trait_summary}}} {{hitLocation=@{melee_roll_hit_location}}} {{maneuver=@{melee_roll_maneuver}}} {{allOutAttack=@{melee_roll_allout_attack}}} {{reach=@{reach}}} {{notes=@{notes}}} {{showNotes=[[1]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsSL" />
 									</div>
 								</div> <!-- .row -->
 								<div class="melee-notebox">
+
+									<div class="row">
+										<div class="cell label">
+											<div class="popup">
+												<span data-i18n="row-id-label">Row ID:</span>
+											</div>
+											<span class="tooltip">
+												<span data-i18n="melee-row-id-tooltip">Use the melee row id to link an active defense to this skill.<br />This allows you to use your enhanced skill with this weapon for parries.</span>
+											</span> 
+										</div>
+										<div class="cell">
+											<input type="text" readonly="readonly" name="attr_row_id" value="" />
+										</div>
+										
+									</div> <!-- .row -->
+
+
 									<div class="row">
 										<!-- hidden input is used to show/hide Row ID: based on selection -->
 										<input type="hidden" name="attr_melee_row_type" value="Skill" />
@@ -12608,6 +12703,52 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>Combat Tab > Melee table. Display swing & thrust damage, also widened the damage column a little to make easier to enter field values and formulas. Requested by PL M.</li>
+				<li>Combat Tab. An Active Defense can now be linked to a melee weapon. This allows you assign a defense to melee weapon that has additional skill bonuses, like weapon bond.</li>
+				<li>New Rolltemplate. A generic, simple template for use with macros. See below.</li>
+			</ul>
+
+			<h5>Rolltemplate for Macros</h5>
+
+			<h6>Example Macro</h6>
+
+			<div style="padding: 5px; background: #ccc;">
+				&{template:macro}  {{templateType=dnd5e}} {{sheetStyle=4}} {{roll=[[3d6]]}} {{target=[[13]]}} {{title=Drake}} {{subtitle=Attacks Orc}} {{Damage=[[1d6-1]] crush}} {{Location=[[3d6]]}} {{Note=Groin shots don't count}} {{desc=**Roll** HT-2 to avoid stun. If stunned roll HT each turn to recover.}}
+			</div>
+
+			<ul style="margin-top: 20px; margin-bottom: 20px;">
+				<li>templateType = basic | dnd5e | pathfinder.</li>
+				<li>sheetStyle = #. Matches the Sheet Style drop-down option on the character sheet. 
+					<ul>
+						<li>0 = Green</li>
+						<li>1 = Blue</li>
+						<li>2 = Beige</li>
+						<li>3 = Gray</li>
+						<li>4 = Class White</li>
+						<li>5 = Pastel Pink</li>
+						<li>6 = Pastel Earth</li>
+						<li>7 = Purple</li>
+						<li>8 = Fabric</li>
+					</ul>
+				</li>
+				<li>title = Main title</li>
+				<li>subtitle = Sub Title</li>
+				<li>desc = Description, full-width, placed at the bottom of the template.</li>
+				<li>All other properties will be automatically added to the template as key/value pairs. Key = Label, Value = displayed in second column.
+					<ul>
+						<li>Example: {{note=This is a test}}</li>
+						<li><b>note</b> is the <i>key</i> and would populate the first column.</li>
+						<li><b>This is a test</b> is the <i>value</i> would populate the second column.</li>
+						<li><b style="color: red;">Important</b> The key would need to be a single word, no spaces.</li>
+					</ul>
+				</li>
+			</ul>
+
+			<h4>Version: 2.5.2</h4>
+
+			<p>Pull Request: 11/17/2020</p>
+
+			<ul>
 				<li>Current Move Bug. Fix issue where current move wasn't updated when inventory total changes. Reported by Adam .</li>
 				<li>Combat Tab > Defense Sub-tab > Roll Modifier Tool. Add Defense Bonus modifier.</li>
 				<li>Bugfix: Roll template Pastelle Pink not showing correctly for rolls and dex rolls. Reported by Ian.</li>
@@ -13534,7 +13675,15 @@ See notes for weapon.</textarea>
                         {{/bookReference}}
                     </td>
                 </tr>
-                {{/type}}
+				{{/type}}
+				{{#against}}
+                <tr>
+                    <td class="label"><span data-i18n="against-label">Against</span>:</td>
+                    <td>
+                        {{against}}
+                    </td>
+                </tr>
+                {{/against}}
                 {{#rollResult}}
                 <tr>
                     <td class="label"><span data-i18n="roll-label">Roll:</span></td>
@@ -14693,6 +14842,61 @@ See notes for weapon.</textarea>
 
             </table>
         </div>
+	</rolltemplate>
+	
+	<rolltemplate class="sheet-rolltemplate-macro">
+        <div class="container template-{{templateType}} rolltemplate-color-setting-{{sheetStyle}}">
+			
+			<div class="header">
+				{{#title}}
+				<div class="title">
+					<div class="text">{{title}}</div>
+				</div>
+				{{/title}}
+				{{#subtitle}}
+				<div class="subtitle">
+					<div class="text">{{subtitle}}</div>
+				</div>
+				{{/subtitle}}
+			</div>
+
+			<div class="arrow-container">
+				<div class="arrow-right"></div>
+			</div>
+
+			<div class="content">
+
+				{{#roll}}
+				{{#target}}
+				<div class="key">Roll</div>
+				<div class="value">
+					<span class="roll">{{roll}}</span> <span class="versus">vs</span> <span class="target">{{target}}</span>
+				</div>
+				{{/target}}
+				{{/roll}}
+				
+				{{#roll}}
+				{{#^target}}
+				<div class="key">Roll</div>
+				<div class="value">
+					<span class="roll">{{roll}}</span>
+				</div>
+				{{/^target}}
+				{{/roll}}
+				
+				<!-- list all the other properties that were not defined -->
+				{{#allprops() title subtitle roll target desc templateType sheetStyle}}
+				<div class="key">{{key}}</div>
+      			<div class="value">{{value}}</div>
+				{{/allprops() title subtitle roll target desc templateType sheetStyle}}
+
+				{{#desc}}
+				<div class="sheet-desc">{{desc}}</div>
+				{{/desc}}
+
+			</div>
+
+        </div>
     </rolltemplate>
     
 </div>
@@ -14707,9 +14911,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.5.2-rc";  
+	var version = "2.5.3";  
 
-	var latestChangesDate = "11/15/2020";
+	var latestChangesDate = "11/30/2020";
 
 	var modCascade = true;
 	
@@ -15735,9 +15939,7 @@ See notes for weapon.</textarea>
 		updateRepeatingDefenseNotes();
 		
 		// use underscore wrap to update skills, then update melee/ranged linked skills
-		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function(firstFunction) {
-		    
-		    firstFunction();
+		runUpdateRepeatingSkillLevels = _.wrap(updateRepeatingSkillLevels, function() {
 		    
 		    thenUpdateLinkedAttacksSkills(); 
 		    
@@ -15745,9 +15947,7 @@ See notes for weapon.</textarea>
 		
 		runUpdateRepeatingSkillLevels();
 		
-		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function(thisFunction) {
-		    
-		    thisFunction();
+		runUpdateRepeatingSpellLevels = _.wrap(updateRepeatingSpellLevels, function() {
 		    
 		    thenUpdateLinkedAttacksSpells(); 
 		    
@@ -16442,7 +16642,7 @@ See notes for weapon.</textarea>
 	
 	// watches for a change in a single row, updates row id and skill level
 	// event = {sourceAttribute, sourceType, triggerName, sourceAttribute, previousValue, newValue}
-	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised", event => {
+	on("change:repeating_spells change:repeating_skills change:repeating_techniquesrevised change:repeating_melee", event => {
 
 		let source = event.sourceType;
 
@@ -16465,6 +16665,10 @@ See notes for weapon.</textarea>
 				break;
 
 			case "repeating_techniquesrevised":
+				updateRowIdDisplay(section, rowId);
+				break;
+			
+			case "repeating_melee":
 				updateRowIdDisplay(section, rowId);
 				break;
 		}
@@ -20358,6 +20562,15 @@ See notes for weapon.</textarea>
 
 	});
 
+	// check if melee level changed
+    on("change:repeating_melee:skill", function(event) {
+        
+		var rowId = getRowIdFromEventInfo(event, "repeating_melee");
+        
+		updateSectionSkillsLinkedToUpdatedRow(rowId);
+        
+	});
+
 	/**
 	 * Checks to see if the knockback defense skill is linked to this rowId
 	 *
@@ -20707,7 +20920,11 @@ See notes for weapon.</textarea>
 			
 		    let skillRowId = values[skillRowIdFieldName];
 		    
-		    let skillMod = +values[skillRowModFieldName];
+			let skillMod = +values[skillRowModFieldName];
+			
+			if (isNaN(skillMod)) {
+				skillMod = 0;
+			}
 		    
 		    // if updating using a repeating field make sure there's a row id to search for
 		    if (updateMethod != "attribute" && skillRowId.length === 0 ) {
@@ -20794,6 +21011,10 @@ See notes for weapon.</textarea>
 				table = "repeating_spells";
 	            break;
 	            
+			case "Melee":
+				table = "repeating_melee";
+	            break;
+	            
 	        case "Skill":
 	        default:
 				table = "repeating_skills";
@@ -20811,7 +21032,7 @@ See notes for weapon.</textarea>
 	}
 	
 	/**
-	 * Update the selected weapon skill by linking to another skill, technique, or spell
+	 * Update the selected weapon skill by linking to another skill, technique, spell, or melee weapon
 	 * 
 	 * @param string   sectionName               Name of section that is getting udpated
 	 * @param string   weaponSkillFieldName      For Weapon that is getting updated
@@ -20835,10 +21056,14 @@ See notes for weapon.</textarea>
 		let skillFieldNameOfSkill = `${repeatingTableToUse}_${skillRowId}_name`;
 		
 		// if we're getting values from the techniques table, don't use level_mirror
-		if (repeatingTableToUse == "repeating_techniquesrevised") {
+		if (repeatingTableToUse == "repeating_techniquesrevised" ) {
 
 			skillFieldName = `${repeatingTableToUse}_${skillRowId}_level`;
 		
+		} else if (repeatingTableToUse == "repeating_melee") {
+
+			skillFieldName = `${repeatingTableToUse}_${skillRowId}_skill`;
+
 		}
 		
 		// update the skill level for weapon.
@@ -21564,7 +21789,7 @@ See notes for weapon.</textarea>
     	    // loop through each row
     	    _.each(ids,function(id) {
             
-				let rowType = `${sectionName}_${id}_${subName}_row_type`;
+				let rowType = `${sectionName}_${id}_${subName}`;
 	   
 	            let linkedRowId = `${sectionName}_${id}_${subName}_skill_row_id`;
 	            
@@ -25180,5 +25405,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		});
 	}
+
+	on("clicked:select_token", event => {
+		console.log(event);
+	});
 
 </script>
