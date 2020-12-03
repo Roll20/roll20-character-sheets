@@ -128,8 +128,8 @@
     <!-- ********************************** -->
     <div class="momentumpanel">
         <span class="2d20header">Momentum</span><BR>
-        <img src="https://i.imgur.com/ixvmhBJ.png" width="70" title="Manually tracked personal Momentum pool">
-      <input type="number" class="big-value" name="attr_momentum" value="0"> <!-- <button class="blankroll" type="roll" value="!spendmomentum @{character_id} ?{how much|1} Miscellaneous"><img src="https://i.imgur.com/2aj8eEM.png" title="spend momentum" width="20" height="20"></button>-->
+        <img src="https://i.imgur.com/ixvmhBJ.png" width="70" title="Max momentum that can be saved turn to turn.">
+      <input type="number" class="big-value" name="attr_maxpool" value="0"> <!-- <button class="blankroll" type="roll" value="!spendmomentum @{character_id} ?{how much|1} Miscellaneous"><img src="https://i.imgur.com/2aj8eEM.png" title="spend momentum" width="20" height="20"></button>-->
     </div>
 
     <div class="luckpanel">
@@ -709,10 +709,12 @@ attributes.forEach(maxup => {
             var mxcon=emp+rea;
             var mxfear=dar+pas;
             var mxinj=cun+mig;
+            var poolmom=Math.min(emp,cun,mig,pas,dar,rea);
             setAttrs({
                maxconfusion:mxcon,
                maxfear:mxfear,
-               maxinjury:mxinj
+               maxinjury:mxinj,
+               maxpool:poolmom
             });
         });
     });
@@ -1040,36 +1042,22 @@ attribbuttons.forEach(button => {
             var attribvalue=parseInt(values[attribname])||0;
             var a1=parseInt(values.attribval1)||0;
             var a2=parseInt(values.attribval2)||0;
-            var newFC=parseInt(values.FC)||0;
 
             switch (attribpos){
                 case "1":
-                    console.log("----------------");                    console.log("Attrib1 is: " + a1);
-                    console.log("attrib2 is: " +a2);
-                    console.log("newFC is: "+newFC);
-                    console.log("attribvalue is: " +attribvalue);
-                    if (attribvalue<a2){
-                        newFC=attribvalue;
-                    } else {
-                        newFC=a2;
-                    }
-                    console.log("newFC is: "+newFC);
+                    var minatt=Math.min(attribvalue,a2);
                     setAttrs({
                         attribute1:attribname,
                         attribval1:attribvalue,
-                        FC:newFC
+                        FC:minatt
                     });
                 break;
                 case"2":
-                if (attribvalue<a1){
-                    newFC=attribvalue;
-                } else {
-                    newFC=a1;
-                }
+                    var minatt=Math.min(a1,attribvalue)
                     setAttrs({
                         attribute2:attribname,
                         attribval2:attribvalue,
-                        FC:newFC
+                        FC:minatt
                     });
                 break;
             }    
