@@ -3,19 +3,19 @@ mixin headerEntry(name)
     span(data-i18n=`pc_ship_${name}`)
   input(type='text' name=`attr_pc_ship_${name}`)
 
-mixin abilityBox(name)
+mixin abilityBox(name, ...abilities)
   h3
     span(data-i18n=`pc_ship_${name}`)
-    if block
-      .sheet-flex-container
-        block
-    span(data-i18n='pc_ship_modifiers')
+  .sheet-scores.sheet-flex-container
+    each ability in abilities
+      +ability(ability, name)
+  span(data-i18n='pc_ship_modifiers')
 
-mixin ability(name)
+mixin ability(name, owner)
   .sheet-ability
-    label(for=`attr_pc_ship_${name}`)
+    label(for=`attr_pc_ship_${name}_${owner}`)
       span(data-i18n=`pc_ship_${name}`)
-    input(type='text' name=`attr_pc_ship_${name}`)
+    input(type='text' name=`attr_pc_ship_${name}_${owner}`)
 
 .sheet-pc-ship
   .sheet-top
@@ -37,31 +37,19 @@ mixin ability(name)
       .sheet-col-left
         .sheet-grid-container.sheet-abilities
           .sheet-pilot
-            +abilityBox('pilot')
-              +ability('dexterity','pilot')
-              +ability('wisdom','pilot')
+            +abilityBox('pilot', 'dexterity', 'wisdom')
 
           .sheet-captain
-            +abilityBox('captain','')
-              +ability('wisdom','')
-              +ability('charisma','')
+            +abilityBox('captain','wisdom', 'charisma')
 
           .sheet-technician1
-            +abilityBox('captain','')
-              +ability('intelligence','')
-              +ability('wisdom','')
+            +abilityBox('technician1', 'intelligence', 'wisdom')
 
           .sheet-technician2
-            +abilityBox('captain','')
-              +ability('intelligence','')
-              +ability('wisdom','')
+            +abilityBox('technician2', 'intelligence', 'wisdom')
 
           .sheet-commander
-            +abilityBox('captain','')
-              +ability('dexterity','')
-              +ability('intelligence','')
-              +ability('wisdom','')
-              +ability('charisma','')
+            +abilityBox('commander', 'dexterity', 'intelligence', 'wisdom', 'charisma')
 
       .sheet-col-center
         | 1
