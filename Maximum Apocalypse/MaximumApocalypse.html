@@ -1,5 +1,4 @@
 <input type="hidden" name="attr_mod_query" value="?{Modifiers|None, 0|1 Advantage, 1|1 Disadvantage, -1|2 Advantages, 2|2 Disadvantage, -2|3 Advantages, 3|3 Disadvantage, -3}"/>
-<input type="hidden" name="attr_mod_query_-" value="?{Modifiers|Disadvantage, -1|None, 0|2 Disadvantage, -2|3 Disadvantage, -3}"/>
 <input type="hidden" name="attr_mod_bool_one_if_adv" value="({[[{@{mod_query}, 0}kh1]], 1}kl1)"/>
 <input type="hidden" name="attr_mod_bool_one_if_dis" value="([[{[[{@{mod_query}, 0}kl1]], -1}kh1]]*-1)"/>
 <input type="hidden" name="attr_mod_bool_one_if_nomod" value="(1-@{mod_bool_one_if_adv}+-@{mod_bool_one_if_dis})"/>
@@ -7,14 +6,13 @@
 <input type="hidden" name="attr_roll_perc_dis" value="(([[@{mod_bool_one_if_dis}+1*@{mod_bool_one_if_dis}]]d10kh1cs>0cf<0-[[1*@{mod_bool_one_if_dis}]])*10)"/>
 <input type="hidden" name="attr_roll_perc_nomod" value="(([[1*@{mod_bool_one_if_nomod}]]d10cs>0cf<0-[[1*@{mod_bool_one_if_nomod}]])*10)"/>
 <input type="hidden" name="attr_roll_perc" value="@{roll_perc_adv}+@{roll_perc_dis}+@{roll_perc_nomod}+(1d10cs>0cf<0)"/>
-<input type="hidden" name="attr_roll_thresh_mod" value="(({@{mod_query}, 1}kh1-1)*5)"/>
+<input type="hidden" name="attr_roll_thresh_mod" value="((({@{mod_query}, 1}kh1-1)*5)+@{threshold_modifier})"/>
 <div class="main">
     <div class="character section">
         <div class="character-name-input data-entry"><input name="attr_character_name" type="text"/></div>
         <div class="character-name-label"><label data-i18n="character_name">Character Name.</label></div>
         <div class="logo">
             <img height="500px" width="500px" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Maximum%20Apocalypse/ma-logo.png" alt="Maxiumum Apocalypse"/>
-            <!--span>Modifier popup for rolls ? <input type="checkbox" name="attr_roll_mod" value="?{Advantages?|0|1|2|3}+?{Disadvantages?|0|1|2|3}"></span-->
         </div>
         <div class="player-name-input data-entry"><input name="attr_player_name" type="text"/></div>
         <div class="player-name-label"><label data-i18n="player_name">Player Name.</label></div>
@@ -663,7 +661,7 @@
       </div>
       <div class="xenotechuse-label">
           <button value="&{template:maxapoc} {{subtitle=^{xenotech_use}}} {{profdesc=@{xenotechuse_prof_desc}}} {{firstdegree1=[[@{xenotechuse}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{xenotechuse}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{xenotechuse}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{xenotechuse}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{xenotechuse}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{xenotechuse}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="skill-label blank-roll-button">
-            <!--span data-i18n="xenotech_use">Xenotech Use.</span-->Xenotech Use.
+            <span data-i18n="xenotech_use">Xenotech Use.</span>
           </button>
       </div>
       <div class="prof-desc">
@@ -680,11 +678,16 @@
           <div class="prof-desc-m"><label data-i18n="master">Master.</label></div>
           <div class="prof-text"><span data-i18n="proficiency_text">Skills that are NOT PROFICIENT start as DISADVANTAGE and cannot have ADVANTAGE when rolled.</span></div>
       </div>
+      <div class="roll-modifiers">
+          <span class="label" data-i18n="threshold_modifier_text">Threshold modifier prompt on every roll ?</span>
+          <input type="checkbox" value="?{Threshold Modifier|0}" name="attr_threshold_modifier"/>
+      </div>
       <div class="luck-label"><span data-i18n="luck" class="banner">Luck.</span><span class="dark code"> (L)</span></div>
       <div class="luck-triangle"></div>
       <div class="luck-use-label">
         <span data-i18n="use_per_game">Use Per Game.</span><br/>
         <span>(</span><span data-i18n="luck">Luck.</span><span>&divide; 10)</span>
+        <input type="hidden" name="attr_has_faith"/>
       </div>
       <div class="luck-input">
         <input class="stat" type="number" name="attr_luck"/> 
@@ -874,6 +877,7 @@
           <div class="dodge-row defense-row table-row">
               <div class="dodge-desc defense-desc table-cell">
                     <span data-i18n="dodge" class="subheading">Dodge.</span><br/>
+                    <input type="hidden" name="attr_has_reflex"/>
                     <span class="footing">(AGI + INS) / 2</span>
               </div>
               <div class="dodge-threshold table-cell"><input name="attr_dodge" class="defense-threshold" type="number" readonly/></div>
@@ -1127,7 +1131,7 @@
     ======================================================*/
 
 const multistats = {
-    luck_uses_max: {rule: 'special_stat', attributes: ['luck'], modifier: 10},
+    luck_uses_max: {rule: 'luck_uses', attributes: ['luck', 'has_faith'], modifier: 10},
     build: {rule: 'special_stat', attributes: ['str', 'for'], modifier: 1},
     build_dc: {rule: 'build_dc', attributes: ['build']},
     health_max: {rule: 'special_stat', attributes: ['build'], modifier: 5},
@@ -1142,7 +1146,7 @@ const multistats = {
     resilience: {rule: 'special_stat', attributes: ['str', 'fort'], modifier: 2},
     resolve: {rule: 'special_stat', attributes: ['int', 'ins'], modifier: 2},
     immunity: {rule: 'special_stat', attributes: ['for', 'luck'], modifier: 2},
-    dodge: {rule: 'special_stat', attributes: ['agi', 'ins'], modifier: 2},
+    dodge: {rule: 'dodge', attributes: ['agi', 'ins', 'has_reflex'], modifier: 2},
     full_dodge: {rule: 'full_dodge', attributes: ['dodge', 'str']},
     parry: {rule: 'max', attributes: ['blades', 'brawl', 'clubs']},
     riposte: {rule: 'max', attributes: ['blades', 'brawl', 'clubs']},
@@ -1189,6 +1193,21 @@ const multifunctions = {
     max: (arr) => Math.max(...arr),
     encumbered: (arr) => arr[0] > arr[1] || arr[2] >= 12 ? 'on' : '0',
     greater_than_or_equal: (arr) => arr[0] >= arr[1] ? 'on' : '0',
+    luck_uses: function(arr, divisor) {
+      let luck = arr[0];
+      let has_faith = arr[1];
+      let luck_uses = Math.floor(luck / divisor)
+      luck_uses = luck_uses + (has_faith > 0 ? 3 : 0);
+      return luck_uses;
+    },
+    dodge: function(arr, divisor) {
+      let agi = arr[0];
+      let ins = arr[1];
+      let has_reflex = arr[2];
+      let dodge = Math.floor((agi + ins) / divisor)
+      dodge = dodge + (has_reflex > 0 ? 10 : 0);
+      return dodge;
+    },
     prof: function(arr) {
         let stat_val = parseInt(arr[0]) || 0;
         let prof_mod = prof_mods[arr[1]];
@@ -1372,25 +1391,52 @@ const repeatingSum = (destinations, section, fields) => {
     }); 
 };
 
+const repeatingPresence = (destinations, section, fields, names) => {
+    if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(names)) names = [names.replace(/\s/g, '').split(',')];
+    getSectionIDs(`repeating_${section}`, idArray => {
+        const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
+        getAttrs([...attrArray], v => {
+            const checkValue = (section, id, field, name) => v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === `${name}` || 
+                                                             v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === getTranslationByKey(`${name}`) ? 1 : 0;
+            const output = {};
+            destinations.forEach((destination, index) => {
+                output[destination] = idArray.reduce((total, id) => total + checkValue(section, id, fields[index], names[index]), 0);
+            });
+            console.log('repeatingPresence: destinations: "' + destinations + '"; section: "' + section + '"; fields: "' + fields + '"; names: "' + names + '"; output: "' + JSON.stringify(output));
+            setAttrs(output);
+        }); 
+    }); 
+};
 
+
+/* armor point total */
 on('change:repeating_armor:armor_ap remove:repeating_armor', function() {
 	repeatingSum("armor_max","armor","armor_ap");
 });
 
-
+/* armor cp total */
 on('change:repeating_armor:armor_cp remove:repeating_armor', function() {
 	repeatingSum("armor_cp_total","armor","armor_cp");
 });
 
-
+/* weapon cp total */
 on('change:repeating_attack:attack_cp remove:repeating_attack', function() {
 	repeatingSum("attack_cp_total","attack","attack_cp");
 });
 
-
+/* gear cp total */
 on('change:repeating_gear:gear_cp remove:repeating_gear', function() {
 	repeatingSum("gear_cp_total","gear","gear_cp");
 });
+
+/* detect Faith special ability */
+on('change:repeating_abilities:ability_name remove:repeating_abilities', function() {  
+	repeatingPresence(["has_faith", "has_reflex"],"abilities",["ability_name", "ability_name"], ["faith", "reflex"]);
+});
+
+
 
 /* END OF REPEATING SUMS */
 
