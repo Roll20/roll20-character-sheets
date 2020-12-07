@@ -9,7 +9,7 @@ const fillShipStats = () => {
             data.ship_hp_max = data.ship_hp;
             Object.keys(data).forEach(key => {
                 //Might remove later. Unsure if desired feature.
-                if (!(["", 0, "0"].includes(v[key]))) delete data[key]; //Prevents changing Hull Type
+                if (!(["", 0, "0"].includes(v[key])) && v.hasOwnProperty(key)) delete data[key]; //Prevents changing Hull Type
             });
             mySetAttrs(data, v);
             calculateShipStats();

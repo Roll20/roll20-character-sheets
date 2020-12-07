@@ -14,43 +14,44 @@
 		const mancerData = getCharmancerData();
 		const mancerValues = mancerData["importer"].values;
 		let applyEnabled = true;
-	    let setText = {};
+	  let setText = {};
 
-	    // Verify the user entered a JSON in the textarea. If not, provide user feedabck.
-	    if (mancerValues.jsonData) {
-	    	const parsedData = JSON.parse(mancerValues.jsonData) || false;
-	    	setText[`import-feedback`] = "";
-	    	// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback 
-	    	if (parsedData) {
-	    		setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
-		      // Send the parsed data to the selected importer or let users know something went wrong 
-		      if (mancerValues.builder && mancerValues.builder === "Chummer") {
-				if (parsedData.characters && parsedData.characters.character) {
-					importChummer(parsedData.characters.character);
-		      	} else {
-					setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
+		// Verify the user entered a JSON in the textarea. If not, provide user feedabck.
+		if (mancerValues.jsonData) {
+			const parsedData = JSON.parse(mancerValues.jsonData) || false;
+		
+			setText[`import-feedback`] = "";
+			// There is a value in the textarea! Check to see if its a valid JSON. Provide users feeadback 
+			if (parsedData) {
+				setText[`import-feedback`] += `<p class="feedback">A valid JSON was imported for ${mancerValues.builder}.</p>`
+				// Send the parsed data to the selected importer or let users know something went wrong 
+				if (mancerValues.builder && mancerValues.builder === "Chummer") {
+			if (parsedData.characters && parsedData.characters.character) {
+				importChummer(parsedData.characters.character);
+					} else {
+				setText[`import-feedback`] += `<p class="warning">Parsed JSON is missing character data.</p>`;
+				applyEnabled = false
+					}
+				} else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
+					importHeroLab();
+					setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
+				} else {
+					setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
 					applyEnabled = false
-		      	}
-		      } else if (mancerValues.builder && mancerValues.builder === "Hero Lab") {
-		      	importHeroLab();
-		      	setText[`import-feedback`] += `<p class="warning">Coming Soon....</p>`;
-		      } else {
-		      	setText[`import-feedback`] += `<p class="warning">A character builder was not selected. Try changing your selection then change it back if needed.</p>`;
-		      	applyEnabled = false
-		      }
-		    } else {
-		      setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
-		      applyEnabled = false
-		    };
-	    } else {
-	    	 setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
-	    	 applyEnabled = false
-	    };
+				}
+			} else {
+				setText[`import-feedback`] += `<p class="warning"><span>The text imported is not a valid JSON. Verify the JSON is formatted correctly. Check the format at,</span> JSONLint.com.</p>`;
+				applyEnabled = false
+			};
+		} else {
+				setText[`import-feedback`] = `<p class="warning">No information was entered in the JSON text area.</p>`;
+				applyEnabled = false
+		};
 
-	    let buttonStatus = (applyEnabled) ? "" : "disabled";
-	    setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
+		let buttonStatus = (applyEnabled) ? "" : "disabled";
+		setText[`finish-button`] = `<button class="finish" type="finish" value="apply" data-i18n="apply" ${buttonStatus}>Apply</button>`;
 
-	    setCharmancerText(setText);
+		setCharmancerText(setText);
 	});
 
 	const chummerDirections = `<ol>
@@ -93,9 +94,7 @@
   };
 
 	//USEFUL FUNCTIONS
-	const capitialize = (string) => {
-		return string.charAt(0).toUpperCase() + string.slice(1);
-	};
+	const capitialize = (string) => string.charAt(0).toUpperCase() + string.slice(1)
 
 	const addFeedback = (attribute, value) => {
 		return `<p class="feedback"><strong>${capitialize(attribute)}:</strong> ${value} </p>`
@@ -109,14 +108,10 @@
 		return alphabeticalKeys
 	};
 
-	const getValInParen = (value) => {
-		return value.split("(")[1].split(")")[0];
-	};
+	const getValInParen = value => value.split("(")[1].split(")")[0];
 
-	const getArray = (array) => {
-		return Array.isArray(array) ? array : [ array ];
-	};
+	const getArray = array => Array.isArray(array) ? array : [ array ]
 
-	const getSplitNum = (value) => {
-		return value.split("/")[0];
-	}
+	const getSplitNum = value => value.split("/")[0]
+	
+	const checkForModifiedAttribute = value => value.includes("/") ? getSplitNum(value) : value

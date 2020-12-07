@@ -26,7 +26,7 @@ on("change:class", fillClassStats);
 attributes.forEach(attr => on(`change:${attr}_base change:${attr}_boosts`, () => calculateAttr(attr)));
 attributes.forEach(attr => on(`change:${attr} change:${attr}_bonus`, () => calculateMod(attr)));
 
-on("change:repeating_shells", function(eventInfo) {
+on("change:repeating_shells remove:repeating_shells", function(eventInfo) {
     if (eventInfo.sourceType === "player") {
         validateShells(eventInfo);
     }
@@ -41,7 +41,7 @@ on("change:homebrew_skill_list", () => getSectionIDs("repeating_weapons", valida
 
 on("change:strain change:strain_permanent", validateStrain);
 on("change:constitution", calculateMaxStrain);
-on("change:repeating_cyberware", calculateCyberwareStrain);
+on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);
 
 on("change:level", calculateSaves);
@@ -50,7 +50,7 @@ on([...effortAttributes, "repeating_psychic-skills:skill"].map(x => `change:${x}
 
 on("change:magic_committed_effort_current change:magic_committed_effort_scene change:magic_committed_effort_day change:magic_total_effort", calculateMagicEffort);
 
-on("change:ai_committed_processing_current change:ai_committed_processing_scene change:ai_committed_processing_day change:ai_extra_processing change:repeating_processing-nodes", calculateProcessing);
+on("change:ai_committed_processing_current change:ai_committed_processing_scene change:ai_committed_processing_day change:ai_extra_processing change:repeating_processing-nodes remove:repeating:processing_nodes", calculateProcessing);
 
 on("change:repeating_armor change:innate_ac remove:repeating_armor", calculateAC);
 
@@ -81,7 +81,7 @@ on([
 
 on("change:setting_super_type change:repeating_spells remove:repeating_spells " +
     "change:repeating_magic-skills remove:repeating_magic-skills " +
-    "change:skill_magic change:skill_magic2_name change:skill_magic2", buildMagicMenu);
+    "change:skill_know_magic change:skill_use_magic change:skill_fight change:skill_sunblade change:skill_magic2_name change:skill_magic2", buildMagicMenu);
 
 /* Repeating autofill */
 autofillSections.forEach(sName => {
