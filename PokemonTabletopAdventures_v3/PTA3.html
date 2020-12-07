@@ -983,556 +983,990 @@
 <script type="text/worker">
     // Handling Stat Changes
     on("change:ATK change:atkbonus sheet:opened", function () {
-        getAttrs(["ATK", "atkbonus"], function (values) {
-            let atk = parseInt(values.ATK) || 0;
-            let bonus = parseInt(values.atkbonus) || 0;
-            calcModFor("ATK", atk, bonus);
-        });
+      getAttrs(["ATK", "atkbonus"], function (values) {
+        let atk = parseInt(values.ATK) || 0;
+        let bonus = parseInt(values.atkbonus) || 0;
+        calcModFor("ATK", atk, bonus);
+      });
     });
     
     on("change:DEF change:defbonus sheet:opened", function () {
-        getAttrs(["DEF", "defbonus"], function (values) {
-            let def = parseInt(values.DEF) || 0;
-            let bonus = parseInt(values.defbonus) || 0;
-            calcModFor("DEF", def, bonus);
-        });
+      getAttrs(["DEF", "defbonus"], function (values) {
+        let def = parseInt(values.DEF) || 0;
+        let bonus = parseInt(values.defbonus) || 0;
+        calcModFor("DEF", def, bonus);
+      });
     });
     
     on("change:SPATK change:spatkbonus sheet:opened", function () {
-        getAttrs(["SPATK", "spatkbonus"], function (values) {
-            let spatk = parseInt(values.SPATK) || 0;
-            let bonus = parseInt(values.spatkbonus) || 0;
-            calcModFor("SPATK", spatk, bonus);
-        });
+      getAttrs(["SPATK", "spatkbonus"], function (values) {
+        let spatk = parseInt(values.SPATK) || 0;
+        let bonus = parseInt(values.spatkbonus) || 0;
+        calcModFor("SPATK", spatk, bonus);
+      });
     });
     
     on("change:SPDEF change:spdefbonus sheet:opened", function () {
-        getAttrs(["SPDEF", "spdefbonus"], function (values) {
-            let spdef = parseInt(values.SPDEF) || 0;
-            let bonus = parseInt(values.spdefbonus) || 0;
-            calcModFor("SPDEF", spdef, bonus);
-        });
+      getAttrs(["SPDEF", "spdefbonus"], function (values) {
+        let spdef = parseInt(values.SPDEF) || 0;
+        let bonus = parseInt(values.spdefbonus) || 0;
+        calcModFor("SPDEF", spdef, bonus);
+      });
     });
     
     on("change:SPD change:spdbonus sheet:opened", function () {
-        getAttrs(["SPD", "spdbonus"], function (values) {
-            let spd = parseInt(values.SPD) || 0;
-            let bonus = parseInt(values.spdbonus) || 0;
-            calcModFor("SPD", spd, bonus);
-        });
+      getAttrs(["SPD", "spdbonus"], function (values) {
+        let spd = parseInt(values.SPD) || 0;
+        let bonus = parseInt(values.spdbonus) || 0;
+        calcModFor("SPD", spd, bonus);
+      });
     });
     
     function calcModFor(ability, stat, bonus) {
-        const combined = stat + bonus;
-        const modifier = Math.floor(combined / 2);
-        const name = `${ability}MOD`;
-        const attrs = { [name]:  modifier}
-        if (ability == "SPD") attrs["movement"] = combined * 5;
-        setAttrs(attrs);
+      const combined = stat + bonus;
+      const modifier = Math.floor(combined / 2);
+      const name = `${ability}MOD`;
+      const attrs = { [name]: modifier };
+      if (ability == "SPD") attrs["movement"] = combined * 5;
+      setAttrs(attrs);
     }
     
     // Handling Colour Changes
-    types = ["bug", "dark", "dragon", "electric", "fairy", "fighting", "fire", "flying", "ghost", "grass", "ground", "ice", "normal", "poison", "psychic", "rock", "steel", "water"]
+    types = [
+      "bug",
+      "dark",
+      "dragon",
+      "electric",
+      "fairy",
+      "fighting",
+      "fire",
+      "flying",
+      "ghost",
+      "grass",
+      "ground",
+      "ice",
+      "normal",
+      "poison",
+      "psychic",
+      "rock",
+      "steel",
+      "water",
+    ];
     on("change:type1 sheet:opened", function (event) {
-        getAttrs(["type1"], function (values) {
-            var typeAttrs = {};
-            var selectedType = values.type1;
-            types.forEach((type) => {
-                if (type == selectedType) {
-                    typeAttrs["style-" + type] = "on";
-                } else {
-                    typeAttrs["style-" + type] = "off";
-                }
-            })
-            setAttrs(typeAttrs);
+      getAttrs(["type1"], function (values) {
+        var typeAttrs = {};
+        var selectedType = values.type1;
+        types.forEach((type) => {
+          if (type == selectedType) {
+            typeAttrs["style-" + type] = "on";
+          } else {
+            typeAttrs["style-" + type] = "off";
+          }
         });
+        setAttrs(typeAttrs);
+      });
     });
     
     on("change:repeating_moves:move_type", function (event) {
-        getAttrs(["repeating_moves_move_type"], function (values) {
-            var typeAttrs = {};
-            var selectedType = values.repeating_moves_move_type;
-            types.forEach((type) => {
-                if (type == selectedType) {
-                    typeAttrs["repeating_moves_style-" + type + "-move"] = "on";
-                } else {
-                    typeAttrs["repeating_moves_style-" + type + "-move"] = "off";
-                }
-            })
-            setAttrs(typeAttrs);
+      getAttrs(["repeating_moves_move_type"], function (values) {
+        var typeAttrs = {};
+        var selectedType = values.repeating_moves_move_type;
+        types.forEach((type) => {
+          if (type == selectedType) {
+            typeAttrs["repeating_moves_style-" + type + "-move"] = "on";
+          } else {
+            typeAttrs["repeating_moves_style-" + type + "-move"] = "off";
+          }
         });
+        setAttrs(typeAttrs);
+      });
     });
     
     // Handling Targeted Defense Changes
     defenses = ["", "Defense", "Special Defense", "Speed"];
     on("sheet:opened", function (eventInfo) {
-        getSectionIDs("repeating_moves", function (idArray) {
-            const categories = idArray.map(id => `repeating_moves_${id}_move_category`);
+      getSectionIDs("repeating_moves", function (idArray) {
+        const categories = idArray.map(
+          (id) => `repeating_moves_${id}_move_category`
+        );
     
-            getAttrs([...categories], function (values) {
-                const rows = categories.reduce((obj, rowName) => {
-                    const cat = parseInt(values[rowName]) || 0;
-                    const defense = defenses[cat];
+        getAttrs([...categories], function (values) {
+          const rows = categories.reduce((obj, rowName) => {
+            const cat = parseInt(values[rowName]) || 0;
+            const defense = defenses[cat];
     
-                    obj[rowName + '_defense'] = defense;
-                    return obj;
-                }, {});
-                if (rows) setAttrs(rows);
-            });
+            obj[rowName + "_defense"] = defense;
+            return obj;
+          }, {});
+          if (rows) setAttrs(rows);
         });
+      });
     });
     
     on("change:repeating_moves:move_category", function (event) {
-        getAttrs(["repeating_moves_move_name", "repeating_moves_move_category"], function (values) {
-            var attrs = {};
-            let cat = parseInt(values.repeating_moves_move_category) || 0;
-            attrs["repeating_moves_move_category_defense"] = defenses[cat];
-            setAttrs(attrs);
-        });
+      getAttrs(
+        ["repeating_moves_move_name", "repeating_moves_move_category"],
+        function (values) {
+          var attrs = {};
+          let cat = parseInt(values.repeating_moves_move_category) || 0;
+          attrs["repeating_moves_move_category_defense"] = defenses[cat];
+          setAttrs(attrs);
+        }
+      );
     });
     
     // Handling Move and Feature Usage
     on("clicked:repeating_moves:incrementmoveusage", function () {
-        getAttrs(["repeating_moves_move_usage"], function (values) {
-            const currentusage = +values.repeating_moves_move_usage || 0;
-            const newusage = currentusage + 1;
-            setAttrs({
-                repeating_moves_move_usage: newusage
-            });
+      getAttrs(["repeating_moves_move_usage"], function (values) {
+        const currentusage = +values.repeating_moves_move_usage || 0;
+        const newusage = currentusage + 1;
+        setAttrs({
+          repeating_moves_move_usage: newusage,
         });
+      });
     });
     
     on("clicked:repeating_moves:resetmoveusage", function () {
-        getAttrs(["repeating_moves_move_usage"], function (values) {
-            setAttrs({
-                repeating_moves_move_usage: 0
-            });
+      getAttrs(["repeating_moves_move_usage"], function (values) {
+        setAttrs({
+          repeating_moves_move_usage: 0,
         });
+      });
     });
     
     on("clicked:incrementoriginusage", function () {
-        getAttrs(["origin_usage"], function (values) {
-            const currentusage = +values.origin_usage || 0;
-            const newusage = currentusage + 1;
-            setAttrs({
-                origin_usage: newusage
-            });
+      getAttrs(["origin_usage"], function (values) {
+        const currentusage = +values.origin_usage || 0;
+        const newusage = currentusage + 1;
+        setAttrs({
+          origin_usage: newusage,
         });
+      });
     });
     
     on("clicked:resetoriginusage", function () {
-        getAttrs(["origin_usage"], function (values) {
-            setAttrs({
-                origin_usage: 0
-            });
+      getAttrs(["origin_usage"], function (values) {
+        setAttrs({
+          origin_usage: 0,
         });
+      });
     });
     
     on("clicked:repeating_features:incrementfeatureusage", function () {
-        getAttrs(["repeating_features_feature_usage"], function (values) {
-            const currentusage = +values.repeating_features_feature_usage || 0;
-            const newusage = currentusage + 1;
-            setAttrs({
-                repeating_features_feature_usage: newusage
-            });
+      getAttrs(["repeating_features_feature_usage"], function (values) {
+        const currentusage = +values.repeating_features_feature_usage || 0;
+        const newusage = currentusage + 1;
+        setAttrs({
+          repeating_features_feature_usage: newusage,
         });
+      });
     });
     
     on("clicked:repeating_features:resetfeatureusage", function () {
-        getAttrs(["repeating_features_feature_usage"], function (values) {
-            setAttrs({
-                repeating_features_feature_usage: 0
-            });
+      getAttrs(["repeating_features_feature_usage"], function (values) {
+        setAttrs({
+          repeating_features_feature_usage: 0,
         });
+      });
     });
     
     // Handling Move Effects
-    effects = ["Critical Hit", "put to Sleep", "Burned", "Confused", "Cursed", "Frozen", "Infatuated", "Paralyzed", "Poisoned", "Toxified", "Stunned", "Other"];
+    effects = [
+      "Critical Hit",
+      "put to Sleep",
+      "Burned",
+      "Confused",
+      "Cursed",
+      "Frozen",
+      "Infatuated",
+      "Paralyzed",
+      "Poisoned",
+      "Toxified",
+      "Stunned",
+      "Other",
+    ];
     on("sheet:opened", function (eventInfo) {
-        getSectionIDs("repeating_moves", function (idArray) {
-            const rowNames = idArray.map(id => `repeating_moves_${id}`);
-            const effect1s = idArray.map(id => `repeating_moves_${id}_move_effect1`);
-            const effect2s = idArray.map(id => `repeating_moves_${id}_move_effect2`);
+      getSectionIDs("repeating_moves", function (idArray) {
+        const rowNames = idArray.map((id) => `repeating_moves_${id}`);
+        const effect1s = idArray.map((id) => `repeating_moves_${id}_move_effect1`);
+        const effect2s = idArray.map((id) => `repeating_moves_${id}_move_effect2`);
     
-            getAttrs([...effect1s, ...effect2s], function (values) {
-                const rows = rowNames.reduce((obj, rowName) => {
-                    const index1 = parseInt(values[rowName + '_move_effect1']) || 99;
-                    const index2 = parseInt(values[rowName + '_move_effect2']) || 99;
+        getAttrs([...effect1s, ...effect2s], function (values) {
+          const rows = rowNames.reduce((obj, rowName) => {
+            const index1 = parseInt(values[rowName + "_move_effect1"]) || 99;
+            const index2 = parseInt(values[rowName + "_move_effect2"]) || 99;
     
-                    var name = "";
-                    if (index1 < effects.length) {
-                        name = effects[index1];
-                    }
-                    obj[rowName + '_move_effect1_name'] = name;
+            var name = "";
+            if (index1 < effects.length) {
+              name = effects[index1];
+            }
+            obj[rowName + "_move_effect1_name"] = name;
     
-                    name = "";
-                    if (index2 < effects.length) {
-                        name = effects[index2];
-                    }
-                    obj[rowName + '_move_effect2_name'] = name;
+            name = "";
+            if (index2 < effects.length) {
+              name = effects[index2];
+            }
+            obj[rowName + "_move_effect2_name"] = name;
     
-                    return obj;
-                }, {});
-                if (rows) setAttrs(rows);
-            });
+            return obj;
+          }, {});
+          if (rows) setAttrs(rows);
         });
+      });
     });
     
-    on("change:repeating_moves:move_effect1 change:repeating_moves:move_effect2", function (eventInfo) {
-        getAttrs(["repeating_moves_move_effect1", "repeating_moves_move_effect2"], function (values) {
+    on(
+      "change:repeating_moves:move_effect1 change:repeating_moves:move_effect2",
+      function (eventInfo) {
+        getAttrs(
+          ["repeating_moves_move_effect1", "repeating_moves_move_effect2"],
+          function (values) {
             let index1 = parseInt(values.repeating_moves_move_effect1) || 99;
             let index2 = parseInt(values.repeating_moves_move_effect2) || 99;
     
             var effectNames = {};
             var name = "";
             if (index1 < effects.length) {
-                name = effects[index1];
+              name = effects[index1];
             }
             effectNames["repeating_moves_move_effect1_name"] = name;
     
             name = "";
             if (index2 < effects.length) {
-                name = effects[index2];
+              name = effects[index2];
             }
             effectNames["repeating_moves_move_effect2_name"] = name;
     
             if (effectNames) setAttrs(effectNames);
-        });
-    });
+          }
+        );
+      }
+    );
     
     // Handling Move Damage Bonuses
     categoryDamageModifiers = ["", "ATKMOD", "SPATKMOD", ""];
     on("change:ATKMOD change:SPATKMOD sheet:opened", function (eventInfo) {
-        getSectionIDs("repeating_moves", function (idArray) {
-            const rowNames = idArray.map(id => `repeating_moves_${id}`);
-            const categories = idArray.map(id => `repeating_moves_${id}_move_category`);
-            const extraBonuses = idArray.map(id => `repeating_moves_${id}_move_damagebonus`);
-            const stabBonuses = idArray.map(id => `repeating_moves_${id}_move_stabbonus`);
-            const diceNumbers = idArray.map(id => `repeating_moves_${id}_move_dicenumber`);
-            const damageDice = idArray.map(id => `repeating_moves_${id}_damage_dice`);
+      getSectionIDs("repeating_moves", function (idArray) {
+        const rowNames = idArray.map((id) => `repeating_moves_${id}`);
+        const categories = idArray.map(
+          (id) => `repeating_moves_${id}_move_category`
+        );
+        const extraBonuses = idArray.map(
+          (id) => `repeating_moves_${id}_move_damagebonus`
+        );
+        const stabBonuses = idArray.map(
+          (id) => `repeating_moves_${id}_move_stabbonus`
+        );
+        const diceNumbers = idArray.map(
+          (id) => `repeating_moves_${id}_move_dicenumber`
+        );
+        const damageDice = idArray.map((id) => `repeating_moves_${id}_damage_dice`);
     
-            getAttrs([`ATKMOD`, `SPATKMOD`, ...categories, ...extraBonuses, ...stabBonuses, ...diceNumbers, ...damageDice], function (values) {
-                const rows = rowNames.reduce((obj, rowName) => {
-                    const category = parseInt(values[rowName + `_move_category`]) || 0;
-                    const extra = parseInt(values[rowName + '_move_damagebonus']) || 0;
-                    const stab = parseInt(values[rowName + '_move_stabbonus']) || 0;
-                    const dice = parseInt(values[rowName + '_move_dicenumber']) || 0;
-                    const points = parseInt(values[rowName + '_damage_dice']) || 0;
-
-                    const categoryModifier = parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
-                    const total = categoryModifier + extra + stab;
+        getAttrs(
+          [
+            `ATKMOD`,
+            `SPATKMOD`,
+            ...categories,
+            ...extraBonuses,
+            ...stabBonuses,
+            ...diceNumbers,
+            ...damageDice,
+          ],
+          function (values) {
+            const rows = rowNames.reduce((obj, rowName) => {
+              const category = parseInt(values[rowName + `_move_category`]) || 0;
+              const extra = parseInt(values[rowName + "_move_damagebonus"]) || 0;
+              const stab = parseInt(values[rowName + "_move_stabbonus"]) || 0;
+              const dice = parseInt(values[rowName + "_move_dicenumber"]) || 0;
+              const points = parseInt(values[rowName + "_damage_dice"]) || 0;
     
-                    var display = `${total}`;
-                    if (dice > 0) display = `${dice}d${points} ${total < 0 ? "" : "+ "}${total}`;
+              const categoryModifier =
+                parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
+              const total = categoryModifier + extra + stab;
     
-                    obj[rowName + '_move_totaldamage'] = total;
-                    obj[rowName + '_move_totaldamage_display'] = display;
-                    return obj;
-                }, {});
-                if (rows) setAttrs(rows);
-            });
-        });
+              var display = `${total}`;
+              if (dice > 0)
+                display = `${dice}d${points} ${total < 0 ? "" : "+ "}${total}`;
+    
+              obj[rowName + "_move_totaldamage"] = total;
+              obj[rowName + "_move_totaldamage_display"] = display;
+              return obj;
+            }, {});
+            if (rows) setAttrs(rows);
+          }
+        );
+      });
     });
     
-    on("change:repeating_moves:move_category change:repeating_moves:move_damagebonus change:repeating_moves:move_stabbonus change:repeating_moves:move_dicenumber change:repeating_moves:damage_dice", function (eventInfo) {
-        getAttrs(["ATKMOD", "SPATKMOD", "repeating_moves_move_category", "repeating_moves_move_damagebonus", "repeating_moves_move_stabbonus", "repeating_moves_move_dicenumber", "repeating_moves_damage_dice"], function (values) {
+    on(
+      "change:repeating_moves:move_category change:repeating_moves:move_damagebonus change:repeating_moves:move_stabbonus change:repeating_moves:move_dicenumber change:repeating_moves:damage_dice",
+      function (eventInfo) {
+        getAttrs(
+          [
+            "ATKMOD",
+            "SPATKMOD",
+            "repeating_moves_move_category",
+            "repeating_moves_move_damagebonus",
+            "repeating_moves_move_stabbonus",
+            "repeating_moves_move_dicenumber",
+            "repeating_moves_damage_dice",
+          ],
+          function (values) {
             const category = parseInt(values.repeating_moves_move_category) || 0;
             const extra = parseInt(values.repeating_moves_move_damagebonus) || 0;
             const stab = parseInt(values.repeating_moves_move_stabbonus) || 0;
             const dice = parseInt(values.repeating_moves_move_dicenumber) || 0;
             const points = parseInt(values.repeating_moves_damage_dice) || 0;
     
-            const categoryModifier = parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
+            const categoryModifier =
+              parseInt(values[`${categoryDamageModifiers[category]}`]) || 0;
             const total = categoryModifier + extra + stab;
     
             var display = `${total}`;
-            if (dice > 0) display = `${dice}d${points} ${total < 0 ? "" : "+ "}${total}`;
+            if (dice > 0)
+              display = `${dice}d${points} ${total < 0 ? "" : "+ "}${total}`;
     
             setAttrs({
-                'repeating_moves_move_totaldamage': total,
-                'repeating_moves_move_totaldamage_display': display
+              repeating_moves_move_totaldamage: total,
+              repeating_moves_move_totaldamage_display: display,
             });
-        });
-    });
+          }
+        );
+      }
+    );
     
     // Handling Move Accuracy Bonuses
     categoryAccuracyModifiers = ["", "ATKMOD", "SPATKMOD", "SPDMOD"];
-    on("change:ATKMOD change:SPATKMOD change:SPDMOD sheet:opened", function (eventInfo) {
+    on(
+      "change:ATKMOD change:SPATKMOD change:SPDMOD sheet:opened",
+      function (eventInfo) {
         getSectionIDs("repeating_moves", function (idArray) {
-            const rowNames = idArray.map(id => `repeating_moves_${id}`);
-            const categories = idArray.map(id => `repeating_moves_${id}_move_category`);
-            const accuracyMods = idArray.map(id => `repeating_moves_${id}_move_acmod`);
+          const rowNames = idArray.map((id) => `repeating_moves_${id}`);
+          const categories = idArray.map(
+            (id) => `repeating_moves_${id}_move_category`
+          );
+          const accuracyMods = idArray.map(
+            (id) => `repeating_moves_${id}_move_acmod`
+          );
     
-            getAttrs([`ATKMOD`, `SPATKMOD`, `SPDMOD`, ...categories, ...accuracyMods], function (values) {
-                const rows = rowNames.reduce((obj, rowName) => {
-                    const category = parseInt(values[rowName + `_move_category`]) || 0;
-                    const accuracy = parseInt(values[rowName + `_move_acmod`]) || 0;
+          getAttrs(
+            [`ATKMOD`, `SPATKMOD`, `SPDMOD`, ...categories, ...accuracyMods],
+            function (values) {
+              const rows = rowNames.reduce((obj, rowName) => {
+                const category = parseInt(values[rowName + `_move_category`]) || 0;
+                const accuracy = parseInt(values[rowName + `_move_acmod`]) || 0;
     
-                    const categoryModifier = parseInt(values[`${categoryAccuracyModifiers[category]}`]) || 0;
-                    const total = categoryModifier + accuracy;
-                    const roll = `d20 ${total < 0 ? "" : "+ "}${total}`;
+                const categoryModifier =
+                  parseInt(values[`${categoryAccuracyModifiers[category]}`]) || 0;
+                const total = categoryModifier + accuracy;
+                const roll = `d20 ${total < 0 ? "" : "+ "}${total}`;
     
-                    obj[rowName + '_move_totalaccuracy'] = total;
-                    obj[rowName + '_move_totalaccuracy_display'] = roll;
-                    return obj;
-                }, {});
-                if (rows) setAttrs(rows);
-            });
+                obj[rowName + "_move_totalaccuracy"] = total;
+                obj[rowName + "_move_totalaccuracy_display"] = roll;
+                return obj;
+              }, {});
+              if (rows) setAttrs(rows);
+            }
+          );
         });
-    });
+      }
+    );
     
-    on("change:repeating_moves:move_category change:repeating_moves:move_acmod", function (eventInfo) {
-        getAttrs([`ATKMOD`, `SPATKMOD`, `SPDMOD`, `repeating_moves_move_category`, `repeating_moves_move_acmod`], function (values) {
+    on(
+      "change:repeating_moves:move_category change:repeating_moves:move_acmod",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `ATKMOD`,
+            `SPATKMOD`,
+            `SPDMOD`,
+            `repeating_moves_move_category`,
+            `repeating_moves_move_acmod`,
+          ],
+          function (values) {
             const category = parseInt(values.repeating_moves_move_category) || 0;
             const accuracy = parseInt(values.repeating_moves_move_acmod) || 0;
     
-            const categoryModifier = parseInt(values[`${categoryAccuracyModifiers[category]}`]) || 0;
+            const categoryModifier =
+              parseInt(values[`${categoryAccuracyModifiers[category]}`]) || 0;
             const total = categoryModifier + accuracy;
-            const roll = `d20 ${total < 0 ? "" : "+ "}${total}`
+            const roll = `d20 ${total < 0 ? "" : "+ "}${total}`;
     
             setAttrs({
-                'repeating_moves_move_totalaccuracy': total,
-                'repeating_moves_move_totalaccuracy_display': roll
+              repeating_moves_move_totalaccuracy: total,
+              repeating_moves_move_totalaccuracy_display: roll,
             });
-        });
-    });
+          }
+        );
+      }
+    );
     
     // Skills Sheet Workers
-
+    
     // Acrobatics
-    on("change:SPDMOD change:acrobaticstalent1 change:acrobaticstalent2 change:acrobatics sheet:opened", function (eventInfo) {
-        getAttrs([`SPDMOD`, `acrobaticstalent1`, `acrobaticstalent2`, `acrobatics`, `acrobatics_total`], function (values) {
+    on(
+      "change:SPDMOD change:acrobaticstalent1 change:acrobaticstalent2 change:acrobatics sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDMOD`,
+            `acrobaticstalent1`,
+            `acrobaticstalent2`,
+            `acrobatics`,
+            `acrobatics_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDMOD) || 0;
             const talent1 = parseInt(values.acrobaticstalent1) || 0;
             const talent2 = parseInt(values.acrobaticstalent2) || 0;
             const total = parseInt(values.acrobatics_total) || -1;
             const userBonus = parseInt(values.acrobatics) || 0;
-
-            assignSkillTotal('acrobatics_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "acrobatics_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Athletics
-    on("change:ATKMOD change:athleticstalent1 change:athleticstalent2 change:athletics sheet:opened", function (eventInfo) {
-        getAttrs([`ATKMOD`, `athleticstalent1`, `athleticstalent2`, `athletics`, `athletics_total`], function (values) {
+    on(
+      "change:ATKMOD change:athleticstalent1 change:athleticstalent2 change:athletics sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `ATKMOD`,
+            `athleticstalent1`,
+            `athleticstalent2`,
+            `athletics`,
+            `athletics_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.ATKMOD) || 0;
             const talent1 = parseInt(values.athleticstalent1) || 0;
             const talent2 = parseInt(values.athleticstalent2) || 0;
             const total = parseInt(values.athletics_total) || -1;
             const userBonus = parseInt(values.athletics) || 0;
-
-            assignSkillTotal('athletics_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "athletics_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Bluff/Deception
-    on("change:SPDEFMOD change:blufftalent1 change:blufftalent2 change:bluff sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `blufftalent1`, `blufftalent2`, `bluff`, `bluff_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:blufftalent1 change:blufftalent2 change:bluff sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [`SPDEFMOD`, `blufftalent1`, `blufftalent2`, `bluff`, `bluff_total`],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.blufftalent1) || 0;
             const talent2 = parseInt(values.blufftalent2) || 0;
             const total = parseInt(values.bluff_total) || -1;
             const userBonus = parseInt(values.bluff) || 0;
-
-            assignSkillTotal('bluff_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "bluff_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Concentration
-    on("change:DEFMOD change:concentrationtalent1 change:concentrationtalent2 change:concentration sheet:opened", function (eventInfo) {
-        getAttrs([`DEFMOD`, `concentrationtalent1`, `concentrationtalent2`, `concentration`, `concentration_total`], function (values) {
+    on(
+      "change:DEFMOD change:concentrationtalent1 change:concentrationtalent2 change:concentration sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `DEFMOD`,
+            `concentrationtalent1`,
+            `concentrationtalent2`,
+            `concentration`,
+            `concentration_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.DEFMOD) || 0;
             const talent1 = parseInt(values.concentrationtalent1) || 0;
             const talent2 = parseInt(values.concentrationtalent2) || 0;
             const total = parseInt(values.concentration_total) || -1;
             const userBonus = parseInt(values.concentration) || 0;
-
-            assignSkillTotal('concentration_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "concentration_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Constitution
-    on("change:DEFMOD change:constitutiontalent1 change:constitutiontalent2 change:constitution sheet:opened", function (eventInfo) {
-        getAttrs([`DEFMOD`, `constitutiontalent1`, `constitutiontalent2`, `constitution`, `constitution_total`], function (values) {
+    on(
+      "change:DEFMOD change:constitutiontalent1 change:constitutiontalent2 change:constitution sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `DEFMOD`,
+            `constitutiontalent1`,
+            `constitutiontalent2`,
+            `constitution`,
+            `constitution_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.DEFMOD) || 0;
             const talent1 = parseInt(values.constitutiontalent1) || 0;
             const talent2 = parseInt(values.constitutiontalent2) || 0;
             const total = parseInt(values.constitution_total) || -1;
             const userBonus = parseInt(values.constitution) || 0;
-
-            assignSkillTotal('constitution_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "constitution_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Diplomacy/Persuasion
-    on("change:SPDEFMOD change:diplomacytalent1 change:diplomacytalent2 change:diplomacy sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `diplomacytalent1`, `diplomacytalent2`, `diplomacy`, `diplomacy_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:diplomacytalent1 change:diplomacytalent2 change:diplomacy sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDEFMOD`,
+            `diplomacytalent1`,
+            `diplomacytalent2`,
+            `diplomacy`,
+            `diplomacy_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.diplomacytalent1) || 0;
             const talent2 = parseInt(values.diplomacytalent2) || 0;
             const total = parseInt(values.diplomacy_total) || -1;
             const userBonus = parseInt(values.diplomacy) || 0;
-
-            assignSkillTotal('diplomacy_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "diplomacy_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Engineering/Operation
-    on("change:SPATKMOD change:engineeringtalent1 change:engineeringtalent2 change:engineering sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `engineeringtalent1`, `engineeringtalent2`, `engineering`, `engineering_total`], function (values) {
+    on(
+      "change:SPATKMOD change:engineeringtalent1 change:engineeringtalent2 change:engineering sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPATKMOD`,
+            `engineeringtalent1`,
+            `engineeringtalent2`,
+            `engineering`,
+            `engineering_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.engineeringtalent1) || 0;
             const talent2 = parseInt(values.engineeringtalent2) || 0;
             const total = parseInt(values.engineering_total) || -1;
             const userBonus = parseInt(values.engineering) || 0;
-
-            assignSkillTotal('engineering_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "engineering_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // History
-    on("change:SPATKMOD change:historytalent1 change:historytalent2 change:history sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `historytalent1`, `historytalent2`, `history`, `history_total`], function (values) {
+    on(
+      "change:SPATKMOD change:historytalent1 change:historytalent2 change:history sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPATKMOD`,
+            `historytalent1`,
+            `historytalent2`,
+            `history`,
+            `history_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.historytalent1) || 0;
             const talent2 = parseInt(values.historytalent2) || 0;
             const total = parseInt(values.history_total) || -1;
             const userBonus = parseInt(values.history) || 0;
-
-            assignSkillTotal('history_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "history_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Insight
-    on("change:SPDEFMOD change:insighttalent1 change:insighttalent2 change:insight sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `insighttalent1`, `insighttalent2`, `insight`, `insight_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:insighttalent1 change:insighttalent2 change:insight sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDEFMOD`,
+            `insighttalent1`,
+            `insighttalent2`,
+            `insight`,
+            `insight_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.insighttalent1) || 0;
             const talent2 = parseInt(values.insighttalent2) || 0;
             const total = parseInt(values.insight_total) || -1;
             const userBonus = parseInt(values.insight) || 0;
-
-            assignSkillTotal('insight_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "insight_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Investigate
-    on("change:SPATKMOD change:investigatetalent1 change:investigatetalent2 change:investigate sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `investigatetalent1`, `investigatetalent2`, `investigate`, `investigate_total`], function (values) {
+    on(
+      "change:SPATKMOD change:investigatetalent1 change:investigatetalent2 change:investigate sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPATKMOD`,
+            `investigatetalent1`,
+            `investigatetalent2`,
+            `investigate`,
+            `investigate_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.investigatetalent1) || 0;
             const talent2 = parseInt(values.investigatetalent2) || 0;
             const total = parseInt(values.investigate_total) || -1;
             const userBonus = parseInt(values.investigate) || 0;
-
-            assignSkillTotal('investigate_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "investigate_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Medicine
-    on("change:SPATKMOD change:medicinetalent1 change:medicinetalent2 change:medicine sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `medicinetalent1`, `medicinetalent2`, `medicine`, `medicine_total`], function (values) {
+    on(
+      "change:SPATKMOD change:medicinetalent1 change:medicinetalent2 change:medicine sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPATKMOD`,
+            `medicinetalent1`,
+            `medicinetalent2`,
+            `medicine`,
+            `medicine_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.medicinetalent1) || 0;
             const talent2 = parseInt(values.medicinetalent2) || 0;
             const total = parseInt(values.medicine_total) || -1;
             const userBonus = parseInt(values.medicine) || 0;
-
-            assignSkillTotal('medicine_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "medicine_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Nature
-    on("change:SPATKMOD change:naturetalent1 change:naturetalent2 change:nature sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `naturetalent1`, `naturetalent2`, `nature`, `nature_total`], function (values) {
+    on(
+      "change:SPATKMOD change:naturetalent1 change:naturetalent2 change:nature sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [`SPATKMOD`, `naturetalent1`, `naturetalent2`, `nature`, `nature_total`],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.naturetalent1) || 0;
             const talent2 = parseInt(values.naturetalent2) || 0;
             const total = parseInt(values.nature_total) || -1;
             const userBonus = parseInt(values.nature) || 0;
-
-            assignSkillTotal('nature_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "nature_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Perception
-    on("change:SPDEFMOD change:perceptiontalent1 change:perceptiontalent2 change:perception sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `perceptiontalent1`, `perceptiontalent2`, `perception`, `perception_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:perceptiontalent1 change:perceptiontalent2 change:perception sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDEFMOD`,
+            `perceptiontalent1`,
+            `perceptiontalent2`,
+            `perception`,
+            `perception_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.perceptiontalent1) || 0;
             const talent2 = parseInt(values.perceptiontalent2) || 0;
             const total = parseInt(values.perception_total) || -1;
             const userBonus = parseInt(values.perception) || 0;
-
-            assignSkillTotal('perception_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "perception_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Perform
-    on("change:SPDEFMOD change:performtalent1 change:performtalent2 change:perform sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `performtalent1`, `performtalent2`, `perform`, `perform_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:performtalent1 change:performtalent2 change:perform sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDEFMOD`,
+            `performtalent1`,
+            `performtalent2`,
+            `perform`,
+            `perform_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.performtalent1) || 0;
             const talent2 = parseInt(values.performtalent2) || 0;
             const total = parseInt(values.perform_total) || -1;
             const userBonus = parseInt(values.perform) || 0;
-
-            assignSkillTotal('perform_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "perform_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Pokémon Handling
-    on("change:SPDEFMOD change:handlingtalent1 change:handlingtalent2 change:handling sheet:opened", function (eventInfo) {
-        getAttrs([`SPDEFMOD`, `handlingtalent1`, `handlingtalent2`, `handling`, `handling_total`], function (values) {
+    on(
+      "change:SPDEFMOD change:handlingtalent1 change:handlingtalent2 change:handling sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDEFMOD`,
+            `handlingtalent1`,
+            `handlingtalent2`,
+            `handling`,
+            `handling_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDEFMOD) || 0;
             const talent1 = parseInt(values.handlingtalent1) || 0;
             const talent2 = parseInt(values.handlingtalent2) || 0;
             const total = parseInt(values.handling_total) || -1;
             const userBonus = parseInt(values.handling) || 0;
-
-            assignSkillTotal('handling_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "handling_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Programming
-    on("change:SPATKMOD change:programmingtalent1 change:programmingtalent2 change:programming sheet:opened", function (eventInfo) {
-        getAttrs([`SPATKMOD`, `programmingtalent1`, `programmingtalent2`, `programming`, `programming_total`], function (values) {
+    on(
+      "change:SPATKMOD change:programmingtalent1 change:programmingtalent2 change:programming sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPATKMOD`,
+            `programmingtalent1`,
+            `programmingtalent2`,
+            `programming`,
+            `programming_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPATKMOD) || 0;
             const talent1 = parseInt(values.programmingtalent1) || 0;
             const talent2 = parseInt(values.programmingtalent2) || 0;
             const total = parseInt(values.programming_total) || -1;
             const userBonus = parseInt(values.programming) || 0;
-
-            assignSkillTotal('programming_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "programming_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Sleight of Hand
-    on("change:SPDMOD change:sleightofhandtalent1 change:sleightofhandtalent2 change:sleightofhand sheet:opened", function (eventInfo) {
-        getAttrs([`SPDMOD`, `sleightofhandtalent1`, `sleightofhandtalent2`, `sleightofhand`, `sleightofhand_total`], function (values) {
+    on(
+      "change:SPDMOD change:sleightofhandtalent1 change:sleightofhandtalent2 change:sleightofhand sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDMOD`,
+            `sleightofhandtalent1`,
+            `sleightofhandtalent2`,
+            `sleightofhand`,
+            `sleightofhand_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDMOD) || 0;
             const talent1 = parseInt(values.sleightofhandtalent1) || 0;
             const talent2 = parseInt(values.sleightofhandtalent2) || 0;
             const total = parseInt(values.sleightofhand_total) || -1;
             const userBonus = parseInt(values.sleightofhand) || 0;
-
-            assignSkillTotal('sleightofhand_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "sleightofhand_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Stealth
-    on("change:SPDMOD change:stealthtalent1 change:stealthtalent2 change:stealth sheet:opened", function (eventInfo) {
-        getAttrs([`SPDMOD`, `stealthtalent1`, `stealthtalent2`, `stealth`, `stealth_total`], function (values) {
+    on(
+      "change:SPDMOD change:stealthtalent1 change:stealthtalent2 change:stealth sheet:opened",
+      function (eventInfo) {
+        getAttrs(
+          [
+            `SPDMOD`,
+            `stealthtalent1`,
+            `stealthtalent2`,
+            `stealth`,
+            `stealth_total`,
+          ],
+          function (values) {
             const stat = parseInt(values.SPDMOD) || 0;
             const talent1 = parseInt(values.stealthtalent1) || 0;
             const talent2 = parseInt(values.stealthtalent2) || 0;
             const total = parseInt(values.stealth_total) || -1;
             const userBonus = parseInt(values.stealth) || 0;
-
-            assignSkillTotal('stealth_total', stat, talent1, talent2, total, userBonus);
-        });
-    });
-
+    
+            assignSkillTotal(
+              "stealth_total",
+              stat,
+              talent1,
+              talent2,
+              total,
+              userBonus
+            );
+          }
+        );
+      }
+    );
+    
     // Capture
     on("change:SPDMOD change:capture sheet:opened", function (eventInfo) {
       getAttrs([`SPDMOD`, `capture_total`], function (values) {
@@ -1542,13 +1976,21 @@
         assignSkillTotal("capture_total", stat, 0, 0, total, 0);
       });
     });
-
-    function assignSkillTotal(skillName, stat, leftTalent, rightTalent, oldTotal, userBonus) {
-        const talentAccumulator = leftTalent + rightTalent == 4 ? 1 : 0;
-        const talent = leftTalent + rightTalent + talentAccumulator;
-
-        const newBonus = stat + talent + userBonus;
-        const attrs = { [skillName]: newBonus };
-        if (newBonus != oldTotal) setAttrs(attrs);
+    
+    function assignSkillTotal(
+      skillName,
+      stat,
+      leftTalent,
+      rightTalent,
+      oldTotal,
+      userBonus
+    ) {
+      const talentAccumulator = leftTalent + rightTalent == 4 ? 1 : 0;
+      const talent = leftTalent + rightTalent + talentAccumulator;
+    
+      const newBonus = stat + talent + userBonus;
+      const attrs = { [skillName]: newBonus };
+      if (newBonus != oldTotal) setAttrs(attrs);
     }
+    
 </script>
