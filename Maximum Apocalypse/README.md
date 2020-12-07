@@ -27,6 +27,7 @@ I'm using this project as a way to become familiar with the mechanics.
 
 - Fix weapon DC field to accept letters
 - Change weapon trait field font to match abilities & gear (more room for text)
+- Add buttons for defense & build/repair rolls
 - Add button for weapon attack and damage rolls
 - Default proficiency roll prompt to disadvantage for non-proficient skills
 - Implement Disadvantage to all rolls when Emaciated
