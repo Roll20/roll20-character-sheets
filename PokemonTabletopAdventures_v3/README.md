@@ -7,6 +7,10 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Dec 7, 2020
+
+- Added a Capture Pokemon skill to make life easier for everyone.
+
 ### Nov 28, 2020
 - Added support for temporary bonuses!
 
