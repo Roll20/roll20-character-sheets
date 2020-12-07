@@ -10,6 +10,7 @@ https://discord.gg/F24Ka8E
 ### Dec 7, 2020
 
 - Added a Capture Pokemon skill to make life easier for everyone.
+- Added generic attribute checks - click on the modifier values to roll them.
 
 ### Nov 28, 2020
 - Added support for temporary bonuses!
