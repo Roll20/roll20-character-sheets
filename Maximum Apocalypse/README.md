@@ -9,18 +9,46 @@ I'm using this project as a way to become familiar with the mechanics.
 ## Usage Notes
 
 - Structure very close to to core rulebook
-- Deviations implemented to provide enough room for Special Ability and Gear descriptions
+- Automatically calculates all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
+- Roll buttons for stats, skills & special stats
+- Roll buttons query for 0-3 advantages/disadvantages & implement advantage/disadvantage effects
+- Roll template indicates level & degree of success
+- Tick the "Threshold modifier prompt on every roll" checkbox to specify misc. threshold modifer for subsequent rolls
 - Drop down selections for archetypes, apocalypse & skill proficiencies
+- Initiative includes modifiers from being encumbered, shaken, acute, starving & emaciated
+- Temporary initiative modifier field for situational special ability effects 
+- Faith & Reflex ability benefits automatically calculated
 - Special Ability and Gear descriptions can be expanded/contracted to see the full text when needed
-- The sheet will automatically calculate all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
-- Initiative includes modifiers from being encumbered, shaken, acute, starving & emaciated.
 - Hunger conditions will highlight in red when active
+- Starving condition will apply -10 modifier to base stats (modifier indicator will appear next to base stats)
+- Structure deviations from core rulebook implemented to provide enough room for Special Ability and Gear descriptions
 
 ## Planned enhancements
 
-- Add roll buttons with advantage/disadvantage modifier entered by player.
+- Default proficiency roll prompt to disadvantage for non-proficient skills
+- Implement Disadvantage to all rolls when Emaciated
+- Implement special ability conditional modifier roll queries
 
-## Change Log 
+## Change Log
+
+### December 7th 2020 v3.0
+
+- Added roll buttons for stats, skills & special stats
+- Roll formulas include query for 0-3 advantages/disadvantages
+- Dice rolled will take into account advantages/disadvantages (roll 'tens' dice twice & keep/lose the lowest)
+- More than one advantage will adjust success threshold targets
+- More than one disadvantage will raise the number degrees of success required
+- Roll template showing:
+  - Proficiency (for skill rolls)
+  - Advantage/Disadvantage modifier
+  - Normal, Great & Amazing success threshold targets
+  - The dice roll with calculated outcome
+  - Degrees of success (where not failure)
+- Player can activate an additional roll query to specify other threshold modifiers
+- Temporary modifier field for Initiative
+- Character with the "Faith" special ability will gain 3 luck uses
+- Character with the "Reflex" special ability will gain 10 to their Dodge threshold
+- Starving condition will apply -10 modifier to base stats (modifier indicator will appear next to base stats)
 
 ### November 26th 2020 v2.0
 
