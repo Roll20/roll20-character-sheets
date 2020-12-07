@@ -12,6 +12,7 @@ https://discord.gg/F24Ka8E
 
 - Added a Capture Pokemon skill to make life easier for everyone.
 - Added generic attribute checks - click on the modifier values to roll them.
+- Added a hidden attribute for use in initiative checks: `initiative-tie-breaker` which rolls a d20 when accessed.
 - Ran the code through the Prettifier linter to ensure we're not missing any gaps - this kind of messes up the formatting but it should at least standardise it from now on!
 
 ### Nov 28, 2020
