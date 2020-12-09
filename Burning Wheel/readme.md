@@ -2,7 +2,7 @@
 
 This sheet is designed for use with the Burning Wheel system written by Luke Crane and produced with permission for use on Roll20. Much of the Character Burner process has been enhanced with auto calculating values and many of the final results translate to the rest of the sheet.
 
-Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Ability names in order to make use of the roll template. In the roll query you'll be asked for a Help, FoRKs and other Advantages (depending on the Ability), Artha dice (from Persona or Deeds expenditure) which add to the roll but don't compare to the Obs difficulty, and the base Obstacle of the test. The semi-hidden star `✦` symbol to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode.
+Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Ability names in order to make use of the roll template. In the roll query you'll be asked for a Help, FoRKs and other Advantages (depending on the Ability), Artha dice (from Persona or Deeds expenditure) which add to the roll but don't compare to the Obs difficulty, and the base Obstacle of the test. The 4-point star `✦` symbol to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode.
 
 Enjoy!
 
@@ -15,6 +15,7 @@ Enjoy!
 * The 'Magic' tab can be used to put your all spells and songs in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also. All stats and attribute can also be taxed from this tab.
 * The 'Journal' tab can be used to track old beliefs and instinct, as well as trait votes, and other campaign notes and miscellany.
 * The 'Rogues' tab can be used for tracking PC bodyguards and animal companions, multiple NPCs within an organization, or simple creature stat-blocks as presented in BWG pp 565-571.
+* A 'Die of Fate' button on multiple tabs that simply rolls a d6 and nicely displays the result.
 
 ### Notes
 For the best user experience we recommend that you install the two open-license fonts [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) and [Open Sans](https://fonts.google.com/specimen/Open+Sans).
@@ -35,6 +36,9 @@ Update by Seraaron (147454) with direction from Luke Crane.
 * Changed the 'You are Incapacitated' error message to 'You may be Incapacitated', so that things like 0 Resources can still be rolled with the aid of cash dice.
 * Added a new 'Journal' tab to store old beliefs, instincts, and traits (with a trait vote tracker), and to keep additional campaign notes.
 * Added repeating armor and weapon segments. (Minor destructive change, since this replaces the last weapon slot for melee and ranged, but these two slots were added recently in version 2.2, so few very current users are likely to be affected).
+* Added new 'Die of Fate' macro buttons, which simply roll a d6 and display red green or yellow depending on the result. One button appears on the Skills, Gear, Magic, and Rogues tab respectively to reduce page flipping when the player needs a DoF.
+* Fixed 'delete' and 'move' overlay visual bug for repeating segments, though this fix now results in them both being on the left of every element.
+* Slightly fixed font color discrepancies.
 * Updated preview image.
 
 ## v2.3 (2020-11-20)
