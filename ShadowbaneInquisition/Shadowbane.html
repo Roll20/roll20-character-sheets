@@ -1690,7 +1690,7 @@
 					<option value='-10' >Long Range (-10)</option>
 					<option value='-30' >Extreme Range (-30)</option>
 			  </select>
-				<button class='equipment_ranged_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{roll=[[floor(( [[@{BS} + @{BS_advancement} + @{R_weapon_trained} - 20 + @{R_weapon_mod1}]] + [[?{Attack Type|Standard (+10),+10 | Burst (+0),+0 | Auto (-10),-10 | Called Shot (-20),-20 | Suppressing Fire (-20),-20} + ?{Aim | No aim (+0),+0 | Half aim (+10),+10| Full aim (+20),+20} + ?{Range | Point Blank (+30),+30 | Short Range (+10),+10 | Standard range (+0),+0 | Long Range (-10),-10 | Extreme Range (-30),-30} + @{inlinemod-toggle} ]] - 1d100@{R_weapon_mishap_chance})/10)]]}} @{settings_hitroll}' >Hit</button>
+				<button class='equipment_ranged_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{aim= @{R_weapon_aim}}}{{R_type= @{R_weapon_attack}}}{{range= @{R_weapon_attack_range}}}{{modifier= @{inlinemod-toggle} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}}}{{ballistic= @{BS} + @{BS_advancement}}}{{weaponmod= @{R_weapon_mod1}}}{{trained= @{R_weapon_trained}}}{{degrees=[[1+ floor(abs( [[@{BS} + @{BS_advancement} + @{R_weapon_trained} - 20 + @{R_weapon_mod1}]] + [[@{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{inlinemod-toggle} ]] - [[1d100@{R_weapon_mishap_chance}]])/10)]]}}{{roll= $[[2]]}}{{target= [[@{BS} + @{BS_advancement} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{inlinemod-toggle}]]}}@{settings_hitroll}' >Hit</button>
 			  <button class='equipment_ranged_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_dam-roll}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }}' >DMG</button>
 			</div>
 			<div class='equipment_ranged_weapons_grid1'>
@@ -1781,7 +1781,7 @@
 					<option value='-10' >Swift (-10)</option>
 					<option value='-20' >Lighting (-20)</option>
 			  </select>
-				<button class='equipment_melee_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}} {{roll=[[floor(([[@{WS}+@{WS_advancement} + @{M_weapon_trained} - 20 + @{M_weapon_mod1}]] + [[?{Attack Type | Standard (+10),+10 | Swift Attack (+0),+0 | Lighting (-10),-10 | Charge (+20),+20 | All-out (+30),+30} + ?{Aim | No aim (+0),+0 | Half aim (+10),+10 | Full aim (+20),+20} + @{inlinemod-toggle} ]]-1d100)/10)]]}} @{settings_hitroll}' >Hit</button>
+				<button class='equipment_melee_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}} {{aim= @{M_weapon_aim}}}{{M_type= @{M_weapon_attack}}}{{multi= @{M_weapon_multi}}}{{modifier= @{inlinemod-toggle} + @{M_weapon_attack} + @{M_weapon_aim} + @{M_weapon_multi}}}{{weapnskill= @{WS} + @{WS_advancement}}}{{weaponmod= @{M_weapon_mod1}}}{{trained= @{M_weapon_trained}}}{{degrees=[[1+ floor(abs([[@{WS}+@{WS_advancement} + @{M_weapon_trained} - 20 + @{M_weapon_mod1}]] + [[@{M_weapon_attack} + @{M_weapon_aim} + @{M_weapon_multi} + @{inlinemod-toggle} ]] - [[1d100]])/10)]]}}{{roll= $[[2]]}} {{target= [[@{WS} + @{WS_advancement} + @{M_weapon_trained} - 20 + @{M_weapon_mod1} + @{M_weapon_attack} + @{M_weapon_aim} + @{M_weapon_multi} + @{inlinemod-toggle}]]}}@{settings_hitroll}' >Hit</button>
 			  <button class='equipment_melee_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{M_weapon_name}}} {{type= @{M_weapon_type}}} {{damage=[[@{M_weapon_dam-roll}+[[floor((@{STR} + @{STR_advancement})/10) + @{str_unnat}]]]] }} {{pen= [[@{M_weapon_pen}]] }} {{@{settings_weapondescription}=@{M_ability_r} }}' >DMG</button>
 			</div>
 			<div class='equipment_melee_weapons_grid1'>
@@ -2972,10 +2972,50 @@
   {{#loc}}<div class="sheet-template-content template-content_top">{{/loc}}
     {{^loc}}<div class="sheet-template-content">{{/loc}}
 
+      <div class="sheet-template-2x2 sheet-template-row accordion">
+        <div class="sheet-template-right">Target :</div>
+				<div style="float: right">{{target}}</div>
+      </div>
+<!--
+		{{^melee}}
+			<div class="sheet-template-2x2 sheet-template-row collapse">
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">Ballistic Skill :</div>
+					<div style="float: right">{{ballistic}}</div>
+				</div>
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">Weapon Mod :</div>
+					<div style="float: right">{{weaponmod}}</div>
+				</div>
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">Training :</div>
+					<div style="float: right">{{trained}}</div>
+				</div>
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">Aim :</div>
+					<div style="float: right">{{aim}}</div>
+				</div>
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">RoF :</div>
+					<div style="float: right">{{R_type}}</div>
+				</div>
+				<div class="sheet-template-2x2 sheet-template-row">
+					<div class="sheet-template-right">Range :</div>
+					<div style="float: right">{{range}}</div>
+				</div>
+			</div>
+		{{/melee}}
+-->
+
       <div class="sheet-template-2x2 sheet-template-row">
-        <div class="sheet-template-right">{{roll}}</div>
-        {{#^rollLess() roll 0 }}<div style="float: right">Additional DoS</div>{{/^rollLess() roll 0 }}
-        {{#rollLess() roll 0 }}<div style="float: right">Additional DoF</div>{{/rollLess() roll 0 }}
+        <div class="sheet-template-right">Roll :</div>
+				<div style="float: right">{{roll}}</div>
+      </div>
+
+      <div class="sheet-template-2x2 sheet-template-row">
+        <div class="sheet-template-right">{{degrees}}</div>
+        {{#rollLess() roll target }}<div style="float: right">Additional DoS</div>{{/rollLess() roll target }}
+        {{#^rollLess() roll target }}<div style="float: right">Additional DoF</div>{{/^rollLess() roll target }}
       </div>
 
       {{#rollWasCrit() roll }}
