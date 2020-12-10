@@ -1,12 +1,13 @@
 <!-- Background coloring strategy inspired by the GURPS sheet -->
 <input class="sheet-color-setting" name="attr_type1" type="hidden" value="normal" />
 <div class="wrapper color-background">
-  <input type="radio" name="attr_tab" class="tab select-trainer" value="1" title="Trainer" checked="checked" />
-  <span class="tab select-trainer">Trainer</span>
-  <input type="radio" name="attr_tab" class="tab select-pokemon" value="2" title="Pokemon" />
-  <span class="tab select-pokemon">Pokémon</span>
-  <input type="radio" name="attr_tab" class="tab select-hybrid" value="3" title="Hybrid" />
-  <span class="tab select-hybrid">Hybrid</span>
+  <input class="sheet-character-type" name="attr_character-type" type="hidden" value="trainer" />
+  <b>Character Type:</b>
+  <select class="sheet-character-type sheet-no-dropdown" name="attr_character-type">
+    <option value="trainer" selected>Trainer</option>
+    <option value="pokemon">Pokémon</option>
+    <option value="hybrid">Pokémon (Character Class)</option>
+  </select>
 
   <p class="logo">
     <img
@@ -634,7 +635,7 @@
           >
             Capture Pokémon (SPD)
           </button>
-          <select name="attr_ball_capture_modifier" class="ball-selector">
+          <select name="attr_ball_capture_modifier" class="sheet-ball-selector sheet-no-dropdown">
             <option value="5" selected>Basic Ball</option>
             <option value="0">Great Ball</option>
             <option value="-5">Ultra Ball</option>
@@ -1619,4 +1620,60 @@
     const attrs = { [skillName]: newBonus };
     if (newBonus != oldTotal) setAttrs(attrs);
   }
+
+  // ATTRIBUTE DEPRECATION SHEET WORKERS
+
+  // Sheet Style Deprecation - Remove 4 weeks after deployment.
+  on("sheet:opened", function () {
+    var styles = [
+      "style-bug",
+      "style-dark",
+      "style-dragon",
+      "style-electric",
+      "style-fairy",
+      "style-fighting",
+      "style-fire",
+      "style-flying",
+      "style-ghost",
+      "style-grass",
+      "style-ground",
+      "style-ice",
+      "style-normal",
+      "style-poison",
+      "style-psychic",
+      "style-rock",
+      "style-steel",
+      "style-water",
+    ];
+    getAttrs([...styles, "type1"], function (attributes) {
+      styles = styles.filter((style) => attributes[style] != undefined);
+      const values = styles.map((style) => attributes[style]);
+      if (values[0] == undefined) {
+        console.log("No Style attributes found; aborting prerservation attempt");
+        return;
+      }
+      console.log("Existing Style Attributes Parsed:");
+      styles.forEach((style) => console.log(`${style}-${attributes[style]}`));
+
+      var attrs = {};
+      styles.forEach((style) => (attrs[style] = ""));
+      console.log("All Attributes set to blank");
+
+      const onStyle = styles.filter((style) => attributes[style] == "on").shift();
+      if (onStyle == undefined) {
+        setAttrs(attrs);
+        return;
+      }
+      console.log(`Retrieved on-style: ${onStyle}`);
+
+      const type = onStyle.replace("style-", "");
+      const type1 = attributes.type1;
+      if (type != type1) {
+        console.log(`Re-assigning type1 (${type1}) to ${type}`);
+        attrs["type1"] = type;
+      }
+
+      setAttrs(attrs);
+    });
+  });
 </script>
