@@ -1001,6 +1001,7 @@
             {{/target}}
           </td>
         </tr>
+
         <!-- Effectiveness -->
         {{#^rollTotal() effectiveness-roll 2}}
         <tr>
@@ -1020,7 +1021,7 @@
         </tr>
         {{/^rollTotal() effectiveness-roll 2}}
 
-        <!-- Damage Roll -->
+        <!-- Damage Rolls -->
         <!-- Dice-Based Critical Hit -->
         {{#rollWasCrit() accuracy}} {{#rollGreater() critical-damage 0}}
         <tr>
@@ -1035,8 +1036,10 @@
         {{/rollGreater() critical-damage 0}} {{/rollWasCrit() accuracy}}
 
         <!-- Effect-Based Critical Hit -->
-        {{#^rollWasCrit() accuracy}} {{#rollGreater() critical-damage 0}} {{#rollTotal() effect1_roll 99}} {{#^rollLess() accuracy
-        effect1_threshold}}
+        <!-- Not a Natural Crit, and we deal Critical Damage -->
+        {{#^rollWasCrit() accuracy}} {{#rollGreater() critical-damage 0}}
+        <!-- Effect 1 is Critical Hit and we hit the Threshold -->
+        {{#rollTotal() effect1_roll 99}} {{#^rollLess() accuracy effect1_threshold}}
         <tr>
           <td class="label"><span>{{move-type}} Damage:</span></td>
           <td>
@@ -1048,7 +1051,7 @@
         </tr>
         {{/^rollLess() accuracy effect1_threshold}}
 
-        <!-- Effect-Based Critical Hit Miss -->
+        <!-- Effect-Based Critical Hit Dealing Regular Damage -->
         {{#rollLess() accuracy effect1_threshold}}
         <tr>
           <td class="label"><span>{{move-type}} Damage:</span></td>
@@ -1056,8 +1059,9 @@
             <span class="damage-roll {{effectiveness}}-effectiveness-color"> {{damage}} </span>
           </td>
         </tr>
-        {{/rollLess() accuracy effect1_threshold}} {{/rollTotal() effect1_roll 99}} {{/rollGreater() critical-damage 0}} {{/^rollWasCrit()
-        accuracy}}
+        {{/rollLess() accuracy effect1_threshold}}
+        <!-- Closing The Critical Hit Section -->
+        {{/rollTotal() effect1_roll 99}} {{/rollGreater() critical-damage 0}} {{/^rollWasCrit() accuracy}}
 
         <!-- Regular Hit -->
         {{#^rollWasCrit() accuracy}} {{#rollGreater() damage 0}} {{#rollLess() effect1_roll 99}}
@@ -1070,14 +1074,17 @@
         {{/rollLess() effect1_roll 99}} {{/rollGreater() damage 0}} {{/^rollWasCrit() accuracy}}
 
         <!-- Effect Resoluton  -->
+        <!-- Effect 1 -->
         {{#rollBetween() effect1_roll 1 10}} {{#^rollLess() accuracy effect1_threshold}}
         <tr>
           <td class="effectiveness-text" colspan="2">
             <span>The opponent was {{effect1_name}}</span>
           </td>
         </tr>
-        {{/^rollLess() accuracy effect1_threshold}} {{/rollBetween() effect1_roll 1 10}} {{#rollBetween() effect2_roll 1 10}} {{#^rollLess()
-        accuracy effect2_threshold}}
+        {{/^rollLess() accuracy effect1_threshold}} {{/rollBetween() effect1_roll 1 10}}
+
+        <!-- Effect 2 -->
+        {{#rollBetween() effect2_roll 1 10}} {{#^rollLess() accuracy effect2_threshold}}
         <tr>
           <td class="effectiveness-text" colspan="2">
             <span>The opponent was {{effect2_name}}</span>
