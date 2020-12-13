@@ -569,7 +569,7 @@ let wizardSpellLevelsSections = [
 
 let priestSpellLevelsSections = [
     {level: '1', sections: ['28', '29', '30', 'pri1']},
-    {level: '2', sections: ['31', '32', '33']},
+    {level: '2', sections: ['31', '32', '33', 'pri2']},
     {level: '3', sections: ['34', '35', '36']},
     {level: '4', sections: ['37', '38', '39']},
     {level: '5', sections: ['40', '41', '42']},
@@ -767,3 +767,55 @@ gemSections.forEach(i => {
 // --- End setup gem total value calculation for all settings --- //
 
 // --- ALL SHEET WORKERS END --- //
+
+var sheetName = 'AD&D 2E Revised';
+var sheetVersion = '3.3.1';
+
+on('sheet:opened', function(){
+    getAttrs(['character_sheet'],function(attrs){
+        let cs=_.rest((attrs.character_sheet||'').match(/(.*?)(?:\s+v(.*))?$/)),
+            sheet_name=cs[0]||'',
+            sheet_version=cs[1]||'';
+
+        // do something with sheet_name and sheet_version, if you might be converting
+
+        if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
+            console.log('Updating character sheet version');
+            setAttrs({
+                character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):'')
+            },{silent:true});
+
+            getAttrs(['spell-points', 'spell-points-priest'], function(values) {
+                let sp = parseInt(values['spell-points']) || 0;
+                let psp = parseInt(values['spell-points-priest']) || 0;
+
+                console.log(`Old spell points: ${sp}`);
+                console.log(`Old spell points priest: ${psp}`);
+
+                let newValue = {};
+                if (sp > 0) {
+                    newValue['spell-points-lvl'] = sp;
+                    newValue['spell-points'] = '';
+                }
+
+                if (psp > 0) {
+                    newValue['spell-points-priest-lvl'] = psp;
+                    newValue['spell-points-priest'] = '';
+                }
+
+                setAttrs(newValue);
+            });
+
+            TAS.repeating('spells')
+                .fields('spell-points', 'spell-points1', 'arc', 'arc1')
+                .each(function (r) {
+                    console.log('Updating repeating spells-points and arc');
+                    r['spell-points'] = (r.I['spell-points1']);
+                    r['spell-points1'] = '';
+                    r['arc'] = (r.I['arc1']);
+                    r['arc1'] = '';
+                })
+                .execute();
+        }
+    });
+});
