@@ -4307,12 +4307,7 @@
 				</h4>
 
 				<ul>
-					<li>Melee and Ranged weapon tables. Added new tool to turn on option to use a selected token or target a token. This might allow more advanced features when using the Roll20 API.</li>
-					<li>Roll Modifier Tool. Added a reset button and a note icons to view the summary of the roll modifiers.</li>
-					<li>Roll Modifier Tool. Added a checkbox to apply encumbrance penalty skills, techniques, and active defenses.</li>
-					<li>Roll Modifier Tool for Defense. Added drop-down to apply Shield DB and Magic DB to active defenses.</li>
-					<li>Combat tab > Defense. Added option to display Defense Bonus Notes on roll result table. Requested by <i>Charles</i>.</li>
-					<li>Roll Modifier Tool. Melee Attacks. Added <b>Flurry of Blows</b> and <b>Might Blow</b>. Requested by <i>Hypnobeard</i></li>
+					<li>Added GURPS Character Assistant Importer.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -7392,6 +7387,14 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					</div>
 					<div class="cell col1">
 						<input type="text" name="attr_fullname" title="Macro name: fullname" />
+					</div>
+				</div> <!-- .row -->
+				<div class="row">
+					<div class="cell col0 label">
+						<span data-i18n="player-name-label">Player name</span>
+					</div>
+					<div class="cell col1">
+						<input type="text" name="attr_playername" title="Macro: @{playername}" />
 					</div>
 				</div> <!-- .row -->
 				<div class="row">
@@ -13038,6 +13041,14 @@ visualize what it will look like in chat.
 			<h4>Version: <span name="attr_announcement_version"></span></h4>
 
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
+
+			<ul>
+				<li>Added GURPS Character Assistant Importer.</li>
+			</ul>
+
+			<h4>Version: 2.5.4</h4>
+
+			<p>Pull Request: 12/09/2020</p>
 			
 			<ul>
 				<li>Melee and Ranged weapon tables. Added new tool to turn on option to use a selected token or target a token. This might allow more advanced features when using the Roll20 API.</li>
@@ -13251,713 +13262,800 @@ visualize what it will look like in chat.
 	</div> <!-- .tab7 -->
 	
 	<div class="tab0">
+
+		<!-- see: https://codepen.io/YozhEzhi/pen/gcLpI/ -->
+		<div class="tabbed">
+			
+			<!-- tabs -->
+			<label>
+				<input type="radio" name="attr_options_tabs" value="sheet" class="tab-control" checked />
+				<span data-i18n="sheet-options-label">Sheet Options</span>
+			</label>
+			<label>
+				<input type="radio" name="attr_options_tabs" value="rules" class="tab-control" />
+				<span data-i18n="rules-label">Rules</span>
+			</label>
+			<label>
+				<input type="radio" name="attr_options_tabs" value="import" class="tab-control" />
+				<span data-i18n="import-label">Import</span>
+			</label>
+
+		</div>
 		
-		<div class="options">
-		    
-		    <div class="option-column">
-		        
-		        <div class="option-container">
-					
-					<h4>
-						<span data-i18n="critical-roll-options-label">Critical Roll Options</span>
-					</h4>
-					
-					<input type="radio" name="attr_use_critical_plus_10" value="1" checked="checked" />
-    				<span data-i18n="user-rules-as-written-label">Use rules as written</span>
-    				<br />
-					
-					<input type="radio" name="attr_use_critical_plus_10" value="0" />
-					<span data-i18n="only-on-3-or-4-label">Only on a 3 or 4</span>
-					<br />
-    				
-					<input type="radio" name="attr_use_critical_plus_10" value="2" /> 
-					<span data-i18n="turn-off-label">Turn Off</span>
+		<!-- tabbed section to display | value changes based on selected radio button -->
+		<input type="hidden" name="attr_options_tabs" value="sheet" />
+		<div class="tabs options">
 
-    			</div><!-- end critical roll options -->
-    			
-    			<!-- roll modifiers -->
-		        <div class="option-container">
-					<h4>
-						<span data-i18n="skill-modifier-options-label">Skill Modifier Options</span>
-					</h4>
-					
-    				<input type="radio" name="attr_modifier" value="0" />
-    				<span class="popup">
-						<span data-i18n="no-modifier-prompt-label">No Modifier Prompt</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="no-modifier-prompt-tooltip">
-							Rolls will be made immediately with no prompt.
-						</span>
-					</span>
-					<br />
-					
-					<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]]" checked="true" />
-    				<span class="popup">
-						<span data-i18n="single-modifier-prompt-label">Single Modifier Prompt</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="single-modifier-prompt-tooltip">
-							Ask for a bonus or penalty to be added to dice rolls.<br />
-							This will not affect damage rolls.
-						</span>
-    				</span>
-					<br />
-					
-    				<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]" />
-    				<span class="popup">
-						<span data-i18n="extended-modifier-prompt-label">Extended Modifier Prompts</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="extended-modifier-prompt-tooltip">
-							Instead of a single modifier, rolls will ask for a series of modifiers,<br />
-							to remind you about potential bonuses/penalties.<br />
-							This will not affect damage rolls.
-						</span>
-					</span>
-					
-				</div><!-- end roll modifiers -->
+			<div class="options sheet-options">
 				
-				<!-- roll modifiers -->
-		        <div class="option-container">
-					<h4>
-						<span data-i18n="skill-modifier-tools-label">Skill Modifier Tools</span>
-					</h4>
+				<div class="option-column">
 					
-    				<input type="checkbox" name="attr_use_skill_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-skill-modifier-tool-label">Use Skill Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">Displays a modifier text box, a button to open a tool to modify effective skill, and to check off Max skill of 9.</span>
-					</span>
-					<br />
-					
-					<input type="checkbox" name="attr_use_technique_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-technique-modifier-tool-label">Use Technique Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">
-							Displays a modifier text box, a button to open a tool to modify effective skill, and
-							to check off Max skill of 9.
-						</span>
-    				</span>
-					<br />
-					
-					<input type="checkbox" name="attr_use_defense_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-defense-modifier-tool-label">Use Defense Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">
-							Displays a modifier text box, a button to open a tool to modify effective skill, and
-							to check off Max skill of 9.
-						</span>
-    				</span>
-					<br />
+					<div class="option-container">
+						
+						<h4>
+							<span data-i18n="critical-roll-options-label">Critical Roll Options</span>
+						</h4>
+						
+						<input type="radio" name="attr_use_critical_plus_10" value="1" checked="checked" />
+						<span data-i18n="user-rules-as-written-label">Use rules as written</span>
+						<br />
+						
+						<input type="radio" name="attr_use_critical_plus_10" value="0" />
+						<span data-i18n="only-on-3-or-4-label">Only on a 3 or 4</span>
+						<br />
+						
+						<input type="radio" name="attr_use_critical_plus_10" value="2" /> 
+						<span data-i18n="turn-off-label">Turn Off</span>
 
-					<input type="checkbox" name="attr_use_melee_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-melee-modifier-tool-label">Use Melee Attack Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">
-							Displays a modifier text box, a button to open a tool to modify effective skill, and
-							to check off Max skill of 9.
-						</span>
-    				</span>
-					<br />
+					</div><!-- end critical roll options -->
 					
-					<input type="checkbox" name="attr_use_ranged_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-ranged-modifier-tool-label">Use Ranged Attack Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">
-							Displays a modifier text box, a button to open a tool to modify effective skill, and
-							to check off Max skill of 9.
+					<!-- roll modifiers -->
+					<div class="option-container">
+						<h4>
+							<span data-i18n="skill-modifier-options-label">Skill Modifier Options</span>
+						</h4>
+						
+						<input type="radio" name="attr_modifier" value="0" />
+						<span class="popup">
+							<span data-i18n="no-modifier-prompt-label">No Modifier Prompt</span>
 						</span>
-    				</span>
-					<br />
-					
-					<input type="checkbox" name="attr_use_spell_modifier_tool" value="1" />
-    				<span class="popup">
-						<span data-i18n="use-spell-modifier-tool-label">Use Spell Modifier Tool</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="use-skill-modifier-tool-tooltip">
-							Displays a modifier text box, a button to open a tool to modify effective skill, and
-							to check off Max skill of 9.
-						</span>
-    				</span>
-					<br />
-
-    			</div><!-- end roll modifiers -->
-    			
-    			<div class="option-container">
-    			    <h4>
-						<span data-i18n="public-or-private-rolls-label">Public or Private Rolls</span>
-					</h4>
-					
-					<input type="radio" name="attr_roll" value="" checked="true" />
-    				<span class="popup">
-						<span data-i18n="public-rolls-label">Public Rolls</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="public-rolls-tooltip">
-							All players will be able to see<br />
-							your skill level, roll and results.
-						</span>
-    				</span>
-    				<br />
-					
-					<input type="radio" name="attr_roll" value="/w gm --l " />
-    				<span class="popup">
-						<span data-i18n="private-skill-levels-label">Private Skill Levels <em>deprecated</em></span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="private-skill-levels-tooltip">
-							Only the GM will be able to see<br />
-							your skill level, but all players<br />
-							will see the result.<br />
-							<b>NOTE:</b> This now behaves just like Private Rolls
-						</span>
-    				</span>
-					<br />
-					
-    				<input type="radio" name="attr_roll" value="/w gm " />
-    				<span class="popup">
-						<span data-i18n="private-rols-label">Private Rolls</span>
-					</span>
-    				<span class="tooltip">
-						<span data-i18n="private-rolls-tooltip">
-							Only the GM will see your skill<br />
-							level and the result.
-						</span>
-					</span>
-					
-    			</div><!-- end public/private rolls -->
-				
-				<div class="option-container">
-    			    <h4>
-						<span data-i18n="repeating-technique-tables-label">Repeating Technique Tables</span>
-					</h4>
-
-    				<div>
-        			    <input type="checkbox" name="attr_show_old_techniques" value="1" />
-        			    <span class="popup">
-							<span data-i18n="show-original-label">Show Original</span>
-						</span>
-        			    <span class="tooltip">
-							<span data-i18n="show-original-tooltip">Show the original techniques table.</span>
-						</span>
-					</div>
-
-					<div>
-        			    <input type="checkbox" name="attr_show_new_techniques" checked="checked" value="1" />
-        			    <span class="popup">
-							<span data-i18n="show-revised-label">Show Revised</span>
-						</span>
-        			    <span class="tooltip">
-							<span data-i18n="show-revised-tooltip">Show the revised techniques table.</span>
-						</span>
-					</div>
-					
-				</div><!-- end public/private rolls -->
-				
-		    </div><!-- end option-column -->
-		    
-			<div class="option-column">
-		        
-		        <div class="option-container">
-					
-					<h4>
-						<span data-i18n="point-summary-layout-label">Point Summary Layout</span>
-					</h4>
-					
-    			    <div>
-        			    <input type="radio" name="attr_point_summary_layout" value="1"  checked="checked" />
-        			    <span class="popup">
-							<span data-i18n="abbreviation-gurps-character-assistant-label">GCA</span>
-						</span>
-						<span class="tooltip" style="margin-left: 0;">
-							<span data-i18n="gurps-character-assistant-tooltip">GURPS Character Assistant.</span>
-						</span>
-    			    </div>
-    			    <div>
-        			    <input type="radio" name="attr_point_summary_layout" value="2" />
-        			    <span class="popup">
-							<span data-i18n="abbreviation-gurps-character-sheet-label">GCS</span>
-						</span>
-						<span class="tooltip" style="margin-left: 0;">
-							<span data-i18n="gurps-character-sheet-tooltip">GURPS Character Sheet.</span>
-						</span>
-    			    </div>
-    			    <div>
-        			    <input type="radio" name="attr_point_summary_layout" value="3" />
-        			    <span class="popup">
-							<span data-i18n="detailed-label">Detailed</span>
-						</span>
-						<span class="tooltip" style="margin-left: -10px;">
-							<span data-i18n="point-summary-detailed-tooltip">
-								Custom view displaying each section total.<br />
-								Including the deprecated Misc. Points box.
+						<span class="tooltip">
+							<span data-i18n="no-modifier-prompt-tooltip">
+								Rolls will be made immediately with no prompt.
 							</span>
 						</span>
-    			    </div>
-    			</div><!-- end point summary layout -->
-    			
-    			<div class="option-container">
-    			    <div>
-        			    <input type="checkbox" name="attr_use_unspent_box" value="1" />
-        			    <span class="popup">
-							<span data-i18n="enter-unspent-points-label">Enter Unspent Points</span>
+						<br />
+						
+						<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]]" checked="true" />
+						<span class="popup">
+							<span data-i18n="single-modifier-prompt-label">Single Modifier Prompt</span>
 						</span>
-        			    <span class="tooltip">
-							<span data-i18n="enter-unspent-points-tooltip">Check if you would like to manually track your unspent points</span>
+						<span class="tooltip">
+							<span data-i18n="single-modifier-prompt-tooltip">
+								Ask for a bonus or penalty to be added to dice rolls.<br />
+								This will not affect damage rolls.
+							</span>
 						</span>
-    			    </div>
-    			</div><!-- end enter unspent points -->
-			
-			    <div class="option-container">
+						<br />
+						
+						<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]" />
+						<span class="popup">
+							<span data-i18n="extended-modifier-prompt-label">Extended Modifier Prompts</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="extended-modifier-prompt-tooltip">
+								Instead of a single modifier, rolls will ask for a series of modifiers,<br />
+								to remind you about potential bonuses/penalties.<br />
+								This will not affect damage rolls.
+							</span>
+						</span>
+						
+					</div><!-- end roll modifiers -->
 					
-					<h4>
-						<span data-i18n="add-to-combat-tracker-label">Add to combat tracker</span>
-					</h4>
+					<!-- roll modifiers -->
+					<div class="option-container">
+						<h4>
+							<span data-i18n="skill-modifier-tools-label">Skill Modifier Tools</span>
+						</h4>
+						
+						<input type="checkbox" name="attr_use_skill_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-skill-modifier-tool-label">Use Skill Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">Displays a modifier text box, a button to open a tool to modify effective skill, and to check off Max skill of 9.</span>
+						</span>
+						<br />
+						
+						<input type="checkbox" name="attr_use_technique_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-technique-modifier-tool-label">Use Technique Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">
+								Displays a modifier text box, a button to open a tool to modify effective skill, and
+								to check off Max skill of 9.
+							</span>
+						</span>
+						<br />
+						
+						<input type="checkbox" name="attr_use_defense_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-defense-modifier-tool-label">Use Defense Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">
+								Displays a modifier text box, a button to open a tool to modify effective skill, and
+								to check off Max skill of 9.
+							</span>
+						</span>
+						<br />
+
+						<input type="checkbox" name="attr_use_melee_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-melee-modifier-tool-label">Use Melee Attack Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">
+								Displays a modifier text box, a button to open a tool to modify effective skill, and
+								to check off Max skill of 9.
+							</span>
+						</span>
+						<br />
+						
+						<input type="checkbox" name="attr_use_ranged_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-ranged-modifier-tool-label">Use Ranged Attack Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">
+								Displays a modifier text box, a button to open a tool to modify effective skill, and
+								to check off Max skill of 9.
+							</span>
+						</span>
+						<br />
+						
+						<input type="checkbox" name="attr_use_spell_modifier_tool" value="1" />
+						<span class="popup">
+							<span data-i18n="use-spell-modifier-tool-label">Use Spell Modifier Tool</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="use-skill-modifier-tool-tooltip">
+								Displays a modifier text box, a button to open a tool to modify effective skill, and
+								to check off Max skill of 9.
+							</span>
+						</span>
+						<br />
+
+					</div><!-- end roll modifiers -->
 					
-					<input type="radio" name="attr_speed_tracker" value="/em" checked="true" />
-    				<span class="popup">
-						<span data-i18n="public-speed-tracker-label">Public Speed Tracker</span>
-					</span>
-    				<span class="tooltip">
-    					<span data-i18n="public-speed-tracker-tooltip">Show basic speed and add to Chat message to public.</span>
-    				</span>
-					<br />
+					<div class="option-container">
+						<h4>
+							<span data-i18n="public-or-private-rolls-label">Public or Private Rolls</span>
+						</h4>
+						
+						<input type="radio" name="attr_roll" value="" checked="true" />
+						<span class="popup">
+							<span data-i18n="public-rolls-label">Public Rolls</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="public-rolls-tooltip">
+								All players will be able to see<br />
+								your skill level, roll and results.
+							</span>
+						</span>
+						<br />
+						
+						<input type="radio" name="attr_roll" value="/w gm --l " />
+						<span class="popup">
+							<span data-i18n="private-skill-levels-label">Private Skill Levels <em>deprecated</em></span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="private-skill-levels-tooltip">
+								Only the GM will be able to see<br />
+								your skill level, but all players<br />
+								will see the result.<br />
+								<b>NOTE:</b> This now behaves just like Private Rolls
+							</span>
+						</span>
+						<br />
+						
+						<input type="radio" name="attr_roll" value="/w gm " />
+						<span class="popup">
+							<span data-i18n="private-rols-label">Private Rolls</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="private-rolls-tooltip">
+								Only the GM will see your skill<br />
+								level and the result.
+							</span>
+						</span>
+						
+					</div><!-- end public/private rolls -->
 					
-    				<input type="radio" name="attr_speed_tracker" value="/w gm" />
-    				<span class="popup">
-						<span data-i18n="private-speed-tracker-label">Private Speed Tracker</span>
-					</span>
-    				<span class="tooltip">
-    					<span data-i18n="private-speed-tracker-tooltip">Show basic speed and add to Chat message to GM.</span>
-					</span>
+					<div class="option-container">
+						<h4>
+							<span data-i18n="repeating-technique-tables-label">Repeating Technique Tables</span>
+						</h4>
+
+						<div>
+							<input type="checkbox" name="attr_show_old_techniques" value="1" />
+							<span class="popup">
+								<span data-i18n="show-original-label">Show Original</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="show-original-tooltip">Show the original techniques table.</span>
+							</span>
+						</div>
+
+						<div>
+							<input type="checkbox" name="attr_show_new_techniques" checked="checked" value="1" />
+							<span class="popup">
+								<span data-i18n="show-revised-label">Show Revised</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="show-revised-tooltip">Show the revised techniques table.</span>
+							</span>
+						</div>
+						
+					</div><!-- end public/private rolls -->
 					
-    			</div><!-- end combat-tracker -->
-    			
-    			<div class="option-container">
-		            
-		            <h4>
-						<span data-i18n="spell-options-label">Spell Options (See B238, M10)</span>
-					</h4>
+				</div><!-- end option-column -->
+				
+				<div class="option-column">
 					
-					<span data-i18n="spell-options-table">
+					<div class="option-container">
+						
+						<h4>
+							<span data-i18n="point-summary-layout-label">Point Summary Layout</span>
+						</h4>
+						
+						<div>
+							<input type="radio" name="attr_point_summary_layout" value="1"  checked="checked" />
+							<span class="popup">
+								<span data-i18n="abbreviation-gurps-character-assistant-label">GCA</span>
+							</span>
+							<span class="tooltip" style="margin-left: 0;">
+								<span data-i18n="gurps-character-assistant-tooltip">GURPS Character Assistant.</span>
+							</span>
+						</div>
+						<div>
+							<input type="radio" name="attr_point_summary_layout" value="2" />
+							<span class="popup">
+								<span data-i18n="abbreviation-gurps-character-sheet-label">GCS</span>
+							</span>
+							<span class="tooltip" style="margin-left: 0;">
+								<span data-i18n="gurps-character-sheet-tooltip">GURPS Character Sheet.</span>
+							</span>
+						</div>
+						<div>
+							<input type="radio" name="attr_point_summary_layout" value="3" />
+							<span class="popup">
+								<span data-i18n="detailed-label">Detailed</span>
+							</span>
+							<span class="tooltip" style="margin-left: -10px;">
+								<span data-i18n="point-summary-detailed-tooltip">
+									Custom view displaying each section total.<br />
+									Including the deprecated Misc. Points box.
+								</span>
+							</span>
+						</div>
+					</div><!-- end point summary layout -->
+					
+					<div class="option-container">
+						<div>
+							<input type="checkbox" name="attr_use_unspent_box" value="1" />
+							<span class="popup">
+								<span data-i18n="enter-unspent-points-label">Enter Unspent Points</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="enter-unspent-points-tooltip">Check if you would like to manually track your unspent points</span>
+							</span>
+						</div>
+					</div><!-- end enter unspent points -->
+				
+					<div class="option-container">
+						
+						<h4>
+							<span data-i18n="add-to-combat-tracker-label">Add to combat tracker</span>
+						</h4>
+						
+						<input type="radio" name="attr_speed_tracker" value="/em" checked="true" />
+						<span class="popup">
+							<span data-i18n="public-speed-tracker-label">Public Speed Tracker</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="public-speed-tracker-tooltip">Show basic speed and add to Chat message to public.</span>
+						</span>
+						<br />
+						
+						<input type="radio" name="attr_speed_tracker" value="/w gm" />
+						<span class="popup">
+							<span data-i18n="private-speed-tracker-label">Private Speed Tracker</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="private-speed-tracker-tooltip">Show basic speed and add to Chat message to GM.</span>
+						</span>
+						
+					</div><!-- end combat-tracker -->
+					
+					<div class="option-container">
+						
+						<h4>
+							<span data-i18n="spell-options-label">Spell Options (See B238, M10)</span>
+						</h4>
+						
+						<span data-i18n="spell-options-table">
+							<table>
+								<tr>
+									<td>
+										Penalty for each spell <b>ON:</b>      
+									</td>
+									<td>
+										<input type="number" step="1" value="-1" name="attr_penalty_per_spell_on"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Penalty for each spell <b>Concentrated On:</b>             
+									</td>
+									<td>
+										<input type="number" step="1" value="-3" name="attr_penalty_per_spell_maintained"></input>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										Show casting details on roll template:
+									</td>
+									<td>
+										<input type="checkbox" name="attr_show_casting_details" />
+									</td>
+								</tr>
+							</table>
+						</span>
+						
+					</div><!-- end option-container -->
+					
+					<div class="option-container">
+						
+						<h4><span data-i18n="active-defenses-label">Show RAW Notes</span></h4>
+						
+						<div>
+							<input type="checkbox" name="attr_show_raw_defensive_notes" value="1" checked="checked" />
+							<span class="popup">
+								<span data-i18n="abbreviation-show-rules-as-written-notes-label">Show Active Defenses RAW Notes</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="abbreviation-show-rules-as-written-notes-tooltip">
+									Show Rules as Written Success/Fail notes
+								</span>
+							</span>
+						</div>
+						
+					</div><!-- end option-container -->
+					
+				</div><!-- end option-column -->
+				
+				<div class="option-column">
+					
+					<div class="option-container damage-dice">
+						<h4>
+							<span data-i18n="damage-dice-icon">Damage Dice Icon</span>
+						</h4>
+						
+						<div>
+							<input type="radio" name="attr_damage_dice_type" value="explode" checked="true" />
+							<button type="roll" value="0" name="btn_damage_dice_explode" class="roll_explode btn" disabled="disabled" />
+						</div>
+						<div>
+							<input type="radio" name="attr_damage_dice_type" value="d6black" />
+							<button type="roll" value="0" name="btn_damage_dice_d6black" class="btn" disabled="disabled" />
+						</div>
+						<div>
+							<input type="radio" name="attr_damage_dice_type" value="d20blank" />
+							<button type="roll" value="0" name="btn_damage_dice_d20blank" class="btn roll_d20blank" disabled="disabled" />
+						</div>
+						<div>
+							<input type="radio" name="attr_damage_dice_type" value="d4skull" />
+							<button type="roll" value="0" name="btn_damage_dice_d4skull" class="btn roll_d4skull" disabled="disabled" />
+						</div> 
+					</div><!-- end damage dice icon -->
+
+					<div class="option-container">
+						<div>
+							<input type="checkbox" name="attr_use_malfunction" value="1" />
+							<span class="popup">
+								<span data-i18n="use-malfunction-label">Use Malfunction</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="use-malfunction-tooltip">If checked, roll results will check for malfunction.</span>
+							</span>
+						</div>
+					</div><!-- end malfunction -->
+					
+					<div class="option-container">
+
+						<h4>
+							<span data-i18n="stat-modifier-options-label">Stat Modifier Options</span>
+						</h4>
+						
+						<div>
+							<input type="radio" name="attr_mod_cascade" value="all" checked="true" />
+							<span data-i18n="modifiers-to-attributes-increase-all-label">Mods to attributes increase all derived stats (including HP, FP)</span>
+						</div>
+						<div>
+							<input type="radio" name="attr_mod_cascade" value="some" />
+							<span data-i18n="modifiers-to-attributes-increase-most-label">Mods to attributes increase most derived stats (not HP, FP)</span>
+						</div>
+						<div>
+							<input type="radio" name="attr_mod_cascade" value="none" />
+							<span data-i18n="modifiers-to-attributes-increase-none-label">Mods to attributes do not increase derived stats</span>
+						</div>
+					</div><!-- end stat modifier options -->
+					<div class="option-container">
+						
+						<h4>
+							<span data-i18n="sheet-style-label">Sheet Style</span>
+						</h4>
+						
+						<span data-i18n="sheet-style-description">Selects a visual style for the character sheet</span>
+						
+						<div>
+							<select name="attr_sheetstyle"/>
+							<option class="color-option-0" value="0"><span data-i18n="sheet-style-green-option">Green</span></option> <!-- Color Style options, remember to add one to add a new option-->>
+							<option class="color-option-1" value="1"><span data-i18n="sheet-style-blue-option">Blue</span></option>
+							<option class="color-option-2" value="2"><span data-i18n="sheet-style-beige-option">Beige</span></option>
+							<option class="color-option-3" value="3"><span data-i18n="sheet-style-gray-option-">Gray</span></option>
+							<option class="color-option-5" value="5"><span data-i18n="sheet-style-pastel-pink-option">Pastel Pink</span></option>
+							<option class="color-option-6" value="6"><span data-i18n="sheet-style-pastel-earth">Pastel Earth</span></option>
+							<option class="color-option-7" value="7"><span data-i18n="sheet-style-purple-option">Purple</span></option>
+							<option class="color-option-8" value="8"><span data-i18n="sheet-style-fabric-option">Fabric</span></option>
+							<option class="color-option-4" value="4" selected="selected"><span data-i18n="sheet-style-classic-white-option">Classic White</span></option>
+							</select>
+						</div>
+					</div><!-- end style selector options -->
+				</div><!-- end option-column -->
+				
+			</div><!-- end options row -->
+				
+			<div class="options rule-options">
+				
+				<div class="option-column">
+				
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="falling-collision-damage-notes-label">Falling & Collision Damage Notes</span>
+						</h4>
+						<textarea name="attr_falling_collision_damage_notes">Collisions: If an object is bullet-shaped, sharp, or spiked, it does half damage, but this damage is piercing, cutting, or impaling, rather than crushing.
+					
+	Falling Damage: If using hit locations, roll randomly for the hit location damaged in a fall. If the injury is to an extremity or a limb, do not ignore injury in excess of that required to cripple it. Instead, subtract the full amount from HP! If the fall would cripple a limb, roll 1d. On 5-6, all limbs of that type are crippled, although there is no extra injury. B431</textarea>
+					</div>
+					
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="demolition-damage-notes-label">Demolition Damage Notes</span>
+						</h4>
+						<textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
+					
+	* Use torso armor to determine DR against explosion.
+	* If the explosion has an armor divisor, do NOT apply to "collateral damage.
+	* Explosions are considered incendiary. see Catching Fire B434.
+	* Can use Dodge and Drop (B377) to avoid collateral damage.
+	* See B414</textarea>    
+					</div><!-- end option-container -->
+				
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="fragmentation-skill-notes-label">Fragmentation Skill Notes</span>
+						</h4>
+						<textarea name="attr_fragmentation_skill_notes">For every three points by which the attack roll succeeds, one additional fragment strikes the target.
+
+	The only active defense against fragments is to dive away from the explosion that produced them; see Dodge and Drop and Diving for Cober (B377).
+
+	For each hit, roll hit location randomly. If that location is behind cover, the fragment hits cover.
+	</textarea>    
+					</div><!-- end option-container -->
+					
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="fragmentation-damage-notes-label">Fragmentation Damage Notes</span>
+						</h4>
+						<textarea name="attr_fragmentation_damage_notes">Fragmentation damage is cutting. Note that if an explosive attack has an armor divisor, this does not apply to the fragments it produces.</textarea>    
+					</div><!-- end option-container -->
+					
+					<div class="option-container">
+						
 						<table>
 							<tr>
 								<td>
-									Penalty for each spell <b>ON:</b>      
+									<b><span data-i18n="fragmentation-recoil-label">Fragmentation Recoil:</span></b>      
 								</td>
 								<td>
-									<input type="number" step="1" value="-1" name="attr_penalty_per_spell_on"></input>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									Penalty for each spell <b>Concentrated On:</b>             
-								</td>
-								<td>
-									<input type="number" step="1" value="-3" name="attr_penalty_per_spell_maintained"></input>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									Show casting details on roll template:
-								</td>
-								<td>
-									<input type="checkbox" name="attr_show_casting_details" />
+									<input type="number" step="1" value="3" name="attr_fragmentation_recoil"></input>
 								</td>
 							</tr>
 						</table>
-					</span>
-    			    
-				</div><!-- end option-container -->
+						
+					</div><!-- end option-container -->
+					
+				</div><!-- end option-column -->
 				
-				<div class="option-container">
-		            
-		            <h4><span data-i18n="active-defenses-label">Show RAW Notes</span></h4>
+				<div class="option-column">
 					
-		            <div>
-        			    <input type="checkbox" name="attr_show_raw_defensive_notes" value="1" checked="checked" />
-        			    <span class="popup">
-							<span data-i18n="abbreviation-show-rules-as-written-notes-label">Show Active Defenses RAW Notes</span>
-						</span>
-        			    <span class="tooltip">
-							<span data-i18n="abbreviation-show-rules-as-written-notes-tooltip">
-								Show Rules as Written Success/Fail notes
-							</span>
-						</span>
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="spell-critical-success-notes-label">Spell Critical Success Notes</span>
+						</h4>
+						<textarea name="attr_spell_critical_success_notes">The spell works especially well. **Details are up to the GM**, who should be both generous and creative. Whatever else occurs, there is never an energy cost if you get a critical success when you cast a spell. B235, M7</textarea>    
+					</div><!-- end option-container -->
+					
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="spell-fail-notes-label">Spell Fail Notes</span>
+						</h4>
+						<textarea name="attr_spell_fail_notes">The spell does not work. If success would have cost energy, you lose one energy point; otherwise, you lose nothing. (Exception: You must pay the full energy cost even on a failure for an Information spell; see Information Spells. B235, M7.
+						
+	**In Very High Mana Areas**, all Failures are treated as Critical Failures. M6.</textarea>    
+					</div><!-- end option-container -->
+					
+					<div class="option-container collision-falling-options">
+						<h4>
+							<span data-i18n="spell-critical-failure-notes-label">Spell Critical Failure Notes</span>
+						</h4>
+						<textarea name="attr_spell_critical_failure_notes">You must spend the full energy cost and the spell fails . . . badly! **The GM may** use the Critical Spell Failure Table on B236 or, M7, or improvise some other “backfire” he finds amusing. (B235, M7.)
+						
+	**In Very High Mana Areas**, all actual Critical Failures produce spectacular disasters! (M6)
+
+	**In Low Mana Areas**, Critical Failures have mild effects or no effect at all. (M6)</textarea>    
+					</div><!-- end option-container -->
+						
+				</div><!-- end option-column -->
+				
+				<div class="option-column">
+
+					<div class="option-container damage-type-notes">
+
+						<h4>
+							<span data-i18n="minimum-damage-notes-label">Minimum Damage Notes</span>
+						</h4>
+
+						<div class="toggle-notes">
+							<input type="checkbox" name="attr_show_minimum_damage_notes" value="1" checked="checked" />
+							<span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
+						</div>
+						
 					</div>
+
+					<div class="option-container damage-type-notes">
 					
-		        </div><!-- end option-container -->
-    			
-			</div><!-- end option-column -->
-			
-			<div class="option-column">
-			    
-			    <div class="option-container damage-dice">
-			        <h4>
-						<span data-i18n="damage-dice-icon">Damage Dice Icon</span>
-					</h4>
-			        
-			        <div>
-        			    <input type="radio" name="attr_damage_dice_type" value="explode" checked="true" />
-        			    <button type="roll" value="0" name="btn_damage_dice_explode" class="roll_explode btn" disabled="disabled" />
-    				</div>
-    				<div>
-        				<input type="radio" name="attr_damage_dice_type" value="d6black" />
-        			    <button type="roll" value="0" name="btn_damage_dice_d6black" class="btn" disabled="disabled" />
-    				</div>
-    				<div>
-        				<input type="radio" name="attr_damage_dice_type" value="d20blank" />
-        			    <button type="roll" value="0" name="btn_damage_dice_d20blank" class="btn roll_d20blank" disabled="disabled" />
-    				</div>
-    				<div>
-        				<input type="radio" name="attr_damage_dice_type" value="d4skull" />
-        			    <button type="roll" value="0" name="btn_damage_dice_d4skull" class="btn roll_d4skull" disabled="disabled" />
-    				</div> 
-			    </div><!-- end damage dice icon -->
-
-    		    <div class="option-container">
-    			    <div>
-        			    <input type="checkbox" name="attr_use_malfunction" value="1" />
-        			    <span class="popup">
-							<span data-i18n="use-malfunction-label">Use Malfunction</span>
-						</span>
-        			    <span class="tooltip">
-							<span data-i18n="use-malfunction-tooltip">If checked, roll results will check for malfunction.</span>
-						</span>
-    			    </div>
-    			</div><!-- end malfunction -->
-    			
-    			<div class="option-container">
-
-		            <h4>
-						<span data-i18n="stat-modifier-options-label">Stat Modifier Options</span>
-					</h4>
-		            
-		            <div>
-    		            <input type="radio" name="attr_mod_cascade" value="all" checked="true" />
-        				<span data-i18n="modifiers-to-attributes-increase-all-label">Mods to attributes increase all derived stats (including HP, FP)</span>
-    				</div>
-    				<div>
-        				<input type="radio" name="attr_mod_cascade" value="some" />
-        				<span data-i18n="modifiers-to-attributes-increase-most-label">Mods to attributes increase most derived stats (not HP, FP)</span>
-    				</div>
-    				<div>
-        				<input type="radio" name="attr_mod_cascade" value="none" />
-        				<span data-i18n="modifiers-to-attributes-increase-none-label">Mods to attributes do not increase derived stats</span>
-        			</div>
-		        </div><!-- end stat modifier options -->
-		        <div class="option-container">
+						<h4>
+							<span data-i18n="editable-wound-modifier-notes-label">Editable Wound Modifier Notes</span>
+						</h4>
 					
-					<h4>
-						<span data-i18n="sheet-style-label">Sheet Style</span>
-					</h4>
+						<div>
+							<span data-i18n="editable-wound-modifier-notes-description">Initial wound modifier notes based on GURPS 4th Edition - Campaigns</span>
+						</div>
+
+						<div class="toggle-notes">
+							<input type="checkbox" name="attr_use_damage_type_notes" value="1" checked="checked" />
+							<span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
+						</div>
 					
-					<span data-i18n="sheet-style-description">Selects a visual style for the character sheet</span>
-					
-					<div>
-    		            <select name="attr_sheetstyle"/>
-						  <option class="color-option-0" value="0"><span data-i18n="sheet-style-green-option">Green</span></option> <!-- Color Style options, remember to add one to add a new option-->>
-						  <option class="color-option-1" value="1"><span data-i18n="sheet-style-blue-option">Blue</span></option>
-						  <option class="color-option-2" value="2"><span data-i18n="sheet-style-beige-option">Beige</span></option>
-						  <option class="color-option-3" value="3"><span data-i18n="sheet-style-gray-option-">Gray</span></option>
-						  <option class="color-option-5" value="5"><span data-i18n="sheet-style-pastel-pink-option">Pastel Pink</span></option>
-						  <option class="color-option-6" value="6"><span data-i18n="sheet-style-pastel-earth">Pastel Earth</span></option>
-						  <option class="color-option-7" value="7"><span data-i18n="sheet-style-purple-option">Purple</span></option>
-						  <option class="color-option-8" value="8"><span data-i18n="sheet-style-fabric-option">Fabric</span></option>
-						  <option class="color-option-4" value="4" selected="selected"><span data-i18n="sheet-style-classic-white-option">Classic White</span></option>
-						</select>
-    				</div>
-		        </div><!-- end style selector options -->
-			</div><!-- end option-column -->
-			
-		</div><!-- end options row -->
-			
-		<div class="options">
-		    
-		    <div class="option-column">
-		       
-		        <div class="option-container collision-falling-options">
-                    <h4>
-						<span data-i18n="falling-collision-damage-notes-label">Falling & Collision Damage Notes</span>
-					</h4>
-			        <textarea name="attr_falling_collision_damage_notes">Collisions: If an object is bullet-shaped, sharp, or spiked, it does half damage, but this damage is piercing, cutting, or impaling, rather than crushing.
-			    
-Falling Damage: If using hit locations, roll randomly for the hit location damaged in a fall. If the injury is to an extremity or a limb, do not ignore injury in excess of that required to cripple it. Instead, subtract the full amount from HP! If the fall would cripple a limb, roll 1d. On 5-6, all limbs of that type are crippled, although there is no extra injury. B431</textarea>
-			    </div>
-			    
-			    <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="demolition-damage-notes-label">Demolition Damage Notes</span>
-					</h4>
-		            <textarea name="attr_demolition_damage_notes">Explosion damage. Targets struck directly takes listed damage. Apply "collateral damage" of Damage / (3 x distance from center of blast) rounded down.
-			    
-* Use torso armor to determine DR against explosion.
-* If the explosion has an armor divisor, do NOT apply to "collateral damage.
-* Explosions are considered incendiary. see Catching Fire B434.
-* Can use Dodge and Drop (B377) to avoid collateral damage.
-* See B414</textarea>    
-		        </div><!-- end option-container -->
-		       
-		        <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="fragmentation-skill-notes-label">Fragmentation Skill Notes</span>
-					</h4>
-		            <textarea name="attr_fragmentation_skill_notes">For every three points by which the attack roll succeeds, one additional fragment strikes the target.
+						<table>
+							<tr>
+								<th>
+									<span data-i18n="type-label">Type</span>
+								</th>
+								<th>
+									<span data-i18n="notes-label">Notes</span>
+								</th>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="cutting-label">Cutting</span>
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_cut">CUTTING
+	Damage x1.5
+	Neck Damage x2
+	Skull Damage x4</textarea>
+									</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="impaling-label">Impaling</span>
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_imp">IMPALING
+	Damage x2
+	Arm, Leg, Foot, or Hand x1 (B399)
+	Vitals Damage x3
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="crushing-label">Crushing</span>
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_cr">CRUSHING
+	Damage x1
+	Neck Damage x1.5
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="abbreviation-piercing-label">PI</span>-
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_pi_minus">PIERCING-
+	Damage x .5
+	Vitals Damage x3
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="abbreviation-piercing-label">PI</span>
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_pi">PIERCING
+	Damage x1
+	Vitals Damage x3
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="abbreviation-piercing-label">PI</span>+
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_pi_plus">PIERCING+
+	Damage x1.5
+	Arm, Leg, Foot, or Hand x1 (B399)
+	Vitals Damage x3
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="abbreviation-piercing-label">PI</span>++
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_pi_plus_plus">PIERCING++
+	Damage x2
+	Arm, Leg, Foot, or Hand x1 (B399)
+	Vitals Damage x3
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<span data-i18n="afflication-label">Affliction</span>
+								</td>
+								<td>
+									<textarea name="attr_damage_type_note_aff">AFFLICTION
+	Special damage and affects based on affliction description</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td><span data-i18n="burn-label">Burn</span></td>
+								<td>
+									<textarea name="attr_damage_type_note_burn">BURN 
+	Damage x1
+	Skull Damage x4</textarea>
+								</td>
+							</tr>
+							<tr>
+								<td><span data-i18n="corrosion-label">Corrosion</span></td>
+								<td>
+									<textarea name="attr_damage_type_note_cor">CORRROSION 
+	Damage x1
+	Face Damage x1.5, blind eye if major wound, both eyes if full HP
+	Neck Damage x1.5
+	Skull Damage x4
+	-1 DR per 5 points damage</textarea>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span data-i18n="fatigue-label">Fatigue</span>
+									</td>
+									<td>
+										<textarea name="attr_damage_type_note_fat">FATIGUE 
+	Damage x1</textarea>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span data-i18n="toxic-label">Toxic</span>
+									</td>
+									<td>
+										<textarea name="attr_damage_type_note_tox">TOXIC 
+	Damage x1</textarea>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<span data-i18n="special-label">Special</span>
+									</td>
+									<td>
+										<textarea name="attr_damage_type_note_spec">SPECIAL 
+	See notes for weapon.</textarea>
+									</td>
+								</tr>
+							</table>
+							
+					</div><!-- end option-container -->	
+						
+				</div><!-- end option-column -->
+				
+			</div><!-- end options row -->
 
-The only active defense against fragments is to dive away from the explosion that produced them; see Dodge and Drop and Diving for Cober (B377).
+			<div class="options import">
 
-For each hit, roll hit location randomly. If that location is behind cover, the fragment hits cover.
-</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="fragmentation-damage-notes-label">Fragmentation Damage Notes</span>
-					</h4>
-		            <textarea name="attr_fragmentation_damage_notes">Fragmentation damage is cutting. Note that if an explosive attack has an armor divisor, this does not apply to the fragments it produces.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container">
-		            
-		            <table>
-    			        <tr>
-    			            <td>
-    			                <b><span data-i18n="fragmentation-recoil-label">Fragmentation Recoil:</span></b>      
-    			            </td>
-    			            <td>
-    			                <input type="number" step="1" value="3" name="attr_fragmentation_recoil"></input>
-    			            </td>
-    			        </tr>
-    			    </table>
-    			    
-		        </div><!-- end option-container -->
-		        
-		    </div><!-- end option-column -->
-		    
-		    <div class="option-column">
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="spell-critical-success-notes-label">Spell Critical Success Notes</span>
-					</h4>
-		            <textarea name="attr_spell_critical_success_notes">The spell works especially well. **Details are up to the GM**, who should be both generous and creative. Whatever else occurs, there is never an energy cost if you get a critical success when you cast a spell. B235, M7</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="spell-fail-notes-label">Spell Fail Notes</span>
-					</h4>
-		            <textarea name="attr_spell_fail_notes">The spell does not work. If success would have cost energy, you lose one energy point; otherwise, you lose nothing. (Exception: You must pay the full energy cost even on a failure for an Information spell; see Information Spells. B235, M7.
-		            
-**In Very High Mana Areas**, all Failures are treated as Critical Failures. M6.</textarea>    
-		        </div><!-- end option-container -->
-		        
-		        <div class="option-container collision-falling-options">
-		            <h4>
-						<span data-i18n="spell-critical-failure-notes-label">Spell Critical Failure Notes</span>
-					</h4>
-		            <textarea name="attr_spell_critical_failure_notes">You must spend the full energy cost and the spell fails . . . badly! **The GM may** use the Critical Spell Failure Table on B236 or, M7, or improvise some other “backfire” he finds amusing. (B235, M7.)
-		            
-**In Very High Mana Areas**, all actual Critical Failures produce spectacular disasters! (M6)
+				<div class="instructions" style="width: 33%; float: left;">
 
-**In Low Mana Areas**, Critical Failures have mild effects or no effect at all. (M6)</textarea>    
-		        </div><!-- end option-container -->
-					
-		    </div><!-- end option-column -->
-		    
-		    <div class="option-column">
+					<h3>Import Tool</h3>
 
-				<div class="option-container damage-type-notes">
-
-					<h4>
-						<span data-i18n="minimum-damage-notes-label">Minimum Damage Notes</span>
-					</h4>
-
-					<div class="toggle-notes">
-        			    <input type="checkbox" name="attr_show_minimum_damage_notes" value="1" checked="checked" />
-        			    <span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
-					</div>
-					
+					<h4>Version 1.0</h4>
+	
+					<p>
+						Initial version is designed for a one time import. Future iterations will allow re-import.
+					</p>
+	
+					<h4>GCA Import</h4>
+	
+					<ol>
+						<li>Export your character sheet to an XML file.</li>
+						<li>Convert the XML file to json.
+							<ol>
+								<li>https://convertxmljson.com/</li>
+								<li>https://www.convertjson.com/xml-to-json.htm</li>
+								<li>https://jsonformatter.org/xml-to-json</li>
+							</ol>
+						</li>
+						<li>Copy/Past the json data to the text box below.</li>
+						<li>Press the <b>[Import CGA]</b> button</li>
+						<li>Wait for the process to complete.</li>
+					</ol>
+	
 				</div>
 
-        		<div class="option-container damage-type-notes">
-			    
-			        <h4>
-						<span data-i18n="editable-wound-modifier-notes-label">Editable Wound Modifier Notes</span>
-					</h4>
-			    
-			        <div>
-						<span data-i18n="editable-wound-modifier-notes-description">Initial wound modifier notes based on GURPS 4th Edition - Campaigns</span>
+				<div class="importer" style="width: 67%; float: left;">
+
+					<h4>JSON DATA</h4>
+
+					<textarea name="attr_json_data" class="json-data" style="width: 98%;"></textarea>
+
+					<div class="controls">
+
+						<div style="float:right;">
+							<button type="action" name="act_import_reset" class="btn">Reset</button>
+						</div>
+
+						<div style="float:left; margin-right: 10px;">
+							<button type="action" name="act_import_gca" class="btn">Import GCA</button>
+						</div>
+
+						<div style="float:left; margin-right: 10px;">
+							<button type="action" name="act_import_gcs" class="btn">Import GCS</button>
+						</div>
+
+						<div style="float:left; margin-right: 10px;">
+							<input type="hidden" name="attr_import_message" value="Start Import" />
+							<span name="attr_import_message"></span>
+						</div>
+
 					</div>
 
-                    <div class="toggle-notes">
-        			    <input type="checkbox" name="attr_use_damage_type_notes" value="1" checked="checked" />
-        			    <span data-i18n="show-notes-in-roll-template-label">Show notes in roll template</span>
-    			    </div>
-			    
-    			    <table>
-    			        <tr>
-    			            <th>
-								<span data-i18n="type-label">Type</span>
-							</th>
-    			            <th>
-								<span data-i18n="notes-label">Notes</span>
-							</th>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="cutting-label">Cutting</span>
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_cut">CUTTING
-Damage x1.5
-Neck Damage x2
-Skull Damage x4</textarea>
-        			            </td>
-    			        </tr>
-    			        <tr>
-							<td>
-								<span data-i18n="impaling-label">Impaling</span>
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_imp">IMPALING
-Damage x2
-Arm, Leg, Foot, or Hand x1 (B399)
-Vitals Damage x3
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="crushing-label">Crushing</span>
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_cr">CRUSHING
-Damage x1
-Neck Damage x1.5
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="abbreviation-piercing-label">PI</span>-
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_pi_minus">PIERCING-
-Damage x .5
-Vitals Damage x3
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="abbreviation-piercing-label">PI</span>
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_pi">PIERCING
-Damage x1
-Vitals Damage x3
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="abbreviation-piercing-label">PI</span>+
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_pi_plus">PIERCING+
-Damage x1.5
-Arm, Leg, Foot, or Hand x1 (B399)
-Vitals Damage x3
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="abbreviation-piercing-label">PI</span>++
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_pi_plus_plus">PIERCING++
-Damage x2
-Arm, Leg, Foot, or Hand x1 (B399)
-Vitals Damage x3
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td>
-								<span data-i18n="afflication-label">Affliction</span>
-							</td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_aff">AFFLICTION
-Special damage and affects based on affliction description</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td><span data-i18n="burn-label">Burn</span></td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_burn">BURN 
-Damage x1
-Skull Damage x4</textarea>
-    			            </td>
-    			        </tr>
-    			        <tr>
-    			            <td><span data-i18n="corrosion-label">Corrosion</span></td>
-    			            <td>
-    			                <textarea name="attr_damage_type_note_cor">CORRROSION 
-Damage x1
-Face Damage x1.5, blind eye if major wound, both eyes if full HP
-Neck Damage x1.5
-Skull Damage x4
--1 DR per 5 points damage</textarea>
-        			            </td>
-        			        </tr>
-        			        <tr>
-        			            <td>
-									<span data-i18n="fatigue-label">Fatigue</span>
-								</td>
-        			            <td>
-        			                <textarea name="attr_damage_type_note_fat">FATIGUE 
-Damage x1</textarea>
-        			            </td>
-        			        </tr>
-        			        <tr>
-        			            <td>
-									<span data-i18n="toxic-label">Toxic</span>
-								</td>
-        			            <td>
-        			                <textarea name="attr_damage_type_note_tox">TOXIC 
-Damage x1</textarea>
-        			            </td>
-        			        </tr>
-        			        <tr>
-        			            <td>
-									<span data-i18n="special-label">Special</span>
-								</td>
-        			            <td>
-        			                <textarea name="attr_damage_type_note_spec">SPECIAL 
-See notes for weapon.</textarea>
-        			            </td>
-        			        </tr>
-        			    </table>
-        			    
-		        </div><!-- end option-container -->	
-    			    
-			</div><!-- end option-column -->
-			
-		</div><!-- end options row -->
+				</div>
+
+			</div>
+
+		</div>
+
 		
 	</div> <!-- .tab0 -->
 
@@ -15283,9 +15381,9 @@ See notes for weapon.</textarea>
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.5.4";
+	var version = "2.6.0";
 
-	var latestChangesDate = "12/9/2020";
+	var latestChangesDate = "12/24/2020";
 
 	var modCascade = true;
 	
@@ -26111,6 +26209,157 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 
 		return [newSummary, originalDB];
+	}
+
+	// close roll modifiers, no updates
+	on("clicked:import_gca", (event) => {
+
+		setAttrs({"import_message": "Processing"});
+
+		importGCA();
+
+	});
+
+	/**
+	 * Import GCA JSON into character sheet
+	 */
+	function importGCA() {
+
+		getAttrs(["json_data", "mod_cascade"], values => {
+
+			let data = String(values.json_data).trim();
+
+			let success = true;
+
+			let message = "";
+			
+			let jsonData;
+
+			if (data) {
+
+				try {
+
+					jsonData = JSON.parse(data);
+
+					// check for GCA signature
+					let programName = String(jsonData.Character.Author.Program);
+
+					if (programName.toLowerCase() != "gurps character assistant") {
+
+						success = false;
+
+						message = "Invalid GCA Data. Program name was not set to GURPS Character Assistant."
+
+					}
+
+				} catch (ex) {
+
+					success = false;
+
+					message = "Invalid JSON Data. " + ex.message;
+
+				}
+
+
+			} else {
+
+				success = false;
+
+				message = "Please copy/paste JSON Data into text area.";
+
+			}
+
+			if (success) {
+
+				updateCharacterSheetWithGCA(jsonData, values.mod_cascade);
+
+			} else {
+
+				setAttrs({"import_message": message});
+
+			}
+
+
+		});
+
+	}
+
+	/**
+	 * Start processing GCA json data and update character sheet
+	 */
+	function updateCharacterSheetWithGCA(jsonData, mod_cascade) {
+
+		updateNonRepeatingFieldsWithGCA(jsonData, (jsonData) => {
+
+			setAttrs({"import_message": "Import has completed."});
+
+		});
+
+	}
+
+	/**
+	 * Update non-repeating fields, then process callback function
+	 *
+	 * @param json     jsonData GCA json data
+	 * @param function callback Function to run next
+	 */
+	function updateNonRepeatingFieldsWithGCA (jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let general = jsonData.Character.General;
+
+		let attributes = jsonData.Character.Traits.Attribute;
+
+		let updates = {
+			fullname:              general.name,
+			playername:            general.playername,
+			race:                  general.race,
+			height:                general.height,
+			weight:                general.weight,
+			age:                   general.age,
+			general_appearance:    general.appearance,
+			strength_points:       getCharacterPointsFromGCA(attributes, "ST"),
+			dexterity_points:      getCharacterPointsFromGCA(attributes, "DX"),
+			intelligence_points:   getCharacterPointsFromGCA(attributes, "IQ"),
+			health_points:         getCharacterPointsFromGCA(attributes, "HT"),
+			hit_points_points:     getCharacterPointsFromGCA(attributes, "Hit Points"),
+			fatigue_points_points: getCharacterPointsFromGCA(attributes, "Fatigue Points"),
+		};
+
+		setAttrs(updates, {silent: false}, callback(jsonData));
+
+	}
+
+	/**
+	 * Get the character points for an attribute
+	 *
+	 * @param json   attributes JSON Attribute data. Array of elements
+	 * @param string name       Name of the field to get CP for.
+	 *
+	 * @return int
+	 */
+	function getCharacterPointsFromGCA(attributes, name) {
+
+		let points = 0;
+
+		// loop through the attributes
+		attributes.forEach(attribute => {
+
+			if (name.toLowerCase() === String(attribute.name).toLowerCase()) {
+
+				points = Number(attribute.points);
+
+			}
+
+		});
+
+		if ( isNaN(points) ) {
+			points = 0;
+		}
+
+		return points;
 	}
 
 </script>
