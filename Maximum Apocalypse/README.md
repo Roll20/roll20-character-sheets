@@ -24,14 +24,13 @@ I'm using this project as a way to become familiar with the mechanics.
 - Structure deviations from core rulebook implemented to provide enough room for Special Ability and Gear descriptions
 
 ## Aspirational enhancements
-
 - Default proficiency roll prompt to disadvantage for non-proficient skills
 - Implement Disadvantage to all rolls when Emaciated
 - Implement special ability conditional modifier roll queries
 
 ## Change Log
 
-### December 13th 2020 v3.0
+### December 13th 2020 v4.0
 
 - Changed attack DC field to dropdown
 - Change weapon trait field font to match abilities & gear (more room for text)
