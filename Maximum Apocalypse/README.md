@@ -10,7 +10,7 @@ I'm using this project as a way to become familiar with the mechanics.
 
 - Structure very close to to core rulebook
 - Automatically calculates all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
-- Roll buttons for stats, skills & special stats
+- Roll buttons for stats, skills, special stats, defenses, attacks & damage
 - Roll buttons query for 0-3 advantages/disadvantages & implement advantage/disadvantage effects
 - Roll template indicates level & degree of success
 - Tick the "Threshold modifier prompt on every roll" checkbox to specify misc. threshold modifer for subsequent rolls
@@ -23,17 +23,24 @@ I'm using this project as a way to become familiar with the mechanics.
 - Starving condition will apply -10 modifier to base stats (modifier indicator will appear next to base stats)
 - Structure deviations from core rulebook implemented to provide enough room for Special Ability and Gear descriptions
 
-## Planned enhancements
-
-- Fix weapon DC field to accept letters
-- Change weapon trait field font to match abilities & gear (more room for text)
-- Add buttons for defense & build/repair rolls
-- Add button for weapon attack and damage rolls
+## Aspirational enhancements
 - Default proficiency roll prompt to disadvantage for non-proficient skills
 - Implement Disadvantage to all rolls when Emaciated
 - Implement special ability conditional modifier roll queries
 
 ## Change Log
+
+### December 13th 2020 v4.0
+
+- Changed attack DC field to dropdown
+- Change weapon trait field font to match abilities & gear (more room for text)
+- Re-arranged structure to make room in attacks section for skill field & roll buttons
+- Added skill selection for attacks
+- Added attack & damage roll buttons for attacks
+- Added roll buttons for defenses
+- Attack thresholds automatically calculated based on chosen skill
+- Attack thresholds automatically re-calculated if chosen skill prociency changes
+- Changed section widths to percentages so it adjusts with sheet window
 
 ### December 7th 2020 v3.0
 
