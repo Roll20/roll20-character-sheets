@@ -1,11 +1,120 @@
 ## Versioning
-Versions have three numbers Major.Minor.Release
+Versions have two numbers Major.Minor
 
-**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design.
+**Major**: Indicates that some form of compatibility has broken.  These versions should have notes indicating what broke and how to handle it.  May include major UI changes to sheet layout and design or fundamental changes in how parts of the sheet are managed.
 
-**Minor**: Indicates the addition of new features and/or bugfixes.
+**Minor**: Indicates the addition of new features, bugfixes or other adjustments which do not alter variable names or fundamental workflow.
 
-**Release**: Indicates bugfixes and minor UI changes only.
+## 2.7
+### Bug Fixes
+* Fixed formatting for Social Conflicts in Firefox
+### New Features
+* Added rollable hit tables
+
+## 2.6
+### New Features
+* Added Social Conflict Support
+
+## 2.5
+### Big Fixes
+* Fixed unarmed in Combat section
+
+### New Features
+* Added sheet option to enable Work Songs
+* Added sheet option to enable Artifice
+* Added sheet option to enable Alchemy
+* Added effect template
+* Added effect rolls to equipment
+* Added equipement and money to compact/mook sheets
+
+## 2.4
+### Bug Fixes
+* Fixed overflow in Firefox with Passions
+* Fixed current/max fields which would be mis-synced after JSON imports
+
+### New Features
+* Added toggle to base Exp Mod on INT
+* Added option to make Strangeness a Standard Skill
+* Added option to make The Soot a Standard Skill
+* Added Peculiarities
+* Added Odd Soot Magic Support
+* Added Odd Soot to Settings
+
+## 2.3
+### New Features
+* Added Support for Superpowers
+* Toggle to calculate Healing Rate with CON + half POW
+* Toggle to calculate Luck Points with CHA + half POW
+* Added Agony & Ecstasy to Settings
+* Cleaned up skill rolltemplate so it doesn't use bold font for everything
+
+## 2.2
+### New Features
+* Added toggle to base HP on CON+SIZ or CON+SIZ+POW or CON+SIZ+STR
+* Added toggle to base damage mod on STR+SIZ or STR+SIZ+POW or STR+SIZ+CON
+* Added toggle to add 1/10 Athletics to Initiative rolls
+* Added notes field to all skills which will display at the bottom of skill rolls
+* Added Worlds United to Settings
+
+## 2.1
+### New Features
+* Added options to enable/disable magic point/power points/prana points
+* Can now disable vehicles entirely, this is the default.  Ships and shield walls ships will need enabled unless mechanics are supplied in the setting.
+* New option to enable/disable battle units.
+* New option to enable/disable spirit type creatures and the form toggle.
+* Removed sheet variants which was a hidden feature utilized to help support the M-Space sheet on the same code base.  Now simply selecting M-Space setting will do all that work.  This includes altering the logo in the upper-right.
+* 
+
+## 2.0
+With this version I am switching back to a two number version format.  The description above has been adjusted.  The intent is to release versions in smaller chunks.  As soon as a new feature or adjustment is made it will be released as a version.  This will hopefully quicken the pace of sheet development and make sheet adjustments a bit more manageable.  Expect that 2nd number to increase rather fast.
+
+### Known Issues
+* Due to the large number of variables converting to sheet workers and the inter-related effects of values in the Mythras system, the upgrade process will sometimes not go as expected.  It is highly dependent on the order in which other value calculations are triggers when we start converting fields for sheet workers.  If the update of one value triggers a reclac for a field which is also dependent on a value which has not yet converted the process breaks down.  If this happens simply click the recalculate button.  Enough of the conversions will be complete the 2nd time around to allow the sheet calculations to complete successfully.
+
+### Compatibility Issues
+* This version removes the NPC sheet in favor of a generic Character type which can be used for NPCs or PCs.  A new Compact and Mook sheet have been added to provide the smaller sheet layout and some other features useful to NPCs.  Data from the NPC sheet will be lost due to an inability to discern which of the npc or pc values one may wish to have in the upgraded sheet.  A warning has been displayed in the NPC sheet for a number of months to copy data over to the PC sheet in preparation for this.
+* In addition a large amount of the sheet has converted over to using sheet worker for auto calculations.  As a result many variable value formats have changed.
+* A number of variables have been renamed to reflect a more generic approach to setting support.
+
+### New Features
+* Added the Compact view.  This uses the same values as the primary sheet but displays them in a simplified and compact form.  This allows a user to maintain basic easy to navigate sheets for NPCs without loosing the advanced features of the PC sheet.  If you need to access modifiers or other values not displayed in this view simply switch over to the more advanced views, edit and return to the compact view.
+* Added the Mook view.  This is nearly identical to the Compact view but provides multiple entries for current values.  This allows GMs to have one sheet representing multiple instances of like characters.  Useful when you need to have like NPCs but wish to track the full assortment of values which won't fit into the three token bars.
+* Rank is now an optional field
+* Movement values are now rounded to make them more readable
+* A number of sections can now be collapsed hiding them away when unneeded.
+* Fatigue now uses a number based value under the hood which allows it to be set up as a token bar more easily.
+* Added a toggle which switches the character between spirit and material forms.  Useful for defining spirit type characters and for shamans who often enter the spirit realm.
+* Removed the tenacity for spirits option.  Now it is simply enabled when Tenacity is.
+* Added a method to define separate swim and fly movement species values.  Useful for defining non-human characters.
+* Added Mythra Imperative as a setting which makes the sheet fall inline with the simplified rulesets better.
+* Added a sheet option to set AP to a particular value instead of being based on Characteristics.
+* Added a sheet option to enable/disable weapon reach
+* The encumbered toggle for skills is automatically checked/unchecked based on the base characteristics selected
+* Added buttons at the sheet footer which will show a link in the chat window which serve various purposes: Report a bug in the sheet, contact the sheet author, and visit the Mythras Roll20 Forum on The Design Mechanism's forum board where we discuss beta testing, plan feature enhancements, and other development tasks.
+* Firearms and Missile Weapons were merged together into Ranged Weapons
+* Shields were merged into Melee Weapons
+* Weapons and Armor and now primarily listed in the Equipment tab.  They still display for utility in other locations but they may only be added/removed in Equipment.
+* Added a sheet option to calculate Herculean difficulty at 1/10th or 1/5th standard value.
+* Added a new sheet option for the use of Linguistics instead of Language/Literacy which slightly modifies the language section to better represent how linguistics applies to multiple languages.
+
+### Bug Fixes
+* After the Vampire Wars was set as the default campaign value, it is now Default again.  Most probably never noticed because the default was reset by campaign options.
+* A few bugs in the new hit location presets were resolved
+* Resolved an issue which was preventing sheet upgrade functions from running when sheets were upgraded.
+
+### Other Changes
+* Quick Stats renamed to Build (Doesn't not take you through the build process, still just provides a quick way to input the fields you need when first defining a character).
+* Traits were broken out of Info and into it's own section
+* The Penalty field has been renamed to 101+ which will hopefully make it's purpose clearer.
+* The All tab has been removed, partially because I needed to free up the space for new tabs and also because the new Compact tab can be an effective replacement for the purpose the All tab filled.
+* Combat Styles is now just Combat and holds a number of things useful for combat like a handful of standard skills.  Weapons were also merged into this section.
+* Roll buttons which use d100 based rolls have a hundreds d10 icon instead of a d20.
+
+## 1.9.0
+### New Features
+* Added the Quick Stats tab to allow for the rapid setting of base sheet values without a lot of opening/collapsing of detail sections.
+* Added Fae Magic support for After the Vampire Wars
+* Added needed Folk Magic adjustment options for After the Vampire Wars
 
 ## 1.8.0
 ### Bug Fixes

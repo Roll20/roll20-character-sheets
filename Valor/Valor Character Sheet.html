@@ -1,0 +1,3041 @@
+<script type="text/worker">
+
+    /**
+     * VALOR CHARACTER SHEET
+     *
+     * Usage:
+     * - If you want to use unlisted mods or limits, enter "Custom #", where # is
+     * the number of tech levels to add or how much to reduce ST by. You can put
+     * extra text between Custom and the number, like "Custom (Mind reader) 6".
+     * - If you want to use unlisted skills or flaws, choose 'Custom Skill' or
+     * 'Custom Flaw' and set the level to the amount of SP.
+     *
+     **/
+
+    let flawLibrary = [
+        { cost: 1, levelUp: 1, speed: 3, id: 'customFlaw', namePattern: '^custom' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'aggravatedWounds', namePattern: '^aggravated' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'berserker', namePattern: '^berserk' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'compulsion', namePattern: '^compulsion' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'despair', namePattern: '^despair' },
+        { cost: 2, levelUp: 1, speed: 2, id: 'energyVulnerability', namePattern: '^energy vuln' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'feeble', namePattern: '^feeble' },
+        { cost: 3, levelUp: 2, speed: 2, id: 'fragile', namePattern: '^fragile' },
+        { cost: 2, levelUp: 1, speed: 2, id: 'lackOfControl', namePattern: '^lack ' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'malevolentEntity', namePattern: '^malevolent entity' },
+        { cost: 1, levelUp: 0, speed: 0, id: 'nonProficient', namePattern: '^non[ -]?proficient' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'oblivious', namePattern: '^oblivious' },
+        { cost: 2, levelUp: 1, speed: 1, id: 'slow', namePattern: '^slow$' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'slowHealing', namePattern: '^slow heal' },
+        { cost: 1, levelUp: 0, speed: 0, id: 'slowToAct', namePattern: '^slow to act' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'unthreatening', namePattern: '^unthreatening' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'uncoordinated', namePattern: '^uncoordinated' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'violent', namePattern: '^violent' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'weakAura', namePattern: '^weak aura' },
+        { cost: 2, levelUp: 1, speed: 2, id: 'weakDefender', namePattern: '^weak defend' },
+        { cost: 4, levelUp: 3, speed: 1, id: 'weakWilled', namePattern: '^weak will' },
+        { cost: 1, levelUp: 0, speed: 0, id: 'unprincipled', namePattern: '^unprincipled' },
+        { cost: 2, levelUp: 1, speed: 1, id: 'elementalVulnerability', namePattern: '^elemental vuln' },
+        { cost: 2, levelUp: 1, speed: 1, id: 'armorReliant', namePattern: '^armor reliant' },
+        { cost: 2, levelUp: 1, speed: 1, id: 'wardReliant', namePattern: '^ward reliant' },
+        { cost: 3, levelUp: 2, speed: 0, id: 'weakPhysicalAttacker', namePattern: '^weak phys(ical)? attack' },
+        { cost: 3, levelUp: 2, speed: 0, id: 'weakEnergyAttacker', namePattern: '^weak en(ergy)? attack' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'impairedAccuracy', namePattern: '^impaired acc' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'impairedEvasion', namePattern: '^impaired (evd|eva)' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'flightless', namePattern: '^malevolent possess' }
+    ];
+    let skillLibrary = [
+        { cost: 1, levelUp: 1, speed: 3, id: 'customSkill', namePattern: '^custom' },
+        { cost: 8, levelUp: 0, speed: 0, id: 'balancedFighter', namePattern: '^balanced' },
+        { cost: 6, levelUp: 6, speed: 0, id: 'bravado', namePattern: '^bravado' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'discreetAura', namePattern: '^discreet' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'darksight', namePattern: '^dark( )?sight' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'energyAttacker', namePattern: '^en(ergy)? attack' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'fastHealing', namePattern: '^fast heal' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'improvedDamageIncrement', namePattern: '^improved damage inc' }, // ERRATA: Reduced cost for IDI
+        { cost: 2, levelUp: 1, speed: 2, id: 'increasedSize', namePattern: '^increased size' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'ironDefense', namePattern: '^iron def' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'physicalAttacker', namePattern: '^phys(ical)? attack' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'resistant', namePattern: '^resistan' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'sprinter', namePattern: '^sprint' },
+        { cost: 5, levelUp: 2, speed: 2, id: 'tireless', namePattern: '^tireless' },
+        { cost: 6, levelUp: 3, speed: 2, id: 'tough', namePattern: '^tough$' },
+        { cost: 6, levelUp: 3, speed: 2, id: 'versatileFighter', namePattern: '^versatile' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'skyAttack', namePattern: '^sky attack' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'breakValorLimit', namePattern: '^break valor' },
+        { cost: 8, levelUp: 0, speed: 0, id: 'expandedReach', namePattern: '^expanded reach' },
+        { cost: 12, levelUp: 0, speed: 0, id: 'extraAction', namePattern: '^extra action' },
+        { cost: 6, levelUp: 4, speed: 1, id: 'regeneration', namePattern: '^regen' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'staminaRecovery', namePattern: '^stamina recover' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'teleportation', namePattern: '^teleport' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'unyieldingDetermination', namePattern: '^unyielding' }, // ERRATA: Reduced cost, different effect
+        { cost: 4, levelUp: 0, speed: 0, id: 'violentAura', namePattern: '^violent aura' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'bounceBack', namePattern: '^bounce back' },
+        { cost: 4, levelUp: 2, speed: 2, id: 'crisis', namePattern: '^crisis$' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'dangerSense', namePattern: '^danger sense' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'desperation', namePattern: '^desperation' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'digDeep', namePattern: '^dig deep' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'discretion', namePattern: '^discretion' },
+        { cost: 6, levelUp: 3, speed: 2, id: 'empowerAttack', namePattern: '^empower' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'improvedSwimming', namePattern: '^improved swim' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'nimbleMovement', namePattern: '^nimble move' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'overloadLimits', namePattern: '^overload limit' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'passiveHealing', namePattern: '^passive heal' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'protector', namePattern: '^protector' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'quickToAct', namePattern: '^quick to act' },
+        { cost: 5, levelUp: 3, speed: 1, id: 'recklessAttack', namePattern: '^reckless' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'resoluteStrike', namePattern: '^resolute strike' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'revenge', namePattern: '^revenge' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'rollingRecovery', namePattern: '^rolling recover' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'teamTactics', namePattern: '^team tactic' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'unmovable', namePattern: '^unmovable' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'abundantCreation', namePattern: '^abundant creat' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'cloneTactics', namePattern: '^clone tactic' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'combatToss', namePattern: '^combat toss' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'daredevil', namePattern: '^daredevil' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'phasing', namePattern: '^phasing' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'risingAttack', namePattern: '^rising attack' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'safeStride', namePattern: '^safe stride' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'splitMove', namePattern: '^split move' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'transposition', namePattern: '^transposition' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'underhanded', namePattern: '^underhanded' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'wallWalk', namePattern: '^wall walk' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'waterAdaptation', namePattern: '^water adaptation' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'waterWalk', namePattern: '^water walk' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'xRayVision', namePattern: '^x[ -]?ray' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'unshakeable', namePattern: '^unshakeable' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'unstoppable', namePattern: '^unstoppable' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'extendedRange', namePattern: '^extended range' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'freeFlight', namePattern: '^free flight' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'freeSwiftStep', namePattern: '^free swift step' },
+        { cost: 5, levelUp: 2, speed: 2, id: 'attackNode', namePattern: '^attack node$' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'darkHealing', namePattern: '^dark heal' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'dirtyTrick', namePattern: '^dirty trick' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'duel', namePattern: '^duel' },
+        { cost: 4, levelUp: 3, speed: 1, id: 'effectTransfer', namePattern: '^effect transfer' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'feint', namePattern: '^feint' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'inspire', namePattern: '^inspire' }, // ERRATA: Fixed level on Inspire
+        { cost: 5, levelUp: 3, speed: 1, id: 'intimidate', namePattern: '^intimidate' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'jump', namePattern: '^jump' },
+        { cost: 5, levelUp: 2, speed: 1, id: 'nullify', namePattern: '^nullify' },
+        { cost: 4, levelUp: 2, speed: 2, id: 'provoke', namePattern: '^provoke' },
+        { cost: 5, levelUp: 3, speed: 1, id: 'recharge', namePattern: '^recharge' },
+        { cost: 3, levelUp: 1, speed: 2, id: 'sizeUp', namePattern: '^size up' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'spiritSight', namePattern: '^spirit sight' },
+        { cost: 5, levelUp: 2, speed: 1, id: 'toss', namePattern: '^toss' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'battleAnalysis', namePattern: '^battle analysis' },
+        { cost: 6, levelUp: 0, speed: 1, id: 'clone', namePattern: '^clone$' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'effectCapture', namePattern: '^effect capture' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'healthTransference', namePattern: '^health transfer' },
+        { cost: 6, levelUp: 3, speed: 2, id: 'portal', namePattern: '^portal$' },
+        { cost: 4, levelUp: 2, speed: 2, id: 'refractionPoint', namePattern: '^refraction point' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'seal', namePattern: '^seal$' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'shadowMeld', namePattern: '^shadow( )?meld' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'staminaTransference', namePattern: '^stamina transfer' },
+        { cost: 5, levelUp: 2, speed: 1, id: 'swiftStep', namePattern: '^swift step' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'attackNodeNetwork', namePattern: '^attack node network' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'exploitWeakness', namePattern: '^exploit weakness' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'flunkyDomination', namePattern: '^flunky domination' },
+        { cost: 6, levelUp: 2, speed: 1, id: 'fly', namePattern: '^fly$' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'refractionChain', namePattern: '^refraction chain' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'swiftJump', namePattern: '^swift jump' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'combinationAttack', namePattern: '^comb(o|ination) attack' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'counterattack', namePattern: '^counter( )?attack' },
+        { cost: 6, levelUp: 2, speed: 2, id: 'cover', namePattern: '^cover$' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'ignoreEffect', namePattern: '^ignore effect' },
+        { cost: 3, levelUp: 2, speed: 1, id: 'interruptAttack', namePattern: '^interrupt attack' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'afterimage', namePattern: '^after( )?image' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'areaShield', namePattern: '^area shield' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'clash', namePattern: '^clash$' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'damageFeedback', namePattern: '^damage feedback' },
+        { cost: 5, levelUp: 2, speed: 1, id: 'divingEscape', namePattern: '^diving escape' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'finalAttack', namePattern: '^final attack' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'lineDeflect', namePattern: '^line deflect' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'mobileCover', namePattern: '^mobile cover' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'mobileDodge', namePattern: '^mobile dodge' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'opportunisticDodge', namePattern: '^opportunistic dodge' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'pushAway', namePattern: '^push away' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'rangedInterrupt', namePattern: '^ranged interrupt' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'shrugOff', namePattern: '^shrug off' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'defensiveClash', namePattern: '^defensive clash' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'deflectingShield', namePattern: '^deflecting shield' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'prepared', namePattern: '^prepared' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'acceleration', namePattern: '^acceleration' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'analysis', namePattern: '^analysis' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'blazingMight', namePattern: '^blazing might' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'burningPassion', namePattern: '^burning passion' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'fightingSpirit', namePattern: '^fighting spirit' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'hardenedDefense', namePattern: '^hardened def' },
+        { cost: 6, levelUp: 3, speed: 1, id: 'hardenedResistance', namePattern: '^hardened res' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'resoluteAura', namePattern: '^resolute aura' },
+        { cost: 5, levelUp: 0, speed: 0, id: 'strengthOfWill', namePattern: '^strength of will' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'asset', namePattern: '^asset' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'challengeTechnique', namePattern: '^challenge tech' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'favorableInsight', namePattern: '^favo(u)?rable insight' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'proficiency', namePattern: '^proficiency' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'recovery', namePattern: '^recovery' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'favorableSuccess', namePattern: '^favorable success' },
+        { cost: 6, levelUp: 4, speed: 1, id: 'companion', namePattern: '^companion$' },
+        { cost: 2, levelUp: 1, speed: 2, id: 'fastCompanion', namePattern: '^fast companion' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'hiddenCompanion', namePattern: '^hidden companion' },
+        { cost: 3, levelUp: 1, speed: 1, id: 'mount', namePattern: '^mount$' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'senseMalice', namePattern: '^sense malice' },
+        { cost: 3, levelUp: 1, speed: 1, id: 'allyMount', namePattern: '^ally mount' },
+        { cost: 4, levelUp: 4, speed: 1, id: 'companionZoneOfControl', namePattern: '^companion z' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'extendedRevival', namePattern: '^extended reviv' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'flankAttack', namePattern: '^flank' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'protectAlly', namePattern: '^protect ally' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'protectMaster', namePattern: '^protect master' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'rangedRevival', namePattern: '^ranged reviv' },
+        { cost: 3, levelUp: 1, speed: 1, id: 'tossingCompanion', namePattern: '^tossing companion' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'trustingCompanion', namePattern: '^trusting companion' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'companionSense', namePattern: '^companion sense' },
+        { cost: 3, levelUp: 3, speed: 1, id: 'flyingCompanion', namePattern: '^flying companion' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'instantMount', namePattern: '^instant mount' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'reactiveCompanion', namePattern: '^reactive companion' },
+        { cost: 12, levelUp: 0, speed: 0, id: 'limitlessPower', namePattern: '^valiant' },
+        { cost: 8, levelUp: 0, speed: 0, id: 'invisibility', namePattern: '^invisibility' },
+        { cost: 8, levelUp: 3, speed: 1, id: 'revive', namePattern: '^revive$' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'principled', namePattern: '^principled' },
+        { cost: 6, levelUp: 3, speed: 2, id: 'illusoryAssailant', namePattern: '^illusory assailant' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'illusoryDisguise', namePattern: '^illusory disguise' },
+        { cost: 4, levelUp: 2, speed: 2, id: 'illusoryTerrain', namePattern: '^illusory terrain' },
+        { cost: 4, levelUp: 0, speed: 0, id: 'pierceIllusion', namePattern: '^pierce illusion' },
+        { cost: 4, levelUp: 2, speed: 1, id: 'elementalResistance', namePattern: '^elemental resist' },
+        { cost: 3, levelUp: 0, speed: 0, id: 'elementalAttunement', namePattern: '^elemental attune' },
+        { cost: 2, levelUp: 0, speed: 0, id: 'changeAttributes', namePattern: '^change attr' },
+        { cost: 2, levelUp: 2, speed: 0, id: 'enhancedRange', namePattern: '^enhanced range' },
+        { cost: 8, levelUp: 0, speed: 0, id: 'greatAccuracy', namePattern: '^great acc' },
+        { cost: 8, levelUp: 0, speed: 0, id: 'greatEvasion', namePattern: '^great (evd|eva)' },
+        { cost: 6, levelUp: 0, speed: 0, id: 'powerfulBlow', namePattern: '^powerful blow' }
+    ];
+    let coreLibrary = [
+        { cost: 2, levelUp: 1, id: 'damage' },
+        { cost: 1, levelUp: 1, id: 'barrier' },
+        { cost: 0, levelUp: 2, id: 'boost' },
+        { cost: 1, levelUp: 1, id: 'healing' },
+        { cost: 0, levelUp: 0, id: 'mimic' },
+        { cost: 3, levelUp: 2, id: 'summoning' },
+        { cost: 1, levelUp: 1, id: 'weaken' },
+        { cost: 4, levelUp: 2, id: 'ultDamage' },
+        { cost: 0, levelUp: 3, id: 'ultTransform' }
+    ];
+
+    function calculateBaseAttributes() {
+        log('VALOR - Recalculating Base Attributes');
+        getAttrs(['level', 'strength', 'agility', 'spirit', 'mind', 'guts'], function(values) {
+            let level = parseInt(values.level);
+            let strength = parseInt(values.strength);
+            let agility = parseInt(values.agility);
+            let spirit = parseInt(values.spirit);
+            let mind = parseInt(values.mind);
+            let guts = parseInt(values.guts);
+
+            if(strength > level + 7) {
+                strength = level + 7;
+            }
+            if(agility > level + 7) {
+                agility = level + 7;
+            }
+            if(spirit > level + 7) {
+                spirit = level + 7;
+            }
+            if(mind > level + 7) {
+                mind = level + 7;
+            }
+            if(guts > level + 7) {
+                guts = level + 7;
+            }
+
+            if(strength < 1) {
+                strength = 1
+            }
+            if(agility < 1) {
+                agility = 1
+            }
+            if(spirit < 1) {
+                spirit = 1
+            }
+            if(mind < 1) {
+                mind = 1
+            }
+            if(guts < 1) {
+                guts = 1
+            }
+
+            let unspentAttributePoints = 22 + 3 * level - strength - agility - spirit - mind - guts;
+
+            // Set values
+            setAttrs({
+                strength: strength,
+                agility: agility,
+                spirit: spirit,
+                mind: mind,
+                guts: guts,
+                unspentattributepoints: unspentAttributePoints
+            });
+        });
+    }
+
+    function calculateActiveAttributes() {
+        log('VALOR - Recalculating Active Attributes');
+        getAttrs(['level', 'strength', 'agility', 'spirit', 'mind', 'guts', 'type'], function(values) {
+            const level = parseInt(values.level);
+            const strength = parseInt(values.strength);
+            const agility = parseInt(values.agility);
+            const spirit = parseInt(values.spirit);
+            const mind = parseInt(values.mind);
+            const guts = parseInt(values.guts);
+
+            let muscle = Math.ceil((level + strength) / 2);
+            let dexterity = Math.ceil((level + agility) / 2);
+            let aura = Math.ceil((level + spirit) / 2);
+            let intuition = Math.ceil((level + mind) / 2);
+            let resolve = Math.ceil((level + guts) / 2);
+
+            switch(values.type) {
+                case 'flunky':
+                case 'soldier':
+                    muscle--;
+                    dexterity--;
+                    aura--;
+                    intuition--;
+                    resolve--;
+                    break;
+            }
+
+            // Apply Skills
+            let skillFieldNames = [];
+            getSectionIDs('repeating_skills', function(sidarray) {
+                for(let i = 0; i < sidarray.length; i++) {
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                }
+                getAttrs(skillFieldNames, function(skillValues) {
+                    for(let i = 0; i < sidarray.length; i++) {
+                        const skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                        if(skillName && skillName == 'balancedFighter') {
+                            let stats = [muscle, dexterity, aura, intuition, resolve];
+                            const highestStat = Math.max(...stats);
+                            if(muscle < highestStat) {
+                                muscle++;
+                            }
+                            if(dexterity < highestStat) {
+                                dexterity++;
+                            }
+                            if(aura < highestStat) {
+                                aura++;
+                            }
+                            if(intuition < highestStat) {
+                                intuition++;
+                            }
+                            if(resolve < highestStat) {
+                                resolve++;
+                            }
+                        }
+                    }
+
+                    // Set values
+                    setAttrs({
+                        muscle: muscle,
+                        dexterity: dexterity,
+                        aura: aura,
+                        intuition: intuition,
+                        resolve: resolve
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateAttack() {
+        log('VALOR - Recalculating Attack');
+        getAttrs(['level', 'strength', 'agility', 'spirit', 'mind', 'guts', 'type'], function(values) {
+            let level = parseInt(values.level);
+            let strength = parseInt(values.strength);
+            let agility = parseInt(values.agility);
+            let spirit = parseInt(values.spirit);
+            let mind = parseInt(values.mind);
+            let guts = parseInt(values.guts);
+
+            let strengthAttack = (level + strength) * 2;
+            let agilityAttack = (level + agility) * 2;
+            let spiritAttack = (level + spirit) * 2;
+            let mindAttack = (level + mind) * 2;
+
+            // Apply Skills
+            let skillFieldNames = [];
+            getSectionIDs('repeating_skills', function(sidarray) {
+                for(let i = 0; i < sidarray.length; i++) {
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                }
+                getAttrs(skillFieldNames, function(skillValues) {
+                    for(let i = 0; i < sidarray.length; i++) {
+                        let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                        if(!skillName) {
+                            skillName = 'customSkill';
+                        }
+                        let skillLevel = 1;
+                        if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                            skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                        }
+
+                        switch(skillName) {
+                            case 'energyAttacker':
+                                spiritAttack += 3 + 3 * skillLevel;
+                                mindAttack += 3 + 3 * skillLevel;
+                                break;
+                            case 'physicalAttacker':
+                                strengthAttack += 3 + 3 * skillLevel;
+                                agilityAttack += 3 + 3 * skillLevel;
+                                break;
+                        }
+                    }
+
+                    switch(values.type) {
+                        case 'flunky':
+                        case 'soldier':
+                        case 'swarm':
+                            strengthAttack = Math.ceil(strengthAttack / 2);
+                            agilityAttack = Math.ceil(agilityAttack / 2);
+                            spiritAttack = Math.ceil(spiritAttack / 2);
+                            mindAttack = Math.ceil(mindAttack / 2);
+                            break;
+                        case 'master':
+                            strengthAttack += strength;
+                            agilityAttack += agility;
+                            spiritAttack += spirit;
+                            mindAttack += mind;
+                            break;
+                    }
+
+                    // Set values
+                    setAttrs({
+                        strengthattack: strengthAttack,
+                        agilityattack: agilityAttack,
+                        spiritattack: spiritAttack,
+                        mindattack: mindAttack
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateHealth() {
+        log('VALOR - Recalculating Max Health');
+        getAttrs(['level', 'strength', 'guts', 'type'], function(values) {
+            let level = parseInt(values.level);
+            let strength = parseInt(values.strength);
+            let guts = parseInt(values.guts);
+
+            let health = 50 + 10 * level + 10 * guts + 5 * strength;
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        let flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'fragile':
+                                health -= 15 + 15 * flawLevel;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                let skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'tough':
+                                        health += 15 + 15 * skillLevel;
+                                        break;
+                                }
+                            }
+
+                            switch(values.type) {
+                                case 'flunky':
+                                    health = 1;
+                                    break;
+                                case 'soldier':
+                                    health = Math.ceil(health / 2);
+                                    break;
+                                case 'master':
+                                    health *= 2;
+                                    break;
+                            }
+
+                            // Set values
+                            setAttrs({
+                                health_max: health,
+                                healthincrement: Math.ceil(health / 5),
+                                criticalhealth: Math.ceil(health / 5) * 2
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateStamina() {
+        log('VALOR - Recalculating Max Stamina');
+        getAttrs(['level', 'mind', 'spirit', 'type'], function(values) {
+            let level = parseInt(values.level);
+            let mind = parseInt(values.mind);
+            let spirit = parseInt(values.spirit);
+
+            let stamina = 8 + 4 * level + 2 * spirit + 2 * mind;
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        let flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'lackOfControl':
+                                stamina -= 2 + 6 * flawLevel;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                let skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'tireless':
+                                        stamina += 2 + 6 * skillLevel;
+                                        break;
+                                }
+                            }
+
+                            switch(values.type) {
+                                case 'master':
+                                    stamina *= 2;
+                                    break;
+                            }
+
+                            // Set values
+                            setAttrs({
+                                stamina_max: stamina,
+                                staminaincrement: Math.ceil(stamina / 5)
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateDefense() {
+        log('VALOR - Recalculating Defense');
+        getAttrs(['level', 'strength', 'guts', 'type'], function(values) {
+            let level = parseInt(values.level);
+            let strength = parseInt(values.strength);
+            let guts = parseInt(values.guts);
+
+            let defense = 2 * level + strength + guts;
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        let flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'weakDefender':
+                                defense -= 2 + 2 * flawLevel;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                let skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'ironDefense':
+                                        defense += 2 + 2 * skillLevel;
+                                        break;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                defense: defense
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateResistance() {
+        log('VALOR - Recalculating Resistance');
+        getAttrs(['level', 'spirit', 'mind', 'type'], function(values) {
+            let level = parseInt(values.level);
+            let spirit = parseInt(values.spirit);
+            let mind = parseInt(values.mind);
+
+            let resistance = 2 * level + spirit + mind;
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        let flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'energyVulnerability':
+                                resistance -= 2 + 2 * flawLevel;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                let skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'resistant':
+                                        resistance += 2 + 2 * skillLevel;
+                                        break;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                resistance: resistance
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateMove() {
+        log('VALOR - Recalculating Move');
+        getAttrs(['agility'], function(values) {
+            let agility = parseInt(values.agility);
+
+            let move = Math.ceil(agility / 4) + 2;
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        let flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'slow':
+                                move -= flawLevel;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                let skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'sprinter':
+                                        move += skillLevel;
+                                        break;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                move: move
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateDamageIncrement() {
+        log('VALOR - Recalculating Damage Increment');
+        getAttrs(['level', 'type'], function(values) {
+            let level = parseInt(values.level);
+
+            let damageIncrement = level + 5;
+
+            // Apply Skills
+            let skillFieldNames = [];
+            getSectionIDs('repeating_skills', function(sidarray) {
+                for(let i = 0; i < sidarray.length; i++) {
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                }
+                getAttrs(skillFieldNames, function(skillValues) {
+                    for(let i = 0; i < sidarray.length; i++) {
+                        let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                        if(!skillName) {
+                            skillName = 'customSkill';
+                        }
+                        let skillLevel = 1;
+                        if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                            skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                        }
+
+                        switch(skillName) {
+                            case 'improvedDamageIncrement':
+                                damageIncrement += 2 + 2 * skillLevel; // ERRATA: More powerful IDI
+                                break;
+                        }
+                    }
+
+                    switch(values.type) {
+                        case 'flunky':
+                        case 'soldier':
+                            damageIncrement = Math.ceil(damageIncrement / 2);
+                            break;
+                    }
+
+                    // Set values
+                    setAttrs({
+                        damageincrement: damageIncrement
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateInitiative() {
+        log('VALOR - Recalculating Initiative');
+        getAttrs(['dexterity'], function(values) {
+            let initiative = parseInt(values.dexterity);
+
+            // Apply Flaws
+            let flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(let i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    for(let i = 0; i < idarray.length; i++) {
+                        let flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+
+                        // Apply effects
+                        switch(flawName) {
+                            case 'slowToAct':
+                                initiative -= 2;
+                                break;
+                        }
+                    }
+
+                    // Apply Skills
+                    let skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(let i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(let i = 0; i < sidarray.length; i++) {
+                                let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+
+                                switch(skillName) {
+                                    case 'quickToAct':
+                                        initiative += 2;
+                                        break;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                initiative: initiative
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateBonuses() {
+        log('VALOR - Recalculating Attack/Defense Bonuses');
+        getAttrs(['type'], function(values) {
+
+            let atkBonus = 0;
+            let defBonus = 0;
+
+            if(values.type == 'master') {
+                atkBonus++;
+            }
+
+            // Apply Skills
+            let skillFieldNames = [];
+            getSectionIDs('repeating_skills', function(sidarray) {
+                for(let i = 0; i < sidarray.length; i++) {
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                }
+                getAttrs(skillFieldNames, function(skillValues) {
+                    for(let i = 0; i < sidarray.length; i++) {
+                        let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                        if(!skillName) {
+                            skillName = 'customSkill';
+                        }
+                        let skillLevel = 1;
+                        if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                            skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                        }
+
+                        switch(skillName) {
+                            case 'increasedSize':
+                                atkBonus++;
+                                defBonus--;
+                                break;
+                            case 'diminuitive':
+                                atkBonus--;
+                                defBonus++;
+                                break;
+                        }
+                    }
+
+                    let atkBonusDisp = ' ';
+                    if(atkBonus > 0) atkBonusDisp = `+${atkBonus}`;
+                    if(atkBonus < 0) atkBonusDisp = atkBonus;
+                    let defBonusDisp = ' ';
+                    if(defBonus > 0) defBonusDisp = `+${defBonus}`;
+                    if(defBonus < 0) defBonusDisp = defBonus;
+
+                    // Set values
+                    setAttrs({
+                        iatkrollbonus: atkBonus,
+                        idefrollbonus: defBonus,
+                        iatkrollbonusdisp: atkBonusDisp,
+                        idefrollbonusdisp: defBonusDisp,
+                    });
+                });
+            });
+        });
+    }
+
+    // Utility function that unpacks camelcase into a display name.
+    function getDisplayName(name) {
+        return name
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, function(str) { return str.toUpperCase(); });
+    }
+
+    function calculateFlawsAndSkills() {
+        log('VALOR - Recalculating Flaws & Skills');
+        getAttrs(['level', 'type'], function(values) {
+            var level = parseInt(values.level);
+            var unspentSkillPoints = 14 + 6 * level;
+
+            // Various values determined solely by skill list
+            var valor = 10;
+            var hasUlt = false;
+
+            switch(values.type) {
+                case 'flunky':
+                case 'soldier':
+                    unspentSkillPoints = Math.ceil(unspentSkillPoints / 2);
+                    break;
+                case 'master':
+                    unspentSkillPoints += 4 + level;
+                    break;
+            }
+
+            // Apply Flaws
+            var flawFieldNames = [];
+            getSectionIDs('repeating_flaws', function(idarray) {
+                for(var i = 0; i < idarray.length; i++) {
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawname`);
+                    flawFieldNames.push(`repeating_flaws_${idarray[i]}_flawlevel`);
+                }
+                getAttrs(flawFieldNames, function(flawValues) {
+                    var flawSP = 0;
+                    for(var i = 0; i < idarray.length; i++) {
+                        var warning = ' ';
+                        var flawName = flawValues[`repeating_flaws_${idarray[i]}_flawname`];
+                        if(!flawName) {
+                            flawName = 'customFlaw';
+                        }
+                        var flawLevel = 1;
+                        if(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]) {
+                            flawLevel = parseInt(flawValues[`repeating_flaws_${idarray[i]}_flawlevel`]);
+                        }
+
+                        var flaw = flawLibrary.find(function(f) {
+                            return f.id == flawName;
+                        });
+
+                        if(flaw) {
+                            var flawMaxLevel = 1;
+                            switch(flaw.speed) {
+                                case 1:
+                                    flawMaxLevel = Math.ceil(level / 5);
+                                    break;
+                                case 2:
+                                    flawMaxLevel = Math.ceil(level / 3);
+                                    break;
+                                case 3:
+                                    flawMaxLevel = 100; // Custom Flaw
+                            }
+                            if(flawLevel > flawMaxLevel && flaw.speed != 3) {
+                                warning = getTranslationByKey('warning-flaw-level-cap').replace("{{0}}", flawMaxLevel);
+                                log(warning);
+                            }
+
+                            var flawAttrs = {};
+                            flawAttrs[`repeating_flaws_${idarray[i]}_warning`] = warning;
+                            setAttrs(flawAttrs, { silent: true });
+
+                            flawSP += flaw.cost + (flawLevel - 1) * flaw.levelUp;
+                        }
+                    }
+
+                    // Gain SP from Flaws
+                    if(flawSP > level + 7) {
+                        flawSP = level + 7;
+                    }
+                    unspentSkillPoints += flawSP;
+
+                    // Apply Skills
+                    var skillFieldNames = [];
+                    getSectionIDs('repeating_skills', function(sidarray) {
+                        for(var i = 0; i < sidarray.length; i++) {
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                            skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                        }
+                        getAttrs(skillFieldNames, function(skillValues) {
+                            for(var i = 0; i < sidarray.length; i++) {
+                                var warning = ' ';
+                                var skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                                if(!skillName) {
+                                    skillName = 'customSkill';
+                                }
+                                var skillLevel = 1;
+                                if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                                    skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                                }
+
+                                switch(skillName) {
+                                    case 'breakValorLimit':
+                                        valor += 10;
+                                        break;
+                                }
+
+                                var skill = skillLibrary.find(function(s) {
+                                    return s.id == skillName;
+                                });
+
+                                if(skill) {
+                                    var skillMaxLevel = 1;
+                                    switch(skill.speed) {
+                                        case 1:
+                                            skillMaxLevel = Math.ceil(level / 5);
+                                            break;
+                                        case 2:
+                                            skillMaxLevel = Math.ceil(level / 3);
+                                            break;
+                                        case 3:
+                                            skillMaxLevel = 100; // Custom Skill
+                                    }
+
+                                    if(skillLevel > skillMaxLevel && skill.level != 3) {
+                                        warning = getTranslationByKey('warning-skill-level-cap').replace("{{0}}", skillMaxLevel);
+                                    }
+
+                                    var skillAttrs = {};
+                                    skillAttrs[`repeating_skills_${sidarray[i]}_warning`] = warning;
+                                    setAttrs(skillAttrs, { silent: true });
+
+                                    unspentSkillPoints -= skill.cost + (skillLevel - 1) * skill.levelUp;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                unspentskillpoints: unspentSkillPoints,
+                                valor_max: valor
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateTP() {
+        log('VALOR - Recalculating Unspent TP');
+        getAttrs(['level', 'type'], function(values) {
+            let level = parseInt(values.level);
+
+            let unspentTechPoints = 8 + 4 * level;
+            let flunkyTP = 2 + level;
+            let soldierTP = 4 + 2 * level;
+            if(level > 5) {
+                unspentTechPoints += level - 5;
+                flunkyTP += level - 5;
+                soldierTP += level - 5;
+            }
+            if(level > 10) {
+                unspentTechPoints += level - 10;
+            }
+            if(level > 15) {
+                unspentTechPoints += level - 15;
+                soldierTP += level - 15;
+            }
+
+            let hasUlt = false;
+
+            switch(values.type) {
+                case 'flunky':
+                    unspentTechPoints = flunkyTP;
+                    break;
+                case 'soldier':
+                case 'swarm':
+                    unspentTechPoints = soldierTP;
+                    break;
+                case 'master':
+                    unspentTechPoints += 1 + level;
+                    break;
+
+            }
+
+            // Apply Skills
+            let skillFieldNames = [];
+            getSectionIDs('repeating_skills', function(sidarray) {
+                for(let i = 0; i < sidarray.length; i++) {
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skillname`);
+                    skillFieldNames.push(`repeating_skills_${sidarray[i]}_skilllevel`);
+                }
+                getAttrs(skillFieldNames, function(skillValues) {
+                    for(let i = 0; i < sidarray.length; i++) {
+                        let skillName = skillValues[`repeating_skills_${sidarray[i]}_skillname`];
+                        if(!skillName) {
+                            skillName = 'customSkill';
+                        }
+                        let skillLevel = 1;
+                        if(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]) {
+                            skillLevel = parseInt(skillValues[`repeating_skills_${sidarray[i]}_skilllevel`]);
+                        }
+
+                        switch(skillName) {
+                            case 'versatileFighter':
+                                switch(values.type) {
+                                    case 'flunky':
+                                        unspentTechPoints += skillLevel;
+                                        break;
+                                    case 'soldier':
+                                    case 'swarm':
+                                        unspentTechPoints += 2 + skillLevel;
+                                        break;
+                                    default:
+                                        unspentTechPoints += 2 + 2 * skillLevel;
+                                        break;
+                                }
+                                break;
+                            case 'ultimateAttack':
+                                hasUlt = true;
+                                break;
+                        }
+                    }
+
+                    // Apply techs
+                    let techFieldNames = [];
+                    getSectionIDs('repeating_techs', function(tidarray) {
+                        for(let i = 0; i < tidarray.length; i++) {
+                            techFieldNames.push(`repeating_techs_${tidarray[i]}_tech_core_level`);
+                            techFieldNames.push(`repeating_techs_${tidarray[i]}_tech_mod_level`);
+                            techFieldNames.push(`repeating_techs_${tidarray[i]}_tech_core`);
+                        }
+
+                        getAttrs(techFieldNames, function(techValues) {
+
+                            let ults = [];
+                            if(level >= 5) {
+                                ults.push(8);
+                            }
+                            if(level >= 10) {
+                                ults.push(13);
+                            }
+                            if(level >= 15) {
+                                ults.push(18);
+                            }
+                            if(level >= 20) {
+                                ults.push(23);
+                            }
+                            if(hasUlt) {
+                                ults.push(level);
+                            }
+
+                            for(let i = 0; i < tidarray.length; i++) {
+                                techCore = techValues[`repeating_techs_${tidarray[i]}_tech_core`];
+                                let techCoreLevel = 1;
+                                if(techValues[`repeating_techs_${tidarray[i]}_tech_core_level`]) {
+                                    techCoreLevel = parseInt(techValues[`repeating_techs_${tidarray[i]}_tech_core_level`]);
+                                }
+                                let techModsLevel = 0;
+                                if(techValues[`repeating_techs_${tidarray[i]}_tech_mod_level`]) {
+                                    techModsLevel = parseInt(techValues[`repeating_techs_${tidarray[i]}_tech_mod_level`]);
+                                }
+
+                                let spentTP = techModsLevel + techCoreLevel;
+
+                                // Set the tech's total level
+                                let techAttrs = {};
+                                techAttrs[`repeating_techs_${tidarray[i]}_tech_level`] = spentTP;
+                                setAttrs(techAttrs);
+
+                                if((techCore == 'ultDamage' || techCore == 'ultTransform')
+                                    && ults.length > 0) {
+                                    // Use the next Ult to offset the TP cost
+                                    spentTP -= ults[0];
+                                    ults.splice(0,1);
+                                }
+
+                                if(spentTP > 0) {
+                                    unspentTechPoints -= spentTP;
+                                }
+                            }
+
+                            // Set values
+                            setAttrs({
+                                unspenttechpoints: unspentTechPoints
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    function calculateTech(techId) {
+        log(`VALOR - Recalculating Technique ID ${techId}`);
+
+        let techFieldNames = ['strength', 'agility', 'spirit', 'mind', 'guts',
+                              'muscle', 'dexterity', 'aura', 'intuition', 'resolve',
+                              'strengthattack', 'agilityattack', 'spiritattack', 'mindattack',
+                              'level', 'health_max', 'damageincrement', 'type',
+                              'rollbonus', 'atkrollbonus', 'iatkrollbonus', 'eatkbonus', 'patkbonus'];
+
+        techFieldNames.push(`repeating_techs_${techId}_tech_name`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_core_level`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_core`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_stat`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_mods`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_limits`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_description`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_granted_skills`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_inflicted_flaws`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_targets`);
+        techFieldNames.push(`repeating_techs_${techId}_tech_custom_cost`);
+
+        getAttrs(techFieldNames, function(techValues) {
+            const level = parseInt(techValues.level);
+            const health = parseInt(techValues.health_max);
+            const damageIncrement = parseInt(techValues.damageincrement);
+            const strength = parseInt(techValues.strength);
+            const agility = parseInt(techValues.agility);
+            const spirit = parseInt(techValues.spirit);
+            const mind = parseInt(techValues.mind);
+            const guts = parseInt(techValues.guts);
+            const rollBonus = parseInt(techValues.rollbonus);
+            const attackRollBonus = parseInt(techValues.atkrollbonus);
+            const inherentAttackRollBonus = parseInt(techValues.iatkrollbonus);
+            const energyAttackBonus = parseInt(techValues.eatkbonus);
+            const physicalAttackBonus = parseInt(techValues.patkbonus);
+
+            let techName = techValues[`repeating_techs_${techId}_tech_name`];
+            let techStat = techValues[`repeating_techs_${techId}_tech_stat`];
+            let techGrantedSkills = techValues[`repeating_techs_${techId}_tech_granted_skills`];
+            let techInflictedFlaws = techValues[`repeating_techs_${techId}_tech_inflicted_flaws`];
+            let techDescription = techValues[`repeating_techs_${techId}_tech_description`];
+            let techCore = 'damage';
+            if(techValues[`repeating_techs_${techId}_tech_core`]) {
+                techCore = techValues[`repeating_techs_${techId}_tech_core`];
+            }
+            let techMods = '';
+            if(techValues[`repeating_techs_${techId}_tech_mods`]) {
+                techMods = techValues[`repeating_techs_${techId}_tech_mods`].toLowerCase();
+            }
+            let techLimits = '';
+            if(techValues[`repeating_techs_${techId}_tech_limits`]) {
+                techLimits = techValues[`repeating_techs_${techId}_tech_limits`].toLowerCase();
+            }
+            let techCoreLevel = 1;
+            if(techValues[`repeating_techs_${techId}_tech_core_level`]) {
+                techCoreLevel = parseInt(techValues[`repeating_techs_${techId}_tech_core_level`]);
+            }
+            let techTargets = 1;
+            if(techValues[`repeating_techs_${techId}_tech_targets`]) {
+                techTargets = parseInt(techValues[`repeating_techs_${techId}_tech_targets`]);
+            }
+            if(techTargets > 20) {
+                techTargets = 20;
+            }
+            let techCustomCost = 0;
+            if(techValues[`repeating_techs_${techId}_tech_custom_cost`]) {
+                techCustomCost = parseInt(techValues[`repeating_techs_${techId}_tech_custom_cost`]);
+            }
+
+
+            // Build tech summary
+            let summary = '';
+            let warnings = [];
+
+            let hasSkills = false;
+            let hasFlaws = false;
+            let skillSpMax
+            let flawSpMax = 0;
+            let barrierFreebie = false;
+
+            if(techCoreLevel < 1) {
+                warnings.push(getTranslationByKey('warning-core-power-1'));
+            }
+
+            // Is this an ult?
+            if(techCore == 'ultDamage' || techCore == 'ultTransform') {
+                summary += getTranslationByKey('desc-ultimate-technique');
+            }
+
+            // Display required action
+            let action = getTranslationByKey('attack');
+            if(techCore == 'barrier' || techCore == 'boost' ||
+               techCore == 'healing' || techCore == 'weaken' ||
+               techCore == 'ultTransform') {
+                action  = getTranslationByKey('support');
+            }
+            if(techMods.indexOf('rush') > -1 || techMods.indexOf('ram') > -1) {
+                action = getTranslationByKey('attack-move');
+            }
+            if((techCore == 'summoning' && techMods.indexOf('quick summon') == -1) || techLimits.indexOf('slow') > -1) {
+                action = getTranslationByKey('slow');
+            }
+            if(techCore != 'custom') {
+                summary += getTranslationByKey('desc-action').replace("{{0}}", action);
+            }
+
+            // Display core functionality
+            let rollStat = techStat;
+            let rollStatName = '';
+            if(techMods.indexOf('muscular') > -1) {
+                rollStat = 'strength';
+            }
+            if(techMods.indexOf('dexterous') > -1 ||
+               techMods.indexOf('dextrous') > -1) {
+                rollStat = 'agility';
+            }
+            if(techMods.indexOf('aura') > -1) {
+                rollStat = 'spirit';
+            }
+            if(techMods.indexOf('intuitive') > -1) {
+                rollStat = 'mind';
+            }
+            if(techMods.indexOf('intuitive') > -1) {
+                rollStat = 'mind';
+            }
+            
+            let techRoll = '';
+            let damageAmount = 0;
+            let healingAmount = 0;
+            let transformAmount = 0;
+            let defRes = 'def';
+            let displayMods = [];
+
+            if(techCore == 'damage' ||
+               techCore == 'ultDamage' ||
+               techCore == 'weaken' ||
+               techCore == 'custom') {
+                let hitBonus = 0;
+                if(techMods.indexOf('accurate') > -1) {
+                    hitBonus += 2;
+                }
+                if(techLimits.indexOf('final') > -1) {
+                    hitBonus += 5;
+                }
+                let toHit = 0;
+                switch(rollStat) {
+                    case 'strength':
+                        toHit = techValues.muscle + hitBonus;
+                        rollStatName = getTranslationByKey('muscle');
+                        break;
+                    case 'agility':
+                        toHit = techValues.dexterity + hitBonus;
+                        rollStatName = getTranslationByKey('dexterity');
+                        break;
+                    case 'spirit':
+                        toHit = techValues.aura + hitBonus;
+                        rollStatName = getTranslationByKey('aura');
+                        break;
+                    case 'mind':
+                        toHit = techValues.intuition + hitBonus;
+                        rollStatName = getTranslationByKey('intuition');
+                        break;
+                    case 'guts':
+                        toHit = techValues.resolve + hitBonus;
+                        rollStatName = getTranslationByKey('resolve');
+                        break;
+                }
+                summary += getTranslationByKey('desc-roll-to-hit')
+                    .replace("{{0}}", rollStatName)
+                    .replace("{{1}}", toHit);
+                
+                if(techCore == 'damage' || techCore == 'ultDamage') {
+                    toHit += attackRollBonus + inherentAttackRollBonus;
+                }
+                toHit += rollBonus;
+                
+                techRoll += `[[1d10+${toHit}]] ${rollStatName}`;
+            }
+            
+            switch(techCore) {
+                case 'damage':
+                case 'ultDamage':
+
+                    // Get damage and stat for description
+                    let specialAttack =
+                        techMods.indexOf('sapping') > -1 ||
+                        techMods.indexOf('piercing') > -1 ||
+                        techMods.indexOf('drain') > -1 ||
+                        techMods.indexOf('persistent') > -1 ||
+                        techMods.indexOf('debilitating') > -1 ||
+                        techMods.indexOf('boosting') > -1;
+                    switch(techStat) {
+                        case 'strength':
+                            if(specialAttack && techCore == 'damage') {
+                                damageAmount = 12 + 4 * techCoreLevel + Math.ceil(techValues.strengthattack / 2);
+                            } else if((!specialAttack && techCore == 'damage') || (specialAttack && techCore == 'ultDamage')) {
+                                damageAmount = 15 + 5 * techCoreLevel + techValues.strengthattack;
+                            } else {
+                                damageAmount = 24 + 8 * techCoreLevel + techValues.strengthattack;
+                            }
+                            damageAmount += physicalAttackBonus;
+                            summary += getTranslationByKey('desc-physical-damage').replace("{{0}}", damageAmount);
+                            break;
+                        case 'agility':
+                            if(specialAttack && techCore == 'damage') {
+                                damageAmount = 12 + 4 * techCoreLevel + Math.ceil(techValues.agilityattack / 2);
+                            } else if((!specialAttack && techCore == 'damage') || (specialAttack && techCore == 'ultDamage')) {
+                                damageAmount = 15 + 5 * techCoreLevel + techValues.agilityattack;
+                            } else {
+                                damageAmount = 24 + 8 * techCoreLevel + techValues.agilityattack;
+                            }
+                            damageAmount += physicalAttackBonus;
+                            summary += getTranslationByKey('desc-physical-damage').replace("{{0}}", damageAmount);
+                            break;
+                        case 'spirit':
+                            if(specialAttack && techCore == 'damage') {
+                                damageAmount = 12 + 4 * techCoreLevel + Math.ceil(techValues.spiritattack / 2);
+                            } else if((!specialAttack && techCore == 'damage') || (specialAttack && techCore == 'ultDamage')) {
+                                damageAmount = 15 + 5 * techCoreLevel + techValues.spiritattack;
+                            } else {
+                                damageAmount = 24 + 8 * techCoreLevel + techValues.spiritattack;
+                            }
+                            damageAmount += energyAttackBonus;
+                            summary += getTranslationByKey('desc-energy-damage').replace("{{0}}", damageAmount);
+                            defRes = 'res';
+                            break;
+                        case 'mind':
+                            if(specialAttack && techCore == 'damage') {
+                                damageAmount = 12 + 4 * techCoreLevel + Math.ceil(techValues.mindattack / 2);
+                            } else if((!specialAttack && techCore == 'damage') || (specialAttack && techCore == 'ultDamage')) {
+                                damageAmount = 15 + 5 * techCoreLevel + techValues.mindattack;
+                            } else {
+                                damageAmount = 24 + 8 * techCoreLevel + techValues.mindattack;
+                            }
+                            damageAmount += energyAttackBonus;
+                            summary += getTranslationByKey('desc-energy-damage').replace("{{0}}", damageAmount);
+                            defRes = 'res';
+                            break;
+                    }
+                    break;
+                case 'healing':
+                    switch(techStat) {
+                        case 'spirit':
+                            healingAmount = Math.ceil(spirit / 2); // ERRATA - Reduced Healing power
+                            break;
+                        case 'mind':
+                            healingAmount = Math.ceil(mind / 2);
+                            break;
+                        case 'guts':
+                            healingAmount = Math.ceil(guts / 2);
+                            break;
+                    }
+                    healingAmount += 9 + 3 * techCoreLevel;
+                    if(techValues.type == 'flunky' || techValues.type == 'soldier') healingAmount = Math.ceil(healingAmount / 2);
+                    summary += getTranslationByKey('desc-healing-core').replace("{{0}}", healingAmount);
+                    break;
+                case 'barrier':
+                    summary += getTranslationByKey('desc-barrier-core').replace("{{0}}", techCoreLevel);
+                    barrierFreebie = true;
+                    break;
+                case 'mimic':
+                    summary += getTranslationByKey('desc-mimic-core').replace("{{0}}", techCoreLevel);
+                    break;
+                case 'summoning':
+                    summary += getTranslationByKey('desc-summoning-core').replace("{{0}}", techCoreLevel);
+                    break;
+                case 'ultTransform':
+                    transformAmount = level * 10;
+                    if(techValues.type == 'master') {
+                        transformAmount *= 2;
+                    }
+                    summary += getTranslationByKey('desc-transformation-core').replace("{{0}}", transformAmount);
+                    if(techGrantedSkills) {
+                        summary += getTranslationByKey('desc-grants-skills').replace("{{0}}", techGrantedSkills);
+                    }
+                    hasSkills = true;
+                    break;
+                case 'boost':
+                    if(techGrantedSkills) {
+                        summary += getTranslationByKey('desc-grants-skills').replace("{{0}}", techGrantedSkills);
+                    }
+                    hasSkills = true;
+                    break;
+                case 'weaken':
+                    if(techInflictedFlaws) {
+                        summary += getTranslationByKey('desc-inflicts-flaws').replace("{{0}}", techInflictedFlaws);
+                    }
+                    hasFlaws = true;
+                    break;
+                case 'custom':
+                    hasSkills = true;
+                    hasFlaws = true;
+                    break;
+                default:
+                    warnings.push(getTranslationByKey('warning-unknown-core').replace("{{0}}", techCoreLevel));
+                    break;
+            }
+            summary += '\n';
+
+            // Display mods
+            let totalModLevel = 0;
+            let mods = techMods.split('\n');
+            mods.forEach(function(mod) {
+                // Try to get the level
+                let split = mod.split(' ');
+                let modLevel = parseInt(split[split.length - 1]);
+                if(modLevel != modLevel) {
+                    // NaN, so there's no level listed - assume 1
+                    modLevel = 1;
+                }
+
+                if(mod.indexOf('custom') == 0) {
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('range') == 0) {
+                    let range = 3 * modLevel;
+                    switch(techStat) {
+                        case 'strength':
+                            range = 2 * modLevel;
+                            break;
+                        case 'agility':
+                        case 'spirit':
+                            range = 4 * modLevel;
+                            break;
+                    }
+                    summary += getTranslationByKey('desc-mods-ranged').replace("{{0}}", range);
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('blast') == 0) {
+                    let rushMod = mods.find(function(m) {
+                      return m.indexOf('line') > -1;
+                    });
+                    if(rushMod) {
+                        // Say nothing - this'll get incorporated into the rush mod
+                    } else {
+                        summary += getTranslationByKey('desc-mods-blast-radius').replace("{{0}}", modLevel);
+                    }
+                    let blastCost = 0;
+                    if(techStat == 'spirit') {
+                        blastCost = 2 * modLevel - 1;
+                    } else {
+                        blastCost = 2 * modLevel;
+                    }
+                    if(barrierFreebie) {
+                        blastCost -= 2;
+                        if(blastCost < 0) {
+                            blastCost = 0;
+                        }
+                        barrierFreebie = false;
+                    }
+                    totalModLevel += blastCost;
+                } else if(mod.indexOf('chain') == 0) {
+                    if(modLevel == 1) {
+                        summary += getTranslationByKey('desc-mods-chain-1');
+                    } else if(modLevel == 2) {
+                        summary += getTranslationByKey('desc-mods-chain-2');
+                    } else {
+                        summary += getTranslationByKey('desc-mods-chain-x').replace("{{0}}", modLevel);
+                    }
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('line') == 0 && mod.indexOf('line var') != 0) {
+                    let line = 3 * modLevel;
+                    switch(techStat) {
+                        case 'strength':
+                        case 'agility':
+                            line = 2 * modLevel;
+                            break;
+                        case 'spirit':
+                            line++;
+                            break;
+                    }
+
+                    let blastMod = mods.find(function(m) {
+                      return m.indexOf('blast') == 0;
+                    });
+                    if(blastMod) {
+                        // Incorporate blast radius into line attack
+                        let blastSplit = blastMod.split(' ');
+                        let blastRadius = parseInt(blastSplit[blastSplit.length - 1]);
+                        if(blastRadius != blastRadius) {
+                            // NaN, so there's no level listed - assume 1
+                            blastRadius = 1;
+                        }
+                        summary += getTranslationByKey('desc-mods-line-blast')
+                            .replace("{{0}}", blastRadius)
+                            .replace("{{1}}", line);
+                    } else {
+                        summary += getTranslationByKey('desc-mods-line-attack').replace("{{0}}", line);
+                    }
+                    totalModLevel += modLevel;
+                    if(barrierFreebie) {
+                        totalModLevel--;
+                        barrierFreebie = false;
+                    }
+                } else if(mod.indexOf('line var') == 0) {
+                    let variations = modLevel;
+                    if(techStat == 'mind') {
+                        variations++;
+                    }
+                    if(variations == 1) {
+                        summary += getTranslationByKey('desc-mods-line-variation-1');
+                    } else {
+                        summary += getTranslationByKey('desc-mods-line-variation-x').replace("{{0}}", variations);
+                    }
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('multiple') == 0) {
+                    let targets = 1 + modLevel;
+                    if(techStat == 'agility') {
+                        targets++;
+                    }
+                    summary += getTranslationByKey('desc-mods-line-variation-x').replace("{{0}}", targets);
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('indirect') == 0) {
+                        summary += getTranslationByKey('desc-mods-indirect-attack');
+                    totalModLevel += 3;
+                } else if(mod.indexOf('rush') == 0) {
+                    summary += getTranslationByKey('desc-mods-rush-attack');
+                    let dashMod = mods.find(function(m) {
+                      return m.indexOf('dash') > -1;
+                    });
+                    if(dashMod) {
+                        // Incorporate dash mod into rush attack
+                        let dashSplit = dashMod.split(' ');
+                        let bonusMove = parseInt(dashSplit[dashSplit.length - 1]);
+                        if(bonusMove != bonusMove) {
+                            // NaN, so there's no level listed - assume 1
+                            bonusMove = 1;
+                        }
+                        if(techStat == 'agility') {
+                            bonusMove++;
+                        }
+                        if(bonusMove == 1) {
+                            summary += getTranslationByKey('desc-mods-rush-dash-1');
+                        } else {
+                            summary += getTranslationByKey('desc-mods-rush-dash-x').replace("{{0}}", bonusMove);
+                        }
+                    }
+                    if(techStat == 'agility' || techStat == 'strength') {
+                        totalModLevel += 2;
+                    } else {
+                        totalModLevel += 3;
+                    }
+                } else if(mod.indexOf('smart area') == 0) {
+                    summary += getTranslationByKey('desc-mods-smart-area');
+                    if(techStat == 'mind') {
+                        totalModLevel++;
+                    } else {
+                        totalModLevel += 2;
+                    }
+                } else if(mod.indexOf('whirlwind') == 0) {
+                    summary += getTranslationByKey('desc-mods-whirlwind');
+                    if(techStat == 'strength' || techStat == 'agility') {
+                        totalModLevel++;
+                    } else {
+                        totalModLevel += 2;
+                    }
+                } else if(mod.indexOf('debilitating') == 0) {
+                    if(techInflictedFlaws) {
+                        summary += getTranslationByKey('desc-mods-debilitating').replace("{{0}}", techInflictedFlaws);
+                    }
+                    hasFlaws = true;
+                } else if(mod.indexOf('boosting') == 0) {
+                    hasSkills = true;
+                } else if(mod.indexOf('drain') == 0) {
+                    summary += getTranslationByKey('desc-mods-drain');
+                    displayMods.push(getTranslationByKey('mods-drain'));
+                } else if(mod.indexOf('persistent') == 0) {
+                    summary += getTranslationByKey('desc-mods-persistent');
+                    displayMods.push(getTranslationByKey('mods-persistent'));
+                } else if(mod.indexOf('piercing') == 0) {
+                    if(techStat == 'strength' || techStat == 'agility') {
+                        summary += getTranslationByKey('desc-mods-piercing-def');
+                    } else {
+                        summary += getTranslationByKey('desc-mods-piercing-res');
+                    }
+                    defRes = null;
+                } else if(mod.indexOf('sapping') == 0) {
+                    summary += getTranslationByKey('desc-mods-sapping');
+                    displayMods.push(getTranslationByKey('mods-sapping'));
+                } else if(mod.indexOf('transform ally') == 0) {
+                    summary += getTranslationByKey('desc-mods-transform-ally');
+                    totalModLevel += 1;
+                } else if(mod.indexOf('unerring') == 0) {
+                    summary += getTranslationByKey('desc-mods-unerring');
+                    totalModLevel += 2;
+                } else if(mod.indexOf('consecutive transform') == 0) {
+                    summary += getTranslationByKey('desc-mods-consecutive-transformation');
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('intimidating transform') == 0) {
+                    summary += getTranslationByKey('desc-mods-intimidating-transformation')
+                        .replace("{{0}}", techValues.resolve)
+                        .replace("{{1}}", techValues.aura)
+                        .replace("{{2}}", modLevel);
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('accurate') == 0) {
+                    if(techStat == 'agility') {
+                        totalModLevel += 3;
+                    } else {
+                        totalModLevel += 4;
+                    }
+                } else if(mod.indexOf('aura') == 0) {
+                    totalModLevel++;
+                } else if(mod.indexOf('damage shift') == 0) {
+                    if(techStat == 'strength' || techStat == 'agility') {
+                        summary += getTranslationByKey('desc-mods-damage-shift-res');
+                        defRes = 'res';
+                    } else {
+                        summary += getTranslationByKey('desc-mods-damage-shift-def');
+                        defRes = 'def';
+                    }
+                    totalModLevel++;
+                } else if(mod.indexOf('darkness zone') == 0) {
+                    summary += getTranslationByKey('desc-mods-darkness-zone');
+                    displayMods.push(getTranslationByKey('mods-darkness-zone'));
+                    totalModLevel += 2;
+                } else if(mod.indexOf('dash') == 0) {
+                    let rushMod = mods.find(function(m) {
+                      return m.indexOf('rush') > -1;
+                    });
+                    if(rushMod) {
+                        // Say nothing - this'll get incorporated into the rush mod
+                    } else {
+                        let distance = modLevel;
+                        if(techStat == 'agility') {
+                            distance++;
+                        }
+                        if(distance == 1) {
+                            summary += getTranslationByKey('desc-mods-dash-1');
+                            
+                        } else {
+                            summary += getTranslationByKey('desc-mods-dash-x').replace("{{0}}", distance);
+                        }
+                    }
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('destruction') == 0) {
+                    let destroy = 2 * modLevel;
+                    summary += getTranslationByKey('desc-mods-destruction').replace("{{0}}", destroy);
+                    totalModLevel++;
+                } else if(mod.indexOf('dexterous') == 0 ||
+                          mod.indexOf('dextrous') == 0) {
+                    totalModLevel++;
+                } else if(mod.indexOf('drop') == 0) {
+                    summary += getTranslationByKey('desc-mods-drop-attack').replace("{{0}}", damageIncrement);
+                    displayMods.push(getTranslationByKey('mods-drop-attack'));
+                    totalModLevel++;
+                } else if(mod.indexOf('grant flaw') == 0 ||
+                          mod.indexOf('grants flaw') == 0 ||
+                          mod.indexOf('inflict flaw') == 0 ||
+                          mod.indexOf('inflicts flaw') == 0) {
+                    if(techInflictedFlaws) {
+                        summary += getTranslationByKey('desc-inflicts-flaws').replace("{{0}}", techInflictedFlaws);
+                    }
+                    totalModLevel += modLevel;
+                    flawSpMax = modLevel;
+                    hasFlaws = true;
+                } else if(mod.indexOf('grant skill') == 0 ||
+                          mod.indexOf('grants skill') == 0) {
+                    if(techGrantedSkills) {
+                        summary += getTranslationByKey('desc-grants-skills').replace("{{0}}", techGrantedSkills);
+                    }
+                    totalModLevel += modLevel;
+                    skillSpMax = modLevel;
+                    hasSkills = true;
+                } else if(mod.indexOf('high barrier') == 0) {
+                    summary += getTranslationByKey('desc-mods-high-barrier');
+                    totalModLevel ++;
+                } else if(mod.indexOf('immobiliz') == 0) {
+                    summary += getTranslationByKey('desc-mods-immobilize');
+                    totalModLevel += 3;
+                    displayMods.push(getTranslationByKey('mods-immobilize'));
+                } else if(mod.indexOf('intuitive') == 0) {
+                    totalModLevel++;
+                } else if(mod.indexOf('knock') == 0) {
+                    summary += getTranslationByKey('desc-mods-knock-down');
+                    totalModLevel += 3;
+                    displayMods.push(getTranslationByKey('mods-knock-down'));
+                } else if(mod.indexOf('light zone') == 0) {
+                    summary += getTranslationByKey('desc-mods-light-zone');
+                    displayMods.push(getTranslationByKey('mods-light-zone'));
+                    totalModLevel++;
+                } else if(mod.indexOf('muscular') == 0) {
+                    totalModLevel++;
+                } else if(mod.indexOf('ram') == 0) {
+                    summary += getTranslationByKey('desc-mods-ramming');
+                    displayMods.push(getTranslationByKey('mods-ramming'));
+                    if(techStat == 'strength') {
+                        totalModLevel++;
+                    } else {
+                        totalModLevel += 2;
+                    }
+                } else if(mod.indexOf('repo') == 0) {
+                    let distance = 1 + modLevel;
+                    if(techStat == 'strength') {
+                        distance++;
+                    }
+                    summary += getTranslationByKey('desc-mods-reposition').replace("{{0}}", distance);
+                    displayMods.push(getTranslationByKey('mods-reposition').replace("{{0}}", distance));
+                    totalModLevel += modLevel;
+                } else if(mod.indexOf('throw') == 0) {
+                    summary += getTranslationByKey('desc-mods-throw');
+                    displayMods.push(getTranslationByKey('mods-throw'));
+                    if(techStat == 'strength') {
+                        totalModLevel++;
+                    } else {
+                        totalModLevel += 2;
+                    }
+                } else if(mod.indexOf('violent') == 0) {
+                    summary += getTranslationByKey('desc-mods-violent-barrier').replace("{{0}}", damageIncrement);
+                    totalModLevel++;
+                } else if(mod.indexOf('launch') == 0) {
+                    summary += getTranslationByKey('desc-mods-launch');
+                    displayMods.push(getTranslationByKey('mods-launch'));
+                    totalModLevel += 3;
+                } else if(mod.indexOf('phasing') == 0) {
+                    summary += getTranslationByKey('desc-mods-phasing');
+                    totalModLevel++;
+                } else if(mod.indexOf('quick summon') == 0) {
+                    totalModLevel += 3;
+                } else if(mod.indexOf('selective barrier') == 0) {
+                    summary += getTranslationByKey('desc-mods-selective-barrier');
+                    totalModLevel++;
+                } else if(mod.indexOf('disrupt') >= 0) {
+                    summary += getTranslationByKey('desc-mods-terrain-disruption');
+                    displayMods.push(getTranslationByKey('mods-terrain-disruption'));
+                    totalModLevel++;
+                } else if(mod.indexOf('repair') >= 0) {
+                    summary += getTranslationByKey('desc-mods-repair');
+                    displayMods.push(getTranslationByKey('mods-terrain-repair'));
+                    totalModLevel++;
+                } else if(mod.indexOf('element') == 0) {
+                    summary += getTranslationByKey('desc-mods-elemental');
+                    if(techStat == 'strength' || techStat == 'agility') {
+                        totalModLevel++;
+                    }
+                } else if(mod.length > 0) {
+                    warnings.push(getTranslationByKey('warning-unknown-mod').replace("{{0}}", mod));
+                }
+            });
+            if(techCore == 'ultDamage') {
+                totalModLevel -= 2;
+                if(totalModLevel < 0) totalModLevel = 0;
+                totalModLevel = Math.ceil(totalModLevel / 2);
+            }
+
+            let techLevel = techCoreLevel + totalModLevel;
+            if(techLevel > level + 3 || (techCoreLevel > level && techCore == 'summoning')) {
+                warnings.push(getTranslationByKey('warning-tech-level-cap'));
+            }
+
+            summary += '\n';
+            // Display the technique cost and limits
+            let core = coreLibrary.find(function(c) {
+                return c.id == techCore;
+            });
+
+            let limitSummary = '';
+            let limitSt = 0;
+            let limits = techLimits.split('\n');
+            limits.forEach(function(limit) {
+                // Try to get the level
+                let split = limit.split(' ');
+                let limitLevel = parseInt(split[split.length - 1]);
+                if(limitLevel != limitLevel) {
+                    // NaN, so there's no level listed - assume 1
+                    limitLevel = 1;
+                }
+
+                if(limit.indexOf('custom') == 0) {
+                    limitSt += limitLevel;
+                } else if(limit.indexOf('health') == 0) {
+                    let healthLost = 5 * limitLevel;
+                    limitSummary += getTranslationByKey('desc-limits-health').replace("{{0}}", healthLost);
+                    limitSt += 2 * limitLevel;
+                    if(limitLevel > 5) {
+                        warnings.push(getTranslationByKey('warnings-health-limit-5'));
+                    }
+                } else if(limit.indexOf('ally') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-ally');
+                    limitSt++;
+                } else if(limit.indexOf('ammo') == 0 ||
+                          limit.indexOf('ammunition') == 0) {
+                    let ammo = 4 - limitLevel;
+                    if(ammo == 1) {
+                        limitSummary += getTranslationByKey('desc-limits-ammo-1');
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-ammo-x').replace("{{0}}", ammo);
+                    }
+                    limitSt += 3 * limitLevel;
+                } else if(limit.indexOf('companion') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-companion');
+                    limitSt += 2;
+                } else if(limit.indexOf('cooldown') == 0) {
+                    if(limitLevel == 1) {
+                        limitSummary += getTranslationByKey('desc-limits-cooldown-1');
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-cooldown-x').replace("{{0}}", limitLevel);
+                    }
+                    limitSt += 2 * limitLevel;
+                } else if(limit.indexOf('dark power') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-companion');
+                    limitSt += 10;
+                } else if(limit.indexOf('form') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-form');
+                    limitSt += 2 * limitLevel;
+                } else if(limit.indexOf('fall') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-falling');
+                    limitSt += 4;
+                } else if(limit.indexOf('grant flaw') == 0 ||
+                    limit.indexOf('grants flaw') == 0 ||
+                    limit.indexOf('inflict flaw') == 0 ||
+                    limit.indexOf('inflicts flaw') == 0) {
+                    if(techInflictedFlaws) {
+                        limitSummary += getTranslationByKey('desc-limits-inflict-flaws').replace("{{0}}", techInflictedFlaws);
+                    }
+                    limitSt += limitLevel;
+                    flawSpMax = limitLevel;
+                    hasFlaws = true;
+                } else if(limit.indexOf('grant skill') == 0 ||
+                    limit.indexOf('grants skill') == 0) {
+                    if(techGrantedSkills) {
+                        limitSummary += getTranslationByKey('desc-limits-grant-skills').replace("{{0}}", techGrantedSkills);
+                    }
+                    limitSt += limitLevel;
+                    skillSpMax = limitLevel;
+                    hasSkills = true;
+                } else if(limit.indexOf('init') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-initiative').replace("{{0}}", limitLevel);
+                    limitSt += 3 * limitLevel;
+                } else if(limit.indexOf('immobile') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-immobile');
+                    limitSt += 3;
+                } else if(limit.indexOf('injury') == 0) {
+                    let threshold = health - Math.ceil(health / 5) * limitLevel;
+                    limitSummary += getTranslationByKey('desc-limits-injury').replace("{{0}}", threshold);
+                    limitSt += 2 * limitLevel;
+                } else if(limit.indexOf('landbound') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-landbound');
+                    limitSt++;
+                } else if(limit.indexOf('mercy') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-mercy');
+                    displayMods.push(getTranslationByKey('limits-mercy'));
+                    limitSt += 3;
+                } else if(limit.indexOf('minimum range') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-minimum-range').replace("{{0}}", limitLevel);
+                    limitSt += limitLevel;
+                } else if(limit.indexOf('move') == 0) {
+                    if(limitLevel == 1) {
+                        limitSummary += getTranslationByKey('desc-limits-movement-1');
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-movement-x').replace("{{0}}", limitLevel);
+                    }
+                    limitSt += limitLevel;
+                } else if(limit.indexOf('push') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-push');
+                    limitSt++;
+                } else if(limit.indexOf('pull') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-pull');
+                    limitSt++;
+                } else if(limit.indexOf('reaction') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-reaction');
+                    limitSt += 3;
+                } else if(limit.indexOf('reload') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-reload');
+                    limitSt += 4;
+                } else if(limit.indexOf('sequence') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-sequence');
+                    limitSt += 4;
+                } else if(limit.indexOf('self') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-self');
+                    limitSt++;
+                } else if(limit.indexOf('setup') == 0 ||
+                          limit.indexOf('set-up') == 0 ||
+                          limit.indexOf('set up') == 0) {
+                    let turn = 1 + limitLevel;
+                    limitSummary += getTranslationByKey('desc-limits-setup').replace("{{0}}", turn);
+                    limitSt += limitLevel;
+                } else if(limit.indexOf('single companion') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-single-companion');
+                    limitSt += 3;
+                } else if(limit.indexOf('slow') == 0) {
+                    limitSt += 6;
+                } else if(limit.indexOf('temporary') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-temporary');
+                    limitSt += 6;
+                } else if(limit.indexOf('unstable summon') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-unstable-summon').replace("{{0}}", limitLevel);
+                    limitSt += 4 * limitLevel;
+                } else if(limit.indexOf('upkeep') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-upkeep').replace("{{0}}", limitLevel);
+                    limitSt += 4 * limitLevel;
+                } else if(limit.indexOf('vitality') == 0) {
+                    let threshold = Math.ceil(health * 0.4);
+                    limitSummary += getTranslationByKey('desc-limits-vitality').replace("{{0}}", threshold);
+                    limitSt += 3 * limitLevel;
+                } else if(limit.indexOf('valor') == 0) {
+                    if(limit.indexOf('valor consumption') > -1) {
+                        limitSummary += getTranslationByKey('desc-limits-valor-consumption').replace("{{0}}", limitLevel);
+                        limitSt += 5 * limitLevel;
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-valor').replace("{{0}}", limitLevel);
+                        limitSt += 2 * limitLevel;
+                    }
+                } else if(limit.indexOf('clone') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-clone');
+                    limitSt += 2;
+                } else if(limit.indexOf('node sacrifice') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-node-sacrifice');
+                    limitSt += 8;
+                } else if(limit.indexOf('refraction') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-refraction');
+                    limitSt += 2;
+                } else if(limit.indexOf('time') == 0) {
+                    let time = 5 - limitLevel;
+                    if(time == 1) {
+                        limitSummary += getTranslationByKey('desc-limits-time-1');
+                        displayMods.push(getTranslationByKey('limits-time-1'));
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-time-x').replace("{{0}}", time);
+                        displayMods.push(getTranslationByKey('limits-time-x').replace("{{0}}", time));
+                    }
+                    limitSt += 5 * limitLevel;
+                } else if(limit.indexOf('airborne') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-airborne');
+                    limitSt++;
+                } else if(limit.indexOf('drop') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-drop');
+                    limitSt += 4;
+                } else if(limit.indexOf('revert') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-revert');
+                    limitSt += 10;
+                } else if(limit.indexOf('ultimate cooldown') == 0) {
+                    if(limitLevel == 1) {
+                        limitSummary += getTranslationByKey('desc-limits-ultimate-cooldown-1');
+                    } else {
+                        limitSummary += getTranslationByKey('desc-limits-ultimate-cooldown-x').replace("{{0}}", limitLevel);
+                    }
+                    limitSt += 10 * limitLevel;
+                } else if(limit.indexOf('ultimate health') == 0) {
+                    healthLost = Math.ceil(health / 5);
+                    limitSummary += getTranslationByKey('desc-limits-health').replace("{{0}}", healthLost);
+                    limitSt += 20;
+                } else if(limit.indexOf('ultimate valor') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-ultimate-valor').replace("{{0}}", limitLevel);
+                    limitSt += 10 * limitLevel;
+                } else if(limit.indexOf('dark surrender') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-dark-surrender');
+                    limitSt += 30;
+                } else if(limit.indexOf('final') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-final');
+                    limitSt = 9999;
+                } else if(limit.indexOf('sacrifice') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-sacrifice').replace("{{0}}", 10 * limitLevel);
+                    limitSt += 2 * limitLevel;
+                } else if(limit.indexOf('fatigue') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-fatigue');
+                    limitSt += 15;
+                } else if(limit.indexOf('weapon req') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-weapon-requirement');
+                    limitSt += 3;
+                } else if(limit.indexOf('weapon rel') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-weapon-reliant');
+                    limitSt += 1;
+                } else if(limit.indexOf('expendable') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-expendable-ammo');
+                    limitSt += limitLevel;
+                } else if(limit.indexOf('sync') == 0) {
+                    limitSummary += getTranslationByKey('desc-limits-sync').replace("{{0}}", limitLevel);
+                    limitSt += 2 * limitLevel;
+                } else if(limit.length > 0 &&
+                          limit.indexOf('slow') == -1 &&
+                          limit.indexOf('grant') == -1) {
+                    warnings.push(getTranslationByKey('warning-unknown-limit').replace("{{0}}", limit));
+                }
+            });
+
+            let cost = 0;
+            if((core || techCore == 'custom') && techCore != 'mimic') {
+                if(techCore == 'custom') {
+                    cost = techCustomCost;
+                } else {
+                    cost = core.cost + core.levelUp * (techCoreLevel + totalModLevel) - limitSt;
+                }
+                if(cost < 0) {
+                    cost = 0;
+                }
+
+                summary += getTranslationByKey('desc-stamina-cost').replace("{{0}}", cost);
+            }
+            summary += limitSummary;
+
+            // Determine Flaw SP
+            let flawSp = 0;
+            if(hasFlaws) {
+                if(techCore == 'weaken' || (techCore == 'damage' && techMods.indexOf('debilitating') > -1)) {
+                    flawSpMax = techCoreLevel;
+                }
+                const techFlawList = techInflictedFlaws.toLowerCase()
+                    .split(',')
+                    .map(s => {
+                        if(s && s.length > 0) {
+                            // Try to split out the flaw level
+                            let split = s.split(' ');
+                            let flawLevel = parseInt(split[split.length - 1]);
+                            if(flawLevel != flawLevel) {
+                                // NaN, so there's no level listed
+                                return {
+                                    name: s.trim(),
+                                    level: 1
+                                };
+                            } else {
+                                return {
+                                    name: split.slice(0, split.length - 1).join(' ').trim(),
+                                    level: flawLevel
+                                };
+                            }
+                        } else {
+                            return null;
+                        }
+                    })
+                    .filter(s => s);
+                
+                for(const flaw of techFlawList) {
+                    const flawData = flawLibrary.find(f => flaw.name.match(f.namePattern));
+                    if(flawData) {
+                        // Max flaw level
+                        var flawMaxLevel = 1;
+                        switch(flawData.speed) {
+                            case 1:
+                                flawMaxLevel = Math.ceil(level / 5);
+                                break;
+                            case 2:
+                                flawMaxLevel = Math.ceil(level / 3);
+                                break;
+                            case 3:
+                                flawMaxLevel = 100; // Custom Flaw
+                        }
+                        if(flaw.level > flawMaxLevel) {
+                            warnings.push(getTranslationByKey('warning-tech-flaw-level-cap')
+                                .replace("{{0}}", flaw.name)
+                                .replace("{{1}}", flawMaxLevel));
+                        }
+                        
+                        flawSp += flawData.cost + flawData.levelUp * (flaw.level - 1);
+                    } else {
+                        warnings.push(getTranslationByKey('warning-unknown-flaw').replace("{{0}}", flaw.name));
+                    }
+                }
+                if(flawSp > flawSpMax && flawSpMax > 0) {
+                    warnings.push(getTranslationByKey('warning-flaw-sp-limit'));
+                }
+            }
+
+            // Determine Skill SP
+            let skillSp = 0;
+            if(hasSkills) {
+                switch(techCore) {
+                    case 'boost':
+                    case 'ultTransform':
+                        skillSpMax = 2 * techCoreLevel;
+                        break;
+                }
+                const techSkillList = techGrantedSkills.toLowerCase()
+                    .split(',')
+                    .map(s => {
+                        if(s && s.length > 0) {
+                            // Try to split out the flaw level
+                            let split = s.split(' ');
+                            let skillLevel = parseInt(split[split.length - 1]);
+                            if(skillLevel != skillLevel) {
+                                // NaN, so there's no level listed
+                                return {
+                                    name: s.trim(),
+                                    level: 1
+                                };
+                            } else {
+                                return {
+                                    name: split.slice(0, split.length - 1).join(' ').trim(),
+                                    level: skillLevel
+                                };
+                            }
+                        } else {
+                            return null;
+                        }
+                    })
+                    .filter(s => s);
+                for(const skill of techSkillList) {
+                    const skillData = skillLibrary.find(s => skill.name.match(s.namePattern));
+                    if(skillData) {
+                        // Max skill level
+                        var skillMaxLevel = 1;
+                        switch(skillData.speed) {
+                            case 1:
+                                skillMaxLevel = Math.ceil(level / 5);
+                                break;
+                            case 2:
+                                skillMaxLevel = Math.ceil(level / 3);
+                                break;
+                            case 3:
+                                skillMaxLevel = 100; // Custom Flaw
+                        }
+                        if(skill.level > skillMaxLevel) {
+                            warnings.push(getTranslationByKey('warning-tech-skill-level-cap')
+                                .replace("{{0}}", skill.name)
+                                .replace("{{1}}", skillMaxLevel));
+                        }
+                        
+                        skillSp += skillData.cost + skillData.levelUp * (skill.level - 1);
+                    } else {
+                        warnings.push(getTranslationByKey('warning-unknown-skill').replace("{{0}}", flaw.skill));
+                    }
+                }
+                if(skillSp > skillSpMax && skillSpMax > 0) {
+                    warnings.push(getTranslationByKey('warning-skill-sp-limit'));
+                }
+            }
+            
+            let attrs = {};
+            
+            // Write the in-line summary
+            if(damageAmount > 0) {
+                attrs[`repeating_techs_${techId}_tech_damage_disp`] = damageAmount;
+                if(defRes){
+                    attrs[`repeating_techs_${techId}_tech_defres_disp`] = ` - ${defRes == 'def' ? 'Defense' : 'Resistance'}`;
+                } 
+            } else {
+                attrs[`repeating_techs_${techId}_tech_damage_disp`] = '';
+                attrs[`repeating_techs_${techId}_tech_defres_disp`] = '';
+            }
+            if(healingAmount > 0) {
+                attrs[`repeating_techs_${techId}_tech_healing_disp`] = healingAmount;
+            } else {
+                attrs[`repeating_techs_${techId}_tech_healing_disp`] = '';
+            }
+            if(transformAmount > 0) {
+                attrs[`repeating_techs_${techId}_tech_transform_disp`] = transformAmount;
+            } else {
+                attrs[`repeating_techs_${techId}_tech_transform_disp`] = '';
+            }
+            if(displayMods.length > 0) {
+                attrs[`repeating_techs_${techId}_tech_mods_disp`] = displayMods.join(', ');
+            } else {
+                attrs[`repeating_techs_${techId}_tech_mods_disp`] = '';
+            }
+            
+            attrs[`repeating_techs_${techId}_tech_summary`] = summary;
+            attrs[`repeating_techs_${techId}_tech_warnings`] = warnings.length > 0 ? `WARNING: ${warnings.join(' ')}` : ' ';
+            attrs[`repeating_techs_${techId}_tech_mod_level`] = totalModLevel;
+            attrs[`repeating_techs_${techId}_tech_level`] = techLevel;
+            attrs[`repeating_techs_${techId}_tech_limit_st`] = limitSt;
+            attrs[`repeating_techs_${techId}_tech_cost`] = cost;
+            attrs[`repeating_techs_${techId}_tech_flaw_sp`] = flawSp;
+            attrs[`repeating_techs_${techId}_tech_flaw_sp_max`] = flawSpMax;
+            attrs[`repeating_techs_${techId}_tech_skill_sp`] = skillSp;
+            attrs[`repeating_techs_${techId}_tech_skill_sp_max`] = skillSpMax;
+            attrs[`repeating_techs_${techId}_tech_is_mimic`] = techCore == 'mimic'
+                ? 'on' : 'off';
+            attrs[`repeating_techs_${techId}_tech_has_flaws`] = hasFlaws
+                ? 'on' : 'off';
+            attrs[`repeating_techs_${techId}_tech_has_skills`] = hasSkills
+                ? 'on' : 'off';
+            attrs[`repeating_techs_${techId}_tech_inflicted_flaws`] = hasFlaws ? techInflictedFlaws : '';
+            attrs[`repeating_techs_${techId}_tech_granted_skills`] = hasSkills ? techGrantedSkills : '';
+            if(techCore != 'mimic') {
+                attrs[`repeating_techs_${techId}_tech_mimic_target`] = '';
+            }
+            attrs[`repeating_techs_${techId}_tech_can_edit_cost`] = techCore == 'custom' ? 'on' : 'off';
+            attrs[`repeating_techs_${techId}_tech_stat_roll`] = techRoll;
+            setAttrs(attrs, { silent: true });
+        });
+    }
+
+    on('change:level change:strength change:agility change:spirit change:mind change:guts', function() {
+        calculateBaseAttributes();
+    });
+
+    on('change:level change:strength change:agility change:spirit change:mind change:guts ' +
+        'change:type change:repeating_skills remove:repeating_skills', function() {
+        calculateAttack();
+        calculateActiveAttributes();
+
+    });
+
+    on('change:strengthattack change:agilityattack change:mindattack change:spiritattack ' +
+        'change:patkbonus change:eatkbonus change:atkrollbonus change:iatkrollbonus change:rollbonus', function() {
+        getSectionIDs('repeating_techs', function(tidarray) {
+            tidarray.forEach(function(techId) {
+                calculateTech(techId);
+            });
+        });
+    });
+
+    on('change:level change:strength change:guts change:type ' +
+        'change:repeating_skills remove:repeating_skills change:repeating_flaws remove:repeating_flaws', function() {
+        calculateHealth();
+        calculateDefense();
+    });
+
+    on('change:level change:mind change:spirit change:type ' +
+        'change:repeating_skills remove:repeating_skills change:repeating_flaws remove:repeating_flaws', function() {
+        calculateStamina();
+        calculateResistance();
+    });
+
+    on('change:agility change:repeating_skills remove:repeating_skills change:repeating_flaws remove:repeating_flaws', function() {
+        calculateMove();
+    });
+
+    on('change:level change:type change:repeating_skills remove:repeating_skills', function() {
+        calculateDamageIncrement();
+    });
+
+    on('change:dexterity change:repeating_skills remove:repeating_skills change:repeating_flaws remove:repeating_flaws', function() {
+        calculateInitiative();
+    });
+
+    on('change:level change:type change:repeating_skills remove:repeating_skills ' +
+        'change:repeating_flaws remove:repeating_flaws', function() {
+        calculateFlawsAndSkills();
+    });
+
+    on('change:type change:repeating_skills remove:repeating_skills', function() {
+        calculateBonuses();
+    });
+
+    on('change:level change:type change:repeating_skills remove:repeating_skills ' +
+       'change:repeating_techs:tech_core_level change:repeating_techs:tech_mods change:repeating_techs:tech_core', function() {
+        calculateTP();
+    });
+
+    on('change:repeating_techs:tech_name change:repeating_techs:tech_core_level ' +
+       'change:repeating_techs:tech_core change:repeating_techs:tech_stat ' +
+       'change:repeating_techs:tech_mods change:repeating_techs:tech_targets change:repeating_techs:tech_bonus ' +
+       'change:repeating_techs:tech_limits change:repeating_techs:tech_description ' +
+       'change:repeating_techs:tech_granted_skills change:repeating_techs:tech_inflicted_flaws ' +
+       'change:repeating_techs:tech_custom_cost', function(eventInfo) {
+        var techId = eventInfo.sourceAttribute.substring(16, 36);
+        calculateTech(techId);
+    });
+
+    on('sheet:opened', function() {
+        // Update attributes
+        calculateBaseAttributes();
+        calculateAttack();
+        calculateActiveAttributes();
+        calculateHealth();
+        calculateDefense();
+        calculateStamina();
+        calculateResistance();
+        calculateMove();
+        calculateDamageIncrement();
+        calculateInitiative();
+        calculateFlawsAndSkills();
+        calculateBonuses();
+        calculateTP();
+
+        // Update techs
+        getSectionIDs('repeating_techs', function(tidarray) {
+            tidarray.forEach(function(techId) {
+                calculateTech(techId);
+            });
+        });
+    });
+
+</script>
+
+<div class="sheet-container">
+    <!-- Tabs -->
+    <input type="radio" name="attr_tab" class="sheet-tab sheet-tab1" value="1" checked="checked"><span title="Attributes"></span>
+    <input type="radio" name="attr_tab" class="sheet-tab sheet-tab2" value="2"><span title="Skills & Flaws"></span>
+    <input type="radio" name="attr_tab" class="sheet-tab sheet-tab3" value="3"><span title="Techniques"></span>
+
+    <div class="sheet-tab-content sheet-tab1">
+        <!-- Sheet header -->
+        <div class="attributes-header">
+            <div class="attributes-header-label">
+                <span data-i18n="level:" class="label">Level:</span>
+            </div>
+            <div>
+                <input class="attributes-header-input" type="number" name="attr_level" title="@{level}" value="1">
+            </div>
+            <div class="attributes-header-label">
+                <span data-i18n="experience:" class="label">Experience:</span>
+            </div>
+            <div>
+                <input type="number" class="longer-number attributes-header-input" name="attr_experience" title="@{experience}" value="0">
+            </div>
+            <div class="attributes-header-label">
+                <span data-i18n="type:" class="label">Type:</span>
+            </div>
+            <div>
+                <select name="attr_type" class="attributes-header-input" title="@{type}">
+                    <option data-i18n="flunky" value="flunky">Flunky</option>
+                    <option data-i18n="soldier" value="soldier">Summon/Soldier</option>
+                    <option data-i18n="swarm" value="swarm">Swarm</option>
+                    <option data-i18n="player-character-elite-abv" value="elite" selected="selected">PC/Elite</option>
+                    <option data-i18n="master" value="master">Master</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Attributes -->
+        <div data-i18n="attributes-u" class="section-header">ATTRIBUTES</div>
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-column stats-orange">
+                    <div data-i18n="base-u" class="label stats-column-header">BASE</div>
+                    <div data-i18n="strength:">Strength:</div>
+                    <div>
+                        <input type="number" class="number-input-orange" name="attr_strength" title="@{strength}" value="5">
+                    </div>
+                    <div data-i18n="agility:">Agility:</div>
+                    <div>
+                        <input type="number" class="number-input-orange" name="attr_agility" title="@{agility}" value="5">
+                    </div>
+                    <div data-i18n="spirit:">Spirit:</div>
+                    <div>
+                        <input type="number" class="number-input-orange" name="attr_spirit" title="@{spirit}" value="5">
+                    </div>
+                    <div data-i18n="mind:">Mind:</div>
+                    <div>
+                        <input type="number" class="number-input-orange" name="attr_mind" title="@{mind}" value="5">
+                    </div>
+                    <div data-i18n="guts:">Guts:</div>
+                    <div>
+                        <input type="number" class="number-input-orange" name="attr_guts" title="@{guts}" value="5">
+                    </div>
+                </div>
+                <div class="stats-column stats-green">
+                    <div data-i18n="active-u" class="label stats-column-header">ACTIVE</div>
+                    <div data-i18n="muscle:">Muscle:</div>
+                    <div>
+                        <span class="derived-value" name="attr_muscle" title="@{muscle}"></span>
+                        <button type="roll" value='[[1d10+@{muscle}+@{rollbonus}]] Muscle' name="roll_muscle"></button>
+                    </div>
+                    <div data-i18n="dexterity:">Dexterity:</div>
+                    <div>
+                        <span class="derived-value" name="attr_dexterity" title="@{dexterity}"></span>
+                        <button type="roll" value='[[1d10+@{dexterity}+@{rollbonus}]] Dexterity' name="roll_dexterity"></button>
+                    </div>
+                    <div data-i18n="aura:">Aura:</div>
+                    <div>
+                        <span class="derived-value" name="attr_aura" title="@{aura}"></span>
+                        <button type="roll" value='[[1d10+@{aura}+@{rollbonus}]] Aura' name="roll_aura"></button>
+                    </div>
+                    <div data-i18n="intuition:">Intuition:</div>
+                    <div>
+                        <span class="derived-value" name="attr_intuition" title="@{intuition}"></span>
+                        <button type="roll" value='[[1d10+@{intuition}+@{rollbonus}]] Intuition' name="roll_intuition"></button>
+                    </div>
+                    <div data-i18n="resolve:">Resolve:</div>
+                    <div>
+                        <span class="derived-value" name="attr_resolve" title="@{resolve}"></span>
+                        <button type="roll" value='[[1d10+@{resolve}+@{rollbonus}]] Resolve' name="roll_resolve"></button>
+                    </div>
+                </div>
+                <div class="stats-column stats-orange">
+                    <div data-i18n="attack-u" class="label stats-column-header">ATTACK</div>
+                    <div data-i18n="strength:">Strength:</div>
+                    <div class="derived-value">
+                        <span name="attr_strengthattack" title="@{strengthattack}"/>
+                    </div>
+                    <div data-i18n="agility:">Agility:</div>
+                    <div class="derived-value">
+                        <span name="attr_agilityattack" title="@{agilityattack}"/>
+                    </div>
+                    <div data-i18n="spirit:">Spirit:</div>
+                    <div class="derived-value">
+                        <span name="attr_spiritattack" title="@{spiritattack}"/>
+                    </div>
+                    <div data-i18n="mind:">Mind:</div>
+                    <div class="derived-value">
+                        <span name="attr_mindattack" title="@{mindattack}"/>
+                    </div>
+                    <div>
+                        <!-- No guts attack -->
+                    </div>
+                </div>
+                <div class="stats-column stats-green">
+                    <div data-i18n="statistics-u" class="label stats-column-header">STATISTICS</div>
+                    <div data-i18n="health:">Health:</div>
+                    <div class="derived-value">
+                        <span name="attr_health_max" title="@{health_max}" />
+                    </div>
+                    <div data-i18n="stamina:">Stamina:</div>
+                    <div class="derived-value">
+                        <span name="attr_stamina_max" title="@{stamina_max}" />
+                    </div>
+                    <div data-i18n="defense:">Defense:</div>
+                    <div class="derived-value">
+                        <span name="attr_defense" title="@{defense}" />
+                    </div>
+                    <div data-i18n="resistance:">Resistance:</div>
+                    <div class="derived-value">
+                        <span name="attr_resistance" title="@{resistance" />
+                    </div>
+                    <div data-i18n="move:">Move:</div>
+                    <div class="derived-value">
+                        <span name="attr_move" title="@{move}" />
+                    </div>
+                </div>
+                <div class="stats-column stats-orange">
+                    <div data-i18n="increments-allcaps" class="label stats-column-header">INCREMENTS</div>
+                    <div data-i18n="health-increment-abv:">HP Increment:</div>
+                    <div class="derived-value">
+                        <span name="attr_healthincrement" title="@{healthincrement}" />
+                    </div>
+                    <div data-i18n="stamina-increment-abv:">ST Increment:</div>
+                    <div class="derived-value">
+                        <span name="attr_staminaincrement" title="@{staminaincrement}" />
+                    </div>
+                    <div data-i18n="critical-health-abv:">Critical HP:</div>
+                    <div class="derived-value">
+                        <span name="attr_criticalhealth" title="@{cricialhealth}" />
+                    </div>
+                    <div data-i18n="damage-increment-abv:">Dmg Increment:</div>
+                    <div class="derived-value">
+                        <span name="attr_damageincrement" title="@{damageincrement}" />
+                    </div>
+                    <div data-i18n="initiative:">Initiative:</div>
+                    <div class="derived-value">
+                        <span name="attr_initiative" title="@{initiative}" ></span>
+                        <button type="roll" value="[[1d10+@{initiative}+@{rollbonus} &{tracker} &{noerror}]] Initiative" name="roll_init"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-i18n="unspent-attribute-points-abv-u" class="unspent-ap"><span name="attr_unspentattributepoints" title="@{unspentattributepoints}" ></span> AP UNSPENT</div>
+        <div data-i18n="bonuses-u" class="section-header">BONUSES</div>
+        <div class="stats-container">
+            <div class="stats">
+                <div class="stats-wide-column stats-green stats-short">
+                    <div data-i18n="all-rolls:">All Rolls:</div>
+                    <div>
+                        <input type="number" class="number-input-green" name="attr_rollbonus" title="@{rollbonus}" value="0">
+                    </div>
+                    <div></div>
+                    <div data-i18n="attack-rolls:">Attack Rolls:</div>
+                    <div>
+                        <input type="number" class="number-input-green" name="attr_atkrollbonus" title="@{atkrollbonus}" value="0">
+                    </div>
+                    <div>
+                        <span name="attr_iatkrollbonusdisp" title="@{iatkrollbonusdisp}" ></span>
+                    </div>
+                    <div data-i18n="defense-rolls:">Defense Rolls:</div>
+                    <div>
+                        <input type="number" class="number-input-green" name="attr_defrollbonus" title="@{defrollbonus}" value="0">
+                    </div>
+                    <div>
+                        <span name="attr_idefrollbonusdisp" title="@{idefrollbonusdisp}"></span>
+                    </div>
+                </div>
+                <div class="stats-column stats-orange stats-short">
+                    <div data-i18n="physical-attack-abv:">Phys. Attack:</div>
+                    <div>
+                        <input type="number" class="number-input-orange long-number" name="attr_patkbonus" title="@{patkbonus}" value="0">
+                    </div>
+                    <div data-i18n="energy-attack-abv:">En. Attack:</div>
+                    <div>
+                        <input type="number" class="number-input-orange long-number" name="attr_eatkbonus" title="@{eatkbonus}" value="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div data-i18n="roll-defense-u" class="section-header roll-defense">ROLL DEFENSE</div>
+        <div class="defense-buttons">
+            <button class="valor-button" type="roll" value='[[1d10+@{muscle}+@{rollbonus}+@{defrollbonus}+@{idefrollbonus}]] Muscle Defense' name="roll_mus_def">Muscle</button>
+            <button class="valor-button" type="roll" value='[[1d10+@{dexterity}+@{rollbonus}+@{defrollbonus}+@{idefrollbonus}]] Dexterity Defense' name="roll_dex_def">Dexterity</button>
+            <button class="valor-button" type="roll" value='[[1d10+@{aura}+@{rollbonus}+@{defrollbonus}+@{idefrollbonus}]] Aura Defense' name="roll_aur_def">Aura</button>
+            <button class="valor-button" type="roll" value='[[1d10+@{intuition}+@{rollbonus}+@{defrollbonus}+@{idefrollbonus}]] Intuition Defense' name="roll_int_def">Intuition</button>
+            <button class="valor-button" type="roll" value='[[1d10+@{resolve}+@{rollbonus}+@{defrollbonus}+@{idefrollbonus}]] Resolve Defense' name="roll_res_def">Resolve</button>
+        </div>
+    </div>
+
+    <div class="sheet-tab-content sheet-tab2">
+        <div data-i18n="flaws-u" class="flaws-header">FLAWS</div>
+        <fieldset class="repeating_flaws">
+            <div class="flaw">
+                <div class="flaw-upper">
+                    <select class="flaw-picker" name="attr_flawname" title="@{repeating_flaws_#_flawname}" selected="customFlaw">
+                        <option data-i18n="option-custom-flaw" value="customFlaw">Custom Flaw</option>
+                        <option data-i18n="option-aggravated-wounds" value="aggravatedWounds">Aggravated Wounds (+2)</option>
+                        <option data-i18n="option-berserker" value="berserker">Berserker (+5)</option>
+                        <option data-i18n="option-compulsion" value="compulsion">Compulsion (+4)</option>
+                        <option data-i18n="option-despair" value="despair">Despair (+4)</option>
+                        <option data-i18n="option-energy-vulnerability" value="energyVulnerability">Energy Vulnerability (+2/+1)</option>
+                        <option data-i18n="option-feeble" value="feeble">Feeble (+3)</option>
+                        <option data-i18n="option-fragile" value="fragile">Fragile (+3/+2)</option>
+                        <option data-i18n="option-lack-of-control" value="lackOfControl">Lack of Control (+2/+1)</option>
+                        <option data-i18n="option-malevolent-entity" value="malevolentEntity">Malevolent Entity (+5)</option>
+                        <option data-i18n="option-non-proficient" value="nonProficient">Non-Proficient (+1)</option>
+                        <option data-i18n="option-oblivious" value="oblivious">Oblivious (+3)</option>
+                        <option data-i18n="option-slow" value="slow">Slow (+2/+1)</option>
+                        <option data-i18n="option-slow-healing" value="slowHealing">Slow Healing (+2)</option>
+                        <option data-i18n="option-slow-to-act" value="slowToAct">Slow to Act (+1)</option>
+                        <option data-i18n="option-unthreatening" value="unthreatening">Unthreatening (+3)</option>
+                        <option data-i18n="option-uncoordinated" value="uncoordinated">Uncoordinated (+3)</option>
+                        <option data-i18n="option-violent" value="violent">Violent (+3)</option>
+                        <option data-i18n="option-weak-aura" value="weakAura">Weak Aura (+3)</option>
+                        <option data-i18n="option-weak-defender" value="weakDefender">Weak Defender (+2/+1)</option>
+                        <option data-i18n="option-weak-willed" value="weakWilled">Weak Willed (+4/+3)</option>
+                        <optgroup data-i18n-label="optional-rules" label="Optional Rules">
+                            <option data-i18n="option-armor-reliant" value="armorReliant">Armor Reliant (+2/+1)</option>
+                            <option data-i18n="option-elemental-vulnerability" value="elementalVulnerability">Elemental Vulnerability (+2/+1)</option>
+                            <option data-i18n="option-unprincipled" value="unprincipled">Unprincipled (+1)</option>
+                            <option data-i18n="option-ward-reliant" value="wardReliant">Ward Reliant (+2/+1)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="npc-only" label="NPC Only">
+                            <option data-i18n="option-battle-damage" value="battleDamage">Battle Damage (+3)</option>
+                        </optgroup>
+                    </select>
+                    <span class="label">
+                        <span data-i18n="level">Level</span> <input class="flaw-level" type="number" name="attr_flawlevel" title="@{repeating_flaws_#_flawlevel}" value="1" />
+                    </span>
+                    <span name="attr_warning"></span>
+                </div>
+                <div><span data-i18n="notes" class="label notes-label">Notes</span> <input class="notes" type="text" spellcheck="false" name="attr_flawnotes" title="@{repeating_flaws_#_flawnotes}" /></div>
+            </div>
+        </fieldset>
+
+        <div data-i18n="skills-u" class="skills-header">SKILLS</div>
+
+        <fieldset class="repeating_skills">
+            <div class="skill">
+                <div class="skill-upper">
+                    <select class="skill-picker" name="attr_skillname" title="@{repeating_skills_#_skillname}" selected="customSkill">
+                        <option data-i18n="option-custom-skill" value="customSkill">Custom Skill</option>
+                        <optgroup data-i18n-label="season-1-skills" label="Season 1 Skills">
+                            <option data-i18n="option-acceleration" value="acceleration">Acceleration (5)</option>
+                            <option data-i18n="option-analysis" value="analysis">Analysis (5)</option>
+                            <option data-i18n="option-asset" value="asset">Asset (3)</option>
+                            <option data-i18n="option-attack-node" value="attackNode">Attack Node (5/2)</option>
+                            <option data-i18n="option-balanced-fighter" value="balancedFighter">Balanced Fighter (8)</option>
+                            <option data-i18n="option-blazing-might" value="blazingMight">Blazing Might (6/3)</option>
+                            <option data-i18n="option-bounce-back" value="bounceBack">Bounce Back (6)</option>
+                            <option data-i18n="option-bravado" value="bravado">Bravado (6/6)</option>
+                            <option data-i18n="option-burning-passion" value="burningPassion">Burning Passion (5)</option>
+                            <option data-i18n="option-challenge-technique" value="challengeTechnique">Challenge Technique (3)</option>
+                            <option data-i18n="option-combination-attack" value="combinationAttack">Combination Attack (6)</option>
+                            <option data-i18n="option-companion" value="companion">Companion (6/4)</option>
+                            <option data-i18n="option-counterattack" value="counterattack">Counterattack (6)</option>
+                            <option data-i18n="option-cover" value="cover">Cover (6/2)</option>
+                            <option data-i18n="option-crisis" value="crisis">Crisis (4/2)</option>
+                            <option data-i18n="option-danger-sense" value="dangerSense">Danger Sense (3)</option>
+                            <option data-i18n="option-dark-healing" value="darkHealing">Dark Healing (5)</option>
+                            <option data-i18n="option-darksight" value="darksight">Darksight (4)</option>
+                            <option data-i18n="option-desperation" value="desperation">Desperation (5)</option>
+                            <option data-i18n="option-dig-deep" value="digDeep">Dig Deep (5)</option>
+                            <option data-i18n="option-dirty-trick" value="dirtyTrick">Dirty Trick (5)</option>
+                            <option data-i18n="option-discreet-aura" value="discreetAura">Discreet Aura (3)</option>
+                            <option data-i18n="option-discretion" value="discretion">Discretion (2)</option>
+                            <option data-i18n="option-duel" value="duel">Duel (2)</option>
+                            <option data-i18n="option-effect-transfer" value="effectTransfer">Effect Transfer (4/3)</option>
+                            <option data-i18n="option-empower-attack" value="empowerAttack">Empower Attack (6/3)</option>
+                            <option data-i18n="option-energy-attacker" value="energyAttacker">Energy Attacker (6/3)</option>
+                            <option data-i18n="option-fast-companion" value="fastCompanion">Fast Companion (2/1)</option>
+                            <option data-i18n="option-fast-healing" value="fastHealing">Fast Healing (4)</option>
+                            <option data-i18n="option-favorable-insight" value="favorableInsight">Favorable Insight (3)</option>
+                            <option data-i18n="option-feint" value="feint">Feint (6)</option>
+                            <option data-i18n="option-fighting-spirit" value="fightingSpirit">Fighting Spirit (6/3)</option>
+                            <option data-i18n="option-hardened-defense" value="hardenedDefense">Hardened Defense (6/3)</option>
+                            <option data-i18n="option-hardened-resistance" value="hardenedResistance">Hardened Resistance (6/3)</option>
+                            <option data-i18n="option-hidden-companion" value="hiddenCompanion">Hidden Companion (4/2)</option>
+                            <option data-i18n="option-ignore-effect" value="ignoreEffect">Ignore Effect (5)</option>
+                            <option data-i18n="option-improved-damage-increment-abv" value="improvedDamageIncrement">Improved Damage Inc. (4/2)</option>
+                            <option data-i18n="option-improved-swimming" value="improvedSwimming">Improved Swimming (4)</option>
+                            <option data-i18n="option-increased-size" value="increasedSize">Increased Size (2/1)</option>
+                            <option data-i18n="option-inspire" value="inspire">Inspire (5)</option>
+                            <option data-i18n="option-interrupt-attack" value="interruptAttack">Interrupt Attack (3/2)</option>
+                            <option data-i18n="option-intimidate" value="intimidate">Intimidate (5/3)</option>
+                            <option data-i18n="option-iron-defense" value="ironDefense">Iron Defense (4/2)</option>
+                            <option data-i18n="option-jump" value="Jump">Jump (4)</option>
+                            <option data-i18n="option-mount" value="mount">Mount (3/1)</option>
+                            <option data-i18n="option-nimble-movement" value="nimbleMovement">Nimble Movement (4)</option>
+                            <option data-i18n="option-nullify" value="nullify">Nullify (5/3)</option>
+                            <option data-i18n="option-overload-limits" value="overloadLimits">Overload Limits (6)</option>
+                            <option data-i18n="option-passive-healing" value="passiveHealing">Passive Healing (4)</option> (6)
+                            <option data-i18n="option-physical-attacker" value="physicalAttacker">Physical Attacker (6/3)</option>
+                            <option data-i18n="option-proficiency" value="proficiency">Proficiency (2)</option>
+                            <option data-i18n="option-protector" value="protector">Protector (5)</option>
+                            <option data-i18n="option-provoke" value="provoke">Provoke (4/2)</option>
+                            <option data-i18n="option-quick-to-act" value="quickToAct">Quick to Act (3)</option>
+                            <option data-i18n="option-recharge" value="recharge">Recharge (5/3)</option>
+                            <option data-i18n="option-reckless-attack" value="recklessAttack">Reckless Attack (5/3)</option>
+                            <option data-i18n="option-recovery" value="recovery">Recovery (3)</option>
+                            <option data-i18n="option-resistant" value="resistant">Resistant (4/2)</option>
+                            <option data-i18n="option-resolute-aura" value="resoluteAura">Resolute Aura (5)</option>
+                            <option data-i18n="option-resolute-strike" value="resoluteStrike">Resolute Strike (5)</option>
+                            <option data-i18n="option-revenge" value="revenge">Revenge (5)</option>
+                            <option data-i18n="option-rolling-recovery" value="rollingRecovery">Rolling Recovery (4)</option>
+                            <option data-i18n="option-sense-malice" value="senseMalice">Sense Malice (2)</option>
+                            <option data-i18n="option-size-up" value="sizeUp">Size Up (3/1)</option>
+                            <option data-i18n="option-spirit-sight" value="spiritSight">Spirit Sight (5)</option>
+                            <option data-i18n="option-sprinter" value="sprinter">Sprinter (4/2)</option>
+                            <option data-i18n="option-strength-of-will" value="strengthOfWill">Strength of Will (5)</option>
+                            <option data-i18n="option-team-tactics" value="teamTactics">Team Tactics (6)</option>
+                            <option data-i18n="option-tireless" value="tireless">Tireless (5/2)</option>
+                            <option data-i18n="option-tough" value="tough">Tough (6/3)</option>
+                            <option data-i18n="option-toss" value="toss">Toss (5/2)</option>
+                            <option data-i18n="option-underhanded" value="underhanded">Underhanded (5)</option>
+                            <option data-i18n="option-unmovable" value="unmovable">Unmovable (4/2)</option>
+                            <option data-i18n="option-versatile-fighter" value="versatileFighter">Versatile Fighter (6/3)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-2-skills" label="Season 2 Skills">
+                            <option data-i18n="option-abundant-creation" value="abundantCreation">Abundant Creation (5)</option>
+                            <option data-i18n="option-afterimage" value="afterimage">Afterimage (4)</option>
+                            <option data-i18n="option-ally-mount" value="allyMount">Ally Mount (3/1)</option>
+                            <option data-i18n="option-area-shield" value="areaShield">Area Shield (4)</option>
+                            <option data-i18n="option-battle-analysis" value="battleAnalysis">Battle Analysis (6)</option>
+                            <option data-i18n="option-clash" value="clash">Clash (3)</option>
+                            <option data-i18n="option-clone" value="clone">Clone (6/3)</option>
+                            <option data-i18n="option-clone-tactics" value="cloneTactics">Clone Tactics (5)</option>
+                            <option data-i18n="option-combat-toss" value="combatToss">Combat Toss (4)</option>
+                            <option data-i18n="option-companion-zone-of-control-abv" value="companionZoneOfControl">Companion ZOC (4/4)</option>
+                            <option data-i18n="option-damage-feedback" value="damageFeedback">Damage Feedback (5)</option>
+                            <option data-i18n="option-daredevil" value="daredevil">Daredevil (4)</option>
+                            <option data-i18n="option-diving-escape" value="divingEscape">Diving Escape (5/2)</option>
+                            <option data-i18n="option-effect-capture" value="effectCapture">Effect Capture (4)</option>
+                            <option data-i18n="option-extended-revival" value="extendedRevival">Extended Revival (4)</option>
+                            <option data-i18n="option-favorable-success" value="favorableSuccess">Favorable Success (4)</option>
+                            <option data-i18n="option-final-attack" value="finalAttack">Final Attack (6)</option>
+                            <option data-i18n="option-flank-attack" value="flankAttack">Flank Attack (4)</option>
+                            <option data-i18n="option-health-transference" value="healthTransference">Health Transference (4)</option>
+                            <option data-i18n="option-line-deflect" value="lineDeflect">Line Deflect (5)</option>v
+                            <option data-i18n="option-mobile-cover" value="mobileCover">Mobile Cover (5)</option>
+                            <option data-i18n="option-mobile-dodge" value="mobileDodge">Mobile Dodge (4)</option>
+                            <option data-i18n="option-opportunistic-dodge" value="opportunisticDodge">Opportunistic Dodge (6)</option>
+                            <option data-i18n="option-phasing" value="phasing">Phasing (5)</option>
+                            <option data-i18n="option-portal" value="portal">Portal (6/3)</option>
+                            <option data-i18n="option-protect-ally" value="protectAlly">Protect Ally (2)</option>
+                            <option data-i18n="option-protect-master" value="protectMaster">Protect Master (3)</option>
+                            <option data-i18n="option-push-away" value="pushAway">Push Away (4/2)</option>
+                            <option data-i18n="option-ranged-interrupt" value="rangedInterrupt">Ranged Interrupt (4)</option>
+                            <option data-i18n="option-ranged-revival" value="rangedRevival">Ranged Revival (3)</option>
+                            <option data-i18n="option-refraction-point" value="refractionPoint">Refraction Point (4/2)</option>
+                            <option data-i18n="option-rising-attack" value="risingAttack">Rising Attack (6)</option>
+                            <option data-i18n="option-safe-stride" value="safeStride">Safe Stride (5)</option>
+                            <option data-i18n="option-seal" value="seal">Seal (6/3)</option>
+                            <option data-i18n="option-shadow-meld" value="shadowMeld">Shadow Meld (6)</option>
+                            <option data-i18n="option-shrug-off" value="shrugOff">Shrug Off (6)</option>
+                            <option data-i18n="option-split-move" value="splitMove">Split Move (6)</option>
+                            <option data-i18n="option-stamina-transference" value="staminaTransference">Stamina Transference (6)</option>
+                            <option data-i18n="option-swift-step" value="swiftStep">Swift Step (5/2)</option>
+                            <option data-i18n="option-tossing-companion" value="tossingCompanion">Tossing Companion (3/1)</option>
+                            <option data-i18n="option-transposition" value="transposition">Transposition (4)</option>
+                            <option data-i18n="option-trusting-companion" value="trustingCompanion">Trusting Companion (4)</option>
+                            <option data-i18n="option-wall-walk" value="wallWalk">Wall Walk (4)</option>
+                            <option data-i18n="option-water-adaptation" value="waterAdaptation">Water Adaptation (6)</option>
+                            <option data-i18n="option-water-walk" value="waterWalk">Water Walk (4)</option>
+                            <option data-i18n="option-x-ray-vision" value="xRayVision">X-Ray Vision (4)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-3-skills" label="Season 3 Skills">
+                            <option data-i18n="option-attack-node-network" value="attackNodeNetwork">Attack Node Network (4)</option>
+                            <option data-i18n="option-companion-sense" value="companionSense">Companion Sense (2)</option>
+                            <option data-i18n="option-defensive-clash" value="defensiveClash">Defensive Clash (4)</option>
+                            <option data-i18n="option-deflecting-shield" value="deflectingShield">Deflecting Shield (4)</option>
+                            <option data-i18n="option-exploit-weakness" value="exploitWeakness">Exploit Weakness (6)</option>
+                            <option data-i18n="option-flunky-domination" value="flunkyDomination">Flunky Domination (5)</option>
+                            <option data-i18n="option-fly" value="fly">Fly (6/2)</option>
+                            <option data-i18n="option-flying-companion" value="flyingCompanion">Flying Companion (3/3)</option>
+                            <option data-i18n="option-instant-mount" value="instantMonut">Instant Mount (3)</option>
+                            <option data-i18n="option-prepared" value="prepared">Prepared (6)</option>
+                            <option data-i18n="option-reactive-companion" value="reactiveCompanion">Reactive Companion (4)</option>
+                            <option data-i18n="option-refraction-chain" value="refractionChain">Refraction Chain (6)</option>
+                            <option data-i18n="option-swift-jump" value="swiftJump">Swift Jump (3)</option>
+                            <option data-i18n="option-unshakeable" value="unshakeable">Unshakeable (6)</option>
+                            <option data-i18n="option-unstoppable" value="unstoppable">Unstoppable (6)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-4-skills" label="Season 4 Skills">
+                            <option data-i18n="option-break-valor-limit" value="breakValorLimit">Break Valor Limit (6)</option>
+                            <option data-i18n="option-expanded-reach" value="expandedReach">Expanded Reach (8)</option>
+                            <option data-i18n="option-extended-range" value="extendedRange">Extended Range (4)</option>
+                            <option data-i18n="option-extra-action" value="extraAction">Extra Action (12)</option>
+                            <option data-i18n="option-free-flight" value="freeFlight">Free Flight (3)</option>
+                            <option data-i18n="option-free-swift-step" value="freeSwiftStep">Free Swift Step (5)</option>
+                            <option data-i18n="option-regeneration" value="regeneration">Regeneration (6/4)</option>
+                            <option data-i18n="option-stamina-recovery" value="staminaRecovery">Stamina Recovery (4/2)</option>
+                            <option data-i18n="option-teleportation" value="teleportation">Teleportation (6)</option>
+                            <option data-i18n="option-unyielding-determination" value="unyieldingDetermination">Unyielding Determination (6)</option>
+                            <option data-i18n="option-violent-aura" value="violentAura">Violent Aura (4)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-1-optional-rules" label="Season 1 (Optional Rules)">
+                            <option data-i18n="option-elemental-resistance" value="elementalResistance">Elemental Resistance (4/2)</option>
+                            <option data-i18n="option-elemental-attunement" value="elementalAttunement">Elemental Attunement (3)</option>
+                            <option data-i18n="option-illusory-disguise" value="illusoryDisguise">Illusory Disguise (3)</option>
+                            <option data-i18n="option-illusory-terrain" value="illusoryTerrain">Illusory Terrain (4/2)</option>
+                            <option data-i18n="option-pierce-illusion" value="pierceIllusion">Pierce Illusion (4)</option>
+                            <option data-i18n="option-principled" value="principled">Principled (2)</option>
+                            <option data-i18n="option-polearm-wielder" value="polearmWielder">Polearm Wielder (5)</option>
+                            <option data-i18n="option-ranged-weapon-wielder" value="rangedWeaponWielder">Ranged Weapon Wielder (4/2)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-2-optional-rules" label="Season 2 (Optional Rules)">
+                            <option data-i18n="option-illusory-assailant" value="illusoryAssailant">Illusory Assailant (6/3)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-1-npc-only" label="Season 1 (NPC Only)">
+                            <option data-i18n="option-invisibility" value="invisibility">Invisibility (8)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-2-npc-only" label="Season 2 (NPC Only)">
+                            <option data-i18n="option-revive" value="revive">Revive (8/3)</option>
+                        </optgroup>
+                        <optgroup data-i18n-label="season-4-npc-only" label="Season 4 (NPC Only)">
+                            <option data-i18n="option-valiant" value="limitlessPower">Valiant (12)</option>
+                        </optgroup>
+                    </select>
+                    <span data-i18n="level" class="label">Level</span> <input class="skill-level" type="number" name="attr_skilllevel" title="@{repeating_skills_#_skilllevel}" value="1" />
+                    <span name="attr_warning"></span>
+                </div>
+                <span data-i18n="notes" class="label">Notes</span> <input class="notes" type="text" spellcheck="false" name="attr_skillnotes" title="@{repeating_skills_#_skillnotes}" />
+            </div>
+        </fieldset>
+
+        <div data-i18n="unspent-skill-points-abv-u" class="unspent-sp"><span name="attr_unspentskillpoints" title="@{unspentskillpoints}" ></span> SP UNSPENT</div>
+    </div>
+
+    <div class="sheet-tab-content sheet-tab3">
+        <div class="techs-header">TECHNIQUES</div>
+
+        <fieldset class="repeating_techs">
+            <div class="tech-name">
+                <input type="text" spellcheck="false" class="tech-name" name="attr_tech_name" title="@{repeating_techs_#_tech_name}" value="New Technique" />
+            </div>
+            <div class="tech">
+                <div class="spacer"></div>
+                <div class="tech-level">
+                    <div class="tech-header">
+                        <span data-i18n="technique-level-abv" class="label">Tech Level</span>
+                        <span class="derived-value" name="attr_tech_level" title="@{repeating_techs_#_tech_level}" >
+                    </div>
+                </div>
+                <div class="tech-button">
+                    <input type="hidden" class="tech-name" name="attr_tech_stat_roll" title="@{repeating_techs_#_tech_stat_roll}" value="" />
+                    <input type="hidden" class="tech-name" name="attr_tech_damage_disp" title="@{repeating_techs_#_tech_damage_disp}" value="" />
+                    <input type="hidden" class="tech-name" name="attr_tech_defres_disp" title="@{repeating_techs_#_tech_defres_disp}" value="" />
+                    <input type="hidden" class="tech-name" name="attr_tech_healing_disp" title="@{repeating_techs_#_tech_healing_disp}" value="" />
+                    <input type="hidden" class="tech-name" name="attr_tech_transform_disp" title="@{repeating_techs_#_tech_transform_disp}" value="" />
+                    <input type="hidden" class="tech-name" name="attr_tech_mods_disp" title="@{repeating_techs_#_tech_mods_disp}" value="" />
+                    <button class="valor-button" type='roll' 
+                        value='&{template:valor} {{name=@{tech_name}}} {{roll=@{tech_stat_roll}}} {{damage=@{tech_damage_disp}}} {{defres=@{tech_defres_disp}}} {{healing=@{tech_healing_disp}}} {{transform=@{tech_transform_disp}}} {{skills=@{tech_granted_skills}}} {{flaws=@{tech_inflicted_flaws}}} {{mimic=@{tech_mimic_target}}} {{mods=@{tech_mods_disp}}}'> Use Technique</button>
+                </div>
+                <div>
+                    <span data-i18n="core:" class="label">Core:</span>
+                </div>
+                <div class="tech-core">
+                    <select class="tech-field" name="attr_tech_core" title="@{repeating_techs_#_tech_core}" >
+                        <option data-i18n="option-barrier-core" value="barrier">Barrier Core</option>
+                        <option data-i18n="option-boost-core" value="boost">Boost Core</option>
+                        <option data-i18n="option-damage-core" value="damage" selected="selected">Damage Core</option>
+                        <option data-i18n="option-healing-core" value="healing">Healing Core</option>
+                        <option data-i18n="option-mimic-core" value="mimic">Mimic Core</option>
+                        <option data-i18n="option-summoning-core" value="summoning">Summoning Core</option>
+                        <option data-i18n="option-weaken-core" value="weaken">Weaken Core</option>
+                        <optgroup data-i18n-label="ultimate-cores" label="Ultimate Cores">
+                            <option data-i18n="option-ultimate-attack" value="ultDamage">Ultimate Attack</option>
+                            <option data-i18n="option-transformation" value="ultTransform">Transformation</option>
+                        </optgroup>
+                        <option data-i18n="option-custom-core" value="custom">Custom Core</option>
+                    </select>
+                </div>
+                <div class="tech-core-level">
+                    <span data-i18n="core-power:" class="label">Core Power:</span>
+                    <input class="tech-field tech-small-input" type="number" name="attr_tech_core_level" title="@{repeating_techs_#_tech_core_level}" value="1" />
+                </div>
+                <div class="tech-summary">
+                    <div><span name="attr_tech_description" title="@{repeating_techs_#_tech_description}" ></span></div>
+                    <div><span name="attr_tech_summary" title="@{repeating_techs_#_tech_summary}" ></span></div>
+                    <div><span name="attr_tech_warnings" title="@{repeating_techs_#_tech_warnings}" ></span></div>
+                </div>
+                <div>
+                    <span data-i18n="attribute:" class="label">Attribute:</span>
+                </div>
+                <div class="tech-attribute">
+                    <select class="tech-field" name="attr_tech_stat" title="@{repeating_techs_#_tech_stat}" >
+                        <option data-i18n="none" value="none" selected="selected">None</option>
+                        <option data-i18n="strength" value="strength">Strength</option>
+                        <option data-i18n="agility" value="agility">Agility</option>
+                        <option data-i18n="spirit" value="spirit">Spirit</option>
+                        <option data-i18n="mind" value="mind">Mind</option>
+                        <option data-i18n="guts" value="guts">Guts</option>
+                    </select>
+                </div>
+                <div class="tech-cost">
+                    <input type="checkbox" class="conditional-check" name="attr_tech_can_edit_cost">
+                    <div class="conditional-block">
+                        <span data-i18n="stamina-cost-abv:" class="label">ST Cost:</span>
+                        <input class="tech-field tech-small-input" type="number" name="attr_tech_custom_cost" title="@{repeating_techs_#_tech_custom_cost}" value="0" />
+                    </div>
+                    <div class="conditional-block-inverse">
+                        <span data-i18n="stamina-cost-abv" class="label">ST Cost</span>
+                        <span class="derived-value" name="attr_tech_cost" title="@{repeating_techs_#_tech_cost}" ></span>
+                    </div>
+                </div>
+                <div class="tech-description">
+                    <div data-i18n="description" class="label">Description</div>
+                    <div>
+                        <textarea class="smallertext tech-field" name="attr_tech_description" title="@{repeating_techs_#_tech_description}" ></textarea>
+                    </div>
+                </div>
+                <div class="tech-optional-fields">
+                    <div class="tech-conditional-field">
+                        <input type="checkbox" class="conditional-check" name="attr_tech_has_skills">
+                        <div class="tech-block conditional-block">
+                            <span data-i18n="skills:" class="label">Skills:</span>
+                            <input type="text" spellcheck="false" class="tech-field" name="attr_tech_granted_skills" title="@{repeating_techs_#_tech_granted_skills}" />
+                            (<span class="sp_label" name="attr_tech_skill_sp"></span>/<span class="sp_label" name="attr_tech_skill_sp_max" title="@{repeating_techs_#_tech_skill_sp_max}" ></span>)
+                        </div>
+                    </div>
+                    <div class="tech-conditional-field">
+                        <input type="checkbox" class="conditional-check" name="attr_tech_has_flaws">
+                        <div class="tech-block conditional-block">
+                            <span data-i18n="flaws:" class="label">Flaws:</span>
+                            <input type="text" spellcheck="false" class="tech-field" name="attr_tech_inflicted_flaws" title="@{repeating_techs_#_tech_inflicted_flaws}" />
+                            (<span class="sp_label" name="attr_tech_flaw_sp"></span>/<span class="sp_label" name="attr_tech_flaw_sp_max" title="@{repeating_techs_#_tech_flaw_sp_max}" ></span>)
+                        </div>
+                    </div>
+                    <div class="tech-conditional-field">
+                        <input type="checkbox" class="conditional-check" name="attr_tech_is_mimic">
+                        <div class="tech-block conditional-block">
+                            <span data-i18n="mimicked-technique-abv:" class="label">Mimicked Tech:</span>
+                            <input class="tech-field" type="text" spellcheck="false" name="attr_tech_mimic_target" title="@{repeating_techs_#_tech_mimic_target}" />
+                        </div>
+                    </div>
+                </div>
+                <div class="tech-modifiers">
+                    <div data-i18n="modifiers-one-per-line" class="label">Modifiers (one per line)</div>
+                    <div>
+                        <textarea class="smalltext tech-field" name="attr_tech_mods" title="@{repeating_techs_#_tech_mods}" rows="3" cols="40"></textarea>
+                    </div>
+                    <div>
+                        <span data-i18n="total-mod-levels">Total Mod Levels <span name="attr_tech_mod_level" title="@{repeating_techs_#_tech_mod_level}" class="derived-value"></span></span>
+                    </div>
+                </div>
+                <div class="tech-limits">
+                    <div data-i18n="limits-one-per-line" class="label">Limits (one per line)</div>
+                    <div>
+                        <textarea class="smalltext tech-field" name="attr_tech_limits" title="@{repeating_techs_#_tech_limits}" rows="3" cols="40"></textarea>
+                    </div>
+                    <div>
+                        <span data-i18n="total-cost-reduction">Total Cost Reduction <span name="attr_tech_limit_st" title="@{repeating_techs_#_tech_limit_st}" class="derived-value"></span></span>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        <div data-i18n="unspent-technique-points-abv-u" class="unspent-tp"><span name="attr_unspenttechpoints" title="@{unspenttechpoints}"></span> TP UNSPENT</div>
+    </div>
+</div>
+
+<rolltemplate class="sheet-rolltemplate-valor">
+    <div class="outer">
+        <div class="header">
+            {{name}} {{#mimic}}[{{mimic}}]{{/mimic}}
+        </div>
+        <div>
+            {{roll}}
+        </div>
+        {{#damage}}
+            <div>
+                <span data-i18n="template-damage" data-i18n-vars="{{damage}}|{{defres}}">Damage: <span class="damage-number">{{0}}</span> {{1}}</span>
+            </div>
+        {{/damage}}
+        {{#healing}}
+            <div>
+                <span data-i18n="template-restores-hp" data-i18n-vars="{{healing}}">Restores <span class="healing-number">{{healing}}</span> HP</span>
+            </div>
+        {{/healing}}
+        {{#transform}}
+            <div>
+                <span data-i18n="template-transform-hp" data-i18n-vars="{{transform}}">HP +<span class="healing-number">{{transform}}</span></span>
+            </div>
+        {{/transform}}
+        {{#skills}}
+        <div>
+            <span data-i18n="skills:">Skills:</span> {{skills}}
+        </div>
+        {{/skills}}
+        {{#flaws}}
+        <div>
+            <span data-i18n="flaws:">Flaws:</span> {{flaws}}
+        </div>
+        {{/flaws}}
+        {{#mods}}
+        <div class="mods-list">
+            {{mods}}
+        </div>
+        {{/mods}}
+    </div>
+</rolltemplate>

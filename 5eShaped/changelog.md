@@ -11,6 +11,96 @@ Bugs fall into the patch category.
 
 The sheet will always upgrade itself unless I specify otherwise, though some things like roll template fields changing will require users who have added custom macros to fix.
 
+## 19.3.0
+
+### Features
+- Update French translations
+
+## 19.2.0
+
+### Features
+- [#778: Suggestion: Luck Statistic](https://bitbucket.org/mlenser/5eshaped/issues/778/suggestion-luck-statistic)
+
+## 19.1.5
+
+### Bug fixes
+- [#775: Spell data not converting for NPCs and Monster spellcasters on premade campaign](https://bitbucket.org/mlenser/5eshaped/issues/775/spell-data-not-converting-for-npcs-and)
+
+## 19.1.4
+
+### Bug fixes
+- [#772: Drag and Drop of spells ceases to function after attempting the "Heal" spell](https://bitbucket.org/mlenser/5eshaped/issues/772/drag-and-drop-of-spells-ceases-to-function) and add a test
+
+## 19.1.3
+
+### Bug fixes
+- [#766: Warlock spell slots not updating when level changed](https://bitbucket.org/mlenser/5eshaped/issues/766/warlock-spell-slots-not-updating-when)
+- [#767: Higher level spell queries are not updated as spells are expended](https://bitbucket.org/mlenser/5eshaped/issues/767/higher-level-spell-queries-are-not-updated)
+
+## 19.1.2
+
+### Bug fixes
+- [#758: New SRD Content cleanup code breaks lair actions and regional effects import from script](https://bitbucket.org/mlenser/5eshaped/issues/758/new-srd-content-cleanup-code-breaks-lair)
+- [#759: Race condition with updating actions on import](https://bitbucket.org/mlenser/5eshaped/issues/759/race-condition-with-updating-actions-on)
+- Fixed Goblin Spider parsing
+- [#761: Spellcasting trait parse has invalid destructuring usage](https://bitbucket.org/mlenser/5eshaped/issues/761/spellcasting-trait-parse-has-invalid)
+- [#765: Fix for #759 broke more stuff](https://bitbucket.org/mlenser/5eshaped/issues/765/fix-for-759-broke-more-stuff)
+
+## 19.1.1
+
+### Bug fixes
+- [#754: Incorrect assumption that all innate spellcasting groups will end with "each"](https://bitbucket.org/mlenser/5eshaped/issues/757/incorrect-assumption-that-all-innate)
+
+## 19.1.0
+
+### Features
+- The sheet now supports some newer script edge-case features such as Anubian’s stealth being higher in sand.
+
+### Bug fixes
+- [#752: NPC Average HP's not calculating properly](https://bitbucket.org/mlenser/5eshaped/issues/752/npc-average-hps-not-calculating-properly)
+
+## 19.0.0
+
+### Breaking Changes
+- Removed my custom classes (only one, called `Summoner`) and my psionic classes (`Psion` and `Soulknife`) from the sheet. If you have custom classes then use the custom name field for the class.
+
+### Features
+- Settings page cleaned up after latest Roll20 changes. It has also been reorganized to match the PC sheet sections (skills, saving throws, etc).
+- [#750: Always show NPC saving throws](https://bitbucket.org/mlenser/5eshaped/issues/750/always-show-npc-saving-throws)
+
+### Bug fixes
+- [#729: NPC skill proficiencies are lost during conversion from OGL sheet](https://bitbucket.org/mlenser/5eshaped/issues/729/npc-skill-proficiencies-are-lost-during)
+- NPC skills should never expand in to the right column now
+
+## 18.1.13
+
+### Bug fixes
+- [#738: Overlapping UI in NPC sheet](https://bitbucket.org/mlenser/5eshaped/issues/738/overlapping-ui-in-npc-sheet)
+
+## 18.1.12
+
+### Bug fixes
+- [#733: Class traits with damage do not check damage option by default](https://bitbucket.org/mlenser/5eshaped/issues/733/class-traits-with-damage-do-not-check)
+- [#743: Incorrect assumption about OGL HP format breaks some imports](https://bitbucket.org/mlenser/5eshaped/issues/743/incorrect-assumption-about-ogl-hp-format)
+- [#744: TypeError on OGL conversion](https://bitbucket.org/mlenser/5eshaped/issues/744/typeerror-on-ogl-conversion)
+- [#745: Consider not using npc_name from OGL to set character name](https://bitbucket.org/mlenser/5eshaped/issues/745/consider-not-using-npc_name-from-ogl-to)
+
+## 18.1.11
+
+### Bug fixes
+- [#728: Error message when using NPC actions](https://bitbucket.org/mlenser/5eshaped/issues/728/error-message-when-using-npc-actions)
+
+## 18.1.10
+
+### Bug fixes
+- Fix attachers for NPC actions and reactions. Closes [#726: NPC attachers do not trigger for Actions](https://bitbucket.org/mlenser/5eshaped/issues/726/npc-attachers-do-not-trigger-for-actions)
+
+## 18.1.9
+
+### Bug fixes
+- [#723: NPC skill parsing broken for skills with spaces in them](https://bitbucket.org/mlenser/5eshaped/issues/723/npc-skill-parsing-broken-for-skills-with)
+- [#724: Drag-and-drop for crossbow bolts freezes sheet, breaks future imports](https://bitbucket.org/mlenser/5eshaped/issues/724/drag-and-drop-for-crossbow-bolts-freezes)
+
 ## 18.1.8
 
 ### Bug fixes

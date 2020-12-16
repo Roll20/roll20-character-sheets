@@ -16,13 +16,12 @@ $rt-blue: #80b0ff;
 $rt-purple: #b291ec;
 $rt-gray: #bababa;
 
-/* polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 22px 100%, 0 calc(100% - 22px)) */
-
 /* global styles */
 .charsheet {
 	background-color: white;
 	padding: 0 !important;
 	font-size: 12px;
+	line-height: 18px;
 	min-width: 800px;
 	color: #000;
 }
@@ -94,7 +93,7 @@ button[type=roll].sheet-invisible-button {
 	width: 100%;
 	height: 100%;
 	top: 0;
-	&:hover + div {
+	&:hover ~ div:not(.sheet-no-highlight) {
 		color: $brightblue;
 		border-color: $brightblue;
 	}
@@ -146,8 +145,11 @@ h3 {
 /* tab wrappers and type chooser */
 .sheet-npc-input[value="0"] ~ .sheet-tabs .sheet-npc-tab,
 .sheet-npc-input[value="1"] ~ .sheet-tabs .sheet-pc-tab,
+.sheet-npc-input[value="0"] ~ .sheet-drones .sheet-npc-show,
+.sheet-npc-input[value="1"] ~ .sheet-drones .sheet-pc-show,
 .sheet-tab-input:not([value="character"]) ~ .sheet-character,
 .sheet-tab-input:not([value="ship"]) ~ .sheet-ship,
+.sheet-tab-input:not([value="drones"]) ~ .sheet-drones,
 .sheet-tab-input:not([value="npc"]) ~ .sheet-npc { display: none }
 
 .sheet-content {
@@ -248,7 +250,7 @@ h3 {
 .sheet-halfgrid {
 	display: grid;
 	grid: auto/ 1fr 1fr;
-	grid-column-gap: 5px;
+	grid-gap: 5px;
 }
 .sheet-thirdsgrid {
 	display: grid;
@@ -256,22 +258,19 @@ h3 {
 	grid-column-gap: 1%;
 }
 .sheet-column > div:not(:first-child) { margin-top: 5px }
-.sheet-col-1-3 { grid-column: 1/3 }
-.sheet-col-1-4 { grid-column: 1/4 }
-.sheet-col-1-5 { grid-column: 1/5 }
 .sheet-col-2 { grid-column: 2 }
-.sheet-col-2-4 { grid-column: 2/4 }
 .sheet-col-3 { grid-column: 3 }
-.sheet-col-3-5 { grid-column: 3/5 }
 .sheet-col-4 { grid-column: 4 }
-.sheet-col-4-7 { grid-column: 4/7 }
-.sheet-col-5-7 { grid-column: 5/7 }
-.sheet-row-3-5 { grid-row: 3/5 }
+.sheet-cols-2 { grid-column: span 2 }
+.sheet-cols-3 { grid-column: span 3 }
+.sheet-cols-4 { grid-column: span 4 }
+.sheet-rows-2 { grid-row: span 2 }
 .sheet-col55 { width: 55% }
 .sheet-col50 { width: 50% }
 .sheet-col40 { width: 40% }
 .sheet-colthird { width: calc(100%/3) }
 .sheet-col25 { width: 25% }
+.sheet-col20 { width: 20% }
 .sheet-colsixth { width: calc(100%/6) }
 
 /* containers */
@@ -297,7 +296,7 @@ input[type=text].sheet-inherit {
 	color: inherit;
 	font: inherit;
 }
-input[type=number].sheet-inline-input {
+.sheet-inline-input {
 	position: relative;
 	z-index: 2;
 	vertical-align: baseline;
@@ -380,6 +379,7 @@ input[type=number].sheet-inline-input {
 }
 .sheet-blue-button {
 	text-align: center;
+	line-height: 1.5;
 	button[type=roll].btn {
 		background: $brightblue;
 		width: 35px;
@@ -388,6 +388,26 @@ input[type=number].sheet-inline-input {
 		margin: 0 auto;
 		color: white;
 		&::before { content: "" }
+	}
+}
+.sheet-focusinfo {
+	position: relative;
+	.sheet-details {
+		position: absolute;
+		z-index: 1;
+		opacity: 1;
+		width: 250px;
+		top: 22px;
+		left: calc(50% - 125px);
+		transition: all 0.3s;
+		background: #FFF;
+		border: 1px solid #777;
+		border-radius: 8px;
+		padding: 5px;
+	}
+	input:not(:focus) ~ .sheet-details {
+		visibility: hidden;
+		opacity: 0;
 	}
 }
 
@@ -439,7 +459,10 @@ input[type=number].sheet-inline-input {
 .sheet-skills-type[value="neither"] ~ div .sheet-skills-either,
 .sheet-skills-type:not([value="first"]) ~ div .sheet-skills-first,
 .sheet-skills-type:not([value="revised"]) ~ div .sheet-skills-revised,
+.sheet-skills-type:not([value="wwn"]) ~ div .sheet-skills-wwn,
 .sheet-skills-type:not([value="neither"]) ~ div .sheet-skills-neither,
+.sheet-super-type:not([value="psionics"]):not([value="both"]) ~ div .sheet-skills-psionics,
+.sheet-super-type:not([value="magic"]):not([value="both"]) ~ div .sheet-skills-magic,
 .sheet-skills-query:not([value="hover"]) ~ div .sheet-skills-query-hover,
 .sheet-skills-query[value="query"] ~ div .sheet-skills-query-display,
 .sheet-skills-query[value="query"] ~ div .sheet-skills-query-ask {
@@ -574,19 +597,17 @@ input[type=number].sheet-inline-input {
 	display: grid;
 	grid: auto / 1fr 1fr;
 }
-.sheet-character .sheet-menus button[type=roll].btn {
-	margin-right: auto;
-}
 .sheet-menus button[type=roll].btn {
 	color: $brightblue;
 	font-size: 1.1em;
 	&:hover { color: red }
+	.sheet-character & { margin-right: auto }
 }
 
 /* Attributes */
 .sheet-attributes {
 	font-size: 1.1em;
-	line-height: 16px;
+	line-height: 1.2;
 	table {
 		width: 100%;
 		height: 100%;
@@ -594,6 +615,7 @@ input[type=number].sheet-inline-input {
 	td:first-child, .sheet-mod { font-weight: bold }
 	td:not(:first-child) { text-align: center }
 	input[type=number] { width: 45px }
+	td:nth-child(2n+3) input[type=number] { width: 37px }
 	.sheet-mod { font-size: 1.1em }
 }
 
@@ -614,6 +636,17 @@ input[type=number].sheet-inline-input {
 	}
 	.sheet-slash { margin: 0 2px }
 }
+
+/* Shells */
+
+.sheet-shells {
+	.sheet-shells-grid {
+		grid: auto / 40px 35px 35px 35px 45px 1fr;
+	}
+}
+
+.sheet-transhuman-setting:not([value="transhuman"]) ~ .sheet-column .sheet-transhuman-enabled { display: none }
+.sheet-transhuman-setting[value="transhuman"] ~ .sheet-core .sheet-transhuman-disabled { display: none }
 
 /* Weapons */
 .sheet-weapons {
@@ -743,6 +776,7 @@ input[type=number].sheet-inline-input {
 .sheet-skills-type:not([value="neither"]) ~ div .sheet-skills-repeating,
 .sheet-psionics .sheet-skills-repeating, .sheet-magic .sheet-skills-repeating { margin-top: 4px }
 .sheet-skill-blurb {
+	margin-top: 3px;
 	font-style: italic;
 	text-align: center;
 }
@@ -763,6 +797,7 @@ input[type=number].sheet-inline-input {
 	}
 }
 .sheet-input-details:not([value="1"]) ~ div .sheet-details { display: none }
+.sheet-input-details:not([value="0"]) ~ div .sheet-notdetails { display: none }
 
 
 /* Supernatural section controls */
@@ -781,7 +816,7 @@ input[type=number].sheet-inline-input {
 /* Psionics */
 .sheet-psionics-effort {
 	display: grid;
-	grid: auto/ auto 60px 60px 60px 80px;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
 	align-items: center;
 	grid-column-gap: 4px;
 	margin-top: 5px;
@@ -798,6 +833,16 @@ input[type=number].sheet-inline-input {
 }
 
 /* Space Magic */
+
+.sheet-magic-effort {
+	display: grid;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
+	align-items: center;
+	grid-column-gap: 4px;
+	margin-top: 5px;
+	h3 { line-height: 1 }
+}
+
 .sheet-spells {
 	margin-top: 5px;
 	> .sheet-flex-center { margin-bottom: 5px }
@@ -825,6 +870,41 @@ input[type=number].sheet-inline-input {
 	}
 }
 
+.sheet-spell-slots {
+	display: grid;
+	grid: auto/ auto 55px 55px 55px 55px 55px;
+	align-items: center;
+	grid-column-gap: 4px;
+	margin-top: 5px;
+	h3 { line-height: 1 }
+}
+
+.sheet-magic-type {
+	&:not([value="adept"]) ~ div .sheet-adept,
+	&:not([value="magister"]) ~ div .sheet-magister,
+	&:not([value="arcanist"]) ~ div .sheet-arcanist,
+	&[value="adept"] ~ div .sheet-spellcaster { display: none }
+}
+
+/* AI */
+.sheet-ai-processing {
+	display: grid;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
+	align-items: center;
+	grid-column-gap: 4px;
+	h3 { line-height: 1 }
+}
+
+.sheet-ai-processing-nodes {
+	.sheet-nodes-grid {
+		grid: auto / 65px 65px 1fr;
+	}
+}
+
+.sheet-ai-setting:not([value="ai"]) ~ .sheet-ai-enabled  { display: none }
+.sheet-ai-setting[value="ai"] ~ .sheet-column .sheet-ai-enabled { display: block }
+.sheet-ai-setting[value="ai"] ~ .sheet-core .sheet-ai-disabled { display: none }
+
 /* Foci */
 .sheet-foci-loc {
 	&[value="left"] ~ .sheet-column .sheet-foci-right,
@@ -842,7 +922,7 @@ input[type=number].sheet-inline-input {
 			font-size: 1.1em;
 			border-bottom: 1px solid #777;
 		}
-		.sheet-name,.sheet-edit textarea, .sheet-display { margin-bottom: 3px }
+		.sheet-name, .sheet-edit textarea, .sheet-display { margin-bottom: 3px }
 	}
 	.sheet-edit {
 		.sheet-name { flex-grow: 1 }
@@ -856,12 +936,14 @@ input[type=number].sheet-inline-input {
 
 /* Gear */
 .sheet-armor {
-	.sheet-total-ac {
-		margin-left: auto;
-		font-weight: bold;
-	}
 	.sheet-armor-grid {
-		grid: auto / 40px 1fr 40px 75px 35px 70px;
+		grid: auto / 40px 1fr 40px 75px 35px 35px 70px;
+	}
+	.sheet-details div, .sheet-details label {
+		grid-column: 2 / 8;
+	}
+	.sheet-details .sheet-display {
+		line-height: 1.3;
 	}
 }
 .sheet-readied-stowed {
@@ -885,7 +967,7 @@ input[type=number].sheet-inline-input {
 .sheet-equipment {
 	.repcontainer[data-groupname="repeating_weapons"] + .repcontrol { display: none }
 	.sheet-gear-grid {
-		grid: auto / minmax(120px,1fr) 2fr 35px 70px;
+		grid: auto / 35px minmax(130px, 1fr) 2fr 35px 70px 40px;
 	}
 	.sheet-other h3 { margin-bottom: 5px }
 	.sheet-other-gear { height: 100px }
@@ -913,7 +995,7 @@ input[type=number].sheet-inline-input {
 }
 .sheet-ship {
 	margin-top: -20px;
-	grid: auto/ repeat(4, 1fr);
+	grid: auto/ 2fr 1fr 1fr;
 	.sheet-menus {
 		h3 { line-height: 1 }
 		button[type=roll].btn { line-height: 1 }
@@ -940,26 +1022,6 @@ input[type=number].sheet-inline-input {
 		display: grid;
 		grid: auto / 1fr 1fr;
 	}
-	.sheet-hulltype {
-		position: relative;
-		.sheet-details {
-			position: absolute;
-			z-index: 1;
-			opacity: 1;
-			width: 250px;
-			top: 22px;
-			left: -63px;
-			transition: all 0.3s;
-			background: #FFF;
-			border: 1px solid #777;
-			border-radius: 8px;
-			padding: 5px;
-		}
-		input:not(:focus) ~ .sheet-details {
-			visibility: hidden;
-			opacity: 0;
-		}
-	}
 	.sheet-input-color-negative[value^="-"] + .sheet-text-input input:first-child { color: red }
 	.repcontainer {
 		display: grid;
@@ -976,6 +1038,7 @@ input[type=number].sheet-inline-input {
 			.sheet-damage { width: 65px }
 			.sheet-duo { width: 80px }
 			.sheet-qualities { width: calc(100% - 195px) }
+			.sheet-range { width: 70px }
 		}
 		.sheet-display {
 			text-indent: -10px;
@@ -1014,13 +1077,14 @@ input[type=number].sheet-inline-input {
 	.sheet-input-type[value="VEHICLE"] ~ div .sheet-vehicle-type:not(.sheet-vehicle-type-custom) {
 		display: none;
 	}
-}
-.sheet-editmode[value="0"] ~ .sheet-ship {
-	.sheet-ship-defenses, .sheet-ship-fitting {
-		background: $lightbox;
-		padding: 3px 0;
+	.sheet-editmode[value="0"] ~ & {
+		.sheet-ship-defenses, .sheet-ship-fitting {
+			background: $lightbox;
+			padding: 3px 0;
+		}
 	}
 }
+
 
 /* NPC tab */
 .sheet-npc {
@@ -1062,13 +1126,16 @@ input[type=number].sheet-inline-input {
 				width: 0;
 				flex-grow: 1;
 			}
-			.sheet-attacks, .sheet-ab { width: 50px }
-			.sheet-burst, .sheet-damage { width: 65px }
+			.sheet-attacks, .sheet-ab, .sheet-range { width: 50px }
+			.sheet-burst, .sheet-damage { width: 60px }
+			.sheet-shock-damage { width: 30px }
+			.sheet-shock-ac { width: 40px }
 		}
 		.sheet-display {
 			font-size: 1.1em;
 			font-weight: bold;
 			padding: 4px 8px;
+			.sheet-range[value="0"] + span {display: none }
 			.sheet-attacks[value="1"] + span { display: none }
 			.sheet-attacks { text-transform: lowercase }
 		}
@@ -1091,14 +1158,62 @@ input[type=number].sheet-inline-input {
 	}
 }
 
-/* Roll templates */
-
-.withoutavatars {
-	.sheet-rolltemplate-swn-default,
-	.sheet-rolltemplate-swn-attack,
-	.sheet-rolltemplate-swn-skill,
-	.sheet-rolltemplate-swn-save { margin-left: -11px }
+/* Drone tab */
+.sheet-drone {
+	display: grid;
+	grid: 86px 1fr / 1fr 1fr;
+	grid-gap: 5px;
+	align-items: start;
+	border-top: 1px solid #555;
+	padding: 5px 0;
+	.sheet-stats {
+		display: grid;
+		align-content: start;
+		grid: auto / repeat(7, 1fr);
+	}
+	.sheet-fittings {
+		.sheet-name {
+			font-weight: bold;
+			&:not(:empty)::after { content: ". " }
+		}
+		.sheet-desc { font-style: italic }
+		.sheet-display { margin-bottom: 3px }
+	}
+	.sheet-fitting-grid {
+		grid: auto / .8fr 1.2fr;
+	}
+	.sheet-num-fittings {
+		&[value="1"], &[value="2"], &[value="3"], &[value="4"] {
+			~ .sheet-fitting-5 { display: none }
+		}
+		&[value="1"], &[value="2"], &[value="3"] {
+			~ .sheet-fitting-4 { display: none }
+		}
+		&[value="1"], &[value="2"] {
+			~ .sheet-fitting-3 { display: none }
+		}
+		&[value="1"] {
+			~ .sheet-fitting-2 { display: none }
+		}
+	}
+	.sheet-weapon-grid {
+		grid: auto / 35px 1fr 50px 60px 35px 70px;
+	}
+	.sheet-weapon {
+		position: relative;
+		.sheet-name { font-weight: bold }
+		.sheet-display {
+			margin-right: 4px;
+			div::after { content: "," }
+		}
+	}
+	.sheet-editmode[value="0"] ~ .sheet-content & .sheet-drone-weapons {
+		display: flex;
+		flex-wrap: wrap;
+	}
 }
+
+/* Roll templates */
 
 .sheet-rolltemplate-swn-default,
 .sheet-rolltemplate-swn-attack,
@@ -1109,6 +1224,7 @@ input[type=number].sheet-inline-input {
 	color: #FFF;
 	font-family: $arial;
 	div { box-sizing: border-box; }
+	.withoutavatars & { margin-left: -11px }
 	.sheet-container .inlinerollresult {
 		padding: 0;
 		font-family: inherit;

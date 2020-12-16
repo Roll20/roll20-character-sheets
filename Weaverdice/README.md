@@ -1,25 +1,31 @@
-Character sheet for Weaver Dice, based on the superhero webserial by John C. "Wildbow" McCrae,
-converted from the original sheet to Roll20 by Andreas J. Help to improve the sheet is welcome.
+# Character sheet for WeaverDice
+*based on the superhero webserial Worm by John C. "Wildbow" McCrae*
 
-Version 0.9:
+Any improvements to the sheet are welcome.
 
--basic stat tracking capabilities, dynamicly expanding sections for gear and other lists 
--stats can be rolled directly from the sheet
--Cape name moved to be in more in the center
--no help yet with character creation rolls yet
--buttons to roll for skills have not been implemented, as the way skills improve in WD is complex to implement
+## [Changelog](https://github.com/Roll20/roll20-character-sheets/blob/master/Weaverdice/CHANGELOG-Weaverdice.md)
 
-Possible future improvements:
--implement quick buttons and options to roll skills from sheet
--create power-generation and luck tables so character creation can be made quicker in Roll20
--make the layout more flexible to resizing, it's still quite crude atm
+## Possible future improvements:
 
-Rulebook: 			https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
-Online charsheet: 	https://docs.google.com/document/d/15peMSA3fdp9EK9urwvYps4Q0z06EQ6iJdVggD81a2bg/
-Getting Started: 	https://docs.google.com/document/d/1Py-zQBE94hm8Iu0Oqoy_p_svALXYkKVpTiq-i7PwCwE/
+- simple section for weapons/armor
 
-Character Creation Guide https://docs.google.com/document/d/1Eo7AZpjm-mIQBVxXpjvxgNoHMpSBa9M0onzhYaX-HDU/
+- body location tracker (wounds/armor)
 
-IRC-channel 	 https://kiwiirc.com/client/irc.parahumans.net/#weaverdice
-Worm Web serial: https://parahumans.wordpress.com/
-Sureddit:		 https://www.reddit.com/r/Weaverdice/
+- implement all skill options
+
+- create power-generation and luck tables so character creation can be made quicker in Roll20
+
+
+## WeaverDice Resources & Community Links
+Resources | Link
+------ | ---------------
+**Rulebook:** | https://docs.google.com/document/d/1e-H--GkPrbJq4WRNYndBnjjLjE7-2kOZkjwltkP1Ong/
+**Online charsheet:** | https://docs.google.com/document/d/1TBYprvESCqI7rt13h85FWsTobcoQ7AuMh1-L8T5fMq8/
+**Getting Started:** | https://docs.google.com/document/d/1Py-zQBE94hm8Iu0Oqoy_p_svALXYkKVpTiq-i7PwCwE/
+**Character Creation Guide** | https://docs.google.com/document/d/1Eo7AZpjm-mIQBVxXpjvxgNoHMpSBa9M0onzhYaX-HDU/
+
+Community | Link
+------- | ---------------
+**Discord** | https://discord.gg/TYsRHpG
+**Worm Web serial:** | https://parahumans.wordpress.com/
+**Subreddit:** | https://www.reddit.com/r/Weaverdice/

@@ -8,4 +8,4 @@ To simulate a diffcult rolls kput have you skill as a minus e.g. with 50% kill p
 
 There are three sections  magic / powers available they have a blank field so that the type  can be enetered e.g  Rune Magic, Spirit Magic, Talents, Super Powers etc....
 
-Any questions regarding this sheet should be directed to Khoa P. https://app.roll20.net/users/546568/khoa-p
+Any questions regarding this sheet should be directed to [Khoa P.](https://app.roll20.net/users/546568/khoa-p)
