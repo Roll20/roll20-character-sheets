@@ -6,6 +6,8 @@ Haven't actually played a game of Maximum Apocalypse yet, but it looks like a re
 
 I'm using this project as a way to become familiar with the mechanics.
 
+Also see the API script which implements the logic to handle initiative tracking (4 action phases, each reducing value by 5) & the "enemy attraction gauge" as a token.
+
 ## Usage Notes
 
 - Structure very close to to core rulebook
