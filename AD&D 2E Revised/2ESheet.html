@@ -3487,28 +3487,18 @@
                         <td class="sheet-centering" title="Grand Mastery">GM</td>
                         <td class="sheet-centering" title="Chosen Weapon">CW</td>
                     </tr>
-                    <tr>
-                        <td><input type="text" name="attr_weapprofname" title="@{weaponprofname}" class="sheet-middle" placeholder="Name of Weapon Prof"></td>
-                        <td><input type="number" name="attr_weapprofnum" title="@{weapprofnum}" class="sheet-short" placeholder="Slots"></td>
-                        <td><label><input type="checkbox" name="attr_expert" title="@{expert}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_specialist" title="@{specialist}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_mastery" title="@{mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_high-mastery" title="@{high-mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_grand-mastery" title="@{grand-mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_chosen-weapon" title="@{chosen-weapon}" value="1"/><span></span></label></td>
-                    </tr>
                 </table>
                 <fieldset name="repeating_weaponprofs" title="@{weaponprofs}" class="repeating_weaponprofs">
                 <table>
                     <tr>
                         <td><input type="text" name="attr_weapprofname" title="@{repeating_weaponprofs_$X_weaponprofname}" class="sheet-middle" placeholder="Name of Weapon Prof"></td>
                         <td><input type="number" name="attr_weapprofnum" title="@{repeating_weaponprofs_$X_weapprofnum}" class="sheet-short" placeholder="Slots"></td>
-                        <td><label><input type="checkbox" name="attr_expert" title="@{expert}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_specialist" title="@{specialist}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_mastery" title="@{mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_high-mastery" title="@{high-mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_grand-mastery" title="@{grand-mastery}" value="1"/><span></span></label></td>
-                        <td><label><input type="checkbox" name="attr_chosen-weapon" title="@{chosen-weapon}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_expert" title="@{repeating_weaponprofs_$X_expert}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_specialist" title="@{repeating_weaponprofs_$X_specialist}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_mastery" title="@{repeating_weaponprofs_$X_mastery}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_high-mastery" title="@{repeating_weaponprofs_$X_high-mastery}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_grand-mastery" title="@{repeating_weaponprofs_$X_grand-mastery}" value="1"/><span></span></label></td>
+                        <td><label><input type="checkbox" name="attr_chosen-weapon" title="@{repeating_weaponprofs_$X_chosen-weapon}" value="1"/><span></span></label></td>
                     </tr>
                 </table>
                 </fieldset>
@@ -3578,13 +3568,6 @@
                 </table>
                 <fieldset name="repeating_profs" title="@{profs}" class="repeating_profs">
                 <table class="sheet-table-white">
-                    <!--  Invisible header row to keep the spacing of all the cells  -->
-                    <tr class="sheet-default-header" style="visibility: collapse;">
-                        <td>Proficiency</td>
-                        <td>Slots</td>
-                        <td colspan="2">Ability Score</td>
-                        <td colspan="3">Modifier</td>
-                    </tr>
                     <tr>
                         <td><input type="text" name="attr_profname" title="@{repeating_profs_$X_profname}" placeholder="Name of NonWepProf"></td>
                         <td><input type="number" name="attr_profslots" title="@{repeating_profs_$X_profslots}" class="sheet-short" placeholder="Slots"></td>
@@ -3601,10 +3584,6 @@
                     <tr class="sheet-default-header">
                         <td>Language</td>
                         <td>Reading/Writing</td>
-                    </tr>
-                    <tr class="sheet-centering">
-                        <td><input type="text" name="attr_langname" title="@{langname}" placeholder="Name of Language"></td>
-                        <td><label><input type="checkbox" name="attr_lang-rw" title="@{lang-rw}" value="1"/><span></span></label></td>
                     </tr>
                 </table>
                 <fieldset name="repeating_langs" title="@{langs}" class="repeating_langs">
@@ -19749,37 +19728,14 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 // --- End setup Rogue skills total --- //
 
 //Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprofnum', function(){
-
-    TAS.repeating('weaponprofs')
-        .attrs('weapprofslotssum','weapprofnum')
-        .fields('weapprofnum')
-        .reduce(function(m,r){
-            m.weapprofnum+=(r.I.weapprofnum);
-            return m;
-
-        },{weapprofnum:0, desc: []},function(m,r,a){
-            m.weapprofnum+=(a.I.weapprofnum);
-            a.I.weapprofslotssum=(m.weapprofnum);
-        })
-        .execute();
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
+    TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
 });
 
 //Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs change:profslots', function(){
+on('change:repeating_profs:profslots remove:repeating_profs', function(){
 
-    TAS.repeating('profs')
-        .attrs('profslotssum','profslots')
-        .fields('profslots')
-        .reduce(function(m,r){
-            m.profslots+=(r.I.profslots);
-            return m;
-
-        },{profslots:0, desc: []},function(m,r,a){
-            m.profslots+=(a.I.profslots);
-            a.I.profslotssum=(m.profslots);
-        })
-        .execute();
+    TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
 });
 
 //Equipment Carried Section
@@ -19846,8 +19802,26 @@ gemSections.forEach(i => {
 
 // --- ALL SHEET WORKERS END --- //
 
+// --- Version change start --- //
+
 var sheetName = 'AD&D 2E Revised';
-var sheetVersion = '3.3.1';
+var sheetVersion = '3.3.2';
+
+function moveStaticToRepeating(fieldsToMove) {
+    getAttrs(fieldsToMove, function (values) {
+        if (values[fieldsToMove[0]]) {
+            let newrowid = generateRowID();
+            let newValue = {};
+
+            for (const [key, value] of Object.entries(values)) {
+                newValue[`repeating_weaponprofs_${newrowid}_${key}`] = value
+                newValue[key] = '';
+            }
+
+            setAttrs(newValue);
+        }
+    });
+}
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -19894,8 +19868,15 @@ on('sheet:opened', function(){
                     r['arc1'] = '';
                 })
                 .execute();
+
+            moveStaticToRepeating(['weaponprofname', 'weapprofnum', 'expert', 'specialist', 'mastery', 'high-mastery', 'grand-mastery', 'chosen-weapon']);
+            moveStaticToRepeating(['profname', 'profslots', 'profstatnum', 'profmod']);
+            moveStaticToRepeating(['langname', 'lang-rw']);
+            
         }
     });
 });
+
+// --- Version change end --- //
 
 </script>
