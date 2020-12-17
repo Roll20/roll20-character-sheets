@@ -500,17 +500,15 @@ input(type='hidden' name='attr_template_start' value='@{whisper_state} &{templat
 			.mid-column
 				.armor-speed-container
 					//initiative, dr, speed, and ac containers
-					+hexagonLabelContainer('initiative',`initiative`,'initiative',true,{type:'roll',name:'roll_initiative',class:'hexagon-label','data-i18n':'initiative',value:'@{template_start} {{rollname=^{initiative}}} {{d20=[[@{advantage_state}+@{dexterity_mod}@{initiative_modded}',content:'initiative'})
+					+hexagonLabelContainer('initiative',`initiative`,'initiative',true,{type:'roll',name:'roll_initiative',class:'hexagon-label','data-i18n':'initiative',value:'@{template_start} {{rollName=^{initiative}}} {{d20=[[@{advantage_state}+@{dexterity_mod}@{initiative_modded} &{tracker}]]}}',content:'initiative'})
 						+plusControl('initiative',0)
 					+hexagonLabelContainer('dr','damage reduction','damage reduction')
 						input(type='number' name='attr_damage_reduction' value='')
 					+hexagonLabelContainer('speed','speed','speed')
 						input(type='text' name='attr_speed' value='')
-					+hexagonLabelContainer('ac',`armor class`,'armor class',true)
+					+hexagonLabelContainer('ac',`armor class`,'armor class')
 						input(type='hidden' name='attr_ac_formula' value='10+@{dexterity_mod}')
-						input(type='number' class='hidden' name='attr_ac' value='10')
-						span(name='attr_ac')
-							|10
+						input(type='number' name='attr_ac' value='10')
 				//- End .armor-speed-container
 				.hp-resistance-container
 					//current health, max health, temp hp, hit dice, death saves, and resistances
@@ -623,7 +621,7 @@ input(type='hidden' name='attr_template_start' value='@{whisper_state} &{templat
 	.npc
 		.toggles
 			.toggle-row
-				each section in [/**/{div:{class:'settings'},span:[{class:'settings pictos',contents:'y'},{class:'settings pictos',contents:'x'}],input:[{type:'radio',value:'settings',class:'settings',name:'attr_sheet_view'},{type:'radio',value:'in-play',class:'npc',name:'attr_sheet_view'}]},/**/{div:{class:'whisper'},span:[{class:'whisper pictos',contents:'q'},{class:'public pictos',contents:'w'}],input:[{type:'radio',value:'/w gm',class:'whisper',name:'attr_whisper_state'},{type:'radio',value:' ',class:'public',name:'attr_whisper_state'}]}]
+				each section in [/**/{div:{class:'settings'},span:[{class:'settings pictos',contents:'y'},{class:'settings pictos',contents:'x'}],input:[{type:'radio',value:'settings',class:'settings',name:'attr_sheet_view'},{type:'radio',value:'in-play',class:'npc',name:'attr_sheet_view'}]},/**/{div:{class:'whisper'},span:[{class:'whisper pictos',contents:'q'},{class:'public pictos',contents:'w'}],input:[{type:'radio',value:'/w gm',class:'whisper',name:'attr_whisper_state'},{type:'radio',value:' ',class:'public',name:'attr_whisper_state'}]},{div:{class:'import'},span:[{class:'import','data-i18n':'import'},{class:'import','data-i18n':'import'}],input:[{type:'checkbox',value:'import',class:'import',name:'attr_import'},{type:'checkbox',value:'import',class:'import',name:'attr_import'}]}]
 					.bordered-checkbox&attributes(section.div)
 						each num in [0,1]
 							input&attributes(section.input[num])
@@ -635,8 +633,12 @@ input(type='hidden' name='attr_template_start' value='@{whisper_state} &{templat
 				//- End each
 				each section in [/**/{div:{class:'advantage'},span:{'data-i18n':'advantage',class:'advantage'},input:{type:'radio',value:'2d20kh1',class:'advantage',name:'attr_advantage_state'}},/**/{div:{class:'normal'},span:{'data-i18n':'normal',class:'normal'},input:{type:'radio',value:'1d20',class:'normal',name:'attr_advantage_state',checked:true}},/**/{div:{class:'disadvantage'},span:{'data-i18n':'disadvantage',class:'disadvantage'},input:{type:'radio',value:'2d20kl1',class:'disadvantage',name:'attr_advantage_state'}},/**/{div:{class:'query'},span:{'data-i18n':'query',class:'query'},input:{type:'radio',value:'?{Advantage|Normal,1d20|Advantage,2d20kh1|Disadvantage,2d20kl1}',class:'query',name:'attr_advantage_state'}}]
 					+bordered-checkbox(section.div,section.input,section.span)
-			//- End toggle-row
-		//- End toggles
+			// End toggle-row
+		// End toggles
+		// npc importer
+		//- .npc-import
+			//- +bordered-container
+
 		.npc-info
 			.statblock
 				.statblock-section
@@ -980,7 +982,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{strength}-10)/2)',
-					affects:['athletics','strength_save']
+					affects:['athletics','strength_save','variable']
 				},
 				strength_save_proficiency:{
 					name:'strength_save_proficiency',
@@ -1000,7 +1002,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{dexterity}-10)/2)',
-					affects:['acrobatics','drive','sleight_of_hand','stealth','dexterity_save','initiative']
+					affects:['acrobatics','drive','sleight_of_hand','stealth','dexterity_save','initiative','variable']
 				},
 				dexterity_save_proficiency:{
 					name:'dexterity_save_proficiency',
@@ -1020,7 +1022,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{constitution}-10)/2)',
-					affects:['constitution_save']
+					affects:['constitution_save','variable']
 				},
 				constitution_save_proficiency:{
 					name:'constitution_save_proficiency',
@@ -1040,7 +1042,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{intelligence}-10)/2)',
-					affects:['bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','intelligence_save']
+					affects:['bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','intelligence_save','variable']
 				},
 				intelligence_save_proficiency:{
 					name:'intelligence_save_proficiency',
@@ -1060,7 +1062,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{wisdom}-10)/2)',
-					affects:['insight','perception','survival','wisdom_save']
+					affects:['insight','perception','survival','wisdom_save','variable']
 				},
 				wisdom_save_proficiency:{
 					name:'wisdom_save_proficiency',
@@ -1080,7 +1082,7 @@ script(type='text/worker').
 					defaultValue:0,
 					type:'number',
 					calculation:'floor((@{charisma}-10)/2)',
-					affects:['deception','intimidation','performance','persuasion','charisma_save']
+					affects:['deception','intimidation','performance','persuasion','charisma_save','variable']
 				},
 				charisma_save_proficiency:{
 					name:'charisma_save_proficiency',
@@ -1294,7 +1296,7 @@ script(type='text/worker').
 					name:'passive_insight',
 					defaultValue:10,
 					type:'number',
-					calculation:'10 + @{wisdom_mod} +@{insight}@{passive_insight_modded}',
+					calculation:'10 +@{insight}@{passive_insight_modded}',
 					affects:[]
 				},
 				passive_insight_modded:{
@@ -1320,7 +1322,7 @@ script(type='text/worker').
 					name:'passive_perception',
 					defaultValue:10,
 					type:'number',
-					calculation:'10 + @{wisdom_mod} + @{perception}@{passive_perception_modded}',
+					calculation:'10 + @{perception}@{passive_perception_modded}',
 					affects:[]
 				},
 				passive_perception_modded:{
@@ -1495,6 +1497,7 @@ script(type='text/worker').
 				}
 			}
 		},
+		dropDowns = ['repeating_action_$X_attack_ability'],
 		hitDice = ['d8_hd','d10_hd','d12_hd'],
 		toMonitor = ['strength','dexterity','constitution','intelligence','wisdom','charisma','base_strength','base_dexterity','base_constitution','base_intelligence','base_wisdom','base_charisma','strength_save_proficiency','dexterity_save_proficiency','constitution_save_proficiency','intelligence_save_proficiency','wisdom_save_proficiency','charisma_save_proficiency','class_level','level','athletics_proficiency','acrobatics_proficiency','drive_proficiency','sleight_of_hand_proficiency','stealth_proficiency','bureaucracy_proficiency','computers_proficiency','investigation_proficiency','life_science_proficiency','mechanics_proficiency','physical_science_proficiency','social_science_proficiency','streetwise_proficiency','insight_proficiency','perception_proficiency','survival_proficiency','deception_proficiency','intimidation_proficiency','performance_proficiency','persuasion_proficiency','athletics_proficiency','acrobatics_proficiency','drive_proficiency','sleight_of_hand_proficiency','stealth_proficiency','bureaucracy_proficiency','computers_proficiency','investigation_proficiency','life_science_proficiency','mechanics_proficiency','physical_science_proficiency','social_science_proficiency','streetwise_proficiency','insight_proficiency','perception_proficiency','survival_proficiency','deception_proficiency','intimidation_proficiency','performance_proficiency','persuasion_proficiency'],
 		baseGet = [...toMonitor,'proficiency','character_type','strength_mod','dexterity_mod','constitution_mod','intelligence_mod','wisdom_mod','charisma_mod','strength_save','dexterity_save','constitution_save','intelligence_save','wisdom_save','charisma_save','athletics','acrobatics','drive','sleight_of_hand','stealth','bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','insight','perception','survival','deception','intimidation','performance','persuasion'],
@@ -1551,11 +1554,10 @@ script(type='text/worker').
 			[...toMonitor,'repeating_action','repeating_hack','repeating_trait','repeating_equipment'].forEach((attr)=>{
 				on(`change:${attr}${/repeating/.test(attr) ? ` remove:${attr}` :''}`,(event)=>{
 					let triggers = [event.sourceAttribute];
-					log('on event:',event);
+					log('event:',event);
 					if(/_mods$/.test(event.sourceAttribute)){
 						triggers = extractModTrigger(`${event.newValue},${event.previousValue}`,triggers);
 					}else if(event.removedInfo && _.contains(_.keys(event.removedInfo),`${triggers[0]}_mods`)){
-						log('removal detected');
 						triggers = extractModTrigger(event.removedInfo[`${event.sourceAttribute}_mods`],[]);
 					}else if(event.removedInfo){
 						return;
@@ -1580,13 +1582,12 @@ script(type='text/worker').
 
 		accessSheet = function(getArray,sections,triggers){
 			const setObj = {};
-			log('initial triggers:',triggers);
 			getAttrs(getArray,(attributes)=>{
 				const buffs = parseBuffs(attributes,sections,triggers);
 				if(attributes.character_type === 'pc' && !buffs.ac_formula){
 					buffs.ac_formula = [{value:cascades.pc.ac_formula.defaultValue,label:'AC'}];
 				}
-				triggers = parseTrigger(triggers,attributes.character_type,buffs,sections);
+				triggers = parseTrigger(triggers,attributes.character_type,attributes,buffs,sections);
 				log('parsed triggers',triggers);
 				triggers = sortTrigger(triggers);
 				reactToTrigger(triggers,attributes,setObj,buffs);
@@ -1685,7 +1686,7 @@ script(type='text/worker').
 			return tempCasc;
 		},
 
-		parseTrigger = function(triggers,character_type,buffs,sections){
+		parseTrigger = function(triggers,character_type,attributes,buffs,sections){
 			let cascadeCopy = character_type==='pc' ? applyBuffsToCascades(cascades[character_type],buffs,sections) : expandRepeating(cascades[character_type],sections),
 				trigQueue,
 				trigWorker = (queue,arr) =>{
@@ -1711,6 +1712,7 @@ script(type='text/worker').
 								_.each(affectArray,(affected)=>{
 									if(/^repeating_/.test(affected)){
 										affected.replace(/(repeating_[^_]+_)[^_]+(.+)/,(match,section,field)=>{
+											log(`rowID:${rowID}`);
 											if(rowID){
 												parsedItem[key].push(`${section}${rowID}${field}`);
 												if(_.every(arr,(item)=>{
@@ -1728,6 +1730,18 @@ script(type='text/worker').
 													}
 												});
 											}
+										});
+									}else if(/^variable$/.test(affected)){
+										dropDowns.forEach((dropDown)=>{
+											dropDown.replace(/(?:(repeating_[^_]+)_[^_]+_)?(.+)/,(match,section,field)=>{
+												log(section,sections[section]);
+												sections[section].forEach((id)=>{
+													if(attributes[`${section}_${id}_${field}`]===`@{${key}}`){
+														parsedItem[key].push(`${section}_${id}_${field}`);
+														queue.push(`${section}_${id}_${field}`);
+													}
+												});
+											});
 										});
 									}else{
 										parsedItem[key].push(affected);
