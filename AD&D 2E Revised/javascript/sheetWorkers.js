@@ -671,37 +671,14 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 // --- End setup Rogue skills total --- //
 
 //Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs change:weapprofnum', function(){
-
-    TAS.repeating('weaponprofs')
-        .attrs('weapprofslotssum','weapprofnum')
-        .fields('weapprofnum')
-        .reduce(function(m,r){
-            m.weapprofnum+=(r.I.weapprofnum);
-            return m;
-
-        },{weapprofnum:0, desc: []},function(m,r,a){
-            m.weapprofnum+=(a.I.weapprofnum);
-            a.I.weapprofslotssum=(m.weapprofnum);
-        })
-        .execute();
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
+    TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
 });
 
 //Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs change:profslots', function(){
+on('change:repeating_profs:profslots remove:repeating_profs', function(){
 
-    TAS.repeating('profs')
-        .attrs('profslotssum','profslots')
-        .fields('profslots')
-        .reduce(function(m,r){
-            m.profslots+=(r.I.profslots);
-            return m;
-
-        },{profslots:0, desc: []},function(m,r,a){
-            m.profslots+=(a.I.profslots);
-            a.I.profslotssum=(m.profslots);
-        })
-        .execute();
+    TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
 });
 
 //Equipment Carried Section
@@ -767,55 +744,3 @@ gemSections.forEach(i => {
 // --- End setup gem total value calculation for all settings --- //
 
 // --- ALL SHEET WORKERS END --- //
-
-var sheetName = 'AD&D 2E Revised';
-var sheetVersion = '3.3.1';
-
-on('sheet:opened', function(){
-    getAttrs(['character_sheet'],function(attrs){
-        let cs=_.rest((attrs.character_sheet||'').match(/(.*?)(?:\s+v(.*))?$/)),
-            sheet_name=cs[0]||'',
-            sheet_version=cs[1]||'';
-
-        // do something with sheet_name and sheet_version, if you might be converting
-
-        if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
-            console.log('Updating character sheet version');
-            setAttrs({
-                character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):'')
-            },{silent:true});
-
-            getAttrs(['spell-points', 'spell-points-priest'], function(values) {
-                let sp = parseInt(values['spell-points']) || 0;
-                let psp = parseInt(values['spell-points-priest']) || 0;
-
-                console.log(`Old spell points: ${sp}`);
-                console.log(`Old spell points priest: ${psp}`);
-
-                let newValue = {};
-                if (sp > 0) {
-                    newValue['spell-points-lvl'] = sp;
-                    newValue['spell-points'] = '';
-                }
-
-                if (psp > 0) {
-                    newValue['spell-points-priest-lvl'] = psp;
-                    newValue['spell-points-priest'] = '';
-                }
-
-                setAttrs(newValue);
-            });
-
-            TAS.repeating('spells')
-                .fields('spell-points', 'spell-points1', 'arc', 'arc1')
-                .each(function (r) {
-                    console.log('Updating repeating spells-points and arc');
-                    r['spell-points'] = (r.I['spell-points1']);
-                    r['spell-points1'] = '';
-                    r['arc'] = (r.I['arc1']);
-                    r['arc1'] = '';
-                })
-                .execute();
-        }
-    });
-});
