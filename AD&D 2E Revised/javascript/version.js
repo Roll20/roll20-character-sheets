@@ -3,17 +3,21 @@
 var sheetName = 'AD&D 2E Revised';
 var sheetVersion = '3.3.2';
 
-function moveStaticToRepeating(fieldsToMove) {
+function moveStaticToRepeating(section, fieldsToMove) {
     getAttrs(fieldsToMove, function (values) {
         if (values[fieldsToMove[0]]) {
             let newrowid = generateRowID();
             let newValue = {};
 
+            console.log(`New rowId ${newrowid}`);
+            
             for (const [key, value] of Object.entries(values)) {
-                newValue[`repeating_weaponprofs_${newrowid}_${key}`] = value
+                newValue[`repeating_${section}_${newrowid}_${key}`] = value;
                 newValue[key] = '';
             }
-
+            
+            console.log(newValue);
+            
             setAttrs(newValue);
         }
     });
@@ -65,9 +69,9 @@ on('sheet:opened', function(){
                 })
                 .execute();
 
-            moveStaticToRepeating(['weaponprofname', 'weapprofnum', 'expert', 'specialist', 'mastery', 'high-mastery', 'grand-mastery', 'chosen-weapon']);
-            moveStaticToRepeating(['profname', 'profslots', 'profstatnum', 'profmod']);
-            moveStaticToRepeating(['langname', 'lang-rw']);
+            moveStaticToRepeating('weaponprofs', ['weaponprofname', 'weapprofnum', 'expert', 'specialist', 'mastery', 'high-mastery', 'grand-mastery', 'chosen-weapon']);
+            moveStaticToRepeating('profs', ['profname', 'profslots', 'profstatnum', 'profmod']);
+            moveStaticToRepeating('langs', ['langname', 'lang-rw']);
             
         }
     });
