@@ -2,7 +2,7 @@
 
 This sheet is designed for use with the Burning Wheel system written by Luke Crane and produced with permission for use on Roll20. Much of the Character Burner process has been enhanced with auto calculating values and many of the final results translate to the rest of the sheet.
 
-Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Ability names in order to make use of the roll template. In the roll query you'll be asked for a Help, FoRKs and other Advantages (depending on the Ability), Artha dice (from Persona or Deeds expenditure) which add to the roll but don't compare to the Obs difficulty, and the base Obstacle of the test. The semi-hidden star `✦` symbol to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode.
+Hovering over most of the Stats & Skills will reveal with underlying Roll20 Attribute names. Roll by clicking on the white D6 next to Ability names in order to make use of the roll template. In the roll query you'll be asked for a Help, FoRKs and other Advantages (depending on the Ability), Artha dice (from Persona or Deeds expenditure) which add to the roll but don't compare to the Obs difficulty, and the base Obstacle of the test. The 4-point star `✦` symbol to the upper right of an ability exponent mark's the roll as Open Ended and will cause any 6s rolled to explode.
 
 Enjoy!
 
@@ -15,6 +15,7 @@ Enjoy!
 * The 'Magic' tab can be used to put your all spells and songs in, but all of the title fields are re-namable so additional homebrew / codex content could be put here also. All stats and attribute can also be taxed from this tab.
 * The 'Journal' tab can be used to track old beliefs and instinct, as well as trait votes, and other campaign notes and miscellany.
 * The 'Rogues' tab can be used for tracking PC bodyguards and animal companions, multiple NPCs within an organization, or simple creature stat-blocks as presented in BWG pp 565-571.
+* A 'Die of Fate' button on multiple tabs that simply rolls a d6 and nicely displays the result.
 
 ### Notes
 For the best user experience we recommend that you install the two open-license fonts [Crimson Pro](https://fonts.google.com/specimen/Crimson+Pro) and [Open Sans](https://fonts.google.com/specimen/Open+Sans).
@@ -24,6 +25,13 @@ Please direct major issues, suggestions, or complaints to the current sheet main
 ![Screenshot](https://raw.githubusercontent.com/Seraaron/roll20-character-sheets/master/Burning%20Wheel/Burning%20Wheel.png)
 
 # Changelog
+
+### v2.4.1 (2020-12-15)
+Patch by Seraaron (147454)
+
+* Added new 'Die of Fate' macro buttons, which simply roll a d6 and display red green or yellow depending on the result. One button appears on the Skills, Gear, Magic, and Rogues tab respectively to reduce page flipping when the player needs a DoF.
+* Fixed 'delete' and 'move' overlay visual bug for repeating segments, though this fix now results in them both being on the left of every element.
+* Slightly fixed font color discrepancies.
 
 ## v2.4 (2020-12-07)
 Update by Seraaron (147454) with direction from Luke Crane.
@@ -46,7 +54,7 @@ Update by Seraaron (147454).
 * Added a 'quote README to chat' button in the Character Burner tab to redirect users to this page.
 
 ### v2.2.2 (2020-11-18)
-Update by Seraaron (147454).
+Patch by Seraaron (147454).
 
 * Fixed Attribute 'routine tests needed' incorrect calculation, and added special case for second emotional attribute that stays at 5 once you're at exponent 5 and above, for Greed and Corruption
 * Added new 'quote' macro template that lets you quote parts of the sheet to the chat log, such as beliefs, special traits, and magic spells. (Look for the 'thought bubble symbol').
@@ -55,7 +63,7 @@ Update by Seraaron (147454).
 * Added roll button to repeating magic segment, so that they can be better used for elven spell songs with less page flipping
 
 ### v2.2.1 (2020-11-03)
-Early bug fixes by Seraaron (147454).
+Patch by Seraaron (147454).
 
 * Users in the public test of the preview build reported browser incompatibility issues with Chrome. Specifically, the difficulty tracker buttons for stats and wounds couldn't be selected properly. In the process of fixing this bug, it was required to fit most stats and attributes into `<div>` elements, and generally beautify the HTML code and CSS to be more legible (many long sections of code were written on one line which looked horrible) (this is also the main reason that the number of lines of code in this PR basically just doubled)
 * Fixed a styling issue where columns would wrap onto themselves and look very bad at certain browser zoom levels.
@@ -68,7 +76,7 @@ Early bug fixes by Seraaron (147454).
 * Similarly, all magic spells' subtitles are renamable, meaning that the Magic tab could ostensibly be used to list vehicles or other custom powers or objects from systems like Burning Empires.
 
 ## v2.2 (public test / preview build)
-Tweaked design and code by Seraaron (147454).
+Update by Seraaron (147454).
 
 * Added dropdown menu in the wound tolerance scale that can actually go grey or white
 * Improved injury tracking with automated segments
