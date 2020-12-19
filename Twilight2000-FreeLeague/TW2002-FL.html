@@ -154,7 +154,7 @@
                         <option value="8">C</option>
                         <option value="6" selected="selected">D</option>
                     </select>
-                    <input type="number" name="attr_staminamelee" class="width5">
+                    <input type="number" name="attr_staminaattribdie" class="width5">
                     <input type="number" name="attr_staminaskilldie" class="width5">
                     <button class="twilightdie" type="roll" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=Strength Check}}{{attribvalue=@{strength}}}{{result=[[1d@{strength}>6cs>10]]}}" name="roll_strength"></button>
                     <br>
@@ -642,10 +642,24 @@ const bonusfields =["strbonus"];
 const attributes=["strength","agility","intelligence","Empathy"];
 const strengthskills=["heavyweapons","melee","stamina"];
 
+strengthskills.forEach(skill => {
+    on(`change:${skill}`, function() {
+        getAttrs([skill], function(values){
+            var skillval=values[skill];
+            var skillname=skill+"skilldie";
+            setAttrs({
+                [skillname]:skillval,
+                strengthmod:0
+            })
+        })
+    })
+})
+
+
 attributes.forEach(attrib=> {
     on(`change:${attrib}`, function() {
         getAttrs([attrib], function(values){
-            var attribdie=attrib+"attribdie";
+            var attribdie=attrib+"die";
             var die=values[attrib];
             var mod=attrib+"mod";
             console.log("Setting die");
@@ -653,7 +667,10 @@ attributes.forEach(attrib=> {
             console.log("die "+die);
             setAttrs({
                 [attribdie]:die,
-                [mod]:0
+                [mod]:0,
+                heavyweaponsattribdie:die,
+                meleeattribdie:die,
+                staminaattribdie:die
             })
         })
     })
