@@ -446,7 +446,6 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
         }
 
         let onChange = `change:repeating_${repeatingName}:${fieldName} remove:repeating_${repeatingName}`;
-        console.log(onChange);
         on(onChange, function () {
 
             console.log(`Summing started by section ${repeatingName}`);

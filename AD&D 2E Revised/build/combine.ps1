@@ -11,3 +11,4 @@ $inserts | ForEach-Object {
 }
 
 $content | Set-Content -Path $outputFile
+Write-Host "Combine complete"

@@ -9,14 +9,10 @@ function moveStaticToRepeating(section, fieldsToMove) {
             let newrowid = generateRowID();
             let newValue = {};
 
-            console.log(`New rowId ${newrowid}`);
-            
             for (const [key, value] of Object.entries(values)) {
                 newValue[`repeating_${section}_${newrowid}_${key}`] = value;
                 newValue[key] = '';
             }
-            
-            console.log(newValue);
             
             setAttrs(newValue);
         }
@@ -69,7 +65,7 @@ on('sheet:opened', function(){
                 })
                 .execute();
 
-            moveStaticToRepeating('weaponprofs', ['weaponprofname', 'weapprofnum', 'expert', 'specialist', 'mastery', 'high-mastery', 'grand-mastery', 'chosen-weapon']);
+            moveStaticToRepeating('weaponprofs', ['weapprofname', 'weapprofnum', 'expert', 'specialist', 'mastery', 'high-mastery', 'grand-mastery', 'chosen-weapon']);
             moveStaticToRepeating('profs', ['profname', 'profslots', 'profstatnum', 'profmod']);
             moveStaticToRepeating('langs', ['langname', 'lang-rw']);
             
