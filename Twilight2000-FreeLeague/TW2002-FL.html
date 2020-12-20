@@ -7,26 +7,17 @@
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="main">
 
 <div class="sheet-main">
-    <div class="header-image">
-    </div>
-    <div class="footer-image">
-    </div>
-    <div class="footer-image2">
-    </div>
-    <div class="footer-image3">
-    </div>
-    <div class="charactername">
+
+    <div class="headerpanel">
         <input class="nametext"  Type="text" name="attr_character_name"><label class="attriblabel">Name</label>
         <button type="roll" class="vaesend66" title="d66" value="&{template:vaesen-skill}{{playername=@{character_name}}}{{skillname=D66 Roll}}{{result=[[[[d6]][[d6]]]]}}" name="roll_protection"></button>
-    </div>
-    
-    <div class="leftstats">
+
         <br><BR>
         <input class="medtext" Type="text" name="attr_Age"><label class="attriblabel">Age/Age Group</label>
         <input class="medtext" Type="text" name="attr_Archetype"><label class="attriblabel">Archetype</label>
         <input class="medtext" type="text" name="attr_Motivation"><Label class="attriblabel">Motivation</Label>
     </div>
-
+<!--
     <div class="rightstats">
         <br><BR>
         <textarea class="vaesentextarea" name="attr_trauma"></textarea><Label class="attriblabel">Trauma</Label>
@@ -103,8 +94,8 @@
             <button type="roll" class="twilightdie"  value="&{template:vaesen-attack}{{playername=@{character_name}}}{{attribname=@{weapon} attack!}}{{attribvalue=@{weatype}}}{{weabonus=@{bonus}}}{{bonus=@{equipedbonus}}}{{damage=@{damage}}}{{result=[[(@{weatype}+@{bonus}+@{equipedbonus})d6>6]]}}" name="roll_attack"></button>
         </fieldset>
     </div>
-    
-    <div class="PC-attribs">
+-->
+    <div class="strengthpanel">
         <table border=1>
             <tr>
                 <h2 class="areaheader">Attributes</h3>
@@ -159,12 +150,19 @@
                     <button class="twilightdie" type="roll" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=Strength Check}}{{attribvalue=@{strength}}}{{result=[[1d@{strength}>6cs>10]]}}" name="roll_strength"></button>
                     <br>
 
-                    Mod: <input type="number" name="attr_strengthmod" value="0">
+                    Strength Mod: <input type="number" name="attr_strengthmod" value="0">
 
                 </td>
             </tr>
         </table><br>
-        <table>
+    </div>
+    <div class="agilitypanel">
+        <table border=1>
+            <tr>
+                <h2 class="areaheader"> #--/--# </h3>
+                <th></th>
+            </tr>
+            <tr>
                 <td>
                     <span class="normallabel">Agility</span>
                     <select class="width5" name="attr_agility" 
@@ -174,9 +172,7 @@
                         <option value="6" selected="selected">D</option>
                     </select>
                     <button class="twilightdie" type="roll" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=Precision Check}}{{attribvalue=@{precision}}}{{bonus=@{equipedbonus}}}{{condition=[[@{physicalcondition}]]}}{{result=[[[[{(@{precision}+@{equipedbonus}-[[@{physicalcondition}]]),1}kh1]]d6>6]]}}" name="roll_Precision"></button>
-                </td>
-    
-                <td>
+
                     <span class="normallabel">Intelligence</span>
                     <select class="width5" name="attr_intelligence" >
                         <option value="12" >A</option>
@@ -184,10 +180,8 @@
                         <option value="8">C</option>
                         <option value="6" selected="selected">D</option>
                     </select>
-                     <button type="roll" class="twilightdie" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=Logic Check}}{{attribvalue=@{logic}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{logic}+@{equipedbonus}-[[@{mentalcondition}]]),1}kh1]]d6>6]]}}" name="roll_Logic"></button>
-                </td>
-    
-                <td>
+                        <button type="roll" class="twilightdie" value="&{template:vaesen-attrib}{{playername=@{character_name}}}{{attribname=Logic Check}}{{attribvalue=@{logic}}}{{bonus=@{equipedbonus}}}{{condition=[[@{mentalcondition}]]}}{{result=[[[[{(@{logic}+@{equipedbonus}-[[@{mentalcondition}]]),1}kh1]]d6>6]]}}" name="roll_Logic"></button>
+
                     <span class="normallabel">Empathy</span>
                     <select class="width5" name="attr_empathy" >
                         <option value="12" >A</option>
@@ -657,16 +651,57 @@ strengthskills.forEach(skill => {
 
 on("change:strengthmod", function(){
     getAttrs(["strengthmod","strength","heavyweapons","melee","stamina"], function(values){
-        var mod=values.strengthmod;
-        var str=values.strength;
-        var hwea=values.heavyweapons;
-        var mel=values.melee;
-        var sta=values.stamina;
+        var mod=parseInt(values.strengthmod);
+        var str=parseInt(values.strength);
+        var hwea=parseInt(values.heavyweapons);
+        var mel=parseInt(values.melee);
+        var sta=parseInt(values.stamina);
         console.log("mod: "+mod);
         console.log("str: "+str);
         console.log("hwea: "+hwea);
         console.log("mel: "+mel);
         console.log("sta: "+sta);
+        var dice={};
+        var newskillarray=[];
+
+        if (str>hwea){
+            dice={bigdie:str,smalldie:hwea,bigattrib:"heavyweaponsattribdie",smallattrib:"heavyweaponsskilldie"};
+        } else {
+            dice={bigdie:hwea,smalldie:str,bigattrib:"heavyweaponsskilldie",smallattrib:"heavyweaponsattribdie"};
+        }
+        if (mod>0) {
+            var maxsteps=(12-dice.bigdie)/2;
+            console.log("maxsteps: "+maxsteps);
+            if (mod>maxsteps){
+                var shift=mod-maxsteps;
+                dice.bigdie=dice.bigdie+maxsteps*2;
+                dice.smalldie=dice.smalldie+shift*2;
+            } else {
+                dice.bigdie=dice.bigdie+maxsteps*2;
+            }
+        } else if (mod<0) {
+            var maxsteps=(dice.smalldie-6)/2;
+            console.log("maxsteps: "+maxsteps);
+            if (Math.abs(mod)>maxsteps){
+                var shift=Math.abs(mod)-maxsteps;
+                dice.smalldie=0
+                dice.bigdie=dice.bigdie-shift*2;
+            } else {
+                dice.smalldie=dice.smalldie-Math.abs(mod)*2;
+            } 
+        }
+        newskillarray.push(dice);
+        console.log (dice);
+        console.log (dice.bigattrib);
+        console.log (newskillarray);
+        console.log (newskillarray.length);
+        if (newskillarray.length>0){
+            console.log (newskillarray[0].smalldie);
+            setAttrs({
+                [newskillarray[0].bigattrib]:newskillarray[0].bigdie,
+                [newskillarray[0].smallattrib]:newskillarray[0].smalldie
+            })
+        }
     });
 });
 
