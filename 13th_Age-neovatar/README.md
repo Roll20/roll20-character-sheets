@@ -48,26 +48,6 @@ grunt build
 This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into Roll 20 directly.
 
 ### Changelog
-**1.9:**
-* Lots of big changes and new features! (courtesy of user Seraaron)
-* More character specification options on top bar, including alignment, age, and size
-* Added simple ability check buttons, for use with no background modifier
-* Added additional basic melee and ranged attacks for secondary weapons
-* Added repeating resistances / immunities
-* Added death saves and other saving throw options
-* Made initiative ability bonus modifiable
-* Added more text boxes for more personal character and class expressions, plus some repeating note boxes
-* Moved incremental advances to make it more clear and added a few options that were missing previously
-* Radical alterations to the repeating power sections: including drop-down usage box, current / total power uses, recharge rate option, feats checkboxes, and colour-coded macro templates
-* Added spell slots
-* Added extra box to repeating backgrounds for listing established skills
-* Added repeating list for making easy notes about npcs met or places visited
-* Added general textbox for basic item lists, and kept the repeating section for special items
-* Added textbox for non-monetary resources
-* Added chakra / attunement slots for magic items
-* Re-vamped 'NPC' tab to be more useful and flexible for GMs who like to homebrew, including: repeating custom attack macros, separate from the repeating power macros, and repeating resistances and vulnerabilities
-* Added more useful macros to the 'Setup' tab for basic attacks and the tier_dmg_mult
-* Also on the 'Setup' tab is a special repeating power section where feats from the previous version of this sheet should still be found (for pre-existing users so that their work isn't lost), and where homebrew players can add their own custom powers
 
 **1.8.1:**
 * CSS fixes for upstream Roll20 changes
@@ -131,3 +111,4 @@ This will create `13th_Age-neovatar.[css|html]` that you can copy and paste into
 
   * added roll templates
   * default macros now use roll templates
+

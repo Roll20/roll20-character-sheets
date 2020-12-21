@@ -2,6 +2,24 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.7.1
+
+### Fixed
+
+- Fix a bug where newly created monsters did not have a die button
+
+## 1.7.0
+
+### Added
+
+- Add retainers tab for charisma based retainer modifiers
+- Add prompt for Wisdom bonus on saving throws
+
+### Fixed
+
+- Fix a bug where the spell level input was wider than the space in the grid
+- Fix a bug where setting the default sheet to DAC wouldn't create DAC characters
+
 ## 1.6.2
 
 ### Fixed
