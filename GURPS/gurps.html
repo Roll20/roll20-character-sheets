@@ -6805,6 +6805,8 @@ and Advantages.
 				<fieldset class="repeating_languages">
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_languages. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -6898,6 +6900,8 @@ normal TL.
 				<fieldset class="repeating_cultures">
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_cultures. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -6970,6 +6974,8 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_traits. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -7058,6 +7064,8 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_perks. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -7137,6 +7145,8 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_quirks. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -7163,7 +7173,7 @@ PU2:126 = Power-Ups 2. Page 126<br />
 						    <textarea name="attr_notes" title="Macro table name: repeating_quirks. Field name: notes"></textarea>
 						</div>
 					</div> <!-- .row -->
-				</fieldset> <!-- .repeating_disadvantages -->
+				</fieldset> <!-- .repeating_perks -->
 			</div> <!-- .table -->
 			<!-- END QUIRKS AREA -->
 
@@ -7229,6 +7239,8 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_disadvantages. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -7335,6 +7347,8 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<span class="checkbox"></span>
 					<div class="row row-stats">
 						<div class="cell col0">
+							<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+							<input type="hidden" name="attr_idkey" />
 							<input type="text" name="attr_name" title="Macro table name: repeating_racial. Field name: name" />
 						</div>
 						<div class="cell col1">
@@ -26279,7 +26293,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			}
 
-
 		});
 
 	}
@@ -26289,9 +26302,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function updateCharacterSheetWithGCA(jsonData, mod_cascade) {
 
-		updateNonRepeatingFieldsWithGCA(jsonData, (jsonData) => {
+		updateNonRepeatingFieldsWithGCA(jsonData, () => {
 
-			setAttrs({"import_message": "Import has completed."});
+			updateGcaAdvantages(jsonData, () => {
+
+				setAttrs({"import_message": "Import has completed."});
+
+			});
 
 		});
 
@@ -26312,6 +26329,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let attributes = jsonData.Character.Traits.Attribute;
 
+		let advantages = jsonData.Character.Traits.Advantage;
+
+		let campaign = jsonData.Character.Campaign;
+
+		let basePoints = Number(campaign.basepoints);
+
+		let baseTL = Number(campaign.basetl);
+
+		let miscNotes = jsonData.Character.Description + "\n\n" + jsonData.Character.Notes;
+
 		let updates = {
 			fullname:              general.name,
 			playername:            general.playername,
@@ -26320,15 +26347,27 @@ The attacker may choose to hit the original target or the limb you used to parry
 			weight:                general.weight,
 			age:                   general.age,
 			general_appearance:    general.appearance,
-			strength_points:       getCharacterPointsFromGCA(attributes, "ST"),
-			dexterity_points:      getCharacterPointsFromGCA(attributes, "DX"),
-			intelligence_points:   getCharacterPointsFromGCA(attributes, "IQ"),
-			health_points:         getCharacterPointsFromGCA(attributes, "HT"),
-			hit_points_points:     getCharacterPointsFromGCA(attributes, "Hit Points"),
-			fatigue_points_points: getCharacterPointsFromGCA(attributes, "Fatigue Points"),
+			total_points:          basePoints,
+			tl:	                   baseTL,
+			misc_notes:            miscNotes,
+			strength_points:       getCharacterPointsFromGcaAttributes(attributes, "ST"),
+			dexterity_points:      getCharacterPointsFromGcaAttributes(attributes, "DX"),
+			intelligence_points:   getCharacterPointsFromGcaAttributes(attributes, "IQ"),
+			health_points:         getCharacterPointsFromGcaAttributes(attributes, "HT"),
+			hit_points_points:     getCharacterPointsFromGcaAttributes(attributes, "Hit Points"),
+			fatigue_points_points: getCharacterPointsFromGcaAttributes(attributes, "Fatigue Points"),
+			perception_points:     getCharacterPointsFromGcaAttributes(attributes, "Perception"),
+			vision_points:         getCharacterPointsFromGcaAdvantages(advantages, "Acute Vision"),
+			hearing_points:        getCharacterPointsFromGcaAdvantages(advantages, "Acute Hearing"),
+			taste_smell_points:    getCharacterPointsFromGcaAdvantages(advantages, "Acute Taste and Smell"),
+			touch_points:          getCharacterPointsFromGcaAdvantages(advantages, "Acute Touch"),
+			willpower_points:      getCharacterPointsFromGcaAttributes(attributes, "Will"),
+			fear_check_points:     getCharacterPointsFromGcaAdvantages(advantages, "Fearlessness"),
+			basic_speed_points:    getCharacterPointsFromGcaAttributes(attributes, "Basic Speed"),
+			basic_move_points:     getCharacterPointsFromGcaAttributes(attributes, "Basic Move"),
 		};
 
-		setAttrs(updates, {silent: false}, callback(jsonData));
+		setAttrs(updates, {silent: false}, callback);
 
 	}
 
@@ -26340,7 +26379,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 *
 	 * @return int
 	 */
-	function getCharacterPointsFromGCA(attributes, name) {
+	function getCharacterPointsFromGcaAttributes(attributes, name) {
 
 		let points = 0;
 
@@ -26360,6 +26399,180 @@ The attacker may choose to hit the original target or the limb you used to parry
 		}
 
 		return points;
+	}
+
+	/**
+	 * Get the character points for an advantage
+	 *
+	 * @param json   advantages JSON Advantages data. Array of elements
+	 * @param string name       Name of the field to get CP for.
+	 *
+	 * @return int
+	 */
+	 function getCharacterPointsFromGcaAdvantages(advantages, name) {
+
+		let points = 0;
+
+		// loop through the advantages
+		advantages.forEach(advantage => {
+
+			if (name.toLowerCase() === String(advantage.name).toLowerCase()) {
+
+				points = Number(advantage.points);
+
+			}
+
+		});
+
+		if ( isNaN(points) ) {
+			points = 0;
+		}
+
+		return points;
+	}
+
+	const IGNORED_ADVANTAGES = [
+		"Acute Vision",
+		"Acute Hearing",
+		"Acute Taste and Smell",
+		"Acute Touch",
+		"Fearlessness",
+	];
+
+	/**
+	 * Loops advantages and add advantages
+	 * TODO: Check to see if advantage already exists, then update
+	 * 
+	 * @param json     jsonData Json DATA from GCA file
+	 * @param function callback A function to run after updating is complete
+	 * @return void
+	 */
+	function updateGcaAdvantages(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let advantages = jsonData.Character.Traits.Advantage;
+
+		let rows = {};
+
+		let saveRows = false;
+
+		if (advantages && advantages.length) {
+
+			advantages.forEach(advantage => {
+
+				let name = advantage.name;
+
+				if (!IGNORED_ADVANTAGES.includes(name)) {
+
+					saveRows = true;
+
+					let rowId = generateRowID();
+
+					let idkey = advantage.IDKey;
+
+					let baseFieldName = `repeating_traits_${rowId}`;
+
+					rows[`${baseFieldName}_idkey`] = idkey;
+
+					rows[`${baseFieldName}_name`] = name;
+
+					rows[`${baseFieldName}_name`] = name;
+
+					if (advantage.level) {
+						rows[`${baseFieldName}_trait_level`] = Number(advantage.level);
+					}
+
+					rows[`${baseFieldName}_points`] = Number(advantage.points);
+
+					if (advantage.page) {
+						rows[`${baseFieldName}_ref`] = advantage.page;
+					}
+
+					let notes = getGcaAdvantageNotes(advantage);
+
+					if (notes) {
+						rows[`${baseFieldName}_notes`] = notes;
+					}
+
+				}
+
+			});
+
+		}
+
+		if (saveRows) {
+			
+			setAttrs(rows, {silent: false}, callback);
+
+		} else {
+
+			callback();
+
+		}
+
+	}
+
+	/**
+	 * Get notes for GCA
+	 * 
+	 * @param json advantage JSON object for an GCA advantage
+	 */
+	function getGcaAdvantageNotes(advantage) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (advantage.basedon) {
+			arrNotes.push("Based On: " + advantage.basedon + "\n"); 
+		}
+
+		if (advantage.usernotes) {
+			arrNotes.push(advantage.usernotes + "\n"); 
+		}
+
+		let modNote = getGcaModifierNotes(advantage);
+
+		if (modNote) {
+			arrNotes.push(modNote);
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+	}
+
+	/**
+	 * Gets modifier notes, if any
+	 * 
+	 * @param json advantage JSON object for an GCA advantage
+	 */
+	function getGcaModifierNotes(advantage) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (advantage.Modifier && advantage.Modifier.length) {
+
+			advantage.Modifier.forEach( modifier => {
+
+				arrNotes.push(`${modifier.name}, ${modifier.value}`);
+
+			});
+
+		}
+
+		if (arrNotes.length) {
+			notes = "Modifiers:\n" + arrNotes.join("\n") + "\n";
+		}
+		
+		return notes;
+	
 	}
 
 </script>
