@@ -6766,6 +6766,8 @@ and Advantages.
 				</div> <!-- .header -->
 				<div class="row row-native-language">
 					<div class="cell col0 label">
+						<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+						<input type="hidden" name="attr_native_language_idkey" />
 						<input type="text" style="font-weight:bold;" name="attr_name_native_language" placeholder="-Enter Native Language here" title="Macro name: name_native_language" />
 					</div>
 					<div class="cell col1">
@@ -6779,8 +6781,8 @@ and Advantages.
 					<div class="cell col2">
 						<select name="attr_native_language_written" title="Macro name: @{native_language_written}">
 							<option value="0" selected><span data-i18n="option-native">Native</span></option>
-							<option value="-1"><span data-i18n="option-accented">Accented</span></option>
-							<option value="-2"><span data-i18n="option-broken">Broken</span></option>
+							<option value="-1"><span data-i18n="option-literate">Literate</span></option>
+							<option value="-2"><span data-i18n="option-semi-literate">Semi-literate</span></option>
 							<option value="-3"><span data-i18n="option-none">None</span></option>
 						</select>
 					</div>
@@ -6820,8 +6822,8 @@ and Advantages.
 						<div class="cell col2">
 							<select name="attr_written" title="Macro table name: repeating_languages. Field name: @{written}">
 								<option value="3"><span data-i18n="option-native">Native</span</option>
-								<option value="2"><span data-i18n="option-accented">Accented</span></option>
-								<option value="1"><span data-i18n="option-broken">Broken</span></option>
+								<option value="2"><span data-i18n="option-literate">Literate</span></option>
+								<option value="1"><span data-i18n="option-semi-literate">Semi-literate</span></option>
 								<option value="0" selected><span data-i18n="option-none">None</span></option>
 							</select>
 						</div>
@@ -26464,37 +26466,34 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = advantage.name;
 
+				let basedon = "";
+
+				if (advantage.basedon) {
+					basedon = advantage.basedon;
+				}
+
 				if (!IGNORED_ADVANTAGES.includes(name)) {
 
 					saveRows = true;
 
-					let rowId = generateRowID();
+					if (basedon == "Language - Native" || basedon == "Language - Native (Spoken)" || basedon == "Language - Native (Written)") {
 
-					let idkey = advantage.IDKey;
+						rows = getGcaValuesForNativeLanguage(rows, name, basedon, advantage);
 
-					let baseFieldName = `repeating_traits_${rowId}`;
+					} else if (basedon == "Language" || basedon == "Language (Spoken)" || basedon == "Language (Written)") {
 
-					rows[`${baseFieldName}_idkey`] = idkey;
+						rows = getGcaValuesForRepeatingLanguage(rows, name, basedon, advantage);
 
-					rows[`${baseFieldName}_name`] = name;
+					} else if (basedon.includes("Cultural Familiarity")) {
 
-					rows[`${baseFieldName}_name`] = name;
+						rows = getGcaValuesForCulturalFamiliarity(rows, name, advantage);
 
-					if (advantage.level) {
-						rows[`${baseFieldName}_trait_level`] = Number(advantage.level);
+					} else {
+
+						rows = getGcaAdvantageRow(rows, name, advantage);
 					}
 
-					rows[`${baseFieldName}_points`] = Number(advantage.points);
-
-					if (advantage.page) {
-						rows[`${baseFieldName}_ref`] = advantage.page;
-					}
-
-					let notes = getGcaAdvantageNotes(advantage);
-
-					if (notes) {
-						rows[`${baseFieldName}_notes`] = notes;
-					}
+					rows = getGcaBonusesForAdvantage(rows, name, advantage);
 
 				}
 
@@ -26512,6 +26511,267 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		}
 
+	}
+
+	/**
+	 * Updates the rows value with an row for advantages
+	 * 
+	 * @param object rows      Object of properties to update/add rows
+	 * @param string name      Name of the advantage
+	 * @param json   advantage JSON data for the advantage
+	 */
+	function getGcaAdvantageRow(rows, name, advantage) {
+
+		let rowId = generateRowID();
+
+		let idkey = advantage.IDKey;
+
+		let baseFieldName = `repeating_traits_${rowId}`;
+
+		let fullName = name;
+
+		if (advantage.nameext) {
+
+			fullName += ` (${advantage.nameext})`;
+
+		}
+
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		if (advantage.level) {
+			rows[`${baseFieldName}_trait_level`] = Number(advantage.level);
+		}
+
+		if (advantage.points) {
+			rows[`${baseFieldName}_points`] = Number(advantage.points);
+		} else {
+			rows[`${baseFieldName}_points`] = 0;
+		}
+		
+		if (advantage.page) {
+			rows[`${baseFieldName}_ref`] = advantage.page;
+		}
+
+		let notes = getGcaAdvantageNotes(advantage);
+
+		if (notes) {
+			rows[`${baseFieldName}_notes`] = notes;
+		}
+
+		return rows;
+
+	}
+
+	/**
+	 * Adds the row values for native language fields. 
+	 * Currently, non-repeating
+	 * 
+	 * @param object rows      Object of row properties
+	 * @param string name      Name of advantage
+	 * @param string basedon   Language based on
+	 * @param json   advantage JSON data for advantage
+	 *
+	 * @return object
+	 */
+	function getGcaValuesForNativeLanguage(rows, name, basedon, advantage) {
+
+		basedon = basedon.toLowerCase();
+
+		let writtenLevel = -3;
+
+		let spokenLevel = -3;
+
+		if (basedon.includes("spoken")) {
+
+			spokenLevel = getLanguageValueFromGca(advantage.level);
+
+			writtenLevel = -3;
+
+		} else if (basedon.includes("written")) {
+
+			spokenLevel = -3;
+
+			writtenLevel = getLanguageValueFromGca(advantage.level);
+
+		} else {
+
+			spokenLevel = getLanguageValueFromGca(advantage.level);
+
+			writtenLevel = spokenLevel;
+
+		}
+
+		let fullName = name;
+
+		if (advantage.nameext) {
+
+			fullName += ` (${advantage.nameext})`;
+
+		}
+
+		rows["name_native_language"] = fullName
+
+		rows["native_language_idkey"] = advantage.IDKey;
+		
+		rows["native_language_spoken"] = spokenLevel;
+
+		rows["native_language_written"] = writtenLevel;
+
+		return rows;
+
+	}
+
+	/**
+	 * Get the Roll20 language level from GCA level
+	 * 
+	 * @param string gcaLevel  The value for the GCA language level
+	 * @param bool   repeating Get value for repeating language
+	 * 
+	 * @return int
+	 */
+	function getLanguageValueFromGca(gcaLevel, repeating = false) {
+
+		gcaLevel = Number(gcaLevel);
+
+		let roll20Level;
+
+		if (repeating) {
+
+			roll20Level = gcaLevel;
+			
+		} else {
+
+			switch (gcaLevel) {
+
+				case 1:
+					roll20Level = -2
+					break;
+	
+				case 2:
+					roll20Level = -1;
+					break;
+	
+				case 3:
+					roll20Level = 0;
+					break;
+				
+				default:
+					roll20Level = -3;
+					break;
+	
+			}
+	
+		}
+		
+		return roll20Level;
+	}
+
+	/**
+	 * Adds the row values for repeating language fields. 
+	 * 
+	 * @param object rows      Object of row properties
+	 * @param string name      Name of advantage
+	 * @param string basedon   Language based on
+	 * @param json   advantage JSON data for advantage
+	 *
+	 * @return object
+	 */
+	function getGcaValuesForRepeatingLanguage(rows, name, basedon, advantage) {
+
+		basedon = basedon.toLowerCase();
+
+		let rowId = generateRowID();
+
+		let idkey = advantage.IDKey;
+
+		let baseFieldName = `repeating_languages_${rowId}`;
+
+		let langName = name.toLowerCase();
+
+		let writtenLevel = "-3";
+
+		let spokenLevel = "-3";
+
+		if (basedon.includes("spoken")) {
+
+			spokenLevel = getLanguageValueFromGca(advantage.level, true);
+
+			writtenLevel = "0";
+
+		} else if (basedon.includes("written")) {
+
+			spokenLevel = "0";
+
+			writtenLevel = getLanguageValueFromGca(advantage.level, true);
+
+		} else {
+
+			spokenLevel = getLanguageValueFromGca(advantage.level, true);
+
+			writtenLevel = spokenLevel;
+
+		}
+
+		let fullName = name;
+
+		if (advantage.nameext) {
+
+			fullName += ` (${advantage.nameext})`;
+
+		}
+		
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		rows[`${baseFieldName}_spoken`] = spokenLevel;
+
+		rows[`${baseFieldName}_written`] = writtenLevel;
+
+		return rows;
+
+	}
+
+	/**
+	 * Adds the row values for repeating cultural Familiarities fields. 
+	 * 
+	 * @param object rows      Object of row properties
+	 * @param string name      Name of advantage
+	 * @param json   advantage JSON data for advantage
+	 *
+	 * @return object
+	 */
+	function getGcaValuesForCulturalFamiliarity(rows, name, advantage) {
+
+		let rowId = generateRowID();
+
+		let idkey = advantage.IDKey;
+
+		let baseFieldName = `repeating_cultures_${rowId}`;
+
+		let fullName = name;
+
+		if (advantage.nameext) {
+
+			fullName += ` (${advantage.nameext})`;
+
+		}
+
+		let points = 0;
+
+		if (advantage.points) {
+			points = Number(advantage.points);
+		}
+		
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		rows[`${baseFieldName}_points`] = points;
+
+		return rows;
 	}
 
 	/**
@@ -26565,6 +26825,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			});
 
+		} else if (advantage.Modifier) {
+			
+			arrNotes.push(`${advantage.Modifier.name}, ${advantage.Modifier.value}`);
+
 		}
 
 		if (arrNotes.length) {
@@ -26573,6 +26837,36 @@ The attacker may choose to hit the original target or the limb you used to parry
 		
 		return notes;
 	
+	}
+
+	/**
+	 * Find additional bonuses and check boxes based on advantage name
+	 * 
+	 * @param object rows Current set of rows
+	 * @param string name Name of the advantage
+	 * @param 
+	 */
+	function getGcaBonusesForAdvantage(rows, name, advantage) {
+
+		let nameCompare = name.toLowerCase();
+
+		switch (nameCompare) {
+
+			case "combat reflexes":
+				rows["combat_reflexes"] = 1;
+				break;
+
+			case "lifting st":
+				rows["lift_st_mod"] = advantage.level;
+				break;
+
+			case "striking st":
+				rows["striking_st_mod"] = advantage.level;
+				break;
+
+		}
+
+		return rows;
 	}
 
 </script>
