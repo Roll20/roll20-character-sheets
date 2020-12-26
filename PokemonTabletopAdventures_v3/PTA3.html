@@ -1766,55 +1766,60 @@
 
   // ATTRIBUTE DEPRECATION SHEET WORKERS
 
-  // Sheet Style Deprecation
+  // Push so that it gets linted to two lines instead of 18. Huzzah!
+  var styles = ["style-bug", "style-dark", "style-dragon", "style-electric", "style-fairy", "style-fighting", "style-fire", "style-flying", "style-ghost"];
+  styles.push("style-grass", "style-ground", "style-ice", "style-normal", "style-poison", "style-psychic", "style-rock", "style-steel", "style-water");
+
   on("sheet:opened", function () {
-    // Push so that it gets linted to two lines instead of 18. Huzzah!
-    var styles = ["style-bug", "style-dark", "style-dragon", "style-electric", "style-fairy", "style-fighting", "style-fire", "style-flying", "style-ghost"];
-    styles.push("style-grass", "style-ground", "style-ice", "style-normal", "style-poison", "style-psychic", "style-rock", "style-steel", "style-water");
+    // Get every attribute involved with migrations:
+    var migrants = ["character-type", "nature", "nature-type", "tab", "type1"];
+    getAttrs([...migrants, ...styles], function (attributes) {
+      // Hold the settable attributes
+      var settable = {};
 
-    getAttrs([...styles, "type1"], function (attributes) {
-      styles = styles.filter((style) => attributes[style] != undefined);
-      const values = styles.map((style) => attributes[style]);
-      if (values[0] == undefined) {
-        console.log("No Style attributes found; aborting preservation attempt");
-        return;
-      }
-      console.log("Existing Style Attributes Parsed:");
-      styles.forEach((style) => console.log(`${style}-${attributes[style]}`));
+      migrateCharacterType(settable, attributes);
+      migrateNature(settable, attributes);
+      migrateStyle(settable, attributes);
 
-      var attrs = {};
-      styles.forEach((style) => (attrs[style] = ""));
-      console.log("All Attributes set to blank");
-
-      const onStyle = styles.filter((style) => attributes[style] == "on").shift();
-      if (onStyle == undefined) {
-        setAttrs(attrs);
-        return;
-      }
-      console.log(`Retrieved on-style: ${onStyle}`);
-
-      const type = onStyle.replace("style-", "");
-      const type1 = attributes.type1;
-      if (type != type1) {
-        console.log(`Re-assigning type1 (${type1}) to ${type}`);
-        attrs["type1"] = type;
-      }
-
-      setAttrs(attrs);
+      // Finally, update attributes accordingly
+      if (settable) setAttrs(settable);
     });
   });
+
+  // Character Type Migration
+  function migrateCharacterType(settable, attributes) {
+    if (attributes["tab"] == undefined) return;
+
+    settable["tab"] = "";
+    var characters = ["trainer", "trainer", "pokemon", "hybrid"];
+    const tab = parseInt(attributes["tab"]) || 0;
+    const charTab = characters[tab];
+
+    if (attributes["character-type"] != charTab) settable["character-type"] = charTab;
+  }
 
   // Nature Migration
-  on("sheet:opened", function () {
-    getAttrs(["nature", "nature-type"], function (values) {
-      if (values.nature === values.nature + 0) return;
+  function migrateNature(settable, attributes) {
+    const nature = attributes["nature"];
+    if (nature === nature + 0) return;
 
-      const nature = values.nature;
-      const type = values["nature-type"];
-      var attrs = { nature: 0 };
-      if (nature != type) attrs["nature-type"] = nature;
+    const type = attributes["nature-type"];
+    settable["nature"] = 0;
+    if (nature != type) settable["nature-type"] = nature;
+  }
 
-      setAttrs(attrs);
-    });
-  });
+  // Sheet Style Migration
+  function migrateStyle(settable, attributes) {
+    styles = styles.filter((style) => attributes[style] != undefined);
+    const values = styles.map((style) => attributes[style]);
+    if (values[0] == undefined) return;
+
+    styles.forEach((style) => (settable[style] = ""));
+    const onStyle = styles.filter((style) => attributes[style] == "on").shift();
+    if (onStyle == undefined) return;
+
+    const type = onStyle.replace("style-", "");
+    const type1 = attributes["type1"];
+    if (type != type1) settable["type1"] = type;
+  }
 </script>
