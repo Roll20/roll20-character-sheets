@@ -13,6 +13,7 @@ December 28st 2020 v1.3
 
 - Roll Modifier Text: Most roll buttons now have a optional configuratiuon cog next too them allow players to add text to the roll template output (can be conditional on test outcome, ie success/fail). This includes Skills/Weapons/Spell/NPC. Handy for adding text related to Talent based roll outcomes, i.e. +1 SL on success or Reverse Result on fail.
 - Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Marginal fail rolls (-0) will now show correctly in SL results
 
 December 21st 2020 v1.23.4
 
