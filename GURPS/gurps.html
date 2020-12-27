@@ -15388,7 +15388,7 @@ visualize what it will look like in chat.
 </div>
 
 <script type="text/worker">
-
+	
 	// this type is required by roll20, be sure to set before uploading
 	// type="text/worker"
 	
@@ -26308,7 +26308,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			updateGcaAdvantages(jsonData, () => {
 
-				setAttrs({"import_message": "Import has completed."});
+				updateGcaPerksQuirks(jsonData, () => {
+
+					setAttrs({"import_message": "Import has completed."});
+
+				});
+				
 
 			});
 
@@ -26385,17 +26390,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let points = 0;
 
-		// loop through the attributes
-		attributes.forEach(attribute => {
+		if (attributes) {
 
-			if (name.toLowerCase() === String(attribute.name).toLowerCase()) {
+			// loop through the attributes
+			attributes.forEach(attribute => {
 
-				points = Number(attribute.points);
+				if (name.toLowerCase() === String(attribute.name).toLowerCase()) {
 
-			}
+					points = Number(attribute.points);
 
-		});
+				}
 
+			});
+			
+		}
+		
 		if ( isNaN(points) ) {
 			points = 0;
 		}
@@ -26415,17 +26424,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let points = 0;
 
-		// loop through the advantages
-		advantages.forEach(advantage => {
+		if (advantages) {
 
-			if (name.toLowerCase() === String(advantage.name).toLowerCase()) {
+			// loop through the advantages
+			advantages.forEach(advantage => {
 
-				points = Number(advantage.points);
+				if (name.toLowerCase() === String(advantage.name).toLowerCase()) {
 
-			}
+					points = Number(advantage.points);
 
-		});
+				}
 
+			});
+
+		}
+		
 		if ( isNaN(points) ) {
 			points = 0;
 		}
@@ -26864,6 +26877,111 @@ The attacker may choose to hit the original target or the limb you used to parry
 				rows["striking_st_mod"] = advantage.level;
 				break;
 
+		}
+
+		return rows;
+	}
+
+	/**
+	 * Updates Perks and Quirks
+	 * TODO: Check to see if Perk or Quirk already exists, then update
+	 * 
+	 * @param json     jsonData Json DATA from GCA file
+	 * @param function callback A function to run after updating is complete
+	 * @return void
+	 */
+	function updateGcaPerksQuirks(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let perks = jsonData.Character.Traits.Perks;
+
+		let quirks = jsonData.Character.Traits.Quirk;
+
+		let rows = {};
+
+		let saveRows = false;
+
+		if (perks && perks.length) {
+
+			perks.forEach(perk => {
+
+				let name = perk.name;
+
+				rows = getGcaValuesForPerksQuirks( "perk", rows, name, perk);
+				
+			});
+
+		}
+
+		if (quirks && quirks.length) {
+
+			quirks.forEach(quirk => {
+
+				let name = quirk.name;
+
+				rows = getGcaValuesForPerksQuirks( "quirk", rows, name, quirk);
+				
+			});
+
+		}
+
+		setAttrs(rows, {silent: false}, callback);
+
+	}
+
+
+	/**
+	 * Get the row values for repeating perks or quirks
+	 * 
+	 * @param string type        Type = perk | quirk
+	 * @param object rows        Rows for setAttr() function
+	 * @param string name        Name of the quirk or perk
+	 * @param json   perkOrQuirk object of perk or quirk
+	 * 
+	 * @return object
+	 */
+	function getGcaValuesForPerksQuirks(type = "perk", rows, name, perkOrQuirk) {
+
+		let rowId = generateRowID();
+
+		let idkey = perkOrQuirk.IDKey;
+
+		let baseFieldName;
+
+		let fullName = name;
+
+		if (type === "perk") {
+			baseFieldName = `repeating_perks_${rowId}`
+		} else {
+			baseFieldName = `repeating_quirks_${rowId}`
+		}
+
+		if (perkOrQuirk.nameext) {
+
+			fullName += ` (${perkOrQuirk.nameext})`;
+
+		}
+
+		let points = 0;
+
+		if (perkOrQuirk.points) {
+			points = Number(perkOrQuirk.points);
+		}
+		
+		rows[`${baseFieldName}_idkey`]  = idkey;
+
+		rows[`${baseFieldName}_name`]   = fullName;
+
+		rows[`${baseFieldName}_points`] = points;
+
+		if (perkOrQuirk.page) {
+			rows[`${baseFieldName}_ref`]    = perkOrQuirk.page;
+		}
+		
+		if (perkOrQuirk.usernotes) {
+			rows[`${baseFieldName}_notes`]  = perkOrQuirk.usernotes;
 		}
 
 		return rows;
