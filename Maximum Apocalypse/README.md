@@ -11,6 +11,7 @@ Also see the API script which implements the logic to handle initiative tracking
 ## Usage Notes
 
 - Structure very close to to core rulebook
+- If sheet is too wide/large setting browser zoom to 80% is a good alternate size
 - Automatically calculates all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
 - Automatic calculations incorporate effects from following abilities: Collar, Faith, Giant Genetics, Instinctive, Luck Stars, Moving Target, Reflex, Tightening the Belt, Unreliable
 - Roll buttons for stats, skills, special stats, defenses, attacks & damage
