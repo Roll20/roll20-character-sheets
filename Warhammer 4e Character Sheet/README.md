@@ -12,8 +12,12 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 December 28st 2020 v1.3
 
 - Roll Modifier Text: Most roll buttons now have a optional configuratiuon cog next too them allow players to add text to the roll template output (can be conditional on test outcome, ie success/fail). This includes Skills/Weapons/Spell/NPC. Handy for adding text related to Talent based roll outcomes, i.e. +1 SL on success or Reverse Result on fail.
-- Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
 - Marginal fail rolls (-0) will now show correctly in SL results
+- New hard coded Channelling Witch, Dark & Chaos skills added.
+- Added some further missing translation tags.
+
 
 December 21st 2020 v1.23.4
 
