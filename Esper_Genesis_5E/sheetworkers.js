@@ -300,6 +300,9 @@ on("change:race change:subrace", function(eventinfo) {
 on("change:drop_category", function(eventinfo) {
     if(eventinfo.newValue === "Monsters" || eventinfo.newValue === "Ships") {
         getAttrs(["class","race","speed","hp"], function(v) {
+            if(eventinfo.newValue === "Ships") {
+                setAttrs({npc_tab: "ships"});
+            }
             if(v["class"] != "" || v["race"] != "" || v["speed"] != "" || v["hp"] != "") {
                 setAttrs({monster_confirm_flag: 1});
             }
@@ -4584,7 +4587,7 @@ var versioning = function(finished) {
             setAttrs({version: "2.7"}, function(){
                 finished();
             });
-            console.log("5th Edition OGL by Roll20 v" + v["version"]);
+            console.log(`Esper Genesis by Roll20 v${v["version"]}`);
             return;
         }
         else if(!version || version === "") {
