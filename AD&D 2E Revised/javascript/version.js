@@ -36,7 +36,8 @@ on('sheet:opened', function(){
         if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
             console.log('Updating character sheet version');
             setAttrs({
-                character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):'')
+                character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):''),
+                announcement: 1
             },{silent:true});
 
             getAttrs(['spell-points', 'spell-points-priest'], function(values) {
