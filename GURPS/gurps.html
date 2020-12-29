@@ -26304,17 +26304,27 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function updateCharacterSheetWithGCA(jsonData, mod_cascade) {
 
-		updateNonRepeatingFieldsWithGCA(jsonData, () => {
+		importGcaNonRepeatingFields(jsonData, () => {
 
-			updateGcaAdvantages(jsonData, () => {
+			importGcaAdvantages(jsonData, () => {
 
-				updateGcaPerksQuirks(jsonData, () => {
+				importGcaPerksQuirks(jsonData, () => {
 
-					setAttrs({"import_message": "Import has completed."});
+					importGcaDisadvantages(jsonData, () => {
 
+						importGcaSkills(jsonData, () => {
+
+							setAttrs({
+								"import_message": "Import has completed.",
+								"json_data": ""
+							});
+	
+						});
+						
+					});
+					
 				});
 				
-
 			});
 
 		});
@@ -26327,7 +26337,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * @param json     jsonData GCA json data
 	 * @param function callback Function to run next
 	 */
-	function updateNonRepeatingFieldsWithGCA (jsonData, callback) {
+	function importGcaNonRepeatingFields(jsonData, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -26462,7 +26472,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * @param function callback A function to run after updating is complete
 	 * @return void
 	 */
-	function updateGcaAdvantages(jsonData, callback) {
+	function importGcaAdvantages(jsonData, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -26535,6 +26545,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaAdvantageRow(rows, name, advantage) {
 
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
 		let idkey = advantage.IDKey;
@@ -26695,6 +26706,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		basedon = basedon.toLowerCase();
 
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
 		let idkey = advantage.IDKey;
@@ -26758,6 +26770,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesForCulturalFamiliarity(rows, name, advantage) {
 
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
 		let idkey = advantage.IDKey;
@@ -26788,7 +26801,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
-	 * Get notes for GCA
+	 * Get notes for GCA advantage OR disadvantage
 	 * 
 	 * @param json advantage JSON object for an GCA advantage
 	 */
@@ -26798,7 +26811,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let notes = "";
 
-		if (advantage.basedon) {
+		if (advantage.basedon && advantage.basedon != advantage.name) {
 			arrNotes.push("Based On: " + advantage.basedon + "\n"); 
 		}
 
@@ -26888,9 +26901,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * 
 	 * @param json     jsonData Json DATA from GCA file
 	 * @param function callback A function to run after updating is complete
+	 * 
 	 * @return void
 	 */
-	function updateGcaPerksQuirks(jsonData, callback) {
+	function importGcaPerksQuirks(jsonData, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -26900,8 +26914,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let quirks = jsonData.Character.Traits.Quirk;
 
 		let rows = {};
-
-		let saveRows = false;
 
 		if (perks && perks.length) {
 
@@ -26944,6 +26956,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesForPerksQuirks(type = "perk", rows, name, perkOrQuirk) {
 
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
 		let idkey = perkOrQuirk.IDKey;
@@ -26953,9 +26966,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let fullName = name;
 
 		if (type === "perk") {
-			baseFieldName = `repeating_perks_${rowId}`
+			baseFieldName = `repeating_perks_${rowId}`;
 		} else {
-			baseFieldName = `repeating_quirks_${rowId}`
+			baseFieldName = `repeating_quirks_${rowId}`;
 		}
 
 		if (perkOrQuirk.nameext) {
@@ -26983,6 +26996,387 @@ The attacker may choose to hit the original target or the limb you used to parry
 		if (perkOrQuirk.usernotes) {
 			rows[`${baseFieldName}_notes`]  = perkOrQuirk.usernotes;
 		}
+
+		return rows;
+	}
+
+	/**
+	 * Import GCA disadvantages
+	 * TODO: Add Update feature. Currently only does insert
+	 *  
+	 * @param json     jsonData Json DATA from GCA file
+	 * @param function callback A function to run after updating is complete
+	 * 
+	 * @return void
+	 */
+	function importGcaDisadvantages(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let disadvantages = jsonData.Character.Traits.Disadvantage;
+
+		let rows = {};
+
+		if (disadvantages && disadvantages.length) {
+
+			disadvantages.forEach(disadvantage => {
+
+				let name = disadvantage.name;
+
+				rows = getGcaValuesForDisadvantage(rows, name, disadvantage);
+				
+			});
+
+		}
+
+		setAttrs(rows, {silent: false}, callback);
+
+	}
+
+	/**
+	 * Get row values for the disadvantage
+	 * check for additional non-repeating values based on name 
+	 * 
+	 * @param object rows         Rows for setAttr() function
+	 * @param string name         Name of the quirk or perk
+	 * @param json   disadvantage object disadvantage
+	 * 
+	 * @return object
+	 */
+	function getGcaValuesForDisadvantage(rows, name, disadvantage)
+	{
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = disadvantage.IDKey;
+
+		let fullName = name;
+
+		let levelName;
+
+		let baseFieldName = `repeating_disadvantages_${rowId}`;
+
+		if (disadvantage.nameext) {
+
+			fullName += ` (${disadvantage.nameext})`;
+
+		}
+
+		if (disadvantage.levelnames) {
+
+			levelName = getGcaLevelName(disadvantage);
+
+			fullName += ` (${levelName})`;
+
+		}
+
+		let points = 0;
+
+		if (disadvantage.points) {
+			points = Number(disadvantage.points);
+		}
+		
+		rows[`${baseFieldName}_idkey`]  = idkey;
+
+		rows[`${baseFieldName}_name`]   = fullName;
+
+		rows[`${baseFieldName}_points`] = points;
+
+		if (disadvantage.page) {
+			rows[`${baseFieldName}_ref`] = disadvantage.page;
+		}
+		
+		rows[`${baseFieldName}_notes`]  = getGcaAdvantageNotes(disadvantage);
+		
+		if (disadvantage.level) {
+			rows[`${baseFieldName}_trait_level`]  = disadvantage.level;
+		}
+
+		if (levelName && levelName.includes("6 or less")) {
+			
+			rows[`${baseFieldName}_control_rating`]  = 6;
+			
+		} else if (levelName && levelName.includes("9 or less")) {
+			
+			rows[`${baseFieldName}_control_rating`]  = 9;
+			
+		} else if (levelName && levelName.includes("12 or less")) {
+			
+			rows[`${baseFieldName}_control_rating`]  = 12;
+			
+		} else if (levelName && levelName.includes("15 or less")) {
+			
+			rows[`${baseFieldName}_control_rating`]  = 15;
+			
+		}
+
+		rows = getGcaValuesByDisadvantageName(rows, name, disadvantage);
+
+		return rows;
+
+	}
+
+	/**
+	 * Get any special non-repeating fields based on disadvantage name
+	 * 
+	 * @param object rows         Rows for setAttr() function
+	 * @param string name         Name of the quirk or perk
+	 * @param json   disadvantage object of perk or quirk
+	 * 
+	 * @return object
+	 */
+	function getGcaValuesByDisadvantageName(rows, name, disadvantage) {
+
+		let nameCheck = name.toLowerCase();
+
+		switch (nameCheck) {
+
+			case "appearance":
+				
+				if (disadvantage.points) {
+					rows["appearance"] = disadvantage.points;
+				}
+				 
+				break;
+
+			default:
+				// do nothing
+				break;
+
+		}
+
+		return rows;
+		
+	}
+
+	/**
+	 * Parses the level name for a GCA attribute
+	 * Such as advantage, disadvantage, perk, and quirk
+	 * 
+	 * @param json attribute JSON object for GCA attribute: advantage, disadvantage, etc.
+	 */
+	function getGcaLevelName(attribute) {
+
+		let arrNames = attribute.levelnames.split(", ");
+
+		let level = Number(attribute.level);
+
+		let name = arrNames[level-1];
+
+		return name;
+
+	}
+
+	/**
+	 * Import GCA Skills
+	 * TODO: Add Update feature. Currently only does insert
+	 *  
+	 * @param json     jsonData Json DATA from GCA file
+	 * @param function callback A function to run after updating is complete
+	 * 
+	 * @return void
+	 */
+	function importGcaSkills(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let skills = jsonData.Character.Traits.Skill;
+
+		let rows = {};
+
+		if (skills && skills.length) {
+
+			skills.forEach(skill => {
+
+				let name = skill.name;
+
+				if (!skill.type.includes("Tech")) {
+
+					rows = getGcaValuesForSkill(rows, name, skill);
+				
+				}
+				
+			});
+
+		}
+
+		setAttrs(rows, {silent: false}, callback);
+
+	}
+
+	/**
+	 * Get any special non-repeating fields based on disadvantage name
+	 * 
+	 * @param object rows  Rows for setAttr() function
+	 * @param string name  Name of the quirk or perk
+	 * @param json   skill object for skill
+	 * 
+	 * @return object
+	 */
+	function getGcaValuesForSkill(rows, name, skill) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = skill.IDKey;
+
+		let fullName = name;
+
+		let baseFieldName = `repeating_skills_${rowId}`;
+
+		if (skill.nameext) {
+
+			fullName += ` (${skill.nameext})`;
+
+		}
+
+		let points = 0;
+
+		if (skill.points) {
+			points = Number(skill.points);
+		}
+		
+		rows[`${baseFieldName}_idkey`]  = idkey;
+
+		rows[`${baseFieldName}_name`]   = fullName;
+
+		rows[`${baseFieldName}_points`] = points;
+
+		if (skill.page) {
+			rows[`${baseFieldName}_ref`] = skill.page;
+		}
+
+		let [attributeValue, difficultyValue] = getSkillAttributeDifficultyForGca(skill.type);
+		
+		rows[`${baseFieldName}_base`] = attributeValue;
+
+		rows[`${baseFieldName}_difficulty`] = difficultyValue;
+
+		rows[`${baseFieldName}_notes`]  = getGcaNotesForSkillTechnique(skill);
+		
+		return rows;
+
+	}
+
+	/**
+	 * Returns an array of attribute and difficulty drop-down values
+	 * 
+	 * @param strin skillType Skill type: attribute/difficulty level
+	 * 
+	 * @return array [attributeValue, difficultyValue]
+	 */
+	function getSkillAttributeDifficultyForGca(skillType) {
+
+		// type = DX/A
+		let arrType = skillType.split("/");
+
+		let attribute = arrType[0];
+
+		let difficulty = arrType[1];
+
+		let attributeValue;
+
+		let difficultyValue;
+
+		switch(attribute) {
+
+			case "ST":
+				attributeValue = "@{strength}";
+				break;
+
+			case "DX":
+				attributeValue = "@{dexterity}";
+				break;
+
+			case "IQ":
+				attributeValue = "@{intelligence}";
+				break;
+
+			case "HT":
+				attributeValue = "@{health}";
+				break;
+
+			case "Will":
+				attributeValue = "@{willpower}";
+				break;
+
+			case "Per":
+				attributeValue = "@{perception}";
+				break;
+
+			default:
+				attributeValue = "@{dexterity}";
+				break;
+
+		}
+
+		switch(difficulty) {
+			
+			case "E":
+				difficultyValue = -1;
+				break;
+
+			case "A":
+				difficultyValue = -2;
+				break;
+
+			case "H":
+				difficultyValue = -3;
+				break;
+
+			case "VH":
+				difficultyValue = -4;
+				break;
+
+			case "WC":
+				difficultyValue = "-5 + 1";
+				break;
+
+			default: 
+				difficultyValue = -2;
+				break;
+		}
+
+		return [attributeValue, difficultyValue];
+
+	}
+
+	/**
+	 * Get any additional notes for skill/technique
+	 * 
+	 * @param json skillOrTechnique JSON object for skill or technique
+	 * 
+	 * @return string
+	 */
+	function getGcaNotesForSkillTechnique(skillOrTechnique) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (skillOrTechnique.basedon && skillOrTechnique.basedon != skillOrTechnique.name) {
+			arrNotes.push("Based On: " + skillOrTechnique.basedon + "\n"); 
+		}
+
+		if (skillOrTechnique.usernotes) {
+			arrNotes.push(skillOrTechnique.usernotes + "\n"); 
+		}
+
+		if (skillOrTechnique.description) {
+			arrNotes.push(skillOrTechnique.description + "\n");
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+
+	}
+
+	function getGcaValuesForTechnique(rows, name, skill) {
 
 		return rows;
 	}
