@@ -395,6 +395,19 @@ on('change:charisma change:leadership change:appearance', function() {
     });
 });
 
+function repeatingMultipleSum(section, valueField, multiplierField, destination, decimals) {
+    TAS.repeating(section)
+        .attr(destination)
+        .field([valueField, multiplierField])
+        .reduce(function(m, r) {
+            return m + r.F[valueField] * r.F[multiplierField];
+        }, 0, function(t,r,a) {
+            let dec = parseInt(decimals) || 0;
+            a.D[dec][destination] = t;
+        })
+        .execute();
+}
+
 function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
@@ -681,20 +694,8 @@ on('change:repeating_profs:profslots remove:repeating_profs', function(){
 });
 
 //Equipment Carried Section
-on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear change:gearweight change:gearqty', function(){
-
-    TAS.repeating('gear')
-        .attrs('gearweighttotal','gearqty','gearweight')
-        .fields('gearqty','gearweight')
-        .reduce(function(m,r){
-            m.gearweight+=(r.F.gearweight*r.I.gearqty);
-            return m;
-
-        },{gearweight:0, desc: []},function(m,r,a){
-            m.gearweight+=(a.F.gearweight*a.I.gearqty);
-            a.D[2].gearweighttotal=m.gearweight;
-        })
-        .execute();
+on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(){
+    repeatingMultipleSum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
 });
 
 //Equipment Stored Section
@@ -702,16 +703,14 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
 
     TAS.repeating('gear-stored')
-        .attrs('mount-gear-weight-total','stored-gear-weight-total','on-mount','gear-stored-weight','gear-stored-qty')
+        .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
         .reduce(function(m,r){
-            m.allgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']);
-            m.mountgearweight+=(r.F['gear-stored-weight']*r.I['gear-stored-qty']*r.I['on-mount']);
+            m.allgearweight+=(r.F['gear-stored-weight'] * r.I['gear-stored-qty']);
+            m.mountgearweight+=(r.F['gear-stored-weight'] * r.I['gear-stored-qty'] * r.I['on-mount']);
             return m;
 
         },{allgearweight:0,mountgearweight:0, desc: []},function(m,r,a){
-            m.allgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']);
-            m.mountgearweight+=(a.F['gear-stored-weight']*a.I['gear-stored-qty']*a.I['on-mount']);
             a.D[2]['mount-gear-weight-total']=m.mountgearweight;
             a.D[2]['stored-gear-weight-total']=(m.allgearweight-m.mountgearweight);
         })

@@ -11,4 +11,5 @@ $inserts | ForEach-Object {
 }
 
 $content | Set-Content -Path $outputFile
-Write-Host "Combine complete"
+$time = Get-Date -Format "HH:mm:ss";
+Write-Host "Combine complete $time" 
