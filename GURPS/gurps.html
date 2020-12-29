@@ -26314,11 +26314,15 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 						importGcaSkills(jsonData, () => {
 
-							setAttrs({
-								"import_message": "Import has completed.",
-								"json_data": ""
+							importGcaTechniques(jsonData, () => {
+
+								setAttrs({
+									"import_message": "Import has completed.",
+									"json_data": ""
+								});
+
 							});
-	
+							
 						});
 						
 					});
@@ -26548,7 +26552,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = advantage.IDKey;
+		let idkey = advantage.IDKey.trim();
 
 		let baseFieldName = `repeating_traits_${rowId}`;
 
@@ -26709,7 +26713,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = advantage.IDKey;
+		let idkey = advantage.IDKey.trim();
 
 		let baseFieldName = `repeating_languages_${rowId}`;
 
@@ -26773,7 +26777,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = advantage.IDKey;
+		let idkey = advantage.IDKey.trim();
 
 		let baseFieldName = `repeating_cultures_${rowId}`;
 
@@ -26959,7 +26963,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = perkOrQuirk.IDKey;
+		let idkey = perkOrQuirk.IDKey.trim();
 
 		let baseFieldName;
 
@@ -27049,7 +27053,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = disadvantage.IDKey;
+		let idkey = disadvantage.IDKey.trim();
 
 		let fullName = name;
 
@@ -27207,10 +27211,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
-	 * Get any special non-repeating fields based on disadvantage name
+	 * Get values for repeating skill
 	 * 
 	 * @param object rows  Rows for setAttr() function
-	 * @param string name  Name of the quirk or perk
+	 * @param string name  Name of the skill
 	 * @param json   skill object for skill
 	 * 
 	 * @return object
@@ -27220,7 +27224,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
 
-		let idkey = skill.IDKey;
+		let idkey = skill.IDKey.trim();
 
 		let fullName = name;
 
@@ -27255,6 +27259,22 @@ The attacker may choose to hit the original target or the limb you used to parry
 		rows[`${baseFieldName}_difficulty`] = difficultyValue;
 
 		rows[`${baseFieldName}_notes`]  = getGcaNotesForSkillTechnique(skill);
+
+		// check for modifiers
+		if (skill.level && skill.baselevel) {
+			
+			let skillLevel = Number(skill.level);
+
+			let baseSkillLevel = Number(skill.baselevel);
+
+			if (skillLevel !== baseSkillLevel) {
+
+				let skillMod = skillLevel - baseSkillLevel;
+
+				rows[`${baseFieldName}_bonus`]  = skillMod;
+
+			}
+		}
 		
 		return rows;
 
@@ -27347,16 +27367,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Get any additional notes for skill/technique
 	 * 
 	 * @param json skillOrTechnique JSON object for skill or technique
-	 * 
+	 * @param bool useBasedOn       If true, include basedon notes.
 	 * @return string
 	 */
-	function getGcaNotesForSkillTechnique(skillOrTechnique) {
+	function getGcaNotesForSkillTechnique(skillOrTechnique, useBasedOn = true) {
 
 		let arrNotes = [];
 
 		let notes = "";
 
-		if (skillOrTechnique.basedon && skillOrTechnique.basedon != skillOrTechnique.name) {
+		if (useBasedOn && skillOrTechnique.basedon && skillOrTechnique.basedon != skillOrTechnique.name) {
 			arrNotes.push("Based On: " + skillOrTechnique.basedon + "\n"); 
 		}
 
@@ -27376,9 +27396,226 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	}
 
-	function getGcaValuesForTechnique(rows, name, skill) {
+	/**
+	 * Import GCA Techniques
+	 * TODO: Add Update feature. Currently only does insert
+	 *  
+	 * @param json     jsonData Json DATA from GCA file
+	 * @param function callback A function to run after updating is complete
+	 * 
+	 * @return void
+	 */
+	function importGcaTechniques(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let skills = jsonData.Character.Traits.Skill;
+
+		let rows = {};
+
+		if (skills && skills.length) {
+
+			skills.forEach(skill => {
+
+				let name = skill.name;
+
+				if (skill.type.includes("Tech")) {
+
+					rows = getGcaValuesForTechniques(rows, name, skill, skills);
+				
+				}
+				
+			});
+
+		}
+
+		setAttrs(rows, {silent: false}, callback);
+
+	}
+
+	/**
+	* Get values for repeating skill techniques
+	* 
+	* @param object rows   Rows for setAttr() function
+	* @param string name   Name of the skill
+	* @param json   skill  object for skill
+	* @param json   skills All the json skills from GCA
+	* 
+	* @return object
+	*/
+	function getGcaValuesForTechniques(rows, name, skill, skills) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = skill.IDKey.trim();
+
+		let fullName = name;
+
+		let baseFieldName = `repeating_techniquesrevised_${rowId}`;
+
+		let points = 0;
+
+		if (skill.points) {
+			points = Number(skill.points);
+		}
+
+		rows[`${baseFieldName}_idkey`]  = idkey;
+
+		rows[`${baseFieldName}_name`]   = fullName;
+
+		rows[`${baseFieldName}_points`] = points;
+
+		if (skill.page) {
+			rows[`${baseFieldName}_ref`] = skill.page;
+		}
+
+		// NOTE: attributeValue is not needed, it just identifies the skill as a technique
+		let difficultyValue = getTechniqueDifficultyFromGca(skill.type);
+
+		rows[`${baseFieldName}_default`] = getGcaTechniqueDefaultValue(skill);
+
+		rows[`${baseFieldName}_max_modifier`] = getGcaTechniqueMaxValue(skill);
+
+		let baseSkill  = getGcaTechniqueBaseSkillInfo(skill, skills);
+
+		if (baseSkill) {
+
+			let parentName = baseSkill.name;
+
+			if (baseSkill.nameext) {
+				parentName += ` (${baseSkill.nameext})`;
+			}
+
+			rows[`${baseFieldName}_parent`] = parentName;
+
+			rows[`${baseFieldName}_base_level`] = baseSkill.level;
+
+		}
+
+		rows[`${baseFieldName}_difficulty`] = difficultyValue;
+
+		rows[`${baseFieldName}_notes`]  = getGcaNotesForSkillTechnique(skill, false);
 
 		return rows;
+
+	}
+
+	/**
+	 * Parses the default value of a technique
+	 * 
+	 * @param json skill JSON object for skill
+	 * 
+	 * @return int
+	 */
+	function getGcaTechniqueDefaultValue(skill) {
+
+		// example: "default": "\"SK:Brawling::level\" - 1",
+		let techDefault = "";
+
+		if (skill.default) {
+			techDefault = skill.default;
+		} 
+
+		let arrDefault;
+
+		let defaultValue = 0;
+
+		if (techDefault.includes(" - ")) {
+			
+			arrDefault = techDefault.split(" - ");
+
+			defaultValue = -1 * Number(arrDefault[1]);
+
+		} else if (techDefault.includes(" + ")) {
+			
+			arrDefault = techDefault.split(" + ");
+
+			defaultValue = Number(arrDefault[1]);
+
+		}  
+
+		return defaultValue;
+	}
+
+	/**
+	 * Parses upto field to determine max value modifier
+	 * 
+	 * @param json skill JSON object for skill
+	 * 
+	 * @return int
+	*/ 
+	function getGcaTechniqueMaxValue(skill) {
+
+		// example: "upto": "prereq + 4",
+		let upto = "";
+
+		if (skill.upto) {
+			upto = skill.upto;
+		}
+
+		let arrUpto;
+
+		let maxValue = 0;
+
+		if (upto.includes(" - ")) {
+			
+			arrUpto = upto.split(" - ");
+
+			maxValue = -1 * Number(arrUpto[1]);
+
+		} else if (upto.includes(" + ")) {
+			
+			arrUpto = upto.split(" + ");
+
+			maxValue = Number(arrUpto[1]);
+
+		}  
+
+		return maxValue;
+
+	}
+
+	/**
+	 * Tries to find the base skill for technique
+	 * returns matching skill object
+	 * 
+	 * @param json skill  Skill technique to find base skill for
+	 * @param json skills A list of skills from GCA
+	 * 
+	 * @return json baseSkill
+	 */
+	function getGcaTechniqueBaseSkillInfo(skill, skills) {
+
+		let baseSkill;
+
+		skills.forEach(searchSkill => {
+
+			if (searchSkill.IDKey.trim() === skill.deffromid.trim()) {
+				baseSkill = searchSkill;
+			}
+			
+		});
+
+		return baseSkill;
+	}
+
+	/**
+	 * Get the difficulty level of technique
+	 * 
+	 * @param string skillType skill type. example: Tech/A
+	 */
+	function getTechniqueDifficultyFromGca(skillType) {
+
+		let difficulty = "Average";
+
+		if (skillType === "Tech/H") {
+			difficulty = "Hard";
+		}
+
+		return difficulty;
+
 	}
 
 </script>
