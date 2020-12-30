@@ -26318,11 +26318,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 								importGcaEquipment(jsonData, () => {
 
-									setAttrs({
-										"import_message": "Import has completed.",
-										"json_data": ""
-									});
+									importGcaSpells(jsonData, () => {
 
+										setAttrs({
+											"import_message": "Import has completed.",
+											"json_data": ""
+										});
+
+
+									});
+								
 								});
 
 							});
@@ -26896,6 +26901,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			case "striking st":
 				rows["striking_st_mod"] = advantage.level;
+				break;
+
+			case "magery":
+				rows["spell_bonus"] = advantage.level;
 				break;
 
 		}
@@ -27746,4 +27755,203 @@ The attacker may choose to hit the original target or the limb you used to parry
 		return notes;
 
 	}
+
+	/**
+	 * Import GCA Spells 
+	 * TODO: Add ability to update existing spells
+	 * 
+	 * @param json     jsonData GCA JSON data
+	 * @param function callback Function to run after importing
+	 */ 
+	function importGcaSpells(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let spells = jsonData.Character.Traits.Spell;
+
+		let rows = {};
+
+		getAttrs(["spell_bonus"], values => {
+
+			let magery = Number(values.spell_bonus);
+			
+			if (spells && spells.length) {
+
+				spells.forEach(spell => {
+
+					let name = spell.name;
+
+					rows = getGcaValuesForSpell(rows, name, spell, magery);
+					
+				});
+
+			}
+
+			setAttrs(rows, {silent: false}, callback);
+
+		});
+
+	}
+
+	/**
+	 * Get the row values for GCA Spell
+	 * 
+	 * @param object rows   Object for updating repeating table
+	 * @param string name   Name of spell
+	 * @param json   spell  JSON object of spell
+	 * @param int    magery Magery level of character
+	 * 
+	 * @return object
+	 */ 
+	function getGcaValuesForSpell(rows, name, spell, magery) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = spell.IDKey.trim();
+
+		let fullName = name;
+
+		let baseFieldName = `repeating_spells_${rowId}`;
+
+		if (spell.nameext) {
+
+			fullName += ` (${spell.nameext})`;
+
+		}
+
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		rows[`${baseFieldName}_level`] = spell.level;
+
+		rows[`${baseFieldName}_difficulty`] = getSpellDifficultyFromGca(spell.type);
+
+		let spellModifier = 0;
+
+		let spellBaseLevel = 0;
+
+		if (spell.baselevel) {
+
+			spellModifier = Number(spell.level) - ( Number(spell.baselevel ) + magery);
+
+		}
+
+		rows[`${baseFieldName}_spell_modifier`] = spellModifier;
+
+		rows[`${baseFieldName}_points`] = Number(spell.points);
+
+		let [spellClass, resistedby] = getSpellClassResistedByFromGca(spell);
+
+		rows[`${baseFieldName}_spell_resisted_by`] = resistedby;
+
+		rows[`${baseFieldName}_spell_class`] = spellClass;
+
+		if (spell.duration) {
+			rows[`${baseFieldName}_duration`] = spell.duration;
+		}
+
+		if (spell.castingcost) {
+			rows[`${baseFieldName}_cost`] = spell.castingcost;
+		}
+
+		if (spell.time) {
+			rows[`${baseFieldName}_casttime`] = spell.time;
+		}
+
+		if (spell.cat) {
+			rows[`${baseFieldName}_spell_college`] = spell.cat;
+		}
+
+		rows[`${baseFieldName}_spell_notes`] = getSpellNotesFromGcaSpell(spell);
+		
+		return rows;
+
+	}
+
+	/**
+	 * Get the spell difficulty based on spell type
+	 * 
+	 * @param string spellType Spell Type: IQ/H | IQ/VH
+	 * 
+	 * @return int
+	 */
+	function getSpellDifficultyFromGca(spellType) {
+
+		let difficulty = -3;
+
+		if (spellType === "IQ/VH") {
+			difficulty = -4;
+		}
+
+		return difficulty;
+	}
+
+	/**
+	 * Get the spell's class and resisted by (if any)
+	 * from spell.class property
+	 * 
+	 * @param json spell GCA Spell JSON object
+	 * 
+	 * @return array [spellClass, resistedby]
+	 */
+	function getSpellClassResistedByFromGca(spell) {
+
+		let spellClass;
+		
+		let resistedby = "";
+
+		// example: "class": "Regular/R-HT",
+		if (spell.class.includes("/R-")) {
+
+			let arrClass = spell.class.split("/R-");
+
+			spellClass = arrClass[0];
+
+			resistedby = arrClass[1];
+
+		} else {
+
+			spellClass = spell.class;
+
+		}
+
+		return [spellClass, resistedby];
+	}
+
+	/**
+	 * Compiles spell notes from GCA Spell object
+	 * 
+	 * @param json spell GCA spell object
+	 * 
+	 * @return string
+	 */
+	function getSpellNotesFromGcaSpell(spell) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (spell.usernotes) {
+			arrNotes.push(spell.usernotes + "\n"); 
+		}
+
+		if (spell.description) {
+			arrNotes.push(spell.description + "\n"); 
+		}
+
+		if (spell.needs) {
+			arrNotes.push("Needs: " + spell.needs + "\n"); 
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+
+	}
+
 </script>
