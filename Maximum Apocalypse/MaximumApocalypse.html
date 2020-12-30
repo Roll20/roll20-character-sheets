@@ -709,8 +709,9 @@
       <div class="luck-label"><span data-i18n="luck" class="banner">Luck.</span><span class="dark code"> (L)</span></div>
       <div class="luck-use-label">
         <input type="hidden" name="attr_has_faith" class="has-faith-check"/>
+        <input type="hidden" name="attr_has_luck_stars" class="has-luck-stars-check"/>
         <span data-i18n="use_per_game">Use Per Game.</span><br/>
-        <span>( </span><span data-i18n="luck">Luck.</span><span>/ 10 </span><span class="has-faith" data-i18n="+3_for_faith">+3 for Faith.</span><span>)</span>
+        <span>( </span><span data-i18n="luck">Luck.</span><span>/ 10 </span><span class="has-faith"> +3 </span><span class="has-luck-stars"> +1 </span><span>)</span>
       </div>
       <div class="luck-input">
         <input class="stat" type="number" name="attr_luck"/> 
@@ -769,8 +770,12 @@
       </div> 
       <div class="build">
           <div class="stat-labels build-labels">
-            <div class="subheading"><span data-i18n="build" class="subheading">Build.</span></div>
-            <div class="footing"><span class="footing">(STR + FOR)</span></div>
+            <div data-i18n="build" class="subheading">Build.</div>
+            <div class="footing">
+                <span>(STR + FOR)</span>
+                <input type="hidden" name="attr_has_giant_genetics" class="has-giant-genetics-check"/>
+                <span class="has-giant-genetics"> + 50 </span>
+            </div>
           </div>
           <div class="build-input"> 
               <input class="build-lozenge" type="number" name="attr_build" width="18" readonly/>
@@ -911,7 +916,10 @@
                     <button value="&{template:maxapoc} {{subtitle=^{dodge}}} {{firstdegree1=[[@{dodge}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{dodge}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{dodge}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{dodge}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{dodge}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{dodge}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button defense-button">
                         <span data-i18n="dodge" class="subheading">Dodge.</span><br/>
                         <input type="hidden" name="attr_has_reflex" class="has-reflex-check"/>
-                        <span class="footing">(AGI + INS) / 2 </span><span class="has-reflex footing" data-i18n="+10_for_reflex">+10 for Reflex.</span>
+                        <input type="hidden" name="attr_has_moving_target" class="has-moving-target-check"/>
+                        <span class="footing">(AGI + INS) / 2 </span>
+                        <span class="has-reflex footing"> +10 </span>
+                        <span class="has-moving-target footing"> +5 </span>
                     </button>
               </div>
               <div class="dodge-threshold table-cell"><input name="attr_dodge" class="defense-threshold" type="number" readonly/></div>
@@ -1155,16 +1163,26 @@
           <div class="infection-status transformdie-status"><input name="attr_transformdie" class="infection-status transformdie-status" type="checkbox"/></div>
       </div>
     </div>
-    <div class="hunger section">
+    <div class="hunger section">    
       <div class="hunger-banner banner"><span data-i18n="hunger" class="banner">Hunger.</span></div>
       <input type="hidden" name="attr_starving" class="starving-check"/>
-      <div class="starving hunger-desc-left table-head-small">1/4 FOR = </div>
+      <div class="starving hunger-desc-left table-head-small">
+        <span>1/4 FOR</span>
+        <input type="hidden" name="attr_has_tightening_the_belt" class="tightening-the-belt-check"/>
+        <span class="tightening-the-belt"> +4 </span>
+        <span> = </span>
+      </div>
       <div class="starving hunger-desc-right table-head-small"><span data-i18n="starving">Starving.</span></div>
       <input type="hidden" name="attr_emaciated" class="emaciated-check"/>
-      <div class="emaciated hunger-desc-left table-head-small">1/2 FOR =  </div>
+      <div class="emaciated hunger-desc-left table-head-small">
+          <span>1/2 FOR </span>
+          <input type="hidden" name="attr_has_tightening_the_belt" class="tightening-the-belt-check"/>
+          <span class="tightening-the-belt"> +8 </span>
+        <span> = </span>
+      </div>
       <div class="emaciated hunger-desc-right table-head-small"><span data-i18n="emaciated">Emaciated.</span></div>
       <input type="hidden" name="attr_dead" class="dead-check"/>
-      <div class="dead hunger-desc-left table-head-small">FOR =  </div>
+      <div class="dead hunger-desc-left table-head-small">FOR = </div>
       <div class="dead hunger-desc-right table-head-small"><span data-i18n="dead">Dead.</span></div>
       <div class="hunger-input"><input name="attr_hunger" class="hunger-input prof" type="number" value="0"/></div>
     </div>
@@ -1232,14 +1250,14 @@
     ======================================================*/
 
 const multistats = {
-    luck_uses_max: {rule: 'luck_uses', attributes: ['luck', 'has_faith'], modifier: 10},
-    build: {rule: 'special_stat', attributes: ['str', 'for'], modifier: 1},
+    luck_uses_max: {rule: 'luck_uses', attributes: ['luck', 'has_faith', "has_luck_stars"], modifier: 10},
+    build: {rule: 'build', attributes: ['str', 'for', 'has_giant_genetics'], modifier: 1},
     build_dc: {rule: 'build_dc', attributes: ['build']},
     health_max: {rule: 'special_stat', attributes: ['build'], modifier: 5},
-    starving: {rule: 'greater_than_or_equal', attributes: ['hunger', 'for_quarter']},
-    emaciated: {rule: 'greater_than_or_equal', attributes: ['hunger', 'for_half']},
+    starving: {rule: 'hungry', attributes: ['hunger', 'for_quarter', 'has_tightening_the_belt'], modifier: 4},
+    emaciated: {rule: 'hungry', attributes: ['hunger', 'for_half', 'has_tightening_the_belt'], modifier: 8},
     dead: {rule: 'greater_than_or_equal', attributes: ['hunger', 'for']},
-    init: {rule: 'init', values: -1, attributes: ['agi', 'luck', 'init_temp', 'encumbered', 'shaken', 'acute', 'starving', 'emaciated'], modifier: 10},
+    init: {rule: 'init', values: -1, attributes: ['agi', 'luck', 'init_temp', 'encumbered', 'shaken', 'acute', 'starving', 'emaciated', 'has_moving_target'], modifier: 10},
     init_5: {rule: 'add', attributes: ['init'], modifier: -5},
     init_10: {rule: 'add', attributes: ['init'], modifier: -10},
     init_15: {rule: 'add', attributes: ['init'], modifier: -15},
@@ -1247,7 +1265,7 @@ const multistats = {
     resilience: {rule: 'special_stat', attributes: ['str', 'fort'], modifier: 2},
     resolve: {rule: 'special_stat', attributes: ['int', 'ins'], modifier: 2},
     immunity: {rule: 'special_stat', attributes: ['for', 'luck'], modifier: 2},
-    dodge: {rule: 'dodge', attributes: ['agi', 'ins', 'has_reflex'], modifier: 2},
+    dodge: {rule: 'dodge', attributes: ['agi', 'ins', 'has_reflex', 'has_moving_target'], modifier: 2},
     full_dodge: {rule: 'full_dodge', attributes: ['dodge', 'str']},
     parry: {rule: 'max', attributes: ['blades', 'brawl', 'clubs']},
     riposte: {rule: 'max', attributes: ['blades', 'brawl', 'clubs']},
@@ -1304,16 +1322,20 @@ const multifunctions = {
     luck_uses: function(arr, divisor) {
       let luck = arr[0];
       let has_faith = arr[1];
+      let has_luck_stars = arr[2];
       let luck_uses = Math.floor(luck / divisor)
-      luck_uses = luck_uses + (has_faith > 0 ? 3 : 0);
+      luck_uses += has_faith > 0 ? 3 : 0;
+      luck_uses += has_luck_stars > 0 ? 1 : 0;
       return luck_uses;
     },
     dodge: function(arr, divisor) {
       let agi = arr[0];
       let ins = arr[1];
       let has_reflex = arr[2];
+      let has_moving_target = arr[3];
       let dodge = Math.floor((agi + ins) / divisor)
-      dodge = dodge + (has_reflex > 0 ? 10 : 0);
+      dodge += has_reflex > 0 ? 10 : 0;
+      dodge += has_moving_target > 0 ? 5 : 0;
       return dodge;
     },
     prof: function(arr) {
@@ -1330,6 +1352,19 @@ const multifunctions = {
     	let stat = Math.floor(sum / divisor);
     	return stat;
     },
+    build: function(arr) {
+        let str = arr[0];
+        let fort = arr[1];
+        let hasGiantGenetics = arr[2];
+        return str + fort + (hasGiantGenetics > 0 ? 50 : 0);
+    },
+    hungry: function(arr, modifier) {
+        let hunger = arr[0];
+        let baseThreshold = arr[1];
+        let hasTighteningTheBelt = arr[2];
+        let threshold = baseThreshold + (hasTighteningTheBelt > 0 ? modifier : 0);
+        return hunger >= threshold ? 'on' : '0';
+    },
     init: function(arr, divisor) {
         let agi = parseInt(arr[0]) || 0;
         let luck = parseInt(arr[1]) || 0;
@@ -1339,6 +1374,7 @@ const multifunctions = {
         let acute = arr[5];
         let starving = arr[6];
         let emaciated = arr[7];
+        let hasMovingTarget = arr[8];
         
         let init = Math.floor((agi+luck) / divisor);
         init += initTemp;
@@ -1347,6 +1383,7 @@ const multifunctions = {
         init -= acute === 'on' ? 5 : 0;
         init -= starving === 'on' ? 2 : 0;
         init -= emaciated === 'on' ? 2 : 0;
+        init += hasMovingTarget > 0 ? 1 : 0;
         return init;
     }
 };
@@ -1503,13 +1540,13 @@ const repeatingSum = (destinations, section, fields) => {
 
 const repeatingPresence = (destinations, section, fields, names) => {
     if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
-    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
+    if (!Array.isArray(fields)) fields = Array(destinations.length).fill(fields);
     if (!Array.isArray(names)) names = [names.replace(/\s/g, '').split(',')];
     getSectionIDs(`repeating_${section}`, idArray => {
         const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
         getAttrs([...attrArray], v => {
-            const checkValue = (section, id, field, name) => v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === `${name}` || 
-                                                             v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === getTranslationByKey(`${name}`) ? 1 : 0;
+            const checkValue = (section, id, field, name) => v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === `${name}`.replace(/_/g, ' ').toLowerCase() || 
+                                                             v[`repeating_${section}_${id}_${field}`].trim().toLowerCase() === (""+getTranslationByKey(`${name}`)).toLowerCase() ? 1 : 0;
             const output = {};
             destinations.forEach((destination, index) => {
                 output[destination] = idArray.reduce((total, id) => total + checkValue(section, id, fields[index], names[index]), 0);
@@ -1546,9 +1583,13 @@ on('change:repeating_gear:gear_cp remove:repeating_gear', function() {
 
 /* START OF REPEATING ABILITY PRESENCE */
 
-/* detect Faith special ability */
+/* detect special abilities */
 on('change:repeating_abilities:ability_name remove:repeating_abilities', function() {  
-	repeatingPresence(["has_faith", "has_reflex"],"abilities",["ability_name", "ability_name"], ["faith", "reflex"]);
+	repeatingPresence(["has_faith", "has_reflex", "has_tightening_the_belt", "has_moving_target", "has_giant_genetics", "has_luck_stars"],
+	                    "abilities",
+	                  //["ability_name", "ability_name", "ability_name", "ability_name", "ability_name", "ability_name"], 
+	                  "ability_name",
+	                  ["faith", "reflex", "tightening_the_belt", "moving_target", "giant_genetics", "luck_stars"]);
 });
 
 /* END OF REPEATING ABILITY PRESENCE */

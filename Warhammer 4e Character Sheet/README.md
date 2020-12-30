@@ -8,6 +8,14 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+
+December 21st 2020 v1.23.4
+
+- Cleaned up critical roll text for casting and channeling to make it clearer that theses at happening.
+- PC & NPC Characterisitc rolls now show success/failure message.
+- Added some further missing translation tags
+
+
 November 2nd th 2020 v1.23.3
 
 - Added translation tag for modifier text in the roll template.

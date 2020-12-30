@@ -6,10 +6,13 @@ Haven't actually played a game of Maximum Apocalypse yet, but it looks like a re
 
 I'm using this project as a way to become familiar with the mechanics.
 
+Also see the API script which implements the logic to handle initiative tracking (4 action phases, each reducing value by 5) & the "enemy attraction gauge" as a token.
+
 ## Usage Notes
 
 - Structure very close to to core rulebook
 - Automatically calculates all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
+- Automatic calculations incorporate effects from following abilities: Faith, Giant Genetics, Luck Stars, Moving Target, Reflex, Tightening the Belt
 - Roll buttons for stats, skills, special stats, defenses, attacks & damage
 - Roll buttons query for 0-3 advantages/disadvantages & implement advantage/disadvantage effects
 - Roll template indicates level & degree of success
@@ -26,9 +29,16 @@ I'm using this project as a way to become familiar with the mechanics.
 ## Aspirational enhancements
 - Default proficiency roll prompt to disadvantage for non-proficient skills
 - Implement Disadvantage to all rolls when Emaciated
-- Implement special ability conditional modifier roll queries
+- Implement special ability conditional modifier roll queries (e.g. Bravery, Hollow Points ...)
 
 ## Change Log
+
+### December 14th 2020 v5.0
+- Added support to field calculations for specific special abilities:
+  - Tightening the Belt
+  - Moving Target
+  - Giant Genetics
+  - Luck Stars
 
 ### December 13th 2020 v4.0
 
