@@ -12,7 +12,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(/18\[([0-9]{1,3})]/);
+        let exceptionalMatch = abilityScoreString.match(/18\[([0-9]{1,3})]/) || abilityScoreString.match(/18\(([0-9]{1,3})\)/);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
