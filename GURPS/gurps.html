@@ -26316,9 +26316,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 							importGcaTechniques(jsonData, () => {
 
-								setAttrs({
-									"import_message": "Import has completed.",
-									"json_data": ""
+								importGcaEquipment(jsonData, () => {
+
+									setAttrs({
+										"import_message": "Import has completed.",
+										"json_data": ""
+									});
+
 								});
 
 							});
@@ -27461,9 +27465,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 			points = Number(skill.points);
 		}
 
-		rows[`${baseFieldName}_idkey`]  = idkey;
+		rows[`${baseFieldName}_idkey`] = idkey;
 
-		rows[`${baseFieldName}_name`]   = fullName;
+		rows[`${baseFieldName}_name`] = fullName;
 
 		rows[`${baseFieldName}_points`] = points;
 
@@ -27618,4 +27622,128 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	}
 
+	/**
+	 * Import GCA Equipment 
+	 * TODO: Add ability to update existing equipment
+	 * 
+	 * @param json     jsonData GCA JSON data
+	 * @param function callback Function to run after importing
+	 */ 
+	function importGcaEquipment(jsonData, callback) {
+
+		// make sure we have a valid function
+		callback = callback || noop;
+
+		let items = jsonData.Character.Traits.Equipment;
+
+		let rows = {};
+
+		if (items && items.length) {
+
+			items.forEach(item => {
+
+				let name = item.name;
+
+				rows = getGcaValuesForEquipment(rows, name, item);
+				
+			});
+
+		}
+
+		setAttrs(rows, {silent: false}, callback);
+
+	}
+
+	/**
+	 * Get the row values for GCA equipment
+	 * 
+	 * @param object rows Object for updating repeating table
+	 * @param string name Name of equipment
+	 * @param json   item JSON object of equipment
+	 * 
+	 * @return object
+	 */ 
+	function getGcaValuesForEquipment(rows, name, item) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = item.IDKey.trim();
+
+		let fullName = name;
+
+		let baseFieldName = `repeating_item_${rowId}`;
+
+		if (item.nameext) {
+
+			fullName += ` (${item.nameext})`;
+
+		}
+
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		if (item.location) {
+			rows[`${baseFieldName}_location`] = item.location;
+		}
+
+		if (item.techlvl) {
+			rows[`${baseFieldName}_tl`] = item.techlvl;
+		}
+		
+		if (item.lc) {
+			rows[`${baseFieldName}_legality_class`] = item.lc;
+		}
+		
+		if (item.page) {
+			rows[`${baseFieldName}_ref`] = item.page;
+		}
+
+		if (item.count) {
+			rows[`${baseFieldName}_count`] = Number(item.count);
+		}
+		
+		if (item.basecost) {
+			rows[`${baseFieldName}_cost`] = Number(item.basecost);
+		}
+		
+		if (item.baseweight) {
+			rows[`${baseFieldName}_weight`] = Number(item.baseweight);
+		}
+		
+		rows[`${baseFieldName}_notes`] = getGcaNotesForEquipment(item);
+
+		return rows;
+		
+	}
+
+	/**
+	 * Get any additional notes for equipment
+	 * 
+	 * @param json item   JSON object for item
+	 *
+	 * @return string
+	 */
+	function getGcaNotesForEquipment(item) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (item.usernotes) {
+			arrNotes.push(item.usernotes + "\n"); 
+		}
+
+		if (item.description) {
+			arrNotes.push(item.description + "\n");
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+
+	}
 </script>
