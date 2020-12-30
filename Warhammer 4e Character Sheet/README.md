@@ -15,7 +15,9 @@ December 28st 2020 v1.3
 - Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
 - Crit/fumble logic update: Auto Failure on 99 roll result, will always result in a fumble, even if target is above 100.
 - Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
+- Roll template now has Critical / Fumble(Oops) / Miscast / Wrath buttons integrated, they only show when these events happen and are clickable.
 - Marginal fail rolls (-0) will now show correctly in SL results
+- Corruption Section now has a Max Corruption value field, based on TB+WPB.
 - New hard coded skills for Channelling Witch, Dark & Chaos added.
 - Added some further missing translation tags.
 
