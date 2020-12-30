@@ -5,9 +5,9 @@
     </div>
     <div class="sheet-gear">
       <div class="header" data-i18n="gear">Gear</div>
-      <div class="auto-expand"><span name="attr_gear"></span>
-        <textarea spellcheck="false" name="attr_gear" data-i18n-placeholder="gear-placeholder" placeholder="Battle axe, spiked armor, horned helmet, bag of tasty snacks"></textarea>
-      </div>
+        <fieldset class="repeating_gear">
+          <input type="text" name="attr_gear"/>
+        </fieldset>
       <div class="header" data-i18n="supply">Supply</div>
     </div>
     <div class="sheet-stress">
@@ -25,23 +25,41 @@
       Minions
     </div>
     <div class="sheet-duties">
-      <div class="header" data-i18n="dungeon-duties">Dungeon Duties</div>
-      <div class="duties-header">
-        <div data-i18n="tier">Tier</div>
-        <div data-i18n="type">Type</div>
-        <div data-i18n="description">Description</div>
+      <div class="header"> 
+        <span data-i18n="dungeon-duties">Dungeon Duties</span>
+        <input type="hidden" class="direction" name="attr_hide-duties" value="show"/>
+        <button type="action" name="act_toggle-duties" class="toggle">
+          <span class="show">▼</span>
+          <span class="hide">◄</span>
+        </button>
       </div>
-      <fieldset class="repeating_duties">
-        <input type="text" name="attr_duty-tier"/>
-        <input type="text" name="attr_duty-type"/>
-        <div class="auto-expand"><span name="attr_duty-desc"></span>
-          <textarea pellcheck="false" name="attr_duty-desc"></textarea>
+      <input type="hidden" class="hider" name="attr_hide-duties"/>
+      <div class="hider">
+        <div class="duties-header">
+          <div data-i18n="tier">Tier</div>
+          <div data-i18n="type">Type</div>
+          <div data-i18n="description">Description</div>
         </div>
-      </fieldset>
+        <fieldset class="repeating_duties">
+          <input type="text" name="attr_duty-tier"/>
+          <input type="text" name="attr_duty-type"/>
+          <div class="auto-expand"><span name="attr_duty-desc"></span>
+            <textarea spellcheck="false" name="attr_duty-desc"></textarea>
+          </div>
+        </fieldset>
+      </div>
     </div>
     <div class="sheet-downtime clocks">
-      <div class="header" data-i18n="downtime-projects">Downtime Projects</div>
-      <div>
+      <div class="header">
+        <span data-i18n="downtime-projects">Downtime Projects</span>
+        <input type="hidden" class="direction" name="attr_hide-downtime-list" value="show"/>
+        <button type="action" name="act_toggle-downtime-list" class="toggle">
+          <span class="show">▼</span>
+          <span class="hide">◄</span>
+        </button>
+      </div>
+      <input type="hidden" name="attr_hide-downtime-list" class="hider"/>
+      <div class="hider">
         <ul data-i18n-list="projects-list">
           <li data-i18n="brew-project" data-i18n-list-item="brew"><strong>Brew</strong> Potions and Alchemicals</li>
           <li data-i18n="build-project" data-i18n-list-item="build"><strong>Build</strong> Locks, Traps, Tricks, and Rooms.</li>
@@ -133,3 +151,18 @@
     XP
   </div>
 </div>
+<script type="text/worker">
+  on("clicked:toggle-downtime-list clicked:toggle-duties", function(eventInfo) {
+    //get the right attribute for the button we clicked
+    var attr = eventInfo.triggerName.replace("clicked:toggle", "hide")
+    
+    // Check the current value of the hidden attribute.
+    getAttrs([attr], function(v) {
+      console.log(v)
+      // Toggle the hidden attribute value between "hide" and "show"
+      var set = {}
+      set[attr] = v[attr] !== "hide" ? "hide" : "show"
+      setAttrs(set);
+    });
+  });
+</script>
