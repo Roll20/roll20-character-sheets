@@ -26421,14 +26421,52 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let baseTL = Number(campaign.basetl);
 
-		let miscNotes = jsonData.Character.Description + "\n\n" + jsonData.Character.Notes;
+		let miscNotes = jsonData.Character.Notes;
 
 		let jsonSM = getTraitFromGcaAttributes(attributes, "Size Modifier");
 
 		let sizeModifier = 0;
 
+		let jsonStatus = getTraitFromGcaAttributes(attributes, "Status");
+
+		let status = 0;
+
+		let jsonMonthlyPay = getTraitFromGcaAttributes(attributes, "Monthly Pay");
+
+		let monthlyPay = "0";
+
+		let jsonRemainingFunds = getTraitFromGcaAttributes(attributes, "Remaining Funds");
+
+		let remainingFunds = "0";
+
+		let jsonCostOfLiving = getTraitFromGcaAttributes(attributes, "Cost of Living");
+
+		let costOfLiving = "0";
+
 		if (jsonSM && jsonSM.level) {
 			sizeModifier = jsonSM.level;
+		}
+
+		if (jsonStatus && jsonStatus.score) {
+			status = jsonStatus.score;
+		}
+
+		if (jsonMonthlyPay && jsonMonthlyPay.score) {
+
+			monthlyPay = formatNumber(jsonMonthlyPay.score);
+			
+		}
+
+		if (jsonRemainingFunds && jsonRemainingFunds.score) {
+
+			remainingFunds = formatNumber(jsonRemainingFunds.score);
+
+		}
+
+		if (jsonCostOfLiving && jsonCostOfLiving.score) {
+
+			costOfLiving = formatNumber(jsonCostOfLiving.score);
+
 		}
 
 		let updates = {
@@ -26442,6 +26480,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 			general_appearance:    general.appearance,
 			total_points:          basePoints,
 			tl:	                   baseTL,
+			status:				   status,
+			income:                monthlyPay,
+			stash:                 remainingFunds,
+			wealth:				   "Average",
+			cost_of_living:		   costOfLiving,
 			misc_notes:            miscNotes,
 			strength_points:       getCharacterPointsFromGcaAttributes(attributes, "ST"),
 			dexterity_points:      getCharacterPointsFromGcaAttributes(attributes, "DX"),
@@ -26464,6 +26507,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		setAttrs(updates, {silent: false}, callback);
 
+	}
+
+	/**
+	 * Add commas to a number. 
+	 * see: https://blog.abelotech.com/posts/number-currency-formatting-javascript/
+	 * 
+	 * @param number num Number to format
+	 * 
+	 * @return string
+	 */
+	function formatNumber(num) {
+ 		return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 	}
 
 	/**
@@ -26669,6 +26724,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 		if (trait.nameext) {
 
 			fullName += ` (${trait.nameext})`;
+
+		}
+
+		if (trait.levelnames) {
+
+			levelName = getGcaLevelName(trait);
+
+			fullName += ` (${levelName})`;
 
 		}
 
@@ -27163,7 +27226,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 						rows = getRangedAttackFromGcaTrait(rows, advantage);
 					}
 
-					rows = getGcaBonusesForAdvantage(rows, name, advantage);
+					rows = getGcaModifiersForAdvantage(rows, name, advantage);
 
 				}
 
@@ -27203,9 +27266,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let fullName = name;
 
+		let levelName;
+
 		if (advantage.nameext) {
 
 			fullName += ` (${advantage.nameext})`;
+
+		}
+
+		if (advantage.levelnames) {
+
+			levelName = getGcaLevelName(advantage);
+
+			fullName += ` (${levelName})`;
 
 		}
 
@@ -27521,7 +27594,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * @param string name Name of the advantage
 	 * @param 
 	 */
-	function getGcaBonusesForAdvantage(rows, name, advantage) {
+	function getGcaModifiersForAdvantage(rows, name, advantage) {
 
 		let nameCompare = name.toLowerCase();
 
@@ -27541,6 +27614,32 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			case "magery":
 				rows["spell_bonus"] = advantage.level;
+				break;
+
+			case "wealth":
+				rows["wealth"] = getGcaLevelName(advantage, "Average");
+				break;
+
+		}
+
+		return rows;
+	}
+
+	/**
+	 * Find additional modifiers and check boxes based on disadvantage name
+	 * 
+	 * @param object rows         Current set of rows
+	 * @param string name         Name of the disadvantage
+	 * @param json   disadvantage GCA json object
+	 */
+	function getGcaModifiersDisadvantage(rows, name, disadvantage) {
+
+		let nameCompare = name.toLowerCase();
+
+		switch (nameCompare) {
+
+			case "wealth":
+				rows["wealth"] = getGcaLevelName(disadvantage, "Average");
 				break;
 
 		}
@@ -27678,6 +27777,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 				let name = disadvantage.name;
 
 				rows = getGcaValuesForDisadvantage(rows, name, disadvantage);
+
+				rows = getGcaModifiersDisadvantage(rows, name, disadvantage);
 				
 			});
 
@@ -27807,16 +27908,25 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Parses the level name for a GCA attribute
 	 * Such as advantage, disadvantage, perk, and quirk
 	 * 
-	 * @param json attribute JSON object for GCA attribute: advantage, disadvantage, etc.
+	 * @param json   attribute    JSON object for GCA attribute: advantage, disadvantage, etc.
+	 * @param string defaultValue Default value if no value is found
+	 * 
+	 * @return string
 	 */
-	function getGcaLevelName(attribute) {
+	function getGcaLevelName(attribute, defaultValue = "") {
 
-		let arrNames = attribute.levelnames.split(", ");
+		let name = defaultValue;
 
-		let level = Number(attribute.level);
+		if (attribute && attribute.levelnames && attribute.level) {
 
-		let name = arrNames[level-1];
+			let arrNames = attribute.levelnames.split(", ");
 
+			let level = Number(attribute.level);
+
+			name = arrNames[level-1];
+		
+		}
+		
 		return name;
 
 	}
@@ -27879,9 +27989,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let baseFieldName = `repeating_skills_${rowId}`;
 
+		let levelName;
+
 		if (skill.nameext) {
 
 			fullName += ` (${skill.nameext})`;
+
+		}
+
+		if (skill.levelnames) {
+
+			levelName = getGcaLevelName(skill);
+
+			fullName += ` (${levelName})`;
 
 		}
 
@@ -28333,6 +28453,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		}
 
+		if (item.levelnames) {
+
+			levelName = getGcaLevelName(item);
+
+			fullName += ` (${levelName})`;
+
+		}
+
 		rows[`${baseFieldName}_idkey`] = idkey;
 
 		rows[`${baseFieldName}_name`] = fullName;
@@ -28466,6 +28594,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 		if (spell.nameext) {
 
 			fullName += ` (${spell.nameext})`;
+
+		}
+
+		if (spell.levelnames) {
+
+			levelName = getGcaLevelName(spell);
+
+			fullName += ` (${levelName})`;
 
 		}
 
