@@ -26423,12 +26423,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let miscNotes = jsonData.Character.Description + "\n\n" + jsonData.Character.Notes;
 
+		let jsonSM = getTraitFromGcaAttributes(attributes, "Size Modifier");
+
+		let sizeModifier = 0;
+
+		if (jsonSM && jsonSM.level) {
+			sizeModifier = jsonSM.level;
+		}
+
 		let updates = {
 			fullname:              general.name,
 			playername:            general.playername,
 			race:                  general.race,
 			height:                general.height,
 			weight:                general.weight,
+			sm:                    sizeModifier,
 			age:                   general.age,
 			general_appearance:    general.appearance,
 			total_points:          basePoints,
@@ -26450,6 +26459,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 			basic_speed_points:    getCharacterPointsFromGcaAttributes(attributes, "Basic Speed"),
 			basic_move_points:     getCharacterPointsFromGcaAttributes(attributes, "Basic Move"),
 		};
+
+		updates = importNaturalAttacksFromGca(updates, attributes);
 
 		setAttrs(updates, {silent: false}, callback);
 
@@ -26490,6 +26501,32 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
+	 * Find a matching trait based name
+	 * 
+	 * @param json   attributes A list of attributes
+	 * @param string name       Name of attribute to find
+	 * 
+	 * @return json Json element 
+	 */
+	function getTraitFromGcaAttributes(attributes, name) {
+
+		let trait;
+
+		attributes.forEach(attribute => {
+
+			if (attribute.name.toLowerCase() === name.toLowerCase()) {
+
+				trait = attribute;
+
+			}
+
+		});
+
+		return trait;
+
+	}
+
+	/**
 	 * Get the character points for an advantage
 	 *
 	 * @param json   advantages JSON Advantages data. Array of elements
@@ -26523,7 +26560,38 @@ The attacker may choose to hit the original target or the limb you used to parry
 		return points;
 	}
 
-	const IGNORED_ADVANTAGES = [
+	const GCA_NATURAL_MELEE_ATTACKS = [
+		"Bite",
+		"Punch",
+		"Kick",
+	];
+
+	/**
+	 * Import natural attacks like punch and bite to melee/range tables
+	 * Based on standard attributes from GCA
+	 * 
+	 * @param object updates    Object of Roll20 fields to update
+	 * @param json   attributes A list of CGA attributes
+	 * 
+	 * @return object Return updates with new fields
+	 */
+	function importNaturalAttacksFromGca(updates, attributes) {
+
+		GCA_NATURAL_MELEE_ATTACKS.forEach( name => {
+
+			trait = getTraitFromGcaAttributes(attributes, name);
+
+			if (trait) {
+				updates = getMeleeAttackFromGcaTrait(updates, trait);
+			}
+
+		});
+
+		return updates;
+
+	}
+
+	const GCA_IGNORED_ADVANTAGES = [
 		"Acute Vision",
 		"Acute Hearing",
 		"Acute Taste and Smell",
@@ -26956,7 +27024,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 					basedon = advantage.basedon;
 				}
 
-				if (!IGNORED_ADVANTAGES.includes(name)) {
+				if (!GCA_IGNORED_ADVANTAGES.includes(name)) {
 
 					saveRows = true;
 
