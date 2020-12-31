@@ -26676,11 +26676,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		rows[`${baseFieldName}_name`] = fullName;
 
-		let damage = trait.chardamage;
-
-		// replace "d" with "d6"
-		damage = damage.replace("d", "d6");
-
+		let damage = getDamageDieFromGca(trait.chardamage);
+		
 		rows[`${baseFieldName}_damage`] = damage;
 
 		rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
@@ -26804,10 +26801,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_name`] = fullName;
 
-			let damage = trait.chardamage;
-
-			// replace "d" with "d6"
-			damage = damage.replace("d", "d6");
+			let damage = getDamageDieFromGca(trait.chardamage);
 
 			rows[`${baseFieldName}_damage`] = damage;
 			
@@ -26840,6 +26834,126 @@ The attacker may choose to hit the original target or the limb you used to parry
 		}
 
 		return rows;
+	}
+
+	/**
+	 * Get Damage Die roll for use with Roll20
+	 * Will convert variable die rolls to Roll20 macro prompt
+	 */
+	function getDamageDieFromGca(damageDie) {
+
+		let dieRoll;
+
+		if (damageDie.includes("~")) {
+
+			// example: ~1d+1
+			// remove ~
+			damageDie = damageDie.replace("~", "");
+
+			// array = [1, +1]
+			let arrDamageDie = damageDie.split("d");
+
+			let baseDie = 1;
+
+			let dieModifier = "0";
+
+			if (arrDamageDie.length === 1) {
+
+				baseDie = arrDamageDie[0];
+
+			} else if (arrDamageDie.length === 2) {
+
+				baseDie = arrDamageDie[0];
+
+				dieModifier = arrDamageDie[0];
+
+			}
+			
+			dieRoll = getNumberOfDicePrompt(baseDie, dieModifier);
+
+		} else {
+
+			dieRoll = damageDie.replace("d", "d6");
+		}
+
+		return dieRoll;
+
+	}
+
+	/**
+	 * Returns a Roll20 prompt macro to select number of dice for a roll
+	 * example: GCA Roll = ~2d+1. 
+	 *          baseDie = 1
+	 * 			dieModifier = 1
+	 * 			return a macro: ?{# of Dice|1d6|2d6|3d6|4d6|5d6}
+	 * 
+	 * @param int baseDie Base die roll
+	 * @param int dieModifier Modifier applied to the die roll
+	 * @param int optionCount Number of options to include in the drop-down
+	 * 
+	 * @return string Roll20 Macro Prompt
+	 */
+	function getNumberOfDicePrompt(baseDie, dieModifier, optionCount = 9) {
+
+		let prompt;
+
+		let arrOptions = [];
+
+		let option;
+
+		let optionDie;
+
+		let optionDieMod;
+
+		let options;
+
+		// makee sure baseDie is a number
+		baseDie = Number(baseDie);
+		if (isNaN(baseDie)) {
+			baseDie = 1;
+		}
+
+		dieModifier = Number(dieModifier);
+		if (isNaN(dieModifier)) {
+			dieModifier = 0;
+		}
+
+		if (optionCount < 0) {
+			optionCount = 1;
+		}
+
+		// create the options
+		for (counter = 1; counter <= optionCount; counter++) {
+
+			optionDie = counter * baseDie;
+
+			optionDieMod = counter * dieModifier;
+
+			if (optionDieMod === 0) {
+
+				option = `${optionDie}d6`;
+
+			} else if (optionDieMod > 0) {
+
+				option = `${optionDie}d6+${optionDieMod}`;
+
+			} else {
+
+				option = `${optionDie}d6-${optionDieMod}`;
+
+			}
+			
+			arrOptions.push(option);
+
+		}
+
+		
+		options = arrOptions.join("|");
+
+		prompt = `?{# of Die|${options}}`;
+
+		return prompt;
+		
 	}
 
 	
