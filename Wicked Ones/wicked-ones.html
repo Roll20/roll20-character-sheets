@@ -5,10 +5,66 @@
     </div>
     <div class="sheet-gear">
       <div class="header" data-i18n="gear">Gear</div>
-        <fieldset class="repeating_gear">
-          <input type="text" name="attr_gear"/>
+      <fieldset class="repeating_gear">
+        <input type="text" name="attr_gear"/>
+      </fieldset>
+      <div class="header">
+        <span data-i18n="supply">Supply</span>
+        <input type="hidden" class="toggle complex" name="attr_supply-settings"/>
+        <button type="action" name="act_toggle-supply-settings" class="toggle symbol">
+          <span>y</span>
+        </button>
+        <span class="complex normal" data-i18n="slots"> Slots</span>
+        <input type="number" name="attr_supply-slots" min="2" max="5" class="complex" />
+        <input type="hidden" name="attr_supply-slots" class="extra"/>
+        <span class="spacer"></span>
+        <input type="hidden" class="toggle" name="attr_supply1" />
+        <button type="action" name="act_toggle-supply1" class="toggle square extra1">
+          <span></span>
+        </button>
+        <input type="hidden" class="toggle" name="attr_supply2" />
+        <button type="action" name="act_toggle-supply2" class="toggle square extra2">
+          <span></span>
+        </button>
+        <input type="hidden" class="toggle" name="attr_supply3" />
+        <button type="action" name="act_toggle-supply3" class="toggle square extra3">
+          <span></span>
+        </button>
+        <input type="hidden" class="toggle" name="attr_supply4" />
+        <button type="action" name="act_toggle-supply4" class="toggle square extra4">
+          <span></span>
+        </button>
+        <input type="hidden" class="toggle" name="attr_supply5" />
+        <button type="action" name="act_toggle-supply5" class="toggle square extra5">
+          <span></span>
+        </button>
+      </div>
+      <div>
+        <input type="hidden" class="toggle complex" name="attr_supply-settings" />
+        <fieldset class="repeating_supply">
+          <span class="textplus">
+            <input type="text" name="attr_supply" size="10">
+            <input type="hidden" name="attr_extra-supply-item" class="extra"/>
+            <input type="hidden" class="toggle" name="attr_extra-supply1" />
+            <button type="action" name="act_toggle-extra-supply1" class="toggle square extra1">
+              <span></span>
+            </button>
+            <input type="hidden" class="toggle" name="attr_extra-supply2" />
+            <button type="action" name="act_toggle-extra-supply2" class="toggle square extra2">
+              <span></span>
+            </button>
+            <input type="hidden" class="toggle" name="attr_extra-supply3" />
+            <button type="action" name="act_toggle-extra-supply3" class="toggle square extra3">
+              <span></span>
+            </button>
+          </span>
+          <span class="complex">
+            <span data-i18n="extra-slots">Extra Slots</span>
+            <input type="number" name="attr_extra-supply-item" min="0" max="3"/>
+          </span>
+          
         </fieldset>
-      <div class="header" data-i18n="supply">Supply</div>
+      </div>
     </div>
     <div class="sheet-stress">
       Stress & Defenses
@@ -27,8 +83,8 @@
     <div class="sheet-duties">
       <div class="header"> 
         <span data-i18n="dungeon-duties">Dungeon Duties</span>
-        <input type="hidden" class="direction" name="attr_hide-duties" value="show"/>
-        <button type="action" name="act_toggle-duties" class="toggle">
+        <input type="hidden" class="toggle" name="attr_hide-duties" value="show"/>
+        <button type="action" name="act_toggle-duties" class="toggle arrow">
           <span class="show">▼</span>
           <span class="hide">◄</span>
         </button>
@@ -52,7 +108,7 @@
     <div class="sheet-downtime clocks">
       <div class="header">
         <span data-i18n="downtime-projects">Downtime Projects</span>
-        <input type="hidden" class="direction" name="attr_hide-downtime-list" value="show"/>
+        <input type="hidden" class="toggle arrow" name="attr_hide-downtime-list" value="show"/>
         <button type="action" name="act_toggle-downtime-list" class="toggle">
           <span class="show">▼</span>
           <span class="hide">◄</span>
@@ -152,17 +208,48 @@
   </div>
 </div>
 <script type="text/worker">
+  on("sheet:opened", function(eventInfo) {
+    getAttrs(["supply-slots"], function(v){
+      set = {};
+      if (v["supply-slots"] === "") set["supply-slots"] = 2;
+      setAttrs(set);
+    });
+  });
+
   on("clicked:toggle-downtime-list clicked:toggle-duties", function(eventInfo) {
     //get the right attribute for the button we clicked
     var attr = eventInfo.triggerName.replace("clicked:toggle", "hide")
     
+    toggle(attr, "hide", "show")
+
+    //console.log(eventInfo);
+  });
+
+  function toggle(attr, on, off){
     // Check the current value of the hidden attribute.
+    //console.log(arguments)
     getAttrs([attr], function(v) {
-      console.log(v)
       // Toggle the hidden attribute value between "hide" and "show"
       var set = {}
-      set[attr] = v[attr] !== "hide" ? "hide" : "show"
+      set[attr] = v[attr] !== on ? on : off
       setAttrs(set);
+      //console.log(set);
     });
+  }
+
+  function eventList(count, ...events) {
+    var nums = [...Array(count).keys()].map(v => v + 1);
+    return events.flatMap( e => nums.map( v => e + v)).join(" ");
+  }
+
+  on(eventList(5, "clicked:toggle-supply", "clicked:repeating_supply:toggle-extra-supply"), function(eventInfo){
+    var attr = eventInfo.triggerName.replace(/clicked:(repeating_.+?_)?.*toggle-/, "$1")
+    toggle(attr, "used", "0");
+    //console.log(eventInfo);
+  });
+
+
+  on("clicked:toggle-supply-settings", function(){
+    toggle("supply-settings", "show", "hide")
   });
 </script>
