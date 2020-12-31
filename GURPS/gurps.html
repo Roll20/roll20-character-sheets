@@ -10757,6 +10757,8 @@ visualize what it will look like in chat.
 								<span class="checkbox"></span>
 								<div class="row row-stats">
 									<div class="cell col0">
+										<!-- idkey is the key used by either GCA or GCS. Can be used to update and advantage instead of just adding -->
+										<input type="hidden" name="attr_idkey" />
 										<input type="text" name="attr_name" title="Macro table name: repeating_melee. Field name: name" />
 									</div>
 									<div class="cell col1">
@@ -26543,7 +26545,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (Array.isArray(trait)) {
 			traits = trait;
-		} else {
+		} else if (trait) {
 			// convert to an array
 			traits = [trait];
 		}
@@ -26551,6 +26553,377 @@ The attacker may choose to hit the original target or the limb you used to parry
 		return traits;
 
 	}
+
+	/**
+	 * If trait has melee stats, create entry on melee table
+	 *
+	 * @param object rows  Object of properties to update/add rows
+	 * @param json   trait JSON data for the trait
+	 * 
+	 * @return object
+	 */
+	function getMeleeAttackFromGcaTrait(rows, trait) {
+
+		if (trait.charreach && trait.mode && trait.mode.includes("|")) {
+
+			rows = getMultipleMeleeAttackModesFromGcaTrait(rows, trait);
+
+		} else if (trait.charreach) {
+
+			rows = getSingleMeleeAttackModeFromGcaTrait(rows, trait);
+
+		}
+
+		return rows;
+
+	}
+
+
+	/**
+	 * If trait only has a single attack mode, use this function
+	 *
+	 * @param object rows  Object of properties to update/add rows
+	 * @param json   trait JSON data for the trait
+	 * 
+	 * @return object
+	 */
+	 function getSingleMeleeAttackModeFromGcaTrait(rows, trait) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = trait.IDKey.trim();
+
+		let baseFieldName = `repeating_melee_${rowId}`;
+
+		let fullName = trait.name;
+
+		if (trait.nameext) {
+
+			fullName += ` (${trait.nameext})`;
+
+		}
+
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		let damage = trait.chardamage;
+
+		// replace "d" with "d6"
+		damage = damage.replace("d", "d6");
+
+		rows[`${baseFieldName}_damage`] = damage;
+
+		rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
+
+		rows[`${baseFieldName}_reach`] = trait.charreach;
+
+		rows[`${baseFieldName}_skill`] = trait.charskillscore;
+
+		rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait);
+
+		return rows;
+
+	}
+
+	/**
+	 * The melee attack has several modes
+	 * Need a row for each attack mode
+	 * 
+	 * @param object rows  Object of properties to update/add rows
+	 * @param json   trait JSON data for the trait
+	 * 
+	 * @return object
+	 */ 
+	function  getMultipleMeleeAttackModesFromGcaTrait(rows, trait) {
+
+		// example: "mode": "Staff swing|Staff thrust|Sword swing|Sword thrust"
+		let arrModes = trait.mode.split("|");
+
+		// example: "chardamage": "1d+1|1d|1d+1|1d-1",
+		let arrDamage = trait.chardamage.split("|");
+
+		// example: "chardamtype": "cr|cr|cr|cr",
+		let arrDamType = trait.chardamtype.split("|");
+
+		// example: "charreach": "1,2|1,2|1,2|2"
+		let arrReach = trait.charreach.split("|");
+
+		// example: "charskillscore": "11|11|5|5"
+		let arrSkillLevel = trait.charskillscore.split("|");
+
+		// example: "charskillused": "\"SK:Staff\"|\"SK:Staff\"|\"ST:DX\"-5|\"ST:DX\"-5"
+		let arrSkillUsed = trait.charskillused.split("|");
+
+		// tracks which mode to use
+		let index = 0;
+
+		arrModes.forEach(mode => {
+
+			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+			let rowId = generateRowID();
+
+			let idkey = trait.IDKey.trim() + `-mode-${index}`;
+
+			let baseFieldName = `repeating_melee_${rowId}`;
+
+			let fullName = trait.name;
+
+			if (trait.nameext) {
+
+				fullName += ` (${trait.nameext})`;
+
+			}
+
+			fullName += ` (${mode})`;
+
+			rows[`${baseFieldName}_idkey`] = idkey;
+
+			rows[`${baseFieldName}_name`] = fullName;
+
+			let damage = arrDamage[index];
+
+			// replace "d" with "d6"
+			damage = damage.replace("d", "d6");
+
+			rows[`${baseFieldName}_damage`] = damage;
+
+			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
+
+			rows[`${baseFieldName}_reach`] = arrReach[index];
+
+			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
+
+			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index]);
+
+			index++;
+
+		});
+
+		return rows;
+
+	}
+
+	/**
+	 * If trait has ranged stats, create entry on ranged table
+	 *
+	 * @param object rows  Object of properties to update/add rows
+	 * @param json   trait JSON data for the trait
+	 * 
+	 * @return object
+	 */
+	function getRangedAttackFromGcaTrait(rows, trait) {
+
+		if (trait.characc) {
+
+			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+			let rowId = generateRowID();
+
+			let idkey = trait.IDKey.trim();
+
+			let baseFieldName = `repeating_ranged_${rowId}`;
+
+			let fullName = trait.name;
+
+			if (trait.nameext) {
+
+				fullName += ` (${trait.nameext})`;
+
+			}
+
+			rows[`${baseFieldName}_idkey`] = idkey;
+
+			rows[`${baseFieldName}_name`] = fullName;
+
+			let damage = trait.chardamage;
+
+			// replace "d" with "d6"
+			damage = damage.replace("d", "d6");
+
+			rows[`${baseFieldName}_damage`] = damage;
+			
+			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
+
+			rows[`${baseFieldName}_acc`] = trait.characc;
+
+			rows[`${baseFieldName}_range`] = getRangeFromGca(trait);
+
+			rows[`${baseFieldName}_skill`] = trait.charskillscore;
+
+			if (trait.charrof) {
+				rows[`${baseFieldName}_rof`] = trait.charrof;
+			}
+
+			if (trait.charshots) {
+				rows[`${baseFieldName}_shots`] = trait.charshots;
+			}
+
+			if (trait.bulk) {
+				rows[`${baseFieldName}_bulk`] = trait.bulk;
+			}
+
+			if (trait.charrcl) {
+				rows[`${baseFieldName}_recoil`] = trait.charrcl;
+			}
+			
+			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait);
+
+		}
+
+		return rows;
+	}
+
+	
+	/**
+	 * Gets ranged/melee notes GCA trait
+	 * 
+	 * @param json   trait     JSON data for the trait
+	 * @param string skillUsed Used for multimode attack. Replaces trait.charskillused
+	 * 
+	 * @return string
+	 */ 
+	function getRangedMeleeNotesFromGca(trait, skillUsed = "") {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (trait.usernotes) {
+			arrNotes.push(trait.usernotes + "\n"); 
+		}
+
+		if (skillUsed) {
+
+			arrNotes.push("Skill: " + skillUsed + "\n");
+
+		} else if (trait.charskillused) {
+
+			arrNotes.push("Skill: " + trait.charskillused + "\n");
+
+		}
+
+		if (trait.damage && trait.damtype) {
+
+			arrNotes.push(`Damage: ${trait.damage} (${trait.damtype})` + "\n");
+
+		} else if (trait.damage) {
+
+			arrNotes.push(`Damage: ${trait.damage}` + "\n");
+
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+	}
+
+	/**
+	 * Gets ranged value from GCA trait
+	 * 
+	 * @param json trait JSON data for the trait
+	 * 
+	 * @return string
+	 */ 
+	function getRangeFromGca(trait) {
+
+		let range = "";
+
+		if (trait.charrangehalfdam && trait.charrangemax) {
+
+			range = trait.charrangehalfdam + "/" + trait.charrangemax; 
+		
+		} else if (trait.charrangehalfdam) {
+			
+			range = trait.charrangehalfdam; 
+		
+		} else if (trait.charrangemax) {
+		
+			range = trait.charrangemax; 
+		
+		}
+
+		return range;
+			
+	}
+
+	/**
+	 * Gets the roll20 damage type based GCA damage type
+	 * 
+	 * @param string gcaDamageType GCA damage type
+	 */
+	function getDamageTypeFromGca(gcaDamageType) {
+
+		let type = "";
+
+		switch(gcaDamageType) {
+
+			case "aff":
+				type = "Affliction (aff)";
+				break;
+
+			case "burn":
+				type = "Burning (burn)";
+				break;
+
+			case "cor":
+				type = "Corrosion (cor)";
+				break;
+
+			case "cr":
+				type = "Crushing (cr)";
+				break;
+
+			case "cut":
+				type = "Cutting (cut)";
+				break;
+
+			case "fat":
+				type = "Fatigue (fat)";
+				break;
+
+			case "imp":
+				type = "Impaling (imp)";
+				break;
+
+			case "pi-":
+				type = "Small Piercing (pi-)";
+				break;
+
+			case "pi":
+				type = "Piercing (pi)";
+				break;
+
+			case "pi+":
+				type = "Large Piercing (pi+)";
+				break;
+
+			case "pi++":
+				type = "Huge Piercing (pi++)";
+				break;
+
+			case "knock":
+				type = "Knockback (knock)";
+				break;
+
+			case "tox":
+				type = "Toxic (tox)";
+				break;
+
+			case "spec":
+			default:
+				type = "Special (spec)";
+				break;
+
+
+		}
+		
+		return type;
+
+	}
+
 
 	/**
 	 * Loops advantages and add advantages
@@ -26602,6 +26975,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 					} else {
 
 						rows = getGcaAdvantageRow(rows, name, advantage);
+
+						rows = getMeleeAttackFromGcaTrait(rows, advantage);
+
+						rows = getRangedAttackFromGcaTrait(rows, advantage);
 					}
 
 					rows = getGcaBonusesForAdvantage(rows, name, advantage);
@@ -26630,6 +27007,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * @param object rows      Object of properties to update/add rows
 	 * @param string name      Name of the advantage
 	 * @param json   advantage JSON data for the advantage
+	 * 
+	 * @return object
 	 */
 	function getGcaAdvantageRow(rows, name, advantage) {
 
@@ -27340,6 +27719,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_ref`] = skill.page;
 		}
 
+		if (skill.tl) {
+			rows[`${baseFieldName}_tl`] = skill.tl;
+		}
+
 		let [attributeValue, difficultyValue] = getSkillAttributeDifficultyForGca(skill.type);
 		
 		rows[`${baseFieldName}_base`] = attributeValue;
@@ -27729,6 +28112,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 				let name = item.name;
 
 				rows = getGcaValuesForEquipment(rows, name, item);
+
+				rows = getMeleeAttackFromGcaTrait(rows, item);
+
+				rows = getRangedAttackFromGcaTrait(rows, item);
 				
 			});
 
@@ -27858,6 +28245,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 					let name = spell.name;
 
 					rows = getGcaValuesForSpell(rows, name, spell, magery);
+
+					rows = getMeleeAttackFromGcaTrait(rows, spell);
+
+					rows = getRangedAttackFromGcaTrait(rows, spell);
 					
 				});
 
@@ -27941,6 +28332,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 		}
 
 		rows[`${baseFieldName}_spell_notes`] = getSpellNotesFromGcaSpell(spell);
+
+		if (spell.ref) {
+
+			rows[`${baseFieldName}_ref`] = spell.page;
+		
+		}
 		
 		return rows;
 
