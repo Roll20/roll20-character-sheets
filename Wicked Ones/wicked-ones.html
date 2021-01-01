@@ -97,7 +97,7 @@
       <div class="header">
         <span data-i18n="stress">Stress</span>
       </div>
-      <div class="feral" data-i18n="go-feral">When the Clock is full, you Go Feral.</div>
+      <div class="feral" data-i18n="go-feral-stress">When the Clock is full, you Go Feral.</div>
       <div class="stress-clock">
         <input class="size" type="hidden" name="attr_stress-size" value="6"/>
         <div class="clock-container">
@@ -383,6 +383,38 @@
           <span data-i18n="threaten">Threaten</span> &nbsp; <em class="normal" data-i18n="forcefully"> / forcefully</em>
         </div>
       </div>
+      <div class="small header">
+        <input type="hidden" name="attr_bloodied" class="toggle"/>
+        <button type="action" name="act_toggle-bloodied" class="toggle diamond"></button>
+        <span data-i18n="bloodied">Bloodied</span>
+      </div>
+      <div class="small header">
+        <span data-i18n="dark-hearts">Dark Hearts</span>
+        <input type="hidden" name="attr_dark-heart1" class="toggle"/>
+        <button type="action" name="act_toggle-dark-heart1" class="toggle diamond"></button>
+        <input type="hidden" name="attr_dark-heart2" class="toggle"/>
+        <button type="action" name="act_toggle-dark-heart2" class="toggle diamond"></button>
+      </div>
+      <div>
+        <ul>
+          <li><strong data-i18n="assist">Assist</strong>: <span data-i18n="assist-desc">Give +Effect, but open to consequence.</span></li>
+          <li><strong data-i18n="go-hard">Go Hard</strong>: <span data-i18n="go-hard-desc">Trade +Effect for &#8209;Position.</span></li>
+          <li><strong data-i18n="team-up">Team Up</strong>: <span data-i18n="team-up-desc">Take the highest result, but each PC with a Mixed or Failure takes stress.</span></li>
+          <li><strong data-i18n="dark-bargain">Dark Bargain</strong>: <span data-i18n="dark-bargain-desc">Trade +1D for a Consequence.</span></li>
+          <li><strong data-i18n="dark-heart">Dark Heart</strong>: <span data-i18n="dark-heart-desc">Take +1D on a roll.</span></li>
+        </ul>
+      </div>
+      <div>
+        <hr/>
+      </div>
+      <div>
+        <ul>
+          <li><strong data-i18n="shock">Shock</strong>: <span data-i18n="shock-desc">Take &#8209;1D on next roll, then clears.</span></li>
+          <li><strong data-i18n="bloodied">Bloodied</strong>: <span data-i18n="bloodied-desc">Take Shock to all Attributes, and clears when all Shock is clear.</span></li>
+          <li><strong data-i18n="death-knell">Death Knell</strong>: <span data-i18n="death-knell-desc">Take a Final Action if you have a Dark Heart left when you die.</span></li>
+          <li><strong data-i18n="go-feral">Go Feral</strong>: <span data-i18n="go-feral-desc">Immediately Compelled; Abilities used during this Action cost no Stress.</span></li>
+        </ul>
+      </div>
     </div>
     <div class="sheet-friend">
       Vile Friend
@@ -436,14 +468,20 @@
     return events.flatMap( e => nums.map( v => e + v)).join(" ");
   }
 
-  on(eventList(5, "clicked:toggle-supply", "clicked:repeating_supply:toggle-extra-supply"), function(eventInfo){
+  on(eventList(5, "clicked:toggle-supply", "clicked:repeating_supply:toggle-extra-supply", "clicked:toggle-dark-heart"), function(eventInfo){
     var attr = eventInfo.triggerName.replace(/clicked:(repeating_.+?_)?.*toggle-/, "$1")
     toggle(attr, "used", "0");
     //console.log(eventInfo);
   });
 
-  on("clicked:repeating_defense:toggle-defense-used", function(eventInfo){
-    toggle("repeating_defense_defense-used", "used", "0");
+  //on("clicked:repeating_defense:toggle-defense-used", function(eventInfo){
+  //  toggle("repeating_defense_defense-used", "used", "0");
+  //});
+
+  on("clicked:repeating_defense:toggle-defense-used clicked:toggle-brains-shock clicked:toggle-muscles-shock clicked:toggle-guts-shock clicked:toggle-bloodied", function(eventInfo){
+    console.log(eventInfo)
+    var attr = eventInfo.triggerName.replace(/clicked:(repeating_.+?_)?.*toggle-/, "$1")
+    toggle(attr,"used","0")
   });
 
   on("clicked:toggle-supply-settings", function(){
@@ -464,12 +502,6 @@
     setAttrs({
       revelry: rev
     });
-  });
-
-  on("clicked:toggle-brains-shock clicked:toggle-muscles-shock clicked:toggle-guts-shock", function(eventInfo){
-    var attr = eventInfo.triggerName.replace("clicked:toggle-", "")
-    toggle(attr,"used","0")
-    console.log(attr)
   });
 
   on(eventList(3,"clicked:scan","clicked:tinker","clicked:trick","clicked:finesse","clicked:skulk","clicked:smash","clicked:banter","clicked:invoke","clicked:threaten"), function(eventInfo){
