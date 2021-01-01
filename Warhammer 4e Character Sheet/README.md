@@ -16,9 +16,11 @@ December 28st 2020 v1.3
 - Crit/fumble logic update: Auto Failure on 99 roll result, will always result in a fumble, even if target is above 100.
 - Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
 - Roll template now has Critical / Fumble(Oops) / Miscast / Wrath buttons integrated, they only show when these events happen and are useable by anyone with control of that character sheet.
+- Advanded Skills will now always have base skill 0 (unmodified) when they are not Taken (i.e. trained). This is intended to prevent any untaken advanced skills to be rolled by accident. Note Ranged Crossbow and Ranged Thrown are always rollable as per core rules. Also fixed Rt header display for advanced grouped skills which will now display the user entered name field as well as the grouped skill name.
 - Marginal fail rolls (-0) will now show correctly in SL results
 - Corruption Section now has a Max Corruption value field, based on TB+WPB.
 - New hard coded skills for Channelling Witch, Dark & Chaos added.
+- Roll Tags have been added to the formulas for all combat skills. Other skills to follow.
 - Added some further missing translation tags.
 
 
