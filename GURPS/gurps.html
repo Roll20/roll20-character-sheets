@@ -15451,7 +15451,7 @@ visualize what it will look like in chat.
 </div>
 
 <script type="text/worker">
-	
+	 
 	// this type is required by roll20, be sure to set before uploading
 	// type="text/worker"
 	
@@ -26316,7 +26316,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	// close roll modifiers, no updates
 	on("clicked:import_gca", (event) => {
 
-		setAttrs({"import_message": "Processing"});
+		setAttrs({"import_message": "Processing... If message doesn't clear, an error occurred."});
 
 		importGCA();
 
@@ -26399,27 +26399,33 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function importCharacterSheetWithGCA(jsonData, mod_cascade) {
 
-		importGcaNonRepeatingFields(jsonData, () => {
+		// keeps track of running totals
+		let runningTotals = {
+			"stun_check_mod": 0,
+			"knockdown_check_mod": 0,
+			"unconscious_check_mod": 0,
+			"death_check_mod": 0,
+			"import_message": "Import has completed.",
+			"json_data": ""
+		};
 
-			importGcaAdvantages(jsonData, () => {
+		importGcaNonRepeatingFields(jsonData, runningTotals, () => {
 
-				importGcaPerksQuirks(jsonData, () => {
+			importGcaAdvantages(jsonData, runningTotals, () => {
 
-					importGcaDisadvantages(jsonData, () => {
+				importGcaPerksQuirks(jsonData, runningTotals, () => {
 
-						importGcaSkills(jsonData, () => {
+					importGcaDisadvantages(jsonData, runningTotals, () => {
 
-							importGcaTechniques(jsonData, () => {
+						importGcaSkills(jsonData, runningTotals, () => {
 
-								importGcaEquipment(jsonData, () => {
+							importGcaTechniques(jsonData, runningTotals, () => {
 
-									importGcaSpells(jsonData, () => {
+								importGcaEquipment(jsonData, runningTotals, () => {
 
-										setAttrs({
-											"import_message": "Import has completed.",
-											"json_data": ""
-										});
+									importGcaSpells(jsonData, runningTotals, () => {
 
+										setAttrs(runningTotals);
 
 									});
 								
@@ -26442,10 +26448,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Update non-repeating fields, then process callback function
 	 *
-	 * @param json     jsonData GCA json data
-	 * @param function callback Function to run next
+	 * @param json     jsonData      GCA json data
+	 * @param object   runningTotals An object that keeps track of running totals
+	 * @param function callback      Function to run next
 	 */
-	function importGcaNonRepeatingFields(jsonData, callback) {
+	function importGcaNonRepeatingFields(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -26544,7 +26551,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			basic_move_points:     getCharacterPointsFromGcaAttributes(attributes, "Basic Move"),
 		};
 
-		updates = importNaturalAttacksFromGca(updates, attributes);
+		importNaturalAttacksFromGca(updates, attributes);
 
 		setAttrs(updates, {silent: false}, callback);
 
@@ -26666,10 +26673,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Import natural attacks like punch and bite to melee/range tables
 	 * Based on standard attributes from GCA
 	 * 
-	 * @param object updates    Object of Roll20 fields to update
+	 * @param object updates    Object of Roll20 fields to update. Passed by reference
 	 * @param json   attributes A list of CGA attributes
-	 * 
-	 * @return object Return updates with new fields
 	 */
 	function importNaturalAttacksFromGca(updates, attributes) {
 
@@ -26678,12 +26683,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			trait = getTraitFromGcaAttributes(attributes, name);
 
 			if (trait) {
-				updates = getMeleeAttackFromGcaTrait(updates, trait);
+				getMeleeAttackFromGcaTrait(updates, trait, true);
 			}
 
 		});
-
-		return updates;
 
 	}
 
@@ -26721,24 +26724,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * If trait has melee stats, create entry on melee table
 	 *
-	 * @param object rows  Object of properties to update/add rows
+	 * @param object rows  Object of properties to update/add rows. passed by reference
 	 * @param json   trait JSON data for the trait
-	 * 
-	 * @return object
+	 * @param bool   force Force function to process single melee attack
 	 */
-	function getMeleeAttackFromGcaTrait(rows, trait) {
+	function getMeleeAttackFromGcaTrait(rows, trait, force = false) {
 
-		if (trait.charreach && trait.mode && trait.mode.includes("|")) {
+		if (trait.mode && trait.mode.includes("|") && trait.charreach && trait.charreach !== "|") {
 
-			rows = getMultipleMeleeAttackModesFromGcaTrait(rows, trait);
+			getMultipleMeleeAttackModesFromGcaTrait(rows, trait);
 
-		} else if (trait.charreach) {
+		} else if ( force || (trait.charreach && trait.charreach !== "|")) {
 
-			rows = getSingleMeleeAttackModeFromGcaTrait(rows, trait);
+			getSingleMeleeAttackModeFromGcaTrait(rows, trait);
 
 		}
-
-		return rows;
 
 	}
 
@@ -26746,12 +26746,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * If trait only has a single attack mode, use this function
 	 *
-	 * @param object rows  Object of properties to update/add rows
+	 * @param object rows  Object of properties to update/add rows. passed by reference
 	 * @param json   trait JSON data for the trait
 	 * 
 	 * @return object
 	 */
-	 function getSingleMeleeAttackModeFromGcaTrait(rows, trait) {
+	function getSingleMeleeAttackModeFromGcaTrait(rows, trait) {
 
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
@@ -26798,20 +26798,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 		
 		}
 
-		return rows;
-
 	}
 
 	/**
 	 * The melee attack has several modes
 	 * Need a row for each attack mode
 	 * 
-	 * @param object rows  Object of properties to update/add rows
+	 * @param object rows  Object of properties to update/add rows. passed by reference
 	 * @param json   trait JSON data for the trait
-	 * 
-	 * @return object
 	 */ 
-	function  getMultipleMeleeAttackModesFromGcaTrait(rows, trait) {
+	function getMultipleMeleeAttackModesFromGcaTrait(rows, trait) {
 
 		// example: "mode": "Staff swing|Staff thrust|Sword swing|Sword thrust"
 		let arrModes = trait.mode.split("|");
@@ -26822,6 +26818,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// example: "chardamtype": "cr|cr|cr|cr",
 		let arrDamType = trait.chardamtype.split("|");
 
+		let damageNote = "";
+
 		// example: "charreach": "1,2|1,2|1,2|2"
 		let arrReach = trait.charreach.split("|");
 
@@ -26830,6 +26828,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		// example: "charskillused": "\"SK:Staff\"|\"SK:Staff\"|\"ST:DX\"-5|\"ST:DX\"-5"
 		let arrSkillUsed = trait.charskillused.split("|");
+
+		// example: "chararmordivisor": "|3",
+		let arrDivisor = [];
+
+		if (trait.chararmordivisor) {
+			arrDivisor = trait.chararmordivisor.split("|");
+		}
 
 		// tracks which mode to use
 		let index = 0;
@@ -26870,38 +26875,171 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
 
-			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index]);
+			damageNote = `${arrDamage[index]} (${arrDamType[index]})`;
 
-			if (trait.chararmordivisor) {
-		
-				rows[`${baseFieldName}_armor_divisor`] = trait.chararmordivisor;
+			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index], damageNote);
+
+			divisor = Number(arrDivisor[index]);
+
+			if (isNaN(divisor) || divisor < 1) {
+				divisor = 1;
+			}
+
+			rows[`${baseFieldName}_armor_divisor`] = divisor;
 			
-			}	
-
 			index++;
 
 		});
-
-		return rows;
 
 	}
 
 	/**
 	 * If trait has ranged stats, create entry on ranged table
 	 *
-	 * @param object rows  Object of properties to update/add rows
+	 * @param object rows  Object of properties to update/add rows. Passed by reference
 	 * @param json   trait JSON data for the trait
-	 * 
-	 * @return object
 	 */
 	function getRangedAttackFromGcaTrait(rows, trait) {
 
-		if (trait.characc) {
+		if (trait.mode && trait.mode.includes("|") && trait.characc && trait.characc !== "|") {
+
+			getMultipleRangedAttackModesFromGcaTrait(rows, trait);
+
+		} else if (trait.characc) {
+
+			getSingleRangedAttackModeFromGcaTrait(rows, trait);
+
+		}
+
+	}
+
+	/**
+	 * If trait only has a single attack mode, use this function
+	 *
+	 * @param object rows  Object of properties to update/add rows. Passed by reference
+	 * @param json   trait JSON data for the trait
+	 */
+	function getSingleRangedAttackModeFromGcaTrait(rows, trait) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = trait.IDKey.trim();
+
+		let baseFieldName = `repeating_ranged_${rowId}`;
+
+		let fullName = trait.name;
+
+		if (trait.nameext) {
+
+			fullName += ` (${trait.nameext})`;
+
+		}
+
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		let damage = getDamageDieFromGca(trait.chardamage);
+
+		rows[`${baseFieldName}_damage`] = damage;
+		
+		rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
+
+		rows[`${baseFieldName}_acc`] = trait.characc;
+
+		rows[`${baseFieldName}_range`] = getRangeFromGca(trait);
+
+		rows[`${baseFieldName}_skill`] = trait.charskillscore;
+
+		if (trait.charrof) {
+			rows[`${baseFieldName}_rof`] = trait.charrof;
+		}
+
+		if (trait.charshots) {
+			rows[`${baseFieldName}_shots`] = trait.charshots;
+		}
+
+		if (trait.bulk) {
+			rows[`${baseFieldName}_bulk`] = trait.bulk;
+		}
+
+		if (trait.charrcl) {
+			rows[`${baseFieldName}_recoil`] = trait.charrcl;
+		}
+		
+		if (trait.chararmordivisor) {
+	
+			rows[`${baseFieldName}_armor_divisor`] = trait.chararmordivisor;
+		
+		}
+		
+		rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait);
+
+	}
+
+	/**
+	 * The ranged attack has several modes
+	 * Need a row for each attack mode
+	 * 
+	 * @param object rows  Object of properties to update/add rows. Passed by reference
+	 * @param json   trait JSON data for the trait
+	*/ 
+	function  getMultipleRangedAttackModesFromGcaTrait(rows, trait) {
+
+		// example: "mode": "Staff swing|Staff thrust|Sword swing|Sword thrust"
+		let arrModes = trait.mode.split("|");
+
+		// example: "chardamage": "1d+1|1d|1d+1|1d-1",
+		let arrDamage = trait.chardamage.split("|");
+
+		// example: "chardamtype": "cr|cr|cr|cr",
+		let arrDamType = trait.chardamtype.split("|");
+
+		// example: "chararmordivisor": "|3",
+		let arrDivisor = [];
+
+		if (trait.chararmordivisor) {
+			arrDivisor = trait.chararmordivisor.split("|");
+		}
+
+		let divisor = 1;
+
+		// example: "charskillscore": "11|11|5|5"
+		let arrSkillLevel = trait.charskillscore.split("|");
+
+		// i.e: "characc": "4|4",
+		let arrAcc = trait.charrcl.split("|");
+
+		// i.e: "charrcl": "3|3",
+		let arrRecoil = trait.charrcl.split("|");
+
+		// "charrof": "3|3",
+		let arrRof = trait.charrof.split("|");
+
+		// "charshots": "20+1(3)|20+1(3)",
+		let arrShots = trait.charshots.split("|");
+
+		// "charskillused": "\"SK:Guns (Pistol)\"|\"SK:Guns (Pistol)\"",
+		let arrSkillUsed = trait.charskillused.split("|");
+
+		// "charrangehalfdam": "180|180",
+		let arrHalfRange = trait.charrangehalfdam.split("|");
+
+		// "charrangemax": "2000|2000",
+		let arrMaxRange = trait.charrangemax.split("|");
+
+		let damageNote = "";
+
+		// tracks which mode to use
+		let index = 0;
+
+		arrModes.forEach(mode => {
 
 			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 			let rowId = generateRowID();
 
-			let idkey = trait.IDKey.trim();
+			let idkey = trait.IDKey.trim() + `-mode-${index}`;
 
 			let baseFieldName = `repeating_ranged_${rowId}`;
 
@@ -26913,49 +27051,53 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			}
 
+			fullName += ` (${mode})`;
+
 			rows[`${baseFieldName}_idkey`] = idkey;
 
 			rows[`${baseFieldName}_name`] = fullName;
 
-			let damage = getDamageDieFromGca(trait.chardamage);
+			let damage = arrDamage[index];
+
+			// replace "d" with "d6"
+			damage = damage.replace("d", "d6");
 
 			rows[`${baseFieldName}_damage`] = damage;
+
+			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
+
+			rows[`${baseFieldName}_acc`] = arrAcc[index];
+
+			rows[`${baseFieldName}_range`] = getRangeFromHalfMax(arrHalfRange[index], arrMaxRange[index]);
+
+			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
+
+			rows[`${baseFieldName}_rof`] = arrRof[index];
+
+			rows[`${baseFieldName}_shots`] = arrShots[index];
 			
-			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
-
-			rows[`${baseFieldName}_acc`] = trait.characc;
-
-			rows[`${baseFieldName}_range`] = getRangeFromGca(trait);
-
-			rows[`${baseFieldName}_skill`] = trait.charskillscore;
-
-			if (trait.charrof) {
-				rows[`${baseFieldName}_rof`] = trait.charrof;
-			}
-
-			if (trait.charshots) {
-				rows[`${baseFieldName}_shots`] = trait.charshots;
-			}
-
 			if (trait.bulk) {
 				rows[`${baseFieldName}_bulk`] = trait.bulk;
 			}
 
-			if (trait.charrcl) {
-				rows[`${baseFieldName}_recoil`] = trait.charrcl;
-			}
+			rows[`${baseFieldName}_recoil`] = arrRecoil[index];
 			
-			if (trait.chararmordivisor) {
-		
-				rows[`${baseFieldName}_armor_divisor`] = trait.chararmordivisor;
-			
-			}
-			
-			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait);
+			divisor = Number(arrDivisor[index]);
 
-		}
+			if (isNaN(divisor) || divisor < 1) {
+				divisor = 1;
+			}
 
-		return rows;
+			rows[`${baseFieldName}_armor_divisor`] = divisor;
+			
+			damageNote = `${arrDamage[index]} (${arrDamType[index]})`;
+
+			rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index], damageNote);
+
+			index++;
+
+		});
+
 	}
 
 	/**
@@ -27084,10 +27226,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * 
 	 * @param json   trait     JSON data for the trait
 	 * @param string skillUsed Used for multimode attack. Replaces trait.charskillused
+	 * @param string damage    Used for multimode attack. Replaces trait.damage && trait.damtype
 	 * 
 	 * @return string
 	 */ 
-	function getRangedMeleeNotesFromGca(trait, skillUsed = "") {
+	function getRangedMeleeNotesFromGca(trait, skillUsed = "", damageNote = "") {
 
 		let arrNotes = [];
 
@@ -27107,7 +27250,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		}
 
-		if (trait.damage && trait.damtype) {
+		if (damageNote) {
+
+			arrNotes.push(`Damage: ${damageNote}` + "\n");
+
+		} else if (trait.damage && trait.damtype) {
 
 			arrNotes.push(`Damage: ${trait.damage} (${trait.damtype})` + "\n");
 
@@ -27115,6 +27262,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			arrNotes.push(`Damage: ${trait.damage}` + "\n");
 
+		}
+
+		if (trait.gives) {
+			arrNotes.push("Gives: " + trait.gives + "\n"); 
 		}
 
 		if (arrNotes.length) {
@@ -27154,6 +27305,36 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
+	 * Returns the range of a weapon
+	 * 
+	 * @param string halfRange Half damage range
+	 * @param string maxRange  Maximum range
+	 * 
+	 * @return string
+	 */
+	function getRangeFromHalfMax(halfRange, maxRange) {
+
+		let range = "";
+
+		if (halfRange && maxRange) {
+
+			range = halfRange + "/" + maxRange; 
+		
+		} else if (halfRange) {
+			
+			range = halfRange; 
+		
+		} else if (maxRange) {
+		
+			range = maxRange; 
+		
+		}
+
+		return range;
+			
+	}
+
+	/**
 	 * Gets the roll20 damage type based GCA damage type
 	 * 
 	 * @param string gcaDamageType GCA damage type
@@ -27161,6 +27342,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 	function getDamageTypeFromGca(gcaDamageType) {
 
 		let type = "";
+
+		// if damage type contains a space, there's an additional damage type present
+		// example: damage type = cr exp = Crush Explosive. 
+		// we only want "cr"
+
+		if (gcaDamageType.includes(" ")) {
+
+			let arrType = gcaDamageType.split(" ");
+
+			gcaDamageType = arrType[0];
+
+		}
 
 		switch(gcaDamageType) {
 
@@ -27233,17 +27426,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Loops advantages and add advantages
 	 * TODO: Check to see if advantage already exists, then update
 	 * 
-	 * @param json     jsonData Json DATA from GCA file
-	 * @param function callback A function to run after updating is complete
-	 * @return void
+	 * @param json     jsonData      Json DATA from GCA file
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      A function to run after updating is complete
 	 */
-	function importGcaAdvantages(jsonData, callback) {
+	function importGcaAdvantages(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
 
 		let advantages = getJsonArrayFromTrait(jsonData.Character.Traits.Advantage);
 
+		// rows is passed by reference
 		let rows = {};
 
 		let saveRows = false;
@@ -27266,26 +27460,26 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 					if (basedon == "Language - Native" || basedon == "Language - Native (Spoken)" || basedon == "Language - Native (Written)") {
 
-						rows = getGcaValuesForNativeLanguage(rows, name, basedon, advantage);
+						getGcaValuesForNativeLanguage(rows, name, basedon, advantage);
 
 					} else if (basedon == "Language" || basedon == "Language (Spoken)" || basedon == "Language (Written)") {
 
-						rows = getGcaValuesForRepeatingLanguage(rows, name, basedon, advantage);
+						getGcaValuesForRepeatingLanguage(rows, name, basedon, advantage);
 
 					} else if (basedon.includes("Cultural Familiarity")) {
 
-						rows = getGcaValuesForCulturalFamiliarity(rows, name, advantage);
+						getGcaValuesForCulturalFamiliarity(rows, name, advantage);
 
 					} else {
 
-						rows = getGcaAdvantageRow(rows, name, advantage);
+						getGcaAdvantageRow(rows, name, advantage);
 
-						rows = getMeleeAttackFromGcaTrait(rows, advantage);
+						getMeleeAttackFromGcaTrait(rows, advantage);
 
-						rows = getRangedAttackFromGcaTrait(rows, advantage);
+						getRangedAttackFromGcaTrait(rows, advantage);
 					}
 
-					rows = getGcaModifiersForAdvantage(rows, name, advantage);
+					getGcaModifiersForAdvantage(rows, name, advantage, runningTotals);
 
 				}
 
@@ -27308,11 +27502,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Updates the rows value with an row for advantages
 	 * 
-	 * @param object rows      Object of properties to update/add rows
+	 * @param object rows      Object of properties to update/add rows. passed by Ref
 	 * @param string name      Name of the advantage
 	 * @param json   advantage JSON data for the advantage
-	 * 
-	 * @return object
 	 */
 	function getGcaAdvantageRow(rows, name, advantage) {
 
@@ -27365,20 +27557,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_notes`] = notes;
 		}
 
-		return rows;
-
 	}
 
 	/**
 	 * Adds the row values for native language fields. 
 	 * Currently, non-repeating
 	 * 
-	 * @param object rows      Object of row properties
+	 * @param object rows      Object of row properties. Passed by reference
 	 * @param string name      Name of advantage
 	 * @param string basedon   Language based on
 	 * @param json   advantage JSON data for advantage
-	 *
-	 * @return object
 	 */
 	function getGcaValuesForNativeLanguage(rows, name, basedon, advantage) {
 
@@ -27423,8 +27611,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		rows["native_language_spoken"] = spokenLevel;
 
 		rows["native_language_written"] = writtenLevel;
-
-		return rows;
 
 	}
 
@@ -27476,12 +27662,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Adds the row values for repeating language fields. 
 	 * 
-	 * @param object rows      Object of row properties
+	 * @param object rows      Object of row properties. Passed by reference
 	 * @param string name      Name of advantage
 	 * @param string basedon   Language based on
 	 * @param json   advantage JSON data for advantage
-	 *
-	 * @return object
 	 */
 	function getGcaValuesForRepeatingLanguage(rows, name, basedon, advantage) {
 
@@ -27543,11 +27727,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Adds the row values for repeating cultural Familiarities fields. 
 	 * 
-	 * @param object rows      Object of row properties
+	 * @param object rows      Object of row properties. passed by reference
 	 * @param string name      Name of advantage
 	 * @param json   advantage JSON data for advantage
-	 *
-	 * @return object
 	 */
 	function getGcaValuesForCulturalFamiliarity(rows, name, advantage) {
 
@@ -27578,7 +27760,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		rows[`${baseFieldName}_points`] = points;
 
-		return rows;
 	}
 
 	/**
@@ -27598,6 +27779,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (advantage.usernotes) {
 			arrNotes.push(advantage.usernotes + "\n"); 
+		}
+
+		if (advantage.gives) {
+			arrNotes.push("Gives: " + advantage.gives + "\n"); 
 		}
 
 		let modNote = getGcaModifierNotes(advantage);
@@ -27649,11 +27834,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Find additional bonuses and check boxes based on advantage name
 	 * 
-	 * @param object rows Current set of rows
-	 * @param string name Name of the advantage
-	 * @param 
+	 * @param object rows          Current set of rows. passed by reference
+	 * @param string name          Name of the advantage
+	 * @param json   advantage     GCA JSON advantage data
+	 * @param object runningTotals An object that keeps track of running totals. NOTE: passed by reference
 	 */
-	function getGcaModifiersForAdvantage(rows, name, advantage) {
+	function getGcaModifiersForAdvantage(rows, name, advantage, runningTotals) {
 
 		let nameCompare = name.toLowerCase();
 
@@ -27679,19 +27865,52 @@ The attacker may choose to hit the original target or the limb you used to parry
 				rows["wealth"] = getGcaLevelName(advantage, "Average");
 				break;
 
+			case "fit":
+				runningTotals.unconscious_check_mod += 1;
+				runningTotals.death_check_mod += 1;
+				break;
+
+			case "very fit":
+				runningTotals.unconscious_check_mod += 2;
+				runningTotals.death_check_mod += 2;
+				break;
+
+			case "hard to kill":
+				let deathMod = Number(advantage.level);
+				if (isNaN(deathMod)) {
+					deathMod = 0;
+				}
+				runningTotals.death_check_mod += deathMod;
+				break;
+
+			case "hard to subdue":
+				let subdueMod = Number(advantage.level);
+				if (isNaN(subdueMod)) {
+					subdueMod = 0;
+				}
+				runningTotals.unconscious_check_mod += subdueMod;
+				break;
+
+			case "high pain threshold":
+				runningTotals.stun_check_mod += 3;
+				runningTotals.knockdown_check_mod += 3;
+				break;
+
 		}
 
-		return rows;
 	}
 
 	/**
 	 * Find additional modifiers and check boxes based on disadvantage name
 	 * 
-	 * @param object rows         Current set of rows
-	 * @param string name         Name of the disadvantage
-	 * @param json   disadvantage GCA json object
+	 * @param object rows          Current set of rows. Passed by reference
+	 * @param string name          Name of the disadvantage
+	 * @param json   disadvantage  GCA json object
+	 * @param object runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * 
+	 * @return rows
 	 */
-	function getGcaModifiersDisadvantage(rows, name, disadvantage) {
+	function getGcaModifiersDisadvantage(rows, name, disadvantage, runningTotals) {
 
 		let nameCompare = name.toLowerCase();
 
@@ -27701,21 +27920,24 @@ The attacker may choose to hit the original target or the limb you used to parry
 				rows["wealth"] = getGcaLevelName(disadvantage, "Average");
 				break;
 
+			case "low pain threshold":
+				runningTotals.stun_check_mod += -3;
+				runningTotals.knockdown_check_mod += -4;
+				break;
+
 		}
 
-		return rows;
 	}
 
 	/**
 	 * Updates Perks and Quirks
 	 * TODO: Check to see if Perk or Quirk already exists, then update
 	 * 
-	 * @param json     jsonData Json DATA from GCA file
-	 * @param function callback A function to run after updating is complete
-	 * 
-	 * @return void
+	 * @param json     jsonData      Json DATA from GCA file
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      A function to run after updating is complete
 	 */
-	function importGcaPerksQuirks(jsonData, callback) {
+	function importGcaPerksQuirks(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -27732,7 +27954,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = perk.name;
 
-				rows = getGcaValuesForPerksQuirks( "perk", rows, name, perk);
+				getGcaValuesForPerksQuirks( "perk", rows, name, perk);
 				
 			});
 
@@ -27744,7 +27966,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = quirk.name;
 
-				rows = getGcaValuesForPerksQuirks( "quirk", rows, name, quirk);
+				getGcaValuesForPerksQuirks( "quirk", rows, name, quirk);
 				
 			});
 
@@ -27759,11 +27981,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Get the row values for repeating perks or quirks
 	 * 
 	 * @param string type        Type = perk | quirk
-	 * @param object rows        Rows for setAttr() function
+	 * @param object rows        Rows for setAttr() function. passed by reference
 	 * @param string name        Name of the quirk or perk
 	 * @param json   perkOrQuirk object of perk or quirk
-	 * 
-	 * @return object
 	 */
 	function getGcaValuesForPerksQuirks(type = "perk", rows, name, perkOrQuirk) {
 
@@ -27808,19 +28028,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_notes`]  = perkOrQuirk.usernotes;
 		}
 
-		return rows;
 	}
 
 	/**
 	 * Import GCA disadvantages
 	 * TODO: Add Update feature. Currently only does insert
 	 *  
-	 * @param json     jsonData Json DATA from GCA file
-	 * @param function callback A function to run after updating is complete
+	 * @param json     jsonData      Json DATA from GCA file
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      A function to run after updating is complete
 	 * 
 	 * @return void
 	 */
-	function importGcaDisadvantages(jsonData, callback) {
+	function importGcaDisadvantages(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -27835,9 +28055,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = disadvantage.name;
 
-				rows = getGcaValuesForDisadvantage(rows, name, disadvantage);
+				getGcaValuesForDisadvantage(rows, name, disadvantage);
 
-				rows = getGcaModifiersDisadvantage(rows, name, disadvantage);
+				getGcaModifiersDisadvantage(rows, name, disadvantage, runningTotals);
 				
 			});
 
@@ -27851,11 +28071,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Get row values for the disadvantage
 	 * check for additional non-repeating values based on name 
 	 * 
-	 * @param object rows         Rows for setAttr() function
+	 * @param object rows         Rows for setAttr() function. Passed by Reference
 	 * @param string name         Name of the quirk or perk
 	 * @param json   disadvantage object disadvantage
-	 * 
-	 * @return object
 	 */
 	function getGcaValuesForDisadvantage(rows, name, disadvantage)
 	{
@@ -27924,16 +28142,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 			
 		}
 
-		rows = getGcaValuesByDisadvantageName(rows, name, disadvantage);
-
-		return rows;
+		getGcaValuesByDisadvantageName(rows, name, disadvantage);
 
 	}
 
 	/**
 	 * Get any special non-repeating fields based on disadvantage name
 	 * 
-	 * @param object rows         Rows for setAttr() function
+	 * @param object rows         Rows for setAttr() function. Pass by reference
 	 * @param string name         Name of the quirk or perk
 	 * @param json   disadvantage object of perk or quirk
 	 * 
@@ -27958,8 +28174,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 				break;
 
 		}
-
-		return rows;
 		
 	}
 
@@ -27995,11 +28209,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * TODO: Add Update feature. Currently only does insert
 	 *  
 	 * @param json     jsonData Json DATA from GCA file
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
 	 * @param function callback A function to run after updating is complete
 	 * 
 	 * @return void
 	 */
-	function importGcaSkills(jsonData, callback) {
+	function importGcaSkills(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -28016,7 +28231,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				if (!skill.type.includes("Tech")) {
 
-					rows = getGcaValuesForSkill(rows, name, skill);
+					getGcaValuesForSkill(rows, name, skill);
+
+					getMeleeAttackFromGcaTrait(rows, skill);
+
+					getRangedAttackFromGcaTrait(rows, skill);
 				
 				}
 				
@@ -28031,11 +28250,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Get values for repeating skill
 	 * 
-	 * @param object rows  Rows for setAttr() function
+	 * @param object rows  Rows for setAttr() function. Passed by reference
 	 * @param string name  Name of the skill
 	 * @param json   skill object for skill
-	 * 
-	 * @return object
 	 */
 	function getGcaValuesForSkill(rows, name, skill) {
 
@@ -28108,8 +28325,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 			}
 		}
 		
-		return rows;
-
 	}
 
 	/**
@@ -28220,6 +28435,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			arrNotes.push(skillOrTechnique.description + "\n");
 		}
 
+		if (skillOrTechnique.gives) {
+			arrNotes.push("Gives: " + skillOrTechnique.gives + "\n"); 
+		}
+
 		if (arrNotes.length) {
 			notes = arrNotes.join("\n");
 		}
@@ -28232,12 +28451,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Import GCA Techniques
 	 * TODO: Add Update feature. Currently only does insert
 	 *  
-	 * @param json     jsonData Json DATA from GCA file
-	 * @param function callback A function to run after updating is complete
+	 * @param json     jsonData      Json DATA from GCA file
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      A function to run after updating is complete
 	 * 
 	 * @return void
 	 */
-	function importGcaTechniques(jsonData, callback) {
+	function importGcaTechniques(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -28254,7 +28474,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				if (skill.type.includes("Tech")) {
 
-					rows = getGcaValuesForTechniques(rows, name, skill, skills);
+					getGcaValuesForTechniques(rows, name, skill, skills);
+
+					getMeleeAttackFromGcaTrait(rows, skill);
+
+					getRangedAttackFromGcaTrait(rows, skill);
 				
 				}
 				
@@ -28269,12 +28493,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	* Get values for repeating skill techniques
 	* 
-	* @param object rows   Rows for setAttr() function
+	* @param object rows   Rows for setAttr() function. passed by reference
 	* @param string name   Name of the skill
 	* @param json   skill  object for skill
 	* @param json   skills All the json skills from GCA
-	* 
-	* @return object
 	*/
 	function getGcaValuesForTechniques(rows, name, skill, skills) {
 
@@ -28329,8 +28551,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		rows[`${baseFieldName}_difficulty`] = difficultyValue;
 
 		rows[`${baseFieldName}_notes`]  = getGcaNotesForSkillTechnique(skill, false);
-
-		return rows;
 
 	}
 
@@ -28454,10 +28674,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Import GCA Equipment 
 	 * TODO: Add ability to update existing equipment
 	 * 
-	 * @param json     jsonData GCA JSON data
-	 * @param function callback Function to run after importing
+	 * @param json     jsonData      GCA JSON data
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      Function to run after importing
 	 */ 
-	function importGcaEquipment(jsonData, callback) {
+	function importGcaEquipment(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -28472,11 +28693,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = item.name;
 
-				rows = getGcaValuesForEquipment(rows, name, item);
+				getGcaValuesForEquipment(rows, name, item);
 
-				rows = getMeleeAttackFromGcaTrait(rows, item);
+				getMeleeAttackFromGcaTrait(rows, item);
 
-				rows = getRangedAttackFromGcaTrait(rows, item);
+				getRangedAttackFromGcaTrait(rows, item);
 				
 			});
 
@@ -28489,11 +28710,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Get the row values for GCA equipment
 	 * 
-	 * @param object rows Object for updating repeating table
+	 * @param object rows Object for updating repeating table. passed by reference
 	 * @param string name Name of equipment
 	 * @param json   item JSON object of equipment
-	 * 
-	 * @return object
 	 */ 
 	function getGcaValuesForEquipment(rows, name, item) {
 
@@ -28554,8 +28773,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		
 		rows[`${baseFieldName}_notes`] = getGcaNotesForEquipment(item);
 
-		return rows;
-		
 	}
 
 	/**
@@ -28579,6 +28796,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			arrNotes.push(item.description + "\n");
 		}
 
+		if (item.gives) {
+			arrNotes.push("Gives: " + item.gives + "\n"); 
+		}
+
 		if (arrNotes.length) {
 			notes = arrNotes.join("\n");
 		}
@@ -28591,10 +28812,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Import GCA Spells 
 	 * TODO: Add ability to update existing spells
 	 * 
-	 * @param json     jsonData GCA JSON data
-	 * @param function callback Function to run after importing
+	 * @param json     jsonData      GCA JSON data
+	 * @param object   runningTotals An object that keeps track of running totals. NOTE: passed by reference
+	 * @param function callback      Function to run after importing
 	 */ 
-	function importGcaSpells(jsonData, callback) {
+	function importGcaSpells(jsonData, runningTotals, callback) {
 
 		// make sure we have a valid function
 		callback = callback || noop;
@@ -28613,11 +28835,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 					let name = spell.name;
 
-					rows = getGcaValuesForSpell(rows, name, spell, magery);
+					getGcaValuesForSpell(rows, name, spell, magery);
 
-					rows = getMeleeAttackFromGcaTrait(rows, spell);
+					getMeleeAttackFromGcaTrait(rows, spell);
 
-					rows = getRangedAttackFromGcaTrait(rows, spell);
+					getRangedAttackFromGcaTrait(rows, spell);
 					
 				});
 
@@ -28632,7 +28854,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Get the row values for GCA Spell
 	 * 
-	 * @param object rows   Object for updating repeating table
+	 * @param object rows   Object for updating repeating table. passed by reference
 	 * @param string name   Name of spell
 	 * @param json   spell  JSON object of spell
 	 * @param int    magery Magery level of character
@@ -28715,8 +28937,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_ref`] = spell.page;
 		
 		}
-		
-		return rows;
 
 	}
 
@@ -28793,6 +29013,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (spell.needs) {
 			arrNotes.push("Needs: " + spell.needs + "\n"); 
+		}
+
+		if (spell.gives) {
+			arrNotes.push("Gives: " + spell.gives + "\n"); 
 		}
 
 		if (arrNotes.length) {
