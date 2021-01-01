@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
-var sheetName = 'AD&D 2E Revised';
-var sheetVersion = '3.3.2';
+const sheetName = 'AD&D 2E Revised';
+const sheetVersion = '3.3.2';
 
 function moveStaticToRepeating(section, fieldsToMove) {
     getAttrs(fieldsToMove, function (values) {
@@ -30,10 +30,11 @@ on('sheet:opened', function(){
 
         // do something with sheet_name and sheet_version, if you might be converting
 
-        if(sheet_name !== sheetName || (sheetVersion && (sheet_version !== sheetVersion))){
+        if(sheet_name !== sheetName || sheet_version !== sheetVersion) {
             console.log('Updating character sheet version');
             setAttrs({
-                character_sheet: (sheetName||'AD&D 2E Revised')+(sheetVersion?(' v'+sheetVersion):''),
+                character_sheet: `${sheetName} v${sheetVersion}`,
+                version: `v${sheetVersion}`,
                 announcement: 1
             },{silent:true});
 
