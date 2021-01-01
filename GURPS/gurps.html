@@ -26517,6 +26517,38 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		}
 
+		let [strPts, strMod] = getCharacterPointsModFromGcaAttributes(attributes, "ST");
+
+		let [dexPts, dexMod] = getCharacterPointsModFromGcaAttributes(attributes, "DX");
+
+		let [intPts, intMod] = getCharacterPointsModFromGcaAttributes(attributes, "IQ");
+
+		let [htPts, htMod] = getCharacterPointsModFromGcaAttributes(attributes, "HT");
+
+		let [hpPts, hpMod] = getCharacterPointsModFromGcaAttributes(attributes, "Hit Points");
+
+		let [fatPts, fatMod] = getCharacterPointsModFromGcaAttributes(attributes, "Fatigue Points");
+
+		let [perPts, perMod] = getCharacterPointsModFromGcaAttributes(attributes, "Perception");
+
+		let [visionPts, visionMod] = getCharacterPointsModFromGcaAttributes(attributes, "Acute Vision");
+
+		let [hearPts, hearMod] = getCharacterPointsModFromGcaAttributes(attributes, "Acute Hearing");
+
+		let [tastePts, tasteMod] = getCharacterPointsModFromGcaAttributes(attributes, "Acute Taste and Smell");
+
+		let [touchPts, touchMod] = getCharacterPointsModFromGcaAttributes(attributes, "Acute Touch");
+
+		let [willPts, willMod] = getCharacterPointsModFromGcaAttributes(attributes, "Will");
+
+		let [fearPts, fearMod] = getCharacterPointsModFromGcaAttributes(attributes, "Fearlessness");
+
+		// update running total using fearMod
+
+		let [speedPts, speedMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Speed");
+
+		let [movePts, moveMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Move");
+
 		let updates = {
 			fullname:              general.name,
 			playername:            general.playername,
@@ -26534,21 +26566,35 @@ The attacker may choose to hit the original target or the limb you used to parry
 			wealth:				   "Average",
 			cost_of_living:		   costOfLiving,
 			misc_notes:            miscNotes,
-			strength_points:       getCharacterPointsFromGcaAttributes(attributes, "ST"),
-			dexterity_points:      getCharacterPointsFromGcaAttributes(attributes, "DX"),
-			intelligence_points:   getCharacterPointsFromGcaAttributes(attributes, "IQ"),
-			health_points:         getCharacterPointsFromGcaAttributes(attributes, "HT"),
-			hit_points_points:     getCharacterPointsFromGcaAttributes(attributes, "Hit Points"),
-			fatigue_points_points: getCharacterPointsFromGcaAttributes(attributes, "Fatigue Points"),
-			perception_points:     getCharacterPointsFromGcaAttributes(attributes, "Perception"),
-			vision_points:         getCharacterPointsFromGcaAdvantages(advantages, "Acute Vision"),
-			hearing_points:        getCharacterPointsFromGcaAdvantages(advantages, "Acute Hearing"),
-			taste_smell_points:    getCharacterPointsFromGcaAdvantages(advantages, "Acute Taste and Smell"),
-			touch_points:          getCharacterPointsFromGcaAdvantages(advantages, "Acute Touch"),
-			willpower_points:      getCharacterPointsFromGcaAttributes(attributes, "Will"),
-			fear_check_points:     getCharacterPointsFromGcaAdvantages(advantages, "Fearlessness"),
-			basic_speed_points:    getCharacterPointsFromGcaAttributes(attributes, "Basic Speed"),
-			basic_move_points:     getCharacterPointsFromGcaAttributes(attributes, "Basic Move"),
+			strength_points:       strPts,
+			strength_mod:		   strMod,
+			dexterity_points:      dexPts,
+			dexterity_mod:		   dexMod,
+			intelligence_points:   intPts,
+			intelligence_mod:      intMod,
+			health_points:         htPts,
+			health_mod:            htMod,
+			hit_points_points:     hpPts,
+			hit_points_mod:		   hpMod,
+			fatigue_points_points: fatPts,
+			fatigue_points_mod:    fatMod,
+			perception_points:     perPts,
+			perception_mod:		   perMod,
+			vision_points:         visionPts,
+			vision_mod:            visionMod,
+			hearing_points:        hearPts,
+			hearing_mod:           hearMod,
+			taste_smell_points:    tastePts,
+			taste_smell_mod:       tasteMod,
+			touch_points:          touchPts,
+			touch_mod:             touchMod,
+			willpower_points:      willPts,
+			willpower_mod:         willMod,
+			fear_check_points:     fearPts,
+			basic_speed_points:    speedPts,
+			basic_speed_mod:       speedMod,
+			basic_move_points:     movePts,
+			basic_move_mod:        moveMod,
 		};
 
 		importNaturalAttacksFromGca(updates, attributes);
@@ -26570,16 +26616,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
-	 * Get the character points for an attribute
+	 * Get the character points and modifier for an attribute
 	 *
 	 * @param json   attributes JSON Attribute data. Array of elements
 	 * @param string name       Name of the field to get CP for.
 	 *
-	 * @return int
+	 * @return array [points, modifier]
 	 */
-	function getCharacterPointsFromGcaAttributes(attributes, name) {
+	function getCharacterPointsModFromGcaAttributes(attributes, name) {
 
 		let points = 0;
+
+		let modifier = 0;
 
 		if (attributes) {
 
@@ -26589,6 +26637,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 				if (name.toLowerCase() === String(attribute.name).toLowerCase()) {
 
 					points = Number(attribute.points);
+
+					let baseScore = Number(attribute.basescore);
+
+					let score = Number(attribute.score);
+
+					modifier = score - baseScore;
 
 				}
 
@@ -26600,7 +26654,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			points = 0;
 		}
 
-		return points;
+		return [points, modifier];
 	}
 
 	/**
@@ -26841,6 +26895,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		arrModes.forEach(mode => {
 
+			if (mode.toLowerCase() === "thrown") {
+				return;
+			}
+
 			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 			let rowId = generateRowID();
 
@@ -27009,13 +27067,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let arrSkillLevel = trait.charskillscore.split("|");
 
 		// i.e: "characc": "4|4",
-		let arrAcc = trait.charrcl.split("|");
+		let arrAcc = trait.characc.split("|");
 
 		// i.e: "charrcl": "3|3",
-		let arrRecoil = trait.charrcl.split("|");
+		let arrRecoil;
+
+		if (trait.charrcl) {
+			arrRecoil = trait.charrcl.split("|")
+		}
 
 		// "charrof": "3|3",
-		let arrRof = trait.charrof.split("|");
+		let arrRof;
+
+		if (trait.charrof) {
+			arrRof = trait.charrof.split("|")
+		}
 
 		// "charshots": "20+1(3)|20+1(3)",
 		let arrShots = trait.charshots.split("|");
@@ -27035,6 +27101,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let index = 0;
 
 		arrModes.forEach(mode => {
+
+			if (mode.toLowerCase() === "swing" || mode.toLowerCase() === "thrust") {
+				return;
+			}
 
 			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 			let rowId = generateRowID();
@@ -27072,15 +27142,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
 
-			rows[`${baseFieldName}_rof`] = arrRof[index];
-
+			if (arrRof) {
+				rows[`${baseFieldName}_rof`] = arrRof[index];
+			}
+			
 			rows[`${baseFieldName}_shots`] = arrShots[index];
 			
 			if (trait.bulk) {
 				rows[`${baseFieldName}_bulk`] = trait.bulk;
 			}
 
-			rows[`${baseFieldName}_recoil`] = arrRecoil[index];
+			if (arrRecoil) {
+				rows[`${baseFieldName}_recoil`] = arrRecoil[index];
+			}
 			
 			divisor = Number(arrDivisor[index]);
 
