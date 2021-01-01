@@ -12,14 +12,11 @@ function moveStaticToRepeating(section, fieldsToMove) {
             let newrowid = generateRowID();
             let newValue = {};
 
-            console.log(JSON.stringify(values));
-            
             for (const [field, value] of Object.entries(values)) {
                 newValue[`repeating_${section}_${newrowid}_${field}`] = value;
                 newValue[field] = '';
             }
             
-            console.log(JSON.stringify(newValue));
             setAttrs(newValue);
         }
     });
