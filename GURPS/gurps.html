@@ -10086,7 +10086,7 @@ visualize what it will look like in chat.
 												<option value="Spell"><span data-i18n="option-spell">Spell</span></option>
 												<option value="ST"><span data-i18n="abbreviation-strength">ST</span></option>
 												<option value="STRIKING"><span data-i18n="attribute-striking">Striking</span> <span data-i18n="abbreviation-strength">ST</span></option>
-												<option value="DX"><span data-i18n="abbreviation-dexterity">DX</span></option>
+												<option value="DX" selected="selected"><span data-i18n="abbreviation-dexterity">DX</span></option>
 												<option value="IQ"><span data-i18n="abbreviation-intelligence">IQ</span></option>
 												<option value="WILL"><span data-i18n="will-label">WILL</span></option>
 												<option value="HT"><span data-i18n="abbreviation-health">HT</span></option>
@@ -17625,11 +17625,11 @@ visualize what it will look like in chat.
 			callback = callback || noop;
 
 			// + means to convert variable to number
-			var chkCombatReflexes = +values.combat_reflexes;
+			let chkCombatReflexes = Number(values.combat_reflexes);
 
-			var modDodge = 0;
+			let modDodge = 0;
 
-			var modFear = 0;
+			let modFear = 0;
 
 			if (chkCombatReflexes == 1) {
 				
@@ -17646,26 +17646,22 @@ visualize what it will look like in chat.
 			}
 
 			// update dodge modifier
-			var orig_dodge_mod = 0;
+			let orig_dodge_mod = Number(values.dodge_mod);
 
-			if (isNaN(values.dodge_mod)) {
+			if (isNaN(orig_dodge_mod)) {
 				orig_dodge_mod = 0;
-			} else {
-				orig_dodge_mod = +values.dodge_mod;
-			}
+			} 
 
-			var new_dodge_mod = orig_dodge_mod +  modDodge;
+			let new_dodge_mod = orig_dodge_mod +  modDodge;
 
 			// update fear check
-			var orig_fear_check_mod = 0;
+			let orig_fear_check_mod = Number(values.fear_check_mod);
 
-			if (isNaN(values.fear_check_mod)) {
+			if (isNaN(orig_fear_check_mod)) {
 				orig_fear_check_mod = 0;
-			} else {
-				orig_fear_check_mod = +values.fear_check_mod;
-			}
-			
-			var new_fear_check_mod = orig_fear_check_mod + modFear;
+			} 
+
+			let new_fear_check_mod = orig_fear_check_mod + modFear;
 
 			// update 
 
@@ -20611,13 +20607,17 @@ visualize what it will look like in chat.
     function updateDefenseNote() {
         
         getAttrs(['repeating_defense_info'], function(values) {
+			
+			if (values && values.repeating_defense_info) {
+
+				var note = getDefenseNote(values.repeating_defense_info);
             
-            var note = getDefenseNote(values.repeating_defense_info);
-            
-            // update the note
-            setAttrs({
-                repeating_defense_info_description: note
-            });
+				// update the note
+				setAttrs({
+					repeating_defense_info_description: note
+				});
+				
+			}
             
         });
         
@@ -20818,9 +20818,9 @@ visualize what it will look like in chat.
             
             var moveType = values.turning_move_type;
             
-            var velocityStart = +values.start_velocity;
+            var velocityStart = Number(values.start_velocity);
             
-            var velocityChange = +values.change_velocity;
+            var velocityChange = Number(values.change_velocity);
             
             var velocityFinal = 0;
             
@@ -20838,7 +20838,7 @@ visualize what it will look like in chat.
             
             velocityFinal = velocityStart + velocityChange;
             
-            if (velocityFinal < 0) {
+            if ( isNaN(velocityFinal) || velocityFinal < 0) {
                 velocityFinal = 0;
             }
             
@@ -20852,7 +20852,7 @@ visualize what it will look like in chat.
                         // normal move, no tight turn penalty
                         tightTurnPenalty = 0;
                         
-                        baseMove = +values.current_move;
+                        baseMove = Number(values.current_move);
                         
                     } else {
                         
@@ -20976,11 +20976,11 @@ visualize what it will look like in chat.
             arrMoveValue = moveValue.split("/");
             
             // get second part, convert to number
-            move = +arrMoveValue[0];
+            move = Number(arrMoveValue[0]);
             
         } else {
             
-            move = +moveValue;
+            move = Number(moveValue);
             
 		}
 		
@@ -21506,7 +21506,7 @@ visualize what it will look like in chat.
 			
 		    let skillRowId = values[skillRowIdFieldName];
 		    
-			let skillMod = +values[skillRowModFieldName];
+			let skillMod = Number(values[skillRowModFieldName]);
 			
 			if (isNaN(skillMod)) {
 				skillMod = 0;
@@ -26973,7 +26973,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let fullName = trait.name;
 
-		if (trait.nameext) {
+		if (trait.nameext && trait.nameext != trait.name){
 
 			fullName += ` (${trait.nameext})`;
 
@@ -27067,7 +27067,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			let fullName = trait.name;
 
-			if (trait.nameext) {
+			if (trait.nameext && trait.nameext != trait.name ) {
 
 				fullName += ` (${trait.nameext})`;
 
@@ -27147,7 +27147,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let fullName = trait.name;
 
-		if (trait.nameext) {
+		if (trait.nameext && trait.namext != trait.name ) {
 
 			fullName += ` (${trait.nameext})`;
 
@@ -27274,7 +27274,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			let fullName = trait.name;
 
-			if (trait.nameext) {
+			if (trait.nameext && trait.nameext != trait.name ) {
 
 				fullName += ` (${trait.nameext})`;
 
@@ -27330,6 +27330,334 @@ The attacker may choose to hit the original target or the limb you used to parry
 			index++;
 
 		});
+
+	}
+
+	/**
+	 * Check if trait has any defense mods
+	 *
+	 * @param object rows  Object of properties to update/add rows. Passed by reference
+	 * @param json   trait JSON data for the trait
+	 */
+	function getDefenseFromGcaTrait(rows, trait) {
+
+		// determine defen
+		let parryDefense = getDefenseForGcaTrait(trait, "parry");
+
+		let blockDefense = getDefenseForGcaTrait(trait, "block");
+
+		// it could be possible a trait has block & parry
+		if (parryDefense === "multi") {
+
+			getMultipleDefenseModesFromGcaTrait(rows, trait, "parry");
+
+		} else if (parryDefense === "single") {
+
+			getSingleDefenseModeFromGcaTrait(rows, trait, "parry");
+
+		}
+
+		// it could be possible a trait has block & parry
+		if (blockDefense === "multi") {
+
+			getMultipleDefenseModesFromGcaTrait(rows, trait, "block");
+
+		} else if (blockDefense === "single") {
+
+			getSingleDefenseModeFromGcaTrait(rows, trait, "block");
+
+		}
+
+	}
+
+	/**
+	 * Determines the defense type of a trait based on parry or block
+	 * if it is single, multi, or not present
+	 * 
+	 * @param json trait GCA json data
+	 * @param string checkFor What type of defense to check for. parry | block
+	 *
+	 * @return string Returns single|multi|empty if none
+	 */ 
+	function getDefenseForGcaTrait(trait, checkFor = "parry") {
+
+		let defenseType;
+
+		let parry;
+
+		let blocklevel;
+
+		if (checkFor.toLowerCase() === "parry") {
+
+			if (trait.charparryscore) {
+
+				parry = trait.charparryscore;
+
+				// unset if value is "no"
+				if (parry.toLowerCase() === "no" || parry == 0) {
+					parry = null;
+				}
+
+			}
+
+			if (parry && parry.includes("|")) {
+
+				defenseType = "multi";
+
+			} else if (parry) {
+
+				defenseType = "single";
+
+			}
+
+		}
+
+		if (checkFor.toLowerCase() === "block") {
+
+			if (trait.blocklevel) {
+			
+				blocklevel = trait.blocklevel;
+
+				// unset if value is "no"
+				if (blocklevel.toLowerCase() === "no" || blocklevel == 0) {
+					blocklevel = null;
+				}
+
+			}
+
+			if (blocklevel && blocklevel.includes("|")) {
+
+				defenseType = "multi";
+
+			} else if (blocklevel) {
+
+				defenseType = "single";
+
+			}
+
+		}
+
+		return defenseType;
+
+	}
+
+	/**
+	 * If trait only has a single defense mode, use this function
+	 * Currenlty only handles parry and block
+	 *
+	 * @param object rows        Object of properties to update/add rows. Passed by reference
+	 * @param json   trait       JSON data for the trait
+	 * @param string defenseType parry|block. Used to help determine defense type drop-down value
+	 */
+	function getSingleDefenseModeFromGcaTrait(rows, trait, defenseType) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = trait.IDKey.trim();
+
+		let baseFieldName = `repeating_defense_${rowId}`;
+
+		let fullName = trait.name;
+
+		if (trait.nameext && trait.nameext != trait.name) {
+
+			fullName += ` (${trait.nameext})`;
+
+		}
+
+		let skill;
+
+		let defenseDropDownValue;
+
+		let defenseInfo;
+
+		if (defenseType.toLowerCase() === "parry") {
+
+			[skill, defenseDropDownValue, defenseInfo] = getParryDefenseInfoFromGca(trait.charparryscore, trait.name);
+
+		} else {
+
+			skill = Number(trait.blocklevel);
+
+			defenseDropDownValue = "Block";
+
+			defenseInfo = "";
+
+		}
+
+		// if no skill value, LEAVE!
+		if (!skill || isNaN(skill)) {
+			return;
+		}
+		
+		rows[`${baseFieldName}_idkey`] = idkey;
+
+		rows[`${baseFieldName}_name`] = fullName;
+
+		rows[`${baseFieldName}_skill`] = skill;
+
+		rows[`${baseFieldName}_type`] = defenseDropDownValue;
+
+		rows[`${baseFieldName}_info`] = defenseInfo;
+
+	}
+
+	/**
+	* The ranged attack has several modes
+	* Need a row for each attack mode
+	* 
+	* @param object rows        Object of properties to update/add rows. Passed by reference
+	* @param json   trait       JSON data for the trait
+	* @param string defenseType parry|block. Used to help determine defense type drop-down value
+	*/ 
+	function  getMultipleDefenseModesFromGcaTrait(rows, trait, defenseType) {
+
+		// example: "mode": "Staff swing|Staff thrust|Sword swing|Sword thrust"
+		let arrModes = trait.mode.split("|");
+
+		// "charparryscore": "10|10|No",
+		let arrParry;
+
+		if (defenseType.toLowerCase() === "parry" && trait.charparryscore) {
+			arrParry = trait.charparryscore.split("|");
+		}
+
+		// "charparryscore": "10|No|No",
+		let arrBlock;
+
+		if (defenseType.toLowerCase() === "block" && trait.blocklevel) {
+			arrBlock = trait.blocklevel.split("|");
+		}
+
+		let skill;
+
+		let defenseDropDownValue;
+
+		let defenseInfo;
+
+		let parryScore;
+
+		// tracks which mode to use
+		let index = 0;
+
+		arrModes.forEach(mode => {
+
+			// reset values because for loop;
+			parryScore = null;
+
+			skill = null;
+
+			defenseDropDownValue = "";
+
+			defenseInfo = "";
+
+			if (defenseType.toLowerCase() === "parry") {
+
+				parryScore = arrParry[index];
+
+				[skill, defenseDropDownValue, defenseInfo] = getParryDefenseInfoFromGca(parryScore, trait.name);
+
+			} else {
+
+				skill = Number(arrBlock[index]);
+				
+				defenseDropDownValue = "Block";
+
+				defenseInfo = "";
+				
+			}
+
+			// if no skill, get out of loop
+			if (!skill || isNaN(skill)) {
+				return;
+			}
+
+			// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+			let rowId = generateRowID();
+
+			let idkey = trait.IDKey.trim() + `-mode-${index}`;
+
+			let baseFieldName = `repeating_defense_${rowId}`;
+
+			let fullName = trait.name;
+
+			if (trait.nameext && trait.nameext != trait.name) {
+
+				fullName += ` (${trait.nameext})`;
+
+			}
+
+			fullName += ` (${mode})`;
+
+			rows[`${baseFieldName}_idkey`] = idkey;
+
+			rows[`${baseFieldName}_name`] = fullName;
+
+			rows[`${baseFieldName}_skill`] = skill;
+
+			rows[`${baseFieldName}_type`] = defenseDropDownValue;
+
+			rows[`${baseFieldName}_info`] = defenseInfo;
+
+			index++;
+
+		});
+
+	}
+
+	/**
+	 * Get parry defense information based on parry score
+	 * i.e.: score of 12U returns [12, U, Parry] 
+	 * 
+	 * @param string parryScore Value to evaluate
+	 * @param string name       Name of trait. Punch = Unarmed Parry
+	 * 
+	 * @return array [skill, dropDownValue, defenseInfo]
+	 */
+	function getParryDefenseInfoFromGca(parryScore, name) {
+
+		let skill;
+
+		let dropDownValue;
+
+		let defenseInfo = "";
+
+		// check for unbalanced parry
+		if (parryScore.includes("U")) {
+				
+			defenseInfo = "U";
+
+			// just need number
+			skill = Number(parryScore.replace("U", ""));
+
+		} else if (parryScore.includes("F")) {
+
+			defenseInfo = "F";
+
+			// just need number
+			skill = Number(parryScore.replace("F", ""));
+
+		} else {
+
+			skill = Number(parryScore);
+
+		}
+
+		// check skill is a number
+		if (!skill || isNaN(skill)) {
+
+			skill = null;
+
+		};
+
+		if (name.toLowerCase() === "punch") {
+			dropDownValue = "Unarmed Parry";
+		} else {
+			dropDownValue = "Parry";
+		}
+
+		return [skill, dropDownValue, defenseInfo];
 
 	}
 
@@ -27499,6 +27827,36 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (trait.gives) {
 			arrNotes.push("Gives: " + trait.gives + "\n"); 
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+	}
+
+	/**
+	 * Gets defense notes GCA trait
+	 * 
+	 * @param json   trait     JSON data for the trait
+	 * 
+	 * @return string
+	 */ 
+	function getDefenseNotesFromGca(trait) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (trait.usernotes) {
+			arrNotes.push(trait.usernotes + "\n"); 
+		}
+
+		if (trait.charskillused) {
+
+			arrNotes.push("Skill: " + trait.charskillused + "\n");
+
 		}
 
 		if (arrNotes.length) {
@@ -27710,6 +28068,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 						getMeleeAttackFromGcaTrait(rows, advantage);
 
 						getRangedAttackFromGcaTrait(rows, advantage);
+
+						getDefenseFromGcaTrait(rows, advantage);
 					}
 
 					getGcaModifiersForAdvantage(rows, name, advantage, runningTotals);
@@ -28565,6 +28925,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 					getMeleeAttackFromGcaTrait(rows, skill);
 
 					getRangedAttackFromGcaTrait(rows, skill);
+
+					getDefenseFromGcaTrait(rows, skill);
 				
 				}
 				
@@ -28810,6 +29172,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 					getMeleeAttackFromGcaTrait(rows, skill);
 
 					getRangedAttackFromGcaTrait(rows, skill);
+
+					getDefenseFromGcaTrait(rows, skill);
 				
 				}
 				
@@ -29030,6 +29394,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				getRangedAttackFromGcaTrait(rows, item);
 				
+				getDefenseFromGcaTrait(rows, item);
+
 			});
 
 		}
@@ -29210,6 +29576,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 					getMeleeAttackFromGcaTrait(rows, spell);
 
 					getRangedAttackFromGcaTrait(rows, spell);
+
+					getDefenseFromGcaTrait(rows, spell);
 					
 				});
 
