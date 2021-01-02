@@ -1,14 +1,15 @@
+<input type="hidden" name="attr_calling-settings" class="calling-settings"/>
 <div class="sheet-main">
   <div class="sheet-left">
     <div class="sheet-details">
       <span data-i18n="name" class="namelabel">Name</span>
-      <input type="text" name="attr_character_name" class="name"/>
+      <input type="text" name="attr_character_name" class="name" size="12"/>
       <span data-i18n="race-look" class="looklabel">Race & Look</span>
-      <input type="text" name="attr_look" class="look"/>
+      <input type="text" name="attr_look" class="look" size="12"/>
       <span data-i18n="dark-impulse" class="impulselabel">Dark Impulse</span>
-      <input type="text" name="attr_impulse" class="impulse"/>
+      <input type="text" name="attr_impulse" class="impulse" size="12"/>
       <span data-i18n="revelry" class="revelrylabel">Revelry</span>
-      <input type="text" name="attr_revelry" class="revelry"/>
+      <input type="text" name="attr_revelry" class="revelry" size="12"/>
       <span data-i18n-list="impulse-list">
         <input type="hidden" name="attr_impulse" class="suggested" value=""/>
         <button type="action" name="act_impulse-bigmouth" class="suggestion" data-i18n="bigmouth" data-i18n-list-item="bigmouth">Bigmouth</button>
@@ -37,7 +38,7 @@
       </fieldset>
       <div class="header">
         <span data-i18n="supply">Supply</span>
-        <input type="hidden" class="toggle complex" name="attr_supply-settings"/>
+        <input type="hidden" class="toggle complex settings" name="attr_supply-settings"/>
         <button type="action" name="act_toggle-supply-settings" class="toggle symbol">
           <span>y</span>
         </button>
@@ -67,7 +68,7 @@
         </button>
       </div>
       <div>
-        <input type="hidden" class="toggle complex" name="attr_supply-settings" />
+        <input type="hidden" class="toggle complex settings" name="attr_supply-settings" />
         <fieldset class="repeating_supply">
           <span class="textplus">
             <input type="text" name="attr_supply" size="10" class="textplus" />
@@ -176,7 +177,29 @@
     </div>
   </div>
   <div class="sheet-calling">
-    Calling
+    <input type="hidden" class="toggle complex settings" name="attr_calling-settings" value="show"/>
+    <button type="action" name="act_toggle-calling-settings" class="toggle symbol settings">
+      <span>y</span>
+    </button>
+    <input type="text" name="attr_calling" class="complex"/>
+    <!-- <input type="text" name="attr_calling-desc" class="complex"/> -->
+    <div class="auto-expand complex"><span name="attr_calling-desc"></span>
+      <textarea spellcheck="false" name="attr_calling-desc"></textarea>
+    </div>
+    <div class="complex suggestions">
+      <input type="hidden" name="attr_calling" class="suggested" value=""/>
+      <button type="action" name="act_calling-brute" class="suggestion" data-i18n="brute" data-i18n-list-item="brute">Brute</button>
+      <button type="action" name="act_calling-conniver" class="suggestion" data-i18n="conniver" data-i18n-list-item="conniver">Conniver</button>
+      <button type="action" name="act_calling-crafter" class="suggestion" data-i18n="crafter" data-i18n-list-item="crafter">Crafter</button>
+      <button type="action" name="act_calling-hunter" class="suggestion" data-i18n="hunter" data-i18n-list-item="hunter">Hunter</button>
+      <button type="action" name="act_calling-marauder" class="suggestion" data-i18n="marauder" data-i18n-list-item="marauder">Marauder</button>
+      <button type="action" name="act_calling-shadow" class="suggestion" data-i18n="shadow" data-i18n-list-item="shadow">Shadow</button>
+      <button type="action" name="act_calling-shaman" class="suggestion" data-i18n="shaman" data-i18n-list-item="shaman">Shaman</button>
+      <button type="action" name="act_calling-warlock" class="suggestion" data-i18n="warlock" data-i18n-list-item="warlock">Warlock</button>
+      <button type="action" name="act_calling-zealot" class="suggestion" data-i18n="zealot" data-i18n-list-item="zealot">Zealot</button>
+    </div>
+    <span name="attr_calling" class="simple"></span>
+    <span name="attr_calling-desc" class="simple right pre"></span>
   </div>
   <div class="sheet-middle">
     <div class="sheet-minions">
@@ -503,6 +526,10 @@
     });
   });
 
+  function getClickAttr(eventInfo, prefix){
+    return eventInfo.triggerName.replace(new RegExp(`clicked:(repeating_.+?_)?.*${prefix}-`), "$1")
+  }
+
   on("clicked:toggle-downtime-list clicked:toggle-duties", function(eventInfo) {
     //get the right attribute for the button we clicked
     var attr = eventInfo.triggerName.replace("clicked:toggle", "hide")
@@ -551,8 +578,11 @@
     toggle(attr,"used","0")
   });
 
-  on("clicked:toggle-supply-settings", function(){
-    toggle("supply-settings", "show", "hide")
+  on("clicked:toggle-supply-settings clicked:toggle-calling-settings", function(eventInfo){
+    var attr = getClickAttr(eventInfo, "toggle");
+    console.log(attr)
+    console.log(eventInfo)
+    toggle(attr, "show", "hide")
   });
 
   on("clicked:impulse-bigmouth clicked:impulse-cruel clicked:impulse-deranged clicked:impulse-fickle clicked:impulse-obsessed clicked:impulse-paranoid clicked:impulse-reckless clicked:impulse-vengeful", function(eventInfo) {
@@ -598,4 +628,35 @@
     toggle(attr, "used", "0");
   });
 
+  on("clicked:calling-brute clicked:calling-conniver clicked:calling-crafter clicked:calling-hunter clicked:calling-marauder clicked:calling-shadow clicked:calling-shaman clicked:calling-warlock clicked:calling-zealot", function(eventInfo){
+    var key = getClickAttr(eventInfo, "calling")
+    var calling = getTranslationByKey(key)
+    var desc = _.unescape(getTranslationByKey(key + "-desc"));
+    setAttrs({
+      calling: calling, 
+      "calling-desc": desc,
+      "calling-settings": "hide"
+    });
+  })
+
 </script>
+<div class="translation-holder">
+  <span data-i18n="brute-desc">Powerful & Intimidating 
+ Brawlers</span>
+  <span data-i18n="conniver-desc">Manipulative & Controlling 
+ Masterminds</span>
+  <span data-i18n="crafter-desc">Clever & Curious 
+ Tinkerers</span>
+  <span data-i18n="hunter-desc">Ruthless & Tenacious 
+ Trackers</span>
+  <span data-i18n="marauder-desc">Cunning & Fearless 
+ Warriors</span>
+  <span data-i18n="shadow-desc">Sneaky & Elusive 
+ Rogues</span>
+  <span data-i18n="shaman-desc">Terrifying & Vengeful 
+ Witches</span>
+  <span data-i18n="warlock-desc">Daring & Ambitious 
+ Mages</span>
+  <span data-i18n="zealot-desc">Fervent & Mystical 
+ Believers</span>
+</div>
