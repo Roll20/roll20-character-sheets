@@ -7335,7 +7335,7 @@ PU2:126 = Power-Ups 2. Page 126<br />
 				</div> <!-- .header -->
 				<div class="row">
 					<div class="cell col-race">
-						 <b><span data-i18n="race-label">Race</span>:</b> <input type="text" name="attr_race" title="Macro name: race" />
+						 <b><span data-i18n="race-label">Race</span>:</b> <input type="text" name="attr_race" title="Macro: @{race}" />
 					</div>
 					<div class="cell col1"></div>
 					<div class="cell col1"></div>
@@ -7346,6 +7346,16 @@ PU2:126 = Power-Ups 2. Page 126<br />
 					<div class="cell col4">
 					    <input type="text" name="attr_race_ref" title="Macro name: race_ref" />
 					</div>
+				</div> 
+				<div class="row">
+					<div class="cell col-template">
+						 <b><span data-i18n="templates-label">Templates</span>:</b> <input type="text" name="attr_template_names" title="Macro: @{templates_names}" />
+					</div>
+					<div class="cell col1"></div>
+					<div class="cell col1"></div>
+					<div class="cell col2"></div>
+					<div class="cell col3"></div>
+					<div class="cell col4"></div>
 				</div> <!-- .header -->
 				<fieldset class="repeating_racial">
 					<input type="hidden" name="attr_control_rating" />
@@ -8824,11 +8834,11 @@ visualize what it will look like in chat.
 
 								<!-- row 2 -->
 								<div class="item item3">
-									<input type="text" name="attr_thrust" value="" title="Macro: @{thrust}">
+									<input type="text" name="attr_thrust" value="1d6-2" title="Macro: @{thrust}">
 								</div>
 								
 								<div class="item item4">
-									<input type="text" name="attr_swing" value="" title="Macro: @{swing}">
+									<input type="text" name="attr_swing" value="1d6" title="Macro: @{swing}">
 								</div>
 								
 							</div>
@@ -9474,7 +9484,8 @@ visualize what it will look like in chat.
 										</div>
 										<div class="tooltip max-skill-9">
 											<span data-i18n="apply-encumbrance-tooltip">Apply encumbrance penalty.</span>
-											<b style="color:red;"><span name="attr_encumbrance_level"></span></b>
+											<b style="color:red;"><span name="attr_encumbrance_level"></span></b><br />
+											<span data-i18n="apply-encumbrance-dodge-note-tooltip"><b>NOTE:</b> The predefined <i>dodges</i> already of encumbrance applied!</span>
 										</div>
 									</div>
 								</div>
@@ -26406,8 +26417,22 @@ The attacker may choose to hit the original target or the limb you used to parry
 			"unconscious_check_mod": 0,
 			"death_check_mod": 0,
 			"import_message": "Import has completed.",
-			"json_data": ""
+			"json_data": "",
+			"templates": [],
+			"templateNotes": "",
+			"templateNames": "",
 		};
+
+		/*
+		Example:
+		templates: [{
+						name: "Dwarf (Dungeon Fantasy)",
+						notes: "Dwarves are essentially hardy-but-stumpy humans...",
+						keys: [181, 182, 183, 184, 185, 187, 188, 189, 191, 192]
+					}];
+		keys are advantages/disadvantages for the template. 
+		NOTE: Don't care about skills/spells/techniques. Just advantages/disadvantages need to be moved to racial traits table
+		*/
 
 		importGcaNonRepeatingFields(jsonData, runningTotals, () => {
 
@@ -26543,16 +26568,25 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let [fearPts, fearMod] = getCharacterPointsModFromGcaAttributes(attributes, "Fearlessness");
 
-		// update running total using fearMod
+		// TODO: Howto update running total using fearMod
 
 		let [speedPts, speedMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Speed");
 
 		let [movePts, moveMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Move");
 
+		let racialUpdates = getTemplatesFromGca(jsonData, runningTotals);
+
+		if (runningTotals.templateNotes) {
+
+			miscNotes += "\n\nTemplate(s):\n\n" + runningTotals.templateNotes;
+
+		}
+
 		let updates = {
 			fullname:              general.name,
 			playername:            general.playername,
 			race:                  general.race,
+			template_names:        runningTotals.templateNames,
 			height:                general.height,
 			weight:                general.weight,
 			size:                  sizeModifier,
@@ -26599,7 +26633,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		importNaturalAttacksFromGca(updates, attributes);
 
-		setAttrs(updates, {silent: false}, callback);
+		let updatesMerged;
+
+		// if there are racial records, merge them into updates
+		if (racialUpdates) {
+			updatesMerged = {...updates, ...racialUpdates};
+		} else {
+			updatesMerged = {...updates};
+		}
+
+		setAttrs(updatesMerged, {silent: false}, callback);
 
 	}
 
@@ -26776,6 +26819,120 @@ The attacker may choose to hit the original target or the limb you used to parry
 	}
 
 	/**
+	 * Gets templates from GCA. If found, runningTotals with template data
+	 * Returns Repeating Racial Records to add, if template provides 
+	 * additional attribute updates not covered by advantages/disadvantages
+	 * 
+	 * @param json   jsonData      GCA JSON data
+	 * @param object runningTotals Object that tracks running totals and changes. Passed by reference
+	 * 
+	 * @return object Repeating Racial Records
+	 */ 
+	function getTemplatesFromGca(jsonData, runningTotals) {
+
+		let templates = getJsonArrayFromTrait(jsonData.Character.Traits.Template);
+
+		let arrNames = [];
+
+		let arrNotes = [];
+
+		let templateToAdd;
+
+		let racialUpdates = {};
+
+		if (templates && templates.length) {
+
+			templates.forEach(template => {
+
+				let name = template.name;
+
+				if (template.nameext) {
+					name += ` (${template.nameext})`;
+				}
+
+				arrNames.push(name);
+
+				let notes = getGcaNotesForTemplate(template);
+
+				arrNotes.push(notes);
+
+				let keys = [];
+
+				if (template.pkids) {
+					// get rid of spaces, just in case
+					let ids = template.pkids.replaceAll(", ", ",");
+
+					keys = ids.split(",");
+				} 
+
+				templateToAdd = {
+					name: name,
+					notes: notes,
+					keys: keys
+				};
+
+				runningTotals.templates.push(templateToAdd);
+
+				// check for additional racial row to get added
+				// this fixes offset issues with stat updates 
+				if (template.premodspoints) {
+
+					getGcaRacialUpdates(racialUpdates, template, name);
+
+				}
+				
+			});
+
+			let templateNames = arrNames.join("|");
+
+			let templateNotes = arrNotes.join("\n\n");
+
+			runningTotals.templateNames = templateNames;
+
+			runningTotals.templateNotes = templateNotes;
+			
+		}
+
+		return racialUpdates;
+		
+	}
+
+	/**
+	 * Gets repeating racial record that accounts for attribute updates 
+	 * not covered advantage/disadvantages
+	 * example: Dwarf Gives: +1 to ST:HT, +3 to ST:Fatigue Points, -1 to ST:Basic Move
+	 * 
+	 * @param object racialUpdates Object for updating repeating_racial table. Passed by reference
+	 * @param json   template      GCA json object
+	 * @param string templateName  Name of template that "gives" attributes
+	 * 
+	 * @return object
+	 */
+	function getGcaRacialUpdates(racialUpdates, template, templateName) {
+
+		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
+		let rowId = generateRowID();
+
+		let idkey = template.IDKey.trim();
+
+		let baseFieldName = `repeating_racial_${rowId}`;
+
+		racialUpdates[`${baseFieldName}_idkey`] = idkey;
+
+		let gives = template.gives;
+
+		gives = gives.replaceAll("ST:", "");
+
+		racialUpdates[`${baseFieldName}_name`] = templateName + " gives: " + template.gives;
+
+		racialUpdates[`${baseFieldName}_points`] = template.premodspoints;
+
+		racialUpdates[`${baseFieldName}_ref`] = template.page;
+
+		return racialUpdates;
+	}
+
+	/**
 	 * If trait has melee stats, create entry on melee table
 	 *
 	 * @param object rows  Object of properties to update/add rows. passed by reference
@@ -26826,8 +26983,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(trait);
 
-			fullName += ` (${levelName})`;
-
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
+			
 		}
 
 		rows[`${baseFieldName}_idkey`] = idkey;
@@ -27546,7 +27705,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 					} else {
 
-						getGcaAdvantageRow(rows, name, advantage);
+						getGcaAdvantageRow(rows, name, advantage, runningTotals);
 
 						getMeleeAttackFromGcaTrait(rows, advantage);
 
@@ -27576,11 +27735,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Updates the rows value with an row for advantages
 	 * 
-	 * @param object rows      Object of properties to update/add rows. passed by Ref
-	 * @param string name      Name of the advantage
-	 * @param json   advantage JSON data for the advantage
+	 * @param object rows          Object of properties to update/add rows. passed by Ref
+	 * @param string name          Name of the advantage
+	 * @param json   advantage     JSON data for the advantage
+	 * @param object runningTotals An object that keeps track of running totals. NOTE: passed by reference
 	 */
-	function getGcaAdvantageRow(rows, name, advantage) {
+	function getGcaAdvantageRow(rows, name, advantage, runningTotals) {
 
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
@@ -27593,6 +27753,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let levelName;
 
+		let templateName = getGcaTemplateName(idkey, runningTotals);
+
+		if (templateName) {
+
+			// save to racial table instead.
+			baseFieldName = `repeating_racial_${rowId}`;
+
+			// if more than one template, prepend the template name
+			if (runningTotals.templates.length > 1) {
+			
+				fullName = `[${templateName}] ${fullName}`;
+			}
+
+		}
+
 		if (advantage.nameext) {
 
 			fullName += ` (${advantage.nameext})`;
@@ -27603,7 +27778,9 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(advantage);
 
-			fullName += ` (${levelName})`;
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
 
 		}
 
@@ -27630,6 +27807,36 @@ The attacker may choose to hit the original target or the limb you used to parry
 		if (notes) {
 			rows[`${baseFieldName}_notes`] = notes;
 		}
+
+	}
+
+	/**
+	 * Attempts to get an associated template name to the unique key
+	 * If no match, returns false
+	 *
+	 * @param string idkey GCA unique primary key to search for
+	 * @param object runningTotals GCA import totals. Passed by reference. 
+	 * 
+	 * @return ?string
+	 */
+	function getGcaTemplateName(idkey, runningTotals) {
+
+		let name = false;
+
+		// for info on runningTotals see: function importCharacterSheetWithGCA(
+		if (runningTotals.templates && runningTotals.templates.length) {
+
+			runningTotals.templates.forEach(template => {
+
+				if (template.keys && template.keys.includes(idkey)) {
+					name = template.name;
+				}
+
+			});
+
+		}
+
+		return name;
 
 	}
 
@@ -27859,6 +28066,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 			arrNotes.push("Gives: " + advantage.gives + "\n"); 
 		}
 
+		if (advantage.description) {
+			arrNotes.push("Description: " + advantage.description + "\n"); 
+		}
+
 		let modNote = getGcaModifierNotes(advantage);
 
 		if (modNote) {
@@ -28028,7 +28239,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = perk.name;
 
-				getGcaValuesForPerksQuirks( "perk", rows, name, perk);
+				getGcaValuesForPerksQuirks( "perk", rows, name, perk, runningTotals);
 				
 			});
 
@@ -28040,7 +28251,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = quirk.name;
 
-				getGcaValuesForPerksQuirks( "quirk", rows, name, quirk);
+				getGcaValuesForPerksQuirks( "quirk", rows, name, quirk, runningTotals);
 				
 			});
 
@@ -28054,12 +28265,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 	/**
 	 * Get the row values for repeating perks or quirks
 	 * 
-	 * @param string type        Type = perk | quirk
-	 * @param object rows        Rows for setAttr() function. passed by reference
-	 * @param string name        Name of the quirk or perk
-	 * @param json   perkOrQuirk object of perk or quirk
+	 * @param string type          Type = perk | quirk
+	 * @param object rows          Rows for setAttr() function. passed by reference
+	 * @param string name          Name of the quirk or perk
+	 * @param json   perkOrQuirk   object of perk or quirk
+	 * @param object runningTotals An object that keeps track of running totals. NOTE: passed by reference
 	 */
-	function getGcaValuesForPerksQuirks(type = "perk", rows, name, perkOrQuirk) {
+	function getGcaValuesForPerksQuirks(type = "perk", rows, name, perkOrQuirk, runningTotals) {
 
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
@@ -28070,10 +28282,27 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let fullName = name;
 
-		if (type === "perk") {
+		let templateName = getGcaTemplateName(idkey, runningTotals);
+		
+		if (templateName) {
+			
+			// save to racial table instead.
+			baseFieldName = `repeating_racial_${rowId}`;
+
+			// if more than one template, prepend the template name
+			if (runningTotals.templates.length > 1) {
+			
+				fullName = `[${templateName}] ${fullName}`;
+			}
+
+		} else if (type === "perk") {
+			
 			baseFieldName = `repeating_perks_${rowId}`;
+		
 		} else {
+			
 			baseFieldName = `repeating_quirks_${rowId}`;
+		
 		}
 
 		if (perkOrQuirk.nameext) {
@@ -28129,7 +28358,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = disadvantage.name;
 
-				getGcaValuesForDisadvantage(rows, name, disadvantage);
+				getGcaValuesForDisadvantage(rows, name, disadvantage, runningTotals);
 
 				getGcaModifiersDisadvantage(rows, name, disadvantage, runningTotals);
 				
@@ -28145,11 +28374,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 * Get row values for the disadvantage
 	 * check for additional non-repeating values based on name 
 	 * 
-	 * @param object rows         Rows for setAttr() function. Passed by Reference
-	 * @param string name         Name of the quirk or perk
-	 * @param json   disadvantage object disadvantage
+	 * @param object rows          Rows for setAttr() function. Passed by Reference
+	 * @param string name          Name of the quirk or perk
+	 * @param json   disadvantage  object disadvantage
+	 * @param object runningTotals An object that keeps track of running totals. NOTE: passed by reference
 	 */
-	function getGcaValuesForDisadvantage(rows, name, disadvantage)
+	function getGcaValuesForDisadvantage(rows, name, disadvantage, runningTotals)
 	{
 		// TODO: check idkey to existing repeating keys. If exist, get row Id instead of generating one.
 		let rowId = generateRowID();
@@ -28162,6 +28392,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let baseFieldName = `repeating_disadvantages_${rowId}`;
 
+		let templateName = getGcaTemplateName(idkey, runningTotals);
+
+		if (templateName) {
+
+			// save to racial table instead.
+			baseFieldName = `repeating_racial_${rowId}`;
+
+			// if more than one template, prepend the template name
+			if (runningTotals.templates.length > 1) {
+			
+				fullName = `[${templateName}] ${fullName}`;
+			}
+
+		}
+
 		if (disadvantage.nameext) {
 
 			fullName += ` (${disadvantage.nameext})`;
@@ -28172,8 +28417,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(disadvantage);
 
-			fullName += ` (${levelName})`;
-
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
+			
 		}
 
 		let points = 0;
@@ -28264,13 +28511,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let name = defaultValue;
 
-		if (attribute && attribute.levelnames && attribute.level) {
+		if (attribute && attribute.levelnames && attribute.levelnames.includes(",") && attribute.level) {
 
-			let arrNames = attribute.levelnames.split(", ");
+			// get rid of spaces between commas (seems to change from advantage to advantage)
+			let levelNames = attribute.levelnames.replaceAll(", ", ",");
+
+			let arrNames = levelNames.split(",");
 
 			let level = Number(attribute.level);
 
-			name = arrNames[level-1];
+			// NOTE: Appearance index needs to start at 1 so we can ignore "average"
+			if (attribute.name.toLowerCase() !== "appearance") {
+				level = level - 1;
+			}
+
+			name = arrNames[level];
 		
 		}
 		
@@ -28351,8 +28606,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(skill);
 
-			fullName += ` (${levelName})`;
-
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
+			
 		}
 
 		let points = 0;
@@ -28809,8 +29066,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(item);
 
-			fullName += ` (${levelName})`;
-
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
+			
 		}
 
 		rows[`${baseFieldName}_idkey`] = idkey;
@@ -28872,6 +29131,43 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (item.gives) {
 			arrNotes.push("Gives: " + item.gives + "\n"); 
+		}
+
+		if (arrNotes.length) {
+			notes = arrNotes.join("\n");
+		}
+
+		return notes;
+
+	}
+
+	/**
+	 * Get any additional notes for template
+	 * 
+	 * @param json item JSON object for item
+	 *
+	 * @return string
+	 */
+	function getGcaNotesForTemplate(item) {
+
+		let arrNotes = [];
+
+		let notes = "";
+
+		if (item.gives) {
+			arrNotes.push("Gives: " + item.gives + "\n"); 
+		}
+
+		if (item.features) {
+			arrNotes.push("Features: " + item.features + "\n"); 
+		}
+
+		if (item.usernotes) {
+			arrNotes.push(item.usernotes + "\n"); 
+		}
+
+		if (item.description) {
+			arrNotes.push(item.description + "\n");
 		}
 
 		if (arrNotes.length) {
@@ -28956,8 +29252,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			levelName = getGcaLevelName(spell);
 
-			fullName += ` (${levelName})`;
-
+			if (levelName) {
+				fullName += ` (${levelName})`;
+			}
+			
 		}
 
 		rows[`${baseFieldName}_idkey`] = idkey;
