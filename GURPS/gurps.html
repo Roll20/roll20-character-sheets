@@ -14093,8 +14093,8 @@ visualize what it will look like in chat.
 						<li>Convert the XML file to json.
 							<ul>
 								<li>https://convertxmljson.com/</li>
-								<li>https://www.convertjson.com/xml-to-json.htm</li>
 								<li>https://jsonformatter.org/xml-to-json</li>
+								<li>Initial testing worked with both sites. <b>Alert</b> if you use a different one make sure it <b>doesn't</b> create fields named <b>__cdata</b></li>
 							</ul>
 						</li>
 						<li>Copy/Past the json data to the text box below.</li>
@@ -14151,7 +14151,17 @@ visualize what it will look like in chat.
 
 						</div>
 
+					</div>
 
+					<div class="control">
+						<div>
+							<h4 style="color:red;">Alert</h4>
+							<p>
+								Since the JSON data is large, please only press the button <b>once.</b> Then wait for the <b>Processing...</b> message to show.
+								It might take more than 5 to 10 seconds to run, depending on your processing power. If the <b>Processing...</b> doesn't disappear 
+								after 20 seconds or so, then something probably broke during the import.
+							</p>
+						</div>
 					</div>
 
 				</div>
@@ -26844,6 +26854,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let [speedPts, speedMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Speed");
 
+		// don't use moveMod for Basic Move, since that is derived from rounding down speed
 		let [movePts, moveMod] = getCharacterPointsModFromGcaAttributes(attributes, "Basic Move");
 
 		let racialUpdates = getTemplatesFromGca(uniqueKeys, jsonData, runningTotals);
@@ -26902,8 +26913,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			fear_check_points:     fearPts,
 			basic_speed_points:    speedPts,
 			basic_speed_mod:       speedMod,
-			basic_move_points:     movePts,
-			basic_move_mod:        moveMod,
+			basic_move_points:     movePts
 		};
 
 		importNaturalAttacksFromGca(uniqueKeys, updates, attributes, importNotes);
@@ -27336,7 +27346,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let damageNote = "";
 
 		// example: "charreach": "1,2|1,2|1,2|2"
-		let arrReach = trait.charreach.split("|");
+		let arrReach;
+
+		if (trait.charreach) {
+			arrReach = trait.charreach.split("|")
+		}
 
 		// example: "charskillscore": "11|11|5|5"
 		let arrSkillLevel = trait.charskillscore.split("|");
@@ -27392,7 +27406,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
 
-			if (arrReach[index]) {
+			if (arrReach) {
 				reach = arrReach[index];
 			}
 
@@ -27476,11 +27490,17 @@ The attacker may choose to hit the original target or the limb you used to parry
 		
 		rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
 
-		rows[`${baseFieldName}_acc`] = trait.characc;
-
+		if (trait.characc) {
+			rows[`${baseFieldName}_acc`] = trait.characc;
+		} else {
+			rows[`${baseFieldName}_acc`] = 0;
+		}
+		
 		rows[`${baseFieldName}_range`] = getRangeFromGca(trait);
 
-		rows[`${baseFieldName}_skill`] = trait.charskillscore;
+		if (trait.charskillscore) {
+			rows[`${baseFieldName}_skill`] = trait.charskillscore;
+		}
 
 		if (trait.charrof) {
 			rows[`${baseFieldName}_rof`] = trait.charrof;
@@ -27525,10 +27545,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let arrModes = trait.mode.split("|");
 
 		// example: "chardamage": "1d+1|1d|1d+1|1d-1",
-		let arrDamage = trait.chardamage.split("|");
+		let arrDamage;
+
+		if (trait.chardamage) {
+			arrDamage = trait.chardamage.split("|");
+		}
 
 		// example: "chardamtype": "cr|cr|cr|cr",
-		let arrDamType = trait.chardamtype.split("|");
+		let arrDamType;
+
+		if (trait.chardamtype) {
+			arrDamType = trait.chardamtype.split("|")
+		}
 
 		// example: "chararmordivisor": "|3",
 		let arrDivisor = [];
@@ -27543,7 +27571,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let arrSkillLevel = trait.charskillscore.split("|");
 
 		// i.e: "characc": "4|4",
-		let arrAcc = trait.characc.split("|");
+		let arrAcc;
+
+		if (trait.characc) {
+			arrAcc = trait.characc.split("|");
+		}
 
 		// i.e: "charrcl": "3|3",
 		let arrRecoil;
@@ -27570,10 +27602,18 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let arrSkillUsed = trait.charskillused.split("|");
 
 		// "charrangehalfdam": "180|180",
-		let arrHalfRange = trait.charrangehalfdam.split("|");
+		let arrHalfRange;
+
+		if (trait.charrangehalfdam) {
+			arrHalfRange = trait.charrangehalfdam.split("|");
+		}
 
 		// "charrangemax": "2000|2000",
-		let arrMaxRange = trait.charrangemax.split("|");
+		let arrMaxRange;
+
+		if (trait.charrangemax) {
+			arrMaxRange = trait.charrangemax.split("|")
+		}
 
 		let arrBulk;
 
@@ -27612,18 +27652,39 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_name`] = fullName;
 
-			let damage = arrDamage[index];
+			if (arrDamage) {
 
-			// replace "d" with "d6"
-			damage = damage.replace("d", "d6");
+				let damage = arrDamage[index];
 
-			rows[`${baseFieldName}_damage`] = damage;
+				// replace "d" with "d6"
+				damage = damage.replace("d", "d6");
 
-			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
+				rows[`${baseFieldName}_damage`] = damage;
+			}
 
-			rows[`${baseFieldName}_acc`] = arrAcc[index];
+			if (arrDamType) {
 
-			rows[`${baseFieldName}_range`] = getRangeFromHalfMax(arrHalfRange[index], arrMaxRange[index]);
+				rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
+
+			}
+
+			if (arrAcc) {
+				rows[`${baseFieldName}_acc`] = arrAcc[index];
+			}
+			
+			let halfRange = "";
+
+			if (arrHalfRange) {
+				halfRange = arrHalfRange[index];
+			}
+
+			let maxRange = "";
+
+			if (arrMaxRange) {
+				maxRange = arrMaxRange[index];
+			}
+
+			rows[`${baseFieldName}_range`] = getRangeFromHalfMax(halfRange, maxRange);
 
 			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
 
@@ -27998,7 +28059,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getDamageDieFromGca(damageDie) {
 
-		let dieRoll;
+		let dieRoll = "";
+
+		if (!damageDie) {
+			return dieRoll;
+		}
 
 		if (damageDie.includes("~")) {
 
@@ -28264,6 +28329,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 	function getDamageTypeFromGca(gcaDamageType) {
 
 		let type = "";
+
+		if (!gcaDamageType) {
+			return type;
+		}
 
 		// if damage type contains a space, there's an additional damage type present
 		// example: damage type = cr exp = Crush Explosive. 
