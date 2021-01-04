@@ -26762,7 +26762,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let baseTL = Number(campaign.basetl);
 
-		let miscNotes = jsonData.Character.Notes;
+		let miscNotes = "";
+
+		if (jsonData.Character.Notes) {
+			miscNotes = jsonData.Character.Notes;
+		}
 
 		let jsonSM = getTraitFromGcaAttributes(attributes, "Size Modifier");
 
@@ -26907,7 +26911,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let updatesMerged;
 
 		// check for merging in notes and racial traits
-		if (importNotes && racialUpdates) {
+		if (importNotes && !isEmpty(racialUpdates)) {
 			updatesMerged = {...updates, ...notes, ...racialUpdates};
 		} else if (importNotes) {
 			updatesMerged = {...updates, ...notes};
@@ -27275,6 +27279,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 			
 		}
 
+		let reach = "c";
+
 		rows[`${baseFieldName}_idkey`] = idkey;
 
 		rows[`${baseFieldName}_name`] = fullName;
@@ -27285,7 +27291,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		rows[`${baseFieldName}_type`] = getDamageTypeFromGca(trait.chardamtype);
 
-		rows[`${baseFieldName}_reach`] = trait.charreach;
+		if (trait.charreach) {
+
+			reach = trait.charreach;
+
+		}
+
+		rows[`${baseFieldName}_reach`] = reach;
 
 		rows[`${baseFieldName}_skill`] = trait.charskillscore;
 
@@ -27342,6 +27354,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// tracks which mode to use
 		let index = 0;
 
+		let reach = "c";
+
 		arrModes.forEach(mode => {
 
 			if (mode.toLowerCase() === "thrown") {
@@ -27378,7 +27392,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
 
-			rows[`${baseFieldName}_reach`] = arrReach[index];
+			if (arrReach[index]) {
+				reach = arrReach[index];
+			}
+
+			rows[`${baseFieldName}_reach`] = reach;
 
 			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
 
