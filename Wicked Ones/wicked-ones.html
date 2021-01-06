@@ -345,12 +345,14 @@
             <span class="dropdown">
               <input type="hidden" name="attr_minion-action-roll"/>
               <input type="hidden" name="attr_minion-action-name"/>
-              <button type="roll" class="text-button" name="roll_minion-action" value="&{template:basic} {{character=@{minion-count} @{minion-race} @{minion-type}}} {{action=^{@{minion-action-name}}}} @{minion-action-roll}">
+              <button type="roll" class="text-button" name="roll_minion-action" value="&{template:basic} {{character=@{character_name}}} {{action=@{minion-count} @{minion-race} @{minion-type}}} {{subaction=^{@{minion-action-name}}}} @{minion-action-roll}">
                 <span name="attr_minion-action-name" data-i18n-dynamic></span>
               </button>
               <input type="hidden" name="attr_minion-action-drop" class="dropdown" value="up">
               <button type="action" class="toggle dropdown" name="act_toggle-minion-action-drop" >
-                <span>˅</span>
+                <span class="chevron bottom"></span>
+                <!-- <span>▼</span> -->
+                <!-- <span>˅</span> -->
               </button>
               <div class="dropdown">
                 <button type="action" class="text-button" name="act_minion-action-scan"> <span data-i18n="scan">Scan</span></button>
@@ -462,11 +464,15 @@
           <div data-i18n="description">Description</div>
         </div>
         <fieldset class="repeating_duties">
-          <input type="text" name="attr_duty-tier"/>
+          <input type="text" name="attr_duty-tier" class="duty-tier"/>
           <input type="text" name="attr_duty-type"/>
           <div class="auto-expand"><span name="attr_duty-desc"></span>
             <textarea spellcheck="false" name="attr_duty-desc"></textarea>
           </div>
+          <input type="hidden" name="attr_duty-roll"/>
+          <button type="roll" name="roll_duty" class="text-button" value="&{template:basic} {{character=@{character_name}}} {{action=^{tier} @{duty-tier} - @{duty-type}}} {{subaction=@{duty-desc}}} @{duty-roll}">
+            <span>Roll</span>
+          </button>
         </fieldset>
       </div>
     </div>
@@ -768,6 +774,11 @@
           <li><strong data-i18n="go-feral">Go Feral</strong>: <span data-i18n="go-feral-desc">Immediately Compelled; Abilities used during this Action cost no Stress.</span></li>
         </ul>
       </div>
+      <div class="sheet-fortune">
+        <button type="roll" name="roll_fortune" class="text-button" value="&{template:basic} {{character=@{character_name}}} {{action=^{fortune-roll}}} @{fortune-roll}">
+          <span data-i18n="fortune-roll">Fortune Roll</span>
+        </button>
+      </div>
     </div>
     <div class="sheet-friend">
       <span data-i18n="vile-friend" class="header small box">Vile Friend</span>
@@ -880,18 +891,22 @@
 
   function updateRolls(){
     getSectionIDs("minion-actions", function(ids){
-      console.log(ids)
       var attrs = actions.concat(ids.map(i => `repeating_minion-actions_${i}_minion-action`))
-      getAttrs(attrs, function(v) {
-        var set = {}
-        for (a in v) {
-          set[a + "-roll"] = getRoll(v[a])
-        }
-
-        set["loot-roll"] = getRoll(0,0,6)
-
-        setAttrs(set);
-      });
+      getSectionIDs("duties", function(ids){
+        //console.log(ids)
+        attrs = attrs.concat(ids.map(i => `repeating_duties_${i}_duty-tier`))
+        getAttrs(attrs, function(v) {
+          var set = {}
+          for (a in v) {
+            set[a.replace("duty-tier", "duty") + "-roll"] = getRoll(v[a])
+          }
+  
+          set["loot-roll"] = set["fortune-roll"] = getRoll(0,0,6)
+  
+          setAttrs(set);
+        });
+      })
+      
     });
     
   }
@@ -1295,6 +1310,7 @@
 <rolltemplate class="sheet-rolltemplate-basic">
   {{#character}}<div class="character">{{character}}</div>{{/character}}
   {{#action}}<div class="action">{{action}}</div>{{/action}}
+  {{#subaction}}<div class="subaction">{{subaction}}</div>{{/subaction}}
   {{#roll}}<div class="roll">{{roll}}</div>{{/roll}}
   {{#zero}}<div class="zero">{{zero}}</div>{{/zero}}
 </rolltemplate>
