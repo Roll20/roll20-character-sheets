@@ -1,4 +1,4 @@
 Todo for the sheet:
 
-* Add crew sheet option
-* Create roll template
+* Create roll template (something like a simpler blades in the dark?)
+* Make it prettier
