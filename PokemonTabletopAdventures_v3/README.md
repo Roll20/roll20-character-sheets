@@ -8,6 +8,13 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Jan 7th, 2020
+
+- Added support for scatter moves
+- Added roll templates for dual hit and multi hit scatter attacks
+- Added a quick roll button that rolls a move without any query boxes for temporary modifiers or effectiveness, rolling with +0/+0/Neutral values
+- Streamlined move displays to show the configuration only when desired via a collapsible control
+
 ### Dec 12, 2020
 
 - Migrated the character sheet style attributes to new fields
