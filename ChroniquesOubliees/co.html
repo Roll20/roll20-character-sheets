@@ -537,7 +537,7 @@
                     <button type="roll" class="atk" name="roll_Arme" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{armenom}}} {{subtags=Attaque}} {{attaque=[[ @{armeattnbde}d@{armeattde}@{armeattrollmod}cs>@{armecrit}cf1 + [[@{armeatk}]] + @{armeatkdiv} +@{bonus_attaque_option} +@{armebonusoption}]]}} @{armereussiteauto} @{armepoudre} @{armedegats} {{special=@{armespec}}} {{degats2=@{bonus_dm_option}}} {{dmtemp=@{armedmtemp}}}" />
                   </td>
                   <td class="boxinputleft-atk" style="min-width:130px;">
-                    <input type="text" class="atk" style="width:11px; text-align:right; font-size:10px" name="attr_armelabel" value=0>
+                    <input type="text" class="atk" style="width:12px; text-align:right; font-size:10px" name="attr_armelabel" value=0>
                     <input type="text" class="atk" name="attr_armenom" style="font-weight: bold;width:94%;margin-left:-5px" placeholder="Arme/attaque"/>
                   </td>
                   <td class="boxinputleft-atk">
@@ -1380,12 +1380,60 @@
         </table>
       </div>
       <img class="imghr" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/ChroniquesOubliees/co_hr.png" />
-      <table class="tabsep">
-        <tr>
-          <td class="textfatleft" style="min-width:245px;">Jets de Capacités</td>
-          <td class="textbase" style="width:100%;">&nbsp;</td>
-        </tr>
-      </table>
+        <table class="tabsep">
+          <tr>
+            <td class="textfatleft" style="width:320px;">Compétences</td>
+            <td class="textbase" style="width:66px;">Malus</td>
+            <td class="textbase" style="width:54px;">Carac.</td>
+            <td class="textbase" style="width:60px;">Bonus</td>
+            <td class="textbase">Description</td>
+          </tr>
+        </table>
+      <fieldset class="repeating_competences">
+        <input type='hidden' name='attr_comp_jet' value='@{FOR_SUP} + @{FOR_TEST}' />
+        <input type='hidden' name='attr_comp_nomCapa' value='' />
+        <input type='hidden' name='attr_comp_bonusCapa' value=0 />
+        <input type='hidden' name='attr_comp_bonusCapaText' value='' />
+        <input type='hidden' name='attr_comp_caracs' value='' />
+        <input type='hidden' name='attr_comp_bonusTotal' value=0 />
+        <table  class="tabsep">
+          <tr>
+            <td>
+              <button type="roll" class="neutre" name="roll_competence" value="@{jets_caches}&{template:co1} {{perso=@{character_name}}} {{name=@{comp_nomCapa}@{comp_nom}}} {{subtags=@{comp_carac}:}} {{carac=[[@{comp_jet} + @{comp_bonusTotal}]]}} {{desc=@{comp_description}}}" />
+            </td>
+            <td class="boxinputleft" style="min-width:300px;">
+              <span name="attr_nomCapa"></span>
+              <input type="text" name="attr_comp_nom" style="font-weight: bold;" placeholder="Nom de la compétence" />
+            </td>
+            <td class="boxinputleft">
+              <select style="width:62px;" name="attr_comp_malus" size="1" title="Malus applicable">
+                  <option value="" selected>-</option>
+                  <option value="armure">Armure</option>
+                  <option value="casque">Casque</option>
+              </select>
+            </td>
+            <td class="boxinputleft">
+              <select class="carac" name="attr_comp_carac" size="1" title="Caractéristique utilisée pour le jet">
+                  <option selected>FOR</option>
+                  <option>DEX</option>
+                  <option>CON</option>
+                  <option>INT</option>
+                  <option>SAG</option>
+                  <option>CHA</option>
+              </select>
+            </td>
+            <td class="boxinputleft">
+              <span name="attr_comp_bonusCapaText"></span>
+              +<input type="number" style="width:32px;" name="attr_comp_bonus" value="0" title="Bonus divers" />
+            </td>
+            <td class="boxinputleft" style="width:100%;">
+              <span name="attr_comp_caracs"></span>
+              <textarea name="attr_comp_description" title="Description"></textarea>
+            </td>
+          </tr>
+        </table>
+      </fieldset>
+      <span class="textfatleft">Jets de Capacité</span>
       <fieldset class="repeating_jetcapas">
         <table  class="tabsep">
           <tr>
@@ -2992,7 +3040,7 @@
       mot = mot.trim();
       if (mot === '') return;
       var s = mapArmes[mot];
-      if (s) {
+      if (s && s.typeattaque) {
         newAttrs[prefix + 'typeattaque'] = s.typeattaque;
         newAttrs[prefix + 'modificateurs'] = s.modificateurs;
         newAttrs[prefix + 'typedegats'] = s.typedegats;
@@ -3691,6 +3739,12 @@
       effet: "!cof-effet-temp formeGazeuse [[1d4+3]]",
     }],
   }, {
+    keys: ['gland'],
+    variantes: [{
+      keys: ['pouvoir'],
+      effet: "#Attaque Gland de pouvoir --toucher [[@{selected|ATKTIR}]] --portee 10 --pasDeDmg --magique --effet statueDeBois [[2d6+@{selected|SAG}]] --valeur 10 10",
+    }],
+  }, {
     keys: ['invisibilité', 'invisibilite', "d'invisibilité", "d'invisibilite"],
     effet: "!cof-set-state invisible true --message devient invisible"
   }, {
@@ -3913,6 +3967,64 @@
           }
         }
       }
+    });
+  });
+
+  //Les compétences
+  on('change:repeating_competences:comp_carac', function(eventinfo) {
+    var carac = eventinfo.newValue;
+    setAttrs({
+      repeating_competences_comp_jet: "@{" + carac + "_SUP} + [[@{" + carac + "} + @{" + carac + "_BONUS}]]"
+    });
+  });
+
+  on('change:repeating_competences:comp_bonusCapa', function(eventinfo) {
+    var bc = parseInt(eventinfo.newValue);
+    if (isNaN(bc)) bc = eventinfo.newValue;
+    else if (bc > 0) bc = '+' + bc;
+    else if (bc === 0) bc = '';
+    setAttrs({
+      repeating_competences_comp_bonusCapaText: bc
+    });
+  });
+
+  function bonusTotalCompetence(compValues, prefix, values) {
+    var bonusTotal = 0;
+    var bonus = parseInt(compValues[prefix + 'bonusCapa']);
+    if (!isNaN(bonus)) bonusTotal += bonus;
+    bonus = parseInt(compValues[prefix + 'bonus']);
+    if (!isNaN(bonus)) bonusTotal += bonus;
+    switch (compValues[prefix + 'malus']) {
+      case 'armure':
+        bonus = values.DEFARMUREON * values.DEFARMUREMALUS + values.DEFBOUCLIERON * values.DEFBOUCLIERMALUS;
+        if (!isNaN(bonus)) bonusTotal -= bonus;
+        break;
+      case 'casque':
+        bonus = values.casque_on * values.casque_malus;
+        if (!isNaN(bonus)) bonusTotal -= bonus;
+        break;
+    }
+    var sa = {};
+    sa[prefix + 'bonusTotal'] = bonusTotal;
+    setAttrs(sa);
+  }
+
+  on('change:repeating_competences:comp_bonusCapa change:repeating_competences:comp_bonus change:repeating_competences:comp_malus', function(eventinfo) {
+    getAttrs(['repeating_competences_comp_bonusCapa', 'repeating_competences_comp_bonus', 'repeating_competences_comp_malus', 'DEFARMUREON', 'DEFARMUREMALUS', 'DEFBOUCLIERON', 'DEFBOUCLIERMALUS', 'casque_on', 'casque_malus'], function(values) {
+      bonusTotalCompetence(values, 'repeating_competences_comp_', values);
+    });
+  });
+
+  on('change:DEFARMUREON change:DEFARMUREMALUS change:DEFBOUCLIERON change:DEFBOUCLIERMALUS change:casque_on change:casque_malus', function(eventinfo) {
+    getAttrs(['DEFARMUREON', 'DEFARMUREMALUS', 'DEFBOUCLIERON', 'DEFBOUCLIERMALUS', 'casque_on', 'casque_malus'], function(values) {
+      getSectionIDs('repeating_competences', function(idArray) {
+        idArray.forEach(function(id) {
+          var prefix = 'repeating_competences_' + id + '_comp_';
+          getAttrs([prefix + 'bonusCapa', prefix + 'bonus', prefix + 'malus'], function(compValues) {
+            bonusTotalCompetence(compValues, prefix, values);
+          });
+        });
+      });
     });
   });
 </script>
