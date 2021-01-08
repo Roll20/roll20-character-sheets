@@ -8,6 +8,14 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+January 12th 2021 v1.31
+
+- Reroll clicky buttons now integrated into the rol template out put for most rolls, including all repeating sections. This is diplayed in the Test value row.
+- NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is allow shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead.
+- Weapons & Spells Tab rework, cleaned it up and added a Mod and Target display fields which matches the roll target.
+- All Mod fields will now prepopulate the Roll Modifider popup with the set value.
+- Fixed the Talents tab text field dragging issue from the last update.
+
 
 December 28st 2020 v1.3
 
