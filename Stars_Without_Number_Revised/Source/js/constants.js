@@ -2,7 +2,7 @@
 
 /* Data constants */
 const sheetName = "Stars Without Number (revised)";
-const sheetVersion = "2.5.2";
+const sheetVersion = "2.5.3";
 const translate = getTranslationByKey;
 const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",

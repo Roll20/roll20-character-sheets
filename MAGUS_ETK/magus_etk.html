@@ -35,7 +35,7 @@
         <label>Tp</label>
         <input type='number' name='attr_tp' placeholder='Tp' min="0" class="full"/>
         <label>Szint</label>
-        <input type='number' name='attr_szint' placeholder='TSz' min="1" class="emphasized full"/>
+        <input type='number' name='attr_szint' placeholder='TSz' min="0" class="emphasized full"/>
         <label>Következő szint</label>
         <input type='number' name='attr_tp_max' placeholder='Köv. szint' min="100" class="full"/>
       </div>
@@ -179,45 +179,6 @@
     </div>
 
     <div class="container">
-      <div class="section col-5 values health">
-        <div>
-          <div>
-            <label>Ép alap</label>
-            <input type='number' name='attr_epAlap' min="1"/>
-          </div>
-          <div>
-            <label>Max. Ép</label>
-            <input type='number' name='attr_ep_max' value="@{epAlap} + @{egeszseg10}" disabled="disabled"/>
-          </div>
-          <div>
-            <label>Akt. Ép</label>
-            <input type='number' name='attr_ep' min="0" class="emphasized" />
-          </div>
-        </div>
-      </div>
-      <div class="section col-7 values health">
-        <div>
-          <div>
-            <label>Fp alap</label>
-            <input type='number' name='attr_fpAlap' min="1"/>
-          </div>
-          <div>
-            <label>Fp szintlépéskor kapott</label>
-            <input type='number' name='attr_fpSzint' min="1"/>
-          </div>
-          <div>
-            <label>Max. Fp</label>
-            <input type='number' name='attr_fp_max' value="@{fpAlap} + @{allokepesseg10} + @{akaratero10} + @{fpSzint}" disabled="disabled"/>
-          </div>
-          <div>
-            <label>Akt. Fp</label>
-            <input type='number' name='attr_fp' min="0" class="emphasized"/>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
       <div class="section col-5 me">
         <h2>Mágiaellenállás</h2>
         <div class="flex-table">
@@ -248,8 +209,8 @@
           </div>
           <div>
             <div><label>ME</label></div>
-            <div><input type="number" name="attr_asztral" value="@{asztralTme}+@{asztralStatikus}+@{asztralDinamikus}+@{asztralEgyeb}" disabled="true"/></div>
-            <div><input type="number" name="attr_mental" value="@{mentalTme}+@{mentalStatikus}+@{mentalDinamikus}+@{mentalEgyeb}" disabled="true"/></div>
+            <div><input type="number" name="attr_asztralMe" value="@{asztralTme}+@{asztralStatikus}+@{asztralDinamikus}+@{asztralEgyeb}" disabled="true"/></div>
+            <div><input type="number" name="attr_mentalMe" value="@{mentalTme}+@{mentalStatikus}+@{mentalDinamikus}+@{mentalEgyeb}" disabled="true"/></div>
           </div>
         </div>
       </div>
@@ -305,6 +266,45 @@
             <td><input type="number" name="attr_mp" class="emphasized" style="width: 106px" /></td>
           </tr>
         </table>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="section col-5 values health">
+        <div>
+          <div>
+            <label>Ép alap</label>
+            <input type='number' name='attr_epAlap' min="1"/>
+          </div>
+          <div>
+            <label>Max. Ép</label>
+            <input type='number' name='attr_ep_max' value="@{epAlap} + @{egeszseg10}" disabled="disabled"/>
+          </div>
+          <div>
+            <label>Akt. Ép</label>
+            <input type='number' name='attr_ep' min="0" class="emphasized" />
+          </div>
+        </div>
+      </div>
+      <div class="section col-7 values health">
+        <div>
+          <div>
+            <label>Fp alap</label>
+            <input type='number' name='attr_fpAlap' min="1"/>
+          </div>
+          <div>
+            <label>Fp szintlépéskor kapott</label>
+            <input type='number' name='attr_fpSzint' min="1"/>
+          </div>
+          <div>
+            <label>Max. Fp</label>
+            <input type='number' name='attr_fp_max' value="@{fpAlap} + @{allokepesseg10} + @{akaratero10} + @{fpSzint}" disabled="disabled"/>
+          </div>
+          <div>
+            <label>Akt. Fp</label>
+            <input type='number' name='attr_fp' min="0" class="emphasized"/>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -528,6 +528,70 @@
 </div>
 
 <script type="text/worker">
+  const defaults = [
+    {name: "szint", value: 0},
+    {name: "ero", value: 12},
+    {name: "ero10", value: 2},
+    {name: "ero_max", value: 12},
+    {name: "allokepesseg", value: 12},
+    {name: "allokepesseg10", value: 2},
+    {name: "allokepesseg_max", value: 12},
+    {name: "ugyesseg", value: 12},
+    {name: "ugyesseg10", value: 2},
+    {name: "ugyesseg_max", value: 12},
+    {name: "gyorsasag", value: 12},
+    {name: "gyorsasag10", value: 2},
+    {name: "gyorsasag_max", value: 12},
+    {name: "egeszseg", value: 12},
+    {name: "egeszseg10", value: 2},
+    {name: "egeszseg_max", value: 12},
+    {name: "szepseg", value: 12},
+    {name: "szepseg10", value: 2},
+    {name: "szepseg_max", value: 12},
+    {name: "intelligencia", value: 12},
+    {name: "intelligencia10", value: 2},
+    {name: "intelligencia_max", value: 12},
+    {name: "akaratero", value: 12},
+    {name: "akaratero10", value: 2},
+    {name: "akaratero_max", value: 12},
+    {name: "asztral", value: 12},
+    {name: "asztral10", value: 2},
+    {name: "asztral_max", value: 12},
+    {name: "asztralTme", value: 2},
+    {name: "mentalTme", value: 2},
+    {name: "asztralStatikus", value: 0},
+    {name: "mentalStatikus", value: 0},
+    {name: "asztralDinamikus", value: 0},
+    {name: "mentalDinamikus", value: 0},
+    {name: "asztralEgyeb", value: 0},
+    {name: "mentalEgyeb", value: 0},
+    {name: "keMod", value: 0},
+    {name: "teMod", value: 0},
+    {name: "veMod", value: 0},
+    {name: "ceMod", value: 0},
+    {name: "sebzesMod", value: 0},
+  ];
+  const keys = defaults.map(item => item.name);
+
+
+  on('sheet:opened', () => {
+    getAttrs(keys, values => {
+      const updates = {};
+      defaults.forEach(item => {
+        if (!values[item.name]) {
+          updates[item.name] = item.value;
+        }
+      });
+
+      if (Object.keys(updates).length !== 0) {
+        console.log(updates);
+        setAttrs(updates, () => console.log("Defaults have been set"));
+      }
+    })
+  })
+
+</script>
+<script type="text/worker">
   const buttonlist = ["tab-1","tab-2","tab-3"];
   buttonlist.forEach(button => {
     on(`clicked:${button}`, function() {
@@ -539,23 +603,6 @@
 </script>
 
 <script type="text/worker">
-
-  on('sheet:opened',function(){
-    getAttrs([
-      "ero", "gyorsasag", "ugyesseg", "allokepesseg", "egeszseg", "intelligencia", "akaratero", "asztral",
-      "ero10", "gyorsasag10", "ugyesseg10", "allokepesseg10", "egeszseg10", "intelligencia10", "akaratero10", "asztral10"
-    ], (values) => {
-      Object.keys(values).forEach(key => {
-        if (key.endsWith("10") && values[key] === "") {
-          const attrName = key.substring(0, key.length - 2)
-          const value = tizFelettiResz(values[attrName]);
-          console.log("setAttrs", {[key]: value})
-          setAttrs({[key]: value});
-        }
-      })
-    });
-  });
-
   function tizFelettiResz(value) {
     return value - 10 < 0 ? 0 : value - 10;
   }

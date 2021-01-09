@@ -9,7 +9,40 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 ///// ============ Change Log ============ ///// 
 
 
-October 5th 2020 v1.23
+December 28st 2020 v1.3
+
+- Roll Modifier Text: Most roll buttons now have a optional configuration cog next too them allow players to add text to the roll template output (can be conditional on test outcome, ie success/fail). This includes Skills/Weapons/Spells & NPC tabs. Handy for adding text related to Talent based roll outcomes, i.e. +1 SL on success or Reverse Result on fail.
+- Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Crit/fumble logic update: Auto Failure on 99 roll result, will always result in a fumble, even if target is above 100.
+- Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
+- Roll template now has Critical / Fumble(Oops) / Miscast / Wrath buttons integrated, they only show when these events happen and are useable by anyone with control of that character sheet.
+- Advanded Skills will now always have base skill 0 (unmodified) when they are not Taken (i.e. trained). This is intended to prevent any untaken advanced skills to be rolled by accident. Note Ranged Crossbow and Ranged Thrown are always rollable as per core rules. Also fixed Rt header display for advanced grouped skills which will now display the user entered name field as well as the grouped skill name.
+- Marginal fail rolls (-0) will now show correctly in SL results
+- Corruption Section now has a Max Corruption value field, based on TB+WPB.
+- New hard coded skills for Channelling Witch, Dark & Chaos added.
+- Roll Tags have been added to the formulas for all combat skills. Other skills to follow.
+- Added some further missing translation tags.
+
+
+December 21st 2020 v1.23.4
+
+- Cleaned up critical roll text for casting and channeling to make it clearer that theses are happening.
+- PC & NPC Characterisitc rolls now show success/failure message.
+- Added some further missing translation tags
+
+
+November 2nd th 2020 v1.23.3
+
+- Added translation tag for modifier text in the roll template.
+
+
+October 12th 2020 v1.23.2
+
+- translation.json update, attempting to fix the translation issue which was introduced last week which prevent the new json from use on the live server sheet.
+- Fixed issue with Heavy Head armor capping at 1 carried Enc.
+
+
+October 5th 2020 v1.23.1
 
 - Further modification of how Armor tab works. Worn? check will now add/remove ENC and AP appropriately. Some descriptive text has been added to these sections too.
 - Continued adding IL8N tags that were missing from a lot of the new content. This work is now mostly complete.
@@ -234,9 +267,9 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 Future release wish list :
 
-- More themes. (v1.3)
-- Talents Tab rework, with possible roll integration. (v1.3)
-- WFRP 4e Roll API with SL resolution API. (v1.x)
+- Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe)
+- More themes. (v1.4)
+- WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x)
 
 
 
