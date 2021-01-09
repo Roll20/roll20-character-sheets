@@ -1065,6 +1065,7 @@
 <script type="text/worker">
   var callings = ["brute", "conniver", "crafter", "hunter", "marauder", "shadow", "shaman", "warlock", "zealot"]
   var actions = ["scan", "tinker", "trick", "finesse", "skulk", "smash", "banter", "invoke", "threaten"]
+  var dungeons = ["enclave", "forge", "hideout", "stronghold", "temple"]
 
   on("sheet:opened", function(eventInfo) {
     getAttrs(["supply-slots", "gold-slots", "dice-images"], function(v){
@@ -1288,7 +1289,8 @@
     toggle(attr, "marked", "0");
   });
 
-  on("clicked:calling-brute clicked:calling-conniver clicked:calling-crafter clicked:calling-hunter clicked:calling-marauder clicked:calling-shadow clicked:calling-shaman clicked:calling-warlock clicked:calling-zealot", function(eventInfo){
+  on("clicked:calling-brute clicked:calling-conniver clicked:calling-crafter clicked:calling-hunter clicked:calling-marauder clicked:calling-shadow clicked:calling-shaman clicked:calling-warlock clicked:calling-zealot"
+  + " clicked:calling-enclave clicked:calling-forge clicked:calling-hideout clicked:calling-stronghold clicked:calling-temple", function(eventInfo){
     var key = getClickAttr(eventInfo, "calling")
     var calling = getTranslationByKey(key)
     var desc = _.unescape(getTranslationByKey(key + "-desc"));
@@ -1299,16 +1301,26 @@
       "calling-settings": "hide"
     }
 
+    var core = false;
+    var other = false;
     if (callings.includes(key)) {
+      core = other = "ability"
       set.flashback = getTranslationByKey(key + "-flashback")
-      set["core-ability-name"] = getTranslationByKey(key + "-core-ability-name")
-      set["core-ability-desc"] = getTranslationByKey(key + "-core-ability-desc")
+    } else if (dungeons.includes(key)){
+      core = "feature"
+      other = "room"
+      set["core-ability-marked"] = "marked";
+    }
+
+    if (core) {
+      set["core-ability-name"] = getTranslationByKey(`${key}-core-${core}-name`)
+      set["core-ability-desc"] = getTranslationByKey(`${key}-core-${core}-desc`)
       set["core-ability-settings"] = "hide";
 
       for (var i = 1; i <= 7; i++) {
         var id = "repeating_ability_" + generateRowID();
-        set[id + "_ability-name"] = getTranslationByKey(key + "-ability-name" + i)
-        set[id + "_ability-desc"] = getTranslationByKey(key + "-ability-desc" + i)
+        set[id + "_ability-name"] = getTranslationByKey(`${key}-${other}-name${i}`)
+        set[id + "_ability-desc"] = getTranslationByKey(`${key}-${other}-desc${i}`)
         set[id + "_ability-settings"] = "hide";
       }
 
@@ -1537,6 +1549,132 @@
 <span data-i18n="loot-roll">Loot Roll</span>
 <span data-i18n="dice-query">Dice?</span>
 <span data-i18n="modifier-query">Modifier?</span>
+<span data-i18n="enclave">Enclave</span>
+<span data-i18n="enclave-desc">Tapping into the Arcane</span>
+<span data-i18n="enclave-core-feature-name">Twisted Landscape</span>
+<span data-i18n="enclave-core-feature-desc">Arcane energy corrupts the area around the dungeon. Establish its range, increasing with tier, and how it manifests (choose 3): corrupted wildlife - dark whispers - illusions - inclement weather - living plants - wisps. These act as a trap and a trick equal to the dungeon tier against invaders.</span>
+<span data-i18n="enclave-room-name1">Academy</span>
+<span data-i18n="enclave-room-desc1">Young monsters come to study and learn arcane secrets. You can recruit minions from this room. They have Invoke as their primary action and the adept upgrade for free. This room also acts as a creature with a tier equal to the dungeon tier.
+An academy might need crystal balls, mantles, or wands.</span>
+<span data-i18n="enclave-room-name2">Crucible</span>
+<span data-i18n="enclave-room-desc2">The mystical power of this room enchants items. Each downtime, it can either produce a single tier 1 magic item or tick a magic item creation clock twice. You must still provide the special requirements for tier 2 and 3 magic items.
+A crucible might need an essence core, a mystical beast, or magical helpers.</span>
+<span data-i18n="enclave-room-name3">Greenery</span>
+<span data-i18n="enclave-room-desc3">This garden of voracious plants will devour living prey. Feed them to harvest (choose one): a plant-based shared supply - special ingredients for potions, a few doses of a concoction. The higher the tier, the better the harvest. This room is also a trap equal to your dungeon tier.
+A greenery might need rare plants, fertilizer, or artificial sunlight.</span>
+<span data-i18n="enclave-room-name4">Library</span>
+<span data-i18n="enclave-room-desc4">Books are the key to knowledge of the world. Once per cycle, the dungeon can establish a fact about the history, cultures, or arcana of the world. You can also flashback to use this again while outside the dungeon.
+A library might need a trove of books, large bookshelves, or a librarian.</span>
+<span data-i18n="enclave-room-name5">Potion Lab</span>
+<span data-i18n="enclave-room-desc5">Your imps have learned how to make potions. The dungeon chooses a single magic path of which you have a steady supply of all tier 1 potions and a single tier 2 potion.
+A potion lab might need brewing equipment, special ingredients, or a giant cauldron.</span>
+<span data-i18n="enclave-room-name6">Scrying Pool</span>
+<span data-i18n="enclave-room-desc6">The pool reveals far away scenes. Once per cycle, the dungeon can establish a fact about an NPC’s recent activity. You can also flashback to use this again while outside the dungeon. What question or object do you present to the pool to guide its gaze?
+A scrying pool might need cursed water, mosaic tiles, or a center figurine.</span>
+<span data-i18n="enclave-room-name7">Spawning Chamber</span>
+<span data-i18n="enclave-room-desc7">Minions are grown or summoned here, easily replacing your losses. Once per dungeon defense, a copy of a slain minion pack can burst forth from this spawning chamber. You can also add the expendable upgrade to minions for free.
+A spawning chamber might need mystical goo, glass containers, or magic seeds.</span>
+<span data-i18n="forge">Forge</span>
+<span data-i18n="forge-desc">The Power of Industry</span>
+<span data-i18n="forge-core-feature-name">Power Source</span>
+<span data-i18n="forge-core-feature-desc">In a forge, your sanctum is a source of power fueling your dungeon, such as a volcano, a steamworks, or a waterwheel. During downtime, you can take +1d on a single downtime action. During dungeon defense, you can take +1d on a single lock, trap, or trick on your list of dungeon duties.</span>
+<span data-i18n="forge-room-name1">Alchemist Lab</span>
+<span data-i18n="forge-room-desc1">Your imps are always hard at work mixing reagents. You have a steady supply of all tier 1 concoctions.
+An alchemist lab might need alchemy equipment, chests full of reagents, or recipes.</span>
+<span data-i18n="forge-room-name2">Guild Hall</span>
+<span data-i18n="forge-room-desc2">You let your minions organize to better their working and living conditions. In truth, you ignore their demands, but the illusion of having some control reduces grumbling. The dungeon takes +1d on calamity rolls.
+A guild hall might need benches, a long table, or scribing tools.</span>
+<span data-i18n="forge-room-name3">Factory</span>
+<span data-i18n="forge-room-desc3">Your imps relentlessly sweat away in the factory. Each downtime, they can either produce a single tier 1 contraption or tick a contraption clock twice.
+A factory might need metal casing for a boiler, piles of coal, or raw iron.</span>
+<span data-i18n="forge-room-name4">Mineshaft</span>
+<span data-i18n="forge-room-desc4">You dig out a mine, gaining a steady supply of a single non-precious material and make an immediate discovery leading away from the mine. You take +1d on this and all future discovery rolls.
+A mineshaft might need mining gear, lots of railway, or several minecarts.</span>
+<span data-i18n="forge-room-name5">Testing Chamber</span>
+<span data-i18n="forge-room-desc5">You can empower your monster science, for a price. You can pay cost related to your testing to (choose one): remove an item's volatility - increase a concoction in size, scope, or duration - take +1d on your next use with a specific item.
+A testing chamber might need a huge steel door, a pulley system, or gears.</span>
+<span data-i18n="forge-room-name6">Vehicle Bay</span>
+<span data-i18n="forge-room-desc6">The dungeon has an incredible vehicle, such as a submarine, dirigible, or steamcar. Detail the vehicle and give it edges (choose two): armored - camouflaged - dependable - fast - nimble. Give it a flaw (choose one): clumsy - distinct - noisy - rickety - slow. The vehicle is fully repaired or rebuilt by imps each recovery.
+A vehicle bay might need parts for the vehicle, barrels of fuel, or awesome paint.</span>
+<span data-i18n="forge-room-name7">Workshop</span>
+<span data-i18n="forge-room-desc7">You have a well-furnished workshop where your imps and minions can toil away. They take +1d when working on crafting or building projects.
+A workshop might need crafting tools, leather aprons, or barrels of nails.</span>
+<span data-i18n="hideout">Hideout</span>
+<span data-i18n="hideout-desc">Keeping Your Head Low</span>
+<span data-i18n="hideout-core-feature-name">Agents of Chaos</span>
+<span data-i18n="hideout-core-feature-desc">Your dungeon excels at placing blame on others or meddling with faction plans. On a success on blowback, your minions gain morale and you can finish or reset a faction clock. What happens in the aftermath of your raid to cause this?</span>
+<span data-i18n="hideout-room-name1">Dojo</span>
+<span data-i18n="hideout-room-desc1">The dojo master trains you relentlessly, forging you into a unified team. When you team up, you only take stress on a failure and 6s from different participants count towards rolling a critical. This room also acts as a creature with a tier equal to the dungeon tier.
+A dojo only needs a master to train you, which you must either defeat or impress.</span>
+<span data-i18n="hideout-room-name2">Gambling Den</span>
+<span data-i18n="hideout-room-desc2">You set up a small gambling establishment, attracting monsters from outside your dungeon. You can recruit minions from this room. They always have Trick as their 2d action and start with the strapped upgrade for free. This room also acts as a creature with a tier equal to the dungeon tier.
+A gambling den might need gambling tables, luxurious lighting, or cigars.</span>
+<span data-i18n="hideout-room-name3">Gear Locker</span>
+<span data-i18n="hideout-room-desc3">You always get geared up before leaving the dungeon. You gain a supply slot and have a steady supply of the following concoctions and gear: climbing gear - glowsticks - smoke bombs - tar bombs - throwing weapons - thunderstones - traps.
+A gear locker might need a trove of concoctions, crates of gear, or matching outfits.</span>
+<span data-i18n="hideout-room-name4">Obstacle Course</span>
+<span data-i18n="hideout-room-desc4">Minions train hard here, honing their skills. When recruited, you can add an extra 2d action to minions, but only to Finesse, Scan, or Skulk. This room also acts as a trick equal to the dungeon tier, detailed when the room is built.
+An obstacle course might need rolls of wire, large spikes, or barrels of tar.</span>
+<span data-i18n="hideout-room-name5">Planning Room</span>
+<span data-i18n="hideout-room-desc5">You plot out your raids in great detail. You take +1d on engagement rolls for negotiation, stealth, or trickery plans. On a success, you gain a dark heart.
+A planning room might need maps, measuring tools, or refreshments.</span>
+<span data-i18n="hideout-room-name6">Roost</span>
+<span data-i18n="hideout-room-desc6">You have bats, ravens, or other small winged beasts at your service. Each time you plan a raid, the dungeon can establish a fact about the target that your beasts saw from the sky. You can also flashback to use this again while outside the dungeon.
+A roost might need cages, winged beasts, or pet food.</span>
+<span data-i18n="hideout-room-name7">Tavern</span>
+<span data-i18n="hideout-room-desc7">You have a raucous tavern complete with a bar, shelves of alcohol, a roaring fire, and usually a scuffle. Your minions gain morale during recovery and take +1d when fighting invaders here. Wandering monsters also show up from time to time.
+A tavern might need a bartender, lots of alcohol, or a bard.</span>
+<span data-i18n="stronghold">Stronghold</span>
+<span data-i18n="stronghold-desc">Through Strength of Arms</span>
+<span data-i18n="stronghold-core-feature-name">Warband</span>
+<span data-i18n="stronghold-core-feature-desc">The dungeon has a raiding party, a shared minion pack with greater scale than usual and the companion and expendable upgrades. It can be sent on its own raids. At the beginning of the raiding phase, each player allocates 1d towards a target, chooses a raid plan, then selects a goal (choose one): gather room materials - grab good loot - influence a faction - kidnap someone - setup for a pillaging raid. You can also choose the same plan and goal to combine rolls to determine effectiveness. Make a fortune roll for each target, rolling the number of dice allocated and narrate accordingly. If you forego these independent raids, the warband can accompany you on a raid instead.</span>
+<span data-i18n="stronghold-room-name1">Barracks</span>
+<span data-i18n="stronghold-room-desc1">Fresh recruits flock to your dungeon. You can recruit minions from this room. They have Smash as their primary action and the mindset (loyal) upgrade for free. This room also acts as a creature with a tier equal to the dungeon tier.
+A barracks might need a cache of weapons, armor, or a large amount of rations.</span>
+<span data-i18n="stronghold-room-name2">Bestiary</span>
+<span data-i18n="stronghold-room-desc2">You have mounts and a secure area to keep them in. Detail them and give them edges (choose two): aquatic - armored - fast - flying - magical - terrifying. This room also acts as a creature with a tier equal to the dungeon tier.
+A bestiary might need the mounts, something to feed them, or riding equipment.</span>
+<span data-i18n="stronghold-room-name3">Fighting Pit</span>
+<span data-i18n="stronghold-room-desc3">Place any two combatants in the pit, then each PC chooses the one they think willwin. Make fortune rolls for each fighter, with the loser dying and both living on atie. If your chosen fighter wins, you gain a dark heart.
+A fighting pit might need exotic weapons, dangerous animals, or a pitmaster.</span>
+<span data-i18n="stronghold-room-name4">Funeral Pyre</span>
+<span data-i18n="stronghold-room-desc4">Your warrior culture honors the dead, burning their bodies as a sendoff to the afterlife. When minions die in combat, any minions that witness it gain morale and will perform a downtime action during the next downtime without asking for gold.
+A funeral pyre might need incense, special wood, or the tabards of conquered enemies.</span>
+<span data-i18n="stronghold-room-name5">Smithy</span>
+<span data-i18n="stronghold-room-desc5">You have a steady supply of mundane weapons such as axes, bows, and hatchets. Your minions take +1d when crafting items or adding edges.
+A smithy might need an anvil, metalworking tools, or a large pile of charcoal.</span>
+<span data-i18n="stronghold-room-name6">War Drums</span>
+<span data-i18n="stronghold-room-desc6">A steady beat emanates throughout your dungeon, keeping everyone focused on the task at hand. Each player can tick a project clock once per downtime, but each tick must go to a different clock. Your imps also take +1d on their downtime action.
+War drums might need lots of leather, huge wooden drums, or massive horns.</span>
+<span data-i18n="stronghold-room-name7">War Room</span>
+<span data-i18n="stronghold-room-desc7">Proper strategy is the key to warfare. You take +1d on engagement rolls for ambush, assault, or strike raid plans. On a success, you gain a dark heart.
+A war room might need maps, books on warfare, or intel on your enemies.</span>
+<span data-i18n="temple">Temple</span>
+<span data-i18n="temple-desc">Serving a Greater Power</span>
+<span data-i18n="temple-core-feature-name">Unholy Intervention</span>
+<span data-i18n="temple-core-feature-desc">Once per cycle, one member of the dungeon can beseech the dungeon’s deity to cast a tier 3 spell from their domains. You roll the dungeon tier as an action roll with no dice penalty and the GM determines who is open to any consequences.</span>
+<span data-i18n="temple-room-name1">Altar</span>
+<span data-i18n="temple-room-desc1">You can make a sacrifice at the altar, paying cost to gain a dark blessing (choose one): take +1d on a single roll with an item this cycle - take +1d on your next resistance roll - your next failure instead becomes a mixed. The sacrifice must be unique each time you ask for a blessing.
+An altar might need incense, statues, or icons specific to your god's domains.</span>
+<span data-i18n="temple-room-name2">Antechamber</span>
+<span data-i18n="temple-room-desc2">Between the stairway and sanctum on the final level is an impressive room glorifying your deeds in the name of your dark god. Adventurers stop to take note of it, giving you a dark heart and +1d on the engagement roll before a sanctum fight.
+An antechamber might need skulls, the banners of worthy foes, or an artist.</span>
+<span data-i18n="temple-room-name3">Augury Circle</span>
+<span data-i18n="temple-room-desc3">You can flashback to time spent in the circle, reading portents of future events. You can establish a fact in the present about an NPC's next likely action. What portent did the circle show you and how does it manifest in the present?
+An augury circle might need mosaic tiles, a large mirror, or exotic incenses.</span>
+<span data-i18n="temple-room-name4">Dormitory</span>
+<span data-i18n="temple-room-desc4">Fresh cultists flock to serve your god. You can recruit minions from this room. They always have your god's favored action, chosen when this room is built, as their primary action and start with the mindset (zealous) upgrade for free. This room also acts as a creature with a tier equal to the dungeon tier.
+A dormitory might need furniture, accoutrements, or the first batch of pupils.</span>
+<span data-i18n="temple-room-name5">Reliquary</span>
+<span data-i18n="temple-room-desc5">This room corrupts and amplifies the magic of up to three items of unholy impact placed within it. When an item is placed, it immediately incants a tier 2 ritual causing a persistent effect within your dungeon related to the specific item.
+A reliquary does not require special materials beyond the items placed within it.</span>
+<span data-i18n="temple-room-name6">Penance Chamber</span>
+<span data-i18n="temple-room-desc6">Your minions fear punishment more than death and will never betray you. When they fight to the death, they ignore the dice penalty from being bloodied.
+A penance chamber might need shackles, whips, or tar.</span>
+<span data-i18n="temple-room-name7">Scriptorium</span>
+<span data-i18n="temple-room-desc7">Your deeds are recorded in unholy scripture, immediately giving you wicked xp equal to your dungeon tier. You also gain a new wicked xp trigger: Were your actions worthy of your god’s notice? Each PC must prove their own worth to gain this xp.
+A scriptorium might need desks, writing equipment, or leather for binding.</span>
+
 </div>
 <rolltemplate class="sheet-rolltemplate-basic">
   {{#character}}<div class="character">{{character}}</div>{{/character}}
@@ -1733,3 +1871,4 @@
   {{#zero}}<div class="zero">{{zero}}</div>{{/zero}}
   
 </rolltemplate>
+
