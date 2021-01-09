@@ -747,10 +747,10 @@
           </button>
       </div>
       <div class="roll-modifiers">
-          <span class="label" data-i18n="threshold_modifier_text">Threshold modifier prompt on every roll ?</span>
-          <input type="checkbox" value="?{Threshold Modifier|0}" name="attr_threshold_modifier"/>
+          <span class="label" data-i18n="threshold_modifier_text">Threshold modifier prompt on every roll ?.</span>
+          <input type="checkbox" value="?{Threshold Modifier.|0}" name="attr_threshold_modifier"/>
           <br/>
-          <span class="label" data-i18n="use_api_text">Use API for rolls (Requires Pro Account) ?</span>
+          <span class="label" data-i18n="use_api_text">Use API for rolls (Requires Pro Account) ?.</span>
           <input type="checkbox" value="!ma roll" name="attr_api_use"/>
       </div>
       <div class="luck-label">
@@ -760,7 +760,7 @@
       </div>
       <div class="luck-reroll">
         <input type="hidden" name="attr_api_use" class="api-use-check"/>
-        <button value="?{Re-Roll?|No,Re-Roll Cancelled|Yes,!ma lrr}" type="roll" class="blank-roll-button sheet-luck-button luck-reroll">
+        <button value="?{Re-Roll?|No,Re-Roll Cancelled|Yes,!ma lrr @{character_id}|Yes & don't use luck,!ma reroll}" type="roll" class="blank-roll-button sheet-luck-button luck-reroll">
             <span data-i18n="re-roll">Re-Roll.</span>
         </button>
       </div>
@@ -1413,8 +1413,6 @@ dmg_codes[dmg_codes.length] = {key: 'ruinous_ruinous', roll:"4d10+22", code:'R+R
 on("sheet:opened", function(eventInfo)
 {
     // concatenate modifiers roll query
-    console.log('prof_mod_labels, num: ' + prof_mod_labels.length);
-    console.log('prof_mod_labels: ' + JSON.stringify(prof_mod_labels));
     var modQuery = "?{";
     var modQueryLabel = getTranslationByKey("modifiers");
     if (!modQueryLabel) modQueryLabel = "Modifiers."
@@ -1430,8 +1428,6 @@ on("sheet:opened", function(eventInfo)
     modQuery += "}";
     
     // concatenate damage code roll query
-    console.log('dmg_codes, num: ' + dmg_codes.length);
-    console.log('dmg_codes: ' + JSON.stringify(dmg_codes));
     var dmgQuery = "?{";
     var dmgQueryLabel = getTranslationByKey("damage_code");
     if (!dmgQueryLabel) dmgQueryLabel = "Damage Code."
@@ -1446,14 +1442,21 @@ on("sheet:opened", function(eventInfo)
     }
     dmgQuery += "}";
     
+    // update threshold modifier query
+    var thresholdModifierText = getTranslationByKey("threshold_modifier");
+    if (!thresholdModifierText) thresholdModifierText = "Threshold Modifier."
+    var thresholdModiferQuery = '?{' + thresholdModifierText + '|0}';
+    
     // console output
     console.log('modQuery: ' + modQuery);
     console.log('dmgQuery: ' + dmgQuery);
+    console.log('thresholdModiferQuery: ' + thresholdModiferQuery);
     
     // update translated roll queries
     setAttrs({
         mod_query: modQuery,
-        dmg_query: dmgQuery
+        dmg_query: dmgQuery,
+        threshold_modifier: thresholdModiferQuery
     });
     
 });
