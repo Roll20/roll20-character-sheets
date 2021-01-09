@@ -10,9 +10,19 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.6 [Screenshot](coc_v2.png)
+3.7 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.7 (2020-12-21)
+
+- Ajout d'un compteur optionnel sur l'onglet Caractéristiques sous les états préjudiciables
+  - comporte un intitulé et une valeur (pas de valeur max.)
+  - l'activation du compteur et son intitulé sont déterminés par le setting choisi sur l'onglet Configuration
+  - permet de comptabiliser les Points de Folie (Cthulhu), Tension (Menace-X), Pulsion (Monstres), Ame/Rage/Sang (Surhumains Démons/Loups-garous/Vampires), etc...
+- Ajout d'un champ Origine sous les champs Profil et Famille dans l'entête de la fiche. Les intitulés 'Profil', 'Famille' et 'Origine' sont modifiés en fonction du setting
+- Pour le setting Monstres, remplacement de l'état Affaibli par la Poisse (moins bon de deux d20) pour tous les états préjudiciables utilisant le d12.
+- Sur une fiche de véhicule, la section des traits physiques (sexe, âge, taille, poids) n'est pas affichée
 
 ## v3.6 (2020-09-04)
 
