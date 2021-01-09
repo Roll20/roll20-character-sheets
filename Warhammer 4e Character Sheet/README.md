@@ -11,11 +11,12 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 January 11th 2021 v1.31
 
 - Reroll clicky buttons now integrated into the roll template out put for most rolls, including all repeating sections. This is diplayed in the Test value row.
-- NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead.
+- NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
 - Channelling Roll template has been altered to be more inline with other rolls to allow the reroll intergation.
 - Weapons & Spells Tab rework, cleaned it up and added a Mod and Target display fields which matches the roll target.
 - All Mod fields will now prepopulate the Roll Modifider popup with the set value.
 - Fixed the Talents tab text field dragging issue from the last update.
+- New GM whisper button in the Combat Actions title row, and adjusted matched the Conditions hider button to match it.
 - The sheet will perform a repeating section ID scan and set them as attributes inside the sections on first opening after this update to populate the required ID's of existing sections to allow new features to function correctly. There is a check to only allow this to happen once as it does take a few seconds to complete.
 
 
