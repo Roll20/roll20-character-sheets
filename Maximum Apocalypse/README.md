@@ -6,34 +6,61 @@ Haven't actually played a game of Maximum Apocalypse yet, but it looks like a re
 
 I'm using this project as a way to become familiar with the mechanics.
 
+Also see the API script which implements the logic to handle initiative tracking (4 action phases, each reducing value by 5) & the "enemy attraction gauge" as a token.
+
 ## Usage Notes
 
 - Structure very close to to core rulebook
+- If sheet is too wide/large setting browser zoom to 80% is a good alternate size
 - Automatically calculates all derived stats: half/quarter stats, special stats, build/repair table & encumbrance
-- Roll buttons for stats, skills & special stats
+- Automatic calculations incorporate effects from following abilities: Collar, Faith, Giant Genetics, Instinctive, Luck Stars, Moving Target, Reflex, Tightening the Belt, Unreliable
+- Roll buttons for stats, skills, special stats, defenses, attacks & damage
 - Roll buttons query for 0-3 advantages/disadvantages & implement advantage/disadvantage effects
 - Roll template indicates level & degree of success
+- Sheet also has roll buttons for base stat actions & shows required food units
 - Tick the "Threshold modifier prompt on every roll" checkbox to specify misc. threshold modifer for subsequent rolls
 - Drop down selections for archetypes, apocalypse & skill proficiencies
 - Initiative includes modifiers from being encumbered, shaken, acute, starving & emaciated
 - Temporary initiative modifier field for situational special ability effects 
-- Faith & Reflex ability benefits automatically calculated
 - Special Ability and Gear descriptions can be expanded/contracted to see the full text when needed
 - Hunger conditions will highlight in red when active
 - Starving condition will apply -10 modifier to base stats (modifier indicator will appear next to base stats)
 - Structure deviations from core rulebook implemented to provide enough room for Special Ability and Gear descriptions
 
-## Planned enhancements
-
-- Fix weapon DC field to accept letters
-- Change weapon trait field font to match abilities & gear (more room for text)
-- Add buttons for defense & build/repair rolls
-- Add button for weapon attack and damage rolls
+## Aspirational enhancements
 - Default proficiency roll prompt to disadvantage for non-proficient skills
 - Implement Disadvantage to all rolls when Emaciated
-- Implement special ability conditional modifier roll queries
+- Implement special ability conditional modifier roll queries (e.g. Bravery, Hollow Points ...)
 
 ## Change Log
+
+### December 27th 2020 v6.0
+- Added support to field calculations for specific special abilities:
+  - Collar
+  - Instinctive
+- Added base stat action roll button below skills. Contort roll incorporates build modifier.
+- For weapons with Unreliable trait, the roll template will show if weapon becomes jammed
+- Added required food units below build
+- Ensure all read-only fields have a grey background
+
+### December 14th 2020 v5.0
+- Added support to field calculations for specific special abilities:
+  - Tightening the Belt
+  - Moving Target
+  - Giant Genetics
+  - Luck Stars
+
+### December 13th 2020 v4.0
+
+- Changed attack DC field to dropdown
+- Change weapon trait field font to match abilities & gear (more room for text)
+- Re-arranged structure to make room in attacks section for skill field & roll buttons
+- Added skill selection for attacks
+- Added attack & damage roll buttons for attacks
+- Added roll buttons for defenses
+- Attack thresholds automatically calculated based on chosen skill
+- Attack thresholds automatically re-calculated if chosen skill prociency changes
+- Changed section widths to percentages so it adjusts with sheet window
 
 ### December 7th 2020 v3.0
 

@@ -922,6 +922,44 @@
 		});
 	});
 	
+	on("change:intelligence change:initiative_bonusD6 change:initiative_bonusDes sheet:opened", function() 
+	{
+		getAttrs(["intelligence", "initiative_bonusD6", "initiative_bonusDes"], function(values) 
+		{
+			var intel = parseInt(values["intelligence"], 10)||0;
+			var bonus = parseInt(values["initiative_bonusD6"], 10)||0;
+			var D6 = parseInt(values["initiative_bonusDes"], 10)||0;
+			
+			var dice = 3;
+			dice += D6;
+			
+			var total = intel+bonus;
+			
+			setAttrs({
+				initiative:dice+"D6+"+total
+			});
+		});
+	});
+	
+	on("change:puissancePNJ change:initiativePNJ_bonus change:initiativePNJ_bonusDes sheet:opened", function() 
+	{
+		getAttrs(["puissancePNJ", "initiativePNJ_bonus", "initiativePNJ_bonusDes"], function(values) 
+		{
+			var puissance = parseInt(values["puissancePNJ"], 10)||0;
+			var bonus = parseInt(values["initiativePNJ_bonus"], 10)||0;
+			var D6 = parseInt(values["initiativePNJ_bonusDes"], 10)||0;
+			
+			var dice = 3;
+			dice += D6;
+			
+			var total = puissance+bonus;
+			
+			setAttrs({
+				initiativePNJ:dice+"D6+"+total
+			});
+		});
+	});
+
 	on("change:version", function() 
 	{
 		getAttrs(["version"], function(values) 
@@ -950,6 +988,7 @@
 		});
 	});
 </script>
+
 <div class="top">
 	<div class="version">
 		<input type="hidden" name="attr_version" value="0" />
@@ -1201,12 +1240,12 @@
 				<span></span>
 			</label>
 			<label>
-				<input type="number" name="attr_initiative" value="@{initiative_bonusIntelligence}+@{initiative_bonusD6}" disabled />
+				<input type="text" name="attr_initiative" value="0" readonly />
 			</label>
-			<button type="roll" name="roll_initiative" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[3D6+[[@{initiative}]]+@{bonus} &{tracker}]]}}" ></button>
+			<button type="roll" name="roll_initiative" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[ @{initiative}+@{bonus} &{tracker}]]}}" ></button>
 			<div>
 				<label>
-					<input type="number" name="attr_initiative" value="@{initiative_bonusIntelligence}+@{initiative_bonusD6}" disabled />
+					<input type="text" name="attr_initiative" value="0" readonly />
 					<span>Total</span>
 				</label>
 				<div></div>
@@ -1217,7 +1256,12 @@
 				<div></div>
 				<label>
 					<input type="number" name="attr_initiative_bonusD6" value="0" />
-					<span>Bonus D6</span>
+					<span>Bonus aux D6</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiative_bonusDes" value="0" />
+					<span>D6 Bonus</span>
 				</label>
 			</div>
 		</div>
@@ -1234,7 +1278,7 @@
 			</label>
 			<div>
 				<label>
-					<input type="number" name="attr_defense" value="10+@{defense_bonusSagesse}+@{defense_protection}+@{defense_cyber}+@{defense_capacites}" disabled />
+					<input type="number" name="attr_defense" value="10-(@{version}*3)+@{defense_bonusSagesse}+@{defense_protection}+@{defense_cyber}+@{defense_capacites}" disabled />
 					<span>Total</span>
 				</label>
 				<div></div>
@@ -1310,10 +1354,32 @@
 		
 		<div class="pareFeu">
 			<div>
+				<input type="hidden" name="attr_expandPareFeu" value="0" />
 				<span>Pare-Feu</span>
 				<label>
-					<input type="number" name="attr_pareFeu" value="0"/>
+					<input type="checkbox" name="attr_expandPareFeu" value="1" />
+					<span></span>
 				</label>
+				<label>
+					<input type="text" name="attr_pareFeu_total" value="@{pareFeu}" disabled />
+				</label>
+				<button type="roll" name="roll_pareFeu" value="@{gm} &{template:base} {{nom=Pare-Feu}} {{jet=[[ 1D6 ]]}}  {{bonus=[[ @{pareFeu_bonusDes}D6 ]]}}" ></button>
+				<div>
+					<label>
+						<input type="text" name="attr_pareFeu_total" value="@{pareFeu}" disabled />
+						<span>Total</span>
+					</label>
+					<div></div>
+					<label>
+						<input type="number" name="attr_pareFeu" value="0" />
+						<span>Base</span>
+					</label>
+					<div></div>
+					<label>
+						<input type="number" name="attr_pareFeu_bonusDes" value="0" min="0" max="1" />
+						<span>D6 Bonus</span>
+					</label>
+				</div>
 			</div>
 			<div></div>
 			<div>
@@ -1361,13 +1427,15 @@
 	<div class="tab1">
 		<div class="armement">
 			<span>Armes de corps à corps</span>
+			<span>Type</span>
 			<span>Att.</span>
 			<span>Dgts</span>
 			<span>Discrétion</span>
 			<span>Options</span>
 			<fieldset class="repeating_armementcac">
 				<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
-				<button type="roll" name="roll_armementCaC" value="@{gm} &{template:base} {{nom=@{nomArmementCaC}}} {{attaque=[[2D6+@{force}[For]+@{attArmementCaC}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{force}+@{dgtsArmementCaC}]]}} {{relance=[Relance dégâts](~repeating_armementcac_buttonRelance)}}" ></button>
+				<button type="roll" name="roll_armementCaC" value="@{gm} &{template:base} {{nom=@{nom}}} {{attaque=[[2D6+@{force}[For]+@{attArmementCaC}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{force}+@{dgtsArmementCaC}]]}} {{relance=[Relance dégâts](~repeating_armementcac_buttonRelance)}}" ></button>
+				<input type="text" name="attr_nom" />
 				<select name="attr_nomArmementCaC">
 					<option value=""></option>
 					<option value="Nanolame courte">Nanolame courte</option>
@@ -1384,13 +1452,15 @@
 		
 		<div class="armement">
 			<span>Armes à distance</span>
+			<span>Type</span>
 			<span>Att.</span>
 			<span>Dgts</span>
 			<span>Discrétion</span>
 			<span>Options</span>
 			<fieldset class="repeating_armementdistance">
 				<button type="roll" name="roll_buttonRelance" style="display:none;" value="@{gm} &{template:base} {{nom=Relance dégâts}} {{jet=[[1D6!]]}}" ></button>
-				<button type="roll" name="roll_armementDistance" value="@{gm} &{template:base} {{nom=@{nomArmementDistance}}} {{attaque=[[2D6+@{dexterite}[Dex]+@{attArmementDistance}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{dexterite}+@{dgtsArmementDistance}]]}} {{relance=[Relance dégâts](~repeating_armementdistance_buttonRelance)}}" ></button>
+				<button type="roll" name="roll_armementDistance" value="@{gm} &{template:base} {{nom=@{nom}}} {{attaque=[[2D6+@{dexterite}[Dex]+@{attArmementDistance}[Arme]+@{bonus}[Bonus]@{malusBlessureV1}]]}} {{deSpecial=[[1D6]]}} {{degats=[[@{dexterite}+@{dgtsArmementDistance}]]}} {{relance=[Relance dégâts](~repeating_armementdistance_buttonRelance)}}" ></button>
+				<input type="text" name="attr_nom" />
 				<select name="attr_nomArmementDistance">
 					<option value=""></option>
 					<option value="Arme de poing">Arme de poing</option>
@@ -1688,12 +1758,12 @@
 				<span></span>
 			</label>
 			<label>
-				<input type="number" name="attr_initiativePNJ" value="@{initiativePNJ_puissance}+@{initiativePNJ_bonus}" disabled />
+				<input type="text" name="attr_initiativePNJ" value="0" readonly />
 			</label>
-			<button type="roll" name="roll_initiativePNJ" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[3D6+[[@{initiativePNJ}]]+@{bonus} &{tracker}]]}}" ></button>
+			<button type="roll" name="roll_initiativePNJ" value="@{gm} &{template:base} {{nom=Initiative}} {{jet=[[ @{initiativePNJ}+@{bonus} &{tracker}]]}}" ></button>
 			<div>
 				<label>
-					<input type="number" name="attr_initiativePNJ" value="@{initiativePNJ_puissance}+@{initiativePNJ_bonus}" disabled />
+					<input type="text" name="attr_initiativePNJ" value="0" readonly />
 					<span>Total</span>
 				</label>
 				<div></div>
@@ -1704,7 +1774,12 @@
 				<div></div>
 				<label>
 					<input type="number" name="attr_initiativePNJ_bonus" value="0" />
-					<span>Bonus D6</span>
+					<span>Bonus aux D6</span>
+				</label>
+				<div></div>
+				<label>
+					<input type="number" name="attr_initiativePNJ_bonusDes" value="0" />
+					<span>D6 Bonus</span>
 				</label>
 			</div>
 		</div>
@@ -1864,7 +1939,11 @@
 	{{#jet}}
 		<div>
 			<span>Résultat</span>
-			<span>{{jet}}</span>
+			<span>{{jet}}
+				{{#rollGreater() bonus 0}}
+					+ {{bonus}}
+				{{/rollGreater() bonus 0}}
+			</span>
 		</div>
 	{{/jet}}
 	{{#attaque}}

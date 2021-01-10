@@ -8,6 +8,23 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Jan 7th, 2020
+
+- Added support for scatter moves
+- Added roll templates for dual hit and multi hit scatter attacks
+- Added a quick roll button that rolls a move without any query boxes for temporary modifiers or effectiveness, rolling with +0/+0/Neutral values
+- Streamlined move displays to show the configuration only when desired via a collapsible control
+
+### Dec 12, 2020
+
+- Migrated the character sheet style attributes to new fields
+- Character type selection is now presented via a drop-down selector
+- Added a Configuration page!
+  - Moved the character type selection to the configuration page
+  - Added a way to change the `initiative-tie-breake` attribute
+  - Copied the type selector to the config page
+- Corrected some of the formatting issues with the linter, which means it doesn't make the code quite so ugly
+
 ### Dec 7, 2020
 
 - Added a Capture Pokemon skill to make life easier for everyone.
@@ -93,7 +110,7 @@ Things we want to add to the character sheet, presented in no particular order o
 - [x] ~~Display the full bonus to skill checks~~
 - [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
-- [ ] Add a Settings page
+- [x] ~~Add a Settings page~~
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Allow modifications to movement (maybe just an extra box)
 - [ ] Display the adjusted stat score when temporary stat changes are provided
