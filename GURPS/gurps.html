@@ -4309,6 +4309,8 @@
 				<ul>
 					<li>Fix spelling error for drowsy. Reported by Charles</li>
 					<li>Fix bug with checkbox <b>Show casting details on roll template:</b>. The bug was if checked no roll is made, if uncheded the roll is made.</li>
+					<li>Fix bug for mini-roll modifier tool. If Encumbrance level changed, the total may not calculate correctly. Reported by PL M.</li>
+					<li>Fix but with range calculator. Math error calculating total distance when firing up. Reported by Idle</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13107,6 +13109,8 @@ visualize what it will look like in chat.
 			<ul>
 				<li>Fix spelling error for drowsy. Reported by Charles</li>
 				<li>Fix bug with checkbox <b>Show casting details on roll template:</b>. The bug was if checked no roll is made, if uncheded the roll is made.</li>
+				<li>Fix bug for mini-roll modifier tool. If Encumbrance level changed, the total may not calculate correctly. Reported by PL M.</li>
+				<li>Fix but with range calculator. Math error calculating total distance when firing up. Reported by Idle</li>
 			</ul>
 
 			<h4>Version: 2.6.0</h4>
@@ -15512,7 +15516,7 @@ visualize what it will look like in chat.
 
 	var version = "2.6.1";
 
-	var latestChangesDate = "1/9/2020";
+	var latestChangesDate = "1/10/2020";
 
 	var modCascade = true;
 	
@@ -19890,7 +19894,7 @@ visualize what it will look like in chat.
 			
 			if (elevation < 0) {
 				
-				rangeToTarget = linearDistance + elevation;
+				rangeToTarget = linearDistance - elevation;
 				
 			} else if (elevation > 0) {
 				
@@ -23359,7 +23363,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	on("change:size", (event) => {
 
-		sizeDiff = Number(event.newValue) - Number(event.previousValue);
+		let sizeDiff = Number(event.newValue) - Number(event.previousValue);
+
+		if (isNaN(sizeDiff)) {
+			sizeDiff = 0;
+		}
 
 		updateReach();
 
@@ -25146,37 +25154,97 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		});
 
+		const CUSTOM_MOD_DESC = "custom modifier";
+
 		/* check for manual changes to skill modifier boxes */
-		on(`change:${section}_roll_modifier change:${section}_roll_max_nine`, event => {
+		on(`change:${section}_roll_modifier`, event => {
 
-			getAttrs([`${section}_roll_modifier`, `${section}_roll_max_nine`], values => {
+			let newValue = Number(event.newValue);
 
-				let isMaxNine = Number(values[`${section}_roll_max_nine`]);
+			if (isNaN(newValue)) {
+				newValue = 0;
+			}
 
-				let maxNineValue = 100;
+			getAttrs([`${section}_roll_modifier`, `${section}_roll_modifier_summary`], values => {
 
-				if (isMaxNine) {
-					maxNineValue = 9;
-				}
+				let summary = values[`${section}_roll_modifier_summary`];
+
+				let [customMod, summaryUpdated] = updateCustomModifierSummary(newValue, summary, CUSTOM_MOD_DESC);
 
 				let updateFields = {
-					[`${section}_roll_modifier_summary`]: "",
-					[`${section}_roll_trait_summary`]: "",
-					[`${section}_roll_max_nine`]: isMaxNine, 
-					[`${section}_roll_max_nine_value`]: maxNineValue,
-					[`${section}_roll_hit_location`]: "",
-					[`${section}_roll_maneuver`]: "",
-					[`${section}_roll_allout_attack`]: "",
-					[`${section}_roll_apply_encumbrance`]: 0,
+					[`${section}_roll_modifier_summary`]: summaryUpdated,
+					dialog_custom_roll_modifier: customMod
 				}
 
-				setAttrs(updateFields, {silent: true});
+				setAttrs(updateFields);
 
 			});
 
 		});
 
 	});
+
+
+	/**
+	 * Updates the custom modifier line for a summary 
+	 * and returns the corrected total
+	 * Example: summary = -1 custom modifier¬-2 Encumbrance
+	 *          note: ¬ is a line feed character
+	 *          rollModifier = -5
+	 * 			customModifier = rollModifier - (sum of other lines) = -5 - (-2) = -3
+	 *          new summary = -3 custom modifier¬-2 Encumbrance
+	 *          
+	 *          
+	 * @param int    rollModifier The value of the custom modifier
+	 * @param string summary      The Current summary
+	 * @param string modifierDesc The text that describes the roll modifier
+
+	 * @return array [customModifier,summaryNew] 
+	 */
+	function updateCustomModifierSummary(rollModifier, summary, modifierDesc) {
+
+		// after removing the custom modifier, sum up the remaining modifiers
+		let totalMod = 0;
+
+		// make sure to remove any carriage returns
+		let summaryNew = summary.replaceAll("\r", "");
+
+		// remove anything that matches the modifierDesc
+		let pattern = new RegExp(`-?[0-9]\d* ${modifierDesc}\n`, "gi");
+
+		summaryNew = summaryNew.replace(pattern, "");
+
+		// create an array so we can pull out modifiers and update totalMod
+		let arrSummary = summaryNew.split("\n");
+
+		arrSummary.forEach(line => {
+
+			let arrLine = line.split(" ");
+
+			// the first element will always be the modifier number, unless a coder breaks the patter
+			let modifier = Number(arrLine[0]);
+
+			if (isNaN(modifier)) {
+				modifier = 0;
+			}
+
+			totalMod += modifier;
+
+		});
+
+		// the remainder should go tothe custom Modifier
+		let customModifier = rollModifier - totalMod;
+
+		// if negative or postive value, add the description to the beginning
+		if (customModifier !== 0) {
+
+			summaryNew = `${customModifier} ${modifierDesc}\n` + summaryNew;
+
+		}
+	
+		return [customModifier,summaryNew];
+
+	}
 
 	// check for change to hit location fields
 	// easier to read and change list of fields using this method
@@ -26153,13 +26221,16 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		// if defense, also reset Defense Bonuses
 		if (section == "defense") {
-		
 			updates[`${section}_apply_shield_db`] = 0;
 			updates[`${section}_apply_magic_db`] = 0;
+		}
 
+		// check for resetting encumbrance
+		if (section == "defense" || section == "skill") {
+			updates[`${section}_roll_apply_encumbrance`] = 0;
 		}
 			
-		setAttrs(updates);
+		setAttrs(updates, {silent: true});
 
 	}
 
