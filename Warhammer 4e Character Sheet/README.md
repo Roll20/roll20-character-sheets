@@ -13,6 +13,7 @@ January 11th 2021 v1.31
 - Reroll clicky buttons now integrated into the roll template out put for most rolls, including all repeating sections. This is diplayed in the Test value row.
 - NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
 - Channelling Roll template has been altered to be more inline with other rolls to allow the reroll intergation.
+- Spell Tab now has lvl selectors for Talents: Aethyric Attunement, Instinctive Diction, Perfect Pitch and Holy Hatred.  This are coded into he roll template to display their appropriate Modifiers. And hide/show miscast clicky's on crit when not trained.
 - Weapons & Spells Tab rework, cleaned it up and added a Mod and Target display fields which matches the roll target.
 - All Mod fields will now prepopulate the Roll Modifider popup with the set value.
 - Fixed the Talents tab text field dragging issue from the last update.
