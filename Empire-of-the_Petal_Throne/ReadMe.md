@@ -2,9 +2,17 @@
 Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR in 1975.
 
 ## Current Version
-1.4
+1.5
 
 ### Change log
+
+#### 1.5.1
+* Fixed Magic User ad Priest XP Bonus calculations
+
+#### 1.5
+* Fixed Revivification check scores for below 61
+* Skills now integrates use of checkboxes and adding additional skills
+* Property changed to Equipment and section for Coin added
 
 #### 1.4
 * Fixed validation checking for Talent scores
@@ -56,7 +64,7 @@ Player sheet for Empire of the Petal Throne by M.A.R. Barker, published by TSR i
 * Sheet creation for Roll20
 
 #### Todo List
-* Add items list from original sheet
+* updated functionality for equipment list (formerly called property)
 * Add attack Roll Buttons
 * Add Sheet Defaults for GM to pick which alignments to use
 * Add Sheet Defaults for GM to pick if players see Savings Throws, Attack Rolls and Checks

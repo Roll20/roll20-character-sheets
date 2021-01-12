@@ -659,9 +659,11 @@
                 <td id='upper-right-section'>
                     <div class="rating-wrapper">
                         <span class="label" data-i18n="experience">Experience</span>
-                        <img class="rating-diamond" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/The%20One%20Ring/assets/images/rating-diamond.png">
-                        <input id="xp-spent" name="attr_unused_experience_points" value="0" type="text">
-                        <input id="xp-input" name="attr_used_experience_points" value="0" class="nw-sub-rating" type="text">
+                        <div class="sheet-hover-info" data-i18n="experience-description">Experience is a measure of a character’s having been affected by or gained knowledge or skill through direct observation or participation over a period of time.<br><br>The upper left bubble represents a player characters unspent experiance points.<br><br>The upper right bubble bubble represents a player characters spent experiance points.<br><br> The central big main bubble represents a player characters total experiance points, this can be helpful when determining courage points.</div>
+                        <img class="rating-diamond" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/The%20One%20Ring/assets/images/rating-diamond.png"> 
+                        <input id="xp-total" name="attr_total_experience_points" value="0" type="text">
+                        <input id="xp-input" name="attr_unused_experience_points" value="0" class="nw-sub-rating" type="text">
+                        <input id="xp-spent" name="attr_used_experience_points" value="0" class="nw1-sub-rating" type="text">
                     </div>
                     <div class="rating-wrapper">
                         <span class="label" data-i18n="valour">Valour</span>
@@ -1867,4 +1869,39 @@
 		});
 	});
 });
+    /* This adds total_experience_points and allows the api to manipulate total_experience_points
+     * If a field has the readonly attribute (which total_experience_points does), the user will be unable to modify its value, and its default styling will be the same as if it were disabled.
+     * However, sheet worker scripts will be able to modify its value, and if its value is some kind of equation, it won't be automatically calculated.(but will be calculated when the sheet is
+     * opened or one of the values are changed) Note: If for some reason a readonly field is an equation, sheetworker-autocalc will be able to resolve it to a value just fine.
+    */ 
+    on("change:unused_experience_points change:used_experience_points sheet:opened", function() {  
+	getAttrs(["unused_experience_points","used_experience_points"], function(values) {
+		let unusedexperiencepoints = parseInt(values.unused_experience_points,10)||0;
+		let usedexperiencepoints = parseInt(values.used_experience_points,10)||0;
+		let totalexperiencepoints = unusedexperiencepoints + usedexperiencepoints;
+		setAttrs({                            
+			total_experience_points: totalexperiencepoints
+		});
+	});
+});
 </script>
+    /* This adds Jakob's Better Default Rolltemplate
+     * Documentation can be found at https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates Jakob's Better Default Rolltemplate
+     * added all 66 Character/ping Colors to the rolltemplate use roll20 hexcode.
+     * Example &{template:custom} {{color=434343}} {{title=Energy Claws(Attack)}} {{subtitle=Razor Claw(Hero)}} {{Fighting = [[{1d8!, 1d6!}k1]] }} {{Damage = [[3d6!]] }} {{desc=Energy Claws is an Innate Attack, Superpower. Requires conscious activation.}}
+    */ 
+<rolltemplate class="sheet-rolltemplate-custom">
+  <div class="sheet-container sheet-color-{{color}}">
+    <div class="sheet-header">
+      {{#title}}<div class="sheet-title">{{title}}</div>{{/title}}
+      {{#subtitle}}<div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+    </div>
+    <div class="sheet-content">
+      {{#allprops() title subtitle desc color}}
+      <div class="sheet-key">{{key}}</div>
+      <div class="sheet-value">{{value}}</div>
+      {{/allprops() title subtitle desc color}}
+      {{#desc}}<div class="sheet-desc">{{desc}}</div>{{/desc}}
+    </div>
+  </div>
+</rolltemplate>
