@@ -64,9 +64,11 @@
 				<h2 data-i18n="heat">Heat</h2><input type="number" name="attr_heat" placeholder="#" title="@{heat}" />
 			</div>
 			<div class="row-long pd-kar">
-				<h2 data-i18n="karma">Karma</h2><input type="number" name="attr_karma" placeholder="#" title="@{karma}" />
-				<h2 data-i18n="total karma">Total Karma</h2><input type="number" name="attr_total_karma" placeholder="#" title="@{total_karma}" />
-				<h2 data-i18n="essence">Essence</h2><input type="number" step="0.01" min='0.00' max='6.00' name="attr_essence" placeholder="6" title="@{essence}" />
+				<h2 data-i18n="karma">Karma</h2><input style="width: 2em;" type="number" name="attr_karma" placeholder="#" title="@{karma}" />
+				<h2 data-i18n="total karma">Total Karma</h2><input style="width: 2em;" type="number" name="attr_total_karma" placeholder="#" title="@{total_karma}" />
+			</div>
+			<div class="row-long pd-kar">
+				<h2 data-i18n="essence">Base Essence</h2><input disabled="disabled" style="width: 1.5em;" type="number" step="0.01" min="0.01" name="attr_essence_base" value="6" title="@{essence_base}" /> - <h2 data-i18n="essencemodifier">Modifier</h2><input style="width: 3em;" type="number" step="0.01" min="0.01" name="attr_essence_mod" placeholder="0" title="@{essence_mod}" /> - <h2 data-i18n="augmentations">Augmentations</h2><span name="attr_aug_essence_cost" title="@{aug_essence_cost}"></span> = <h2 data-i18n="currentessence">Current Essence</h2><span name="attr_essence" title="@{essence}"><span>
 			</div>
 		</div>
 	</div>
@@ -317,14 +319,13 @@
 				<label data-i18n="movement">Movement</label>
 				<div class="attr-und">
 					<div class="settings">
-						<input type="number" name="attr_walk_modifier" value="" placeholder="0" title="@{walk_modifier}" /><span class="tiny-span">/</span>
-						<input type="number" name="attr_run_modifier" value="" placeholder="0" title="@{run_modifier}" /><span class="tiny-span">/+</span>
-						<input type="number" name="attr_movement_mod" value="2" placeholder="2" title="@{movement_mod}" />
+						<input type="number" name="attr_move_speed" style="width: 2em;" value="10" placeholder="10" title="@{move_speed}" /><span class="tiny-span">/</span>
+						<input type="number" name="attr_sprint_speed" style="width: 2em;" value="15" placeholder="15" title="@{sprint_speed}" />
 					</div>
 					<div class="display">
-						<span name="attr_walk" title="@{walk}"></span><span> / </span>
-						<span name="attr_run" title="@{run}"></span><span> / +</span>
-						<span name="attr_movement_mod" title="@{movement_mod}"></span>
+						<button type="roll" name="sprint" value="@{gm_toggle} &{template:rolls}{{header=^{sprint}}}{{base=^{base} @{move_speed}+@{sprint_speed}+(Athletics+Agility)}}{{dice=[[@{sprint_speed}+((@{athletics}+@{agility}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle})]] meters}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}">
+							<span data-i18n="sprint">Sprint</span>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -388,7 +389,8 @@
                 <input class="settings-flag" name="attr_flag" type="hidden" value="settings" title="undefined_flag}"/>
                 <div class="buttons">
                   <button name="roll_skill" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[((@{rating}+@{attribute})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}}}"><span name="attr_name"></span></button>
-                  <button name="roll_skill" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} + @{spec}}}{{dice=[[((@{rating}+@{attribute}+2)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}\nSpec: @{spec}}}"><span name="attr_spec"></span></button>
+                  <button name="roll_skill spec" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} + @{spec}}}{{dice=[[((@{rating}+@{attribute}+2)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}\nSpec: @{spec}}}"><span name="attr_spec"></span></button>
+                  <button name="roll_skill expert" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} + @{expert}}}{{dice=[[((@{rating}+@{attribute}+3)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=@{notes}\nExpertise: @{expert}}}"><span name="attr_expert"></span></button>
                 </div><span class="text-align-center" name="attr_rating" title="@{repeating_skills_${x}_rating}"></span>
                 <select class="attribute-select" name="attr_attribute" title="undefined_attribute">
                   <option data-i18n="body" value="@{body}">Body</option>
@@ -407,24 +409,25 @@
                 <div class="collapse"><span name="attr_notes"></span></div>
                 <div class="settings">
                   <select class="skill-select" name="attr_name" title="undefined_name}"><option value="Astral Combat" data-i18n="Astral">Astral</option>
-<option value="Athletics" data-i18n="athletics">Athletics</option>
-<option value="Biotech" data-i18n="biotech">Biotech</option>
-<option value="Close Combat" data-i18n="closecombat">Close Combat</option>
-<option value="Con" data-i18n="con">Con</option>
-<option value="Conjuring" data-i18n="conjuring">Conjuring</option>
-<option value="Cracking" data-i18n="cracking">Cracking</option>
-<option value="Electronics" data-i18n="electronics">Electronics</option>
-<option value="Enchanting" data-i18n="enchanting">Enchanting</option>
-<option value="Engineering" data-i18n="engineering">Engineering</option>
-<option value="Exotic Weapon" data-i18n="exoticweapon">Exotic Weapons</option>
-<option value="Firearms" data-i18n="firearms">Firearms</option>
-<option value="Influence" data-i18n="influence">Influence</option>
-<option value="Outdoors" data-i18n="outdoors">Outdoors</option>
-<option value="Perception" data-i18n="perception">Perception</option>
-<option value="Pilot Aerospace" data-i18n="piloting">Piloting</option>
-<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
-<option value="Stealth" data-i18n="stealth">Stealth</option>
-<option value="Tasking" data-i18n="tasking">Tasking</option>
+							<option value="Astral" data-i18n="astral">Astral</option>
+							<option value="Athletics" data-i18n="athletics">Athletics</option>
+							<option value="Biotech" data-i18n="biotech">Biotech</option>
+							<option value="Close Combat" data-i18n="closecombat">Close Combat</option>
+							<option value="Con" data-i18n="con">Con</option>
+							<option value="Conjuring" data-i18n="conjuring">Conjuring</option>
+							<option value="Cracking" data-i18n="cracking">Cracking</option>
+							<option value="Electronics" data-i18n="electronics">Electronics</option>
+							<option value="Enchanting" data-i18n="enchanting">Enchanting</option>
+							<option value="Engineering" data-i18n="engineering">Engineering</option>
+							<option value="Exotic Weapons" data-i18n="exoticweapon">Exotic Weapons</option>
+							<option value="Firearms" data-i18n="firearms">Firearms</option>
+							<option value="Influence" data-i18n="influence">Influence</option>
+							<option value="Outdoors" data-i18n="outdoors">Outdoors</option>
+							<option value="Perception" data-i18n="perception">Perception</option>
+							<option value="Piloting" data-i18n="piloting">Piloting</option>
+							<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
+							<option value="Stealth" data-i18n="stealth">Stealth</option>
+							<option value="Tasking" data-i18n="tasking">Tasking</option>
                   </select>
                   <label data-i18n-title="rating" title="rating">
                     <input name="attr_rating" min="0" placeholder="0" type="number" title="rating"/>
@@ -434,6 +437,9 @@
                   </label>
                   <label data-i18n-title="specialization" title="specialization"> <span data-i18n="specialization">specialization</span>
                     <input name="attr_spec" placeholder="specialization" type="text" title="specialization"/>
+                  </label>
+                  <label data-i18n-title="expertise" title="expertise"> <span data-i18n="expertise">Expertise</span>
+                    <input name="attr_expert" placeholder="expertise" type="text" title="expertise"/>
                   </label>
                   <label data-i18n-title="focus" title="focus"> <span data-i18n="focus">focus</span>
                     <input name="attr_focus" placeholder="focus" type="text" title="undefined_focus}"/>
@@ -524,9 +530,9 @@
 				<input type="number" name="attr_stun_modifier" value="" placeholder="#" title="@{stun_modifier}" /><br />
 				<input type="hidden" name="attr_overflow" value="3" />
 				<label data-i18n="overflowmodifier">Overflow Modifier</label><input type="number" name="attr_overflow_modifier" value="" placeholder="#" title="@{overflow_modifier}" /><br />
-				<label data-i18n="paintolerance">Pain Tolerance</label><input type="number" name="attr_pain_tolerance" value="0" placeholder="#" title="@{pain_tolerance}" />
+				<label data-i18n="paintolerance">Pain Tolerance</label><input type="number" step="1" min="-1" max="1" name="attr_pain_tolerance" value="0" placeholder="0" title="@{pain_tolerance}" />
 				<div class="con-footer">
-					<span data-i18n="painfooter">Low Pain Tolernace adds a -1 and High Pain Tolerance adds a +1 per rank.</span>
+					<span data-i18n="painfooter">Low Pain Tolerance applies a -1 and High Pain Tolerance applies a +1 modifier to wound penalty related to damage.</span>
 				</div>
 			</div>
 			<div class="display">
@@ -2320,24 +2326,25 @@
           <h2 data-i18n="attribute">Attribute</h2>
           <h2 data-i18n="limit">Limit</h2>
           <select class="skill-select" name="attr_skill" title="@{repeating_active_${x}_skill}" value="Close Combat Group"><option value="Astral Combat" data-i18n="Astral">Astral</option>
-<option value="Athletics" data-i18n="Athletics">Athletics</option>
-<option value="Biotech" data-i18n="Biotech">Biotech</option>
-<option value="Close Combat" data-i18n="Close Combat">Close Combat</option>
-<option value="Con" data-i18n="Con">Con</option>
-<option value="Conjuring" data-i18n="Conjuring">Conjuring</option>
-<option value="Cracking" data-i18n="Cracking">Cracking</option>
-<option value="Electronics" data-i18n="Electronics">Electronics</option>
-<option value="Enchanting" data-i18n="Enchanting">Enchanting</option>
-<option value="Engineering" data-i18n="Engineering">Engineering</option>
-<option value="Exotic Weapon" data-i18n="Exotic Weapon">Exotic Weapons</option>
-<option value="Firearms" data-i18n="Firearms">Firearms</option>
-<option value="Influence" data-i18n="Influence">Influence</option>
-<option value="Outdoors" data-i18n="Outdoors">Outdoors</option>
-<option value="Perception" data-i18n="Perception">Perception</option>
-<option value="Pilot Aerospace" data-i18n="Piloting">Piloting</option>
-<option value="Sorcery" data-i18n="Sorcery">Sorcery</option>
-<option value="Stealth" data-i18n="Stealth">Stealth</option>
-<option value="Tasking" data-i18n="Tasking">Tasking</option>
+<option value="Astral" data-i18n="astral">Astral</option>
+<option value="Athletics" data-i18n="athletics">Athletics</option>
+<option value="Biotech" data-i18n="biotech">Biotech</option>
+<option value="Close Combat" data-i18n="closecombat">Close Combat</option>
+<option value="Con" data-i18n="con">Con</option>
+<option value="Conjuring" data-i18n="conjuring">Conjuring</option>
+<option value="Cracking" data-i18n="cracking">Cracking</option>
+<option value="Electronics" data-i18n="electronics">Electronics</option>
+<option value="Enchanting" data-i18n="enchanting">Enchanting</option>
+<option value="Engineering" data-i18n="engineering">Engineering</option>
+<option value="Exotic Weapons" data-i18n="exoticweapon">Exotic Weapons</option>
+<option value="Firearms" data-i18n="firearms">Firearms</option>
+<option value="Influence" data-i18n="influence">Influence</option>
+<option value="Outdoors" data-i18n="outdoors">Outdoors</option>
+<option value="Perception" data-i18n="perception">Perception</option>
+<option value="Piloting" data-i18n="piloting">Piloting</option>
+<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
+<option value="Stealth" data-i18n="stealth">Stealth</option>
+<option value="Tasking" data-i18n="tasking">Tasking</option>
           </select>
           <label data-i18n-title="rating" title="rating">
             <input name="attr_rating" min="0" placeholder="0" title="@{repeating_active_${x}_rating}" type="number"/>
@@ -3013,12 +3020,7 @@
 <input type="hidden" name="attr_palming" min="0" value="0" />
 <input type="hidden" name="attr_perception" min="0" value="0" />
 <input type="hidden" name="attr_performance" min="0" value="0" />
-<input type="hidden" name="attr_pilotaerospace" min="0" value="0" />
-<input type="hidden" name="attr_pilotaircraft" min="0" value="0" />
-<input type="hidden" name="attr_pilotexoticvehicle" min="0" value="0" />
-<input type="hidden" name="attr_pilotgroundcraft" min="0" value="0" />
-<input type="hidden" name="attr_pilotwalker" min="0" value="0" />
-<input type="hidden" name="attr_pilotwatercraft" min="0" value="0" />
+<input type="hidden" name="attr_pilot" min="0" value="0" />
 <input type="hidden" name="attr_pistols" min="0" value="0" />
 <input type="hidden" name="attr_registering" min="0" value="0" />
 <input type="hidden" name="attr_ritualspellcasting" min="0" value="0" />
@@ -3242,22 +3244,41 @@
 	    });
 
 
-	//This function watches for changes to augmentations and updates recalculates essence
-	on("remove:repeating_augmentations change:repeating_augmentations:essence_cost", (eventInfo) => {
+	// Update the essence count (6 - aug_mods - calculated augmentation costs = total)
+	var update_essence = () => {
 		let ess = 6;
+		let aug_ess_cost = 0;
 
 		getSectionIDs("augmentations", (ids) => {
 			_.each(ids, (id) => {
 				getAttrs([`repeating_augmentations_${id}_essence_cost`], (aug_ess) => {
-					ess -= aug_ess[`repeating_augmentations_${id}_essence_cost`];
-
+					aug_ess_cost += aug_ess[`repeating_augmentations_${id}_essence_cost`];
 					setAttrs({
-						essence: ess
+						aug_essence_cost: parseFloat(aug_ess_cost).toFixed(2)
+					});
+
+					ess -= aug_ess[`repeating_augmentations_${id}_essence_cost`];
+					setAttrs({
+						essence: parseFloat(ess).toFixed(2)
 					});
 				});
 			});
+
+			getAttrs(['essence_mod'], (ess_mod) => {
+				ess -= ess_mod['essence_mod'];
+				setAttrs({
+					essence: parseFloat(ess).toFixed(2)
+				});
+			});
 		});
+
+	};
+
+	//This function watches for changes to augmentations and updates recalculates essence
+	on("change:essence_mod remove:repeating_augmentations change:repeating_augmentations:essence_cost", (eventInfo) => {
+		update_essence();
 	});
+
 
 	//This function checks changes to repeating_armor and updates the Primary Armor if needed
 	on("change:repeating_armor", (eventInfo) => {
