@@ -3281,6 +3281,7 @@
                         _.each(callbacks, function(callback) {
                             callback();
                         });
+                        setTalentPointsAndMastery();
                     });/**/
                 });
             });
@@ -3660,7 +3661,7 @@
 
         //Next, add spell drops
         _.each(spells.all, function(spell) {
-            var spelldata = {name: "Spells:" + spell.Name};
+            var spelldata = {name: "Powers:" + spell.Name};
             spelldata.data = {"spellcasting_ability": spell.Ability};
             if(spell.Source == "race") {
                 spelldata.data.spellclass = "Racial";

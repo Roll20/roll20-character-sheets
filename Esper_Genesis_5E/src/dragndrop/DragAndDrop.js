@@ -195,7 +195,7 @@ var processDrop = function(page, currentData, repeating, looped) {
     const processSpells = () => {
         try {
             if(page.name) {
-                const spellLevel = page.data["Level"] && page.data["Level"] > 0 ? page.data["Level"] : "cantrip";
+                const spellLevel = page.data["Rank"] && page.data["Rank"] > 0 ? page.data["Rank"] : "prime";
                 const section = `spell-${spellLevel}`
                 let existing = {id: false}; 
 
@@ -210,7 +210,7 @@ var processDrop = function(page, currentData, repeating, looped) {
     
                 const dropSheetAssocitation = {
                     spelldescription: page.data['data-description'],
-                    spellschool: page.data['School'].toLowerCase(),
+                    spellschool: page.data['Domain'].toLowerCase(),
                     spellclass: page.data['spellclass'],
                     spellsource: page.data['spellsource'],
                     spellritual: page.data['Ritual'],
@@ -435,12 +435,12 @@ var processDrop = function(page, currentData, repeating, looped) {
                  })
             }
 
-            if (page.data["data-Spells"]) {
-                const spellList = dropFunctions.buildSpellList(page.data["data-Spells"]);
+            if (page.data["data-Powers"]) {
+                const spellList = dropFunctions.buildSpellList(page.data["data-Powers"]);
                 getCompendiumPage(spellList, compendiumPages => {
                     compendiumPages = removeDuplicatedPageData(compendiumPages);
                     compendiumPages = Array.isArray(compendiumPages) ? compendiumPages : [compendiumPages];
-                    const innateSpellLists = dropFunctions.jsonParse(page.data["data-Spells"])[`innate`] || false;
+                    const innateSpellLists = dropFunctions.jsonParse(page.data["data-Powers"])[`innate`] || false;
                     let spellUpdate = {}, spellCallbacks = [];
 
                     compendiumPages.forEach(spellPage => {
@@ -583,7 +583,7 @@ var processDrop = function(page, currentData, repeating, looped) {
             }
 
             if (page.data["data-Saving Throws"] && !page.data.multiclass) {
-                const saves = dropFunctions.jsonParse(page.data["data-Saving Throws"]);
+                const saves = Array.isArray(page.data["data-Saving Throws"]) ? page.data["data-Saving Throws"] : dropFunctions.jsonParse(page.data["data-Saving Throws"]);
                 saves.forEach(value => {
                     const save = new SavingThrow(value);
                     assignUpdate(dropFunctions.updateSheetAttributes(save));
@@ -688,7 +688,7 @@ var processDrop = function(page, currentData, repeating, looped) {
         case "Proficiencies":
             processProficiencies();
             break;
-        case "Spells":
+        case "Powers":
             processSpells();
             break;
         case "Subclasses":
@@ -725,7 +725,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                 const traitArray = dropFunctions.jsonParse(blob["Traits"]);
                 if (traitArray && traitArray.length) {
                     traitArray.forEach(trait => {
-                        if (!trait.Input) {
+                        if (!trait.Input && trait.Name) {
                             let match = {name: trait["Name"], type: page.name};
                             if (trait["Replace"]) {
                                 match = {name: trait["Replace"]};
@@ -1138,9 +1138,9 @@ var processDrop = function(page, currentData, repeating, looped) {
             }
         }
         
-        if (blob["Spells"]) {
+        if (blob["Powers"]) {
             try {
-                let spells = dropFunctions.jsonParse(blob["Spells"]);
+                let spells = dropFunctions.jsonParse(blob["Powers"]);
                 let spellUpdate = {}, spellCallbacks = [];
                 let spellPages = [];
                 spells.forEach(spell => {
@@ -1152,7 +1152,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                 getCompendiumPage(spellPages, spellData => {
                     var inSpellBook = function(name) {
                       let found = false;
-                      const spellRepeating = ["cantrip", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+                      const spellRepeating = ["prime", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
                       spellRepeating.forEach(spellLevel => {
                         if(found) return;
                         if(repeating[`spell-${spellLevel}`]) {
@@ -1174,7 +1174,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                                     const mockPage = {
                                       name: s,
                                       data: {
-                                          "Category": "Spells"
+                                          "Category": "Powers"
                                       }
                                   }
                                   const pageData = (Array.isArray(spellData)) ? spellData.filter(entry => { return entry['name'] === s})[0] : spellData;
@@ -1190,7 +1190,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                                 const mockPage = {
                                   name: spellInformation.Name,
                                   data: {
-                                      "Category": "Spells"
+                                      "Category": "Powers"
                                   }
                               }
                               const pageData = (Array.isArray(spellData))? spellData.filter(entry => { return entry['name'] === spellInformation.Name})[0] : spellData;
@@ -1211,19 +1211,19 @@ var processDrop = function(page, currentData, repeating, looped) {
                     }
                 });
             } catch (error) {
-                errorMessage("Spells", error)
+                errorMessage("Powers", error)
             }
         }
         
-        if (blob["Custom Spells"]) {
+        if (blob["Custom Powers"]) {
             try {
-                let customSpells = dropFunctions.jsonParse(blob["Custom Spells"]);
+                let customSpells = dropFunctions.jsonParse(blob["Custom Powers"]);
                 let spellUpdate = {}, spellCallbacks = [];
                 customSpells.forEach(spellInformation => {
                     const mockPage = {
                         name: spellInformation.Name,
                         data: {
-                            "Category": "Spells"
+                            "Category": "Powers"
                         }
                     }
                     Object.assign(mockPage.data, spellInformation);
@@ -1238,7 +1238,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                     });
                 });
             } catch (error) {
-                errorMessage("Custom Spells", error)
+                errorMessage("Custom Powers", error)
             }
         }
     }
