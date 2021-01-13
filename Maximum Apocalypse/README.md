@@ -21,11 +21,13 @@ Also see the API script which implements the logic to handle initiative tracking
 - Tick the "Threshold modifier prompt on every roll" checkbox to specify misc. threshold modifer for subsequent rolls
 - Drop down selections for archetypes, apocalypse & skill proficiencies
 - Initiative includes modifiers from being encumbered, shaken, acute, starving & emaciated
+- "Next Combat Phase" button to reduce initiative tracker value by 5 (See API script to do this automatically, track phase number & reset for new round)
 - Temporary initiative modifier field for situational special ability effects 
 - Special Ability and Gear descriptions can be expanded/contracted to see the full text when needed
 - Hunger conditions will highlight in red when active
 - Starving condition will apply -10 modifier to base stats (modifier indicator will appear next to base stats)
 - Structure deviations from core rulebook implemented to provide enough room for Special Ability and Gear descriptions
+- Install Maximum Apocalypse API & tick the "Use API for rolls (Requires Pro Account)" checkbox to use "Re-Roll" button to re-roll & reduce luck uses
 
 ## Aspirational enhancements
 - Default proficiency roll prompt to disadvantage for non-proficient skills
@@ -33,6 +35,18 @@ Also see the API script which implements the logic to handle initiative tracking
 - Implement special ability conditional modifier roll queries (e.g. Bravery, Hollow Points ...)
 
 ## Change Log
+
+### January 7th 2021 v7.0
+- Add Luck button!
+- Add button to add initiative to tracker
+- Use tracker macro to reduce initiative for "Full Dodge" and Riposte
+- Add button to adjust initiative for next combat phase
+- Add Parry & Riposte buttons for each weapon
+- Add Luck Re-Roll button when using the API
+- Optimise grid spacings for FireFox
+- Add translation to roll template
+- Add translation order for selects options
+- Add translations for roll queries
 
 ### December 27th 2020 v6.0
 - Added support to field calculations for specific special abilities:
