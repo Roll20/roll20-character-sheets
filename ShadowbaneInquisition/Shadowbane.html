@@ -263,7 +263,7 @@
 		<input name='attr_initmod2' type='number' value='0' />
 		<p class='init_plus'>+</p>
 		<select name='attr_initmod3' class='init_field'>
-		  <option value='(@{AGI}+@{AGI_advancement})/10+@{AGI_unnat}' selected='selected'>Agility</option>
+		  <option value='(@{agiTotal})/10+@{AGI_unnat}' selected='selected'>Agility</option>
 		  <option value='(@{INT}+@{INT_advancement})/10+@{INT_unnat}'>Intelligence</option>
 		  <option value='(@{PER}+@{PER_advancement})/10+@{PER_unnat}'>Perception</option>
 		  <option value='0'>N/A</option>
@@ -2182,18 +2182,20 @@
   // ___________________________________________________________________________
   // ____________________Movement and Weight sheet worker_______________________
   // ___________________________and Fatigue Pts_________________________________
-  on('sheet:opened change:size change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:agi change:agi_unnat change:agi_advancement change:agi_mov_mod', function() {
+  on('sheet:opened change:size change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:agi change:agi_unnat change:agi_advancement change:agi_mov_mod change:armor_agi change:armor_limit', function() {
     getAttrs([
 	'size',
     'str', 'str_unnat', 'str_advancement',
     'tou', 'tou_unnat', 'tou_advancement',
-	'agi', 'agi_unnat', 'agi_advancement', 'agi_mov_mod'
+	'agi', 'agi_unnat', 'agi_advancement', 'agi_mov_mod', 'armor_agi', 'armor_limit'
     ], function(values) {
 	  var size = parseInt(values['size'], 10) || 0;
       var agi = parseInt(values['agi'], 10) || 0;
       var agi_unnat = parseInt(values['agi_unnat'], 10) || 0;
 			var agi_advancement = parseInt(values['agi_advancement'], 10) || 0;
       var agi_mov_mod = parseInt(values['agi_mov_mod'], 10) || 0;
+      var armor_agi = parseInt(values['armor_agi'], 10) || 0;
+			var armor_limit = parseInt(values['armor_limit'], 10) || 0;
       var str = parseInt(values['str'], 10) || 0;
       var str_unnat = parseInt(values['str_unnat'], 10) || 0;
       var str_advancement = parseInt(values['str_advancement'], 10) || 0;
@@ -2205,7 +2207,9 @@
       var wp_advancement = parseInt(values['wp_advancement'], 10) || 0;
       var str_mod = Math.floor((str + str_advancement) / 10 + str_unnat);
 	  var tou_mod = Math.floor((tou + tou_advancement) / 10 + tou_unnat);
-	  var agi_mod = Math.floor((agi + agi_advancement) / 10 + agi_unnat);
+		var agiTotal = agi + agi_advancement;
+		if (armor_limit) {agiTotal = (agiTotal > armor_agi ) ? armor_agi : agiTotal; }
+	  var agi_mod = Math.floor((agiTotal) / 10 + agi_unnat);
 	  var wp_mod = Math.floor((wp + wp_advancement) / 10 + wp_unnat);
 	  var move_mod = agi_mod + size + agi_mov_mod;
 	  var carry_mod = str_mod + tou_mod;
@@ -2246,6 +2250,7 @@
 		carry: (carry_calc * 1), //taking out the * 1 seems to cause attr_carry to freeze when carry_mod is set to 1 or 0
         lift: (carry_calc * 2),
         push: (carry_calc * 4),
+				agiTotal: (agiTotal),
       });
 
       // 0 mod movement override _______________________________________________
@@ -2306,30 +2311,6 @@
 		soak_leg_left: (armor_leg_left + tou_mod),
 		fatigue_max: (tou_mod + wp_mod)
       });
-
-    });
-  });
-
-	// ___________________________________________________________________________
-  // ____________________Armor Agility Limiter__________________________________
-  // ___________________________________________________________________________
-
-	on('sheet:opened change:agi change:agi_unnat change:agi_advancement change:armor_agi change:armor_limit ', function() {
-    getAttrs([
-    'agi', 'agi_unnat', 'agi_advancement', 'armor_agi', 'armor_limit'], function(values) {
-      var agi = parseInt(values['agi'], 10) || 0;
-      var agi_unnat = parseInt(values['agi_unnat'], 10) || 0;
-      var agi_advancement = parseInt(values['agi_advancement'], 10) || 0;
-      var armor_agi = parseInt(values['armor_agi'], 10) || 0;
-			var armor_limit = parseInt(values['armor_limit'], 10) || 0;
-			var agiTotal = agi + agi_advancement
-
-			if (armor_limit) {
-				agiTotal = (agiTotal > armor_agi ) ? armor_agi : agiTotal;
-			}
-
-      // normal, no modifiers ___________________________________________________
-      setAttrs({agiTotal: (agiTotal)});
 
     });
   });
