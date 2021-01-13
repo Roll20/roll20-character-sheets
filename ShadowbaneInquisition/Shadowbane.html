@@ -315,13 +315,15 @@
 			<input class='minimisable_infographic_g3 full_width' type='text' name='attr_wounds_max' value='0' />
 		  </div>
 
-		  <div class='minimisable_infographic_field2x3 radius_border'>
+		  <div class='minimisable_infographic_field4x4 radius_border'>
 			<button name='fatigue_roll' type='roll' class='minimisable_infographic_g1 clear radius_border_top'
 			value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{name=Fatigue}} {{2x2-name=Current}} {{2x2=@{fatigue}}} {{2x2-name-max=Max}} {{2x2-max=@{fatigue|max}}}'>Fatigue</button>
 			<p class='minimisable_infographic_g2'>Current</p>
 			<input class='minimisable_infographic_g3 full_width' type='text' name='attr_fatigue' value='0' />
 			<p class='minimisable_infographic_g4'>Max</p>
 			<input class='minimisable_infographic_g5 full_width' type='text' name='attr_fatigue_max' value='0' readonly />
+			<p class='minimisable_infographic_g8'>Threshold Mod</p>
+			<input class='minimisable_infographic_g9 full_width' type='text' name='attr_fatigue_mod' value='0' />
 		  </div>
 
 		  <div class='minimisable_infographic_field2x3 radius_border'>
@@ -2381,12 +2383,14 @@
   // ___________________________________________________________________________
   // ________________________Fatigue and Armor sheet worker_____________________
   // ___________________________________________________________________________
-  on('sheet:opened change:tou change:tou_unnat change:tou_advancement change:wp change:wp_unnat change:wp_advancement change:armor_head change:armor_arm_right change:armor_body change:armor_arm_left change:armor_leg_right change:armor_leg_left', function() {
+  on('sheet:opened change:tou change:tou_unnat change:tou_advancement change:wp change:wp_unnat change:wp_advancement change:armor_head change:armor_arm_right change:armor_body change:armor_arm_left change:armor_leg_right change:armor_leg_left change:fatigue_mod', function() {
     getAttrs([
+		'fatigue_mod',
     'tou', 'tou_unnat', 'tou_advancement',
 	'wp', 'wp_unnat', 'wp_advancement',
 	'armor_head', 'armor_arm_right', 'armor_body', 'armor_arm_left', 'armor_leg_right', 'armor_leg_left'
     ], function(values) {
+			var fatigue_mod = parseInt(values['fatigue_mod'], 10) || 0;
       var tou = parseInt(values['tou'], 10) || 0;
       var tou_unnat = parseInt(values['tou_unnat'], 10) || 0;
       var tou_advancement = parseInt(values['tou_advancement'], 10) || 0;
@@ -2410,7 +2414,7 @@
 		soak_arm_left: (armor_arm_left + tou_mod),
 		soak_leg_right: (armor_leg_right + tou_mod),
 		soak_leg_left: (armor_leg_left + tou_mod),
-		fatigue_max: (tou_mod + wp_mod)
+		fatigue_max: (tou_mod + wp_mod + fatigue_mod)
       });
 
     });
