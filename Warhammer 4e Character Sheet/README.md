@@ -8,17 +8,19 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+January 18th 2021 v1.32
+
+- Armor Tab rework: Seperated AP from Armor Damage points and added field to add Durable value to increase Damage Points only without inceasing AP. Also added a Robust talent lvl selector which modifies the right hand body location total AP display.
+
+
 January 11th 2021 v1.31
 
-- Reroll clicky buttons now integrated into the roll template output for most rolls, including all repeating sections. This is displayed in the Test value row.
-- NPC Tab rework, a number of modifications have been made to increase performance when a lot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifier are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
+- Reroll clicky buttons now integrated into the roll template out put for most rolls, including all repeating sections. This is diplayed in the Test value row.
+- NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
 - Channelling Roll template has been altered to be more inline with other rolls to allow the reroll intergation.
-- Spell Tab now has lvl selectors for Talents: Aethyric Attunement, Instinctive Diction, Perfect Pitch and Holy Hatred.  This are coded into he roll template to display their appropriate Modifiers. And hide/show miscast clicky's on crit when not trained.
-- Weapons & Spells Tab now have added a Mod and Target display fields which matches the roll target.
-- All Mod fields will now prepopulate the Roll Modifier popup with the set value.
-- Chenged Sturdy Talent field in the Encumbrance section to a selector and added Strong Back Talent next to it.
+- Weapons & Spells Tab rework, cleaned it up and added a Mod and Target display fields which matches the roll target.
+- All Mod fields will now prepopulate the Roll Modifider popup with the set value.
 - Fixed the Talents tab text field dragging issue from the last update.
-- Character Status will now display in the banner of Charm, Gossip, Intimidate and Leadership Rolls.
 - New GM whisper button in the Combat Actions title row, and adjusted matched the Conditions hider button to match it.
 - The sheet will perform a repeating section ID scan and set them as attributes inside the sections on first opening after this update to populate the required ID's of existing sections to allow new features to function correctly. There is a check to only allow this to happen once as it does take a few seconds to complete.
 
