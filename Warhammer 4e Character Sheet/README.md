@@ -8,10 +8,39 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 
 ///// ============ Change Log ============ ///// 
 
+January 11th 2021 v1.31
+
+- Reroll clicky buttons now integrated into the roll template output for most rolls, including all repeating sections. This is displayed in the Test value row.
+- NPC Tab rework, a number of modifications have been made to increase performance when a lot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifier are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
+- Channelling Roll template has been altered to be more inline with other rolls to allow the reroll intergation.
+- Spell Tab now has lvl selectors for Talents: Aethyric Attunement, Instinctive Diction, Perfect Pitch and Holy Hatred.  This are coded into he roll template to display their appropriate Modifiers. And hide/show miscast clicky's on crit when not trained.
+- Weapons & Spells Tab now have added a Mod and Target display fields which matches the roll target.
+- All Mod fields will now prepopulate the Roll Modifier popup with the set value.
+- Chenged Sturdy Talent field in the Encumbrance section to a selector and added Strong Back Talent next to it.
+- Fixed the Talents tab text field dragging issue from the last update.
+- Character Status will now display in the banner of Charm, Gossip, Intimidate and Leadership Rolls.
+- New GM whisper button in the Combat Actions title row, and adjusted matched the Conditions hider button to match it.
+- The sheet will perform a repeating section ID scan and set them as attributes inside the sections on first opening after this update to populate the required ID's of existing sections to allow new features to function correctly. There is a check to only allow this to happen once as it does take a few seconds to complete.
+
+
+December 28st 2020 v1.3
+
+- Roll Modifier Text: Most roll buttons now have a optional configuration cog next too them allow players to add text to the roll template output (can be conditional on test outcome, ie success/fail). This includes Skills/Weapons/Spells & NPC tabs. Handy for adding text related to Talent based roll outcomes, i.e. +1 SL on success or Reverse Result on fail.
+- Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Crit/fumble logic update: Auto Failure on 99 roll result, will always result in a fumble, even if target is above 100.
+- Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
+- Roll template now has Critical / Fumble(Oops) / Miscast / Wrath buttons integrated, they only show when these events happen and are useable by anyone with control of that character sheet.
+- Advanded Skills will now always have base skill 0 (unmodified) when they are not Taken (i.e. trained). This is intended to prevent any untaken advanced skills to be rolled by accident. Note Ranged Crossbow and Ranged Thrown are always rollable as per core rules. Also fixed Rt header display for advanced grouped skills which will now display the user entered name field as well as the grouped skill name.
+- Marginal fail rolls (-0) will now show correctly in SL results
+- Corruption Section now has a Max Corruption value field, based on TB+WPB.
+- New hard coded skills for Channelling Witch, Dark & Chaos added.
+- Roll Tags have been added to the formulas for all combat skills. Other skills to follow.
+- Added some further missing translation tags.
+
 
 December 21st 2020 v1.23.4
 
-- Cleaned up critical roll text for casting and channeling to make it clearer that theses at happening.
+- Cleaned up critical roll text for casting and channeling to make it clearer that theses are happening.
 - PC & NPC Characterisitc rolls now show success/failure message.
 - Added some further missing translation tags
 
@@ -253,8 +282,7 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 Future release wish list :
 
 - Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe)
-- More themes. (v1.3)
-- Talents Tab rework, with possible roll integration. (v1.3)
+- More themes. (v1.4)
 - WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x)
 
 

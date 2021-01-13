@@ -8,6 +8,18 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
+### Jan 8th, 2020
+
+- Added the ability to change which ability applies to which skills to the Configuration page
+  - Unfortunately you'll still need to add any second ability modifier applied to the manual bonus column - support for multiple abilities has been added to the to-do list
+
+### Jan 7th, 2020
+
+- Added support for scatter moves
+- Added roll templates for dual hit and multi hit scatter attacks
+- Added a quick roll button that rolls a move without any query boxes for temporary modifiers or effectiveness, rolling with +0/+0/Neutral values
+- Streamlined move displays to show the configuration only when desired via a collapsible control
+
 ### Dec 12, 2020
 
 - Migrated the character sheet style attributes to new fields
@@ -104,6 +116,7 @@ Things we want to add to the character sheet, presented in no particular order o
 - [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
 - [x] ~~Add a Settings page~~
+- [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Allow modifications to movement (maybe just an extra box)
 - [ ] Display the adjusted stat score when temporary stat changes are provided
