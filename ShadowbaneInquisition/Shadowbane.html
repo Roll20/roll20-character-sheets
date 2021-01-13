@@ -1348,6 +1348,7 @@
 	<br>
 
 	<div class='equipment_gear equipment_header'>
+		<div class='equipment_gear_gs0'>Carry</div>
 	  <div class='equipment_gear_gs1'>Gear / Item Name</div>
 	  <div class='equipment_gear_gs2'>Craftsmanship</div>
 	  <div class='equipment_gear_gs3'>Quantity</div>
@@ -1356,6 +1357,7 @@
 	  <div class='equipment_gear_gs6'>Page #</div>
 	</div>
 	<div class='equipment_gear'>
+		<input name='attr_gear_carry' type='checkbox'class='equipment_gear_gs0' value='1' checked />
 	  <input name='attr_gear_name' type='text' placeholder='Gear / Item Name' class='equipment_gear_gs1' />
 	  <input name='attr_gear_crafts' type='text' value='Common' class='equipment_gear_gs2' />
 	  <input name='attr_gear_quantity' type='text' value='1' placeholder='Amount' class='equipment_gear_gs3' />
@@ -1368,6 +1370,7 @@
 	<textarea name='attr_gear_desc' placeholder='Description' class='collapsible_entity_block auto_margin 90width'></textarea>
 	<fieldset name='gear' class='repeating_gear'>
 	  <div class='equipment_gear'>
+			<input name='attr_gear_carry_r' type='checkbox'class='equipment_gear_gs0' value='1' checked />
 		<input name='attr_gear_name_r' type='text' placeholder='Gear / Item Name' class='equipment_gear_gs1' />
 		<input name='attr_gear_crafts_r' type='text' value='Common' class='equipment_gear_gs2' />
 		<input name='attr_gear_quantity_r' type='text' value='1' placeholder='Amount' class='equipment_gear_gs3' />
@@ -2195,9 +2198,9 @@
   // ___________________________________________________________________________
   // ____________________Movement and Weight sheet worker_______________________
   // ___________________________and Fatigue Pts_________________________________
-  on('sheet:opened change:size change:fatigue change:ws change:ws_unnat change:ws_advancement change:bs change:bs_unnat change:bs_advancement change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:int change:int_unnat change:int_advancement change:per change:per_unnat change:per_advancement change:wp change:wp_unnat change:wp_advancement change:fel change:fel_unnat change:fel_advancement change:agi change:agi_unnat change:agi_advancement change:agi_mov_mod change:armor_agi change:armor_limit', function() {
+  on('sheet:opened change:size change:fatigue change:carry change:weight_total change:ws change:ws_unnat change:ws_advancement change:bs change:bs_unnat change:bs_advancement change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:int change:int_unnat change:int_advancement change:per change:per_unnat change:per_advancement change:wp change:wp_unnat change:wp_advancement change:fel change:fel_unnat change:fel_advancement change:agi change:agi_unnat change:agi_advancement change:agi_mov_mod change:armor_agi change:armor_limit', function() {
     getAttrs([
-	'size', 'fatigue',
+	'size', 'fatigue', 'carry', 'weight_total',
     'ws', 'ws_unnat', 'ws_advancement',
     'bs', 'bs_unnat', 'bs_advancement',
     'str', 'str_unnat', 'str_advancement',
@@ -2212,6 +2215,9 @@
 	  var size = parseInt(values['size'], 10) || 0;
 		// FATIGUE
 		var fatigue = parseInt(values['fatigue'], 10) || 0;
+		// CARRY
+	  var carry = parseInt(values['carry'], 10) || 0;
+		var weight_total = parseInt(values['weight_total'], 10) || 0;
 		// WS
 		var ws = parseInt(values['ws'], 10) || 0,
 				ws_unnat = parseInt(values['ws_unnat'], 10) || 0,
@@ -2260,6 +2266,7 @@
 				armor_agi = parseInt(values['armor_agi'], 10) || 0,
 				armor_limit = parseInt(values['armor_limit'], 10) || 0;
 		var agiTotal = agi + agi_advancement;
+		if (weight_total > carry) { agiTotal -= 10; }
 		if (armor_limit) {agiTotal = (agiTotal > armor_agi ) ? armor_agi : agiTotal; }
 		var agi_mod = Math.floor(agiTotal / 10 + agi_unnat);
 		if (agi_mod < fatigue) {
@@ -2606,16 +2613,18 @@
     repeatingSum("M_weapon_weight_t","meleeweapons","M_weapon_weight");
   });
 
-  on('change:M_weapon_weight_t change:R_weapon_weight_t change:gear_weight change:gear_quantity change:repeating_gear remove:repeating_gear', () => {
+  on('change:M_weapon_weight_t change:R_weapon_weight_t change:gear_carry change:gear_weight change:gear_quantity change:repeating_gear remove:repeating_gear', () => {
     getSectionIDs(`repeating_gear`, idArray => {
       const fieldset_weight = [];
-      const fieldset_quantity = [];
+			const fieldset_quantity = [];
+      const fieldset_carry = [];
       idArray.forEach(id => fieldset_weight.push (`repeating_gear_${id}_gear_weight_r`));
-      idArray.forEach(id => fieldset_quantity.push (`repeating_gear_${id}_gear_quantity_r`));
-      getAttrs(['M_weapon_weight_t','R_weapon_weight_t','weight_total', 'gear_weight', 'gear_quantity', ...fieldset_weight, ...fieldset_quantity], v => {
+			idArray.forEach(id => fieldset_quantity.push (`repeating_gear_${id}_gear_quantity_r`));
+      idArray.forEach(id => fieldset_carry.push (`repeating_gear_${id}_gear_carry_r`));
+      getAttrs(['M_weapon_weight_t','R_weapon_weight_t','weight_total', 'gear_carry', 'gear_weight', 'gear_quantity', ...fieldset_weight, ...fieldset_quantity, ...fieldset_carry], v => {
         const getValue = (id, field) => parseFloat(v[`repeating_gear_${id}_${field}`]) || 0
-        const weight_base = parseFloat(v.gear_weight) * parseFloat(v.gear_quantity)
-        const weight_repeating = idArray.reduce((total, id) => total + (getValue(id, 'gear_weight_r') * getValue(id, 'gear_quantity_r')), 0)
+        const weight_base = parseFloat(v.gear_weight) * parseFloat(v.gear_quantity) * parseFloat(v.gear_carry)
+        const weight_repeating = idArray.reduce((total, id) => total + (getValue(id, 'gear_weight_r') * getValue(id, 'gear_quantity_r') * getValue(id, 'gear_carry_r')), 0)
         const weapon_weight = parseFloat(v.M_weapon_weight_t) + parseFloat(v.R_weapon_weight_t)
         setAttrs({
           weight_total: weight_base + weight_repeating + weapon_weight,
