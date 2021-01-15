@@ -995,26 +995,26 @@
 		<fieldset name='rangedweapons' class='repeating_rangedweapons'>
 		  <div class='equipment_ranged_weapons_rep'>
 			<div class='equipment_ranged_weapons_grid1'>
-			  <select name='attr_R_weapon_attack_range' class='equipment_ranged_weapons_gs1 full_width clear sheet-select_correction'>
+			  <select name='attr_R_weapon_attack_range' class='equipment_ranged_weapons_gs1 full_width clear select_correction'>
 				<option value='30' >Point Blank (+30)</option>
 				<option value='10' >Short Range (+10)</option>
 				<option value='0' selected='selected'>Standard (+0)</option>
 				<option value='-10' >Long Range (-10)</option>
 				<option value='-30' >Extreme Range (-30)</option>
 			  </select>
-			  <select name='attr_R_weapon_attack' class='equipment_ranged_weapons_gs2 full_width clear sheet-select_correction'>
+			  <select name='attr_R_weapon_attack' class='equipment_ranged_weapons_gs2 full_width clear select_correction'>
 				<option value='10' selected='selected'>Standard (+10)</option>
 				<option value='0' >Semi Auto (+0)</option>
 				<option value='-10' >Full Auto (-10)</option>
 				<option value='-20' >Called Shot (-20)</option>
 				<option value='-20' >Suppressing (-20)</option>
 			  </select>
-			  <select name='attr_R_weapon_aim' class='equipment_ranged_weapons_gs3 full_width clear sheet-select_correction'>
+			  <select name='attr_R_weapon_aim' class='equipment_ranged_weapons_gs3 full_width clear select_correction'>
 				<option value='0' selected='selected'>No Aim (+0)</option>
 				<option value='10' >Half Aim (+10)</option>
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
-			  <button class='equipment_ranged_weapons_gs4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{degrees=[[1+ floor(abs( [[[[@{BS} + @{BS_advancement} + @{R_weapon_trained} - 20 + @{R_weapon_mod1}]] + [[@{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{inlinemod-toggle} ]]]] - [[1d100@{R_weapon_mishap_chance}]])/10)]]}}{{roll= $[[3]]}}{{target= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}' >Hit</button>
+			  <button class='equipment_ranged_weapons_gs4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{degrees=[[1+ floor(abs( [[[[@{BS} + @{BS_advancement} + @{R_weapon_trained} - 20 + @{R_weapon_mod1}]] + [[@{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{inlinemod-toggle} ]]]] - [[1d100@{R_weapon_mishap_chance}]])/10)]]}}{{roll= $[[3]]}}{{target= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{hitmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained} - 20]]}}' >Hit</button>
 			  <button class='equipment_ranged_weapons_gs5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_dam-roll}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }}' >DMG</button>
 			</div>
 			<div class='equipment_ranged_weapons_grid2'>
@@ -2298,8 +2298,8 @@
 
 
   {{#roll-name}}
-  <div class="sheet-template-header">{{character}} Rolls for {{roll-name}}</div>
-  <div class="sheet-template-content">
+  <div class="template-header">{{character}} Rolls for {{roll-name}}</div>
+  <div class="template-content">
 	  <div class="template-2x2">
 		<div class="template-2x2">
 		  <div class="template-row template-right">Target:</div>
@@ -2310,29 +2310,119 @@
 		  <div class="template-row mythic_crit">{{roll}}</div>
 		</div>
 	  </div>
-	<div class="sheet-template-row">
-	  {{#^rollGreater() roll target }}
-		<div class="sheet-template-center">Success with {{degrees}} DoS</div>
-	  {{/^rollGreater() roll target }}
-	  {{#rollGreater() roll target }}
-		<div class="sheet-template-center">Failure with {{degrees}} DoF</div>
-	  {{/rollGreater() roll target }}
+	<div class="template-row">
+	  <div class="template-right">{{degrees}}</div>
+	  <div>
+		{{#^rollGreater() roll target }} Degrees of Success{{/^rollGreater() roll target }}
+		{{#rollGreater() roll target }} Degrees of Failure{{/rollGreater() roll target }}
+	  </div>
 	</div>
   </div>
   {{/roll-name}}
 
 
-
+<!--TODO: lots of these would look better if the key/value pairs were left/right rather than centered-->
   {{#attack}}
   <div class="template-header">{{character}} rolls to hit with {{weapon}}</div>
   {{#loc}}<div class="template-content template-content_top">{{/loc}}
 	{{^loc}}<div class="template-content">{{/loc}}
 
-	  <div class="template-2x2 template-row">
-		<div class="template-right">{{roll}}</div>
-		{{#^rollLess() roll 0 }}<div style="float: right">Additional DoS</div>{{/^rollLess() roll 0 }}
-		{{#rollLess() roll 0 }}<div style="float: right">Additional DoF</div>{{/rollLess() roll 0 }}
+	  <div class="rolltemplate-collapsible_entity_switch">
+		<div class="template-2x2 template-row template-content_top">
+		  <div class="template-right">Target:</div>
+		  <div>{{target}}</div>
+		</div>
+		<div class="rolltemplate-collapsible_entity_block">
+		  {{#skill_name}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">{{skill_name}} Skill</div>
+			  <div>{{skill}}</div>
+			</div>
+			<div class="template-2x2 template-row">
+			  <div class="template-right">Advancement</div>
+			  <div>{{advancement}}</div>
+			</div>
+		  {{/skill_name}}
+		  {{#weaponmod}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">Hit Mod</div>
+			  <div>{{hitmod}}</div>
+			</div>
+		  {{/weaponmod}}
+		  {{#trained}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right inlineroll">Weapon Trained</div>
+			  <div>{{trained}}</div>
+			</div>
+		  {{/trained}}
+		  {{#aim}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">
+				{{#rollTotal() aim 0}}No Aim{{/rollTotal() aim 0}}
+				{{#rollTotal() aim 10}}Half Aim{{/rollTotal() aim 10}}
+				{{#rollTotal() aim 20}}Full Aim{{/rollTotal() aim 20}}
+			  </div>
+			  <div>{{aim}}</div>
+			</div>
+		  {{/aim}}
+		  {{#R_type}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">
+				{{#rollTotal() R_type 10}}Single Shot{{/rollTotal() R_type 10}}
+				{{#rollTotal() R_type 0}}Burst{{/rollTotal() R_type 0}}
+				{{#rollTotal() R_type -10}}Full Auto{{/rollTotal() R_type -10}}
+				{{#rollTotal() R_type -20}}Called Shot / Suppressing{{/rollTotal() R_type -20}}
+			  </div>
+			  <div>{{R_type}}</div>
+			</div>
+		  {{/R_type}}
+		  {{#range}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">
+				{{#rollTotal() range 30}}Point Blank{{/rollTotal() range 30}}
+				{{#rollTotal() range 10}}Short Range{{/rollTotal() range 10}}
+				{{#rollTotal() range 0}}Standard{{/rollTotal() range 0}}
+				{{#rollTotal() range -10}}Long Range{{/rollTotal() range -10}}
+				{{#rollTotal() range -30}}Extreme{{/rollTotal() range -30}}
+			  </div>
+			  <div>{{range}}</div>
+			</div>
+		  {{/range}}
+		  {{#M_type}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">
+				{{#rollTotal() M_type 30}}All Out{{/rollTotal() M_type 30}}
+				{{#rollTotal() M_type 20}}Charge{{/rollTotal() M_type 20}}
+				{{#rollTotal() M_type 10}}Standard{{/rollTotal() M_type 10}}
+			  </div>
+			  <div>{{M_type}}</div>
+			</div>
+		  {{/M_type}}
+		  {{#multi}}
+			<div class="template-2x2 template-row">
+			  <div class="template-right">
+				{{#rollTotal() multi 0}}Standard{{/rollTotal() multi 0}}
+				{{#rollTotal() multi -10}}Swift{{/rollTotal() multi -10}}
+				{{#rollTotal() multi -20}}Lighting{{/rollTotal() multi -20}}
+			  </div>
+			  <div>{{multi}}</div>
+			</div>
+		  {{/multi}}
+		</div>
 	  </div>
+	  
+	  <div class="template-2x2 template-row">
+		<div class="template-right">Roll:</div>
+		<div>{{roll}}</div>
+	  </div>
+	  
+	  <!-- Gosh darn it I can't make the inline roll nice like CKenny's -->
+	  {{#^rollGreater() roll target}}
+		<div class="template-2x2 template-row">Degrees of Success: {{degrees}}</div>
+	  {{/^rollGreater() roll target}}
+	  {{#rollGreater() roll target}}
+		<div class="template-2x2 template-row">Degrees of Failure: {{degrees}}</div>
+	  {{/rollGreater() roll target}}
 
 	  {{#rollWasCrit() roll }}
 		{{#psy}}<div class="template-row template-center">Failed to cast due to >91 roll</div>{{/psy}}
@@ -2341,7 +2431,6 @@
 	  {{#rollWasFumble() roll }}
 		{{#psy}}<div class="template-row template-center">Psychic Phenomena</div>{{/psy}}
 		{{^psy}}<div class="template-row template-center">How about that?</div>{{/psy}}
-		
 	  {{/rollWasFumble() roll }}
 	</div>
 	{{/attack}}
