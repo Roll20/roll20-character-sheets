@@ -1166,6 +1166,7 @@
 				  <input class='equipment_ranged_weapons_gs09 full_width' type='number' value='0' name='attr_R_weapon_min' />
 				  <div class='equipment_ranged_weapons_gs010'>Vengeful</div>
 				  <input class='equipment_ranged_weapons_gs011 full_width' type='number' value='0' name='attr_R_weapon_vengeful' />
+					<input type='hidden' value='' name='attr_R_weapon_real_dmg' />
 				</div>
 				<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle_min'>
 				  <div class='equipment_ranged_weapons_gs13'>RoF</div>
@@ -1298,6 +1299,15 @@
           <option value='Rending'>Rending</option>
           <option value='Explosive'>Explosive</option>
         </select>
+			</div>
+			<div class='equipment_melee_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half' >
+				<div class='equipment_melee_weapons_gs06'>Primitive</div>
+				<input class='equipment_melee_weapons_gs07 full_width' type='number' value='0' name='attr_M_weapon_max' />
+				<div class='equipment_melee_weapons_gs08'>Proven</div>
+				<input class='equipment_melee_weapons_gs09 full_width' type='number' value='0' name='attr_M_weapon_min' />
+				<div class='equipment_melee_weapons_gs010'>Vengeful</div>
+				<input class='equipment_melee_weapons_gs011 full_width' type='number' value='0' name='attr_M_weapon_vengeful' />
+				<input type='hidden' value='' name='attr_M_weapon_real_dmg' />
 			</div>
 			<div class='equipment_melee_weapons_grid3 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 			  <div class='equipment_melee_weapons_gs13'>Trained?</div>
@@ -1815,6 +1825,15 @@
 	          <option value='Explosive'>Explosive</option>
 	        </select>
 				</div>
+				<div class='equipment_ranged_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half' >
+          <div class='equipment_ranged_weapons_gs06'>Primitive</div>
+				  <input class='equipment_ranged_weapons_gs07 full_width' type='number' value='0' name='attr_V_R_weapon_max' />
+				  <div class='equipment_ranged_weapons_gs08'>Proven</div>
+				  <input class='equipment_ranged_weapons_gs09 full_width' type='number' value='0' name='attr_V_R_weapon_min' />
+				  <div class='equipment_ranged_weapons_gs010'>Vengeful</div>
+				  <input class='equipment_ranged_weapons_gs011 full_width' type='number' value='0' name='attr_V_R_weapon_vengeful' />
+					<input type='hidden' value='' name='attr_V_R_weapon_real_dmg' />
+				</div>
 				<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle_min'>
 				  <div class='equipment_ranged_weapons_gs13'>RoF</div>
 				  <input class='equipment_ranged_weapons_gs14 full_width' type='text' placeholder='Std' name='attr_V_R_weapon_standard' />
@@ -1946,6 +1965,15 @@
 	          <option value='Rending'>Rending</option>
 	          <option value='Explosive'>Explosive</option>
 	        </select>
+				</div>
+				<div class='equipment_melee_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half' >
+          <div class='equipment_melee_weapons_gs06'>Primitive</div>
+				  <input class='equipment_melee_weapons_gs07 full_width' type='number' value='0' name='attr_V_M_weapon_max' />
+				  <div class='equipment_melee_weapons_gs08'>Proven</div>
+				  <input class='equipment_melee_weapons_gs09 full_width' type='number' value='0' name='attr_V_M_weapon_min' />
+				  <div class='equipment_melee_weapons_gs010'>Vengeful</div>
+				  <input class='equipment_melee_weapons_gs011 full_width' type='number' value='0' name='attr_V_M_weapon_vengeful' />
+					<input type='hidden' value='' name='attr_V_M_weapon_real_dmg' />
 				</div>
 				<div class='equipment_melee_weapons_grid3 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 				  <div class='equipment_melee_weapons_gs13'>Trained?</div>
@@ -2714,7 +2742,7 @@
 	on(fields.map(field => 'change:repeating_' + field).join(' '), (e) => {
 		// use regex to find repeating section ID
 		let id = /[a-z0-9_]*-[a-z0-9]*[rvm_]*_/.exec(e.sourceAttribute);
-		let redice = /(\d+)(d\d+)(kh?\d+)?(kl\d+)?(dl?\d+)?(dh\d+)?([\+|-]\d+)?/;
+		let redice = /(\d+)(d\d+)((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?(?:[\+|-]\d+)?)?/;
 		// transform lower case to upper case
 		let source = id[0].replace('v_', 'V_').replace('r_', 'R_').replace('m_', 'M_');
 		// to avoid retyping long strings because i'm lazy
@@ -2727,30 +2755,35 @@
 					ven = parseInt(v[ven], 10) || 0,
 					min = parseInt(v[min], 10) || 0,
 					max = parseInt(v[max], 10) || 0;
-console.log(dmg);
+
 			let dicenum = parseInt(dmg[1], 10) || 0,
 					dicetype = dmg[2],
-					kh = parseInt(dmg[3], 10) || 0, kl = parseInt(dmg[4], 10) || 0,
-					dl = parseInt(dmg[5], 10) || 0, dh = parseInt(dmg[6], 10) || 0,
-					mod = dmg[7];
-console.log(dicenum, dicetype, kh, kl, dl, dh, mod);
+					mod = dmg[3];
 			let damTotal = '{';
 
 			for (var i = 0; i < dicenum; i++) {
 				if (i) damTotal += ', '
+				if (min) damTotal += '{';
+				if (max) damTotal += '{';
 				damTotal += '1' + dicetype;
 				if (ven) damTotal += 'cs>' + ven;
-				if (min) damTotal += ', 0d1+' + min;
-				if (max) damTotal += ', 0d1+' + max;
+				if (min) damTotal += ', 0d1+' + min + '}kh1';
+				if (max) damTotal += ', 0d1+' + max + '}kl1';
 			}
 			damTotal += '}';
-			if (min) damTotal += 'kl' + (kl || dh || dicenum);
-			if (max) damTotal += 'kl' + (kh || dl || dicenum);
 			if (mod) damTotal += mod;
 
-			console.log('damage = ',v[dam],'\nmin = ',min,'\nmax = ',max,'\nvengeful = ',ven );
-			console.log(damTotal);
-			// 5d10k1+3
+			console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
+
+			let attr = {};
+			Object.defineProperty(attr, `${source}weapon_real_dmg`, {
+			  value: 'damTotal'
+			});
+			console.log(attr);
+
+			setAttrs(attr);
+
+			getAttrs([source + 'weapon_real_dmg'], (v) => {console.log(v);})
 		});
 	});
 
