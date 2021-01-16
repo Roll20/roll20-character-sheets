@@ -17,7 +17,10 @@ Change Log
 	Updated how Essence is displayed (breaks down aug cost and allows for manual modifications (critter effects that drain essence for example))
 	Updated how movement was being displayed, rules are now 10m base and sprint is 15m + results of an Athletics+Agility check)
 	Added Expertise to the skills section, having problems figuring out how to make the specialization and expertise roll buttons hide when there isn't a value for them.
-	
+2021-01-11 - 2021-01-15
+	Updated repeating items formatting
+	Updated repeating items to make specialization and expertise buttons 15 characters if the actual display name is greater than 15
+
 
 
 
