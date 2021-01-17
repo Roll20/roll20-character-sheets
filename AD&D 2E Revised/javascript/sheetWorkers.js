@@ -682,6 +682,18 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 });
 // --- End setup Rogue skills total --- //
 
+//Related weapons / familiarity penalty
+on('change:nonprof-penalty', function () {
+    getAttrs(['nonprof-penalty'], function(values) {
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty']) ?? 0) * -1;
+        let famil = Math.floor(nonprof / 2)
+        setAttrs({
+            ['nonprof-penalty']: nonprof,
+            ['famil-penalty']: famil
+        });
+    });
+})
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
