@@ -1665,7 +1665,7 @@
             clearRepeatingSections("background_holder");
         }
 
-        if(eventinfo.newValue === "Rules:Backgrounds") {
+        if(eventinfo.newValue === "Rules::Personality%20and%20Background") {
             //Clears saved data for this field
             getCompendiumPage("");
             setAttrs(reset, function() {
@@ -3632,7 +3632,7 @@
         }
         //set up background drop
         if(data["l1-background"].values.background) {
-            if(data["l1-background"].values.background == "Rules:Backgrounds") {
+            if(data["l1-background"].values.background == "Rules::Personality%20and%20Backgrounds") {
                 var customBg  = {name: removeExpansionInfo(data["l1-background"].values["background_name"]), data: {Category: "Backgrounds", blobs:{}}};
                 if(customtraits.background.length > 0) {
                     customBg.data.theseblobs = ["customblob"];
