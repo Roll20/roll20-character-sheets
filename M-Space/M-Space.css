@@ -4,7 +4,7 @@ hr {
 }
 
 .sheet-invisible {
-    opacity: 0;
+    visibility: hidden;
 }
 
 .sheet-text-align-center {
@@ -38,6 +38,9 @@ hr {
 .sheet-background-green {
     background:#DFF0D8;
 }
+.sheet-fading-background {
+    background-image: linear-gradient(to right, rgba(220,220,220,1), rgba(220,221,222,.1));
+}
 
 /* Remove margin from selects in webkit browsers, same for textareas */
 button {
@@ -49,22 +52,48 @@ button {
     height: 1.5em;
     font-size: 1em;
 }
+button[type=roll].sheet-d100::before {
+    font-family: 'dicefontd10';
+    font-size: 175%;
+}
 button[type=roll].sheet-reduced-size {
-    margin: 0px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
     padding: 0px;
     height: 1.5em;
-    font-size: 1em;
+    font-size: .92em;
 }
+
+button[type=roll].sheet-no-dice {
+    padding-left: 2px;
+    padding-right: 2px;
+    height: 16px;
+}
+
+button[type=roll].sheet-memorized {
+    padding-left: 2px;
+    padding-right: 2px;
+    height: 16px;
+}
+
+input[type="checkbox"].sheet-display-memorized:checked + button.sheet-memorized::before {
+    font-family: 'Pictos';
+    content: 'S';
+}
+input[type="checkbox"].sheet-display-memorized:not(:checked) + button.sheet-memorized::before {
+    content: '';
+}
+
+button[type=roll].sheet-no-dice::before { content: ''; }
+
 select {
     margin: 0px;
     padding: 0px;
     height: 1.5em;
 }
-option {
-    margin: 0px;
-    padding: 0px;
-    height: 1.5em;
-}
+
 textarea {
     margin: 0px;
     padding: 0px;
@@ -74,6 +103,7 @@ input {
     padding: 0px;
     height: 1.5em;
 }
+
 
 input[type="number"]:disabled::-webkit-inner-spin-button,
 input[type="number"]:disabled::-webkit-outer-spin-button {
@@ -87,11 +117,9 @@ input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
 }
-input[type='number'] {
-    -moz-appearance: textfield;
-}
 
 input[type='number'] {
+    -moz-appearance: textfield;
     text-align: center;
 }
 
@@ -102,6 +130,10 @@ div[class^="repcontrol"] {
 div[class="repcontainer editmode"] ~ div[class^="repcontrol"] button[class="btn repcontrol_add"] {
     display: inline-block!important;
     visibility: hidden;
+}
+/* Make repeating section inline-block for display modes */
+fieldset.sheet-inlined~.repcontainer[data-groupname^="repeating_"] > .repitem {
+    display: inline-block;
 }
 
 /* Make the delete buttons appear above the detail toggles */
@@ -129,13 +161,41 @@ div.sheet-rep-row {
 .sheet-full-width {
     width: 100%;
 }
+
+.sheet-number-width {
+    width: 47px;
+}
 div.sheet-number-width {
     display: inline-block;
     width: 47px;
 }
-.sheet-number-width {
+
+.sheet-hpad-5 {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+input[type="text"].sheet-number-width {
     width: 47px;
 }
+input[type="number"].sheet-number-width {
+    width: 47px;
+}
+
+.sheet-number-width-sm {
+    width: 22px;
+}
+div.sheet-number-width-sm {
+    display: inline-block;
+    width: 22px;
+}
+input[type="text"].sheet-number-width-sm {
+    width: 22px;
+}
+input[type="number"].sheet-number-width-sm {
+    width: 25px;
+}
+
 .sheet-damage-width {
     width: 94px;
 }
@@ -184,6 +244,11 @@ div.sheet-section {
     padding-top: 4px;
 }
 
+.sheet-header-bar {
+    background: #636466;
+    color: white;
+}
+
 .sheet-header {
     font-weight: bold;
     text-align: center;
@@ -207,6 +272,14 @@ input[type="number"].sheet-disabled::-webkit-outer-spin-button {
     font-weight: bold;
 }
 
+.sheet-underlined {
+    text-decoration: underline;;
+}
+
+.sheet-italic {
+    font-style: italic;
+}
+
 .sheet-hidden {
     display: none;
 }
@@ -221,28 +294,144 @@ span.sheet-in-header-toggle {
     margin-right: 3px;
 }
 
-
-/* Collapse */
-input.sheet-details-toggle {
-    position: relative;
-    z-index: 99;
-    cursor: pointer;    
+/* Section Collapse */
+input[type="checkbox"].sheet-section-toggle
+{
     opacity: 0;
-    width: 16px;
-    height: 16px
+    width: 100%;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    margin: -10px;
+    cursor: pointer;
+    z-index: 1;
 }
-input.sheet-details-toggle + span {
+h3.sheet-section-toggle {
     display: inline-block;
     position: relative;
+    width: 100%;
+    margin-left: -100%;
+    padding-left: 16px;
+}
+
+input[type="checkbox"].sheet-section-toggle + h3::after {
+    margin-right: 4px;
+    line-height: 14px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 4px;
+    content: "►";
+}
+
+input[type="checkbox"].sheet-section-toggle:checked + h3::after {
+    content: "▼";
+}
+
+input[type="checkbox"].sheet-section-toggle:not(:checked) ~ div.sheet-section-toggle {
+    display: none;
+}
+
+input[type="checkbox"].sheet-mook-section-toggle
+{
+    opacity: 0;
+    width: 100%;
+    position: relative;
+    top: 0px;
+    left: 0px;
+    margin: -10px;
+    cursor: pointer;
+    z-index: 1;
+}
+
+h5.sheet-mook-section-toggle {
+    display: inline-block;
+    position: relative;
+    left: 5px;
+    width: calc(100% + 5px);
+    margin-left: -100%;
+    padding-left: 6px;
+}
+input[type="checkbox"].sheet-mook-section-toggle + h5::after {
+    margin-right: 3px;
+    margin-left: 3px;
+    line-height: 10px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 3px;
+    content: "►";
+}
+
+input[type="checkbox"].sheet-mook-section-toggle:checked + h5::after {
+    content: "▼";
+}
+div.sheet-mook-section-toggle {
+    margin-left: -10px;
+}
+input[type="checkbox"].sheet-mook-section-toggle:not(:checked) ~ div.sheet-mook-section-toggle {
+    display: none;
+}
+
+/*input[type="checkbox"].sheet-section-toggle
+{
+    opacity: 0;
     width: 16px;
     height: 16px;
-    background: url(http://i.imgur.com/FDNaXPO.png);
+    position: relative;
+    top: 5px;
+    left: 6px;
+    margin: -10px;
     cursor: pointer;
-    margin-left: -16px;
-    margin-bottom: -3px;
+    z-index: 1;
 }
-input.sheet-details-toggle:checked + span {
-    background: url(http://i.imgur.com/4Lp1ONC.png);
+
+input[type="checkbox"].sheet-section-toggle + span::after {
+    margin-right: 4px;
+    line-height: 14px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    content: "∨";
+    font-weight: bold;
+}
+
+input[type="checkbox"].sheet-section-toggle:checked + span::after {
+    content: "∧";
+    font-weight: bold;
+}*/
+
+/* New Collapse */
+input[type="checkbox"].sheet-details-toggle
+{
+    opacity: 0;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    top: 5px;
+    left: 6px;
+    margin: -10px;
+    cursor: pointer;
+    z-index: 1;
+    font-family: Pictos;
+}
+
+input[type="checkbox"].sheet-details-toggle + span::before {
+    margin-right: 4px;
+    line-height: 14px;
+    text-align: center;
+    display: inline-block;
+    vertical-align: middle;
+    content: "&";
+    width: 14px;
+    height: 14px;
+    font-size: 12px;
+    font-family: Pictos;
+}
+
+input[type="checkbox"].sheet-details-toggle:checked + span::before {
+    content: "_";
+    font-family: Pictos;
 }
 
 input[type="checkbox"].sheet-details-toggle:not(:checked) ~ div.sheet-details {
@@ -275,6 +464,30 @@ input.sheet-mspace-variant-toggle:not(:checked) ~ div .sheet-mspace-variant {
 input.sheet-mythras-variant-toggle:checked ~ div .sheet-mythras-variant,
 input.sheet-mspace-variant-toggle:checked ~ div .sheet-mspace-variant {
     display: initial;
+}
+
+input.sheet-spirit-toggle:not(:checked) ~ div .sheet-spirit-value {
+    display: none;
+}
+input.sheet-spirit-toggle:checked ~ div .sheet-nonspirit-value {
+    display: none;
+}
+
+input.sheet-spirit-toggle:not(:checked) ~ div .sheet-spirit-value-inline {
+    display: none;
+}
+input.sheet-spirit-toggle:checked ~ div .sheet-nonspirit-value-inline {
+    display: none;
+}
+
+input.sheet-reach-enabled-toggle:not(:checked) ~ div .sheet-reach-enabled {
+    display: none;
+}
+input.sheet-reach-enabled-toggle:not(:checked) ~ div .sheet-weapon-effects {
+    width: 53.75%;
+}
+input.sheet-reach-enabled-toggle:not(:checked) ~ div .sheet-weapon-effects-core {
+    width: 55.5%;
 }
 
 input.sheet-default-style-toggle:not(:checked) ~ div .sheet-default-style,
@@ -370,12 +583,22 @@ input.sheet-mspace-vehicles-toggle:checked ~ .sheet-mspace-vehicles {
     display: initial;
 }
 
+input.sheet-linguistics-enabled-toggle:not(:checked) ~ div .sheet-linguistics-enabled {
+    display: none;
+}
+input.sheet-linguistics-enabled-toggle:checked ~ div .sheet-languages-enabled {
+    display: none;
+}
 
 input.sheet-dependencies-enabled-toggle ~ div .sheet-dependencies-enabled {
     display: none;
 }
 input.sheet-dependencies-enabled-toggle:checked ~ div .sheet-dependencies-enabled {
     display: initial;
+}
+
+input.sheet-rank-enabled-toggle:not(:checked) ~ div .sheet-rank-enabled {
+    display: none;
 }
 
 input.sheet-tenacity-enabled-toggle ~ div .sheet-tenacity-enabled {
@@ -433,6 +656,10 @@ input.sheet-divine-magic-enabled-toggle:not(:checked) ~ div .sheet-divine-magic-
     display: none;
 }
 
+input.sheet-fae-powers-enabled-toggle:not(:checked) ~ div .sheet-fae-powers-enabled {
+    display: none;
+}
+
 input.sheet-folk-magic-enabled-toggle:not(:checked) ~ div .sheet-folk-magic-enabled {
     display: none;
 }
@@ -464,7 +691,6 @@ input.sheet-affiliations-enabled-toggle:not(:checked) ~ div .sheet-affiliations-
 /* Sheet Types */
 input.sheet-type-toggle-battle-unit:not(:checked) ~ div.sheet-type-battle-unit,
 input.sheet-type-toggle-json:not(:checked) ~ div.sheet-type-json,
-input.sheet-type-toggle-npc:not(:checked) ~ div.sheet-type-npc,
 input.sheet-type-toggle-pc:not(:checked) ~ div.sheet-type-pc,
 input.sheet-type-toggle-ship:not(:checked) ~ div.sheet-type-ship,
 input.sheet-type-toggle-vehicle:not(:checked) ~ div.sheet-type-vehicle,
@@ -643,16 +869,15 @@ span.sheet-page-toggle {
     margin-left: -100px;
 }
 
-input.sheet-page-toggle-npc-sheet:checked + span.sheet-page-toggle-npc-sheet,
-input.sheet-page-toggle-npc-json:checked + span.sheet-page-toggle-npc-json,
 input.sheet-page-toggle-core:checked + span.sheet-page-toggle-core,
 input.sheet-page-toggle-equipment:checked + span.sheet-page-toggle-equipment,
 input.sheet-page-toggle-magic:checked + span.sheet-page-toggle-magic,
 input.sheet-page-toggle-background:checked + span.sheet-page-toggle-background,
 input.sheet-page-toggle-notes:checked + span.sheet-page-toggle-notes,
 input.sheet-page-toggle-stats:checked + span.sheet-page-toggle-stats,
-input.sheet-page-toggle-npc:checked + span.sheet-page-toggle-npc,
 input.sheet-page-toggle-help:checked + span.sheet-page-toggle-help,
+input.sheet-page-toggle-compact:checked + span.sheet-page-toggle-compact,
+input.sheet-page-toggle-mooks:checked + span.sheet-page-toggle-mooks,
 input.sheet-page-toggle-all:checked + span.sheet-page-toggle-all {
     background: black;
     color: firebrick;
@@ -664,16 +889,15 @@ div.sheet-page {
     max-height: 0;
     overflow: hidden;
 }
-input.sheet-page-toggle-npc-sheet:checked ~ div.sheet-page-npc-sheet,
-input.sheet-page-toggle-npc-json:checked ~ div.sheet-page-npc-json,
 input.sheet-page-toggle-core:checked ~ div.sheet-page-core,
-input.sheet-page-toggle-equipment:checked ~ div.sheet-page-equipment,
 input.sheet-page-toggle-magic:checked ~ div.sheet-page-magic,
+input.sheet-page-toggle-equipment:checked ~ div.sheet-page-equipment,
 input.sheet-page-toggle-background:checked ~ div.sheet-page-background,
 input.sheet-page-toggle-notes:checked ~ div.sheet-page-notes,
 input.sheet-page-toggle-stats:checked ~ div.sheet-page-stats,
-input.sheet-page-toggle-npc:checked ~ div.sheet-page-npc,
 input.sheet-page-toggle-help:checked ~ div.sheet-page-help,
+input.sheet-page-toggle-mooks:checked ~ div.sheet-page-mooks,
+input.sheet-page-toggle-compact:checked ~ div.sheet-page-compact,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-core,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-magic,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-equipment,
@@ -681,17 +905,22 @@ input.sheet-page-toggle-all:checked ~ div.sheet-page-background,
 input.sheet-page-toggle-all:checked ~ div.sheet-page-notes {
     visibility: visible;
     opacity: 1;
-    max-height: 999999px;
-    overflow: auto;
+    max-height: 99999999999px;
+    overflow: visible;
 }
 
 /* Traits */
+div.sheet-traits {
+    margin-bottom: 5px;
+}
+
+/* Info */
 div.sheet-info {
     margin-bottom: 5px;
 }
 div.sheet-info-firstrow {
     display: inline-block;
-    width: 97%;
+    width: 97.9%;
 }
 div.sheet-info-row {
     display: inline-block;
@@ -699,19 +928,15 @@ div.sheet-info-row {
 }
 div.sheet-info-name {
     display: inline-block;
-    width: 20.25%;
-}
-div.sheet-npc-info {
-    display: inline-block;
-    width: 24.375%;
-}
-div.sheet-npc-info-short {
-    display: inline-block;
-    width: 9%;
+    width: 16%;
 }
 div.sheet-info-species {
     display: inline-block;
-    width: 20.25%;
+    width: 16%;
+}
+div.sheet-info-form {
+    display: inline-block;
+    width: 13%;
 }
 div.sheet-info-hit-locations {
     display: inline-block;
@@ -719,17 +944,11 @@ div.sheet-info-hit-locations {
 }
 div.sheet-info-career {
     display: inline-block;
-    width: 20.25%;
+    width: 16%;
 }
 div.sheet-info-traits {
     display: inline-block;
     width: 100%;
-}
-textarea.sheet-npc-traits {
-    height: 50px;
-}
-textarea.sheet-npc-notes {
-    height: 80px;
 }
 div.sheet-info-age {
     display: inline-block;
@@ -782,35 +1001,15 @@ div.sheet-characteristics {
     margin-bottom: 5px;
 }
 
-div.sheet-npc-characteristics {
-    width: 510px;
-    /*width: 102px;*/
-    float: left;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
-
 div.sheet-char-row {
     display: inline-block;
-    width: 86%;
-}
-
-div.sheet-npc-char {
-    display: inline-block;
-    text-align: center;
-    width: 69px;
+    width: 89%;
 }
 
 div.sheet-char-number {
     display: inline-block;
     text-align: center;
     width: 33%;
-}
-
-div.sheet-npc-char-number {
-    display: inline-block;
-    text-align: center;
-    width: 47px;
 }
 
 div.sheet-char-number-header {
@@ -835,20 +1034,12 @@ div.sheet-conditions {
     margin-bottom: 5px;
 }
 textarea.sheet-conditions {
-    height: 62px;
+    height: 55px;
 }
 
 /* Initiative */
-div.sheet-npc-initiative {
-    width: 194px;
-    float: left;
-    margin-right: 5px;
-}
 input.sheet-init-dice {
     width: 75px;
-}
-button.sheet-npc-init-button {
-    width: 34px;
 }
 
 /* Attributes */
@@ -856,18 +1047,12 @@ div.sheet-attributes {
     width: 32%;
     float: left;
     margin-right: 5px;
-}
-div.sheet-npc-attributes {
-    width: 200px;
-    float: left;
-    margin-right: 5px;
     margin-bottom: 5px;
 }
 
-
 div.sheet-attribute-row {
     display: inline-block;
-    width: 92%;
+    width: 93.5%;
 }
 
 div.sheet-attribute-number {
@@ -881,24 +1066,9 @@ div.sheet-attribute-symbol {
     text-align: center;
 }
 
-div.sheet-npc-attribute-symbol {
-    display: inline-block;
-    text-align: center;
-    width: 6px;
-}
-
 div.sheet-attribute-label {
     display: inline-block;
     width: 33%;
-}
-
-div.sheet-npc-attribute-label-short {
-    display: inline-block;
-    width: 88px;
-}
-div.sheet-npc-attribute-label-long {
-    display: inline-block;
-    width: 146px;
 }
 
 div.sheet-attribute-total {
@@ -912,18 +1082,16 @@ input.sheet-attribute-table-lookup {
 }
 
 /* Hit Locations */
-div.sheet-hit-locations {
-    margin-bottom: 5px;
+input[type="checkbox"].sheet-location-display-toggle:not(:checked) + div.sheet-loction-display {
+    display: none;
 }
-div.sheet-npc-hit-locations {
-    float: left;
-    width: 294px;
+div.sheet-hit-locations {
     margin-bottom: 5px;
 }
 
 div.sheet-hit-locations-row {
     display: inline-block;
-    width: 94%;
+    width: 95.25%;
 }
 
 input[type="number"].sheet-hit-locations-table-number {
@@ -936,32 +1104,16 @@ div.sheet-hit-locations-number {
     text-align: center;
     width: 13%;
 }
-div.sheet-npc-hit-locations-number {
-    display: inline-block;
-    text-align: center;
-    width: 47px;
-}
 
 div.sheet-hit-locations-symbol {
     display: inline-block;
     text-align: center;
 }
 
-div.sheet-npc-hit-locations-symbol {
-    display: inline-block;
-    text-align: center;
-    width: 1px;
-}
-
 div.sheet-hit-locations-label {
     display: inline-block;
     text-align: center;
     width: 36%;
-}
-div.sheet-npc-hit-locations-label {
-    display: inline-block;
-    text-align: center;
-    width: 125px;
 }
 
 div.sheet-hit-locations-block {
@@ -970,19 +1122,26 @@ div.sheet-hit-locations-block {
     width: 4%;
 }
 
-div.sheet-npc-hit-locations-block {
-    display: inline-block;
-    text-align: center;
-    width: 13px;
-}
-
 div.sheet-hit-locations-hp {
     display: inline-block;
     text-align: center;
     width: 29%;
 }
 textarea.sheet-hit-locations-note {
-    height: 88px;
+    height: 195px;
+    width: calc(100% - 2px);
+}
+textarea.sheet-hit-locations-note-7 {
+    height: 75px;
+    width: calc(100% - 2px);
+}
+textarea.sheet-hit-locations-note-8 {
+    height: 55px;
+    width: calc(100% - 2px);
+}
+textarea.sheet-hit-locations-note-9 {
+    height: 35px;
+    width: calc(100% - 2px);
 }
 
 /* Movement */
@@ -992,7 +1151,7 @@ div.sheet-movement {
 
 div.sheet-movement-row {
     display: inline-block;
-    width: 97.5%;
+    width: 97.75%;
 }
 
 
@@ -1005,7 +1164,7 @@ div.sheet-encumbrance {
 
 div.sheet-encumbrance-row {
     display: inline-block;
-    width: 95%;
+    width: 96%;
 }
 
 div.sheet-encumbrance-number {
@@ -1038,11 +1197,6 @@ div.sheet-fatigue {
     width: 44.5%;
     margin-bottom: 5px;
 }
-div.sheet-npc-fatigue {
-    float: left;
-    width: 312px;
-    margin-bottom: 5px;
-}
 
 div.sheet-fatigue-row {
     display: inline-block;
@@ -1061,37 +1215,44 @@ div.sheet-fatigue-recovery {
     width: 24%;
 }
 
-div.sheet-npc-fatigue-label {
-    display: inline-block;
-    text-align: center;
-    width: 120px;
-}
-div.sheet-npc-fatigue-mod {
-    display: inline-block;
-    text-align: center;
-    width: 47px;
+/* Combat Skills */
+div.sheet-combatskill-column {
+    float: left;
+    width: 49.5%;
 }
 
-div.sheet-npc-fatigue-recovery {
+div.sheet-combatskill-name {
+    display: inline-block;
+    width: 34%;
+}
+div.sheet-combatskill-checkbox {
     display: inline-block;
     text-align: center;
-    width: 87px;
+    width: 4.5%;
+}
+div.sheet-combatskill-spacer {
+    display: inline-block;
+    width: 1%;
+}
+div.sheet-combatskill-number {
+    display: inline-block;
+    text-align: center;
+    width: 11.5%;
+}
+div.sheet-combatskill-button {
+    display: inline-block;
+    text-align: center;
+    width: 5%;
 }
 
 /* Combat Styles */
 div.sheet-combatstyle {
     margin-bottom: 5px;
 }
-div.sheet-npc-combatstyle {
-    width: 200px;
-    float: left;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
 
 div.sheet-combatstyle-row {
     display: inline-block;
-    width: 97.5%;
+    width: 97.75%;
 }
 
 div.sheet-combatstyle-name {
@@ -1133,6 +1294,29 @@ select.sheet-combatstyle-char {
     width: 7%;
 }
 
+/* Armor */
+div.sheet-armor {
+    margin-bottom: 5px;
+}
+div.sheet-armor-field {
+    display: inline-block;
+    width: 15%;
+}
+div.sheet-armor-ap {
+    display: inline-block;
+    text-align: center;
+    width: 6.5%;
+}
+div.sheet-armor-enc {
+    display: inline-block;
+    text-align: center;
+    width: 4%;
+}
+div.sheet-armor-notes {
+    display: inline-block;
+    width: 42%;
+}
+
 /* Weapons */
 div.sheet-weapons {
     margin-bottom: 5px;
@@ -1152,7 +1336,7 @@ input[type="checkbox"].sheet-display-melee-weapons:not(:checked) ~ div.sheet-dis
     display: none;
 }
 
-input[type="checkbox"].sheet-display-missile-weapons:not(:checked) ~ div.sheet-display-missile-weapons {
+input[type="checkbox"].sheet-display-ranged-weapons:not(:checked) ~ div.sheet-display-ranged-weapons {
     display: none;
 }
 
@@ -1162,13 +1346,13 @@ input[type="checkbox"].sheet-display-firearms:not(:checked) ~ div.sheet-display-
 
 div.sheet-weapons-row {
     display: inline-block;
-    width: 97.5%;
+    width: 97.75%;
 }
 
 div.sheet-weapon-name {
     display: inline-block;
     text-align: center;
-    width: 17.5%;
+    width: 13.5%;
 }
 div.sheet-npc-weapon-name {
     display: inline-block;
@@ -1224,7 +1408,7 @@ div.sheet-npc-weapon-size {
 div.sheet-weapon-reach {
     display: inline-block;
     text-align: center;
-    width: 5%;
+    width: 5.5%;
 }
 div.sheet-npc-weapon-reach {
     display: inline-block;
@@ -1237,7 +1421,6 @@ div.sheet-npc-weapon-notes {
     text-align: center;
     width: 139px;
 }
-
 
 div.sheet-weapon-force {
     display: inline-block;
@@ -1266,7 +1449,7 @@ div.sheet-npc-weapon-fire-rate {
 div.sheet-weapon-ammo {
     display: inline-block;
     text-align: center;
-    width: 11.75%;
+    width: 6.5%;
 }
 
 div.sheet-npc-weapon-ammo {
@@ -1303,23 +1486,37 @@ div.sheet-npc-weapon-number {
     text-align: center;
     width: 25px;
 }
-
+div.sheet-weapon-hp {
+    display: inline-block;
+    text-align: center;
+    width: 6.5%;
+}
 div.sheet-weapon-effects {
     display: inline-block;
     text-align: center;
-    width: 48.75%;
+    width: 48.25%;
+}
+div.sheet-weapon-effects-core {
+    display: inline-block;
+    text-align: center;
+    width: 50%;
 }
 
 div.sheet-weapon-missile-effects {
     display: inline-block;
     text-align: center;
-    width: 34.5%;
+    width: 23%;
+}
+div.sheet-weapon-missile-effects-core {
+    display: inline-block;
+    text-align: center;
+    width: 24.75%;
 }
 
 div.sheet-weapon-firearm-traits {
     display: inline-block;
     text-align: center;
-    width: 30.75%;
+    width: 30.5%;
 }
 
 /* Skills */
@@ -1336,22 +1533,9 @@ div.sheet-skill2 {
     margin-bottom: 5px;
 }
 
-div.sheet-npc-skill {
-    float: left;
-    width: 247px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-}
-
-div.sheet-npc-skill2 {
-    float: left;
-    width: 247px;
-    margin-bottom: 5px;
-}
-
 div.sheet-skill-row {
     display: inline-block;
-    width: 95%;
+    width: 95.5%;
 }
 
 div.sheet-skill-name {
@@ -1359,14 +1543,13 @@ div.sheet-skill-name {
     width: 36%;
 }
 
-div.sheet-npc-skill-name {
-    display: inline-block;
-    width: 125px;
-}
-
 div.sheet-language-name {
     display: inline-block;
     width: 42%;
+}
+
+textarea.sheet-known-languages {
+    height: 3em;
 }
 
 div.sheet-dependency-name {
@@ -1390,21 +1573,11 @@ div.sheet-skill-number {
     text-align: center;
     width: 12%;
 }
-div.sheet-npc-skill-number {
-    display: inline-block;
-    text-align: center;
-    width: 47px;
-}
 
 div.sheet-skill-button {
     display: inline-block;
     text-align: center;
     width: 5%;
-}
-div.sheet-npc-skill-button {
-    display: inline-block;
-    text-align: center;
-    width: 17px;
 }
 
 select.sheet-skill-char {
@@ -1444,6 +1617,10 @@ input[type="checkbox"].sheet-display-animism:not(:checked) ~ div.sheet-display-a
     display: none;
 }
 
+input[type="checkbox"].sheet-display-fae-powers:not(:checked) ~ div.sheet-display-fae-powers {
+    display: none;
+}
+
 input[type="checkbox"].sheet-display-folk-magic:not(:checked) ~ div.sheet-display-folk-magic {
     display: none;
 }
@@ -1462,7 +1639,7 @@ input[type="checkbox"].sheet-display-roman-magic:not(:checked) ~ div.sheet-displ
 
 div.sheet-magic-row {
     display: inline-block;
-    width: 97.5%;
+    width: 97.75%;
 }
 
 div.sheet-magic-name {
@@ -1580,12 +1757,12 @@ div.sheet-divine-magic-field {
 div.sheet-animism-number {
     display: inline-block;
     text-align: center;
-    width: 16%;
+    width: 15.50%;
 }
 div.sheet-animism-spirit-ap {
     display: inline-block;
     text-align: center;
-    width: 11.5%;
+    width: 12%;
 }
 div.sheet-animism-button {
     display: inline-block;
@@ -1610,56 +1787,28 @@ div.sheet-fetish-name {
     text-align: center;
     width: 17.5%;
 }
-div.sheet-npc-fetish-name {
-    display: inline-block;
-    text-align: center;
-    width: 22.5%;
-}
 div.sheet-fetish-type {
     display: inline-block;
     text-align: center;
     width: 11%;
-}
-div.sheet-npc-fetish-type {
-    display: inline-block;
-    text-align: center;
-    width: 12%;
 }
 div.sheet-fetish-description {
     display: inline-block;
     text-align: center;
     width: 70%;
 }
-div.sheet-npc-fetish-description {
-    display: inline-block;
-    text-align: center;
-    width: 64%;
-}
 div.sheet-fetish-skill-column {
     display: inline-block;
     margin-right: 1px;
     width: 33%;
 }
-div.sheet-npc-fetish-skill-column {
-    display: inline-block;
-    margin-right: 1px;
-    width: 49.5%;
-}
 div.sheet-fetish-skill {
     display: inline-block;
-    width: 150px;
-}
-div.sheet-npc-fetish-skill {
-    display: inline-block;
-    width: 126px;
+    width: 145px;
 }
 div.sheet-fetish-powers-column {
     display: inline-block;
     width: 66%;
-}
-div.sheet-npc-fetish-powers-column {
-    display: inline-block;
-    width: 49.5%;
 }
 div.sheet-mediation-number {
     display: inline-block;
@@ -1722,7 +1871,7 @@ div.sheet-equipment {
 
 div.sheet-equipment-row {
     display: inline-block;
-    width: 95%;
+    width: 95.5%;
 }
 
 div.sheet-equipment-item {
@@ -1844,6 +1993,165 @@ div.sheet-notes {
 }
 
 
+/* Quick Stats */
+div.sheet-stats-info-label {
+    display: inline-block;
+    width: 30%;
+}
+div.sheet-stats-info-value {
+    display: inline-block;
+    width: 69%;
+}
+div.sheet-stats-char-label {
+    display: inline-block;
+    width: 40px;
+}
+div.sheet-stats-attribute-label {
+    display: inline-block;
+    width: 95px;
+}
+select.sheet-stats-char-select {
+    width: 55px;
+}
+div.sheet-stats-passion-label {
+    display: inline-block;
+    width: 175px;
+}
+
+/* Compact */
+div.sheet-compact-characteristic-section {
+    float: left;
+    width: 110px;
+    margin-right: 5px;
+}
+div.sheet-compact-health-section {
+    float: left;
+    margin-right: 5px;
+}
+textarea.sheet-compact-conditions {
+    height: 75px;
+    width: calc(100% - 2px);
+}
+div.sheet-compact-attribute-section {
+    float: left;
+    margin-right: 5px;
+}
+div.sheet-compact-fatigue-label {
+    display: inline-block;
+    width: 65px;
+}
+div.sheet-compact-fatigue-value {
+    display: inline-block;
+    width: 145px;
+}
+div.sheet-compact-encumbrance-label {
+    display: inline-block;
+    width: 95px;
+}
+div.sheet-compact-encumbrance-value {
+    display: inline-block;
+    width: 115px;
+}
+textarea.sheet-compact-notes {
+    height: 115px;
+    width: calc(100% - 2px);
+}
+
+/* Mooks */
+div.sheet-mook-page-width {
+    width: 850px;
+}
+
+div.sheet-mook-characteristic-section {
+    float: left;
+    width: 110px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+div.sheet-mook-char-name-col {
+    display: inline-block;
+    width: 80px;
+    text-align: left;
+}
+div.sheet-mook-char-value-col {
+    display: inline-block;
+    width: 25px;
+}
+
+div.sheet-mook-attribute-section {
+    float: left;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+div.sheet-mook-attr-name-col {
+    display: inline-block;
+    width: 110px;
+}
+div.sheet-mook-attr-value-col {
+    display: inline-block;
+    width: 36px;
+    text-align: center;
+    font-weight: bold;
+}
+
+textarea.sheet-mook-notes {
+    height: 137px;
+    width: calc(100% - 1px);
+}
+
+div.sheet-mook-health-hitrange-col {
+    display: inline-block;
+    width: 45px;
+}
+
+div.sheet-mook-health-location-col {
+    display: inline-block;
+    width: 134px;
+}
+
+div.sheet-mook-health-block-col {
+    display: inline-block;
+    width: 12px;
+}
+
+div.sheet-mook-health-armor-col {
+    display: inline-block;
+    width: 22px;
+}
+
+div.sheet-mook-health-hp-col {
+    display: inline-block;
+    width: 36px;
+    font-weight: bold;
+}
+
+div.sheet-mook-health-notes-col {
+    display: inline-block;
+    width: 179px;
+    font-weight: bold;
+}
+
+select.sheet-mook-fatigue-width {
+    width: 32px;
+}
+
+fieldset.sheet-nocontrols~.repcontrol {
+  display: none;
+}
+
+div.sheet-mook-skilllabel-col {
+    display: inline-block;
+    width: 12%;
+    vertical-align: top;
+}
+div.sheet-mook-skilllist-col {
+    display: inline-block;
+    width: 86.25%;
+}
+div.sheet-mook-btn {
+    display: inline-block;
+}
 
 /* Roll Templates */
 .sheet-rolltemplate-skill div.sheet-header {
