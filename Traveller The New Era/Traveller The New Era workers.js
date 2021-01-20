@@ -1,3 +1,362 @@
+	//Ship design
+	//Hull
+	//Calculate Volume, Size, intial length and material volume
+	on ("change:ship_displacement", function () {
+		getAttrs(["Ship_Displacement", "Ship_Volume", "Ship_Initial_MV", "Ship_Initial_LM", "Ship_Size"], function (values) {
+			var Ship_Displacement = values.Ship_Displacement;
+			var Ship_Volume = (Ship_Displacement*14);
+			var Ship_Initial_MV = (3.14**(1/3))*((6*Ship_Volume)**(2/3))*0.01;
+			var Ship_Initial_LM = (((3*(Ship_Volume+Ship_Initial_MV))/(4*3.14))**(1/3)*2);
+			var Ship_Size;	
+			if (Ship_Displacement < 1) {
+			Ship_Size = "SM (Sub Micro)" 
+			} else if (Ship_Displacement < 10) {
+			Ship_Size = "Mc (Micro)"	
+			} else if (Ship_Displacement < 100) {
+				Ship_Size = "S (Small)"
+			} else if (Ship_Displacement < 1000) {
+				Ship_Size = "M (Medium)"
+			}	else if (Ship_Displacement < 10000) {
+				Ship_Size = "L (Large)"
+			} 	else if (Ship_Displacement < 100000) {
+				Ship_Size = "VL (Very Large)"
+			} else {
+				Ship_Size = "G (Gigantic)"
+			} setAttrs ({Ship_Initial_MV:Ship_Initial_MV, Ship_Initial_LM:Ship_Initial_LM, Ship_Initial_Volume:Ship_Initial_Volume, Ship_Size:Ship_Size});
+		});
+	});
+
+//Calculate Ship Length, Surface Area, Price modifier and adjusted material volume
+	on ("change:hull_form change:ship_displacement" , function () {
+		getAttrs (["Hull_Form", "Adjusted_MV", "Ship_Length", "Ship_Configuration_Price_Modifier", "Ship_Initial_MV", "Ship_Initial_LM", "Ship_Surface"], function (values) {
+			var Hull_Form = values.Hull_Form;
+			var Ship_Initial_MV = values.Ship_Initial_MV;
+			var Ship_Initial_LM = values.Ship_Initial_LM;
+			var Adjusted_MV;
+			var Ship_Length;
+			var Ship_Surface;
+			var Ship_Configuration_Price_Modifier;
+			if (Hull_Form == "Open Frame") {
+				Adjusted_MV = (Ship_Initial_MV*2)
+				Ship_Length = (Ship_Initial_LM*3.5)
+				Ship_Configuration_Price_Modifier = 0.3
+				Ship_Surface = (Ship_Initial_MV)*100
+			} else if (Hull_Form == "Needle") {
+				Ship_Configuration_Price_Modifier = 0.7
+				Adjusted_MV = (Ship_Initial_MV*1.3)
+				Ship_Length = (Ship_Initial_LM*3)
+				Ship_Surface = (Adjusted_MV)*100	
+			} else if (Hull_Form == "Needle Streamlined") {
+				Adjusted_MV = (Ship_Initial_MV*1.3)
+				Ship_Length = (Ship_Initial_LM*3)
+				Ship_Configuration_Price_Modifier = 0.8
+				Ship_Surface = (Adjusted_MV)*100	
+			} else if (Hull_Form == "Needle Airframe") {
+				Ship_Configuration_Price_Modifier = 1.5
+				Adjusted_MV = ((Ship_Initial_MV*1.3)*1.3)
+				Ship_Length = (Ship_Initial_LM*3)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Wedge") {
+				Ship_Configuration_Price_Modifier = 0.5
+				Adjusted_MV = (Ship_Initial_MV*1.5)
+				Ship_Length = (Ship_Initial_LM*2.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Wedge Streamlined") {
+				Ship_Configuration_Price_Modifier = 0.7
+				Adjusted_MV = (Ship_Initial_MV*1.5)
+				Ship_Length = (Ship_Initial_LM*2.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Wedge Airframe") {
+				Ship_Configuration_Price_Modifier = 0.5
+				Adjusted_MV = ((Ship_Initial_MV*1.5)*1.3)
+				Ship_Length = (Ship_Initial_LM*2.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Cylinder") {
+				Ship_Configuration_Price_Modifier = 0.6
+				Adjusted_MV = (Ship_Initial_MV*1.1)
+				Ship_Length = (Ship_Initial_LM*2)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Cylinder Streamlined") {
+				Ship_Configuration_Price_Modifier = 0.8
+				Adjusted_MV = (Ship_Initial_MV*1.1)
+				Ship_Length = (Ship_Initial_LM*2)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Cylinder Airframe") {
+				Ship_Configuration_Price_Modifier = 2
+				Adjusted_MV = ((Ship_Initial_MV*1.1)*1.3)
+				Ship_Length = (Ship_Initial_LM*2)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Box") {
+				Ship_Configuration_Price_Modifier = 0.4
+				Adjusted_MV = (Ship_Initial_MV*1.1)
+				Ship_Length = (Ship_Initial_LM*2)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Box Streamlined") {
+				Ship_Configuration_Price_Modifier = 0.6
+				Adjusted_MV = (Ship_Initial_MV*1.1)
+				Ship_Length = (Ship_Initial_LM*2)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Sphere") {
+				Ship_Configuration_Price_Modifier = 0.8
+				Adjusted_MV = (Ship_Initial_MV*1)
+				Ship_Length = (Ship_Initial_LM*1)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Sphere Streamlined") {
+				Ship_Configuration_Price_Modifier = 1
+				Adjusted_MV = (Ship_Initial_MV*1)
+				Ship_Length = (Ship_Initial_LM*1)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Dome/Disc") {
+				Ship_Configuration_Price_Modifier = 1.4
+				Adjusted_MV = (Ship_Initial_MV*1.2)
+				Ship_Length = (Ship_Initial_LM*1.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Dome/Disc Streamlined") {
+				Ship_Configuration_Price_Modifier = 1.6
+				Adjusted_MV = (Ship_Initial_MV*1.2)
+				Ship_Length = (Ship_Initial_LM*1.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Dome/Disc Airframe") {
+				Ship_Configuration_Price_Modifier = 1.2
+				Adjusted_MV = ((Ship_Initial_MV*1.2)*1.3)
+				Ship_Length = (Ship_Initial_LM*1.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Close Structure") {
+				Ship_Configuration_Price_Modifier = 0.3
+				Adjusted_MV = (Ship_Initial_MV*1.4)
+				Ship_Length = (Ship_Initial_LM*1.5)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Slab") {
+				Ship_Configuration_Price_Modifier = 0.5
+				Adjusted_MV = (Ship_Initial_MV*1.5)
+				Ship_Length = (Ship_Initial_LM*2.75)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form == "Slab Streamlined") {
+				Ship_Configuration_Price_Modifier = 0.7
+				Adjusted_MV = (Ship_Initial_MV*1.5)
+				Ship_Length = (Ship_Initial_LM*2.75)
+				Ship_Surface = (Adjusted_MV)*100
+			}	else if (Hull_Form = "Slab Airframe") {
+				Ship_Configuration_Price_Modifier = 1.5
+				Adjusted_MV = ((Ship_Initial_MV*1.5)*1.3)
+				Ship_Length = (Ship_Initial_LM*2.75)
+				Ship_Surface = (Adjusted_MV)*100
+			} else {
+				Ship_Configuration_Price_Modifier = 0
+				Adjusted_MV = ((Ship_Initial_MV*1.5)*0)
+				Ship_Length = (Ship_Initial_LM*0)
+				Ship_Surface = (Adjusted_MV)*100
+			} setAttrs ({Ship_Configuration_Price_Modifier:Ship_Configuration_Price_Modifier, Adjusted_MV:Adjusted_MV, Ship_Length:Ship_Length, Ship_Surface:Ship_Surface})	
+			});
+		});
+
+//Calculate Minimum Armor
+		on ("change:g_rating" , function () {
+		getAttrs (["G_Rating"], function (values) {
+			var G_Rating = values.G_Rating;
+			var Min_Armor;
+			if (G_Rating < 1) {
+				Min_Armor = 1
+			} else {
+				Min_Armor = (G_Rating*10)
+			} setAttrs ({Min_Armor:Min_Armor})
+			});
+		});
+
+
+//Calculate Tech Level - dosent currently compile
+		on ("change:hull_tech_level change:jump_drive_tech_level change:control_tech_level" , function () {
+		getAttrs (["Hull_Tech_Level, Ship_Tech_Level, Jump_Drive_Tech_Level, Control_Tech_Level, Minimum_Tech_Level"], function (values) {
+			var Hull_Tech_Level = values.Hull_Tech_Level
+      		var Jump_Drive_Tech_Level = values.Jump_Drive_Tech_Level
+      		var Control_Tech_Level = values.Control_Tech_Level
+      		var Minimum_Tech_Level = Math.max(Hull_Tech_Level, Jump_Drive_Tech_Level, Control_Tech_Level)
+			} setAttrs ({Minimum_Tech_Level:Minimum_Tech_Level})
+			});
+		
+
+
+//Calculate Hull Armor, Tech Level, Material Weight and Cost - Uses thickness and material to determine armor value. Could be done other way around as well?
+		on ("change:hull_thickness change:hull_material" , function () {
+		getAttrs (["Hull_Thickness", "Hull_Material", "Hull_Armor", "Hull_Cost", "Hull_Material_Mass", "Hull_Cost", "Adjusted_MV", "Hull_Tech_Level"], function (values) {
+			var Hull_Thickness = values.Hull_Thickness;
+			var Adjusted_MV = values.Adjusted_MV
+			var Hull_Material;
+			var Hull_Armor;
+			var Hull_Material_Mass
+			var Hull_Cost
+			var Hull_Tech_Level 
+			if (Hull_Material == "Soft Steel") {
+				Hull_Armor = Hull_Thickness*1.7;
+				Hull_Material_Mass = (Adjusted_MV*8)
+				Hull_Cost =  (Adjusted_MV*0.0016)
+				Hull_Tech_Level = 5
+			} else if {
+				(Hull_Material == "Hard Steel") {
+				Hull_Armor = Hull_Thickness*2;	
+				Hull_Material_Mass = (Adjusted_MV*8)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.002)*(Hull_Thickness)
+				Hull_Tech_Level = 6
+			} else if {
+				(Hull_Material == "Light Alloy") {
+				Hull_Armor = Hull_Thickness*1.7;
+				Hull_Material_Mass = (Adjusted_MV*6)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.004)*(Hull_Thickness)
+				Hull_Tech_Level = 6
+			} else if {
+				(Hull_Material == "Composite") {
+				Hull_Armor = Hull_Thickness*4;
+				Hull_Material_Mass = (Adjusted_MV*7)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.007)*(Hull_Thickness)
+				Hull_Tech_Level = 7
+			} else if {
+				(Hull_Material == "Composite Laminate") {
+				Hull_Armor = Hull_Thickness*6;
+				Hull_Material_Mass = (Adjusted_MV*8)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.008)*(Hull_Thickness)
+				Hull_Tech_Level = 8
+			} else if {
+				(Hull_Material == "Crystaliron") {
+				Hull_Armor = Hull_Thickness*8;
+				Hull_Material_Mass = (Adjusted_MV*10)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.009)*(Hull_Thickness)
+				Hull_Tech_Level = 10
+			} else if {
+				(Hull_Material == "Superdense (SD)") {
+				Hull_Armor = Hull_Thickness*14;
+				Hull_Material_Mass = (Adjusted_MV*15)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.014)*(Hull_Thickness)
+				Hull_Tech_Level = 12
+			} else if {
+				(Hull_Material == "Bonded SD") {
+				Hull_Armor = Hull_Thickness*28;
+				Hull_Material_Mass = (Adjusted_MV*15)*(Hull_Thickness)
+				Hull_Cost = (Adjusted_MV*0.028)*(Hull_Thickness)
+				Hull_Tech_Level = 14
+			} else if {
+				(Hull_Material == "Bonded Coherent SD") {
+				Hull_Armor = Hull_Thickness*40;
+				Hull_Material_Mass = (Adjusted_MV*15)
+				Hull_Cost = (Adjusted_MV*0.035)
+				Hull_Tech_Level = 7				
+			} else {
+				Min_Armor = (G_Rating*10)
+			} setAttrs ({Min_Armor:Min_Armor, Hull_Material_Mass:Hull_Material_Mass, Hull_Cost:Hull_Cost})
+			});
+		});
+
+		//Calculates Jump Drive details
+		on ("change:max_jump change:ship_volume" , function () {
+		getAttrs (["Max_Jump", "Ship_Volume"], function (values) {
+			var Max_Jump = values.Max_Jump;
+			var Ship_Volume = values.Ship_Volume
+			var Jump_Drive_Volume;
+			var Jump_Drive_Area;
+			var Jump_Drive_Mass;
+			var Jump_Drive_Cost;
+			var Jump_Drive_Tech_Level;
+			var Fuel_Parsec;
+			if (Max_Jump == 0) {
+				Jump_Drive_Volume = 0
+				Jump_Drive_Area = 0
+				Jump_Drive_Mass = 0
+				Jump_Drive_Cost = 0
+				Jump_Drive_Tech_Level = 0
+			} else if (Max_Jump == 1) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*3)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 9
+			} else if (Max_Jump == 2) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*3)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 12
+			} else if (Max_Jump == 3) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*3)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 12
+			} else if (Max_Jump == 4) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*3)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 13
+			} else if (Max_Jump == 5) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*2.5)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 14		
+			} else if (Max_Jump == 6) {
+				Jump_Drive_Volume = (Ship_Volume)*((1+(Max_Jump))/100)
+				Jump_Drive_Mass = (Jump_Drive_Volume*2)
+				Jump_Drive_Area = (Jump_Drive_Volume/3)
+				Jump_Drive_Cost = (Jump_Drive_Volume*0.3)
+				Jump_Drive_Tech_Level = 15 
+			} setAttrs ({Jump_Drive_Volume:Jump_Drive_Volume, Jump_Drive_Mass:Jump_Drive_Mass, Jump_Drive_Area:Jump_Drive_Area, Jump_Drive_Cost:Jump_Drive_Cost, Jump_Drive_Tech_Level:Jump_Drive_Tech_Level})
+			});
+		});
+
+		//Calculates Control System details
+		on ("change:ship_controls change:ship_displacement" , function () {
+		getAttrs (["Ship_Control", "Ship_Displacement"], function (values) {
+			var Ship_Control = values.Ship_Control;
+			var Ship_Displacement = values.Ship_Displacement
+			var Control_Volume;
+			var Control_Mass;
+			var Control_Cost;
+			var Control_Tech_Level;
+			var Control_Power;
+			if (Ship_Control == "Basic Mechanical") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.0002
+				Control_Power = Ship_Displacement*0
+				Control_Tech_Level = 5
+			} else if (Ship_Control == "Enhanced Mechanical") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.0003
+				Control_Power = Ship_Displacement*0.0002
+				Control_Tech_Level = 6
+			} else if (Ship_Control == "Electronic") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.0005
+				Control_Power = Ship_Displacement*0.0005
+				Control_Tech_Level = 7
+			} else if (Ship_Control == "Enhanced Electronic") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.00075
+				Control_Power = Ship_Displacement*0.0005
+				Control_Tech_Level = 8
+			} else if (Ship_Control == "Computer Linked") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.001
+				Control_Power = Ship_Displacement*0.0005
+				Control_Tech_Level = 9
+			} else if (Ship_Control == "Dynamic Linked") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.0015
+				Control_Power = Ship_Displacement*0.001
+				Control_Tech_Level = 10
+			} else if (Ship_Control == "Holograpich Linked") {
+				Control_Volume = Ship_Displacement*0.014
+				Control_Mass = Ship_Displacement*0.0014
+				Control_Cost = Ship_Displacement*0.002
+				Control_Power = Ship_Displacement*0.001
+				Control_Tech_Level = 13				 
+			} setAttrs ({Control_Volume:Control_Volume, Control_Mass:Control_Mass, Control_Cost:Control_Cost, Control_Tech_Level:Control_Tech_Level, Control_Power:Control_Power})
+			});
+		});
 
 	//Homeworld data
 			on ("change:homeworldnumber", function () {
@@ -11,7 +370,7 @@
 				var govlevel;
 				var lawlevel;
 				var techlevel;
-			} if (homeworldnumber < 1 ) {
+			if (homeworldnumber < 1 ) {
 				starport = "B"
 				planetsize = 8
 				atmosphere = 4
@@ -121,7 +480,7 @@
 				lawlevel = 6
 				techlevel = 11
 				homeworld = "Eos"
-			} else if (homeworldnumber < 13 ) {
+			} else if (homeworldnumber < 12 ) {
 				starport = "D"
 				planetsize = 5
 				atmosphere = 4
@@ -131,7 +490,7 @@
 				lawlevel = 7
 				techlevel = 7
 				homeworld = "Vezina"
-			} else if (homeworldnumber < 14 ) {
+			} else if (homeworldnumber < 13 ) {
 				starport = "D"
 				planetsize = 8
 				atmosphere = 9
@@ -141,7 +500,7 @@
 				lawlevel = 8
 				techlevel = 7
 				homeworld = "Spencer"
-			} else if (homeworldnumber < 15 ) {
+			} else if (homeworldnumber < 14 ) {
 				starport = "E"
 				planetsize = 5
 				atmosphere = 7
@@ -151,7 +510,7 @@
 				lawlevel = 10
 				techlevel = 6
 				homeworld = "Ra"
-			} else if (homeworldnumber < 16 ) {
+			} else if (homeworldnumber < 15 ) {
 				starport = "C"
 				planetsize = 5
 				atmosphere = 8
@@ -161,7 +520,7 @@
 				lawlevel = 3
 				techlevel = 6
 				homeworld = "Shenandoah"
-			} else if (homeworldnumber < 17 ) {
+			} else if (homeworldnumber < 16 ) {
 				starport = "E"
 				planetsize = 5
 				atmosphere = 1
@@ -171,7 +530,7 @@
 				lawlevel = 5
 				techlevel = 9
 				homeworld = "Enkidu"
-			} else if (homeworldnumber < 18 ) {
+			} else if (homeworldnumber < 17 ) {
 				starport = "D"
 				planetsize = 5
 				atmosphere = 6
@@ -181,7 +540,7 @@
 				lawlevel = 3
 				techlevel = 7
 				homeworld = "Phoebus"
-			} else if (homeworldnumber < 19 ) {
+			} else if (homeworldnumber < 18 ) {
 				starport = "E"
 				planetsize = 8
 				atmosphere = 12
@@ -191,7 +550,7 @@
 				lawlevel = 0
 				techlevel = 8
 				homeworld = "Apollo"
-			} else if (homeworldnumber < 20 ) {
+			} else if (homeworldnumber < 19 ) {
 				starport = "B"
 				planetsize = 0
 				atmosphere = 0
@@ -201,7 +560,7 @@
 				lawlevel = 2
 				techlevel = 11
 				homeworld = "Kruyter"
-			} else if (homeworldnumber < 21 ) {
+			} else if (homeworldnumber < 20 ) {
 				starport = "E"
 				planetsize = 3
 				atmosphere = 1
@@ -211,7 +570,7 @@
 				lawlevel = 5
 				techlevel = 9
 				homeworld = "Rohit"
-			} else if (homeworldnumber < 22 ) {
+			} else if (homeworldnumber < 21 ) {
 				starport = "E"
 				planetsize = 4
 				atmosphere = 3
@@ -221,7 +580,7 @@
 				lawlevel = 5
 				techlevel = 9
 				homeworld = "Zloga"
-			} else if (homeworldnumber < 23 ) {
+			} else if (homeworldnumber < 22 ) {
 				starport = "E"
 				planetsize = 6
 				atmosphere = 4
@@ -243,7 +602,7 @@
 				homeworld = "Not Set"
 			} setAttrs({Homeworld:homeworld, Starport:starport, Planetsize:planetsize, Atmosphere:atmosphere, Hydrosphere:hydrosphere, Population:population, Govlevel:govlevel, Lawlevel:lawlevel, Techlevel:techlevel});
 			});
-			})
+		})	
 	
 	//Age and terms
 		//Number of terms
