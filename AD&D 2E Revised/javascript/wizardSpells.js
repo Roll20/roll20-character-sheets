@@ -180,7 +180,7 @@ wiz1['Color Spray'] = {
 wiz1['Comprehend Languages'] = {
     'name': 'Comprehend Languages',
     'level': 'Level 1 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': 'Touch',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 speaking creature or written text',
@@ -252,7 +252,7 @@ wiz1['Detect Undead'] = {
 wiz1['Enlarge'] = {
     'name': 'Enlarge',
     'level': 'Level 1 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': '[[5*LEVEL#]] rounds',
     'aoe': '1 creature or object',
@@ -576,7 +576,7 @@ wiz1['Phantasmal Force'] = {
 wiz1['Protection From Evil'] = {
     'name': 'Protection From Evil',
     'level': 'Level 1 Wizard',
-    'school': 'Abjuration',
+    'school': 'Abjuration (Reversible)',
     'range': 'Touch',
     'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
@@ -640,7 +640,7 @@ wiz1['Shocking Grasp'] = {
     'materials': '',
     'reference': 'PHB p. 178',
     'damage': '[[1d8+[[@{level-wizard}]] ]]',
-    'damage-type': 'Lightning',
+    'damage-type': 'Electrical',
     'healing': '',
     'effect': 'When the wizard casts this spell, he develops a powerful electrical charge that gives a jolt to the creature touched. The spell remains in effect for one round per level of the caster ([[@{level-wizard}]] rounds) or until it is discharged by the caster touching another creature. The shocking grasp delivers 1d8 points of damage, plus 1 point per level of the wizard (for example, a 2nd-level wizard would discharge a shock causing 1d8+2 points of damage). While the wizard must come close enough to his opponent to lay a hand on the opponent’s body or upon an electrical conductor that touches the opponent’s body, a like touch from the opponent does not discharge the spell.'
 };
@@ -883,7 +883,7 @@ wiz2['Blur'] = {
 wiz2['Continual Light'] = {
     'name': 'Continual Light',
     'level': 'Level 2 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': '60 yards',
     'duration': 'Permanent',
     'aoe': '60-foot radius',
@@ -955,7 +955,7 @@ wiz2['Deeppockets'] = {
 wiz2['Detect Evil'] = {
     'name': 'Detect Evil',
     'level': 'Level 2 Wizard',
-    'school': 'Divination',
+    'school': 'Divination (Reversible)',
     'range': '0',
     'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '10 x 180 feet',
@@ -1171,7 +1171,7 @@ wiz2['Irritation'] = {
 wiz2['Knock'] = {
     'name': 'Knock',
     'level': 'Level 2 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': '60yards',
     'duration': 'Special',
     'aoe': '[[10*[[@{level-wizard}]] ]] feet',
@@ -1189,7 +1189,7 @@ wiz2['Knock'] = {
 wiz2['Know Alignment'] = {
     'name': 'Know Alignment',
     'level': 'Level 2 Wizard',
-    'school': 'Divination',
+    'school': 'Divination (Reversible)',
     'range': '10 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '1 creature or object per 2 rounds',
@@ -1243,7 +1243,7 @@ wiz2['Levitate'] = {
 wiz2['Locate Object'] = {
     'name': 'Locate Object',
     'level': 'Level 2 Wizard',
-    'school': 'Divination',
+    'school': 'Divination (Reversible)',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[20*[[@{level-wizard}]] ]] yards',
@@ -1938,7 +1938,7 @@ wiz3['Lightning Bolt'] = {
     'materials': 'A bit of fur and an amber, crystal, or glass rod',
     'reference': 'PHB p. 194',
     'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6]]',
-    'damage-type': 'Lightning',
+    'damage-type': 'Electrical',
     'healing': '',
     'effect': 'Upon casting this spell, the wizard releases a powerful stroke of electrical energy that inflicts 1d6 points of damage per level of the spellcaster (maximum of 10d6) to each creature within its area of effect. A successful saving throw vs. spell reduces this damage to half (round fractions down). The bolt begins at a range and height decided by the caster and streaks outward in a direct line from the casting wizard (for example, if a 40-foot bolt was started at 180 feet from the wizard, the far end of the bolt would reach 220 feet (180 + 40). The lightning bolt may set fire to combustibles, sunder wooden doors, splinter up to a half-foot thickness of stone, and melt metals with a low melting point (lead, gold, copper, silver, bronze). Saving throws must be rolled for objects that withstand the full force of a stroke (see the *fireball* spell). If the damage caused to an interposing barrier shatters or breaks through it (i.e., the saving throw fails), the bolt continues. A bolt can breach 1 inch of wood or half an inch of stone per caster level, up to a maximum of 1 foot of wood or half a foot of stone. \n&emsp;The lightning bolt’s area of effect is chosen by the spellcaster: either a forked bolt 10 feet wide and 40 feet long or a single bolt 5 feet wide and 80 feet long. If a bolt cannot reach its full length, because of an unyielding barrier (such as a stone wall), the lightning bolt rebounds from the barrier toward its caster, ending only when it reaches its full length. \n&emsp;For example: An 80-foot-long stroke is begun at a range of 40 feet, but it hits a stone wall at 50 feet. The bolt travels 10 feet, hits the wall, and rebounds for 70 feet back toward its creator (who is only 50 feet from the wall, and so is caught in his own lightning bolt!). \n&emsp;The DM might allow reflecting bolts. When this type of lightning bolt strikes a solid surface, the bolt reflects from the surface at an angle equal to the angle of incidence (like light off a mirror). A creature crossed more than once by the bolt must roll a saving throw for every time it is crossed, but it still suffers either full damage (if one saving throw is missed) or half damage (if all saving throws are made).'
 };
@@ -2144,7 +2144,7 @@ wiz3['Suggestion'] = {
 wiz3['Tongues'] = {
     'name': 'Tongues',
     'level': 'Level 3 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': '0',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': '30-foot radius',
@@ -2180,7 +2180,7 @@ wiz3['Vampiric Touch'] = {
 wiz3['Water Breathing'] = {
     'name': 'Water Breathing',
     'level': 'Level 3 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': 'Touch',
     'duration': '[[ [[@level-wizard}]]+1d4]] hours',
     'aoe': 'Creature touched',
