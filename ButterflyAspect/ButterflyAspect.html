@@ -1,13 +1,27 @@
+<input class="sheet-selector-switch sheet-rollmod" name="attr_rollmodswitch" type="checkbox" value="1">
+<input class="sheet-selector-switch sheet-rollrandomplayer" name="attr_rollrandomplayer" type="checkbox" value="1">
+
 <div class="sheet-container">
     <div class="sheet-float sheet-head">
         <div class="sheet-float sheet-head-logo">
             <img class="sheet-logo" src="https://img.anzahcraft.de/logo-roll20.png" alt="AnzahCraft" />
-            <div class="sheet-gmroll">
+            <div class="sheet-settings">
                 <select name="attr_gmroll">
-                    <option value="nogm" selected="selected">Für alle sichtbar w&uuml;rfeln</option>
-                    <option value="gm">Für GM w&uuml;rfeln</option>
+                    <option value="0" selected disabled>Auswahl treffen</option>
+                    <option value="nogm">Für alle sichtbar würfeln</option>
+                    <option value="gm">Für GM würfeln</option>
                 </select>
                 <input type="hidden" name="attr_abilityroll" />
+
+                <select name="attr_rollmodswitch">
+                    <option value="1">Modifier aktiv</option>
+                    <option value="0" selected>Modifier inaktiv</option>
+                </select>
+
+                <select name="attr_rollrandomplayer">
+                    <option value="1">Spielerauswahl aktiv</option>
+                    <option value="0" selected>Spielerauswahl inaktiv</option>
+                </select>
             </div>
         </div>
 
@@ -19,33 +33,17 @@
             <div class="sheet-float sheet-head-info-boxes">
                 <div class="sheet-formular">
                     <label for="attr_character_name">Charaktername</label>
-                    <input class="sheet-bottomspace" type="text" name="attr_character_name" />
+                    <input type="text" name="attr_character_name" />
                 </div>
                 <div class="sheet-formular">
                     <label for="attr_character_description">Beschreibung</label>
                     <textarea name="attr_character_description" style="height: 102px;"></textarea>
                 </div>
             </div>
-            <div class="sheet-float sheet-head-info-sideboxes">
-                <div class="sheet-formular">
-                    <button type="roll" class="sheet-small-button" name="roll_schicksalRoll"
-                        value="Die Gruppe hat jetzt noch [[@{schicksal} ?{Modifier?|+/-}]] Schicksalspunkte">Schicksal</button>
-                    <input type="number" name="attr_schicksal" value="4" class="sheet-number-20" />
-                </div>
-                <div class="sheet-formular">
-                    <label for="attr_exp">EXP</label>
-                    <input type="number" name="attr_exp" value="0" class="sheet-number-20" />
-                </div>
-                <div class="sheet-formular">
-                    <button type="roll" class="sheet-small-button" name="roll_schicksalRoll"
-                        value="/w gm @{character_name} stellt sich dem Karma: [[1d10cf<@{karma}]]">Karma</button>
-                    <input type="number" name="attr_karma" value="0" class="sheet-number-20" />
-                </div>
-            </div>
             <div class="sheet-head-stats">
                 <div class="sheet-formular">
                     <label for="attr_leben">Leben</label>
-                    <div class="sheet-head-stats-health">
+                    <div class="sheet-health">
                         <input type="number" class="sheet-number-20" name="attr_leben" placeholder="Aktuell" /> / <input
                             type="number" class="sheet-number-20" name="attr_leben_max" readonly />
                     </div>
@@ -56,11 +54,9 @@
                         readonly />
                 </div>
                 <div class="sheet-formular">
-                    <label for="attr_bewegung">Mana</label>
-                    <div class="sheet-head-stats-mana">
-                        <input type="number" class="sheet-number-20" name="attr_mana" placeholder="Aktuell" /> / <input
-                            type="number" class="sheet-number-20" name="attr_mana_max" readonly />
-                    </div>
+                    <button type="roll" class="sheet-small-button" name="roll_schicksalRoll"
+                        value="Die Gruppe hat jetzt noch [[@{schicksal} + ?{Modifier?|-1}]] Schicksalspunkte">Schicksal</button>
+                    <input type="number" name="attr_schicksal" value="4" class="sheet-number-20" />
                 </div>
             </div>
         </div>
@@ -68,65 +64,68 @@
 
     <div class="sheet-break"></div>
 
-    <div class="sheet-float sheet-half sheet-attribut">
+    <div class="sheet-float sheet-attribut">
         <div class="sheet-header">
             <span>Attribute</span>
         </div>
         <div class="sheet-float sheet-attribut-stats">
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_NaRoll"
-                    value="@{abilityroll} versucht sich in Nahkampf [[floor(@{Na}d10 / 2) + ?{Modifier?|0}]]">Nahkampf</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_NaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Nahkampf}} {{rolling=[[floor(@{Na}d10 / 2)]]}}">Nahkampf</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_NaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Nahkampf}} {{rolling=[[floor(@{Na}d10 / 2) + ?{Modifier?|0}]]}}">Nahkampf</button>
                 <input type="number" name="attr_Na" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_FeRoll"
-                    value="@{abilityroll} versucht sich in Fernkampf [[floor(@{Fe}d10 / 2) + ?{Modifier?|0}]]">Fernkampf</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_FeRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Fernkampf}} {{rolling=[[floor(@{Fe}d10 / 2)]]}}">Fernkampf</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_FeRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Fernkampf}} {{rolling=[[floor(@{Fe}d10 / 2) + ?{Modifier?|0}]]}}">Fernkampf</button>
                 <input type="number" name="attr_Fe" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_GeRoll"
-                    value="@{abilityroll} versucht sich in Geschick [[floor(@{Ge}d10 / 2) + ?{Modifier?|0}]]">Geschick</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_GeRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Geschick}} {{rolling=[[floor(@{Ge}d10 / 2)]]}}">Geschick</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_GeRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Geschick}} {{rolling=[[floor(@{Ge}d10 / 2) + ?{Modifier?|0}]]}}">Geschick</button>
                 <input type="number" name="attr_Ge" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_WaRoll"
-                    value="@{abilityroll} versucht sich in Wahrnehmung [[floor(@{Wa}d10 / 2) + ?{Modifier?|0}]]">Wahrnehmung</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_WaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Wahrnehmung}} {{rolling=[[floor(@{Wa}d10 / 2)]]}}">Wahrnehmung</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_WaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Wahrnehmung}} {{rolling=[[floor(@{Wa}d10 / 2) + ?{Modifier?|0}]]}}">Wahrnehmung</button>
                 <input type="number" name="attr_Wa" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_KoRoll"
-                    value="@{abilityroll} versucht sich in Konstitution [[floor(@{Ko}d10 / 2) + ?{Modifier?|0}]]">Konstitution</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_KoRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Konstitution}} {{rolling=[[floor(@{Ko}d10 / 2)]]}}">Konstitution</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_KoRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Konstitution}} {{rolling=[[floor(@{Ko}d10 / 2) + ?{Modifier?|0}]]}}">Konstitution</button>
                 <input type="number" name="attr_Ko" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_InRoll"
-                    value="@{abilityroll} versucht sich in Intelligenz [[floor(@{In}d10 / 2) + ?{Modifier?|0}]]">Intelligenz</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_InRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Intelligenz}} {{rolling=[[floor(@{In}d10 / 2)]]}}">Intelligenz</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_InRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Intelligenz}} {{rolling=[[floor(@{In}d10 / 2) + ?{Modifier?|0}]]}}">Intelligenz</button>
                 <input type="number" name="attr_In" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_WiRoll"
-                    value="@{abilityroll} versucht sich in Wissen [[floor(@{Wi}d10 / 2) + ?{Modifier?|0}]]">Wissen</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_WiRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Wissen}} {{rolling=[[floor(@{Wi}d10 / 2)]]}}">Wissen</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_WiRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Wissen}} {{rolling=[[floor(@{Wi}d10 / 2) + ?{Modifier?|0}]]}}">Wissen</button>
                 <input type="number" name="attr_Wi" value="1" min="1" class="sheet-number-20" />
             </div>
             <div class="sheet-float sheet-formular">
-                <button type="roll" class="sheet-small-button" name="roll_CaRoll"
-                    value="@{abilityroll} versucht sich in Charisma [[floor(@{Ca}d10 / 2) + ?{Modifier?|0}]]">Charisma</button>
+                <button type="roll" class="sheet-small-button sheet-norollmod" name="roll_CaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Charisma}} {{rolling=[[floor(@{Ca}d10 / 2)]]}}">Charisma</button>
+                <button type="roll" class="sheet-small-button sheet-rollmod" name="roll_CaRoll"
+                    value="@{abilityroll} &{template:butterfly} {{name=Charisma}} {{rolling=[[floor(@{Ca}d10 / 2) + ?{Modifier?|0}]]}}">Charisma</button>
                 <input type="number" name="attr_Ca" value="1" min="1" class="sheet-number-20" />
             </div>
         </div>
-    </div>
-
-    <div class="sheet-float sheet-half sheet-aspects">
-        <div class="sheet-header">
-            <span>Aspekte</span>
-        </div>
-        <input type="text" name="attr_aspekt1" />
-        <input type="text" name="attr_aspekt2" />
-        <input type="text" name="attr_aspekt3" />
-        <input type="text" name="attr_aspekt4" />
-        <fieldset class="repeating_aspekte">
-            <input type="text" name="attr_aspekt" />
-        </fieldset>
     </div>
 
     <div class="sheet-break"></div>
@@ -145,53 +144,65 @@
         </div>
         <div class="sheet-gridplace">
 
-            <div class="repcontainer" data-groupname="repeating_basicskills">
-                <div class="repitem" data-reprowid="-LqmJZp6DZSuTu37ytv5">
-                    <div><input class="sheet-textcenter" type="text" name="attr_ansehen_name" value="Ansehen" />
+            <div class="repcontainer">
+                <div class="repitem">
+                    <div id="skilldiv" class="sheet-repeat-skill">
+                        <div><input class="sheet-textcenter" type="text" name="attr_ansehen_name" value="Ansehen" />
+                        </div>
+                        <div>-</div>
+                        <div><input type="number" name="attr_ansehen" value="0"></div>
+                        <div><input type="number" name="attr_ansehen_mod" value="0"></div>
+                        <div>-</div>
+                        <div>
+                            <button type="roll" class="sheet-norollmod" name="roll_statikskill1"
+                                value="@{abilityroll} &{template:butterfly} {{name=@{ansehen_name}}} {{rolling=[[{1d10! + @{ansehen} + @{ansehen_mod},{(@{ansehen} + 1) * 10}}kl1]]}}"></button>
+                            <button type="roll" class="sheet-rollmod" name="roll_statikskill1"
+                                value="@{abilityroll} &{template:butterfly} {{name=@{ansehen_name}}} {{rolling=[[{1d10! + @{ansehen} + @{ansehen_mod} + ?{Modifier?|0},{(@{ansehen} + 1) * 10}}kl1]]}}"></button>
+                        </div>
                     </div>
-                    <div>-</div>
-                    <div><input type="number" name="attr_ansehen" value="0"></div>
-                    <div><input type="number" name="attr_ansehen_mod" value="0"></div>
-                    <div>-</div>
-                    <div><button type="roll" name="roll_statikskill1"
-                            value="@{abilityroll} würfelt auf @{ansehen_name} mit dem Ergebnis [[{1d10! + @{ansehen} + @{ansehen_mod} + ?{Modifier?|0},{(@{ansehen} + 1) * 10}}kl1]]"
-                            class="btn ui-draggable"></button></div>
                 </div>
-            </div>
-
-            <div class="repcontainer" data-groupname="repeating_basicskills">
-                <div class="repitem" data-reprowid="-LqmJZp6DZSuTu37ytv5">
-                    <div><input class="sheet-textcenter" type="text" name="attr_vermoegen_name" value="Vermögen" />
+                <div class="repitem">
+                    <div id="skilldiv" class="sheet-repeat-skill">
+                        <div><input class="sheet-textcenter" type="text" name="attr_vermoegen_name" value="Vermögen" />
+                        </div>
+                        <div>-</div>
+                        <div><input type="number" name="attr_vermoegen" value="0"></div>
+                        <div><input type="number" name="attr_vermoegen_mod" value="0"></div>
+                        <div>-</div>
+                        <div>
+                            <button type="roll" class="sheet-norollmod" name="roll_vermoegen"
+                                value="@{abilityroll} &{template:butterfly} {{name=@{vermoegen_name}}} {{rolling=[[{1d10! + @{vermoegen} + @{vermoegen_mod},{(@{vermoegen} + 1) * 10}}kl1]]}}"></button>
+                            <button type="roll" class="sheet-rollmod" name="roll_vermoegen"
+                                value="@{abilityroll} &{template:butterfly} {{name=@{vermoegen_name}}} {{rolling=[[{1d10! + @{vermoegen} + @{vermoegen_mod} + ?{Modifier?|0},{(@{vermoegen} + 1) * 10}}kl1]]}}"></button>
+                        </div>
                     </div>
-                    <div>-</div>
-                    <div><input type="number" name="attr_vermoegen" value="0"></div>
-                    <div><input type="number" name="attr_vermoegen_mod" value="0"></div>
-                    <div>-</div>
-                    <div><button type="roll" name="roll_vermoegen"
-                            value="@{abilityroll} würfelt auf @{vermoegen_name} mit dem Ergebnis [[{1d10! + @{vermoegen} + @{vermoegen_mod} + ?{Modifier?|0},{(@{vermoegen} + 1) * 10}}kl1]]"
-                            class="btn ui-draggable"></button></div>
                 </div>
             </div>
 
             <fieldset class="repeating_basicskills">
-                <div><input class="sheet-textcenter" type="text" name="attr_skillname" /></div>
-                <div>
-                    <select name="attr_attribut">
-                        <option value="@{Na}">Nahkampf</option>
-                        <option value="@{Fe}">Fernkampf</option>
-                        <option value="@{Ge}">Geschick</option>
-                        <option value="@{Wa}">Wahrnehmung</option>
-                        <option value="@{Ko}">Konstitution</option>
-                        <option value="@{in}">Intelligenz</option>
-                        <option value="@{Wi}">Wissen</option>
-                        <option value="@{Ca}">Charisma</option>
-                    </select>
-                </div>
-                <div><input type="number" name="attr_skill" value="0" /></div>
-                <div><input type="number" name="attr_skill_mod" value="0" /></div>
-                <div><input type="number" name="attr_pp" value="0" /></div>
-                <div><button type="roll" name="roll_skill"
-                        value="@{abilityroll} würfelt auf @{skillname} mit dem Ergebnis [[{@{attribut}d10! + @{skill} + @{skill_mod} + ?{Modifier?|0},{(@{skill} + 1) * 10}}kl1]]"></button>
+                <div id="skilldiv" class="sheet-repeat-skill">
+                    <div><input class="sheet-textcenter" type="text" name="attr_skillname" /></div>
+                    <div>
+                        <select name="attr_attribut">
+                            <option value="@{Na}">Nahkampf</option>
+                            <option value="@{Fe}">Fernkampf</option>
+                            <option value="@{Ge}">Geschick</option>
+                            <option value="@{Wa}">Wahrnehmung</option>
+                            <option value="@{Ko}">Konstitution</option>
+                            <option value="@{in}">Intelligenz</option>
+                            <option value="@{Wi}">Wissen</option>
+                            <option value="@{Ca}">Charisma</option>
+                        </select>
+                    </div>
+                    <div><input type="number" name="attr_skill" value="0" /></div>
+                    <div><input type="number" name="attr_skill_mod" value="0" /></div>
+                    <div><input type="number" name="attr_pp" value="0" /></div>
+                    <div>
+                        <button type="roll" class="sheet-norollmod" name="roll_skill"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[{@{attribut}d10! + @{skill} + @{skill_mod},{(@{skill} + 1) * 10}}kl1]]}}"></button>
+                        <button type="roll" class="sheet-rollmod" name="roll_skill"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{skillname}}} {{rolling=[[{@{attribut}d10! + @{skill} + @{skill_mod} + ?{Modifier?|0},{(@{skill} + 1) * 10}}kl1]]}}"></button>
+                    </div>
                 </div>
             </fieldset>
         </div>
@@ -199,7 +210,7 @@
 
     <div class="sheet-break"></div>
 
-    <div class="sheet-float sheet-full sheet-skills">
+    <div class="sheet-float sheet-full sheet-weapons">
         <div class="sheet-header">
             <span>Waffen</span>
         </div>
@@ -213,25 +224,136 @@
         </div>
         <div class="sheet-gridplace">
             <fieldset class="repeating_waponskills">
-                <div><input class="sheet-textcenter" type="text" name="attr_weaponname"></div>
-                <div>
-                    <select name="attr_attribut">
-                        <option value="@{Na}">Nahkampf</option>
-                        <option value="@{Fe}">Fernkampf</option>
-                    </select>
-                </div>
-                <div><input type="number" name="attr_weaponskill" value="0"></div>
-                <div><input type="number" name="attr_weaponskill_mod" value="0"></div>
-                <div><input type="number" name="attr_weapondmg" value="0"></div>
-                <div><button type="roll" name="roll_skill"
-                        value="@{abilityroll} benutzt @{weaponname} mit dem Ergebnis [[{@{attribut}d10! + @{weaponskill} + @{weaponskill_mod} + ?{Modifier?|0},{(@{weaponskill} + 1) * 10}}kl1]] und einem Waffenschaden von [[@{weapondmg}]]"
-                        class="btn ui-draggable"></button>
+                <div id="weapondiv" class="sheet-repeat-weapon">
+                    <input class="sheet-options-flag" id="magecheck" name="attr_options-flag" type="checkbox"
+                        title="Show/hide options"><span>y</span>
+                    <div><input class="sheet-textcenter" type="text" name="attr_weaponname"></div>
+                    <div>
+                        <select name="attr_attribut">
+                            <option value="@{Na}">Nahkampf</option>
+                            <option value="@{Fe}">Fernkampf</option>
+                        </select>
+                    </div>
+                    <div><input type="number" name="attr_weaponskill" value="0"></div>
+                    <div><input type="number" name="attr_weaponskill_mod" value="0"></div>
+                    <div><input type="number" name="attr_weapondmg" value="0"></div>
+                    <div>
+                        <button type="roll" class="sheet-norollmod" name="roll_skill"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{weaponname}}} {{rolling=[[{@{attribut}d10! + @{weaponskill} + @{weaponskill_mod},{(@{weaponskill} + 1) * 10}}kl1]]}} {{damage=[[@{weapondmg}]]}} {{desc=@{weaponeffekt}}}"></button>
+                        <button type="roll" class="sheet-rollmod" name="roll_skill"
+                                value="@{abilityroll} &{template:butterfly} {{name=@{weaponname}}} {{rolling=[[{@{attribut}d10! + @{weaponskill} + @{weaponskill_mod} + ?{Würfel Modifier?|0},{(@{weaponskill} + 1) * 10}}kl1]]}} {{damage=[[@{weapondmg} + ?{Schaden Modifier?|0}]]}} {{desc=@{weaponeffekt}}}"></button>
+                    </div>
+                    <input class="sheet-liketextarea"type="text" name="attr_weaponeffekt" placeholder="Spezialeffekt"></input>
                 </div>
             </fieldset>
         </div>
     </div>
 
     <div class="sheet-break"></div>
+
+    <div class="sheet-float sheet-full sheet-mage">
+        <div class="sheet-header">
+            <span>Magie</span>
+        </div>
+        <div class="sheet-grid">
+            <div>Zauber</div>
+            <div>Befeh.</div>
+            <div>Bew.</div>
+            <div>Element</div>
+            <div>Entf.</div>
+            <div>Gestalt</div>
+            <div>Glück</div>
+            <div>Rein.</div>
+            <div>Wissen</div>
+            <div>Mysterien</div>
+            <div>Wied.</div>
+            <div>Roll</div>
+        </div>
+        <div class="sheet-gridplace">
+            <fieldset class="repeating_spells">
+                <div id="magediv" class="sheet-repeat-mage">
+                    <input class="sheet-options-flag" id="magecheck" name="attr_options-flag" type="checkbox"
+                        title="Show/hide options"><span>y</span>
+                    <div><input class="sheet-textcenter" type="text" name="attr_spellname"></div>
+                    <div>
+                        <input type="checkbox" name="attr_spellbefehligen" value="1">
+                        <input type="checkbox" name="attr_spellbefehligen" value="3">
+                        <input type="checkbox" name="attr_spellbefehligen" value="6">
+                        <input type="checkbox" name="attr_spellbefehligen" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellbewegung" value="1">
+                        <input type="checkbox" name="attr_spellbewegung" value="3">
+                        <input type="checkbox" name="attr_spellbewegung" value="6">
+                        <input type="checkbox" name="attr_spellbewegung" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellelement" value="1">
+                        <input type="checkbox" name="attr_spellelement" value="3">
+                        <input type="checkbox" name="attr_spellelement" value="6">
+                        <input type="checkbox" name="attr_spellelement" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellentfernung" value="1">
+                        <input type="checkbox" name="attr_spellentfernung" value="3">
+                        <input type="checkbox" name="attr_spellentfernung" value="6">
+                        <input type="checkbox" name="attr_spellentfernung" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellgestalt" value="1">
+                        <input type="checkbox" name="attr_spellgestalt" value="3">
+                        <input type="checkbox" name="attr_spellgestalt" value="6">
+                        <input type="checkbox" name="attr_spellgestalt" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellglueck" value="1">
+                        <input type="checkbox" name="attr_spellglueck" value="3">
+                        <input type="checkbox" name="attr_spellglueck" value="6">
+                        <input type="checkbox" name="attr_spellglueck" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellreinigung" value="1">
+                        <input type="checkbox" name="attr_spellreinigung" value="3">
+                        <input type="checkbox" name="attr_spellreinigung" value="6">
+                        <input type="checkbox" name="attr_spellreinigung" value="10">
+                    </div>
+                    <div>
+                        <input type="checkbox" name="attr_spellwissen" value="1">
+                        <input type="checkbox" name="attr_spellwissen" value="3">
+                        <input type="checkbox" name="attr_spellwissen" value="6">
+                        <input type="checkbox" name="attr_spellwissen" value="10">
+                    </div>
+                    <div><input type="number" name="attr_spellskill" value="0"></div>
+                    <div><input type="number" name="attr_spellwiederstand"
+                            value="floor((@{spellbefehligen} + @{spellbewegung} + @{spellelement} + @{spellentfernung} + @{spellgestalt} + @{spellglueck} + @{spellreinigung} + @{spellwissen}) * 2)"
+                            disabled></div>
+                    <div>
+                        <button type="roll" class="sheet-norollmod sheet-norollrandomplayer" name="roll_spell"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} {{rolling=[[({@{in}d10! + @{spellskill},{(@{spellskill} + 1) * 10}}kl1)]]}} {{wiederstand=[[@{spellwiederstand} + (?{Ziehlbereich/-anzahl?|0}  + ?{Zeit?|0} + ?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]}} {{desc=@{spelleffekt}}} {{dauer=[[1d10]]}}"></button>
+                        <button type="roll" class="sheet-rollmod sheet-norollrandomplayer" name="roll_spell"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} {{rolling=[[({@{in}d10! + @{spellskill} + ?{Würfel Modifier?|0},{(@{spellskill} + 1) * 10}}kl1)]]}} {{wiederstand=[[@{spellwiederstand} + (?{Ziehlbereich/-anzahl?|0}  + ?{Zeit?|0} + ?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]}} {{desc=@{spelleffekt}}} {{dauer=[[1d10]]}}"></button>
+                        <button type="roll" class="sheet-norollmod sheet-rollrandomplayer" name="roll_spell"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} {{rolling=[[({@{in}d10! + @{spellskill},{(@{spellskill} + 1) * 10}}kl1)]]}} {{wiederstand=[[@{spellwiederstand} + (?{Ziehlbereich/-anzahl?|0}  + ?{Zeit?|0} + ?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]}} {{desc=@{spelleffekt}}} {{dauer=[[1d10]]}} {{randomplayer=[[1t[randomplayer]]]}}"></button>
+                        <button type="roll" class="sheet-rollmod sheet-rollrandomplayer" name="roll_spell"
+                            value="@{abilityroll} &{template:butterfly} {{name=@{spellname}}} {{rolling=[[({@{in}d10! + @{spellskill} + ?{Würfel Modifier?|0},{(@{spellskill} + 1) * 10}}kl1)]]}} {{wiederstand=[[@{spellwiederstand} + (?{Ziehlbereich/-anzahl?|0}  + ?{Zeit?|0} + ?{Gegnerische Intelligenz?|0} + ?{Aufrechterhaltene Zauber?|0}) * 2]]}} {{desc=@{spelleffekt}}} {{dauer=[[1d10]]}} {{randomplayer=[[1t[randomplayer]]]}}"></button>
+                    </div>
+                    <input class="sheet-liketextarea" type="text" name="attr_spelleffekt" placeholder="Zufälliger Effekt"></input>
+                    <textarea name="attr_spelldescription" placeholder="Inhalt"></textarea>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="sheet-break"></div>
+
+    <div class="sheet-float sheet-half sheet-aspects">
+        <div class="sheet-header">
+            <span>Aspekte</span>
+        </div>
+        <fieldset class="repeating_aspekte">
+            <input type="text" name="attr_aspekt" />
+        </fieldset>
+    </div>
 
     <div class="sheet-float sheet-half sheet-stunts">
         <div class="sheet-header">
@@ -247,6 +369,8 @@
         </fieldset>
     </div>
 
+    <div class="sheet-break"></div>
+
     <div class="sheet-float sheet-half sheet-inventar">
         <div class="sheet-header">
             <span>Inventar</span>
@@ -261,12 +385,28 @@
                 <input class="sheet-options-flag" name="attr_options-flag" type="checkbox"
                     title="Show/hide options"><span>y</span>
                 <input type="text" name="attr_name" placeholder="Gegenstand" />
-                <input type="text" name="attr_wight" placeholder="Gewicht" />
-                <input type="text" name="attr_costs" placeholder="Anzahl" />
+                <input type="number" name="attr_wight" placeholder="Kosten" />
+                <input type="number" name="attr_costs" placeholder="Anzahl" />
                 <textarea name="attr_description" placeholder="Beschreibung"></textarea>
             </div>
         </fieldset>
     </div>
+
+    <div class="sheet-float sheet-half sheet-notes">
+        <div class="sheet-header">
+            <span>Notizen</span>
+        </div>
+        <fieldset class="repeating_notes">
+            <div class="sheet-repeat-notes sheet-notes-row">
+                <input class="sheet-options-flag" name="attr_options-flag" type="checkbox"
+                    title="Show/hide options"><span>y</span>
+                <input type="text" name="attr_title" placeholder="Titel" />
+                <textarea name="attr_body" placeholder="Inhalt"></textarea>
+            </div>
+
+        </fieldset>
+    </div>
+
     <div class="sheet-break"></div>
 
     <div class="sheet-float sheet-full sheet-xp">
@@ -278,7 +418,7 @@
             <div class="sheet-formular">
                 <label for="attr_XPtoSpend">Verfügbare EP</label>
                 <input type="number" class="sheet-number-20" name="attr_XPtoSpend" value="@{XPTotal} - @{XPSpent}"
-                    disabled />
+                    disabled style="cursor: not-allowed;" />
             </div>
             <div class="sheet-formular">
                 <label for="attr_XPSpent">Ausgegebene EP</label>
@@ -315,21 +455,47 @@
     </div>
 
     <div class="sheet-break"></div>
-
-    <div class="sheet-float sheet-full sheet-notes">
-        <div class="sheet-header">
-            <span>Notizen</span>
-        </div>
-        <fieldset class="repeating_notes">
-            <div class="sheet-options sheet-notes-row">
-                <input type="text" name="attr_title" placeholder="Titel" />
-                <textarea name="attr_body" placeholder="Inhalt"></textarea>
-            </div>
-
-        </fieldset>
-    </div>
 </div>
 
+<!-- rolltemplate -->
+<rolltemplate class="sheet-rolltemplate-butterfly">
+    <div class="sheet-container">
+        <div class="sheet-header">
+            <span>{{name}}</span>
+        </div>
+        <div class="sheet-content">
+            <div>
+                <span>Egebnis: </span>{{rolling}}
+            </div>
+            {{#damage}}
+            <div>
+                <span>Schaden: </span>{{damage}}
+            </div>
+            {{/damage}}
+            {{#wiederstand}}
+            <div>
+                <span>Wiederstand: </span>{{wiederstand}}
+            </div>
+            {{/wiederstand}}
+            {{#desc}}
+            <div class="sheet-desc">
+                <span>Effekt:</span>
+                {{desc}}
+            </div>
+                {{#dauer}}
+                <div>
+                    <span>Dauer: </span>{{dauer}}
+                </div>
+                {{/dauer}}
+                {{#randomplayer}}
+                <div>
+                    <span>Spieler: </span>{{randomplayer}}
+                </div>
+                {{/randomplayer}}
+            {{/desc}}
+        </div>
+    </div>
+</rolltemplate>
 
 <!-- worker scripts -->
 <script type="text/worker">
@@ -998,7 +1164,6 @@ var TAS = TAS || (function(){
 
 
 
-//https://wiki.roll20.net/Sheet_Worker_Scripts#change:.3Cattribute_name.3E
 on("change:gmroll", function(f) {
 	getAttrs(["gmroll"], function(v) {
 		let rollstring = "/me";
@@ -1020,17 +1185,6 @@ on("change:ko", function() {
 		});
 		setAttrs({
 			leben_max: Math.floor(10 + parseInt(values.ko) * 5)
-		});
-	});
-});
-
-on("change:in", function() {
-	getAttrs(["in"], function(values) {
-		setAttrs({
-			mana: Math.floor(10 + parseInt(values.in) * 10)
-		});
-		setAttrs({
-			mana_max: Math.floor(10 + parseInt(values.in) * 10)
 		});
 	});
 });
