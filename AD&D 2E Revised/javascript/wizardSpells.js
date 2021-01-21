@@ -880,6 +880,26 @@ wiz2['Blur'] = {
     'effect': 'When a *blur* spell is cast, the wizard causes the outline of his form to become blurred, shifting and wavering. This distortion causes all missile and melee combat attacks against the caster to be made with –4 penalties on the first attempt and –2 penalties on all successive attacks. It also grants the wizard a +1 bonus to his saving throw for any direct magical attack. A *detect invisibility* spell will not counter this effect, but the 5th-level priest spell *true seeing* and similar magic will.'
 };
 
+//Find another place for this
+wiz2['Choke'] = {
+    'name': 'Choke',
+    'level': 'Level 2 Wizard',
+    'school': 'Necromancy, Conjuraion/Summoning',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'One creature',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': '½',
+    'materials': 'A handkerchief or similarly-sized piece of cloth that has been tied in a knot',
+    'reference': 'The Complete Wizard\'s Handbook p. 97',
+    'damage': '[[1d4]]',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of *choke*, the caster causes a pair of ghostly hands to appear around the throat of a single victim. The victim must be a human, demihuman, or humanoid, and must be within 30 yards of the caster. The hands will choke and strangle the affected victim for the duration of the spell; each round, the victim suffers 1-4 hit points of damage from the choking hands. If the victim makes a successful saving throw, he suffers half- damage each round.\\n&emsp;*Choke* can be negated by *dispel magic* or a similar spell; the victim makes all attack rolls at a -2 penalty while affected by *choke*.'
+}
+// End
+
 wiz2['Continual Light'] = {
     'name': 'Continual Light',
     'level': 'Level 2 Wizard',
