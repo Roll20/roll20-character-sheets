@@ -1,4 +1,9 @@
 """Module for providing the parts in the template.html file"""
+from pathlib import Path
+
+import markdown
+from bs4 import BeautifulSoup as soup
+
 from .helpers import (
     CHARACTERISTICS,
     FORMS,
@@ -115,3 +120,8 @@ parts["form_enumerated_options"] = repeat_template(
     enumerate_helper(FORMS, [str.capitalize], start=1),
     tuple_keys=("index", "form", "Form"),
 )
+
+# Documentation
+with open(Path(__file__).parents[1] / "documentation.md") as f:
+    html = markdown.markdown("\n".join(f.readlines()))
+parts["documentation"] = soup(html, "html.parser").prettify()

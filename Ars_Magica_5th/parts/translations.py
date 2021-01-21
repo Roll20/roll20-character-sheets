@@ -1,5 +1,6 @@
 from .helpers import CHARACTERISTICS, FORMS, TECHNIQUES
 
+# list of (attr, default, translation_key)
 TRANSLATION_ATTRS = (
     [
         ("ability", "Abiliy", "ability"),
@@ -8,6 +9,7 @@ TRANSLATION_ATTRS = (
         ("attack", "Attack", "attack"),
         ("aura", "Aura", "aura"),
         ("bonus", "Bonus", "bonus"),
+        ("botch_num", "Number of botch dice", "botch-num"),
         ("circumstances", "Circumstances", "circumstances-m"),
         ("circumstantial", "Circumstancial", "circumstantial"),
         ("damage", "Damage", "damage"),
@@ -18,7 +20,6 @@ TRANSLATION_ATTRS = (
         ("initiative", "Initiative", "initiative"),
         ("modifiers", "Modifiers", "modifiers"),
         ("philos", "Philos.", "philos-"),
-        ("query", "Name of Query", "query"),
         ("technique", "Technique", "technique"),
         ("wounds", "Wounds", "wounds"),
     ]
