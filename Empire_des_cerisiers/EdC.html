@@ -51,7 +51,7 @@
             </div>
             <div class="row">
                 <div class="cell cell-8">
-                    <p>Nombre d'attaque par tour: </p>
+                    <p>Nombre d'action par tour: </p>
                     <p class="initiative-p">Défense: </p>
                     <p class="initiative-p">Initiative: </p>
                     <p class="initiative-p">Résistance mentale: </p>
@@ -620,7 +620,7 @@
                                     <div class='cell cell-1'>
                                         <input type="hidden" name="attr_foototalweaponrollbonus" value="[[@{atkbonus}+@{fooweaponassociatedfieldlvl}+@{fooweaponassociatedspelvl}+@{fooweaponassociatedspelvlbonus}]]"/>
                                         <input type="hidden" name="attr_foototalweapondmg" value="@{dgt} + @{dmgbonus}" />
-                                        <button class="roll-tech" type="roll" name="roll_tech" value="@{gmroll}&{template:sakura} {{subtitle= @{character_name} attaque avec @{weaponname} :}} {{check=[[2d6cs0cf0 + @{foototalweaponrollbonus}]]}} {{mincheck=[[2+@{foototalweaponrollbonus}]]}} {{maxcheck=[[12+@{foototalweaponrollbonus}]]}} {{desc=@{weaponnotes}}} {{note=Dégats de l'arme : @{foototalweapondmg}}}"/>
+                                        <button class="roll-tech" type="roll" name="roll_tech" value="@{gmroll}&{template:sakura} {{subtitle= @{character_name} attaque avec @{weaponname} :}} {{check=[[2d6cs0cf0 + @{foototalweaponrollbonus}]]}} {{mincheck=[[2+@{foototalweaponrollbonus}]]}} {{maxcheck=[[12+@{foototalweaponrollbonus}]]}} {{currentinjury=@{foocurrentinjurylevel}}} {{desc=@{weaponnotes}}} {{note=Dégats de l'arme : @{foototalweapondmg}}}"/>
                                     </div>
                                 </div>
                             </fieldset>
@@ -650,7 +650,7 @@
                     </div>
                     <div class=" cell cell-3 text-center">  
                      <p class="tooltip">Gin :
-                        <span class="tooltiptext">1 Gin = 1000 mon</span></p>
+                        <span class="tooltiptext">1 Gin = 100 mon</span></p>
                          <span class="number-wrapper"><input type="number" name="attr_gin" placeholder="0"/></span>
                     </div>
                     <div class="cell cell-3 text-center">                    
@@ -1521,14 +1521,14 @@
         updateRepeatingRelatedAttrFromRepeating("field", "weapon", "fooindexfield", changedID, "fooweaponassociatedfield", e.newValue);
         updateRepeatingRelatedAttrFromRepeating("field", "magic", "fooindexfield", changedID, "foomagicassociatedfield", e.newValue);
     });
-    
+    // update spec, weapon and magic roll en field level change
     on("change:repeating_field:fieldlvl", function(e){
         let changedID = e.sourceAttribute.split('_')[2];
         updateRepeatingRelatedAttrFromRepeating("field", "spec", "fooindexfield", changedID, "foospecassociatedfieldlvl", e.newValue);
         updateRepeatingRelatedAttrFromRepeating("field", "weapon", "fooindexfield", changedID, "fooweaponassociatedfieldlvl", e.newValue);
         updateRepeatingRelatedAttrFromRepeating("field", "magic", "fooindexfield", changedID, "foomagicassociatedfieldlvl", e.newValue);
     });
-
+    // update max field level on field level change
     on("change:repeating_field:fieldlvl", function() {
         getSectionIDs("field", function(idarray) {
             let max = 0;
@@ -1621,7 +1621,8 @@
             });
     });
     
-    on("change:repeating_field:fieldiscombatrelated", function(){
+    // update init bonus on check and on field level change
+    on("change:repeating_field:fieldiscombatrelated change:repeating_field:fieldlvl", function(){
         getSectionIDs("field", function(idarray){
             let fieldidarray = [];
             for(var i = 0; i < idarray.length; i++)
@@ -1668,15 +1669,18 @@
             getAttrs(armorfieldarray, function(data){
                 let initmalus = 0;
                 let armorbonus = 0;
-                let tData = {};
+                console.log(data);
                 for(var j = 0;j<idarray.length; j++)
                 {
-                    if(data["repeating_armor_"+idarray[j]+"_armorequiped"] || 0 ==1)
+                    if(parseInt(data["repeating_armor_"+idarray[j]+"_armorequiped"] || "0",10) == 1)
                     {
-                        initmalus += parseInt(data["repeating_armor_"+idarray[j]+"_armormalus"] || 0,10);
-                        armorbonus += parseInt(data["repeating_armor_"+idarray[j]+"_armordefence"] || 0,10)+parseInt(data["repeating_armor_"+idarray[j]+"_armordefencebonus"] || 0,10);
+                        initmalus += parseInt(data["repeating_armor_"+idarray[j]+"_armormalus"] || "0",10);
+                        armorbonus += parseInt(data["repeating_armor_"+idarray[j]+"_armordefence"] || "0",10)+parseInt(data["repeating_armor_"+idarray[j]+"_armordefencebonus"] || "0",10);
+                        console.log("armor " + idarray[j] + " imalus: " + initmalus);
                     }
                 }
+                console.log("foodefence: " + armorbonus);
+                console.log("fooinitmalus: " + initmalus);
                 setAttrs({foodefence: armorbonus, fooinitmalus: initmalus}); 
             });
         });
