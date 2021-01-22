@@ -20,6 +20,7 @@ TRANSLATION_ATTRS = (
         ("initiative", "Initiative", "initiative"),
         ("modifiers", "Modifiers", "modifiers"),
         ("philos", "Philos.", "philos-"),
+        ("soakbns", "Soak Bonus", "soak-bonus"),
         ("technique", "Technique", "technique"),
         ("wounds", "Wounds", "wounds"),
     ]
