@@ -1182,12 +1182,12 @@
                     }
                     _.each(data.blobs, function(blob, blobname) {
                         if(blob.Multiclass != "no" && ((parseInt(blob.Level) <= thislevel || blob.Level == "all") && !blob.Group) || choices.includes(blobname)) {
-                            if(blob.Spells) {
-                                var blobspells = JSON.parse(blob.Spells);
+                            if(blob.Powers) {
+                                var blobspells = JSON.parse(blob.Powers);
                                 _.each(blobspells, function(blobspell) {
                                     if(blobspell.Known) {
                                         _.each(blobspell.Known, function(spell) {
-                                            spelldata[spell] = spelldata[spell] || {level: blobspell.Level};
+                                            spelldata[spell] = spelldata[spell] || {level: blobspell.Rank};
                                             spelldata[spell].known = blobspell.Source || data.Category.substring(0, data.Category.length - 2);
                                             spelldata[spell].spellclass = thisclass.classname;
                                             if(dataname.substring(0,5) != "class") {
@@ -1210,7 +1210,7 @@
                 });
                 //Gater spells from class features
                 _.each(page.values, function(value, name) {
-                    if(name.substr(-18) === "_utilityrow_spells") {
+                    if(name.substr(-18) === "_utilityrow_powers") {
                         spelldata = _.extend(spelldata, JSON.parse(value));
                     }
                 });
@@ -1239,8 +1239,8 @@
                 if(level[section]) {
                     _.each(level[section].blobs, function(blob) {
                         if(blob.Level == thislevel) {
-                            if(blob["Spells Known"]) {
-                                currentknown = parseInt(blob["Spells Known"]);
+                            if(blob["Talents Known"]) {
+                                currentknown = parseInt(blob["Talents Known"]);
                                 if(level.class["data-Spell Replace"]) result = true;
                             }
                             if(blob.Cantrips) {
@@ -1252,9 +1252,9 @@
                             }
                         }
                         if(blob.Level == prevlevel || (prevlevel === 0 && blob.Level == 1)) {
-                            if(blob["Spells Known"]) {
-                                prevknown = prevlevel === 0 ? 0 : parseInt(blob["Spells Known"]);
-                                if(prevlevel === 0) thisclass.newspells = parseInt(blob["Spells Known"]);
+                            if(blob["Talents Known"]) {
+                                prevknown = prevlevel === 0 ? 0 : parseInt(blob["Talents Known"]);
+                                if(prevlevel === 0) thisclass.newspells = parseInt(blob["Talents Known"]);
                             }
                             if(blob.Cantrips) {
                                 thisclass.cantrips = true;
@@ -1337,13 +1337,13 @@
                     if(level[section]["Spellcasting Ability"]) thisclass.ability = level[section]["Spellcasting Ability"];
                     _.each(level[section].blobs, function(blob) {
                         if(blob.Level == thislevel) {
-                            if(blob["Spell Slots"]) {
-                                var slots = JSON.parse(blob["Spell Slots"]);
-                                thisclass.maxlevel = JSON.parse(_.last(_.last(_.keys(slots).sort()).split(" ")));
+                            if(blob["Talents Known"]) {
+                                var maxRank = JSON.parse(blob["Maximum Talent Rank"]);
+                                thisclass.maxlevel = parseInt(maxRank);
                                 spellmaxlevel = Math.max(thisclass.maxlevel, spellmaxlevel);
                             }
-                            if(blob["Spells Known"]) {
-                                currentknown = parseInt(blob["Spells Known"]);
+                            if(blob["Talents Known"]) {
+                                currentknown = parseInt(blob["Talents Known"]);
                             }
                             if(blob.Cantrips) {
                                 thisclass.cantrips = true;
@@ -1363,9 +1363,9 @@
                             }
                         }
                         if(blob.Level == prevlevel || (prevlevel === 0 && blob.Level == 1)) {
-                            if(blob["Spells Known"]) {
-                                prevknown = prevlevel === 0 ? 0 : parseInt(blob["Spells Known"]);
-                                if(prevlevel === 0) thisclass.newspells = parseInt(blob["Spells Known"]);
+                            if(blob["Talents Known"]) {
+                                prevknown = prevlevel === 0 ? 0 : parseInt(blob["Talents Known"]);
+                                if(prevlevel === 0) thisclass.newspells = parseInt(blob["Talents Known"]);
                             }
                             if(blob.Cantrips) {
                                 thisclass.cantrips = true;
@@ -1438,7 +1438,7 @@
                 }
             });
             if(knownlist) {
-                queries.push("Category:Spells Name:" + knownlist.join("|"));
+                queries.push("Category:Powers Name:" + knownlist.join("|"));
             }
             _.each(classes, function(thisclass) {
                 if(thisclass.maxlevel || thisclass.newcantrips) {
@@ -1446,7 +1446,7 @@
                     newspells += thisclass.newspells;
                     replace += thisclass.replace;
                     if(!thisclass.prepared) prepared = false;
-                    thisquery = "Category:Spells Classes:*" + _.uniq(thisclass.list).join("|*") + " Level:";
+                    thisquery = "Category:Powers Classes:*" + _.uniq(thisclass.list).join("|*") + " Rank:";
                     if(thisclass.cantrips) thisquery += "0|"
                     for(var x = 1; x <= thisclass.maxlevel; x++) {
                         thisquery += x;
@@ -1505,19 +1505,19 @@
                                 classes.push(name);
                             };
                         });
-
+    
                        if (classes.length > 0) {
                             classes = classes.join(', ');
                        };
                     };
-
+    
                     /* This will set the information for populating the spell list */
                     if (classes.length > 0) {
-                        byLevel[spell.data.Level] = byLevel[spell.data.Level] || [];
-                        byLevel[spell.data.Level].push({
+                        byLevel[spell.data.Rank] = byLevel[spell.data.Rank] || [];
+                        byLevel[spell.data.Rank].push({
                             name: spell.name,
                             classes: classes.split(",").map(x => x.trim()),
-                            level: parseInt(spell.data.Level)
+                            level: parseInt(spell.data.Rank)
                         });
                     };
                 });
@@ -1533,7 +1533,8 @@
             });
         }
     });
-
+    
+    
     const addSpellSections = function(byLevel, settings) {
         settings = settings || {};
         let newspells = settings.newspells || 0;
@@ -1972,7 +1973,7 @@
                             for(let i=0; i<spells.length; i++) {
                                 const spellIndex = i+1;
                                 const selector = `comp_repeating_${rowID}_asi-row_feat_spell_choice${spellIndex}`;
-                                const query = `Category:Spells ${spells[i]['List']}`;
+                                const query = `Category:Powers ${spells[i]['List']}`;
                                 showList.push(`feat_spell_choice${spellIndex}`);
                                 setCharmancerOptions(selector, query);
                             }
@@ -2231,13 +2232,13 @@
                 if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
             });
             if(spellnames.length > 0) {
-                query = "Category:Spells Name:" + spellnames.join("|");
+                query = "Category:Powers Name:" + spellnames.join("|");
             } else {
                 update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
                 setCharmancerText(update);
             }
         } else {
-            query = "Category:Spells";
+            query = "Category:Powers";
             if(querysettings.Level) {
                 let levels = [querysettings.Level];
                 if(querysettings.Level == "max") {
@@ -2358,13 +2359,13 @@
                 if(!querysettings.Level || (querysettings.Level && querysettings.Level == spell.level)) spellnames.push(spellname);
             });
             if(spellnames.length > 0) {
-                query = "Category:Spells Name:" + spellnames.join("|");
+                query = "Category:Powers Name:" + spellnames.join("|");
             } else {
                 update[`${eventinfo.sourceSection} .sheet-warning`] = `You do not currently know any level ${querysettings.Level} spells.`;
                 setCharmancerText(update);
             }
         } else {
-            query = "Category:Spells";
+            query = "Category:Powers";
             if(querysettings.Level) {
                 let levels = [querysettings.Level];
                 if(querysettings.Level == "max") {
