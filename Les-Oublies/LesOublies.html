@@ -4,6 +4,21 @@
                 Sheet version: 1.0
 -->
 
+
+<!-- ----------------------------------------------------------------------- -->
+<!-- --------------------- SCRIPT PATCH FOR ATTRIBUTES --------------------- -->
+<!-- ----------------------------------------------------------------------- -->
+
+<script type="text/worker">
+	on('sheet:opened', function() {
+		getAttrs(['amure_penalite', 'armure_penalite'], function(values) {
+			if((values.amure_penalite) && !(values.armure_penalite)) {
+				setAttrs({armure_penalite: values.amure_penalite});
+			}
+		});
+	});
+</script>
+
 <div class="outline"> 
 
 <!-- ----------------------------------------------------------------------- -->
@@ -1027,7 +1042,7 @@
 	<div class="sheet-row"> <!-- Initiative -->
 		<div class="sheet-col section-initiative">
 			<button type="roll" class="init-roll" name="initiative"
-					value="&{template:initiative-roll} {{roll=[[ceil((@{rapidite}[Rapidite] + 1d12) / 2) - @{amure_penalite}[Penalite armure] &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}"
+					value="&{template:initiative-roll} {{roll=[[ceil((@{rapidite}[Rapidite] + 1d12) / 2) + @{armure_penalite}[Penalite armure] &{tracker}]]}} {{prime=@{prime_init}}} {{penalite=@{penalite_init}}}"
 				<span class="small-text">Initiative</span>
 			</button>
 		</div>
@@ -1199,7 +1214,6 @@
             			        "prime_reaction": "Prudence"
             			    })
             			}
-            			console.log("descr");
             			setAttrs({
             				"prime_descr": descr,
             				"prime_short_descr": shortDescr
@@ -1446,7 +1460,7 @@
 			</fieldset>
 			
 			<div class="armure-penalite">
-			    Pénalité totale de l'armure : <input type="number" class="input-type" name="attr_amure_penalite" readonly>
+			    Pénalité totale de l'armure : <input type="number" class="input-type" name="attr_armure_penalite" readonly>
 			</div>
 		</div>
 		
@@ -1469,7 +1483,7 @@
         			    }
         			}
         			setAttrs({
-        				"amure_penalite": total
+        				"armure_penalite": total
         			});
                 });
         	});
