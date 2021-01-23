@@ -749,7 +749,6 @@
           <input type="checkbox" value="?{Threshold Modifier|0}" name="attr_threshold_modifier"/>
           <br/>
           <span class="label" data-i18n="damage_code_text">Damage code prompt on every attack ?.</span>
-          <!-- dmg_query attribute will be replaced by on("sheet:opened") function with translated version -->
           <input type="checkbox" name="attr_dmg_query" value="?{Damage Code|1d4|2d4|1d6+3|2d6+3|1d8+7|2d8+7|1d10+11|2d10+11|2d10+1d4+11|2d10+2d4+11|2d10+1d6+14|2d10+2d6+14|2d10+1d8+18|2d10+2d8+18|3d10+22|4d10+220}"/>
       </div> 
       <div class="gm-modifiers">
@@ -1123,7 +1122,7 @@
              <input name="attr_brawl_ammo" class="attack-ammo table-cell" type="text" value="n/a" readonly/>
              <input name="attr_brawl_traits" class="attack-traits table-cell" type="text"/>
              <input name="attr_brawl_cp" class="attack-cp table-cell" type="text" value="n/a" readonly/>
-             <button value="@{api_use} &{template:maxapoc} {{debug=1}} {{subtitle=^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{brawl_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
+             <button value="@{api_use} &{template:maxapoc} {{subtitle=^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{brawl_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
                 <span data-i18n="attack">Attack.</span>
              </button>
              <button value="@{api_use} &{template:maxapoc} {{subtitle=^{parry}: ^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button parry-roll">
@@ -1460,21 +1459,6 @@ on("sheet:opened", function(eventInfo)
     }
     modQuery += "}";
     
-    // concatenate damage code roll query
-    var dmgQuery = "?{";
-    var dmgQueryLabel = getTranslationByKey("damage_code");
-    if (!dmgQueryLabel) dmgQueryLabel = "Damage Code."
-    dmgQuery += dmgQueryLabel;
-    for(var i=0;i<dmg_codes.length;i++)
-    {
-        let dmg = dmg_codes[i];
-        let translation = getTranslationByKey(dmg.key);
-        if(!translation) translation = dmg.name;
-        //console.log('dmg_code_translation: ' + translation);
-        dmgQuery += "|" + translation + " (" + dmg.roll + ")," + dmg.roll;
-    }
-    dmgQuery += "}";
-    
     // Brawl translation
     var brawlSkillName = getTranslationByKey("unarmed");
     if (!brawlSkillName) brawlSkillName = "Unarmed.";
@@ -1484,14 +1468,12 @@ on("sheet:opened", function(eventInfo)
     
     // console output
     console.log('modQuery: ' + modQuery);
-    console.log('dmgQuery: ' + dmgQuery);
     console.log('brawlSkillName: ' + brawlSkillName);
     console.log('brawlWeaponName: ' + brawlWeaponName);
     
     // update translated roll queries
     setAttrs({
         mod_query: modQuery,
-        dmg_query: dmgQuery,
         brawl_skill: brawlSkillName,
         brawl_weapon: brawlWeaponName
     });
