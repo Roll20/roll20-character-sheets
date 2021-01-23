@@ -749,7 +749,8 @@
           <input type="checkbox" value="?{Threshold Modifier|0}" name="attr_threshold_modifier"/>
           <br/>
           <span class="label" data-i18n="damage_code_text">Damage code prompt on every attack ?.</span>
-          <input type="checkbox" name="attr_dmg_query" value="?{Damage Code|1d4|2d4|1d6+3|2d6+3|1d8+7|2d8+7|1d10+11|2d10+11|2d10+1d4+11|2d10+2d4+11|2d10+1d6+14|2d10+2d6+14|2d10+1d8+18|2d10+2d8+18|3d10+22|4d10+220}"/>
+          <input type="checkbox" name="attr_prompt_dmg" value="on"/>
+          <input type="hidden" name="attr_dmg_query" value="0"/>
       </div> 
       <div class="gm-modifiers">
           <span class="label" data-i18n="use_api_text">Use API for rolls (Requires Pro Account) ?.</span>
@@ -1478,6 +1479,38 @@ on("sheet:opened", function(eventInfo)
         brawl_weapon: brawlWeaponName
     });
 
+});
+
+on("change:prompt_dmg", function(eventInfo)
+{
+    if(eventInfo.newValue === 'on')
+    {
+        // ?{Damage Code|1d4|2d4|1d6+3|2d6+3|1d8+7|2d8+7|1d10+11|2d10+11|2d10+1d4+11|2d10+2d4+11|2d10+1d6+14|2d10+2d6+14|2d10+1d8+18|2d10+2d8+18|3d10+22|4d10+220}
+        
+        // concatenate damage code roll query
+        var dmgQuery = "?{";
+        var dmgQueryLabel = getTranslationByKey("damage_code");
+        if (!dmgQueryLabel) dmgQueryLabel = "Damage Code."
+        dmgQuery += dmgQueryLabel;
+        for(var i=0;i<dmg_codes.length;i++)
+        {
+            let dmg = dmg_codes[i];
+            let translation = getTranslationByKey(dmg.key);
+            if(!translation) translation = dmg.name;
+            dmgQuery += "|" + translation + "," + dmg.roll;
+        }
+        dmgQuery += "}";
+        
+            
+        // console output
+        console.log('dmgQuery: ' + dmgQuery);
+        
+    
+        // update translated roll query
+        setAttrs({
+            dmg_query: dmgQuery
+        });
+    }
 });
 
 /*
