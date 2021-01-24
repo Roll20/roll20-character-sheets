@@ -8,7 +8,7 @@ This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet
 This Character Sheet has been updated to fix and enhance mostly in the original style. And uploaded to Roll20 for all to use. 
 I'm a active WFRP player and I plan to further enhance this sheet at time goes on.
 
-This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accompilshed by a combination of manual configuation for each character, as every character is different, and a highly integrated and standardized roll template.
+This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accompilshed by a combination of manual configuation for each character, as every character is different, and a highly integrated and standardized roll template. There is also some TEW companion rule integration but its minor.
 
 My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip
 
@@ -30,9 +30,9 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 
 - Full combat Advantage & Condition Tracking, per core rules.
 
-- Inventory: Full Encumbrance Management system, with automatic Overencumbrance modifiers (-move/agi), and Container & Vehicle Management section.
+- Inventory: Full Encumbrance Management system, with automatic Overencumbrance modifiers (-move/agi), and Container & Vehicle Management section (TEW compatible) .
 
-- Full Roll integration for Critical / Oops / Miscast & Wrath of the God, with clicky buttons in the roll template output.
+- Full Roll integration for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God, with clicky buttons in the roll template output. 
 
 - Custom NPC tab, on sheet area to quickly add NPC for GM and players alike. Not meant to replace a full character sheet, but handy for quick trash mob types. The idea is to make a full char sheet for the "boss" and to have his henchmen as Custom NPC's on the NPC tab. 
 
