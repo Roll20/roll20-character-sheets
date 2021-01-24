@@ -3186,6 +3186,11 @@
             });
         });
 
+        on("clicked:repeating_abilities:ability", (eventInfo) => {
+            const id = eventInfo.sourceAttribute.match(/repeating_abilities_(.*)_ability/)[1];
+            updateDicePoolAttributes(eventInfo.sourceAttribute);
+        });
+
         on("change:attack", function() {
             updateAttacks();
         });
@@ -3552,6 +3557,9 @@
             if (skills.includes(attribute)) {
                 return "skill";
             }
+            if (/repeating_abilities_.*_ability/.test(attribute)) {
+                return "ability";
+            }
             if (attribute === "potency") {
                 return "potency";
             }
@@ -3687,55 +3695,66 @@
         }
 
         var updateDicePoolAttributes = function(attribute) {
-            getAttrs([...allStats, "dice_pool_attributes", "sheettype", "homebrew_rank"], (v) => {
-                // Update roll stats collection
-                let poolAttributes = v["dice_pool_attributes"]
-                    .split(",")
-                    .filter((poolAttribute) => poolAttribute);
-
-                if (poolAttributes.includes(attribute)) {
-                    // Remove attribute from roll
-                    poolAttributes = poolAttributes.filter((poolAttribute) => poolAttribute !== attribute);
-                }
-                else {
-                    // Add attribute to roll
-                    poolAttributes = poolAttributes.concat(attribute);
-
-                    // Cap stats by type
-                    const poolAttributeTypes = poolAttributes
-                        .map((poolAttribute) => ({ poolAttribute, type: getAttributeType(poolAttribute) }));
-                    poolAttributes = poolAttributeTypes.filter((x) => x.type === "attribute").reverse().slice(0, 2).reverse()
-                        .concat(poolAttributeTypes.filter((x) => x.type === "skill").reverse().slice(0, 1).reverse())
-                        .concat(poolAttributeTypes.filter((x) => x.type === "power").reverse().slice(0, 1).reverse())
-                        .concat(poolAttributeTypes.filter((x) => x.type === "potency").reverse().slice(0, 1).reverse())
-                        .map((x) => x.poolAttribute);
-                }
-
-                // Create HTML for roll template
-                const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, v);
-
-                // Create dice pool for roll
-                const dicePool = getSheetDicePool(poolAttributes, v);
-
-                // Create display for dice roller
-                const rollDisplay = poolAttributes
-                    .map((poolAttribute) => getAttributeTranslation(poolAttribute, v["sheettype"], v["homebrew_rank"]))
-                    .join(" +\n");
-
-                // Determine flag values
-                const flags = allStats
-                    .map((flagAttribute) => ({
-                        "flag": `${flagAttribute}_flag`,
-                        "value": poolAttributes.includes(flagAttribute) ? 1 : 0
-                    }))
-                    .reduce((all, next) => ({ ...all, [next.flag]: next.value }), {});
-
-                setAttrs({
-                    ["dice_pool_attributes"]: poolAttributes.join(","),
-                    ["dice_pool_html"]: dicePoolHtml,
-                    ["dice_pool"]: dicePool,
-                    ["rolldisplay"]: rollDisplay,
-                    ...flags,
+            attribute = attribute.toLowerCase();
+            getSectionIDs("abilities", (abilityIds) => {
+                const abilityAttributes = abilityIds
+                    .map((abilityId) => `repeating_abilities_${abilityId}_ability`);
+                const abilityValueAttributes = [
+                    ...abilityAttributes,
+                    ...abilityAttributes
+                        .map((abilityAttribute) => `${abilityAttribute}_name`)
+                ];
+                getAttrs([...allStats, ...abilityValueAttributes, "dice_pool_attributes", "sheettype", "homebrew_rank"], (v) => {
+                    // Update roll stats collection
+                    let poolAttributes = v["dice_pool_attributes"]
+                        .split(",")
+                        .filter((poolAttribute) => poolAttribute);
+    
+                    if (poolAttributes.includes(attribute)) {
+                        // Remove attribute from roll
+                        poolAttributes = poolAttributes.filter((poolAttribute) => poolAttribute !== attribute);
+                    }
+                    else {
+                        // Add attribute to roll
+                        poolAttributes = poolAttributes.concat(attribute);
+    
+                        // Cap stats by type
+                        const poolAttributeTypes = poolAttributes
+                            .map((poolAttribute) => ({ poolAttribute, type: getAttributeType(poolAttribute) }));
+                        poolAttributes = poolAttributeTypes.filter((x) => x.type === "attribute").reverse().slice(0, 2).reverse()
+                            .concat(poolAttributeTypes.filter((x) => x.type === "skill").reverse().slice(0, 1).reverse())
+                            .concat(poolAttributeTypes.filter((x) => x.type === "ability").reverse().slice(0, 1).reverse())
+                            .concat(poolAttributeTypes.filter((x) => x.type === "power").reverse().slice(0, 1).reverse())
+                            .concat(poolAttributeTypes.filter((x) => x.type === "potency").reverse().slice(0, 1).reverse())
+                            .map((x) => x.poolAttribute);
+                    }
+    
+                    // Create HTML for roll template
+                    const dicePoolHtml = getSheetDicePoolHtml(poolAttributes, v);
+    
+                    // Create dice pool for roll
+                    const dicePool = getSheetDicePool(poolAttributes, v);
+    
+                    // Create display for dice roller
+                    const rollDisplay = poolAttributes
+                        .map((poolAttribute) => v[`${poolAttribute}_name`] || getAttributeTranslation(poolAttribute, v["sheettype"], v["homebrew_rank"]))
+                        .join(" +\n");
+    
+                    // Determine flag values
+                    const flags = [...allStats, ...abilityAttributes]
+                        .map((flagAttribute) => ({
+                            "flag": `${flagAttribute}_flag`,
+                            "value": poolAttributes.includes(flagAttribute) ? 1 : 0
+                        }))
+                        .reduce((all, next) => ({ ...all, [next.flag]: next.value }), {});
+    
+                    setAttrs({
+                        ["dice_pool_attributes"]: poolAttributes.join(","),
+                        ["dice_pool_html"]: dicePoolHtml,
+                        ["dice_pool"]: dicePool,
+                        ["rolldisplay"]: rollDisplay,
+                        ...flags,
+                    });
                 });
             });
         }
@@ -3759,7 +3778,7 @@
         var getSheetDicePoolHtml = function(poolAttributes, values) {
             return poolAttributes
                 .map((poolAttribute) => ({
-                    label: getAttributeTranslation(poolAttribute, values["sheettype"], values["homebrew_rank"]),
+                    label: values[`${poolAttribute}_name`] || getAttributeTranslation(poolAttribute, values["sheettype"], values["homebrew_rank"]),
                     value: getAttributePool(poolAttribute, values)
                 }))
                 .map((stat) => `<div>${stat.label} (${stat.value})</div>`)
