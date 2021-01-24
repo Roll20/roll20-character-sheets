@@ -978,21 +978,21 @@
                                     <span class="game-line wod-demon" data-i18n="lore">Lores</span>
                                     <span class="game-line homebrew" name="attr_homebrew_abilities"></span>
                                 </div>
-                                <fieldset class="repeating_othertraits">
+                                <fieldset class="repeating_abilities">
                                     <div class="input-group">
                                         <span class="checkbox">
-                                            <input type="hidden" class="flag" name="attr_othertrait_flag">
-                                            <button type="action" name="act_othertrait"></button>
+                                            <input type="hidden" class="flag" name="attr_ability_flag">
+                                            <button type="action" name="act_ability"></button>
                                         </span>
-                                        <input type="text" name="attr_othertrait_name" />
+                                        <input type="text" name="attr_ability_name" />
                                         <div class="dots">
-                                            <input type="hidden" name="attr_othertrait" value="0">
-                                            <button type="action" class="dot zero" name="act_othertrait_0">&times;</button>
-                                            <button type="action" class="dot" name="act_othertrait_1"></button>
-                                            <button type="action" class="dot ne-1" name="act_othertrait_2"></button>
-                                            <button type="action" class="dot ne-1 ne-2" name="act_othertrait_3"></button>
-                                            <button type="action" class="dot ne-1 ne-2 ne-3" name="act_othertrait_4"></button>
-                                            <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_othertrait_5"></button>
+                                            <input type="hidden" name="attr_ability" value="0">
+                                            <button type="action" class="dot zero" name="act_ability_0">&times;</button>
+                                            <button type="action" class="dot" name="act_ability_1"></button>
+                                            <button type="action" class="dot ne-1" name="act_ability_2"></button>
+                                            <button type="action" class="dot ne-1 ne-2" name="act_ability_3"></button>
+                                            <button type="action" class="dot ne-1 ne-2 ne-3" name="act_ability_4"></button>
+                                            <button type="action" class="dot ne-1 ne-2 ne-3 ne-4" name="act_ability_5"></button>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -3218,7 +3218,7 @@
             updateHealth();
         });
 
-        const listDotTraits = ["merit","othertrait","discipline","arcana"];
+        const listDotTraits = ["merit","ability","discipline","arcana"];
         const listDotAttrs = listDotTraits
             .reduce((attrs, trait) => [
                 ...attrs,
@@ -3492,23 +3492,27 @@
                 if (version < 5) {
                     attrs = {
                         ...attrs,
-                        ...["merit","othertrait"]
-                            .map((entryName) => new Array(16)
+                        ...[
+                            { oldName: "merit", newName: "merit", sectionName: "merits" },
+                            { oldName: "othertrait", newName: "ability", sectionName: "abilities" }
+                        ]
+                            .map(({ oldName, newName, sectionName }) => new Array(16)
                                 .fill(1)
-                                .map((_, index) => `${entryName}${index + 1}`)
+                                .map((_, index) => `${oldName}${index + 1}`)
                                 .filter((item) => v[`${item}_name`])
                                 .map((item) => ({
-                                    entryName,
+                                    sectionName,
+                                    entryName: newName,
                                     id: generateRowID(),
                                     name: v[`${item}_name`],
                                     value: v[item]
                                 }))
                             )
                             .flat()
-                            .reduce((acc, { entryName, id, name, value }) => ({
+                            .reduce((acc, { sectionName, entryName, id, name, value }) => ({
                                 ...acc,
-                                [`repeating_${entryName}s_${id}_${entryName}_name`]: name,
-                                [`repeating_${entryName}s_${id}_${entryName}`]: value
+                                [`repeating_${sectionName}_${id}_${entryName}_name`]: name,
+                                [`repeating_${sectionName}_${id}_${entryName}`]: value
                             }), {}),
                         "version": 5
                     };
