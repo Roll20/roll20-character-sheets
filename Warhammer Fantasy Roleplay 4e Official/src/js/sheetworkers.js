@@ -1549,7 +1549,7 @@ const wfrpModule = ( () => {
                             const enc = parseInt(values[`repeating_armour_${id}_armour_enc`])
                             const total = (worn === "on") ? enc - 1 : enc || 0
 
-                            total_enc += total;
+                            total_enc += total >= 0 ? total : 0;
                         });
 
                         weapons_array.forEach(id => {
@@ -1566,7 +1566,7 @@ const wfrpModule = ( () => {
 
                             const total = (worn === "on") ? (enc - 1) * amount : enc * amount;
 
-                            if (inenc === "on") total_enc += total;
+                            if (inenc === "on") total_enc += total >= 0 ? total : 0;
                         });
 
                         setAttrs({encumbrance:total_enc})
