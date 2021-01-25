@@ -13,7 +13,6 @@ Changes include:
 8. Ghost sheet
 
 Planned changes:
-* Increase max ghost Attribute dots to 15
 * Replace Specializations text inputs with repeating section for each Skill
 * Include ability description in page 2 sheet rolls
 * Alternate Beat/Experience types (Vampire, Werewolf, Mage, Geist, Promethean?)
