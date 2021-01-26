@@ -10,8 +10,10 @@ Changes include:
 5. Homebrew sheet, which allows custom labels for specific traits
 6. Remove Health and Willpower dots, leaving just the checkboxes.
 7. Dark Eras skills: Archery, Ride, Enigmas
+8. Ghost sheet
 
 Planned changes:
+* Increase max ghost Attribute dots to 15
 * Replace Specializations text inputs with repeating section for each Skill
 * Include ability description in page 2 sheet rolls
 * Alternate Beat/Experience types (Vampire, Werewolf, Mage, Geist, Promethean?)
