@@ -801,13 +801,12 @@
 				  <option value='@{wsTotal}' >WS</option>
 				  <option value='@{bsTotal}' >BS</option>
 				  <option value='@{strTotal}'>STR</option>
-				  <option value='@{touTotal}' >TOU</option>
-				  <option value='@{agiTotal}' >AGI</option>
-				  <option value='@{intTotal}' >INT</option>
-				  <option value='@{perTotal}' >PER</option>
+				  <option value='@{touTotal}'>TOU</option>
+				  <option value='@{agiTotal}'>AGI</option>
+				  <option value='@{intTotal}'>INT</option>
+				  <option value='@{perTotal}'>PER</option>
 				  <option value='@{wpTotal}' >WP</option>
 					<option value='@{felTotal}'>FEL</option>
-				  <option value='@{INF} + @{INF_advancement}' selected='selected'>INF</option>
 				</select>
 				<input name='attr_skill_R_mod2' type='number' value='0' />
 				<input name='attr_skill_R_mod3' type='checkbox' value='20' class='skills_item' />
@@ -1052,6 +1051,7 @@
 		  </div>
 
 		</div>
+
 		<br>
 
 
@@ -2210,19 +2210,20 @@
   // ___________________________________________________________________________
   // ____________________Movement and Weight sheet worker_______________________
   // ___________________________and Fatigue Pts_________________________________
-  on('sheet:opened change:size change:fatigue change:carry change:weight_total change:ws change:ws_unnat change:ws_advancement change:bs change:bs_unnat change:bs_advancement change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:int change:int_unnat change:int_advancement change:per change:per_unnat change:per_advancement change:wp change:wp_unnat change:wp_advancement change:fel change:fel_unnat change:fel_advancement change:agi change:agi_unnat change:agi_advancement change:agi_mov_mod change:armor_agi change:armor_limit', function() {
-    getAttrs([
-	'size', 'fatigue', 'carry', 'weight_total',
-    'ws', 'ws_unnat', 'ws_advancement',
-    'bs', 'bs_unnat', 'bs_advancement',
-    'str', 'str_unnat', 'str_advancement',
-    'tou', 'tou_unnat', 'tou_advancement',
-    'int', 'int_unnat', 'int_advancement',
-    'per', 'per_unnat', 'per_advancement',
-    'wp', 'wp_unnat', 'wp_advancement',
-    'fel', 'fel_unnat', 'fel_advancement',
-	'agi', 'agi_unnat', 'agi_advancement', 'agi_mov_mod', 'armor_agi', 'armor_limit'
-    ], function(values) {
+	let fieldsMWF = [
+		'size', 'fatigue', 'carry', 'weight_total',
+		'ws', 'ws_unnat', 'ws_advancement',
+		'bs', 'bs_unnat', 'bs_advancement',
+		'str', 'str_unnat', 'str_advancement',
+		'tou', 'tou_unnat', 'tou_advancement',
+		'int', 'int_unnat', 'int_advancement',
+		'per', 'per_unnat', 'per_advancement',
+		'wp', 'wp_unnat', 'wp_advancement',
+		'fel', 'fel_unnat', 'fel_advancement',
+		'agi', 'agi_unnat', 'agi_advancement', 'agi_mov_mod', 'armor_agi', 'armor_limit'
+	];
+  on('sheet:opened ' + fieldsMWF.map(field => 'change:' + field).join(' '), function() {
+    getAttrs(fieldsMWF, function(values) {
 		// SIZE
 	  var size = parseInt(values['size'], 10) || 0;
 		// FATIGUE
@@ -2402,13 +2403,14 @@
   // ___________________________________________________________________________
   // ________________________Fatigue and Armor sheet worker_____________________
   // ___________________________________________________________________________
-  on('sheet:opened change:tou change:tou_unnat change:tou_advancement change:wp change:wp_unnat change:wp_advancement change:armor_head change:armor_arm_right change:armor_body change:armor_arm_left change:armor_leg_right change:armor_leg_left change:fatigue_mod', function() {
-    getAttrs([
+  let fieldsFA = [
 		'fatigue_mod',
-    'tou', 'tou_unnat', 'tou_advancement',
-	'wp', 'wp_unnat', 'wp_advancement',
-	'armor_head', 'armor_arm_right', 'armor_body', 'armor_arm_left', 'armor_leg_right', 'armor_leg_left'
-    ], function(values) {
+		'tou', 'tou_unnat', 'tou_advancement',
+		'wp', 'wp_unnat', 'wp_advancement',
+		'armor_head', 'armor_arm_right', 'armor_body', 'armor_arm_left', 'armor_leg_right', 'armor_leg_left'
+	];
+  on('sheet:opened ' + fieldsFA.map(field => 'change:' + field).join(' '), function() {
+    getAttrs(fieldsFA, function(values) {
 			var fatigue_mod = parseInt(values['fatigue_mod'], 10) || 0;
       var tou = parseInt(values['tou'], 10) || 0;
       var tou_unnat = parseInt(values['tou_unnat'], 10) || 0;
@@ -2416,24 +2418,24 @@
       var wp = parseInt(values['wp'], 10) || 0;
       var wp_unnat = parseInt(values['wp_unnat'], 10) || 0;
       var wp_advancement = parseInt(values['wp_advancement'], 10) || 0;
-	  var tou_mod = Math.floor((tou + tou_advancement) / 10 + tou_unnat);
-	  var wp_mod = Math.floor((wp + wp_advancement) / 10 + wp_unnat);
-	  var armor_head = parseInt(values['armor_head'], 10) || 0;
-	  var armor_arm_right = parseInt(values['armor_arm_right'], 10) || 0;
-	  var armor_body = parseInt(values['armor_body'], 10) || 0;
-	  var armor_arm_left = parseInt(values['armor_arm_left'], 10) || 0;
-	  var armor_leg_right = parseInt(values['armor_leg_right'], 10) || 0;
-	  var armor_leg_left = parseInt(values['armor_leg_left'], 10) || 0;
+		  var tou_mod = Math.floor((tou + tou_advancement) / 10 + tou_unnat);
+		  var wp_mod = Math.floor((wp + wp_advancement) / 10 + wp_unnat);
+		  var armor_head = parseInt(values['armor_head'], 10) || 0;
+		  var armor_arm_right = parseInt(values['armor_arm_right'], 10) || 0;
+		  var armor_body = parseInt(values['armor_body'], 10) || 0;
+		  var armor_arm_left = parseInt(values['armor_arm_left'], 10) || 0;
+		  var armor_leg_right = parseInt(values['armor_leg_right'], 10) || 0;
+		  var armor_leg_left = parseInt(values['armor_leg_left'], 10) || 0;
 
       // normal, no modifiers ___________________________________________________
       setAttrs({
-		soak_head: (armor_head + tou_mod),
-		soak_arm_right: (armor_arm_right + tou_mod),
-		soak_body: (armor_body + tou_mod),
-		soak_arm_left: (armor_arm_left + tou_mod),
-		soak_leg_right: (armor_leg_right + tou_mod),
-		soak_leg_left: (armor_leg_left + tou_mod),
-		fatigue_max: (tou_mod + wp_mod + fatigue_mod)
+				soak_head: (armor_head + tou_mod),
+				soak_arm_right: (armor_arm_right + tou_mod),
+				soak_body: (armor_body + tou_mod),
+				soak_arm_left: (armor_arm_left + tou_mod),
+				soak_leg_right: (armor_leg_right + tou_mod),
+				soak_leg_left: (armor_leg_left + tou_mod),
+				fatigue_max: (tou_mod + wp_mod + fatigue_mod)
       });
 
     });
@@ -2537,9 +2539,9 @@
   // ___________________________________________________________________________
   // _______________________psychic info sheet worker___________________________
   // ___________________________________________________________________________
-
-  on('sheet:opened change:psykana_class change:psykana_limit change:psy_push change:psy_rating change:psykana_sustain change:psykana_sustain_count', function() {
-	getAttrs(['psykana_class', 'psykana_limit', 'psy_push', 'psy_rating','psykana_sustain','psykana_sustain_count'], function(values) {
+  let fieldsPsy = ['psykana_class', 'psykana_limit', 'psy_push', 'psy_rating','psykana_sustain','psykana_sustain_count'];
+  on('sheet:opened ' + fieldsPsy.map(field => 'change:' + field).join(' '), function() {
+	getAttrs(fieldsPsy, function(values) {
       var psykana_class = parseInt(values['psykana_class'])||0;
 	  var psykana_limit = parseInt(values['psykana_limit'])||0;
       var psy_push = parseInt(values['psy_push'])||0;
