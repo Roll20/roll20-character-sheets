@@ -8,12 +8,17 @@ https://discord.gg/F24Ka8E
 
 ## Changelog
 
-### Jan 8th, 2020
+### Jan 23rd, 2021
+
+- Fixed January update dates to be the correct year
+- Fixed the display of zero-damage attacks for all move templates
+
+### Jan 8th, 2021
 
 - Added the ability to change which ability applies to which skills to the Configuration page
   - Unfortunately you'll still need to add any second ability modifier applied to the manual bonus column - support for multiple abilities has been added to the to-do list
 
-### Jan 7th, 2020
+### Jan 7th, 2021
 
 - Added support for scatter moves
 - Added roll templates for dual hit and multi hit scatter attacks
