@@ -2,6 +2,18 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.8.0
+
+### Changed
+
+- Change damage die to a text field to provide more flexibility
+
+## 1.7.1
+
+### Fixed
+
+- Fix a bug where newly created monsters did not have a die button
+
 ## 1.7.0
 
 ### Added
