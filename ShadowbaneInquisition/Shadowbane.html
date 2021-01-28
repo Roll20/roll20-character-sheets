@@ -2306,7 +2306,6 @@ NOTE: replace worker by javascript for IDE functionality
 			don't forget to put worker back for published version
 -->
 <script type='text/worker'>
-console.log('text');
 	// ___________________________________________________________________________
 	// __________________________Kartus Easter Egg________________________________
 	// ___________________________________________________________________________
@@ -2343,8 +2342,8 @@ console.log('text');
 		'parry','psyniscience','scrutiny','security','sleight','stealth','survival','tech_use',
 		'linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
 	let repeatingSkills = ['skill','linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
-	console.log('skills');
-	on('sheet:opened', function () {
+	on('sheet:opened ' + skills.map(skill => `change:${skill}_char`).join(' ') + repeatingSkills.map(skill => `change:repeating_${skill}:${skill}_r_char`).join(' '), function () {
+		console.log('== UPDATING SKILLS ==');
 		getAttrs(skills.map( skill => `${skill}_char`), (values) => {
 			let attr = {};
 			for (var [skill, focus] of Object.entries(values)) {
@@ -2352,7 +2351,23 @@ console.log('text');
 			}
 			setAttrs(attr);
 		});
-	})
+		repeatingSkills.forEach(field => {
+			var repSkills = [];
+			getSectionIDs(field, ids => {
+				ids.forEach( id => {
+					repSkills.push(`repeating_${field}_${id}_${field}_r_char`);
+				});
+				getAttrs(repSkills, (values) => {
+					let attr;
+					for (var [skill, focus] of Object.entries(values)) {
+						attr = {...attr, ...skillRoll(skill.replace('_char', ''), focus)};
+					}
+					if (attr) setAttrs(attr);
+				});
+			});
+		});
+		console.log('== SKILLS UPDATED ==');
+	});
 
 
   // ___________________________________________________________________________
