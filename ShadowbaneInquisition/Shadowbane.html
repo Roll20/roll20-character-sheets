@@ -2300,7 +2300,7 @@
 NOTE: replace worker by javascript for IDE functionality
 			don't forget to put worker back for published version
 -->
-<script type='text/javascript'>
+<script type='text/worker'>
 console.log('text');
 	// ___________________________________________________________________________
 	// __________________________Kartus Easter Egg________________________________
@@ -2329,8 +2329,8 @@ console.log('text');
    */
   const skillRoll = (skill, focus) => {
 		let attr = {};
-    attr[`${skill}_focus`] = `${focus}Total`;
-    attr[`${skill}_unnat`]=`${focus.toUpperCase()}_unnat`;
+    attr[`${skill}_focus`] = `@{${focus}Total}`;
+    attr[`${skill}_unnat`]=`@{${focus.toUpperCase()}_unnat}`;
 		return attr;
   };
 	let skills = ['acrobatics','athletics','awareness','charm','command','commerce','deceive','dodge','inquiry',
@@ -2339,13 +2339,15 @@ console.log('text');
 		'linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
 	let repeatingSkills = ['skill','linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
 	console.log('skills');
-/*	on('sheet:opened', function () {
-		console.log('sheet opened');
-		var attr = getAttrs(skills.map( skill => `${skill}_char`), (values) => {
-			//values.forEach()
-			console.log(values);
+	on('sheet:opened', function () {
+		getAttrs(skills.map( skill => `${skill}_char`), (values) => {
+			let attr = {};
+			for (var [skill, focus] of Object.entries(values)) {
+				attr = {...attr, ...skillRoll(skill.replace('_char', ''), focus)};
+			}
+			setAttrs(attr);
 		});
-	})*/
+	})
 
 
   // ___________________________________________________________________________
