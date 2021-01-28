@@ -21,3 +21,4 @@ Planned changes:
 * Alternate Beat/Experience types (Vampire, Werewolf, Mage, Geist, Promethean?)
 * Ephemeral sheet
 * Absent sheet (Geist: The Sin-Eaters Second Edition)
+* Clean up Vampire, Mage ability translations (deprecated)
