@@ -104,7 +104,7 @@
       <div class="header small box">
         <span data-i18n="supply">Supply</span>
         <input type="hidden" class="toggle complex settings" name="attr_supply-settings"/>
-        <button type="action" name="act_toggle-supply-settings" class="toggle symbol">
+        <button type="action" name="act_toggle-supply-settings" class="toggle symbol settings">
           <span>y</span>
         </button>
         <span class="complex normal" data-i18n="slots"> Slots</span>
@@ -781,7 +781,7 @@
       <div class="header small box">
         <span data-i18n="gold">Gold</span>
         <input type="hidden" class="toggle complex settings" name="attr_gold-settings"/>
-        <button type="action" name="act_toggle-gold-settings" class="toggle symbol">
+        <button type="action" name="act_toggle-gold-settings" class="toggle symbol settings">
           <span>y</span>
         </button>
         <span class="complex normal" data-i18n="slots"> Slots</span>
@@ -1143,7 +1143,7 @@
       </div>
     </fieldset>
   </div>
-  <div class="invasions">
+  <div class="invasions tab-gm">
     <div class="header box small">
       <span data-i18n="major-invasions">Major Invasions</span>
     </div>
@@ -1171,7 +1171,7 @@
       <input type="text" name="attr_invasion-hire" size="1"/>
     </fieldset>
   </div>
-  <div class="adventurers">
+  <div class="adventurers tab-gm">
     <div class="header box small" data-i18n="adventurers">Adventurers</div>
     <div class="adventurers-header">
       <span>Class, Passive, Traits, & Motivation</span>
@@ -1180,8 +1180,9 @@
       <span>Moves</span>
     </div>
     <fieldset class="repeating_adventurers ">
-      <div class="auto-expand"><span name="attr_adventurer"></span>
-        <textarea spellcheck="false" name="attr_adventurer"></textarea>
+      <input type="hidden" name="attr_adventurer-name"/>
+      <div class="auto-expand"><span name="attr_adventurer-desc"></span>
+        <textarea spellcheck="false" name="attr_adventurer-desc"></textarea>
       </div>
       <input type="hidden" name="attr_adventurer-edit-tier" class="toggle complex settings" value="show"/>
       <input type="number" name="attr_adventurer-tier" min="0" max="4" class="complex"/>
@@ -1235,6 +1236,10 @@
         <button type="action" name="act_toggle-adventurer-move3" class="toggle square">
           <span></span>
         </button>
+        <input type="hidden" name="attr_adventurer-tier-roll"/>
+        <button type="roll" class="symbol-three text-button" name="roll_defensive_move" value="&{template:basic} {{character=@{adventurer-name}}} {{action=^{defensive-move}}} @{adventurer-tier-roll} @{dice-type}">
+          <span>b</span>
+        </button>
       </div>
     </fieldset>
   </div>
@@ -1260,21 +1265,24 @@
       getSectionIDs("duties", function(ids){
         //console.log(ids)
         attrs = attrs.concat(ids.map(i => `repeating_duties_${i}_duty-tier`))
-        attrs.push("dice-images")
-        getAttrs(attrs, function(v) {
-          var set = {}
-          var images = v["dice-images"] == "marked"
-          for (a in v) {
-            if (a != "dice-images") {
-              set[a.replace("duty-tier", "duty") + "-roll"] = getRoll(v[a], images)
+        getSectionIDs("adventurers", function(ids) {
+          attrs = attrs.concat(ids.map(i => `repeating_adventurers_${i}_adventurer-tier`))
+          attrs.push("dice-images")
+          getAttrs(attrs, function(v) {
+            var set = {}
+            var images = v["dice-images"] == "marked"
+            for (a in v) {
+              if (a != "dice-images") {
+                set[a.replace("duty-tier", "duty") + "-roll"] = getRoll(v[a], images)
+              }
             }
-          }
-  
-          set["loot-roll"] = set["fortune-roll"] = getRoll(0, images, 0, 6)
-  
-          setAttrs(set);
+    
+            set["loot-roll"] = set["fortune-roll"] = getRoll(0, images, 0, 6)
+    
+            setAttrs(set);
+          });
         });
-      })
+      });
       
     });
     
@@ -1566,20 +1574,24 @@
 
   on("change:repeating_adventurers:adventurer-tier", function(eventInfo) {
     var newHealth = parseInt(eventInfo.newValue) * 2 + 2;
-    setAttrs({
-      "repeating_adventurers_adventurer-health_max": newHealth,
-      "repeating_adventurers_adventurer-health": newHealth,
-      "repeating_adventurers_adventurer-heart1": "full",
-      "repeating_adventurers_adventurer-heart2": "full",
-      "repeating_adventurers_adventurer-heart3": "full",
-      "repeating_adventurers_adventurer-heart4": "full",
-      "repeating_adventurers_adventurer-heart5": "full",
-      "repeating_adventurers_adventurer-edit-tier": "hide"
-    }, {silent: true})
+    getAttrs(["dice-images"], function(v){
+      var images = v["dice-images"] == "marked"
+      setAttrs({
+        "repeating_adventurers_adventurer-health_max": newHealth,
+        "repeating_adventurers_adventurer-health": newHealth,
+        "repeating_adventurers_adventurer-heart1": "full",
+        "repeating_adventurers_adventurer-heart2": "full",
+        "repeating_adventurers_adventurer-heart3": "full",
+        "repeating_adventurers_adventurer-heart4": "full",
+        "repeating_adventurers_adventurer-heart5": "full",
+        "repeating_adventurers_adventurer-edit-tier": "hide",
+        "repeating_adventurers_adventurer-tier-roll": getRoll(eventInfo.newValue, images)
+      }, {silent: true})
+    });
   });
 
   on("clicked:repeating_adventurers:adv-edit-tier", function(eventInfo) {
-    console.log("test");
+    //console.log("test");
     setAttrs({
       "repeating_adventurers_adventurer-edit-tier": "show"
     }, {silent: true});
@@ -1598,7 +1610,7 @@
   }
 
   on(eventList(5, "clicked:repeating_adventurers:adventurer-health"), function(eventInfo) {
-    console.log("test");
+    //console.log("test");
     var heart = eventInfo.triggerName.match(/clicked:(.+)(\d)/)[2];
     getAttrs(["repeating_adventurers_adventurer-health", "repeating_adventurers_adventurer-health_max"], function (val) {
       var health = val["repeating_adventurers_adventurer-health"];
@@ -1630,6 +1642,13 @@
 
       setAttrs(set, {silent: true});
 
+    });
+  });
+
+  on("change:repeating_adventurers:adventurer-desc", function(eventInfo){
+    //console.log(eventInfo)
+    setAttrs({
+      "repeating_adventurers_adventurer-name": (eventInfo.newValue || "").split('\n', 1)[0]
     });
   });
 </script>
@@ -1934,7 +1953,7 @@ A penance chamber might need shackles, whips, or tar.</span>
 <span data-i18n="temple-room-name7">Scriptorium</span>
 <span data-i18n="temple-room-desc7">Your deeds are recorded in unholy scripture, immediately giving you wicked xp equal to your dungeon tier. You also gain a new wicked xp trigger: Were your actions worthy of your god’s notice? Each PC must prove their own worth to gain this xp.
 A scriptorium might need desks, writing equipment, or leather for binding.</span>
-
+<span data-i18n="defensive-move">Defensive Move</span>
 </div>
 <rolltemplate class="sheet-rolltemplate-basic">
   {{#character}}<div class="character">{{character}}</div>{{/character}}
