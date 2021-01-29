@@ -11,6 +11,8 @@ Changes include:
 6. Remove Health and Willpower dots, leaving just the checkboxes.
 7. Dark Eras skills: Archery, Ride, Enigmas
 8. Ghost sheet
+9. Repeating Merits and Abilities sections
+10. Select any Ability for sheet roll
 
 Planned changes:
 * Replace Specializations text inputs with repeating section for each Skill
@@ -18,4 +20,4 @@ Planned changes:
 * Alternate Beat/Experience types (Vampire, Werewolf, Mage, Geist, Promethean?)
 * Ephemeral sheet
 * Absent sheet (Geist: The Sin-Eaters Second Edition)
-* Make Merits and Abilities repeating sections; Select any Ability for a sheet roll
+* Clean up Vampire, Mage ability translations (deprecated)
