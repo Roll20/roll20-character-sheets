@@ -17,6 +17,7 @@ This is the community-contributed version of the [Chronicles of Darkness by Roll
 
 ## Backlog
 * Replace Specializations text inputs with repeating section for each Skill
+* Include ability description in page 2 sheet rolls
 * Spirit, Angel, generic Ephemeral sheets
 * Absent sheet (Geist: The Sin-Eaters Second Edition)
 * Clean up Vampire, Mage ability translations (deprecated)
