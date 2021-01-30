@@ -1,5 +1,5 @@
 ﻿$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\raw\2ESheet-raw.html'
-$jsFolderPath = 'D:\git\roll20-character-sheets\AD&D 2E Revised\javascript'
+$sourceFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised'
 $outputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\2ESheet.html'
 
 $content = Get-Content -Path $inputFile
@@ -7,7 +7,9 @@ $content = Get-Content -Path $inputFile
 $inserts = ($content | Select-String -Pattern 'insert_')
 
 $inserts | ForEach-Object {
-   $content = $content -replace $_.Line, (Get-Content -Path "$($jsFolderPath)\$($_.Line.Split('_')[1])" -Raw)
+   $fileName = $_.Line.Split('_')[1]
+   $file = Get-ChildItem -Path $sourceFolder -Filter $fileName -Recurse
+   $content = $content -replace $_.Line, (Get-Content -Path $file.FullName -Raw)
 }
 
 $content | Set-Content -Path $outputFile
