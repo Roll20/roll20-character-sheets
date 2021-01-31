@@ -9,6 +9,7 @@
 - Add modifiers to attribute scores
 - Add roll button for NPC Reaction
 - Add spells tab
+- Add default sheet setting for default character type
 
 ### Changed
 
