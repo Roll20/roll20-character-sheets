@@ -8,6 +8,7 @@
 
 - Add modifiers to attribute scores
 - Add roll button for NPC Reaction
+- Add spells tab
 
 ### Changed
 
