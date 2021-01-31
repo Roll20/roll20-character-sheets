@@ -31,7 +31,10 @@ GLOBALS["personality_trait_rows"] = repeat_template(
     """<tr>
     <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait%%"/></td>
     <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait%%_score"/></td>
-    <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[1d10 + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}}"></button></td>
+    <td>
+        <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{simple-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}}"></button>
+        <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{stress-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}} {{stress=1}}"></button>
+    </td>
 </tr>""",
     range(1, 7),
 )
@@ -43,21 +46,30 @@ GLOBALS["reputation_rows"] = repeat_template(
     <td><input type="text" class="sheet-heading_2" name="attr_Reputations%%"/></td>
     <td><input type="text" class="sheet-heading_2a" name="attr_Reputations%%_type"/></td>
     <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations%%_score"/></td>
-    <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[1d10 + [[@{Reputations%%_Score}]][@{Reputations%%}] ]] }}"></button></td>
+    <td><div class="sheet-roll-container">
+        <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{simple-die} + [[@{Reputations%%_Score}]][@{Reputations%%}] ]] }}"></button>
+        <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{stress-die} + [[@{Reputations%%_Score}]][@{Reputations%%}] ]] }} {{stress=1}}"></button>
+    </div></td>
 </tr>""",
     range(1, 7),
 )
 
 
 # Characteristics definitions
+characteristic_roll = "@{%(Char)s_Score}[@{%(char)s_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}]"
 GLOBALS["characteristic_rows"] = repeat_template(
     """<tr>
     <th data-i18n="%(char)s" >%(Char)s</th>
     <td><input type="text" class="sheet-heading_2" name="attr_%(Char)s_Description"/></td>
     <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Score" value="0"/></td>
     <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Aging" value="0"/></td>
-    <td><button type="roll" class="sheet-button" name="roll_%(Char)s" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{%(Char)s_Score}[@{%(char)s_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
-</tr>""",
+    <td><div class="sheet-roll-container">
+        <button type="roll" class="sheet-button sheet-simple-roll" name="roll_%(Char)s_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + $characteristic_roll$ ]]}}"></button>
+        <button type="roll" class="sheet-button sheet-stress-roll" name="roll_%(Char)s_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + $characteristic_roll$ ]]}}"></button>
+    </div></td>
+</tr>""".replace(
+        "$characteristic_roll$", characteristic_roll
+    ),
     CHARACTERISTICS,
     str_key="char",
 )
@@ -73,6 +85,16 @@ GLOBALS["characteristic_name_options"] = repeat_template(
     CHARACTERISTICS,
     str_key="char",
 )
+
+# Abilities
+ability_roll_template = "&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=%(roll)s}}"
+ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]"
+GLOBALS["ability_roll_simple"] = ability_roll_template % {
+    "roll": ability_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["ability_roll_stress"] = (
+    ability_roll_template % {"roll": ability_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
 
 
 # Technique options
@@ -121,12 +143,60 @@ GLOBALS["form_enumerated_options"] = repeat_template(
     tuple_keys=("index", "form", "Form"),
 )
 
+
+# Casting rolls
+spontaneous_roll_template = "&{template:arcane} {{label0=^{spontaneous} ^{casting}}} {{result0=%(roll)s}} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"
+spontaneous_roll = "[[(%(die)s + @{Spontaneous1_Technique} + @{Spontaneous1_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2 ]]"
+GLOBALS["spontaneous_roll_simple"] = spontaneous_roll_template % {
+    "roll": spontaneous_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["spontaneous_roll_stress"] = (
+    spontaneous_roll_template % {"roll": spontaneous_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
+
+ceremonial_roll_template = "&{template:arcane} {{label0=^{ceremonial} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"
+ceremonial_roll = "[[(%(die)s+ @{Ceremonial_Technique} + @{Ceremonial_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + @{Ceremonial_Artes_Lib}[@{artes_i18n}] + @{Ceremonial_Philos}[@{philos_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2  ]]"
+GLOBALS["ceremonial_roll_simple"] = ceremonial_roll_template % {
+    "roll": ceremonial_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["ceremonial_roll_stress"] = (
+    ceremonial_roll_template % {"roll": ceremonial_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
+
+formulaic_roll_template = "&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"
+formulaic_roll = "[[%(die)s + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] ]]"
+GLOBALS["formulaic_roll_simple"] = formulaic_roll_template % {
+    "roll": formulaic_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["formulaic_roll_stress"] = (
+    formulaic_roll_template % {"roll": formulaic_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
+
+ritual_roll_template = "&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"
+ritual_roll = "[[%(die)s + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]"
+GLOBALS["ritual_roll_simple"] = ritual_roll_template % {
+    "roll": ritual_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["ritual_roll_stress"] = (
+    ritual_roll_template % {"roll": ritual_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
+
+spell_roll_template = "&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{roll= %(roll)s }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{Technique_name} }} {{Form= @{Form_name} }} {{Level= @{spell_level} }}"
+spell_roll = "[[%(die)s + @{Stamina_Score}[@{stamina_i18n}] + @{spell_Technique}[@{Technique_name}] + @{spell_Form}[@{Form_name}] + @{spell_bonus}[@{bonus_i18n}] + @{aura}[@{aura_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] ]]"
+GLOBALS["spell_roll_simple"] = spell_roll_template % {
+    "roll": spell_roll % {"die": "@{simple-die}"}
+}
+GLOBALS["spell_roll_stress"] = (
+    spell_roll_template % {"roll": spell_roll % {"die": "@{stress-die}"}}
+) + " {{stress=1}}"
+
+
 # Botch formula
 GLOBALS["botch_separated"] = (
     '"?{@{botch_num_i18n} | '
     + "|".join(
-        f"{n} {'Die' if n==1 else 'Dice'}," + " ".join(["[[1d10]]"] * n)
-        for n in range(1, 11)
+        f"{n} {'Die' if n==1 else 'Dice'}," + " ".join(["[[1d10cf1cs0]]"] * n)
+        for n in range(1, 13)
     )
     + '}"'
 )

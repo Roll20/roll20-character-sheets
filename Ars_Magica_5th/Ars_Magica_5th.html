@@ -48,19 +48,25 @@
 
 <div class="sheet-tab-br"></div>
 <input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab" value="character"/>
+<input type="hidden" name="attr_simple-die" value="(1d10cs0cf0) [@{simple-die_i18n}]"/>
+<input type="hidden" name="attr_stress-die" value="ceil(((((1d10cs1cf10 %9) -1)+9) %9) *1.1) [@{stress-die_i18n}]"/>
+<input type="hidden" class="sheet-dtype-selector" name="attr_die-type-selection-proxy" value="toggle"/>
+<input type="hidden" class="selected-die" name="attr_selected-die" value="simple"/>
 <div class="sheet-buttonbar">
     <div class="sheet-navbuttons">
         <button type="action" name="act_character" class="sheet-tabbutton" data-i18n="character" >Character</button>
-        <button type="action" name="act_abilities" class="sheet-tabbutton"  data-i18n="abilities" >Abilities</button>
-        <button type="action" name="act_magic" class="sheet-tabbutton"  data-i18n="magic" >Magic</button>
-        <button type="action" name="act_combat" class="sheet-tabbutton"  data-i18n="combat" >Combat</button>
-        <button type="action" name="act_spells" class="sheet-tabbutton"  data-i18n="spells" >Spells</button>
-        <button type="action" name="act_doc" class="sheet-tabbutton" data-i18n="doc">Doc</button>
+        <button type="action" name="act_abilities" class="sheet-tabbutton" data-i18n="abilities" >Abilities</button>
+        <button type="action" name="act_magic" class="sheet-tabbutton" data-i18n="magic" >Magic</button>
+        <button type="action" name="act_combat" class="sheet-tabbutton" data-i18n="combat" >Combat</button>
+        <button type="action" name="act_spells" class="sheet-tabbutton" data-i18n="spells" >Spells</button>
+        <button type="action" name="act_help" class="sheet-tabbutton" data-i18n="help">Help</button>
     </div>
     <div class="sheet-functions">
+        <button type="action" name="act_die-toggle-simple" class="sheet-die-toggle-simple" data-i18n="simple">Simple</button>
+        <button type="action" name="act_die-toggle-stress" class="sheet-die-toggle-stress" data-i18n="stress">Stress</button>
         <button type="roll" class="sheet-reroll" name="roll_reroll" title="Reroll" value="&{template:reroll} {{roll= [[1d10]]}}" data-i18n="roll">Roll</button>
-        <button type="roll" class="sheet-botch" name="roll_botch" title="Botch" value="&{template:botch} {{roll= ?{@{botch_num_i18n}|1 Die,[[1d10]]|2 Dice,[[1d10]] [[1d10]]|3 Dice,[[1d10]] [[1d10]] [[1d10]]|4 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]]|5 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]|6 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]|7 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]|8 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]|9 Dice,[[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]|10 Dice,[[1d10]] [[1d10]][[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]] [[1d10]]} }}" data-i18n="botch" >Botch</button>
-        <button type="roll" class="sheet-critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[2*2**floor(1d10!!10 / 10)*(1d9+1)]]}}" data-i18n="critical">Critical</button>
+        <button type="roll" class="sheet-botch" name="roll_botch" title="Botch" value="&{template:botch} {{roll= @{botchFormula} }}" data-i18n="botch" >Botch</button>
+        <button type="roll" class="sheet-critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10!1}=1))[number of 1s] * [[1d9+1]][last die]]]}}" data-i18n="critical">Critical</button>
     </div>
 </div>
 <div class="sheet-tab-br"></div> 
@@ -287,32 +293,50 @@
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait1"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait1_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait1}}} {{Result=[[1d10 + [[@{Personality_Trait1_Score}]][@{Personality_Trait1}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait1}}} {{Result=[[@{simple-die} + [[@{Personality_Trait1_Score}]][@{Personality_Trait1}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait1}}} {{Result=[[@{stress-die} + [[@{Personality_Trait1_Score}]][@{Personality_Trait1}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait2"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait2_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait2}}} {{Result=[[1d10 + [[@{Personality_Trait2_Score}]][@{Personality_Trait2}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait2}}} {{Result=[[@{simple-die} + [[@{Personality_Trait2_Score}]][@{Personality_Trait2}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait2}}} {{Result=[[@{stress-die} + [[@{Personality_Trait2_Score}]][@{Personality_Trait2}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait3"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait3_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait3}}} {{Result=[[1d10 + [[@{Personality_Trait3_Score}]][@{Personality_Trait3}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait3}}} {{Result=[[@{simple-die} + [[@{Personality_Trait3_Score}]][@{Personality_Trait3}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait3}}} {{Result=[[@{stress-die} + [[@{Personality_Trait3_Score}]][@{Personality_Trait3}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait4"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait4_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait4}}} {{Result=[[1d10 + [[@{Personality_Trait4_Score}]][@{Personality_Trait4}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait4}}} {{Result=[[@{simple-die} + [[@{Personality_Trait4_Score}]][@{Personality_Trait4}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait4}}} {{Result=[[@{stress-die} + [[@{Personality_Trait4_Score}]][@{Personality_Trait4}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait5"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait5_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait5}}} {{Result=[[1d10 + [[@{Personality_Trait5_Score}]][@{Personality_Trait5}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait5}}} {{Result=[[@{simple-die} + [[@{Personality_Trait5_Score}]][@{Personality_Trait5}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait5}}} {{Result=[[@{stress-die} + [[@{Personality_Trait5_Score}]][@{Personality_Trait5}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait6"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait6_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait6}}} {{Result=[[1d10 + [[@{Personality_Trait6_Score}]][@{Personality_Trait6}] ]]}}"></button></td>
+                        <td>
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait6}}} {{Result=[[@{simple-die} + [[@{Personality_Trait6_Score}]][@{Personality_Trait6}] ]]}}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait6}}} {{Result=[[@{stress-die} + [[@{Personality_Trait6_Score}]][@{Personality_Trait6}] ]]}} {{stress=1}}"></button>
+                        </td>
                     </tr>
                 </table>
             </div>
@@ -328,37 +352,55 @@
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations1"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations1_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations1_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations1}}} {{Result=[[1d10 + [[@{Reputations1_Score}]][@{Reputations1}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations1}}} {{Result=[[@{simple-die} + [[@{Reputations1_Score}]][@{Reputations1}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations1}}} {{Result=[[@{stress-die} + [[@{Reputations1_Score}]][@{Reputations1}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations2"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations2_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations2_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations2}}} {{Result=[[1d10 + [[@{Reputations2_Score}]][@{Reputations2}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations2}}} {{Result=[[@{simple-die} + [[@{Reputations2_Score}]][@{Reputations2}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations2}}} {{Result=[[@{stress-die} + [[@{Reputations2_Score}]][@{Reputations2}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations3"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations3_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations3_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations3}}} {{Result=[[1d10 + [[@{Reputations3_Score}]][@{Reputations3}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations3}}} {{Result=[[@{simple-die} + [[@{Reputations3_Score}]][@{Reputations3}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations3}}} {{Result=[[@{stress-die} + [[@{Reputations3_Score}]][@{Reputations3}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations4"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations4_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations4_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations4}}} {{Result=[[1d10 + [[@{Reputations4_Score}]][@{Reputations4}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations4}}} {{Result=[[@{simple-die} + [[@{Reputations4_Score}]][@{Reputations4}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations4}}} {{Result=[[@{stress-die} + [[@{Reputations4_Score}]][@{Reputations4}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations5"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations5_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations5_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations5}}} {{Result=[[1d10 + [[@{Reputations5_Score}]][@{Reputations5}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations5}}} {{Result=[[@{simple-die} + [[@{Reputations5_Score}]][@{Reputations5}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations5}}} {{Result=[[@{stress-die} + [[@{Reputations5_Score}]][@{Reputations5}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                     <tr>
                         <td><input type="text" class="sheet-heading_2" name="attr_Reputations6"/></td>
                         <td><input type="text" class="sheet-heading_2a" name="attr_Reputations6_type"/></td>
                         <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations6_score"/></td>
-                        <td><button type="roll" class="sheet-button" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations6}}} {{Result=[[1d10 + [[@{Reputations6_Score}]][@{Reputations6}] ]] }}"></button></td>
+                        <td><div class="sheet-roll-container">
+                            <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations6}}} {{Result=[[@{simple-die} + [[@{Reputations6_Score}]][@{Reputations6}] ]] }}"></button>
+                            <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations6}}} {{Result=[[@{stress-die} + [[@{Reputations6_Score}]][@{Reputations6}] ]] }} {{stress=1}}"></button>
+                        </div></td>
                     </tr>
                 </table>
             </div>
@@ -413,56 +455,80 @@
                             <td><input type="text" class="sheet-heading_2" name="attr_Intelligence_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Intelligence_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Intelligence_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Intelligence" value="&{template:ability} {{name= @{character_name}}} {{label0=^{intelligence}}} {{banner=@{Intelligence_Description}}} {{label1=^{score}}} {{result1=@{Intelligence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Intelligence_Score}[@{intelligence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Intelligence_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{intelligence}}} {{banner=@{Intelligence_Description}}} {{label1=^{score}}} {{result1=@{Intelligence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Intelligence_Score}[@{intelligence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Intelligence_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{intelligence}}} {{banner=@{Intelligence_Description}}} {{label1=^{score}}} {{result1=@{Intelligence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Intelligence_Score}[@{intelligence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="perception" >Perception</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Perception_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Perception_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Perception_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Perception" value="&{template:ability} {{name= @{character_name}}} {{label0=^{perception}}} {{banner=@{Perception_Description}}} {{label1=^{score}}} {{result1=@{Perception_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Perception_Score}[@{perception_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Perception_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{perception}}} {{banner=@{Perception_Description}}} {{label1=^{score}}} {{result1=@{Perception_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Perception_Score}[@{perception_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Perception_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{perception}}} {{banner=@{Perception_Description}}} {{label1=^{score}}} {{result1=@{Perception_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Perception_Score}[@{perception_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="strength" >Strength</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Strength_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Strength_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Strength_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Strength" value="&{template:ability} {{name= @{character_name}}} {{label0=^{strength}}} {{banner=@{Strength_Description}}} {{label1=^{score}}} {{result1=@{Strength_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Strength_Score}[@{strength_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Strength_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{strength}}} {{banner=@{Strength_Description}}} {{label1=^{score}}} {{result1=@{Strength_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Strength_Score}[@{strength_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Strength_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{strength}}} {{banner=@{Strength_Description}}} {{label1=^{score}}} {{result1=@{Strength_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Strength_Score}[@{strength_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="stamina" >Stamina</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Stamina_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Stamina_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Stamina_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Stamina" value="&{template:ability} {{name= @{character_name}}} {{label0=^{stamina}}} {{banner=@{Stamina_Description}}} {{label1=^{score}}} {{result1=@{Stamina_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Stamina_Score}[@{stamina_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Stamina_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{stamina}}} {{banner=@{Stamina_Description}}} {{label1=^{score}}} {{result1=@{Stamina_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Stamina_Score}[@{stamina_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Stamina_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{stamina}}} {{banner=@{Stamina_Description}}} {{label1=^{score}}} {{result1=@{Stamina_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="presence" >Presence</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Presence_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Presence_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Presence_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Presence" value="&{template:ability} {{name= @{character_name}}} {{label0=^{presence}}} {{banner=@{Presence_Description}}} {{label1=^{score}}} {{result1=@{Presence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Presence_Score}[@{presence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Presence_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{presence}}} {{banner=@{Presence_Description}}} {{label1=^{score}}} {{result1=@{Presence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Presence_Score}[@{presence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Presence_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{presence}}} {{banner=@{Presence_Description}}} {{label1=^{score}}} {{result1=@{Presence_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Presence_Score}[@{presence_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="communication" >Communication</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Communication_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Communication_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Communication_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Communication" value="&{template:ability} {{name= @{character_name}}} {{label0=^{communication}}} {{banner=@{Communication_Description}}} {{label1=^{score}}} {{result1=@{Communication_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Communication_Score}[@{communication_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Communication_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{communication}}} {{banner=@{Communication_Description}}} {{label1=^{score}}} {{result1=@{Communication_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Communication_Score}[@{communication_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Communication_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{communication}}} {{banner=@{Communication_Description}}} {{label1=^{score}}} {{result1=@{Communication_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Communication_Score}[@{communication_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="dexterity" >Dexterity</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Dexterity_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Dexterity_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Dexterity_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Dexterity" value="&{template:ability} {{name= @{character_name}}} {{label0=^{dexterity}}} {{banner=@{Dexterity_Description}}} {{label1=^{score}}} {{result1=@{Dexterity_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Dexterity_Score}[@{dexterity_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Dexterity_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{dexterity}}} {{banner=@{Dexterity_Description}}} {{label1=^{score}}} {{result1=@{Dexterity_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Dexterity_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{dexterity}}} {{banner=@{Dexterity_Description}}} {{label1=^{score}}} {{result1=@{Dexterity_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                         <tr>
                             <th data-i18n="quickness" >Quickness</th>
                             <td><input type="text" class="sheet-heading_2" name="attr_Quickness_Description"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Quickness_Score" value="0"/></td>
                             <td><input type="text" class="sheet-number_1" name="attr_Quickness_Aging" value="0"/></td>
-                            <td><button type="roll" class="sheet-button" name="roll_Quickness" value="&{template:ability} {{name= @{character_name}}} {{label0=^{quickness}}} {{banner=@{Quickness_Description}}} {{label1=^{score}}} {{result1=@{Quickness_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ 1d10 + @{Quickness_Score}[@{quickness_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_Quickness_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{quickness}}} {{banner=@{Quickness_Description}}} {{label1=^{score}}} {{result1=@{Quickness_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + @{Quickness_Score}[@{quickness_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_Quickness_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{quickness}}} {{banner=@{Quickness_Description}}} {{label1=^{score}}} {{result1=@{Quickness_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                            </div></td>
                         </tr>
                     </table>
                 </div>
@@ -495,7 +561,10 @@
                 <fieldset class="repeating_ability">
                     <table class="sheet-table_2" style="width:400px;">
                         <tr>
-                            <td width="30px"><button type="roll" class="sheet-button" name="roll_ability" value="&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=[[ 1d10 + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button></td>
+                            <td width="30px"><div class="sheet-roll-container">
+                                <button type="roll" class="sheet-button sheet-simple-roll" name="roll_ability_simple" value="&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=[[ @{simple-die} + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}}"></button>
+                                <button type="roll" class="sheet-button sheet-stress-roll" name="roll_ability_stress" value="&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=[[ @{stress-die} + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]}} {{stress=1}}"></button>
+                            </div></td>
                             <td width="240px"><input type="text" style="width:220px;" class="sheet-heading_4" name="attr_Ability_name"/></td>
                             <td><input type="number" class="sheet-number_2" name="attr_Ability_TotalScore" value="[[(@{Ability_Score}) + (@{Ability_Puissant})]]" disabled="true" /></td>
                             <th><div style="width:40px;"><input type="checkbox" class="sheet-hider sheet-checkbox_1" name="attr_Ability_show" value="1" checked/><span></span></div></th>
@@ -686,7 +755,10 @@
             </tr>
             <tr>
                 <td data-i18n="fatiguing" >Fatiguing</td>
-                <td><button style="margin: 0px auto;" type="roll" class="sheet-button" name="roll_Spontaneous1" value="&{template:arcane} {{label0=^{spontaneous} ^{casting}}} {{result0=[[(1d10 + @{Spontaneous1_Technique} + @{Spontaneous1_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2  ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"></button></td>
+                <td><div class="sheet-roll-container">
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Spontaneous1_simple" value="&{template:arcane} {{label0=^{spontaneous} ^{casting}}} {{result0=[[(@{simple-die} + @{Spontaneous1_Technique} + @{Spontaneous1_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2 ]]}} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"></button>
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Spontaneous1_stress" value="&{template:arcane} {{label0=^{spontaneous} ^{casting}}} {{result0=[[(@{stress-die} + @{Spontaneous1_Technique} + @{Spontaneous1_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2 ]]}} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}} {{stress=1}}"></button>
+                </div></td>
                 <td><input type="number" class="sheet-number_2" name="attr_Spontaneous1" value="(@{Spontaneous1_Technique} + @{Spontaneous1_Form} + @{Stamina_Score} + @{aura})/2" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Spontaneous1_Technique">
@@ -720,7 +792,10 @@
             </tr>
             <tr>
                 <td data-i18n="ceremonial" >Ceremonial</td>
-                <td><button style="margin: 0px auto;" type="roll" class="sheet-button" name="roll_Ceremonial" value="&{template:arcane} {{label0=^{ceremonial} ^{casting}}} {{result0=[[(1d10 + @{Ceremonial_Technique} + @{Ceremonial_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + @{Ceremonial_Artes_Lib}[@{artes_i18n}] + @{Ceremonial_Philos}[@{philos_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2  ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"></button></td>
+                <td><div class="sheet-roll-container">
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Ceremonial_simple" value="&{template:arcane} {{label0=^{ceremonial} ^{casting}}} {{result0= [[(@{simple-die}+ @{Ceremonial_Technique} + @{Ceremonial_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + @{Ceremonial_Artes_Lib}[@{artes_i18n}] + @{Ceremonial_Philos}[@{philos_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2  ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"></button>
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Ceremonial_stress" value="&{template:arcane} {{label0=^{ceremonial} ^{casting}}} {{result0= [[(@{stress-die}+ @{Ceremonial_Technique} + @{Ceremonial_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + @{Ceremonial_Artes_Lib}[@{artes_i18n}] + @{Ceremonial_Philos}[@{philos_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] )/2  ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}} {{stress=1}}"></button>
+                </div></td>
                 <td><input type="number" class="sheet-number_2" name="attr_Ceremonial" value="(@{Ceremonial_Technique} + @{Ceremonial_Form} + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Ceremonial_Technique">
@@ -794,7 +869,10 @@
             </tr>
             <tr>
                 <td data-i18n="formulaic" >Formulaic</td>
-                <td><button style="margin: 0px auto;" type="roll" class="sheet-button" name="roll_Formulaic" value="&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0=[[1d10 + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"></button></td>
+                <td><div class="sheet-roll-container">
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Formulaic_simple" value="&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0= [[@{simple-die} + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"></button>
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Formulaic_stress" value="&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0= [[@{stress-die} + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{stress=1}}"></button>
+                </div></td>
                 <td><input type="number" class="sheet-number_2" name="attr_Formulaic" value="@{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score} + @{aura}" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Formulaic_Technique">
@@ -828,7 +906,10 @@
             </tr>
             <tr>
                 <td data-i18n="ritual" >Ritual</td>
-                <td><button style="margin: 0px auto;" type="roll" class="sheet-button" name="roll_Ritual" value="&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0=[[1d10 + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"></button></td>
+                <td><div class="sheet-roll-container">
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Ritual_simple" value="&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0= [[@{simple-die} + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"></button>
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Ritual_stress" value="&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0= [[@{stress-die} + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]] }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{stress=1}}"></button>
+                </div></td>
                 <td><input type="number" class="sheet-number_2" name="attr_Ritual" value="@{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score} + @{aura} + @{Ritual_Artes_Lib} + @{Ritual_Philos}" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Ritual_Technique">
@@ -1103,7 +1184,7 @@
             </table>
         </div>
         <div class='sheet-col'>
-            <h4 class="sheet-heading_label" data-i18n="wounds" >Wounds <input type="number" class="sheet-counter" name="attr_wound_total" value="" /></h4>
+            <h4 class="sheet-heading_label" data-i18n="wounds" >Wounds <input type="number" class="sheet-counter" name="attr_wound_total" value="0" /></h4>
             <table class="sheet-table_3" style="width:500px;" >
                 <tr>
                     <th></th>
@@ -1189,7 +1270,9 @@
                 <td></td>
             </tr>
             <tr>
-                <td style="width:30px;"><button type="roll" class="sheet-button" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{rollsoak= [[1d10 + @{Stamina_Score}[@{stamina_i18n}] + @{soak_bonus}[@{soakbns_i18n}] + @{armor_soak_bonus}[@{armor_i18n}]]]}}"></button></td>
+                <td style="width:30px;">
+                    <button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}} {{rollsoak= [[@{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{soak_bonus}[@{soakbns_i18n}] + @{armor_soak_bonus}[@{armor_i18n}]]]}} {{stress=1}}"></button>
+                </td>
                 <td><input type="text" class="sheet-number_1" name="attr_Soak" value="(@{Stamina_Score} + @{soak_bonus} + @{armor_soak_bonus})" disabled="true"/></td>
                 <td><input type="number" class="sheet-number_2" name="attr_soak_bonus" value="0"/></td>
                 <td><input type="number" class="sheet-number_2" name="attr_armor_soak_bonus" value="0"/></td>
@@ -1222,13 +1305,13 @@
                 <tr>
                     <th><input type="text" class="sheet-heading_3" name="attr_Weapon_name"/></th>
 
-                    <td><button type="roll" class="sheet-button" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ 1d10 + @{Quickness_Score}[@{quickness_i18n}] + @{Init_Weap}[@{Weapon_name}] - @{Init_Enc}[@{encumbrance_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0})[@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }}" data-i18n="init" >Init</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{Init_Weap}[@{Weapon_name}] - @{Init_Enc}[@{encumbrance_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0})[@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}}" data-i18n="init" >Init</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Init" value="(@{Quickness_Score} + @{Init_Weap} - @{Init_Enc})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ 1d10 + @{Dexterity_Score}[@{dexterity_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Atk_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0})[@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score}[@{strength_i18n}] + @{Dam_Weap}[@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0})[@{circumstantial_i18n} @{damage_i18n}] ]]}} " data-i18n="atk" >Atk</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Atk_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0})[@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score}[@{strength_i18n}] + @{Dam_Weap}[@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0})[@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}}" data-i18n="atk" >Atk</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Atk" value="(@{Dexterity_Score} + @{WeaponAbility} + @{Atk_Weap})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ 1d10 + @{Quickness_Score}[@{quickness_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Dfn_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0})[@{circumstantial_i18n} @{defense_i18n}] ]] }}" data-i18n="dfn" >Dfn</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Dfn_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0})[@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}}" data-i18n="dfn" >Dfn</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_DFN" value="(@{Quickness_Score} + @{WeaponAbility} + @{Dfn_Weap})" disabled="true"/></td>
                     
                     <td><div style="width:10px;"></div></td>
@@ -1330,7 +1413,10 @@
     <fieldset class="repeating_spell">
         <table style="margin-top:10px;">
             <tr>
-                <th style="padding-left:10px;"><button type="roll" class="sheet-button" name="roll_spell" value="&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{roll= [[1d10 + @{Stamina_Score}[@{stamina_i18n}] + @{spell_Technique}[@{Technique_name}] + @{spell_Form}[@{Form_name}] + @{spell_bonus}[@{bonus_i18n}] + @{aura}[@{aura_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] ]] }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{Technique_name} }} {{Form= @{Form_name} }} {{Level= @{spell_level} }}"></button></th>
+                <th style="padding-left:10px;"><div class="sheet-roll-container">
+                    <button type="roll" class="sheet-button sheet-simple-roll" name="roll_spell_simple" value="&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{roll= [[@{simple-die} + @{Stamina_Score}[@{stamina_i18n}] + @{spell_Technique}[@{Technique_name}] + @{spell_Form}[@{Form_name}] + @{spell_bonus}[@{bonus_i18n}] + @{aura}[@{aura_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] ]] }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{Technique_name} }} {{Form= @{Form_name} }} {{Level= @{spell_level} }}"></button>
+                    <button type="roll" class="sheet-button sheet-stress-roll" name="roll_spell_stress" value="&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{roll= [[@{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{spell_Technique}[@{Technique_name}] + @{spell_Form}[@{Form_name}] + @{spell_bonus}[@{bonus_i18n}] + @{aura}[@{aura_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}] ]] }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{Technique_name} }} {{Form= @{Form_name} }} {{Level= @{spell_level} }} {{stress=1}}"></button>
+                </div></th>
                 <th style="padding-left:10px;"><input style="width:645px;" type="text" class="sheet-heading_2" name="attr_spell_name" placeholder="Spell Name" data-i18n-placeholder="spell-name" /></th>
                 <th><div style="width:40px;"><input type="checkbox" class="sheet-hider sheet-checkbox_1" name="attr_Spell_show" value="1" checked/><span></span></div></th>
             </tr>
@@ -1402,8 +1488,28 @@
     </fieldset>
 </div>
 
-<!-- 6 Documentation -->
+<!-- 6 Help -->
 <div class="sheet-tab-content sheet-tab6">
+    <div>
+        <h2 class="sheet-heading_label">Configuration</h2>
+        <div class="sheet-config">
+            <div class="sheet-config-entry">
+                <span>Botch formula</span>
+                <select class="sheet-select_1" name="attr_botchFormula">
+                    <option value="[[{[[?{@{botch_num_i18n}|1}]]d10cs0cf1}=1]]">Grouped rolls</option>
+                    <option value="?{@{botch_num_i18n} | 1 Die,[[1d10cf1cs0]]|2 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]]|3 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|4 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|5 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|6 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|7 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|8 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|9 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|10 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|11 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]|12 Dice,[[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]] [[1d10cf1cs0]]}">Separated rolls</option>
+                </select>
+            </div>
+
+            <div class="sheet-config-entry">
+                <span>Dice type</span>
+                <select class="sheet-select_1" name="attr_die-type-selection">
+                    <option value="toggle">Toggle</option>
+                    <option value="both">Both</option>
+                </select>
+            </div>
+        </div>
+    </div>
     <h1>
      Sheet Documentation
     </h1>
@@ -1416,7 +1522,7 @@
 <div class="sheet-hidden">
     <!-- melee -->
     <rolltemplate class="sheet-rolltemplate-spell">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <td class="spellsubheader" colspan="3"><i><b>{{character}}</b> <div data-i18n="casts-rt" style="padding-left: 112px;">casts</div></i></td>
             </tr>
@@ -1444,7 +1550,12 @@
             </tr>
             <tr>
                 <td><div style="padding-left:5px;padding-right:5px;"><b data-i18n="roll">Roll:</b></div></td>
-                <td><span class="sheet-tcat"></span>{{roll}}</td>
+                {{^stress}}
+                <td class="sheet-display-simple"><span class="sheet-tcat"></span>{{roll}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-display-stress"><span class="sheet-tcat"></span>{{roll}}</td>
+                {{/stress}}
                 <td></td>
             </tr>
             <tr>
@@ -1463,7 +1574,7 @@
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-botch">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <th colspan="3" data-i18n="botch">Botch</th>
             </tr>
@@ -1474,7 +1585,7 @@
     </rolltemplate>
 	
 	<rolltemplate class="sheet-rolltemplate-reroll">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <th colspan="3" data-i18n="roll">Roll</th>
             </tr>
@@ -1485,7 +1596,7 @@
     </rolltemplate>
 
     <rolltemplate class="sheet-rolltemplate-critical">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <th colspan="3" data-i18n="critical">Critical</th>
             </tr>
@@ -1496,90 +1607,117 @@
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-attack">
-        <table class="combatroller">
+        <table class="combatroller sheet-rolltemplate-all">
             <tr>
                 <th colspan="2">{{name}}</th>
             </tr>
-            {{#defend}}
-            <tr>
-                <td data-i18n="defend-rt">Defend</td>
-                <td>{{defend}}</td>
-            </tr>
-            {{/defend}}
-            {{#attack}}
             <tr>
                 <td><div style="text-align:center;" data-i18n="attack">Attack</div></td>
-                <td><div style="text-align:center;">{{attack}}</div></td>
+                {{^stress}}
+                <td class="sheet-display-simple-light"><div style="text-align:center;">{{attack}}</div></td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-display-stress-light"><div style="text-align:center;">{{attack}}</div></td>
+                {{/stress}}
             </tr>
             <tr>
                 <td><div style="text-align:center;" data-i18n="damage">Damage</div></td>
-                <td><div style="text-align:center;">{{damage}}</div></td>
+                <td class="sheet-display-default"><div style="text-align:center;">{{damage}}</div></td>
             </tr>
-            {{/attack}}
         </table>
     </rolltemplate>
 	
 	<rolltemplate class="sheet-rolltemplate-defend">
-	<div class="combatroller">
+	<div class="combatroller sheet-rolltemplate-all">
         <table>
             <tr>
                 <th colspan="2">{{name}}</th>
             </tr>
-            {{#defend}}
             <tr>
                 <td data-i18n="defend-rt">Defend</td>
-                <td>{{defend}}</td>
+                {{^stress}}
+                <td class="sheet-display-simple-light">{{defend}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-display-stress-light">{{defend}}</td>
+                {{/stress}}
             </tr>
-            {{/defend}}
-            {{#attack}}
-            <tr>
-                <td><div style="text-align:center;" data-i18n="attack">Attack</div></td>
-                <td><div style="text-align:center;">{{attack}}</div></td>
-            </tr>
-            <tr>
-                <td><div style="text-align:center;" data-i18n="damage">Damage</div></td>
-                <td><div style="text-align:center;">{{damage}}</div></td>
-            </tr>
-            {{/attack}}
         </table>
 	</div>
     </rolltemplate>
 	
 	<rolltemplate class="sheet-rolltemplate-soak">
-        <table class="combatroller">
+        <table class="combatroller sheet-rolltemplate-all">
 			<tr>
                 <th colspan="2">{{name}}</th>
             </tr>
 			<tr>
                 <td><div style="text-align:center;" data-i18n="soak">Soak</div></td>
-                <td><div style="text-align:center;">{{rollsoak}}</div></td>
+                {{^stress}}
+                <td class="sheet-display-simple-light"><div style="text-align:center;">{{rollsoak}}</div></td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-display-stress-light"><div style="text-align:center;">{{rollsoak}}</div></td>
+                {{/stress}}
             </tr>
-            
             <tr>
                 <td><div style="text-align:center;" data-i18n="armor-protection">Armor Protection</div></td>
-                <td><div style="text-align:center;">{{armorsoak}}</div></td>
+                <td class="sheet-display-default"><div style="text-align:center;">{{armorsoak}}</div></td>
             </tr>
+            {{#soakbonus}}
+            <tr>
+                <td><div style="text-align:center;" data-i18n="bonus">Bonus</div></td>
+                <td class="sheet-display-default"><div style="text-align:center;">{{soakbonus}}</div></td>
+            </tr>
+            {{/soakbonus}}
         </table>
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-initiative">
-        <table class="sheet-combatroller">
+        <table class="sheet-combatroller sheet-rolltemplate-all">
             <tr>
                 <th>{{name}}</th>
             </tr>
             <tr>
-                <td><div style="text-align:center;"> <div data-i18n="initiative">Initiative</div> {{roll}} <div data-i18n="with-rt">with</div> {{weapon}}</div></td>
+                {{^stress}}
+                <td class="sheet-display-simple-light">
+                    <div style="text-align:center;">
+                        <div data-i18n="initiative">Initiative</div>
+                        {{roll}}
+                        <div data-i18n="with-rt">with</div>
+                        {{weapon}}
+                    </div>
+                </td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-display-stress-light">
+                    <div style="text-align:center;">
+                        <div data-i18n="initiative">Initiative</div>
+                        {{roll}}
+                        <div data-i18n="with-rt">with</div>
+                        {{weapon}}
+                    </div>
+                </td>
+                {{/stress}}
             </tr>
         </table>
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-ability">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <th colspan="2"><b>{{name}}</b> <div data-i18n="leverages-rt" style="font-size:24px; padding-left:112px;">leverages</div></th>
             </tr>
             <tr class="subheader">
-                <td class="label" colspan="2"><div class="flex_container"><div class="define">{{label0}},</div> <div class="flex_item" data-i18n="attaining-rt">Attaining</div> <div class="bigresult">{{result0}}</div></div></td>
+                <td class="label" colspan="2"><div class="flex_container"><div class="define">{{label0}}</div> <div class="flex_item" data-i18n="attaining-rt">Attaining</div>
+                    {{^stress}}
+                    <div class="sheet-display-simple bigresult">{{result0}}</div>
+                    {{/stress}}
+
+                    {{#stress}}
+                    <div class="sheet-display-stress bigresult">{{result0}}</div>
+                    {{/stress}}
+                </div></td>
             </tr>
             <tr>
                 <td class="banner" colspan="2">{{banner}}</td>
@@ -1604,13 +1742,18 @@
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-generic">
-        <table>
+        <table class="sheet-rolltemplate-all">
             <tr>
                 <th colspan=2><span style="position:relative;bottom:5px;">{{Banner}}</span></th>
             </tr>
             <tr>
                 <td class="Label">{{Label}}</td>
-                <td class="Result">{{Result}}</td>
+                {{^stress}}
+                <td class="Result sheet-display-simple">{{Result}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="Result sheet-display-stress">{{Result}}</td>
+                {{/stress}}
             </tr>
         </table>
     </rolltemplate>
@@ -1619,64 +1762,69 @@
     <rolltemplate class="sheet-rolltemplate-arcane">
         <div style="background-image:url(https://i.imgur.com/gIacv0f.jpg);box-shadow: 0px 0px 4px black;">
         <div style="background-image:url(https://i.imgur.com/q9tcTtR.jpg);width:235px;height:125px"></div>
-    <table>
-        <tr>
-            <td class="sheet-bigresult" colspan="2">{{result0}}</td>
-        </tr>
-        <tr>
-            <th colspan="2"><span>{{label0}}</span></th>
-        </tr>
-        <tr>
-            <td>&nbsp;</td>
-        </tr>
-        {{#label1}}
-        <tr>
-            <td class="sheet-label">{{label1}}</td>
-            <td class="sheet-result">{{result1}}</td>
-        </tr>
-        {{/label1}}
-        {{#label2}}
-        <tr>
-            <td class="sheet-label">{{label2}}</td>
-            <td class="sheet-result">{{result2}}</td>
-        </tr>
-        {{/label2}}
-        {{#label3}}
-        <tr>
-            <td class="sheet-label">{{label3}}</td>
-            <td class="sheet-result">{{result3}}</td>
-        </tr>
-        {{/label3}}
-        {{#label4}}
-        <tr>
-            <td class="sheet-label">{{label4}}</td>
-            <td class="sheet-result">{{result4}}</td>
-        </tr>
-        {{/label4}}
-        {{#label5}}
-        <tr>
-            <td class="sheet-label">{{label5}}</td>
-            <td class="sheet-result">{{result5}}</td>
-        </tr>
-        {{/label5}}
-        {{#label6}}
-        <tr>
-            <td class="sheet-label">{{label6}}</td>
-            <td class="sheet-result">{{result6}}</td>
-        </tr>
-        {{/label6}}
-        {{#textlabel}}
-        <tr name="divider">
-            <td colspan="2"><hr style="margin-bottom:0px;"></td>
-        </tr>
-        <tr>
-            <td class="sheet-label" colspan="2">{{textlabel}}</td>
-        </tr>
-        <tr>
-            <td class="sheet-textfield" colspan="2">{{textfield}}</td>
-        </tr>
-        {{/textlabel}}
-    </table>
+        <table class="sheet-rolltemplate-all">
+            <tr>
+                {{^stress}}
+                <td class="sheet-bigresult sheet-display-simple-light" colspan="2">{{result0}}</td>
+                {{/stress}}
+                {{#stress}}
+                <td class="sheet-bigresult sheet-display-stress-light" colspan="2">{{result0}}</td>
+                {{/stress}}
+            </tr>
+            <tr>
+                <th colspan="2"><span>{{label0}}</span></th>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+            </tr>
+            {{#label1}}
+            <tr>
+                <td class="sheet-label">{{label1}}</td>
+                <td class="sheet-result">{{result1}}</td>
+            </tr>
+            {{/label1}}
+            {{#label2}}
+            <tr>
+                <td class="sheet-label">{{label2}}</td>
+                <td class="sheet-result">{{result2}}</td>
+            </tr>
+            {{/label2}}
+            {{#label3}}
+            <tr>
+                <td class="sheet-label">{{label3}}</td>
+                <td class="sheet-result">{{result3}}</td>
+            </tr>
+            {{/label3}}
+            {{#label4}}
+            <tr>
+                <td class="sheet-label">{{label4}}</td>
+                <td class="sheet-result">{{result4}}</td>
+            </tr>
+            {{/label4}}
+            {{#label5}}
+            <tr>
+                <td class="sheet-label">{{label5}}</td>
+                <td class="sheet-result">{{result5}}</td>
+            </tr>
+            {{/label5}}
+            {{#label6}}
+            <tr>
+                <td class="sheet-label">{{label6}}</td>
+                <td class="sheet-result">{{result6}}</td>
+            </tr>
+            {{/label6}}
+            {{#textlabel}}
+            <tr name="divider">
+                <td colspan="2"><hr style="margin-bottom:0px;"></td>
+            </tr>
+            <tr>
+                <td class="sheet-label" colspan="2">{{textlabel}}</td>
+            </tr>
+            <tr>
+                <td class="sheet-textfield" colspan="2">{{textfield}}</td>
+            </tr>
+            {{/textlabel}}
+        </table>
         </div>
         <div style="background-image:url(https://i.imgur.com/DdTHJT1.jpg); width:235px; height:125px; position:relative; top:-50px;"></div>
     
@@ -1702,8 +1850,11 @@
 <input name ="attr_initiative_i18n" type="hidden" value="Initiative" />
 <input name ="attr_modifiers_i18n" type="hidden" value="Modifiers" />
 <input name ="attr_philos_i18n" type="hidden" value="Philos." />
+<input name ="attr_simple-die_i18n" type="hidden" value="Simple" />
 <input name ="attr_soakbns_i18n" type="hidden" value="Soak Bonus" />
+<input name ="attr_stress-die_i18n" type="hidden" value="Stress" />
 <input name ="attr_technique_i18n" type="hidden" value="Technique" />
+<input name ="attr_total_i18n" type="hidden" value="Total" />
 <input name ="attr_wounds_i18n" type="hidden" value="Wounds" />
 <input name ="attr_intelligence_i18n" type="hidden" value="Intelligence" />
 <input name ="attr_perception_i18n" type="hidden" value="Perception" />
@@ -1737,14 +1888,34 @@
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
-    const buttonlist = ["character", "abilities", "magica", "combat", "spells", "doc"];
-    buttonlist.forEach(button => {
-        on(`clicked:${button}`, function() {
-            setAttrs({
-                sheetTab: button
-            });
+["character","abilities","magic","combat","spells","help"].forEach(function (button) {
+    on("clicked:" + button, function() {
+        setAttrs({
+            "sheetTab": button
         });
     });
+});
+
+// Die configuration and toggle
+on("change:die-type-selection", function() {
+    getAttrs(["die-type-selection"], function(values) {
+        setAttrs({
+            "die-type-selection-proxy": values["die-type-selection"]
+        });
+    });
+});
+
+on("clicked:die-toggle-simple", function() {
+    setAttrs({
+        "selected-die": "stress"
+    });
+});
+
+on("clicked:die-toggle-stress", function() {
+    setAttrs({
+        "selected-die": "simple"
+    });
+});
 
 // Ability Experience Calculations
 
@@ -1762,50 +1933,50 @@ on("change:repeating_ability:ability_score change:repeating_ability:acceleratedc
 // Art Experience Calculations
 
 ['creo', 'intellego', 'muto', 'perdo', 'rego', 'animal', 'aquam', 'auram', 'corpus', 'herbam', 'ignem', 'imaginem', 'mentem', 'terram', 'vim'].forEach(function (name) {
-  on("change:" + name + "_score", function () {
-    getAttrs([name + "_score"], function(values) {
-      const n = parseInt(values[name + "_score"])||0;
-      setAttrs({
-            [name + "_Scoreexp2"]: (n+1),
-            [name + "_Scoreexp3"]: (n*(n+1)/2)
-      });
+    on("change:" + name + "_score", function () {
+        getAttrs([name + "_score"], function(values) {
+            const n = parseInt(values[name + "_score"])||0;
+            setAttrs({
+                [name + "_Scoreexp2"]: (n+1),
+                [name + "_Scoreexp3"]: (n*(n+1)/2)
+            });
+        });
     });
-  });
 });
 
 // Laboratory Adding
 
 on("change:repeating_labspecializations:labbonus remove:repeating_labspecializations change:repeating_labspecializations:sactive", function() {
-   getSectionIDs("repeating_labspecializations", function(IDArray) {
-      var fieldNames = [];
+    getSectionIDs("repeating_labspecializations", function(IDArray) {
+        var fieldNames = [];
         for (var i=0; i < IDArray.length; i++) {
-         fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_labbonus");
-         fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_sactive");
-      }
+            fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_labbonus");
+            fieldNames.push("repeating_labspecializations_" + IDArray[i] + "_sactive");
+        }
 
         var total = 0;
         getAttrs(fieldNames, function(values) {
-         for (var i=0; i < IDArray.length; i++) {
-            total += (parseInt(values["repeating_labspecializations_" + IDArray[i] + "_labbonus"])||0) * ( parseInt(values["repeating_labspecializations_" + IDArray[i] + "_sactive"])|| 0 );
-         }
-         setAttrs({
-            "labbonus_total": total
-         });
+            for (var i=0; i < IDArray.length; i++) {
+                total += (parseInt(values["repeating_labspecializations_" + IDArray[i] + "_labbonus"])||0) * ( parseInt(values["repeating_labspecializations_" + IDArray[i] + "_sactive"])|| 0 );
+            }
+            setAttrs({
+                "labbonus_total": total
+            });
         });
-   });
+    });
 });
 
 
 // Basic Math
-    //Stats
-    //Wounds
+//Stats
+//Wounds
 on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds_Light4 change:Wounds_Light5 change:Wounds_Medium1 change:Wounds_Medium2 change:Wounds_Medium3 change:Wounds_Medium4 change:Wounds_Medium5 change:Wounds_Heavy1 change:Wounds_Heavy2 change:Wounds_Heavy3 change:Wounds_Heavy4 change:Wounds_Heavy5 change:Wounds_Incapacitated change:Wounds_Dead sheet:opened", function() {
-        getAttrs(["Wounds_Light1", "Wounds_Light2", "Wounds_Light3", "Wounds_Light4", "Wounds_Light5", "Wounds_Medium1", "Wounds_Medium2", "Wounds_Medium3", "Wounds_Medium4", "Wounds_Medium5", "Wounds_Heavy1", "Wounds_Heavy2", "Wounds_Heavy3", "Wounds_Heavy4", "Wounds_Heavy5", "Wounds_Incapacitated", "Wounds_Dead"], function(values) {
-            setAttrs({
-                wound_total: (+values.Wounds_Light1 + +values.Wounds_Light2 + +values.Wounds_Light3 + +values.Wounds_Light4 + +values.Wounds_Light5 + +values.Wounds_Medium1 + +values.Wounds_Medium2 + +values.Wounds_Medium3 + +values.Wounds_Medium4 + +values.Wounds_Medium5 + +values.Wounds_Heavy1 + +values.Wounds_Heavy2 + +values.Wounds_Heavy3 + +values.Wounds_Heavy4 + +values.Wounds_Heavy5 + +values.Wounds_Incapacitated + +values.Wounds_Dead)
-            });
+    getAttrs(["Wounds_Light1", "Wounds_Light2", "Wounds_Light3", "Wounds_Light4", "Wounds_Light5", "Wounds_Medium1", "Wounds_Medium2", "Wounds_Medium3", "Wounds_Medium4", "Wounds_Medium5", "Wounds_Heavy1", "Wounds_Heavy2", "Wounds_Heavy3", "Wounds_Heavy4", "Wounds_Heavy5", "Wounds_Incapacitated", "Wounds_Dead"], function(values) {
+        setAttrs({
+            wound_total: (+values.Wounds_Light1 + +values.Wounds_Light2 + +values.Wounds_Light3 + +values.Wounds_Light4 + +values.Wounds_Light5 + +values.Wounds_Medium1 + +values.Wounds_Medium2 + +values.Wounds_Medium3 + +values.Wounds_Medium4 + +values.Wounds_Medium5 + +values.Wounds_Heavy1 + +values.Wounds_Heavy2 + +values.Wounds_Heavy3 + +values.Wounds_Heavy4 + +values.Wounds_Heavy5 + +values.Wounds_Incapacitated + +values.Wounds_Dead)
         });
     });
+});
 on("change:repeating_spell:Technique_select change:Fatigue change:wound_total change:Creo_Score change:Intellego_Score change:Muto_Score change:Perdo_Score change:Rego_Score change:Creo_Puissant change:Intellego_Puissant change:Muto_Puissant change:Perdo_Puissant change:Rego_Puissant change:Creo_Puissant change:Intellego_Puissant change:Muto_Puissant change:Perdo_Puissant change:Rego_Puissant sheet:open", function() {
         getAttrs(['repeating_spell_Technique_select', 'Creo_Score', 'Intellego_Score', 'Muto_Score', 'Perdo_Score', 'Rego_Score', 'Creo_Puissant', 'Intellego_Puissant', 'Muto_Puissant', 'Perdo_Puissant', 'Rego_Puissant'], function(values) {
             if (values.repeating_spell_Technique_select == 0 ) {
@@ -1922,49 +2093,52 @@ on("change:repeating_spell:Form_select change:Fatigue change:wound_total change:
 on("sheet:opened", function(eventInfo){
     
     setAttrs({
-        ability_i18n: getTranslationByKey("ability")
-        armor_i18n: getTranslationByKey("armor")
-        artes_i18n: getTranslationByKey("artes-lib-")
-        attack_i18n: getTranslationByKey("attack")
-        aura_i18n: getTranslationByKey("aura")
-        bonus_i18n: getTranslationByKey("bonus")
-        botch_num_i18n: getTranslationByKey("botch-num")
-        circumstances_i18n: getTranslationByKey("circumstances-m")
-        circumstantial_i18n: getTranslationByKey("circumstantial")
-        damage_i18n: getTranslationByKey("damage")
-        defense_i18n: getTranslationByKey("defense")
-        encumbrance_i18n: getTranslationByKey("encumbrance")
-        fatigue_i18n: getTranslationByKey("fatigue-m")
-        form_i18n: getTranslationByKey("form")
-        initiative_i18n: getTranslationByKey("initiative")
-        modifiers_i18n: getTranslationByKey("modifiers")
-        philos_i18n: getTranslationByKey("philos-")
-        soakbns_i18n: getTranslationByKey("soak-bonus")
-        technique_i18n: getTranslationByKey("technique")
-        wounds_i18n: getTranslationByKey("wounds")
-        intelligence_i18n: getTranslationByKey("intelligence")
-        perception_i18n: getTranslationByKey("perception")
-        strength_i18n: getTranslationByKey("strength")
-        stamina_i18n: getTranslationByKey("stamina")
-        presence_i18n: getTranslationByKey("presence")
-        communication_i18n: getTranslationByKey("communication")
-        dexterity_i18n: getTranslationByKey("dexterity")
-        quickness_i18n: getTranslationByKey("quickness")
-        creo_i18n: getTranslationByKey("creo")
-        intellego_i18n: getTranslationByKey("intellego")
-        muto_i18n: getTranslationByKey("muto")
-        perdo_i18n: getTranslationByKey("perdo")
-        rego_i18n: getTranslationByKey("rego")
-        animal_i18n: getTranslationByKey("animal")
-        aquam_i18n: getTranslationByKey("aquam")
-        auram_i18n: getTranslationByKey("auram")
-        corpus_i18n: getTranslationByKey("corpus")
-        herbam_i18n: getTranslationByKey("herbam")
-        ignem_i18n: getTranslationByKey("ignem")
-        imaginem_i18n: getTranslationByKey("imaginem")
-        mentem_i18n: getTranslationByKey("mentem")
-        terram_i18n: getTranslationByKey("terram")
-        vim_i18n: getTranslationByKey("vim")
+        "ability_i18n": getTranslationByKey("ability"),
+        "armor_i18n": getTranslationByKey("armor"),
+        "artes_i18n": getTranslationByKey("artes-lib-"),
+        "attack_i18n": getTranslationByKey("attack"),
+        "aura_i18n": getTranslationByKey("aura"),
+        "bonus_i18n": getTranslationByKey("bonus"),
+        "botch_num_i18n": getTranslationByKey("botch-num"),
+        "circumstances_i18n": getTranslationByKey("circumstances-m"),
+        "circumstantial_i18n": getTranslationByKey("circumstantial"),
+        "damage_i18n": getTranslationByKey("damage"),
+        "defense_i18n": getTranslationByKey("defense"),
+        "encumbrance_i18n": getTranslationByKey("encumbrance"),
+        "fatigue_i18n": getTranslationByKey("fatigue-m"),
+        "form_i18n": getTranslationByKey("form"),
+        "initiative_i18n": getTranslationByKey("initiative"),
+        "modifiers_i18n": getTranslationByKey("modifiers"),
+        "philos_i18n": getTranslationByKey("philos-"),
+        "simple-die_i18n": getTranslationByKey("simple"),
+        "soakbns_i18n": getTranslationByKey("soak-bonus"),
+        "stress-die_i18n": getTranslationByKey("stress"),
+        "technique_i18n": getTranslationByKey("technique"),
+        "total_i18n": getTranslationByKey("total"),
+        "wounds_i18n": getTranslationByKey("wounds"),
+        "intelligence_i18n": getTranslationByKey("intelligence"),
+        "perception_i18n": getTranslationByKey("perception"),
+        "strength_i18n": getTranslationByKey("strength"),
+        "stamina_i18n": getTranslationByKey("stamina"),
+        "presence_i18n": getTranslationByKey("presence"),
+        "communication_i18n": getTranslationByKey("communication"),
+        "dexterity_i18n": getTranslationByKey("dexterity"),
+        "quickness_i18n": getTranslationByKey("quickness"),
+        "creo_i18n": getTranslationByKey("creo"),
+        "intellego_i18n": getTranslationByKey("intellego"),
+        "muto_i18n": getTranslationByKey("muto"),
+        "perdo_i18n": getTranslationByKey("perdo"),
+        "rego_i18n": getTranslationByKey("rego"),
+        "animal_i18n": getTranslationByKey("animal"),
+        "aquam_i18n": getTranslationByKey("aquam"),
+        "auram_i18n": getTranslationByKey("auram"),
+        "corpus_i18n": getTranslationByKey("corpus"),
+        "herbam_i18n": getTranslationByKey("herbam"),
+        "ignem_i18n": getTranslationByKey("ignem"),
+        "imaginem_i18n": getTranslationByKey("imaginem"),
+        "mentem_i18n": getTranslationByKey("mentem"),
+        "terram_i18n": getTranslationByKey("terram"),
+        "vim_i18n": getTranslationByKey("vim")
     });     
     
 });

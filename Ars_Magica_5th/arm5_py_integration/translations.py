@@ -24,6 +24,7 @@ TRANSLATION_ATTRS = (
         ("soakbns", "Soak Bonus", "soak-bonus"),
         ("stress-die", "Stress", "stress"),
         ("technique", "Technique", "technique"),
+        ("total", "Total", "total"),
         ("wounds", "Wounds", "wounds"),
     ]
     + [(char.lower(), char.capitalize(), char.lower()) for char in CHARACTERISTICS]
@@ -36,7 +37,7 @@ translation_attrs = "\n".join(
     for attr, default, tkey in TRANSLATION_ATTRS
 )
 
-translation_attrs_setup = "\n".join(
-    """%s_i18n: getTranslationByKey("%s")""" % (attr, tkey)
+translation_attrs_setup = ",\n".join(
+    """"%s_i18n": getTranslationByKey("%s")""" % (attr, tkey)
     for attr, default, tkey in TRANSLATION_ATTRS
 )
