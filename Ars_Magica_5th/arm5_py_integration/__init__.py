@@ -31,7 +31,7 @@ GLOBALS["personality_trait_rows"] = repeat_template(
     """<tr>
     <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait%%"/></td>
     <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait%%_score"/></td>
-    <td><div class="sheet-roll-container">
+    <td><div class="sheet-flex-container">
         <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{simple-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}}"></button>
         <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{stress-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}} {{stress=1}}"></button>
     </div></td>
@@ -46,7 +46,7 @@ GLOBALS["reputation_rows"] = repeat_template(
     <td><input type="text" class="sheet-heading_2" name="attr_Reputations%%"/></td>
     <td><input type="text" class="sheet-heading_2a" name="attr_Reputations%%_type"/></td>
     <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations%%_score"/></td>
-    <td><div class="sheet-roll-container">
+    <td><div class="sheet-flex-container">
         <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{simple-die} + [[@{Reputations%%_Score}]][@{Reputations%%}] ]] }}"></button>
         <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{stress-die} + [[@{Reputations%%_Score}]][@{Reputations%%}] ]] }} {{stress=1}}"></button>
     </div></td>
@@ -63,7 +63,7 @@ GLOBALS["characteristic_rows"] = repeat_template(
     <td><input type="text" class="sheet-heading_2" name="attr_%(Char)s_Description"/></td>
     <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Score" value="0"/></td>
     <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Aging" value="0"/></td>
-    <td><div class="sheet-roll-container">
+    <td><div class="sheet-flex-container">
         <button type="roll" class="sheet-button sheet-simple-roll" name="roll_%(Char)s_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + $characteristic_roll$ ]]}}"></button>
         <button type="roll" class="sheet-button sheet-stress-roll" name="roll_%(Char)s_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + $characteristic_roll$ ]]}}"></button>
     </div></td>
