@@ -163,8 +163,8 @@ GLOBALS["ceremonial_roll_stress"] = (
     ceremonial_roll_template % {"roll": ceremonial_roll % {"die": "@{stress-die}"}}
 ) + " {{stress=1}}"
 
-formulaic_roll_template = "&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"
-formulaic_roll = "[[%(die)s + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] ]]"
+formulaic_roll_template = "&{template:arcane} {{label0=^{formulaic} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[@{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"
+formulaic_roll = "[[%(die)s + @{Formulaic_Technique} + @{Formulaic_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}]]]"
 GLOBALS["formulaic_roll_simple"] = formulaic_roll_template % {
     "roll": formulaic_roll % {"die": "@{simple-die}"}
 }
@@ -172,8 +172,8 @@ GLOBALS["formulaic_roll_stress"] = (
     formulaic_roll_template % {"roll": formulaic_roll % {"die": "@{stress-die}"}}
 ) + " {{stress=1}}"
 
-ritual_roll_template = "&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}}"
-ritual_roll = "[[%(die)s + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]"
+ritual_roll_template = "&{template:arcane} {{label0=^{ritual} ^{casting}}} {{result0= %(roll)s }} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}}"
+ritual_roll = "[[%(die)s + @{Ritual_Technique} + @{Ritual_Form} + @{Stamina_Score}[@{stamina_i18n}] + @{aura}[@{aura_i18n}] + @{Ritual_Artes_Lib}[@{artes_i18n}] + @{Ritual_Philos}[@{philos_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] + (?{@{modifiers_i18n}|0})[@{modifiers_i18n}]]]"
 GLOBALS["ritual_roll_simple"] = ritual_roll_template % {
     "roll": ritual_roll % {"die": "@{simple-die}"}
 }
