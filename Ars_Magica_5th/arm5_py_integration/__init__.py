@@ -31,10 +31,10 @@ GLOBALS["personality_trait_rows"] = repeat_template(
     """<tr>
     <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait%%"/></td>
     <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait%%_score"/></td>
-    <td>
+    <td><div class="sheet-roll-container">
         <button type="roll" class="sheet-button sheet-simple-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{simple-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}}"></button>
         <button type="roll" class="sheet-button sheet-stress-roll" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{stress-die} + [[@{Personality_Trait%%_Score}]][@{Personality_Trait%%}] ]]}} {{stress=1}}"></button>
-    </td>
+    </div></td>
 </tr>""",
     range(1, 7),
 )
