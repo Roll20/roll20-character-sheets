@@ -11272,7 +11272,7 @@
 				<span class="grid-label sheet-hideable-shield-active">Schild</span>
 				<div class="flex-container sheet-hideable-shield-active">
 					<div><span name="attr_shield_name"></span></div>
-					<div>AT: <span name="attr_shield_at"></span></div>
+					<div>AT: <span name="attr_at_raufen"></span></div>
 					<div>PA: <span name="attr_shield_pa"></span></div>
 					<div>TP(A): <span name="attr_shield_tp"></span></div>
 					<div>TP/KK: <span name="attr_shield_tpkk"></span></div>
@@ -11447,8 +11447,8 @@
                 <div class="sheet-grid-melee-actions sheet-grid-shield-actions">
                     <div class="sheet-grid-melee-actions-label"><span>Schild-Aktionen</span></div>
                     <!-- Schildattacke -->
-                    <button class="sheet-hideable-man-schildattacke sheet-grid-melee-actions-button" name="Schildattacke" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Schildattacke}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{wert=[[@{shield_at}]]}} {{eff_wert=[[@{shield_at}]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Schildattacke</span></button>
-                    <button class="sheet-hideable-man-schildattacke sheet-grid-melee-actions-button-mod" name="Schildattacke+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Schildattacke}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{ansage=[[-1]]}} {{wert=[[@{shield_at}]]}} {{eff_wert=[[[[@{shield_at}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button>
+                    <button class="sheet-hideable-man-schildattacke sheet-grid-melee-actions-button" name="Schildattacke" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Raufen (Schildattacke)}} {{mod=[[@{shield_at_mod}]]}} {{ansage=[[-1]]}} {{wert=[[@{AT_Raufen}]]}} {{eff_wert=[[@{AT_Raufen} - (@{shield_at_mod})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Schildattacke</span></button>
+                    <button class="sheet-hideable-man-schildattacke sheet-grid-melee-actions-button-mod" name="Schildattacke+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-AT} {{name=Schildattacke}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{ansage=[[-1]]}} {{wert=[[@{AT_Raufen}]]}} {{eff_wert=[[ @{AT_Raufen} - (@{shield_at_mod}) - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button>
                     <!-- Schildparade -->
                     <button class="sheet-hideable-man-schildparade sheet-grid-melee-actions-button" name="Schild-PA" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Schildparade}} {{mod=[[0]]}} {{ansage=[[-1]]}} {{modansage=[[-1]]}} {{wert=[[@{shield_pa}]]}} {{eff_wert=[[@{shield_pa}]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>Schild-Parade</span></button>
                     <button class="sheet-hideable-man-schildparade sheet-grid-melee-actions-button-mod" name="Schild-PA+-" type="roll" value="@{gm_roll_opt} &{template:DSA-Nahkampf-PA} {{name=Schildparade}} {{mod=[[?{Erleichterung (−) oder Erschwernis (+)|0}]]}} {{modansage=[[-1]]}} {{ansage=[[-1]]}} {{wert=[[@{shield_pa}]]}} {{eff_wert=[[[[@{shield_pa}]] - (?{Erleichterung (−) oder Erschwernis (+)|0})]]}} {{wurf=[[1d20cs1cf20]]}} {{pruefwurf=[[1d20cs1cf20]]}}"> <span>+/−</span></button>
@@ -15952,7 +15952,7 @@ function migrateTo99999999(migrationChain) {
     
             let result = calculateShieldAttack(values, activeShieldRowId);
             
-            attrsToChange["shield_at"] = result.shieldAt;
+            attrsToChange["shield_at_mod"] = result.shieldAtMod;
             attrsToChange["shield_at_available"] = result.shieldAtAvailable;
     
             setAttrs(attrsToChange, {}, function(){
@@ -17366,7 +17366,7 @@ function calculateTpKKMod(values, weapon) {
     return tpkkMod;
 }
 
-// calculate shield attack value
+// calculate shield attack modifier
 on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:AT_raufen", function(eventInfos) {
     getAttrs(["activeShieldRowId"], function(rowIdValues) {
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
@@ -17378,7 +17378,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             }
         }
 
-        let variablesToGet = [ "kk", "AT_raufen", "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag"]
+        let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag"]
 
         // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
         if (activeShieldRowId) {
@@ -17387,7 +17387,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         } else {
             console.log("no active shield found");
-            setAttrs({ shield_at_available: "0", shield_at: 0 });
+            setAttrs({ shield_at_available: "0", shield_at_mod: 0 });
             return;
         }
 
@@ -17395,43 +17395,46 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             let result = calculateShieldAttack(values, activeShieldRowId);
             console.log('calculated shield attack');
             console.log(result);
-            setAttrs({ shield_at: result.shieldAt, shield_at_available: result.shieldAtAvailable });
+            setAttrs({ shield_at_mod: result.shieldAtMod, shield_at_available: result.shieldAtAvailable });
         });
 
     });
 });
 
-function calculateShieldAttack(values, activeShieldRowId) { 
-    var shieldAt = 0;
+function calculateShieldAttack(values, activeShieldRowId) {
+    var shieldAtAvailable = "on";
+
+	// Default Value: +3
+    var shieldAtMod = 3;
+    var activeShieldAtMod = parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
+	var shieldType = values["repeating_shields_" + activeShieldRowId + "_shield_type"];
     var schildkampfI = values["sf_schildkampfI"];
-    if (activeShieldRowId && schildkampfI === "1" && values["repeating_shields_" + activeShieldRowId + "_shield_type"] === "shield") {
-        var schildkampfII = values["sf_schildkampfII"];
-        var knaufschlag = values["sf_knaufschlag"];
-        var schmutzigeTricks = values["sf_schmutzigetricks"];
-        shieldAt = parseInt(values["AT_raufen"]);
+    var schildkampfII = values["sf_schildkampfII"];
+    var knaufschlag = values["sf_knaufschlag"];
+    var schmutzigeTricks = values["sf_schmutzigetricks"];
 
-        if (values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]) {
-            shieldAt += parseInt(values["repeating_shields_" + activeShieldRowId + "_shield_at_mod"]);
-        }
-        if (schildkampfII !== "1" && knaufschlag !== "1" && schmutzigeTricks !== "1") {
-            shieldAt -= 3;
-        }
+	// Without a Shield, no Shield Attack
+	if (shieldType !== "shield" || !activeShieldRowId) {
+		shieldAtAvailable = "0";
+		console.log("ping");
 
-        let kkDifference = parseInt(values["kk"]) - 13;
+    // Without Shield Combat I, no Shield Attacks
+	} else if (schildkampfI !== "1") {
+    	console.log("schildkampfI:", schildkampfI);
+		shieldAtAvailable = "0";
+		console.log("pong");
 
-        var tpkkMod = Math.floor(Math.abs(kkDifference) / 3);
-        if (kkDifference < 0) {
-            shieldAt -= tpkkMod;
-        }
-
-        if (shieldAt < 0) {
-            shieldAt = 0;
-        }
+	// Good to go, check for modifier reduction
+    } else if (schildkampfII === "1" || knaufschlag === "1" || schmutzigeTricks === "1") {
+    	console.log("schildkampfII:", schildkampfII, "knaufschlag:", knaufschlag, "schmutzigeTricks:", schmutzigeTricks);
+    	shieldAtMod = 0;
     }
-    if (!shieldAt) {
-        shieldAt = 0;
-    }
-    var shieldAtAvailable = shieldAt > 0 ? "on" : "0";
-    return {shieldAt: shieldAt, shieldAtAvailable: shieldAtAvailable };
+
+	// Add active shield AT modifier
+	// CAUTION: AT modifier != check modifier (i.e. signs have different meaning)
+	if (activeShieldAtMod) {
+		shieldAtMod -= activeShieldAtMod;
+	}
+    return {shieldAtMod: shieldAtMod, shieldAtAvailable: shieldAtAvailable };
 }
 </script>
