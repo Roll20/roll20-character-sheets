@@ -7,6 +7,7 @@
 ### Added
 
 - Add modifiers to attribute scores
+- Add roll button for NPC Reaction
 
 ### Changed
 
