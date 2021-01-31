@@ -201,6 +201,36 @@ GLOBALS["botch_separated"] = (
     + '}"'
 )
 
+# Fatigue
+add_fatigue_lvl_num = 10
+GLOBALS["fatigue_levels_options"] = repeat_template(
+    """<option value="%%">%%</option>""", range(0, add_fatigue_lvl_num + 1)
+)
+GLOBALS["additional_fatigue_levels"] = repeat_template(
+    """<tr class="sheet-addfatigue-%(num)s">
+    <td><input type="radio" class="sheet-radio_1" name="attr_Fatigue" value="%(value)s"><span></span></td>
+    <td style="text-align:center;">0</td>
+    <td>2 min.</td>
+    <td data-i18n="winded" >Winded</td>
+</tr>""",
+    [(str(i), str(i / 1000)) for i in range(1, add_fatigue_lvl_num + 1)],
+    tuple_keys=("num", "value"),
+)
+GLOBALS["fatigue_level_css"] = "\n".join(
+    (
+        # if the selector is not on a value for which the level is visibles
+        "".join(
+            ':not(.sheet-fatigue-proxy[value="%s"])' % val
+            for val in range(lvl, add_fatigue_lvl_num + 1)
+        )
+        # hide the level
+        + (" + table tr.sheet-addfatigue-%s" % lvl)
+        + " {\n    display: none;\n}"
+    )
+    for lvl in range(1, add_fatigue_lvl_num + 1)
+)
+
+
 # Documentation
 with open(Path(__file__).parents[1] / "documentation.md") as f:
     html = markdown.markdown("\n".join(f))

@@ -41,7 +41,7 @@ def repeat_template(
     """
     Repeatedly formats a template with values from the list.
 
-    This function behaves diferrently based on the type of values:
+    This function behaves differently based on the type of values:
     - if the value is a str, it uses %-formatting with a dict where:
         - key.lower() maps to value.lower()
         - key.capitalize() maps to value.capitalize()
