@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.0
+
+### Changed
+
+- Change rolltemplates to show character name
+
 ## 1.8.0
 
 ### Changed
