@@ -4,6 +4,10 @@
 
 ## 1.9.0
 
+### Added
+
+- Add modifiers to attribute scores
+
 ### Changed
 
 - Change rolltemplates to show character name
