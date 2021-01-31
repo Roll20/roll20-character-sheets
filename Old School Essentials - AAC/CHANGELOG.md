@@ -11,6 +11,7 @@
 ### Changed
 
 - Change rolltemplates to show character name
+- Change button hover color to orange for better contrast
 
 ## 1.8.0
 
