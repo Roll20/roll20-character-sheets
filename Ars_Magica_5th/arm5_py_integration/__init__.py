@@ -96,8 +96,8 @@ def xp(
 GLOBALS["xp"] = xp
 
 # Abilities
-ability_roll_template = "&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=%(roll)s}}"
-ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]"
+ability_roll_template = "&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_CharacName}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=%(roll)s}}"
+ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_lbk}]][@{Ability_CharacName}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]"
 GLOBALS["ability_roll_simple"] = ability_roll_template % {
     "roll": ability_roll % {"die": "@{simple-die}"}
 }
