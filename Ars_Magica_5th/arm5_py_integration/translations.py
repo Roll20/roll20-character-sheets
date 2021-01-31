@@ -16,6 +16,7 @@ TRANSLATION_ATTRS = (
         ("defense", "Defense", "defense"),
         ("encumbrance", "Encumbrance", "encumbrance"),
         ("fatigue", "Fatigue", "fatigue-m"),
+        ("focus", "Focus", "focus"),
         ("form", "Form", "form"),
         ("initiative", "Initiative", "initiative"),
         ("modifiers", "Modifiers", "modifiers"),
