@@ -203,5 +203,9 @@ GLOBALS["botch_separated"] = (
 
 # Documentation
 with open(Path(__file__).parents[1] / "documentation.md") as f:
-    html = markdown.markdown("\n".join(f.readlines()))
-GLOBALS["documentation"] = soup(html, "html.parser").prettify()
+    html = markdown.markdown("\n".join(f))
+html = soup(html, "html.parser")
+for i in range(1, 10):
+    for tag in html.find_all(f"h{i}"):
+        tag.attrs["class"] = tag.get("class", "") + " sheet-heading_label"
+GLOBALS["documentation"] = html.prettify()
