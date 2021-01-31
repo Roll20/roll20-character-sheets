@@ -86,6 +86,15 @@ GLOBALS["characteristic_name_options"] = repeat_template(
     str_key="char",
 )
 
+# Xp helper
+def xp(
+    name: str, *, suffix="_exp", adv_suffix="_advancementExp", tot_suffix="_totalExp"
+) -> str:
+    return f"""[<input type="text" class="sheet-number_3" name="attr_{name}{suffix}" value="0"/>/<input type="text" class="sheet-number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>/<input type="text" class="sheet-number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>]"""
+
+
+GLOBALS["xp"] = xp
+
 # Abilities
 ability_roll_template = "&{template:ability} {{name= @{character_name}}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_Characteristic}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ [[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{result0=%(roll)s}}"
 ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant})[@{Ability_name}] + [[@{sys_at}@{character_name}@{sys_pipe}@{Ability_Characteristic}_Score@{sys_lbk}]][@{Ability_Characteristic}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0})[@{circumstances_i18n}] ]]"
@@ -96,6 +105,20 @@ GLOBALS["ability_roll_stress"] = (
     ability_roll_template % {"roll": ability_roll % {"die": "@{stress-die}"}}
 ) + " {{stress=1}}"
 
+
+# Technique definitions
+GLOBALS["technique_definitions"] = repeat_template(
+    """<tr>
+    <td><input type="text" class="sheet-number_3" name="attr_%(Tech)s_Score" value="0"/></td>
+    <td data-i18n="%(tech)s" >%(Tech)s</td>
+    <td>"""
+    + xp("%(Tech)s")
+    + """</td>
+    <td><input type="text" class="sheet-number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
+</tr>""",
+    TECHNIQUES,
+    str_key="tech",
+)
 
 # Technique options
 GLOBALS["technique_score_options"] = repeat_template(
@@ -118,6 +141,24 @@ GLOBALS["technique_enumerated_options"] = repeat_template(
     """<option value="%(index)s" data-i18n="%(tech)s" >%(Tech)s</option>""",
     enumerate_helper(TECHNIQUES, [str.capitalize], start=1),
     tuple_keys=("index", "tech", "Tech"),
+)
+
+# Form definitions
+form_template = (
+    """<tr>
+    <td><input type="text" class="sheet-number_3" name="attr_%(Form)s_Score" value="0"/></td>
+    <td data-i18n="%(form)s" >%(Form)s</td>
+    <td>"""
+    + xp("%(Form)s")
+    + """</td>
+    <td><input type="text" class="sheet-number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
+</tr>"""
+)
+GLOBALS["form_definitions_1"] = repeat_template(
+    form_template, FORMS[:5], str_key="form"
+)
+GLOBALS["form_definitions_2"] = repeat_template(
+    form_template, FORMS[5:], str_key="form"
 )
 
 # Form options
