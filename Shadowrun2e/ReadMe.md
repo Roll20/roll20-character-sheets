@@ -6,6 +6,30 @@ This sheet is designed to be functional for any level of subscription, but API h
 
 ## Changelog
 
+### 01/02/2021 
+Added and changed by [Darren H](https://app.roll20.net/users/3856359/darren-h)
+
+
+This sheet has been vastly changed and adapted from the original, and have been working on it for a
+a few months now in my spare time. It has been fixed and made into a workable sheet.
+
+Many parts have been upgraded and/or added such as new tabs, a major retool on the look of the sheet. 
+It has used code from the original creator as well as others and myself.
+
+-Reworking the tabs i.e ALL combat related things are now under one tab so players dont have to jump around the sheet during combat.  
+
+-Skills and any game issues that effect them (such as Edges and Flaws, are under one tab so players dont have to switch tabs to determine Modifiers.  
+
+-Magic section now has section for Shamans.
+
+-All dice rolls now have a dice template attached to them making it easier to see in Roll20.
+
+-Sheet is a working sheet as it has been tested by players and myself.
+
+-Weapons and Spells table was added using code from contributor below.
+
+Unfortunatly no logo as I was working on this before update below.
+
 ### 26th January 2021
 Added by [RafaelLVX](https://app.roll20.net/users/2403046/rafaellvx).
 
