@@ -411,9 +411,9 @@ const wfrpModule = ( () => {
                 let skill_index = 1;
                 let talent_index = 1;
                 
-                if (skills.Fixed) skills_fixed = skills.Fixed.split(",").map(item=>item.trim());
-                if (talents.Fixed) talents_fixed = talents.Fixed.split(",").map(item=>item.trim());
-                if (talents.Choices) talents.Choices.forEach(choice => talents_choices = [...talents_choices, ...choice]);
+                if (skills && skills.Fixed) skills_fixed = skills.Fixed.split(",").map(item=>item.trim());
+                if (talents && talents.Fixed) talents_fixed = talents.Fixed.split(",").map(item=>item.trim());
+                if (talents && talents.Choices) talents.Choices.forEach(choice => talents_choices = [...talents_choices, ...choice]);
     
                 for (let index = 1; index <= 12; index++) {
                     update[`species_skill_${index}_name`] = "";
