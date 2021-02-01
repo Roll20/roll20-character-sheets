@@ -2,6 +2,20 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.0
+
+### Added
+
+- Add modifiers to attribute scores
+- Add roll button for NPC Reaction
+- Add spells tab
+- Add default sheet setting for default character type
+
+### Changed
+
+- Change rolltemplates to show character name
+- Change button hover color to orange for better contrast
+
 ## 1.8.0
 
 ### Changed
