@@ -1,4 +1,6 @@
 // --- ALL SHEET WORKERS START --- //
+const SheetWorker = 'sheetworker';
+const Player = 'player';
 
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
@@ -685,9 +687,12 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 // --- End setup Rogue skills total --- //
 
 //Related weapons / familiarity penalty
-on('change:nonprof-penalty', function () {
+on('change:nonprof-penalty', function (eventInfo) {
+    if (eventInfo.sourceType === SheetWorker) {
+        return;
+    }
     getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty']) ?? 0) * -1;
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
         setAttrs({
             ['nonprof-penalty']: nonprof,

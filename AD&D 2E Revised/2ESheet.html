@@ -1329,9 +1329,9 @@
             <input type="radio" name="attr_tab81" class="sheet-tab sheet-tab82" value="2"/><span class="sheet-tab sheet-tab82">Player's Option</span>
             <br>
             <br>
-            <h4><b>Nonproficient weapon penalty:</b></h4><input type="text" name="attr_nonprof-penalty" title="@{nonprof-penalty}" value="-0" class="sheet-min"/>
+            <h4><b>Nonproficient weapon penalty:</b></h4><input type="number" name="attr_nonprof-penalty" title="@{nonprof-penalty}" value="0" class="sheet-min"/>
             <br>
-            <h4><b>Related weapons / familiarity penalty:</b></h4><input type="text" name="attr_famil-penalty" title="@{famil-penalty}" value="-0" class="sheet-min" readonly/>
+            <h4><b>Related weapons / familiarity penalty:</b></h4><input type="number" name="attr_famil-penalty" title="@{famil-penalty}" value="0" class="sheet-min" readonly/>
             <br>
             <h4><b>Base ThAC0 number or macro:</b></h4><input type="text" name="attr_thac0-base" title="@{thac0-base}" value="20" class="sheet-display"/>
             <br>
@@ -21690,6 +21690,8 @@ priestSpells['pri3'] = pri3;
 /* ---- Priest spells end ---- */
 
 // --- ALL SHEET WORKERS START --- //
+const SheetWorker = 'sheetworker';
+const Player = 'player';
 
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
@@ -22376,9 +22378,12 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 // --- End setup Rogue skills total --- //
 
 //Related weapons / familiarity penalty
-on('change:nonprof-penalty', function () {
+on('change:nonprof-penalty', function (eventInfo) {
+    if (eventInfo.sourceType === SheetWorker) {
+        return;
+    }
     getAttrs(['nonprof-penalty'], function(values) {
-        let nonprof = Math.abs(parseInt(values['nonprof-penalty']) ?? 0) * -1;
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
         let famil = Math.floor(nonprof / 2)
         setAttrs({
             ['nonprof-penalty']: nonprof,
@@ -22504,10 +22509,9 @@ on('sheet:opened', function(){
             moveStaticToRepeating('weapons-damage', ['weaponname1', 'strbonus1', 'dexbonus1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml', 'knockdown1']);
 
             getAttrs(['nonprof-penalty'], function(values) {
-                console.log("Updating nonprof-penalty")
-                let nonprof = Math.abs(parseInt(values['nonprof-penalty']) ?? 0) * -1;
+                let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
                 let famil = Math.floor(nonprof / 2)
-                setAttrs({  
+                setAttrs({
                     ['nonprof-penalty']: nonprof,
                     ['famil-penalty']: famil
                 });
