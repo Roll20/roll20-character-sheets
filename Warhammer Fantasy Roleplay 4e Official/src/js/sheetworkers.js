@@ -404,14 +404,15 @@ const wfrpModule = ( () => {
                 const skills = helperFunctions.parseJSON(page.data.Skills);
                 const talents = helperFunctions.parseJSON(page.data.Talents);
     
-                const skills_fixed = skills.Fixed.split(",").map(item=>item.trim()) || [];
-                const talents_fixed = talents.Fixed.split(",").map(item=>item.trim()) || [];
-    
+                let skills_fixed = [];
+                let talents_fixed = [];
                 let talents_choices = [];
     
                 let skill_index = 1;
                 let talent_index = 1;
                 
+                if (skills.Fixed) skills_fixed = skills.Fixed.split(",").map(item=>item.trim());
+                if (talents.Fixed) talents_fixed = talents.Fixed.split(",").map(item=>item.trim());
                 if (talents.Choices) talents.Choices.forEach(choice => talents_choices = [...talents_choices, ...choice]);
     
                 for (let index = 1; index <= 12; index++) {
