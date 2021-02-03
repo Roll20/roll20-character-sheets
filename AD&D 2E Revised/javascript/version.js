@@ -54,10 +54,9 @@ on('sheet:opened', function(){
             moveStaticToRepeating('weapons-damage', ['weaponname1', 'strbonus1', 'dexbonus1', 'specialist-damage', 'mastery-damage', 'damadj', 'damsm', 'daml', 'knockdown1']);
 
             getAttrs(['nonprof-penalty'], function(values) {
-                console.log("Updating nonprof-penalty")
-                let nonprof = Math.abs(parseInt(values['nonprof-penalty']) ?? 0) * -1;
+                let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
                 let famil = Math.floor(nonprof / 2)
-                setAttrs({  
+                setAttrs({
                     ['nonprof-penalty']: nonprof,
                     ['famil-penalty']: famil
                 });

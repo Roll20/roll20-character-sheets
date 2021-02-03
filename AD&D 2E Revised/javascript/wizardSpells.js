@@ -1192,7 +1192,7 @@ wiz2['Knock'] = {
     'name': 'Knock',
     'level': 'Level 2 Wizard',
     'school': 'Alteration (Reversible)',
-    'range': '60yards',
+    'range': '60 yards',
     'duration': 'Special',
     'aoe': '[[10*[[@{level-wizard}]] ]] feet',
     'components': 'V',

@@ -1,4 +1,6 @@
 // --- ALL SHEET WORKERS START --- //
+const SheetWorker = 'sheetworker';
+const Player = 'player';
 
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
@@ -686,27 +688,16 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === 'sheetworker') {
+    if (eventInfo.sourceType === SheetWorker) {
         return;
     }
     getAttrs(['nonprof-penalty'], function(values) {
-        let number = parseInt(values['nonprof-penalty']);
-        let nonprof;
-        let famil;
-        console.log(number);
-        if (isNaN(number) || number === 0) {
-            setAttrs({
-                ['nonprof-penalty']: '-0',
-                ['famil-penalty']: '-0'
-            });
-        } else {
-            nonprof = Math.abs(number) * -1;
-            famil = Math.floor(nonprof / 2);
-            setAttrs({
-                ['nonprof-penalty']: nonprof,
-                ['famil-penalty']: famil
-            });
-        }
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
+        let famil = Math.floor(nonprof / 2)
+        setAttrs({
+            ['nonprof-penalty']: nonprof,
+            ['famil-penalty']: famil
+        });
     });
 })
 
@@ -729,6 +720,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
 on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(){
+
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
