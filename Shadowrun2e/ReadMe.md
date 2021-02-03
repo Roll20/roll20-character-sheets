@@ -6,6 +6,19 @@ This sheet is designed to be functional for any level of subscription, but API h
 
 ## Changelog
 
+### 26th January 2021
+Added by [RafaelLVX](https://app.roll20.net/users/2403046/rafaellvx).
+
+- Multiple visual fixes, including broken columns, dislodged fields and buttons.
+- Added game logo.
+- Added cool table styling to weapons, skills and spells repeating sections as suggested [here](https://app.roll20.net/forum/post/3149948/repeating-section-issue). [This](https://app.roll20.net/forum/post/9483852/repeating-sections-in-tables) is another possible solution to displaying confusing fieldsets in neat columns, but although a grid is generally more elegant, you'd need a separate class for each table if they have a different number of columns.
+- Fixed typos.
+- Cleaned up code. Among other things: removed escaped tags, added double quotes where there were single or no quotes, added semicolon at the end of CSS declarations.
+- Fixed problematic code such as "width=100px" which was present both on HTML and CSS.
+- Replaced inline styles with new classes (though many are still to be done).
+
+No script/sheetworkers were touched, no calculation and rolls should be affected (they were working fine as far as I can tell). There's still a lot of room for improvement.
+
 ### 18th September 2018
 - roll button icons changed to d6 from default d20
 
