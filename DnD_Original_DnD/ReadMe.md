@@ -2,9 +2,12 @@
 This is a character sheet designed for use with Original Dungeons & Dragons. The sheet is lacking a lot of automation in rolls and calculations to give maximum flexibility to the Dungeon Master in which Original Dungeons & Dragons rules to use. This sheet will also work with Holmes Basic D&D.
 
 ## Current Version
-1.5
+1.5.1
 
 ### Change log
+
+#### 1.5.1
+* Fixed savings throw issue
 
 #### 1.5
 * Fixed form label base align issue
