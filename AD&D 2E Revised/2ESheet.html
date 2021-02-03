@@ -1329,9 +1329,9 @@
             <input type="radio" name="attr_tab81" class="sheet-tab sheet-tab82" value="2"/><span class="sheet-tab sheet-tab82">Player's Option</span>
             <br>
             <br>
-            <h4><b>Nonproficient weapon penalty:</b></h4><input type="text" name="attr_nonprof-penalty" title="@{nonprof-penalty}" class="sheet-short" value="-0" list="weapprof-penalty"/>
+            <h4><b>Nonproficient weapon penalty:</b></h4><input type="number" name="attr_nonprof-penalty" title="@{nonprof-penalty}" class="sheet-short" value="-0" list="weapprof-penalty"/>
             <br>
-            <h4><b>Related weapons / familiarity penalty:</b></h4><input type="text" name="attr_famil-penalty" title="@{famil-penalty}" class="sheet-short" value="-0" readonly/>
+            <h4><b>Related weapons / familiarity penalty:</b></h4><input type="number" name="attr_famil-penalty" title="@{famil-penalty}" class="sheet-short" value="-0" readonly/>
             <br>
             <h4><b>Base ThAC0 number or macro:</b></h4><input type="text" name="attr_thac0-base" title="@{thac0-base}" class="sheet-display" list="base-thac0" placeholder="Macro or number"/>
             <br>
@@ -22668,27 +22668,16 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === 'sheetworker') {
+    if (eventInfo.sourceType === SheetWorker) {
         return;
     }
     getAttrs(['nonprof-penalty'], function(values) {
-        let number = parseInt(values['nonprof-penalty']);
-        let nonprof;
-        let famil;
-        console.log(number);
-        if (isNaN(number) || number === 0) {
-            setAttrs({
-                ['nonprof-penalty']: '-0',
-                ['famil-penalty']: '-0'
-            });
-        } else {
-            nonprof = Math.abs(number) * -1;
-            famil = Math.floor(nonprof / 2);
-            setAttrs({
-                ['nonprof-penalty']: nonprof,
-                ['famil-penalty']: famil
-            });
-        }
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
+        let famil = Math.floor(nonprof / 2)
+        setAttrs({
+            ['nonprof-penalty']: nonprof,
+            ['famil-penalty']: famil
+        });
     });
 })
 
