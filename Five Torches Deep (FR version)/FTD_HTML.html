@@ -154,7 +154,7 @@
                 <h2 data-i18n="load">Charge</h2>
             </div>
             <div class="load2 attributes">
-                <input type="number" name="attr_pc_load"> <span class="slash">/</span> <input type="number" name="attr_pc_load_max">
+                <input type="number" name="attr_pc_load"> <span class="slash">/</span> <input type="number" name="attr_pc_load_max"> <input type="hidden" name="attr_pc_load1">
             </div>
             <div class="initiative1 attributes" style="margin-top: 5px;">
                 <button name="roll_initiative" type="roll" value="@{togm} &{template:ftdroll} {{name=@{character_name}}} {{test_name=initiative}} {{r1=[[@{pc_dexterity} &{tracker}]]}}">
@@ -1081,7 +1081,7 @@ on("change:pc_arch change:select-chooser", function () {
         "9": {first: "5", second: "5", third: "5", fourth: "3", fifth: "1"},
     };
 
-on("change:pc_lvl", function() {  
+on("change:pc_lvl sheet:opened", function() {  
     getAttrs(["pc_lvl"], function(values) {
         let LVL = values.pc_lvl;
         if (!spelltable.hasOwnProperty( LVL )) {
@@ -1223,7 +1223,19 @@ const repeatingSum = (destination, section, fields, multiplier = 1) => {
 };
 
 on('change:repeating_inventory remove:repeating_inventory', function() {
-    repeatingSum("pc_load","inventory","pc_item_load");
+    repeatingSum("pc_load1","inventory","pc_item_load");
+});
+
+on("change:pc_load1 change:pc_sup", function() {  
+    getAttrs(["pc_load1", "pc_sup"], function(values) {
+        let lo1 = parseInt(values.pc_load1,10)||0;
+		let lo2 = parseInt(values.pc_sup,10)||0;
+		let lo3 = Math.round(lo2/5);
+		let lo = lo1 + lo3;
+        setAttrs({                            
+            "pc_load": lo,
+        });
+    });
 });
 
 // === TO GM WHISP MODE
