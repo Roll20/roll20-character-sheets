@@ -1665,7 +1665,7 @@
             clearRepeatingSections("background_holder");
         }
 
-        if(eventinfo.newValue === "Rules::Personality%20and%20Background") {
+        if(eventinfo.newValue === "Rules:Personality%20and%20Background") {
             //Clears saved data for this field
             getCompendiumPage("");
             setAttrs(reset, function() {
@@ -3491,6 +3491,12 @@
                         profs.all[slide.values[sectionid + "_type"]].push(slide.values[sectionid + "_custom"])
                     }
                 }
+                if(value == "custom" && name.includes('language_choice')) {
+                    const customValueAttribute = name.replace('language_choice', 'language_custom')
+                    if(slide.values[customValueAttribute]) {
+                        profs.all['Language'].push(slide.values[customValueAttribute]);
+                    }
+                }
             })
         });
         //Set up drops. start with class, subclass, race, subrace, background
@@ -3632,7 +3638,7 @@
         }
         //set up background drop
         if(data["l1-background"].values.background) {
-            if(data["l1-background"].values.background == "Rules::Personality%20and%20Backgrounds") {
+            if(data["l1-background"].values.background == "Rules:Personality%20and%20Backgrounds") {
                 var customBg  = {name: removeExpansionInfo(data["l1-background"].values["background_name"]), data: {Category: "Backgrounds", blobs:{}}};
                 if(customtraits.background.length > 0) {
                     customBg.data.theseblobs = ["customblob"];
