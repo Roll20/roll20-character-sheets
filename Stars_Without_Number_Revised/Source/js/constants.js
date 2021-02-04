@@ -474,7 +474,7 @@ const autofillData = {
         shield: {
             armor_ac: "13",
             armor_ac_bonus: "1",
-            armor_encumbrance: "1",
+            armor_encumbrance: "2",
             armor_type: "SHIELD",
             armor_price: "10",
         },
