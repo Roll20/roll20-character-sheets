@@ -11,9 +11,13 @@ Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règl
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-4.03 [Screenshot](co_v3.jpg)
+4.04 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v4.04 (2020-02-01)
+* Séparation des capacités en titre + texte
+* Ajout d'un texte pour les voies
+
 ## v4.03 (2020-11-27)
 * Possibilité de ne plus avoir le bonus de base en attaque égal au niveau
 
