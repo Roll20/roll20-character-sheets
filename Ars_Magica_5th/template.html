@@ -67,6 +67,8 @@ $$header$$
         <button type="roll" class="sheet-reroll" name="roll_reroll" title="Reroll" value="&{template:reroll} {{roll= [[1d10]]}}" data-i18n="roll">Roll</button>
         <button type="roll" class="sheet-botch" name="roll_botch" title="Botch" value="&{template:botch} {{roll= @{botchFormula} }}" data-i18n="botch" >Botch</button>
         <button type="roll" class="sheet-critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10!1}=1))[number of 1s] * [[1d9+1]][last die]]]}}" data-i18n="critical">Critical</button>
+        <!-- Invisible second critical button with a divide by 2, for spontaneous criticals -->
+        <button type="roll" class="sheet-critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2**({1d10!1}=1))[number of 1s] * [[1d9+1]][last die]]]}} {{type=@{spontaneous_i18n}}}" data-i18n="critical">Critical</button>
     </div>
 </div>
 <div class="sheet-tab-br"></div> 
@@ -485,10 +487,10 @@ $$header$$
             <tr>
                 <td data-i18n="fatiguing" >Fatiguing</td>
                 <td><div class="sheet-flex-container">
-                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Spontaneous1_simple" value="$$spontaneous_roll_simple$$"></button>
-                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Spontaneous1_stress" value="$$spontaneous_roll_stress$$"></button>
+                    <!-- <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Spontaneous1_simple" value="$$spontaneous_roll_simple$$"></button> -->
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_Spontaneous1_stress" value="$$spontaneous_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="sheet-number_2" name="attr_Spontaneous1" value="(@{Spontaneous1_Technique} + @{Spontaneous1_Form} + (@{Spontaneous1_Focus}) + @{Stamina_Score} + @{aura})/2" disabled="true"/></td>
+                <td><input type="number" class="sheet-number_2" name="attr_Spontaneous1" value="(@{Spontaneous1_Technique} + @{Spontaneous1_Form} + (@{Spontaneous1_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/2" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Spontaneous1_Technique">
                         <option class="sheet-italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -510,10 +512,10 @@ $$header$$
             <tr>
                 <td data-i18n="ceremonial" >Ceremonial</td>
                 <td><div class="sheet-flex-container">
-                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Ceremonial_simple" value="$$ceremonial_roll_simple$$"></button>
-                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Ceremonial_stress" value="$$ceremonial_roll_stress$$"></button>
+                    <!-- <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Ceremonial_simple" value="$$ceremonial_roll_simple$$"></button> -->
+                    <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_Ceremonial_stress" value="$$ceremonial_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="sheet-number_2" name="attr_Ceremonial" value="(@{Ceremonial_Technique} + @{Ceremonial_Form} + (@{Ceremonial_Focus}) + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2" disabled="true"/></td>
+                <td><input type="number" class="sheet-number_2" name="attr_Ceremonial" value="(@{Ceremonial_Technique} + @{Ceremonial_Form} + (@{Ceremonial_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura} + @{Ceremonial_Artes_Lib} + @{Ceremonial_Philos})/2" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Ceremonial_Technique">
                         <option class="sheet-italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -537,7 +539,7 @@ $$header$$
             <tr>
                 <td data-i18n="non-fatiguing" >Non-Fatiguing</td>
                 <td></td>
-                <td><input type="number" class="sheet-number_2" name="attr_Spontaneous2" value="(@{Spontaneous2_Technique} + @{Spontaneous2_Form} + (@{Spontaneous2_Focus}) + @{Stamina_Score} + @{aura})/5" disabled="true"/></td>
+                <td><input type="number" class="sheet-number_2" name="attr_Spontaneous2" value="(@{Spontaneous2_Technique} + @{Spontaneous2_Form} + (@{Spontaneous2_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura})/5" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Spontaneous2_Technique">
                         <option class="sheet-italic" value="0" data-i18n="technique" >Technique</option>
@@ -558,7 +560,7 @@ $$header$$
             </tr>
             <tr>
                 <th data-i18n="designed-spells" >Designed Spells</th>
-                <td colspan="8"></td>
+                <td colspan="9"></td>
             </tr>
             <tr>
                 <td data-i18n="formulaic" >Formulaic</td>
@@ -566,7 +568,7 @@ $$header$$
                     <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-simple-roll" name="roll_Formulaic_simple" value="$$formulaic_roll_simple$$"></button>
                     <button style="margin: 0px auto;" type="roll" class="sheet-button sheet-stress-roll" name="roll_Formulaic_stress" value="$$formulaic_roll_stress$$"></button>
                 </div></td>
-                <td><input type="number" class="sheet-number_2" name="attr_Formulaic" value="@{Formulaic_Technique} + @{Formulaic_Form} + (@{Formulaic_Focus}) + @{Stamina_Score} + @{aura}" disabled="true"/></td>
+                <td><input type="number" class="sheet-number_2" name="attr_Formulaic" value="@{Formulaic_Technique} + @{Formulaic_Form} + (@{Formulaic_Focus}) + @{gestures} + @{words} + @{Stamina_Score} + @{aura}" disabled="true"/></td>
                 <td>
                     <select class="sheet-select_1" name="attr_Formulaic_Technique">
                         <option class="sheet-italic" value="0 [@{technique_i18n}]" data-i18n="technique" >Technique</option>
@@ -610,10 +612,33 @@ $$header$$
                 <td><input type="number" class="sheet-number_2" name="attr_Ritual_Artes_Lib" value="@{Ceremonial_Artes_Lib}" disabled="true"/></td>
                 <td><input type="number" class="sheet-number_2" name="attr_Ritual_Philos" value="@{Ceremonial_Philos}" disabled="true"/></td>
             </tr>
-            
+            <tr></tr>
+            <tr>
+                <th data-i18n="bonus" >Bonus</th>
+                <td colspan="9"></td>
+            </tr>
             <tr>
                 <td style="text-align:right;"><span style="font-size:1.4em;" data-i18n="aura" >Aura</span></td>
                 <td><input type="number" class="sheet-number_1" name="attr_aura" value="3"/></td>
+                <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="gestures" >Gestures</span></td>
+                <td>
+                    <select class="sheet-select_1" name="attr_gestures">
+                        <option class="sheet-italic" value="1 [@{gestures_i18n}: @{exaggerated_i18n}]" data-i18n="gestures-exaggerated" >Exaggerated</option>
+                        <option class="sheet-italic" selected value="0 [@{gestures_i18n}: @{bold_i18n}]" data-i18n="gestures-bold" >Bold</option>
+                        <option class="sheet-italic" value="(-2) [@{gestures_i18n}: @{subtle_i18n}]" data-i18n="gestures-subtle" >Subtle</option>
+                        <option class="sheet-italic" value="(-5) [@{gestures_i18n}: @{gest-none_i18n}]" data-i18n="gestures-none" >None</option>
+                    </select>
+                </td>
+                <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="words" >Words</span></td>
+                <td colspan="2">
+                    <select class="sheet-select_1" name="attr_words">
+                        <option class="sheet-italic" value="1 [@{words_i18n}: @{loud_i18n}]" data_i18n="words-loud" >Loud</option>
+                        <option class="sheet-italic" selected value="0 [@{words_i18n}: @{firm_i18n}]" data_i18n="words-firm" >Firm</option>
+                        <option class="sheet-italic" value="(-5) [@{words_i18n}: @{quiet_i18n}]" data_i18n="words-quiet" >Quiet</option>
+                        <option class="sheet-italic" value="(-10) [@{words_i18n}: @{words-none_i18n}]" data_i18n="words-none" >None</option>
+                    </select>
+                </td>
+                <td></td>
             </tr>
         </table>
     </div>
@@ -797,9 +822,11 @@ $$header$$
             <table class="sheet-table_2" style="width:300px;">
                 <tr>
                     <td><span style="font-size:1.2em;" data_i18n="additional-fatigue-levels">Additional fatigue levels</span></td>
-                    <td> <select class="sheet-select_1" style="width: 60px" name="attr_additionalFatigue">
-                        $$fatigue_levels_options$$
-                    </select></td>
+                    <td>
+                        <select class="sheet-select_1" style="width: 60px" name="attr_additionalFatigue">
+                            $$fatigue_levels_options$$
+                        </select>
+                    </td>
                 <tr/>
             </table>
             <input type="hidden" class="sheet-fatigue-proxy" name="attr_additionalFatigueProxy" value="0"/>
@@ -937,7 +964,7 @@ $$header$$
             </tr>
             <tr>
                 <td style="width:30px;">
-                    <button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}}} {{rollsoak= [[@{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{soak_bonus}[@{soakbns_i18n}] + @{armor_soak_bonus}[@{armor_i18n}]]]}} {{stress=1}}"></button>
+                    <button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}}} {{rollsoak= [[@{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{soak_bonus}[@{soakbns_i18n}] + @{armor_soak_bonus}[@{armor_i18n}]]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
                 </td>
                 <td><input type="text" class="sheet-number_1" name="attr_Soak" value="(@{Stamina_Score} + @{soak_bonus} + @{armor_soak_bonus})" disabled="true"/></td>
                 <td><input type="number" class="sheet-number_2" name="attr_soak_bonus" value="0"/></td>
@@ -971,13 +998,13 @@ $$header$$
                 <tr>
                     <th><input type="text" class="sheet-heading_3" name="attr_Weapon_name"/></th>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{Init_Weap}[@{Weapon_name}] - @{Init_Enc}[@{encumbrance_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0})[@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}}" data-i18n="init" >Init</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{Init_Weap}[@{Weapon_name}] - @{Init_Enc}[@{encumbrance_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0})[@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="init" >Init</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Init" value="(@{Quickness_Score} + @{Init_Weap} - @{Init_Enc})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Atk_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0})[@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score}[@{strength_i18n}] + @{Dam_Weap}[@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0})[@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}}" data-i18n="atk" >Atk</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Atk_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0})[@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score}[@{strength_i18n}] + @{Dam_Weap}[@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0})[@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="atk" >Atk</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Atk" value="(@{Dexterity_Score} + @{WeaponAbility} + @{Atk_Weap})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Dfn_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0})[@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}}" data-i18n="dfn" >Dfn</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Dfn_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0})[@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="dfn" >Dfn</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_DFN" value="(@{Quickness_Score} + @{WeaponAbility} + @{Dfn_Weap})" disabled="true"/></td>
                     
                     <td><div style="width:10px;"></div></td>
@@ -1069,11 +1096,32 @@ $$header$$
 
 <!-- 5  Spells -->
 <div class="sheet-tab-content sheet-tab5">
-    <table class="sheet-table_2" style="width:400px;">
+    <h4 class="sheet-heading_label" style="margin-top:10px;" data-i18n="bonus" >Bonus</h4>
+    <table class="sheet-table_3" style="width:400px;">
+        <tr></tr>
         <tr>
-            <td style="text-align:right;"><span style="font-size:1.4em;" data-i18n="aura" >Aura</span></td>
+            <td style="text-align:right;"><span style="font-size:1.4em; margin-left: 15px;" data-i18n="aura" >Aura</span></td>
             <td><input type="number" class="sheet-number_1" name="attr_aura" value="3"/></td>
-        <tr />
+            <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="gestures" >Gestures</span></td>
+            <td>
+                <select class="sheet-select_1" name="attr_gestures">
+                    <option class="sheet-italic" value="1 [@{gestures_i18n}: @{exaggerated_i18n}]" data-i18n="gestures-exaggerated" >Exaggerated</option>
+                    <option class="sheet-italic" selected value="0 [@{gestures_i18n}: @{bold_i18n}]" data-i18n="gestures-bold" >Bold</option>
+                    <option class="sheet-italic" value="(-2) [@{gestures_i18n}: @{subtle_i18n}]" data-i18n="gestures-subtle" >Subtle</option>
+                    <option class="sheet-italic" value="(-5) [@{gestures_i18n}: @{gest-none_i18n}]" data-i18n="gestures-none" >None</option>
+                </select>
+            </td>
+            <td style="text-align:right;" colspan="2"><span style="font-size:1.2em; margin-right:15px" data-i18n="words" >Words</span></td>
+            <td colspan="2">
+                <select class="sheet-select_1" name="attr_words">
+                    <option class="sheet-italic" value="1 [@{words_i18n}: @{loud_i18n}]" data_i18n="words-loud" >Loud</option>
+                    <option class="sheet-italic" selected value="0 [@{words_i18n}: @{firm_i18n}]" data_i18n="words-firm" >Firm</option>
+                    <option class="sheet-italic" value="(-5) [@{words_i18n}: @{quiet_i18n}]" data_i18n="words-quiet" >Quiet</option>
+                    <option class="sheet-italic" value="(-10) [@{words_i18n}: @{words-none_i18n}]" data_i18n="words-none" >None</option>
+                </select>
+            </td>
+            <td></td>
+        </tr>
     </table>
     <h4 class="sheet-heading_label" style="margin-top:10px;" data-i18n="spells" >Spells</h4>
     <fieldset class="repeating_spell">
@@ -1152,7 +1200,7 @@ $$header$$
                 <span>Botch formula</span>
                 <select class="sheet-select_1" name="attr_botchFormula">
                     <option value="[[{[[?{@{botch_num_i18n}|1}]]d10cs0cf1}=1]]">Grouped rolls</option>
-                    <option value=$$botch_separated$$>Separated rolls</option>
+                    <option value="$$botch_separated$$">Separated rolls</option>
                 </select>
             </div>
 
@@ -1182,9 +1230,11 @@ $$header$$
             <tr>
                 <th colspan="3">{{spell}}</th>
             </tr>
+            {{#sigil}}
             <tr>
-                <td colspan="3"><i>{{sigil}}</i></td>
+                <td colspan="3"><i class="sheet-spelldescription" style="margin-left:5px;">{{sigil}}</i></td>
             </tr>
+            {{/sigil}}
             <tr>
                 <td class="sheet-top_bottom" style="padding-left:5px;padding-right:5px;"><i>{{Technique}}</i></td>
                 <td class="sheet-top_bottom" style="padding-left:5px;padding-right:5px;"><i>{{Form}}</i></td>
@@ -1207,29 +1257,49 @@ $$header$$
                 <td class="sheet-display-simple"><span class="sheet-tcat"></span>{{roll}}</td>
                 {{/stress}}
                 {{#stress}}
-                <td class="sheet-display-stress"><span class="sheet-tcat"></span>{{roll}}</td>
+                <td class="sheet-display-stress">
+                    <span class="sheet-tcat"></span>
+                    {{roll}}
+
+                    {{#rollWasFumble() roll}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() roll}}
+
+                    {{#rollWasCrit() roll}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() roll}}
+                </td>
                 {{/stress}}
                 <td></td>
             </tr>
+            {{#effect}}
             <tr>
                 <td colspan="3"><div style="padding-left:5px;padding-right:5px;"><b data-i18n="effect" >Effect</b></div></td>
             </tr>
             <tr>
                 <td colspan="3"><div style="padding-left:5px;padding-right:5px;" class="spelldescription">{{effect}}</div></td>
             </tr>
+            {{/effect}}
+            {{#mastery}}
             <tr>
                 <td colspan="3"><div style="padding-left:5px;padding-right:5px;"><b data-i18n="mastery">Mastery</b></div> </td>
             </tr>
             <tr>
                 <td colspan="3"><div style="padding-left:5px;padding-right:5px;" class="spelldescription">{{mastery}}</div></td>
             </tr>
+            {{/mastery}}
         </table>
     </rolltemplate>
     
     <rolltemplate class="sheet-rolltemplate-botch">
         <table class="sheet-rolltemplate-all">
             <tr>
-                <th colspan="3" data-i18n="botch">Botch</th>
+                <th colspan="3">
+                    <span data-i18n="botch">Botch</span>
+                    {{#type}}
+                    <span> ({{type}})</span>
+                    {{/type}}
+                </th>
             </tr>
             <tr>
                 <td colspan="3">{{roll}}</td>
@@ -1251,7 +1321,12 @@ $$header$$
     <rolltemplate class="sheet-rolltemplate-critical">
         <table class="sheet-rolltemplate-all">
             <tr>
-                <th colspan="3" data-i18n="critical">Critical</th>
+                <th colspan="3">
+                    <span data-i18n="critical">Critical</span>
+                    {{#type}}
+                    <span> ({{type}})</span>
+                    {{/type}}
+                </th>
             </tr>
             <tr>
                 <td colspan="3">{{roll}}</td>
@@ -1270,7 +1345,17 @@ $$header$$
                 <td class="sheet-display-simple-light"><div style="text-align:center;">{{attack}}</div></td>
                 {{/stress}}
                 {{#stress}}
-                <td class="sheet-display-stress-light"><div style="text-align:center;">{{attack}}</div></td>
+                <td class="sheet-display-stress-light">
+                    <div style="text-align:center;">{{attack}}</div>
+
+                    {{#rollWasFumble() attack}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() attack}}
+
+                    {{#rollWasCrit() attack}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() attack}}
+                </td>
                 {{/stress}}
             </tr>
             <tr>
@@ -1281,22 +1366,32 @@ $$header$$
     </rolltemplate>
 	
 	<rolltemplate class="sheet-rolltemplate-defend">
-	<div class="combatroller sheet-rolltemplate-all">
-        <table>
-            <tr>
-                <th colspan="2">{{name}}</th>
-            </tr>
-            <tr>
-                <td data-i18n="defend-rt">Defend</td>
-                {{^stress}}
-                <td class="sheet-display-simple-light">{{defend}}</td>
-                {{/stress}}
-                {{#stress}}
-                <td class="sheet-display-stress-light">{{defend}}</td>
-                {{/stress}}
-            </tr>
-        </table>
-	</div>
+        <div class="combatroller sheet-rolltemplate-all">
+            <table>
+                <tr>
+                    <th colspan="2">{{name}}</th>
+                </tr>
+                <tr>
+                    <td data-i18n="defend-rt">Defend</td>
+                    {{^stress}}
+                    <td class="sheet-display-simple-light">{{defend}}</td>
+                    {{/stress}}
+                    {{#stress}}
+                    <td class="sheet-display-stress-light">
+                        {{defend}}
+
+                        {{#rollWasFumble() defend}}
+                        <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                        {{/rollWasFumble() defend}}
+
+                        {{#rollWasCrit() defend}}
+                        <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                        {{/rollWasCrit() defend}}
+                    </td>
+                    {{/stress}}
+                </tr>
+            </table>
+        </div>
     </rolltemplate>
 	
 	<rolltemplate class="sheet-rolltemplate-soak">
@@ -1310,7 +1405,17 @@ $$header$$
                 <td class="sheet-display-simple-light"><div style="text-align:center;">{{rollsoak}}</div></td>
                 {{/stress}}
                 {{#stress}}
-                <td class="sheet-display-stress-light"><div style="text-align:center;">{{rollsoak}}</div></td>
+                <td class="sheet-display-stress-light">
+                    <div style="text-align:center;">{{rollsoak}}</div>
+
+                    {{#rollWasFumble() rollsoak}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() rollsoak}}
+
+                    {{#rollWasCrit() rollsoak}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() rollsoak}}
+                </td>
                 {{/stress}}
             </tr>
             <tr>
@@ -1345,8 +1450,18 @@ $$header$$
                 {{#stress}}
                 <td class="sheet-display-stress-light">
                     <div style="text-align:center;">
-                        <div data-i18n="initiative">Initiative</div>
-                        {{roll}}
+                        <div>
+                            <div data-i18n="initiative">Initiative</div>
+                            {{roll}}
+
+                            {{#rollWasFumble() roll}}
+                            <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                            {{/rollWasFumble() roll}}
+
+                            {{#rollWasCrit() roll}}
+                            <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                            {{/rollWasCrit() roll}}
+                        </div>
                         <div data-i18n="with-rt">with</div>
                         {{weapon}}
                     </div>
@@ -1362,15 +1477,30 @@ $$header$$
                 <th colspan="2"><b>{{name}}</b> <div data-i18n="leverages-rt" style="font-size:24px; padding-left:112px;">leverages</div></th>
             </tr>
             <tr class="subheader">
-                <td class="label" colspan="2"><div class="flex_container"><div class="define">{{label0}}</div> <div class="flex_item" data-i18n="attaining-rt">Attaining</div>
+                <td class="label" colspan="2" style="width:100%">
+                    <div class="define">{{label0}}</div>
+                    <div class="flex_item" data-i18n="attaining-rt">Attaining</div>
+                </td>
+            </tr>
+            <tr class="subheader">
+                <td class="label" colspan="2">
                     {{^stress}}
-                    <div class="sheet-display-simple bigresult">{{result0}}</div>
+                        <div class="sheet-display-simple bigresult">{{result0}}</div>
                     {{/stress}}
 
                     {{#stress}}
-                    <div class="sheet-display-stress bigresult">{{result0}}</div>
+                    <div class="sheet-display-stress bigresult">{{result0}}
+
+                        {{#rollWasFumble() result0}}
+                        <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                        {{/rollWasFumble() result0}}
+                        
+                        {{#rollWasCrit() result0}}
+                        <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                        {{/rollWasCrit() result0}}
+                    </div>
                     {{/stress}}
-                </div></td>
+                </td>
             </tr>
             <tr>
                 <td class="banner" colspan="2">{{banner}}</td>
@@ -1405,7 +1535,17 @@ $$header$$
                 <td class="Result sheet-display-simple">{{Result}}</td>
                 {{/stress}}
                 {{#stress}}
-                <td class="Result sheet-display-stress">{{Result}}</td>
+                <td class="Result sheet-display-stress">
+                    {{Result}}
+
+                    {{#rollWasFumble() Result}}
+                    <span class="sheet-rolltemplate-botchbt">{{botch-button}}</span>
+                    {{/rollWasFumble() Result}}
+
+                    {{#rollWasCrit() Result}}
+                    <span class="sheet-rolltemplate-critbt">{{crit-button}}</span>
+                    {{/rollWasCrit() Result}}
+                </td>
                 {{/stress}}
             </tr>
         </table>
@@ -1424,6 +1564,13 @@ $$header$$
                 <td class="sheet-bigresult sheet-display-stress-light" colspan="2">{{result0}}</td>
                 {{/stress}}
             </tr>
+            {{#rollWasFumble() result0}}
+            <tr style="text-align: center;"><td colspan="2"><span class="sheet-rolltemplate-botchbt">{{botch-button}}</span></td></tr>
+            {{/rollWasFumble() result0}}
+
+            {{#rollWasCrit() result0}}
+            <tr style="text-align: center;"><td colspan="2"><span class="sheet-rolltemplate-critbt">{{crit-button}}</span></td></tr>
+            {{/rollWasCrit() result0}}
             <tr>
                 <th colspan="2"><span>{{label0}}</span></th>
             </tr>
@@ -1713,6 +1860,13 @@ on("sheet:opened", function(eventInfo){
         $$translation_attrs_setup$$
     });     
     
+});
+
+// test
+on("sheet:opened", function(eventInfo) {
+    getAttrs(["words"], function (values) {
+        testAttr: values.words
+    });
 });
 
 </script>
