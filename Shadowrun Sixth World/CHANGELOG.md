@@ -20,7 +20,9 @@ Change Log
 2021-01-11 - 2021-01-15
 	Updated repeating items formatting
 	Updated repeating items to make specialization and expertise buttons 15 characters if the actual display name is greater than 15
-
+2021-01-16 - 2021-02-06
+	Revamped Weapons->Melee to remove unused fields (Reach, AP, etc) and add range blocks and Specialization and Expertise checkboxes.
+	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons.
 
 
 
