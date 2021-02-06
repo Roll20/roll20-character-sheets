@@ -2966,224 +2966,12 @@ NOTE: replace worker by javascript for IDE functionality
 	// ___________________________________________________________________________
 	// _________________________ weapon damage primitive _________________________
 	// ___________________________________________________________________________
-
-	let fields = [
-		'vehiclerangedweapons:V_R_weapon_dam-roll', 'vehiclerangedweapons:V_R_weapon_vengeful', 'vehiclerangedweapons:V_R_weapon_min', 'vehiclerangedweapons:V_R_weapon_max',
-		'rangedweapons:R_weapon_dam-roll', 'rangedweapons:R_weapon_vengeful', 'rangedweapons:R_weapon_min', 'rangedweapons:R_weapon_max',
-		'vehiclemeleeweapons:V_M_weapon_dam-roll', 'vehiclemeleeweapons:V_M_weapon_vengeful', 'vehiclemeleeweapons:V_M_weapon_min', 'vehiclemeleeweapons:V_M_weapon_max',
-		'meleeweapons:M_weapon_dam-roll', 'meleeweapons:M_weapon_vengeful', 'meleeweapons:M_weapon_min', 'meleeweapons:M_weapon_max',
-		];
-	on('sheet:opened', () => {
+	/**
+	 * calculate real damage roll
+	 * @param  {string} source row id of the weapon
+	 */
+	const calcDmg = function (source) {
 		var redice = /(\d+)(d\d+)((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?(?:[\+|-]\d+)?)?/;
-
-		getSectionIDs('rangedweapons', (idArray) => {
-			idArray.forEach( id => {
-				let source = `repeating_rangedweapons_${id}_R_`;
-
-				// to avoid retyping long strings because i'm lazy
-				var dam = source + 'weapon_dam-roll',
-						ven = source + 'weapon_vengeful', // crit
-						min = source + 'weapon_min', //  proven
-						max = source + 'weapon_max'; //  primitive
-
-				getAttrs([dam, ven, min, max], (v) => {
-					let dmg = redice.exec(v[dam])
-							ven = parseInt(v[ven], 10) || 0,
-							min = parseInt(v[min], 10) || 0,
-							max = parseInt(v[max], 10) || 0;
-					if (!dmg) {
-						console.log('no damage found');
-					} else {
-						let dicenum = parseInt(dmg[1], 10) || 0,
-								dicetype = dmg[2],
-								mod = dmg[3];
-						let damTotal = '{';
-
-						for (var i = 0; i < dicenum; i++) {
-							if (i) damTotal += ', '
-							if (min > 0) damTotal += '{';
-							if (max > 0) damTotal += '{';
-							damTotal += '1' + dicetype;
-							if (ven > 0) damTotal += 'cs>' + ven;
-							if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
-							if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
-						}
-						damTotal += '}';
-						if (mod) damTotal += mod;
-
-						console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
-
-						let attr = {};
-						//Object.defineProperty(attr, `${source}weapon_real_dmg`, {value: damTotal});
-						attr[`${source}weapon_real_dmg`] = damTotal;
-						console.log(attr);
-
-						setAttrs(attr, null, () => {
-						  getAttrs([`${source}weapon_real_dmg`], (v) => {console.log(v);}) // check if real_dmg was set
-						});
-					}
-				});
-			});
-		});
-
-		getSectionIDs('meleeweapons', (idArray) => {
-			idArray.forEach( id => {
-				let source = `repeating_meleeweapons_${id}_M_`;
-
-				// to avoid retyping long strings because i'm lazy
-				var dam = source + 'weapon_dam-roll',
-						ven = source + 'weapon_vengeful', // crit
-						min = source + 'weapon_min', //  proven
-						max = source + 'weapon_max'; //  primitive
-
-				getAttrs([dam, ven, min, max], (v) => {
-					let dmg = redice.exec(v[dam])
-							ven = parseInt(v[ven], 10) || 0,
-							min = parseInt(v[min], 10) || 0,
-							max = parseInt(v[max], 10) || 0;
-					if (!dmg) {
-						console.log('no damage found');
-					} else {
-						let dicenum = parseInt(dmg[1], 10) || 0,
-								dicetype = dmg[2],
-								mod = dmg[3];
-						let damTotal = '{';
-
-						for (var i = 0; i < dicenum; i++) {
-							if (i) damTotal += ', '
-							if (min > 0) damTotal += '{';
-							if (max > 0) damTotal += '{';
-							damTotal += '1' + dicetype;
-							if (ven > 0) damTotal += 'cs>' + ven;
-							if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
-							if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
-						}
-						damTotal += '}';
-						if (mod) damTotal += mod;
-
-						console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
-
-						let attr = {};
-						//Object.defineProperty(attr, `${source}weapon_real_dmg`, {value: damTotal});
-						attr[`${source}weapon_real_dmg`] = damTotal;
-						console.log(attr);
-
-						setAttrs(attr, null, () => {
-						  getAttrs([`${source}weapon_real_dmg`], (v) => {console.log(v);}) // check if real_dmg was set
-						});
-					}
-				});
-			});
-		});
-
-		getSectionIDs('vehiclerangedweapons', (idArray) => {
-			idArray.forEach( id => {
-				let source = `repeating_vehiclerangedweapons_${id}_V_R_`;
-
-				// to avoid retyping long strings because i'm lazy
-				var dam = source + 'weapon_dam-roll',
-						ven = source + 'weapon_vengeful', // crit
-						min = source + 'weapon_min', //  proven
-						max = source + 'weapon_max'; //  primitive
-
-				getAttrs([dam, ven, min, max], (v) => {
-					let dmg = redice.exec(v[dam])
-							ven = parseInt(v[ven], 10) || 0,
-							min = parseInt(v[min], 10) || 0,
-							max = parseInt(v[max], 10) || 0;
-					if (!dmg) {
-						console.log('no damage found');
-					} else {
-						let dicenum = parseInt(dmg[1], 10) || 0,
-								dicetype = dmg[2],
-								mod = dmg[3];
-						let damTotal = '{';
-
-						for (var i = 0; i < dicenum; i++) {
-							if (i) damTotal += ', '
-							if (min > 0) damTotal += '{';
-							if (max > 0) damTotal += '{';
-							damTotal += '1' + dicetype;
-							if (ven > 0) damTotal += 'cs>' + ven;
-							if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
-							if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
-						}
-						damTotal += '}';
-						if (mod) damTotal += mod;
-
-						console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
-
-						let attr = {};
-						//Object.defineProperty(attr, `${source}weapon_real_dmg`, {value: damTotal});
-						attr[`${source}weapon_real_dmg`] = damTotal;
-						console.log(attr);
-
-						setAttrs(attr, null, () => {
-						  getAttrs([`${source}weapon_real_dmg`], (v) => {console.log(v);}) // check if real_dmg was set
-						});
-					}
-				});
-			});
-		});
-
-		getSectionIDs('vehiclemeleeweapons', (idArray) => {
-			idArray.forEach( id => {
-				let source = `repeating_vehiclemeleeweapons_${id}_V_M_`;
-
-				// to avoid retyping long strings because i'm lazy
-				var dam = source + 'weapon_dam-roll',
-						ven = source + 'weapon_vengeful', // crit
-						min = source + 'weapon_min', //  proven
-						max = source + 'weapon_max'; //  primitive
-
-				getAttrs([dam, ven, min, max], (v) => {
-					let dmg = redice.exec(v[dam])
-							ven = parseInt(v[ven], 10) || 0,
-							min = parseInt(v[min], 10) || 0,
-							max = parseInt(v[max], 10) || 0;
-					if (!dmg) {
-						console.log('no damage found');
-					} else {
-						let dicenum = parseInt(dmg[1], 10) || 0,
-								dicetype = dmg[2],
-								mod = dmg[3];
-						let damTotal = '{';
-
-						for (var i = 0; i < dicenum; i++) {
-							if (i) damTotal += ', '
-							if (min > 0) damTotal += '{';
-							if (max > 0) damTotal += '{';
-							damTotal += '1' + dicetype;
-							if (ven > 0) damTotal += 'cs>' + ven;
-							if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
-							if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
-						}
-						damTotal += '}';
-						if (mod) damTotal += mod;
-
-						console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
-
-						let attr = {};
-						//Object.defineProperty(attr, `${source}weapon_real_dmg`, {value: damTotal});
-						attr[`${source}weapon_real_dmg`] = damTotal;
-						console.log(attr);
-
-						setAttrs(attr, null, () => {
-						  getAttrs([`${source}weapon_real_dmg`], (v) => {console.log(v);}) // check if real_dmg was set
-						});
-					}
-				});
-			});
-		});
-	});
-	on(fields.map(field => 'change:repeating_' + field).join(' '), (e) => {
-		let section = e.sourceAttribute.split('_')[1];
-    let id = e.sourceAttribute.split('_')[2];
-    let tail = e.sourceAttribute.split('_')[3] + '_';
-    if (tail == 'v_') tail += e.sourceAttribute.split('_')[4] + '_';
-		let source = `repeating_${section}_${id}_${tail.toUpperCase()}`;
-
-		let redice = /(\d+)(d\d+)((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?(?:[\+|-]\d+)?)?/;
 
 		// to avoid retyping long strings because i'm lazy
 		var dam = source + 'weapon_dam-roll',
@@ -3196,8 +2984,12 @@ NOTE: replace worker by javascript for IDE functionality
 					ven = parseInt(v[ven], 10) || 0,
 					min = parseInt(v[min], 10) || 0,
 					max = parseInt(v[max], 10) || 0;
+			let attr = {};
+
 			if (!dmg) {
 				console.log('no damage found');
+				attr[`${source}weapon_real_dmg`] = v[dam];
+				setAttrs(attr);
 			} else {
 				let dicenum = parseInt(dmg[1], 10) || 0,
 						dicetype = dmg[2],
@@ -3208,25 +3000,46 @@ NOTE: replace worker by javascript for IDE functionality
 					if (i) damTotal += ', '
 					if (min > 0) damTotal += '{';
 					if (max > 0) damTotal += '{';
-					damTotal += (dicetype == 'd5') ? 'ceil(1d10/2)' : '1' + dicetype
+					damTotal += (dicetype == 'd5') ? 'ceil(1d10/2)' : '1' + dicetype;
 					if (ven > 0) damTotal += 'cs>' + ven;
 					if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
 					if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
 				}
 				damTotal += '}';
 				if (mod) damTotal += mod;
-
-				console.log(v[dam], `\nwith vengeful: ${ven}\nmin: ${min}\nand max: ${max}\ntranformed to:\n` ,damTotal);
-
-				let attr = {};
-				//Object.defineProperty(attr, `${source}weapon_real_dmg`, {value: damTotal});
 				attr[`${source}weapon_real_dmg`] = damTotal;
-				console.log(attr);
 
-				setAttrs(attr, null, () => {
-				  getAttrs([`${source}weapon_real_dmg`], (v) => {console.log(v);}) // check if real_dmg was set
-				});
+				setAttrs(attr);
 			}
+		};
+	}
+
+	let fieldsDMG = [
+		'vehiclerangedweapons:V_R_weapon_dam-roll', 'vehiclerangedweapons:V_R_weapon_vengeful', 'vehiclerangedweapons:V_R_weapon_min', 'vehiclerangedweapons:V_R_weapon_max',
+		'rangedweapons:R_weapon_dam-roll', 'rangedweapons:R_weapon_vengeful', 'rangedweapons:R_weapon_min', 'rangedweapons:R_weapon_max',
+		'vehiclemeleeweapons:V_M_weapon_dam-roll', 'vehiclemeleeweapons:V_M_weapon_vengeful', 'vehiclemeleeweapons:V_M_weapon_min', 'vehiclemeleeweapons:V_M_weapon_max',
+		'meleeweapons:M_weapon_dam-roll', 'meleeweapons:M_weapon_vengeful', 'meleeweapons:M_weapon_min', 'meleeweapons:M_weapon_max',
+		];
+	on('sheet:opened' + fieldsDMG.map(field => 'change:repeating_' + field).join(' '), () => {
+		getSectionIDs('rangedweapons', (idArray) => {
+			idArray.forEach( id => {
+				calcDmg(`repeating_rangedweapons_${id}_R_`);
+			});
+		});
+		getSectionIDs('meleeweapons', (idArray) => {
+			idArray.forEach( id => {
+				calcDmg(`repeating_meleeweapons_${id}_M_`);
+			});
+		});
+		getSectionIDs('vehiclerangedweapons', (idArray) => {
+			idArray.forEach( id => {
+				calcDmg(`repeating_vehiclerangedweapons_${id}_V_R_`);
+			});
+		});
+		getSectionIDs('vehiclemeleeweapons', (idArray) => {
+			idArray.forEach( id => {
+				calcDmg(`repeating_vehiclemeleeweapons_${id}_V_M_`);
+			});
 		});
 	});
 
