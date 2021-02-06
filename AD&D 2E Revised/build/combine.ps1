@@ -1,4 +1,4 @@
-﻿$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\raw\2ESheet-base.html'
+﻿$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.html'
 $sourceFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised'
 $outputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\2ESheet.html'
 
@@ -9,7 +9,7 @@ $content = Get-Content -Path $inputFile
 $inserts = ($content | Select-String -Pattern 'insert_')
 
 $inserts | ForEach-Object {
-   $_.Trim()
+   $_.Line.Trim()
    $split = $_.Line.Split('_')
    $whiteSpace = $split[0].Replace('insert', '')
    $fileName = $split[1]
