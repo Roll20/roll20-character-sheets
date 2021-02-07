@@ -700,8 +700,74 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
-//melee weapons autofill
-// on('change:')
+//melee hit autofill
+on('change:repeating_weapons:weaponname', function(eventInfo){
+    let weapon = Weapons[eventInfo.newValue];
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons_range'           : 'Melee',
+        'repeating_weapons_size'            : weapon['size'],
+        'repeating_weapons_weapspeed'       : weapon['speed'],
+        'repeating_weapons2_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
+        'repeating_weapons2_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
+        'repeating_weapons2_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+    };
+    
+    setAttrs(weaponInfo);
+});
+
+//melee damage autofill
+on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
+    let weapon = Weapons[eventInfo.newValue];
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons-damage_damsm'     : weapon['small-medium'],
+        'repeating_weapons-damage_daml'      : weapon['large'],
+        'repeating_weapons-damage_knockdown1': weapon['knockdown'] ?? ''
+    };
+
+    setAttrs(weaponInfo);
+});
+
+//range hit autofill
+on('change:repeating_weapons2:weaponname2', function(eventInfo){
+    let weapon = Weapons[eventInfo.newValue];
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons2_strbonus2'       : weapon['strength'] ? 1 : 0,
+        'repeating_weapons2_attacknum2'      : weapon['rof'] ?? '',
+        'repeating_weapons2_range2'          : weapon['range'] ?? '',
+        'repeating_weapons2_size2'           : weapon['size'],
+        'repeating_weapons2_weapspeed2'      : weapon['speed'],
+        'repeating_weapons2_weaptype-slash2' : weapon['type'].includes('S') ? 1 : 0,
+        'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
+        'repeating_weapons2_weaptype-blunt2' : weapon['type'].includes('B') ? 1 : 0,
+    };
+    
+    setAttrs(weaponInfo);
+});
+
+//range damage autofill
+on('change:repeating_ammo:ammoname', function(eventInfo){
+    let weapon = Weapons[eventInfo.newValue];
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
+        'repeating_ammo_damsm2'              : weapon['small-medium'],
+        'repeating_ammo_daml2'               : weapon['large'],
+        'repeating_weapons-damage_knockdown2': weapon['knockdown'] ?? '' 
+    };
+
+    setAttrs(weaponInfo);
+});
 
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
@@ -719,7 +785,6 @@ on('change:repeating_profs:profname', function (eventInfo) {
     if (nonweaponProficiency === undefined)
         return;
     
-    console.log(nonweaponProficiency);
     setAttrs({
         'repeating_profs_profslots'  : nonweaponProficiency['slots'],
         'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
