@@ -1,7 +1,6 @@
 /* ---- Priest spells start ---- */
 const pri1 = {}
 pri1['Animal Friendship'] = {
-    'name': 'Animal Friendship',
     'level': 'Level 1 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
@@ -20,7 +19,6 @@ pri1['Animal Friendship'] = {
 };
 
 pri1['Bless'] = {
-    'name': 'Bless',
     'level': 'Level 1 Priest',
     'school': 'Conjuration/Summoning (Reversible)',
     'sphere': 'All',
@@ -39,7 +37,6 @@ pri1['Bless'] = {
 };
 
 pri1['Combine'] = {
-    'name': 'Combine',
     'level': 'Level 1 Priest',
     'school': 'Evocation',
     'sphere': 'All',
@@ -58,7 +55,6 @@ pri1['Combine'] = {
 };
 
 pri1['Command'] = {
-    'name': 'Command',
     'level': 'Level 1 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
@@ -77,7 +73,6 @@ pri1['Command'] = {
 };
 
 pri1['Create Water'] = {
-    'name': 'Create Water',
     'level': 'Level 1 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water)',
@@ -96,7 +91,6 @@ pri1['Create Water'] = {
 };
 
 pri1['Cure Light Wounds'] = {
-    'name': 'Cure Light Wounds',
     'level': 'Level 1 Priest',
     'school': 'Necromancy (Reversible)',
     'sphere': 'Healing',
@@ -115,7 +109,6 @@ pri1['Cure Light Wounds'] = {
 };
 
 pri1['Detect Evil'] = {
-    'name': 'Detect Evil',
     'level': 'Level 1 Priest',
     'school': 'Divination (Reversible)',
     'sphere': 'All',
@@ -134,7 +127,6 @@ pri1['Detect Evil'] = {
 };
 
 pri1['Detect Magic'] = {
-    'name': 'Detect Magic',
     'level': 'Level 1 Priest',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -153,7 +145,6 @@ pri1['Detect Magic'] = {
 };
 
 pri1['Detect Poison'] = {
-    'name': 'Detect Poison',
     'level': 'Level 1 Priest',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -172,7 +163,6 @@ pri1['Detect Poison'] = {
 };
 
 pri1['Detect Snares & Pits'] = {
-    'name': 'Detect Snares & Pits',
     'level': 'Level 1 Priest',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -191,7 +181,6 @@ pri1['Detect Snares & Pits'] = {
 };
 
 pri1['Endure Cold/Endure Heat'] = {
-    'name': 'Endure Cold/Endure Heat',
     'level': 'Level 1 Priest',
     'school': 'Alteration',
     'sphere': 'Protection',
@@ -210,7 +199,6 @@ pri1['Endure Cold/Endure Heat'] = {
 };
 
 pri1['Entangle'] = {
-    'name': 'Entangle',
     'level': 'Level 1 Priest',
     'school': 'Alteration',
     'sphere': 'Plant',
@@ -229,7 +217,6 @@ pri1['Entangle'] = {
 };
 
 pri1['Faerie Fire'] = {
-    'name': 'Faerie Fire',
     'level': 'Level 1 Priest',
     'school': 'Alteration',
     'sphere': 'Weather',
@@ -248,7 +235,6 @@ pri1['Faerie Fire'] = {
 };
 
 pri1['Invisibility to Animals'] = {
-    'name': 'Invisibility to Animals',
     'level': 'Level 1 Priest',
     'school': 'Alteration',
     'sphere': 'Animal',
@@ -267,7 +253,6 @@ pri1['Invisibility to Animals'] = {
 };
 
 pri1['Invisibility to Undead'] = {
-    'name': 'Invisibility to Undead',
     'level': 'Level 1 Priest',
     'school': 'Abjuration',
     'sphere': 'Necromantic',
@@ -286,7 +271,6 @@ pri1['Invisibility to Undead'] = {
 };
 
 pri1['Light'] = {
-    'name': 'Light',
     'level': 'Level 1 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Sun',
@@ -305,7 +289,6 @@ pri1['Light'] = {
 };
 
 pri1['Locate Animals or Plants'] = {
-    'name': 'Locate Animals or Plants',
     'level': 'Level 1 Priest',
     'school': 'Divination',
     'sphere': 'Divination (Animal, Plant)',
@@ -324,7 +307,6 @@ pri1['Locate Animals or Plants'] = {
 };
 
 pri1['Magical Stone'] = {
-    'name': 'Magical Stone',
     'level': 'Level 1 Priest',
     'school': 'Enchantment',
     'sphere': 'Combat',
@@ -343,7 +325,6 @@ pri1['Magical Stone'] = {
 };
 
 pri1['Pass Without Trace'] = {
-    'name': 'Pass Without Trace',
     'level': 'Level 1 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
@@ -362,7 +343,6 @@ pri1['Pass Without Trace'] = {
 };
 
 pri1['Protection From Evil'] = {
-    'name': 'Protection From Evil',
     'level': 'Level 1 Priest',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
@@ -381,7 +361,6 @@ pri1['Protection From Evil'] = {
 };
 
 pri1['Purify Food & Drink'] = {
-    'name': 'Purify Food & Drink',
     'level': 'Level 1 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'All',
@@ -400,7 +379,6 @@ pri1['Purify Food & Drink'] = {
 };
 
 pri1['Remove Fear'] = {
-    'name': 'Remove Fear',
     'level': 'Level 1 Priest',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Charm',
@@ -419,7 +397,6 @@ pri1['Remove Fear'] = {
 };
 
 pri1['Sanctuary'] = {
-    'name': 'Sanctuary',
     'level': 'Level 1 Priest',
     'school': 'Abjuration',
     'sphere': 'Protection',
@@ -438,7 +415,6 @@ pri1['Sanctuary'] = {
 };
 
 pri1['Shillelagh'] = {
-    'name': 'Shillelagh',
     'level': 'Level 1 Priest',
     'school': 'Alteration',
     'sphere': 'Combat, Plant',
@@ -458,7 +434,6 @@ pri1['Shillelagh'] = {
 
 let pri2 = {};
 pri2['Aid'] = {
-    'name': 'Aid',
     'level': 'Level 2 Priest',
     'school': 'Necromancy, Conjuration',
     'sphere': 'Necromantic',
@@ -477,7 +452,6 @@ pri2['Aid'] = {
 };
 
 pri2['Augury'] = {
-    'name': 'Augury',
     'level': 'Level 2 Priest',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -496,7 +470,6 @@ pri2['Augury'] = {
 };
 
 pri2['Barkskin'] = {
-    'name': 'Barkskin',
     'level': 'Level 2 Priest',
     'school': 'Alteration',
     'sphere': 'Protection, Plant',
@@ -515,7 +488,6 @@ pri2['Barkskin'] = {
 };
 
 pri2['Chant'] = {
-    'name': 'Chant',
     'level': 'Level 2 Priest',
     'school': 'Conjuring/Summoning',
     'sphere': 'Combat',
@@ -534,7 +506,6 @@ pri2['Chant'] = {
 };
 
 pri2['Charm Person or Mammal'] = {
-    'name': 'Charm Person or Mammal',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
@@ -553,7 +524,6 @@ pri2['Charm Person or Mammal'] = {
 };
 
 pri2['Detect Charm'] = {
-    'name': 'Detect Charm',
     'level': 'Level 2 Priest',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
@@ -572,7 +542,6 @@ pri2['Detect Charm'] = {
 };
 
 pri2['Dust Devil'] = {
-    'name': 'Dust Devil',
     'level': 'Level 2 Priest',
     'school': 'Conjuration/Summoning',
     'sphere': 'Elemental (Air)',
@@ -591,7 +560,6 @@ pri2['Dust Devil'] = {
 };
 
 pri2['Enthrall'] = {
-    'name': 'Enthrall',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
@@ -610,7 +578,6 @@ pri2['Enthrall'] = {
 };
 
 pri2['Find Traps'] = {
-    'name': 'Find Traps',
     'level': 'Level 2 Priest',
     'school': 'Divination',
     'sphere': 'Divination',
@@ -629,7 +596,6 @@ pri2['Find Traps'] = {
 };
 
 pri2['Fire Trap'] = {
-    'name': 'Fire Trap',
     'level': 'Level 2 Priest',
     'school': 'Abjuration, Evocation',
     'sphere': 'Elemental (Fire)',
@@ -648,7 +614,6 @@ pri2['Fire Trap'] = {
 };
 
 pri2['Flame Blade'] = {
-    'name': 'Flame Blade',
     'level': 'Level 2 Priest',
     'school': 'Evocation',
     'sphere': 'Elemental (Fire)',
@@ -667,7 +632,6 @@ pri2['Flame Blade'] = {
 };
 
 pri2['Goodberry'] = {
-    'name': 'Goodberry',
     'level': 'Level 2 Priest',
     'school': 'Alteration, Evocation (Reversible)',
     'sphere': 'Plant',
@@ -686,7 +650,6 @@ pri2['Goodberry'] = {
 };
 
 pri2['Heat Metal'] = {
-    'name': 'Heat Metal',
     'level': 'Level 2 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Fire)',
@@ -705,7 +668,6 @@ pri2['Heat Metal'] = {
 };
 
 pri2['Hold Person'] = {
-    'name': 'Hold Person',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Charm',
@@ -724,7 +686,6 @@ pri2['Hold Person'] = {
 };
 
 pri2['Know Alignment'] = {
-    'name': 'Know Alignment',
     'level': 'Level 2 Priest',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
@@ -743,7 +704,6 @@ pri2['Know Alignment'] = {
 };
 
 pri2['Messenger'] = {
-    'name': 'Messenger',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
@@ -762,7 +722,6 @@ pri2['Messenger'] = {
 };
 
 pri2['Obscurement'] = {
-    'name': 'Obscurement',
     'level': 'Level 2 Priest',
     'school': 'Alteration',
     'sphere': 'Weather',
@@ -781,7 +740,6 @@ pri2['Obscurement'] = {
 };
 
 pri2['Produce Flame'] = {
-    'name': 'Produce Flame',
     'level': 'Level 2 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
@@ -800,7 +758,6 @@ pri2['Produce Flame'] = {
 };
 
 pri2['Resist Fire/Resist Cold'] = {
-    'name': 'Resist Fire/Resist Cold',
     'level': 'Level 2 Priest',
     'school': 'Alteration',
     'sphere': 'Protection',
@@ -819,7 +776,6 @@ pri2['Resist Fire/Resist Cold'] = {
 };
 
 pri2['Silence, 15\' Radius'] = {
-    'name': 'Silence, 15\' Radius',
     'level': 'Level 2 Priest',
     'school': 'Alteration',
     'sphere': 'Guardian',
@@ -838,7 +794,6 @@ pri2['Silence, 15\' Radius'] = {
 };
 
 pri2['Slow Poison'] = {
-    'name': 'Slow Poison',
     'level': 'Level 2 Priest',
     'school': 'Necromancy',
     'sphere': 'Healing',
@@ -857,7 +812,6 @@ pri2['Slow Poison'] = {
 };
 
 pri2['Snake Charm'] = {
-    'name': 'Snake Charm',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
@@ -876,7 +830,6 @@ pri2['Snake Charm'] = {
 };
 
 pri2['Spiritual Hammer'] = {
-    'name': 'Spiritual Hammer',
     'level': 'Level 2 Priest',
     'school': 'Invocation',
     'sphere': 'Combat',
@@ -895,7 +848,6 @@ pri2['Spiritual Hammer'] = {
 };
 
 pri2['Trip'] = {
-    'name': 'Trip',
     'level': 'Level 2 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
@@ -914,7 +866,6 @@ pri2['Trip'] = {
 };
 
 pri2['Warp Wood'] = {
-    'name': 'Warp Wood',
     'level': 'Level 2 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Plant',
@@ -933,7 +884,6 @@ pri2['Warp Wood'] = {
 };
 
 pri2['Withdraw'] = {
-    'name': 'Withdraw',
     'level': 'Level 2 Priest',
     'school': 'Ateration',
     'sphere': 'Protection',
@@ -952,7 +902,6 @@ pri2['Withdraw'] = {
 };
 
 pri2['Wyvern Watch'] = {
-    'name': 'Wyvern Watch',
     'level': 'Level 2 Priest',
     'school': 'Evocation',
     'sphere': 'Guardian',
@@ -972,7 +921,6 @@ pri2['Wyvern Watch'] = {
 
 const pri3 = {};
 pri3['Animate Dead'] = {
-    'name': 'Animate Dead',
     'level': 'Level 3 Priest',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
@@ -991,7 +939,6 @@ pri3['Animate Dead'] = {
 };
 
 pri3['Call Lightning'] = {
-    'name': 'Call Lightning',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Weather',
@@ -1010,7 +957,6 @@ pri3['Call Lightning'] = {
 };
 
 pri3['Continual Light'] = {
-    'name': 'Continual Light',
     'level': 'Level 3 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Sun',
@@ -1029,7 +975,6 @@ pri3['Continual Light'] = {
 };
 
 pri3['Create Food & Water'] = {
-    'name': 'Create Food & Water',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Creation',
@@ -1048,7 +993,6 @@ pri3['Create Food & Water'] = {
 };
 
 pri3['Cure Blindness or Deafness'] = {
-    'name': 'Cure Blindness or Deafness',
     'level': 'Level 3 Priest',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Necromantic',
@@ -1067,7 +1011,6 @@ pri3['Cure Blindness or Deafness'] = {
 };
 
 pri3['Cure Disease'] = {
-    'name': 'Cure Disease',
     'level': 'Level 3 Priest',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Necromantic',
@@ -1086,7 +1029,6 @@ pri3['Cure Disease'] = {
 };
 
 pri3['Dispel Magic'] = {
-    'name': 'Dispel Magic',
     'level': 'Level 3 Priest',
     'school': 'Abjuration',
     'sphere': 'Protection',
@@ -1105,7 +1047,6 @@ pri3['Dispel Magic'] = {
 };
 
 pri3['Feign Death'] = {
-    'name': 'Feign Death',
     'level': 'Level 3 Priest',
     'school': 'Necromancy',
     'sphere': 'Necromantic',
@@ -1124,7 +1065,6 @@ pri3['Feign Death'] = {
 };
 
 pri3['Flame Walk'] = {
-    'name': 'Flame Walk',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
@@ -1143,7 +1083,6 @@ pri3['Flame Walk'] = {
 };
 
 pri3['Glyph of Warding'] = {
-    'name': 'Glyph of Warding',
     'level': 'Level 3 Priest',
     'school': 'Abjuration, Evocation',
     'sphere': 'Guardian',
@@ -1162,7 +1101,6 @@ pri3['Glyph of Warding'] = {
 };
 
 pri3['Hold Animal'] = {
-    'name': 'Hold Animal',
     'level': 'Level 3 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Animal',
@@ -1181,7 +1119,6 @@ pri3['Hold Animal'] = {
 };
 
 pri3['Locate Object'] = {
-    'name': 'Locate Object',
     'level': 'Level 3 Priest',
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
@@ -1200,7 +1137,6 @@ pri3['Locate Object'] = {
 };
 
 pri3['Magical Vestment'] = {
-    'name': 'Magical Vestment',
     'level': 'Level 3 Priest',
     'school': 'Enchantment',
     'sphere': 'Protection',
@@ -1219,7 +1155,6 @@ pri3['Magical Vestment'] = {
 };
 
 pri3['Meld Into Stone'] = {
-    'name': 'Meld Into Stone',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
@@ -1238,7 +1173,6 @@ pri3['Meld Into Stone'] = {
 };
 
 pri3['Negative Plane Protection'] = {
-    'name': 'Negative Plane Protection',
     'level': 'Level 3 Priest',
     'school': 'Abjuration',
     'sphere': 'Protection, Necromantic',
@@ -1257,7 +1191,6 @@ pri3['Negative Plane Protection'] = {
 };
 
 pri3['Plant Growth'] = {
-    'name': 'Plant Growth',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Plant',
@@ -1276,7 +1209,6 @@ pri3['Plant Growth'] = {
 };
 
 pri3['Prayer'] = {
-    'name': 'Prayer',
     'level': 'Level 3 Priest',
     'school': 'Conjuration/Summoning',
     'sphere': 'Combat',
@@ -1295,7 +1227,6 @@ pri3['Prayer'] = {
 };
 
 pri3['Protection From Fire'] = {
-    'name': 'Protection From Fire',
     'level': 'Level 3 Priest',
     'school': 'Abjuration',
     'sphere': 'Protection, Elemental (Fire)',
@@ -1314,7 +1245,6 @@ pri3['Protection From Fire'] = {
 };
 
 pri3['Pyrotechnics'] = {
-    'name': 'Pyrotechnics',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Fire)',
@@ -1333,7 +1263,6 @@ pri3['Pyrotechnics'] = {
 };
 
 pri3['Remove Curse'] = {
-    'name': 'Remove Curse',
     'level': 'Level 3 Priest',
     'school': 'Abjuration (Reversible)',
     'sphere': 'Protection',
@@ -1352,7 +1281,6 @@ pri3['Remove Curse'] = {
 };
 
 pri3['Remove Paralysis'] = {
-    'name': 'Remove Paralysis',
     'level': 'Level 3 Priest',
     'school': 'Abjuration',
     'sphere': 'Protection',
@@ -1371,7 +1299,6 @@ pri3['Remove Paralysis'] = {
 };
 
 pri3['Snare'] = {
-    'name': 'Snare',
     'level': 'Level 3 Priest',
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
@@ -1390,7 +1317,6 @@ pri3['Snare'] = {
 };
 
 pri3['Speak With Dead'] = {
-    'name': 'Speak With Dead',
     'level': 'Level 3 Priest',
     'school': 'Necromancy',
     'sphere': 'Divination',
@@ -1409,7 +1335,6 @@ pri3['Speak With Dead'] = {
 };
 
 pri3['Spike Growth'] = {
-    'name': 'Spike Growth',
     'level': 'Level 3 Priest',
     'school': 'Alteration, Enchantment',
     'sphere': 'Plant',
@@ -1428,7 +1353,6 @@ pri3['Spike Growth'] = {
 };
 
 pri3['Starshine'] = {
-    'name': 'Starshine',
     'level': 'Level 3 Priest',
     'school': 'Evocation, Illusion/Phantasm',
     'sphere': 'Sun',
@@ -1447,7 +1371,6 @@ pri3['Starshine'] = {
 };
 
 pri3['Stone Shape'] = {
-    'name': 'Stone Shape',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Earth)',
@@ -1466,7 +1389,6 @@ pri3['Stone Shape'] = {
 };
 
 pri3['Summon Insects'] = {
-    'name': 'Summon Insects',
     'level': 'Level 3 Priest',
     'school': 'Conjuration/Summoning',
     'sphere': 'Animal',
@@ -1485,7 +1407,6 @@ pri3['Summon Insects'] = {
 };
 
 pri3['Tree'] = {
-    'name': 'Tree',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Plant',
@@ -1504,7 +1425,6 @@ pri3['Tree'] = {
 };
 
 pri3['Water Breathing'] = {
-    'name': 'Water Breathing',
     'level': 'Level 3 Priest',
     'school': 'Alteration (Reversible)',
     'sphere': 'Elemental (Water, Air)',
@@ -1523,7 +1443,6 @@ pri3['Water Breathing'] = {
 };
 
 pri3['Water Walk'] = {
-    'name': 'Water Walk',
     'level': 'Level 3 Priest',
     'school': 'Alteration',
     'sphere': 'Elemental (Water)',
