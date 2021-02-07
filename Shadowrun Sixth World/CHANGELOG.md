@@ -23,7 +23,8 @@ Change Log
 2021-01-16 - 2021-02-06
 	Revamped Weapons->Melee to remove unused fields (Reach, AP, etc) and add range blocks and Specialization and Expertise checkboxes.
 	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons.
-
+	Added dicepool to Weapons->Melee display
+	
 
 
 

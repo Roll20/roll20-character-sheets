@@ -532,6 +532,7 @@
 			</div>
 			<div class="row-long cc-row">
 				<h2 data-i18n="primarymeleeweapon">Primary Melee Weapon</h2>
+<button name="roll_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{primary_melee_weapon}}}{{base=^{agility}}}{{dice=[[((@{rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{agility})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Skill: @{skill}, Close Combat: @{Close Combat}, Rating: @{rating}, Spec: @{spec}, Expert: @{expert}}}"><span name="attr_weapon"></span></button>
 				<button type="roll" name="primary melee" value="@{gm_toggle} &{template:rolls}{{header=@{primary_melee_weapon}}}{{base=^{base}}}{{dice=[[((@{primary_melee_weapon_skill}+@{primary_melee_weapon_dicepool}+@{agility})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=ACC @{primary_melee_weapon_acc}, DV @{primary_melee_weapon_damage}, AP @{primary_melee_weapon_ap}, Reach @{primary_melee_weapon_reach}}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}" title="Primary melee weapon"><span name="attr_primary_melee_weapon" title="@{primary_melee_weapon}"></span></button>
 			</div>
 			<div class="cc-row">
@@ -827,6 +828,7 @@
           <div class="rows repeating-container weapon-melee">
             <div class="row-long headers">
               <h2 data-i18n="weapon">Weapon</h2>
+              <h2 data-i18n="pool">Pool</h2>
               <h2 data-i18n="dam">Dam</h2>
               <h2 data-i18n="c" title="Close 0-3">C</h2>
               <h2 data-i18n="n" title="Near 4-50">N</h2>
@@ -835,12 +837,12 @@
               <h2 data-i18n="e" title="Extreme 500+">E</h2>
             </div>
             <fieldset class="repeating_melee">
-              <input name="attr_dicepool" type="hidden" value="0"/>
               <input title="@{repeating_melee_${x}_rating}" name="attr_rating" type="hidden" value="0" />
               <input name="attr_skill" type="hidden" value=""/>
               <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
               <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
               <button name="roll_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{weapon}}}{{base=^{agility}}}{{dice=[[((@{rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{agility})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Skill: @{skill}, Close Combat: @{Close Combat}, Rating: @{rating}, Spec: @{spec}, Expert: @{expert}}}"><span name="attr_weapon"></span></button>
+              <span class="center" name="attr_dicepool"></span>
               <span class="center" name="attr_damage"></span>
               <span class="center" name="attr_close"></span>
               <span class="center" name="attr_near"></span>
@@ -853,6 +855,9 @@
               <div class="settings">
                 <label data-i18n-title="weapon" title="weapon">
                   <input name="attr_weapon" placeholder="Katana" title="@{repeating_melee_${x}_weapon}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="pool" title="pool">
+                  <input name="attr_dicepool" placeholder="0d6" title="@{repeating_melee_${x}_dicepool}" type="text" value=""/>
                 </label>
                 <label data-i18n-title="dam" title="dam">
                   <input name="attr_damage" placeholder="5P" title="@{repeating_melee_${x}_damage}" type="text" value=""/>
@@ -3100,7 +3105,7 @@
 
 //Sheet workers
 on("sheet:opened", function() {
-	const version = '0.2';
+	const version = '0.21';
 	console.log(`%c Shadowrun 6th World v`+version, "color: blue; font-weight:bold");
 });
 
@@ -3885,9 +3890,7 @@ on("change:repeating_skills", (eventinfo) => {
 		const source = eventInfo.sourceAttribute;
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
-console.log(`${weap}` + ' changed!');
-console.log(source);
-console.log(weap);
+
 		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`], (v) => {
 			const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 			const spec = parseInt(v[`${weap}_spec`]) || 0;
@@ -3895,23 +3898,14 @@ console.log(weap);
 			const skill = v[`${weap}_skill`] || '';
 
 			getAttrs([`${skill}`], (s) => {
-console.log('rating: ' + s[`${skill}`]);
 				rating = s[`${skill}`];
 
 				const tot = mod + spec + expert + rating;
-console.log('tot: ' + tot);
 				setAttrs({
 					[`${weap}_rating`]: s[`${skill}`],
 					[`${weap}_dicepool`]: tot
 				});
 			});
-console.log('rating: ' + rating);
-
-//			const tot = mod + spec + expert + rating;
-//console.log('tot: ' + tot);
-//			setAttrs({
-//				[`${weap}_dicepool`]: tot
-//			});
 		});
 
 		if (source.includes('primary')) {
@@ -3922,6 +3916,9 @@ console.log('rating: ' + rating);
 				//Add the range or melee specific ones
 				if(type === "range") {
 					array.push("ammo", "ammo_max", "mode");
+				}
+				if(type === "melee") {
+
 				}
 
 				//Add the repeating section to the begining of each attribute
@@ -3962,7 +3959,7 @@ console.log('rating: ' + rating);
 					setAttrs(update);
 				});
 			};
-		} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('skill') || source.includes('rating') || source.includes('ammo') || source.includes('mode')) {
+		} else if (source.includes('dicepool') || source.includes('weapon') || source.includes('damage') || source.includes('skill') || source.includes('rating') || source.includes('ammo') || source.includes('mode') || source.includes('close') || source.includes('near') || source.includes('medium') || source.includes('far') || source.includes('extreme')) {
 			getAttrs([`${weap}_primary`, `${source}`], (v) => {
 				if (v[`${weap}_primary`] === 'primary') {
 					let update = {};
