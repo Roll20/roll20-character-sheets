@@ -153,9 +153,18 @@ const shadowrunFunctions = {
       }
     }
     return update
+  },
+  determineMatrixDice: attrs => {
+    const diceCheck = dice => dice >= 5 ? 5 : dice <= 1 ? 1 : dice;
+
+    if (attrs.edge) {
+      return 5
+    } else if (attrs.mode === 'cold') {
+      return diceCheck(3 + attrs.modifer)
+    } else {
+      //Hot Sims is the default
+      return diceCheck(4 + attrs.modifer)
+    }
   }
 }
-
-//for Mocha Unit Testing
-//-module.exports = shadowrunFunctions;
 
