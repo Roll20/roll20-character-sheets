@@ -710,6 +710,19 @@ on('change:repeating_profs:profslots remove:repeating_profs', function(){
 
     TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
 });
+//Nonweapon proficiency autofill
+on('change:repeating_profs:profname', function (eventInfo) {
+    let nonweaponProficiency = NonweaponProficiencies[eventInfo.newValue];
+    if (nonweaponProficiency === undefined)
+        return;
+    
+    console.log(nonweaponProficiency);
+    setAttrs({
+        'repeating_profs_profslots'  : nonweaponProficiency['slots'],
+        'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
+        'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+    });
+});
 
 //Equipment Carried Section
 on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(){
