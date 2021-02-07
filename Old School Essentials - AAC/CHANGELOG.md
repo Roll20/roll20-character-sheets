@@ -2,6 +2,12 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.2
+
+### Fixed
+
+- Fix a bug where the modifier inputs would throw validation errors when less than 0
+
 ## 1.9.1
 
 ### Fixed
