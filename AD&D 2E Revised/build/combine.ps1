@@ -25,8 +25,9 @@ $inserts | ForEach-Object {
    if ($split.Length -gt 2 -and $rawContent.Contains($replaceConstant)) {
       $rawContent = $rawContent.Replace($replaceConstant, $split[2])
    }
-
-   $content = $content -replace $_.Line, ($rawContent)
+   
+   $regex = "^" + [Regex]::Escape($_.Line) + "$"
+   $content = $content -replace $regex, $rawContent
 }
 
 $content | Set-Content -Path $outputFile
