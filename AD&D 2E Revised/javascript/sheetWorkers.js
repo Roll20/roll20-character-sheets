@@ -476,14 +476,13 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 
 function setupAutoFillSpellInfo(section, spellsTable) {
     if (spellsTable[section]) {
-        on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
+        on(`change:repeating_spells-${section}:spell-name`, function(eventInfo){
 
             let spell = spellsTable[section][eventInfo.newValue];
             if (spell === undefined)
                 return;
 
             let spellInfo ={
-                [`repeating_spells-${section}_spell-name`]         : spell['name'],
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
                 [`repeating_spells-${section}_spell-level`]        : spell['level'],
                 [`repeating_spells-${section}_spell-school`]       : spell['school'],
