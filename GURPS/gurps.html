@@ -77,6 +77,7 @@
 	<input type="hidden" name="attr_roll_hit_location" value="" />
 	<input type="hidden" name="attr_roll_maneuver" value=""  />
 	<input type="hidden" name="attr_roll_allout_attack" value=""  />
+	<input type="hidden" name="attr_roll" value=""  />
 	<div class="modal">
 		<div class="modal-dialog">
 			<div class="modal-header">
@@ -453,8 +454,13 @@
 								<div>
 									<div class="tooltip">
 										<span data-i18n="two-letter-abbreviation-size-modifier-label">SM</span>
-										<span class="tooltiptext">
-											<span data-i18n="target-size-modifier-tooltip">Size Modifier of target.</span>
+										<input type="hidden" name="attr_display_ranged_maneuvers_section" value="0" />
+										<span class="tooltiptext ranged">
+											<span data-i18n="target-ranged-size-modifier-tooltip">Size Modifier of target. The modifier is applied AFTER location, grapple, shield, chinks in armor have been applied.</span>
+										</span>
+										<input type="hidden" name="attr_display_melee_maneuvers_section" value="0" />
+										<span class="tooltiptext melee">
+											<span data-i18n="target-melee-size-modifier-tooltip">Size Modifier of target, which will then be substracted by your size modifier to get a final <b>Relative Size Modifier</b>.<br />The modifier is applied AFTER location, grapple, shield, chinks in armor have been applied.<br />For information on Relative SM see http://www.sjgames.com/gurps/faq/FAQ4-3.html#SS3.4.2.23</span>
 										</span>
 									</div>
 								</div>
@@ -4291,7 +4297,36 @@
 	<!-- /HIDDEN FIELDS -->
 
 	<div class="heading-character-name">
-		<h3><span name="attr_character_name"></span></h3>	
+		
+		<div style="float:right;">
+
+			<!-- see: https://codepen.io/YozhEzhi/pen/gcLpI/ -->
+			<input type="hidden" name="attr_display_roll_option_header" />
+			<div class="roll-options">
+				
+				<label>
+					<input type="radio" name="attr_roll_option_header" value="public" />
+					<span data-i18n="public-rolls-label">Public Rolls</span>
+				</label>
+				<label>
+					<input type="radio" name="attr_roll_option_header" value="private" />
+					<span data-i18n="private-rolls-label">Private Rolls</span>
+				</label>
+
+				<input type="hidden" name="attr_display_custom_roll_option_header" />
+				<label class="custom-roll-button">
+					<input type="radio" name="attr_roll_option_header" value="custom" />
+					<span name="attr_custom_roll_macro_label"></span>
+				</label>
+
+			</div>
+			
+		</div>
+
+		<div style="float:left;">
+			<h3><span name="attr_character_name"></span></h3>
+		</div>
+			
 	</div>
 
 	<div class="update-alert">
@@ -4307,10 +4342,22 @@
 				</h4>
 
 				<ul>
-					<li>Fix spelling error for drowsy. Reported by Charles</li>
-					<li>Fix bug with checkbox <b>Show casting details on roll template:</b>. The bug was if checked no roll is made, if unchecked the roll is made. Reported by Charles.</li>
-					<li>Fix bug for mini-roll modifier tool. If Encumbrance level changed, the total may not calculate correctly. Reported by PL M.</li>
-					<li>Fix but with range calculator. Math error calculating total distance when firing up. Reported by Idle</li>
+					<li><b>Bio\Misc</b> tab. Added <b>Apply</b> checkbox for Size Modifier. If checked, the Size Modifier will change the required character points for <b>Strength</b> and <b>Hit Points</b>. If you spent too many character points on Strength, you will get a warning message.</li>
+					<li>GCA Import. If character has Size Modifier 1 or higher, the <b>Apply</b> Size Modifier will be checked.</li>
+					<li>Combat Tab. Moved Shotgun damage tool to the Ranged sub-tab.</li>
+					<li>Combat Tool for Melee. Updated Size Modifier to use relative Size Modifier. Relative Size Modifier is Target Size - Your Size.
+						<ul>
+							<li>Requested by Charles and confirmed by PL M as addendum rule on FAQ site.</li>
+							<li>See: http://www.sjgames.com/gurps/faq/FAQ4-3.html#SS3.4.2.23</li>
+						</ul>
+					</li>
+					<li>
+						Chat Roll Options. Added a campaign setting and sheet option to display <b>Public</b> and <b>Private</b> roll options in the header. Added an optional <b>Custom</b> roll options.
+						<ul>
+							<li><b>Note:</b> The custom option requires an API script that can intercept the roll template.</li>
+							<li>For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</li>
+						</ul>
+					</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -4335,6 +4382,24 @@
 	
 	<!-- ===== ===== ===== ===== GENERAL TAB ===== ===== ===== ===== -->
 	<div class="tab1">
+
+		<div class="warning-messages">
+
+			<input type="hidden" name="attr_show_size_modifier_strength_message" value="" />
+			<input type="hidden" name="attr_size_modifier_cp_strength_adjustment" value="0" />
+			<div class="message-box size-modifier-strength-message">
+				<span data-i18n="size-modifier-strength-warning-message"><b style="color: red;">Warning!</b> Due to your Size Modifier <span name="attr_size"></span> you only need to spend <span name="attr_size_modifier_cp_strength_adjustment"></span> character points for Strength.</span>
+			</div>
+
+			<input type="hidden" name="attr_show_size_modifier_hit_point_message" value="" />
+			<input type="hidden" name="attr_size_modifier_cp_hit_point_adjustment" value="0" />
+			<div class="message-box size-modifier-hit-point-message">
+				<span data-i18n="size-modifier-hit-point-warning-message"><b style="color: red;">Warning!</b> Due to your Size Modifier <span name="attr_size"></span> you only need to spend <span name="attr_size_modifier_cp_hit_point_adjustment"></span> character points for Extra Hit Points.</span>
+			</div>
+
+		</div>
+
+		<div class="tab1-container">
 
 		<!-- _____ _____ ATTRIBUTE BOX _____ _____ -->
 		<div class="box attribute" style="float: left;">
@@ -4375,15 +4440,15 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							</span>
 						</div>
 						<div class="cell col1">
-							<input type="number" name="attr_strength_display" value="10" readonly="readonly" title="Macro name: strength_display" />
-							<input type="hidden" name="attr_strength_halved" value="0" title="Macro name: strength_halved" />
-							<input type="hidden" name="attr_strength" value="10" title="Macro name: strength" />
+							<input type="number" name="attr_strength_display" value="10" readonly="readonly" title="Macro: @{strength_display}" />
+							<input type="hidden" name="attr_strength_halved" value="0" title="Macro: @{strength_halved}" />
+							<input type="hidden" name="attr_strength" value="10" title="Macro: @{strength}" />
 						</div>
 						<div class="cell col2">
-							<input type="number" name="attr_strength_mod" value="0" step="1" title="Macro name: strength_mod" />
+							<input type="number" name="attr_strength_mod" value="0" step="1" title="Macro: @{strength_mod}" />
 						</div>
 						<div class="cell col3">
-							<input type="number" name="attr_strength_points" value="0" step="10" title="Macro name: strength_points" />
+							<input type="number" name="attr_strength_points" value="0" step="10" title="Macro: @{strength_points}" />
 						</div>
 						<div class="cell col4">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Strength Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{strength_display} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsST" />
@@ -4400,13 +4465,13 @@ Cost reduced by -10% (Max -80%) per SM+1 (B15)
 							</span>
 						</div>
 						<div class="cell col1">
-							<input type="number" name="attr_dexterity" value="10" readonly="readonly" title="Macro name: dexterity" >
+							<input type="number" name="attr_dexterity" value="10" readonly="readonly" title="Macro: @{dexterity}" >
 						</div>
 						<div class="cell col2">
-							<input type="number" name="attr_dexterity_mod" value="0" step="1" title="Macro name: dexterity_mod" />
+							<input type="number" name="attr_dexterity_mod" value="0" step="1" title="Macro: @{dexterity_mod}" />
 						</div>
 						<div class="cell col3">
-							<input type="number" name="attr_dexterity_points" value="0" step="20" title="Macro name: dexterity_points" />
+							<input type="number" name="attr_dexterity_points" value="0" step="20" title="Macro: @{dexterity_points}" />
 						</div>
 						<div class="cell col4">
 							<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Dexterity Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{dexterity} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsDX" />
@@ -6744,6 +6809,7 @@ and Advantages.
 			</div> <!-- .table -->
 		</div> <!-- box points -->
 
+		</div>
 	</div> <!-- tab1 -->
 
     <!-- ===== ===== ===== ===== TRAITS TAB ===== ===== ===== ===== -->
@@ -7458,14 +7524,23 @@ PU2:126 = Power-Ups 2. Page 126<br />
 							<span data-i18n="size-modifier-label">Size Modifier</span>
 						</div>
 						<span class="tooltip">
-							<span data-i18n="size-modifier-tooltip">
-This sheet does <strong>NOT</strong> auto adjust the cost values for ST	and Extra HP for a SM<br />
-that is greater than 0. To do that you can use a combination of Points and<br />
-MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
-							</span>
+							<span data-i18n="size-modifier-tooltip">For more information see B15, B16, <strong>B19</strong>. <b>Note:</b> use the <i>Apply</i> checkbox to use Size Modify limitations to Strength and Extra Hit Points.</span>
+						</span>
 					</div>
 					<div class="cell col-half">
 						<input type="number" name="attr_size" value="0" title="Macro name: size" />
+					</div>
+
+					<div class="cell col-apply-size-modifier label">
+						<div class="popup">
+							<span data-i18n="apply-label">Apply</span>
+						</div>
+						<span class="tooltip">
+							<span data-i18n="close-reach-tooltip">If checked, character point costs for Strength and Hit Points will be modified.<br />See B15, B16, <strong>B19</strong></span>
+						</span>
+					</div>
+					<div class="cell col-input">
+						<input type="checkbox" name="attr_apply_size_modifier" value="1" title="Macro: @{apply_size_modifier}" />
 					</div>
 
 					<div class="cell col0 label">
@@ -7474,6 +7549,7 @@ MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
 						</div>
 						<span class="tooltip">
 							<span data-i18n="reach-modifier-tooltip">Reach Modifier.<br />See Size Modifier and Reach, B402<br />When grappling, you get +1 To Hit per size modifier difference.</span>
+						</span>
 					</div>
 					<div class="cell col-input">
 						<input type="number" name="attr_reach" value="0" readonly="readonly" title="Macro name: reach" />
@@ -7485,6 +7561,7 @@ MOD entries to get the desired value. (B15, B16, <strong>B19</strong>)
 						</div>
 						<span class="tooltip">
 							<span data-i18n="close-reach-tooltip">If checked, a reach <span class="emphatic">C</span> weapon increases to reach 1, but no other effects.<br />See Size Modifier and Reach, B402</span>
+						</span>
 					</div>
 					<div class="cell col-input">
 						<input type="checkbox" name="attr_is_close_reach" title="Macro name: is_close_reach" />
@@ -11858,6 +11935,141 @@ visualize what it will look like in chat.
 						</div> <!-- .table -->
 					</div> <!-- .box .ranged-attacks firing-up-or-down -->
 					
+					<!-- _____ _____ Shotgun Tool _____ _____ -->
+					<div class="box shotgun-tool">
+						<div class="table">
+							
+							<div class="row title">
+								<div class="cell">
+									<span data-i18n="close-range-shotgun-label">Close Range Shotgun Damage Tool</span>
+								</div>
+							</div>
+							
+							<div class="header">
+								<div class="cell damage">
+									<span data-i18n="abbreviation-damage-label">DMG</span>
+								</div>
+								<div class="cell rof">
+									<span data-i18n="abbreviation-rate-of-fire-label">RoF</span>
+								</div>
+								<div class="cell damage-type">
+									<span data-i18n="type-label">Type</span>
+								</div>
+								<div class="cell range">
+									<div class="popup">
+										<span class="one-half">1/2</span> <span data-i18n="range-label">Range</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="shotgun-half-damage-tooltip">Enter half-damage range of shotgun.</span>
+									</div>
+								</div>
+								<div class="cell close-range">
+									<div class="popup">
+										<span data-i18n="close-label">Close</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="shotgun-close-range-tooltip">Close range.</span>
+									</div>
+								</div>
+								<div class="cell close-rof">
+									<div class="popup">
+										<span data-i18n="abbreviation-rate-of-fire-label">RoF</span>
+									</div>
+									<span class="tooltip">
+										<span data-i18n="shotgun-new-rate-of-fire-tooltip">New Rate of Fire</span>
+									</span>
+								</div>
+								<div class="cell close-damage">
+									<div class="popup">
+										<span data-i18n="abbreviation-damage-label">DMG</span>
+									</div>
+									<div class="tooltip">
+										<span data-i18n="shotgun-new-damage-tooltip">New Damage</span>
+									</div>
+								</div>
+								<div class="cell close-damage">
+									<div class="popup">
+										<span data-i18n="abbreviation-damage-resistance-multiplier-label">DR Mult.</span>
+									</div>
+									<div class="tooltip">
+										<div data-i18n="shotgun-damage-resistance-multiplier-tooltip">Damage Resistance Multiplier.</div>
+									</div>
+								</div>
+								<div class="cell roll-damage">
+									&nbsp;
+								</div>
+								<div class="cell reset">
+									&nbsp;
+								</div>
+							</div> <!-- .header -->
+							
+							<div class="container">
+								
+								<div class="row">
+									<div class="cell damage">
+										<input type="text" value="1d6+1" name="attr_shotgun_damage" title="Macro name: shotgun_damage" />
+									</div>
+									<div class="cell rof">
+										<input type="text" value="2x9" name="attr_shotgun_rof" title="Macro name: shotgun_rof" />
+									</div>
+									<div class="cell type">
+										<select name="attr_shotgun_damage_type" title="Macro name: shotgun_damage_type">
+											<option value="Affliction (aff)"><span data-i18n="abbreviation-affliction">aff</span></option>
+											<option value="Burning (burn)"><span data-i18n="abbreviation-option-burning">burn</span></option>
+											<option value="Corrosion (cor)"><span data-i18n="abbreviation-option-corrosion">cor</span></option>
+											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
+											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
+											<option value="Fatigue (fat)"><span data-i18n="abbreviation-option-fatigue">fat</span></option>
+											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
+											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
+											<option value="Piercing (pi)" selected="selected"><span data-i18n="abbreviation-option-piercing">pi</span></option>
+											<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
+											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
+											<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
+											<option value="Knockback (knock)"><span data-i18n="abbreviation-option-knockback">knock</span></option>
+											<option value="Toxic (tox)"><span data-i18n="abbreviation-option-toxic">tox</span></option>
+										</select>
+									</div>
+									<div class="cell range">
+										<input type="number" value="50" step="1" min="0" name="attr_shotgun_half_range" title="Macro name: shotgun_half_range" />
+									</div>
+									<div class="cell close-range">
+										<input type="text" value="5" name="attr_shotgun_close_range" readonly="readonly" title="Macro name: shotgun_close_range" />
+									</div>
+									<div class="cell close-rof">
+										<input type="text" value="2" name="attr_shotgun_close_rof" readonly="readonly" title="Macro name: shotgun_close_row" />
+									</div>
+									<div class="cell close-damage">
+										<input type="text" value="4d6+4" name="attr_shotgun_close_damage" readonly="readonly" title="Macro name: shotgun_close_damage" />
+									</div>
+									<div class="cell close-damage">
+										<input type="text" value="DR x 4" name="attr_shotgun_dr_multiplier" readonly="readonly" title="Macro name: shotgun_dr_multiplier" />
+									</div>
+									<div class="cell roll-damage">
+										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
+										<input type="hidden" name="attr_shotgun_damage_type_note" value="PIERCING
+			Damage x1
+			Vitals Damage x3
+			Skull Damage x4" />
+										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
+									</div>
+									<div class="cell reset">
+										<button type="action" name="act_shotgun_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
+									</div>
+								</div>
+								
+								<div class="row shotgun-notes">
+									<span data-i18n="shotgun-notes-description">
+			Enter the stats of the shotgun, be sure to use half-damage range. The tool will calculate how 
+			close you need to be with the shotgun, the RoF, close range damage, and DR multiplier.
+			For more information, see B409.
+									</span>
+								</div>
+							</div> <!-- .container -->
+							
+						</div> <!-- .table -->
+					</div> <!-- .box .shotgun tool -->
+					
 				</div>
 
 				<div class="tools">
@@ -12315,141 +12527,6 @@ visualize what it will look like in chat.
 					</div> 
 					<!-- end demolition -->
 			
-					<!-- _____ _____ Shotgun Tool _____ _____ -->
-					<div class="box shotgun-tool">
-						<div class="table">
-							
-							<div class="row title">
-								<div class="cell">
-									<span data-i18n="close-range-shotgun-label">Close Range Shotgun Damage Tool</span>
-								</div>
-							</div>
-							
-							<div class="header">
-								<div class="cell damage">
-									<span data-i18n="abbreviation-damage-label">DMG</span>
-								</div>
-								<div class="cell rof">
-									<span data-i18n="abbreviation-rate-of-fire-label">RoF</span>
-								</div>
-								<div class="cell damage-type">
-									<span data-i18n="type-label">Type</span>
-								</div>
-								<div class="cell range">
-									<div class="popup">
-										<span class="one-half">1/2</span> <span data-i18n="range-label">Range</span>
-									</div>
-									<div class="tooltip">
-										<span data-i18n="shotgun-half-damage-tooltip">Enter half-damage range of shotgun.</span>
-									</div>
-								</div>
-								<div class="cell close-range">
-									<div class="popup">
-										<span data-i18n="close-label">Close</span>
-									</div>
-									<div class="tooltip">
-										<span data-i18n="shotgun-close-range-tooltip">Close range.</span>
-									</div>
-								</div>
-								<div class="cell close-rof">
-									<div class="popup">
-										<span data-i18n="abbreviation-rate-of-fire-label">RoF</span>
-									</div>
-									<span class="tooltip">
-										<span data-i18n="shotgun-new-rate-of-fire-tooltip">New Rate of Fire</span>
-									</span>
-								</div>
-								<div class="cell close-damage">
-									<div class="popup">
-										<span data-i18n="abbreviation-damage-label">DMG</span>
-									</div>
-									<div class="tooltip">
-										<span data-i18n="shotgun-new-damage-tooltip">New Damage</span>
-									</div>
-								</div>
-								<div class="cell close-damage">
-									<div class="popup">
-										<span data-i18n="abbreviation-damage-resistance-multiplier-label">DR Mult.</span>
-									</div>
-									<div class="tooltip">
-										<div data-i18n="shotgun-damage-resistance-multiplier-tooltip">Damage Resistance Multiplier.</div>
-									</div>
-								</div>
-								<div class="cell roll-damage">
-									&nbsp;
-								</div>
-								<div class="cell reset">
-									&nbsp;
-								</div>
-							</div> <!-- .header -->
-							
-							<div class="container">
-								
-								<div class="row">
-									<div class="cell damage">
-										<input type="text" value="1d6+1" name="attr_shotgun_damage" title="Macro name: shotgun_damage" />
-									</div>
-									<div class="cell rof">
-										<input type="text" value="2x9" name="attr_shotgun_rof" title="Macro name: shotgun_rof" />
-									</div>
-									<div class="cell type">
-										<select name="attr_shotgun_damage_type" title="Macro name: shotgun_damage_type">
-											<option value="Affliction (aff)"><span data-i18n="abbreviation-affliction">aff</span></option>
-											<option value="Burning (burn)"><span data-i18n="abbreviation-option-burning">burn</span></option>
-											<option value="Corrosion (cor)"><span data-i18n="abbreviation-option-corrosion">cor</span></option>
-											<option value="Crushing (cr)"><span data-i18n="abbreviation-option-crushing">cr</span></option>
-											<option value="Cutting (cut)"><span data-i18n="abbreviation-option-cutting">cut</span></option>
-											<option value="Fatigue (fat)"><span data-i18n="abbreviation-option-fatigue">fat</span></option>
-											<option value="Impaling (imp)"><span data-i18n="abbreviation-option-impaling">imp</span></option>
-											<option value="Small Piercing (pi-)"><span data-i18n="abbreviation-option-piercing-minus">pi-</span></option>
-											<option value="Piercing (pi)" selected="selected"><span data-i18n="abbreviation-option-piercing">pi</span></option>
-											<option value="Large Piercing (pi+)"><span data-i18n="abbreviation-option-piercing-plus">pi+</span></option>
-											<option value="Huge Piercing (pi++)"><span data-i18n="abbreviation-option-piercing-plus-plus">pi++</span></option>
-											<option value="Special (spec)"><span data-i18n="abbreviation-option-special">spec</span></option>
-											<option value="Knockback (knock)"><span data-i18n="abbreviation-option-knockback">knock</span></option>
-											<option value="Toxic (tox)"><span data-i18n="abbreviation-option-toxic">tox</span></option>
-										</select>
-									</div>
-									<div class="cell range">
-										<input type="number" value="50" step="1" min="0" name="attr_shotgun_half_range" title="Macro name: shotgun_half_range" />
-									</div>
-									<div class="cell close-range">
-										<input type="text" value="5" name="attr_shotgun_close_range" readonly="readonly" title="Macro name: shotgun_close_range" />
-									</div>
-									<div class="cell close-rof">
-										<input type="text" value="2" name="attr_shotgun_close_rof" readonly="readonly" title="Macro name: shotgun_close_row" />
-									</div>
-									<div class="cell close-damage">
-										<input type="text" value="4d6+4" name="attr_shotgun_close_damage" readonly="readonly" title="Macro name: shotgun_close_damage" />
-									</div>
-									<div class="cell close-damage">
-										<input type="text" value="DR x 4" name="attr_shotgun_dr_multiplier" readonly="readonly" title="Macro name: shotgun_dr_multiplier" />
-									</div>
-									<div class="cell roll-damage">
-										<input type="hidden" name="attr_thrust_damage_dice_icon" class="thrust-damage-dice-icon" value="explode" />
-										<input type="hidden" name="attr_shotgun_damage_type_note" value="PIERCING
-			Damage x1
-			Vitals Damage x3
-			Skull Damage x4" />
-										<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Damage Roll}} {{characterName=@{character_name}}} {{skillName=Close Shotgun Damage}} {{damageRoll=[[@{shotgun_close_damage}]]}} {{useDamageTypeNotes=[[@{use_damage_type_notes}]]}} {{damageTypeNote=@{shotgun_damage_type_note}}} {{showMinimumDmgNote=[[@{show_minimum_damage_notes}]]}} {{minDamageNote=Crush min 0, else min 1}}" name="roll_dmgCloseShotgunDamage" class="roll_damage" />
-									</div>
-									<div class="cell reset">
-										<button type="action" name="act_shotgun_reset" class="reset"><span data-i18n="reset-label">Reset</span></button>
-									</div>
-								</div>
-								
-								<div class="row shotgun-notes">
-									<span data-i18n="shotgun-notes-description">
-			Enter the stats of the shotgun, be sure to use half-damage range. The tool will calculate how 
-			close you need to be with the shotgun, the RoF, close range damage, and DR multiplier.
-			For more information, see B409.
-									</span>
-								</div>
-							</div> <!-- .container -->
-							
-						</div> <!-- .table -->
-					</div> <!-- .box .falling and collision -->
-					
 				</div>	
 
 			</div>
@@ -13107,6 +13184,29 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li><b>Bio\Misc</b> tab. Added <b>Apply</b> checkbox for Size Modifier. If checked, the Size Modifier will change the required character points for <b>Strength</b> and <b>Hit Points</b>. If you spent too many character points on Strength, you will get a warning message.</li>
+				<li>GCA Import. If character has Size Modifier 1 or higher, the <b>Apply</b> Size Modifier will be checked.</li>
+				<li>Combat Tab. Moved Shotgun damage tool to the Ranged sub-tab.</li>
+				<li>Combat Tool for Melee. Updated Size Modifier to use relative Size Modifier. Relative Size Modifier is Target Size - Your Size.
+					<ul>
+						<li>Requested by Charles and confirmed by PL M as addendum rule on FAQ site.</li>
+						<li>See: http://www.sjgames.com/gurps/faq/FAQ4-3.html#SS3.4.2.23</li>
+					</ul>
+				</li>
+				<li>
+					Chat Roll Options. Added a campaign setting and sheet option to display <b>Public</b> and <b>Private</b> roll options in the header. Added an optional <b>Custom</b> roll options.
+					<ul>
+						<li><b>Note:</b> The custom option requires an API script that can intercept the roll template.</li>
+						<li>For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</li>
+					</ul>
+				</li>
+			</ul>
+
+			<h4>Version: 2.6.1</h4>
+
+			<p>Pull Request: 1/9/2021</p>
+
+			<ul>
 				<li>Fix spelling error for drowsy. Reported by Charles</li>
 				<li>Fix bug with checkbox <b>Show casting details on roll template:</b>. The bug was if checked no roll is made, if unchecked the roll is made. Reported by Charles.</li>
 				<li>Fix bug for mini-roll modifier tool. If Encumbrance level changed, the total may not calculate correctly. Reported by PL M.</li>
@@ -13115,7 +13215,7 @@ visualize what it will look like in chat.
 
 			<h4>Version: 2.6.0</h4>
 
-			<p>Pull Request: 1/4/2020</p>
+			<p>Pull Request: 1/4/2021</p>
 
 			<ul>
 				<li>Options tab. Created sub-tabs for <b>Sheet Options</b>, <b>Rules</b>, <b>Import</b></li>
@@ -13513,44 +13613,83 @@ visualize what it will look like in chat.
 							<span data-i18n="public-or-private-rolls-label">Public or Private Rolls</span>
 						</h4>
 						
-						<input type="radio" name="attr_roll" value="" checked="true" />
+						<input type="checkbox" name="attr_display_roll_option_header" value="1" />
+						<span class="popup">
+							<span data-i18n="display-in-header-label">Display Roll Options in Header</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="display-in-header-tooltip">
+								If checked, the options for <b>Public Rolls</b> and <b>Private Rolls</b> will be displayed to the right of the character name above the tabs.
+							</span>
+						</span>
+						<br />
+
+						<input type="checkbox" name="attr_display_custom_roll_option_header" value="1" />
+						<span class="popup">
+							<span data-i18n="display-custom-in-header-label">Display Custom Option in Header</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="display-custom-in-header-tooltip">
+								If checked, button name for <b>Custom Rolls</b> will be displayed to the right of the character name above the tabs.
+							</span>
+						</span>
+						<br />
+
+						<input type="radio" name="attr_roll_option" value="public" checked="checked">
 						<span class="popup">
 							<span data-i18n="public-rolls-label">Public Rolls</span>
 						</span>
 						<span class="tooltip">
-							<span data-i18n="public-rolls-tooltip">
-								All players will be able to see<br />
-								your skill level, roll and results.
-							</span>
+							<span data-i18n="public-rolls-tooltip">All players will be able to see<br>your skill level, roll and results.</span>
 						</span>
-						<br />
+						<br>
 						
-						<input type="radio" name="attr_roll" value="/w gm --l " />
+						<input type="radio" name="attr_roll_option" value="deprecated">
 						<span class="popup">
 							<span data-i18n="private-skill-levels-label">Private Skill Levels <em>deprecated</em></span>
 						</span>
 						<span class="tooltip">
-							<span data-i18n="private-skill-levels-tooltip">
-								Only the GM will be able to see<br />
-								your skill level, but all players<br />
-								will see the result.<br />
-								<b>NOTE:</b> This now behaves just like Private Rolls
-							</span>
+							<span data-i18n="private-skill-levels-tooltip">Only the GM will be able to see<br>your skill level, but all players<br>will see the result.<br><b>NOTE:</b> This now behaves just like Private Rolls</span>
 						</span>
-						<br />
+						<br>
 						
-						<input type="radio" name="attr_roll" value="/w gm " />
+						<input type="radio" name="attr_roll_option" value="private">
 						<span class="popup">
-							<span data-i18n="private-rols-label">Private Rolls</span>
+							<span data-i18n="private-rolls-label">Private Rolls</span>
 						</span>
 						<span class="tooltip">
-							<span data-i18n="private-rolls-tooltip">
-								Only the GM will see your skill<br />
-								level and the result.
-							</span>
+							<span data-i18n="private-rolls-tooltip">Only the GM will see your skill<br>level and the result.</span>
 						</span>
-						
-					</div><!-- end public/private rolls -->
+						<br>
+
+						<input type="radio" name="attr_roll_option" value="custom">
+						<span class="popup">
+							<span data-i18n="custom-rolls-label">Custom Rolls</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="custom-rolls-tooltip">Use this option to use a custom macro with the Roll Template.<br><br><b style="color:red;">Important:</b> When entering the macro, be sure to add a <i>space</i> character to the end!<br><br>Add a <b>Button Label</b> to display a button in the header.<br><br>For example, the Private Rolls option adds <i style="color:gray;">/w gm</i> to the beginning of the roll, which means whisper to GM.<br><br>Another example is adding a blind roll option, where <b>only</b> the GM sees the roll. This example uses the <i>Blind Roll</i> API script, see https://app.roll20.net/forum/permalink/5064809/.<br>Set Label = <b>Blind Roll</b>, set Macro = <b>!broll</b></span>
+						</span>
+
+						<div>
+							<div>
+								<b>
+									<span data-i18n="button-label">Button Name</span>
+								</b><br>
+								<input type="text" name="attr_custom_roll_macro_label" value="Blind Roll">
+							</div>
+							<div>
+								<span class="popup">
+									<span data-i18n="macro-label">Macro</span>
+								</span>
+								<span class="tooltip">
+									<span data-i18n="macro-label-tooltip"><b>NOTE:</b> In order to use this option, you will need an API script that can intercept the data for the roll and then send a message to the GM.<br /><br />For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</span>
+								</span>
+								<br />
+								<input type="text" name="attr_custom_roll_macro" value="">
+							</div>
+						</div>
+
+					</div>
 					
 					<div class="option-container">
 						<h4>
@@ -15494,7 +15633,7 @@ visualize what it will look like in chat.
 				{{/allprops() title subtitle roll target desc templateType sheetStyle}}
 
 				{{#desc}}
-				<div class="sheet-desc">{{desc}}</div>
+				<div class="desc">{{desc}}</div>
 				{{/desc}}
 
 			</div>
@@ -15514,9 +15653,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.1";
+	var version = "2.6.2";
 
-	var latestChangesDate = "1/10/2020";
+	var latestChangesDate = "2/1/2021";
 
 	var modCascade = true;
 	
@@ -16354,6 +16493,8 @@ visualize what it will look like in chat.
 	on('sheet:opened', function() {
 	    
 		console.log('********* Sheet Opened *********');
+
+		syncRollOptions();
 		
 		setAttrs({inventory_fixed_digits: 1}); 
 
@@ -16649,17 +16790,109 @@ visualize what it will look like in chat.
 	}
 	
 	// Strength Change
-	on('change:strength_points change:strength_mod change:defense_knockback_hitpoints_mod', function (e) {
+	on('change:strength_points change:strength_mod change:defense_knockback_hitpoints_mod change:size change:apply_size_modifier', function (e) {
 		updateST();
 	});
 
+	/**
+	 * Get the size modifier percentage for use with 
+	 * Strength and extra HP character point costs
+	 * 
+	 * @param int sizeModifier size of character
+	 * 
+	 * @return int
+	 */
+	function getSizeModifierPercentage(sizeModifier) {
+
+		let percentModifier = 0;
+
+		// make sure we have an integer
+		if (Number.isInteger(sizeModifier) === false) {
+			sizeModifier = Math.floor(sizeModifier);
+		}
+
+		if (1 <= sizeModifier && sizeModifier <= 8) {
+			percentModifier = -10 * sizeModifier;
+		} else if (sizeModifier > 8) {
+			percentModifier = -80;
+		}
+		
+		return percentModifier;
+
+	}
+
+	/**
+	 * Get the point cost per level based on size modifier.
+	 * 
+	 * @param bool applySizeModifier Should size modifier by applied?
+	 * @param int  sizeModifier      Size of character
+	 * @param int  basePointsPerLevel Cost per level for an attribute. ST is 10 per level. HP is 2 per level
+	 */
+	function getSizeModifierPointsPerLevel(applySizeModifier, sizeModifier, basePointsPerLevel) {
+
+		let pointsPerLevel = basePointsPerLevel;
+
+		// make sure we have an integer
+		if (Number.isInteger(sizeModifier) === false) {
+			sizeModifier = Math.floor(sizeModifier);
+		}
+
+		if (applySizeModifier && sizeModifier > 0) {
+
+			let percentModifier = getSizeModifierPercentage(sizeModifier);
+
+			let decimalModifier = percentModifier / 100;
+
+			// formula ST example: points per level = 10
+			//                     basePointsPerLevel + (basePointsPerLevel * percentModifier) = pointsPerLevel
+			//                     10 + (10 * 0) = 10		-- size modifier = 0
+			//                     10 + (10 * -10%) = 9		-- size mofifier = 1 | -10% = -.1
+			//                     10 + (10 * -20%) = 8		-- size modifier = 2
+			// formula HP example: points per level = 2
+			//                     2 + (2 * -10%) = 2
+			pointsPerLevel = basePointsPerLevel + (basePointsPerLevel * decimalModifier);
+
+		}
+
+		return pointsPerLevel;
+
+	}
+
 	// Update Strength
 	function updateST(callback) {
+
 		callback = callback || noop;
+		
 		console.log('********* updateST *********');
-		getAttrs(['strength_points', 'strength_mod', 'strength_halved', 'defense_knockback_hitpoints_mod'], function(v) {
+		
+		getAttrs(['strength_points', 'strength_mod', 'strength_halved', 'defense_knockback_hitpoints_mod', 'apply_size_modifier', 'size'], function(v) {
 		    
-			let base = 10 + ((+v.strength_points || 0) / 10 | 0);
+			let applySizeModifier = (v.apply_size_modifier == "1");
+
+			let sizeModifier = Number(v.size) || 0;
+
+			let characterPoints = Number(v.strength_points) || 0;
+
+			let pointsPerLevel = getSizeModifierPointsPerLevel(applySizeModifier, sizeModifier, 10);
+
+			let strengthModByCharacterPoints = Math.floor(characterPoints/pointsPerLevel);
+
+			// check for remainder. 
+			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+
+			let pointsNeededForStrength = 0;
+
+			let showMessage = 0;
+
+			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+
+				showMessage = 1;
+
+				pointsNeededForStrength = Math.floor(pointsPerLevel * strengthModByCharacterPoints);
+
+			}
+
+			let base = 10 + strengthModByCharacterPoints;
 			
 			let mod = +v.strength_mod || 0;
 			
@@ -16680,7 +16913,9 @@ visualize what it will look like in chat.
 				strength_base: base,
 				strength: base + mod,
 				strength_display: st_display,
-				knockback_points: st_display - 2 + knockbackMod
+				knockback_points: st_display - 2 + knockbackMod,
+				show_size_modifier_strength_message: showMessage,
+				size_modifier_cp_strength_adjustment: pointsNeededForStrength
 			}, {silent: false}, callback);
 		});
 	}
@@ -16743,7 +16978,7 @@ visualize what it will look like in chat.
 	}
 
 	// HP
-	on('change:strength change:hit_points_points change:hit_points_mod', function (e) {
+	on('change:strength change:hit_points_points change:hit_points_mod change:apply_size_modifier change:size', function (e) {
 		
 		// after updating hit points, update thresholds
 		updateHP(updateHitPointThresholds);
@@ -16757,11 +16992,36 @@ visualize what it will look like in chat.
 		
 		callback = callback || noop;
 		
-		getAttrs(['strength', 'strength_base', 'hit_points_points', 'hit_points_mod'], function(v) {
+		getAttrs(['strength', 'strength_base', 'hit_points_points', 'hit_points_mod', 'apply_size_modifier', 'size'], function(v) {
 		
-			let base = (modCascadeAll ? +v.strength : +v.strength_base) + ((+v.hit_points_points || 0) / 2 | 0);
+			let applySizeModifier = (v.apply_size_modifier == "1");
+
+			let sizeModifier = Number(v.size) || 0;
+
+			let characterPoints = Number(v.hit_points_points) || 0;
+
+			let pointsPerLevel = getSizeModifierPointsPerLevel(applySizeModifier, sizeModifier, 2);
+
+			let modByCharacterPoints = Math.floor(characterPoints/pointsPerLevel);
+
+			// check for remainder. 
+			let hasRemainder = (characterPoints % pointsPerLevel) >= 1;
+
+			let pointsNeededForHitPoints = 0;
+
+			let showMessage = 0;
+
+			if (applySizeModifier && sizeModifier > 0 && hasRemainder) {
+
+				showMessage = 1;
+
+				pointsNeededForHitPoints = Math.floor(pointsPerLevel * modByCharacterPoints);
+
+			}
+			
+			let base = (modCascadeAll ? +v.strength : +v.strength_base) + modByCharacterPoints;
 		
-			let mod = +v.hit_points_mod;
+			let mod = +v.hit_points_mod || 0;
 
 			let hitPoints = base + mod;
 
@@ -16769,7 +17029,9 @@ visualize what it will look like in chat.
 		
 			setAttrs({
 				hit_points_max: hitPoints,
-				major_wound_threshold: majorWound
+				major_wound_threshold: majorWound,
+				show_size_modifier_hit_point_message: showMessage,
+				size_modifier_cp_hit_point_adjustment: pointsNeededForHitPoints
 			}, {silent: false}, callback);
 		
 		});
@@ -19857,7 +20119,8 @@ visualize what it will look like in chat.
 			"firing_elevation",
 			"firing_acc",
 			"firing_aiming_bonus",
-			"firing_rof"
+			"firing_rof",
+			"size"
 		];
 			
 		getAttrs(fields, function(values) {
@@ -19865,6 +20128,11 @@ visualize what it will look like in chat.
 			let linearDistance = Number(values.firing_distance);
 			
 			let sizeMod = Number(values.firing_size_mod);
+
+			let characterSize = Number(values.size) || 0;
+
+			// calculate the final size modifier
+			sizeMod = sizeMod + characterSize;
 			
 			let speed = Number(values.firing_speed_difference);
 			
@@ -25365,6 +25633,8 @@ The attacker may choose to hit the original target or the limb you used to parry
 			"target_down",
 			"target_partly_exposed",
 			"target_intervening_figures",
+			"size",
+			"display_melee_maneuvers_section"
 		];
 
 		getAttrs(fields, values => {
@@ -25375,7 +25645,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			let grapple = Number(values.grapple_modifier);
 
-			let sizeModifier = Number(values.target_size_modifier);
+			let sizeModifier = Number(values.target_size_modifier) || 0;
+
+			let characterSize = Number(values.size) || 0;
+
+			let isMelee = values.display_melee_maneuvers_section == "1";
+
+			let sizeModifierLabel = "SM";
+
+			// if melee, use relative size modifier. See FAQ. http://www.sjgames.com/gurps/faq/FAQ4-3.html#SS3.4.2.23
+			if (isMelee) {
+
+				sizeModifier = sizeModifier - characterSize;
+
+				sizeModifierLabel = "Relative SM";
+			}
 
 			let hasShield = Number(values.has_shield) === 1 ? true : false;
 
@@ -25414,7 +25698,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			// NOTE: some types of underscores, like humanoid_nartial_arts.
 			let typeDescription = type.replace(/_/g, " ");
 
-			let locationNote = `${typeDescription} (SM ${sizeModifier}) ` + arrLocation.join(" ");
+			let locationNote = `${typeDescription} (${sizeModifierLabel} ${sizeModifier}) ` + arrLocation.join(" ");
 
 			// check for shield modifier
 			if (hasShield && isHitLocationAffectedByShield(locationNote)) {
@@ -26763,6 +27047,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			"knockdown_check_mod": 0,
 			"unconscious_check_mod": 0,
 			"death_check_mod": 0,
+			"apply_size_modifier": 0,
 			"import_message": "Import has completed.",
 			"json_data": "",
 			"templates": [],
@@ -26875,8 +27160,12 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let costOfLiving = "0";
 
-		if (jsonSM && jsonSM.level) {
-			sizeModifier = jsonSM.level;
+		if (jsonSM && jsonSM.score) {
+			sizeModifier = jsonSM.score;
+		}
+
+		if (sizeModifier > 0) {
+			runningTotals.apply_size_modifier = 1; 
 		}
 
 		if (jsonStatus && jsonStatus.score) {
@@ -30271,5 +30560,88 @@ The attacker may choose to hit the original target or the limb you used to parry
 		return notes;
 
 	}
+
+	// check for roll options and changes to custom roll macro
+	on("change:custom_roll_macro change:roll_option", event => {
+
+		getAttrs(["roll_option", "custom_roll_macro"], values => {
+
+			let rollOption = values.roll_option;
+
+			rollOption = rollOption.trim();
+
+			let customMacro = values.custom_roll_macro;
+
+			customMacro = customMacro.trim();
+
+			let rollMacro = "";
+
+			if (rollOption === "deprecated") {
+
+				rollMacro = "/w gm --l ";
+
+			} else if (rollOption === "private") {
+
+				rollMacro = "/w gm ";
+
+			} else if (rollOption === "custom") {
+
+				rollMacro = customMacro;
+
+			}
+
+			setAttrs({roll: rollMacro}, {silent: true}, () => {
+
+				setAttrs({roll_option_header: rollOption});
+
+			});
+
+		});
+
+	});
+
+	/**
+	 * Needed to add a new attr_roll_option to handle
+	 * a custom roll macro. This code makes sure the 
+	 * correct roll option is selected when the sheet opens.
+	 */
+	function syncRollOptions() {
+
+		getAttrs(["roll"], values => {
+
+			let rollValue = values.roll;
+
+			let rollOption;
+
+			rollValue = rollValue.trim();
+
+			if (rollValue === "") {
+				rollOption = "public";
+			} else if (rollValue === "/w gm --l ") {
+				rollOption = "deprecated";
+			} else if (rollValue === "/w gm ") {
+				rollOption = "private";
+			} else {
+				rollOption = "custom";
+			}
+
+			setAttrs({roll_option: rollOption, roll_option_header: rollOption}, {silent: true});
+
+		});
+
+	}
+
+	// if roll option in header changes, update the sheet option
+	on("change:roll_option_header", event => {
+
+		getAttrs(["roll_option_header"], values => {
+
+			let option = values.roll_option_header;
+
+			setAttrs({roll_option: option});
+
+		});
+
+	});
 
 </script>
