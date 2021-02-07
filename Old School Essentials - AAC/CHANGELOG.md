@@ -7,6 +7,7 @@
 ### Fixed
 
 - Fix a bug where the modifier inputs would throw validation errors when less than 0
+- Fix a bug where the modifiers could be changed
 
 ## 1.9.1
 
