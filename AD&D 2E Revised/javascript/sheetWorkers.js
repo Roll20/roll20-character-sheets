@@ -700,6 +700,9 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
+//melee weapons autofill
+// on('change:')
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
