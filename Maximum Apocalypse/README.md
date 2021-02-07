@@ -35,7 +35,6 @@ Also see the API script which implements the logic to handle initiative tracking
 ## Aspirational enhancements
 - Distinguish between current & max ammo
 - Add range to weapons
-- Text areas should remember how expanded they were
 - Distinguish between current & max ammo
 - Add radiation infection table
 - Add food poisoning table
@@ -45,6 +44,9 @@ Also see the API script which implements the logic to handle initiative tracking
 - Implement special ability conditional modifier roll queries (e.g. Bravery, Hollow Points ...)
 
 ## Change Log
+
+### February 7th 2021 v9.0
+- Add checkbox for special ability & gear textareas to toggle height between 1 & 6
 
 ### January 21st 2021 v8.0
 - Make damage roll query optional
