@@ -45,6 +45,7 @@ on Github.
 ### 2.5.4
 
 * Fix incorrect encumbrance value for shields.
+* Fix (un)checking Shell Affinity deactivating all active Shells.
 * Add WWN to skill lists selectable in sheet default settings.
 
 ### 2.5.3
