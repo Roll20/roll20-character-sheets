@@ -1,5 +1,16 @@
 <!-- The file template.html includes python integration. See Readme.md for details -->
 $$header$$
+<!-- Do not remove older alerts, the id system will break and hide new alerts on old sheets -->
+$$alert(
+    "February 2021 v1.6 Update - Loss of ability configuration",
+    "In the 'Ability' tab, the characteristic of each ability must be selected again."
+)$$
+$$alert(
+    "February 2021 v1.6 Update - Inline Labels",
+    "Inline label have been added to the sheet rolls. To see some of them, you must re-select characteristics and arts in the dropdown menus.",
+    level="info"
+)$$
+
 <div class="sheet-top_bar">
     <div>
         <div class='sheet-3colrow'>
@@ -66,9 +77,9 @@ $$header$$
         <button type="action" name="act_die-toggle-stress" class="sheet-die-toggle-stress" data-i18n="stress">Stress</button>
         <button type="roll" class="sheet-reroll" name="roll_reroll" title="Reroll" value="&{template:reroll} {{roll= [[1d10]]}}" data-i18n="roll">Roll</button>
         <button type="roll" class="sheet-botch" name="roll_botch" title="Botch" value="&{template:botch} {{roll= @{botchFormula} }}" data-i18n="botch" >Botch</button>
-        <button type="roll" class="sheet-critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10!1}=1))[number of 1s] * [[1d9+1]][last die]]]}}" data-i18n="critical">Critical</button>
+        <button type="roll" class="sheet-critical" name="roll_critical" title="Critical" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2*2**({1d10!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}}" data-i18n="critical">Critical</button>
         <!-- Invisible second critical button with a divide by 2, for spontaneous criticals -->
-        <button type="roll" class="sheet-critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2**({1d10!1}=1))[number of 1s] * [[1d9+1]][last die]]]}} {{type=@{spontaneous_i18n}}}" data-i18n="critical">Critical</button>
+        <button type="roll" class="sheet-critical" name="roll_critical-spontaneous" title="Critical" style="display: none" value="&{template:critical} {{roll=[[?{@{total_i18n}|0}[@{total_i18n}] + (2**({1d10!1}=1)) [number of 1s] * [[1d9+1]] [last die]]]}} {{type=@{spontaneous_i18n}}}" data-i18n="critical">Critical</button>
     </div>
 </div>
 <div class="sheet-tab-br"></div> 
@@ -972,7 +983,7 @@ $$header$$
             </tr>
             <tr>
                 <td style="width:30px;">
-                    <button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}}} {{rollsoak= [[@{stress-die} + @{Stamina_Score}[@{stamina_i18n}] + @{soak_bonus}[@{soakbns_i18n}] + @{armor_soak_bonus}[@{armor_i18n}]]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
+                    <button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_soak" value="&{template:soak} {{name= @{character_name} }} {{armorsoak= @{armor_soak_bonus}}} {{soakbonus= @{soak_bonus}}} {{rollsoak= [[@{stress-die} + @{Stamina_Score} [@{stamina_i18n}] + @{soak_bonus} [@{soakbns_i18n}] + @{armor_soak_bonus} [@{armor_i18n}]]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
                 </td>
                 <td><input type="text" class="sheet-number_1" name="attr_Soak" value="(@{Stamina_Score} + @{soak_bonus} + @{armor_soak_bonus})" disabled="true"/></td>
                 <td><input type="number" class="sheet-number_2" name="attr_soak_bonus" value="0"/></td>
@@ -1006,13 +1017,13 @@ $$header$$
                 <tr>
                     <th><input type="text" class="sheet-heading_3" name="attr_Weapon_name"/></th>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{Init_Weap}[@{Weapon_name}] - @{Init_Enc}[@{encumbrance_i18n}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0})[@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="init" >Init</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Init" value="&{template:initiative} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{roll= [[ @{stress-die} + @{Quickness_Score} [@{quickness_i18n}] + @{Init_Weap} [@{Weapon_name}] - @{Init_Enc} [@{encumbrance_i18n}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{initiative_i18n} @{modifiers_i18n}|0}) [@{initiative_i18n} @{modifiers_i18n}] &{tracker}]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="init" >Init</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Init" value="(@{Quickness_Score} + @{Init_Weap} - @{Init_Enc})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + @{Dexterity_Score}[@{dexterity_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Atk_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0})[@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score}[@{strength_i18n}] + @{Dam_Weap}[@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0})[@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="atk" >Atk</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Atk" value="&{template:attack} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{attack= [[ @{stress-die} + @{Dexterity_Score} [@{dexterity_i18n}] + @{WeaponAbility} [@{ability_i18n}] + @{Atk_Weap} [@{Weapon_name}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{attack_i18n}|0}) [@{circumstantial_i18n} @{attack_i18n}] ]] }} {{damage= [[ @{Strength_Score} [@{strength_i18n}] + @{Dam_Weap} [@{Weapon_name}] + (?{@{circumstantial_i18n} @{damage_i18n}|0}) [@{circumstantial_i18n} @{damage_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="atk" >Atk</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_Atk" value="(@{Dexterity_Score} + @{WeaponAbility} + @{Atk_Weap})" disabled="true"/></td>
 
-                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + @{Quickness_Score}[@{quickness_i18n}] + @{WeaponAbility}[@{ability_i18n}] + @{Dfn_Weap}[@{Weapon_name}] + @{wound_total}[@{wounds_i18n}] + [[floor(@{Fatigue})]][@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0})[@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="dfn" >Dfn</button></td>
+                    <td><button type="roll" class="sheet-button sheet-stress-roll sheet-single-roll" name="roll_weapon_Dfn" value="&{template:defend} {{name= @{character_name} }} {{weapon= @{Weapon_name} }} {{defend= [[ @{stress-die} + @{Quickness_Score} [@{quickness_i18n}] + @{WeaponAbility} [@{ability_i18n}] + @{Dfn_Weap} [@{Weapon_name}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n} @{defense_i18n}|0}) [@{circumstantial_i18n} @{defense_i18n}] ]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}" data-i18n="dfn" >Dfn</button></td>
                     <td><input type="text" class="sheet-number_1" name="attr_DFN" value="(@{Quickness_Score} + @{WeaponAbility} + @{Dfn_Weap})" disabled="true"/></td>
                     
                     <td><div style="width:10px;"></div></td>
@@ -1202,7 +1213,7 @@ $$header$$
 <!-- 6 Help -->
 <div class="sheet-tab-content sheet-tab6">
     <div>
-        <h3 class="sheet-heading_label">Configuration</h3>
+        <h2 class="sheet-heading_label">Configuration</h2>
         <div class="sheet-config">
             <div class="sheet-config-entry">
                 <span>Botch formula</span>
@@ -1368,7 +1379,7 @@ $$header$$
             </tr>
             <tr>
                 <td><div style="text-align:center;" data-i18n="damage">Damage</div></td>
-                <td class="sheet-display-default"><div style="text-align:center;">{{damage}}</div></td>
+                <td class="sheet-display-default"><div style="text-align:center;">{{#^rollLess() damage 0}}<span class="inlinerollresult" style="min-width:0; margin-right: -15px">+</span>{{/^rollLess() damage 0}}{{damage}}</div></td>
             </tr>
         </table>
     </rolltemplate>
@@ -1558,7 +1569,6 @@ $$header$$
             </tr>
         </table>
     </rolltemplate>
-    
  
     <rolltemplate class="sheet-rolltemplate-arcane">
         <div style="background-image:url(https://i.imgur.com/gIacv0f.jpg);box-shadow: 0px 0px 4px black;">

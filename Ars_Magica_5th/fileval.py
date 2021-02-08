@@ -9,7 +9,7 @@ import sys
 import traceback as tb
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Dict, Generator, NoReturn, TextIO
+from typing import Any, Dict, Generator, List, NoReturn, TextIO, Tuple, Union
 
 if sys.version_info < (3, 8):
     raise RuntimeError("This script requires python 3.8 or higher")
@@ -27,76 +27,85 @@ class HandledException(Exception):
 
 def process_template(
     in_file: TextIO,
-    occurence_re: re.Pattern,
-    expr_re: re.Pattern,
+    start_delimiter: str,
+    end_delimiter: str,
     globalns: Dict[str, Any],
     localns: Dict[str, Any],
 ) -> Generator[str, None, None]:
     """
-    Read line from a file and evaluates occurences of occurence_re
+    Read lines from a file and evaluates occurences of occurence_re
     """
-    for lineno, line in enumerate(in_file, start=1):
-        # check presence of occurence
-        if not occurence_re.search(line):
-            yield line
-            continue
-        # process all occurences
-        line_parts = []
-        for part in occurence_re.split(line):
-            match = expr_re.match(part)
-            if not match:
-                line_parts.append(part)
-                continue
-            # evaluate the expression
+    lineno = 0
+    for line in in_file:
+        lineno += 1
+        start, end = 0, 0
+        indent = ""
+        while (start := line.find(start_delimiter, end)) >= 0:
+            if end == 0 and is_whitespace(line[:start]):
+                indent = line[:start]
+            yield line[end:start]
+            start += len(start_delimiter)
+            expr = ""
+            offset = 0
+            while (end := line.find(end_delimiter, start)) < 0:
+                expr += line[start:]
+                line = next(in_file)
+                offset += 1
+                start = 0
+            expr += line[start:end]
+
             try:
-                value = eval(match["expr"], globalns, localns)
+                value = eval(expr, globalns, localns)
             except Exception as err:
-                print(f"Expression at line {lineno} raised an exception")
-                print("Offending expression:", match[0])
+                print(
+                    f"Expression at line {lineno}{'-' + str(lineno + offset) if offset else ''} raised an exception"
+                )
+                print("Offending expression:", start_delimiter + expr + end_delimiter)
                 print(
                     "Exception raised:\n\n",
                     "".join(tb.format_exception(type(err), err, err.__traceback__)),
                 )
                 raise HandledException from err
+
             if not isinstance(value, str):
-                print(f"Expression at line {lineno} does not evaluate to a string")
-                print(f"Offending expression:", match[0])
-                raise HandledException from ValueError(
-                    f"{match[0]} does not evaluate to a string"
+                print(
+                    f"Expression at line {lineno}{'-' + str(lineno + offset) if offset else ''} does not evaluate to a string"
                 )
-            if len(line_parts) == 1 and is_whitespace(line_parts[0]):
-                value = ("\n" + line_parts[0]).join(value.split("\n"))
-            line_parts.append(value)
-        yield "".join(line_parts)
+                print(f"Offending expression:", start_delimiter + expr + end_delimiter)
+                raise HandledException from ValueError(
+                    f"{start_delimiter + expr + end_delimiter} does not evaluate to a string"
+                )
+
+            if indent:
+                value = value.replace("\n", "\n" + indent)
+
+            yield value
+            end += len(end_delimiter)
+            lineno += offset
+            offset = 0
+        yield line[end:]
 
 
-def main(parser: argparse.ArgumentParser, args: argparse.Namespace) -> NoReturn:
+def main(
+    input: Path,
+    output: Path,
+    delimiters: Union[Tuple[str], Tuple[str, str]],
+    global_namespaces: List[str] = (),
+    local_namespaces: List[str] = (),
+) -> NoReturn:
     """
     Main script entry point
     """
-    # check arguments
-    if not args.input.is_file():
-        parser.error(f"{args.input!s} doesn't exists or is not a file")
-    if not isinstance(args.delimiters, list):
-        args.delimiters = [args.delimiters]
-    if not 0 < len(args.delimiters) < 3:
-        parser.error("there must be one or two delimiters")
 
     # build delimiter regex
-    start_delimiter = re.escape(args.delimiters[0])
-    end_delimiter = re.escape(
-        args.delimiters[0] if len(args.delimiters) == 1 else args.delimiters[1]
-    )
-    # global group to get what is inbetween the occurences when using split()
-    occurence_re = re.compile(rf"({start_delimiter}.*?{end_delimiter})")
-    # group with the expression to retrieve it
-    expr_re = re.compile(rf"{start_delimiter}(?P<expr>.*?){end_delimiter}")
+    start_delimiter = delimiters[0]
+    end_delimiter = delimiters[0] if len(delimiters) == 1 else delimiters[1]
 
     # load namespaces
     globalns, localns = {}, {}
     for ns, source_list in zip(
         (globalns, localns),
-        (args.global_namespaces, args.local_namespaces),
+        (global_namespaces, local_namespaces),
     ):
         for name in source_list:
             try:
@@ -118,14 +127,14 @@ def main(parser: argparse.ArgumentParser, args: argparse.Namespace) -> NoReturn:
                 exit(-1)
 
     # process and write lines
-    with args.input.open() as in_file:
+    with input.open() as in_file:
         try:
-            with args.output.open("wt") as out_file:
+            with output.open("wt") as out_file:
                 out_file.writelines(
                     process_template(
                         in_file,
-                        occurence_re,
-                        expr_re,
+                        start_delimiter,
+                        end_delimiter,
                         globalns,
                         localns,
                     )
@@ -133,11 +142,11 @@ def main(parser: argparse.ArgumentParser, args: argparse.Namespace) -> NoReturn:
         except HandledException:
             print("An error occured, see above")
             print("Deleting output file ...")
-            args.output.unlink(missing_ok=True)
+            output.unlink(missing_ok=True)
         except Exception as err:
             print("An unhandled error occured, see below")
             print("Deleting output file ...")
-            args.output.unlink(missing_ok=True)
+            output.unlink(missing_ok=True)
             raise err
 
 
@@ -207,4 +216,12 @@ for prettier formatting of the output.""",
     )
 
     args = parser.parse_args()
-    main(parser, args)
+    # check arguments
+    if not args.input.is_file():
+        parser.error(f"{args.input!s} doesn't exists or is not a file")
+    if not isinstance(args.delimiters, list):
+        args.delimiters = [args.delimiters]
+    if not 0 < len(args.delimiters) < 3:
+        parser.error("there must be one or two delimiters")
+
+    main(**vars(args))

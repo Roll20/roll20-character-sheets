@@ -3,7 +3,8 @@
 Welcome the th Ars Magica 5th Edition character sheet. This page contains the documentation for the sheet.
 
 ### Experience
-The fileds for experience works as folows:
+The fileds for experience works as follows:
+
 + the first number is your xp towards the next level. You can edit it
 + the second number is the xp needed to reach the next level
 + the third number is the total xp needed to reach your current level
@@ -12,6 +13,7 @@ The fileds for experience works as folows:
 ### Rolls and roll buttons
 
 The sheet contains a number of button that roll dice, known as roll button. There are the three button right to the tabs: <span style="color:#169E9C">Roll</span>, <span style="color:#ee3f2f">Botch</span> and <span style="color:#DAA520">Critical</span> (in english, they might be translated to your language):
+
 + <span style="color:#169E9C">Roll</span> rolls a 10-sided die, with no particular results (roll20's default formattion of 1s and 10s is disabled)
 + <span style="color:#ee3f2f">Botch</span> handles rolling botch dice, see below
 + <span style="color:#daa520">Critical</span> handles critical rolls, see below
@@ -21,6 +23,7 @@ There are also die-shaped roll buttons in the sheet near interesting totals (cha
 
 #### Roll configuration
 In the configuration section (above this documentation), you will find a setting for how you want to handle simple vs. stress rolls:
+
 + on "both", you will have two roll buttons, the plain one rolling a simple die, the <span style="color:#ee3f2f">red</span> & <span style="color:#daa520">gold</span> one rolling a stress die
 + on "toggle", a new button will appear left to the "Roll" button. It display the current type of roll, and you can click on it to toggle between simple and stress dice
 
@@ -31,21 +34,25 @@ A simple die has no special results, so no further formatting can happen.
 
 #### Stress die
 The icon for stress dice is a die with a <span style="color:#ee3f2f">red</span> side, and a <span style="color:#daa520">gold</span> side, reflecting the possibility of a botch or a critical roll. When you roll a stress die from the sheet, the result will be coloured:
+
 + <span style="color:#8d4f23">brown</span> or <span style="color:#c2a973">khaki</span> if the result is nothing special
 + <span style="color:#ee3f2f">red</span> on a botch
 + <span style="color:#daa520">gold</span> on a critical (natural 1)
 
 The formula for a stress die (you can see it by hovering over a result, see also "Labels" below) is quite complex, but does something simple:
+
 + on a 10, the value will be 0. You then roll botch dice to see if you botch
 + on a critical (natural 1), the value will also be 0
 + Otherwise, the result is whatever was rolled
 
 #### Botch
 When you roll a 10, the formula for a stress die yields a value of 0 (though other modifiers will apply). A roll of 10 can be easily seen, as the result will be bright red, and you must then roll botch dice. To roll botch dice, you have to equivalent options:
+
 + click on <span style="color:#ee3f2f">Botch</span> right to the tabs on top of the sheet
 + click the underlined "botch!" text in the chat, near the result
 
 In the configuration section (above this documentation), you will find a setting for how you want to roll botch dice:
+
 + on "separate", all botch die will be displayed individually in the chat, and you choose the number of botch dice with a dropdown menu (limited to 12 botch dice)
 + on "grouped", only the total number of botch will be displayed (i.e. the number of 1s rolled). You enter the number of botch dice as a number. You can still see the individual rolls by hovering on the result in chat
 
@@ -60,6 +67,7 @@ When you do botch (i.e roll 1s), the output will be coloured bright red. Note th
 
 #### Critical
 When you roll a natural 1 on a stress die, this is a critical roll. The result will be displayed in bright <span style="color:#daa520">gold</span> colour. In that case, the formula for a stress die has value 0, so that you can add the result of the dice to your modifiers and bonuses. To roll the critical dice, you have two nearly equivalent options:
+
 + click on the <span style="color:#DAA520">Critical</span> button right to the tabs
 + click the "critical!" golden text next to the result in chat
 
@@ -72,6 +80,7 @@ In both case, you will be asked for the previous total (just copy-paste the valu
 As the exploding rolls of Ars Magica are quite hard to handle, there is a caveat in the formula when you use 3D dice in roll20: the last rolled die is rerolled, so *the last result you see on screen is wrong*.
 
 The formula has to split the roll in two parts:
+
 + the first computes the number of 1s you rolled (for each 1, it will multiplie the final roll by 2, as in the Ars Magica rules) but then "forgets" (cannot access) the last result (which cannot be 1, otherwise it wouldn't be the last).
 + it then rerolls the last result. This is a weird dice that takes values from 2 to 10, since the last result can't be 1 (or it wouldn't be the last)
 
@@ -81,9 +90,116 @@ Other than that, the formula is correct: it does takes into account that you alr
 
 
 #### Inline Labels
-When you roll from the sheet, the rolltemplate displayed in the chat will provide some values that went into the roll. You can also hover on the final result to see all the values that were added. The values are labelled so that you know where that 5 comes from.
+When you roll from the sheet, rolltemplates displayed in the chat will show some values that went into the roll. You can hover on the final result to see all the values that were added. The values are labelled so that you know where that +5 comes from.
+
+### Roll buttons
+The following roll buttons are defined in the sheet and may be called using ability command buttons:
+
++ `reroll`
++ `botch`
++ `critical`
++ `critical-spontaneous`
++ `personality1_simple` / `personality1_stress` through `personality6_simple` / `personality6_stress`
++ `reputation1_simple` / `reputation1_stress` through `reputation6_simple` / `reputation6_stress`
++ `Intelligence_simple` / `Intelligence_stress`
++ `Perception_simple` / `Perception_stress`
++ `Strength_simple` / `Strength_stress`
++ `Stamina_simple` / `Stamina_stress`
++ `Presence_simple` / `Presence_stress`
++ `Communication_simple` / `Communication_stress`
++ `Dexterity_simple` / `Dexterity_stress`
++ `Quickness_simple` / `Quickness_stress`
++ `ability_simple` / `ability_stress` (inside a repeating section, needs special handling)
++ `Formulaic_simple` / `Formulaic_stress`
++ `Ritual_simple` / `Ritual_stress`
++ `soak`
++ `weapon_Init`
++ `weapon_Atk`
++ `weapon_Dfn`
++ `spell_simple` / `spell_stress` (inside a repeating section, needs special handling)
+
 
 ### Roll Template
-This is the list of available roll template and what value they support
+This is the list of available roll template and what value they support.
 
-To complete
+All rolltemplate support the following values:
+
++ `stress`: If any value is supplied, indicate that the roll is a stress rolls. Changes the colors of the main roll, and displays the following buttons if appropriate
++ `botch-button`: ability button to roll the botch dice if the roll is a botch. Usually `[@{botch_i18n}!](~@{character_name}|botch)`
++ `crit-button`: ability button to roll the critical dice if the roll is a critical. Usually `[@{critical_i18n}!](~@{character_name}|critical)`, but not always (e.g. spontaneous rolls are special-cases)
+
+Those are omitted in the following list of rolltemplate names and supported values:
+
++ **`spell`**:
+    + `character`
+    + `duration`
+    + `effect`
+    + `Form`
+    + `Level`
+    + `mastery`
+    + `range`
+    + `roll`
+    + `sigil`
+    + `spell`
+    + `target`
+    + `Technique`
++ **`botch`**:
+    + `roll`
+    + `type`
++ **`reroll`**:
+    + `roll`
++ **`critical`**:
+    + `roll`
+    + `type`
++ **`attack`**:
+    + `attack`
+    + `damage`
+    + `name`
++ **`defend`**:
+    + `defend`
+    + `name`
++ **`soak`**:
+    + `armorsoak`
+    + `name`
+    + `rollsoak`
+    + `soakbonus`
++ **`initiative`**:
+    + `name`
+    + `roll`
+    + `weapon`
++ **`ability`**:
+    + `banner`
+    + `label0` through `label4`
+    + `name`
+    + `result0` through `result4`
++ **`generic`**:
+    + `Banner`
+    + `Label`
+    + `Result`
++ **`arcane`**:
+    + `label0` through `label6`
+    + `result0` through`result6`
+    + `textfield`
+    + `textlabel`
+
+### Changelog
++ **February 2021, v1.6**
+    - Added inline labels to all rolls
+    - Fixed tabs not displaying properly (now attched to an attribute again)
+    - Added simple/stress die handling
+    - Support for focus in magic totals & rolls
+    - Support for additional fatigue levels
+    - Fixed ability rolltemplate being too wide in some cases
+    - Added documentation direclty to the sheet
++ **May 2020, v1.51**
+    - Small change to the Ability roll template for legibility
++ **April 2020, v1.5**
+    - Incorporated new fonts throughout the sheet!
+    - Polished several roll templates and added new ones for Defending. Stylish!
+    - Added an extra button for rerolling stress explosions, can be found next to the botch button. 
+    - Fixed several missing translation tags and side-effects of having translations added into the sheet. In particular, Abilities should now have access to the Accelerated Ability option. 
+    - Updated the sheet space and button for Soak/Armor Protection to use the combat roller templates. 
+    - Relinked images from imgur to github asset folders. 
++ **October 2019**
+    - Initiatives now output to Roll20's Tracker while selecting a token. 
+    - Character sheet tabs no longer attached to an attribute, so multiple players can view the same character sheet without wrestling over tab controls.
