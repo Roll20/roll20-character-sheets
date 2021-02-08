@@ -59,6 +59,7 @@ alert.numid = 0
 # parts can be defined in other modules and imported here if the generating
 # code is long
 GLOBALS = {
+    "markdown": markdown,  # makes the module available
     "xp": xp,  # makes the function available in the HTML
     "alert": alert,  # makes the function available in the HTML
     "translation_attrs": translation_attrs,
