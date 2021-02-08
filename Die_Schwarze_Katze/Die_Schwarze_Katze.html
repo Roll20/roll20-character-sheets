@@ -35,9 +35,9 @@
                                 <span>2 x KO + Mod</span>
                                 <input type="number" name="attr_lebensenergiemod" value="0" />
                                 <span>=</span>
-                                <input type="number" name="attr_lebensenergie" value="((@{konstitution}*2)+@{lebensenergiemod})" disabled />
+                                <input type="number" name="attr_lebensenergie_max" value="((@{konstitution}*2)+@{lebensenergiemod})" disabled />
                                 <span class="lebensenergie-aktuell-label">Aktuell </span>
-                                <input class="aktuellelebensenergie" type="number" name="attr_aktuellelebensenergie" value="0" />
+                                <input class="aktuellelebensenergie" type="number" name="attr_lebensenergie" value="0" />
                                 <div class="base-info-lebensenergie-detail detail-container">
                                     <label>Notizen</label>
                                     <textarea name="attr_lebensenergie_detail"></textarea>
@@ -59,7 +59,7 @@
                                 <span>+ Mod</span>
                                 <input type="number" name="attr_ahnenenergiemod" value="0" />
                                 <span>=</span>
-                                <input type="number" name="attr_ahnenenergie" readonly />
+                                <input type="number" name="attr_ahnenenergie_max" readonly />
                                 <div class="base-info-ahnenenergie-detail detail-container">
                                     <label>Notizen</label>
                                     <textarea name="attr_ahnenenergie_detail"></textarea>
@@ -95,7 +95,7 @@
                             </div>
                         </div>
                         <div>
-                            <h3 class="input-label-top">Initiative <button type='roll' name='roll_initiative' value='&{template:initiative} {{result=[[1d6 + @{initiative} &{tracker}]]}}'></button></h3>
+                            <h3 class="input-label-top">Initiative <button type='roll' name='roll_initiative' value='&{template:initiative} {{result=[[1d6+[[@{initiative}]]+([[@{initiative}]]/100)[tie-breaker]&amp;{tracker}]]}}'></button></h3>
                             <div class="base-info-3-content">
                                 <input class="pictos toggle-initiative-detail detail-toggle" name='act_toggle_initiative_detail' type='checkbox'><label class="inline-label"></label>
                                 <span>(MU + GE) / 2 + Mod</span>
@@ -168,7 +168,7 @@
                         <div class="character-eigenschaften-probe">
                             <h3>Eigenschaftsprobe</h3>
                             <button type='roll' name='roll_eigenschaftsprobe'
-                                    value='&{template:skillcheck} [[ ceil(([[?{1. Eigenschaft|MU, @{mut}[MU]|CH, @{charisma}[CH]|KL, @{klugheit}[KL]|IN, @{intuition}[IN]|GE, @{gewandtheit}[GE]|FF, @{fingerfertigkeit}[FF]|KK, @{koerperkraft}[KK]|KO, @{konstitution}[KO]}+?{2. Eigenschaft|MU,@{mut}[MU]|CH, @{charisma}[CH]|KL, @{klugheit}[KL]|IN, @{intuition}[IN]|GE, @{gewandtheit}[GE]|FF, @{fingerfertigkeit}[FF]|KK, @{koerperkraft}[KK]|KO, @{konstitution}[KO]}-5+(?{Modifikatoren (Reichweite, Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Eigenschaftsprobe}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                    value='&{template:skillcheck} [[ ceil(([[?{1. Eigenschaft|MU, @{mut}[MU]|CH, @{charisma}[CH]|KL, @{klugheit}[KL]|IN, @{intuition}[IN]|GE, @{gewandtheit}[GE]|FF, @{fingerfertigkeit}[FF]|KK, @{koerperkraft}[KK]|KO, @{konstitution}[KO]}+?{2. Eigenschaft|MU,@{mut}[MU]|CH, @{charisma}[CH]|KL, @{klugheit}[KL]|IN, @{intuition}[IN]|GE, @{gewandtheit}[GE]|FF, @{fingerfertigkeit}[FF]|KK, @{koerperkraft}[KK]|KO, @{konstitution}[KO]}-5+(?{Modifikatoren (Reichweite, Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Eigenschaftsprobe}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                             </button>
                         </div>
                     </div>
@@ -189,24 +189,24 @@
                     </div>
                     <fieldset class="repeating_meleeweapon">
                         <input class="pictos detail-toggle" name='act_toggle_meleeweapon_detail' type='checkbox'><label class="inline-label"></label>
-                        <input class="weapon-text" type="text" name="attr_meleeweapon">
+                        <input title="@{repeating_meele_$X_meleeweapon}" class="weapon-text" type="text" name="attr_meleeweapon">
                         <div>
-                            <select class="weapon-type" name="attr_meleetype">
+                            <select class="weapon-type" title="@{repeating_meele_$X_meleetype}" name="attr_meleetype">
                                 <option selected value="raufen">Raufen</option>
                                 <option value="einhandwaffen">Einhandwaffe</option>
                                 <option value="zweihandwaffen">Zweihandwaffe</option>
                                 <option value="schilde">Schild</option>
                             </select>
                         </div>
-                        <input class="weapon-short-text" type="text" name="attr_meleetp" value="1d6" />
-                        <input type="number" name="attr_meleemodaw" value="0" />
-                        <input type="number" name="attr_meleemodvw" value="0" />
-                        <input class="weapon-short-text" type="text" name="attr_meleerw" />
-                        <input type="number" name="attr_meleeaw" value="0" readonly />
-                        <input type="number" name="attr_meleevw" value="0" readonly />
+                        <input title="@{repeating_meele_$X_meleetp}" class="weapon-short-text" type="text" name="attr_meleetp" value="1d6" />
+                        <input title="@{repeating_meele_$X_meleemodaw}" type="number" name="attr_meleemodaw" value="0" />
+                        <input title="@{repeating_meele_$X_meleemodvw}" type="number" name="attr_meleemodvw" value="0" />
+                        <input title="@{repeating_meele_$X_meleerw}" class="weapon-short-text" type="text"  name="attr_meleerw" />
+                        <input title="@{repeating_meele_$X_meleeaw}" type="number" name="attr_meleeaw" value="0" readonly />
+                        <input title="@{repeating_meele_$X_meleevw}" type="number" name="attr_meleevw" value="0" readonly />
                         <div>
-                            <button type='roll' name='roll_attackmelee'
-                                    value='&{template:attack} [[[[[[ceil(([[@{meleeaw}[AW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator]) - (?{Verteidigungswert des Ziels|0}[Ziel VW])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]][QS] + [[@{meleetp}]][TP] ]][Gesamtschaden] * 3[Kritisch] ]] {{weapon=@{meleeweapon}}} {{probenwert=$[[0]]}} {{qs=$[[4]]}} {{result=$[[1]]}} {{damageroll=$[[5]]}} {{totaldamage=$[[6]]}} {{totaldamagekritisch=$[[7]]}}'>
+                            <button type='roll' title="%{selected|repeating_meele_$X_attack-roll}" name='roll_attackmelee'
+                                    value='&{template:attack} [[[[[[ceil(([[@{meleeaw}[AW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator]) - (?{Verteidigungswert des Ziels|0}[Ziel VW])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]][QS] + [[@{meleetp}]][TP] ]][Gesamtschaden] * 3[Kritisch] ]] {{weapon=@{meleeweapon}}} {{probenwert=$[[0]]}} {{qs=$[[4]]}} {{result=$[[1]]}} {{damageroll=$[[5]]}} {{totaldamage=$[[6]]}} {{totaldamagekritisch=$[[7]]}}{{Angreifer=@{character_name}}}'>
                             </button>
                         </div>
                         <div class="meleeweapon-detail detail-container">
@@ -238,7 +238,7 @@
                         <input type="number" name="attr_rangedaw" value="0" />
                         <div>
                             <button type='roll' name='roll_attackranged'
-                                    value='&{template:attack} [[[[[[ceil(([[@{rangedaw}[AW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator]) - (?{Verteidigungswert des Ziels|0}[Ziel VW])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]][QS] + [[@{rangedtp}]][TP] ]][Gesamtschaden] * 3[Kritisch] ]] {{weapon=@{rangedweapon}}} {{probenwert=$[[0]]}} {{qs=$[[4]]}} {{result=$[[1]]}} {{damageroll=$[[5]]}} {{totaldamage=$[[6]]}} {{totaldamagekritisch=$[[7]]}}'>
+                                    value='&{template:attack} [[[[[[ceil(([[@{rangedaw}[AW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator]) - (?{Verteidigungswert des Ziels|0}[Ziel VW])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]][QS] + [[@{rangedtp}]][TP] ]][Gesamtschaden] * 3[Kritisch] ]] {{weapon=@{rangedweapon}}} {{probenwert=$[[0]]}} {{qs=$[[4]]}} {{result=$[[1]]}} {{damageroll=$[[5]]}} {{totaldamage=$[[6]]}} {{totaldamagekritisch=$[[7]]}}'>{{Angreifer=@{character_name}}}
                             </button>
                         </div>
                         <div class="rangedweapon-detail detail-container">
@@ -336,8 +336,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillfriemelnew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillfriemelnpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckfriemeln'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillfriemelnpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Friemeln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
-                        </button>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillfriemelnpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Friemeln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'> </button>
                         <div class="detail-container">
                             <label>Notizen</label>
                             <textarea name="attr_friemeln_detail"></textarea>
@@ -358,7 +357,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillkoerperbeherrschungew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillkoerperbeherrschungpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckkoerperbeherrschung'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillkoerperbeherrschungpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Körperbeherrschung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillkoerperbeherrschungpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Körperbeherrschung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -380,7 +379,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillkraftaktew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillkraftaktpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckkraftakt'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillkraftaktpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Kraftakt}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillkraftaktpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Kraftakt}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -402,7 +401,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillselbstbeherrschungew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillselbstbeherrschungpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckselbstbeherrschung'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillselbstbeherrschungpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Selbstbeherrschung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillselbstbeherrschungpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Selbstbeherrschung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -424,7 +423,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillverbergenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillverbergenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckverbergen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillverbergenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Verbergen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillverbergenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Verbergen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -459,7 +458,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillbettelnew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillbettelnpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckbetteln'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillbettelnpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Gesellschaftsfertigkeiten}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillbettelnpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Gesellschaftsfertigkeiten}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -481,7 +480,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skilldurchschauenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skilldurchschauenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckdurchschauen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skilldurchschauenpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Durchschauen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skilldurchschauenpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Durchschauen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -503,7 +502,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skilleinschuechternew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skilleinschuechternpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckeinschuechtern'
-                                value='&{template:skillcheck} [[ ceil(([[@{skilleinschuechternpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Einschüchtern}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skilleinschuechternpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Einschüchtern}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -525,7 +524,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillumschmeichelnew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillumschmeichelnpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckumschmeicheln'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillumschmeichelnpw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Umschmeicheln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillumschmeichelnpw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Umschmeicheln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -547,7 +546,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillwillenskraftew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillwillenskraftpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckwillenskraft'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillwillenskraftpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Willenskraft}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillwillenskraftpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Willenskraft}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}}'>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -581,7 +580,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillbastelnew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillbastelnpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckbasteln'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillbastelnpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Basteln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillbastelnpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Basteln}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -603,7 +602,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillheilkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillheilkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckheilkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillheilkundepw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Heilkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillheilkundepw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Heilkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -625,7 +624,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillkochenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillkochenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckkochen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillkochenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Kochen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillkochenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Kochen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -647,12 +646,12 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillmusizierenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillmusizierenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckmusizieren'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillmusizierenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Musizieren}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillmusizierenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Musizieren}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
-                        <label>Notizen</label>
-                        <textarea name="attr_musizieren_detail"></textarea>
-                    </div>
+                            <label>Notizen</label>
+                            <textarea name="attr_musizieren_detail"></textarea>
+                        </div>
                     </div>
 
                     <div class="skill-list-row">
@@ -669,7 +668,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillueberlebenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillueberlebenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckueberleben'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillueberlebenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Überleben}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillueberlebenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Überleben}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -705,7 +704,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillgassenkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillgassenkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckgassenkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillgassenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geistesfertigkeiten}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillgassenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Gassenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -727,7 +726,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillgeisterkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillgeisterkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckgeisterkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillgeisterkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geisterkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillgeisterkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geisterkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -749,7 +748,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillgeographieew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillgeographiepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckgeographie'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillgeographiepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geographie}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillgeographiepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geographie}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -771,7 +770,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillgeschichtenew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillgeschichtenpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckgeschichten'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillgeschichtenpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geschichten}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillgeschichtenpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Geschichten}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -793,7 +792,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillmenschenkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillmenschenkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckmenschenkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillmenschenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Menschenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillmenschenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Menschenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -815,7 +814,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillorientierungew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillorientierungpw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckorientierung'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillorientierungpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Orientierung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillorientierungpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Orientierung}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -837,7 +836,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillpflanzenkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillpflanzenkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckpflanzenkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillpflanzenkundepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Pflanzenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillpflanzenkundepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Pflanzenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -859,7 +858,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillsinnesschaerfeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillsinnesschaerfepw" value="0" readonly />
                         <button type='roll' name='roll_skillchecksinnesschaerfe'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillsinnesschaerfepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Sinnesschärfe}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillsinnesschaerfepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Sinnesschärfe}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -881,7 +880,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skilltierkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skilltierkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillchecktierkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skilltierkundepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Tierkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skilltierkundepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|-@{belastung}}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Tierkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -903,7 +902,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillzahlenkundeew" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillzahlenkundepw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckzahlenkunde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillzahlenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Zahlenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillzahlenkundepw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Zahlenkunde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -930,7 +929,7 @@
                             <input class="wissendertoggle" type="checkbox" name="attr_vorteilwissender" readonly>
                             <button class="wissenderdisabled" type='roll' disabled></button>
                             <button class="wissenderenabled" type='roll' name='roll_skillcheckwissender'
-                                    value='&{template:skillcheck} [[ ceil(([[@{skillwissenderpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Wissender (@{skillwissenderText})}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                    value='&{template:skillcheck} [[ ceil(([[@{skillwissenderpw}[PW] + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Wissender (@{skillwissenderText})}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                             </button>
                         </div>
 
@@ -972,7 +971,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skilleinhandwaffenaw" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skilleinhandwaffenvw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckeinhandwaffen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skilleinhandwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Einhandwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skilleinhandwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Einhandwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -995,7 +994,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillraufenaw" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillraufenvw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckraufen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillraufenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Raufen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillraufenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Raufen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -1018,7 +1017,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillschildeaw" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillschildevw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckschilde'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillschildepw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Schilde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillschildepw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Schilde}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -1041,7 +1040,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillschusswaffenaw" value="0" readonly />
                         <div></div>
                         <button type='roll' name='roll_skillcheckschusswaffen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillschusswaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Schusswaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillschusswaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Schusswaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}} {{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -1064,7 +1063,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillwurfwaffenaw" value="0" readonly />
                         <div></div>
                         <button type='roll' name='roll_skillcheckwurfwaffen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillwurfwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Wurfwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillwurfwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Wurfwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -1087,7 +1086,7 @@
                         <input class="skill-disabled-number" type="number" name="attr_skillzweihandwaffenaw" value="0" readonly />
                         <input class="skill-disabled-number" type="number" name="attr_skillzweihandwaffenvw" value="0" readonly />
                         <button type='roll' name='roll_skillcheckzweihandwaffen'
-                                value='&{template:skillcheck} [[ ceil(([[@{skillzweihandwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Zweihandwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                                value='&{template:skillcheck} [[ ceil(([[@{skillzweihandwaffenpw}[PW] - (@{belastung}[BE]) + (?{Probewert Modifikator (Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=Zweihandwaffen}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                         </button>
                         <div class="detail-container">
                             <label>Notizen</label>
@@ -1102,9 +1101,9 @@
         <div class="ancestor-container">
             <div class="ancestor-status">
                 <h3 class="input-label-left">Aktuelle Ahnenenergie</h3>
-                <input class="aktuelleahnenenergie" type="number" name="attr_aktuelleahnenenergie" value="0" />
+                <input class="aktuelleahnenenergie" type="number" name="attr_ahnenenergie" value="0" />
                 <h3 class="input-label-left">Maximale Ahnenenergie</h3>
-                <input type="number" name="attr_ahnenenergie" readonly />
+                <input type="number" name="attr_ahnenenergie_max" readonly />
             </div>
             <div class="ancestor-ahnengeschenke">
                 <div class="ancestor-ahnengeschenke-headers">
@@ -1140,11 +1139,11 @@
                     <input class="ancestor-ahnengabe-name" type="text" name="attr_ahnengabename">
                     <input type="number" name="attr_ahnengabeaep" value="0">
                     <select class="ancestor-ahnengaben-stf" name="attr_ahnengabestf">
-                       <option selected value="a">A</option>
-                       <option value="b">B</option>
-                       <option value="c">C</option>
-                       <option value="d">D</option>
-                       <option value="e">E</option>
+                        <option selected value="a">A</option>
+                        <option value="b">B</option>
+                        <option value="c">C</option>
+                        <option value="d">D</option>
+                        <option value="e">E</option>
                     </select>
                     <input type="number" name="attr_ahnengabefw" value="0">
                     <div class="ancestor-ahnengaben-eigenschaften">
@@ -1173,7 +1172,7 @@
                     <input type="number" name="attr_ahnengabeew" readonly>
                     <input type="number" name="attr_ahnengabepw" readonly>
                     <button type='roll' name='roll_ahnengabe'
-                            value='&{template:ahnengabe} [[ ceil(([[@{ahnengabepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=@{ahnengabename}}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}'>
+                            value='&{template:ahnengabe} [[ ceil(([[@{ahnengabepw}[PW] + (?{Probewert Modifikator (Belastung, Zustände etc.)|0}[Modifikator])]] - [[2d20cs1cf20]] + [[1]]) / [[5]]) ]] {{name=@{ahnengabename}}} {{note=@{ahnengabe_detail}}} {{probenwert=$[[0]]}} {{result=$[[1]]}} {{qs=$[[4]]}}{{Angreifer=@{character_name}}} '>
                     </button>
                     <div class="detail-container">
                         <label>Notizen</label>
@@ -1233,7 +1232,7 @@
 
 <rolltemplate class="sheet-rolltemplate-attack">
     <div class="sheet-template-container">
-        <div class="sheet-template-header">Angriff mit {{weapon}}</div>
+        <div class="sheet-template-header">Angriff mit {{weapon}}<br>von <br> {{Angreifer}}</div>
         <div class="sheet-template-body">
             <label>Würfelwurf:</label><span>{{result}}</span>
             <label>Probenwert:</label><span>{{probenwert}}</span>
@@ -1273,7 +1272,7 @@
 
 <rolltemplate class="sheet-rolltemplate-ahnengabe">
     <div class="sheet-template-container">
-        <div class="sheet-template-header">{{name}}</div>
+        <div class="sheet-template-header">{{name}}<br>von <br> {{Angreifer}}</div>
         <div class="sheet-template-body">
             <label>Würfelwurf:</label><span>{{result}}</span>
             <label>Probenwert:</label><span>{{probenwert}}</span>
@@ -1303,13 +1302,15 @@
                     <label>QS:</label><span>{{qs}}</span>
                 {{/^rollGreater() result probenwert}}
             {{/rollBetween() result 3 39}}
+            <label class="sheet-rolltemplate-desciption-header">Wirkung</label>
+            <span class="sheet-rolltemplate-desciption-body">{{note}}</span>
         </div>
     </div>
 </rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-skillcheck">
     <div class="sheet-template-container">
-        <div class="sheet-template-header">{{name}}</div>
+        <div class="sheet-template-header">{{name}}<br>von <br> {{Angreifer}}</div>
         <div class="sheet-template-body">
             <label>Würfelwurf:</label><span>{{result}}</span>
             <label>Probenwert:</label><span>{{probenwert}}</span>
@@ -1369,9 +1370,9 @@
             let leiteigenschaft = values.leiteigenschaft;
             let leiteigenschaftAttribut = parseInt(values[leiteigenschaft])||0;
             let ahnenenergieCalculated = leiteigenschaftAttribut === 0 ? 0 : 20 + leiteigenschaftAttribut + ahnenenergiemod;
-            // console.log("calculated ahnenenergie = " + ahnenenergieCalculated);
+            // console.log("calculated ahnenenergie_max = " + ahnenenergieCalculated);
             setAttrs({
-                ahnenenergie: ahnenenergieCalculated
+                ahnenenergie_max: ahnenenergieCalculated
             });
         });
     });
