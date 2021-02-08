@@ -137,6 +137,16 @@ const calculateCyberwareStrain = () => {
     });
 };
 
+const calculateStrain = () => {
+    //Add up all the strain
+    getAttrs(["strain_permanent", "strain_extra", "strain"], v => {
+        const strain = (parseInt(v.strain_permanent) || 0) + (parseInt(v.strain_extra) || 0)
+        mySetAttrs({
+            strain: strain
+        }, v)
+    })
+}
+
 const calculateAttr = (attr) => {
     getAttrs([attr, `${attr}_base`, `${attr}_boosts`], v => {
         const setting = {
