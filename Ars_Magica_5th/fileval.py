@@ -14,8 +14,6 @@ from typing import Any, Dict, Generator, List, NoReturn, TextIO, Tuple, Union
 if sys.version_info < (3, 8):
     raise RuntimeError("This script requires python 3.8 or higher")
 
-SENTINEL = object()
-
 is_whitespace = re.compile(r"^\s*$").match
 
 

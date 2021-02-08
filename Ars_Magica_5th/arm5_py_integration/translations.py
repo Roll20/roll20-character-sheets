@@ -11,6 +11,7 @@ TRANSLATION_ATTRS = (
         ("bold", "Bold", "gestures-bold"),
         ("bonus", "Bonus", "bonus"),
         ("botch", "Botch", "botch"),
+        ("characteristic", "Characteristic", "characteristic"),
         ("botch_num", "Number of botch dice", "botch-num"),
         ("circumstances", "Circumstances", "circumstances-m"),
         ("circumstantial", "Circumstancial", "circumstantial"),
