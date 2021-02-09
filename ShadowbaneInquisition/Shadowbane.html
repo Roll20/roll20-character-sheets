@@ -2970,49 +2970,50 @@ NOTE: replace worker by javascript for IDE functionality
 	 * calculate real damage roll
 	 * @param  {string} source row id of the weapon
 	 */
-	const calcDmg = function (source) {
-		var redice = /(\d+)(d\d+)((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?(?:[\+|-]\d+)?)?/;
+	const calcDmg = function (sources, fields) {
+		var redice = /^(\d+)(d\d+)((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?(?:[\+|-]\d+)?)?/;
 
-		// to avoid retyping long strings because i'm lazy
-		var dam = source + 'weapon_dam-roll',
-				ven = source + 'weapon_vengeful', // crit
-				min = source + 'weapon_min', //  proven
-				max = source + 'weapon_max'; //  primitive
-
-		getAttrs([dam, ven, min, max], (v) => {
-			let dmg = redice.exec(v[dam])
-					ven = parseInt(v[ven], 10) || 0,
-					min = parseInt(v[min], 10) || 0,
-					max = parseInt(v[max], 10) || 0;
+		getAttrs(fields, v => {
 			let attr = {};
+			sources.forEach( source => {
+				// to avoid retyping long strings because i'm lazy
+				var dam = source + 'weapon_dam-roll',
+						ven = source + 'weapon_vengeful', // crit
+						min = source + 'weapon_min', //  proven
+						max = source + 'weapon_max'; //  primitive
 
-			if (!dmg) {
-				console.log('no damage found');
-				attr[`${source}weapon_real_dmg`] = v[dam];
-				setAttrs(attr);
-			} else {
-				let dicenum = parseInt(dmg[1], 10) || 0,
-						dicetype = dmg[2],
-						mod = dmg[3];
-				let damTotal = '{';
+				let dmg = redice.exec(v[dam]);
+						ven = parseInt(v[ven], 10) || 0,
+						min = parseInt(v[min], 10) || 0,
+						max = parseInt(v[max], 10) || 0;
 
-				for (var i = 0; i < dicenum; i++) {
-					if (i) damTotal += ', '
-					if (min > 0) damTotal += '{';
-					if (max > 0) damTotal += '{';
-					damTotal += (dicetype == 'd5') ? 'ceil(1d10/2)' : '1' + dicetype;
-					if (ven > 0) damTotal += 'cs>' + ven;
-					if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
-					if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
+				if (!dmg) {
+					console.log('no damage found');
+					attr[`${source}weapon_real_dmg`] = v[dam];
+				} else {
+					let dicenum = parseInt(dmg[1], 10) || 0,
+							dicetype = dmg[2],
+							mod = dmg[3];
+					let damTotal = '{';
+
+					for (var i = 0; i < dicenum; i++) {
+						if (i) damTotal += ', '
+						if (min > 0) damTotal += '{';
+						if (max > 0) damTotal += '{';
+						damTotal += (dicetype == 'd5') ? 'ceil(1d10/2)' : '1d10';
+						if (ven > 0) damTotal += 'cs>' + ven;
+						if (min > 0) damTotal += ', 0d1+' + min + '}kh1';
+						if (max > 0) damTotal += ', 0d1+' + max + '}kl1';
+					}
+					damTotal += '}';
+					if (mod) damTotal += mod;
+					attr[`${source}weapon_real_dmg`] = damTotal;
 				}
-				damTotal += '}';
-				if (mod) damTotal += mod;
-				attr[`${source}weapon_real_dmg`] = damTotal;
-
-				setAttrs(attr);
-			}
-		};
-	}
+			});
+			console.log(attr);
+			setAttrs(attr);
+		});
+	};
 
 	let fieldsDMG = [
 		'vehiclerangedweapons:V_R_weapon_dam-roll', 'vehiclerangedweapons:V_R_weapon_vengeful', 'vehiclerangedweapons:V_R_weapon_min', 'vehiclerangedweapons:V_R_weapon_max',
@@ -3020,26 +3021,62 @@ NOTE: replace worker by javascript for IDE functionality
 		'vehiclemeleeweapons:V_M_weapon_dam-roll', 'vehiclemeleeweapons:V_M_weapon_vengeful', 'vehiclemeleeweapons:V_M_weapon_min', 'vehiclemeleeweapons:V_M_weapon_max',
 		'meleeweapons:M_weapon_dam-roll', 'meleeweapons:M_weapon_vengeful', 'meleeweapons:M_weapon_min', 'meleeweapons:M_weapon_max',
 		];
-	on('sheet:opened' + fieldsDMG.map(field => 'change:repeating_' + field).join(' '), () => {
+	on('sheet:opened ' + fieldsDMG.map(field => 'change:repeating_' + field).join(' '), () => {
 		getSectionIDs('rangedweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
 			idArray.forEach( id => {
-				calcDmg(`repeating_rangedweapons_${id}_R_`);
+				sources.push(`repeating_rangedweapons_${id}_R_`);
+				fieldnames.push(
+				`repeating_rangedweapons_${id}_R_weapon_dam-roll`,
+				`repeating_rangedweapons_${id}_R_weapon_vengeful`,
+				`repeating_rangedweapons_${id}_R_weapon_min`,
+				`repeating_rangedweapons_${id}_R_weapon_max`
+				);
 			});
+			calcDmg(sources, fieldnames);
 		});
 		getSectionIDs('meleeweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
 			idArray.forEach( id => {
-				calcDmg(`repeating_meleeweapons_${id}_M_`);
+				sources.push(`repeating_meleeweapons_${id}_M_`);
+				fieldnames.push(
+				`repeating_meleeweapons_${id}_M_weapon_dam-roll`,
+				`repeating_meleeweapons_${id}_M_weapon_vengeful`,
+				`repeating_meleeweapons_${id}_M_weapon_min`,
+				`repeating_meleeweapons_${id}_M_weapon_max`
+				);
 			});
+			calcDmg(sources, fieldnames);
 		});
 		getSectionIDs('vehiclerangedweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
 			idArray.forEach( id => {
-				calcDmg(`repeating_vehiclerangedweapons_${id}_V_R_`);
+				sources.push(`repeating_vehiclerangedweapons_${id}_V_R_`);
+				fieldnames.push(
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_dam-roll`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_vengeful`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_min`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_max`
+				);
 			});
+			calcDmg(sources, fieldnames);
 		});
 		getSectionIDs('vehiclemeleeweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
 			idArray.forEach( id => {
-				calcDmg(`repeating_vehiclemeleeweapons_${id}_V_M_`);
+				sources.push(`repeating_vehiclemeleeweapons_${id}_V_M_`);
+				fieldnames.push(
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_dam-roll`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_vengeful`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_min`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_max`
+				);
 			});
+			calcDmg(sources, fieldnames);
 		});
 	});
 
@@ -3543,7 +3580,7 @@ NOTE: replace worker by javascript for IDE functionality
 					{{#rollBetween() loc 31 70}} ARM {{/rollBetween() loc 31 70}}
 					{{#rollBetween() loc 71 100}} HEAD {{/rollBetween() loc 71 100}}
 							{{/rollGreater() dos 4}}
-							{{#rollGreater() dos 5}}; 
+							{{#rollGreater() dos 5}};
 					{{#rollBetween() loc 1 10}} BODY {{/rollBetween() loc 1 10}}
 					{{#rollBetween() loc 11 30}} ARM {{/rollBetween() loc 11 30}}
 					{{#rollBetween() loc 31 70}} BODY {{/rollBetween() loc 31 70}}
