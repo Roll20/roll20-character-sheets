@@ -23,6 +23,10 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 6th, 2021
+
+- Resolved CSS bug introduced in previous update
+
 ### Feb 5th, 2021
 
 - Added a triple-hit roll template, and support for triple-hit scatter moves
