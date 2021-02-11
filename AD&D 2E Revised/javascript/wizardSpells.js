@@ -130,7 +130,8 @@ wiz1['Charm Person'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell affects any single *person* it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not. \n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the *charm* is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw. \n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands). \n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed person, the *charm* spell is broken. \n&emsp;If two or more *charm* effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells. \n&emsp;Note that the subject has full memory of the events that took place while he was charmed.'
+    'effect': 'This spell affects any single *person* it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not. \n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the *charm* is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw. \n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands). \n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed person, the *charm* spell is broken. \n&emsp;If two or more *charm* effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells. \n&emsp;Note that the subject has full memory of the events that took place while he was charmed.',
+    'table': '{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence Score**}}{{c2-1=3 or less}}{{c3-1=4–6}}{{c4-1=7–9}}{{c5-1=10–12}}{{c6-1=13–14}}{{c7-1=15–16}}{{c8-1=17}}{{c9-1=18}}{{c10-1=19 or more}}{{c1-2=**Time Between Checks**}}{{c2-2=3 months}}{{c3-2=2 months}}{{c4-2=1 month}}{{c5-2=3 weeks}}{{c6-2=2 weeks}}{{c7-2=1 week}}{{c8-2=3 days}}{{c9-2=2 days}}{{c10-2=1 day}}{{effects2=&emsp;**Note:** The period between checks is the time period during which the check occurs. When to roll the check during this time is determined (randomly or by selection) by the DM. The roll is made secretly.}}',
 };
 
 wiz1['Chill Touch'] = {
@@ -300,7 +301,8 @@ wiz1['Find Familiar'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the caster to attempt to summon a familiar to act as his aide and companion. Familiars are typically small creatures, such as cats, frogs, ferrets, crows, hawks, snakes, owls, ravens, toads, weasels, or even mice. A creature acting as a familiar can benefit a wizard, conveying its sensory powers to its master, conversing with him, and serving as a guard/scout/spy as well. A wizard can have only one familiar at a time, however, and he has no control over what sort of creature answers the summoning, if any at all come. \n&emsp;The creature is always more intelligent than others of its type (typically by 2 or 3 Intelligence points), and its bond with the wizard confers upon it an exceptionally long life. The wizard receives the heightened senses of his familiar, which grants the wizard a +1 bonus to all surprise die rolls. Normal familiars have 2–4 hit points plus 1 hit point per caster level, and an Armor Class of 7 (due to size, speed, etc.). \n&emsp;The wizard has an empathic link with the familiar and can issue it mental commands at a distance of up to 1 mile. Note that empathic responses from the familiar are generally fairly basic—while able to communicate simple thoughts, these are often overwhelmed by instinctual responses. Thus, a ferret familiar spying on a band of orcs in the woods might lose its train of thought upon sighting a mouse. Certainly its communications to its master would be tinged with fear of the “big ones” it was spying on! The caster cannot see through the familiar’s eyes. \n&emsp;If separated from the caster, the familiar loses 1 hit point each day, and dies if reduced to 0 hit points. When the familiar is in physical contact with its wizard, it gains the wizard’s saving throws against special attacks. If a special attack would normally cause damage, the familiar suffers no damage if the saving throw is successful and half damage if the saving throw is failed. If the familiar dies, the wizard must successfully roll an immediate system shock check or die. Even if he survives this check, the wizard loses 1 point from his Constitution when the familiar dies. \n&emsp;The power of the conjuration is such that it can be attempted but once per year. When the wizard decides to find a familiar, he must load a brass brazier with charcoal. When this is burning well, he adds 1,000 gp worth of incense and herbs. The spell incantation is then begun and must be continued until the familiar comes or the casting time is finished. The DM secretly determines all results. Note that most familiars are not inherently magical, nor does a *dispel magic* spell send them away. \n&emsp;Deliberate mistreatment, failure to feed and care for the familiar, or continuous unreasonable demands have adverse effects on the familiar’s relationship with its master. Purposely arranging the death of one’s own familiar incurs great disfavor from certain powerful entities, with dire results.'
+    'effect': 'This spell enables the caster to attempt to summon a familiar to act as his aide and companion. Familiars are typically small creatures, such as cats, frogs, ferrets, crows, hawks, snakes, owls, ravens, toads, weasels, or even mice. A creature acting as a familiar can benefit a wizard, conveying its sensory powers to its master, conversing with him, and serving as a guard/scout/spy as well. A wizard can have only one familiar at a time, however, and he has no control over what sort of creature answers the summoning, if any at all come. \n&emsp;The creature is always more intelligent than others of its type (typically by 2 or 3 Intelligence points), and its bond with the wizard confers upon it an exceptionally long life. The wizard receives the heightened senses of his familiar, which grants the wizard a +1 bonus to all surprise die rolls. Normal familiars have 2–4 hit points plus 1 hit point per caster level, and an Armor Class of 7 (due to size, speed, etc.). \n&emsp;The wizard has an empathic link with the familiar and can issue it mental commands at a distance of up to 1 mile. Note that empathic responses from the familiar are generally fairly basic—while able to communicate simple thoughts, these are often overwhelmed by instinctual responses. Thus, a ferret familiar spying on a band of orcs in the woods might lose its train of thought upon sighting a mouse. Certainly its communications to its master would be tinged with fear of the “big ones” it was spying on! The caster cannot see through the familiar’s eyes. \n&emsp;If separated from the caster, the familiar loses 1 hit point each day, and dies if reduced to 0 hit points. When the familiar is in physical contact with its wizard, it gains the wizard’s saving throws against special attacks. If a special attack would normally cause damage, the familiar suffers no damage if the saving throw is successful and half damage if the saving throw is failed. If the familiar dies, the wizard must successfully roll an immediate system shock check or die. Even if he survives this check, the wizard loses 1 point from his Constitution when the familiar dies. \n&emsp;The power of the conjuration is such that it can be attempted but once per year. When the wizard decides to find a familiar, he must load a brass brazier with charcoal. When this is burning well, he adds 1,000 gp worth of incense and herbs. The spell incantation is then begun and must be continued until the familiar comes or the casting time is finished. The DM secretly determines all results. Note that most familiars are not inherently magical, nor does a *dispel magic* spell send them away. \n&emsp;Deliberate mistreatment, failure to feed and care for the familiar, or continuous unreasonable demands have adverse effects on the familiar’s relationship with its master. Purposely arranging the death of one’s own familiar incurs great disfavor from certain powerful entities, with dire results.',
+    'table': '{{style=center1 sheet-spell-fixed3}}{{cc1-1=bottom}}{{c1-1=**D20 Roll**}}{{c2-1=1–5}}{{c3-1=6–7}}{{c4-1=8–9}}{{c5-1=10–11}}{{c6-1=12–13}}{{c7-1=14–15}}{{c8-1=16–20}}{{cc1-2=bottom}}{{c1-2=**Familiar* **}}{{c2-2=Cat, black}}{{c3-2=Crow}}{{c4-2=Hawk}}{{c5-2=Owl}}{{c6-2=Toad}}{{c7-2=Weasel}}{{c8-2=No familiar available within spell range}}{{cs8-2=2}}{{cc1-3=bottom}}{{c1-3=**Sensory Powers**}}{{c2-3=Excellent night vision\n& superior hearing}}{{c3-3=Excellent vision}}{{c4-3=Very superior distance vision}}{{c5-3=Night vision equals human daylight\nvision, superior hearing}}{{c6-3=Wide-angle vision}}{{c7-3=Superior hearing & very\nsuperior olfactory power}}{{effects2=* The DM can substitute other small animals suitable to the area.}}'
 };
 
 wiz1['Friends'] = {
@@ -504,7 +506,8 @@ wiz1['Mount'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster conjures a normal animal to serve him as a mount. The animal serves willingly and well, but at the expiration of the spell duration it disappears, returning to its own place. The type of mount gained by this spell depends on the level of the caster; of course, a caster can choose a lesser mount if desired. Available mounts include the following: \n&emsp;**Level**&emsp;**Mount** \n&emsp;1–3&emsp;&emsp;Mule or light horse \n&emsp;4–7&emsp;&emsp;Draft horse or war horse \n&emsp;8–12&emsp;&ensp;Camel \n&emsp;13–14&emsp;Elephant \n&emsp;15+&emsp;&emsp;Griffon  \n&emsp;The mount does not come with any riding gear, unless it is of a class lower than the caster would normally be entitled to; thus, a 4th-level wizard can gain a war horse without saddle and harness, or a light horse with saddle and harness. Elephants comes with howdah at 18th level. Griffon comes with saddle at 18th level. The statistics of the animal gained are typical of all creatures of the same class. The mount disappears when slain.'
+    'effect': 'By means of this spell, the caster conjures a normal animal to serve him as a mount. The animal serves willingly and well, but at the expiration of the spell duration it disappears, returning to its own place. The type of mount gained by this spell depends on the level of the caster; of course, a caster can choose a lesser mount if desired. Available mounts include the following:',
+    'table': '{{style=center1}}{{c1-1=**Caster Level**}}{{c2-1=1–3}}{{c3-1=4–7}}{{c4-1=8–12}}{{c5-1=13–14}}{{c6-1=15+}}{{c1-2=**Mount**}}{{c2-2=Mule or light horse}}{{c3-2=Draft horse or war horse}}{{c4-2=Camel}}{{c5-2=Elephant}}{{c6-2=Griffon}}{{effects2=&emsp;The mount does not come with any riding gear, unless it is of a class lower than the caster would normally be entitled to; thus, a 4th-level wizard can gain a war horse without saddle and harness, or a light horse with saddle and harness. Elephants comes with howdah at 18th level. Griffon comes with saddle at 18th level. The statistics of the animal gained are typical of all creatures of the same class. The mount disappears when slain.}}'
 };
 
 wiz1['Nystu\'s Magical Aura'] = {
@@ -834,7 +837,7 @@ wiz2['Blur'] = {
 //Find another place for this
 wiz2['Choke'] = {
     'level': 'Level 2 Wizard',
-    'school': 'Necromancy, Conjuraion/Summoning',
+    'school': 'Necromancy, Conjuration/Summoning',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'One creature',
@@ -903,7 +906,7 @@ wiz2['Deafness'] = {
 
 wiz2['Deeppockets'] = {
     'level': 'Level 2 Wizard',
-    'school': 'Ateration, Enchantment',
+    'school': 'Alteration, Enchantment',
     'range': 'Touch',
     'duration': '[[12+[[@{level-wizard}]] ]] hours',
     'aoe': '1 garment',
@@ -1425,7 +1428,8 @@ wiz2['Strength'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Application of this spell increases the Strength of the character by  a number of points—or tenths of points after 18 Strength is attained  (only if the character is a warrior). Benefits of the strength spell last  for the duration of the magic. The amount of added Strength  depends upon the spell recipient’s group and is subject to all restrictions  on Strength due to race and class. Multiclass characters use the  best die. \n&emsp;&emsp;**Class**&emsp;&emsp;**Strength Gain** \n&emsp;&emsp;Priest&emsp;&emsp;1d6 points \n&emsp;&emsp;Rogue&emsp;&ensp;&thinsp;1d6 points \n&emsp;&emsp;Warrior&emsp;&thinsp;1d8 points \n&emsp;&emsp;Wizard&emsp;&ensp;1d4 points \n&emsp;If a warrior has an 18 Strength already, from 10% to 80% is  added to his extraordinary Strength roll. The spell cannot confer a  Strength of 19 or more, nor is it cumulative with other magic that  adds to Strength. Beings without Strength scores (kobolds, lizard  men, etc.) receive a +1 to attack and damage rolls.'
+    'effect': 'Application of this spell increases the Strength of the character by  a number of points—or tenths of points after 18 Strength is attained  (only if the character is a warrior). Benefits of the strength spell last  for the duration of the magic. The amount of added Strength  depends upon the spell recipient’s group and is subject to all restrictions on Strength due to race and class. Multiclass characters use the best die.',
+    'table': '{{c1-1=&emsp;**Class**}}{{c2-1=&emsp;Priest}}{{c3-1=&emsp;Rogue}}{{c4-1=&emsp;Warrior}}{{c5-1=&emsp;Wizard}}{{c1-2=**Strength Gain**}}{{c2-2=1d6 points}}{{c3-2=1d6 points}}{{c4-2=1d8 points}}{{c5-2=1d4 points}}{{effects2=&emsp;If a warrior has an 18 Strength already, from 10% to 80% is  added to his extraordinary Strength roll. The spell cannot confer a Strength of 19 or more, nor is it cumulative with other magic that adds to Strength. Beings without Strength scores (kobolds, lizard  men, etc.) receive a +1 to attack and damage rolls.}}'
 };
 
 wiz2['Summon Swarm'] = {
@@ -1442,7 +1446,8 @@ wiz2['Summon Swarm'] = {
     'damage': '1 damage per round defending else 1d4+[[@{level-wizard}]] ',
     'damage-type': '',
     'healing': '',
-    'effect': 'The swarm of small animals (roll on following table to determine type, or the DM can assign an appropriate creature) drawn by the *summon swarm* spell will viciously attack all creatures in the area chosen by the caster. Creatures actively defending against the swarm to the exclusion of other activities suffer 1 point of damage for each round spent in the swarm. Those taking other actions, including leaving the swarm, receive damage equal to 1d4 points + 1 point per three levels of the caster each round. Note that spellcasting within the swarm is impossible. \n&emsp;&emsp;**Dice Roll**&emsp;**Swarm Type** \n&emsp;&emsp;01–40&emsp;&emsp;&emsp;Rats \n&emsp;&emsp;41–70&emsp;&emsp;&emsp;Bats \n&emsp;&emsp;71–80&emsp;&emsp;&emsp;Spiders \n&emsp;&emsp;81–90&emsp;&emsp;&emsp;Centipedes/beetles \n&emsp;&emsp;91–100&emsp;&emsp;&ensp;Flying insects \n&emsp;The swarm cannot be fought effectively with weapons, but fire and area effects can force it to disperse by inflicting damage. The swarm disperses when it has taken a total of 2 hit points per caster level from these attacks. A *protection from evil* spell keeps the swarm at bay, and certain area-effect spells, such as *gust of wind* and *stinking cloud*, disperse a swarm immediately, if appropriate to the swarm summoned (for example, only flyers are affected by a *gust of wind*). The caster must remain stationary and undisturbed to control the swarm; if his concentration lapses or is broken, the swarm disperses in two rounds. The swarm is stationary once conjured.'
+    'effect': 'The swarm of small animals (roll on following table to determine type, or the DM can assign an appropriate creature) drawn by the *summon swarm* spell will viciously attack all creatures in the area chosen by the caster. Creatures actively defending against the swarm to the exclusion of other activities suffer 1 point of damage for each round spent in the swarm. Those taking other actions, including leaving the swarm, receive damage equal to 1d4 points + 1 point per three levels of the caster each round. Note that spellcasting within the swarm is impossible.',
+    'table': '{{style=center1}}{{c1-1=**Dice Roll**}}{{c2-1=01–40}}{{c3-1=41–70}}{{c4-1=71–80}}{{c5-1=81–90}}{{c6-1=91–100}}{{c1-2=**Swarm Type**}}{{c2-2=Rats}}{{c3-2=Bats}}{{c4-2=Spiders}}{{c5-2=Centipedes/beetles}}{{c6-2=Flying insects}}{{effects2=&emsp;The swarm cannot be fought effectively with weapons, but fire and area effects can force it to disperse by inflicting damage. The swarm disperses when it has taken a total of 2 hit points per caster level from these attacks. A *protection from evil* spell keeps the swarm at bay, and certain area-effect spells, such as *gust of wind* and *stinking cloud*, disperse a swarm immediately, if appropriate to the swarm summoned (for example, only flyers are affected by a *gust of wind*). The caster must remain stationary and undisturbed to control the swarm; if his concentration lapses or is broken, the swarm disperses in two rounds. The swarm is stationary once conjured.}}'
 };
 
 wiz2['Tasha\'s Uncontrollable Hideous Laughter'] = {
@@ -1596,7 +1601,8 @@ wiz3['Dispel Magic'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When a wizard casts this spell, it has a chance to neutralize or negate magic it comes in contact with, as follows:\n&emsp;First, it removes spells and spell-like effects (including device effects and innate abilities) from creatures or objects. Second, it disrupts the casting or use of these in the area of effect at the instant the dispel is cast. Third, it destroys magical potions (which are treated as 12th level for purposes of this spell). \n&emsp;Each effect or potion in the spell’s area is checked to determine if it is dispelled. The caster can always dispel his own magic; otherwise, the chance to dispel depends on the difference in level between the magical effect and the caster. The base chance is 50% (11 or higher on 1d20 to dispel). If the caster is of higher level than the creator of the effect to be dispelled, the difference is subtracted from the number needed on 1d20 to dispel (making it more likely that the dispel succeeds); if the caster is of lower level, the difference is *added* to the number needed on 1d20 to dispel (making it *less* likely that the dispel succeeds). A roll of 20 always succeeds and a roll of 1 always fails. Thus, if a caster is 10 levels higher, only a roll of 1 prevents the effect from being dispelled. \n&emsp;A *dispel magic* spell does not affect a specially enchanted item, such as a magical scroll, ring, wand, rod, staff, miscellaneous item, weapon, shield, or armor, unless it is cast directly upon the item. This renders the item nonoperational for 1d4 rounds. An item possessed and carried by a creature gains the creature’s saving throw against this effect; otherwise, it is automatically rendered nonoperational. An interdimensional interface (such as a *bag of holding*) rendered nonoperational would be temporarily closed. Note that an item’s physical properties are unchanged: A nonoperational magical sword is still a sword. \n&emsp;Artifacts and relics are not subject to this spell; however, some of their spell-like effects may be, at the DM’s option. \n&emsp;Note that this spell can be very effective when used upon charmed and similarly beguiled creatures. Certain spells or effects cannot be dispelled; these are listed in the spell descriptions.\n\n**Summary of Dispel Magic Effects**\n\n**Source of Effect&emsp;&emsp;Resists As&emsp;&emsp;Result of Dispel**\nCaster&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;None&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;Dispel automatic\nOther caster/&emsp;&emsp;&emsp;&emsp;&thinsp;Leve/HD of\n&emsp;innate ability&emsp;&emsp;&emsp;&emsp;other caster&emsp;&thinsp;Effect negated\nWand&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;6th level&emsp;&emsp;&emsp;&emsp;&#42;\nStaff&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;8th level&emsp;&emsp;&emsp;&ensp;&thinsp;&thinsp;&#42\nPotion&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;12th level&emsp;&emsp;&emsp;&thinsp;Potion destroyed\nOther magic&emsp;&emsp;&emsp;&emsp;&ensp;12th,\n&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;unless special&emsp;&#42\nArtifact&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;DM discretion&emsp;&ensp;DM discretion\n\n&#42 Effect negated; if cast directly on item, item becomes nonoperational for 1d4 rounds.'
+    'effect': 'When a wizard casts this spell, it has a chance to neutralize or negate magic it comes in contact with, as follows:\n&emsp;First, it removes spells and spell-like effects (including device effects and innate abilities) from creatures or objects. Second, it disrupts the casting or use of these in the area of effect at the instant the dispel is cast. Third, it destroys magical potions (which are treated as 12th level for purposes of this spell). \n&emsp;Each effect or potion in the spell’s area is checked to determine if it is dispelled. The caster can always dispel his own magic; otherwise, the chance to dispel depends on the difference in level between the magical effect and the caster. The base chance is 50% (11 or higher on 1d20 to dispel). If the caster is of higher level than the creator of the effect to be dispelled, the difference is subtracted from the number needed on 1d20 to dispel (making it more likely that the dispel succeeds); if the caster is of lower level, the difference is *added* to the number needed on 1d20 to dispel (making it *less* likely that the dispel succeeds). A roll of 20 always succeeds and a roll of 1 always fails. Thus, if a caster is 10 levels higher, only a roll of 1 prevents the effect from being dispelled. \n&emsp;A *dispel magic* spell does not affect a specially enchanted item, such as a magical scroll, ring, wand, rod, staff, miscellaneous item, weapon, shield, or armor, unless it is cast directly upon the item. This renders the item nonoperational for 1d4 rounds. An item possessed and carried by a creature gains the creature’s saving throw against this effect; otherwise, it is automatically rendered nonoperational. An interdimensional interface (such as a *bag of holding*) rendered nonoperational would be temporarily closed. Note that an item’s physical properties are unchanged: A nonoperational magical sword is still a sword. \n&emsp;Artifacts and relics are not subject to this spell; however, some of their spell-like effects may be, at the DM’s option. \n&emsp;Note that this spell can be very effective when used upon charmed and similarly beguiled creatures. Certain spells or effects cannot be dispelled; these are listed in the spell descriptions.\n\n**Summary of Dispel Magic Effects**\n',
+    'table': '{{c1-1=**Source of Effect**}}{{c2-1=Caster}}{{c3-1=Other caster/}}{{c4-1=&emsp;innate ability}}{{c5-1=Wand}}{{c6-1=Staff}}{{c7-1=Potion}}{{c8-1=Other magic}}{{c9-1=Artifact}}{{c1-2=**Resists As**}}{{c2-2=None}}{{c3-2=Leve/HD of}}{{c4-2=&emsp;other caster}}{{c5-2=6th level}}{{c6-2=8th level}}{{c7-2=12th level}}{{c8-2=12th, unless special}}{{c9-2=DM discretion}}{{c1-3=**Result of Dispel**}}{{c2-3=Dispel automatic}}{{c4-3=Effect negated}}{{c5-3=&#42;}}{{c6-3=&#42}}{{c7-3=Potion destroyed}}{{c8-3=&#42}}{{c9-3=DM discretion}}{{effects2=&#42 Effect negated; if cast directly on item, item becomes nonoperational for 1d4 rounds.}}'
 };
 
 wiz3['Explosive Runes'] = {
@@ -2145,28 +2151,28 @@ wiz4['Charm Monster'] = {
     'effect': 'This spell is similar to a *charm person* spell, but it can affect any living creature—or several low-level creatures. The spell affects [[2d4]] Hit Dice or levels of creatures, although it only affects one creature of 4 or more Hit Dice or levels, regardless of the number rolled. \n&emsp;All possible subjects receive saving throws vs. spell, adjusted for Wisdom. Any damage inflicted by the caster or his allies in the round of casting grants the wounded creature another saving throw at a bonus of +1 per point of damage received. Any affected creature regards the spellcaster as friendly, an ally or companion to be treated well or guarded from harm. If communication is possible, the charmed creature follows reasonable requests, instructions, or orders most faithfully (see the *suggestion* spell). If communication is not possible, the creature does not harm the caster, but others in the vicinity may be subject to its intentions, hostile or otherwise. Any overtly hostile act by the caster breaks the spell, or at the very least allows a new saving throw against the charm. Affected creatures eventually come out from under the influence of the spell. This is a function of the creature’s level (i.e., its Hit Dice).\n\n**Monster Level**&emsp;&emsp;**% Chance Per Week**\n**or Hit Dice**&emsp;&emsp;&emsp;&emsp;&emsp;**of Breaking Spell**\n1st or up to 2&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;5%\n2nd or up to 3+2&emsp;&emsp;&emsp;&emsp;&emsp;10%\n3rd or up to 4+4&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;15%\n4th or up to 6&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;25%\n5th or up to 7+2&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;35%\n6th or up to 8+4&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;45%\n7th or up to 10&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;60%\n8th or up to 12&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;&thinsp;&thinsp;75%\n9th or over 12&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;90%\n\nThe exact day of the week and time of day is secretly determined by the DM.'
 };
 
-//start here
+
 wiz4['Confusion'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment/Charm',
-    'range': '120 yds.',
+    'range': '120 yards',
     'duration': '[[2+[[@{level-wizard}]] ]] rounds',
-    'aoe': 'Up to 60-ft. cube',
+    'aoe': 'Up to 60-foot cube',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Special',
-    'materials': 'a set of three nut shells',
+    'materials': 'A set of three nut shells',
     'reference': 'PHB p. 198',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects [[1d4+[[@{level-wizard]] ]] creatures. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as follows:\n\n**D10 Roll&emsp;Action**\n1&emsp;Wander away (unless prevented) for duration of spell\n2-6&emsp;Stand confused for one round (then roll again)\n7-9&emsp;Attack nearest creature for one round (then roll again)\n10&emsp;Act normally for one round (then roll again)\n\n&emsp;The spell lasts for two rounds plus one round for each level of the caster. Those who fail are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible, according to their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to make the saving throw, then four are assumed to have succeeded. Out of the other 12, one wanders away, four attack the nearest creature, six stand confused, and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two attacking the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stand confused, four attack, and one acts normally.'
+    'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects [[1d4+[[@{level-wizard}]] ]] creatures. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as follows:\n\n**D10**\n**Roll**&emsp;&ensp;**Action**\n1&emsp;&emsp;&emsp;Wander away (unless prevented) for duration of spell\n2-6&emsp;&emsp;Stand confused for one round (then roll again)\n7-9&emsp;&emsp;Attack nearest creature for one round (then roll again)\n10&emsp;&emsp;&ensp;Act normally for one round (then roll again)\n\n&emsp;The spell lasts for two rounds plus one round for each level of the caster. Those who fail are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible, according to their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to make the saving throw, then four are assumed to have succeeded. Out of the other 12, one wanders away, four attack the nearest creature, six stand confused, and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two attacking the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stand confused, four attack, and one acts normally.'
 };
 
 wiz4['Contagion'] = {
     'level': 'Level 4 Wizard',
     'school': 'Necromancy',
-    'range': '30 yds.',
+    'range': '30 yards',
     'duration': 'Permanent',
     'aoe': '1 creature',
     'components': 'V, S',
@@ -2184,34 +2190,34 @@ wiz4['Detect Scrying'] = {
     'level': 'Level 4 Wizard',
     'school': 'Divination',
     'range': '0',
-    'duration': '[[ 1d6 + [[@{level-wizard}]] ]] turns',
-    'aoe': '120-ft. radius',
+    'duration': '[[1d6+[[@{level-wizard}]] ]] turns',
+    'aoe': '120-foot radius',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Special',
-    'materials': 'a small piece of mirror and a miniature brass hearing trumpet.',
+    'materials': 'A small piece of mirror and a miniature brass hearing trumpet.',
     'reference': 'PHB p. 199',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard immediately becomes aware of any attempt to observe him by means of clairvoyance, clairaudience, or magic mirror. This also reveals the use of crystal balls or other magical scrying devices, provided the attempt is within the area of effect of the spell. Since the spell is centered on the spellcaster, it moves with him, enabling him to â€œsweepâ€ areas for the duration of the spell.\n&emsp;When a scrying attempt is detected, the scryer must immediately roll a saving throw. If this is failed, the identity and general location of the scryer immediately become known to the wizard who cast this spell. The general location is a direction and significant landmark close to the scryer. Thus, the caster might learn, “The wizard Sniggel spies on us from east, under the stairs,” or, “You are watched by Asquil in the city of Samarquol.”',
+    'effect': 'By means of this spell, the wizard immediately becomes aware of any attempt to observe him by means of clairvoyance, clairaudience, or magic mirror. This also reveals the use of crystal balls or other magical scrying devices, provided the attempt is within the area of effect of the spell. Since the spell is centered on the spellcaster, it moves with him, enabling him to ”sweep” areas for the duration of the spell.\n&emsp;When a scrying attempt is detected, the scryer must immediately roll a saving throw. If this is failed, the identity and general location of the scryer immediately become known to the wizard who cast this spell. The general location is a direction and significant landmark close to the scryer. Thus, the caster might learn, “The wizard Sniggel spies on us from east, under the stairs,” or, “You are watched by Asquil in the city of Samarquol.”',
 };
 
 wiz4['Dig'] = {
     'level': 'Level 4 Wizard',
     'school': 'Evocation',
-    'range': '30 yds.',
-    'duration': '1 rd./level',
-    'aoe': '5-ft. cube/level',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[5*[[@{level-wizard}]] ]]-foot cube',
     'components': 'V, S, M',
     'cast-time': '4',
     'saving-throw': 'Special',
-    'materials': '',
+    'materials': 'A miniature shovel and tiny bucket and must continue to hold them while each pit is excavated. These items disappear at the conclusion of the spell.',
     'reference': 'PHB p. 199',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Special  A dig spell enables the caster to excavate 125 cubic feet of earth, sand, or mud per round (i.e., a cubic hole 5 feet on a side). In later rounds the caster can expand an existing hole or start a new one. The material thrown from the excavation scatters evenly around the pit. If the wizard continues downward past 20 feet in earth, there is a 15% chance that the pit collapses. This check is made for every 5 feet dug beyond 20 feet. Sand tends to collapse after 10 feet, mud fills in and collapses after 5 feet, and quicksand fills in as rapidly as it is dug.  Any creature at the edge (within 1 foot) of a pit must roll a suc-cessful Dexterity check or fall into the hole. Creatures moving rapidly toward a pit dug immediately before them must roll a saving throw vs. spell to avoid falling in. Any creature in a pit being excavated can climb out at a rate decided by the DM. A creature caught in a collaps-ing pit must roll a saving throw vs. death to avoid being buried; it escapes the pit if successful. Tunneling is possible with this spell as long as there is space available for the material removed. Chances for collapse are doubled and the safe tunneling distance is half of the safe excavation depth, unless such construction is most carefully braced and supported. The spell is also effective against creatures of earth and rock, particularly clay golems and those from the Elemental Plane of Earth. When cast upon such a creature, it suffers 4d6 points of damage. A successful saving throw vs. spell reduces this damage to half. To activate the spell, the spellcaster needs a miniature shovel and tiny bucket and must continue to hold them while each pit is exca-vated. These items disappear at the conclusion of the spell.Detect Scrying(Divination)Dimension Door(Alteration)'
+    'effect': 'A *dig* spell enables the caster to excavate 125 cubic feet of earth, sand, or mud per round (i.e., a cubic hole 5 feet on a side). In later rounds the caster can expand an existing hole or start a new one. The material thrown from the excavation scatters evenly around the pit. If the wizard continues downward past 20 feet in earth, there is a 15% chance that the pit collapses. This check is made for every 5 feet dug beyond 20 feet. Sand tends to collapse after 10 feet, mud fills in and collapses after 5 feet, and quicksand fills in as rapidly as it is dug.\n&emsp;Any creature at the edge (within 1 foot) of a pit must roll a successful Dexterity check or fall into the hole. Creatures moving rapidly toward a pit dug immediately before them must roll a saving throw vs. spell to avoid falling in. Any creature in a pit being excavated can climb out at a rate decided by the DM. A creature caught in a collapsing pit must roll a saving throw vs. death to avoid being buried; it escapes the pit if successful. Tunneling is possible with this spell as long as there is space available for the material removed. Chances for collapse are doubled and the safe tunneling distance is half of the safe excavation depth, unless such construction is most carefully braced and supported.\n&emsp;The spell is also effective against creatures of earth and rock, particularly clay golems and those from the Elemental Plane of Earth. When cast upon such a creature, it suffers 4d6 points of damage. A successful saving throw vs. spell reduces this damage to half.'
 };
 
 wiz4['Dimension Door'] = {
@@ -2228,16 +2234,16 @@ wiz4['Dimension Door'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of a *dimension door* spell, the wizard instantly transfers himself up to [[30*[[@{level-wizard}]] ]] yards distance. This special form of teleportation allows for no error, and the wizard always arrives at exactly the spot desired—whether by simply visualizing the area (within spell transfer distance, of course) or by stating direction such as, “300 yards straight downward,” or, “upward to the north-west, 45 degree angle, 420 yards.” If the wizard arrives in a place that is already occupied by a solid body, he remains trapped in the Astral Plane. If distances are stated and the spellcaster arrives with no support below his feet (i.e., in mid-air), falling and damage result unless further magical means are employed. All that the wizard wears or carries, subject to a maximum weight equal to 500 pounds of nonliving matter, or half that amount of living matter, is transferred with the spellcaster. Recovery from use of a dimension door spell requires one round.'
+    'effect': 'By means of a *dimension door* spell, the wizard instantly transfers himself up to 30 yards distance per level of experience. Currently [[30*[[@{level-wizard}]] ]] yards. This special form of teleportation allows for no error, and the wizard always arrives at exactly the spot desired—whether by simply visualizing the area (within spell transfer distance, of course) or by stating direction such as, “300 yards straight downward,” or, “upward to the north-west, 45 degree angle, 420 yards.” If the wizard arrives in a place that is already occupied by a solid body, he remains trapped in the Astral Plane. If distances are stated and the spellcaster arrives with no support below his feet (i.e., in mid-air), falling and damage result unless further magical means are employed. All that the wizard wears or carries, subject to a maximum weight equal to 500 pounds of nonliving matter, or half that amount of living matter, is transferred with the spellcaster. Recovery from use of a *dimension door* spell requires one round.'
 };
 
 wiz4['Emotion'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment/Charm',
-    'range': '[[10 *[[@{level-wizard}]] ]] yds.',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
     'duration': 'Special',
-    'aoe': '20-ft. cub',
-    'components': 'V,S',
+    'aoe': '20-foot cube',
+    'components': 'V, S',
     'cast-time': '4',
     'saving-throw': 'Negate',
     'materials': '',
@@ -2245,48 +2251,48 @@ wiz4['Emotion'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard can create a single emotional reaction in the subject creatures. The following are typical:\n&nbsp;1. *Courage:* This emotion causes the creatures affected to become berserk, fighting with a +1 bonus to the attack dice, causing +3 points of damage, and temporarily gaining 5 hit points. The recipients fight without shield and regardless of life, never checking morale. This spell counters (and is countered by) *fear.*\n&nbsp;2. *Fear:* The affected creatures flee in panic for [[2d4]] rounds. It counters (and is countered by) *courage.*\n&nbsp;3. *Friendship:* The affected creatures react more positively (for example, tolerance becomes goodwill). It counters (and is countered by) *hate.*\n&nbsp;4. *Happiness:* This effect creates joy and a feeling of complacent well-being, adding +4 to all reaction rolls and making attack unlikely unless the creatures are subject to extreme provocation. It counters (and is countered by) *sadness.*\n&nbsp;5. *Hate:* The affected creatures react more negatively (for example, tolerance becomes negative neutrality). It counters (and is coun-tered by) *friendship.*\n&nbsp;6. *Hope:* The effect of hope is to raise morale, saving throw rolls, attack rolls, and damage caused by +2. It counters (and is countered by) *hopelessness.*\n&nbsp;7. *Hopelessness:* The affected creatures submit to the demands of any opponent: surrender, get out, etc. Otherwise, the creatures are 25% likely to do nothing in a round, and 25% likely to turn back or retreat. It counters (and is countered by) *hope.*\n&nbsp;8. *Sadness:* This creates unhappiness and a tendency toward maudlin introspection. This emotion penalizes surprise rolls by –1 and adds +1 to initiative rolls. It counters (and is countered by) *happiness.*\n&nbsp;All creatures in the area at the instant the spell is cast are affected unless successful saving throws vs. spell are made, adjusted for Wisdom. The spell lasts as long as the wizard continues to concentrate on projecting the chosen emotion. Those who fail the saving throw against fear must roll a new saving throw if they return to the affected area.'
+    'effect': 'When this spell is cast, the wizard can create a single emotional reaction in the subject creatures. The following are typical:\n&emsp;1. *Courage:* This emotion causes the creatures affected to become berserk, fighting with a +1 bonus to the attack dice, causing +3 points of damage, and temporarily gaining 5 hit points. The recipients fight without shield and regardless of life, never checking morale. This spell counters (and is countered by) *fear.*\n&emsp;2. *Fear:* The affected creatures flee in panic for [[2d4]] rounds. It counters (and is countered by) *courage.*\n&emsp;3. *Friendship:* The affected creatures react more positively (for example, tolerance becomes goodwill). It counters (and is countered by) *hate.*\n&emsp;4. *Happiness:* This effect creates joy and a feeling of complacent well-being, adding +4 to all reaction rolls and making attack unlikely unless the creatures are subject to extreme provocation. It counters (and is countered by) *sadness.*\n&emsp;5. *Hate:* The affected creatures react more negatively (for example, tolerance becomes negative neutrality). It counters (and is countered by) *friendship.*\n&emsp;6. *Hope:* The effect of hope is to raise morale, saving throw rolls, attack rolls, and damage caused by +2. It counters (and is countered by) *hopelessness.*\n&emsp;7. *Hopelessness:* The affected creatures submit to the demands of any opponent: surrender, get out, etc. Otherwise, the creatures are 25% likely to do nothing in a round, and 25% likely to turn back or retreat. It counters (and is countered by) *hope.*\n&emsp;8. *Sadness:* This creates unhappiness and a tendency toward maudlin introspection. This emotion penalizes surprise rolls by –1 and adds +1 to initiative rolls. It counters (and is countered by) *happiness.*\n&emsp;All creatures in the area at the instant the spell is cast are affected unless successful saving throws vs. spell are made, adjusted for Wisdom. The spell lasts as long as the wizard continues to concentrate on projecting the chosen emotion. Those who fail the saving throw against fear must roll a new saving throw if they return to the affected area.'
 };
 
 wiz4['Enchanted Weapon'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment',
     'range': 'Touch',
-    'duration': '[[5*[[@{level-wizard}]] ]] rds.',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': 'Weapon(s) touched',
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'powdered lime and carbon',
+    'materials': 'Powdered lime and carbon',
     'reference': 'PHB p. 200',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell turns an ordinary weapon into a magical one. The weapon is the equivalent of a +1 weapon, with +1 to attack and damage rolls. Thus, arrows, axes, bolts, bows, daggers, hammers, maces,  spears,  swords,  etc.,  can  be  made  into  temporarily enchanted weapons. Two small weapons (arrows, bolts, daggers, etc.) or one large weapon (axe, bow, hammer, mace, etc.) weapon can be affected by the spell. The spell functions on existing magical weapons as long as the total combined bonus is +3 or less.\n&nbsp;Missile weapons enchanted in this way lose their enchantment when they successfully hit a target, but otherwise the spell lasts its full duration. This spell is often used in combination with the *enchant an item* and *permanency* spells to create magical weapons, with this spell being cast once per desired plus of the bonus.'
+    'effect': 'This spell turns an ordinary weapon into a magical one. The weapon is the equivalent of a +1 weapon, with +1 to attack and damage rolls. Thus, arrows, axes, bolts, bows, daggers, hammers, maces,  spears,  swords,  etc.,  can  be  made  into  temporarily enchanted weapons. Two small weapons (arrows, bolts, daggers, etc.) or one large weapon (axe, bow, hammer, mace, etc.) weapon can be affected by the spell. The spell functions on existing magical weapons as long as the total combined bonus is +3 or less.\n&emsp;Missile weapons enchanted in this way lose their enchantment when they successfully hit a target, but otherwise the spell lasts its full duration. This spell is often used in combination with the *enchant an item* and *permanency* spells to create magical weapons, with this spell being cast once per desired plus of the bonus.'
 };
 
 wiz4['Enervation'] = {
     'level': 'Level 4 Wizard',
     'school': 'Necromancy',
-    'range': '10 yds./level',
-    'duration': '[[1d4+[[@{level-wizard}}]] ]] hrs.',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[1d4+[[@{level-wizard}}]] ]] hours',
     'aoe': '1 creature',
     'components': 'V, S',
     'cast-time': '4',
     'saving-throw': 'Negate',
     'materials': '',
     'reference': 'PHB p. 200',
-    'damage': '[[floor(@{level-wizard}/4)]] levels',
-    'damage-type': 'negative energy',
+    'damage': '[[floor([[@{level-wizard}]]/4)]]',
+    'damage-type': 'energy levels drained',
     'healing': '',
-    'effect': 'This spell temporarily suppresses the subject’s life force. The necromancer points his finger and utters the incantation, releasing a black bolt of crackling energy. The subject must roll a saving throw vs. spell, adjusted for Dexterity, to avoid the bolt. Success means the spell has no effect. Failure means the subject is treated exactly as if he had been drained of energy levels by a wight, one level for every four levels of the caster. Hit Dice, spells, and other character details dependent on level are lost or reduced. Those drained to 0th level must make a system shock check to survive and are helpless until the spell expires. The spell effect eventually wears off, either after [[1d4+[[@{level-wizard]] ]] hours, or after six hours of complete and undisturbed rest. Level abilities are regained, but lost spells must be rememorized. Undead are immune to this spell.'
+    'effect': 'This spell temporarily suppresses the subject’s life force. The necromancer points his finger and utters the incantation, releasing a black bolt of crackling energy. The subject must roll a saving throw vs. spell, adjusted for Dexterity, to avoid the bolt. Success means the spell has no effect. Failure means the subject is treated exactly as if he had been drained of energy levels by a wight, one level for every four levels of the caster. Hit Dice, spells, and other character details dependent on level are lost or reduced. Those drained to 0th level must make a system shock check to survive and are helpless until the spell expires. The spell effect eventually wears off, either after 1d4 hours plus one hour per caster level, or after six hours of complete and undisturbed rest. Level abilities are regained, but lost spells must be rememorized. Undead are immune to this spell.'
 };
 
-wiz4['Evard’s Black Tentacles'] = {
+wiz4['Evard\'s Black Tentacles'] = {
     'level': 'Level 4 Wizard',
     'school': 'Conjuration/Summoning',
-    'range': '30 yds.',
-    'duration': '[[@{level-wizard}]] hrs.',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] hours',
     'aoe': '30 sq. ft./level',
     'components': 'V, S, M',
     'cast-time': '1 rd.',
@@ -2336,8 +2342,8 @@ wiz4['Fear'] = {
 wiz4['Fire Charm'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment/Charm',
-    'range': '10 yds.',
-    'duration': '[[2*[[@{level-wizard}]] ]] rds.',
+    'range': '10 yards',
+    'duration': '[[2*[[@{level-wizard}]] ]] rounds',
     'aoe': '15-ft. radius',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2354,7 +2360,7 @@ wiz4['Fire Shield'] = {
     'level': 'Level 4 Wizard',
     'school': 'Evocation, Alteration',
     'range': '0',
-    'duration': '[[2+[[@{level-wizard]] ]] rds.',
+    'duration': '[[2+[[@{level-wizard]] ]] rounds',
     'aoe': 'The caster',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2364,7 +2370,7 @@ wiz4['Fire Shield'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell can be cast in one of two forms: a warm shield that protects against cold-based attacks, or a chill shield that protects against fire-based attacks. Both return damage to creatures making physical attacks against the wizard. The wizard must choose which variation he memorizes when the spell is selected.\n&nbsp;When casting this spell, the wizard appears to immolate himself, but the flames are thin and wispy, shedding no heat, and giving light equal to only half the illumination of a normal torch. The color of the flames is determined randomly (50% chance of either color)—blue or green if the chill shield is cast, violet or blue if the warm shield is employed. The special powers of each shield are as follows:\n&nbsp;A) *Warm shield.* The flames are warm to the touch. Any cold-based attacks are saved against with a +2 bonus; either half normal damage or no damage is sustained. There is no bonus against fire-based attacks, but if the wizard fails to make the required saving throw (if any) against them, he sustains double normal damage.\n&nbsp;B) *Chill shield.* The flames are cool to the touch. Any fire-based attacks are saved against with a +2 bonus; either half normal damage or no damage is sustained. There is no bonus against cold-based attacks, but if the wizard fails to make the required saving throw (if any) against them, he sustains double normal damage.\n&nbsp;Any creature striking the spellcaster with its body or hand-held weapons inflicts normal damage upon the wizard, but the attacker suffers the same amount of damage. An attacker’s magical resistance, if any, is tested when the creature actually strikes the wizard. Successful resistance shatters the spell. Failure means the creature’s magic resistance does not affect that casting of the spell.'
+    'effect': 'This spell can be cast in one of two forms: a warm shield that protects against cold-based attacks, or a chill shield that protects against fire-based attacks. Both return damage to creatures making physical attacks against the wizard. The wizard must choose which variation he memorizes when the spell is selected.\n&emsp;When casting this spell, the wizard appears to immolate himself, but the flames are thin and wispy, shedding no heat, and giving light equal to only half the illumination of a normal torch. The color of the flames is determined randomly (50% chance of either color)—blue or green if the chill shield is cast, violet or blue if the warm shield is employed. The special powers of each shield are as follows:\n&emsp;A) *Warm shield.* The flames are warm to the touch. Any cold-based attacks are saved against with a +2 bonus; either half normal damage or no damage is sustained. There is no bonus against fire-based attacks, but if the wizard fails to make the required saving throw (if any) against them, he sustains double normal damage.\n&emsp;B) *Chill shield.* The flames are cool to the touch. Any fire-based attacks are saved against with a +2 bonus; either half normal damage or no damage is sustained. There is no bonus against cold-based attacks, but if the wizard fails to make the required saving throw (if any) against them, he sustains double normal damage.\n&emsp;Any creature striking the spellcaster with its body or hand-held weapons inflicts normal damage upon the wizard, but the attacker suffers the same amount of damage. An attacker’s magical resistance, if any, is tested when the creature actually strikes the wizard. Successful resistance shatters the spell. Failure means the creature’s magic resistance does not affect that casting of the spell.'
 };
 
 wiz4['Fire Trap'] = {
@@ -2387,8 +2393,8 @@ wiz4['Fire Trap'] = {
 wiz4['Fumble'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment/Charm',
-    'range': '[[10*[[@{level-wizard}]] yds.',
-    'duration': '[[@{level-wizard}]] rds.',
+    'range': '[[10*[[@{level-wizard}]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '30-ft. cube',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2405,7 +2411,7 @@ wiz4['Hallucinatory Terrain'] = {
     'level': 'Level 4 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '[[20*[[@{level-wizard}]] ]] yds.',
-    'duration': '[[@{level-wizard}]] hrs.',
+    'duration': '[[@{level-wizard}]] hours',
     'aoe': '[[10*[[@{level-wizard}]] ]] yds. cube',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -2415,7 +2421,7 @@ wiz4['Hallucinatory Terrain'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard causes an illusion that hides the actual terrain within the area of effect. Thus, open fields or a road can be made to look like a swamp, hill, crevasse, or some other difficult or impassable terrain. A pond can be made to look like a grassy meadow, a precipice like a gentle slope, or a rock-strewn gully like a wide and smooth road. The hallucinatory terrain persists until a dispel magic spell is cast upon the area or until the duration expires. Individual creatures may see through the illusion, but the illusion persists, affecting others who observe the scene.\n&nbsp;If the illusion involves only a subtle change, such as causing an  open wood to appear thick and dark, or increasing the slope of a hill, the effect may be unnoticed even by those in the midst of it. If the change is extreme (for example, a grassy plain covering a seething field of volcanic mudpots), the illusion will no doubt be noticed the instant one person falls prey to it. Each level of experience expands the dimensions of the cubic area affected by 10 yards; for example, a 12th-level caster affects an area 120 yds. × 120 yds. × 120 yds.'
+    'effect': 'By means of this spell, the wizard causes an illusion that hides the actual terrain within the area of effect. Thus, open fields or a road can be made to look like a swamp, hill, crevasse, or some other difficult or impassable terrain. A pond can be made to look like a grassy meadow, a precipice like a gentle slope, or a rock-strewn gully like a wide and smooth road. The hallucinatory terrain persists until a dispel magic spell is cast upon the area or until the duration expires. Individual creatures may see through the illusion, but the illusion persists, affecting others who observe the scene.\n&emsp;If the illusion involves only a subtle change, such as causing an  open wood to appear thick and dark, or increasing the slope of a hill, the effect may be unnoticed even by those in the midst of it. If the change is extreme (for example, a grassy plain covering a seething field of volcanic mudpots), the illusion will no doubt be noticed the instant one person falls prey to it. Each level of experience expands the dimensions of the cubic area affected by 10 yards; for example, a 12th-level caster affects an area 120 yds. × 120 yds. × 120 yds.'
 };
 
 wiz4['Ice Storm'] = {
@@ -2456,7 +2462,7 @@ wiz4['Improved Invisibility'] = {
     'level': 'Level 4 Wizard',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
-    'duration': '[[4+[[@{level-wizard}]] ]] rds.',
+    'duration': '[[4+[[@{level-wizard}]] ]] rounds',
     'aoe': 'Creature touched',
     'components': 'V, S',
     'cast-time': '4',
@@ -2473,7 +2479,7 @@ wiz4['Leomund’s Secure Shelter'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration, Enchantment',
     'range': '20 yds.',
-    'duration': '[[1d4+1+[[@{level-wizard}]] ]] hrs.',
+    'duration': '[[1d4+1+[[@{level-wizard}]] ]] hours',
     'aoe': '[[30*[[@{level-wizard}]] ]] sq. ft.',
     'components': 'V, S, M',
     'cast-time': '4 turns',
@@ -2490,7 +2496,7 @@ wiz4['Magic Mirror'] = {
     'level': 'Level 4 Wizard',
     'school': 'Enchantment, Divination',
     'range': 'Touch',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 hr.',
@@ -2524,7 +2530,7 @@ wiz4['Minor Creation'] = {
     'level': 'Level 4 Wizard',
     'school': 'Illusion/Phantasm',
     'range': 'Touch',
-    'duration': '[[@{level-wizard}]] hrs.',
+    'duration': '[[@{level-wizard}]] hours',
     'aoe': '[[@{level-wizard}]] cubic ft.',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -2541,7 +2547,7 @@ wiz4['Minor Globe of Invulnerability'] = {
     'level': 'Level 4 Wizard',
     'school': 'Abjuration',
     'range': '0',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '5-ft. radius',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2552,7 +2558,6 @@ wiz4['Minor Globe of Invulnerability'] = {
     'damage-type': '',
     'healing': '',
     'effect': 'This spell creates an immobile, faintly shimmering magical sphere around the caster that prevents any 1st-, 2nd-, or 3rd-level spell effects from penetrating (i.e., the area of effect of any such spells does not include the area of the minor globe of invulnerability). This includes innate abilities and effects from devices. However, any type of spell can be cast out of the magical globe, and these pass from the caster of the globe to their subject without affecting the globe. Fourth and higher level spells are not affected by the globe. The globe can be brought down by a successful *dispel magic* spell. The caster can leave and return to the globe without penalty. Note that spell effects are not actually disrupted by the globe unless cast directly through or into it: The caster would still see a mirror image created by a wizard outside the globe. If that wizard then entered the globe, the images would wink out, to reappear when the wizard exited the globe. Likewise, a wizard standing in the area of a *light* spell would still receive sufficient light for vision, even though that part of the light spell volume in the globe would not be luminous.'
-    '
 };
 
 wiz4['Monster Summoning II'] = {
@@ -2576,7 +2581,7 @@ wiz4['Otiluke’s Resilient Sphere'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration, Evocation',
     'range': '20 yds.',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '[[@{level-wizard}]]-ft. diameter',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2593,7 +2598,7 @@ wiz4['Phantasmal Killer'] = {
     'level': 'Level 4 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '[[5*[[@{level-wizard}]] ]] yds.',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '1 creature',
     'components': 'V, S',
     'cast-time': '4',
@@ -2603,7 +2608,7 @@ wiz4['Phantasmal Killer'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard creates the illusion of the most fearsome thing imaginable to the victim, simply by forming the fears of the victim’s subconscious mind into something that its conscious mind can visualize—the most horrible beast. Only the spell recipient can see the phantasmal killer (the caster sees only a shadowy shape), but if it succeeds in scoring a hit, the subject dies from fright. The beast attacks as a 4 Hit Dice monster. It is invulnerable to all attacks and can pass through any barriers, Once cast, it inexorably pursues the subject, for it exists only in the subject’s mind.\n&nbsp;The only defenses against a phantasmal killer are an attempt to disbelieve (which can be tried but once), slaying or rendering unconscious the wizard who cast the spell, or rendering unconscious the target of the spell for its duration. To disbelieve the killer, the subject must specifically state the attempt and then roll an Intelligence check. This roll has a [[-1*floor(@{level-wizard}/4)]] penalty.\n&emsp;Special modifiers apply to this attack:\nCondition&emsp;&emsp;Modifier\nSurprise&emsp;-2\nSubject previously attacked by this spell&emsp;+1\nSubject is an illusionist&emsp;+2\nSubject is wearing a *helm of telepathy*&emsp;+3\n&emsp;Magic resistance, bonuses against fear, and Wisdom adjustments also apply. The subject’s magic resistance is checked first; if the spell overcomes the resistance, the subject’s fear/Wisdom bonuses (if any) then apply as negative modifiers to his Intelligence check.\n&emsp;If the subject of a phantasmal killer attack succeeds in disbelieving, and he is wearing a helm of telepathy, the beast can be turned upon the wizard, who must then disbelieve it or be subject to its attack and possible effects.\n&emsp;If the subject ignores the killer to perform other actions, such as attacking the caster, the killer may, at the DM’s option, gain bonuses to hit (for flank or rear attacks, etc.). Spells such as *remove fear* and *cloak of bravery,* cast after the killer has attacked, grant another check to disbelieve the effect.'
+    'effect': 'When this spell is cast, the wizard creates the illusion of the most fearsome thing imaginable to the victim, simply by forming the fears of the victim’s subconscious mind into something that its conscious mind can visualize—the most horrible beast. Only the spell recipient can see the phantasmal killer (the caster sees only a shadowy shape), but if it succeeds in scoring a hit, the subject dies from fright. The beast attacks as a 4 Hit Dice monster. It is invulnerable to all attacks and can pass through any barriers, Once cast, it inexorably pursues the subject, for it exists only in the subject’s mind.\n&emsp;The only defenses against a phantasmal killer are an attempt to disbelieve (which can be tried but once), slaying or rendering unconscious the wizard who cast the spell, or rendering unconscious the target of the spell for its duration. To disbelieve the killer, the subject must specifically state the attempt and then roll an Intelligence check. This roll has a [[-1*floor(@{level-wizard}/4)]] penalty.\n&emsp;Special modifiers apply to this attack:\nCondition&emsp;&emsp;Modifier\nSurprise&emsp;-2\nSubject previously attacked by this spell&emsp;+1\nSubject is an illusionist&emsp;+2\nSubject is wearing a *helm of telepathy*&emsp;+3\n&emsp;Magic resistance, bonuses against fear, and Wisdom adjustments also apply. The subject’s magic resistance is checked first; if the spell overcomes the resistance, the subject’s fear/Wisdom bonuses (if any) then apply as negative modifiers to his Intelligence check.\n&emsp;If the subject of a phantasmal killer attack succeeds in disbelieving, and he is wearing a helm of telepathy, the beast can be turned upon the wizard, who must then disbelieve it or be subject to its attack and possible effects.\n&emsp;If the subject ignores the killer to perform other actions, such as attacking the caster, the killer may, at the DM’s option, gain bonuses to hit (for flank or rear attacks, etc.). Spells such as *remove fear* and *cloak of bravery,* cast after the killer has attacked, grant another check to disbelieve the effect.'
 };
 
 wiz4['Plant Growth'] = {
@@ -2712,7 +2717,7 @@ wiz4['Shadow Monsters'] = {
     'level': 'Level 4 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '30 yds.',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': '20-ft. cube',
     'components': 'V, S',
     'cast-time': '4',
@@ -2746,7 +2751,7 @@ wiz4['Solid Fog'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration',
     'range': '30 yds.',
-    'duration': '[[2d4+[[@{level-wizard}]] ]] rds.',
+    'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
     'aoe': '20 × 10 × 10 ft.',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2780,7 +2785,7 @@ wiz4['Vacancy'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration, Illusion/Phantasm',
     'range': '[[10*[[@{level-wizard}]] ]] yds.',
-    'duration': '[[@{level-wizard}]] hrs.',
+    'duration': '[[@{level-wizard}]] hours',
     'aoe': '[[10*[[@{level-wizard}]] ]]-ft. radius',
     'components': 'V, S, M',
     'cast-time': '4',
@@ -2831,7 +2836,7 @@ wiz4['Wizard Eye'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration',
     'range': '0',
-    'duration': '[[@{level-wizard}]] rds.',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '1 turn',

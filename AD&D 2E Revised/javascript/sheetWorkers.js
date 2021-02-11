@@ -479,30 +479,40 @@ function setupAutoFillSpellInfo(section, spellsTable) {
         on(`change:repeating_spells-${section}:spell-name`, function(eventInfo){
 
             let spell = spellsTable[section][eventInfo.newValue];
-            if (spell === undefined)
-                return;
+            let tableField = `repeating_spells-${section}_spell-table`;
+            getAttrs([tableField], function(values){
+                if (spell === undefined) {
+                    if (values[tableField]) {
+                        setAttrs({[tableField]: ''});
+                        return;
+                    } else {
+                        return;
+                    }
+                }
 
-            let spellInfo ={
-                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : spell['level'],
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
-                [`repeating_spells-${section}_spell-components`]   : spell['components'],
-                [`repeating_spells-${section}_spell-range`]        : spell['range'],
-                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            }
-            if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-            }
+                let spellInfo ={
+                    [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                    [`repeating_spells-${section}_spell-level`]        : spell['level'],
+                    [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                    [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                    [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                    [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                    [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                    [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                    [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                    [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                    [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                    [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                    [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+                    [`repeating_spells-${section}_spell-effect`]       : spell['effect'],
+                    [`repeating_spells-${section}_spell-table`]        : spell['table'] ?? ''
+                }
+                if (section.startsWith('pri')) {
+                    spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+                }
 
-            setAttrs(spellInfo);
+                setAttrs(spellInfo);
+            });
         });
     }
 }
