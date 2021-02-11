@@ -2148,7 +2148,8 @@ wiz4['Charm Monster'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell is similar to a *charm person* spell, but it can affect any living creature—or several low-level creatures. The spell affects [[2d4]] Hit Dice or levels of creatures, although it only affects one creature of 4 or more Hit Dice or levels, regardless of the number rolled. \n&emsp;All possible subjects receive saving throws vs. spell, adjusted for Wisdom. Any damage inflicted by the caster or his allies in the round of casting grants the wounded creature another saving throw at a bonus of +1 per point of damage received. Any affected creature regards the spellcaster as friendly, an ally or companion to be treated well or guarded from harm. If communication is possible, the charmed creature follows reasonable requests, instructions, or orders most faithfully (see the *suggestion* spell). If communication is not possible, the creature does not harm the caster, but others in the vicinity may be subject to its intentions, hostile or otherwise. Any overtly hostile act by the caster breaks the spell, or at the very least allows a new saving throw against the charm. Affected creatures eventually come out from under the influence of the spell. This is a function of the creature’s level (i.e., its Hit Dice).\n\n**Monster Level**&emsp;&emsp;**% Chance Per Week**\n**or Hit Dice**&emsp;&emsp;&emsp;&emsp;&emsp;**of Breaking Spell**\n1st or up to 2&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;5%\n2nd or up to 3+2&emsp;&emsp;&emsp;&emsp;&emsp;10%\n3rd or up to 4+4&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;15%\n4th or up to 6&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;25%\n5th or up to 7+2&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;35%\n6th or up to 8+4&emsp;&emsp;&emsp;&emsp;&emsp;&thinsp;45%\n7th or up to 10&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;60%\n8th or up to 12&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;&thinsp;&thinsp;&thinsp;75%\n9th or over 12&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&ensp;90%\n\nThe exact day of the week and time of day is secretly determined by the DM.'
+    'effect': 'This spell is similar to a *charm person* spell, but it can affect any living creature—or several low-level creatures. The spell affects [[2d4]] Hit Dice or levels of creatures, although it only affects one creature of 4 or more Hit Dice or levels, regardless of the number rolled. \n&emsp;All possible subjects receive saving throws vs. spell, adjusted for Wisdom. Any damage inflicted by the caster or his allies in the round of casting grants the wounded creature another saving throw at a bonus of +1 per point of damage received. Any affected creature regards the spellcaster as friendly, an ally or companion to be treated well or guarded from harm. If communication is possible, the charmed creature follows reasonable requests, instructions, or orders most faithfully (see the *suggestion* spell). If communication is not possible, the creature does not harm the caster, but others in the vicinity may be subject to its intentions, hostile or otherwise. Any overtly hostile act by the caster breaks the spell, or at the very least allows a new saving throw against the charm. Affected creatures eventually come out from under the influence of the spell. This is a function of the creature’s level (i.e., its Hit Dice).',
+    'table': '{{style=center2 sheet-spell-bottom2}}{{c1-1=**Monster Level**\n**or Hit Dice**}}{{c2-1=1st or up to 2}}{{c3-1=2nd or up to 3+2}}{{c4-1=3rd or up to 4+4}}{{c5-1=4th or up to 6}}{{c6-1=5th or up to 7+2}}{{c7-1=6th or up to 8+4}}{{c8-1=7th or up to 10}}{{c9-1=8th or up to 12}}{{c10-1=9th or over 12}}{{c1-2=**% Chance Per Week**\n**of Breaking Spell**}}{{c2-2=5%}}{{c3-2=10%}}{{c4-2=15%}}{{c5-2=25%}}{{c6-2=35%}}{{c7-2=45%}}{{c8-2=60%}}{{c9-2=75%}}{{c10-2=90%}}{{effects2=&emsp;The exact day of the week and time of day is secretly determined by the DM.}}'
 };
 
 
@@ -2166,7 +2167,8 @@ wiz4['Confusion'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects [[1d4+[[@{level-wizard}]] ]] creatures. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as follows:\n\n**D10**\n**Roll**&emsp;&ensp;**Action**\n1&emsp;&emsp;&emsp;Wander away (unless prevented) for duration of spell\n2-6&emsp;&emsp;Stand confused for one round (then roll again)\n7-9&emsp;&emsp;Attack nearest creature for one round (then roll again)\n10&emsp;&emsp;&ensp;Act normally for one round (then roll again)\n\n&emsp;The spell lasts for two rounds plus one round for each level of the caster. Those who fail are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible, according to their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to make the saving throw, then four are assumed to have succeeded. Out of the other 12, one wanders away, four attack the nearest creature, six stand confused, and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two attacking the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stand confused, four attack, and one acts normally.'
+    'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects [[1d4+[[@{level-wizard}]] ]] creatures. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as described in the table below.\n&emsp;The spell lasts for two rounds plus one round for each level of the caster. Those who fail are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible, according to their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to make the saving throw, then four are assumed to have succeeded. Out of the other 12, one wanders away, four attack the nearest creature, six stand confused, and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two attacking the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stand confused, four attack, and one acts normally.',
+    'table': '{{style=center1}}{{c1-1=**D10 Roll**}}{{c2-1=1}}{{c3-1=2-6}}{{c4-1=7-9}}{{c5-1=10}}{{cc1-2=bottom}}{{c1-2=**Action**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused for one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}'
 };
 
 wiz4['Contagion'] = {
@@ -2293,18 +2295,19 @@ wiz4['Evard\'s Black Tentacles'] = {
     'school': 'Conjuration/Summoning',
     'range': '30 yards',
     'duration': '[[@{level-wizard}]] hours',
-    'aoe': '30 sq. ft./level',
+    'aoe': '[[30*[[@{level-wizard}]] ]] square feet',
     'components': 'V, S, M',
-    'cast-time': '1 rd.',
+    'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'a piece of tentacle from a giant octopus or giant squid',
+    'materials': 'A piece of tentacle from a giant octopus or giant squid',
     'reference': 'PHB p. 200',
-    'damage': '',
+    'damage': '1d4 / 2d4 / 3d4',
     'damage-type': '',
     'healing': '',
     'effect': 'This spell creates many rubbery, black tentacles in the area of effect. These waving members seem to spring forth from the earth, floor, or whatever surface is underfoot—including water. Each tentacle is 10 feet long, AC 4, and requires [[@{level-wizard}]] points of damage to destroy. There are [[1d4+[[@{level-wizard}]] ]] such tentacles.\n&emsp;Any creature within range of the writhing tentacles is subject to attack as determined by the DM. The target of a tentacle attack must roll a saving throw vs. spell. If this succeeds, the subject suffers 1d4 points of damage from contact with the tentacle; the tentacle is then destroyed. Failure to save indicates that the damage inflicted is 2d4 points, the ebon member is wrapped around its subject, and damage will be 3d4 points on the second and all succeeding rounds. Since these tentacles have no intelligence to guide them, there is the possibility that they entwine any object—a tree, post, pillar, even the wizard himself—or continue to squeeze a dead opponent. A grasping hold established by a tentacle remains until the tentacle is destroyed by some form of attack or until it disappears at the end of the spell’s duration.'
 };
 
+// start her
 wiz4['Extension I'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration',
@@ -2475,7 +2478,7 @@ wiz4['Improved Invisibility'] = {
     'effect': 'This spell is similar to the *invisibility* spell, but the recipient is able  to attack, either by missile discharge, melee combat, or spellcasting, and remain unseen. Note, however, that telltale traces (such as a shimmering effect) sometimes allow an observant opponent to attack the invisible spell recipient. These traces are only noticeable when specifically looked for (after the invisible character has made his presence known). Attacks against the invisible character suffer –4 penalties to the attack rolls, and the invisible character’s saving throws are made with a +4 bonus. Beings with high Hit Dice that might normally notice invisible opponents will notice a creature under this spell as if they had 2 fewer Hit Dice (they roll saving throws vs. spell; success indicates they spot the character).'
 };
 
-wiz4['Leomund’s Secure Shelter'] = {
+wiz4['Leomund\'s Secure Shelter'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration, Enchantment',
     'range': '20 yds.',
@@ -2577,7 +2580,7 @@ wiz4['Monster Summoning II'] = {
     'effect': 'This spell is much like the 3rd-level spell *monster summoning I,* except that this spell summons [[1d6]] 2nd-level monsters. These appear anywhere within the spell’s area of effect and attack the caster’s opponents, until he commands them to cease, the spell duration expires, or the monsters are slain. These creatures do not check morale; they vanish when slain. If no opponent exists to fight and the wizard can communicate with them, the summoned monsters can perform other services for the summoning wizard.'
 };
 
-wiz4['Otiluke’s Resilient Sphere'] = {
+wiz4['Otiluke\'s Resilient Sphere'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration, Evocation',
     'range': '20 yds.',
@@ -2679,7 +2682,7 @@ wiz4['Rainbow Pattern'] = {
     'effect': 'By means of this spell, the wizard creates a glowing, rainbow-hued band of interweaving patterns. Any creature caught in it may become fascinated and gaze at it as long as the effect lasts. The spell can captivate a maximum of 24 levels, or Hit Dice, of creatures—24 creatures with 1 Hit Die each, 12 with 2 Hit Dice, etc. All creatures affected must be within the area of effect, and each is entitled to a saving throw vs. spell. An attack on an affected creature that causes damage frees it from the spell immediately. Creatures that are restrained and removed from the area still try to follow the pattern.\n&emsp;Once the rainbow pattern is cast, the wizard need only gesture in the direction he desires, and the pattern of colors moves slowly off in that direction, at the rate of 30 feet per round. It persists without further attention from the spellcaster for [[1d3]] rounds. All affected creatures follow the moving rainbow of light. If the pattern leads its subjects into a dangerous area (through flame, off a cliff, etc.), allow a second saving throw. If the view of the lights is completely blocked (by an *obscurement* spell, for instance), the spell is negated.\n&emsp;The wizard need not utter a sound, but he must gesture appropriately while holding a crystal prism and the material component.'
 };
 
-wiz4['Rary’s Mnemonic Enhancer'] = {
+wiz4['Rary\'s Mnemonic Enhancer'] = {
     'level': 'Level 4 Wizard',
     'school': 'Alteration',
     'range': '0',
@@ -2853,4 +2856,5 @@ const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
 wizardSpells['wiz3'] = wiz3;
+wizardSpells['wiz4'] = wiz4;
 /* ---- Wizard spells end ---- */
