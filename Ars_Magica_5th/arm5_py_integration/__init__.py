@@ -284,7 +284,7 @@ GLOBALS["spell_roll_stress"] = (
 GLOBALS["botch_separated"] = (
     "?{@{botch_num_i18n} | "
     + "|".join(
-        f"{n} {'Die' if n==1 else 'Dice'}," + " ".join(["[[1d10cf1cs0]]"] * n)
+        f"{n} {'Die' if n==1 else 'Dice'}," + " ".join(["[[1d10cf10cs0]]"] * n)
         for n in range(1, 13)
     )
     + "}"
