@@ -3140,16 +3140,7 @@ on("mancer:cancel", function(eventinfo) {
     setAttrs(update);
 });
 
-on("change:licensedsheet", function(eventinfo) {
-    //debugger
-});
-
-/* on("sheet:opened", function(eventinfo) {
-    getAttrs([licensedsheet], function(v) {
-        debugger
-    });
-}); */
-    var v2_old_values_check = function() {
+var v2_old_values_check = function() {
     // update_attacks("all");
     var update = {};
     var attrs = ["simpletraits","features_and_traits","initiative_bonus","npc","character_id"];

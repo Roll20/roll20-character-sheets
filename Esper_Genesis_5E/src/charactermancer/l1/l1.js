@@ -2412,7 +2412,7 @@
             background: "background-u",
             equipment: "equipment-u",
             spells: "spells-u",
-            //feat: "feats-u",
+            feat: "feats-u",
             bio: "bio-u",
             summary: "review-u"
         }
