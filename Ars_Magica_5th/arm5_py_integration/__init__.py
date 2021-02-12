@@ -24,7 +24,7 @@ def xp(
     return f"""[<input type="text" class="sheet-number_3" name="attr_{name}{suffix}" value="0"/>/<input type="text" class="sheet-number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>/<input type="text" class="sheet-number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>]"""
 
 
-def alert(title: str, text: str, *, level: str = "warning"):
+def alert(title: str, text: str, *, level: str = "warning", ID: str = None):
     """
     Generate the HTML to display a banner that can be permanently hidden
 
@@ -34,11 +34,16 @@ def alert(title: str, text: str, *, level: str = "warning"):
         text: Main text of the banner
         title: Title of the banner
         type: On of "warning", "info". The aspect of the banner
+        ID: optional string ID of this banner, if you need to check if it is
+            open/closed somewhere. Do NOT use numbers
     """
-    numid = alert.numid
-    alert.numid += 1
     if not level in ("info", "warning"):
         raise ValueError("Level must be among 'info', 'warning'")
+    if ID is None:
+        numid = alert.numid
+        alert.numid += 1
+    else:
+        numid = str(ID)
     return f"""<input type="hidden" class="sheet-alert-hidder" name="attr_alert-{numid}" value="0"/>
 <div class="sheet-alert sheet-alert-{level}">
     <div>
@@ -145,8 +150,8 @@ GLOBALS["characteristic_name_ask_attr"] = (
 )
 
 # Abilities
-ability_roll_template = "&{template:ability} {{name= @{character_name}}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_CharacName}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_lbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] ]]}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=%(roll)s}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
-ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant}) [@{Ability_name}] + (@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_lbk}) [@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_i18n@{sys_lbk}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]"
+ability_roll_template = "&{template:ability} {{name=@{character_name}}} {{label0=@{Ability_name}}} {{banner=@{Ability_Speciality}}} {{label1=^{rank}}} {{result1= [[ @{Ability_Score} + @{Ability_Puissant} ]]}} {{label2=@{Ability_CharacName}}} {{result2=[[@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk}]]}} {{label3=^{weakness-m}}} {{result3=[[ ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] ]]}} {{label4=^{circumstances-m}}} {{result4=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=%(roll)s}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+ability_roll = "[[ %(die)s + (@{Ability_Score} + @{Ability_Puissant}) [@{Ability_name}] + (@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_Score@{sys_rbk}) [@{sys_at}@{character_name}@{sys_pipe}@{Ability_CharacName}_i18n@{sys_rbk}] + (@{wound_total}) [@{wounds_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]"
 GLOBALS["ability_roll_simple"] = ability_roll_template % {
     "roll": ability_roll % {"die": "@{simple-die}"}
 }
@@ -235,6 +240,7 @@ GLOBALS["form_enumerated_options"] = repeat_template(
 
 
 # Casting rolls
+## Magic tab
 spontaneous_roll_template = "&{template:arcane} {{label0=^{spontaneous} ^{casting}}} {{result0=%(roll)s}} {{label1=^{aura}}} {{result1=@{aura}}} {{label2=^{weakness-m}}} {{result2=[[ @{wound_total}[@{wounds_i18n}] + [[floor(@{fatigue})]][@{fatigue_i18n}] ]]}} {{label3=^{circumstances-m}}} {{result3=?{@{modifiers_i18n}|0}}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical-spontaneous)}}"
 spontaneous_roll = "[[(%(die)s + @{Spontaneous1_Technique} + @{Spontaneous1_Form} + ([[@{Spontaneous1_Focus}]]) [@{focus_i18n}] + (@{gestures}) + (@{words}) + (@{Stamina_Score}) [@{stamina_i18n}] + (@{aura}) [@{aura_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] + (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] )/2 ]]"
 GLOBALS["spontaneous_roll_simple"] = spontaneous_roll_template % {
@@ -271,8 +277,21 @@ GLOBALS["ritual_roll_stress"] = (
     ritual_roll_template % {"roll": ritual_roll % {"die": "@{stress-die}"}}
 ) + " {{stress=1}}"
 
-spell_roll_template = "&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{sigil=@{sigil}}} {{roll= %(roll)s }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{Technique_name} }} {{Form= @{Form_name} }} {{Level= @{spell_level} }} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
-spell_roll = "[[%(die)s + (@{Stamina_Score}) [@{stamina_i18n}] + (@{spell_Technique}) [@{Technique_name}] + (@{spell_Form}) [@{Form_name}] + ([[@{spell_Focus}]]) [@{focus_i18n}] + (@{spell_bonus}) [@{bonus_i18n}] + (@{gestures}) + (@{words}) + (@{aura}) [@{aura_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] + (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] ]]"
+## Spells
+# Deferred attribute access to get the spell's technique value
+spell_tech_value = "(@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Score@{sys_rbk} + @{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Puissant@{sys_rbk}) [@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_i18n@{sys_rbk}]"
+spell_form_value = "(@{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_Score@{sys_rbk} + @{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_Puissant@{sys_rbk}) [@{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_i18n@{sys_rbk}]"
+# Export the deferred attribute access for use in the HTML since the focus depends on them
+GLOBALS["spell_tech_value"] = spell_tech_value
+GLOBALS["spell_form_value"] = spell_form_value
+spell_roll_template = "&{template:spell} {{spell= @{spell_name}}} {{character= @{character_name} }} {{sigil=@{sigil}}} {{roll= %(roll)s }} {{range= @{spell_range} }} {{duration= @{spell_duration} }} {{target= @{spell_target} }} {{effect= @{spell_note} }} {{mastery= @{spell_note-2} }} {{Technique= @{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_i18n@{sys_rbk} }} {{Form= @{sys_at}@{character_name}@{sys_pipe}@{spell_form_name}_i18n@{sys_rbk} }} {{Level= @{spell_level} }} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"
+spell_roll = (
+    "[[%(die)s + (@{Stamina_Score}) [@{stamina_i18n}] + "
+    + spell_tech_value
+    + " + "
+    + spell_form_value
+    + "+ ([[@{spell_Focus}]]) [@{focus_i18n}] + (@{spell_bonus}) [@{bonus_i18n}] + (@{gestures}) + (@{words}) + (@{aura}) [@{aura_i18n}] + ([[floor(@{Fatigue})]]) [@{fatigue_i18n}] + (@{wound_total}) [@{wounds_i18n}] + (?{@{modifiers_i18n}|0}) [@{modifiers_i18n}] ]]"
+)
 GLOBALS["spell_roll_simple"] = spell_roll_template % {
     "roll": spell_roll % {"die": "@{simple-die}"}
 }

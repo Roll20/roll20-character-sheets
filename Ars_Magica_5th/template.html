@@ -17,6 +17,26 @@ $$alert(
 - Added support for focus in magic totals & rolls"""),
     level="info"
 )$$
+$$alert(
+    "February 2021 v1.6.1 Update - Rounding edges",
+    markdown.markdown(
+        """- Fixed botch die botching on 1s instead of 10s
+- Fixed critical dice displaying 10s as exploding, instead of 1s
+- Fixed spell's arts value not being updated when the character's arts are modified
+    + Completely changed how arts are handled inside spells
+    + A script will be run to convert your data to the new format, but may fail for some spells
+    + Check the arts of your spells !
+- Added a critical roll for initiative that sets the tunr tracker initiative (not visible in the sheet, use th chat button)
+- Centered the sheet in its tab"""),
+    level="info"
+)$$
+$$alert(
+    "February 2021 v1.6.1 update - ERROR: Spell's arts conversion",
+    """The conversion script that updates your spell's arts to the new format failed to run. This means you need to setup the arts of your spells again.
+    
+    <b>Note:</b> The script is run each time you open your character sheet, as long as this banner is visible. If it completes normally, it will hide this banner before you can see it.""",
+    ID="161-spell-update"
+)$$
 
 <div class="sheet-top_bar">
     <div>
@@ -79,6 +99,7 @@ $$alert(
         <button type="action" name="act_spells" class="sheet-tabbutton" data-i18n="spells" >Spells</button>
         <button type="action" name="act_help" class="sheet-tabbutton" data-i18n="help">Help</button>
     </div>
+    <div class="tabblank"></div>
     <div class="sheet-functions">
         <button type="action" name="act_die-toggle-simple" class="sheet-die-toggle-simple" data-i18n="simple">Simple</button>
         <button type="action" name="act_die-toggle-stress" class="sheet-die-toggle-stress" data-i18n="stress">Stress</button>
@@ -1170,26 +1191,47 @@ $$alert(
                 <tr>
                     <td data-i18n="technique" >Technique</td>
                     <td>
+                        <!--
+                        This select tag is left in comment for reference purposes. A sheet-worker will translate from that old select
+                        to the new format below
+                        -->
+                        <!--
                         <select class="sheet-select_1" name="attr_Technique_select">
                             <option class="sheet-italic" value="0" data-i18n="technique" >Technique</option>
                             $$technique_enumerated_options$$
                         </select>
+                        -->
+                        <select class="sheet-select_1" name="attr_spell_tech_name">
+                            <option class="sheet-italic" value="unselected" data-i18n="technique" >Technique</option>
+                            $$technique_name_options$$
+                        </select>
                     </td>
                     <td data-i18n="form" >Form</td>
                     <td>
+                        <!--
+                        This select tag is left in comment for reference purposes. A sheet-worker will translate from that old select
+                        to the new format below
+                        -->
+                        <!--
                         <select class="sheet-select_1" name="attr_Form_select">
                             <option class="sheet-italic" value="0" data-i18n="form" >Form</option>
                             $$form_enumerated_options$$
                         </select>
+                        -->
+                        <select class="sheet-select_1" name="attr_spell_form_name">
+                            <option class="sheet-italic" value="unselected" data-i18n="form" >Form</option>
+                            $$form_name_options$$
+                        </select>
                     </td>
                     <td data-i18n="focus" >Focus</td>
-                    <td><input type="checkbox" class="sheet-check" name="attr_spell_Focus" value="[[{@{spell_Technique}, @{spell_Form}}kl1]] [@{focus_i18n}]"></input></td>
+                    <td><input type="checkbox" class="sheet-check" name="attr_spell_Focus" value="[[{($$spell_tech_value$$), ($$spell_form_value$$)}kl1]] [@{focus_i18n}]"></input></td>
                     <td data-i18n="level" >Level</td>
                     <td><input type="number" class="sheet-number_2" name="attr_spell_level" value="0"/></td>
                     <td data-i18n="bonus" >Bonus</td>
                     <td><input type="number" class="sheet-number_2" name="attr_spell_bonus" value="0"/></td>
                     <td></td>
                 </tr>
+                <!--
                 <tr>
                     <td></td>
                     <td><input type="text" class="sheet-hidden" name="attr_Technique_name" value="Technique"/></td>
@@ -1198,6 +1240,7 @@ $$alert(
                     <td><input type="number" class="sheet-hidden" name="attr_spell_Form" value="0"/></td></td>
                     <td></td>
                 </tr>
+                -->
                 <tr>
                     <td data-i18n="range" >Range</td>
                     <td><input type="text" class="sheet-heading_2" name="attr_spell_range" value=""/></td>
@@ -1669,7 +1712,7 @@ $$translation_attrs$$
 <input name="attr_ask_Score" type="hidden" value="$$characteristic_name_ask_attr$$" />
 <input name ="attr_sys_at" type="hidden" value="@{" />
 <input name ="attr_sys_pipe" type="hidden" value="|" />
-<input name ="attr_sys_lbk" type="hidden" value="}" />
+<input name ="attr_sys_rbk" type="hidden" value="}" />
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
@@ -1771,117 +1814,61 @@ on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds
         });
     });
 });
-on("change:repeating_spell:Technique_select change:Fatigue change:wound_total change:Creo_Score change:Intellego_Score change:Muto_Score change:Perdo_Score change:Rego_Score change:Creo_Puissant change:Intellego_Puissant change:Muto_Puissant change:Perdo_Puissant change:Rego_Puissant change:Creo_Puissant change:Intellego_Puissant change:Muto_Puissant change:Perdo_Puissant change:Rego_Puissant sheet:open", function() {
-        getAttrs(['repeating_spell_Technique_select', 'Creo_Score', 'Intellego_Score', 'Muto_Score', 'Perdo_Score', 'Rego_Score', 'Creo_Puissant', 'Intellego_Puissant', 'Muto_Puissant', 'Perdo_Puissant', 'Rego_Puissant'], function(values) {
-            if (values.repeating_spell_Technique_select == 0 ) {
-                setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("none"),
-                    repeating_spell_spell_Technique: 0
-                })
-            }
-            else if 
-            (values.repeating_spell_Technique_select == 1 ) {
-                  setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("creo"),
-                    repeating_spell_spell_Technique: (+values.Creo_Score + +values.Creo_Puissant)
-                })
-            }
-            else if (values.repeating_spell_Technique_select == 2 ) {
-                setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("intellego"),
-                    repeating_spell_spell_Technique: (+values.Intellego_Score + +values.Intellego_Puissant)
-                })
-            }
-            else if (values.repeating_spell_Technique_select == 3 ) {
-                setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("muto"),
-                    repeating_spell_spell_Technique: (+values.Muto_Score + +values.Muto_Puissant)
-                })
-            }
-            else if (values.repeating_spell_Technique_select == 4 ) {
-                setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("perdo"),
-                    repeating_spell_spell_Technique: (+values.Perdo_Score + +values.Perdo_Puissant)
-                })
-            }
-            else if (values.repeating_spell_Technique_select == 5 ) {
-                setAttrs({
-                    repeating_spell_Technique_name: getTranslationByKey("rego"),
-                    repeating_spell_spell_Technique: (+values.Rego_Score + +values.Rego_Puissant)
-                })
-            }
-        });
+
+// Update old spell art selection to new format
+// Skip it if the Warning banner for that update is closed
+on("sheet:opened", function(eventInfo) {
+    getAttrs(["alert-161-spell-update"], function(values) {
+        if (values["alert-161-spell-update"] == 0) {
+            getSectionIDs("spell", function(idarray) {
+                const tech_translation = {
+                    0: "unselected",
+                    1: "Creo",
+                    2: "Intellego",
+                    3: "Muto",
+                    4: "Perdo",
+                    5: "Rego"
+                };
+                const form_translation = {
+                    0: "unselected",
+                    1: "Animal",
+                    2: "Aquam",
+                    3: "Auram",
+                    4: "Corpus",
+                    5: "Herbam",
+                    6: "Ignem",
+                    7: "Imaginem",
+                    8: "Mentem",
+                    9: "Terram",
+                    10: "Vim"
+                };
+                for (var i=0; i < idarray.length; i++) {
+                    const spellid = idarray[i];
+                    console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
+                    getAttrs(
+                        [   
+                            "repeating_spell_" + spellid + "_spell_name",
+                            "repeating_spell_" + spellid + "_Technique_select",
+                            "repeating_spell_" + spellid + "_Form_select"
+                        ],
+                        function (values) {
+                            attr_updates = {
+                                ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
+                                ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
+                            };
+                            console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
+                            console.log(attr_updates);
+                            console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
+                            setAttrs(attr_updates);
+                        }
+                    );
+                }
+                console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
+                setAttrs({"alert-161-spell-update": 1});
+            });
+        }
     });
-on("change:repeating_spell:Form_select change:Fatigue change:wound_total change:Animal_Puissant change:Animal_Score change:Aquam_Score change:Auram_Score change:Corpus_Score change:Herbam_Score change:Ignem_Score change:Imaginem_Score change:Mentem_Score change:Terram_Score change:Vim_Score change:Aquam_Puissant change:Auram_Puissant change:Corpus_Puissant change:Herbam_Puissant change:Ignem_Puissant change:Imaginem_Puissant change:Mentem_Puissant change:Terram_Puissant change: Vim_Puissant sheet:open", function() {
-        getAttrs(['repeating_spell_Form_select', 'Animal_Score', 'Aquam_Score', 'Auram_Score', 'Corpus_Score', 'Herbam_Score', 'Ignem_Score', 'Imaginem_Score', 'Mentem_Score', 'Terram_Score', 'Vim_Score','Animal_Puissant','Aquam_Puissant','Auram_Puissant','Corpus_Puissant','Herbam_Puissant','Ignem_Puissant','Imaginem_Puissant','Mentem_Puissant','Terram_Puissant','Vim_Puissant'], function(values) {
-            if (values.repeating_spell_Form_select == 0 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("none"),
-                    repeating_spell_spell_Form: 0
-                })
-            }
-            else if (values.repeating_spell_Form_select == 1 ) {
-                  setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("animal"),
-                    repeating_spell_spell_Form: +values.Animal_Score + +values.Animal_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 2 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("aquam"),
-                    repeating_spell_spell_Form: +values.Aquam_Score + +values.Aquam_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 3 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("auram"),
-                    repeating_spell_spell_Form: +values.Auram_Score + +values.Auram_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 4 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("corpus"),
-                    repeating_spell_spell_Form: +values.Corpus_Score + +values.Corpus_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 5 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("herbam"),
-                    repeating_spell_spell_Form: +values.Herbam_Score + +values.Herbam_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 6 ) {
-                  setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("ignem"),
-                    repeating_spell_spell_Form: +values.Ignem_Score + +values.Ignem_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 7 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("imaginem"),
-                    repeating_spell_spell_Form: +values.Imaginem_Score + +values.Imaginem_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 8 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("mentem"),
-                    repeating_spell_spell_Form: +values.Mentem_Score + +values.Mentem_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 9 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("terram"),
-                    repeating_spell_spell_Form: +values.Terram_Score + +values.Terram_Puissant
-                })
-            }
-            else if (values.repeating_spell_Form_select == 10 ) {
-                setAttrs({
-                    repeating_spell_Form_name: getTranslationByKey("vim"),
-                    repeating_spell_spell_Form: +values.Vim_Score + +values.Vim_Puissant 
-                })
-            }
-        });
-    });
+})
 
 // Translation key replacement
 on("sheet:opened", function(eventInfo){
