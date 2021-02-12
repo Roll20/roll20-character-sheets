@@ -91,3 +91,42 @@ Some of the translation tag name have suffixes to indicate where they are used. 
 
 - `-rt` : Used in a roll template. Example: "defend-rt"
 - `-m` : Used in a roll button macros or similar. Example: "weakness-m"
+
+
+
+## Deferred attribute lookup
+The sheet uses deferred attribute lookup (or access) for spells and abilities. It is simply a clever way of writing rolls, that fetches the value of an attribute depending on another attribute value. That is, if your spell's art is Creo, you store the value 'creo' in the attribute linked to the spell (so that you can use the name e.g. for inline labels), but you're still able to lookup `Creo_Score` to get the value.
+
+Roll20 engine accepts up to 99-levels of nested attributes lookup using the `@{attr_name}` syntax. The idea is to use adjacent attributes lookup that, when resolve, yields a new attribute lookup. That new attribute will be resolved during the next pass.
+
+This is exactly like having an attribute lookup inside another, but the inner lookup is spread into several attributes. The important things is that all parts are resolved during the same pass.
+
+Here is a table to make this easier to understand. The attributes that makes that possible have the same name as in the sheet.
+
+> Initial formula: `@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Score@{sys_rbk}`
+> 
+> **First Pass**
+>
+> Input: `@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Score@{sys_rbk}`
+> 
+> |       | @{sys_at} | @{character_name} | @{sys_pipe} | @{spell_tech_name} | _Score | @{sys_rbk} |
+> |:-----:|:---------:|:-----------------:|:-----------:|:------------------:|:------:|:----------:|
+> | VALUE |    @{     |       NAME        |      \|     |        Creo        | _Score |      }     |
+> 
+> Output: `@{NAME|Creo_Score}`
+> 
+> **Second Pass**
+>
+> Input: `@{NAME|Creo_Score}`
+>
+> Output: the character's score in Creo
+
+
+This makes it possible to use inline labels that shows the name of the attribute that was looked up, e.g.
+```
+@{sys_at}@{character_name}@{sys_pipe}@{spell_tech_name}_Score@{sys_rbk} [@{spell_tech_name}]
+```
+
+Assuming you have a Creo score of 3, this yields `3 [Creo]`, which tells you where that +3 comes from. The sheet pushes this further, as the inline lable uses the same technique for internationalisation (i18n): a sheet worker creates attributes such as `Creo_i18n` that contain the local translation of the word. We then dynamiclly lookup the proper attributes to translate the arts.
+
+While this is less useful for Arts (since many langage just use the Latin word), it is useful for translating characteristics names in ability rolls.
