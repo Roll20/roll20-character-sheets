@@ -23,6 +23,15 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 11th, 2021
+
+- Resolved a small issue with the move repeating section where the button to collapse the fields would show a `+` instead of a `-`
+
+### Feb 10th, 2021
+
+- Add a new type option to the sheet, intended to represent neutral or unknown types - "Typeless"
+  - This uses the color scheme for the ??? type from the Pokémon video games
+
 ### Feb 6th, 2021
 
 - Resolved CSS bug introduced in previous update
