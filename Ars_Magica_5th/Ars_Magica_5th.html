@@ -42,7 +42,8 @@
 <li>Check the arts of your spells !</li>
 </ul>
 </li>
-<li>Added a critical roll for initiative that sets the tunr tracker initiative (not visible in the sheet, use th chat button)</li>
+<li>Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)</li>
+<li>Added option to always ask which characteristic to use when rolling abilities</li>
 <li>Centered the sheet in its tab</li>
 </ul>
     </div>
@@ -1650,8 +1651,6 @@
                             <option value="5" data-i18n="rego" >Rego</option>
                         </select>
                         -->
-                        <!-- Makes the old attribute available, but do not display it 
-                        <span class="hidden" name="attr_Technique_select"></span>-->
                         <select class="sheet-select_1" name="attr_spell_tech_name">
                             <option class="sheet-italic" value="unselected" data-i18n="technique" >Technique</option>
                             <option value="Creo" data-i18n="creo" >Creo</option>
@@ -1682,8 +1681,6 @@
                             <option value="10" data-i18n="vim" >Vim</option>
                         </select>
                         -->
-                        <!-- Makes the old attribute available, but do not display it 
-                        <span class="hidden" name="attr_Form_select"></span>-->
                         <select class="sheet-select_1" name="attr_spell_form_name">
                             <option class="sheet-italic" value="unselected" data-i18n="form" >Form</option>
                             <option value="Animal" data-i18n="animal" >Animal</option>
@@ -2049,6 +2046,11 @@
          <li>
           <code>
            critical-spontaneous
+          </code>
+         </li>
+         <li>
+          <code>
+           critical-init
           </code>
          </li>
          <li>
@@ -2587,6 +2589,39 @@
          Changelog
         </h3>
         <ul>
+         <li>
+          <strong>
+           February 2021, v1.6.1
+          </strong>
+          <ul>
+           <li>
+            Fixed botch die botching on 1s instead of 10s
+           </li>
+           <li>
+            Fixed critical dice displaying 10s as exploding, instead of 1s
+           </li>
+           <li>
+            Fixed spell's arts value not being updated when the character's arts are modified
+            <ul>
+             <li>
+              Completely changed how arts are handled inside spells
+             </li>
+             <li>
+              A script will be run to convert your data to the new format, but may fail for some spells
+             </li>
+            </ul>
+           </li>
+           <li>
+            Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)
+           </li>
+           <li>
+            Added option to always ask which characteristic to use when rolling abilities
+           </li>
+           <li>
+            Centered the sheet in its tab
+           </li>
+          </ul>
+         </li>
          <li>
           <strong>
            February 2021, v1.6
@@ -3152,6 +3187,8 @@
 <input name ="attr_sys_at" type="hidden" value="@{" />
 <input name ="attr_sys_pipe" type="hidden" value="|" />
 <input name ="attr_sys_rbk" type="hidden" value="}" />
+<!-- Used by the alert system to hide old alerts on new sheets -->
+<input name="attr_notNew" type="hidden" value="0" />
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
@@ -3254,64 +3291,8 @@ on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds
     });
 });
 
-// Update old spell art selection to new format
-// Skip it if the Warning banner for that update is closed
-on("sheet:opened", function(eventInfo) {
-    getAttrs(["alert-161-spell-update"], function(values) {
-        if (values["alert-161-spell-update"] == 0) {
-            getSectionIDs("spell", function(idarray) {
-                const tech_translation = {
-                    0: "unselected",
-                    1: "Creo",
-                    2: "Intellego",
-                    3: "Muto",
-                    4: "Perdo",
-                    5: "Rego"
-                };
-                const form_translation = {
-                    0: "unselected",
-                    1: "Animal",
-                    2: "Aquam",
-                    3: "Auram",
-                    4: "Corpus",
-                    5: "Herbam",
-                    6: "Ignem",
-                    7: "Imaginem",
-                    8: "Mentem",
-                    9: "Terram",
-                    10: "Vim"
-                };
-                for (var i=0; i < idarray.length; i++) {
-                    const spellid = idarray[i];
-                    console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
-                    getAttrs(
-                        [   
-                            "repeating_spell_" + spellid + "_spell_name",
-                            "repeating_spell_" + spellid + "_Technique_select",
-                            "repeating_spell_" + spellid + "_Form_select"
-                        ],
-                        function (values) {
-                            attr_updates = {
-                                ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
-                                ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
-                            };
-                            console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
-                            console.log(attr_updates);
-                            console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
-                            setAttrs(attr_updates);
-                        }
-                    );
-                }
-                console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
-                setAttrs({"alert-161-spell-update": 1});
-            });
-        }
-    });
-})
-
 // Translation key replacement
 on("sheet:opened", function(eventInfo){
-    
     setAttrs({
         "ability_i18n": getTranslationByKey("ability"),
         "armor_i18n": getTranslationByKey("armor"),
@@ -3376,15 +3357,73 @@ on("sheet:opened", function(eventInfo){
         "mentem_i18n": getTranslationByKey("mentem"),
         "terram_i18n": getTranslationByKey("terram"),
         "vim_i18n": getTranslationByKey("vim")
-    });     
-    
-});
-
-// test
-on("sheet:opened", function(eventInfo) {
-    getAttrs(["words"], function (values) {
-        testAttr: values.words
     });
+
+    getAttrs(["notNew"], function (values) {
+        if (values.notNew == 0) {
+            setAttrs({
+                "notNew": 1,
+                "alert-0": 1,
+                "alert-1": 1,
+                "alert-2": 1,
+                "alert-161-spell-update": 1
+            }); 
+        }
+    });
+
+    // Update old spell art selection to new format
+    // Skip it if the Warning banner for that update is closed
+    getAttrs(["alert-161-spell-update"], function(values) {
+        if (values["alert-161-spell-update"] == 0) {
+            getSectionIDs("spell", function(idarray) {
+                const tech_translation = {
+                    0: "unselected",
+                    1: "Creo",
+                    2: "Intellego",
+                    3: "Muto",
+                    4: "Perdo",
+                    5: "Rego"
+                };
+                const form_translation = {
+                    0: "unselected",
+                    1: "Animal",
+                    2: "Aquam",
+                    3: "Auram",
+                    4: "Corpus",
+                    5: "Herbam",
+                    6: "Ignem",
+                    7: "Imaginem",
+                    8: "Mentem",
+                    9: "Terram",
+                    10: "Vim"
+                };
+                for (var i=0; i < idarray.length; i++) {
+                    const spellid = idarray[i];
+                    console.log("Update 1.6.1 - Spell arts updater script - scheduling update for spell ID:" + spellid);
+                    getAttrs(
+                        [   
+                            "repeating_spell_" + spellid + "_spell_name",
+                            "repeating_spell_" + spellid + "_Technique_select",
+                            "repeating_spell_" + spellid + "_Form_select"
+                        ],
+                        function (values) {
+                            attr_updates = {
+                                ["repeating_spell_" + spellid + "_spell_tech_name"]: tech_translation[values["repeating_spell_" + spellid + "_Technique_select"]] || "unselected",
+                                ["repeating_spell_" + spellid + "_spell_form_name"]: form_translation[values["repeating_spell_" + spellid + "_Form_select"]] || "unselected"
+                            };
+                            console.log("Update 1.6.1 - Spell arts updater script - " + values["repeating_spell_" + spellid + "_spell_name"] + " (ID " + spellid + ")");
+                            console.log(attr_updates);
+                            console.log("Update 1.6.1 - Spell arts updater script - spell " + spellid + " END");
+                            setAttrs(attr_updates);
+                        }
+                    );
+                }
+                console.log("Update 1.6.1 - Spell arts updater script - all spell scheduled for update");
+                setAttrs({"alert-161-spell-update": 1});
+            });
+        }
+    });
+    
 });
 
 </script>

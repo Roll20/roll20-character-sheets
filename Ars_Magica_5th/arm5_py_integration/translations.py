@@ -54,7 +54,11 @@ translation_attrs = "\n".join(
     for attr, default, tkey in TRANSLATION_ATTRS
 )
 
-translation_attrs_setup = ",\n".join(
-    """"%s_i18n": getTranslationByKey("%s")""" % (attr, tkey)
-    for attr, default, tkey in TRANSLATION_ATTRS
+translation_attrs_setup = (
+    "setAttrs({\n    "
+    + ",\n    ".join(
+        """"%s_i18n": getTranslationByKey("%s")""" % (attr, tkey)
+        for attr, default, tkey in TRANSLATION_ATTRS
+    )
+    + "\n});"
 )

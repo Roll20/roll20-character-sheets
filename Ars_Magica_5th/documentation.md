@@ -99,6 +99,7 @@ The following roll buttons are defined in the sheet and may be called using abil
 + `botch`
 + `critical`
 + `critical-spontaneous`
++ `critical-init`
 + `personality1_simple` / `personality1_stress` through `personality6_simple` / `personality6_stress`
 + `reputation1_simple` / `reputation1_stress` through `reputation6_simple` / `reputation6_stress`
 + `Intelligence_simple` / `Intelligence_stress`
@@ -183,6 +184,15 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `textlabel`
 
 ### Changelog
++ **February 2021, v1.6.1**
+    - Fixed botch die botching on 1s instead of 10s
+    - Fixed critical dice displaying 10s as exploding, instead of 1s
+    - Fixed spell's arts value not being updated when the character's arts are modified
+        + Completely changed how arts are handled inside spells
+        + A script will be run to convert your data to the new format, but may fail for some spells
+    - Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)
+    - Added option to always ask which characteristic to use when rolling abilities
+    - Centered the sheet in its tab 
 + **February 2021, v1.6**
     - Added inline labels to all rolls
     - Fixed tabs not displaying properly (now attched to an attribute again)

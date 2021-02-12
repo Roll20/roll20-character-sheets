@@ -26,7 +26,8 @@ $$alert(
     + Completely changed how arts are handled inside spells
     + A script will be run to convert your data to the new format, but may fail for some spells
     + Check the arts of your spells !
-- Added a critical roll for initiative that sets the tunr tracker initiative (not visible in the sheet, use th chat button)
+- Added a critical roll for initiative that sets the turn tracker initiative (not visible in the sheet, use the chat button)
+- Added option to always ask which characteristic to use when rolling abilities
 - Centered the sheet in its tab"""),
     level="info"
 )$$
@@ -1713,6 +1714,8 @@ $$translation_attrs$$
 <input name ="attr_sys_at" type="hidden" value="@{" />
 <input name ="attr_sys_pipe" type="hidden" value="|" />
 <input name ="attr_sys_rbk" type="hidden" value="}" />
+<!-- Used by the alert system to hide old alerts on new sheets -->
+<input name="attr_notNew" type="hidden" value="0" />
 
 <!-- Sheet Worker Scripts -->
 <script type="text/worker">
@@ -1815,9 +1818,18 @@ on("change:Wounds_Light1 change:Wounds_Light2 change:Wounds_Light3 change:Wounds
     });
 });
 
-// Update old spell art selection to new format
-// Skip it if the Warning banner for that update is closed
-on("sheet:opened", function(eventInfo) {
+// Translation key replacement
+on("sheet:opened", function(eventInfo){
+    $$translation_attrs_setup$$
+
+    getAttrs(["notNew"], function (values) {
+        if (values.notNew == 0) {
+            $$disable_old_alerts("notNew")$$
+        }
+    });
+
+    // Update old spell art selection to new format
+    // Skip it if the Warning banner for that update is closed
     getAttrs(["alert-161-spell-update"], function(values) {
         if (values["alert-161-spell-update"] == 0) {
             getSectionIDs("spell", function(idarray) {
@@ -1868,22 +1880,7 @@ on("sheet:opened", function(eventInfo) {
             });
         }
     });
-})
-
-// Translation key replacement
-on("sheet:opened", function(eventInfo){
     
-    setAttrs({
-        $$translation_attrs_setup$$
-    });     
-    
-});
-
-// test
-on("sheet:opened", function(eventInfo) {
-    getAttrs(["words"], function (values) {
-        testAttr: values.words
-    });
 });
 
 </script>
