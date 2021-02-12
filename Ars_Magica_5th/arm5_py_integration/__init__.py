@@ -21,7 +21,7 @@ def xp(
     """
     Generate the HTML for the Xp parts of arts & abilities
     """
-    return f"""[<input type="text" class="sheet-number_3" name="attr_{name}{suffix}" value="0"/>/<input type="text" class="sheet-number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>/<input type="text" class="sheet-number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>]"""
+    return f"""[<input type="text" class="number_3" name="attr_{name}{suffix}" value="0"/>/<input type="text" class="number_3 advance" name="attr_{name}{adv_suffix}" value="0" readonly/>/<input type="text" class="number_3 total" name="attr_{name}{tot_suffix}" value="0" readonly/>]"""
 
 
 def alert(title: str, text: str, *, level: str = "warning", ID: str = None):
@@ -46,13 +46,13 @@ def alert(title: str, text: str, *, level: str = "warning", ID: str = None):
         alert_id = str(ID)
         alert.strid.append(alert_id)
 
-    return f"""<input type="hidden" class="sheet-alert-hidder" name="attr_alert-{alert_id}" value="0"/>
-<div class="sheet-alert sheet-alert-{level}">
+    return f"""<input type="hidden" class="alert-hidder" name="attr_alert-{alert_id}" value="0"/>
+<div class="alert alert-{level}">
     <div>
         <h3> {level.title()} - {title}</h3>
         {text}
     </div>
-    <label class="sheet-fakebutton">
+    <label class="fakebutton">
         <input type="checkbox" name="attr_alert-{alert_id}" value="1" /> ×
     </label>
 </div>"""
@@ -93,11 +93,11 @@ GLOBALS = {
 # Personality traits
 GLOBALS["personality_trait_rows"] = repeat_template(
     """<tr>
-    <td><input type="text" class="sheet-heading_2" style="width:245px" name="attr_Personality_Trait%%"/></td>
-    <td><input type="text" class="sheet-number_1" style="width:70px;" name="attr_Personality_Trait%%_score"/></td>
-    <td><div class="sheet-flex-container">
-        <button type="roll" class="sheet-button sheet-simple-roll" name="roll_personality%%_simple" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{simple-die} + [[@{Personality_Trait%%_Score}]] [@{Personality_Trait%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]}} "></button>
-        <button type="roll" class="sheet-button sheet-stress-roll" name="roll_personality%%_stress" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{stress-die} + [[@{Personality_Trait%%_Score}]] [@{Personality_Trait%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
+    <td><input type="text" class="heading_2" style="width:245px" name="attr_Personality_Trait%%"/></td>
+    <td><input type="text" class="number_1" style="width:70px;" name="attr_Personality_Trait%%_score"/></td>
+    <td><div class="flex-container">
+        <button type="roll" class="button simple-roll" name="roll_personality%%_simple" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{simple-die} + [[@{Personality_Trait%%_Score}]] [@{Personality_Trait%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]}} "></button>
+        <button type="roll" class="button stress-roll" name="roll_personality%%_stress" value="&{template:generic} {{Banner=^{personality} ^{roll}}} {{Label=@{Personality_Trait%%}}} {{Result=[[@{stress-die} + [[@{Personality_Trait%%_Score}]] [@{Personality_Trait%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
     </div></td>
 </tr>""",
     range(1, 7),
@@ -107,12 +107,12 @@ GLOBALS["personality_trait_rows"] = repeat_template(
 # Reputations
 GLOBALS["reputation_rows"] = repeat_template(
     """<tr>
-    <td><input type="text" class="sheet-heading_2" name="attr_Reputations%%"/></td>
-    <td><input type="text" class="sheet-heading_2a" name="attr_Reputations%%_type"/></td>
-    <td><input type="text" class="sheet-number_1" style="width:50px;" name="attr_Reputations%%_score"/></td>
-    <td><div class="sheet-flex-container">
-        <button type="roll" class="sheet-button sheet-simple-roll" name="roll_reputation%%_simple" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{simple-die} + [[@{Reputations%%_Score}]] [@{Reputations%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]] }}"></button>
-        <button type="roll" class="sheet-button sheet-stress-roll" name="roll_reputation%%_stress" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{stress-die} + [[@{Reputations%%_Score}]] [@{Reputations%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
+    <td><input type="text" class="heading_2" name="attr_Reputations%%"/></td>
+    <td><input type="text" class="heading_2a" name="attr_Reputations%%_type"/></td>
+    <td><input type="text" class="number_1" style="width:50px;" name="attr_Reputations%%_score"/></td>
+    <td><div class="flex-container">
+        <button type="roll" class="button simple-roll" name="roll_reputation%%_simple" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{simple-die} + [[@{Reputations%%_Score}]] [@{Reputations%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}] ]] }}"></button>
+        <button type="roll" class="button stress-roll" name="roll_reputation%%_stress" value="&{template:generic} {{Banner=^{reputation} ^{roll}}} {{Label=@{Reputations%%}}} {{Result=[[@{stress-die} + [[@{Reputations%%_Score}]] [@{Reputations%%}] + (?{@{circumstantial_i18n}|0}) [@{circumstances_i18n}]]] }} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
     </div></td>
 </tr>""",
     range(1, 7),
@@ -124,12 +124,12 @@ characteristic_roll = "(@{%(Char)s_Score}) [@{%(char)s_i18n}] + (@{wound_total})
 GLOBALS["characteristic_rows"] = repeat_template(
     """<tr>
     <th data-i18n="%(char)s" >%(Char)s</th>
-    <td><input type="text" class="sheet-heading_2" name="attr_%(Char)s_Description"/></td>
-    <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Score" value="0"/></td>
-    <td><input type="text" class="sheet-number_1" name="attr_%(Char)s_Aging" value="0"/></td>
-    <td><div class="sheet-flex-container">
-        <button type="roll" class="sheet-button sheet-simple-roll" name="roll_%(Char)s_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + $characteristic_roll$ ]]}}"></button>
-        <button type="roll" class="sheet-button sheet-stress-roll" name="roll_%(Char)s_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + $characteristic_roll$ ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
+    <td><input type="text" class="heading_2" name="attr_%(Char)s_Description"/></td>
+    <td><input type="text" class="number_1" name="attr_%(Char)s_Score" value="0"/></td>
+    <td><input type="text" class="number_1" name="attr_%(Char)s_Aging" value="0"/></td>
+    <td><div class="flex-container">
+        <button type="roll" class="button simple-roll" name="roll_%(Char)s_simple" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{simple-die} + $characteristic_roll$ ]]}}"></button>
+        <button type="roll" class="button stress-roll" name="roll_%(Char)s_stress" value="&{template:ability} {{name= @{character_name}}} {{label0=^{%(char)s}}} {{banner=@{%(Char)s_Description}}} {{label1=^{score}}} {{result1=@{%(Char)s_Score}}} {{label2=^{characteristic-m}}} {{label2=^{weakness-m}}} {{result2=[[[[floor(@{Fatigue})]][@{fatigue_i18n}] + @{wound_total}[@{wounds_i18n}]]]}} {{label3=^{circumstances-m}}} {{result3=[[(?{@{circumstantial_i18n}|0})]]}} {{result0=[[ @{stress-die} + $characteristic_roll$ ]]}} {{stress=1}} {{botch-button=[@{botch_i18n}!](~@{character_name}|botch)}} {{crit-button=[@{critical_i18n}!](~@{character_name}|critical)}}"></button>
     </div></td>
 </tr>""".replace(
         "$characteristic_roll$", characteristic_roll
@@ -181,12 +181,12 @@ GLOBALS["ability_roll_stress"] = (
 # Technique definitions
 GLOBALS["technique_definitions"] = repeat_template(
     """<tr>
-    <td><input type="text" class="sheet-number_3" name="attr_%(Tech)s_Score" value="0"/></td>
+    <td><input type="text" class="number_3" name="attr_%(Tech)s_Score" value="0"/></td>
     <td data-i18n="%(tech)s" >%(Tech)s</td>
     <td>"""
     + xp("%(Tech)s")
     + """</td>
-    <td style="text-align: center"><input type="text" class="sheet-number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
+    <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Tech)s_Puissant" value="0"/></td>
 </tr>""",
     TECHNIQUES,
     str_key="tech",
@@ -218,12 +218,12 @@ GLOBALS["technique_enumerated_options"] = repeat_template(
 # Form definitions
 form_template = (
     """<tr>
-    <td><input type="text" class="sheet-number_3" name="attr_%(Form)s_Score" value="0"/></td>
+    <td><input type="text" class="number_3" name="attr_%(Form)s_Score" value="0"/></td>
     <td data-i18n="%(form)s" >%(Form)s</td>
     <td>"""
     + xp("%(Form)s")
     + """</td>
-    <td style="text-align: center"><input type="text" class="sheet-number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
+    <td style="text-align: center"><input type="text" class="number_3 minor" name="attr_%(Form)s_Puissant" value="0"/></td>
 </tr>"""
 )
 GLOBALS["form_definitions_1"] = repeat_template(
@@ -334,8 +334,8 @@ GLOBALS["fatigue_levels_options"] = repeat_template(
     """<option value="%%">%%</option>""", range(0, add_fatigue_lvl_num + 1)
 )
 GLOBALS["additional_fatigue_levels"] = repeat_template(
-    """<tr class="sheet-addfatigue-%(num)s">
-    <td><input type="radio" class="sheet-radio_1" name="attr_Fatigue" value="%(value)s"><span></span></td>
+    """<tr class="addfatigue-%(num)s">
+    <td><input type="radio" class="radio_1" name="attr_Fatigue" value="%(value)s"><span></span></td>
     <td style="text-align:center;">0</td>
     <td>2 min.</td>
     <td data-i18n="winded" >Winded</td>
@@ -364,5 +364,5 @@ with open(Path(__file__).parents[1] / "documentation.md") as f:
 html = soup(html, "html.parser")
 for i in range(1, 10):
     for tag in html.find_all(f"h{i}"):
-        tag.attrs["class"] = tag.get("class", "") + " sheet-heading_label"
+        tag.attrs["class"] = tag.get("class", "") + " heading_label"
 GLOBALS["documentation"] = html.prettify()
