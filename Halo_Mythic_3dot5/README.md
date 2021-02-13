@@ -1,7 +1,0 @@
-# Halo_Mythic_3dot5
-
-  This sheet is designed for use in Roll20.  There is a universal header that applies to all in-sheet tabs.  This header section consists of five grid sub-sections: first logo and core character details, second characteristics, third Mythical characteristics plus physical calculations such as movement and carrying capacity, fourth initiative roller and alternate in-sheet tabs, and fifth has all other numbers that should be accessible on-hand by the player such as luck, wounds, etc.
-
-  Specifically, the fifth header grid will be made to have the following attributes displayed: total experience points, luck points, support points, fatigue points, wound count, armor data, shield data, and credit count.  Note that these attributes will be accessible and editable in other parts of the sheet.
-
-  These tabs are composed of different sections: core character information such as skills and education, a summary of medical status along with any bodily injuries that could be sustained, a list of equipment both used in and out of combat such as weapons or communications gear, an experience page to differentiate unspent/spent experience points toward an automatically tracked total sum number, a player-kept journal tab to list complete/incomplete objectives in a mission or keep a history of your character's time spent, a vehicles tab to list vehicle data, and a settings tab to allow the player to apply technical changes to the sheet if needed, such as applying an automatic jump multiplier of 2 if playing as a Jackal.
