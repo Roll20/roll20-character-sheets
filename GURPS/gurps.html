@@ -4298,6 +4298,29 @@
 
 	<div class="heading-character-name">
 		
+		<div style="float:right; margin-left: 15px;">
+
+			<!-- see: https://codepen.io/YozhEzhi/pen/gcLpI/ -->
+			<input type="hidden" name="attr_display_roll_modifiers_header" />
+			<div class="roll-options roll-modifiers-prompt">
+				
+				<label>
+					<input type="radio" name="attr_modifier_header" value="0" />
+					<span data-i18n="no-prompt-label">No Prompt</span>
+				</label>
+				<label>
+					<input type="radio" name="attr_modifier_header" value="[[?{Modifier|0}]]" />
+					<span data-i18n="single-prompt-label">Single Prompt</span>
+				</label>
+				<label>
+					<input type="radio" name="attr_modifier_header" value="[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]" />
+					<span data-i18n="extended-prompt-label">Extended Prompts</span>
+				</label>
+
+			</div>
+			
+		</div>
+
 		<div style="float:right;">
 
 			<!-- see: https://codepen.io/YozhEzhi/pen/gcLpI/ -->
@@ -4342,22 +4365,7 @@
 				</h4>
 
 				<ul>
-					<li><b>Bio\Misc</b> tab. Added <b>Apply</b> checkbox for Size Modifier. If checked, the Size Modifier will change the required character points for <b>Strength</b> and <b>Hit Points</b>. If you spent too many character points on Strength, you will get a warning message.</li>
-					<li>GCA Import. If character has Size Modifier 1 or higher, the <b>Apply</b> Size Modifier will be checked.</li>
-					<li>Combat Tab. Moved Shotgun damage tool to the Ranged sub-tab.</li>
-					<li>Combat Tool for Melee. Updated Size Modifier to use relative Size Modifier. Relative Size Modifier is Target Size - Your Size.
-						<ul>
-							<li>Requested by Charles and confirmed by PL M as addendum rule on FAQ site.</li>
-							<li>See: http://www.sjgames.com/gurps/faq/FAQ4-3.html#SS3.4.2.23</li>
-						</ul>
-					</li>
-					<li>
-						Chat Roll Options. Added a campaign setting and sheet option to display <b>Public</b> and <b>Private</b> roll options in the header. Added an optional <b>Custom</b> roll options.
-						<ul>
-							<li><b>Note:</b> The custom option requires an API script that can intercept the roll template.</li>
-							<li>For an example, see the <b>Blind Roll</b> API script, https://app.roll20.net/forum/permalink/5064809/</li>
-						</ul>
-					</li>
+					<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13184,6 +13192,14 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
+			</ul>
+
+			<h4>Version 2.6.2</h4>
+
+			<p>Pull Request: 2/1/2021</p>
+			
+			<ul>
 				<li><b>Bio\Misc</b> tab. Added <b>Apply</b> checkbox for Size Modifier. If checked, the Size Modifier will change the required character points for <b>Strength</b> and <b>Hit Points</b>. If you spent too many character points on Strength, you will get a warning message.</li>
 				<li>GCA Import. If character has Size Modifier 1 or higher, the <b>Apply</b> Size Modifier will be checked.</li>
 				<li>Combat Tab. Moved Shotgun damage tool to the Ranged sub-tab.</li>
@@ -13493,6 +13509,17 @@ visualize what it will look like in chat.
 						<h4>
 							<span data-i18n="skill-modifier-options-label">Skill Modifier Options</span>
 						</h4>
+						
+						<input type="checkbox" name="attr_display_roll_modifiers_header" value="1" />
+						<span class="popup">
+							<span data-i18n="display-modifier-in-header-label">Display Roll Modifier Options in Header</span>
+						</span>
+						<span class="tooltip">
+							<span data-i18n="display-modifier-in-header-tooltip">
+								If checked, the options for <b>No Modifier Prompt</b>, <b>Single Modifier Prompt</b> and <b>Extended Modifier Prompts</b> will be displayed to the right of the character name above the tabs.
+							</span>
+						</span>
+						<br />
 						
 						<input type="radio" name="attr_modifier" value="0" />
 						<span class="popup">
@@ -15653,9 +15680,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.2";
+	var version = "2.6.3";
 
-	var latestChangesDate = "2/1/2021";
+	var latestChangesDate = "2/15/2021";
 
 	var modCascade = true;
 	
@@ -30595,6 +30622,29 @@ The attacker may choose to hit the original target or the limb you used to parry
 				setAttrs({roll_option_header: rollOption});
 
 			});
+
+		});
+
+	});
+
+	
+	// check for header roll modifier options
+	on("change:modifier_header", event => {
+
+		getAttrs(["modifier_header"], values => {
+
+			setAttrs({modifier: values.modifier_header}, {silent: true});
+
+		});
+
+	});
+
+	// check for header roll modifier options
+	on("change:modifier", event => {
+
+		getAttrs(["modifier"], values => {
+
+			setAttrs({modifier_header: values.modifier}, {silent: true});
 
 		});
 
