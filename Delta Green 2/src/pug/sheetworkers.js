@@ -341,7 +341,8 @@ on("clicked:levelup", () =>{
                 //console.log(val[`${sk}_fail`]);
                 //    console.log(`${sk}`);
                 if (val[`${sk}_fail`]=='on'){
-                    var_rnd=Math.floor(Math.random() * 4);       // generate a random number for each checked value (less number generated)
+                    //var_rnd=Math.floor(Math.random() * 4);       // generate a random number for each checked value (less number generated)
+                    var_rnd=Math.ceil(Math.random() * 4);       // generate a random number for each checked value (less number generated)
                     //console.log(`${idx}`);
                     summary[`${idx-len}_rank`]=var_rnd;           // since the repeating skill don't have a name, they are identified by number 0-N
                     update[`${sk}_rank`]=(parseInt(val[`${sk}_rank`])||0)+var_rnd;
