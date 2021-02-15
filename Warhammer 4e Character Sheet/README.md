@@ -74,6 +74,12 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 ///// ============ Change Log ============ ///// 
 
+February 1st 2021 v1.34
+
+- Added coin converters buttons on the inventory page.
+- Various Qualities text fields now align to the left.
+
+
 January 18th 2021 v1.33
 
 - Various fixes for NPC pages which were PC deafened condition attributes rather the individual NPC value.

@@ -6,7 +6,39 @@ system written by DrMrStark.
 Much of the development discussion takes place on the PTA3 Discord:
 https://discord.gg/F24Ka8E
 
+## To-Do:
+
+Things we want to add to the character sheet, presented in no particular order of priority:
+
+- [x] ~~Display the full bonus to skill checks~~
+- [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
+- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
+- [x] ~~Add a Settings page~~
+- [ ] Allow a second ability score to apply to skill checks
+- [ ] Allow formula calculations for the extra damage fields
+- [ ] Allow modifications to movement (maybe just an extra box)
+- [ ] Display the adjusted stat score when temporary stat changes are provided
+- [ ] Display the skills section for Pokémon characters
+- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
+
 ## Changelog
+
+### Feb 11th, 2021
+
+- Resolved a small issue with the move repeating section where the button to collapse the fields would show a `+` instead of a `-`
+
+### Feb 10th, 2021
+
+- Add a new type option to the sheet, intended to represent neutral or unknown types - "Typeless"
+  - This uses the color scheme for the ??? type from the Pokémon video games
+
+### Feb 6th, 2021
+
+- Resolved CSS bug introduced in previous update
+
+### Feb 5th, 2021
+
+- Added a triple-hit roll template, and support for triple-hit scatter moves
 
 ### Jan 23rd, 2021
 
@@ -31,7 +63,7 @@ https://discord.gg/F24Ka8E
 - Character type selection is now presented via a drop-down selector
 - Added a Configuration page!
   - Moved the character type selection to the configuration page
-  - Added a way to change the `initiative-tie-breake` attribute
+  - Added a way to change the `initiative-tie-breaker` attribute
   - Copied the type selector to the config page
 - Corrected some of the formatting issues with the linter, which means it doesn't make the code quite so ugly
 
@@ -112,17 +144,3 @@ https://discord.gg/F24Ka8E
 ### Sept 16, 2020
 
 - Initial Commit
-
-## To-Do:
-
-Things we want to add to the character sheet, presented in no particular order of priority:
-
-- [x] ~~Display the full bonus to skill checks~~
-- [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
-- [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
-- [x] ~~Add a Settings page~~
-- [ ] Allow a second ability score to apply to skill checks
-- [ ] Allow formula calculations for the extra damage fields
-- [ ] Allow modifications to movement (maybe just an extra box)
-- [ ] Display the adjusted stat score when temporary stat changes are provided
-- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
