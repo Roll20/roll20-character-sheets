@@ -78,6 +78,7 @@
 	<input type="hidden" name="attr_roll_maneuver" value=""  />
 	<input type="hidden" name="attr_roll_allout_attack" value=""  />
 	<input type="hidden" name="attr_roll" value=""  />
+	<input type="hidden" name="attr_modifier" value="[[?{Modifier|0}]]" />
 	<div class="modal">
 		<div class="modal-dialog">
 			<div class="modal-header">
@@ -4305,15 +4306,15 @@
 			<div class="roll-options roll-modifiers-prompt">
 				
 				<label>
-					<input type="radio" name="attr_modifier_header" value="0" />
+					<input type="radio" name="attr_modifier_option_header" value="0" />
 					<span data-i18n="no-prompt-label">No Prompt</span>
 				</label>
 				<label>
-					<input type="radio" name="attr_modifier_header" value="[[?{Modifier|0}]]" />
+					<input type="radio" name="attr_modifier_option_header" value="1" />
 					<span data-i18n="single-prompt-label">Single Prompt</span>
 				</label>
 				<label>
-					<input type="radio" name="attr_modifier_header" value="[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]" />
+					<input type="radio" name="attr_modifier_option_header" value="2" />
 					<span data-i18n="extended-prompt-label">Extended Prompts</span>
 				</label>
 
@@ -13521,7 +13522,7 @@ visualize what it will look like in chat.
 						</span>
 						<br />
 						
-						<input type="radio" name="attr_modifier" value="0" />
+						<input type="radio" name="attr_modifier_option" value="0" />
 						<span class="popup">
 							<span data-i18n="no-modifier-prompt-label">No Modifier Prompt</span>
 						</span>
@@ -13532,7 +13533,7 @@ visualize what it will look like in chat.
 						</span>
 						<br />
 						
-						<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]]" checked="true" />
+						<input type="radio" name="attr_modifier_option" value="1" checked="true" />
 						<span class="popup">
 							<span data-i18n="single-modifier-prompt-label">Single Modifier Prompt</span>
 						</span>
@@ -13544,7 +13545,7 @@ visualize what it will look like in chat.
 						</span>
 						<br />
 						
-						<input type="radio" name="attr_modifier" value="[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]" />
+						<input type="radio" name="attr_modifier_option" value="2" />
 						<span class="popup">
 							<span data-i18n="extended-modifier-prompt-label">Extended Modifier Prompts</span>
 						</span>
@@ -16522,7 +16523,9 @@ visualize what it will look like in chat.
 		console.log('********* Sheet Opened *********');
 
 		syncRollOptions();
-		
+
+		syncModifierPromptOptions();
+
 		setAttrs({inventory_fixed_digits: 1}); 
 
 		sumRepeating('repeating_item', 'weighttotal', function(v) {
@@ -16530,16 +16533,6 @@ visualize what it will look like in chat.
 		});
 		sumRepeating('repeating_item', 'costtotal', function(v) {
 			setAttrs({ total_value: Number((v * 100) / 100).toFixed(2) }, {silent: true});
-		});
-		
-		getAttrs(['modifier'], function(v){
-			const setObj = {};
-			if(v.modifier==='?{Modifier|0}'){
-				setObj.modifier = '[[?{Modifier|0}]]'
-			}else if(v.modifier==='?{Modifier|0} + ?{Shock|0} + ?{Reeling or Staggered|0} + ?{Off-Hand|0} + ?{Familiarity|0}'){
-				setObj.modifier = '[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]'
-			}
-			setAttrs(setObj,{silent:true});
 		});
 		
 		getAttrs(['sheet_version', 'mod_cascade', 'modCascade', 'modCascadeAll'], function(v) {
@@ -30588,6 +30581,21 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	}
 
+	/*** MODIFIER PROMPT OPTIONS ***/
+
+	// if roll option in header changes, update the sheet option
+	on("change:roll_option_header", event => {
+
+		getAttrs(["roll_option_header"], values => {
+
+			let option = values.roll_option_header;
+
+			setAttrs({roll_option: option});
+
+		});
+
+	});
+
 	// check for roll options and changes to custom roll macro
 	on("change:custom_roll_macro change:roll_option", event => {
 
@@ -30627,29 +30635,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	});
 
-	
-	// check for header roll modifier options
-	on("change:modifier_header", event => {
-
-		getAttrs(["modifier_header"], values => {
-
-			setAttrs({modifier: values.modifier_header}, {silent: true});
-
-		});
-
-	});
-
-	// check for header roll modifier options
-	on("change:modifier", event => {
-
-		getAttrs(["modifier"], values => {
-
-			setAttrs({modifier_header: values.modifier}, {silent: true});
-
-		});
-
-	});
-
 	/**
 	 * Needed to add a new attr_roll_option to handle
 	 * a custom roll macro. This code makes sure the 
@@ -30681,17 +30666,103 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 	}
 
-	// if roll option in header changes, update the sheet option
-	on("change:roll_option_header", event => {
+	/*** MODIFIER PROMPT OPTIONS ***/
 
-		getAttrs(["roll_option_header"], values => {
+	// if modifier option in header changes, update the sheet option
+	on("change:modifier_option_header", event => {
 
-			let option = values.roll_option_header;
+		getAttrs(["modifier_option_header"], values => {
 
-			setAttrs({roll_option: option});
+			updateModifierPromptValues(values.modifier_option_header);
 
 		});
 
 	});
+
+	// check for modifier options
+	on("change:modifier_option", event => {
+
+		getAttrs(["modifier_option"], values => {
+
+			updateModifierPromptValues(values.modifier_option);
+
+		});
+
+	});
+
+	/**
+	 * Sync the values for modifier, modifier_option,
+	 * and modifier_option_header if a new prompt option is selected
+	 * 
+	 * @param string option 0 = no, 1 = single, 2 = extended
+	 */
+	function updateModifierPromptValues(option) {
+		
+		// no prompt
+		let promptMacro = "0";
+
+		if (option === "1") {
+
+			// single prompt
+			promptMacro = "[[?{Modifier|0}]]";
+
+		} else if (option === "2") {
+
+			// extended prompt
+			promptMacro = "[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]";
+
+		}
+
+		setAttrs({
+			modifier: promptMacro,
+			modifier_option: option,
+			modifier_option_header: option		
+		}, {silent: true});
+
+	}
+
+	/**
+	 * Needed to add a new attr_modifier_option to handle
+	 * skill modifier prompts. This code makes sure the 
+	 * correct roll option is selected when the sheet opens.
+	 */
+	 function syncModifierPromptOptions() {
+
+		getAttrs(["modifier"], values => {
+
+			let modValue = values.modifier;
+
+			let option = "0";
+
+			modValue = modValue.trim();
+
+			// check for old modifier prompt values and fix
+			if (modValue === "?{Modifier|0}") {
+
+				modValue = "[[?{Modifier|0}]]";
+
+			} else if (modValue === "?{Modifier|0} + ?{Shock|0} + ?{Reeling or Staggered|0} + ?{Off-Hand|0} + ?{Familiarity|0}") {
+				
+				modValue = "[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]";
+
+			}
+
+			if (modValue === "[[?{Modifier|0}]]") {
+				option = "1";
+			} else if (modValue === "[[?{Modifier|0}]] +[[?{Shock|0}]] + [[?{Reeling or Staggered|0}]] + [[?{Off-Hand|0}]] + [[?{Familiarity|0}]]") {
+				option = "2";
+			} 
+
+			setAttrs({
+				modifier: modValue,
+				modifier_option: option, 
+				modifier_option_header: option
+			}, {silent: true});
+
+		});
+
+	}
+
+
 
 </script>
