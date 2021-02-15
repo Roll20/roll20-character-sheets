@@ -4369,6 +4369,7 @@
 					<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
 					<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
 					<li>GCA Import, fixed bug incorrect wealth level name.</li>
+					<li>GCA Import, added more rules to capture frequency of appearance and self-control rolls for advantages/disadvantages.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13198,6 +13199,7 @@ visualize what it will look like in chat.
 				<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
 				<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
 				<li>GCA Import, fixed bug incorrect wealth level name.</li>
+				<li>GCA Import, added more rules to capture frequency of appearance and self-control rolls for advantages/disadvantages.</li>
 			</ul>
 
 			<h4>Version 2.6.2</h4>
@@ -28959,6 +28961,24 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_notes`] = notes;
 		}
 
+		let controlRating = 0;
+
+		if (levelName) {
+
+			controlRating = getControlRatingByLevelName(levelName);
+		
+		} 
+		
+		if (controlRating === 0 ) {
+
+			controlRating = getControlRatingByModifier(advantage);
+
+		}
+
+		if (controlRating > 0) {
+			rows[`${baseFieldName}_foa`]  = controlRating;
+		}
+
 	}
 
 	/**
@@ -29629,25 +29649,114 @@ The attacker may choose to hit the original target or the limb you used to parry
 			rows[`${baseFieldName}_trait_level`]  = disadvantage.level;
 		}
 
-		if (levelName && levelName.includes("6 or less")) {
-			
-			rows[`${baseFieldName}_control_rating`]  = 6;
-			
-		} else if (levelName && levelName.includes("9 or less")) {
-			
-			rows[`${baseFieldName}_control_rating`]  = 9;
-			
-		} else if (levelName && levelName.includes("12 or less")) {
-			
-			rows[`${baseFieldName}_control_rating`]  = 12;
-			
-		} else if (levelName && levelName.includes("15 or less")) {
-			
-			rows[`${baseFieldName}_control_rating`]  = 15;
-			
+		let controlRating = 0;
+
+		if (levelName) {
+
+			controlRating = getControlRatingByLevelName(levelName);
+		
+		} 
+		
+		if (controlRating === 0 ) {
+
+			controlRating = getControlRatingByModifier(disadvantage);
+
+		}
+
+		if (controlRating > 0) {
+			rows[`${baseFieldName}_control_rating`]  = controlRating;
 		}
 
 		getGcaValuesByDisadvantageName(rows, name, disadvantage);
+
+	}
+
+	/**
+	 * Get control or frequency number from level name
+	 * 
+	 * @param string levelName Name of level
+	 * 
+	 * @return int
+	 */
+	function getControlRatingByLevelName(levelName) {
+
+		let rating = 0;
+
+		if (levelName.includes("6 or less")) {
+			
+			rating = 6;
+			
+		} else if (levelName.includes("9 or less")) {
+			
+			rating = 9;
+			
+		} else if (levelName.includes("12 or less")) {
+			
+			rating = 12;
+			
+		} else if (levelName.includes("15 or less")) {
+			
+			rating = 15;
+			
+		}
+
+		return rating;
+
+	}
+
+	/**
+	 * Search Modifiers of an attribute for control
+	 * or frequency values
+	 * 
+	 * @param json attribute Advantage or disadvantage to search modifiers
+	 * 
+	 * @return int
+	 */ 
+	function getControlRatingByModifier(attribute) {
+
+		let rating = 0;
+
+		let shortName = "";
+
+		if (attribute.Modifier && attribute.Modifier.length) {
+
+			for (let i = 0; i < attribute.Modifier.length; i++) {
+
+				let modifier = attribute.Modifier[i];
+
+				if (modifier.shortname && modifier.shortname.includes("or less")) {
+
+					shortName = modifier.shortname;
+
+				}
+				
+			}
+
+		} else if (attribute.Modifier) {
+
+			shortName = attribute.Modifier.shortname;
+
+		}
+
+		if (shortName.includes("6 or less")) {
+			
+			rating = 6;
+			
+		} else if (shortName.includes("9 or less")) {
+			
+			rating = 9;
+			
+		} else if (shortName.includes("12 or less")) {
+			
+			rating = 12;
+			
+		} else if (shortName.includes("15 or less")) {
+			
+			rating = 15;
+			
+		}	
+
+		return rating;
 
 	}
 
