@@ -307,7 +307,7 @@
 				<label title='If selected, all rolls from this sheet will be whispered to GM, instead of posted in public'><input type='checkbox' name='attr_to-gm' value='/w gm' class='select_button hidden' /><span class='select_text'>To GM</span></label>
 				<label title='If selected, most rolls made will also ask for a situational Modifier'><input type='checkbox' name='attr_inlinemod-toggle' value='0?{Modifier|0}' class='select_button hidden' checked /><span class='select_text'>Inline Mod</span></label>
 				<p></p>
-				<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[1d5+(?{Degrees of Failiure|1})+?{Modifier|0}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
+				<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[?{Dice|D10, 1d10|D5, 1d5}+ceil(?{Degrees of Failiure|1}/2)+?{Modifier|0}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
 				<button class='clear minimisable_infographic_override' type='roll' name='shock' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{shock= [[(?{Fear DoF|1})*10 + 1d100]]}}">Shock</button>
 				<button class='clear minimisable_infographic_override' type='roll' name='d100' value="@{to-gm}&{template:mythic} [[ ([[?{Target Number|50}]] - [[1d100]])/10]] {{d100= }} {{character= @{character_name}}} {{target= $[[0]]}} {{roll=$[[1]]}} {{difference=$[[2]]}}">1d100</button>
 				<button class='clear minimisable_infographic_override' type='roll' name='righteousfury' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{righteousfury= }} {{@{settings_crunchsummary}= }} {{target=  [[?{Target|Person, 0|Vehicle, 1}]] }} {{location= [[?{Location|Arm/Weapon, 0|Body/Propulsion, 1|Head/Turret, 2|Leg/Hull, 3}]]}} {{type= [[?{Damage Type|Energy, 0|Explosive, 1|Impact, 2|Rending, 3}]] }} {{roll=[[ ceil(?{Dice Roll|1d5, 1d5|1d10, 1d10} / ?{Mitigation|None, 1| True Grit, 2}) ]] }} ">Righteous
@@ -1203,11 +1203,24 @@
 				<!-- TODO: find a way to expand/collapse weapons -->
 				<fieldset name='rangedweapons' class='repeating_rangedweapons'>
 					<div class='equipment_ranged_weapons_rep'>
+						<input name='attr_wep_display' type='checkbox' value='1' class='collapsible_entity_switch hidden' />
+						<input name='attr_wep_display' type='checkbox' value='2' class='collapsible_entity_switch_half hidden' />
+						<input name='attr_wep_display' type='checkbox' value='3' class='collapsible_entity_switch_min hidden' />
 						<input type='hidden' name='attr_id' value=''>
 						<input type='hidden' name='attr_ammo' value=''>
-						<input name='attr_half' type='checkbox' value='11' class='collapsible_entity_switch_half hidden' />
-						<input name='attr_min' type='checkbox' value='12' class='collapsible_entity_switch_min hidden' />
-						<div class='equipment_ranged_weapons_grid0'>
+						<div class='equipment_weapon_rep_head'>
+							<div class='equipment_weapon_rep_h1'>
+								<label title='Expand' class='wb1'><input type='checkbox' name='attr_wep_display' value='1' class='select_button hidden' /><span class='select_text'>🗕</span></label>
+								<label title='Min'    class='wb2'><input type='checkbox' name='attr_wep_display' value='2' class='select_button hidden' /><span class='select_text'>🗗</span></label>
+								<label title='Half'   class='wb3'><input type='checkbox' name='attr_wep_display' value='3' class='select_button hidden' /><span class='select_text'>🗖</span></label>
+							</div>
+							<h3 class='equipment_weapon_rep_h2'><span name='attr_R_weapon_name'></span></h3>
+							<button name='weapon_hit' class='equipment_weapon_rep_h3 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{0d1+@{R_weapon_target}+@{inlinemod-toggle}, 0d1+@{bsTotal}-@{limiter}}kh1, 0d1+@{bsTotal}+@{limiter}}kl1 ]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}
+!ammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit
+								|<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}' class='input_background input_char_background' disabled ></button>
+							<button name='weapon_dmg' class='equipment_weapon_rep_h4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }}'>DMG</button>
+						</div>
+						<div class='equipment_ranged_weapons_grid0 collapsible_entity_toggle'>
 							<select name='attr_R_weapon_aim' class='equipment_ranged_weapons_gs01 full_width clear select_corection'>
 								<option value='0' selected='selected'>No Aim (+0)</option>
 								<option value='10'>Half Aim (+10)</option>
@@ -1237,12 +1250,8 @@
 									<option value='3'>Maximal</option>
 								</optgroup>
 							</select>
-							<button name='weapon_hit' class='equipment_ranged_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{0d1+@{R_weapon_target}+@{inlinemod-toggle}, 0d1+@{bsTotal}-@{limiter}}kh1, 0d1+@{bsTotal}+@{limiter}}kl1 ]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}
-!ammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit
-								|<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}' class='input_background input_char_background' disabled ></button>
-							<button name='weapon_dmg' class='equipment_ranged_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}]] }} {{@{R_weapon_spray}= }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }}'>DMG</button>
 						</div>
-						<div class='equipment_ranged_weapons_grid1'>
+						<div class='equipment_ranged_weapons_grid1 collapsible_entity_toggle collapsible_entity_toggle_min'>
 							<div class='equipment_ranged_weapons_gs1'>Name</div>
 							<input class='equipment_ranged_weapons_gs2 full_width' type='text' name='attr_R_weapon_name' />
 							<div class='equipment_ranged_weapons_gs3'>Class</div>
@@ -1255,7 +1264,7 @@
 								<option value='Thrown'>Thrown</option>
 							</select>
 						</div>
-						<div class='equipment_ranged_weapons_grid2 collapsible_entity_toggle_min'>
+						<div class='equipment_ranged_weapons_grid2 collapsible_entity_toggle collapsible_entity_toggle_min'>
 							<div class='equipment_ranged_weapons_gs5'>Range</div>
 							<input class='equipment_ranged_weapons_gs6 full_width' type='text' value='0' name='attr_R_weapon_range' />
 							<div class='equipment_ranged_weapons_gs7'>Damage</div>
@@ -1272,7 +1281,7 @@
 								<option value='Explosive'>Explosive</option>
 							</select>
 						</div>
-						<div class='equipment_ranged_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='equipment_ranged_weapons_grid2a collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<div class='equipment_ranged_weapons_gs06'>Primitive</div>
 							<input class='equipment_ranged_weapons_gs07 full_width' type='number' value='0' name='attr_R_weapon_max' />
 							<div class='equipment_ranged_weapons_gs08'>Proven</div>
@@ -1283,7 +1292,7 @@
 							<div class='equipment_ranged_weapons_gs012'>Accurate</div>
 							<input class='equipment_ranged_weapons_gs013' type='checkbox' value='{{accurate=?{dos |1, [[0]]|2, [[0]]|3, [[1d5]]|4, [[1d5]]|5, [[2d5]]|5+, [[2d5]]}}}' name='attr_R_weapon_accurate' />
 						</div>
-						<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle_min'>
+						<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle collapsible_entity_toggle_min'>
 							<div class='equipment_ranged_weapons_gs13'>RoF</div>
 							<input class='equipment_ranged_weapons_gs14 full_width' type='text' placeholder='Std' name='attr_R_weapon_standard' />
 							<div class='equipment_ranged_weapons_gs15'>/</div>
@@ -1295,7 +1304,7 @@
 							<div class='equipment_ranged_weapons_gs21'>/</div>
 							<input class='equipment_ranged_weapons_gs22 full_width' type='text' value='0' name='attr_R_weapon_mag_max' />
 						</div>
-						<div class='equipment_ranged_weapons_grid4 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='equipment_ranged_weapons_grid4 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<div class='equipment_ranged_weapons_gs25'>Trained?</div>
 							<input class='equipment_ranged_weapons_gs26' type='checkbox' value='20' name='attr_R_weapon_trained' checked />
 							<div class='equipment_ranged_weapons_gs27'>Hit Mod</div>
@@ -1305,7 +1314,7 @@
 							<div class='equipment_ranged_weapons_gs31'>Weight</div>
 							<input class='equipment_ranged_weapons_gs32 full_width' type='text' value='0' name='attr_R_weapon_weight' />
 						</div>
-						<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<div class='equipment_ranged_weapons_gs33'>Domain</div>
 							<select class='equipment_ranged_weapons_gs34 full_width select_corection' name='attr_R_weapon_domain'>
 								<option value='-'>N/A</option>
@@ -1344,20 +1353,14 @@
 							<div class='equipment_ranged_weapons_gs37'>Spray?</div>
 							<input class='equipment_ranged_weapons_gs38' type='checkbox' value='spray' name='attr_R_weapon_spray' />
 						</div>
-						<div class='collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<input name='attr_R_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
 							<label title='Expand' class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
 							<label title='Send description in the chat' class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{R_weapon_name} }} {{description=@{R_ability_desc_r} }}' class='hidden'></button><span class='select_text'>🔊</span></label>
 							<input name='attr_collapse' type='checkbox' value='3' class='collapsible_entity_switch hidden' />
 							<textarea name='attr_R_ability_desc_r' class='collapsible_entity_block description_rounded_margin' placeholder='Description'></textarea>
 						</div>
-						<br>
-						<div>
-							<label title='Half' class='margin_adjust_wep3'><input type='checkbox' name='attr_half' value='11' class='collapsible_entity_switch_half select_button hidden' /><span class='select_text radius_border_right_wep'>Half</span></label>
-							<label title='Min' class='margin_adjust_wep4'><input type='checkbox' name='attr_min' value='12' class='collapsible_entity_switch_min select_button hidden' /><span class='select_text radius_border_left_wep'>Min</span></label>
-						</div>
 					</div>
-					<br />
 				</fieldset>
 			</div>
 
@@ -1365,9 +1368,21 @@
 				<h3 class='radius_border_top'>Melee Weapons</h3>
 				<fieldset name='meleeweapons' class='repeating_meleeweapons'>
 					<div class='equipment_melee_weapons_rep'>
-						<input name='attr_half' type='checkbox' value='11' class='collapsible_entity_switch_half hidden' />
-						<input name='attr_min' type='checkbox' value='12' class='collapsible_entity_switch_min hidden' />
-						<div class="equipment_melee_weapons_grid0">
+						<input name='attr_wep_display' type='checkbox' value='1' class='collapsible_entity_switch hidden' />
+						<input name='attr_wep_display' type='checkbox' value='2' class='collapsible_entity_switch_half hidden' />
+						<input name='attr_wep_display' type='checkbox' value='3' class='collapsible_entity_switch_min hidden' />
+						<div class='equipment_weapon_rep_head'>
+							<div class='equipment_weapon_rep_h1'>
+								<label title='Expand' class='wb1'><input type='checkbox' name='attr_wep_display' value='1' class='select_button hidden' /><span class='select_text'>🗕</span></label>
+								<label title='Min'    class='wb2'><input type='checkbox' name='attr_wep_display' value='2' class='select_button hidden' /><span class='select_text'>🗗</span></label>
+								<label title='Half'   class='wb3'><input type='checkbox' name='attr_wep_display' value='3' class='select_button hidden' /><span class='select_text'>🗖</span></label>
+							</div>
+							<h3 class='equipment_weapon_rep_h2'><span name='attr_M_weapon_name'></span></h3>
+							<button name='weapon_hit' class='equipment_weapon_rep_h3 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{0d1+@{M_weapon_target}+@{inlinemod-toggle}, 0d1+@{wsTotal}-@{limiter}}kh1, 0d1+@{wsTotal}+@{limiter}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll} {{aim= [[@{M_weapon_aim}]]}}{{M_type= [[@{M_weapon_attack}]]}}{{multi= [[@{M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Weapon}}{{skill=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{weaponmod=[[@{M_weapon_mod1}]]}}{{trained=[[@{M_weapon_trained}]]}}{{WS_bonus=[[floor((@{WS}+@{WS_advancement})/10)+@{WS_unnat}]]}}'>Hit
+								|<input name='attr_M_weapon_target' value='@{wsTotal}+@{M_weapon_trained}-20+@{M_weapon_mod1}+@{M_weapon_attack}+@{M_weapon_aim}+@{M_weapon_multi}' class='input_background input_char_background' disabled ></button>
+							<button name='weapon_dmg' class='equipment_weapon_rep_h4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{M_weapon_name}}} {{type= @{M_weapon_type}}} {{damage=[[@{M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{M_weapon_pen}]] }} {{@{settings_weapondescription}=@{M_ability_r} }}'>DMG</button>
+						</div>
+						<div class="equipment_melee_weapons_grid0 collapsible_entity_toggle">
 							<select name='attr_M_weapon_aim' class='equipment_melee_weapons_gs01 full_width clear select_corection'>
 								<option value='0' selected='selected'>No Aim (+0)</option>
 								<option value='10'>Half Aim (+10)</option>
@@ -1383,11 +1398,8 @@
 								<option value='-10'>Swift (-10)</option>
 								<option value='-20'>Lighting (-20)</option>
 							</select>
-							<button name='weapon_hit' class='equipment_melee_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{0d1+@{M_weapon_target}+@{inlinemod-toggle}, 0d1+@{wsTotal}-@{limiter}}kh1, 0d1+@{wsTotal}+@{limiter}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll} {{aim= [[@{M_weapon_aim}]]}}{{M_type= [[@{M_weapon_attack}]]}}{{multi= [[@{M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Weapon}}{{skill=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{weaponmod=[[@{M_weapon_mod1}]]}}{{trained=[[@{M_weapon_trained}]]}}{{WS_bonus=[[floor((@{WS}+@{WS_advancement})/10)+@{WS_unnat}]]}}'>Hit
-								|<input name='attr_M_weapon_target' value='@{wsTotal}+@{M_weapon_trained}-20+@{M_weapon_mod1}+@{M_weapon_attack}+@{M_weapon_aim}+@{M_weapon_multi}' class='input_background input_char_background' disabled ></button>
-							<button name='weapon_dmg' class='equipment_melee_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{M_weapon_name}}} {{type= @{M_weapon_type}}} {{damage=[[@{M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{M_weapon_pen}]] }} {{@{settings_weapondescription}=@{M_ability_r} }}'>DMG</button>
 						</div>
-						<div class='equipment_melee_weapons_grid1'>
+						<div class='equipment_melee_weapons_grid1 collapsible_entity_toggle collapsible_entity_toggle_min'>
 							<div class='equipment_melee_weapons_gs1'>Name</div>
 							<input class='equipment_melee_weapons_gs2 full_width' type='text' name='attr_M_weapon_name' />
 							<div class='equipment_melee_weapons_gs3'>Class</div>
@@ -1400,7 +1412,7 @@
 								<option value='Thrown'>Thrown</option>
 							</select>
 						</div>
-						<div class='equipment_melee_weapons_grid2 collapsible_entity_toggle_min'>
+						<div class='equipment_melee_weapons_grid2 collapsible_entity_toggle collapsible_entity_toggle_min'>
 							<div class='equipment_melee_weapons_gs5'>Reach</div>
 							<input class='equipment_melee_weapons_gs6 full_width' type='text' name='attr_M_weapon_reach' />
 							<div class='equipment_melee_weapons_gs7'>Damage</div>
@@ -1416,7 +1428,7 @@
 								<option value='Explosive'>Explosive</option>
 							</select>
 						</div>
-						<div class='equipment_melee_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='equipment_melee_weapons_grid2a collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<div class='equipment_melee_weapons_gs06'>Primitive</div>
 							<input class='equipment_melee_weapons_gs07 full_width' type='number' value='0' name='attr_M_weapon_max' />
 							<div class='equipment_melee_weapons_gs08'>Proven</div>
@@ -1425,7 +1437,7 @@
 							<input class='equipment_melee_weapons_gs011 full_width' type='number' value='0' name='attr_M_weapon_vengeful' />
 							<input type='hidden' value='' name='attr_M_weapon_real_dmg' />
 						</div>
-						<div class='equipment_melee_weapons_grid3 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='equipment_melee_weapons_grid3 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<div class='equipment_melee_weapons_gs13'>Trained?</div>
 							<input class='equipment_melee_weapons_gs14' type='checkbox' value='20' name='attr_M_weapon_trained' checked />
 							<div class='equipment_melee_weapons_gs15'>Hit Mod</div>
@@ -1459,20 +1471,14 @@
 								<option value='Xenos(Ork)'>Xenos (Ork)</option>
 							</select>
 						</div>
-						<div class='collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+						<div class='collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 							<input name='attr_M_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
 							<label title='Expand' title='Expand' class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
 							<label title='Send description in the chat' class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{M_weapon_name} }} {{description=@{M_ability_desc_r} }}' class='hidden'></button><span class='select_text'>🔊</span></label>
 							<input name='attr_collapse' type='checkbox' value='3' class='collapsible_entity_switch hidden' />
 							<textarea name='attr_M_ability_desc_r' class='collapsible_entity_block description_rounded_margin' placeholder='Description'></textarea>
 						</div>
-						<br>
-						<div>
-							<label title='Half' class='margin_adjust_wep3'><input type='checkbox' name='attr_half' value='11' class='collapsible_entity_switch_half select_button hidden' /><span class='select_text radius_border_right_wep'>Half</span></label>
-							<label title='Min' class='margin_adjust_wep4'><input type='checkbox' name='attr_min' value='12' class='collapsible_entity_switch_min select_button hidden' /><span class='select_text radius_border_left_wep'>Min</span></label>
-						</div>
 					</div>
-					<br />
 				</fieldset>
 			</div>
 
@@ -1898,11 +1904,24 @@
 					<h3 class='radius_border_top'>Vehicle Ranged Weapons</h3>
 					<fieldset name='vehiclerangedweapons' class='repeating_vehiclerangedweapons'>
 						<div class='equipment_ranged_weapons_rep'>
+							<input name='attr_wep_display' type='checkbox' value='1' class='collapsible_entity_switch hidden' />
+							<input name='attr_wep_display' type='checkbox' value='2' class='collapsible_entity_switch_half hidden' />
+							<input name='attr_wep_display' type='checkbox' value='3' class='collapsible_entity_switch_min hidden' />
 							<input type='hidden' name='attr_id' value=''>
 							<input type='hidden' name='attr_ammo' value=''>
-							<input name='attr_half' type='checkbox' value='11' class='collapsible_entity_switch_half hidden' />
-							<input name='attr_min' type='checkbox' value='12' class='collapsible_entity_switch_min hidden' />
-							<div class="equipment_ranged_weapons_grid0">
+							<div class='equipment_weapon_rep_head'>
+								<div class='equipment_weapon_rep_h1'>
+									<label title='Expand' class='wb1'><input type='checkbox' name='attr_wep_display' value='1' class='select_button hidden' /><span class='select_text'>🗕</span></label>
+									<label title='Min'    class='wb2'><input type='checkbox' name='attr_wep_display' value='2' class='select_button hidden' /><span class='select_text'>🗗</span></label>
+									<label title='Half'   class='wb3'><input type='checkbox' name='attr_wep_display' value='3' class='select_button hidden' /><span class='select_text'>🗖</span></label>
+								</div>
+								<h3 class='equipment_weapon_rep_h2'><span name='attr_V_R_weapon_name'></span></h3>
+								<button name='weapon_hit' class='equipment_weapon_rep_h3 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}} {{dos=[[[[1+ floor(abs([[{{0d1+@{V_R_weapon_target}+@{inlinemod-toggle}, 0d1+@{bsTotal}-@{limiter}}kh1, 0d1+@{bsTotal}+@{limiter}}kl1 ]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll}{{aim= [[@{V_R_weapon_aim}]]}}{{V_R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}]]}}{{burst=@{V_R_weapon_burst}}}{{auto=@{V_R_weapon_auto}}}
+!ammo @{character_id} repeating_rangedweapons_@{id}_V_R_weapon_mag [[@{ammo}*@{V_R_weapon_setting}]]'>Hit
+									|<input name='attr_V_R_weapon_target' value='@{bsTotal} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range}' class='input_background input_char_background' disabled ></button>
+								<button name='weapon_dmg' class='equipment_weapon_rep_h4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg}]] }} {{@{V_R_weapon_spray}= }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }}'>DMG</button>
+							</div>
+							<div class="equipment_ranged_weapons_grid0 collapsible_entity_toggle">
 								<select name='attr_V_R_weapon_aim' class='equipment_ranged_weapons_gs01 full_width clear select_corection'>
 									<option value='0' selected='selected'>No Aim (+0)</option>
 									<option value='10'>Half Aim (+10)</option>
@@ -1922,12 +1941,18 @@
 									<option value='-10'>Long Range (-10)</option>
 									<option value='-30'>Extreme Range (-30)</option>
 								</select>
-								<button name='v_weapon_hit' class='equipment_ranged_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{0d1+@{V_R_weapon_target}+ @{inlinemod-toggle}, 0d1+@{bsTotal}-@{limiter}}kh1, 0d1+@{bsTotal}+@{limiter}}kl1]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll} {{aim= [[@{V_R_weapon_aim}]]}}{{R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Ballistic}}{{skill=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{weaponmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}]]}}{{burst=@{V_R_weapon_burst}}{{auto=@{V_R_weapon_auto}}
-								!ammo'>Hit
-									|<input name='attr_V_R_weapon_target' value='@{bsTotal}+@{V_R_weapon_trained}-20+@{V_R_weapon_mod1}+@{V_R_weapon_attack}+@{V_R_weapon_aim}+@{V_R_weapon_attack_range}' class='input_background input_char_background' disabled ></button>
-								<button name='v_weapon_dmg' class='equipment_ranged_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg}]] }} {{@{V_R_weapon_spray}= }} {{pen=[[@{V_R_weapon_pen}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }}'>DMG</button>
+								<select name='attr_R_weapon_setting' class='equipment_ranged_weapons_gs04 full_width clear select_corection'>
+									<option value='1'>N/A</option>
+									<optgroup label="Las">
+										<option value='2'>Overcharge</option>
+										<option value='4'>Overload</option>
+									</optgroup>
+									<optgroup label="Plasma">
+										<option value='3'>Maximal</option>
+									</optgroup>
+								</select>
 							</div>
-							<div class='equipment_ranged_weapons_grid1'>
+							<div class='equipment_ranged_weapons_grid1 collapsible_entity_toggle collapsible_entity_toggle_min'>
 								<div class='equipment_ranged_weapons_gs1'>Name</div>
 								<input class='equipment_ranged_weapons_gs2 full_width' type='text' name='attr_V_R_weapon_name' />
 								<div class='equipment_ranged_weapons_gs3'>Class</div>
@@ -1940,13 +1965,14 @@
 									<option value='Thrown'>Thrown</option>
 								</select>
 							</div>
-							<div class='equipment_ranged_weapons_grid2 collapsible_entity_toggle_min'>
+							<div class='equipment_ranged_weapons_grid2 collapsible_entity_toggle collapsible_entity_toggle_min'>
 								<div class='equipment_ranged_weapons_gs5'>Range</div>
 								<input class='equipment_ranged_weapons_gs6 full_width' type='text' value='0' name='attr_V_R_weapon_range' />
 								<div class='equipment_ranged_weapons_gs7'>Damage</div>
 								<input class='equipment_ranged_weapons_gs8 full_width' type='text' value='0' name='attr_V_R_weapon_dam-roll' />
 								<div class='equipment_ranged_weapons_gs9'>Pen</div>
 								<input class='equipment_ranged_weapons_gs10 full_width' type='text' value='0' name='attr_V_R_weapon_pen' />
+								<input type='hidden' value='0' name='attr_V_R_weapon_pen2' />
 								<div class='equipment_ranged_weapons_gs11'>Type</div>
 								<select class='equipment_ranged_weapons_gs12 full_width select_corection' name='attr_V_R_weapon_type'>
 									<option value='-'>N/A</option>
@@ -1956,7 +1982,7 @@
 									<option value='Explosive'>Explosive</option>
 								</select>
 							</div>
-							<div class='equipment_ranged_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+							<div class='equipment_ranged_weapons_grid2a collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 								<div class='equipment_ranged_weapons_gs06'>Primitive</div>
 								<input class='equipment_ranged_weapons_gs07 full_width' type='number' value='0' name='attr_V_R_weapon_max' />
 								<div class='equipment_ranged_weapons_gs08'>Proven</div>
@@ -1965,7 +1991,7 @@
 								<input class='equipment_ranged_weapons_gs011 full_width' type='number' value='0' name='attr_V_R_weapon_vengeful' />
 								<input type='hidden' value='' name='attr_V_R_weapon_real_dmg' />
 							</div>
-							<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle_min'>
+							<div class='equipment_ranged_weapons_grid3 collapsible_entity_toggle collapsible_entity_toggle_min'>
 								<div class='equipment_ranged_weapons_gs13'>RoF</div>
 								<input class='equipment_ranged_weapons_gs14 full_width' type='text' placeholder='Std' name='attr_V_R_weapon_standard' />
 								<div class='equipment_ranged_weapons_gs15'>/</div>
@@ -1977,7 +2003,7 @@
 								<div class='equipment_ranged_weapons_gs21'>/</div>
 								<input class='equipment_ranged_weapons_gs22 full_width' type='text' value='0' name='attr_V_R_weapon_mag_max' />
 							</div>
-							<div class='equipment_ranged_weapons_grid4 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+							<div class='equipment_ranged_weapons_grid4 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 								<div class='equipment_ranged_weapons_gs25'>Trained?</div>
 								<input class='equipment_ranged_weapons_gs26' type='checkbox' value='20' name='attr_V_R_weapon_trained' checked />
 								<div class='equipment_ranged_weapons_gs27'>Hit Mod</div>
@@ -1987,7 +2013,7 @@
 								<div class='equipment_ranged_weapons_gs31'>Weight</div>
 								<input class='equipment_ranged_weapons_gs32 full_width' type='text' value='0' name='attr_V_R_weapon_weight' />
 							</div>
-							<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+							<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 								<div class='equipment_ranged_weapons_gs33'>Domain</div>
 								<select class='equipment_ranged_weapons_gs34 full_width select_corection' name='attr_R_weapon_domain'>
 									<option value='-'>N/A</option>
@@ -2026,135 +2052,131 @@
 								<div class='equipment_ranged_weapons_gs37'>Spray?</div>
 								<input class='equipment_ranged_weapons_gs38' type='checkbox' value='spray' name='attr_V_R_weapon_spray' />
 							</div>
-							<div class='collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+							<div class='collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
 								<input name='attr_V_R_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
 								<label title='Expand' class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
 								<label title='Send description in the chat' class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{V_R_weapon_name} }} {{description=@{V_R_ability_desc_r} }}' class='hidden'></button><span class='select_text'>🔊</span></label>
 								<input name='attr_collapse' type='checkbox' value='3' class='collapsible_entity_switch hidden' />
 								<textarea name='attr_V_R_ability_desc_r' class='collapsible_entity_block description_rounded_margin' placeholder='Description'></textarea>
 							</div>
-							<br>
-							<div>
-								<label title='Half' class='margin_adjust_wep3'><input type='checkbox' name='attr_half' value='11' class='collapsible_entity_switch_half select_button hidden' /><span class='select_text radius_border_right_wep'>Half</span></label>
-								<label title='Min' class='margin_adjust_wep4'><input type='checkbox' name='attr_min' value='12' class='collapsible_entity_switch_min select_button hidden' /><span class='select_text radius_border_left_wep'>Min</span></label>
-							</div>
-						</div>
-						<br />
 					</fieldset>
 				</div>
 
 				<div class='equipment_melee_weapons'>
 					<h3 class='radius_border_top'>Vehicle Melee Weaponry</h3>
 					<fieldset name='vehiclemeleeweapons' class='repeating_vehiclemeleeweapons'>
-						<div class='equipment_melee_weapons_rep'>
-							<input name='attr_half' type='checkbox' value='11' class='collapsible_entity_switch_half hidden' />
-							<input name='attr_min' type='checkbox' value='12' class='collapsible_entity_switch_min hidden' />
-							<div class="equipment_melee_weapons_grid0">
-								<select name='attr_V_M_weapon_aim' class='equipment_melee_weapons_gs01 full_width clear select_corection'>
-									<option value='0' selected='selected'>No Aim (+0)</option>
-									<option value='10'>Half Aim (+10)</option>
-									<option value='20'>Full Aim (+20)</option>
-								</select>
-								<select name='attr_V_M_weapon_attack' class='equipment_melee_weapons_gs02 full_width clear select_corection'>
-									<option value='10' selected='selected'>Standard (+10)</option>
-									<option value='20'>Charge (+20)</option>
-									<option value='30'>All Out (+30)</option>
-								</select>
-								<select name='attr_V_M_weapon_multi' class='equipment_melee_weapons_gs03 full_width clear select_corection'>
-									<option value='0' selected='selected'>Standard (-0)</option>
-									<option value='-10'>Swift (-10)</option>
-									<option value='-20'>Lighting (-20)</option>
-								</select>
-								<button name='v_weapon_hit' class='equipment_melee_weapons_gs04 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{V_M_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{0d1+@{V_M_weapon_target}+ @{inlinemod-toggle}, 0d1+@{wsTotal}-@{limiter}}kh1, 0d1+@{wsTotal}+@{limiter}}kl1 ]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll} {{aim= [[@{V_M_weapon_aim}]]}}{{M_type= [[@{V_M_weapon_attack}]]}}{{multi= [[@{V_M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Weapon}}{{skill=[[@{WS}]]}}{{advancement= [[[@{WS_advancement}]]]}}{{weaponmod= [[@{V_M_weapon_mod1}]]}}{{trained= [[@{V_M_weapon_trained}]]}}{{WS_bonus=[[floor((@{WS}+@{WS_advancement})/10)+@{WS_unnat}]]}}'>Hit
-									|<input name='attr_V_M_weapon_target' value='@{wsTotal}+@{V_M_weapon_trained}-20+@{V_M_weapon_mod1}+@{V_M_weapon_attack}+@{V_M_weapon_aim}+@{V_M_weapon_multi}' class='input_background input_char_background' disabled ></button>
-								<button name='v_weapon_dmg' class='equipment_melee_weapons_gs05 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{V_M_weapon_name}}} {{type= @{V_M_weapon_type}}} {{damage=[[@{V_M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{V_M_weapon_pen}]] }} {{@{settings_weapondescription}=@{V_M_ability_r} }}'>DMG</button>
-							</div>
-							<div class='equipment_melee_weapons_grid1'>
-								<div class='equipment_melee_weapons_gs1'>Name</div>
-								<input class='equipment_melee_weapons_gs2 full_width' type='text' name='attr_V_M_weapon_name' />
-								<div class='equipment_melee_weapons_gs3'>Class</div>
-								<select class='equipment_melle_weapons_gs4 full_width select_corection' name='attr_R_weapon_class'>
-									<option value='-'>N/A</option>
-									<option value='Basic'>Basic</option>
-									<option value='Heavy'>Heavy</option>
-									<option value='Melee'>Melee</option>
-									<option value='Pistol'>Pistol</option>
-									<option value='Thrown'>Thrown</option>
-								</select>
-							</div>
-							<div class='equipment_melee_weapons_grid2 collapsible_entity_toggle_min'>
-								<div class='equipment_melee_weapons_gs5'>Reach</div>
-								<input class='equipment_melee_weapons_gs6 full_width' type='text' name='attr_V_M_weapon_reach' />
-								<div class='equipment_melee_weapons_gs7'>Damage</div>
-								<input class='equipment_melee_weapons_gs8 full_width' type='text' value='0' name='attr_V_M_weapon_dam-roll' />
-								<div class='equipment_melee_weapons_gs9'>Pen</div>
-								<input class='equipment_melee_weapons_gs10 full_width' type='text' value='0' name='attr_V_M_weapon_pen' />
-								<div class='equipment_melee_weapons_gs11'>Type</div>
-								<select class='equipment_melee_weapons_gs12 full_width select_corection' name='attr_V_M_weapon_type'>
-									<option value='-'>N/A</option>
-									<option value='Energy'>Energy</option>
-									<option value='Impact'>Impact</option>
-									<option value='Rending'>Rending</option>
-									<option value='Explosive'>Explosive</option>
-								</select>
-							</div>
-							<div class='equipment_melee_weapons_grid2a collapsible_entity_toggle_min collapsible_entity_toggle_half'>
-								<div class='equipment_melee_weapons_gs06'>Primitive</div>
-								<input class='equipment_melee_weapons_gs07 full_width' type='number' value='0' name='attr_V_M_weapon_max' />
-								<div class='equipment_melee_weapons_gs08'>Proven</div>
-								<input class='equipment_melee_weapons_gs09 full_width' type='number' value='0' name='attr_V_M_weapon_min' />
-								<div class='equipment_melee_weapons_gs010'>Vengeful</div>
-								<input class='equipment_melee_weapons_gs011 full_width' type='number' value='0' name='attr_V_M_weapon_vengeful' />
-								<input type='hidden' value='' name='attr_V_M_weapon_real_dmg' />
-							</div>
-							<div class='equipment_melee_weapons_grid3 collapsible_entity_toggle_min collapsible_entity_toggle_half'>
-								<div class='equipment_melee_weapons_gs13'>Trained?</div>
-								<input class='equipment_melee_weapons_gs14' type='checkbox' value='20' name='attr_V_M_weapon_trained' checked />
-								<div class='equipment_melee_weapons_gs15'>Hit Mod</div>
-								<input class='equipment_melee_weapons_gs16 full_width' type='number' value='0' name='attr_V_M_weapon_mod1' />
-								<div class='equipment_melee_weapons_gs17'>Weight</div>
-								<input class='equipment_melee_weapons_gs18 full_width' type='text' value='0' name='attr_V_M_weapon_weight' />
-								<div class='equipment_melee_weapons_gs39'>Domain</div>
-								<select class='equipment_melee_weapons_gs20 full_width select_corection' name='attr_R_weapon_domain'>
-									<option value='-'>N/A</option>
-									<option value='Bolt'>Bolt</option>
-									<option value='Chain'>Chain</option>
-									<option value='Exotic'>Exotic</option>
-									<option value='Exotic (Graviton)'>Exotic (Graviton)</option>
-									<option value='Explosives'>Explosives</option>
-									<option value='Flame'>Flame</option>
-									<option value='Force'>Force</option>
-									<option value='Grenades/Missiles'>Grenades/Missiles</option>
-									<option value='Las'>Las</option>
-									<option value='Launcher'>Launcher</option>
-									<option value='Low-Tech'>Low-Tech</option>
-									<option value='Melta'>Melta</option>
-									<option value='Plasma'>Plasma</option>
-									<option value='Power'>Power</option>
-									<option value='Shock'>Shock</option>
-									<option value='Solid-Projectile'>Solid Projectile</option>
-									<option value='Varies'>Varies</option>
-									<option value='Xenos(Eldar)'>Xenos (Eldar)</option>
-									<option value='Xenos(Kroot)'>Xenos (Kroot)</option>
-									<option value='Xenos(Lost Races)'>Xenos (Lost Races)</option>
-									<option value='Xenos(Necron)'>Xenos (Necron)</option>
-									<option value='Xenos(Ork)'>Xenos (Ork)</option>
-								</select>
-							</div>
-							<div class='collapsible_entity_toggle_min collapsible_entity_toggle_half'>
-								<input name='attr_V_M_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
-								<label title='Expand' class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
-								<label title='Send description in the chat' class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{V_M_weapon_name} }} {{description=@{V_M_ability_desc_r} }}' class='hidden'></button><span class='select_text'>🔊</span></label>
-								<input name='attr_collapse' type='checkbox' value='3' class='collapsible_entity_switch hidden' />
-								<textarea name='attr_V_M_ability_desc_r' class='collapsible_entity_block description_rounded_margin' placeholder='Description'></textarea>
-							</div>
-							<br>
-							<div>
-								<label title='Half' class='margin_adjust_wep3'><input type='checkbox' name='attr_half' value='11' class='collapsible_entity_switch_half select_button hidden' /><span class='select_text radius_border_right_wep'>Half</span></label>
-								<label title='Min' class='margin_adjust_wep4'><input type='checkbox' name='attr_min' value='12' class='collapsible_entity_switch_min select_button hidden' /><span class='select_text radius_border_left_wep'>Min</span></label>
-							</div>
-						</div>
-						<br />
+					  <div class='equipment_melee_weapons_rep'>
+					    <input name='attr_wep_display' type='checkbox' value='1' class='collapsible_entity_switch hidden' />
+					    <input name='attr_wep_display' type='checkbox' value='2' class='collapsible_entity_switch_half hidden' />
+					    <input name='attr_wep_display' type='checkbox' value='3' class='collapsible_entity_switch_min hidden' />
+					    <div class='equipment_weapon_rep_head'>
+					      <div class='equipment_weapon_rep_h1'>
+					        <label title='Expand' class='wb1'><input type='checkbox' name='attr_wep_display' value='1' class='select_button hidden' /><span class='select_text'>🗕</span></label>
+					        <label title='Min'    class='wb2'><input type='checkbox' name='attr_wep_display' value='2' class='select_button hidden' /><span class='select_text'>🗗</span></label>
+					        <label title='Half'   class='wb3'><input type='checkbox' name='attr_wep_display' value='3' class='select_button hidden' /><span class='select_text'>🗖</span></label>
+					      </div>
+					      <h3 class='equipment_weapon_rep_h2'><span name='attr_V_M_weapon_name'></span></h3>
+					      <button name='weapon_hit' class='equipment_weapon_rep_h3 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{V_M_weapon_name}}}{{dos=[[[[1+ floor(abs([[{{0d1+@{V_M_weapon_target}+@{inlinemod-toggle}, 0d1+@{wsTotal}-@{limiter}}kh1, 0d1+@{wsTotal}+@{limiter}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}@{settings_hitroll} {{aim= [[@{V_M_weapon_aim}]]}}{{V_M_type= [[@{V_M_weapon_attack}]]}}{{multi= [[@{V_M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{skill_name= Weapon}}{{skill=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{weaponmod=[[@{V_M_weapon_mod1}]]}}{{trained=[[@{V_M_weapon_trained}]]}}{{WS_bonus=[[floor((@{WS}+@{WS_advancement})/10)+@{WS_unnat}]]}}'>Hit
+					        |<input name='attr_V_M_weapon_target' value='@{wsTotal}+@{V_M_weapon_trained}-20+@{V_M_weapon_mod1}+@{V_M_weapon_attack}+@{V_M_weapon_aim}+@{V_M_weapon_multi}' class='input_background input_char_background' disabled ></button>
+					      <button name='weapon_dmg' class='equipment_weapon_rep_h4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{V_M_weapon_name}}} {{type= @{V_M_weapon_type}}} {{damage=[[@{V_M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{V_M_weapon_pen}]] }} {{@{settings_weapondescription}=@{V_M_ability_r} }}'>DMG</button>
+					    </div>
+					    <div class="equipment_melee_weapons_grid0 collapsible_entity_toggle">
+					      <select name='attr_V_M_weapon_aim' class='equipment_melee_weapons_gs01 full_width clear select_corection'>
+					        <option value='0' selected='selected'>No Aim (+0)</option>
+					        <option value='10'>Half Aim (+10)</option>
+					        <option value='20'>Full Aim (+20)</option>
+					      </select>
+					      <select name='attr_V_M_weapon_attack' class='equipment_melee_weapons_gs02 full_width clear select_corection'>
+					        <option value='10' selected='selected'>Standard (+10)</option>
+					        <option value='20'>Charge (+20)</option>
+					        <option value='30'>All Out (+30)</option>
+					      </select>
+					      <select name='attr_V_M_weapon_multi' class='equipment_melee_weapons_gs03 full_width clear select_corection'>
+					        <option value='0' selected='selected'>Standard (-0)</option>
+					        <option value='-10'>Swift (-10)</option>
+					        <option value='-20'>Lighting (-20)</option>
+					      </select>
+					    </div>
+					    <div class='equipment_melee_weapons_grid1 collapsible_entity_toggle collapsible_entity_toggle_min'>
+					      <div class='equipment_melee_weapons_gs1'>Name</div>
+					      <input class='equipment_melee_weapons_gs2 full_width' type='text' name='attr_V_M_weapon_name' />
+					      <div class='equipment_melee_weapons_gs3'>Class</div>
+					      <select class='equipment_melee_weapons_gs4 full_width select_corection' name='attr_R_weapon_class'>
+					        <option value='-'>N/A</option>
+					        <option value='Basic'>Basic</option>
+					        <option value='Heavy'>Heavy</option>
+					        <option value='Melee'>Melee</option>
+					        <option value='Pistol'>Pistol</option>
+					        <option value='Thrown'>Thrown</option>
+					      </select>
+					    </div>
+					    <div class='equipment_melee_weapons_grid2 collapsible_entity_toggle collapsible_entity_toggle_min'>
+					      <div class='equipment_melee_weapons_gs5'>Reach</div>
+					      <input class='equipment_melee_weapons_gs6 full_width' type='text' name='attr_V_M_weapon_reach' />
+					      <div class='equipment_melee_weapons_gs7'>Damage</div>
+					      <input class='equipment_melee_weapons_gs8 full_width' type='text' value='0' name='attr_V_M_weapon_dam-roll' />
+					      <div class='equipment_melee_weapons_gs9'>Pen</div>
+					      <input class='equipment_melee_weapons_gs10 full_width' type='text' value='0' name='attr_V_M_weapon_pen' />
+					      <div class='equipment_melee_weapons_gs11'>Type</div>
+					      <select class='equipment_melee_weapons_gs12 full_width select_corection' name='attr_V_M_weapon_type'>
+					        <option value='-'>N/A</option>
+					        <option value='Energy'>Energy</option>
+					        <option value='Impact'>Impact</option>
+					        <option value='Rending'>Rending</option>
+					        <option value='Explosive'>Explosive</option>
+					      </select>
+					    </div>
+					    <div class='equipment_melee_weapons_grid2a collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+					      <div class='equipment_melee_weapons_gs06'>Primitive</div>
+					      <input class='equipment_melee_weapons_gs07 full_width' type='number' value='0' name='attr_V_M_weapon_max' />
+					      <div class='equipment_melee_weapons_gs08'>Proven</div>
+					      <input class='equipment_melee_weapons_gs09 full_width' type='number' value='0' name='attr_V_M_weapon_min' />
+					      <div class='equipment_melee_weapons_gs010'>Vengeful</div>
+					      <input class='equipment_melee_weapons_gs011 full_width' type='number' value='0' name='attr_V_M_weapon_vengeful' />
+					      <input type='hidden' value='' name='attr_V_M_weapon_real_dmg' />
+					    </div>
+					    <div class='equipment_melee_weapons_grid3 collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+					      <div class='equipment_melee_weapons_gs13'>Trained?</div>
+					      <input class='equipment_melee_weapons_gs14' type='checkbox' value='20' name='attr_V_M_weapon_trained' checked />
+					      <div class='equipment_melee_weapons_gs15'>Hit Mod</div>
+					      <input class='equipment_melee_weapons_gs16 full_width' type='number' value='0' name='attr_V_M_weapon_mod1' />
+					      <div class='equipment_melee_weapons_gs17'>Weight</div>
+					      <input class='equipment_melee_weapons_gs18 full_width' type='text' value='0' name='attr_V_M_weapon_weight' />
+					      <div class='equipment_melee_weapons_gs19'>Domain</div>
+					      <select class='equipment_melee_weapons_gs20 full_width select_corection' name='attr_R_weapon_domain'>
+					        <option value='-'>N/A</option>
+					        <option value='Bolt'>Bolt</option>
+					        <option value='Chain'>Chain</option>
+					        <option value='Exotic'>Exotic</option>
+					        <option value='Exotic (Graviton)'>Exotic (Graviton)</option>
+					        <option value='Explosives'>Explosives</option>
+					        <option value='Flame'>Flame</option>
+					        <option value='Force'>Force</option>
+					        <option value='Grenades/Missiles'>Grenades/Missiles</option>
+					        <option value='Las'>Las</option>
+					        <option value='Launcher'>Launcher</option>
+					        <option value='Low-Tech'>Low-Tech</option>
+					        <option value='Melta'>Melta</option>
+					        <option value='Plasma'>Plasma</option>
+					        <option value='Power'>Power</option>
+					        <option value='Shock'>Shock</option>
+					        <option value='Solid-Projectile'>Solid Projectile</option>
+					        <option value='Varies'>Varies</option>
+					        <option value='Xenos(Eldar)'>Xenos (Eldar)</option>
+					        <option value='Xenos(Kroot)'>Xenos (Kroot)</option>
+					        <option value='Xenos(Lost Races)'>Xenos (Lost Races)</option>
+					        <option value='Xenos(Necron)'>Xenos (Necron)</option>
+					        <option value='Xenos(Ork)'>Xenos (Ork)</option>
+					      </select>
+					    </div>
+					    <div class='collapsible_entity_toggle collapsible_entity_toggle_min collapsible_entity_toggle_half'>
+					      <input name='attr_V_M_ability_r' type='text' placeholder='Special' class='full_width_49px border_none' />
+					      <label title='Expand' title='Expand' class='margin_adjust_wep'><input type='checkbox' name='attr_collapse' value='3' class='collapsible_entity_switch select_button hidden' /><span class='select_text radius_border_right_wep'>▼</span></label>
+					      <label title='Send description in the chat' class='margin_adjust_wep2'><button type='roll' value='@{to-gm}&{template:mythic} {{name=@{V_M_weapon_name} }} {{description=@{V_M_ability_desc_r} }}' class='hidden'></button><span class='select_text'>🔊</span></label>
+					      <input name='attr_collapse' type='checkbox' value='3' class='collapsible_entity_switch hidden' />
+					      <textarea name='attr_V_M_ability_desc_r' class='collapsible_entity_block description_rounded_margin' placeholder='Description'></textarea>
+					    </div>
+					  </div>
 					</fieldset>
 				</div>
 			</div>
@@ -2453,7 +2475,7 @@ NOTE: replace worker by javascript for IDE functionality
 		'parry','psyniscience','scrutiny','security','sleight','stealth','survival','tech_use',
 		'linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
 	let repeatingSkills = ['skill','linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
-	on('sheet:opened ' + skills.map(skill => `change:${skill}_char`).join(' ') + repeatingSkills.map(skill => `change:repeating_${skill}:${skill}_r_char`).join(' '), function () {
+	on('sheet:opened ' + skills.map(skill => `change:${skill}_char change:${skill}_name`).join(' ') + repeatingSkills.map(skill => `change:repeating_${skill}:${skill}_r_char change:repeating_${skill}:${skill}_r_name`).join(' '), function () {
 		console.log('== UPDATING SKILLS ==');
 		getAttrs(skills.map( skill => `${skill}_char`), (values) => {
 			let attr = {};
