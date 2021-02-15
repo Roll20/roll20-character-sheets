@@ -157,14 +157,19 @@
     </div>
     <div class="sheet-weaponlist-header">
         <label class="sheet-weaponlist-header-empty"></label>
+        <label class="sheet-weaponlist-header-filled">Тип</label>
         <label class="sheet-weaponlist-header-filled">Урон</label>
         <label class="sheet-weaponlist-header-filled">Качества</label>
     </div>
     <fieldset class="repeating_weaponlist">
         <div class="sheet-weaponlist-item">
             <input class="sheet-weaponname" type="text" name="attr_weapon">
+            <select class="sheet-weapontype" name="attr_atcktype">
+                <option value="@{dex}" selected="selected">Стрлк.</option>
+                <option value="@{str}">Ркп.</option>
+            </select>
             <input class="sheet-weapondice" type="text" name="attr_weapondice">
-            <button type="roll" value="@{template:default} {{урон=[[1d@{weapondice}]]}}"></button>
+            <button type="roll" name="atck_roll" value="&{template:atck} {{name=@{name}}} {{weaponname=@{weapon}}}{{dmg=[[1d@{weapondice}]]}} {{check=[[@{atcktype}]]}} {{result=[[1d20]]}}"></button>
             <input class="sheet-weaponattrs" type="text" name="attr_weaponattrs">
         </div>
     </fieldset>
@@ -190,6 +195,21 @@
         <input type="text" name="attr_stuff">
     </fieldset>
 </div>
+
+<rolltemplate class="sheet-rolltemplate-atck">
+    <div>{{name}} использует {{weaponname}} для атаки.</div>
+    <div>{{result}} vs {{check}}</div>
+    {{#rollTotal() result check}}
+    <div class="rollresult rollfail">ПРОВАЛ</div>
+    {{/rollTotal() result check}}
+    {{#rollLess() result check}}
+    <div class="rollresult rollsuccess">УСПЕХ</div>
+    <div>Урон: {{dmg}}</div>
+    {{/rollLess() result check}}
+    {{#rollGreater() result check}}
+    <div class="rollresult rollfail">ПРОВАЛ</div>
+    {{/rollGreater() result check}}
+</rolltemplate>
 
 <rolltemplate class="sheet-rolltemplate-init">
     <div>{{name}} определяет стартовые аттрибуты:</div>
