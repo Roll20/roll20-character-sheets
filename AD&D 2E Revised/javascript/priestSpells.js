@@ -1529,7 +1529,7 @@ pri4['Cloak of Bravery'] = {
     'components': 'V, S, M',
     'cast-time': '6',
     'saving-throw': 'Negate',
-    'materials': '*Cloak of bravery:* the feather of an eagle or hawk\n*Cloak of Fear:* the tail feathers of a vulture or chicken',
+    'materials': '*Cloak of bravery:* The feather of an eagle or hawk\n*Cloak of Fear:* The tail feathers of a vulture or chicken',
     'reference': 'PHB p. 274',
     'damage': '',
     'damage-type': '',
@@ -1537,23 +1537,23 @@ pri4['Cloak of Bravery'] = {
     'effect': 'The *cloak of bravery* spell can be cast upon any willing creature. The protected individual gains a bonus to his saving throw against any form of fear encountered (but not awe—an ability of some lesser and greater powers). When cast, the spell can affect one to four creatures (caster’s choice). If only one is affected, the saving throw bonus is +4. If two are affected, the bonus is +3, and so forth, until four creatures are protected by a +1 bonus. The magic of the *cloak of bravery* spell works only once and then the spell ends, whether or not the creature’s saving throw is successful. The spell ends after eight hours if no saving throw is required before then.\n&emsp;The reverse of this spell, *cloak of fear,* empowers a single creature touched to radiate a personal aura of fear, at will, out to a 3-foot radius. All other characters and creatures within this aura must roll successful saving throws vs. spell or run away in panic for [[2d8]] rounds. Affected individuals may or may not drop items, at the DM’s option.\n&emsp;The spell has no effect upon undead of any sort. The effect can be used only once, and the spell expires after eight hours if not brought down sooner. Members of the recipient’s party are not immune to the effects of the spell.'
 };
 
-pri4['Control Temperature, 10’ Radius'] = {
+pri4['Control Temperature, 10\' Radius'] = {
     'name': 'Control Temperature, 10’ Radius',
     'level': 'Level 4 Priest',
     'school': 'Alteration',
     'sphere': 'Weather',
     'range': '0',
     'duration': '[[4+[[@{level-priest}]] ]] turns',
-    'aoe': '10-ft. radius',
+    'aoe': '10-foot radius',
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'None',
-    'materials': 'a strip of willow bark (to lower temperatures) or raspberry leaves (to raise temperatures)',
+    'materials': 'A strip of willow bark (to lower temperatures) or raspberry leaves (to raise temperatures)',
     'reference': 'PHB p. 275',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the temperature surrounding the caster can be altered by up to [[10*[[@{level-priest}]] ]]° F., either upward or downward. Thus, a 10th-level caster could raise or lower the surrounding temperature from 1 to 100 degrees. The spell can be used to ensure the comfort of the caster and those with him in extreme weather conditions. The party could stand about in shirt sleeves during the worst blizzard (although it would be raining on them) or make ice for their drinks during a scorching heat wave.\n&emsp;The spell also provides protection from intense normal and magical attacks. If the extreme of temperature is beyond what could be affected by the spell (a searing blast of a fireball or the icy chill of a white dragon), the spell reduces the damage caused by [[5*[[@{level-caster}]] ]] points. Normal saving throws are still allowed, and the reduction is taken after the saving throw is made or failed. Once struck by such an attack, the spell immediately collapses.'
+    'effect': 'When this spell is cast, the temperature surrounding the caster can be altered by up to [[10*[[@{level-priest}]] ]]° F. ([[5.6*[[@{level-priest}]] ]]° C), either upward or downward. Thus, a 10th-level caster could raise or lower the surrounding temperature from 1 to 100 degrees F (1 to 55.6 degrees C). The spell can be used to ensure the comfort of the caster and those with him in extreme weather conditions. The party could stand about in shirt sleeves during the worst blizzard (although it would be raining on them) or make ice for their drinks during a scorching heat wave.\n&emsp;The spell also provides protection from intense normal and magical attacks. If the extreme of temperature is beyond what could be affected by the spell (a searing blast of a fireball or the icy chill of a white dragon), the spell reduces the damage caused by 5 points for every level of the caster. Currently [[5*[[@{level-priest}]] ]] points. Normal saving throws are still allowed, and the reduction is taken after the saving throw is made or failed. Once struck by such an attack, the spell immediately collapses.'
 };
 
 pri4['Cure Serious Wounds'] = {
@@ -1569,8 +1569,8 @@ pri4['Cure Serious Wounds'] = {
     'saving-throw': 'None',
     'materials': '',
     'reference': 'PHB p. 275',
-    'damage': '[[2d8+1]]',
-    'damage-type': 'Negative energy',
+    'damage': '',
+    'damage-type': '',
     'healing': '[[2d8+1]]',
     'effect': 'This spell is a more potent version of the *cure light wounds* spell. When laying his hand upon a creature, the priest heals 2d8+1 points of wound or other injury damage to the creature’s body. This healing cannot affect noncorporeal, nonliving, or extraplanar creatures.\n&emsp;*Cause serious wounds,* the reverse of the spell, operates similarly to the *cause light wounds* spell, the victim having to be touched first. If the touch is successful, 2d8+1 points of damage are inflicted.'
 };
@@ -1581,17 +1581,17 @@ pri4['Detect Lie'] = {
     'school': 'Divination (Reversible)',
     'sphere': 'Divination',
     'range': '30 yards',
-    'duration': '[[@{level-priest}]] rds.',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': '1 creature',
     'components': 'V, S, M',
     'cast-time': '7',
     'saving-throw': 'Negate',
-    'materials': 'one gp worth of gold dust or brass dust for the reverse',
+    'materials': '*Detect lie*: One gp worth of gold dust.\n*Undetectable lie*: Brass dust',
     'reference': 'PHB p. 275',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A priest who casts this spell is immediately able to determine if the subject creature deliberately and knowingly speaks a lie. It does not reveal the truth, uncover unintentional inaccuracies, or necessarily reveal evasions. The subject receives a saving throw vs. spell, which is adjusted only by the Wisdom of the caster ([[@{wisdef}]])—for example, if the caster has a Wisdom of 18, the subject’s saving throw roll is reduced by 4 (see Table 5: Wisdom). The spell’s reverse, *undetectable lie,* prevents the magical detection of lies spoken by the creature for 24 hours.'
+    'effect': 'A priest who casts this spell is immediately able to determine if the subject creature deliberately and knowingly speaks a lie. It does not reveal the truth, uncover unintentional inaccuracies, or necessarily reveal evasions. The subject receives a saving throw vs. spell, which is adjusted only by the Wisdom of the *caster* ([[@{wisdef}]])—for example, if the caster has a Wisdom of 18, the subject’s saving throw roll is reduced by 4 (see Table 5: Wisdom). The spell’s reverse, *undetectable lie,* prevents the magical detection of lies spoken by the creature for 24 hours.'
 };
 
 pri4['Divination'] = {
@@ -1676,7 +1676,7 @@ pri4['Hold Plant'] = {
     'school': 'Enchantment/Charm',
     'sphere': 'Plant',
     'range': '80 yards',
-    'duration': '[[@{level-priest}]] rds.',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': '[[1d4]] plants in 40-ft. sq.',
     'components': 'V, S',
     'cast-time': '7',
@@ -1828,7 +1828,7 @@ pri4['Reflecting Pool'] = {
     'school': 'Divination',
     'sphere': 'Divination',
     'range': '10 yards',
-    'duration': '[[@{level-priest}]] rds.',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': 'Special',
     'components': 'V, S, M',
     'cast-time': '2 hrs.',
@@ -1866,7 +1866,7 @@ pri4['Speak With Plants'] = {
     'school': 'Alteration',
     'sphere': 'Plant',
     'range': '0',
-    'duration': '[[@{level-priest}]] rds.',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': '30-ft. radius',
     'components': 'V, S, M',
     'cast-time': '1 turn',
@@ -1904,7 +1904,7 @@ pri4['Sticks to Snakes'] = {
     'school': 'Alteration (Reversible)',
     'sphere': 'Plant',
     'range': '30 yards',
-    'duration': '[[2*[[@{level-priest}]] rds.',
+    'duration': '[[2*[[@{level-priest}]] rounds',
     'aoe': '[[1d4+[[@{level-priest}]] ]] sticks in a 10-ft cube',
     'components': 'V, S, M',
     'cast-time': '7',
