@@ -4367,6 +4367,7 @@
 
 				<ul>
 					<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
+					<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13194,6 +13195,7 @@ visualize what it will look like in chat.
 
 			<ul>
 				<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
+				<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
 			</ul>
 
 			<h4>Version 2.6.2</h4>
@@ -29241,15 +29243,43 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		if (advantage.Modifier && advantage.Modifier.length) {
 
-			advantage.Modifier.forEach( modifier => {
+			for (let i = 0; i < advantage.Modifier.length; i++) {
 
-				arrNotes.push(`${modifier.name}, ${modifier.value}`);
+				let modifier = advantage[i];
 
-			});
+				let theNote = `${modifier.name}, ${modifier.value}`;
 
-		} else if (advantage.Modifier) {
+				let subNote = "";
+
+				// if there's sub-modifiers, get them
+				if (modifier.Modifier) {
+					
+					subNote = getGcaModifierNotes(advantage);
+
+					theNote += `(${subNote})`;
+
+				}
+
+				arrNotes.push(theNote);
+
+			}
 			
-			arrNotes.push(`${advantage.Modifier.name}, ${advantage.Modifier.value}`);
+		} else if (advantage.Modifier) {
+
+			let theNote = `${advantage.Modifier.name}, ${advantage.Modifier.value}`;
+
+			let subNote = "";
+
+			// if there's sub-modifiers, get them
+			if (advantage.Modifier.Modifier) {
+				
+				subNote = getGcaModifierNotes(advantage.Modifier);
+
+				theNote += `(${subNote})`;
+
+			}
+
+			arrNotes.push(theNote);
 
 		}
 
