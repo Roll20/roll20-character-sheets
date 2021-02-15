@@ -20,10 +20,17 @@ Change Log
 2021-01-11 - 2021-01-15
 	Updated repeating items formatting
 	Updated repeating items to make specialization and expertise buttons 15 characters if the actual display name is greater than 15
-2021-01-16 - 2021-02-06
+2021-01-16 - 2021-02-07
 	Revamped Weapons->Melee to remove unused fields (Reach, AP, etc) and add range blocks and Specialization and Expertise checkboxes.
-	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons.
+	Added functionality so if Close Combat skill rating is changed it updates the dice roller for melee weapons that use that skill.
 	Added dicepool to Weapons->Melee display
+	Revamped Weapons->Range to remove unused fields
+	Added functionality so if Firearms skill rating is changed it updates the dice roller for ranged weapons that use that skill.
+	Added dicepool to Weapons->Range display
+2021-02-08 - 2021-02-14
+	Updated Arms->Armor
+	Added "Modifications" text area to Augs and Gear for future functionality.
+	Updated Core Combat Info->Primary Melee Weapon section to display the new data
 	
 
 
