@@ -15,7 +15,8 @@
   <div class="sheet-col">
     <label>Escala:</label><input type="text" name="attr_escala"/><br/>
 	<label>Mundo:</label><input type="text" name="attr_mundo"/><br/>
-    <label>Dinheiro:</label><input type="number" value="0" name="attr_dinheiro"/>
+    <label>Dinheiro:</label><input type="number" value="0" name="attr_dinheiro"/><br/>
+	<p hidden><button type='roll' name="roll_forca" value='&{template:3dtatributo} {{name= Teste de Força}} {{character=@{character_name}}} {{type=Usando Força}} {{ability=[[1d6]]}} {{atributo=[[@{forca}+@{bf}+?{Modificador|0}]]}}'></button></p>
 </div>
 </div>	
  <hr>
@@ -342,3 +343,156 @@
   <div class="sheet-block-q">    
   </div>	
  </div>
+
+<!-- TEMPLATE ATRIBUTOS-->
+<rolltemplate class="sheet-rolltemplate-3dtatributo">
+    <div class="bordertop"></div>
+    <div class="container">
+
+        <div><h1>{{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+        
+        
+        {{#ability}}
+            <div class="rowcolor"><span class="tcat">{{type}}:</span> {{ability}}</div>
+                {{#^rollGreater() ability atributo }}
+                    <span class="fullcrit">Teste bem sucedido! </span>
+                {{/^rollGreater() ability atributo }}
+                {{#rollGreater() ability atributo}}
+                    <span class="fullfail">Fracassou...</span>
+                {{/rollGreater() ability atributo}}
+        {{/ability}}
+    
+    </div>
+</rolltemplate>
+
+
+<!-- TEMPLATE ATAQUES-->
+<rolltemplate class="sheet-rolltemplate-3dtataque">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques de Perto -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>        
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                    <div class="rowcolor"><span class="tcat">Dano:</span> {{danofa}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{/^rollWasCrit() ataque-pa}}
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit">Acerto crítico!</span>
+                    {{#rollGreater() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danofacrit}}</div>
+                        {{/rollGreater() dano 1 }}
+               {{/rollWasCrit() ataque-pa}}              
+            {{/dano}}	
+        {{/ataque-pa}}
+		
+		<!-- Ataques a Distância -->
+        {{#ataque-dis}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>  
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dis}}</div>
+             {{#dano}}
+               {{#^rollWasCrit() ataque-dis}}
+                    {{#rollGreater() dano 0 }}
+                    <div class="rowcolor"><span class="tcat">Dano:</span>{{danofapf}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{/^rollWasCrit() ataque-dis}}
+                {{#rollWasCrit() ataque-dis}}
+                    <span class="fullcrit">Acerto crítico!</span>
+                    {{#rollGreater() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danofapfcrit}}</div>
+                        {{/rollGreater() dano 1 }}
+               {{/rollWasCrit() ataque-dis}}              
+            {{/dano}}	    
+        {{/ataque-dis}}      
+    </div>
+</rolltemplate>
+
+<!-- TEMPLATE DEFESAS -->
+<rolltemplate class="sheet-rolltemplate-3dtdef">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Defesa Normal -->
+        <div><h1>{{name}}</h1></div>
+        {{#def_norm}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>        
+        <div class="rowcolor"><span class="tcat">Defendeu:</span> {{def_norm}}</div>
+            {{#defn}}
+               {{#^rollWasCrit() def_norm}}
+                    {{#rollGreater() defn 0 }}
+                    <div class="rowcolor"><span class="tcat">Defesa:</span>{{defn}}</div>
+                    {{/rollGreater() defn 0 }}
+                    {{/^rollWasCrit() def_norm}}
+                {{#rollWasCrit() def_norm}}
+                    <span class="fullcrit">Acerto crítico!</span>
+                    {{#rollGreater() defncrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Defesa crítica:</span> {{defncrit}}</div>
+                        {{/rollGreater() defncrit 1 }}
+               {{/rollWasCrit() def_norm}}              
+            {{/defn}}	
+        {{/def_norm}}
+		
+        {{#def_sup}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>  
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dis}}</div>
+             {{#dano}}
+               {{#^rollWasCrit() ataque-dis}}
+                    {{#rollGreater() dano 0 }}
+                    <div class="rowcolor"><span class="tcat">Surpreendido:</span>{{surp}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{/^rollWasCrit() attack-ftf}}
+                {{#rollWasCrit() attack-ftf}}
+                    <span class="fullcrit">Acerto crítico!</span>
+                    {{#rollGreater() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Surpreendido crítico:</span> {{surpcritt}}</div>
+                        {{/rollGreater() dano 1 }}
+               {{/rollWasCrit() ataque-dis}}              
+            {{/dano}}	    
+        {{/def_sup}} 
+		
+		{{#def_indef}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>  
+        <div class="rowcolor"><span class="tcat">Indefeso:</span> {{indef}}</div>
+		{{/def_indef}}
+    </div>
+</rolltemplate>
+
+
+<rolltemplate class="sheet-rolltemplate-3dtiniciativa">
+    <div class="bordertop"></div>
+    <div class="container">
+        <div><h1>{{name}}</h1></div>
+        <div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+		<div><span style="font-weight: bold;">Tirou de iniciativa:</span>{{iniciativa}}</div>
+		
+</rolltemplate>		
+
+<!-- TEMPLATE MAGIA-->
+<rolltemplate class="sheet-rolltemplate-3dtmagia">
+    <div class="bordertop"></div>
+    <div class="container">
+
+        <div><h1>{{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+		<div><span style="font-weight: bold;">Magia:</span>{{Magia}}</div>
+		<div><span style="font-weight: bold;">Escola:</span>{{Escola}}</div>
+		<div><span style="font-weight: bold;">Custo:</span>{{Custo}}<span>PM</span></div>
+		<div><span style="font-weight: bold;">PV:</span>{{PV}}<span>por turno</span></div>
+		<div><span style="font-weight: bold;">Alcance:</span>{{Alcance}}</div>
+		<div><span style="font-weight: bold;">Duração:</span>{{Duração}}</div>
+		<div><span>Tirou</span>{{resultado}}</div><span>no resultado!!!</span>
+		</div>
+		
+</rolltemplate>		
