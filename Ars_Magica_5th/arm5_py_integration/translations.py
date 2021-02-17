@@ -6,6 +6,7 @@ TRANSLATION_ATTRS = (
         ("ability", "Abiliy", "ability"),
         ("armor", "Armor", "armor"),
         ("artes", "Artes Lib.", "artes-lib-"),
+        ("ask", "Ask", "ask"),
         ("attack", "Attack", "attack"),
         ("aura", "Aura", "aura"),
         ("bold", "Bold", "gestures-bold"),
@@ -38,6 +39,7 @@ TRANSLATION_ATTRS = (
         ("subtle", "Subtle", "gestures-subtle"),
         ("technique", "Technique", "technique"),
         ("total", "Total", "total"),
+        ("unselected", "Unselected", "unselected"),
         ("words", "Words", "words"),
         ("words-none", "None", "words-none"),
         ("wounds", "Wounds", "wounds"),
@@ -52,7 +54,11 @@ translation_attrs = "\n".join(
     for attr, default, tkey in TRANSLATION_ATTRS
 )
 
-translation_attrs_setup = ",\n".join(
-    """"%s_i18n": getTranslationByKey("%s")""" % (attr, tkey)
-    for attr, default, tkey in TRANSLATION_ATTRS
+translation_attrs_setup = (
+    "setAttrs({\n    "
+    + ",\n    ".join(
+        """"%s_i18n": getTranslationByKey("%s")""" % (attr, tkey)
+        for attr, default, tkey in TRANSLATION_ATTRS
+    )
+    + "\n});"
 )
