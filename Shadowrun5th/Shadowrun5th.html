@@ -10523,7 +10523,12 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
-                        for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+						if(attr_expImport && !!chummerfile.characters.character.skills.skill[0].name_english) {
+							addSkillsNightly();
+						}
+						else {
+
+						for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                             if(chummerfile.characters.character.skills.skill[i].name=="Alchemy"){
                                 alchemy=i;
                             }
@@ -10603,7 +10608,8 @@ on("change:chummercheckbox", function(){
                                 }
                             }
                         }
-                    }catch(err){
+							}
+					}catch(err){
                         goodcode=false;
                         error="Error with Skills"
                     }
@@ -10692,6 +10698,95 @@ on("change:chummercheckbox", function(){
         }
     });
 });
+
+function addSkillsNightly() {
+	console.log("Reading skills nightly");
+    for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+        if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
+            alchemy=i;
+        }
+        if(chummerfile.characters.character.skills.skill[i].name_english=="Spellcasting"){
+            spellcasting=i;
+        }
+        if(chummerfile.characters.character.skills.skill[i].name_english=="Ritual Spellcasting"){
+            ritual=i;
+        }
+        if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
+        console.log("Reading knowledge skill");
+            var newrowid=generateRowID();
+            attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name_english;
+            if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null)
+                attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
+            if(chummerfile.characters.character.skills.skill[i].rating>0){
+                attributes["repeating_knowledge_"+newrowid+"_knowledgerating"]=chummerfile.characters.character.skills.skill[i].rating;
+                attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+            }else{
+                attributes["repeating_knowledge_"+newrowid+"_knowledgerating"]="-1";
+                attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+            }
+            if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                attributes["repeating_knowledge_"+newrowid+"_knowledgespec"]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+            else
+                attributes["repeating_knowledge_"+newrowid+"_knowledgespec"]="none";
+        }
+
+        if(chummerfile.characters.character.skills.skill[i].exotic=="True"){
+                console.log("Reading exotic skill");
+            attributes["skillname"+exotics]=chummerfile.characters.character.skills.skill[i].name_english;
+            if(chummerfile.characters.character.skills.skill[i].rating>0){
+                attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                attributes["skillrating"+exotics]=chummerfile.characters.character.skills.skill[i].rating;
+            }else{
+                attributes["skillrating"+exotics]="-1";
+                attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+            }
+            attributes["skillattr"+exotics]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
+            if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                attributes["skillspec"+exotics]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+            else
+                attributes["skillspec"+exotics]="none";
+            exotics++;
+        }
+
+        for(var j=1;j<73;j++){
+             console.log("Reading normal skills");
+            var compname='skillname'+j;
+            if((names[compname]==chummerfile.characters.character.skills.skill[i].name_english)||(chummerfile.characters.character.skills.skill[i].name_english=="Locksmith"&&j==29)||(chummerfile.characters.character.skills.skill[i].name_english=="Pilot Ground Craft"&&j==55)){
+                attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
+                if(chummerfile.characters.character.skills.skill[i].rating>0){
+                    attributes["skillrating"+j]=chummerfile.characters.character.skills.skill[i].rating;
+                    attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                }else{
+                    attributes["skillrating"+j]="-1";
+                    attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                }
+                if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                    attributes["skillspec"+j]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+                else
+                    attributes["skillspec"+j]="none";
+                if(chummerfile.characters.character.weapons!=null){
+                    if(chummerfile.characters.character.weapons.weapon.length>1){
+                        for(var h=1;h<chummerfile.characters.character.weapons.weapon.length+1&&h<=6;h++){
+                            if(chummerfile.characters.character.weapons.weapon[h-1].category!="Gear"){
+                                if(names[compname]==chummerfile.characters.character.weapons.weapon[h-1].skill){
+                                    attributes["weaponcategory"+h]="@{skilldicepool"+j+"}";
+                                    attributes["weaponbonus"+h]=chummerfile.characters.character.weapons.weapon[h-1].dicepool-chummerfile.characters.character.skills.skill[i].total;
+                                }
+                            }
+                        }
+                    }else{
+                        if(chummerfile.characters.character.weapons.weapon.category!="Gear"){
+                            if(names[compname]==chummerfile.characters.character.weapons.weapon.skill){
+                                attributes["weaponcategory1"]="@{skilldicepool"+j+"}";
+                                attributes["weaponbonus1"]=chummerfile.characters.character.weapons.weapon.dicepool-chummerfile.characters.character.skills.skill[i].total;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 on("change:wil_base change:wil_aug", function() {
     getAttrs(["wil_base", "wil_aug"], function(value){
