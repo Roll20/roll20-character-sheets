@@ -1,6 +1,6 @@
 <!-- Agone Character Sheet -->
 
-<!-- Version 0.6 -->
+<!-- Version 0.6.1 -->
 <!-- Author: Le Grand Dragon de la Foudre -->
 <!-- Website: http://legdf.free.fr-->
 
@@ -19,9 +19,9 @@
 			<span>Points de Vie</span>
 			<input type="number" class="pc-summary-state-first-full" name="attr_pcHP" title="Point(s) de Vie actuel(s)">
 			<input type="number" class="pc-summary-state-second-full" name="attr_pcHP_max" title="Points de Vie totaux" readonly>
-			<span>Jets génériques (ouvert/fermé)</span>
-			<button class="dice pc-summary-rolls-first-full" type="roll" value="&{template:agone-generic} {{name=@{character_name}}} {{Roll=Générique : [[1d10!+?{Base|0}+?{Bonus/Malus|0}]]}}" name="roll_pc-generic-open" title="Jet ouvert"></button>
-			<button class="dice pc-summary-rolls-second-full" type="roll" value="&{template:agone-generic} {{name=@{character_name}}} {{Roll=Générique : [[1d10+?{Base|0}+?{Bonus/Malus|0}]]}}" name="roll_pc-generic-open" title="Jet fermé"></button>
+			<span>Jet générique (ouvert/fermé)</span>
+			<button class="dice pc-summary-rolls-first-full" type="roll" value="&{template:agone-generic} {{name=@{character_name}}} {{Roll=[[1d10!+?{Base|0}+?{Bonus/Malus|0}]]}}" name="roll_pc-generic-open" title="Jet ouvert"></button>
+			<button class="dice pc-summary-rolls-second-full" type="roll" value="&{template:agone-generic} {{name=@{character_name}}} {{Roll=[[1d10+?{Base|0}+?{Bonus/Malus|0}]]}}" name="roll_pc-generic-open" title="Jet fermé"></button>
 			<span>Points d'Héroïsme</span>
 			<input type="number" class="pc-summary-state-first-full" name="attr_pcFP" title="Point(s) d'Héroïsme actuel(s)">
 			<input type="number" class="pc-summary-state-second-full" name="attr_pcFP_max" title="Points d'Héroïsme totaux" readonly>
@@ -42,8 +42,8 @@
 			<input type="number" class="half-number item-left" name="attr_pcArmorPerceptionPenalty" title="Malus de perception de l'armure" readonly>
 			<span>Initiative / Esquive / Défense Naturelle</span>
 			<button class="dice pc-summary-rolls-first-full" type="roll" value="&{template:agone-initiative} {{name=@{selected|character_name}}} {{Initiative=[[1d10+@{pcInit}+?{Bonus/Malus|0} &{tracker}]]}}" name="roll_pc-init"></button>
-			<button class="dice item-right" type="roll" value="&{template:agone-dodge} {{name=@{character_name}}} {{Dodge=[[1d10!+@{pcDodgeTotal}+?{Bonus/Malus|@{pcArmorPERPenalty}}]]}}" name="roll_pc-dodge"></button>
-			<button class="dice item-left" type="roll" value="&{template:agone-natural-defense} {{name=@{character_name}}} {{NaturalDefense=[[1d10!+@{pcNaturalDefense}+?{Bonus/Malus|@{pcArmorPERPenalty}}]]}}" name="roll_pc-natural-defense"></button>
+			<button class="dice item-right" type="roll" value="&{template:agone-dodge} {{name=@{character_name}}} {{Dodge=[[1d10!+@{pcDodgeTotal}+?{Bonus/Malus|@{pcArmorAGIPenalty}}]]}}" name="roll_pc-dodge"></button>
+			<button class="dice item-left" type="roll" value="&{template:agone-natural-defense} {{name=@{character_name}}} {{NaturalDefense=[[1d10!+@{pcNaturalDefense}+?{Bonus/Malus|@{pcArmorAGIPenalty}}]]}}" name="roll_pc-natural-defense"></button>
 			<span>Blessure(s) Grave(s)</span>
 			<input type="number" name="attr_pcSeriousWound" class="pc-summary-state-first-full" title="Blessure(s) Grave(s) encaissée(s)" value="0">
 			<input type="number" name="attr_pcSeriousWoundPenalty" class="pc-summary-state-second-full" title="Malus concernant la ou les Blessure(s) Grave(s)" readonly>
@@ -1527,7 +1527,7 @@
 <rolltemplate class="sheet-rolltemplate-agone-generic">
 	<div class="sheet-template-container">
 		<div class="sheet-template-header">{{name}}</div>
-		<div class="sheet-template-row"><span>{{Roll}}{{#rollWasCrit() Roll}}<span class="explode">j</span>{{/rollWasCrit() Roll}}{{#rollWasFumble() Roll}}<span class="implode">a</span>{{/rollWasFumble() Roll}}</span></div>
+		<div class="sheet-template-row"><span>Générique : {{Roll}}{{#rollWasCrit() Roll}}<span class="explode">j</span>{{/rollWasCrit() Roll}}{{#rollWasFumble() Roll}}<span class="implode">a</span>{{/rollWasFumble() Roll}}</span></div>
 	</div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-agone-chars">
@@ -1901,8 +1901,8 @@
 						let art = v['repeating_pc-arts_'+id+'_pcArtName'];
 						let apt = v['repeating_pc-arts_'+id+'_pcArtAptitude'];
 						let imp = v['repeating_pc-arts_'+id+'_pcArtImproAptitude'];
-						s += art+', '+'&{template:agone-art&#125; {{name=@{character_name}&#125;&#125; {{Art='+art+' [[1d10!+'+apt+'+?{Bonus/Malus&#124;0&#125;]]&#125;&#125;|';
-						s += art+' (impro), '+'&{template:agone-art-impro&#125; {{name=@{character_name}&#125;&#125; {{Art (impro)='+art+' (impro) [[1d10!+'+imp+'+?{Bonus/Malus&#124;0&#125;]]&#125;&#125;|';
+						s += art+', '+'&{template:agone-art&#125; {{name=@{character_name}&#125;&#125; {{Art='+art+' : [[1d10!+'+apt+'+?{Bonus/Malus&#124;0&#125;]]&#125;&#125;|';
+						s += art+' (impro), '+'&{template:agone-art-impro&#125; {{name=@{character_name}&#125;&#125; {{Art (impro)='+art+' (impro) : [[1d10!+'+imp+'+?{Bonus/Malus&#124;0&#125;]]&#125;&#125;|';
 						if (i == r.length - 1) {
 							s = s.slice(0, -1);
 							s += '}';

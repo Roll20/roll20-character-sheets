@@ -51,3 +51,8 @@ const setAttributes = (update, silent) => silent && typeof update === 'object' ?
 const sliceAttr = attribute => attribute.slice(2, -1)
 
 const sumIntegers = numbers => numbers.reduce((a,b) => a + b, 0)
+
+//enable name edit
+
+on(`clicked:edit_npc_name`, eventInfo => setAttrs({npc_name_toggle:"on"}));
+on(`clicked:save_npc_name`, eventInfo => setAttrs({npc_name_toggle:"0"}));
