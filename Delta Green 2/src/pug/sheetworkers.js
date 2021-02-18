@@ -328,7 +328,8 @@ on("clicked:levelup", () =>{
                 //console.log(val[`${sk}_fail`]);
                 //    console.log(`${sk}`);
                 if (val[`${sk}_fail`]=='on'){                    //if the checkbox is checked
-                    var_rnd=Math.floor(Math.random() * 4);       // generate a random number for each checked value (less number generated)
+                    //var_rnd=Math.floor(Math.random() * 4);       // generate a random number for each checked value (less number generated)
+                    var_rnd=Math.ceil(Math.random() * 4);       // generate a random number for each checked value (less number generated)
                     //console.log(`${idx}`);
                     summary[`${sk}`]=var_rnd;                    // how much the skill has changed 0-3
                     update[`${sk}`]=(parseInt(val[`${sk}`])||0)+var_rnd;  // new value of the skill
