@@ -23,6 +23,13 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 18th, 2021
+
+- Expanded the Capture Pokémon skill, allowing modifiers such as Capture Point to be applied
+- Improved the display of the Pokéball selection, and added a display of the effect that each has on the capture roll
+- Added a display of the total modifier to capture rolls
+- Added the option of configuring the default value for Custom Pokéballs
+
 ### Feb 11th, 2021
 
 - Resolved a small issue with the move repeating section where the button to collapse the fields would show a `+` instead of a `-`

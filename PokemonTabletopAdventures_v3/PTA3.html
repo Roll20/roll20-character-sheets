@@ -578,13 +578,15 @@
           <hr class="sheet-skill-separator" />
           <div class="sheet-capture-pokemon-skill sheet-tab-trainer">
             <input class="sheet-skill-color-setting" name="attr_capture_ability_mod" type="hidden" value="SPD" />
-            <input class="sheet-skill-total" name="attr_capture_total" readonly title="Attribute: capture_total" type="number" />
+            <input class="sheet-skill-total" name="attr_capture_total" readonly title="The value added to your skill check to hit a Pokémon with a Pokéball. Note - this can be ignored if the target Pokémon is at or below half of their max HP.
+            Attribute: capture_total" type="number" />
             <button class="sheet-skill-roller" name="roll_capturecheck" type="roll"
-              value="&{template:skill-roll} {{base-attribute=spd}} {{character-id=@{character_id}}} {{character-name=@{character_name}}} {{skill-name=Capture Pokémon}} {{skill-roll=[[ 1d20 + @{capture_total} ]] Capture Roll: [[ d100 @{ball_capture_modifier} + @{capture_roll_bonus} - @{capture_roll_feature_bonus} ]] }}">
+              value="&{template:skill-roll} {{base-attribute=spd}} {{character-id=@{character_id}}} {{character-name=@{character_name}}} {{skill-name=Capture Pokémon}} {{skill-roll=[[ 1d20 + @{capture_total} ]] Capture Roll: [[ d100 @{ball_capture_modifier} + @{capture_roll_bonus} ]] }}">
               Capture Pokémon (<span name="attr_capture_ability_mod"></span>)
             </button>
             <input name="attr_capture_default_custom_modifier" type="hidden" value="0" />
-            <select class="sheet-ball-picker" name="attr_ball_capture_modifier" title="Attribute: ball_capture_modifier">
+            <select class="sheet-ball-picker" name="attr_ball_capture_modifier" title="Select which Pokéball you want to use - this presumes the benefit is applied for conditional balls such as Quick Ball.
+            Attribute: ball_capture_modifier">
               <option value="+5" selected>Basic Ball</option>
               <option value="+0">Great Ball</option>
               <option value="-5">Ultra Ball</option>
@@ -616,10 +618,15 @@
               <option value="-100">Master Ball</option>
               <option value="+ ?{Custom Ball Modifier|@{capture_default_custom_modifier}}">Custom Ball</option>
             </select>
-            <input name="attr_capture_display" readonly title="Attribute: capture_display" type="text" />
-            <input name="attr_capture_roll_bonus" type="number" value="0" />
-            <input class="sheet-skill-total" name="attr_capture_roll_total" readonly type="text" />
-            <input name="attr_capture_roll_feature_bonus" type="hidden" />
+            <span title="The modifier applied to your capture rolls because of your selected Pokéball. This value can be configured for custom balls in the Configuration page.
+            Attribute: capture_display">
+              <b>Ball Mod:</b>
+              <input class="sheet-total-display" name="attr_capture_display" readonly type="text" />
+            </span>
+            <input name="attr_capture_roll_bonus" title="Use this field to assign a static modifier to your capture rolls - things like a Capture Specialist's Capture Point feature.
+            Attribute: capture_roll_bonus" type="number" value="0" />
+            <input class="sheet-skill-total sheet-total-display" name="attr_capture_roll_total" readonly title="The total modifier applied to your d100 capture rolls. If an asterisk * is shown, that means you've selected a custom ball.
+            Attribute: capture_roll_total" type="text" />
           </div>
         </div>
         <textarea class="sheet-inventory" name="attr_inventory" placeholder="Pokéballs, Berries, Medicine, Accessories, etc." spellcheck="false" title="Attribute: inventory"></textarea>
@@ -995,14 +1002,6 @@
         <input name="attr_capture_default_custom_modifier" title="Attribute: capture_default_custom_modifier" type="text" value="0" /><br />
         <p class="sheet-dark-text">
           This setting allows you to specify a default modifier to be used for the Custom Ball when capturing pokémon. You can use an attribute for this value.
-        </p>
-      </div>
-      <div class="sheet-capture-roll-feature-bonus">
-        <b title="Default value: 0">Feature Bonus to Capture:</b>
-        <b class="sheet-info-tooltip" title="Default value: 0"> ℹ </b>
-        <input name="attr_capture_roll_feature_bonus" title="Attribute: capture_roll_feature_bonus" type="text" value="0" /><br />
-        <p class="sheet-dark-text">
-          This setting allows you to define a numerical bonus to your capture rolls. This value will be subtracted from your capture rolls.
         </p>
       </div>
     </div>
@@ -2329,50 +2328,34 @@
     });
   });
 
-  on("change:ball_capture_modifier change:capture_roll_bonus change:capture_roll_feature_bonus sheet:opened", function () {
-    getAttrs(["ball_capture_modifier", "capture_default_custom_modifier", "capture_roll_bonus", "capture_roll_feature_bonus"], function (values) {
+  on("change:ball_capture_modifier change:capture_roll_bonus sheet:opened", function () {
+    getAttrs(["ball_capture_modifier", "capture_default_custom_modifier", "capture_roll_bonus"], function (values) {
 
       const ball = values.ball_capture_modifier;
       const bonus = parseInt(values.capture_roll_bonus) || 0;
 
       var display;
-      var showAsterisk = false;
+      var isCustomPokeball = false;
       if (ball.includes("Custom")) {
         display = values.capture_default_custom_modifier;
-        showAsterisk = true;
+        isCustomPokeball = true;
       } else {
          display = ball;
       }
       
-      
-      const feature = values.capture_roll_feature_bonus;
-      if (feature.includes("@{")) {
-        const stripped = feature.replace('@{', '').replace('}', '');
-
-        getAttrs([stripped], function (innerValue) {
-          const value = innerValue[`${stripped}`];
-          assignCaptureAttributesWith(bonus, value, display, showAsterisk);
-        });
+      var total = bonus;
+      if (isCustomPokeball) {
+        total = `${total}*`;
       } else {
-        const intFeature = parseInt(feature) || 0;
-        assignCaptureAttributesWith(bonus, intFeature, display, showAsterisk);
+        total += parseInt(display) || 0;
       }
+    
+      setAttrs({
+        "capture_display": display,
+        "capture_roll_total": total
+      });
     });
-  })
-
-  function assignCaptureAttributesWith(bonus, feature, display, isCustomPokeball) {
-    var total = bonus - feature;
-    if (isCustomPokeball) {
-      total = `${total}*`;
-    } else {
-      total += parseInt(display) || 0;
-    }
-  
-    setAttrs({
-      "capture_display"   : display,
-      "capture_roll_total": total
-    });
-  }
+  });
 
   function getSkillAttributes(statLabel, talent1Label, talent2Label, userBonusLabel, totalLabel) {
     getAttrs([statLabel, talent1Label, talent2Label, totalLabel, userBonusLabel], function (attributes) {
