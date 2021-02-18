@@ -580,12 +580,13 @@
             <input class="sheet-skill-color-setting" name="attr_capture_ability_mod" type="hidden" value="SPD" />
             <input class="sheet-skill-total" name="attr_capture_total" readonly title="Attribute: capture_total" type="number" />
             <button class="sheet-skill-roller" name="roll_capturecheck" type="roll"
-              value="&{template:skill-roll} {{base-attribute=spd}} {{character-id=@{character_id}}} {{character-name=@{character_name}}} {{skill-name=Capture Pokémon}} {{skill-roll=[[ 1d20 + @{capture_total} ]] Capture Roll: [[ d100 + @{ball_capture_modifier} ]] }}">
+              value="&{template:skill-roll} {{base-attribute=spd}} {{character-id=@{character_id}}} {{character-name=@{character_name}}} {{skill-name=Capture Pokémon}} {{skill-roll=[[ 1d20 + @{capture_total} ]] Capture Roll: [[ d100 @{ball_capture_modifier} + @{capture_roll_bonus} - @{capture_roll_feature_bonus} ]] }}">
               Capture Pokémon (<span name="attr_capture_ability_mod"></span>)
             </button>
-            <select class="sheet-ball-picker sheet-no-dropdown" name="attr_ball_capture_modifier" title="Attribute: ball_capture_modifier">
-              <option value="5" selected>Basic Ball</option>
-              <option value="0">Great Ball</option>
+            <input name="attr_capture_default_custom_modifier" type="hidden" value="0" />
+            <select class="sheet-ball-picker" name="attr_ball_capture_modifier" title="Attribute: ball_capture_modifier">
+              <option value="+5" selected>Basic Ball</option>
+              <option value="+0">Great Ball</option>
               <option value="-5">Ultra Ball</option>
               <option value="-20">Park Ball</option>
               <option value="-20">Safari Ball</option>
@@ -601,8 +602,8 @@
               <option value="-10">Repeat Ball</option>
               <option value="-10">1m Timer Ball</option>
               <option value="-25">2m Timer Ball</option>
-              <option value="0">Friend Ball</option>
-              <option value="0">Heal Ball</option>
+              <option value="+0">Friend Ball</option>
+              <option value="+0">Heal Ball</option>
               <option value="-10">Dream Ball</option>
               <option value="-15">Heavy Ball</option>
               <option value="-10">Level Ball</option>
@@ -613,8 +614,12 @@
               <option value="-12">Terrain Ball</option>
               <option value="-10">Save Ball</option>
               <option value="-100">Master Ball</option>
-              <option value="?{Custom Ball Modifier|0}">Custom Ball</option>
+              <option value="+ ?{Custom Ball Modifier|@{capture_default_custom_modifier}}">Custom Ball</option>
             </select>
+            <input name="attr_capture_display" readonly title="Attribute: capture_display" type="text" />
+            <input name="attr_capture_roll_bonus" type="number" value="0" />
+            <input class="sheet-skill-total" name="attr_capture_roll_total" readonly type="text" />
+            <input name="attr_capture_roll_feature_bonus" type="hidden" />
           </div>
         </div>
         <textarea class="sheet-inventory" name="attr_inventory" placeholder="Pokéballs, Berries, Medicine, Accessories, etc." spellcheck="false" title="Attribute: inventory"></textarea>
@@ -933,12 +938,12 @@
           <option value="grass">Grass</option>
           <option value="ground">Ground</option>
           <option value="ice">Ice</option>
-          <option value="normal" selected>Normal</option>
+          <option value="normal">Normal</option>
           <option value="poison">Poison</option>
           <option value="psychic">Psychic</option>
           <option value="rock">Rock</option>
           <option value="steel">Steel</option>
-          <option value="typeless">Typeless</option>
+          <option value="typeless" selected>Typeless</option>
           <option value="water">Water</option>
         </select>
         <p class="sheet-dark-text">
@@ -982,6 +987,22 @@
         <p class="sheet-dark-text">
           This setting area allows you to change the base ability modifier added to each skill total. Select the skill you want to modify with the left
           selector, and then assign the stat you want to use with the right selector.
+        </p>
+      </div>
+      <div class="sheet-custom-ball-default-selecton">
+        <b title="Default value: 0">Custom Ball Default:</b>
+        <b class="sheet-info-tooltip" title="Default value: 0"> ℹ </b>
+        <input name="attr_capture_default_custom_modifier" title="Attribute: capture_default_custom_modifier" type="text" value="0" /><br />
+        <p class="sheet-dark-text">
+          This setting allows you to specify a default modifier to be used for the Custom Ball when capturing pokémon. You can use an attribute for this value.
+        </p>
+      </div>
+      <div class="sheet-capture-roll-feature-bonus">
+        <b title="Default value: 0">Feature Bonus to Capture:</b>
+        <b class="sheet-info-tooltip" title="Default value: 0"> ℹ </b>
+        <input name="attr_capture_roll_feature_bonus" title="Attribute: capture_roll_feature_bonus" type="text" value="0" /><br />
+        <p class="sheet-dark-text">
+          This setting allows you to define a numerical bonus to your capture rolls. This value will be subtracted from your capture rolls.
         </p>
       </div>
     </div>
@@ -2299,7 +2320,7 @@
   });
 
   // Capture
-  on("change:SPDMOD change:capture sheet:opened", function () {
+  on("change:SPDMOD sheet:opened", function () {
     getAttrs([`SPDMOD`, `capture_total`], function (values) {
       const stat = parseInt(values.SPDMOD) || 0;
       const total = parseInt(values.capture_total) || -1;
@@ -2307,6 +2328,51 @@
       assignSkillTotal("capture_total", stat, 0, 0, total, 0);
     });
   });
+
+  on("change:ball_capture_modifier change:capture_roll_bonus change:capture_roll_feature_bonus sheet:opened", function () {
+    getAttrs(["ball_capture_modifier", "capture_default_custom_modifier", "capture_roll_bonus", "capture_roll_feature_bonus"], function (values) {
+
+      const ball = values.ball_capture_modifier;
+      const bonus = parseInt(values.capture_roll_bonus) || 0;
+
+      var display;
+      var showAsterisk = false;
+      if (ball.includes("Custom")) {
+        display = values.capture_default_custom_modifier;
+        showAsterisk = true;
+      } else {
+         display = ball;
+      }
+      
+      
+      const feature = values.capture_roll_feature_bonus;
+      if (feature.includes("@{")) {
+        const stripped = feature.replace('@{', '').replace('}', '');
+
+        getAttrs([stripped], function (innerValue) {
+          const value = innerValue[`${stripped}`];
+          assignCaptureAttributesWith(bonus, value, display, showAsterisk);
+        });
+      } else {
+        const intFeature = parseInt(feature) || 0;
+        assignCaptureAttributesWith(bonus, intFeature, display, showAsterisk);
+      }
+    });
+  })
+
+  function assignCaptureAttributesWith(bonus, feature, display, isCustomPokeball) {
+    var total = bonus - feature;
+    if (isCustomPokeball) {
+      total = `${total}*`;
+    } else {
+      total += parseInt(display) || 0;
+    }
+  
+    setAttrs({
+      "capture_display"   : display,
+      "capture_roll_total": total
+    });
+  }
 
   function getSkillAttributes(statLabel, talent1Label, talent2Label, userBonusLabel, totalLabel) {
     getAttrs([statLabel, talent1Label, talent2Label, totalLabel, userBonusLabel], function (attributes) {
