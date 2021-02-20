@@ -39,7 +39,7 @@ on(weaponDisplayEvent, generateWeaponDisplay);
 on("change:repeating_weapons:weapon_name", () => validateWeaponSkills());
 on("change:homebrew_skill_list", () => getSectionIDs("repeating_weapons", validateWeaponSkills));
 
-on("change:strain change:strain_permanent", validateStrain);
+on("change:strain_extra change:strain_permanent", calculateStrain);
 on("change:constitution", calculateMaxStrain);
 on("change:repeating_cyberware remove:repeating_cyberware", calculateCyberwareStrain);
 on("change:strain_permanent_extra change:cyberware_strain_total", calculatePermanentStrain);

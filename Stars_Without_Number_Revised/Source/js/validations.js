@@ -21,17 +21,17 @@ const validateSuperTab = () => {
         mySetAttrs(setting, v);
     });
 };
-const validateStrain = () => {
-    getAttrs(["strain", "strain_permanent", "strain_max"], v => {
-        const currentStrain = parseInt(v.strain) || 0,
-            permanentStrain = parseInt(v.strain_permanent) || 0,
-            strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain)) || 0;
-
-        if (strain !== currentStrain) setAttrs({
-            strain
-        });
-    });
-};
+// const validateStrain = () => {
+//     getAttrs(["strain", "strain_permanent", "strain_max"], v => {
+//         const currentStrain = parseInt(v.strain) || 0,
+//             permanentStrain = parseInt(v.strain_permanent) || 0,
+//             strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain)) || 0;
+//
+//         if (strain !== currentStrain) setAttrs({
+//             strain
+//         });
+//     });
+// };
 const validateWeaponSkills = (ids) => {
     // Makes sure that the select for the weapon skill is never in an invalid state.
     const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];

@@ -195,6 +195,21 @@ const upgradeSheet = (version, firstTime = false, finalTime = false) => {
             upgradeSheet("2.5.3")
         }
 
+
+        /** v2.6.0
+         * Move extra strain into strain_extra
+         */
+        else if (major === 2 && minor < 6) {
+            getAttrs(["strain", "strain_permanent", "strain_extra"], v => {
+                const strain_extra = (parseInt(v.strain || 0)) - (parseInt(v.strain_permanent) || 0)
+                mySetAttrs({
+                    strain_extra: strain_extra
+                }, v, () => {
+                    upgradeSheet("2.6.0")
+                })
+            })
+        }
+
         /** Final upgrade clause, always leave this around */
         else upgradeSheet(sheetVersion, false, true);
     };
