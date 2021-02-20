@@ -33,12 +33,13 @@ on Github.
 * Contributions are welcome at
   [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open
   a pull request.
-* You will need to install [Node.js](https://nodejs.org), then run the following
-  command in bash/cmd:
-  * npm install -g pug pug-cli sass jstransformer-uglify-es
-  * You may need to restart you computer.
-  * Then just make changes to the files in the Source folder, and use the file
-    "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+* You will need to install [Node.js](https://nodejs.org), then go to the Stars_without_Number_Revised folder and run the following
+  commands in bash/cmd:
+  * `npm install`
+  * `npm run dev`
+  
+Npm is now watching all the files for changes and compiling as you go.
+If you want to compile everything just once, use `npm build` instead.
 
 ## Changelog
 
