@@ -31,6 +31,10 @@ Change Log
 	Updated Arms->Armor
 	Added "Modifications" text area to Augs and Gear for future functionality.
 	Updated Core Combat Info->Primary Melee Weapon section to display the new data
+2021-02-15 - 
+	Updated Core Combat Info->Primary Ranged WEapon section to display the new weapon data better
+	Updated Core Combat Info->Armor section, now it's a soak damage button (body), Defense Rating box and Resists.  Still need to make the info update as armor is added in Arms->Armor
+	
 	
 
 
