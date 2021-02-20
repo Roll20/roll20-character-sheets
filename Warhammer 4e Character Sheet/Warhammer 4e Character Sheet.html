@@ -16919,11 +16919,19 @@
 				</div>
 			</div>
 			<div class="sheet-row sheet-sub-header">
-				<div class="sheet-col-1-7 sheet-center sheet-small-label sheet-pad-r-sm">
+				<div class="sheet-col-1-7 sheet-center sheet-small-label">
 					<span data-i18n="BRASS-PENNIES-BP">Brass Pennies (BP)</span>
 				</div>
-				<div class="sheet-col-1-7 sheet-center sheet-small-label sheet-pad-r-sm">
+				<div class="sheet-col-25-2 sheet-center sheet-small-label sheet-pad-r-sm">
+				</div>
+				<div class="sheet-col-25-2 sheet-center sheet-small-label sheet-pad-r-sm">
+				</div>
+				<div class="sheet-col-1-7 sheet-center sheet-small-label">
 					<span data-i18n="SILVER-SHILLINGS-SS">Silver Shillings (SS)</span>
+				</div>
+				<div class="sheet-col-25-2 sheet-center sheet-small-label sheet-pad-r-sm">
+				</div>
+				<div class="sheet-col-25-2 sheet-center sheet-small-label sheet-pad-r-sm">
 				</div>
 				<div class="sheet-col-1-7 sheet-center sheet-small-label sheet-pad-r-sm">
 					<span data-i18n="GOLD-CROWNS-GC">Gold Crowns (GC)</span>
@@ -16931,17 +16939,21 @@
 				<div class="sheet-col-1-7 sheet-center sheet-small-label sheet-pad-r-sm">
 					<span data-i18n="TOTAL-GC-VALUE">Total GC Value</span>
 				</div>
-				<div class="sheet-col-3-7 sheet-center sheet-small-label sheet-pad-r-sm">
+				<div class="sheet-col-1-3 sheet-center sheet-small-label sheet-pad-r-sm">
 					<span data-i18n="EXCHANGE-RATE">Exchange Rate</span>
 				</div>
 			</div>
 			<div class="sheet-row sheet-mar-b-md">
-				<div class="sheet-col-1-7 sheet-pad-r-sm" title="Brass Pennies"><input type="number" name="attr_bp" value="0" /></div>
-				<div class="sheet-col-1-7 sheet-pad-r-sm" title="Silver Shillings"><input type="number" name="attr_ss" value="0" /></div>
-				<div class="sheet-col-1-7 sheet-pad-r-sm" title="Gold Crowns"><input type="number" name="attr_gc" value="0" /></div>
-				<div class="sheet-col-1-7 sheet-pad-r-lg" title="Total (in Gold Crowns)"><input type="number" name="attr_money_total_gc" value="round(((@{BP} / 240) + (@{SS} / 20) + @{GC})*1000)/1000" disabled="true" /></div>
-				<div class="sheet-col-3-7 sheet-pad-t-sm sheet-pad-r-sm">
-					<span data-i18n="EXCHANGE-RATE-DESCRIPTION">240 brass pennies = 20 silver shilling = 1 gold crown</span>
+				<div class="sheet-col-1-7"><input type="number" name="attr_bp" value="0" /></div>
+				<div class="sheet-col-25-2 sheet-pad-r-sm" data-i18n-title="SILVER-TO-BRASS" title="Silver to Brass"><button type="action" name="act_sstobp" ><span><</span></button></div>
+				<div class="sheet-col-25-2 sheet-pad-r-sm" data-i18n-title="BRASS-TO-SILVER" title="Brass to Silver"><button type="action" name="act_bptoss" ><span>></span></button></div>
+				<div class="sheet-col-1-7"><input type="number" name="attr_ss" value="0" /></div>
+				<div class="sheet-col-25-2 sheet-pad-r-sm" data-i18n-title="GOLD-TO-SILVER" title="Gold to Silver"><button type="action" name="act_gctoss" ><span><</span></button></div>
+				<div class="sheet-col-25-2 sheet-pad-r-sm" data-i18n-title="SILVER-TO-GOLD" title="Silver to Gold"><button type="action" name="act_sstogc" ><span>></span></button></div>
+				<div class="sheet-col-1-7 sheet-pad-r-sm"><input type="number" name="attr_gc" value="0" /></div>
+				<div class="sheet-col-1-7 sheet-pad-r-sm"><input type="number" name="attr_money_total_gc" value="round(((@{BP} / 240) + (@{SS} / 20) + @{GC})*1000)/1000" disabled="true" /></div>
+				<div class="sheet-col-1-3 sheet-pad-t-sm sheet-pad-r-sm sheet-center">
+					<span style="font-size: 11px" data-i18n="EXCHANGE-RATE-DESCRIPTION">240 brass pennies = 20 silver shilling = 1 gold crown</span>
 				</div>
 			</div>
 			<!-- ENCUMBRANCE -->
@@ -18307,7 +18319,7 @@
 		<div class="sheet-spacer-xl"></div>
 		<!-- FOOTER -->
 		<div class="sheet-row sheet-footer">
-			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.33 : Feburary 1st 2021 | by Djjus & Pote</div>
+			<div class="sheet-col-1 sheet-small-label sheet-center">Sheet version 1.34 : Feburary 1st 2021 | by Djjus & Pote</div>
 		</div>
 		</div>
 	</div>		
@@ -26017,7 +26029,86 @@ on('change:repeating_advancements', function(){
 		});
 		});
 
+		on("clicked:gctoss", function() {
+			getAttrs(['gc', 'ss'], function(values) {
+				const currgc = +values.gc || 0; 
+				const currss = +values.ss || 0; 
+				
+				let newgc = currgc;
+				let newss = currss;
+				
+				if(values.gc > 0) {
+				newgc -=1;
+				newss +=20;
+				}
 
+			setAttrs({
+				gc: newgc,
+				ss: newss 
+				});
+			});
+		});
+		
+		on("clicked:sstogc", function() {
+			getAttrs(['gc', 'ss'], function(values) {
+				const currgc = +values.gc || 0; 
+				const currss = +values.ss || 0; 
+				
+				let newgc = currgc;
+				let newss = currss;
+				
+				if(values.ss > 19) {
+				newgc +=1;
+				newss -=20;
+				}
+
+			setAttrs({
+				gc: newgc,
+				ss: newss 
+				});
+			});
+		});		
+
+		on("clicked:bptoss", function() {
+			getAttrs(['bp', 'ss'], function(values) {
+				const currbp = +values.bp || 0; 
+				const currss = +values.ss || 0; 
+				
+				let newbp = currbp;
+				let newss = currss;
+				
+				if(values.bp > 11) {
+				newbp -=12;
+				newss +=1;
+				}
+
+			setAttrs({
+				bp: newbp,
+				ss: newss 
+				});
+			});
+		});
+		
+		on("clicked:sstobp", function() {
+			getAttrs(['bp', 'ss'], function(values) {
+				const currbp = +values.bp || 0; 
+				const currss = +values.ss || 0; 
+				
+				let newbp = currbp;
+				let newss = currss;
+				
+				if(values.ss > 0) {
+				newbp +=12;
+				newss -=1;
+				}
+
+			setAttrs({
+				bp: newbp,
+				ss: newss 
+				});
+			});
+		});		
+		
 		/* STAT MODIFIERS
 		This sheet worker loop calculates the values of all the 10 core attributes from their constituent parts, and their modifiers.
 		TotalWounds was dependent on a bunch of stats that were autocalc, so they needed to be replaced with sheet workers for it to work.

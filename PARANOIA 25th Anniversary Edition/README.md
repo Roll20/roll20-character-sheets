@@ -31,7 +31,8 @@ You should then update `translation.json` with the new default translation value
 4. Copy the returned string without the beginning and ending quotes if applicable.
 5. Remove backslashes from the escaped quotes if applicable.
 6. Prettify the JSON object. (You may do so by pasting the translation data in a Roll20 non-sandbox custom game, saving it, and copying it back.)
-7. Replace the contents of `translation.json` with the final output.
+7. Replace the contents of `translation.json` with the prettified output.
+8. **IMPORTANT** - Make sure that the "fallback_for" entry appears in-between "roll" and "rating", as due to a bug in Roll20, `i18nOutput` doesn't extract that entry automatically as of this writing.
 
 You should also update `paranoia25.png` with a new screenshot after loading the resulting `paranoia25.html`, `paranoia25.css` and `translation.json` in Roll20. As per Roll20's guidelines, the image should be 500x500 px. (For 1920x1080 screen resolutions, reducing the screenshot size by 59% before cropping it generates the best results.)
 
