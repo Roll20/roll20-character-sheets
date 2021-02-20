@@ -344,7 +344,7 @@ const generateWeaponDisplay = () => {
                 const weaponDamage = (v[`${prefix}_weapon_damage`] === "0") ? "" : v[`${prefix}_weapon_damage`];
                 const shockString = (v[`${prefix}_weapon_shock`] !== "0") ? `, ${
                     (parseInt(v[`${prefix}_weapon_shock_damage`])||0) + damageBonus
-                }\xa0${translate("SHOCK").toLowerCase()}${
+                }\xa0${translate("SHOCK").toString().toLowerCase()}${
                     v[`${prefix}_weapon_shock_ac`] ? ` ${translate("VS_AC_LEQ")} ${v[`${prefix}_weapon_shock_ac`]}` : ""
                 }` : "";
 
@@ -355,7 +355,7 @@ const generateWeaponDisplay = () => {
                     damageBonus);
 
                 setting[`${prefix}_weapon_attack_display`] = (attack >= 0) ? `+${attack}` : attack.toString();
-                setting[`${prefix}_weapon_damage_display`] = `${damage || 0}\xa0${translate("DAMAGE").toLowerCase()}${shockString}`;
+                setting[`${prefix}_weapon_damage_display`] = `${damage || 0}\xa0${translate("DAMAGE").toString().toLowerCase()}${shockString}`;
             });
             setting.macro_weapons = prefixes.map((prefix, index) => {
                 const label = `${v[`${prefix}_weapon_name`]} (${setting[`${prefix}_weapon_attack_display`]})`;

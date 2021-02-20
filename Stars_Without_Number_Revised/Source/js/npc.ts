@@ -7,9 +7,9 @@ const fillNPC = () => {
             const {
                 HD, AC, npc_attack_bonus, damage, attacks, npc_move,
                 npc_morale, npc_skills, npc_saves, armor_type
-            }: {[key: string]: string} = autofillData.statblocks[v.npc_stat_block];
+            }: {[key: string]: string | false} = autofillData.statblocks[v.npc_stat_block];
 
-            const setting: {[key: string]: string} = {
+            const setting: {[key: string]: string | false} = {
                 AC,
                 npc_attack_bonus,
                 npc_move,
@@ -19,7 +19,7 @@ const fillNPC = () => {
             };
 
             if (armor_type) setting.npc_armor_type = armor_type;
-            if (HD.includes("hp")) setting.HP = HD.replace("hp", "");
+            if (typeof HD === "string" && HD.includes("hp")) setting.HP = HD.replace("hp", "");
             else setting.npc_hd = HD;
 
             setAttrs(setting);

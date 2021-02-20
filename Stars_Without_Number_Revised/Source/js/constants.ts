@@ -50,27 +50,27 @@ const shipStats = ["ship_ac", "ship_armor", "ship_class", "ship_crew_max", "ship
     "ship_hardpoints_max", "ship_hp", "ship_hp_max", "ship_mass_max", "ship_power_max", "ship_speed", "ship_hull_price",
 ];
 const reverseHullTypes = {
-    [translate("BATTLESHIP").toLowerCase()]: "battleship",
-    [translate("BULK_FREIGHTER").toLowerCase()]: "bulk_freighter",
-    [translate("CARRIER").toLowerCase()]: "carrier",
-    [translate("CORVETTE").toLowerCase()]: "corvette",
-    [translate("FLEET_CRUISER").toLowerCase()]: "fleet_cruiser",
-    [translate("FREE_MERCHANT").toLowerCase()]: "free_merchant",
-    [translate("HEAVY_FRIGATE").toLowerCase()]: "heavy_frigate",
-    [translate("LARGE_STATION").toLowerCase()]: "large_station",
-    [translate("PATROL_BOAT").toLowerCase()]: "patrol_boat",
-    [translate("SMALL_STATION").toLowerCase()]: "small station",
-    [translate("STRIKE_FIGHTER").toLowerCase()]: "strike_fighter",
-    [translate("SHUTTLE").toLowerCase()]: "shuttle",
+    [translate("BATTLESHIP").toString().toLowerCase()]: "battleship",
+    [translate("BULK_FREIGHTER").toString().toLowerCase()]: "bulk_freighter",
+    [translate("CARRIER").toString().toLowerCase()]: "carrier",
+    [translate("CORVETTE").toString().toLowerCase()]: "corvette",
+    [translate("FLEET_CRUISER").toString().toLowerCase()]: "fleet_cruiser",
+    [translate("FREE_MERCHANT").toString().toLowerCase()]: "free_merchant",
+    [translate("HEAVY_FRIGATE").toString().toLowerCase()]: "heavy_frigate",
+    [translate("LARGE_STATION").toString().toLowerCase()]: "large_station",
+    [translate("PATROL_BOAT").toString().toLowerCase()]: "patrol_boat",
+    [translate("SMALL_STATION").toString().toLowerCase()]: "small station",
+    [translate("STRIKE_FIGHTER").toString().toLowerCase()]: "strike_fighter",
+    [translate("SHUTTLE").toString().toLowerCase()]: "shuttle",
 };
 const reverseClasses = {
-    [translate("ADVENTURER").toLowerCase()]: "adventurer",
-    [translate("EXPERT").toLowerCase()]: "expert",
-    [translate("PSYCHIC").toLowerCase()]: "psychic",
-    [translate("WARRIOR").toLowerCase()]: "warrior",
+    [translate("ADVENTURER").toString().toLowerCase()]: "adventurer",
+    [translate("EXPERT").toString().toLowerCase()]: "expert",
+    [translate("PSYCHIC").toString().toLowerCase()]: "psychic",
+    [translate("WARRIOR").toString().toLowerCase()]: "warrior",
 };
 const autofillSections = ["armor", "cyberware", "foci", "gear", "ship-defenses", "ship-fittings", "ship-weapons", "techniques", "weapons"];
-const autofillData: {[key: string]: {[key: string]: {[key: string]: string}}} = {
+const autofillData: {[key: string]: {[key: string]: {[key: string]: string | false}}} = {
     "classes": {
         adventurer: {
             class_ability: translate("ADVENTURER_CLASS_ABILITY"),
@@ -1274,7 +1274,7 @@ const autofillData: {[key: string]: {[key: string]: {[key: string]: string}}} = 
     "ship-defenses": {
         ablative_hull_compartments: {
             class: "CAPITAL",
-            defense_effect: `+1 ${translate("AC")}, +20 ${translate("MAXIMUM_HIT_POINTS").toLowerCase()}.`,
+            defense_effect: `+1 ${translate("AC")}, +20 ${translate("MAXIMUM_HIT_POINTS").toString().toLowerCase()}.`,
             defense_mass: "2#",
             defense_power: "5",
             defense_price: "100000*",

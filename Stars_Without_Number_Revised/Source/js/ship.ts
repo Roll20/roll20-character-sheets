@@ -20,15 +20,15 @@ const setShipClass = () => {
     // Sets the internal ship_class_normalised attribute responsible
     // for filtering ship modules according to class.
     getAttrs(["ship_class", "ship_class_normalised"], v => {
-        if (["fighter", translate("FIGHTER").toLowerCase()].includes(v.ship_class.toLowerCase()))
+        if (["fighter", translate("FIGHTER").toString().toLowerCase()].includes(v.ship_class.toLowerCase()))
             setAttrs({
                 ship_class_normalised: "fighter"
             });
-        else if (["frigate", translate("FRIGATE").toLowerCase()].includes(v.ship_class.toLowerCase()))
+        else if (["frigate", translate("FRIGATE").toString().toLowerCase()].includes(v.ship_class.toLowerCase()))
             setAttrs({
                 ship_class_normalised: "frigate"
             });
-        else if (["cruiser", translate("CRUISER").toLowerCase()].includes(v.ship_class.toLowerCase()))
+        else if (["cruiser", translate("CRUISER").toString().toLowerCase()].includes(v.ship_class.toLowerCase()))
             setAttrs({
                 ship_class_normalised: "cruiser"
             });
