@@ -1,6 +1,5 @@
 ///<reference path="constants.ts"/>
 ///<reference path="util.ts"/>
-/* global getAttrs, setAttrs, getSectionIDs, generateRowID, on, removeRepeatingRow, _, getTranslationByKey */
 
 /* Autofill stuff */
 const fillClassStats = () => {
@@ -209,4 +208,32 @@ const generateAutofillInfo = (sName: string) => {
             [`generate_${sName}_info`]: " "
         });
     });
+};
+
+const fillRepeatingSectionFromData = (sName: string, data: {[key: string]: string}[] | {[key: string]: string}, callback?: () => void) => {
+    // Populates the repeating section repeating_${SName} with new
+    // rows from the data array. Every entry of the array is expected
+    // to be an object, and its key/value pairs will be written into
+    // the repeating section as a new row. If data is not an array
+    // but a single object, it will be treated like an array with
+    // a single element.
+    callback = callback || (() => {});
+    const createdIDs: string[] = [],
+        getRowID = () => {
+            while (true) {
+                let newID = generateRowID();
+                if (!createdIDs.includes(newID)) {
+                    createdIDs.push(newID);
+                    return newID;
+                }
+            }
+        };
+    const setting = (Array.isArray(data) ? data : [data]).map(o => {
+        const newID = getRowID();
+        return Object.entries(o).reduce((m: {[k: string]: string}, [key, value]) => {
+            m[`repeating_${sName}_${newID}_${key}`] = `${value}`;
+            return m;
+        }, {});
+    }).reduce((m, o) => Object.assign(m, o), {});
+    setAttrs(setting, {}, callback);
 };
