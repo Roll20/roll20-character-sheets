@@ -4,9 +4,9 @@
 /* Autofill stuff */
 const fillClassStats = () => {
     getAttrs(["class", "class_ability", "attack_bonus"], v => {
-        const label = v.class && reverseClasses[v.class.toLowerCase()];
+        const label = v.class && reverseClasses[v.class ? v.class.toLowerCase() : ""];
         if (label && autofillData.classes.hasOwnProperty(label)) {
-            const data: {[key: string]: string} = Object.assign({}, autofillData.classes[label]);
+            const data: {[key: string]: string | false} = Object.assign({}, autofillData.classes[label]);
             Object.keys(data).forEach(key => {
                 if (!(["", "0"].includes(`${v[key]}`))) delete data[key];
             });
@@ -39,7 +39,7 @@ const getAutofillData = ({sName, v, data, label}: AutofillData) => {
     // inclusion into the sheet.
     const output = Object.assign({}, data);
     if (sName === "ship-defenses") {
-        if (label) output.defense_name = translate(label.toUpperCase());
+        if (label) output.defense_name = translate(label.toUpperCase()) ? translate(label.toUpperCase()) : "false";
         if (output.defense_mass.includes("#")) {
             output.defense_mass = `${parseInt(output.defense_mass) * v.ship_multiplier}`;
         }
@@ -210,7 +210,7 @@ const generateAutofillInfo = (sName: string) => {
     });
 };
 
-const fillRepeatingSectionFromData = (sName: string, data: {[key: string]: string}[] | {[key: string]: string}, callback?: () => void) => {
+const fillRepeatingSectionFromData = (sName: string, data: {[key: string]: AttributeContent}[] | {[key: string]: AttributeContent}, callback?: () => void) => {
     // Populates the repeating section repeating_${SName} with new
     // rows from the data array. Every entry of the array is expected
     // to be an object, and its key/value pairs will be written into

@@ -31,7 +31,7 @@ const setTranslatedDefaults = () => {
                 if (v[name] === data.default && v[name] !== data.trans) setting[name] = data.trans;
             });
         }
-        setting.innate_ac_name = translate("INNATE_AC");
+        setting.innate_ac_name = translate("INNATE_AC").toString();
         mySetAttrs(setting, v);
     });
 };
