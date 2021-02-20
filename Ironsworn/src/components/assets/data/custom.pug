@@ -1,201 +1,141 @@
+mixin builderTitles(parent, child)
+  input.border-bottom.no-border.view-title-width(
+    type='text'
+    name=`attr_builder-titles-${parent}-${child}`
+    value=''
+  )
+
+mixin assetTrackBox(parent, value)
+  .asset-track-box
+    if value == 0
+      .asset-track-box-display 0
+    else
+      .asset-track-box-display='+ ' + value
+    input(type='radio' name=`attr_custom-asset-track-${parent}` value=`${value}`)
+
+mixin abilityView(value)
+  input(
+    class=`builder-ability-${value}-text hide`
+    type='checkbox'
+    name=`attr_builder-ability-${value}-text`
+  )
+  div(class=`builder-ability-${value}-text hide`)
+    input.custom-asset-ability(
+      type='checkbox'
+      name=`attr_assetcheckbox_builder-ability-${value}`
+    )
+    .asset-ability
+      span.no-border.ability-text(name=`attr_builder-ability-${value}-text-area`)
+  input(class=`builder-ability-${value}-text-input hide` type='checkbox' name='attr_builder-ability-1-text-input')
+  div(class=`builder-ability-${value}-text-input hide`)
+    input.custom-asset-ability(type='checkbox' name=`attr_assetcheckbox_builder-ability-${value}`)
+    .asset-ability
+      span.no-border.ability-text(name=`attr_builder-ability-${value}-text-area`)
+      input.border-bottom.no-border(type='text' name=`attr_builder-ability-${value}-custom-text-input` value='')
+
 mixin customAssets
   input.asset-custom.hide(type='checkbox' name='attr_assetcustom')
   .asset-custom.showhide
     input.asset-builder(type='radio' name='attr_custom-asset-page' value='1' checked='')
-    span.custom-asset-page(data-i18n='') Builder
+    span.custom-asset-page(data-i18n='asset-custom-builder-title') Builder
     input.asset-view(type='radio' name='attr_custom-asset-page' value='2')
-    span.custom-asset-page(data-i18n='') View
+    span.custom-asset-page(data-i18n='asset-custom-view-title') View
     .asset-builder.hide
       .builder-name
-        input.border-bottom.no-border(type='text' name='attr_name' value='' placeholder='Asset Name')
-      .builder-titles
-        | Titles
-        br
+        input.border-bottom.no-border(
+          type='text'
+          name='attr_name' 
+          value=''
+          data-i18n-placeholder='asset-custom-builder-name-placeholder'
+          placeholder='Asset Name'
+        )
+      div(class='builder-titles')
+        div(data-i18n='asset-custom-builder-titles') Titles
         select.sub-dropdown.builder-dropdown(name='attr_builder-titles')
-          option(data-i18n='' value='0' selected='') None
-          option(data-i18n='' value='1') 1 Input
-          option(data-i18n='' value='2') 2 Inputs
-          option(data-i18n='' value='3') 3 Inputs
-      each val in [1, 2, 3]
-        div(
-          class=`builder-ability-${val}` data-i18n=`asset-custom-builder-ability-${val}`
-        )='Ability ' + val
-          br
-          select.sub-dropdown(name=`attr_builder-ability-${val}`)
-            option(value='' selected='' disabled='') Select
-            option(value='text') Text Box
-            option(value='text-input') Text Box with Input
-          textarea.build-text(name=`attr_builder-ability-${val}-text-area`)
-      div.builder-tracks(data-i18n='asset-custom-builder-tracks')
-        | Tracks
-        br
-        select.sub-dropdown(name='attr_track-dropdown')
-          each val in [ 0, 1, 2, 3, 4, 5, 6 ]
-            if val == 0
-              option(
-                data-i18n=`asset-custom-builder-track-dropdown-${value}`
-                value=`${val}`
-                selected=''
-              ) None
-            else
-              option(
-                data-i18n=`asset-custom-builder-track-dropdown-${val}`
-                value=`${val}`
-              )='0 to ' + val
+          option(data-i18n='asset-custom-builder-inputs-0' value='0' selected='') None
+          option(data-i18n='asset-custom-builder-inputs-1' value='1') 1 Input
+          option(data-i18n='asset-custom-builder-inputs-2' value='2') 2 Inputs
+          option(data-i18n='asset-custom-builder-inputs-3' value='3') 3 Inputs
+        each ability in [1, 2, 3]
+          - var abilityText = `Ability ${ability}`
+          div(class=`builder-ability-${ability}`)
+          div(data-i18n=`asset-custom-builder-ability-${ability}`)=abilityText
+          select.sub-dropdown(name=`attr_builder-ability-${ability}`)
+            option(
+              data-i18n='asset-custom-builder-ability-dropdown-default'
+              value=''
+              selected=''
+              disabled=''
+            ) Select
+            option(
+              data-i18n='asset-custom-builder-ability-dropdown-text'
+              value='text'
+            ) Text Box
+            option(
+              data-i18n='asset-custom-builder-ability-dropdown-input'
+              value='text-input'
+            ) Text Box with Input
+          textarea.build-text(name=`attr_builder-ability-${ability}-text-area`)
+        div.builder-tracks
+          div(data-i18n='asset-custom-builder-tracks') Tracks
+          select.sub-dropdown(name='attr_track-dropdown')
+            each track in [ 0, 1, 2, 3, 4, 5, 6 ]
+              if track == 0
+                option(
+                  data-i18n=`asset-custom-builder-track-dropdown-${track}`
+                  value=`${track}`
+                  selected=''
+                )='None'
+              else
+                option(
+                  data-i18n=`asset-custom-builder-track-dropdown-${track}`
+                  value=`${track}`
+                )='0 to ' + track
     .asset-view.hide
       .flex-wrapper
         .flex-container
           span.asset-view-name(name='attr_name')
         .flex-container
-          input.builder-titles-0.hide(type='checkbox' name='attr_builder-titles-0')
-          input.builder-titles-1.hide(type='checkbox' name='attr_builder-titles-1')
-          .builder-titles-1.hide
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-1-1' value='')
-          input.builder-titles-2.hide(type='checkbox' name='attr_builder-titles-2')
-          .builder-titles-2.hide
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-2-1' value='')
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-2-2' value='')
-          input.builder-titles-3.hide(type='checkbox' name='attr_builder-titles-3')
-          .builder-titles-3.hide
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-3-1' value='')
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-3-2' value='')
-            input.border-bottom.no-border.view-title-width(type='text' name='attr_builder-titles-3-3' value='')
+          each totalTitles in [ 0, 1, 2, 3 ]
+            if totalTitles == 0
+              input(
+                class=`builder-titles-${totalTitles} hide`
+                type='checkbox'
+                name=`attr_builder-titles-${totalTitles}`
+              )
+            else
+              input(
+                class=`builder-titles-${totalTitles} hide`
+                type='checkbox'
+                name=`attr_builder-titles-${totalTitles}`
+              )
+              div(class=`builder-titles-${totalTitles} hide`)
+                - var currentTitle = 1
+                while currentTitle <= totalTitles
+                  +builderTitles(totalTitles, currentTitle++)       
         .flex-container.ability-top
-          input.builder-ability-1-text.hide(type='checkbox' name='attr_builder-ability-1-text')
-          .builder-ability-1-text.hide
-            input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-1')
-            .asset-ability
-              span.no-border.ability-text(name='attr_builder-ability-1-text-area')
-          input.builder-ability-1-text-input.hide(type='checkbox' name='attr_builder-ability-1-text-input')
-          .builder-ability-1-text-input.hide
-            input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-1')
-            .asset-ability
-              span.no-border.ability-text(name='attr_builder-ability-1-text-area')
-              input.border-bottom.no-border(type='text' name='attr_builder-ability-1-custom-text-input' value='')
+          +abilityView(1)
         .flex-container
-          input.builder-ability-2-text.hide(type='checkbox' name='attr_builder-ability-2-text')
-          .builder-ability-2-text.hide
-            input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-2')
-            .asset-ability
-              span.no-border.ability-text(name='attr_builder-ability-2-text-area')
-          input.builder-ability-2-text-input.hide(type='checkbox' name='attr_builder-ability-2-text-input')
-          .builder-ability-2-text-input.hide
-            input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-2')
-            .asset-ability
-              span.no-border.ability-text(name='attr_builder-ability-2-text-area')
-              input.border-bottom.no-border(type='text' name='attr_builder-ability-2-custom-text-input' value='')
+          +abilityView(2)
         .flex-container
-          input.builder-ability-3-text.hide(type='checkbox' name='attr_builder-ability-3-text')
-          input.builder-ability-3-text-input.hide(type='checkbox' name='attr_builder-ability-3-text-input')
-          .builder-ability-3-text.hide
-            .flex-container
-              input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-3')
-              .asset-ability
-                span.no-border.ability-text(name='attr_builder-ability-3-text-area')
-          .builder-ability-3-text-input.hide
-            input.custom-asset-ability(type='checkbox' name='attr_assetcheckbox_builder-ability-3')
-            .asset-ability
-              span.no-border.ability-text(name='attr_builder-ability-3-text-area')
-              input.border-bottom.no-border(type='text' name='attr_builder-ability-3-custom-text-input' value='')
+          +abilityView(3)
       .flex-wrapper
         .flex-container
-          input.track-dropdown-0.hide(type='checkbox' name='attr_track-dropdown-0')
-          input.track-dropdown-1.hide(type='checkbox' name='attr_track-dropdown-1')
-          .track-dropdown-1.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-1' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-1' value='1')
-          input.track-dropdown-2.hide(type='checkbox' name='attr_track-dropdown-2')
-          .track-dropdown-2.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-2' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-2' value='1')
-              .asset-track-box
-                .asset-track-box-display + 2
-                input(type='radio' name='attr_custom-asset-track-2' value='2')
-          input.track-dropdown-3.hide(type='checkbox' name='attr_track-dropdown-3')
-          .track-dropdown-3.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-3' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-3' value='1')
-              .asset-track-box
-                .asset-track-box-display + 2
-                input(type='radio' name='attr_custom-asset-track-3' value='2')
-              .asset-track-box
-                .asset-track-box-display + 3
-                input(type='radio' name='attr_custom-asset-track-3' value='3')
-          input.track-dropdown-4.hide(type='checkbox' name='attr_track-dropdown-4')
-          .track-dropdown-4.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-4' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-4' value='1')
-              .asset-track-box
-                .asset-track-box-display + 2
-                input(type='radio' name='attr_custom-asset-track-4' value='2')
-              .asset-track-box
-                .asset-track-box-display + 3
-                input(type='radio' name='attr_custom-asset-track-4' value='3')
-              .asset-track-box
-                .asset-track-box-display + 4
-                input(type='radio' name='attr_custom-asset-track-4' value='4')
-          input.track-dropdown-5.hide(type='checkbox' name='attr_track-dropdown-5')
-          .track-dropdown-5.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-5' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-5' value='1')
-              .asset-track-box
-                .asset-track-box-display + 2
-                input(type='radio' name='attr_custom-asset-track-5' value='2')
-              .asset-track-box
-                .asset-track-box-display + 3
-                input(type='radio' name='attr_custom-asset-track-5' value='3')
-              .asset-track-box
-                .asset-track-box-display + 4
-                input(type='radio' name='attr_custom-asset-track-5' value='4')
-              .asset-track-box
-                .asset-track-box-display + 5
-                input(type='radio' name='attr_custom-asset-track-5' value='5')
-          input.track-dropdown-6.hide(type='checkbox' name='attr_track-dropdown-6')
-          .track-dropdown-6.hide
-            .asset-track-wrapper.custom-track
-              .asset-track-box
-                .asset-track-box-display 0
-                input(type='radio' name='attr_custom-asset-track-6' value='0')
-              .asset-track-box
-                .asset-track-box-display + 1
-                input(type='radio' name='attr_custom-asset-track-6' value='1')
-              .asset-track-box
-                .asset-track-box-display + 2
-                input(type='radio' name='attr_custom-asset-track-6' value='2')
-              .asset-track-box
-                .asset-track-box-display + 3
-                input(type='radio' name='attr_custom-asset-track-6' value='3')
-              .asset-track-box
-                .asset-track-box-display + 4
-                input(type='radio' name='attr_custom-asset-track-6' value='4')
-              .asset-track-box
-                .asset-track-box-display + 5
-                input(type='radio' name='attr_custom-asset-track-6' value='5')
-              .asset-track-box
-                .asset-track-box-display + 6
-                input(type='radio' name='attr_custom-asset-track-6' value='6')
+          each dropdownNumber in [ 0, 1, 2, 3, 4, 5, 6, 7]
+            if dropdownNumber == 0
+              input(
+                class=`track-dropdown-${dropdownNumber} hide`
+                type='checkbox'
+                name=`attr_track-dropdown-${dropdownNumber}`
+              )
+            else
+              input(
+                class=`track-dropdown-${dropdownNumber} hide`
+                type='checkbox'
+                name=`attr_track-dropdown-${dropdownNumber}`
+              )
+              div(class=`track-dropdown-${dropdownNumber} hide`)
+                .asset-track-wrapper.custom-track
+                  - var currentBox = 0
+                  while currentBox <= dropdownNumber
+                    +assetTrackBox(dropdownNumber, currentBox++)
