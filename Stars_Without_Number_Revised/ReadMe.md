@@ -39,9 +39,19 @@ on Github.
   * `npm run dev`
   
 Npm is now watching all the files for changes and compiling as you go.
-If you want to compile everything just once, use `npm build` instead.
+If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
+
+### 2.6.0
+
+* Migrate worker codebase to TypeScript. Should hopefully reduce future bugs.
+* Usability pass:
+  * Add a yellow border while in edit mode, which also highlights the edit mode button. Should help new users find the button.
+  * Some clickable labels (one so far) get a dice icon next to them to signify that there's a roll if you click it.
+  * Clarify how Strain works. Now visually clear how it is calculated and what the different numbers are.
+  * Add a few extra fields to track useful things on the ship sheet.
+  * Some text clarification.
 
 ### 2.5.4
 
