@@ -4,12 +4,12 @@
 const fillNPC = () => {
     getAttrs(["npc_stat_block"], (v) => {
         if (v.npc_stat_block && autofillData.statblocks[v.npc_stat_block]) {
-            const [
+            const {
                 HD, AC, npc_attack_bonus, damage, attacks, npc_move,
                 npc_morale, npc_skills, npc_saves, armor_type
-            ] = autofillData.statblocks[v.npc_stat_block];
+            }: {[key: string]: string} = autofillData.statblocks[v.npc_stat_block];
 
-            const setting = {
+            const setting: {[key: string]: string} = {
                 AC,
                 npc_attack_bonus,
                 npc_move,
@@ -52,7 +52,7 @@ const setNPCMultiAttacks = () => {
             "npc_roll_full_attack"
         ];
         getAttrs(sourceAttrs, v => {
-            const setting = idArray.reduce((m, id) => {
+            const setting = idArray.reduce((m: {[key: string]: string}, id) => {
                 if (v.npc_roll_full_attack === "1") {
                     const num = parseInt(v[`repeating_npc-attacks_${id}_attack_number`]) || 1;
                     m[`repeating_npc-attacks_${id}_attack_extra_macro`] = [2, 3, 4, 5, 6, 7, 8].map(n => {
@@ -73,7 +73,7 @@ const setNPCMultiAttacks = () => {
 const handleNPCRollHide = () => {
     const types = ["hp", "initiative", "save", "skill", "morale", "reaction"];
     getAttrs(["npc_rolls_hidden", ...types.map(x => `npc_${x}_hidden`)], v => {
-        const setting = types.reduce((m, n) => {
+        const setting = types.reduce((m: {[key: string]: string}, n) => {
             m[`npc_${n}_hidden`] = v.npc_rolls_hidden;
             return m;
         }, {});

@@ -1,14 +1,14 @@
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on, removeRepeatingRow, _, getTranslationByKey */
 
 /* Utility functions */
-const sign = (value) => {
-    const val = parseInt(value) || 0;
+const sign = (value: number | string):string => {
+    const val = typeof value === "string" ? parseInt(value) || 0 : value
     if (val >= 0) return `+${val}`;
     else return `${val}`;
 };
-const sum = (list) => list.reduce((m, c) => m + (parseInt(c) || 0), 0);
-const buildLink = (caption, ability, last) => `[${caption}${!last ? "," : ""}](~${ability})`;
-const mySetAttrs = (setting, values, ...rest) => {
+const sum = (list: string[]) => list.reduce((m, c) => m + (parseInt(c) || 0), 0);
+const buildLink = (caption: string, ability: string, last?: boolean) => `[${caption}${!last ? "," : ""}](~${ability})`;
+const mySetAttrs = (setting: {[key: string]: string | number | boolean}, values: {[key: string]: string}, ...rest: any[]) => {
     // This is a version of setAttrs that expects an extra values parameter
     // (as received from getAttrs). It will only set values in setting that differ
     // from their current value on the sheet. The intention is to not
@@ -19,7 +19,8 @@ const mySetAttrs = (setting, values, ...rest) => {
     });
     setAttrs(setting, ...rest);
 };
-const fillRepeatingSectionFromData = (sName, data, callback) => {
+
+const fillRepeatingSectionFromData = (sName: string, data: {[key: string]: string}[] | {[key: string]: string}, callback?: () => void) => {
     // Populates the repeating section repeating_${SName} with new
     // rows from the data array. Every entry of the array is expected
     // to be an object, and its key/value pairs will be written into
@@ -27,7 +28,7 @@ const fillRepeatingSectionFromData = (sName, data, callback) => {
     // but a single object, it will be treated like an array with
     // a single element.
     callback = callback || (() => {});
-    const createdIDs = [],
+    const createdIDs: string[] = [],
         getRowID = () => {
             while (true) {
                 let newID = generateRowID();
@@ -39,7 +40,7 @@ const fillRepeatingSectionFromData = (sName, data, callback) => {
         };
     const setting = (Array.isArray(data) ? data : [data]).map(o => {
         const newID = getRowID();
-        return Object.entries(o).reduce((m, [key, value]) => {
+        return Object.entries(o).reduce((m: {[k: string]: string}, [key, value]) => {
             m[`repeating_${sName}_${newID}_${key}`] = `${value}`;
             return m;
         }, {});

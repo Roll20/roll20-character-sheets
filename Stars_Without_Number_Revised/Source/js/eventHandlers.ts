@@ -1,3 +1,9 @@
+///<reference path="migrations.ts"/>
+///<reference path="validations.ts"/>
+///<reference path="translations.ts"/>
+///<reference path="menuBuilders.ts"/>
+///<reference path="ship.ts"/>
+///<reference path="npc.ts"/>
 /* global getAttrs, setAttrs, getSectionIDs, generateRowID, on, removeRepeatingRow, _, getTranslationByKey */
 
 /**
