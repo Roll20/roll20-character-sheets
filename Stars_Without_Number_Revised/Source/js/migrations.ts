@@ -90,7 +90,7 @@ const upgradeSheet = (version: string, firstTime = false, finalTime = false) => 
                             (v[`repeating_gear_${id}_gear_status`] || "").toUpperCase();
                         return m;
                     }, {});
-                    mySetAttrs(setting, v, {}, upgradeFunction);
+                    mySetAttrs(setting, v, null, () => upgradeFunction);
                 });
             });
         }
@@ -139,7 +139,7 @@ const upgradeSheet = (version: string, firstTime = false, finalTime = false) => 
                             if (v[attrName] === "@{attribute_query_none}") m[attrName] = "@{attribute_query}";
                             return m;
                         }, {});
-                        mySetAttrs(setting, v, {}, upgradeFunction);
+                        mySetAttrs(setting, v, null, () => upgradeFunction);
                     });
                 });
             }));
@@ -204,7 +204,7 @@ const upgradeSheet = (version: string, firstTime = false, finalTime = false) => 
                 const strain_extra = (parseInt(v.strain) || 0) - (parseInt(v.strain_permanent) || 0)
                 mySetAttrs({
                     strain_extra: strain_extra
-                }, v, () => {
+                }, v, null, () => {
                     upgradeSheet("2.6.0")
                 })
             })

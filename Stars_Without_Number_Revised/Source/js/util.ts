@@ -8,7 +8,7 @@ const sign = (value: number | string):string => {
 };
 const sum = (list: string[]) => list.reduce((m, c) => m + (parseInt(c) || 0), 0);
 const buildLink = (caption: string, ability: string, last?: boolean) => `[${caption}${!last ? "," : ""}](~${ability})`;
-const mySetAttrs = (setting: {[key: string]: AttributeContent}, values: {[key: string]: string}, ...rest: any[]) => {
+const mySetAttrs = (setting: {[key: string]: AttributeContent}, values: {[key: string]: string}, options?: {silent: boolean}, callback?: (values: {[key: string]: string}) => void) => {
     // This is a version of setAttrs that expects an extra values parameter
     // (as received from getAttrs). It will only set values in setting that differ
     // from their current value on the sheet. The intention is to not
@@ -17,5 +17,5 @@ const mySetAttrs = (setting: {[key: string]: AttributeContent}, values: {[key: s
     Object.keys(setting).forEach(k => {
         if (`${values[k]}` === `${setting[k]}`) delete setting[k];
     });
-    setAttrs(setting, ...rest);
+    setAttrs(setting, options, callback)
 };

@@ -69,6 +69,6 @@ const calculateDroneAttack = (prefixes: string[], callback?: (values: {[key: str
                 });
             return m;
         }, {});
-        mySetAttrs(setting, v, callback);
+        mySetAttrs(setting, v, null, callback);
     });
 };
