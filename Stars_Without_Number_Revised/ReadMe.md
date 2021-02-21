@@ -42,6 +42,12 @@ on Github.
 
 ## Changelog
 
+### 2.5.4
+
+* Fix incorrect encumbrance value for shields.
+* Fix (un)checking Shell Affinity deactivating all active Shells.
+* Add WWN to skill lists selectable in sheet default settings.
+
 ### 2.5.3
 
 * Fix a bug causing the Magic "Quick Menu" to just completely not work.
