@@ -10,6 +10,10 @@ head over to our [Discord](https://discord.gg/rc9Fwgp9qv) to learn more.
 + add a buff menu (temp stats changes & fatigue ignore)
 + make a changelog page
 + add a crit table (reuse the righteous fury)
++ add a carry option for weapons
++ A button in the Psykana section for being a blank
++ need a button to swap between Psychic Bolt, Barrage, and Storm
+
 
 #### v 0.1.3 The weapon update
 + added limiter on roll targets
@@ -22,6 +26,8 @@ head over to our [Discord](https://discord.gg/rc9Fwgp9qv) to learn more.
 + fixed a bug in repeating skills that caused to roll a 0 instead of the characteristic
 + change Scatter to 1d5 + 1 every odd DoF and 1d10 + 1 every odd DoF
 + reworked weapons design
+- Fixed Unbound Psykers Unfettered adding unrequired Psychic Phenomena
++ The button to rearrange items should know its place now
 
 #### v 0.1.2
 + Degrees of Failure have learned the correct Math
