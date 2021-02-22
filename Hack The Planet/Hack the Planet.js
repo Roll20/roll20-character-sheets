@@ -327,7 +327,7 @@
             setHidden["crewengagement-dice"] = "nothing";
             setAttrs(setHidden);
             var setHidden = {};
-            setHidden["crewfortune-dice"] = "nothing";
+            setHidden["crewfortune-dice"] = "0";
             setAttrs(setHidden);
             var setHidden = {};
             setHidden["crewengagement-question1"] = "nothing";

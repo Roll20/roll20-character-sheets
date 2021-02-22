@@ -1,5 +1,10 @@
 ## Roll20 Charakterbogen für Das Schwarze Auge 5
 
+### UPDATE 29.04.2020
+
+Es gibt jetzt eine wiki Seite für das Projekt
+https://wiki.roll20.net/DSA5_Character_Sheet_ger
+
 ### UPDATE 12.04.2020
 
 *Hinweis - die automatischen Berechnungen für Schmerz, LE, AE und KE sind nur aktiv bei normalen Charakteren.*

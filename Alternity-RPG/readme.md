@@ -31,5 +31,8 @@ This sheet is designed for use with the Alternity core player book. Autocalculat
 
 *Combined Situation Die and Control Die to automatically sum the value together.
 
+6/5/2020
+*Added missing Direct Fire skill for Heavy Weapons
+
 
 Sheet Author: [@Reikou](https://app.roll20.net/users/519959/reikou)

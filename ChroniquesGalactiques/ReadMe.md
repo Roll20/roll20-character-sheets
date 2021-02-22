@@ -9,9 +9,34 @@ Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-editions.fr/catalogue.php?id=207) #17,18 et 19.
 
 # Version courante
-3.8 [Screenshot](cog_v3.png)
+V3.110 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.110 (2020.12.21)
+
+- Case à cocher sur l'onglet Capacités de la fiche de PJ permettant de basculer entre :
+  - le mode Affichage, avec nom et description textuelle complète des capacités
+  - le mode Edition, où l'utilisateur peut entrer le texte des capacités (la première ligne de texte est toujours considérée comme étant le nom de la capacité).
+- Possibilité de lier un jet de capacité avec l'une des capacités de la grille, en indiquant le numéro de voie et le rang correspondant. Cette information est principalement utilisée par le script API [COlib](https://github.com/stephaned68/COlib).
+- Sur la fiche de vaisseau :
+  - gestion des Points d'Energie, avec contrôle par rapport aux PE max
+  - gestion de l'occupation des postes, avec prise en compte ou pas des bonus d'équipage sur les jets de vaisseau (Init et DEF (Rapidité) à 0 pour un vaisseau sans pilote)
+  - pas d'affichage de la section des traits physiques (sexe, âge, taille, poids)
+
+## V3.11 (2020.08.15)
+* Amélioration de la logique d'import d'un statblock de PNJ ou de créature
+* Lancement de l'import du statblock via un bouton
+
+## V3.10 (2020.08.04)
+* Retour au schema de versionning sémantique classique (major.minor.patch)
+* Modification de la logique de migration/mise à jour du sheetworker
+
+## V2020.0525
+* Reprise des dernières modifications de la fiche COC
+* Nouveau fichier .html pour la fiche
+* Nouveau schema de versionning : AAAA.MMJJ
+
 ## V3.8 (2019-10-10)
 * Ajout buff et calcul auto des PV
 * Modification du sheetworker pour éviter erreurs dans la console API

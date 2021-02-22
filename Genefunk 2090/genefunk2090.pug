@@ -1,0 +1,2018 @@
+//- Variables
+- const abilityScores = {str:'strength',dex:'dexterity',con:'constitution',int:'intelligence',wis:'wisdom',cha:'charisma'};
+- const skillList = {athletics:'strength',acrobatics:'dexterity',drive:'dexterity',sleight_of_hand:'dexterity',stealth:'dexterity',bureaucracy:'intelligence',computers:'intelligence',investigation:'intelligence',life_science:'intelligence',mechanics:'intelligence',physical_science:'intelligence',social_science:'intelligence',streetwise:'intelligence',insight:'wisdom',perception:'wisdom',survival:'wisdom',deception:'charisma',intimidation:'charisma',performance:'charisma',persuasion:'charisma'};
+- const skillNames = ['athletics','acrobatics','drive','sleight_of_hand','stealth','bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','insight','perception','survival','deception','intimidation','performance','persuasion'];
+- const passives = ['perception','insight'];
+- const senses = ['acute_olfaction','darkvision','macrovision','microvision','penetration','spectrum'];
+- const weaponProficiencies = ['simple','martial_melee','martial_ranged'];
+- const armorProficiencies = ['light','medium','heavy'];
+- const hackLevels = [1,2,3,4,5];
+- const ordinal = ['','st','nd','rd','th','th'];
+- const deathProgress = [0,1,2,3];
+- const logoSrc = 'https://s3.amazonaws.com/files.d20.io/images/103013126/6YV1tDVuUKhJieOeCmgZww/original.png';
+- const helixSrc = 'https://s3.amazonaws.com/files.d20.io/images/103759352/vmECQwpaseeQTN9tX7wJaw/max.png?1580877311';
+- const abilityOptions = ['none','strength','dexterity','constitution','intelligence','wisdom','charisma'];
+- const hackTypes = ['injection','gadget','craft tech','craft explosive','bot','mind','software'];
+
+//- End Variables
+//- Mixin declarations
+mixin trueHexagon(locked,divClass)
+	div(class=`true-hexagon polygon${locked ? ' locked':''}${divClass ? ` ${divClass}`:''}`)
+		block
+
+//- End mixin
+mixin hexagonLabelContainer(divClass,transKey,transValue,locked,buttonDetails)
+	div(class=`hexagon-label-container${divClass ? ` ${divClass}` : ''}`)
+		+trueHexagon(locked)
+			block
+		.hexagon-label
+			if !buttonDetails
+				span(data-i18n=transKey)
+					!= transValue||transKey
+			else
+				button&attributes(buttonDetails)
+					!= buttonDetails.content || ''
+
+//- End mixin
+mixin plusControl(name,defaultValue,classAdd)
+	div(class=`plus-container ${classAdd}`)
+		input(type='hidden' class='mod-control' name=`attr_${name}_modded` value='')
+		input(type='number' class='plus-control hidden' name=`attr_${name}` value=defaultValue||0 min='0')
+		span.plus-display(name=`attr_${name}` class=classAdd||'' title=`@{${name}}`)
+			!=defaultValue||0
+//- End mixin
+mixin repeating-input-label(section,val,addClass)
+	if /ability|save type/.test(val)
+		+input-label-container(val,val,'select',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,abilityOptions,addClass)
+	else if /hack type/.test(val)
+		+input-label-container(val,val,'select',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,hackTypes,addClass)
+	else if val==='description'
+		+input-label-container(val,val,'textarea',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,'',addClass)
+	else if val==='level'
+		+input-label-container(val,val,'number',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,'',addClass)
+	else if val==='id'
+		+input-label-container(val,val,'readonlytext',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,'',addClass)
+	else
+		+input-label-container(val,val,'text',`repeating_${section}_$X_${val.replace(/\s+/g,'_')}`,'',addClass)
+//- End Mixin
+mixin expandable-section(nameAdd)
+	.expandable-section
+		input(class='expand-control' type='hidden' name=`attr_${nameAdd ? `${nameAdd}_` : ''}expand_item` value='1')
+		label.expand-button
+			input(type='checkbox' name=`attr_${nameAdd ? `${nameAdd}_` : ''}expand_item` value='1' checked='true')
+			span.expand-state.pictos
+				|4
+		block
+	//- End .expandable-section
+mixin enable-section(nameAdd,section,addClass,def)
+	input.enable-controller(type='hidden' name=`attr_${nameAdd ? `${nameAdd.replace(/\s+/g,'_')}_` : ''}enable_item` value='0')
+	div(class=`enable-section${addClass ? ` ${addClass}`:''}`)
+		+hexagon-check-label(`${nameAdd ? `${nameAdd.replace(/\s+/g,'_')}_` : ''}enable_item`,section,def)
+		.enabled-section
+			block
+		//- End label
+	//- End .enable-section
+//- End mixin
+mixin id(section)
+	input.id(type='text' name='attr_id' title=`@{repeating_${section}_$X_id}` readonly='readonly')
+//- End mixin
+mixin hexagon-check-label(val,section,def)
+	label.hexagon-check-label
+		.checkbox-container
+			input(type='checkbox' name=`attr_${(val==='proficiency' && section) ? `${section}_` : ''}${val.replace(/\s+/g,'_')}` value=`${def||'1'}` title=`@{${section ? `repeating_${section}_$X_`:''}${(val==='proficiency' && section) ? `${section}_` : ''}${val.replace(/\s+/g,'_')}}`)
+			span.hexagon
+		span(data-i18n=val.replace(/_enable_item/g,'').replace(/_/g,' '))
+			!=val.replace(/_enable_item/g,'').replace(/_/g,' ')
+//- End mixin
+mixin input-label-container(i18n,i18nVal,inType,inName,inVal,addClass)
+	div(class=`input-label-container${addClass ? ` ${addClass}`:''}`)
+		if inType!=='checkbox'
+			span(class='input-label' data-i18n=i18n)=i18nVal
+		if inType==='textarea'
+			textarea(name=`attr_${inName.replace(/repeating_[^_]+_[^_]+_/,'')}` title=`@{${inName}}` value=inVal||'')
+		else if inType==='select'
+			select(name=`attr_${inName.replace(/repeating_[^_]+_[^_]+_/,'')}` title=`@{${inName}}`)
+				each val,index in inVal
+					if typeof val === 'string'
+						if /type/.test(i18n)
+							option(value=`${val}` data-i18n=val)
+								!=val
+						else if  /none/.test(val)
+							option(value=`0` data-i18n=val selected='true')
+								!=val
+						else
+							option(value=`@{${val}_mod}` data-i18n=val)
+								!=val
+					else if typeof val === 'object'
+						option&attributes(val)
+				//- End each
+			//- end Select
+		else if inType==='checkbox'
+			div
+				span(class='input-label' data-i18n=i18n)
+				input(type='checkbox')&attributes(inVal)
+		else if /readonly/.test(inType)
+			input(type=`${inType.replace(/readonly/,'')}` name=`attr_${inName.replace(/repeating_[^_]+_[^_]+_/,'')}` title=`@{${inName}}` value=inVal||'' readonly='true')
+		else if inType === 'radio'
+			div
+				each val in inVal
+					label
+						span&attributes(val.span)
+						input(type='radio')&attributes(val.input)
+		else
+			input(type=inType name=`attr_${inName.replace(/repeating_[^_]+_[^_]+_/,'')}` title=`@{${inName}}` value=inVal||'')
+	//- End .input-label-container
+//- End mixin
+mixin borderedTextarea(divObj,headerObj,textObj)
+	.bordered-textarea&attributes(divObj||{})
+		h4&attributes(headerObj||{})
+			!=i18n
+		textarea.fixed&attributes(textObj||{})
+//- End mixin
+mixin borderedContainer(divObj,sectionHeadObj,columnHeaderArray,columnHeaderObj)
+	.bordered-container&attributes(divObj)
+		if sectionHeadObj
+			h4&attributes(sectionHeadObj)
+				if sectionHeadObj['data-i18n']
+					!=sectionHeadObj['data-i18n']||''
+				else
+					!=sectionHeadObj['value']
+		//- End if
+		if columnHeaderArray
+			each val in columnHeaderArray||[]
+				h5(class=val data-i18n=val)&attributes(columnHeaderObj)
+					!=val
+			//- End each
+		//- End if
+		block
+//-End mixin
+mixin templateConditionalDisplay(fieldBool,fieldDisplay,invert)
+	!=`{{${invert ? '^' : '#'}${fieldBool}}}`
+	span
+		!=`${fieldDisplay}`
+	!=`{{/${fieldBool}}}`
+//- End mixin
+mixin templateBorderedContainer(divObj)
+	.bordered-container&attributes(divObj)
+		block
+//- End mixin
+mixin templateHexagonLabelContainer(divClass,field,def,invert)
+	+trueHexagon(null,divClass)
+		block
+		+templateConditionalDisplay(field,`{{${field}}}`,invert)
+		if def
+			+templateConditionalDisplay(field,def,!invert)
+//- End mixin
+mixin rollTemplateHelperFunction(helperObj)
+	!=`{{${helperObj.positive ? '#' : (helperObj.func ? '#^' : '^')}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
+	block
+	!=`{{/${(helperObj.positive || !helperObj.func) ? '' : '^'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
+//- End Mixin
+mixin hack-header(level)
+	div(class=`hack-header pentagon-hexagon-label-container`)
+		+trueHexagon(locked)
+			input(type='number' title=`@{${level}_level_slots}` name=`attr_${level}_level_slots` value='')
+		span(class='current label' data-i18n='current')
+		.true-pentagon.polygon
+			input(type='number' title=`@{${level}_level_slots|max}` name=`attr_${level}_level_slots_max` value='')
+		span(class='max label' data-i18n='max')
+//- End Mixin
+mixin hack-column(levelArray)
+	div
+		each level in levelArray
+			.hack-master-container
+				+hack-header(level)
+				+borderedContainer({class:`${level}-level hack-container`})
+					h4(data-i18n=`${level} level`)
+						!= `${level} level`
+					+hack(true)
+					
+					+pseudoControl(`${level}_hack`)
+				//- End bordered-container
+			//- End hack-master-container
+		//- End each
+	//- End div
+//- End Mixin
+mixin hack(pc)
+	fieldset.repeating_hack
+		input(type='hidden' name='attr_attack_macro' value='{{d20=[[@{advantage_state} + @{attack_ability} + @{proficiency} + 0@{attack_bonus}]]}}')
+		input(type='hidden' name='attr_save_macro' value='{{dc=[[8 + @{save_ability} + @{proficiency} + 0@{dc_bonus}]]}}')
+		each num in [1,2]
+			input(type='hidden' name=`attr_damage_${num}_macro` value=`{{damage_${num}=[[0@{damage_${num}} + @{damage_ability_${num}}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`)
+		input(type='hidden' name='attr_level' value='' class='level-display')
+		+expandable-section()
+			.expanded-view
+				each val in ['name','level','launch time','duration','hack type','source']
+					+repeating-input-label('hack',val,val.replace(/\s+/g,'-'))
+				.enable-holder
+					+enable-section('attack','hack','attack','@{attack_macro}')
+						if pc
+							each val in ['attack ability','attack bonus']
+								+repeating-input-label('hack',val,val.replace(/\s+/g,'-'))
+						else
+							each val in ['attack bonus']
+								+repeating-input-label('hack',val,val.replace(/\s+/g,'-'))
+						//- End each
+					//- End enable-section
+					+enable-section('save','hack','save','@{save_macro}')
+						if pc
+							each val in ['save ability','save type','dc bonus']
+								+repeating-input-label('hack',val)
+						else
+							each val in ['save type','dc bonus']
+								+repeating-input-label('hack',val)
+						//- End each
+					//- End enable-section
+					each num in [1,2]
+						+enable-section(`damage ${num}`,'hack',`damage ${num}`,`{{damage_type_${num}=@{damage_type_${num}}}} @{damage_${num}_macro}`)
+							if pc
+								each val in [`damage ${num}`,`critical damage ${num}`, `damage ability ${num}`,`damage type ${num}`]
+									+repeating-input-label('hack',val,val.replace(/\s+/g,'-'))
+								//- End each
+							else
+								each val in [`damage ${num}`,`critical damage ${num}`,`damage type ${num}`]
+									+repeating-input-label('hack',val,val.replace(/\s+/g,'-'))
+								//- End each
+						//- End enable-section
+					//- End each
+				//- End .enable-holder
+				each val in ['range','properties','description']
+					+repeating-input-label('hack',val,val)
+				+id('hack')
+			.collapsed-view
+				button(type='roll' name='roll_roll' value='@{template_start} {{rollName=@{name}}} @{attack_enable_item} @{save_enable_item} @{damage_1_enable_item} @{damage_2_enable_item} {{range=@{range}}} {{properties=@{properties}}} {{description=@{description}}}')
+				input(type='hidden' name='attr_hack_type' class='hack-type' value='injection')
+				each val in ['name','hack_type']
+					span(name=`attr_${val}` class=val.replace(/_/g,'-') value='')
+				//- End each
+			//- End collapsed view
+		//- End expandable-section
+	//- End fieldset
+//- End Mixin
+mixin action(isPC)
+	+borderedContainer({class:'action-container'},{'data-i18n':'actions'},['name','mod','damage'])
+		//repeating actions
+		fieldset.repeating_action
+			input(type='hidden' name='attr_attack_macro' value='{{d20=[[@{advantage_state} + @{attack_ability} + @{action_proficiency} + 0@{attack_bonus}]]}}')
+			input(type='hidden' name='attr_save_macro' value='{{dc=[[8 + @{save_ability} + @{action_proficiency} + 0@{dc_bonus}]]}}')
+			each num in [1,2]
+				input(type='hidden' name=`attr_damage_${num}_macro` value=`{{damage_${num}=[[0@{damage_${num}} + @{damage_ability_${num}}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`)
+			+expandable-section()
+				.expanded-view
+					+repeating-input-label('action','name','name')
+					if isPC
+						+hexagon-check-label('proficiency','action','@{proficiency}')
+					//- End each
+					.enable-holder
+						+enable-section('attack','action','attack','@{attack_macro}')
+							if isPC
+								each val in ['attack ability','attack bonus']
+									+repeating-input-label('action',val,val)
+								//- End each
+							else
+								each val in ['attack bonus']
+									+repeating-input-label('action',val,val)
+								//- End each
+						//- End enable-section
+						+enable-section('save','action','save','{{save_type=^{@{save_type}}}} @{save_macro}')
+							if isPC
+								each val in ['save ability','save type','dc bonus']
+									+repeating-input-label('action',val)
+								//- End each
+							else
+								each val in ['save type','dc bonus']
+									+repeating-input-label('action',val)
+								//- End each
+						//- End enable-section
+						each num in [1,2]
+							+enable-section(`damage ${num}`,'action',`damage ${num}`,`{{damage_type_${num}=@{damage_type_${num}}}} @{damage_${num}_macro}`)
+								if isPC
+									each val in [`damage ${num}`,`critical damage ${num}`, `damage ability ${num}`,`damage type ${num}`]
+										+repeating-input-label('action',val,val)
+								else
+									each val in [`damage ${num}`,`critical damage ${num}`,`damage type ${num}`]
+										+repeating-input-label('action',val,val)
+								//- End each
+							//- End enable-section
+						//- End each
+					//- End .enable-holder
+					each val in ['range','properties','description']
+						+repeating-input-label('action',val,val)
+					+id('action')
+				//- End .expanded-view
+				.collapsed-view
+					button(type='roll' name='roll_roll' value='@{template_start} {{rollName=@{name}}} @{attack_enable_item} @{save_enable_item} @{damage_1_enable_item} @{damage_2_enable_item} {{range=@{range}}} {{properties=@{properties}}} {{description=@{description}}}')
+					each val in ['name','bonus','damage_1']
+						span(name=`attr_${val}` value='')
+					//- End each
+				//- End .collapsed-view
+			//- End expandable-section()
+		//- End fieldset.repeating_action
+//- End mixin
+mixin trait(pc)
+	+borderedContainer({class:'trait-container'},{'data-i18n':'features & traits'},(pc ? ['name','source'] : []))
+		fieldset.repeating_trait
+			input(type='hidden' name='attr_macro' value='{{source=@{source}}}')
+			+expandable-section()
+				.expanded-view
+					if pc
+						each val in ['name','source','mods','description']
+							+repeating-input-label('trait',val,val)
+					else
+						each val in ['name','description']
+							+repeating-input-label('trait',val,val)
+					+id('action')
+				//- End expanded-view
+				.collapsed-view
+					button(type='roll' name='roll_details' value='@{template_start} {{rollName=@{name}}} @{macro} {{description=@{description}}}')
+						if !pc
+							span(name=`attr_name` value='')
+					if pc
+						each val in ['name','source']
+							span(name=`attr_${val}` value='')
+					else
+						span.description(name='attr_description' value='')
+				//- End collapsed-view
+			//- End Expandable Section
+		//- End fieldset
+//- End mixin	
+mixin pseudoControl(name)
+	.pseudo-control
+		button(type='action' class='repcontrol_add' name=`act_add_${name}`)
+//- End Mixin
+mixin settingLabel(inputObj,i18n)
+	if !inputObj.type || inputObj.type!=='select'
+		label
+			span(data-i18n=`${i18n}`)
+			input&attributes(inputObj)
+		//- End label
+	else if inputObj.type && inputObj.type==='select'
+		span(data-i18n=`${i18n}`)
+		select&attributes(inputObj)
+			each val,index in inputObj.options
+				option&attributes(val)
+//- End Mixin
+mixin npc-ability-label(ability)
+	.npc-ability-label
+		button.h4(data-i18n=`${ability} abbreviation` type='roll' name=`roll_${ability}` value=`@{template_start} {{rollName=^{${ability.replace(/(\w{3}).*/,'$1')} check}}} @{${ability}_check_macro}`)
+		span(name=`attr_${ability}` class='score')
+		.paren-container
+			input.parens-control(type='hidden' name=`attr_${ability}` value='10')
+			span.parens
+				|(
+			input.plus-control.hidden(type='number' name=`attr_${ability}_mod` value='0' min='0')
+			span.mod.plus-display(name=`attr_${ability}_mod`)
+			span.parens
+				|)
+		button.h4(data-i18n='save' class='save-label' type='roll' name=`roll_${ability}_save` value=`@{template_start} {{rollName=^{${ability.replace(/(\w{3}).*/,'$1')} save}}} @{${ability}_save_macro}`)
+		input.plus-control.hidden(type='number' name=`attr_${ability}_mod` value='0' min='0')
+		span.save.plus-display(name=`attr_${ability}_save`)
+//- End Mixin
+mixin bordered-checkbox(divObj,inputObj,spanObj)
+	.bordered-checkbox&attributes(divObj)
+		input&attributes(inputObj)
+		span&attributes(spanObj)
+			!=spanObj.contents||''
+//- End Mixin Declarations
+//test new line
+// Default Values
+each val,abbreviation in abilityScores
+	input(type='hidden' name=`attr_${val}_mod` value='0')
+	input(type='hidden' name=`attr_${val}_save` value='0')
+	input(type='hidden' name=`attr_${val}_check_macro` value=`{{d20=[[@{advantage_state} + @{${val}_mod} @{${val}_bonus}]]}}`)
+	input(type='hidden' name=`attr_${val}_save_macro` value=`{{d20=[[@{advantage_state} + @{${val}_mod} + @{${val}_save_proficiency} @{${val}_save_bonus}]]}}`)
+	input(type='hidden' name=`attr_${val}_bonus` value='')
+	input(type='hidden' name=`attr_${val}_save_bonus` value='')
+each ability,skill in skillList
+	input(type='hidden' name=`attr_${skill}_bonus` value='')
+	input(type='hidden' name=`attr_${skill}_macro` value=`{{d20=[[@{advantage_state} + @{${skill}_proficiency} + @{${ability}_mod} @{${skill}_bonus}]]}}`)
+each skill in passives
+	input(type='number' class='hidden' name=`attr_passive_${skill}` value='10')
+	input(type='hidden' name=`attr_passive_${skill}_modded` value='')
+input(type='hidden' name='attr_version' value='')
+input(type='hidden' name='attr_template_start' value='@{whisper_state} &{template:general} @{show_character_name}')
+// End Default Values
+.whole
+	input(type='hidden' class='master-display-controller' name='attr_master_display_controller' value='character_type:pc | sheet_view:core | advantage_state:1d20')
+	// Start PC sheet
+	.pc
+		.name-logo-container
+			img(class='genefunk-logo' src=logoSrc)
+			+input-label-container('character name','character name','text','character_name','')
+		//- End .name-logo-container
+		.character-basic-container
+			each val,index in {class_level:'class and level',genome:'genome',cadre:'cadre',experience_points:'experience points',backgrounds:'backgrounds',appearance:'appearance'}
+				+input-label-container(val,val,'text',index,'')
+		//-End .character-basic-container
+		.toggles
+			.toggle-row
+				each section in [/**/{div:{class:'core'},span:{'data-i18n':'core',class:'core'},input:{type:'radio',value:'core',class:'core',name:'attr_sheet_view',checked:'true'}},/**/{div:{class:'hacks'},span:{'data-i18n':'hacks',class:'hacks'},input:{type:'radio',value:'hacks',class:'hacks',name:'attr_sheet_view'}},/**/{div:{class:'settings'},span:{class:'settings pictos',contents:'y'},input:{type:'radio',value:'settings',class:'settings',name:'attr_sheet_view'}}]
+					+bordered-checkbox(section.div,section.input,section.span)
+					//- End .pseudo-button
+				//- End each
+			//- End toggle-row
+			.toggle-row
+				each section in [/**/{div:{class:'advantage'},span:{'data-i18n':'advantage',class:'advantage'},input:{type:'radio',value:'2d20kh1',class:'advantage',name:'attr_advantage_state'}},/**/{div:{class:'normal'},span:{'data-i18n':'normal',class:'normal'},input:{type:'radio',value:'1d20',class:'normal',name:'attr_advantage_state',checked:true}},/**/{div:{class:'disadvantage'},span:{'data-i18n':'disadvantage',class:'disadvantage'},input:{type:'radio',value:'2d20kl1',class:'disadvantage',name:'attr_advantage_state'}},/**/{div:{class:'query'},span:{'data-i18n':'query',class:'query'},input:{type:'radio',value:'?{Advantage|Normal,1d20|Advantage,2d20kh1|Disadvantage,2d20kl1}',class:'query',name:'attr_advantage_state'}}]
+					+bordered-checkbox(section.div,section.input,section.span)
+					//- End .pseudo-button
+				//- End each
+			//- End toggle-row
+		//- End toggles
+		.core
+			.ability-skill-container
+				.ability-scores-container
+					img(class='helix-image' src=helixSrc)
+					each ability,abbreviation in abilityScores
+						// ability 
+						.attribute-container
+							input(type='hidden' name=`attr_${ability}_misc` value='')
+							button.h3(data-i18n=`${ability} abbreviation` type='roll' name=`roll_${ability}` value=`@{template_start} {{rollName=^{${ability.replace(/(\w{3}).*/,'$1')} check}}} @{${ability}_check_macro}`)=abbreviation
+							span(class='score-label' data-i18n='score')
+								|score
+							div(class=`${ability} calc-container score`)
+								input(type='number' name=`attr_base_${ability}` class='base-value' value='10' title=`@{base_${ability}} or @{${ability}}`)
+								input(type='number' name=`attr_${ability}` class='mod-value hidden' readonly='true' value='10')
+								input(type='hidden' class='mod-control' name=`attr_${ability}_modded`)
+								span(name=`attr_${ability}` class='mod-value')
+									|10
+							span.mod-label(data-i18n='mod')
+								|mod
+							|
+							|
+							+plusControl(`${ability}_mod`,0,`${ability} mod`)
+							button(type='roll' name=`roll_${ability}_save` class='save-label' data-i18n='save' value=`@{template_start} {{rollName=^{${ability.replace(/(\w{3}).*/,'$1')} save}}} @{${ability}_save_macro}`)
+								|save
+							div(class='save-label background')
+							label(class=`checkbox-container ${ability} proficiency`)
+								input(type='checkbox' name=`attr_${ability}_save_proficiency` value='@{proficiency}' title=`@{${ability}_save_proficiency}`)
+								|
+								|
+								span.hexagon
+							span(class='check-label proficiency' data-i18n='proficiency abbreviation')
+								|prof
+							|
+							|
+							+plusControl(`${ability}_save`,0,`${ability} save`)
+						//- End .attribute-container
+					//- each ability,abbreviation in abilityScores
+				//- End .ability-scores-container
+				.right-column
+					+hexagonLabelContainer(null,'proficiency bonus','proficiency bonus',true)
+						+plusControl('proficiency',2)
+					.skills-container
+						each abilityScore,skill in skillList
+							if /athletics|acrobatics|bureaucracy|insight|deception/.test(skill)
+								h4(class=`${abilityScore}` data-i18n=`${abilityScore} skills`)
+									!=`${abilityScore} skills`
+							div(class=`${skill} expertise-check-label checkbox-container`)
+								input.prof-control(type='hidden'
+									name=`attr_${skill}_proficiency` value='0')
+								.prof-display.true-hexagon.polygon
+									input(class='untrained' type='radio' title=`@{${skill}_proficiency` name=`attr_${skill}_proficiency` value='0' checked=true)
+									input(class='proficiency' type='radio' title=`@{${skill}_proficiency` name=`attr_${skill}_proficiency` value='[[@{proficiency}]]')
+								.expertise-display.true-pentagon.polygon
+									input(class='expertise' type='radio' title=`@{${skill}_proficiency` name=`attr_${skill}_proficiency` value='[[2*@{proficiency}]]')
+									input(class='proficiency' type='radio' title=`@{${skill}_proficiency` name=`attr_${skill}_proficiency` value='[[@{proficiency}]]')
+								if skill === 'athletics'
+									span.check-label.proficiency(data-i18n='proficiency abbreviation')
+										|prof
+									span.check-label.expertise(data-i18n='expertise abbreviation')
+										|exp
+							//- end div ${skill} expertise-check-label checkbox-container
+							+plusControl(skill,0,skill)
+							button(class=`${skill} skill-label` type='roll' name=`roll_${skill}` data-i18n=`${skill.replace(/_/g,' ')}` value=`@{template_start} {{rollName=^{${skill.replace(/_/g,' ')}}}} @{${skill}_macro}`)
+						//- End each abilityScore,skill in skillList
+					//- End .skills-container
+				//- End .right-column
+				.ability-footer
+					each skill in passives
+						+hexagonLabelContainer(null,`passive ${skill}`,`passive ${skill}`,true)
+							input(type='hidden' class='mod-control' name=`attr_passive_${skill}_modded`)
+							span(name=`attr_passive_${skill}` value='10')
+								|10
+					.senses-container
+						h4(data-i18n='senses')
+							|senses
+						each sense in senses
+							+hexagon-check-label(sense)
+				//- End .ability-footer
+			//- End .ability-skill-container
+			.mid-column
+				.armor-speed-container
+					//initiative, dr, speed, and ac containers
+					+hexagonLabelContainer('initiative',`initiative`,'initiative',true,{type:'roll',name:'roll_initiative',class:'hexagon-label','data-i18n':'initiative',value:'@{template_start} {{rollName=^{initiative}}} {{d20=[[@{advantage_state}+@{dexterity_mod}@{initiative_modded} &{tracker}]]}}',content:'initiative'})
+						+plusControl('initiative',0)
+					+hexagonLabelContainer('dr','damage reduction','damage reduction')
+						input(type='number' name='attr_damage_reduction' value='')
+					+hexagonLabelContainer('speed','speed','speed')
+						input(type='text' name='attr_speed' value='')
+					+hexagonLabelContainer('ac',`armor class`,'armor class')
+						input(type='hidden' name='attr_ac_formula' value='10+@{dexterity_mod}')
+						input(type='number' name='attr_ac' value='10')
+				//- End .armor-speed-container
+				.hp-resistance-container
+					//current health, max health, temp hp, hit dice, death saves, and resistances
+					.current-death
+						.current-health
+							h4(data-i18n='current hit points')
+								|current hit points
+							input.h2(type='number' name='attr_hp')
+						//- End .current-health
+						.hd
+							input(type='hidden' name='attr_hit_dice_macro' value='')
+							button.h4(data-i18n='hit dice' type='roll' name='roll_hit_dice' value='@{template_start} {{rollName=^{hit dice}}} @{hit_dice_macro}')
+							each die in [8,10,12]
+								input(type='number' name=`attr_d${die}_hd`)
+								span(data-i18n=`d${die}`)
+									= `d${die}`
+						//- End .hd
+						.death
+							button.h4(data-i18n='death saves' type='roll' name='roll_death_saves' value='@{template_start} {{rollName=^{death save}}} {{d20=[[@{advantage_state}@{death_save_modded}]]}}')
+								|death saves
+							input(type='hidden' name='attr_death_save_modded' value='')
+							each val in ['success','failure']
+								input(class=`${val}-control` type='hidden' name=`attr_death_${val}` value='0')
+								div(class=`${val} first checkbox-container`)
+									input(type='radio' name=`attr_death_${val}` value='0' title=`@{death_${val}}`)
+									input(type='radio' name=`attr_death_${val}` value='1' title=`@{death_${val}}`)
+									span.hexagon
+								div(class=`${val} second checkbox-container`)
+									input(type='radio' name=`attr_death_${val}` value='2' title=`@{death_${val}}`)
+									span.hexagon
+								div(class=`${val} third checkbox-container`)
+									input(type='radio' name=`attr_death_${val}` value='3' title=`@{death_${val}}`)
+									span.hexagon
+								if val==='success'
+									span.success(style='font-family:pictos;' data-i18n-title='Successes' title='Successes')
+										|k
+								else
+									img.death-label.failure(data-i18n-title='Failures' title='Failures' src='https://s3.amazonaws.com/files.d20.io/images/1/i-f4Y5RklihSCLNOzppdwA/max.png?1575392209')
+							//- End each val in ['success','failure']
+						//- End .death
+					//- End .current-death
+					+hexagonLabelContainer('max','maximum hit points')
+						input(type='number' name='attr_hp_max' value='')
+					+hexagonLabelContainer('temp','temporary hit points')
+						input(type='number' name='attr_temp_hp' value='')
+					+borderedTextarea({class:'resistances'},{'data-i18n':'resistances'},{name:'attr_resistances'})
+					//- End .resistances
+				//- End .hp-resistance-container
+				+action(true)
+				//- End borderedContainer
+				.mosaic-satoshi-container
+					+hexagonLabelContainer('mosaic','mosaic score')
+						input(type='number' name='attr_mosaic_score' value='')
+					//- End hexagonLabelContainer
+					+borderedTextarea({class:'satoshi'},{'data-i18n':'satoshi'},{name:'attr_satoshi'})
+				//- End .mosaic-satoshi-container
+				+borderedContainer({class:'inventory-container'},{'data-i18n':'equipment'},['name','cost','weight'])
+					//Inventory details
+					fieldset.repeating_equipment
+						+expandable-section()
+							.expanded-view
+								each val in ['name','quantity','weight','cost','mods','description']
+									+repeating-input-label('equipment',val,val)
+								+id('action')
+							//- End expanded-view
+							.collapsed-view
+								each val in ['name','weight','quantity']
+									span(name=`attr_${val}` value='')
+								//- End each
+							//- End collapsed-view
+						//- End expandable-section
+					//- End fieldset
+				//- End borderedContainer
+			//- End .mid-column
+			.trait-column
+				+trait(true)
+				//- End borderedContainer
+			//- End .trait-column
+		//- End .core
+		.hacks
+			+hack-column(['1st','2nd'])
+			+hack-column(['3rd','4th'])
+			+hack-column(['5th'])
+		//- End .pc-hacks
+		.settings
+			.column
+				+borderedContainer({class:`character-options`})
+					div
+						.gutter
+						+input-label-container('carrying capacity modifier','carrying capacity modifier','number','carrying_capacity_modifier','7')
+						+input-label-container('add initiative tiebreaker','add initiative tiebreaker','checkbox','initiative_tiebreaker',{value:'@{initiative}',checked:'checked'})
+						.gutter
+			.column
+				+borderedContainer({class:`sheet-options`})
+					div
+						.gutter
+						.grid-container
+							+bordered-checkbox({class:'pc-checkbox'},{name:'attr_character_type',value:'pc',checked:'true',type:'radio'},{'data-i18n':'pc'})
+							+bordered-checkbox({class:'npc-checkbox'},{name:'attr_character_type',value:'npc',type:'radio'},{'data-i18n':'npc'})
+						.gutter
+			.column
+				+borderedContainer({class:`sheet-options`})
+					div
+						.gutter
+						+input-label-container('whisper rolls to gm','whisper rolls to gm','select','whisper_state',[{value:'','data-i18n':'never', selected:'true'},{value:'/w gm','data-i18n':'always'}])
+						+input-label-container('show character name in templates','show character name in templates','checkbox','show_character_name',{name:'attr_show_character_name',value:'{{character_name=@{character_name}}} {{character_id=@{character_id}}}',checked:'checked'})
+						.gutter
+		//- End .settings
+	//- End .pc
+	.npc
+		.toggles
+			.toggle-row
+				each section in [/**/{div:{class:'settings'},span:[{class:'settings pictos',contents:'y'},{class:'settings pictos',contents:'x'}],input:[{type:'radio',value:'settings',class:'settings',name:'attr_sheet_view'},{type:'radio',value:'in-play',class:'npc',name:'attr_sheet_view'}]},/**/{div:{class:'whisper'},span:[{class:'whisper pictos',contents:'q'},{class:'public pictos',contents:'w'}],input:[{type:'radio',value:'/w gm',class:'whisper',name:'attr_whisper_state'},{type:'radio',value:' ',class:'public',name:'attr_whisper_state'}]},{div:{class:'import'},span:[{class:'import','data-i18n':'import'},{class:'import','data-i18n':'import'}],input:[{type:'checkbox',value:'import',class:'import',name:'attr_import'},{type:'checkbox',value:'import',class:'import',name:'attr_import'}]}]
+					.bordered-checkbox&attributes(section.div)
+						each num in [0,1]
+							input&attributes(section.input[num])
+							span&attributes(section.span[num])
+								if section.span[num].contents
+									!=section.span[num].contents
+						//- End each
+					//- End .pseudo-button
+				//- End each
+				each section in [/**/{div:{class:'advantage'},span:{'data-i18n':'advantage',class:'advantage'},input:{type:'radio',value:'2d20kh1',class:'advantage',name:'attr_advantage_state'}},/**/{div:{class:'normal'},span:{'data-i18n':'normal',class:'normal'},input:{type:'radio',value:'1d20',class:'normal',name:'attr_advantage_state',checked:true}},/**/{div:{class:'disadvantage'},span:{'data-i18n':'disadvantage',class:'disadvantage'},input:{type:'radio',value:'2d20kl1',class:'disadvantage',name:'attr_advantage_state'}},/**/{div:{class:'query'},span:{'data-i18n':'query',class:'query'},input:{type:'radio',value:'?{Advantage|Normal,1d20|Advantage,2d20kh1|Disadvantage,2d20kl1}',class:'query',name:'attr_advantage_state'}}]
+					+bordered-checkbox(section.div,section.input,section.span)
+			// End toggle-row
+		// End toggles
+		// npc importer
+		//- .npc-import
+			//- +bordered-container
+
+		.npc-info
+			.statblock
+				.statblock-section
+					input.h2(type='text' name='attr_character_name')
+				.settings
+					.statblock-section
+						.grid-container
+							+bordered-checkbox({class:'pc-checkbox'},{name:'attr_character_type',value:'pc',checked:'true',type:'radio'},{'data-i18n':'pc'})
+							+bordered-checkbox({class:'npc-checkbox'},{name:'attr_character_type',value:'npc',type:'radio'},{'data-i18n':'npc'})
+					.statblock-section
+						.row
+							each val in [{value:'size',type:'text'},{value:'genome',type:'text'},{value:'modification',type:'text'}]
+								+input-label-container(val.value,val.value,val.type,val.value.replace(/ /g,'_'),'')
+					.statblock-section
+						.row
+							each val in [{value:'ac',type:'number'},{value:'damage reduction',type:'text'},{value:'hit points',type:'number'},{value:'hit dice',type:'text'},{value:'speed',type:'text'}]
+								+input-label-container(val.value,val.value,val.type,val.value.replace(/ /g,'_'),'')
+					.statblock-section
+						.row
+							each val in [{value:'strength',type:'text'},{value:'dexterity',type:'text'},{value:'constitution',type:'text'},{value:'intelligence',type:'text'},{value:'wisdom',type:'text'},{value:'charisma',type:'text'}]
+								+input-label-container(val.value,val.value,val.type,val.value.replace(/ /g,'_'),'10','pseudo-number')
+					.statblock-section
+						.row
+							each skill in skillNames
+								+input-label-container(`${skill.replace(/_/g,' ')}`,`${skill.replace(/_/g,' ')}`,'number',skill,'')
+							//- End each
+						.row
+							each val in [{value:'skill notes',type:'text'},{value:'senses',type:'text'},{value:'passive perception',type:'number'}]
+								+input-label-container(val.value,val.value,val.type,val.value.replace(/ /g,'_'),'')
+						.row
+							+input-label-container('languages','languages','text','languages','')
+						.row
+							each val in [{value:'challenge',type:'text'},{value:'experience points',i18n:'xp',type:'number'}]
+								+input-label-container(val.value,(val.i18n || val.value),val.type,val.value.replace(/ /g,'_'),'')
+					.statblock-section
+						.row
+							+input-label-container('hacker level','hacker level','number','hacker_level')
+							+input-label-container('hacking ability','hacking ability','select','hacking_ability',abilityOptions.map((abi,index)=>{
+								let obj = {value:abi,'data-i18n':abi}
+								if(index===0){
+									obj.selected='true';
+								}
+								return obj;
+							}))
+							each val in [{value:'hack dc',type:'number'},{value:'hack attack',type:'number'}]
+								+input-label-container(val.value,val.i18n || val.value,val.type,val.value.replace(/ /g,'_'),'')
+						.row
+							each level in hackLevels
+								+input-label-container(`${level}${ordinal[level]} level slots`,`${level}${ordinal[level]} level slots`,'number',`${level}${ordinal[level]}_level_slots`)
+						+hack()
+					//- End .statblock-section
+				.in-play
+					.statblock-section
+						.row
+							each val in [{value:'size',type:'text'},{value:'genome',type:'text'},{value:'modification',type:'text'}]
+								if val.value === 'modification'
+									input(type='hidden' name=`attr_${val.value}` class='parens-control')
+									span.italics.parens
+										|(
+								span.italics(name=`attr_${val.value}`)
+								if val.value ==='modification'
+									span.italics.parens
+										|)
+					.statblock-section
+						.row
+							h4(data-i18n='armor class')
+							span(name=`attr_ac`)
+							input(type='hidden' name=`attr_ac_notes` class='parens-control')
+							span.italics.parens
+								|(
+							span.italics.parens(name=`attr_ac_notes`)
+							span.italics.parens
+								|)
+						.row
+							h4(data-i18n='damage reduction')
+							span(name=`attr_damage_reduction`)
+						.row
+							h4(data-i18n='hit points')
+							span(name=`attr_hit_points`)
+							input(type='hidden' name=`attr_hit_dice` class='parens-control')
+							span.italics.parens
+								|(
+							span.italics.parens(name=`attr_hit_dice`)
+							span.italics.parens
+								|)
+						.row
+							h4(data-i18n='speed')
+							span(name=`attr_speed`)
+					.statblock-section
+						.row
+							each ability,abbreviation in abilityScores
+								+npc-ability-label(ability)
+					.statblock-section
+						.row
+							h4(data-i18n='skills')
+							each skill in skillNames
+								input.skill-control(type='hidden' name=`attr_${skill}`)
+								.skill-display(title=`@{${skill}}`)
+									button.h4(type='roll' name=`roll_${skill}` data-i18n=skill.replace(/_/g,' ') value=`@{template_start} {{rollName=^{${skill.replace(/_/g,' ')}}}} @{${skill}_macro}`)
+									span(name=`attr_${skill}`)
+							//- End each
+						.row
+							h4(data-i18n='skill notes')
+							span(name='attr_skill_notes' title='@{skill_notes}')
+						.row
+							each val in [{name:'senses',i18n:'senses'},{name:'passive_perception',i18n:'passive perception'}]
+								h4(data-i18n=val.i18n)
+								span(name=`attr_${val.name}` title=`@{${val.name}}`)
+						.row
+							h4(data-i18n='languages')
+							span(name='attr_languages' title='@{languages}')
+						.row
+							each val in [{value:'challenge',i18n:'challenge'},{value:'experience_points',i18n:'xp'}]
+								if val.value==='challenge'
+									h4(data-i18n=val.i18n)
+								if val.i18n==='xp'
+									span.parens
+										|(
+								span(name=`attr_${val.value}`)
+								if val.i18n==='xp'
+									span(data-i18n=val.i18n)
+									span.parens
+										|)
+					each level in hackLevels
+						input(type='hidden' name=`attr_${level}${ordinal[level]}_level_slots` value='' class=`hack-display-control level${level}`)
+					.statblock-section.hack-display
+						each level in hackLevels
+							div(class=`level${level}`)
+								h4(data-i18n=`${level}${ordinal[level]} level`)
+								span
+									|(
+								span(name=`attr_${level}${ordinal[level]}_level_slots`)
+								span
+									|):
+								fieldset.repeating_hack
+									input.button-control(type='hidden' name='attr_level' value='')
+									button.h4(type='roll' name='roll_roll' value='@{template_start} {{rollName=@{name}}} @{attack_enable_item} @{save_enable_item} @{damage_1_enable_item} @{damage_2_enable_item} {{range=@{range}}} {{properties=@{properties}}} {{description=@{description}}}')
+										span(name='attr_name')
+			.repeating-container
+				+trait()
+				+action()
+		//- End .settings
+	//- End .npc
+//- End .whole
+// Roll templates
+rolltemplate.sheet-rolltemplate-general
+	div(class=`roll-display ${['d20','damage_1','damage_2','dc'].map((val,ind)=>{return `{{#${val}}}${ind + 1} {{/${val}}} `}).join('').replace(/\s+/g,'')}`)
+		+rollTemplateHelperFunction({positive:true,field:'character_name'})
+			+templateBorderedContainer({class:'character_name'})
+				h4
+					+rollTemplateHelperFunction({positive:true,field:'character_id'})
+						!='[{{character_name}}](http://journal.roll20.net/character/{{character_id}})'
+					+rollTemplateHelperFunction({positive:false,field:'character_id'})
+						!='{{character_name}}'
+				//- End if
+		+rollTemplateHelperFunction({positive:true,field:'d20'})
+			+templateHexagonLabelContainer('rollValue','rollName','^{roll}')
+				span
+					|{{d20}}
+		+rollTemplateHelperFunction({positive:true,field:'damage_1'})
+			+templateHexagonLabelContainer('damage1','damage_type_1','^{damage 1}')
+				span
+					|{{damage_1}}
+				+rollTemplateHelperFunction({positive:true,field:'d20',func:'rollWasCrit'})
+					+rollTemplateHelperFunction({positive:true,field:'is_custom_crit_1'})
+						span
+							|{{custom_critical_1}}
+					+rollTemplateHelperFunction({positive:false,field:'is_custom_crit_1'})
+						span
+							|{{regular_critical_1}}
+		+rollTemplateHelperFunction({positive:true,field:'damage_2'})
+			+templateHexagonLabelContainer('damage2','damage_type_2','^{damage 2}')
+				span
+					|{{damage_2}}
+				+rollTemplateHelperFunction({positive:true,field:'d20',func:'rollWasCrit'})
+					+rollTemplateHelperFunction({positive:true,field:'is_custom_crit_2'})
+						span
+							|{{custom_critical_2}}
+					+rollTemplateHelperFunction({positive:false,field:'is_custom_crit_2'})
+						span
+							|{{regular_critical_2}}
+		+rollTemplateHelperFunction({positive:true,field:'dc'})
+			+templateHexagonLabelContainer('save','save_type','^{save}')
+				span
+					|{{dc}}
+		+rollTemplateHelperFunction({positive:true,field:'range'})
+			+templateBorderedContainer({class:'range'})
+				span
+					|{{range}}
+		+rollTemplateHelperFunction({positive:true,field:'properties'})
+			+templateBorderedContainer({class:'properties'})
+				span
+					|{{properties}}
+		+rollTemplateHelperFunction({positive:true,field:'description'})
+			+templateBorderedContainer({class:'description'})
+				span
+					|{{description}}
+// End Roll Templates
+// Start Scripts
+script(type='text/worker').
+	var genefunk2090 = genefunk2090 || (function() {
+		const displayControllers = ['sheet_view','advantage_state','character_type','whisper_state'],
+		abilityScores = {str:'strength',dex:'dexterity',con:'constitution',int:'intelligence',wis:'wisdom',cha:'charisma'},
+		skillNames = ['athletics','acrobatics','drive','sleight_of_hand','stealth','bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','insight','perception','survival','deception','intimidation','performance','persuasion'],
+		skillList = {athletics:'strength',acrobatics:'dexterity',drive:'dexterity',sleight_of_hand:'dexterity',stealth:'dexterity',bureaucracy:'intelligence',computers:'intelligence',investigation:'intelligence',life_science:'intelligence',mechanics:'intelligence',physical_science:'intelligence',social_science:'intelligence',streetwise:'intelligence',insight:'wisdom',perception:'wisdom',survival:'wisdom',deception:'charisma',intimidation:'charisma',performance:'charisma',persuasion:'charisma'},
+		hackLevels = ['1st','2nd','3rd','4th','5th'],
+		repeating_section_details = [
+			{
+				section:'repeating_equipment',
+				fields:['name','quantity','weight','cost','mods','description','id']
+			},
+			{
+				section:'repeating_hack',
+				fields:['name','level','launch_time','duration','hack_type','source','action_proficiency','attack_enable_item','save_enable_item','damage_1_enable_item','damage_2_enable_item','attack_ability','attack_bonus','save_ability','save_type','dc_bonus','damage_1','critical_damage_1','damage_ability_1','damage_type_1','damage_2','critical_damage_2','damage_ability_2','damage_type_2','range','properties','description','id']
+			},
+			{
+				section:'repeating_action',
+				fields:['name','action_proficiency','attack_enable_item','save_enable_item','damage_1_enable_item','damage_2_enable_item','attack_ability','attack_bonus','save_ability','save_type','dc_bonus','damage_1','critical_damage_1','damage_ability_1','damage_type_1','damage_2','critical_damage_2','damage_ability_2','damage_type_2','range','properties','description','id']
+			},
+			{
+				section:'repeating_trait',
+				fields:['name','source','mods','description','id']
+			}
+		],
+		cascades = {
+			pc:{
+				class_level:{
+					name:'class_level',
+					defaultValue:'',
+					type:'text',
+					affects:['level']
+				},
+				level:{
+					name:'level',
+					defaultValue:'',
+					type:'number',
+					calculation:'custom',
+					affects:['proficiency']
+				},
+				proficiency:{
+					name:'proficiency',
+					defaultValue:'',
+					type:'number',
+					calculation:'2+floor(@{level}/5)',
+					affects:['variable']
+				},
+				ac_formula:{
+					name:'ac_formula',
+					defaultValue:'10+@{dexterity_mod}',
+					type:'text',
+					calculation:'custom',
+					affects:['ac']
+				},
+				ac:{
+					name:'ac',
+					defaultValue:'10',
+					type:'number',
+					calculation:'@{ac_formula}',
+					affects:[]
+				},
+				base_strength:{
+					name:'base_strength',
+					defaultValue:10,
+					type:'number',
+					affects:['strength']
+				},
+				base_dexterity:{
+					name:'base_dexterity',
+					defaultValue:10,
+					type:'number',
+					affects:['dexterity']
+				},
+				base_constitution:{
+					name:'base_constitution',
+					defaultValue:10,
+					type:'number',
+					affects:['constitution']
+				},
+				base_intelligence:{
+					name:'base_intelligence',
+					defaultValue:10,
+					type:'number',
+					affects:['intelligence']
+				},
+				base_wisdom:{
+					name:'base_wisdom',
+					defaultValue:10,
+					type:'number',
+					affects:['wisdom']
+				},
+				base_charisma:{
+					name:'base_charisma',
+					defaultValue:10,
+					type:'number',
+					affects:['charisma']
+				},
+				strength:{
+					name:'strength',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_strength} @{strength_modded}',
+					affects:['strength_mod']
+				},
+				dexterity:{
+					name:'dexterity',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_dexterity} @{dexterity_modded}',
+					affects:['dexterity_mod']
+				},
+				constitution:{
+					name:'constitution',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_constitution} @{constitution_modded}',
+					affects:['constitution_mod']
+				},
+				intelligence:{
+					name:'intelligence',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_intelligence} @{intelligence_modded}',
+					affects:['intelligence_mod']
+				},
+				wisdom:{
+					name:'wisdom',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_wisdom} @{wisdom_modded}',
+					affects:['wisdom_mod']
+				},
+				charisma:{
+					name:'charisma',
+					defaultValue:10,
+					type:'number',
+					calculation:'@{base_charisma} @{charisma_modded}',
+					affects:['charisma_mod']
+				},
+				strength_mod:{
+					name:'strength_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{strength}-10)/2)',
+					affects:['athletics','strength_save','variable']
+				},
+				strength_save_proficiency:{
+					name:'strength_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['strength_save']
+				},
+				strength_save:{
+					name:'strength_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{strength_mod} + @{strength_save_proficiency}@{strength_save_modded}',
+					affects:[]
+				},
+				dexterity_mod:{
+					name:'dexterity_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{dexterity}-10)/2)',
+					affects:['acrobatics','drive','sleight_of_hand','stealth','dexterity_save','initiative','variable']
+				},
+				dexterity_save_proficiency:{
+					name:'dexterity_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['dexterity_save']
+				},
+				dexterity_save:{
+					name:'dexterity_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod} + @{dexterity_save_proficiency}@{dexterity_save_modded}',
+					affects:[]
+				},
+				constitution_mod:{
+					name:'constitution_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{constitution}-10)/2)',
+					affects:['constitution_save','variable']
+				},
+				constitution_save_proficiency:{
+					name:'constitution_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['constitution_save']
+				},
+				constitution_save:{
+					name:'constitution_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{constitution_mod} + @{constitution_save_proficiency}@{constitution_save_modded}',
+					affects:[]
+				},
+				intelligence_mod:{
+					name:'intelligence_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{intelligence}-10)/2)',
+					affects:['bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','intelligence_save','variable']
+				},
+				intelligence_save_proficiency:{
+					name:'intelligence_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['intelligence_save']
+				},
+				intelligence_save:{
+					name:'intelligence_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{intelligence_save_proficiency}@{intelligence_save_modded}',
+					affects:[]
+				},
+				wisdom_mod:{
+					name:'wisdom_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{wisdom}-10)/2)',
+					affects:['insight','perception','survival','wisdom_save','variable']
+				},
+				wisdom_save_proficiency:{
+					name:'wisdom_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['wisdom_save']
+				},
+				wisdom_save:{
+					name:'wisdom_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{wisdom_mod} + @{wisdom_save_proficiency}@{wisdom_save_modded}',
+					affects:[]
+				},
+				charisma_mod:{
+					name:'charisma_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{charisma}-10)/2)',
+					affects:['deception','intimidation','performance','persuasion','charisma_save','variable']
+				},
+				charisma_save_proficiency:{
+					name:'charisma_save_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['charisma_save']
+				},
+				charisma_save:{
+					name:'charisma_save',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{charisma_mod} + @{charisma_save_proficiency}@{charisma_save_modded}',
+					affects:[]
+				},
+				initiative:{
+					name:'initiative',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod}@{initiative_modded}',
+					affects:[]
+				},
+				initiative_modded:{
+					name:'initiative_modded',
+					defaultValue:'',
+					type:'text',
+					affects:['initiative']
+				},
+				athletics_proficiency:{
+					name:'athletics_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['athletics']
+				},
+				athletics:{
+					name:'athletics',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{strength_mod} + @{athletics_proficiency}@{athletics_modded}',
+					affects:[]
+				},
+				acrobatics_proficiency:{
+					name:'acrobatics_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['acrobatics']
+				},
+				acrobatics:{
+					name:'acrobatics',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod} + @{acrobatics_proficiency}@{acrobatics_modded}',
+					affects:[]
+				},
+				drive_proficiency:{
+					name:'drive_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['drive']
+				},
+				drive:{
+					name:'drive',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod} + @{drive_proficiency}@{drive_modded}',
+					affects:[]
+				},
+				sleight_of_hand_proficiency:{
+					name:'sleight_of_hand_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['sleight_of_hand']
+				},
+				sleight_of_hand:{
+					name:'sleight_of_hand',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod} + @{sleight_of_hand_proficiency}@{sleight_of_hand_modded}',
+					affects:[]
+				},
+				stealth_proficiency:{
+					name:'stealth_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['stealth']
+				},
+				stealth:{
+					name:'stealth',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{dexterity_mod} + @{stealth_proficiency}@{stealth_modded}',
+					affects:[]
+				},
+				bureaucracy_proficiency:{
+					name:'bureaucracy_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['bureaucracy']
+				},
+				bureaucracy:{
+					name:'bureaucracy',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{bureaucracy_proficiency}@{bureaucracy_modded}',
+					affects:[]
+				},
+				computers_proficiency:{
+					name:'computers_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['computers']
+				},
+				computers:{
+					name:'computers',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{computers_proficiency}@{computers_modded}',
+					affects:[]
+				},
+				investigation_proficiency:{
+					name:'investigation_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['investigation']
+				},
+				investigation:{
+					name:'investigation',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{investigation_proficiency}@{investigation_modded}',
+					affects:[]
+				},
+				life_science_proficiency:{
+					name:'life_science_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['life_science']
+				},
+				life_science:{
+					name:'life_science',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{life_science_proficiency}@{life_science_modded}',
+					affects:[]
+				},
+				mechanics_proficiency:{
+					name:'mechanics_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['mechanics']
+				},
+				mechanics:{
+					name:'mechanics',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{mechanics_proficiency}@{mechanics_modded}',
+					affects:[]
+				},
+				physical_science_proficiency:{
+					name:'physical_science_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['physical_science']
+				},
+				physical_science:{
+					name:'physical_science',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{physical_science_proficiency}@{physical_science_modded}',
+					affects:[]
+				},
+				social_science_proficiency:{
+					name:'social_science_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['social_science']
+				},
+				social_science:{
+					name:'social_science',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{social_science_proficiency}@{social_science_modded}',
+					affects:[]
+				},
+				streetwise_proficiency:{
+					name:'streetwise_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['streetwise']
+				},
+				streetwise:{
+					name:'streetwise',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{intelligence_mod} + @{streetwise_proficiency}@{streetwise_modded}',
+					affects:[]
+				},
+				insight_proficiency:{
+					name:'insight_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['insight']
+				},
+				insight:{
+					name:'insight',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{wisdom_mod} + @{insight_proficiency}@{insight_modded}',
+					affects:['passive_insight']
+				},
+				passive_insight:{
+					name:'passive_insight',
+					defaultValue:10,
+					type:'number',
+					calculation:'10 +@{insight}@{passive_insight_modded}',
+					affects:[]
+				},
+				passive_insight_modded:{
+					name:'passive_insight_modded',
+					defaultValue:'',
+					type:'text',
+					affects:['passive_insight']
+				},
+				perception_proficiency:{
+					name:'perception_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['perception']
+				},
+				perception:{
+					name:'perception',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{wisdom_mod} + @{perception_proficiency}@{perception_modded}',
+					affects:['passive_perception']
+				},
+				passive_perception:{
+					name:'passive_perception',
+					defaultValue:10,
+					type:'number',
+					calculation:'10 + @{perception}@{passive_perception_modded}',
+					affects:[]
+				},
+				passive_perception_modded:{
+					name:'passive_perception_modded',
+					defaultValue:'',
+					type:'text',
+					affects:['passive_perception']
+				},
+				survival_proficiency:{
+					name:'survival_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['survival']
+				},
+				survival:{
+					name:'survival',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{wisdom_mod} + @{survival_proficiency}@{survival_modded}',
+					affects:[]
+				},
+				deception_proficiency:{
+					name:'deception_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['deception']
+				},
+				deception:{
+					name:'deception',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{charisma_mod} + @{deception_proficiency}@{deception_modded}',
+					affects:[]
+				},
+				intimidation_proficiency:{
+					name:'intimidation_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['intimidation']
+				},
+				intimidation:{
+					name:'intimidation',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{charisma_mod} + @{intimidation_proficiency}@{intimidation_modded}',
+					affects:[]
+				},
+				performance_proficiency:{
+					name:'performance_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['performance']
+				},
+				performance:{
+					name:'performance',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{charisma_mod} + @{performance_proficiency}@{performance_modded}',
+					affects:[]
+				},
+				persuasion_proficiency:{
+					name:'persuasion_proficiency',
+					defaultValue:0,
+					type:'text',
+					affects:['persuasion']
+				},
+				persuasion:{
+					name:'persuasion',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{charisma_mod} + @{persuasion_proficiency}@{persuasion_modded}',
+					affects:[]
+				},
+				repeating_action_$X_bonus:{
+					name:'repeating_action_$X_bonus',
+					defaultValue:0,
+					type:'number',
+					calculation:'@{repeating_action_$X_attack_ability} + @{repeating_action_$X_attack_bonus} + @{repeating_action_$X_action_proficiency}@{repeating_action_$X_attack_modded}',
+					affects:[]
+				},
+				repeating_action_$X_action_proficiency:{
+					name:'repeating_action_$X_action_proficiency',
+					defaultValue:'0',
+					type:'text',
+					affects:['repeating_action_$X_bonus']
+				},
+				repeating_action_$X_attack_ability:{
+					name:'repeating_action_$X_attack_ability',
+					defaultValue:'0',
+					type:'text',
+					affects:['repeating_action_$X_bonus']
+				},
+				repeating_action_$X_attack_bonus:{
+					name:'repeating_action_$X_attack_bonus',
+					defaultValue:'',
+					type:'text',
+					affects:['repeating_action_$X_bonus']
+				}
+			},
+			npc:{
+				strength:{
+					name:'strength',
+					type:'text',
+					affects:['strength_mod']
+				},
+				dexterity:{
+					name:'dexterity',
+					type:'text',
+					affects:['dexterity_mod']
+				},
+				constitution:{
+					name:'constitution',
+					type:'text',
+					affects:['constitution_mod']
+				},
+				intelligence:{
+					name:'intelligence',
+					type:'text',
+					affects:['intelligence_mod']
+				},
+				wisdom:{
+					name:'wisdom',
+					type:'text',
+					affects:['wisdom_mod']
+				},
+				charisma:{
+					name:'charisma',
+					type:'text',
+					affects:['charisma_mod']
+				},
+				strength_mod:{
+					name:'strength_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{strength}-10)/2)',
+					affects:[]
+				},
+				dexterity_mod:{
+					name:'dexterity_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{dexterity}-10)/2)',
+					affects:[]
+				},
+				constitution_mod:{
+					name:'constitution_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{constitution}-10)/2)',
+					affects:[]
+				},
+				intelligence_mod:{
+					name:'intelligence_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{intelligence}-10)/2)',
+					affects:[]
+				},
+				wisdom_mod:{
+					name:'wisdom_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{wisdom}-10)/2)',
+					affects:[]
+				},
+				charisma_mod:{
+					name:'charisma_mod',
+					defaultValue:0,
+					type:'number',
+					calculation:'floor((@{charisma}-10)/2)',
+					affects:[]
+				}
+			}
+		},
+		dropDowns = ['repeating_action_$X_attack_ability'],
+		hitDice = ['d8_hd','d10_hd','d12_hd'],
+		toMonitor = ['strength','dexterity','constitution','intelligence','wisdom','charisma','base_strength','base_dexterity','base_constitution','base_intelligence','base_wisdom','base_charisma','strength_save_proficiency','dexterity_save_proficiency','constitution_save_proficiency','intelligence_save_proficiency','wisdom_save_proficiency','charisma_save_proficiency','class_level','level','athletics_proficiency','acrobatics_proficiency','drive_proficiency','sleight_of_hand_proficiency','stealth_proficiency','bureaucracy_proficiency','computers_proficiency','investigation_proficiency','life_science_proficiency','mechanics_proficiency','physical_science_proficiency','social_science_proficiency','streetwise_proficiency','insight_proficiency','perception_proficiency','survival_proficiency','deception_proficiency','intimidation_proficiency','performance_proficiency','persuasion_proficiency','athletics_proficiency','acrobatics_proficiency','drive_proficiency','sleight_of_hand_proficiency','stealth_proficiency','bureaucracy_proficiency','computers_proficiency','investigation_proficiency','life_science_proficiency','mechanics_proficiency','physical_science_proficiency','social_science_proficiency','streetwise_proficiency','insight_proficiency','perception_proficiency','survival_proficiency','deception_proficiency','intimidation_proficiency','performance_proficiency','persuasion_proficiency'],
+		baseGet = [...toMonitor,'proficiency','character_type','strength_mod','dexterity_mod','constitution_mod','intelligence_mod','wisdom_mod','charisma_mod','strength_save','dexterity_save','constitution_save','intelligence_save','wisdom_save','charisma_save','athletics','acrobatics','drive','sleight_of_hand','stealth','bureaucracy','computers','investigation','life_science','mechanics','physical_science','social_science','streetwise','insight','perception','survival','deception','intimidation','performance','persuasion'],
+		challengeToXP = {
+			'0':10,
+			'1/8':25,
+			'1/4':50,
+			'1/2':100,
+			'1':200,
+			'2':450,
+			'3':700,
+			'4':1100,
+			'5':1800,
+			'6':2300,
+			'7':2900,
+			'8':3900,
+			'9':5000,
+			'10':5900,
+			'11':7200,
+			'12':8400,
+			'13':10000,
+			'14':11500,
+			'15':13000,
+			'16':15000,
+			'17':18000,
+			'18':20000,
+			'19':22000,
+			'20':25000,
+			'21':33000,
+			'22':41000,
+			'23':50000,
+			'24':62000,
+			'25':75000,
+			'26':90000,
+			'27':105000,
+			'28':120000,
+			'29':135000,
+			'30':155000
+		};
+
+		var registerEventHandlers = function(){
+			displayControllers.forEach((attr)=>{
+				on(`change:${attr}`,changeDisplay);
+			});
+			hackLevels.forEach((attr)=>{
+				on(`clicked:add_${attr}_hack`,createHack);
+			});
+			on('change:character_type',changeCharacter);
+			on('change:challenge',convertChallenge);
+			on('change:hit_dice',averageHP);
+			hitDice.forEach((attr)=>{
+				on(`change:${attr}`,updateHDmacro);
+			});
+			[...toMonitor,'repeating_action','repeating_hack','repeating_trait','repeating_equipment'].forEach((attr)=>{
+				on(`change:${attr}${/repeating/.test(attr) ? ` remove:${attr}` :''}`,(event)=>{
+					let triggers = [event.sourceAttribute];
+					log('event:',event);
+					if(/_mods$/.test(event.sourceAttribute)){
+						triggers = extractModTrigger(`${event.newValue},${event.previousValue}`,triggers);
+					}else if(event.removedInfo && _.contains(_.keys(event.removedInfo),`${triggers[0]}_mods`)){
+						triggers = extractModTrigger(event.removedInfo[`${event.sourceAttribute}_mods`],[]);
+					}else if(event.removedInfo){
+						return;
+					}
+					getSections(accessSheet,baseGet,triggers);
+				});
+			});
+		},
+
+		extractModTrigger = function(string,triggers){
+			string.replace(/([+\-=].+?)\s+([^\s,]+)(?:,|$)/ig,(match,value,target)=>{
+				target = target.toLowerCase();
+				if(/=/.test(value) && target ==='ac'){
+					target = 'ac_formula';
+				}
+				if(!_.contains(triggers,target)){
+					triggers.push(target);
+				}
+			});
+			return triggers;
+		},
+
+		accessSheet = function(getArray,sections,triggers){
+			const setObj = {};
+			getAttrs(getArray,(attributes)=>{
+				const buffs = parseBuffs(attributes,sections,triggers);
+				if(attributes.character_type === 'pc' && !buffs.ac_formula){
+					buffs.ac_formula = [{value:cascades.pc.ac_formula.defaultValue,label:'AC'}];
+				}
+				triggers = parseTrigger(triggers,attributes.character_type,attributes,buffs,sections);
+				log('parsed triggers',triggers);
+				triggers = sortTrigger(triggers);
+				reactToTrigger(triggers,attributes,setObj,buffs);
+			});
+		},
+
+		parseBuffs = function(attributes,sections,triggers){ //parses all of the buffs contained in the repeating_trait, and repeating_equipment items
+			//  creates an object indexed by attribute to be buffed containing objects that have all of the buffs for that attribute
+			//  indexed by buff type
+			const modRegex = /([+\-=].+?)\s+([^\s,]+)(?:,|$)/ig;//mod expression +X target,+X target,...
+			//mod expression can use attribute calls, queries, roll expressions, etc.
+			return _.chain(_.keys(attributes))
+				.filter((attr_name)=>{
+					return /_mods$/.test(attr_name);
+				})
+				.reject((attr_name)=>{
+					return attributes[attr_name] === '' || !attributes[attr_name];
+				})
+				.reduce((memo,attr_name)=>{
+					attributes[attr_name].toLowerCase().replace(modRegex,(match,value,target)=>{
+						if(/=/.test(value) && target === 'ac'){
+							target = 'ac_formula';
+							triggers.push('ac_formula');
+						}
+						if(/repeating_[^_]+_\$/i.test(target)){
+							target.replace(/(repeating_[^_]+_)[^_]+(.+)/,(match,section,field)=>{
+								_.each(sections[section],(id)=>{
+									memo[`${section}${id}${field}`] = memo[`${section}${id}${field}`] || [];
+									let targObj = {
+										value:value,
+										label:attributes[attr_name.replace('mods','name')]
+									};
+									memo[`${section}${id}${field}`].push(targObj);
+								});
+							});
+						}else{
+							memo[target] = memo[target] || [];
+							let targObj = {
+								value:value,
+								label:attributes[attr_name.replace('mods','name')]
+							};
+							memo[target].push(targObj);
+						}
+					});
+					return memo;
+				},{})
+				.tap(log)
+				.value();
+		},
+
+		expandRepeating = function(cascade,sections){
+			let tempCasc = trueCopy(cascade);
+			tempCasc = _.keys(tempCasc).reduce((memo,key)=>{
+				if(/^repeating/.test(key)){
+					key.replace(/(repeating_[^_]+)_[^_]+_(.+)/,(match,section,field)=>{
+						_.each(sections[section].id,(id)=>{
+							memo[`${section}_${id}_${field}`]=trueCopy(tempCasc[key]);
+							memo[`${section}_${id}_${field}`].affects = memo[`${section}_${id}_${field}`].affects.map((affected)=>{
+								return affected.replace(/(repeating_[^_]+_)[^_]+(.+)/,`$1${id}$2`);
+							});
+						});
+					});
+				}else{
+					memo[key] = trueCopy(tempCasc[key]);
+				}
+				return memo;
+			},{});
+			return tempCasc;
+		},
+
+		trueCopy = function(obj){
+			return JSON.parse(JSON.stringify(obj));
+		},
+
+		applyBuffsToCascades = function(cascade,buffs,sections){
+			let tempCasc = expandRepeating(cascade,sections);
+			_.keys(buffs).forEach((key)=>{
+				buffs[key].forEach((buff)=>{
+					buff.value.replace(/@{(.+?)}/g,(match,attr)=>{
+						if(/repeating_[^_]+_\$[X\d]+/i.test(attr)){
+							attr.replace(/(repeating_[^_]+)_[^_]+_(.+)/,(match,section,field)=>{
+								sections[section].id.forEach((id)=>{
+									if(!_.contains(tempCasc[`${section}_${id}_${field}`].affects)){
+										tempCasc[`${section}_${id}_${field}`].affects.push(key);
+									}
+								});
+							});
+						}else{
+							if(!_.contains(tempCasc[attr].affects)){
+								tempCasc[attr].affects.push(key);
+							}
+						}
+					});
+				});
+			});
+			return tempCasc;
+		},
+
+		parseTrigger = function(triggers,character_type,attributes,buffs,sections){
+			let cascadeCopy = character_type==='pc' ? applyBuffsToCascades(cascades[character_type],buffs,sections) : expandRepeating(cascades[character_type],sections),
+				trigQueue,
+				trigWorker = (queue,arr) =>{
+					arr = arr || [];
+					let item = queue.shift(),
+						rowID,
+						itemLookup = item.replace(/(repeating_[^_]+_)([^_]+)/,(match,section,id)=>{
+							rowID = /\$/.test(id) ? undefined : id;
+							return `${section}$X`;
+						});
+					if(cascadeCopy[itemLookup]){
+						let parsedItem = {};
+						_.keys(cascadeCopy[itemLookup]).forEach((key)=>{
+							if(key === 'affects'){
+								parsedItem[key] = [];
+								let affectArray = cascadeCopy[itemLookup][key];
+								_.keys(buffs).forEach((key)=>{
+									if(new RegExp(`@{${itemLookup}}`).test(buffs[key].value)){
+										affectArray.push(key);
+									}
+								});
+								affectArray = _.unique(affectArray);
+								_.each(affectArray,(affected)=>{
+									if(/^repeating_/.test(affected)){
+										affected.replace(/(repeating_[^_]+_)[^_]+(.+)/,(match,section,field)=>{
+											log(`rowID:${rowID}`);
+											if(rowID){
+												parsedItem[key].push(`${section}${rowID}${field}`);
+												if(_.every(arr,(item)=>{
+													return item.name !== `${section}${rowID}${field}`;
+												}) && !_.contains(queue,`${section}${rowID}${field}`)){
+													queue.push(`${section}${rowID}${field}`);
+												}
+											}else{
+												_.each(sections[section],(id)=>{
+													parsedItem[key].push(`${section}${id}${field}`);
+													if(_.every(arr,(item)=>{
+														return item.name !== `${section}${id}${field}`;
+													}) && !_.contains(queue,`${section}${id}${field}`)){
+														queue.push(`${section}${id}${field}`);
+													}
+												});
+											}
+										});
+									}else if(/^variable$/.test(affected)){
+										dropDowns.forEach((dropDown)=>{
+											dropDown.replace(/(?:(repeating_[^_]+)_[^_]+_)?(.+)/,(match,section,field)=>{
+												log(section,sections[section]);
+												sections[section].forEach((id)=>{
+													if(attributes[`${section}_${id}_${field}`]===`@{${key}}`){
+														parsedItem[key].push(`${section}_${id}_${field}`);
+														queue.push(`${section}_${id}_${field}`);
+													}
+												});
+											});
+										});
+									}else{
+										parsedItem[key].push(affected);
+										if(_.every(arr,(item)=>{
+											return item.name !== affected;
+										}) && !_.contains(queue,affected)){
+											queue.push(affected);
+										}
+									}
+								});
+							}else{
+								parsedItem[key] = `${cascadeCopy[itemLookup][key]}`.replace(/(repeating_[^_]+_)[^_]+/,`$1${rowID||''}`);
+							}
+						});
+						if((cascadeCopy[itemLookup].calculation || itemLookup === 'ac_formula') && _.every(arr,(item)=>{
+							return item.name !== parsedItem.name;
+						})){
+							arr.push(parsedItem);
+						}
+					}
+					if(_.isEmpty(queue)){
+						return arr;
+					}else{
+						return trigWorker(queue,arr);
+					}
+				};
+			return trigWorker(triggers);
+		},
+
+		sortTrigger = function(triggers){
+			_.each(triggers,(trigger)=>{
+				trigger.order = triggers.reduce((memo,trig,index)=>{
+					if(_.contains(trig.affects,trigger.name)){
+						memo = trig.order + 1 || index;
+					}
+					return memo;
+				},0);
+			});
+			return _.sortBy(triggers,(obj)=>{return obj.order});
+		},
+
+		reactToTrigger = function(triggers,attributes,setObj,buffs){
+			_.each(triggers,(obj)=>{
+				let calc;
+				if(obj.calculation === 'custom'){
+					calc = customCalcs[obj.name](attributes,triggers,setObj,buffs);
+				}else{
+					calc = sheetCalc(obj.name,obj.calculation,attributes,setObj,buffs);
+				}
+				if(!calc && calc !== 0){
+					calc = obj.defaultValue;
+				}
+				attributes[obj.name] = calc;
+				setObj[obj.name] = calc;
+			});
+			set(setObj);
+		},
+
+		calcLevel = function(attributes){
+			let level = 0;
+			attributes.class_level.replace(/\d+/g,(classLevel)=>{
+				level += classLevel*1;
+			});
+			return level;
+		},
+
+		calcAC = function(attributes,triggers,setObj,buffs){
+			return buffs.ac_formula.reduce((memo,buffObj)=>{
+				let calc = sheetCalc('ac_formula',buffObj.value,attributes,setObj,buffs);
+				if(calc >= memo.value){
+					memo = {value:calc,formula:buffObj.value};
+				}
+				return memo;
+			},{value:0}).formula || triggers.ac_formula.defaultValue;
+		},
+
+		customCalcs = {
+			level:calcLevel,
+			ac_formula:calcAC
+		},
+
+		sheetCalc = function(name,calculation,attributes,setObj,buffs){
+			let parsedCalc = calculation;
+			while(/@{([^}]+)}/.test(parsedCalc)){
+				parsedCalc.replace(/@{(([^}]+)_modded)}/,(match,store,target)=>{
+					attributes[store] = (buffs[target]||[]).map((buffObj)=>{
+						return `+ [[${buffObj.value}]][${buffObj.label}]`;
+					}).join(' ');
+					setObj[store]=attributes[store];
+				});
+				parsedCalc = attributeParse(parsedCalc,attributes);
+			}
+			parsedCalc = parsedCalc.replace(/floor|ceil|round|abs/g,'Math.$&').replace(/\[\[|\]\]|\[.*?\]|=/g,'');
+			let finalCalc;
+			try{
+				finalCalc = eval(parsedCalc);
+			}catch(err){
+				finalCalc = undefined;
+			}
+			return finalCalc;
+		},
+
+		attributeParse = function(string,attributes){
+			return string.replace(/@{([^}]+)}/g,(match,name)=>{
+				return attributes[name.toLowerCase()];
+			});
+		},
+
+		updateHDmacro = function(event){
+			const setObj = {};
+			getAttrs(hitDice,(attributes)=>{
+				let hdAccumulator = [];
+				hitDice.forEach((hd)=>{
+					if(attributes[hd] && (attributes[hd]*1!==0 && attributes[hd]!=='')){
+						hdAccumulator.push(hd.replace(/_hd/,''));
+					}
+				});
+				hdAccumulator = hdAccumulator.join('|');
+				if(/\|/.test(hdAccumulator)){
+					hdAccumulator = `?{Die Size|${hdAccumulator}}`;
+				}
+				setObj.hit_dice_macro = `{{d20=[[?{Number of dice|1}${hdAccumulator} + [[?{Number of dice}*@{constitution_mod}]]]]}}`;
+				set(setObj);
+			});
+		},
+
+		convertChallenge = function(event){
+			set({experience_points:challengeToXP[event.newValue]||10});
+		},
+
+		averageHP = function(event){
+			const setObj = {};
+			let numDie,die,bonus;
+			event.newValue.replace(/(\d+)\s*d\s*(\d+)(?:\s*([+\-]\s*\d+))?/,(match,n,d,b)=>{
+				numDie = n*1||1;
+				die = d*1||6;
+				bonus = (b+'').replace(/\s*\+\s*/,'')*1||0;
+			});
+			setObj.hit_points = bonus + Math.floor(numDie*(die/2));
+			setObj.hit_points_max = setObj.hit_points;
+			set(setObj);
+		},
+
+		changeDisplay = function(){
+			getAttrs(displayControllers,(attributes)=>{
+				const setObj = {};
+				setObj.master_display_controller = displayControllers.map((attr)=>{
+					return `${attr}:${attributes[attr]}`
+				}).join(' | ');
+				set(setObj);
+			});
+		},
+
+		createHack = function(event){
+			const setObj = {},
+				rowID = generateRowID(),
+				[hackLevel] = event.triggerName.match(/\d+/);
+			setObj[`repeating_hack_${rowID}_level`] = hackLevel;
+			setObj[`repeating_hack_${rowID}_hack_type`] = 'injection';
+			setObj[`repeating_hack_${rowID}_id`] = rowID;
+			set(setObj);
+		},
+
+		changeCharacter = function(event){
+			const switcher = {
+				npc:NPC,
+				pc:PC
+			};
+			getSections(switcher[event.newValue]);
+		},
+
+		PC = function(getArray,sections){
+			const setObj = {
+				whisper_state:''
+			};
+			_.keys(skillList).forEach((skill)=>{
+				setObj[`${skill}_macro`]=`{{d20=[[@{advantage_state} + @{${skill}_proficiency}[Proficiency] + @{${skillList[skill]}_mod}[${skillList[skill].toUpperCase()}] @{${skill}_bonus}]]}}`
+			});
+			_.keys(abilityScores).forEach((abbreviation)=>{
+				setObj[`${abilityScores[abbreviation]}_check_macro`]=`{{d20=[[@{advantage_state} + @{${abilityScores[abbreviation]}_mod}[${abbreviation.toUpperCase()}] @{${abilityScores[abbreviation]}_bonus}]]}}`;
+				setObj[`${abilityScores[abbreviation]}_save_macro`]=`{{d20=[[@{advantage_state} + @{${abilityScores[abbreviation]}_mod}[${abbreviation.toUpperCase()}] + @{${abilityScores[abbreviation]}_save_proficiency}[Proficiency] @{${abilityScores[abbreviation]}_save_bonus}]]}}`;
+			});
+			sections.repeating_trait.forEach((id)=>{
+				setObj[`repeating_trait_${id}_macro`]='{{source=@{source}}}';
+			});
+			['repeating_hack','repeating_action'].forEach((section)=>{
+				sections[section].forEach((id)=>{
+					setObj[`repeating_hack_${id}_attack_macro`]='{{d20=[[@{advantage_state} + @{attack_ability} + @{action_proficiency} + 0@{attack_bonus}]]}}';
+					setObj[`repeating_hack_${id}_save_macro`]='{{dc=[[8 + @{save_ability} + @{action_proficiency} + 0@{dc_bonus}]]}}';
+					[1,2].forEach((num)=>{
+						setObj[`${section}_${id}_damage_${num}_macro`]=`{{damage_${num}=[[0@{damage_${num}} + @{damage_ability_${num}}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`;
+					});
+				});
+			});
+			set(setObj,changeDisplay);
+		},
+
+		NPC = function(getArray,sections){
+			const setObj = {
+				whisper_state:'/w gm'
+			};
+			_.keys(skillList).forEach((skill)=>{
+				setObj[`${skill}_macro`]=`{{d20=[[@{advantage_state} + @{${skill}} @{${skill}_bonus}]]}}`
+			});
+			_.keys(abilityScores).forEach((abbreviation)=>{
+				setObj[`${abilityScores[abbreviation]}_check_macro`]=`{{d20=[[@{advantage_state} + @{${abilityScores[abbreviation]}_mod}[${abbreviation.toUpperCase()}] @{${abilityScores[abbreviation]}_bonus}]]}}`;
+				setObj[`${abilityScores[abbreviation]}_save_macro`]=`{{d20=[[@{advantage_state} + @{${abilityScores[abbreviation]}_save}[${abbreviation.toUpperCase()}] @{${abilityScores[abbreviation]}_save_bonus}]]}}`;
+			});
+			sections.repeating_trait.forEach((id)=>{
+				setObj[`repeating_trait_${id}_macro`]='';
+			});
+			['repeating_hack','repeating_action'].forEach((section)=>{
+				sections[section].forEach((id)=>{
+					setObj[`${section}_${id}_attack_macro`]='{{d20=[[@{advantage_state} + 0@{attack_bonus}]]}}';
+					setObj[`${section}_${id}_save_macro`]='{{dc=[[0@{dc_bonus}]]}}';
+					[1,2].forEach((num)=>{
+						setObj[`${section}_${id}_damage_${num}_macro`]=`{{damage_${num}=[[0@{damage_${num}}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`;
+					});
+				});
+			});
+			
+			set(setObj,changeDisplay);
+		},
+
+		getSections = function(callback,getArray,trigger,sections,queue){
+			queue = queue || JSON.parse(JSON.stringify(repeating_section_details));
+			getArray = getArray || [];
+			sections = sections || {};
+			let section = queue.shift();
+			getSectionIDs(section.section,(idArray)=>{
+			sections[section.section]=[];
+				idArray.forEach((id)=>{
+					sections[section.section].push(id);
+					section.fields.forEach((field)=>{
+						getArray.push(`${section.section}_${id}_${field}`);
+					});
+				});
+				if(_.isEmpty(queue)){
+					callback(getArray,sections,trigger);
+				}else{
+					getSections(callback,getArray,trigger,sections,queue);
+				}
+			});
+		},
+
+		log = function(msg,obj){
+	        const sheetName = 'Genefunk2090';
+	        if(typeof msg === 'string'){
+	            console.log(`%c${sheetName} log| ${msg}`,"background-color:#159ccf");
+	        }else{
+	            console.log(`%c${sheetName} log| ${typeof msg}`,"background-color:#159ccf");
+	            console.log(msg);
+	        }
+	        if(obj){
+	            console.log(obj);
+	            console.log(`%c==============`,"background-color:#159ccf");
+	        }
+	    },
+
+		bootUp = function(){
+			log(`Sheet Starting up`);
+		},
+
+		set = function(obj,callback){
+			setAttrs(obj,{silent:true},callback)
+		};
+		return {
+		    BootUp: bootUp,
+		    RegisterEventHandlers: registerEventHandlers
+		};
+	}());
+	genefunk2090.BootUp();
+	genefunk2090.RegisterEventHandlers();
+// End Scripts
