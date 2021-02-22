@@ -447,7 +447,7 @@
 						</div>
 						<div>
 							<div class="sheet-combat-label">Move(hex)</div>
-							<input type="text" name="attr_combat_move" disabled="true" class="sheet-stat-value" value="[[@{agl} - @{physical_penalty}]]">
+							<input type="text" name="attr_combat_move" class="sheet-stat-value" value="0" readonly>
 						</div>
 						<div>
 							<div class="sheet-combat-label">Dodge</div>
@@ -1137,8 +1137,8 @@
 				</div>
 				<div>
 					<div class="sheet-combat-label">Move (hex)</div>
-					<input type="text" name="attr_hcombat_move" disabled="true" class="sheet-skill-value" value="(round([[(@{hmove} - (@{hphysical_penalty}))]]*@{horse_speed}))">
-					(Min <input type="text" name="attr_hcombat_min_move" disabled="true" class="sheet-skill-value" value="(round(@{hcombat_move}/3))">)
+					<input type="text" name="attr_hcombat_move" class="sheet-skill-value" value="0" readonly>
+					(Min <input type="text" name="attr_hcombat_min_move" class="sheet-skill-value" value="0" readonly>)
 				</div>
 				<div>
 					<div class="sheet-combat-label">60&deg; turn (hex)</div>
@@ -2039,6 +2039,33 @@ on("change:hinjury_total change:hfatigue_total sheet:opened", function() {
         });
     });
 });
+
+<!-- Move speed in combat /-->
+	
+on("change:encumbrance change:universal_penalty change:agl", function() {
+    getAttrs(["agl", "universal_penalty", "encumbrance"], function(values) {
+        var cmove = parseInt(values.agl) - parseInt(values.universal_penalty) - parseInt(values.encumbrance);
+        console.log(cmove);
+		setAttrs({
+            "combat_move": cmove
+        });
+    });
+});
+
+<!-- Horse Move speed in combat /-->
+
+on("change:horse_speed change:hencumbrance change:huniversal_penalty change:hagl", function() {
+    getAttrs(["hagl", "huniversal_penalty", "hencumbrance", "horse_speed"], function(values) {
+        var hcmove = parseInt(values.hagl) - parseInt(values.huniversal_penalty) - parseInt(values.hencumbrance);
+		hcmove = Math.round( hcmove * parseFloat(values.horse_speed) ); // note: 0.5 speed for walk doesn't seem to work, goes down to 0. 
+		var hcminmove = Math.round( hcmove/3 );
+        setAttrs({
+            "hcombat_move": hcmove,
+			"hcombat_min_move": hcminmove
+        });
+    });
+});
+
 	
 <!-- effective riding skill on horse /-->
 
