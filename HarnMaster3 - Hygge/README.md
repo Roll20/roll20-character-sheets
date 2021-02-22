@@ -14,6 +14,9 @@ Auto-Calculations:
 * Injury Totals
 * Physical Penalty
 * Universal Penalty
+* Armor values: add armour pieces in the inventory tab, check them as "worn (w)" and total armor values are shown on the character tab.
+* Easily drop weapons and reduce inventory load (and encumbrance) on the fly
+* Auto calculate initiave and effective horse riding skill automatically for the horse included in the horse section, when "Mounted" (checkbox)
 
 Features:
 * Roll buttons for each skill that includes appropriate physical/universal penalty.
@@ -24,11 +27,13 @@ Features:
 * Spell/Ritual/Psionic checks.
 * EMLs for in sheet rolls are capped at 5/95 respectively as per rules.
 * Checkbox under load toggles correct Fatigue and Encumberance for Mounted players.
+* An included horse section to facilitate HarnMaster horse combat rules where character and horse skills are averaged. 
 
 NOTE
 ====
 
 This is **NOT** a character generator.  Due to limits in logic it does not calculate SBs and does not auto-add armor protection values (though it does add armor load).
+
 
 HOUSE RULES
 ===========
