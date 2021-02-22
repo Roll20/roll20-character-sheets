@@ -4366,10 +4366,10 @@
 				</h4>
 
 				<ul>
-					<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
-					<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
-					<li>GCA Import, fixed bug incorrect wealth level name.</li>
-					<li>GCA Import, added more rules to capture frequency of appearance and self-control rolls for advantages/disadvantages.</li>
+					<li>Bug fix for Roll Options. If you selected <b>Private Roll</b>, the next time the sheet opens, it changed the option to <b>Custom Roll</b>. Reported by PL M.</li>
+					<li>Chat Box, update display of Armor Divisor when rolling damage to use the same style as skill. Reported by Jared.</li>
+					<li>GCA Import bug. Added some error checking to try to capture null data values for an advantage. Reported by Bob G.</li>
+					<li>Combat Location Tab. Added character and campaign settings options to update <b>Current Hit Points</b> when location damage is changed.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13196,6 +13196,16 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>Bug fix for Roll Options. If you selected <b>Private Roll</b>, the next time the sheet opens, it changed the option to <b>Custom Roll</b>. Reported by PL M.</li>
+				<li>Chat Box, update display of Armor Divisor when rolling damage to use the same style as skill. Reported by Jared.</li>
+				<li>GCA Import bug. Added some error checking to try to capture null data values for an advantage. Reported by Bob G.</li>
+				<li>Combat Location Tab. Added character and campaign settings options to update <b>Current Hit Points</b> when location damage is changed.</li>
+			</ul>
+
+			<h4>Version: 2.6.3</h4>
+
+			<p>Pull Request: 2/15/2021</p>
+			<ul>
 				<li>Added optional Header Buttons for selecting the <b>modifier types</b> for for skill rolls. Option can be selected on the sheet and campaign options.</li>
 				<li>GCA Import, modifier notes. Updated import to handle cases modifiers of modifiers for a advantage/disadvantage. Reported by Valter</li>
 				<li>GCA Import, fixed bug incorrect wealth level name.</li>
@@ -13870,7 +13880,7 @@ visualize what it will look like in chat.
 					
 					<div class="option-container">
 						
-						<h4><span data-i18n="active-defenses-label">Show RAW Notes</span></h4>
+						<h4><span data-i18n="active-defenses-label">Active Defenses</span></h4>
 						
 						<div>
 							<input type="checkbox" name="attr_show_raw_defensive_notes" value="1" checked="checked" />
@@ -13880,6 +13890,24 @@ visualize what it will look like in chat.
 							<span class="tooltip">
 								<span data-i18n="abbreviation-show-rules-as-written-notes-tooltip">
 									Show Rules as Written Success/Fail notes
+								</span>
+							</span>
+						</div>
+						
+					</div><!-- end option-container -->
+
+					<div class="option-container">
+						
+						<h4><span data-i18n="damage-table-label">Damage Table</span></h4>
+						
+						<div>
+							<input type="checkbox" name="attr_damage_update_hit_points" value="1" />
+							<span class="popup">
+								<span data-i18n="update-hit-points-label">Update Hit Points</span>
+							</span>
+							<span class="tooltip">
+								<span data-i18n="update-hit-points-tooltip">
+									If checked, when applying damage to a location, current <b>Hit Points</b> is updated.
 								</span>
 							</span>
 						</div>
@@ -15459,7 +15487,7 @@ visualize what it will look like in chat.
                     <td class="label">
 						<span data-i18n="armor-divisor-label">Armor Divisor</span>:
 					</td>
-                    <td>{{armorDivisor}}</td>
+                    <td class="effective-skill">{{armorDivisor}}</td>
 				</tr>
 				{{/rollGreater() armorDivisor 1}}
                 
@@ -15685,9 +15713,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.3";
+	var version = "2.6.4";
 
-	var latestChangesDate = "2/15/2021";
+	var latestChangesDate = "2/22/2021";
 
 	var modCascade = true;
 	
@@ -20049,7 +20077,7 @@ visualize what it will look like in chat.
 	        
 	        // check for dice modifier
 	        // 3d6+1; diceType = 6+1; diceType=6; diceModifier=1;
-	        if (diceType.includes("+")) {
+	        if (diceType && diceType.includes("+")) {
 	            
 	            arrDiceTypeModifier = diceType.split("+");
 	            
@@ -20057,7 +20085,7 @@ visualize what it will look like in chat.
 	            
 	            diceModifier = parseInt(arrDiceTypeModifier[1]);
 	            
-	        } else if (diceType.includes("-")) { 
+	        } else if (diceType && diceType.includes("-")) { 
 	            
 	            arrDiceTypeModifier = diceType.split("-");
 	            
@@ -21302,7 +21330,7 @@ visualize what it will look like in chat.
         
         var move = 0;
         
-        if ( moveValue.toString().includes("/") ) {
+        if ( moveValue && moveValue.toString().includes("/") ) {
             
             // split the value
             // move = 8/16
@@ -21345,7 +21373,7 @@ visualize what it will look like in chat.
         
         var arrMoveValue;
         
-        if ( moveValue.toString().includes("/") ) {
+        if ( moveValue && moveValue.toString().includes("/") ) {
                 
             // split the value
             // move = 8/16
@@ -26447,6 +26475,65 @@ The attacker may choose to hit the original target or the limb you used to parry
 		});
 	}
 
+	// check if damage table hit points were modified
+	on (`change:repeating_hitlocation:damage`, event => {
+
+		let previousValue = Number.isNaN(event.previousValue) ? 0 : Number(event.previousValue);
+
+		let newValue = Number.isNaN(event.newValue) ? 0 : Number(event.newValue);
+
+		updateCurrentHitPointsByDamageTable(previousValue, newValue);
+
+	});
+
+
+	/**
+	 * If option to update Hit Points when changing damage table location damage
+	 * is on, then update the current Hit Points.
+	 * 
+	 * @param int previousValue Value before damage was applied
+	 * @param int newValue      Value after damage was applied
+	 */
+	function updateCurrentHitPointsByDamageTable(previousValue, newValue) {
+
+		let arrValues = [
+			"damage_update_hit_points",
+			"hit_points"
+		];
+		
+		getAttrs(arrValues, values => {
+
+			let diff = 0;
+
+			let updateHitPoints = values.damage_update_hit_points === "1";
+
+			// if previous and newvalue are the same, use 0 for previous value
+			if (previousValue === newValue) {
+			
+				// special case, use previous = 0 and just use the newValue
+				diff = 0 - newValue;
+
+			} else {
+				
+				// normal process
+				diff = previousValue - newValue;
+			
+			}
+
+			if (updateHitPoints) {
+
+				let hitPoints = Number(values.hit_points);
+
+				let newHitPoints = hitPoints - diff;
+
+				setAttrs({hit_points: newHitPoints});
+
+			}
+		
+		});
+
+	}
+
 	on("change:selected_token", event => {
 		
 		setSelectedMacro();
@@ -28406,14 +28493,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let defenseInfo = "";
 
 		// check for unbalanced parry
-		if (parryScore.includes("U")) {
+		if (parryScore && parryScore.includes("U")) {
 				
 			defenseInfo = "U";
 
 			// just need number
 			skill = Number(parryScore.replace("U", ""));
 
-		} else if (parryScore.includes("F")) {
+		} else if (parryScore && parryScore.includes("F")) {
 
 			defenseInfo = "F";
 
@@ -28455,7 +28542,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			return dieRoll;
 		}
 
-		if (damageDie.includes("~")) {
+		if (damageDie && damageDie.includes("~")) {
 
 			// example: ~1d+1
 			// remove ~
@@ -28849,7 +28936,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 						getGcaValuesForRepeatingLanguage(uniqueKeys, rows, name, basedon, advantage);
 
-					} else if (basedon.includes("Cultural Familiarity")) {
+					} else if (basedon && basedon.includes("Cultural Familiarity")) {
 
 						getGcaValuesForCulturalFamiliarity(uniqueKeys, rows, name, advantage);
 
@@ -29028,13 +29115,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let spokenLevel = -3;
 
-		if (basedon.includes("spoken")) {
+		if (basedon && basedbasedon.includes("spoken")) {
 
 			spokenLevel = getLanguageValueFromGca(advantage.level);
 
 			writtenLevel = -3;
 
-		} else if (basedon.includes("written")) {
+		} else if (basedon && basedon.includes("written")) {
 
 			spokenLevel = -3;
 
@@ -29122,7 +29209,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesForRepeatingLanguage(uniqueKeys, rows, name, basedon, advantage) {
 
-		basedon = basedon.toLowerCase();
+		basedon =  basedon ? basedon.toLowerCase() : "";
 
 		let idkey = advantage.IDKey.trim();
 
@@ -29682,19 +29769,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let rating = 0;
 
-		if (levelName.includes("6 or less")) {
+		if (levelName && levelName.includes("6 or less")) {
 			
 			rating = 6;
 			
-		} else if (levelName.includes("9 or less")) {
+		} else if (levelName && levelName.includes("9 or less")) {
 			
 			rating = 9;
 			
-		} else if (levelName.includes("12 or less")) {
+		} else if (levelName && levelName.includes("12 or less")) {
 			
 			rating = 12;
 			
-		} else if (levelName.includes("15 or less")) {
+		} else if (levelName && levelName.includes("15 or less")) {
 			
 			rating = 15;
 			
@@ -29738,19 +29825,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		}
 
-		if (shortName.includes("6 or less")) {
+		if (shortName && shortName.includes("6 or less")) {
 			
 			rating = 6;
 			
-		} else if (shortName.includes("9 or less")) {
+		} else if (shortName && shortName.includes("9 or less")) {
 			
 			rating = 9;
 			
-		} else if (shortName.includes("12 or less")) {
+		} else if (shortName && shortName.includes("12 or less")) {
 			
 			rating = 12;
 			
-		} else if (shortName.includes("15 or less")) {
+		} else if (shortName && shortName.includes("15 or less")) {
 			
 			rating = 15;
 			
@@ -29853,7 +29940,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = skill.name;
 
-				if (!skill.type.includes("Tech")) {
+				if (skill.type && !skill.type.includes("Tech")) {
 
 					getGcaValuesForSkill(uniqueKeys, rows, name, skill, importNotes);
 
@@ -30105,7 +30192,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 				let name = skill.name;
 
-				if (skill.type.includes("Tech")) {
+				if (skill.type && skill.type.includes("Tech")) {
 
 					getGcaValuesForTechniques(uniqueKeys, rows, name, skill, skills, importNotes);
 
@@ -30212,13 +30299,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let defaultValue = 0;
 
-		if (techDefault.includes(" - ")) {
+		if (techDefault && techDefault.includes(" - ")) {
 			
 			arrDefault = techDefault.split(" - ");
 
 			defaultValue = -1 * Number(arrDefault[1]);
 
-		} else if (techDefault.includes(" + ")) {
+		} else if (techDefault && techDefault.includes(" + ")) {
 			
 			arrDefault = techDefault.split(" + ");
 
@@ -30249,13 +30336,13 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let maxValue = 0;
 
-		if (upto.includes(" - ")) {
+		if (upto && upto.includes(" - ")) {
 			
 			arrUpto = upto.split(" - ");
 
 			maxValue = -1 * Number(arrUpto[1]);
 
-		} else if (upto.includes(" + ")) {
+		} else if (upto && upto.includes(" + ")) {
 			
 			arrUpto = upto.split(" + ");
 
@@ -30666,7 +30753,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		let resistedby = "";
 
 		// example: "class": "Regular/R-HT",
-		if (spell.class.includes("/R-")) {
+		if (spell.class && spell.class.includes("/R-")) {
 
 			let arrClass = spell.class.split("/R-");
 
@@ -30783,17 +30870,19 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		getAttrs(["roll"], values => {
 
-			let rollValue = values.roll;
+			let rollValue = values.roll ?? "";
 
 			let rollOption;
+
+			console.log("rollValue", rollValue);
 
 			rollValue = rollValue.trim();
 
 			if (rollValue === "") {
 				rollOption = "public";
-			} else if (rollValue === "/w gm --l ") {
+			} else if (rollValue === "/w gm --l") {
 				rollOption = "deprecated";
-			} else if (rollValue === "/w gm ") {
+			} else if (rollValue === "/w gm") {
 				rollOption = "private";
 			} else {
 				rollOption = "custom";
