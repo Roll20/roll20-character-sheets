@@ -28,7 +28,7 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 
 - Intergated SL results for all rolls, which aids in the manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self calcualted approach while providing the maximum possible information.)
 
-- Full combat Advantage & Condition Tracking, per core rules.
+- Full combat Advantage & Condition Tracking, per core rules. Additionally advantage can be disabled for spells in the settings tab, allowing for seemless integration the Unoffical Grimoire rules (@ http://www.lahiette.com/leratierbretonnien/wp-content/uploads/2020/09/WFRP4-Unofficial-Grimoire-2.02-PDF.pdf).
 
 - Inventory: Full Encumbrance Management system, with automatic Overencumbrance modifiers (-move/agi), and Container & Vehicle Management section (TEW compatible) .
 
@@ -74,10 +74,12 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 ///// ============ Change Log ============ ///// 
 
+
 February 1st 2021 v1.34
 
 - Added coin converters buttons on the inventory page.
 - Various Qualities text fields now align to the left.
+- Changed spellbook Channel button label from "Cast" to "Channel".
 
 
 January 18th 2021 v1.33
