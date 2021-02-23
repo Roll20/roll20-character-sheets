@@ -19,6 +19,9 @@ Things we want to add to the character sheet, presented in no particular order o
 - [ ] Allow modifications to movement (maybe just an extra box)
 - [ ] Display the adjusted stat score when temporary stat changes are provided
 - [ ] Display the skills section for Pokémon characters
+- [ ] Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:
+  - [ ] A spot for Attack and Special Attack bonuses, for things like Ace Trainer
+  - [ ] The critical hit range for the moves, as this is used for passives, items, etc.
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
 ## Changelog
