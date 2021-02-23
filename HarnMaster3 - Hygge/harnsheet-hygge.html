@@ -502,7 +502,7 @@
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-heavy">Physical</div>
-						<input type="text" name="attr_physical_penalty" class="sheet-stat-value" value="@{encumbrance} + @{universal_penalty}" disabled="true">
+						<input type="text" name="attr_physical_penalty" class="sheet-stat-value" value="0" readonly>
 					</div>
 				</div>
 			</div>
@@ -1299,7 +1299,7 @@
 			</div>
 			<div>
 				<div class="sheet-combat-label sheet-font-heavy">Physical</div>
-				<input type="text" name="attr_hphysical_penalty" class="sheet-skill-value" value="@{hencumbrance} + @{huniversal_penalty}" disabled="true">
+				<input type="text" name="attr_hphysical_penalty" class="sheet-skill-value" value="0" readonly>
 			</div>
 		</div>
 	</div>
@@ -2013,11 +2013,35 @@ on("change:repeating_hinjury:hinjury_infected", function() {
        });
    });
 });
-	
+
+<!-- physical penalty /-->
+on("change:is_mounted change:universal_penalty change:encumbrance", function() {
+    getAttrs(["universal_penalty", "physical_penalty", "encumbrance"], function(values) {
+        var enc = parseInt(values.encumbrance);
+		var upen = parseInt(values.universal_penalty);
+		console.log("encumbrance:" , enc);
+		console.log("universal penalty:", upen);
+		var ppenalty = enc + upen;
+        setAttrs({
+            "physical_penalty": ppenalty
+        });
+    });
+});
+
+<!-- horse physical penalty /-->
+on("change:huniversal_penalty  change:hencumbrance", function() {
+    getAttrs(["huniversal_penalty", "hphysical_penalty", "hencumbrance"], function(values) {
+        var hppenalty = parseInt(values.hencumbrance) + parseInt(values.huniversal_penalty);
+		console.log("horse phys penalty:" , hppenalty);
+        setAttrs({
+            "hphysical_penalty": hppenalty
+        });
+    });
+});	
 
 <!-- universal penalty /-->
 
-on("change:is_mounted change:injury_total change:fatigue_total sheet:opened", function() {
+on("change:is_mounted change:injury_total change:fatigue_total", function() {
     getAttrs(["injury_total", "fatigue_total", "universal_penalty", "is_mounted"], function(values) {
         var fatigue = parseInt(values.fatigue_total);
         if(values.is_mounted == "on") { fatigue = Math.round(fatigue/2)};
@@ -2030,7 +2054,7 @@ on("change:is_mounted change:injury_total change:fatigue_total sheet:opened", fu
 
 <!-- horse universal penalty /-->
 
-on("change:hinjury_total change:hfatigue_total sheet:opened", function() {
+on("change:hinjury_total change:hfatigue_total", function() {
     getAttrs(["hinjury_total", "hfatigue_total", "huniversal_penalty"], function(values) {
         var hfatigue = parseInt(values.hfatigue_total);
         var hupenalty = parseInt(values.hinjury_total) + hfatigue;
@@ -2045,7 +2069,6 @@ on("change:hinjury_total change:hfatigue_total sheet:opened", function() {
 on("change:encumbrance change:universal_penalty change:agl", function() {
     getAttrs(["agl", "universal_penalty", "encumbrance"], function(values) {
         var cmove = parseInt(values.agl) - parseInt(values.universal_penalty) - parseInt(values.encumbrance);
-        console.log(cmove);
 		setAttrs({
             "combat_move": cmove
         });
