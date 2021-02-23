@@ -19,8 +19,8 @@
         <option value="Magic-User">Magic User</option>
       </select>
     </span>
-    <span class="flex-row"><label >Level</label><input class="fill" type="number" name="attr_level" title="@{Level}" value="1" step="1" /></span>
     <span class="flex-row"><label >Kaitar</label><input class="fill nospin" type="number" name="attr_kiatar" title="@{Kiatar}" value="0" min="0" /></span>
+    <span class="flex-row"><label >Level</label><span class="fill worker" name="attr_level"></span></span>
   </div>
   <!-- END Basics Section -->
 
@@ -70,14 +70,14 @@
     </div>
 
     <div class="profession-magicuser">
-      <span class="flex-row"><label>Number of spells</label><input class="fill" type="number" name="attr_spells" title="@{spells}" value="3" step="1" /></span>
+      <span class="flex-row"><label>Number of spells</label><span class="fill worker" name="attr_spells"></span></span>
       <span class="flex-row  tab1 fill"><label>Control Person</label><input class="fill" type="text" name="attr_spell_controlperson" /></span>
       <span class="flex-row  tab1 fill"><label>Doom Kill</label><input class="fill" type="text" name="attr_spell_doomkill" /></span>
       <span class="flex-row  tab1 fill"><label>Energy Bolt</label><input class="fill" type="text" name="attr_spell_energybolt" /></span>
       <span class="flex-row  tab1 fill"><label>Walls</label><input class="fill" type="text" name="attr_spell_walls" /></span>
     </div>
     <div class="profession-priest">
-      <span class="flex-row"><label>Number of spells</label><input class="fill" type="number" name="attr_spells" title="@{spells}" value="3" step="1" /></span>
+      <span class="flex-row"><label>Number of spells</label><span class="fill worker" name="attr_spells"></span></span>
       <span class="flex-row  tab1 fill"><label>Control Creatures</label><input class="fill" type="text" name="attr_spell_controlcreatures" /></span>
       <span class="flex-row  tab1 fill"><label>Creatures</label><input class="fill" type="text" name="attr_spell_creatures" /></span>
       <span class="flex-row  tab1 fill"><label>Fear</label><input class="fill" type="text" name="attr_spell_fear" /></span>
@@ -97,3 +97,35 @@
   <!-- END Misc. Section -->
 
 </div>
+
+
+<!-- Sheet Workers  -->
+<script type="text/worker">
+
+  // Talent based calulations
+  on("change:kiatar sheet:opened", function() {
+    getAttrs(["KIATAR"], function(values) {
+      let kiatar = parseInt(values.KIATAR)||0;
+      let level = 1;
+      let spells = 3;
+
+      // Strength modifiers
+      if (kiatar >= 30000) {
+        level = 4;
+        spells = 6;
+      } else if (kiatar >= 20000) {
+        level = 3;
+        spells = 5;
+      } else if (kiatar >= 10000) {
+        level = 2;
+        spells = 4;
+      }
+      setAttrs({
+        level: level,
+        spells: spells,
+      });
+  	});
+  });
+
+</script>
+<!-- END charsheet EPT -->
