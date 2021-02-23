@@ -354,7 +354,7 @@ on("change:race change:subrace", function(eventinfo) {
 });
 
 on("change:drop_category", function(eventinfo) {
-    if(eventinfo.newValue === "Monsters" || eventinfo.newValue === "Ships") {
+    if(eventinfo.newValue && (eventinfo.newValue === "Monsters" || eventinfo.newValue === "Ships")) {
         getAttrs(["class","race","speed","hp"], function(v) {
             if(eventinfo.newValue === "Ships") {
                 setAttrs({npc_tab: "ships"});
@@ -366,8 +366,7 @@ on("change:drop_category", function(eventinfo) {
                 handle_drop(eventinfo.newValue);
             }
         });
-    }
-    else {
+    } else if(eventinfo.newValue) {
         handle_drop(eventinfo.newValue);
     }
 });

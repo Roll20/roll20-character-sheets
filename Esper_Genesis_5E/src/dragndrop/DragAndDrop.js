@@ -14,8 +14,15 @@ on("change:drop_category", function(eventinfo) {
     }
 });
 
+var lastDropID = '';
 var handle_drop = function(category, eventinfo) {
     getAttrs(["speed", "hp_max", "hp", "drop_name", "drop_data", "drop_content", "character_id", "npc_legendary_actions", "strength_mod", "dexterity_mod", "npc", "base_level", "strength_base", "dexterity_base", "constitution_base", "wisdom_base", "intelligence_base", "charisma_base", "class_resource_name", "other_resource_name", "multiclass1_lvl", "multiclass2_lvl", "multiclass3_lvl"], function(v) {
+        if((v['drop_name'] && v['drop_name'] == lastDropID) || (v['character_id'] && v['character_id'] == lastDropID)) return;
+        if(v['drop_name']) {
+            lastDropID = v['drop_name'];
+        } else if(v['character_id']) {
+            lastDropID = v['character_id'];
+        }
         var pagedata = {};
         try {
             pagedata = JSON.parse(v.drop_data);
@@ -30,7 +37,9 @@ var handle_drop = function(category, eventinfo) {
         var category = page.data["Category"];
         get_repeating_data(function(repeating) {
             var results = processDrop(page, v, repeating);
-            setAttrs(results.update, {silent: true}, function() {results.callbacks.forEach(function(callback) {callback(); })} );
+            setAttrs(results.update, {silent: true}, function() {
+                results.callbacks.forEach(function(callback) {callback(); })
+            });
         });
 
     });
@@ -403,7 +412,7 @@ var processDrop = function(page, currentData, repeating, looped) {
                 })
             }
 
-            if (page.data["data-Traits"]) {
+           if (page.data["data-Traits"]) {
                  const traits = dropFunctions.jsonParse(page.data[`data-Traits`])
 
                  traits.forEach(trait => {
@@ -424,7 +433,7 @@ var processDrop = function(page, currentData, repeating, looped) {
 
                         callbacks.push(() => update_pb());
                         callbacks.push(() => update_spell_slots());
-                    } else if (trait.Name.match(/innate spellcasting/i)) {
+                    } else if (trait.Name.match(/innate powers/i)) {
                         let spellCastingAbility = page.data["Spellcasting Ability"];
                         newObject.addInnateCaster()
 
@@ -441,6 +450,43 @@ var processDrop = function(page, currentData, repeating, looped) {
                     compendiumPages = removeDuplicatedPageData(compendiumPages);
                     compendiumPages = Array.isArray(compendiumPages) ? compendiumPages : [compendiumPages];
                     const innateSpellLists = dropFunctions.jsonParse(page.data["data-Powers"])[`innate`] || false;
+                    let spellUpdate = {}, spellCallbacks = [];
+
+                    compendiumPages.forEach(spellPage => {
+                       const processedSpell = processDrop(spellPage, currentData, repeating);
+                       Object.assign(spellUpdate, processedSpell.update);
+                       processedSpell.callbacks.forEach(callback => spellCallbacks.push(callback));
+                    });
+
+                    if (innateSpellLists) {
+                        //Search each keys in INNATE to see if spell name === one of the Values
+                        for (let [innateKey, innateValue] of Object.entries(innateSpellLists)) {
+                            innateValue.forEach(spellName => {
+                                for (let [key, value] of Object.entries(spellUpdate)) {
+                                    if (key.includes('_spellname') && (value === spellName || value.toLowerCase() === spellName)) {
+                                        const repeatingRow = key.split('_spellname')[0];
+                                        spellUpdate[`${repeatingRow}_innate`] = innateKey
+                                    }
+                                }
+                            });
+                        };
+                    };
+
+                    setAttrs(spellUpdate, {silent: true}, () => {
+                        spellCallbacks.forEach(callback => {
+                            callback();
+                        });
+                    });
+                });
+            }
+
+            //Hack for existing NPCS
+            if (page.data["data-Spells"]) {
+                const spellList = dropFunctions.buildSpellList(page.data["data-Spells"]);
+                getCompendiumPage(spellList, compendiumPages => {
+                    compendiumPages = removeDuplicatedPageData(compendiumPages);
+                    compendiumPages = Array.isArray(compendiumPages) ? compendiumPages : [compendiumPages];
+                    const innateSpellLists = dropFunctions.jsonParse(page.data["data-Spells"])[`innate`] || false;
                     let spellUpdate = {}, spellCallbacks = [];
 
                     compendiumPages.forEach(spellPage => {
