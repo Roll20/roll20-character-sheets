@@ -23,6 +23,11 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Feb 23rd, 2021
+
+- Added collapsing to the Origin Feature
+- Added a send to chat button for the Origin Feature to output the name and description in the chat log in a nice and easily readable format
+
 ### Feb 18th, 2021
 
 - Expanded the Capture Pokémon skill, allowing modifiers such as Capture Point to be applied
