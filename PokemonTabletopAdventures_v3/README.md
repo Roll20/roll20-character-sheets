@@ -25,8 +25,10 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ### Feb 23rd, 2021
 
-- Added collapsing to the Origin Feature
-- Added a send to chat button for the Origin Feature to output the name and description in the chat log in a nice and easily readable format
+- Unifies background colours for text areas and number inputs
+- Added collapsing to the Origin Feature and all Class Features
+- Added a send to chat button for the Origin Feature and Class Features to output the name and description in the chat log in a nice and easily readable format
+  - Made the name of the features into the same button when collapsed to improve consistency of design vis-a-vis the moves section
 
 ### Feb 18th, 2021
 
