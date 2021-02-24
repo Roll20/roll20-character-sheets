@@ -11,6 +11,8 @@ const sheetSelect = eventinfo => {
 	const newValue = eventinfo.newValue;
 	let update = {}
 
+	console.log(newValue)
+
 	update.sheet_type = newValue === 'knight' || newValue === 'woman' ? 'character' : newValue;
 	update.character_type = newValue === 'woman' ? 'woman' : 'knight';
 
