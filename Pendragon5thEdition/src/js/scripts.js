@@ -117,7 +117,7 @@ const calculateExpenses = ({ triggerName }) => {
 
 	getAttrs(attributes, values => {
 		const parsedNums = helpers.parseIntegers(values)
-		const emergency = helpers.convertIntegerNegative(parsedNums[`${repeatingRow}_emergency_income`])
+		const emergency = parsedNums[`${repeatingRow}_emergency_income`]
 		const expenses = helpers.convertIntegerNegative(parsedNums[`${repeatingRow}_expenses`])
 		const manor = parsedNums[`${repeatingRow}_manor_income`]
 
