@@ -10,9 +10,28 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.7 [Screenshot](coc_v2.png)
+3.8 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.8 (2021-02-22)
+
+_Fiche de PJ_
+
+- Déplacement de l'initiative sur la 1ère ligne de la section combat
+- Amélioration de la reconnaissance des propriétés d'équipement
+  - **DEF : x** pour indiquer le bonus de DEFense d'une armure
+  - **DEF- : x** pour indiquer le malus d'encombrement d'une armure
+  - **RD : x** pour indiquer la réduction des DM d'une armure
+  - **DM : dm type** pour indiquer les dés et le type de DM
+    - Où _dm_ est {nombre}d{faces}
+    - Suffixer _dm_ avec + ou ! pour des DM explosifs
+  - **DM2 : dm2 type2** pour indiquer un second type et dés de DM
+
+_Fiche de Véhicule_
+
+- Ajout d'un type de véhicule et d'un bouton sur l'onglet Configuration
+- Cliquer sur le bouton permet de générer une liste par défaut des jets de véhicule
 
 ## v3.7 (2020-12-21)
 

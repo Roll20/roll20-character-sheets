@@ -15,7 +15,8 @@
   <div class="sheet-col">
     <label>Escala:</label><input type="text" name="attr_escala"/><br/>
 	<label>Mundo:</label><input type="text" name="attr_mundo"/><br/>
-    <label>Dinheiro:</label><input type="number" value="0" name="attr_dinheiro"/>
+    <label>Dinheiro:</label><input type="number" value="0" name="attr_dinheiro"/><br/>
+	<p hidden><button class="sheet-hidden-roll" type='roll' name="roll_forca" value='&{template:3dtatributo} {{name= Teste de Força}} {{character=@{character_name}}} {{type=Usando Força}} {{ability=[[1d6]]}} {{atributo=[[@{forca}+@{bf}+?{Modificador|0}]]}}'><span style="font-family: 'dicefontd6'">f</span></button></p>
 </div>
 </div>	
  <hr>
@@ -342,3 +343,618 @@
   <div class="sheet-block-q">    
   </div>	
  </div>
+
+<!-- TEMPLATE ATRIBUTOS-->
+<rolltemplate class="sheet-rolltemplate-3dtatributo">
+    <div class="bordertop"></div>
+    <div class="container">
+
+        <div><h1>{{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+        
+        
+        {{#ability}}
+            <div class="rowcolor"><span class="tcat">{{type}}:</span> {{ability}}</div>
+                {{#^rollGreater() ability atributo }}
+                    <span class="fullcrit">Teste bem sucedido! </span>
+                {{/^rollGreater() ability atributo }}
+                {{#rollGreater() ability atributo}}
+                    <span class="fullfail">Fracassou...</span>
+                {{/rollGreater() ability atributo}}
+        {{/ability}}
+    
+    </div>
+</rolltemplate>
+
+<!-- TEMPLATE INICIATIVA -->
+<rolltemplate class="sheet-rolltemplate-3dtiniciativa">
+    <div class="bordertop"></div>
+    <div class="container">
+        <div><h1>{{name}}</h1></div>
+        <div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+		<div><span style="font-weight: bold;">Tirou de iniciativa:</span>{{iniciativa}}</div>
+		
+</rolltemplate>		
+
+<!-- TEMPLATE MAGIA-->
+<rolltemplate class="sheet-rolltemplate-3dtmagia">
+    <div class="bordertop"></div>
+    <div class="container">
+
+        <div><h1>{{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader" style="font-weight: bold;">{{character}}</span> <span> conjura a magia...</span></div>
+		<div><span style="font-weight: bold;">Magia:</span> {{Magia}}</div>
+		<div><span style="font-weight: bold;">Escola:</span> {{Escola}}</div>
+		<div><span style="font-weight: bold;">Custo:</span> {{Custo}}<span> PM</span></div>
+		<div><span style="font-weight: bold;">PV:</span> {{PV}}<span> por turno</span></div>
+		<div><span style="font-weight: bold;">Alcance: </span> {{Alcance}}</div>
+		<div><span style="font-weight: bold;">Duração:</span> {{Duração}}</div>
+		<div><span>Tirou</span>{{resultado}}<span> no resultado!!!</span></div>
+		</div>
+		
+</rolltemplate>
+
+	<!-- TEMPLATE ATAQUES-->
+<rolltemplate class="sheet-rolltemplate-3dtataque">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{dano}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+                        {{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{dano}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano: </span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+                        {{#rollLess() danocrit 1 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                        {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+<!-- TEMPLATE DEFESAS -->
+<rolltemplate class="sheet-rolltemplate-3dtdefesa">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Defesa Normal -->
+        <div><h1>{{name}}</h1></div>
+        {{#def_norm}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Defesa:</span> {{defnormal}}</div>
+            {{#defesa}}
+               {{#^rollWasCrit() defesa}}
+                    {{#rollGreater() defnormal 0 }}
+                        <div class="rowcolor"><span class="tcat">Defendeu:</span> {{dano}}</div>
+                    {{/rollGreater() defnormal 0 }}
+                    {{#rollLess() defnormal 1 }}
+                        <div class="rowcolor"><span class="tcat">Defendeu: </span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                    {{/rollLess() defnormal 1 }}
+                {{/^rollWasCrit()defesa}}
+                
+                {{#rollWasCrit() defesa}}
+                    <span class="fullcrit">Defesa crítica! </span>
+                    {{#rollGreater() defcritica 0 }}
+                            <div class="rowcolor"><span class="tcat">Defendeu crítico:</span> {{defcritica}}</div>
+                        {{/rollGreater() defcritica 0 }}
+                        {{#rollLess() defcritica 1 }}
+                            <div class="rowcolor"><span class="tcat">Defendeu crítico:</span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                    {{/rollLess() defcritica 1 }}
+                {{/rollWasCrit() defesa}}
+            {{/defesa}}		
+        {{/def_norm}}
+		
+		<!-- Defesa Supreendido -->
+        {{#def_surp}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{defesa}}</div>
+            
+            {{#surp}}
+                   {{#^rollWasCrit() defesa}}
+                   
+                        {{#rollGreater() defsurp 0 }}
+                            <div class="rowcolor"><span class="tcat">Supreendido:</span> {{defsurp}}</div>
+                        {{/rollGreater() defsurp 0 }}
+                        {{#rollLess() defsurp 1 }}
+                            <div class="rowcolor"><span class="tcat">Supreendido: </span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                        {{/rollLess() defsurp 1 }}
+
+                    {{/^rollWasCrit() defesa}}
+                    {{#rollWasCrit() defesa}}
+                        <span class="fullcrit">Acerto crítico! </span>
+                        {{#rollGreater() suprcritico 0 }}
+                                <div class="rowcolor"><span class="tcat">Supreendido crítico:</span> {{suprcritico}}</div>
+                        {{/rollGreater() suprcritico 0 }}
+                        {{#rollLess() suprcritico 1 }}
+                                <div class="rowcolor"><span class="tcat">Supreendido crítico:</span><span style="font-weight: bold;"> 1 (mín.)</span> </div>
+                        {{/rollLess() suprcritico 1 }}
+                    {{/rollWasCrit() defesa}}
+                {{/surp}}
+        {{/def_surp}} 
+		
+     <!-- Indefeso -->
+	{{#def_indef}}
+		   <div class="arrow-container"><div class="arrow-right"></div></div>
+           <div><span class="subheader">{{subtags}}</span></div>  
+           <div class="rowcolor"><span class="tcat">Indefeso:</span> {{indef}}</div>
+		{{/def_indef}}  
+    </div>
+</rolltemplate>
+
+
+
+
+
+
+
+
+
+
+
+<!-----------------------------------------------------------------------------------TEMPLATE PARA TESTE DE ATAQUES-------------------------------------------------------------------------------------->
+<rolltemplate class="sheet-rolltemplate-3dtatributo2">
+    <div class="bordertop"></div>
+    <div class="container">
+
+        <div><h1>{{name}}</h1></div>
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+        <div><span class="subheader">{{character}}</span></div>
+        
+        
+        {{#ability}}
+            <div class="rowcolor"><span class="tcat">{{type}}:</span> {{testeatt}}</div>
+                {{#^rollGreater() ability atributo }}
+                    <span class="fullcrit" style="font-weight: bold;">Sucesso!!! </span>
+                {{/^rollGreater() ability atributo }}
+                {{#rollGreater() ability atributo}}
+                    <span class="fullfail" style="font-weight: bold;">Fracassou...</span>
+                {{/rollGreater() ability atributo}}
+        {{/ability}}
+    
+    </div>
+</rolltemplate>
+
+
+
+
+<!-- TEMPLATE ATAQUES2-->
+<rolltemplate class="sheet-rolltemplate-3dtataque2">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{dano}}+{{ataque-pa}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}	
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{dano}}+{{ataque-dist}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}		
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+
+<!-- TEMPLATE ATAQUES3-->
+<rolltemplate class="sheet-rolltemplate-3dtataque3">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> ({{dano}}+{{ataque-pa}})</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}		
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> ({dano}}+{{ataque-dist}})</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					    {{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+
+
+<!-- TEMPLATE ATAQUES4-->
+<rolltemplate class="sheet-rolltemplate-3dtataque4">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{({{dano}}+{{ataque-pa}})}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{({dano}}+{{ataque-dist}})}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+
+<!-- TEMPLATE ATAQUES5-->
+<rolltemplate class="sheet-rolltemplate-3dtataque5">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{({{dano}}+{{ataque-pa}})}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano: </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}	
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{({{dano}}+{{ataque-dist}})}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+
+<!-- TEMPLATE ATAQUES6-->
+<rolltemplate class="sheet-rolltemplate-3dtataque6">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{[[({{dano}}+{{ataque-pa}})]]}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                {{/rollWasCrit() ataque-pa}}
+            {{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{[[({{dano}}+{{ataque-dist}})]]}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+
+<!-- TEMPLATE ATAQUES7-->
+<rolltemplate class="sheet-rolltemplate-3dtataque7">
+    <div class="bordertop"></div>
+    <div class="container">
+        <!-- Ataques dos Personagens -->
+        <div><h1>{{name}}</h1></div>
+        {{#ataque-pa}}
+		<div class="arrow-container"><div class="arrow-right"></div></div>
+		
+        <div><span class="subheader">{{subtags}}</span></div>
+        <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-pa}}</div>
+            {{#dano}}
+               {{#^rollWasCrit() ataque-pa}}
+                    {{#rollGreater() dano 0 }}
+                        <div class="rowcolor"><span class="tcat">Dano:</span> {{[[{{dano}}+{{ataque-pa}}]]}}</div>
+                    {{/rollGreater() dano 0 }}
+                    {{#rollLess() dano 1 }}
+                        <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() dano 1 }}
+                {{/^rollWasCrit() ataque-pa}}
+                
+                {{#rollWasCrit() ataque-pa}}
+                    <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                    {{#rollGreater() danocrit 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+				{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                {{/rollLess() danocrit 1 }}		
+                {{/rollWasCrit() ataque-pa}}
+			{{/dano}}		
+        {{/ataque-pa}}
+        {{#ataque-dist}}
+			<div class="arrow-container"><div class="arrow-right"></div></div>
+			
+            <div><span class="subheader">{{subtags}}</span></div>  
+            <div class="rowcolor"><span class="tcat">Ataque:</span> {{ataque-dist}}</div>
+            
+            {{#dano}}
+                   {{#^rollWasCrit() ataque-dist}}
+                   
+                        {{#rollGreater() dano 0 }}
+                            <div class="rowcolor"><span class="tcat">Dano:</span> {{[[{{dano}}+{{ataque-dist}}]]}}</div>
+                        {{/rollGreater() dano 0 }}
+                        {{#rollLess() dano 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo: </span><span style="font-weight: bold;"> 1</span> </div>
+                        {{/rollLess() dano 1 }}
+
+                    {{/^rollWasCrit() ataque-dist}}
+                    {{#rollWasCrit() ataque-dist}}
+                        <span class="fullcrit" style="font-weight: bold;">Acerto crítico! </span>
+                        {{#rollGreater() danocrit 0 }}
+                                <div class="rowcolor"><span class="tcat">Dano crítico:</span> {{danocrit}}</div>
+                        {{/rollGreater() danocrit 0 }}
+					{{#rollLess() danocrit 1 }}
+                            <div class="rowcolor"><span class="tcat">Dano Mínimo:</span><span style="font-weight: bold;"> 1</span> </div>
+                    {{/rollLess() danocrit 1 }}
+                    {{/rollWasCrit() ataque-dist}}
+                {{/dano}}
+        {{/ataque-dist}}      
+       
+    </div>
+</rolltemplate>
+

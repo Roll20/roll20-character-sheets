@@ -55,10 +55,11 @@ const validateWeaponSkills = (ids) => {
 };
 const validateShells = (e) => {
     //Unchecks every shell 'active' toggle except the one toggle now.
-    console.log(e.sourceAttribute);
-    console.log(e.sourceAttribute.slice(17, -13));
-    console.log(e.sourceAttribute.slice(-6));
-    if (e.sourceAttribute.slice(-6) === "active") {
+    // console.log(e.sourceAttribute);
+    // console.log(e.sourceAttribute.slice(17, -13));
+    // console.log(e.sourceAttribute.slice(-6));
+    // console.log(e.sourceAttribute.slice(-15, -7));
+    if (e.sourceAttribute.slice(-6) === "active" && e.sourceAttribute.slice(-15, -7) !== "affinity") {
         console.log("Changing");
         getSectionIDs("repeating_shells", idArray => {
             idArray = idArray.filter(item => item !== e.sourceAttribute.slice(17, -13))

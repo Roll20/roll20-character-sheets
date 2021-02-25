@@ -2,7 +2,7 @@
 
 /* Data constants */
 const sheetName = "Stars Without Number (revised)";
-const sheetVersion = "2.5.3";
+const sheetVersion = "2.5.4";
 const translate = getTranslationByKey;
 const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -476,7 +476,7 @@ const autofillData = {
         shield: {
             armor_ac: "13",
             armor_ac_bonus: "1",
-            armor_encumbrance: "1",
+            armor_encumbrance: "2",
             armor_type: "SHIELD",
             armor_price: "10",
         },
