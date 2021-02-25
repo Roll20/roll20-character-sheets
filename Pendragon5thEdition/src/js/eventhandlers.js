@@ -26,6 +26,7 @@ on(`change:sheet_select`, eventinfo => sheetSelect(eventinfo))
 
 on(`change:repeating_events:new_glory`, () => calculateGlory())
 
+on(`change:repeating_treasure-record:amount_worth`, () => calculateTreasure())
 
 manorAttrs.annual.forEach(attr => {
 	on(`change:repeating_land-record:${attr}`, () => calculateAnnualTotal( attr ))

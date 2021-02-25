@@ -62,6 +62,22 @@ const unconciousCalculator = (attributes, set) => {
 	});
 };
 
+const calculateTreasure = () => {
+	getSectionIDs('treasure-record', idArray => {
+		let attributes = []
+		idArray.forEach(id => attributes.push(`repeating_treasure-record_${id}_amount_worth`))
+
+		getAttrs(attributes, values => {
+			const parsedNums = helpers.parseIntegers(values)
+			const objectValues = Object.values(parsedNums) 
+
+	    setAttrs({
+	    	'treasure_total': helpers.sumIntegers(objectValues)
+	    });
+		})
+	})
+}
+
 const calculateGlory = () => {
 	getSectionIDs('events', idArray => {
 		let attributes = []
