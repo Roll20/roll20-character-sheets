@@ -1,4 +1,6 @@
-﻿$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.html'
+﻿& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
+
+$inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.html'
 $sourceFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised'
 $outputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\2ESheet.html'
 
