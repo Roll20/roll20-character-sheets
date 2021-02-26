@@ -24,9 +24,11 @@ attributes.knights.forEach(attr => {
 
 on(`change:sheet_select`, eventinfo => sheetSelect(eventinfo))
 
-on(`change:repeating_events:new_glory`, () => calculateGlory())
+on(`change:repeating_events:new_glory`, (eventinfo) => calculateGlory(eventinfo))
 
 on(`change:repeating_treasure-record:amount_worth`, () => calculateTreasure())
+
+on(`change:repeating_manor-personnel-retinue:cost`, () => calculateRetinueAnnualTotal())
 
 manorAttrs.annual.forEach(attr => {
 	on(`change:repeating_land-record:${attr}`, () => calculateAnnualTotal( attr ))
@@ -47,3 +49,5 @@ manorAttrs.treasury.forEach(attr => {
 manorAttrs.manor_income.forEach(attr => {
 	on(`change:repeating_income-worksheet:${attr}`, ( eventinfo ) => calculateManorIncome( eventinfo ))
 })
+
+

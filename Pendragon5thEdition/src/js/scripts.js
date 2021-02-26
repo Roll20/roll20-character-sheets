@@ -78,7 +78,9 @@ const calculateTreasure = () => {
 	})
 }
 
-const calculateGlory = () => {
+const calculateGlory = ({ triggerName }) => {
+	const repeatingRow = helpers.getReprowid(triggerName)
+
 	getSectionIDs('events', idArray => {
 		let attributes = []
 		idArray.forEach(id => attributes.push(`repeating_events_${id}_new_glory`))
@@ -86,10 +88,12 @@ const calculateGlory = () => {
 		getAttrs(attributes, values => {
 			const parsedNums = helpers.parseIntegers(values)
 			const gloryValues = Object.values(parsedNums) 
+			const sum = helpers.sumIntegers(gloryValues)
 
 	    setAttrs({
-	    	'glory_total': helpers.sumIntegers(gloryValues)
-	    });
+	    	'glory_total': sum,
+				[`${repeatingRow}_total_glory`]: sum,
+	    })
 		})
 	})
 }
@@ -173,3 +177,20 @@ const calculateAnnualTotal = (attr) => {
 		})
 	})
 }
+
+const calculateRetinueAnnualTotal = () => {
+	getSectionIDs('land-record', idArray => {
+		let attributes = []
+		idArray.forEach(id => attributes.push(`repeating_manor-personnel-retinue_${id}_cost`))
+
+		getAttrs(attributes, values => {
+			const parsedNums = helpers.parseIntegers(values)
+			const objectValues = Object.values(parsedNums)
+
+	    setAttrs({
+	    	[`retinue_total`]: helpers.sumIntegers(objectValues)
+	    });
+		})
+	})
+}
+
