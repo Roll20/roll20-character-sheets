@@ -104,7 +104,8 @@ const manorAttrs = {
 	misfortune: ['fate', 'care'],
 	treasury: ['emergency_income', 'expenses', 'manor_income'],
 	manor_income: ['anticipated_income', 'harvest_result'],
-	annual: ['annual_income', 'annual_maintenance', 'annual_glory']
+	annual: ['annual_income', 'annual_maintenance', 'annual_glory'],
+	expenses: ['lifestyle', 'annual_maintenance_total', 'new_improvements', 'retinue_total']
 }
 
 const formatRepeatinRow = (rowId, array) => array.map( x => `${rowId}_${x}` )
@@ -179,7 +180,7 @@ const calculateAnnualTotal = (attr) => {
 }
 
 const calculateRetinueAnnualTotal = () => {
-	getSectionIDs('land-record', idArray => {
+	getSectionIDs('manor-personnel-retinue', idArray => {
 		let attributes = []
 		idArray.forEach(id => attributes.push(`repeating_manor-personnel-retinue_${id}_cost`))
 

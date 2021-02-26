@@ -50,4 +50,7 @@ manorAttrs.manor_income.forEach(attr => {
 	on(`change:repeating_income-worksheet:${attr}`, ( eventinfo ) => calculateManorIncome( eventinfo ))
 })
 
+manorAttrs.expenses.forEach(attr => {
+	on(`change:${attr}`, ( ) => sumOfCalculator( manorAttrs.expenses, 'expense_total' ))
+})
 
