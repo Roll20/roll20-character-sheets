@@ -38,6 +38,8 @@ Change Log
 	Added automated DR and resistance updates to Core Combat Info from Arms->Armor tab
 2021-02-24
 	Tuned Magic->Spells display and dice roller
+2021-02-27
+	Updated Vehicle tab, players can document the basic stats for their vehicles here, no roll buttons included yet.
 	
 	
 
