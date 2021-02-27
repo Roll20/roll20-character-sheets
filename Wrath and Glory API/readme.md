@@ -9,8 +9,8 @@ Please note that the inline dice roll macros do not fully enable the type of dic
 If you have any questions, comments, or feedback (all welcome) please contact Barry at btsnyder@gmail.com
 
 ### Current Version
-Version 3.0 (May 18th, 2020) Wrath & Glory Revision Updates.
-This release has a significant number of updates to align with the revised edition.  The major change revolves around traumatic injuries and replacement of dice with wrath dice = to number of traumatic injuries.
+Version 3.1 (August 30th, 2020) Revised Release (3.1) fixes.
+this release focused on incorporating max wounds changes from errata, a wiley defect (logical error) in dice rolls, and the addition of dying around trauma.
 
 ### Thanks	
 Many thanks to my players (Dave, Brian, Matt, and Tyler) for their patience as I evolved the sheet and die roller (sometimes - literally - in the middle of play).
@@ -19,13 +19,31 @@ Many thanks to the following individuals who reported defects and provided impro
 1. Morback: extra die on rolls + implement force to add 1/2 willpower to weapon DR + corruption level and roll changes
 2. Zoraste: update wounds to include wounds_max for token bar linking + notes field for Gear + minor spelling errors + request for private rolls + contributed code for automating trait calculations
 3. Fenrir: new layout was his work; full contributions in the API.
+4. Thomas: whose help in identifying the underlying issue with a bug fix and willingness to test was a great aid!
 
 ### Planned Releases
-3.1 After update to Wrath & Glory handling of additional wrath dice for Injuries (swapping them out) will update all rolls to feed Trauma Count (introduced in 3.0) to all dice rolls using wrath.
+3.2 Maintenance - refactor code to align with Roll20 standards.
 
 ### Current Release Changelog
 
-v3.0. Revisions to Align with Cubicle 7 Revised Edition
+v3.1. Errata, Fixes, and Dying Enhancement
+
+The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
+
+Updates:
+01. New: Added Dying checkbox to align with how Traumatic wounds work.  The Wrath dice for Traumatic Wounds only apply when a player is dying.
+02. Fix: Additional wrath dice are only triggered if the Dying checkbox is checked.  Before it was triggered if the number of Traumatic wounds was greater than 0.  This is per RAW.
+03. Fix: Updated load to account for weapons field value that is not being reset for character sheets prior to 3.01.
+04. Fix: Under very specific circumstances, dice rolls for skills and weapon attacks were off by 1 to 2 dice.
+05. Fix: Number of dice being rolled for roll20 standard dice rolling mechanics for damage on attacks was not being properly updated - resulting in missing dice.
+06. New: Errata changes for calculating wounds - I opted to leave in the recovery roll for shock to allow groups to have that option if so desired.
+
+### Changelog
+
+** August 30th, 2020 - v3.1 - Fixes with Dying Enhancement** 
+
+
+** May 18th, 2020 - v3.0 - Revisions to Align with Cubicle 7 Revised Edition** 
 
 The major element of this release, beyond cosmetic changes to match against the Revised rules is the additon of traumatic weapons and replacing existing dice with a number of wrath dice = traumatic injuries.
 
@@ -51,8 +69,6 @@ Updates:
 19. NEW: Added a Melta dice roller for when using Melta vs structure and vehicles; too complex for adding to W&G dice roller at this point.
 20. NEW: Automated replacement of wrath dice with traumatic injuries for Attributes, Traits, Skills, Weapons, and Psychic Powers.  This does not include vehicle and voidship rules till those rules are released.
 21. NEW: On personal tab added fields for - Appearance, Age, Eyes, Hair, Height,Size, and Features.
-
-### Changelog
 
 ** July 28th, 2019: version 2.7 - Dice overhaul + fixes, updates, and enhancements** 
 
