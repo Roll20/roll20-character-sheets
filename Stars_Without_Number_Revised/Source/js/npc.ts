@@ -3,14 +3,18 @@
 /* NPC */
 const fillNPC = () => {
     getAttrs(["npc_stat_block"], (v) => {
+        console.log(1)
+        console.log(v)
         if (v.npc_stat_block && autofillData.statblocks[v.npc_stat_block]) {
+            console.log(2)
             const {
-                HD, AC, npc_attack_bonus, damage, attacks, npc_move,
+                npc_hd, npc_ac, npc_attack_bonus, damage, attacks, npc_move,
                 npc_morale, npc_skills, npc_saves, armor_type
             }: {[key: string]: string | false} = autofillData.statblocks[v.npc_stat_block];
+            console.log(autofillData.statblocks[v.npc_stat_block])
 
             const setting: {[key: string]: string | false} = {
-                AC,
+                npc_ac,
                 npc_attack_bonus,
                 npc_move,
                 npc_morale,
@@ -19,8 +23,11 @@ const fillNPC = () => {
             };
 
             if (armor_type) setting.npc_armor_type = armor_type;
-            if (typeof HD === "string" && HD.includes("hp")) setting.HP = HD.replace("hp", "");
-            else setting.npc_hd = HD;
+            console.log(3)
+            if (typeof npc_hd === "string" && npc_hd.includes("hp")) setting.HP = npc_hd.replace("hp", "");
+            else setting.npc_hd = npc_hd;
+            console.log(4)
+            console.log(setting)
 
             setAttrs(setting);
 
