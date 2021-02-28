@@ -1,5 +1,9 @@
 Change Log
 ==============================================
+**2021-02-28** Chuz (James Culp)
+	Updated Social Tab, Contacts and SINs
+	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
+
 **2021-02-27** Chuz (James Culp)
 	Updated Vehicle tab, players can document the basic stats for their vehicles here, no roll buttons included yet.
 
