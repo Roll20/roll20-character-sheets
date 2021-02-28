@@ -15,6 +15,7 @@ TO DO
 	* Finish updating Rituals
 	* Finish updating Preparations
 	* Finish updating Adept Powers
+	* Entire Matrix tab
 
 **`Grunt Sheet`** - everything
 
