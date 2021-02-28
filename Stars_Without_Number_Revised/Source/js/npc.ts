@@ -3,15 +3,11 @@
 /* NPC */
 const fillNPC = () => {
     getAttrs(["npc_stat_block"], (v) => {
-        console.log(1)
-        console.log(v)
         if (v.npc_stat_block && autofillData.statblocks[v.npc_stat_block]) {
-            console.log(2)
             const {
-                npc_hd, npc_ac, npc_attack_bonus, damage, attacks, npc_move,
-                npc_morale, npc_skills, npc_saves, armor_type
+                npc_hd, npc_ac, npc_attack_bonus, npc_damage, npc_attacks, npc_move,
+                npc_morale, npc_skills, npc_saves, npc_armor_type
             }: {[key: string]: string | false} = autofillData.statblocks[v.npc_stat_block];
-            console.log(autofillData.statblocks[v.npc_stat_block])
 
             const setting: {[key: string]: string | false} = {
                 npc_ac,
@@ -22,21 +18,18 @@ const fillNPC = () => {
                 npc_saves
             };
 
-            if (armor_type) setting.npc_armor_type = armor_type;
-            console.log(3)
+            if (npc_armor_type) setting.npc_armor_type = npc_armor_type;
             if (typeof npc_hd === "string" && npc_hd.includes("hp")) setting.HP = npc_hd.replace("hp", "");
             else setting.npc_hd = npc_hd;
-            console.log(4)
-            console.log(setting)
 
             setAttrs(setting);
 
-            if (damage !== "Unarmed") {
+            if (npc_damage !== "Unarmed") {
                 const newAttack = {
                     attack_ab: npc_attack_bonus,
-                    attack_damage: damage,
+                    attack_damage: npc_damage || 0,
                     attack_name: translate("ATTACK"),
-                    attack_number: attacks
+                    attack_number: npc_attacks
                 };
                 fillRepeatingSectionFromData("npc-attacks", newAttack);
             }

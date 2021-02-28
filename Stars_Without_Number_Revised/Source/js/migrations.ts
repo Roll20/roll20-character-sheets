@@ -198,12 +198,16 @@ const upgradeSheet = (version: string, firstTime = false, finalTime = false) => 
 
         /** v2.6.0
          * Move extra strain into strain_extra
+         * Move NPC AC and HD into npc_ac and npc_hd
          */
         else if (major === 2 && minor < 6) {
-            getAttrs(["strain", "strain_permanent", "strain_extra"], v => {
+            getAttrs(["strain", "strain_permanent", "strain_extra", "AC", "HP", "HP_max"], v => {
                 const strain_extra = (parseInt(v.strain) || 0) - (parseInt(v.strain_permanent) || 0)
                 mySetAttrs({
-                    strain_extra: strain_extra
+                    strain_extra: strain_extra,
+                    npc_ac: v.AC,
+                    npc_hd: v.HD,
+                    npc_hd_max: v.HP_max
                 }, v, null, () => {
                     upgradeSheet("2.6.0")
                 })
