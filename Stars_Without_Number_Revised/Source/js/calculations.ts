@@ -184,7 +184,7 @@ const calculateMod = (attr: string) => {
 };
 const calculateStrDexMod = () => {
     getAttrs(["str_dex_mod", "strength_mod", "dexterity_mod"], v => {
-        const str_dex_mod = Math.max(parseInt(v.strength_mod), parseInt(v.dexterity_mod)) || 0;
+        const str_dex_mod = Math.max(parseInt(v.strength_mod) || 0, parseInt(v.dexterity_mod) || 0);
         mySetAttrs({
             str_dex_mod
         }, v);
