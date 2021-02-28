@@ -39,11 +39,14 @@ const setShipClass = () => {
 };
 const calculateShipStats = () => {
     // Calculates power, mass, and hardpoints remaining.
-    const doCalc = (weaponIDs: string[], fittingIDs: any[], defenseIDs: any[]) => {
+    const doCalc = (weaponIDs: string[], fittingIDs: string[], defenseIDs: string[]) => {
+        console.log(weaponIDs)
+        console.log(fittingIDs)
+        console.log(defenseIDs)
         const oldAttrs = [
             ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_power`),
             ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_mass`),
-            ...weaponIDs.map((id) => `repeating_ship-weapons_${id}_weapon_hardpoints`),
+            ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_hardpoints`),
             ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
             ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_power`),
             ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_mass`),
@@ -55,27 +58,26 @@ const calculateShipStats = () => {
             "ship_power", "ship_mass", "ship_hardpoints", "ship_price", "ship_hull_price", "ship_calculate_price"
         ];
         getAttrs(oldAttrs, v => {
-            const ship_power = parseInt(v.ship_power_max) || 0 - sum([
+            const ship_power = (parseInt(v.ship_power_max) || 0) - sum([
                 ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_power`),
                 ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_power`),
                 ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_power`),
             ].map(x => v[x]));
-            const ship_mass = parseInt(v.ship_mass_max) || 0 - sum([
+            const ship_mass = (parseInt(v.ship_mass_max) || 0) - sum([
                 ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_mass`),
                 ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_mass`),
                 ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_mass`),
             ].map(x => v[x]));
-            const ship_hardpoints = parseInt(v.ship_hardpoints_max) || 0 -
+            const ship_hardpoints = (parseInt(v.ship_hardpoints_max) || 0) -
                 sum(weaponIDs.map(id => v[`repeating_ship-weapons_${id}_weapon_hardpoints`]));
             const setting = {ship_power, ship_mass, ship_hardpoints, ship_price: ""}
             if (v.ship_calculate_price === "1") {
-                setting.ship_price = new Intl.NumberFormat().format(parseInt(v.ship_hull_price) + sum([
+                setting.ship_price = new Intl.NumberFormat().format((parseInt(v.ship_hull_price) || 0) + sum([
                     ...weaponIDs.map(id => `repeating_ship-weapons_${id}_weapon_price`),
                     ...fittingIDs.map(id => `repeating_ship-fittings_${id}_fitting_price`),
                     ...defenseIDs.map(id => `repeating_ship-defenses_${id}_defense_price`),
                 ].map(x => v[x])));
             }
-            //console.log(setting)
             mySetAttrs(setting, v, {
                 silent: true
             });
