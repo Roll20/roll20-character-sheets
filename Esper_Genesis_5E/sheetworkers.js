@@ -353,24 +353,6 @@ on("change:race change:subrace", function(eventinfo) {
     update_race_display();
 });
 
-on("change:drop_category", function(eventinfo) {
-    if(eventinfo.newValue && (eventinfo.newValue === "Monsters" || eventinfo.newValue === "Ships")) {
-        getAttrs(["class","race","speed","hp"], function(v) {
-            if(eventinfo.newValue === "Ships") {
-                setAttrs({npc_tab: "ships"});
-            }
-            if(v["class"] != "" || v["race"] != "" || v["speed"] != "" || v["hp"] != "") {
-                setAttrs({monster_confirm_flag: 1});
-            }
-            else {
-                handle_drop(eventinfo.newValue);
-            }
-        });
-    } else if(eventinfo.newValue) {
-        handle_drop(eventinfo.newValue);
-    }
-});
-
 on(`change:repeating_inventory:hasattack`, function(eventinfo) {
     if(eventinfo.sourceType && eventinfo.sourceType === "sheetworker") {return;};
 

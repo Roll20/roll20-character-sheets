@@ -1,6 +1,9 @@
 on("change:drop_category", function(eventinfo) {
-    if(eventinfo.newValue === "Monsters") {
+    if(eventinfo.newValue && (eventinfo.newValue === "Monsters" || eventinfo.newValue === "Ships")) {
         getAttrs(["class","race","speed","hp"], function(v) {
+            if(eventinfo.newValue === "Ships") {
+                setAttrs({npc_tab: "ships"});
+            }
             if(v["class"] != "" || v["race"] != "" || v["speed"] != "" || v["hp"] != "") {
                 setAttrs({monster_confirm_flag: 1});
             }
@@ -8,8 +11,7 @@ on("change:drop_category", function(eventinfo) {
                 handle_drop(eventinfo.newValue);
             }
         });
-    }
-    else {
+    } else if(eventinfo.newValue) {
         handle_drop(eventinfo.newValue);
     }
 });
@@ -289,7 +291,7 @@ var processDrop = function(page, currentData, repeating, looped) {
         }
     }
 
-    const processMonsters = () => {
+    const processMonsters = (ship = false) => {
         try {
             let newObject = new Npc(page.name);
             newObject.addSkills(globalAttributesByCategory.skills.all())
@@ -312,6 +314,14 @@ var processDrop = function(page, currentData, repeating, looped) {
                 npc_resistances: page.data["Resistances"],
                 npc_speed: page.data["Speed"],
                 npc_challenge: page.data["Challenge Rating"],
+            }
+
+            if(ship) {
+                dropSheetAssocitation['npc_md'] = page.data['Maneuver Defense'];
+                dropSheetAssocitation['npc_mnv_save'] = page.data['Maneuver Save DC'];
+                dropSheetAssocitation['npc_piloting'] = page.data['Piloting Bonus'] || 0;
+                dropSheetAssocitation['ship_si'] = page.data['Structural Integrity'];
+                dropSheetAssocitation['ship_senses'] = page.data['Sensor Range'];
             }
 
             for (let [key, value] of Object.entries(dropSheetAssocitation)) {
@@ -731,6 +741,8 @@ var processDrop = function(page, currentData, repeating, looped) {
         case "Monsters":
             processMonsters();
             break;
+        case "Ships":
+            processMonsters(true);
         case "Proficiencies":
             processProficiencies();
             break;
