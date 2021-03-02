@@ -124,6 +124,7 @@ All rolltemplate support the following values:
 
 Those are omitted in the following list of rolltemplate names and supported values:
 
++ **`custom`**: This is the improved default template created by Jakob. See `https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates#Jakob.27s_Better_Default_Rolltemplate` for details. All CSS v3 colors are supported by the `color` key (names must be all lowercase)
 + **`spell`**:
     + `character`
     + `duration`
@@ -177,6 +178,10 @@ Those are omitted in the following list of rolltemplate names and supported valu
     + `textlabel`
 
 ### Changelog
++ **February 2021, v1.6.2**
+    - Fixed centering not working
+    - Fixed translation of spellcasting words options
+    - Added support for the `custom` rolltemplate from the forum, with all CSS colors. Can be useful for spell tables or similar chat menus
 + **February 2021, v1.6.1**
     - Fixed botch die botching on 1s instead of 10s
     - Fixed critical dice displaying 10s as exploding, instead of 1s
