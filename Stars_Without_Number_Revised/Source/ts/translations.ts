@@ -25,13 +25,13 @@ const setTranslatedDefaults = () => {
         },
     };
     getAttrs([...Object.keys(specialSkills), "homebrew_skill_list", "innate_ac_name"], v => {
-        const setting = {};
+        const setting: {[key: string]: string} = {};
         if (v.homebrew_skill_list === "first") {
             Object.entries(specialSkills).forEach(([name, data]) => {
                 if (v[name] === data.default && v[name] !== data.trans) setting[name] = data.trans;
             });
         }
-        setting.innate_ac_name = translate("INNATE_AC");
+        setting.innate_ac_name = translate("INNATE_AC").toString();
         mySetAttrs(setting, v);
     });
 };

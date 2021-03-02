@@ -2,21 +2,21 @@
 
 /* Menu builders */
 /* Helper functions for  producing skill chat menus */
-const skillToMacro = v => skill => {
+const skillToMacro = (v: { [x: string]: string; }) => (skill: string) => {
     const namedSkills = [
         "culture_one", "culture_two", "culture_three",
         "culture_alien", "profession", "magic2"
     ];
     if (namedSkills.includes(skill))
-        return [`@{skill_${skill}_name} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`];
+        return [`@{skill_${skill}_name} (${sign(parseInt(v[`skill_${skill}`]))})`, `skill_${skill}`];
     else
-        return [`^{${skill.toUpperCase()}} (${sign(v[`skill_${skill}`])})`, `skill_${skill}`];
+        return [`^{${skill.toUpperCase()}} (${sign(parseInt(v[`skill_${skill}`]))})`, `skill_${skill}`];
 };
-const idToSkillMacro = (v, sName) => id => {
+const idToSkillMacro = (v: { [x: string]: string; }, sName: string) => (id: any) => {
     const prefix = `repeating_${sName}_${id}_skill`;
-    return [`${v[`${prefix}_name`]} (${sign(v[prefix])})`, prefix];
+    return [`${v[`${prefix}_name`]} (${sign(parseInt(v[prefix]))})`, prefix];
 };
-const buildSkillMacro = ([name, command], index, allSkills) => {
+const buildSkillMacro = ([name, command]: [string, string], index: number, allSkills: string[][]) => {
     return buildLink(name, command, index + 1 === allSkills.length);
 };
 /* End helper functions */

@@ -6,10 +6,10 @@ const calculateSaves = () => {
         "homebrew_luck_save", "save_physical", "save_mental", "save_evasion", "save_luck"
     ], v => {
         const base = 16 - (parseInt(v.level) || 1);
-        const setting = {
+        const setting: {[key: string]: any} = {
             save_physical: base - (Math.max(parseInt(v.strength_mod), parseInt(v.constitution_mod)) || 0),
             save_mental: base - (Math.max(parseInt(v.charisma_mod), parseInt(v.wisdom_mod)) || 0),
-            save_evasion: base - (Math.max(parseInt(v.intelligence_mod), parseInt(v.dexterity_mod)) || 0)
+            save_evasion: base - (Math.max(parseInt(v.intelligence_mod), parseInt(v.dexterity_mod)) || 0),
         };
         if (v.homebrew_luck_save === "1") setting.save_luck = base;
         mySetAttrs(setting, v);
@@ -57,9 +57,9 @@ const calculateProcessing = () => {
             const maxProcessing = (1 + Math.max(parseInt(v.wisdom_mod) , parseInt(v.intelligence_mod)) || 0)
                 + Math.max(
                     ...idArray.filter(id => v[`repeating_processing-nodes_${id}_node_connected`] === "1")
-                    .map(id => parseInt(v[`repeating_processing-nodes_${id}_node_value`]) || 0)
-                , 0
-            );
+                        .map(id => parseInt(v[`repeating_processing-nodes_${id}_node_value`]) || 0)
+                    , 0
+                );
             const ai_total_processing = (maxProcessing + parseInt(v.ai_extra_processing) - parseInt(v.ai_committed_processing_current) -
                 parseInt(v.ai_committed_processing_scene) - parseInt(v.ai_committed_processing_day)) || 0;
             mySetAttrs({
@@ -137,7 +137,19 @@ const calculateCyberwareStrain = () => {
     });
 };
 
-const calculateAttr = (attr) => {
+const calculateStrain = () => {
+    //Add up all the strain
+    getAttrs(["strain_permanent", "strain_extra", "strain", "strain_max", "strain_above_max"], v => {
+        const strain = (parseInt(v.strain_permanent) || 0) + (parseInt(v.strain_extra) || 0)
+        const strain_above_max = strain > parseInt(v.strain_max) ? 1 : 0
+        mySetAttrs({
+            strain: strain,
+            strain_above_max: strain_above_max
+        }, v)
+    })
+}
+
+const calculateAttr = (attr: string) => {
     getAttrs([attr, `${attr}_base`, `${attr}_boosts`], v => {
         const setting = {
             [`${attr}`]: `${(parseInt(v[`${attr}_base`]) || 10) + (parseInt(v[`${attr}_boosts`]) || 0)}`
@@ -148,7 +160,7 @@ const calculateAttr = (attr) => {
     });
 }
 
-const calculateMod = (attr) => {
+const calculateMod = (attr: string) => {
     getAttrs([attr, `${attr}_bonus`, `${attr}_mod`], v => {
         const mod = (value => {
             if (value >= 18) return 2;
@@ -172,7 +184,7 @@ const calculateMod = (attr) => {
 };
 const calculateStrDexMod = () => {
     getAttrs(["str_dex_mod", "strength_mod", "dexterity_mod"], v => {
-        const str_dex_mod = Math.max(parseInt(v.strength_mod), parseInt(v.dexterity_mod)) || 0;
+        const str_dex_mod = Math.max(parseInt(v.strength_mod) || 0, parseInt(v.dexterity_mod) || 0);
         mySetAttrs({
             str_dex_mod
         }, v);
@@ -192,7 +204,7 @@ const calculateShellAttrs = () => {
         ];
         getAttrs(sourceAttrs, v => {
             if (v.setting_transhuman_enable === "transhuman" || v.setting_ai_enable === "ai"){
-                let attributes = {};
+                let attributes: {[key: string]: string} = {};
                 physicalAttrs.forEach(attr => attributes[attr] = idArray
                     .filter(id => v[`repeating_shells_${id}_shell_active`] === "1")
                     .map(id => v[`repeating_shells_${id}_shell_${attr}`])[0] || "None")
@@ -209,26 +221,27 @@ const calculateShellAttrs = () => {
 const calculateNextLevelXP = () => {
     const xp = [0, 3, 6, 12, 18, 27, 39, 54, 72, 93];
     getAttrs(["level", "setting_xp_scheme"], v => {
+        const level = parseInt(v.level)
         if (v.setting_xp_scheme === "xp") {
-            if (v.level < 10) {
+            if (level < 10) {
                 setAttrs({
-                    xp_next: xp[v.level]
+                    xp_next: xp[level]
                 });
             } else {
                 setAttrs({
-                    xp_next: 93 + ((v.level - 9) * 24)
+                    xp_next: 93 + ((level - 9) * 24)
                 });
             }
         } else if (v.setting_xp_scheme === "money") {
             setAttrs({
-                xp_next: 2500 * (2 * v.level)
+                xp_next: 2500 * (2 * level)
             });
         }
     });
 };
 
 const calculateGearReadiedStowed = () => {
-    const doCalc = (gearIDs, weaponIDs, armorIDs) => {
+    const doCalc = (gearIDs: string[], weaponIDs: string[], armorIDs: string[]) => {
         const attrs = [
             ...gearIDs.map(id => `repeating_gear_${id}_gear_amount`),
             ...gearIDs.map(id => `repeating_gear_${id}_gear_encumbrance`),
@@ -320,7 +333,7 @@ const generateWeaponDisplay = () => {
             "macro_weapons"
         ];
         getAttrs(sourceAttrs, v => {
-            const setting = {};
+            const setting: {[key: string]: string} = {};
             const baseAttackBonus = parseInt(v.attack_bonus) || 0;
             prefixes.forEach(prefix => {
                 const attrBonus = parseInt(v[(v[`${prefix}_weapon_attribute_mod`] || "").slice(2, -1)]) || 0;
@@ -331,7 +344,7 @@ const generateWeaponDisplay = () => {
                 const weaponDamage = (v[`${prefix}_weapon_damage`] === "0") ? "" : v[`${prefix}_weapon_damage`];
                 const shockString = (v[`${prefix}_weapon_shock`] !== "0") ? `, ${
                     (parseInt(v[`${prefix}_weapon_shock_damage`])||0) + damageBonus
-                }\xa0${translate("SHOCK").toLowerCase()}${
+                }\xa0${translate("SHOCK").toString().toLowerCase()}${
                     v[`${prefix}_weapon_shock_ac`] ? ` ${translate("VS_AC_LEQ")} ${v[`${prefix}_weapon_shock_ac`]}` : ""
                 }` : "";
 
@@ -341,8 +354,8 @@ const generateWeaponDisplay = () => {
                     ((damageBonus === 0) ? "" : ((damageBonus > 0) ? ` + ${damageBonus}` : ` - ${-damageBonus}`)) :
                     damageBonus);
 
-                setting[`${prefix}_weapon_attack_display`] = (attack >= 0) ? `+${attack}` : attack;
-                setting[`${prefix}_weapon_damage_display`] = `${damage || 0}\xa0${translate("DAMAGE").toLowerCase()}${shockString}`;
+                setting[`${prefix}_weapon_attack_display`] = (attack >= 0) ? `+${attack}` : attack.toString();
+                setting[`${prefix}_weapon_damage_display`] = `${damage || 0}\xa0${translate("DAMAGE").toString().toLowerCase()}${shockString}`;
             });
             setting.macro_weapons = prefixes.map((prefix, index) => {
                 const label = `${v[`${prefix}_weapon_name`]} (${setting[`${prefix}_weapon_attack_display`]})`;
@@ -355,7 +368,7 @@ const generateWeaponDisplay = () => {
     });
 };
 
-const handleAmmoAPI = (sName) => {
+const handleAmmoAPI = (sName: string) => {
     const formula = (sName === "weapons") ? "[[-1 - @{weapon_burst}]]" : "-1";
     getSectionIDs(`repeating_${sName}`, idArray => {
         getAttrs([
@@ -363,7 +376,7 @@ const handleAmmoAPI = (sName) => {
             ...idArray.map(id => `repeating_${sName}_${id}_weapon_use_ammo`),
             ...idArray.map(id => `repeating_${sName}_${id}_weapon_api`)
         ], v => {
-            const setting = idArray.reduce((m, id) => {
+            const setting = idArray.reduce((m: {[k: string]: string}, id) => {
                 m[`repeating_${sName}_${id}_weapon_api`] =
                     (v.setting_use_ammo === "1" && v[`repeating_${sName}_${id}_weapon_use_ammo`] !== "0") ?
                         `\n!modattr --mute --charid @{character_id} --repeating_${sName}_${id}_weapon_ammo|${formula}` :

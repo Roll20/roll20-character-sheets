@@ -15,24 +15,24 @@ const validateTab = () => {
 };
 const validateSuperTab = () => {
     getAttrs(["setting_super_type", "tab_super"], v => {
-        const setting = {};
+        const setting: {[key: string]: string} = {};
         if (v.setting_super_type === "magic") setting.tab_super = "magic";
         if (v.setting_super_type === "psionics") setting.tab_super = "psionics";
         mySetAttrs(setting, v);
     });
 };
-const validateStrain = () => {
-    getAttrs(["strain", "strain_permanent", "strain_max"], v => {
-        const currentStrain = parseInt(v.strain) || 0,
-            permanentStrain = parseInt(v.strain_permanent) || 0,
-            strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain)) || 0;
-
-        if (strain !== currentStrain) setAttrs({
-            strain
-        });
-    });
-};
-const validateWeaponSkills = (ids) => {
+// const validateStrain = () => {
+//     getAttrs(["strain", "strain_permanent", "strain_max"], v => {
+//         const currentStrain = parseInt(v.strain) || 0,
+//             permanentStrain = parseInt(v.strain_permanent) || 0,
+//             strain = Math.min(parseInt(v.strain_max), Math.max(currentStrain, permanentStrain)) || 0;
+//
+//         if (strain !== currentStrain) setAttrs({
+//             strain
+//         });
+//     });
+// };
+const validateWeaponSkills = (ids?: [string]) => {
     // Makes sure that the select for the weapon skill is never in an invalid state.
     const prefixes = (ids && ids.map(id => `repeating_weapons_${id}`)) || ["repeating_weapons"];
     getAttrs(["homebrew_skill_list", ...prefixes.map(p => `${p}_weapon_skill_bonus`)], v => {
@@ -43,7 +43,7 @@ const validateWeaponSkills = (ids) => {
                 "@{skill_combat_psitech}", "@{skill_combat_unarmed}", "@{skill_telekinesis}", "0"
             ],
             type = v.homebrew_skill_list,
-            setting = {};
+            setting: {[key: string]: string} = {};
         prefixes.forEach(prefix => {
             if (type === "revised" && !revisedList.includes(v[`${prefix}_weapon_skill_bonus`]))
                 setting[`${prefix}_weapon_skill_bonus`] = "@{skill_shoot}";
@@ -53,7 +53,7 @@ const validateWeaponSkills = (ids) => {
         setAttrs(setting);
     });
 };
-const validateShells = (e) => {
+const validateShells = (e: EventInfo) => {
     //Unchecks every shell 'active' toggle except the one toggle now.
     // console.log(e.sourceAttribute);
     // console.log(e.sourceAttribute.slice(17, -13));
@@ -63,9 +63,9 @@ const validateShells = (e) => {
         console.log("Changing");
         getSectionIDs("repeating_shells", idArray => {
             idArray = idArray.filter(item => item !== e.sourceAttribute.slice(17, -13))
-            const setting = {}
+            const setting: {[key: string]: string} = {}
             idArray.forEach(id => setting[`repeating_shells_${id}_shell_active`] = "0");
-            setAttrs(setting, () => {
+            setAttrs(setting, {}, () => {
                 calculateShellAttrs();
             })
         })
