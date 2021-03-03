@@ -118,7 +118,7 @@ def main(
                     ns.update(getattr(module, attr_name))
             except Exception as err:
                 print(
-                    "error: Could not load {name} due to:",
+                    f"error: Could not load {name} due to:",
                     "".join(tb.format_exception(type(err), err, err.__traceback__)),
                     sep="\n\n",
                 )

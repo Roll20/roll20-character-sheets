@@ -10,9 +10,13 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.8 [Screenshot](coc_v2.png)
+3.8.1 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.8.1 (2021-03-01)
+
+Suppression du code de remise en forme des textes de capacités par élimination des retours à la ligne
 
 ## v3.8 (2021-02-22)
 
