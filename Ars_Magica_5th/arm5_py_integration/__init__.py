@@ -1,4 +1,5 @@
 """Module for providing the parts in the template.html file"""
+import csv
 from pathlib import Path
 
 import markdown
@@ -373,3 +374,27 @@ for i in range(1, 10):
     for tag in html.find_all(f"h{i}"):
         tag.attrs["class"] = tag.get("class", "") + " heading_label"
 GLOBALS["documentation"] = html.prettify()
+
+
+# Rolltemplate
+## Custom rolltemplate colors
+with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
+    reader = csv.DictReader(f)
+    css_rules = []
+    for color_def in reader:
+        lines = [
+            ".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-color-%s {"
+            % color_def["color"],
+            "    --header-bg-color: %s;" % color_def["hex"],
+        ]
+        hex = color_def["hex"].lstrip("#")
+        r, g, b = tuple(int(hex[2 * i : 2 * i + 2], 16) / 255 for i in range(3))
+        # Assuming sRGB -> Luma
+        # may need fixing, color spaces are confusing
+        luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
+        if luma > 0.5:  # arbitrary threshold
+            # switch to black text if luma is high enough
+            lines.append("    --header-text-color: #000;")
+        lines.append("}")
+        css_rules.append("\n".join(lines))
+    GLOBALS["custom_rt_color_css"] = "\n".join(css_rules)
