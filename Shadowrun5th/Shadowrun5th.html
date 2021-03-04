@@ -6614,7 +6614,7 @@ Can lift overhead (Strength + Nethits) x 5kg}}"></button>
             <input class="technomancycheckbox" type="checkbox"  name="attr_istechnomancer" value="1">
             <h2>Spells</h2>
             <div class="magiciandrainattribute">
-                <label>Drain-Attribute</label>
+                <button class="sheet-spellrollmage btn" type="roll" title="Click to roll custom drain" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=for drain resist}}{{val1=Drain Attribute}}{{val1_num=[[@{drainattribute}]]}}{{val2=@{wil_name}}}{{val2_num=[[@{wil_total}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{result=[[(@{wil_total}+@{drainattribute}+?{Drain Resist Bonus|0})@{standardroll}]]}}{{drain=Drain}}{{drain_num=[[?{Drain|2}]]}}">Drain-Attribute</button>
                 <div>
                     <select name="attr_drainattribute">
                         <option value="@{log_total}">LOG</option>
@@ -9750,7 +9750,7 @@ on("sheet:opened", function() {
         }
         values.warningcheckbox=0;
         values.chummercheckbox=0;
-        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept";
+        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independet";
     setAttrs(values);
     });
 });
@@ -10509,7 +10509,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Vehicles"
+                    error="Error with Vehicles: " + err;
                 }
                 var index=[];
                 for(var i=1;i<73;i++)
@@ -10523,7 +10523,96 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
-                        for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+						if(chummerfile.characters.character.skills.skill[0].name_english !== undefined) {
+							for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
+                                if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
+                                    alchemy=i;
+                                }
+                                if(chummerfile.characters.character.skills.skill[i].name_english=="Spellcasting"){
+                                    spellcasting=i;
+                                }
+                                if(chummerfile.characters.character.skills.skill[i].name_english=="Ritual Spellcasting"){
+                                    ritual=i;
+                                }
+                                if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
+                                console.log("Reading knowledge skill");
+                                    var newrowid=generateRowID();
+                                    attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name_english;
+                                    if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null)
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgeattr"]="@{"+chummerfile.characters.character.skills.skill[i].skillcategory_english.toLowerCase();
+                                    if(chummerfile.characters.character.skills.skill[i].rating>0){
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgerating"]=chummerfile.characters.character.skills.skill[i].rating;
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                                    }else{
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgerating"]="-1";
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgebonus"]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                                    }
+                                    if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgespec"]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+                                    else
+                                        attributes["repeating_knowledge_"+newrowid+"_knowledgespec"]="none";
+                                }
+
+                                if(chummerfile.characters.character.skills.skill[i].exotic=="True"){
+                                        console.log("Reading exotic skill");
+                                    attributes["skillname"+exotics]=chummerfile.characters.character.skills.skill[i].name_english;
+                                    if(chummerfile.characters.character.skills.skill[i].rating>0){
+                                        attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                                        attributes["skillrating"+exotics]=chummerfile.characters.character.skills.skill[i].rating;
+                                    }else{
+                                        attributes["skillrating"+exotics]="-1";
+                                        attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                                    }
+                                    attributes["skillattr"+exotics]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
+                                    if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                                        attributes["skillspec"+exotics]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+                                    else
+                                        attributes["skillspec"+exotics]="none";
+                                    exotics++;
+                                }
+
+                                for(var j=1;j<73;j++){
+                                     console.log("Reading normal skills");
+                                    var compname='skillname'+j;
+                                    if((names[compname]==chummerfile.characters.character.skills.skill[i].name_english)||(chummerfile.characters.character.skills.skill[i].name_english=="Locksmith"&&j==29)||(chummerfile.characters.character.skills.skill[i].name_english=="Pilot Ground Craft"&&j==55)){
+                                        attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
+                                        if(chummerfile.characters.character.skills.skill[i].rating>0){
+                                            attributes["skillrating"+j]=chummerfile.characters.character.skills.skill[i].rating;
+                                            attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
+                                        }else{
+                                            attributes["skillrating"+j]="-1";
+                                            attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
+                                        }
+                                        if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                                            attributes["skillspec"+j]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
+                                        else
+                                            attributes["skillspec"+j]="none";
+                                        if(chummerfile.characters.character.weapons!=null){
+                                            if(chummerfile.characters.character.weapons.weapon.length>1){
+                                                for(var h=1;h<chummerfile.characters.character.weapons.weapon.length+1&&h<=6;h++){
+                                                    if(chummerfile.characters.character.weapons.weapon[h-1].category!="Gear"){
+                                                        if(names[compname]==chummerfile.characters.character.weapons.weapon[h-1].skill){
+                                                            attributes["weaponcategory"+h]="@{skilldicepool"+j+"}";
+                                                            attributes["weaponbonus"+h]=chummerfile.characters.character.weapons.weapon[h-1].dicepool-chummerfile.characters.character.skills.skill[i].total;
+                                                        }
+                                                    }
+                                                }
+                                            }else{
+                                                if(chummerfile.characters.character.weapons.weapon.category!="Gear"){
+                                                    if(names[compname]==chummerfile.characters.character.weapons.weapon.skill){
+                                                        attributes["weaponcategory1"]="@{skilldicepool"+j+"}";
+                                                        attributes["weaponbonus1"]=chummerfile.characters.character.weapons.weapon.dicepool-chummerfile.characters.character.skills.skill[i].total;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+						}
+						else {
+
+						for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                             if(chummerfile.characters.character.skills.skill[i].name=="Alchemy"){
                                 alchemy=i;
                             }
@@ -10603,9 +10692,10 @@ on("change:chummercheckbox", function(){
                                 }
                             }
                         }
-                    }catch(err){
+							}
+					}catch(err){
                         goodcode=false;
-                        error="Error with Skills"
+                        error="Error with Skills: "+ err;
                     }
                     try{
                         if(chummerfile.characters.character.spells!=null){
@@ -10659,7 +10749,7 @@ on("change:chummercheckbox", function(){
                         }
                     }catch(err){
                         goodcode=false;
-                        error="Error with Spells"
+                        error="Error with Spells: " + err;
                     }
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
@@ -10669,7 +10759,7 @@ on("change:chummercheckbox", function(){
                             setAttrs(attributes);
                         }catch(err){
                         setAttrs({
-                            chummertext:"Error setting Attributes",
+                            chummertext:"Error setting Attributes: " + err,
                             chummercheckbox:"0",
                             warningcheckbox:"0"
                         });
