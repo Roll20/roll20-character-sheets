@@ -317,9 +317,9 @@ var processDrop = function(page, currentData, repeating, looped) {
             }
 
             if(ship) {
+                dropSheetAssocitation['npc_piloting_flag'] = 1;
                 dropSheetAssocitation['npc_md'] = page.data['Maneuver Defense'];
                 dropSheetAssocitation['npc_mnv_save'] = page.data['Maneuver Save DC'];
-                dropSheetAssocitation['npc_piloting'] = page.data['Piloting Bonus'] || 0;
                 dropSheetAssocitation['ship_si'] = page.data['Structural Integrity'];
                 dropSheetAssocitation['ship_senses'] = page.data['Sensor Range'];
             }
