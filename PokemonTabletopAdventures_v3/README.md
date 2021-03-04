@@ -19,9 +19,39 @@ Things we want to add to the character sheet, presented in no particular order o
 - [ ] Allow modifications to movement (maybe just an extra box)
 - [ ] Display the adjusted stat score when temporary stat changes are provided
 - [ ] Display the skills section for Pokémon characters
+- [ ] Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:
+  - [ ] A spot for Attack and Special Attack bonuses, for things like Ace Trainer
+  - [ ] The critical hit range for the moves, as this is used for passives, items, etc.
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 
 ## Changelog
+
+### Feb 23rd, 2021
+
+- Unifies background colours for text areas and number inputs
+- Added collapsing to the Origin Feature and all Class Features
+- Added a send to chat button for the Origin Feature and Class Features to output the name and description in the chat log in a nice and easily readable format
+  - Made the name of the features into the same button when collapsed to improve consistency of design vis-a-vis the moves section
+
+### Feb 18th, 2021
+
+- Expanded the Capture Pokémon skill, allowing modifiers such as Capture Point to be applied
+- Improved the display of the Pokéball selection, and added a display of the effect that each has on the capture roll
+- Added a display of the total modifier to capture rolls
+- Added the option of configuring the default value for Custom Pokéballs
+
+### Feb 11th, 2021
+
+- Resolved a small issue with the move repeating section where the button to collapse the fields would show a `+` instead of a `-`
+
+### Feb 10th, 2021
+
+- Add a new type option to the sheet, intended to represent neutral or unknown types - "Typeless"
+  - This uses the color scheme for the ??? type from the Pokémon video games
+
+### Feb 6th, 2021
+
+- Resolved CSS bug introduced in previous update
 
 ### Feb 5th, 2021
 
