@@ -71,7 +71,7 @@
 				<h2 data-i18n="total karma">Total Karma</h2><input style="width: 2em;" type="number" name="attr_total_karma" placeholder="#" title="@{total_karma}" />
 			</div>
 			<div class="row-long pd-kar">
-				<h2 data-i18n="essence">Base Essence</h2><input disabled="disabled" style="width: 1.5em;" type="number" step="0.01" min="0.01" name="attr_essence_base" value="6" title="@{essence_base}" /> - <h2 data-i18n="essencemodifier">Modifier</h2><input style="width: 3em;" type="number" step="0.01" min="0.01" name="attr_essence_mod" placeholder="0" title="@{essence_mod}" /> - <h2 data-i18n="augmentations">Augmentations</h2><span name="attr_aug_essence_cost" title="@{aug_essence_cost}"></span> = <h2 data-i18n="currentessence">Current Essence</h2><span name="attr_essence" title="@{essence}"><span>
+				<h2 data-i18n="essence">Base Essence</h2><input disabled="disabled" style="width: 1.5em;" type="number" step="0.01" min="0.00" name="attr_essence_base" value="6" title="@{essence_base}" /> + <h2 data-i18n="essencemodifier">Modifier</h2><input style="width: 3em;" type="number" step="0.01" min="-6.00" name="attr_essence_mod" placeholder="0" title="@{essence_mod}" /> - <h2 data-i18n="augmentations">Augmentations</h2><span name="attr_aug_essence_cost" title="@{aug_essence_cost}"></span> = <h2 data-i18n="currentessence">Current Essence</h2><span name="attr_essence" title="@{essence}"><span>
 			</div>
 		</div>
 	</div>
@@ -390,7 +390,7 @@
             <div class="rows repeating-container">
               <div class="row-long">
                 <input name="attr_default_display" type="hidden" value="Agility"/>
-                <button data-i18n="default" name="roll_default" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=^{default}}}{{base=@{default_display} - 1}}{{dice=[[((@{default_attribute}+-1)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}">default</button><span class="text-align-center">-1</span>
+                <button data-i18n="default" name="roll_default" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{default} = @{default_display} - 1}}{{dice=[[((@{default_attribute}+-1)+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}">default</button><span class="text-align-center">-1</span>
                 <select class="attribute-select" name="attr_default_attribute" title="Skill attribute">
                   <option data-i18n="body" value="@{body}">Body</option>
                   <option data-i18n="agility" value="@{agility}" selected="selected">Agility</option>
@@ -454,6 +454,8 @@
 							<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
 							<option value="Stealth" data-i18n="stealth">Stealth</option>
 							<option value="Tasking" data-i18n="tasking">Tasking</option>
+							<option value="Language" data-i18n="language">Language</option>
+							<option value="Knowledge" data-i18n="knowledge">Knowledge</option>
                   </select>
                   <label data-i18n-title="rating" title="rating">
                     <input name="attr_rating" min="0" placeholder="0" type="number" title="rating"/>
@@ -947,6 +949,7 @@
                   <h3 data-i18n="skill">skill</h3>
                   <select name="attr_skill" title="@{repeating_melee_${x}_skill}">
                     <option data-i18n="closecombat" value="Close Combat" selected="selected">Close Combat</option>
+						  <option data-i18n="athletics" value="Athletics">Athletics</option>
                     <option data-i18n="exoticmelee" value="0">Exotic Weapons</option>
                   </select>
                   <h3 data-i18n="specialization">specialization</h3>
@@ -2178,7 +2181,7 @@
     </label>
     <h1 data-i18n="ess">ess</h1><span name="attr_essence"></span>
     <label class="settings" data-i18n-title="essence" title="essence">
-      <input name="attr_essence" placeholder="6" title="@{essence}" type="number" step='0.01' min='0.00' max='6.00' value="6"/>
+      <input name="attr_essence" placeholder="6" title="@{essence}" type="number" step='0.01' min='-6.00' max='6.00' value="6"/>
     </label>
     <h1 class="hide-magic" data-i18n="m">m</h1><span class="hide-magic" name="attr_magic"></span>
     <label class="settings hide-magic" data-i18n-title="magic" title="magic">
@@ -3407,6 +3410,7 @@ on("change:charisma change:composure_modifier change:judge_intentions_modifier",
 });
 
 on("change:essence", () => {
+	// This shouldn't be manually changed by the player it's a calculated value.  See the update_essence function.
 });
 
 on("change:physical_modifier change:flag_drone", () => {
@@ -3477,7 +3481,8 @@ var update_essence = () => {
 		});
 
 		getAttrs(['essence_mod'], (ess_mod) => {
-			ess -= ess_mod['essence_mod'];
+			ess += parseFloat(ess_mod['essence_mod']);
+
 			setAttrs({
 				essence: parseFloat(ess).toFixed(2)
 			});
