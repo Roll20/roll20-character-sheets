@@ -37,4 +37,4 @@ Artwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.
 ##Changelog
 
 
-### v.0.1 2021-02-23
+### v.1.2 2021-03-05
