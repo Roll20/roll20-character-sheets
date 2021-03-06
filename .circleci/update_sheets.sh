@@ -11,6 +11,13 @@ folders=()
 folder_regex='(^.*?)\/'
 IFS=$'\n'
 for file in $changed_files; do
+	if [ "$file" == "approved.yaml" ];
+		then
+			echo ">>> Updating approved.yaml"
+			curl -G \
+				--data-urlencode "repo=roll20-character-sheets" \
+				"https://${SERVICE_DOMAIN}/task/update_repo_metadata"
+	fi
 	folders+=("`grep -oP "$folder_regex" <<< "$file"`")
 done
 
