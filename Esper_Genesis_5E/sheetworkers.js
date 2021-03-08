@@ -3652,6 +3652,42 @@ classRelatedAttrs.forEach(attr => {
     });
 });
 
+/*
+@{wtype}&{template:dmg} {{rname=@{atkname}}} @{atkflag} {{range=@{atkrange}}} @{dmgflag} {{dmg1=[[1d10]]}} {{dmg1type=}} @{dmg2flag} {{dmg2=[[0]]}} {{dmg2type=}} @{saveflag} {{desc=@{atk_desc}}} @{hldmg} {{spelllevel=@{spelllevel}}} {{innate=@{spell_innate}}} {{globaldamage=[[0]]}} {{globaldamagetype=@{global_damage_mod_type}}} @{charname_output} {{licensedsheet=@{licensedsheet}}}
+on("change:repeating_tool:toolname change:repeating_tool:toolbonus_base change:repeating_tool:toolattr_base
+*/
+
+var calcShipAtkdmgc = function(damage) {
+    let damagec = damage + '';
+    for(let i=20; i>=1; i--) {
+        damagec = damagec.replace(`${i}d`, `${i*2}d`);
+        damagec = damagec.replace(`${i}D`, `${i*2}D`);
+    }
+    return damagec;
+};
+var addShipDamageType = function(damage, type) {
+    if(!damage || !type) return damage;
+    return `${damage} [${type}]`;
+}
+on("change:repeating_weapon-systems", eventinfo => {
+    if(!eventinfo.sourceType || eventinfo.sourceType != 'player' || eventinfo.sourceAttribute.includes('atkdmg')) return;
+    const id = SheetUtils.getUID(eventinfo.triggerName);
+    const pre = `repeating_weapon-systems_${id}`;
+    const weaponAttributes = ['gunner', 'weapon', 'range', 'tohit', 'damage', 'dmgtype', 'special', 'ammo', 'recharge'].map(attr => { return `${pre}_${attr}`; });
+    getAttrs(weaponAttributes, values => {
+        if(values[`${pre}_damage`]) {
+            const damage = addShipDamageType(values[`${pre}_damage`], values[`${pre}_dmgtype`]);
+            const damagec = addShipDamageType(calcShipAtkdmgc(values[`${pre}_damage`]), values[`${pre}_dmgtype`]);
+            const atkdmg = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damage}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
+            const atkdmgc = `@{wtype}&{template:dmg} {{rname=@{weapon}}} {{attack=1}} {{range=@{range}}} {{damage=1}} {{dmg1flag=1}} {{dmg1=[[${damagec}]]}} {{dmg1type=${values[`${pre}_dmgtype`]}}} {{desc=@{special}}} @{charname_output} {{licensedsheet=@{licensedsheet}}}`;
+            const update = {
+                [`${pre}_atkdmg`]: atkdmg,
+                [`${pre}_atkdmgc`]: atkdmgc,
+            }
+            setAttrs(update, {silent: true});
+        }
+    });
+});
 
 
 //# sourceURL=espergenesis.js
