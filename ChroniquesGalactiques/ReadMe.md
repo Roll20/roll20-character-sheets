@@ -10,9 +10,17 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V3.112 [Screenshot](cog_v3.png)
+V3.113 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.113 (2021.03.07)
+
+_Fiche de vaisseau_
+
+- Correction d'un bug sur les jets d'attaque (en cas d'ajout d'une nouvelle ligne d'arme sans renseigner de canonnier)
+- Correction du calcul de l'Initiative pour prise en compte d'un vaisseau sans pilote
+- Ajout d'un champ d'attribut pour les points d'énergie perdus (@{PEV_DMG}) et modification du calcul des PEV max
 
 ## V3.112 (2021.03.01)
 
