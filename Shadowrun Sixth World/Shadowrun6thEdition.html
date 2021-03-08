@@ -30,7 +30,7 @@
     <label class="switch" data-i18n-title="edge" title="edge">
       <input class="whisper-toggle" name="attr_edge_toggle" type="checkbox" value="@{edge}"/><span class="slider"></span>
     </label>
-    <button name="d6" title="Roll D6s" type="roll" value="@{gm_toggle} &{template:rolls}{{header=^{d6}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}">L</button>
+    <button name="d6" title="Roll D6s" type="roll" value="@{gm_toggle} &{template:rolls}{{header=@{characer_name}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5)]]}}">L</button>
     <input name="attr_tab" type="hidden" value="core"/>
     <button class="pictos" name="act_tab_options" title="@{tab}" type="action">y</button>
     <button data-i18n="core" name="act_tab_core" type="action" title="@{tab}">core</button>
@@ -194,8 +194,9 @@
 			</div>
 			<div class="attr-col attr-col-right">
 				<!-- ~~:+: Magic or Resonance :+:~~ -->
-				<input type="hidden" name="attr_magic" value="3" />
-				<input type="hidden" name="attr_resonance" value="3" />
+				<input type="hidden" name="attr_display_magic" value="" />
+				<input type="hidden" name="attr_magic_max" value="6" />
+				<input type="hidden" name="attr_display_resonance" value="" />
 				<label data-i18n="magicres">Magic/Resonance</label>
 				<div class="attr-und">
 					<div class="settings">
@@ -536,12 +537,18 @@
 
 			<div class="row-long cc-arm">
 				<div class="armor-info">
+					<button type="roll" name="roll_dr" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{defense} ^{rating}}}{{defenserating=@{armor_rating}}}">
+						<span class="center"><span data-i18n="dr">DR</span> <span name="attr_armor_rating"></span></span>
+					</button>
+					<div>&nbsp;</div>
+					<button type="roll" name="roll_defense" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{defense} = ^{reaction} + ^{intuition}}}{{dice=[[((@{reaction} + @{intuition})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}">
+						<span class="center" name="defense" title="@{defense}">Defense</span>
+					</button>
+					<div>&nbsp;</div>
 					<button type="roll" name="roll_soak" value="@{gm_toggle} &{template:rolls}{{header=^{soak}}}{{base=^{body}}}{{dice=[[((@{body})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}">
 						<span class="center" name="soak" title="@{soak}">Soak Damage</span>
 					</button>
-					<span>&nbsp;</span>
-					<h2 data-i18n="dr">DR</h2>
-					<span class="center armor-resist-value" name="attr_armor_rating"></span>
+					<div>&nbsp;</div>
 				</div>
 				<div class="armor-resists">
 					<h2 data-i18n="resists">Resists</h2>
@@ -766,7 +773,7 @@
             </div>
             <div class="rows repeating-container">
               <fieldset class="repeating_martial"><span name="attr_technique"></span><span class="center" name="attr_style"></span>
-                <button class="pictos" name="technique_chat" type="roll" value="@{gm_toggle} &amp;{template:rolls}{{header=@{technique}}}{{desc=@{notes}}}">w</button>
+                <button class="pictos" name="technique_chat" type="roll" value="@{gm_toggle} &amp;{template:rolls}{{header=@{character_name}}}{{base=@{style} - @{technique}}}{{desc=@{notes}}}">w</button>
                 <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
                 <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
                 <div class="collapse"><span name="attr_notes"></span></div>
@@ -1097,7 +1104,7 @@
           <div class="row-long headers">
             <h2 data-i18n="augmentations">Augmentations</h2>
             <h2 data-i18n="rating">Rating</h2>
-            <h2 data-i18n="essence">Essence</h2>
+            <h2 data-i18n="esscost">Ess Cost</h2>
           </div>
           <div class="rows repeating-container">
             <fieldset class="repeating_augmentations"><span name="attr_augmentation"></span><span class="center" name="attr_rating"></span><span class="center" name="attr_essence_cost"></span>
@@ -1985,7 +1992,10 @@
 
   <div class="social pc-col">
 	<div class="pc-row"><!-- ~~~~~~~~ Start of Lifestyles Row  ~~~~~~~~ -->
-		<div class="header right-header"><h1 data-i18n="idslifestylecurrency">IDs/Lifestyles/Currency</h1><div class="right-tri"></div></div>
+		<div class="header right-header">
+		  <h1 data-i18n="idslifestylecurrency">IDs/Lifestyles/Currency</h1>
+		  <div class="right-tri"></div>
+		</div>
 		<div class="border-box repeat-box lifestyle">
 			<div class="pc-box small-box social-box">
 				<div class="row-long">
@@ -2032,7 +2042,8 @@
 				</fieldset>
 			</div>
 		</div>
-	</div><!-- ~~~~~~~~ End of Lifestyle Row ~~~~~~~~ -->
+	</div>
+	<!-- ~~~~~~~~ End of Lifestyle Row ~~~~~~~~ -->
 
 	<!-- ~~~~~~~~ Start Contacts Row  ~~~~~~~~ -->
 	<div class="pc-row">
@@ -2781,25 +2792,25 @@
           <h2 data-i18n="attribute">Attribute</h2>
           <h2 data-i18n="limit">Limit</h2>
           <select class="skill-select" name="attr_skill" title="@{repeating_active_${x}_skill}" value="Close Combat Group"><option value="Astral Combat" data-i18n="Astral">Astral</option>
-<option value="Astral" data-i18n="astral">Astral</option>
-<option value="Athletics" data-i18n="athletics">Athletics</option>
-<option value="Biotech" data-i18n="biotech">Biotech</option>
-<option value="Close Combat" data-i18n="closecombat">Close Combat</option>
-<option value="Con" data-i18n="con">Con</option>
-<option value="Conjuring" data-i18n="conjuring">Conjuring</option>
-<option value="Cracking" data-i18n="cracking">Cracking</option>
-<option value="Electronics" data-i18n="electronics">Electronics</option>
-<option value="Enchanting" data-i18n="enchanting">Enchanting</option>
-<option value="Engineering" data-i18n="engineering">Engineering</option>
-<option value="Exotic Weapons" data-i18n="exoticweapon">Exotic Weapons</option>
-<option value="Firearms" data-i18n="firearms">Firearms</option>
-<option value="Influence" data-i18n="influence">Influence</option>
-<option value="Outdoors" data-i18n="outdoors">Outdoors</option>
-<option value="Perception" data-i18n="perception">Perception</option>
-<option value="Piloting" data-i18n="piloting">Piloting</option>
-<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
-<option value="Stealth" data-i18n="stealth">Stealth</option>
-<option value="Tasking" data-i18n="tasking">Tasking</option>
+				<option value="Astral" data-i18n="astral">Astral</option>
+				<option value="Athletics" data-i18n="athletics">Athletics</option>
+				<option value="Biotech" data-i18n="biotech">Biotech</option>
+				<option value="Close Combat" data-i18n="closecombat">Close Combat</option>
+				<option value="Con" data-i18n="con">Con</option>
+				<option value="Conjuring" data-i18n="conjuring">Conjuring</option>
+				<option value="Cracking" data-i18n="cracking">Cracking</option>
+				<option value="Electronics" data-i18n="electronics">Electronics</option>
+				<option value="Enchanting" data-i18n="enchanting">Enchanting</option>
+				<option value="Engineering" data-i18n="engineering">Engineering</option>
+				<option value="Exotic Weapons" data-i18n="exoticweapon">Exotic Weapons</option>
+				<option value="Firearms" data-i18n="firearms">Firearms</option>
+				<option value="Influence" data-i18n="influence">Influence</option>
+				<option value="Outdoors" data-i18n="outdoors">Outdoors</option>
+				<option value="Perception" data-i18n="perception">Perception</option>
+				<option value="Piloting" data-i18n="piloting">Piloting</option>
+				<option value="Sorcery" data-i18n="sorcery">Sorcery</option>
+				<option value="Stealth" data-i18n="stealth">Stealth</option>
+				<option value="Tasking" data-i18n="tasking">Tasking</option>
           </select>
           <label data-i18n-title="rating" title="rating">
             <input name="attr_rating" min="0" placeholder="0" title="@{repeating_active_${x}_rating}" type="number"/>
@@ -3345,6 +3356,7 @@
 			{{#effecttype}}<br /><span>{{effecttype}}</span>{{/effecttype}}
 		</div>
 		{{#dice}}<div class="sheet-template-row">Hits: {{dice}}</div>{{/dice}}
+		{{#defenserating}}<div class="sheet-template-row">DR: {{defenserating}}</div>{{/defenserating}}
 		{{#ampup}}{{#rollGreater() ampup 0}}
 		<div class="sheet-template-row">
 			<span class="sheet-template-desc">Amp Up: {{ampup}}</span>
@@ -3709,8 +3721,18 @@ var update_essence = () => {
 			});
 		});
 
-		getAttrs(['essence_mod'], (ess_mod) => {
-			ess += parseFloat(ess_mod['essence_mod']);
+		getAttrs(['essence_mod', 'magic'], (ess_mod) => {
+			var em = 0;
+			if(! isNaN(ess_mod['essence_mod']) && ess_mod['essence_mod'] !== '') {
+				em = ess_mod['essence_mod'];
+			}
+			ess += parseFloat(em);
+
+// Trying to update magic as essence drops but it's not a simple process will revisit later
+//			var magic = 0;
+//			if(! isNaN(ess_mod['magic']) && ess_mod['magic'] !== '') {
+//				magic = ess_mod['magic'];
+//			}
 
 			setAttrs({
 				essence: parseFloat(ess).toFixed(2)
@@ -3718,6 +3740,7 @@ var update_essence = () => {
 		});
 	});
 };
+
 
 //This function watches for changes to augmentations and updates recalculates essence
 on("change:essence_mod remove:repeating_augmentations change:repeating_augmentations:essence_cost", (eventInfo) => {
@@ -3812,6 +3835,10 @@ on("change:repeating_armor", (eventInfo) => {
 			coldTot = 0,
 			elecTot = 0,
 			fireTot = 0;
+
+		getAttrs(['body'], (v) => {
+			ratingTot = v['body'];
+		});
 
 		ids.forEach(id => {
 			var armorFields = [`${arm}_${id}_rating`, `${arm}_${id}_chem`, `${arm}_${id}_cold`, `${arm}_${id}_elec`, `${arm}_${id}_fire`, `${arm}_${id}_primary`, `${arm}_${id}_cumulative`];
