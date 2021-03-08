@@ -1,9 +1,11 @@
 Change Log
 ==============================================
-**2021-03-09** v.22 Chuz (James Culp)
+**2021-03-08** v.22 Chuz (James Culp)
+	Add Defense roll-button and DR roll-button to Core->Combat Info tab
 	Updated Skills to split Skills and Knowledge/Languages into separate tabs
 	Finished Magic->Spells, Preparations, Rituals, Adept Powers, Conjuring and Metamagic sections
 	Minor formatting changes to css and html
+	Bugfix DR not adding Body in
 	Bugfix calculations for Cold and Hot Sim initiative roll buttons
 	Bugfix Essence Mod not allowing a zero value
 	Bugfix Removed roll query from flat attribute rolls
