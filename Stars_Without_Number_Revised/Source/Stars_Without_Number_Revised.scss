@@ -6,6 +6,7 @@ $darkblue: #11194B;
 $headergrey: #9B9B9B;
 $skillgrey: #D3D3D3;
 $lightbox: #F0F0F0;
+$highlightyellow: #FFFF00;
 
 /* roll template */
 $arial: "Arial", sans-serif;
@@ -93,7 +94,7 @@ button[type=roll].sheet-invisible-button {
 	width: 100%;
 	height: 100%;
 	top: 0;
-	&:hover + div {
+	&:hover ~ div:not(.sheet-no-highlight) {
 		color: $brightblue;
 		border-color: $brightblue;
 	}
@@ -145,6 +146,8 @@ h3 {
 /* tab wrappers and type chooser */
 .sheet-npc-input[value="0"] ~ .sheet-tabs .sheet-npc-tab,
 .sheet-npc-input[value="1"] ~ .sheet-tabs .sheet-pc-tab,
+.sheet-npc-input[value="0"] ~ .sheet-drones .sheet-npc-show,
+.sheet-npc-input[value="1"] ~ .sheet-drones .sheet-pc-show,
 .sheet-tab-input:not([value="character"]) ~ .sheet-character,
 .sheet-tab-input:not([value="ship"]) ~ .sheet-ship,
 .sheet-tab-input:not([value="drones"]) ~ .sheet-drones,
@@ -161,9 +164,53 @@ h3 {
 .sheet-editmode[value="0"] ~ .sheet-content .repcontrol,
 .sheet-editmode[value="1"] ~ .sheet-content .sheet-display { display: none }
 
+/** edit mode highlighting **/
+.sheet-editmode[value="1"] ~ {
+	.sheet-content {
+		border-color: $highlightyellow;
+		border-style: solid;
+		border-width: 0 2px 2px 2px;
+	}
+	.sheet-header {
+		border-bottom: 2px solid $highlightyellow;
+	}
+	.sheet-tabs {
+		border-color: $highlightyellow;
+		border-style: solid;
+		border-width: 0 2px 0 2px;
+	}
+	.sheet-settings {
+		border-color: $highlightyellow;
+		border-style: solid;
+		border-width: 0 2px 0 2px;
+	}
+	div .sheet-edit-button {
+		background-color: $highlightyellow;
+		height: 29px;
+		padding: 0 5px 0 5px;
+		margin: 0 0 0 15px;
+		display: flex;
+		align-items: center;
+	}
+}
+
+.sheet-editmode[value="1"] ~ div .sheet-edit-button input {
+	align-self: center;
+}
+
+/* dice icons */
+.sheet-dice-icon {
+	background:
+		transparent
+		url("https://github.com/Roll20/roll20-character-sheets/blob/master/Stars_Without_Number_Revised/Assets/dice.png")
+		no-repeat
+		80px 3px
+		!important;
+	background-size: 15px 15px !important;
+}
+
 /* header */
 .sheet-header {
-	margin-bottom: 10px;
 	input {
 		opacity: 0;
 		position: absolute;
@@ -181,6 +228,7 @@ h3 {
 	.sheet-settings-gear, .sheet-edit-button {
 		cursor: pointer;
 		font-size: 16px;
+		//noinspection CssNoGenericFontName | There is no generic to a picture font.
 		font-family: pictos;
 		input:not(:checked) + span { color: #888 }
 		input:checked + span { color: $navyblue }
@@ -195,7 +243,8 @@ h3 {
 }
 /* tab environment */
 .sheet-tabs {
-	margin-bottom: 10px;
+	padding-bottom: 10px;
+	padding-top: 10px;
 	width: 100%;
 	position: relative;
 	z-index: 2;
@@ -268,6 +317,7 @@ h3 {
 .sheet-col40 { width: 40% }
 .sheet-colthird { width: calc(100%/3) }
 .sheet-col25 { width: 25% }
+.sheet-col20 { width: 20% }
 .sheet-colsixth { width: calc(100%/6) }
 
 /* containers */
@@ -293,7 +343,7 @@ input[type=text].sheet-inherit {
 	color: inherit;
 	font: inherit;
 }
-input[type=number].sheet-inline-input {
+.sheet-inline-input {
 	position: relative;
 	z-index: 2;
 	vertical-align: baseline;
@@ -350,15 +400,28 @@ input[type=number].sheet-inline-input {
 	&.sheet-duo {
 		display: grid;
 		text-align: center;
-		grid: auto / 1fr 5px 1fr;
+		grid: auto / 3px 1fr 5px 1fr 3px;
 		align-items: center;
 		align-content: start;
-		grid-column-gap: 4px;
+		grid-column-gap: 0;
 		> span {
 			font-size: 16px;
 			color: #333;
 		}
-		.sheet-label { grid-column: 1/4 }
+		.sheet-label { grid-column: 1/5 }
+	}
+	&.sheet-trio {
+		display: grid;
+		text-align: center;
+		grid: auto / 3px 1fr 5px 1fr 5px 1fr 3px;
+		align-items: center;
+		align-content: start;
+		grid-column-gap: 0;
+		> span {
+			font-size: 16px;
+			color: #333;
+		}
+		.sheet-label { grid-column: 1/7 }
 	}
 	button[type=roll].btn {
 		width: 100%;
@@ -456,6 +519,7 @@ input[type=number].sheet-inline-input {
 .sheet-skills-type[value="neither"] ~ div .sheet-skills-either,
 .sheet-skills-type:not([value="first"]) ~ div .sheet-skills-first,
 .sheet-skills-type:not([value="revised"]) ~ div .sheet-skills-revised,
+.sheet-skills-type:not([value="wwn"]) ~ div .sheet-skills-wwn,
 .sheet-skills-type:not([value="neither"]) ~ div .sheet-skills-neither,
 .sheet-super-type:not([value="psionics"]):not([value="both"]) ~ div .sheet-skills-psionics,
 .sheet-super-type:not([value="magic"]):not([value="both"]) ~ div .sheet-skills-magic,
@@ -586,7 +650,11 @@ input[type=number].sheet-inline-input {
 	}
 }
 
-/* Saves */
+.sheet-strain-above-max[value="1"] ~ div .sheet-total-strain {
+	color: red;
+}
+
+	/* Saves */
 .sheet-saves .sheet-flex { margin-top: 4px}
 /* menus */
 .sheet-menus-content {
@@ -611,6 +679,7 @@ input[type=number].sheet-inline-input {
 	td:first-child, .sheet-mod { font-weight: bold }
 	td:not(:first-child) { text-align: center }
 	input[type=number] { width: 45px }
+	td:nth-child(2n+3) input[type=number] { width: 37px }
 	.sheet-mod { font-size: 1.1em }
 }
 
@@ -631,6 +700,17 @@ input[type=number].sheet-inline-input {
 	}
 	.sheet-slash { margin: 0 2px }
 }
+
+/* Shells */
+
+.sheet-shells {
+	.sheet-shells-grid {
+		grid: auto / 40px 35px 35px 35px 45px 1fr;
+	}
+}
+
+.sheet-transhuman-setting:not([value="transhuman"]) ~ .sheet-column .sheet-transhuman-enabled { display: none }
+.sheet-transhuman-setting[value="transhuman"] ~ .sheet-core .sheet-transhuman-disabled { display: none }
 
 /* Weapons */
 .sheet-weapons {
@@ -781,6 +861,7 @@ input[type=number].sheet-inline-input {
 	}
 }
 .sheet-input-details:not([value="1"]) ~ div .sheet-details { display: none }
+.sheet-input-details:not([value="0"]) ~ div .sheet-notdetails { display: none }
 
 
 /* Supernatural section controls */
@@ -799,7 +880,7 @@ input[type=number].sheet-inline-input {
 /* Psionics */
 .sheet-psionics-effort {
 	display: grid;
-	grid: auto/ auto 60px 60px 60px 80px;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
 	align-items: center;
 	grid-column-gap: 4px;
 	margin-top: 5px;
@@ -869,6 +950,25 @@ input[type=number].sheet-inline-input {
 	&[value="adept"] ~ div .sheet-spellcaster { display: none }
 }
 
+/* AI */
+.sheet-ai-processing {
+	display: grid;
+	grid: auto/ auto 45px 45px 45px 45px 80px;
+	align-items: center;
+	grid-column-gap: 4px;
+	h3 { line-height: 1 }
+}
+
+.sheet-ai-processing-nodes {
+	.sheet-nodes-grid {
+		grid: auto / 65px 65px 1fr;
+	}
+}
+
+.sheet-ai-setting:not([value="ai"]) ~ .sheet-ai-enabled  { display: none }
+.sheet-ai-setting[value="ai"] ~ .sheet-column .sheet-ai-enabled { display: block }
+.sheet-ai-setting[value="ai"] ~ .sheet-core .sheet-ai-disabled { display: none }
+
 /* Foci */
 .sheet-foci-loc {
 	&[value="left"] ~ .sheet-column .sheet-foci-right,
@@ -931,7 +1031,7 @@ input[type=number].sheet-inline-input {
 .sheet-equipment {
 	.repcontainer[data-groupname="repeating_weapons"] + .repcontrol { display: none }
 	.sheet-gear-grid {
-		grid: auto / 35px minmax(130px,1fr) 2fr 35px 70px;
+		grid: auto / 35px minmax(130px, 1fr) 2fr 35px 70px 40px;
 	}
 	.sheet-other h3 { margin-bottom: 5px }
 	.sheet-other-gear { height: 100px }
@@ -959,7 +1059,7 @@ input[type=number].sheet-inline-input {
 }
 .sheet-ship {
 	margin-top: -20px;
-	grid: auto/ 2fr 1fr 1fr;
+	grid: auto/ 4fr 3fr 2fr;
 	.sheet-menus {
 		h3 { line-height: 1 }
 		button[type=roll].btn { line-height: 1 }
@@ -979,8 +1079,20 @@ input[type=number].sheet-inline-input {
 	}
 	.sheet-data {
 		display: grid;
-		grid: auto / repeat(3, 1fr);
+		grid: auto / repeat(6, 1fr);
 		.sheet-text-input, .sheet-text-input input[type=number] { text-align: center }
+		.sheet-duo {
+			grid-column-start: 1;
+			grid-column-end: 3;
+		}
+	}
+	.sheet-trio {
+		grid-column-start: 3;
+		grid-column-end: 7;
+		grid: auto / 0 1fr 5px 1fr 5px 1fr 0
+	}
+	.sheet-duo {
+		grid: auto / 0 1fr 5px 1fr 0
 	}
 	.sheet-stats {
 		display: grid;
@@ -1090,13 +1202,16 @@ input[type=number].sheet-inline-input {
 				width: 0;
 				flex-grow: 1;
 			}
-			.sheet-attacks, .sheet-ab { width: 50px }
-			.sheet-burst, .sheet-damage { width: 65px }
+			.sheet-attacks, .sheet-ab, .sheet-range { width: 50px }
+			.sheet-burst, .sheet-damage { width: 60px }
+			.sheet-shock-damage { width: 30px }
+			.sheet-shock-ac { width: 40px }
 		}
 		.sheet-display {
 			font-size: 1.1em;
 			font-weight: bold;
 			padding: 4px 8px;
+			.sheet-range[value="0"] + span {display: none }
 			.sheet-attacks[value="1"] + span { display: none }
 			.sheet-attacks { text-transform: lowercase }
 		}
