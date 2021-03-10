@@ -34,8 +34,6 @@
         }
 
         Object.entries(roll).forEach(([key,val]) => roll_array.push(`{{${key}=${val}}}`));
-
-        roll_array.push(`{{name=@{character_name}}}`);
         
         return roll_array.join(" ");
     }
@@ -77,10 +75,13 @@
     [skills.basic[18], skills.advanced[2], skills.advanced[5], skills.advanced[11]].forEach(skill => {
 
         skill.specialisations.forEach(specialisation => {
+
             const attr = specialisation.toLowerCase().replace(/ /g,"_");
 
+            const rollName = (specialisation === "Custom") ? "@{custom_name}" : specialisation;
+
             const roll_values = {
-                roll_name: `${skill.name} - ${specialisation}`,
+                roll_name: `${skill.name} - ${rollName}`,
                 roll_type: `Specialisation`,
                 roll_notes: `@{${attr}_notes}`
             }
@@ -99,6 +100,16 @@
             roll_notes: `@{specialisation_notes}`
         }
         rolls.repeating_skill = makeRoll(roll_values, attr);
+    }
+    
+    {
+        const attr = "npc_skill";
+
+        const roll_values = {
+            roll_name: `@{npc_skillname}`,
+            roll_type: `Skill`
+        }
+        rolls.npc_repeating_skill = makeRoll(roll_values, attr);
     }
 
     rolls.repeating = {};
@@ -195,6 +206,17 @@
         rolls.npctrait = makeRoll(roll_values)
     }
 
+    {
+
+        const roll_values = {
+            roll_name: `@{talent_name}`,
+            roll_type: `Talent`,
+            roll_text: `@{talent_description}`,
+        }
+
+        rolls.npctalent = makeRoll(roll_values)
+    }
+
     rolls.combat = {};
 
     ["Dodge","Endurance","Intuition","Perception","Cool"].forEach(button => {
@@ -208,5 +230,21 @@
         }
 
         rolls.combat[attr] = makeRoll(roll_values, attr, true, "combat")
+
+    });
+
+    rolls.npc_combat = {};
+
+    ["Dodge","Endurance","Intuition","Perception","Cool"].forEach(button => {
+        
+        const attr = button.toLowerCase();
+
+        const roll_values = {
+            roll_name: button,
+            roll_type: `Skill`,
+            roll_notes: `@{${attr}_notes}`
+        }
+
+        rolls.combat[`npc_${attr}`] = makeRoll(roll_values, `npc_${attr}`, true, "combat");
 
     });
