@@ -1771,6 +1771,9 @@ function calcStrifeRoll() {
     });
   },{repeating: {characters: ["strife_formula", ...getStrifeDiceAttributes()]}});
 }
+function safeGuardDiceSize(roll) {
+  return roll.toLowerCase().replace(/\b[^2]?d/g, 'd');
+}
 function joinNameAndTags(characters) {
   let joined = [];
   characters.forEach(character => {
@@ -1778,12 +1781,13 @@ function joinNameAndTags(characters) {
     if(character.tags) {
       joinedChar.rolls = JSON.parse(character.tags);
       joinedChar.rolls.forEach(roll => {
+        if(roll.dice) roll.dice = safeGuardDiceSize(roll.dice);
         if(roll.harm) roll.harm = Object.keys(roll.harm);
       });
     }
     let firstTag = {};
     firstTag.name = character.name;
-    firstTag.dice = character.dice;
+    firstTag.dice = safeGuardDiceSize(character.dice);
     if(character.harm) firstTag.harm = Object.keys(JSON.parse(character.harm));
     joinedChar.rolls = [firstTag, ...joinedChar.rolls];
     if(character.notes) joinedChar.notes = character.notes;
