@@ -1,5 +1,19 @@
 Change Log
 ==============================================
+**2021-03-08** v.22 Chuz (James Culp)
+	Add Defense roll-button and DR roll-button to Core->Combat Info tab
+	Updated Skills to split Skills and Knowledge/Languages into separate tabs
+	Finished Magic->Spells, Preparations, Rituals, Adept Powers, Conjuring and Metamagic sections
+	Minor formatting changes to css and html
+	Bugfix DR not adding Body in
+	Bugfix calculations for Cold and Hot Sim initiative roll buttons
+	Bugfix Essence Mod not allowing a zero value
+	Bugfix Removed roll query from flat attribute rolls
+	Bugfix Added Athletics skill to ranged weapons
+	
+**2021-03-03** Chuz (James Culp)
+	Included in roll20 repository for one-click access
+
 **2021-02-28** Chuz (James Culp)
 	Updated Social Tab, Contacts and SINs
 	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
