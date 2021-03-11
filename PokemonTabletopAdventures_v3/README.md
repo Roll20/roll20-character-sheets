@@ -10,21 +10,44 @@ https://discord.gg/F24Ka8E
 
 Things we want to add to the character sheet, presented in no particular order of priority:
 
+- [ ] Allow a second ability score to apply to skill checks
+- [ ] Allow formula calculations for the extra damage fields
+- [ ] Allow modifications to movement (maybe just an extra box)
+- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
+- [ ] JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters
+- [ ] Add Struggle to the move lists automatically
+- [ ] Add status effects that you can click
+  - [ ] Burn, Poison/Toxified, and Paralyzed should modify stats automatically
+- [ ] Somehow make it easier to get tokens into initiative. No idea how to accomplish this.
 - [x] ~~Display the full bonus to skill checks~~
 - [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
 - [x] ~~Add a Settings page~~
-- [ ] Allow a second ability score to apply to skill checks
-- [ ] Allow formula calculations for the extra damage fields
-- [ ] Allow modifications to movement (maybe just an extra box)
-- [ ] Display the adjusted stat score when temporary stat changes are provided
-- [ ] Display the skills section for Pokémon characters
-- [ ] Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:
-  - [ ] A spot for Attack and Special Attack bonuses, for things like Ace Trainer
-  - [ ] The critical hit range for the moves, as this is used for passives, items, etc.
-- [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
+- [X] ~~Display the adjusted stat score when temporary stat changes are provided~~
+- [X] ~~Display the skills section for Pokémon characters~~
+- [X] ~~Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:~~
+  - [X] ~~A spot for Attack and Special Attack bonuses, for things like Ace Trainer~~
+  - [X] ~~The critical hit range for the moves, as this is used for passives, items, etc.~~
 
 ## Changelog
+
+### Mar 7th, 2021
+
+- The big stat calculation overhaul!
+  - The stat balls are now read-only, except for HP.
+  - Stats are summed from a stat grid that is listed underneath the stat balls
+  - Grid is collapsible to show only one row for ease of use
+  - Stat changes from natures are calculated automatically
+  - Temporary stat changes work now!
+  - Script to fill in data automatically for any existing character sheets
+- Convert var to let
+- Pokemon can use skills now
+- Moved around some boxes and made skills two columns, mostly to support Pokemon getting them
+- STAB is calculated automatically - the previous box for STAB has been removed
+- New section for bonuses that apply to all moves:
+  - Critical Threshold goes here, and has been removed from Pokemon skills.
+  - Bonuses for Attack and Special Attack, to make the Ace Trainers happy
+  - Accuracy bonus field, for things like Hone Claws
 
 ### Feb 23rd, 2021
 
