@@ -413,4 +413,5 @@ with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
         for lines in (lines_header, lines_rolls, lines_buttons):
             lines.append("}")
             css_rules.append("\n".join(lines))
+
     GLOBALS["custom_rt_color_css"] = "\n".join(css_rules)
