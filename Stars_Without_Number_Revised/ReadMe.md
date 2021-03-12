@@ -33,14 +33,88 @@ on Github.
 * Contributions are welcome at
   [the GitHub](https://github.com/Karlinator/roll20-character-sheets). Just open
   a pull request.
-* You will need to install [Node.js](https://nodejs.org), then run the following
-  command in bash/cmd:
-  * npm install -g pug pug-cli sass jstransformer-uglify-es
-  * You may need to restart you computer.
-  * Then just make changes to the files in the Source folder, and use the file
-    "build" or "pug_build.bat" and "sass_build.bat" depending on your OS.
+* You will need to install [Node.js](https://nodejs.org), then go to the Stars_without_Number_Revised folder and run the following
+  commands in bash/cmd:
+  * `npm install`
+  * `npm run dev`
+  
+Npm is now watching all the files for changes and compiling as you go.
+If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
+
+### 2.6.0
+
+* Migrate worker codebase to TypeScript. Should hopefully reduce future bugs.
+* Usability pass:
+  * Add a yellow border while in edit mode, which also highlights the edit mode button. Should help new users find the button.
+  * Some clickable labels (one so far) get a dice icon next to them to signify that there's a roll if you click it.
+  * Clarify how Strain works. Now visually clear how it is calculated and what the different numbers are.
+  * Add a few extra fields to track useful things on the ship sheet.
+  * Some text clarification.
+
+### 2.5.4
+
+* Fix incorrect encumbrance value for shields.
+* Fix (un)checking Shell Affinity deactivating all active Shells.
+* Add WWN to skill lists selectable in sheet default settings.
+
+### 2.5.3
+
+* Fix a bug causing the Magic "Quick Menu" to just completely not work.
+
+### 2.5.2
+
+* Fix a bug preventing ship price from ever being calculated.
+* First support for Worlds Without Number in the form of an alternate skill list.
+* Fix a bug causing some calculations to not update when a repeating row was removed.
+* Fix some items displaying as "NaN" price because their price was dependent on tech level or similar.
+
+### 2.5.1
+
+* Fix a bug causing new sheets to incorrectly initialise as AI and Transhuman.
+* Fix a missing translation key for "Price".
+* Fix a bug to effort making some fields concatenate instead of add.
+* Fix a bug causing str/dex mod to come out as 10 sometimes.
+* Add a description field to weapons/attacks, which shows up in the roll template.
+* Add toggle (default to off) to ship price autocalculation. Lots of existing ships don't have price info updated, and there's no place to write in price for new items.
+* Drones support for NPCs.
+* Add NPC Shock damage.
+
+### 2.5.0
+
+* Support for Transhuman PCs with Shells and body-swapping.
+* Support for True AI PCs, with Processing and Routines, as well as Shells shared with Transhumans.
+* Ship price autocalculation during building (does not update with subsequent Hull Type changes)
+* Price information displayed for everything that currently supports autofilling.
+
+### 2.4.12
+
+* Fix a bug causing Int to be added twice to drone attacks.
+
+### 2.4.11
+
+* Fix a bug causing cyberware strain to not be updated when a cyberware was deleted.
+
+### 2.4.10
+
+* Fix a bug disallowing decimal encumbrance values.
+* Introduce a "bundled" toggle for equipment, which will bundle the items in packs of 3. This can be used instead of decimal encumbrance values.
+
+### 2.4.9
+
+* Fix a bug causing section headers and some fields to render incorrectly.
+
+### 2.4.8
+
+* Add range to NPC attacks.
+* Move bonus effort to psionics section for easier finding.
+* Change encumbrance step size from 0.01 to 1.
+
+### 2.4.7
+
+* Fix attribute boosts not being counted correctly for encumbrance and system strain.
+* Collapse attribute base and boosts fields into a single field in display mode.
 
 ### 2.4.6
 

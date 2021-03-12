@@ -517,6 +517,9 @@
 <!-- SKILLS -->
 <div class="tab-content tab3 main">
     <h3>Skills</h3>
+    <input type="radio" value="-1" name="attr_learning_speed" class="skills-labels">Fast Learner</input>
+    <input type="radio" value="1" name="attr_learning_speed" class="skills-labels">Slow Learner</input>
+    <input type="radio" value="0" name="attr_learning_speed" checked="true" class="skills-labels">None</input>
     <div class="skills-headings skills-container">
         <span class="skills skill skills-headings left">Skill</span>
         <span class="skills skills-skill-level">Lvl</span>
@@ -763,8 +766,10 @@
 on("sheet:opened", () => {
     sheetMigration();
 
-    getAttrs(["btatow_sheet_version"], values => {
-        if (values["btatow_sheet_version"] >= 3) {
+    getAttrs(["btatow_sheet_version"], ({
+        btatow_sheet_version
+    }) => {
+        if (btatow_sheet_version >= 3) {
             recalculateSkills();
         }
     });
@@ -775,7 +780,7 @@ const recalculateSkills = () => {
         ids.forEach(id => getAttrs(["repeating_skills_" + id + "_skill_xp"], values => {
             skillXPChanged({
                 newValue: values["repeating_skills_" + id + "_skill_xp"],
-                id: id
+                id
             })
         }));
     });
@@ -800,57 +805,67 @@ const CHARISMA_LINK = "charisma_link";
 const EDGE_LINK = "edge_link";
 
 // calculate stat values when XP amount changes
-on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", eventInfo => {
-    attributeName = eventInfo.sourceAttribute;
-
-    attributeValue = Math.floor(eventInfo.newValue/100);
+on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp change:intelligence_xp change:will_xp change:charisma_xp change:edge_xp", ({
+    sourceAttribute,
+    newValue
+}) => {
+    attributeValue = Math.floor(newValue / 100);
     attributeLinkedValue = calculateLinkedAttributeValue(attributeValue);
 
     let attributesToSet = {};
 
-    switch (attributeName) {
-        case STRENGTH_XP: attributesToSet = {
-                            strength: attributeValue,
-                            strength_link: attributeLinkedValue
-                        };
-                        break;
-        case BODY_XP: attributesToSet = {
-                            body: attributeValue,
-                            body_link: attributeLinkedValue
-                        };
-                        break;
-        case REFLEX_XP: attributesToSet = {
-                            reflex: attributeValue,
-                            reflex_link: attributeLinkedValue
-                        };
-                        break;
-        case DEXTERITY_XP: attributesToSet = {
-                            dexterity: attributeValue,
-                            dexterity_link: attributeLinkedValue
-                        };
-                        break;
-        case INTELLIGENCE_XP: attributesToSet = {
-                            intelligence: attributeValue,
-                            intelligence_link: attributeLinkedValue
-                        };
-                        break;
-        case WILL_XP: attributesToSet = {
-                            will: attributeValue,
-                            will_link: attributeLinkedValue
-                        };
-                        break;
-        case CHARISMA_XP: attributesToSet = {
-                            charisma: attributeValue,
-                            charisma_link: attributeLinkedValue
-                        };
-                        break;
-        case EDGE_XP: attributesToSet = {
-                            edge: attributeValue,
-                            edge_link: attributeLinkedValue
-                        };
-                        break;
-        default: console.error("unknown attribute type passed in to basic attribute on change function");
-                        return;
+    switch (sourceAttribute) {
+    case STRENGTH_XP:
+        attributesToSet = {
+            strength: attributeValue,
+            strength_link: attributeLinkedValue
+        };
+        break;
+    case BODY_XP:
+        attributesToSet = {
+            body: attributeValue,
+            body_link: attributeLinkedValue
+        };
+        break;
+    case REFLEX_XP:
+        attributesToSet = {
+            reflex: attributeValue,
+            reflex_link: attributeLinkedValue
+        };
+        break;
+    case DEXTERITY_XP:
+        attributesToSet = {
+            dexterity: attributeValue,
+            dexterity_link: attributeLinkedValue
+        };
+        break;
+    case INTELLIGENCE_XP:
+        attributesToSet = {
+            intelligence: attributeValue,
+            intelligence_link: attributeLinkedValue
+        };
+        break;
+    case WILL_XP:
+        attributesToSet = {
+            will: attributeValue,
+            will_link: attributeLinkedValue
+        };
+        break;
+    case CHARISMA_XP:
+        attributesToSet = {
+            charisma: attributeValue,
+            charisma_link: attributeLinkedValue
+        };
+        break;
+    case EDGE_XP:
+        attributesToSet = {
+            edge: attributeValue,
+            edge_link: attributeLinkedValue
+        };
+        break;
+    default:
+        console.error("unknown attribute type passed in to basic attribute on change function");
+        return;
     }
 
     setAttrs(attributesToSet, {}, recalculateSkills)
@@ -858,7 +873,7 @@ on("change:strength_xp change:body_xp change:reflex_xp change:dexterity_xp chang
 
 function calculateLinkedAttributeValue(attribute) {
     if (attribute > 10) {
-        return Math.floor(attribute/3);
+        return Math.floor(attribute / 3);
     } else {
         if (attribute < 1)
             return -4;
@@ -875,16 +890,26 @@ function calculateLinkedAttributeValue(attribute) {
     }
 }
 
-on("change:repeating_skills:skill change:repeating_skills:sub_skill", eventInfo => {
-    getAttrs(["repeating_skills_skill_xp"], values => {
-        skillXPChanged({newValue: values["repeating_skills_skill_xp"]});
+on("change:repeating_skills:skill change:repeating_skills:sub_skill", _ => {
+    getAttrs(["repeating_skills_skill_xp"], ({
+        repeating_skills_skill_xp
+    }) => {
+        skillXPChanged({
+            newValue: repeating_skills_skill_xp
+        });
     });
 });
 
 // calculate skill modifiers when skill xp changes
-on("change:repeating_skills:skill_xp", skillXPChanged);
+on("change:repeating_skills:skill_xp", skillXPChanged)
 
-function skillXPChanged(eventInfo) {
+// recalculate all skills when learning speed modifier changes
+on("change:learning_speed", recalculateSkills)
+
+function skillXPChanged({
+    id,
+    newValue
+}) {
     const tieredSkills = [
         "art",
         "computers",
@@ -896,20 +921,20 @@ function skillXPChanged(eventInfo) {
 
     // When the sheet is opened, or data migrations are run, the skills are retrieved via ID, and thus must have their
     // ID included in the attribute name when setting attributes.
-    const id = eventInfo.id !== undefined ? eventInfo.id + "_" : ""
+    const skillId = id !== undefined ? id + "_" : ""
 
-    const skill = "repeating_skills_" + id + "skill";
-    const skillLevel = "repeating_skills_" + id + "skill_level";
-    const subSkillAttrName = "repeating_skills_" + id + "sub_skill";
+    const skill = "repeating_skills_" + skillId + "skill";
+    const skillLevel = "repeating_skills_" + skillId + "skill_level";
+    const subSkillAttrName = "repeating_skills_" + skillId + "sub_skill";
 
-    getAttrs([skill, subSkillAttrName], values => {
+    getAttrs([skill, subSkillAttrName, "learning_speed"], values => {
         const skillName = values[skill]
         const skillNameLookupKey = skillName.split("_")[0]
         const subSkill = values[subSkillAttrName]
 
         let skillAttributesToSet = {};
 
-        skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(eventInfo.newValue), 0);
+        skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed);
 
         const skillData = getSkill(
             skillNameLookupKey,
@@ -917,22 +942,22 @@ function skillXPChanged(eventInfo) {
             tieredSkills.includes(skillNameLookupKey)
         );
 
-        skillAttributesToSet["repeating_skills_" + id + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity;
-        skillAttributesToSet["repeating_skills_" + id + "target_number"] = skillData.targetNumber;
+        skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity;
+        skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber;
 
         getAttrs(skillData.linkedAttributes, values => {
-            skillAttributesToSet["repeating_skills_" + id + "skill_modifier"] = Object.values(values)
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_modifier"] = Object.values(values)
                 .reduce((total, num) => Number(total) + Number(num)) + Number(skillAttributesToSet[skillLevel]);
 
-            skillAttributesToSet["repeating_skills_" + id + "skill_linked_attributes"] = skillData.linkedAttributes
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_linked_attributes"] = skillData.linkedAttributes
                 .map(linkAtr => getLinkedAttributeDisplayName(linkAtr) + " (" + values[linkAtr] + ")")
                 .join(" + ");
 
-            skillAttributesToSet["repeating_skills_" + id + "skill_roll_value"] =
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_roll_value"] =
                 getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
                 "Margin of Success: [[2d6 + @{skill_modifier}[MOD] - @{target_number}[TN]]]";
 
-            setAttrs(skillAttributesToSet);
+            setAttrs(skillAttributesToSet, {}, () => {});
         });
     });
 }
@@ -977,7 +1002,7 @@ function getSkillDisplayName(skill, skillDisplayNameKey, subSkill) {
 
 const skillsList = {
     "acrobatics": {
-        "linkedAttributes": [ REFLEX_LINK ],
+        "linkedAttributes": [REFLEX_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -987,7 +1012,7 @@ const skillsList = {
         }
     },
     "acting": {
-        "linkedAttributes": [ CHARISMA_LINK ],
+        "linkedAttributes": [CHARISMA_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": false,
@@ -996,7 +1021,7 @@ const skillsList = {
         }
     },
     "administration": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1005,7 +1030,7 @@ const skillsList = {
         }
     },
     "animal": {
-        "linkedAttributes": [ WILL_LINK ],
+        "linkedAttributes": [WILL_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1016,7 +1041,7 @@ const skillsList = {
         }
     },
     "appraisal": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": false,
@@ -1025,7 +1050,7 @@ const skillsList = {
         }
     },
     "archery": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1034,7 +1059,7 @@ const skillsList = {
         }
     },
     "artillery": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1043,7 +1068,7 @@ const skillsList = {
         }
     },
     "career": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": true,
@@ -1052,7 +1077,7 @@ const skillsList = {
         }
     },
     "climbing": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1061,7 +1086,7 @@ const skillsList = {
         }
     },
     "communications": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1072,7 +1097,7 @@ const skillsList = {
         }
     },
     "cryptography": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1081,7 +1106,7 @@ const skillsList = {
         }
     },
     "demolitions": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1090,7 +1115,7 @@ const skillsList = {
         }
     },
     "disguise": {
-        "linkedAttributes": [ CHARISMA_LINK ],
+        "linkedAttributes": [CHARISMA_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1099,7 +1124,7 @@ const skillsList = {
         }
     },
     "driving": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1110,7 +1135,7 @@ const skillsList = {
         }
     },
     "escape": {
-        "linkedAttributes": [ STRENGTH_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [STRENGTH_LINK, DEXTERITY_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1119,7 +1144,7 @@ const skillsList = {
         }
     },
     "forgery": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1128,7 +1153,7 @@ const skillsList = {
         }
     },
     "gunnery": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1145,7 +1170,7 @@ const skillsList = {
         }
     },
     "interrogation": {
-        "linkedAttributes": [ WILL_LINK, CHARISMA_LINK ],
+        "linkedAttributes": [WILL_LINK, CHARISMA_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1154,7 +1179,7 @@ const skillsList = {
         }
     },
     "investigation": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1163,7 +1188,7 @@ const skillsList = {
         }
     },
     "language": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, CHARISMA_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, CHARISMA_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": true,
@@ -1172,7 +1197,7 @@ const skillsList = {
         }
     },
     "leadership": {
-        "linkedAttributes": [ WILL_LINK, CHARISMA_LINK ],
+        "linkedAttributes": [WILL_LINK, CHARISMA_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1181,7 +1206,7 @@ const skillsList = {
         }
     },
     "medtech": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1191,7 +1216,7 @@ const skillsList = {
         }
     },
     "navigation": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1204,7 +1229,7 @@ const skillsList = {
         }
     },
     "negotiation": {
-        "linkedAttributes": [ CHARISMA_LINK ],
+        "linkedAttributes": [CHARISMA_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": false,
@@ -1213,7 +1238,7 @@ const skillsList = {
         }
     },
     "perception": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1222,7 +1247,7 @@ const skillsList = {
         }
     },
     "piloting": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1239,7 +1264,7 @@ const skillsList = {
         }
     },
     "protocol": {
-        "linkedAttributes": [ WILL_LINK, CHARISMA_LINK ],
+        "linkedAttributes": [WILL_LINK, CHARISMA_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": true,
@@ -1248,7 +1273,7 @@ const skillsList = {
         }
     },
     "running": {
-        "linkedAttributes": [ REFLEX_LINK ],
+        "linkedAttributes": [REFLEX_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1257,7 +1282,7 @@ const skillsList = {
         }
     },
     "science": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": true,
@@ -1266,7 +1291,7 @@ const skillsList = {
         }
     },
     "security": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1276,7 +1301,7 @@ const skillsList = {
         }
     },
     "sensor": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1285,7 +1310,7 @@ const skillsList = {
         }
     },
     "small": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1294,7 +1319,7 @@ const skillsList = {
         }
     },
     "stealth": {
-        "linkedAttributes": [ REFLEX_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [REFLEX_LINK, INTELLIGENCE_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1303,7 +1328,7 @@ const skillsList = {
         }
     },
     "strategy": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1312,7 +1337,7 @@ const skillsList = {
         }
     },
     "streetwise": {
-        "linkedAttributes": [ CHARISMA_LINK ],
+        "linkedAttributes": [CHARISMA_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": true,
@@ -1321,7 +1346,7 @@ const skillsList = {
         }
     },
     "support": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1330,7 +1355,7 @@ const skillsList = {
         }
     },
     "surgery": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1340,7 +1365,7 @@ const skillsList = {
         }
     },
     "survival": {
-        "linkedAttributes": [ BODY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [BODY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": true,
@@ -1349,7 +1374,7 @@ const skillsList = {
         }
     },
     "swimming": {
-        "linkedAttributes": [ STRENGTH_LINK ],
+        "linkedAttributes": [STRENGTH_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1358,7 +1383,7 @@ const skillsList = {
         }
     },
     "tactics": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1371,7 +1396,7 @@ const skillsList = {
         }
     },
     "technician": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1387,7 +1412,7 @@ const skillsList = {
         }
     },
     "thrown": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1397,7 +1422,7 @@ const skillsList = {
         }
     },
     "tracking": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1407,7 +1432,7 @@ const skillsList = {
         }
     },
     "training": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, CHARISMA_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, CHARISMA_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1416,7 +1441,7 @@ const skillsList = {
         }
     },
     "zero": {
-        "linkedAttributes": [ REFLEX_LINK ],
+        "linkedAttributes": [REFLEX_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1428,7 +1453,7 @@ const skillsList = {
 
 const tieredSkillsBasic = {
     "art": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": true,
@@ -1437,7 +1462,7 @@ const tieredSkillsBasic = {
         }
     },
     "computers": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": false,
@@ -1446,7 +1471,7 @@ const tieredSkillsBasic = {
         }
     },
     "interest": {
-        "linkedAttributes": [ INTELLIGENCE_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK],
         "targetNumber": 8,
         "complexity": "CB",
         "subSkills": true,
@@ -1455,7 +1480,7 @@ const tieredSkillsBasic = {
         }
     },
     "martial": {
-        "linkedAttributes": [ REFLEX_LINK ],
+        "linkedAttributes": [REFLEX_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1464,7 +1489,7 @@ const tieredSkillsBasic = {
         }
     },
     "melee": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1473,7 +1498,7 @@ const tieredSkillsBasic = {
         }
     },
     "prestidigitation": {
-        "linkedAttributes": [ DEXTERITY_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK],
         "targetNumber": 7,
         "complexity": "SB",
         "subSkills": false,
@@ -1487,7 +1512,7 @@ const tieredSkillsBasic = {
 
 const tieredSkillsAdvanced = {
     "art": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": true,
@@ -1496,7 +1521,7 @@ const tieredSkillsAdvanced = {
         }
     },
     "computers": {
-        "linkedAttributes": [ DEXTERITY_LINK, INTELLIGENCE_LINK ],
+        "linkedAttributes": [DEXTERITY_LINK, INTELLIGENCE_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": false,
@@ -1505,7 +1530,7 @@ const tieredSkillsAdvanced = {
         }
     },
     "interest": {
-        "linkedAttributes": [ INTELLIGENCE_LINK, WILL_LINK ],
+        "linkedAttributes": [INTELLIGENCE_LINK, WILL_LINK],
         "targetNumber": 9,
         "complexity": "CA",
         "subSkills": true,
@@ -1514,7 +1539,7 @@ const tieredSkillsAdvanced = {
         }
     },
     "martial": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1523,7 +1548,7 @@ const tieredSkillsAdvanced = {
         }
     },
     "melee": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1532,7 +1557,7 @@ const tieredSkillsAdvanced = {
         }
     },
     "prestidigitation": {
-        "linkedAttributes": [ REFLEX_LINK, DEXTERITY_LINK ],
+        "linkedAttributes": [REFLEX_LINK, DEXTERITY_LINK],
         "targetNumber": 8,
         "complexity": "SA",
         "subSkills": false,
@@ -1592,15 +1617,15 @@ function sheetMigration() {
             return;
         }
 
-        switch(sheetVersion) {
-            case 1:
-                migrateFrom1To2();
-                break;
-            case 2:
-                migrateFrom2To3();
-                break;
-            default:
-                break;
+        switch (sheetVersion) {
+        case 1:
+            migrateFrom1To2();
+            break;
+        case 2:
+            migrateFrom2To3();
+            break;
+        default:
+            break;
         }
     });
 }
@@ -1641,7 +1666,7 @@ function migrateFrom1To2() {
             }
         }
 
-        console.debug("New attributes: "+ JSON.stringify(newAttributes));
+        console.debug("New attributes: " + JSON.stringify(newAttributes));
 
         setAttrs(newAttributes, {}, () => {
             setAttrs({
@@ -1650,7 +1675,7 @@ function migrateFrom1To2() {
                 console.log("Sheet data migration completed");
             });
         });
-     });
+    });
 }
 
 // Migrate skills data from version 2 to version 3
@@ -1736,15 +1761,17 @@ function migrateFrom2To3() {
 
                 newSkillValues[newSkillDataNames.skill] = skillName;
                 if (displaySubSkill && oldSkillSubSkillName !== undefined) {
-                newSkillValues[newSkillDataNames.subSkill] = oldSkillSubSkillName;
-            }
+                    newSkillValues[newSkillDataNames.subSkill] = oldSkillSubSkillName;
+                }
                 newSkillValues[newSkillDataNames.xp] = oldSkillValues[oldSkillDataNames.xp];
 
                 setAttrs(newSkillValues, {}, () => {
                     skillsUpdated++;
 
                     if (skillsUpdated === ids.length) {
-                        setAttrs({btatow_sheet_version: 3}, {}, () => {
+                        setAttrs({
+                            btatow_sheet_version: 3
+                        }, {}, () => {
                             console.log("Sheet migrated from version 2 to version 3.");
                             recalculateSkills();
                         });

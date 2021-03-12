@@ -1,3 +1,17 @@
+## 1.2.7
+ - 12.04.2020
+  - Berechnung von KE und AE umgestellt (analog wie LE), von autocalc auf sheetworker
+	- In der Konfiguration des Sheet (Anzeige) kann man einstellen, ob die LE/AE/KE Grundwerte automatisch als Maximalwert für LE, AE, KE im Token übernommen werden sollen.
+	- Wenn ja, wir automatisch der aktuelle Grundwert im Token nachgetragen. Dadurch sind auch die Balken auf dem Token stets sichtbar.
+	- Wenn nein, kann der Maximalwert aus dem Token gelöscht werden. Der Wert wird nicht mehr gesetzt oder nachgeführt, bis man die Option in der Konfiguration wieder umstellt. Dadurch kann der Balken auf dem Token ausgeblendet werden.
+  - Wenn "Gegner-Sheet" aktiviert wird in der Konfiguration, werden die automatischen Berechnungen für Schmerz/AE/LE/KE nicht mehr durchgeführt. Der user kann/muss dann alles manuell eingeben.
+	- Der Modifikator für Status Schmerz ist in diesem Fall auch unwirksam, der user wählt den Status über den Button.
+
+## 1.2.6
+ - 08.04.2020
+  - Leiteigenschaft und Schadensschwelle für Nebenhand wird nun korrekt berücksichtigt
+	- Bonus-Schaden wird im Schadenswurf für die Nebenhand berücksichtigt.
+
 ## 1.2.5
  - 01.04.2020 (by Marc Ehrenmann / mckee14)
   - Schmerzstufen werden automatisch berechnet und eingetragen!

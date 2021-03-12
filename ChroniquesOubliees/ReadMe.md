@@ -6,12 +6,59 @@ Chroniques Oubli&eacute;es Fantasy est un jeu de r&ocirc;le m&eacute;di&eacute;v
 
 Cette feuilles de personnage inclue quelques jets et r&egrave;gles optionnelles.
 
+Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règles des Terres d'Arran.
+
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-3.0 [Screenshot](co_v2.png)
+4.04 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v4.04 (2020-02-01)
+* Séparation des capacités en titre + texte
+* Ajout d'un texte pour les voies
+
+## v4.03 (2020-11-27)
+* Possibilité de ne plus avoir le bonus de base en attaque égal au niveau
+
+## v4.02 (2020-10-28)
+* Ajout de l'équipement pour les PNJs
+* Attributs plus fins pour les richesses
+
+## v4.00 (2020-10-14)
+* Support des règles des Terres d'Arran
+* Ajout d'une ligne d'effets pour les consommables
+* Affichage des compétences en mode édition et non-éditable pour un meilleur rendu.
+
+## v3.7 (2020-09-16)
+* Utilisation du même attribut en mode PJ et PNJ pour les PVs, les DM temporaires et la RD
+
+## v3.6 (2020-09-11)
+* Passage de cases à valeur pour les points de récupération
+
+## v3.4 (2020-08-06)
+* Utilisation des modificateurs dans les options d'attaque
+ * avantage et désavantage
+ * attaque automatique et sans dégâts
+ * dégâts temporaires
+ * un peu de logique sur les dés de dégâts
+* Des options d'attaque communes à toutes les attaques (attaque de groupe, attaque risquée, attaque assurée,... )
+
+## v3.3 (20020-06-19)
+* Ajout d'options pour les attaques (pour l'instant utilisées par le script)
+
+## v3.2 (2020-05-07)
+* Ajout de l'armure et du bouclier chez les PNJs
+* Suivi des PVs vers les pnj_pv pour les cas de mauvais lien d'attribut d'un PNJ
+* Ajout du casque sur la fiche PJ
+* Labelisation automatique des attaques
+* Copie des attaques de PJ vers PNJ quand on change le type de personnage.
+
+## v3.1 (2020-04-16)
+* Ajout des couleurs introduites avec les boîtes Chroniques Oubliées
+* Ajout d'un champ `degat2` dans le roll template (pour rajouter des dégâts non multipliés en cas de critique)
+* Essai en enlevant un champ avec accant (créature) de la partie script, pour voir si c'est la cause de l'erreur de syntaxe quand on importe la fiche (pas d'erreur si on copie-colle)
+
 ## v3.0 (2020-01-21)
 * Utilisation d'options pour l'affichage ou non des règles optionnelles, qui sont maintenant dans la partie caractéristique, et non équipement
 * Capacités raciales et langues passent dans l'onglet capacités

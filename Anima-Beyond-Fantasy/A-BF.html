@@ -2714,7 +2714,86 @@
 		TAS.repeatingSimpleSum('spellcreature', "daily_spell_creature_cost", "daily_spell_creature_totalcost");
 	});
 	
-	
+	on('sheet:opened change:fameBravery change:fameCowardice change:fameHonor change:fameInfamy change:fameTalent',function()
+	{
+		getAttrs(["fameBravery", "fameCowardice", "fameHonor", "fameInfamy", "fameTalent"], function (v) 
+		{
+			const bravery = parseInt(v["fameBravery"], 10)||0;
+			const cowardice = parseInt(v["fameCowardice"], 10)||0;
+			const honor = parseInt(v["fameHonor"], 10)||0;
+			const infamy = parseInt(v["fameInfamy"], 10)||0;
+			const talent = parseInt(v["fameTalent"], 10)||0;
+			
+			var total = bravery + cowardice + honor + infamy + talent;
+			
+			
+			if(total < 10)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: 0,
+					["recognition"]: getTranslationByKey("unknown")
+				});
+			}
+			else if(total >= 10 && total < 20)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -1,
+					["recognition"]: getTranslationByKey("known")
+				});
+			}
+			else if(total >= 20 && total < 30)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -3,
+					["recognition"]: getTranslationByKey("popular")
+				});
+			}
+			else if(total >= 30 && total < 40)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -5,
+					["recognition"]: getTranslationByKey("renowned")
+				});
+			}
+			else if(total >= 40 && total < 50)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -10,
+					["recognition"]: getTranslationByKey("famous")
+				});
+			}
+			else if(total >= 50 && total < 70)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -15,
+					["recognition"]: getTranslationByKey("celebrated")
+				});
+			}
+			else if(total >= 70 && total < 100)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: -25,
+					["recognition"]: getTranslationByKey("legendary")
+				});
+			}
+			else if(total >= 100)
+			{
+				setAttrs({
+					["fameTotal"]: total,
+					["fameDifficulty"]: NA,
+					["recognition"]: getTranslationByKey("beyond-legend")
+				});
+			}
+		});
+	});
+		
 	on('sheet:opened',function()
 	{
 		getSectionIDs("repeating_classes", function (ids) 
@@ -3930,7 +4009,7 @@
 			<h2 data-i18n="initiative">Initiative</h2>
 			<fieldset class="repeating_initiative">
 				<input type="hidden" name="attr_init_option" value="0" />
-				<button type="roll" name="roll_init" value="@{diceRollD100} {{subname=^{initiative}}} {{subtitle=@{init_label}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[@{init_final}]]+?{@{modifiersTrad} ?|0}]]}}">
+				<button type="roll" name="roll_init" value="@{diceRollD100} {{subname=^{initiative}}} {{subtitle=@{init_label}}} {{result=[[1d100@{ord}cs>[[@{orr}]]cf<[[@{fr}]]+[[@{init_final}]]+?{@{modifiersTrad} ?|0}&{tracker}]]}}">
 					<input type="text" name="attr_init_label" value=""/>
 					<span name="attr_init_final" />
 				</button>
@@ -9406,12 +9485,12 @@
 			<div>
 				<label>
 					<span data-i18n="fame">Fame</span><span>:</span>
-					<input type="number" name="attr_fameTotal" value="0" disabled />
+					<input type="number" name="attr_fameTotal" value="0" readonly />
 				</label>
 				
 				<label>
 					<span data-i18n="difficulty">Difficulty</span><span>:</span>
-					<input type="number" name="attr_fameDifficulty" value="0" readonly />
+					<input type="text" name="attr_fameDifficulty" value="0" readonly />
 				</label>
 			</div>
 			<label>
