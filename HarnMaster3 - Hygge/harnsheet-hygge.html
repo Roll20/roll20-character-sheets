@@ -1128,7 +1128,7 @@
 			<h4 class="sheet-section-head">Combat</h4>	
 				<div>
 					<div class="sheet-combat-label">Horse Init</div>
-					<input type="number" name="attr_hcombat_initiative" value="(@{hinitiative_ml} - [[(@{hphysical_penalty})*5]])" class="sheet-skill-value" disabled="true">
+					<input type="number" name="attr_hcombat_initiative" value="0" class="sheet-skill-value" readonly>
 				</div>
 				<div>
 					<div class="sheet-combat-label">Endurance</div>
@@ -2135,6 +2135,23 @@ function() {
 		if(values.is_mounted != 0) { cinit = parseInt(values['ridinghorse_ml'])};
 		setAttrs({
 			'combat_initiative': cinit
+		});
+	});
+});
+
+<!-- horse combat initiative /-->
+
+
+
+on('change:hinitiative_ml change:hphysical_penalty', 
+function() {
+    getAttrs(['hinitiative_ml', 'hphysical_penalty'], 
+	function(values) {
+		var hcinit = parseInt(values['hinitiative_ml'])||0;
+		var physpen = parseInt(values['hphysical_penalty'])||0;
+		hcinit = Math.round(hcinit - physpen*5);
+		setAttrs({
+			'hcombat_initiative': hcinit
 		});
 	});
 });
