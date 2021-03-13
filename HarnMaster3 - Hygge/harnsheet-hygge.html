@@ -490,11 +490,11 @@
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-light">Fatigue</div>
-						<input type="number" name="attr_fatigue_total" class="sheet-stat-value" value="0">
+						<input type="number" name="attr_fatigue_total" class="sheet-stat-value">
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-heavy">Universal</div>
-						<input type="number" value="0" class="sheet-stat-value" name="attr_universal_penalty" readonly>
+						<input type="text" class="sheet-stat-value" name="attr_universal_penalty" readonly>
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-light">Encumb.</div>
@@ -1239,10 +1239,10 @@
 				<input type="number" name="attr_trample_weapon_b" class="sheet-skill-value-small" value="0">
 				<input type="number" name="attr_trample_weapon_e" class="sheet-skill-value-small" disabled="true" value="0">
 				<input type="number" name="attr_trample_weapon_p" class="sheet-skill-value-small" disabled="true" value="0">
-				<input type="number" name="attr_trample_weapon_ml" class="sheet-skill-value-small" disabled="true" value="(@{htrample_ml})">
-				<input type="number" name="attr_trample_weapon_aml" class="sheet-skill-value-small" disabled="true" value="(@{trample_weapon_ml})">
+				<input type="number" name="attr_htrample_ml" class="sheet-skill-value-small" readonly">
+				<input type="number" name="attr_htrample_ml" class="sheet-skill-value-small" readonly">
 				<div class="sheet-skill-value">
-					<button type="roll" value="&{template:rollcheck} {{character_name=@{hname}}} {{rolldesc=tramples}} {{rolltarget=[[{[[{[[@{trample_weapon_aml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier??|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier??|0}]]}} {{ml=@{trample_weapon_aml}}} {{note=b(@{trample_weapon_b}) e(@{trample_weapon_e}) p(@{trample_weapon_p})}}" name="roll_trampleweaponamlskillcheck">
+					<button type="roll" value="&{template:rollcheck} {{character_name=@{hname}}} {{rolldesc=tramples}} {{rolltarget=[[{[[{[[@{htrample_ml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier??|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier??|0}]]}} {{ml=@{htrample_ml}}} {{note=b(@{trample_weapon_b}) e(@{trample_weapon_e}) p(@{trample_weapon_p})}}" name="roll_trampleweaponamlskillcheck">
 					</button>
 				</div>
 			</div>				
@@ -1980,14 +1980,14 @@ function() {
 <!-- injury totals /-->
 
 on('change:repeating_injury:injury_level remove:repeating_injury', function() {
-	repeatingSum('injury_total', 'injury','injury_level');
+	repeatingSum('injury_total', 'injury', 'injury_level');
 
 });
 
 <!-- horse injury totals /-->
 
 on('change:repeating_hinjury:hinjury_level remove:repeating_hinjury', function() {
-	repeatingSum('hinjury_total', 'hinjury','hinjury_level');
+	repeatingSum('hinjury_total', 'hinjury', 'hinjury_level');
 
 });
 
@@ -2019,17 +2019,19 @@ on('change:repeating_hinjury:hinjury_infected', function() {
    });
 });
 
-<!-- universal penalty /-->
+<!-- universal and physical penalties /-->
 
-on('change:is_mounted change:injury_total change:fatigue_total', function() {
-    getAttrs(['injury_total', 'fatigue_total', 'universal_penalty', 'is_mounted'], function(values) {
-        var fatigue = parseInt(values.fatigue_total);
-        if (values.is_mounted == 'on') { fatigue = Math.round(fatigue / 2) };
-        var upenalty = parseInt(values.injury_total) + fatigue;
-		console.log(fatigue_total);
-		console.log(upenalty);
+on('change:is_mounted change:injury_total change:fatigue_total change:encumbrance', function() {
+    getAttrs(['injury_total', 'fatigue_total', 'encumbrance', 'is_mounted'], function(values) {
+        var inj = parseInt(values.injury_total)||0;
+		var fat = parseInt(values.fatigue_total)||0;
+		var enc = parseInt(values.encumbrance)||0;
+        if (values.is_mounted == 'on') { fat = Math.round(fat / 2) };
+        var upenalty = inj + fat;
+		var ppenalty = enc + upenalty;
         setAttrs({
-            'universal_penalty': upenalty
+            'universal_penalty': upenalty,
+			'physical_penalty': ppenalty
         });
     });
 });
@@ -2037,7 +2039,7 @@ on('change:is_mounted change:injury_total change:fatigue_total', function() {
 <!-- horse universal penalty /-->
 
 on('change:hinjury_total change:hfatigue_total', function() {
-    getAttrs(['hinjury_total', 'hfatigue_total', 'huniversal_penalty'], function(values) {
+    getAttrs(['hinjury_total', 'hfatigue_total'], function(values) {
         var hfatigue = parseInt(values.hfatigue_total);
         var hupenalty = parseInt(values.hinjury_total) + hfatigue;
         setAttrs({
@@ -2046,25 +2048,12 @@ on('change:hinjury_total change:hfatigue_total', function() {
     });
 });
 
-<!-- physical penalty /-->
-on('change:is_mounted change:universal_penalty change:encumbrance', function() {
-    getAttrs(['universal_penalty', 'physical_penalty', 'encumbrance'], function(values) {
-        var enc = parseInt(values.encumbrance);
-		var upen = parseInt(values.universal_penalty);
-		console.log(enc);
-		console.log(upen);
-		var ppenalty = enc + upen;
-        setAttrs({
-            'physical_penalty': ppenalty
-        });
-    });
-});
+
 
 <!-- horse physical penalty /-->
-on('change:huniversal_penalty  change:hencumbrance', function() {
-    getAttrs(['huniversal_penalty', 'hphysical_penalty', 'hencumbrance'], function(values) {
+on('change:huniversal_penalty change:hencumbrance', function() {
+    getAttrs(['huniversal_penalty', 'hencumbrance'], function(values) {
         var hppenalty = parseInt(values.hencumbrance) + parseInt(values.huniversal_penalty);
-		console.log(hppenalty); 
         setAttrs({
             'hphysical_penalty': hppenalty
         });
@@ -2227,6 +2216,21 @@ on('change:unarmed_ml', function() {
     });
 });
 
+trample_weapon_ml  htrample_ml
+
+on('change:weapon_ml' 'change:weapon_atk' 'change:weapon_def', function() {
+    getAttrs(['weapon_ml', 'weapon_atk', 'weapon_def'], function(values) {
+		var wml = parseInt(values.weapon_ml);
+		var watk = parseInt(values.weapon_atk);
+		var wdef = parseInt(values.weapon_def);
+		var waml = wml + watk;
+		var wdml = wml + wdef;
+        setAttrs({
+            'weapon_aml': waml,
+			'weapon_dml': wdml
+        });
+    });
+});
 
 <!-- end weapons calc -->
 
