@@ -494,7 +494,7 @@
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-heavy">Universal</div>
-						<input type="text" class="sheet-stat-value" name="attr_universal_penalty" readonly>
+						<input type="number" class="sheet-stat-value" name="attr_universal_penalty" readonly>
 					</div>
 					<div>
 						<div class="sheet-combat-label sheet-font-light">Encumb.</div>
@@ -1882,7 +1882,6 @@ on('change:repeating_hinventoryitems remove:repeating_hinventoryitems', function
 
 }); 
 
-
 <!-- endurance /-->
 
 on('change:str change:sta change:wil', 
@@ -2036,31 +2035,21 @@ on('change:is_mounted change:injury_total change:fatigue_total change:encumbranc
     });
 });
 
-<!-- horse universal penalty /-->
+<!-- horse universal and physical penalties  /-->
 
-on('change:hinjury_total change:hfatigue_total', function() {
+on('change:hinjury_total change:hfatigue_total change:hencumbrance', function() {
     getAttrs(['hinjury_total', 'hfatigue_total'], function(values) {
-        var hfatigue = parseInt(values.hfatigue_total);
-        var hupenalty = parseInt(values.hinjury_total) + hfatigue;
+        var hfat = parseInt(values.hfatigue_total)||0;
+		var hinj = parseInt(values.hinjury_total)||0;
+		var henc = parseInt(values.hencumbrance)||0;
+        var hupenalty =  hinj + hfat;
+		var hppenalty = henc + hupenalty;
         setAttrs({
-            'huniversal_penalty': hupenalty
+            'huniversal_penalty': hupenalty,
+			'hphysical_penalty': hppenalty
         });
     });
 });
-
-
-
-<!-- horse physical penalty /-->
-on('change:huniversal_penalty change:hencumbrance', function() {
-    getAttrs(['huniversal_penalty', 'hencumbrance'], function(values) {
-        var hppenalty = parseInt(values.hencumbrance) + parseInt(values.huniversal_penalty);
-        setAttrs({
-            'hphysical_penalty': hppenalty
-        });
-    });
-});	
-
-
 
 <!-- Move speed in combat /-->
 	
@@ -2129,9 +2118,6 @@ function() {
 });
 
 <!-- horse combat initiative /-->
-
-
-
 on('change:hinitiative_ml change:hphysical_penalty', 
 function() {
     getAttrs(['hinitiative_ml', 'hphysical_penalty'], 
@@ -2145,27 +2131,25 @@ function() {
 	});
 });
 
-
 <!-- horse natural armour values based on aq /-->
-
-    on('change:hnatural_aq', function() {
-        getAttrs(['hnatural_aq', 'hnatural_b', 'hnatural_e', 'hnatural_p', 'hnatural_f'], function(values) {
-			var horsenatarmb = 4;
-			var horsenatarme = 3;
-			var horsenatarmp = 1;
-			var horsenatarmf = 3;
-			var horsenatarmaq = parseInt(values.hnatural_aq);
-			var horsenatarmbaq = Math.min(horsenatarmb*2,horsenatarmb+horsenatarmaq);
-			var horsenatarmeaq = Math.min(horsenatarme*2,horsenatarme+horsenatarmaq);
-			var horsenatarmpaq = Math.min(horsenatarmp*2,horsenatarmp+horsenatarmaq);
-			var horsenatarmfaq = Math.min(horsenatarmf*2,horsenatarmf+horsenatarmaq);
-            setAttrs({
-                'hnatural_b': horsenatarmbaq,			
-                'hnatural_e': horsenatarmeaq,			
-                'hnatural_p': horsenatarmpaq,
-				'hnatural_f': horsenatarmfaq
-            });
+on('change:hnatural_aq', function() {
+    getAttrs(['hnatural_aq', 'hnatural_b', 'hnatural_e', 'hnatural_p', 'hnatural_f'], function(values) {
+		var horsenatarmb = 4;
+		var horsenatarme = 3;
+		var horsenatarmp = 1;
+		var horsenatarmf = 3;
+		var horsenatarmaq = parseInt(values.hnatural_aq);
+		var horsenatarmbaq = Math.min(horsenatarmb*2,horsenatarmb+horsenatarmaq);
+		var horsenatarmeaq = Math.min(horsenatarme*2,horsenatarme+horsenatarmaq);
+		var horsenatarmpaq = Math.min(horsenatarmp*2,horsenatarmp+horsenatarmaq);
+		var horsenatarmfaq = Math.min(horsenatarmf*2,horsenatarmf+horsenatarmaq);
+        setAttrs({
+            'hnatural_b': horsenatarmbaq,			
+            'hnatural_e': horsenatarmeaq,			
+            'hnatural_p': horsenatarmpaq,
+			'hnatural_f': horsenatarmfaq
         });
+    });
 });
 
 <!-- horse turning /-->
@@ -2181,59 +2165,6 @@ on('change:horse_speed', function() {
             });
         });
 });
-
-<!-- Weapon AML and DML calculations -->
-
-on('change:weapon_ml' 'change:weapon_atk' 'change:weapon_def', function() {
-    getAttrs(['weapon_ml', 'weapon_atk', 'weapon_def'], function(values) {
-		var wml = parseInt(values.weapon_ml);
-		var watk = parseInt(values.weapon_atk);
-		var wdef = parseInt(values.weapon_def);
-		var waml = wml + watk;
-		var wdml = wml + wdef;
-        setAttrs({
-            'weapon_aml': waml,
-			'weapon_dml': wdml
-        });
-    });
-});
-
-on('change:unarmed_ml', function() {
-    getAttrs(['unarmed_ml', 'punch_weapon_atk', 'kick_weapon_atk', 'punch_weapon_def', 'kick_weapon_def'], function(values) {
-		var uml = parseInt(values.unarmed_ml);
-		var paml = uml + parseInt(values.punch_weapon_atk);
-		var pdml = uml + parseInt(values.punch_weapon_def);
-		var kaml = uml + parseInt(values.kick_weapon_atk);
-		var kdml = uml + parseInt(values.kick_weapon_def);
-        setAttrs({
-            'punch_weapon_ml': uml,
-			'punch_weapon_aml': paml,
-			'punch_weapon_dml': pdml,
-            'kick_weapon_ml': uml,			
-            'kick_weapon_aml': kaml,
-			'kick_weapon_dml': kdml
-        });
-    });
-});
-
-trample_weapon_ml  htrample_ml
-
-on('change:weapon_ml' 'change:weapon_atk' 'change:weapon_def', function() {
-    getAttrs(['weapon_ml', 'weapon_atk', 'weapon_def'], function(values) {
-		var wml = parseInt(values.weapon_ml);
-		var watk = parseInt(values.weapon_atk);
-		var wdef = parseInt(values.weapon_def);
-		var waml = wml + watk;
-		var wdml = wml + wdef;
-        setAttrs({
-            'weapon_aml': waml,
-			'weapon_dml': wdml
-        });
-    });
-});
-
-<!-- end weapons calc -->
-
 
 <!-- armor protection -->
 
