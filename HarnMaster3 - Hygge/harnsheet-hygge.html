@@ -2062,24 +2062,10 @@ on('change:encumbrance change:universal_penalty change:agl', function() {
     });
 });
 
-<!-- Horse Move speed in combat /-->
 
-on('change:horse_speed change:hencumbrance change:huniversal_penalty change:hmove', function() {
-    getAttrs(['hmove', 'huniversal_penalty', 'hencumbrance', 'horse_speed'], function(values) {
-        var hcmove = parseInt(values.hmove) - parseInt(values.huniversal_penalty) - parseInt(values.hencumbrance);
-		hcmove = Math.round( hcmove * parseFloat(values.horse_speed) ); // note: 0.5 speed for walk doesn't seem to work, goes down to 0. 
-		var hcminmove = Math.round( hcmove/3 );
-        setAttrs({
-            'hcombat_move': hcmove,
-			'hcombat_min_move': hcminmove
-        });
-    });
-});
-
-	
 <!-- effective riding skill on horse /-->
 
-on('change:ridingpersonal_ml  change:hinitiative_ml change:hencumbrance change:huniversal_penalty  change:encumbrance  change:universal_penalty ', 
+on('change:ridingpersonal_ml change:hinitiative_ml change:hencumbrance change:huniversal_penalty change:encumbrance change:universal_penalty ', 
 function() {
     getAttrs(['ridingpersonal_ml', 'hinitiative_ml', 'hencumbrance', 'huniversal_penalty', 'encumbrance', 'universal_penalty'], 
 	function(values) {
@@ -2102,7 +2088,7 @@ function() {
 
 <!-- combat initiative toggle between on and off horse /-->
 
-on('change:is_mounted change:ridinghorse_ml  change:initiative_ml change:encumbrance change:universal_penalty', 
+on('change:is_mounted change:ridinghorse_ml change:initiative_ml change:encumbrance change:universal_penalty', 
 function() {
     getAttrs(['initiative_ml', 'ridinghorse_ml', 'is_mounted', 'combat_initiative', 'encumbrance', 'universal_penalty'], 
 	function(values) {
@@ -2131,6 +2117,75 @@ function() {
 	});
 });
 
+<!-- Horse Move speed in combat /-->
+
+on('change:horse_speed change:hencumbrance change:huniversal_penalty change:hmove', function() {
+    getAttrs(['hmove', 'huniversal_penalty', 'hencumbrance', 'horse_speed'], function(values) {
+        var hcmove = parseInt(values.hmove) - parseInt(values.huniversal_penalty) - parseInt(values.hencumbrance);
+		hcmove = Math.round( hcmove * parseFloat(values.horse_speed) ); // note: 0.5 speed for walk doesn't seem to work, goes down to 0. 
+		var hcminmove = Math.round( hcmove/3 );
+        setAttrs({
+            'hcombat_move': hcmove,
+			'hcombat_min_move': hcminmove
+        });
+    });
+});
+
+<!-- horse turning /-->
+
+on('change:horse_speed', function() {
+     getAttrs(['horse_speed'], function(values) {
+		var maxturn = 0;
+			if(values.horse_speed == 1) { maxturn = 3 };
+			if(values.horse_speed == 2) { maxturn = 5 };
+			if(values.horse_speed == 3) { maxturn = 10 };
+            setAttrs({
+                'hturn': maxturn			
+            });
+        });
+});
+
+<!-- WEAPON CALCULATIONS -->
+
+<!-- Weapon AML and DML calculations -->
+
+on('change:repeating_weapon:weapon_ml change:repeating_weapon:weapon_atk change:repeating_weapon:weapon_def sheet:opened', function() {
+    getAttrs(['weapon_ml', 'weapon_atk', 'weapon_def'], function(values) {
+		console.log("ML", repeating_weapon_weapon_ml, "ATK", repeating_weapon_atk, "DEF", repeating_weapon_def);
+		var wml = parseInt(values.repeating_weapon_weapon_ml);
+		var watk = parseInt(values.repeating_weapon_weapon_atk);
+		var wdef = parseInt(values.repeating_weapon_weapon_def);
+		var waml = wml + watk;
+		var wdml = wml + wdef;
+        setAttrs({
+            'weapon_aml': waml,
+			'weapon_dml': wdml
+        });
+    });
+});
+
+<!-- Unarmed AML and DML calculations -->
+
+on('change:unarmed_ml sheet:opened', function() {
+    getAttrs(['unarmed_ml', 'punch_weapon_atk', 'kick_weapon_atk', 'punch_weapon_def', 'kick_weapon_def'], function(values) {
+		var uml = parseInt(values.unarmed_ml);
+		var paml = uml + parseInt(values.punch_weapon_atk);
+		var pdml = uml + parseInt(values.punch_weapon_def);
+		var kaml = uml + parseInt(values.kick_weapon_atk);
+		var kdml = uml + parseInt(values.kick_weapon_def);
+        setAttrs({
+            'punch_weapon_ml': uml,
+			'punch_weapon_aml': paml,
+			'punch_weapon_dml': pdml,
+            'kick_weapon_ml': uml,			
+            'kick_weapon_aml': kaml,
+			'kick_weapon_dml': kdml
+        });
+    });
+});
+
+<!-- ARMOR PROTECTION -->
+
 <!-- horse natural armour values based on aq /-->
 on('change:hnatural_aq', function() {
     getAttrs(['hnatural_aq', 'hnatural_b', 'hnatural_e', 'hnatural_p', 'hnatural_f'], function(values) {
@@ -2152,21 +2207,6 @@ on('change:hnatural_aq', function() {
     });
 });
 
-<!-- horse turning /-->
-
-on('change:horse_speed', function() {
-     getAttrs(['horse_speed'], function(values) {
-		var maxturn = 0;
-			if(values.horse_speed == 1) { maxturn = 3 };
-			if(values.horse_speed == 2) { maxturn = 5 };
-			if(values.horse_speed == 3) { maxturn = 10 };
-            setAttrs({
-                'hturn': maxturn			
-            });
-        });
-});
-
-<!-- armor protection -->
 
 <!-- loop through all locations and fill with B/E/P/F values if location covered --> 
 const locations = ['sk','fa','nk','sh','ua','el','fo','ha','tx','ab','hp','gr','th','kn','ca','ft'];
