@@ -9522,6 +9522,7 @@ Only takes the first match even if multiple identical entries are found.">
                 </div>
                 <div class="importbuttons">
                     <input class="warningcheckbox" type="checkbox" name="attr_warningcheckbox">
+                    <input type="checkbox" name="attr_experimental" hidden>
                     <div class="warninguncheckedwrapper">
                         <label class="warningunchecked">Import</label>
                     </div>
@@ -9751,6 +9752,7 @@ on("sheet:opened", function() {
         values.warningcheckbox=0;
         values.chummercheckbox=0;
         values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
+        values.experimental=0;
     setAttrs(values);
     });
 });
@@ -10234,6 +10236,7 @@ on("change:chummercheckbox", function(){
                                     if(Number(chummerfile.characters.character.weapons.weapon[i-1].ap)!="NaN"){
                                         attributes["weaponnap"+i]=chummerfile.characters.character.weapons.weapon[i-1].ap;
                                     }else{
+                                        console.log(chummerfile.characters.character.weapons.weapon[i-1].ap);
                                         attributes["weaponnap"+i]=0;
                                     }
                                     attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
@@ -10524,7 +10527,7 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
-						if(chummerfile.characters.character.skills.skill[0].name_english !== undefined) {
+						if(chummerfile.characters.character.skills.skill[0].name_english !== "undefined") {
 							for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                                 if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
                                     alchemy=i;
@@ -10752,7 +10755,7 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Spells: " + err;
                     }
-                    if(attributes.experimental !== undefinded){
+                     if(attributes.experimental !== "undefined"){
                      //import contacts
                         try{
                            if(chummerfile.characters.character.contacts!=null){
@@ -10777,6 +10780,7 @@ on("change:chummercheckbox", function(){
                            error="Error with Contacts: " + err;
                         }
                     }
+
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
                     attributes.chummertext="Import successful\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
