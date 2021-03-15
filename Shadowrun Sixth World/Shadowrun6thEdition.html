@@ -1734,6 +1734,9 @@
             		<option data-i18n="shamanism" value="Shamanism">Shamanism</option>
             	</select>
             </label>
+            <h2 data-i18n="magicar">Magic AR</h2>
+            <input type="hidden" name="attr_magic_ar" value="0">
+            <span name="attr_magic_ar"></span>
           </div>
           <div class="row-long headers">
             <h2 data-i18n="metamagic">Metamagic</h2>
@@ -3807,8 +3810,32 @@ on("change:essence_mod remove:repeating_augmentations change:repeating_augmentat
 });
 
 
+// Catch changes to magic, tradition, logic or charisma to update magic AR
+on("change:magic change:tradition change:logic change: charisma", (eventinfo) => {
+	getAttrs(["magic", "tradition", "logic", "charisma"], (v) => {
+		var magic_ar = v.magic;
 
- //This function checks changes to repeating_armor and updates the Primary Armor if needed
+		switch(v.tradition) {
+			case "Hermeticism":
+				magic_ar += v.logic;
+				break;
+			case "Shamanism":
+				magic_ar += v.charisma;
+				break;
+			default:
+				magic_ar = 0;
+				break;
+		}
+
+		setAttrs({
+			'magic_ar': magic_ar
+		});
+	});
+});
+
+
+
+//This function checks changes to repeating_armor and updates the Primary Armor if needed
 on("change:repeating_armor", (eventInfo) => {
 	const source = eventInfo.sourceAttribute;
 	const newV   = eventInfo.newValue;
@@ -4099,7 +4126,7 @@ var update_astral_initiative = () => {
 
 
 //Calculate Matrix Initiatve.
-on("1change:host_rating change:data_processing change:pilot change:intuition change:reaction change:level change:matrix_initiative_mod change:matrix_initiative_dice_mod change:matrix_initiative_temp change:matrix_initiative_temp_flag change:matrix_initiative_dice_temp change:matrix_initiative_dice_temp_flag", () => {
+on("change:host_rating change:data_processing change:pilot change:intuition change:reaction change:level change:matrix_initiative_mod change:matrix_initiative_dice_mod change:matrix_initiative_temp change:matrix_initiative_temp_flag change:matrix_initiative_dice_temp change:matrix_initiative_dice_temp_flag", () => {
 	getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "reaction", "host_rating", "level", "matrix_initiative_mod", "matrix_initiative_dice_mod", "matrix_initiative_temp", "matrix_initiative_temp_flag", "matrix_initiative_dice_temp", "matrix_initiative_dice_temp_flag"], (v) => {
 		const dat = parseInt(v.data_processing) || 0;
 		const pil = parseInt(v.pilot) || 0;
