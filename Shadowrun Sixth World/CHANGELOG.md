@@ -1,5 +1,27 @@
 Change Log
 ==============================================
+**2021-03-15** v.23 Chuz (James Culp)
+	Made sheet work with current roll20 "enhanced" code that has been partially rolled back
+	Changed Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none
+	Added functionality to the ammo counter, now when primary ranged weapon firing mode is changed the number of rounds updates the the correct amount (1, 2, 4, 10)
+	Added Mod field for skills to allow skill rolls to have bonuses added.  Does not add to the actual skill dicepool just affects the skill roller.
+	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly.
+	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
+
+**2021-03-08** v.22 Chuz (James Culp)
+	Add Defense roll-button and DR roll-button to Core->Combat Info tab
+	Updated Skills to split Skills and Knowledge/Languages into separate tabs
+	Finished Magic->Spells, Preparations, Rituals, Adept Powers, Conjuring and Metamagic sections
+	Minor formatting changes to css and html
+	Bugfix DR not adding Body in
+	Bugfix calculations for Cold and Hot Sim initiative roll buttons
+	Bugfix Essence Mod not allowing a zero value
+	Bugfix Removed roll query from flat attribute rolls
+	Bugfix Added Athletics skill to ranged weapons
+	
+**2021-03-03** Chuz (James Culp)
+	Included in roll20 repository for one-click access
+
 **2021-02-28** Chuz (James Culp)
 	Updated Social Tab, Contacts and SINs
 	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
