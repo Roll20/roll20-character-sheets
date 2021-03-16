@@ -1911,9 +1911,424 @@ pri4['Tongues'] = {
     'effect': 'This spell enables the caster to speak and understand additional languages, whether they are racial tongues or regional dialects, but not communications of animals or mindless creatures. When the spell is cast, the spellcaster selects the language or languages to be understood. The spell then empowers the caster with the ability to speak and understand the language desired with perfect fluency and accent. The spell enables the priest to be understood by all speakers of that language within hearing distance, usually 60 feet. This spell does not predispose the subject toward the caster in any way. The priest can speak one additional tongue for every three levels of experience. Currently [[floor([[@{level-priest}]]/3)]] additional tongues.\n&emsp;The reverse of the spell cancels the effect of the *tongues* spell or confuses verbal communication of any sort within the area of effect.'
 };
 
+const pri5 = {};
+pri5['Air Walk'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Air)',
+    'range': 'Touch',
+    'duration': '1 hour + [[@{level-priest}]] turns',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol and a bit of thistledown',
+    'reference': 'PHB p. 280',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables a creature, which can be as big as the largest giant, to tread upon air as if it were walking on solid ground. Moving upward is similar to walking up a hill. A maximum upward angle of 45 degrees is possible at one-half the creature’s movement rate, as is a maximum downward angle of 45 degrees at the normal movement rate. An air-walking creature is in control of its movement, except when a strong wind is blowing. In this case, the creature gains or loses 10 feet of movement for every 10 miles per hour of wind velocity. The creature can, at the DM’s option, be subject to additional penalties in exceptionally strong or turbulent winds, such as loss of control of movement or suffering physical damage.\n&emsp;The spell can be placed upon a trained mount, so it can be ridden through the air. Of course, a mount not accustomed to such movement would certainly need careful and lengthy training, the details for which are up to the DM.'
+};
+
+pri5['Animal Growth'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration (Reversible)',
+    'sphere': 'Animal',
+    'range': '80 yards',
+    'duration': '[[2*[[@{level-priest}}]] ]] rounds',
+    'aoe': 'Up to 8 animals',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'The caster’s holy symbol and a scrap of food',
+    'reference': 'PHB p. 280',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is released, the caster causes up to eight animals within a 20-foot-square area to grow to twice their normal size. The effects of this growth are doubled Hit Dice (with resultant improvement in attack potential), doubled hit points (except hit points added to Hit Dice), and doubled damage in combat. Movement and AC are not affected. The spell lasts for two rounds for each level of the caster. The spell is particularly useful in conjunction with a *charm person or mammal spell*.\n&emsp;The reverse reduces animal size by one-half, and likewise reduces Hit Dice, hit points, attack damage, etc.'
+};
+
+pri5['Animal Summoning II'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Animal, Summoning',
+    'range': '[[60*[[@{level-priest}]] ]] yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 281',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster calls up to six animals of 8 Hit Dice or less, or 12 animals of 4 Hit Dice or less—of whatever sort the caster names. Only animals within range of the caster at the time the spell is cast will come. The caster can try three times to summon three different types of animals. For example, suppose that wild dogs are first summoned to no avail, then hawks are unsuccessfully called, and finally the caster calls for wild horses. The DM determines the chance of a summoned animal type being within range of the spell. The animals summoned aid the caster by whatever means they possess, staying until a fight is over, a specific mission is finished, the caster is safe, he sends them away, etc. Only normal or giant animals can be summoned; fantastic animals or monsters cannot be effected by this spell (no chimerae, dragons, gorgons, manticores, etc.).'
+};
+
+pri5['Antiplant Shell'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Plant, Protection',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '15-foot diameter',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 281',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *anti-plant shell* spell creates an invisible, mobile barrier that keeps all creatures within the shell protected from attacking plants or vegetable creatures such as shambling mounds or treants. Any attempt to force the barrier against such creatures shatters the barrier immediately. The spell lasts for one turn for each experience level of the caster.'
+};
+
+pri5['Atonement'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Abjuration',
+    'sphere': 'All',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 person',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s religious symbol, prayer beads or wheel or book, and burning incense',
+    'reference': 'PHB p. 281',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is used by the priest to remove the burden of unwilling or unknown deeds from the person who is the subject of the atonement. The spell removes the effects of magical alignment changes as well. The person seeking the *atonement* spell must either be truly repentant or not have been in command of his own will when the acts to be atoned for were committed. The DM will judge this spell in this regard, noting any past instances of its use upon the person. Deliberate misdeeds and acts of knowing and willful nature cannot be atoned for with this spell (see the *quest* spell). A character who refuses to accept an atonement is automatically considered to have committed a willful misdeed.'
+};
+
+pri5['Commune'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s religious symbol, holy (unholy) water, and incense; and if a particularly potent commune is needed, a sacrifice proportionate with the difficulty of obtaining the information is required',
+    'reference': 'PHB p. 281',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By use of a *commune* spell, the priest is able to contact his deity—or agents thereof—and request information in the form of questions that can be answered by a simple “yes” or “no.” The priest is allowed one such question for every experience level he has attained. Currently [[@{priest-level}]] questions. The answers given are correct within the limits of the entity’s knowledge. “I don’t know” is a legitimate answer, as powerful outer planar beings are not necessarily omniscient. Optionally, the DM may give a single short answer of five words or less. The spell will, at best, provide information to aid character decisions. Entities communed with structure their answers to further their own purposes. It is probable that the DM will limit the use of *commune* spells to one per adventure, one per week, or even one per month, for the greater powers dislike frequent interruptions. Likewise, if the caster lags, discusses the answers, or goes off to do anything else, the spell immediately ends.\n&emsp;If a sacrifice is required and the offering is insufficient, no information or only partial information is gained.'
+};
+
+pri5['Commune With Nature'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination, Elemental',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 281',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to become one with nature, thus being empowered with knowledge of the surrounding territory. For each level of experience of the caster, he can “know” one fact—ahead, left, or right, about the following subjects: the ground, plants, minerals, bodies of water, people, general animal population, presence of woodland creatures, etc. The presence of powerful unnatural creatures also can be detected, as can the general state of the natural setting. The spell is most effective in outdoor settings, operating in a radius of one-half mile for each level of the caster. Currently [[0.5*[[@{level-priest}]] ]] mile radius. In natural underground settings—caves, cavern, etc.—the range is limited to 10 yards per caster level. Currently [[10*[[@{level-priest}]] ]] yard radius. In constructed settings (dungeons and towns), the spell will not function. The DM may limit the casting of this spell to once per month.'
+};
+
+pri5['Control Winds'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration',
+    'sphere': 'Weather',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '[[40*[[@{level-priest}]] ]]-foot radius',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 282',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of a *control winds* spell, the caster is able to alter wind force in the area of effect. For every three levels of experience, the caster can increase or decrease wind forces by one level of strength. Currently [[floor([[@{level-priest}]]/3)]] wind levels of strength. Wind strengths are as follows:}}{{style=center2}}{{c1-1=**Wind Force**}}{{c2-1=Light Breeze}}{{c3-1=Moderate Breeze}}{{c4-1=Strong Breeze}}{{c5-1=Gale}}{{c6-1=Storm}}{{c7-1=Hurricane}}{{c1-2=**Miles Per Hour**}}{{c2-2=2–7}}{{c3-2=8–18}}{{c4-2=19–31}}{{c5-2=32–54}}{{c6-2=55–72}}{{c7-2=73–176}}{{effects2=&emsp;Winds in excess of 19 miles per hour drive small flying creatures—those eagle-sized and under—from the skies, severely affect missile accuracy, and make sailing difficult. Winds in excess of 32 miles per hour drive even man-sized flying creatures from the skies and cause minor ship damage. Winds in excess of 55 miles per hour drive all flying creatures from the skies, uproot small trees, knock down wooden structures, tear off roofs, and endanger ships. Winds in excess of 73 miles per hour are of hurricane force.\n&emsp;An “eye” of 40-foot radius, in which the wind is calm, exists around the caster. Note that while the spell can be used underground, if the spell is cast in an area smaller than the area of effect, the eye shrinks 1 foot for every foot of confinement. For example, if the area of effect is a 360-foot area, the eye shrinks by 10 feet to a 30-foot radius; a space under 320 feet in a radius would eliminate the eye and subject the spellcaster to the effects of the wind. Once the spell is cast, the wind force increases or decreases by 3 miles per hour per round until the maximum or minimum speed is attained. The caster, with one round of complete concentration, can stabilize the wind at its current strength, or set it to increase or decrease. However, the rate of the change cannot be altered. The spell remains in force for one turn for each level of experience of the caster. When the spell is exhausted, the force of the wind wanes or waxes at the same rate, until it reaches the level it was at before the spell took effect. Another caster can use a *control winds* spell to counter the effects of a like spell up to the limits of his own ability.'
+};
+
+pri5['Cure Critical Wounds'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Healing',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 282',
+    'damage': '',
+    'damage-type': '',
+    'healing': '[[3d8+3]]',
+    'effect': 'The *cure critical wounds* spell is a very potent version of the *cure light wounds* spell. The priest lays his hand upon a creature and heals 3d8+3 points of damage from wounds or other damage. The spell does not affect creatures without corporeal bodies, those of extraplanar origin, or those not living.\n&emsp;The reversed spell, *cause critical wounds,* operates in the same fashion as other cause wounds spells, requiring a successful touch to inflict the 3d8+3 points of damage. Caused wounds heal via the same methods as do wounds of other sorts.'
+};
+
+pri5['Dispel Evil'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Abjuration (Reversible)',
+    'sphere': 'Protection, Summoning',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': 'The priest’s holy symbol and holy (or unholy) water',
+    'reference': 'PHB p. 282',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest using this spell causes a summoned creature of evil nature, an evil creature from another plane, or a creature summoned by an evil caster, to return to its own plane or place when the caster successfully strikes it in melee combat. Examples of such creatures are aerial servants, djinn, efreet, elementals, and invisible stalkers. An evil enchantment (such as a *charm* spell cast by an evil creature) that is subject to a normal *dispel magic* spell can be automatically dispelled by the *dispel evil* spell. This spell lasts for a maximum of one round for each experience level of the caster, or until expended. While the spell is in effect, all creatures that could be affected by it fight with a -7 penalty to their attack rolls when engaging the spellcaster.\n&emsp;The reverse of the spell, *dispel good,* functions against summoned or enchanted creatures of good alignment or creatures that have been sent to aid the cause of good.'
+};
+
+pri5['Flame Strike'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Evocation',
+    'sphere': 'Combat',
+    'range': '60 yards',
+    'duration': 'Instantaneous',
+    'aoe': '5 foot radius x 30 foot column',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': '½',
+    'materials': 'A pinch of sulphur',
+    'reference': 'PHB p. 282',
+    'damage': '[[6d8]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'When the priest evokes a *flame strike* spell, a vertical column of fire roars downward in the location called for by the caster. Any creatures within the area of effect must roll a saving throw vs. spell. Failure means the creature sustains 6d8 points of damage; otherwise, the damage is halved.'
+};
+
+pri5['Insect Plague'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Combat',
+    'range': '120 yards',
+    'duration': '[[2*[[@{level-priest}]] ]] rounds',
+    'aoe': '180 foot × 60 foot cloud',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A few granules of sugar, some kernels of grain, and a smear of fat',
+    'reference': 'PHB p. 282',
+    'damage': '1 point per round',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast by the priest, a horde of creeping, hopping, and flying insects gather and swarm in a thick cloud. In an environment free of normal insects, the spell fails. The insects obscure vision, limiting it to 10 feet. Spellcasting within the cloud is impossible. Creatures in the insect plague, regardless of Armor Class, sustain 1 point of damage for each round they remain within, due to the bites and stings of the insects. Invisibility is no protection. All creatures with 2 or fewer Hit Dice will automatically move at their fastest possible speed in a random direction until they are more than 240 yards away from the insects. Creatures with fewer than 5 Hit Dice must check morale; failure means they run as described above.\n&emsp;Heavy smoke drives off insects within its bounds. Fire also drives insects away. For example, a wall of fire in a ring shape keeps a subsequently cast *insect plague* outside its confines, but a *fireball* spell simply clears insects from its blast area for one round. A single torch is ineffective against this vast horde of insects. Lightning, cold, or ice are likewise ineffective, while a strong wind that covers the entire plague area disperses the insects and ends the spell. The plague lasts two rounds for each level of the caster, and thereafter the insects disperse. The insects swarm in an area that centers around a summoning point determined by the spellcaster. The point can be up to 120 yards away from the priest. The insect plague does not move thereafter for as long as it lasts. Note that the spell can be countered by a *dispel magic* spell.'
+};
+
+pri5['Magic Font'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 hour',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol and the font and its trappings',
+    'reference': 'PHB p. 283',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The spell causes a holy water font to serve as a scrying device. The spell does not function unless the priest is in good standing with his deity. The basin of holy water becomes similar to a *crystal ball.* For each vial of capacity of the basin, the priest may scry for one round, up to a maximum of one hour. Thus, the duration of the *magic font* spell is directly related to the size of the holy water receptacle. The DM will know the chances of a character being able to detect scrying.\n&emsp;The priest’s holy symbol and the font and its trappings are not consumed by the spell.'
+};
+
+pri5['Moonbeam'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Evocation, Alteration',
+    'sphere': 'Sun',
+    'range': '[[60+(10*[[@{level-priest}]])]] yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '5 foot radius + special',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'Several seeds of any moonseed plant and a piece of opalescent feldspar (moonstone)',
+    'reference': 'PHB p. 283',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster is able to cause a beam of soft, pale light to strike down from overhead and illuminate whatever area he is pointing at. The light is exactly the same as moonlight, so that colors other than shades of black, gray, or white are vague. The spellcaster can easily make the moonbeam move to any area that he can see and point to. This makes the spell an effective way to spotlight something, an opponent, for example. While the *moonbeam* spell does not eliminate all shadows, a creature centered in a moonbeam is most certainly visible. The reflected light from this spell enables dim visual perception 10 yards beyond the area of effect, but it does not shed a telltale glow that would negate surprise. The light does not adversely affect infravision. The caster can dim the beam to near darkness if desired. The beam has, in addition, all the properties of true moonlight and can induce a lycanthropic change (of a creature in the beam), unless the DM rules otherwise.'
+};
+
+pri5['Pass Plant'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'PHB p. 283',
+    'reference': '',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By using this spell, the caster is able to enter a tree and move from inside it to inside another tree. The second tree must lie in approximately the direction desired by the spell user and must be within the range shown in the following table.}}{{style=center2}}{{c1-1=**Type of Tree**}}{{c2-1=Oak}}{{c3-1=Ash}}{{c4-1=Yew}}{{c5-1=Elm}}{{c6-1=Linden}}{{c7-1=deciduous}}{{c8-1=coniferous}}{{c9-1=other}}{{cc1-2=bottom}}{{c1-2=**Range of Area of Effect**}}{{c2-2=600 yards}}{{c3-2=540 yards}}{{c4-2=480 yards}}{{c5-2=420 yards}}{{c6-2=360 yards}}{{c7-2=300 yards}}{{c8-2=240 yards}}{{c9-2=180 yards}}{{effects2=The tree entered and that receiving the caster must be of the same type, must both be living, and of girth at least equal to that of the caster. Note that if the caster enters a tree, an ash, for example, and wishes to pass north as far as possible (540 yards), but the only appropriate ash in range is to the south, the caster will pass to the ash in the south. The *pass plant* spell functions so that the movement takes only one round. The caster can, at his option, remain within the receiving tree for a maximum of [[@{level-priest}]] rounds. Otherwise, he can step forth immediately. Should no like tree be in range, the caster simply remains within the first tree, does not pass elsewhere, and must step forth in the appropriate number of rounds. If the occupied tree is chopped down or burned, the caster is slain if he does not exit before the process is complete.'
+};
+
+pri5['Plane Shift'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration',
+    'sphere': 'Astral',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature (special)',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': 'A small, forked metal rod (see below)',
+    'reference': 'PHB p. 283',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the *plane shift* spell is cast, the priest moves himself or some other creature to another plane of existence. The recipient of the spell remains in the new plane until sent forth by some like means. If several persons link hands in a circle, up to eight can be affected by the plane shift at the same time.\n&emsp;The material component of this spell is a small, forked metal rod. The size and metal type dictates to which plane of existence, including sub-planes and alternate dimensions, the spell sends the affected creatures. The DM will determine specifics regarding how and what planes are reached.\n&emsp;An unwilling victim must be touched (successful attack roll) to be sent. In addition, the creature is also allowed a saving throw. If the saving throw is successful, the effect of the spell is negated. Note that pinpoint accuracy is rarely achieved; arriving at a random distance from an intended destination is common.\n&emsp;The metal rod is not expended when the spell is cast. Forked rods keyed to certain planes may be difficult to come by, as decided by the DM.'
+};
+
+pri5['Quest'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Charm',
+    'range': '60 yards',
+    'duration': 'Until fulfilled',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': 'The priest’s holy symbol',
+    'reference': 'PHB p. 284',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *quest* spell enables the priest to require the affected creature to perform a service and return to the priest with proof that the deed was accomplished. The quest can, for example, require that the creature locate and return some important or valuable object, rescue a notable person, release some creature, capture a stronghold, slay a person, deliver some item, and so forth. If the quest is not properly followed, due to disregard, delay, or perversion, the creature affected by the spell loses 1 from its saving throw rolls for each day of such action. This penalty is not removed until the quest is properly pursued or the priest cancels it. There are certain circumstances that will temporarily suspend a quest, and others that will discharge or cancel it. The DM will give you appropriate information as the need to know arises.\n&emsp;If cast upon an unwilling subject, the victim is allowed a saving throw. However, if the person quested agrees to a task—even if the agreement is gained by force or trickery—no saving throw is allowed. If a quest is just and deserved, a creature of the priest’s religion cannot avoid it, and any creature of the priest’s alignment saves with a -4 penalty to the saving throw. A quest cannot be dispelled, but it can be removed by a priest of the same religion or of higher level than the caster. Some artifacts and relics might negate the spell, as can direct intervention by a deity. Likewise, an unjust or undeserved quest grants bonuses to saving throws, or might even automatically fail.'
+};
+
+pri5['Rainbow'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Evocation, Alteration',
+    'sphere': 'Weather, Sun',
+    'range': '120 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol and a vial of holy water; if no rainbow is in the vicinity, the caster can substitute a diamond of not less than 1,000 gp value, specially prepared with *bless* and *prayer* spells while in sight of a rainbow. The holy water and diamond disappear when the spell is cast',
+    'reference': 'PHB p. 284',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'To cast this spell, the priest must be in sight of a rainbow, or have a special component (see below). The *rainbow* spell has two applications, and the priest can choose the desired one at the time of casting. These applications are as follows:\n&emsp;**Bow:** The spell creates a shimmering, multi-layered short composite bow of rainbow hues. It is light and easy to pull, so that any character can use it without penalty for non-proficiency. It is magical: Each of its shimmering missiles is the equivalent of a +2 weapon, including attack and damage bonuses. Magic resistance can negate the effect of any missile fired from the bow. The bow fires seven missiles before disappearing. It can be fired up to four times per round. Each time a missile is fired, one hue leaves the bow, corresponding to the color of arrow that is released. Each color of arrow has the ability to cause double damage to certain creatures, as follows:\n\nRed—fire dwellers/users and fire elementals\nOrange—creatures or constructs of clay, sand, earth, stone or similar materials, and earth elementals\nYellow—vegetable opponents (including fungus creatures, shambling mounds, treants, etc.)\nGreen—aquatic creatures, water elementals\nBlue—aerial creatures, electricity-using creatures, and air elementals\nIndigo—acid-using or poison-using creatures\nViolet—metallic or regenerating creatures\n\n&emsp;When the bow is drawn, an arrow of the appropriate color magically appears, nocked and ready. If no color is requested, or a color that has already been used is asked for, then the next arrow (in the order of the spectrum) appears.\n&emsp;**Bridge:** The caster causes the rainbow to form a seven-hued bridge up to 3 foot wide per level of the caster. Currently [[3*[[@{level-priest}]] ]] foot wide. It must be at least 20 feet long and can be as long as 120 yards, according to the caster’s desire. It lasts as long as the spell’s duration or until ordered out of existence by the caster.'
+};
+
+pri5['Raise Dead'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': '120 yards',
+    'duration': 'Permanent',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 284',
+    'damage': '',
+    'damage-type': '',
+    'healing': 'Restored to 1 hit point',
+    'effect': 'When the priest casts a *raise dead* spell, he can restore life to a dwarf, gnome, half-elf, halfling, or human (other creatures may be allowed, at the DM’s option). The length of time that the person has been dead is of importance, as the priest can raise persons dead only up to a limit of one day for each experience level of the priest. Currently [[@{level-priest}]] days dead. (i.e., a 9th-level priest can raise a person who has been dead for up to nine days).\n&emsp;Note that the body of the person must be whole, or otherwise missing parts are still missing when the person is brought back to life. Likewise, other ills, such as poison and disease, are not negated. The raised person must roll a successful resurrection survival check to survive the ordeal (see Table 3: Constitution) and loses 1 point of Constitution. Further, the raised person is weak and helpless, needing a minimum of one full day of rest in bed for each day or fraction he was dead. The person has 1 hit point when raised and must regain the rest by natural healing or curative magic.\n&emsp;A character’s starting Constitution is an absolute limit to the number of times he can be revived by this means.\n&emsp;The somatic component of the spell is a pointed finger.\n&emsp;The reverse of the spell, *slay living,* grants the victim a saving throw vs. death magic. If the saving throw is successful, the victim sustains damage equal to that of a *cause serious wounds* spell—i.e., 2d8+1 points. Failure means the victim dies instantly.'
+};
+
+pri5['Spike Stones'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration, Enchantment',
+    'sphere': 'Elemental (Earth)',
+    'range': '30 yards',
+    'duration': '[[3d4+[[@{level-priest}]] ]] turns',
+    'aoe': '[[10*[[@{level-priest}]] ]] foot square, 1 spike/square foot',
+    'components': 'V, S, M',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': 'Four tiny stalactites',
+    'reference': 'PHB p. 285',
+    'damage': '1d4 + modifiers',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *spike stones* spell causes rock to shape itself into long, sharp points that tend to blend into the background. It is effective on both natural rock and worked stone. The spike stones serve to impede progress through an area and to inflict damage. If an area is carefully observed, each observer is 25% likely to notice the sharp points of rock. Otherwise, those entering the spell’s area of effect suffer 1d4 points of damage per round. The success of each attack is determined as if the caster of the spell were actually engaging in combat. Those entering the area are subject to attack immediately upon setting foot in the area and for each round spent in the area thereafter. The initial step enables the individual to become aware of some problem only if the initial attack succeeds; otherwise movement continues and the spike stones remain unnoticed until damage occurs. Charging or running victims suffer two attacks per round.\n&emsp;Those falling into pits affected by spike stones suffer six such attacks for every 10 feet fallen, each attack having a +2 bonus to the attack roll. In addition, the damage inflicted by each attack increases by +2 for every 10 feet fallen. Finally, the creatures also suffer normal falling damage.'
+};
+
+pri5['Transmute Rock to Mud'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Alteration (Reversible)',
+    'sphere': 'Elemental (Earth, Water)',
+    'range': '160 yards',
+    'duration': 'Special',
+    'aoe': '[[20*[[@{level-priest}]] ]]-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'Clay and water (or sand, lime, and water for the reverse)',
+    'reference': 'PHB p. 285',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell turns natural rock of any sort into an equal volume of mud. If it is cast upon a rock, for example, the rock affected collapses into mud. Magical or enchanted stone is not affected by the spell. The depth of the mud created cannot exceed 10 feet. Creatures unable to levitate, fly, or otherwise free themselves from the mud sink at the rate of 1⁄3 of their height per round and eventually suffocate, save for lightweight creatures that could normally pass across such ground. Brush thrown atop the mud can support creatures able to climb on top of it, with the amount required decided by the DM. Creatures large enough to walk on the bottom can move through the area at a rate of 10 feet per round.\n&emsp;The mud remains until a successful *dispel magic* or *transmute mud to rock* spell restores its substance—but not necessarily its form. Evaporation turns the mud to normal dirt at a rate of 1d6 days per 10 cubic feet. The exact time depends on exposure to the sun, wind, and normal drainage.\n&emsp;The reverse, *transmute mud to rock,* hardens normal mud or quicksand into soft stone (sandstone or similar mineral) permanently unless magically changed. Creatures in the mud are allowed a saving throw to escape before the area is hardened to stone. Dry sand is unaffected.'
+};
+
+pri5['True Seeing'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Divination',
+    'sphere': 'Divination',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': '*True Seeing*: An ointment for the eyes that is made from very rare mushroom powder, saffron, and fat and costs no less than 300 gp per use. *False Seeing*: An ointment concocted of oil, poppy dust, and pink orchid essence.\n&emsp;For both spells, the ointment must be aged for 1d6 months',    'reference': 'PHB p. 285',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the priest employs this spell, he confers upon the recipient the ability to see all things as they actually are. The spell penetrates normal and magical darkness. Secret doors become plain. The exact location of displaced things is obvious. Invisible things become quite visible. Illusions and apparitions are seen through. Polymorphed, changed, or enchanted things are apparent. Even the aura projected by creatures becomes visible, so that alignment can be discerned. Further, the recipient can focus his vision to see into the Ethereal plane or the bordering areas of adjacent planes. The range of vision conferred is 120 feet. *True seeing,* however, does not penetrate solid objects; it in no way confers X-ray vision or its equivalent. In addition, the spell effects cannot be further enhanced with known magic.\n&emsp;The reverse, *false seeing*, causes the person to see things as they are not: rich is poor, rough is smooth, beautiful is ugly.'
+};
+
+pri5['Wall of Fire'] = {
+    'level': 'Level 5 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Elemental (Fire)',
+    'range': '80 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'Phosphorus',
+    'reference': 'PHB p. 286',
+    'damage': '2d4 / 1d4 heat damage or 4d4+[[@{level-priest}]]',
+    'damage-type': 'fire damage',
+    'healing': '',
+    'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—yellow-green or amber (different from the 4th-level wizard version). The spell creates an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[20*[[@{level-priest}]] ]] foot square), or a ring with a radius of up to 10 feet + 5 feet for every two levels of experience of the spellcaster ([[10+floor([[@{level-priest}]]/2)*5]] foot radius), and 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting 2d4 points of damage upon creatures within 10 feet and 1d4 points of damage upon those within 20 feet. In addition, the wall inflicts 4d4 points of damage, plus 1 point of damage per level of the spellcaster (4d4+[[@{level-priest}]] damage), to any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to directly catch moving creatures with a newly created wall of fire is difficult. A successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the priest concentrates on maintaining it, or one round per level of experience of the priest in the event he does not wish to concentrate upon it. Currently [[@{level-priest}]] rounds.'
+};
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
 priestSpells['pri3'] = pri3;
 priestSpells['pri4'] = pri4;
+priestSpells['pri5'] = pri5;
 /* ---- Priest spells end ---- */
