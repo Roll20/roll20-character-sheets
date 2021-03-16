@@ -300,7 +300,7 @@ wiz1['Find Familiar'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell enables the caster to attempt to summon a familiar to act as his aide and companion. Familiars are typically small creatures, such as cats, frogs, ferrets, crows, hawks, snakes, owls, ravens, toads, weasels, or even mice. A creature acting as a familiar can benefit a wizard, conveying its sensory powers to its master, conversing with him, and serving as a guard/scout/spy as well. A wizard can have only one familiar at a time, however, and he has no control over what sort of creature answers the summoning, if any at all come. \n&emsp;The creature is always more intelligent than others of its type (typically by 2 or 3 Intelligence points), and its bond with the wizard confers upon it an exceptionally long life. The wizard receives the heightened senses of his familiar, which grants the wizard a +1 bonus to all surprise die rolls. Normal familiars have 2–4 hit points plus 1 hit point per caster level, and an Armor Class of 7 (due to size, speed, etc.). \n&emsp;The wizard has an empathic link with the familiar and can issue it mental commands at a distance of up to 1 mile. Note that empathic responses from the familiar are generally fairly basic—while able to communicate simple thoughts, these are often overwhelmed by instinctual responses. Thus, a ferret familiar spying on a band of orcs in the woods might lose its train of thought upon sighting a mouse. Certainly its communications to its master would be tinged with fear of the “big ones” it was spying on! The caster cannot see through the familiar’s eyes. \n&emsp;If separated from the caster, the familiar loses 1 hit point each day, and dies if reduced to 0 hit points. When the familiar is in physical contact with its wizard, it gains the wizard’s saving throws against special attacks. If a special attack would normally cause damage, the familiar suffers no damage if the saving throw is successful and half damage if the saving throw is failed. If the familiar dies, the wizard must successfully roll an immediate system shock check or die. Even if he survives this check, the wizard loses 1 point from his Constitution when the familiar dies. \n&emsp;The power of the conjuration is such that it can be attempted but once per year. When the wizard decides to find a familiar, he must load a brass brazier with charcoal. When this is burning well, he adds 1,000 gp worth of incense and herbs. The spell incantation is then begun and must be continued until the familiar comes or the casting time is finished. The DM secretly determines all results. Note that most familiars are not inherently magical, nor does a *dispel magic* spell send them away. \n&emsp;Deliberate mistreatment, failure to feed and care for the familiar, or continuous unreasonable demands have adverse effects on the familiar’s relationship with its master. Purposely arranging the death of one’s own familiar incurs great disfavor from certain powerful entities, with dire results.}}{{style=center1 sheet-spell-fixed3}}{{cc1-1=bottom}}{{c1-1=**D20 Roll**}}{{c2-1=1–5}}{{c3-1=6–7}}{{c4-1=8–9}}{{c5-1=10–11}}{{c6-1=12–13}}{{c7-1=14–15}}{{c8-1=16–20}}{{cc1-2=bottom}}{{c1-2=**Familiar* **}}{{c2-2=Cat, black}}{{c3-2=Crow}}{{c4-2=Hawk}}{{c5-2=Owl}}{{c6-2=Toad}}{{c7-2=Weasel}}{{c8-2=No familiar available within spell range}}{{cs8-2=2}}{{cc1-3=bottom}}{{c1-3=**Sensory Powers**}}{{c2-3=Excellent night vision\n& superior hearing}}{{c3-3=Excellent vision}}{{c4-3=Very superior distance vision}}{{c5-3=Night vision equals human daylight\nvision, superior hearing}}{{c6-3=Wide-angle vision}}{{c7-3=Superior hearing & very\nsuperior olfactory power}}{{effects2=* The DM can substitute other small animals suitable to the area.'
+    'effect': 'This spell enables the caster to attempt to summon a familiar to act as his aide and companion. Familiars are typically small creatures, such as cats, frogs, ferrets, crows, hawks, snakes, owls, ravens, toads, weasels, or even mice. A creature acting as a familiar can benefit a wizard, conveying its sensory powers to its master, conversing with him, and serving as a guard/scout/spy as well. A wizard can have only one familiar at a time, however, and he has no control over what sort of creature answers the summoning, if any at all come. \n&emsp;The creature is always more intelligent than others of its type (typically by 2 or 3 Intelligence points), and its bond with the wizard confers upon it an exceptionally long life. The wizard receives the heightened senses of his familiar, which grants the wizard a +1 bonus to all surprise die rolls. Normal familiars have 2–4 hit points plus 1 hit point per caster level, and an Armor Class of 7 (due to size, speed, etc.). \n&emsp;The wizard has an empathic link with the familiar and can issue it mental commands at a distance of up to 1 mile. Note that empathic responses from the familiar are generally fairly basic—while able to communicate simple thoughts, these are often overwhelmed by instinctual responses. Thus, a ferret familiar spying on a band of orcs in the woods might lose its train of thought upon sighting a mouse. Certainly its communications to its master would be tinged with fear of the “big ones” it was spying on! The caster cannot see through the familiar’s eyes. \n&emsp;If separated from the caster, the familiar loses 1 hit point each day, and dies if reduced to 0 hit points. When the familiar is in physical contact with its wizard, it gains the wizard’s saving throws against special attacks. If a special attack would normally cause damage, the familiar suffers no damage if the saving throw is successful and half damage if the saving throw is failed. If the familiar dies, the wizard must successfully roll an immediate system shock check or die. Even if he survives this check, the wizard loses 1 point from his Constitution when the familiar dies. \n&emsp;The power of the conjuration is such that it can be attempted but once per year. When the wizard decides to find a familiar, he must load a brass brazier with charcoal. When this is burning well, he adds 1,000 gp worth of incense and herbs. The spell incantation is then begun and must be continued until the familiar comes or the casting time is finished. The DM secretly determines all results. Note that most familiars are not inherently magical, nor does a *dispel magic* spell send them away. \n&emsp;Deliberate mistreatment, failure to feed and care for the familiar, or continuous unreasonable demands have adverse effects on the familiar’s relationship with its master. Purposely arranging the death of one’s own familiar incurs great disfavor from certain powerful entities, with dire results.}}{{style=center1 sheet-spell-fixed3 sheet-spell-min3}}{{cc1-1=bottom}}{{c1-1=**D20 Roll**}}{{c2-1=1–5}}{{c3-1=6–7}}{{c4-1=8–9}}{{c5-1=10–11}}{{c6-1=12–13}}{{c7-1=14–15}}{{c8-1=16–20}}{{cc1-2=bottom}}{{c1-2=**Familiar* **}}{{c2-2=Cat, black}}{{c3-2=Crow}}{{c4-2=Hawk}}{{c5-2=Owl}}{{c6-2=Toad}}{{c7-2=Weasel}}{{c8-2=No familiar available within spell range}}{{cs8-2=2}}{{cc1-3=bottom}}{{c1-3=**Sensory Powers**}}{{c2-3=Excellent night vision\n& superior hearing}}{{c3-3=Excellent vision}}{{c4-3=Very superior distance vision}}{{c5-3=Night vision equals human daylight\nvision, superior hearing}}{{c6-3=Wide-angle vision}}{{c7-3=Superior hearing & very\nsuperior olfactory power}}{{effects2=* The DM can substitute other small animals suitable to the area.'
 };
 
 wiz1['Friends'] = {
@@ -2844,9 +2844,369 @@ wiz4['Wizard Eye'] = {
     'effect': 'When this spell is employed, the wizard creates an invisible sensory organ that sends him visual information. The wizard eye travels at 30 feet per round if viewing an area ahead as a human would (i.e., primarily looking at the floor), or 10 feet per round if examining the ceiling and walls as well as the floor ahead. The wizard eye can see with infravision up to 10 feet, and with normal vision up to 60 feet away in brightly lit areas. The wizard eye can travel in any direction as long as the spell lasts. It has substance and a form that can be detected (by a *detect invisibility* spell, for instance). Solid barriers prevent the passage of a wizard eye, although it can pass through a space no smaller than a small mouse hole (1 inch in diameter).\n&emsp;Using the eye requires the wizard to concentrate. However, if his concentration is broken, the spell does not end—the eye merely becomes inert until the wizard again concentrates, subject to the duration of the spell. The powers of the eye cannot be enhanced by other spells or items. The caster is subject to any gaze attack met by the eye. A successful dispel cast on the wizard or eye ends the spell. With respect to blindness, magical darkness, and so on, the wizard eye is considered an independent sensory organ of the caster.'
 };
 
+const wiz5 = {};
+wiz5['Advanced Illusion'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '[[60+(10*[[@{level-wizard}]])]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '[[40+(10*[[@{level-wizard}]])]]-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'A bit of fleece and several grains of sand',
+    'reference': 'PHB p. 209',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is essentially a *spectral forces* spell that operates through a program (similar to a *programmed illusion* spell) determined by the caster. It is thus unnecessary for the wizard to concentrate on the spell for longer than the round of casting it, as the program has then started and will continue without supervision. The illusion has visual, audio, olfactory, and thermal components. If any viewer actively attempts to disbelieve the spell, he gains a saving throw vs. spell. If any viewer successfully disbelieves and communicates this fact to other viewers, each such viewer gains a saving throw vs. spell with a +4 bonus.'
+};
+
+wiz5['Airy Water'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': '10-foot radius sphere or 15-foot radius hemisphere',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A small handful of alkaline or bromine salts',
+    'reference': 'PHB p.209',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *airy water* spell turns normal liquid, such as water or water-based solutions, into a less dense, breathable substance. Thus, if the wizard wanted to enter an underwater place, he would step into the water, cast the spell, and sink downward in a globe of bubbling water. He and any companions in the spell’s area of effect can move freely and breathe just as if the bubbling water were air. The globe is centered on and moves with the caster. Water-breathing creatures avoid a sphere (or hemisphere) of airy water, although intelligent ones can enter it if they are able to move by means other than swimming. No water-breathers can breathe in an area affected by this spell. There is only one word that needs to be spoken to actuate the magic; thus, it can be cast under water. The spell does not filter or remove solid particles of matter.'
+};
+
+wiz5['Animal Growth'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Alteration (Reversible)',
+    'range': '60 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Up to 8 animals in a 20-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A pinch of powdered bone',
+    'reference': 'PHB p. 209',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard causes all designated animals, up to a maximum of eight, within a 20-foot-square area to grow to twice their normal size. The effects of this growth are doubled Hit Dice (with improvement in attack rolls) and doubled damage in combat. The spell lasts for one round for each level of experience of the wizard casting the spell. Currently [[@{level-wizard}]] rounds. Only natural animals, including giant forms, can be affected by this spell.\n&emsp;The reverse, *shrink animal,* reduces animal size by half and likewise reduces Hit Dice, attack damage, etc.'
+};
+
+wiz5['Animate Dead'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Necromancy',
+    'range': '10 yards',
+    'duration': 'Permanent',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '5 rounds',
+    'saving-throw': 'None',
+    'materials': 'A drop of blood and a pinch of bone powder or a bone shard',
+    'reference': 'PHB p. 210',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates the lowest of the undead monsters—skeletons or zombies—usually from the bones or bodies of dead humans, demihumans, or humanoids. The spell causes existing remains to become animated and obey the simple verbal commands of the caster. The skeletons or zombies can follow the caster, remain in an area and attack any creature (or just a specific type of creature) entering the place, etc. The undead remain animated until they are destroyed in combat or are turned; the magic cannot be dispelled. The following types of dead creatures can be animated:\n&emsp;A) *Humans, demihumans, and humanoids with 1 Hit Die.* The wizard can animate one skeleton for each experience level he has attained, or one zombie for every two levels. Currently [[@{level-wizard}]] skeletons, or [[floor([[@{level-wizard}]]/2)]] zombies. The experience levels, if any, of the slain are ignored; the body of a newly dead 9th-level fighter is animated as a zombie with 2 Hit Dice, without special class or racial abilities.\n&emsp;B) *Creatures with more than 1 Hit Die.* The number of undead animated is determined by the monster Hit Dice (the total Hit Dice cannot exceed the wizards level. Currently [[@{level-wizard}]]). Skeletal forms have the Hit Dice of the original creature, while zombie forms have one more Hit Die. Thus, a 12th-level wizard could animate four zombie gnolls (4 × [2+1 Hit Dice] = 12), or a single fire giant skeleton. Such undead have none of the special abilities they had in life.\n&emsp;C) *Creatures with less than 1 Hit Die.* The caster can animate two skeletons per level or one zombie per level. Currently [[2*[[@{level-wizard}]] ]] skeletons or [[@{level-wizard}]] zombies. The creatures have their normal Hit Dice as skeletons and an additional Hit Die as zombies. Clerics receive a +1 bonus when trying to turn these.\n&emsp;This spell assumes that the bodies or bones are available and are reasonably intact (those of skeletons or zombies destroyed in combat won’t be!).\n&emsp;The casting of this spell is not a good act, and only evil wizards use it frequently.'
+};
+
+wiz5['Avoidance'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Abjuration, Alteration (Reversible)',
+    'range': '10 yards',
+    'duration': 'Permanent until dispelled',
+    'aoe': 'Up to 3-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Special',
+    'materials': 'A magnetized needle',
+    'reference': 'PHB p. 210',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster sets up a natural repulsion between the affected object and all other living things except himself. Thus, any living creature attempting to touch the affected object is repulsed (unable to come closer than 1 foot), or repulses the affected object, depending on the relative mass of the two (a halfling attempting to touch an iron chest with an *avoidance* spell upon it will be thrown back, while the chest will skitter away from a giant-sized creature as the creature approaches).\n&emsp;The spell cannot be cast upon living things; any attempt to cast avoidance upon the apparel or possessions of a living creature entitles the subject creature to a saving throw vs. spell.\n&emsp;The reverse of this spell, *attraction,* uses the same material components and sets up a natural attraction between the affected object and all living things. A creature is drawn to the object if the creature is smaller, or the object slides toward the creature if the creature is larger. It takes a successful bend bars/lift gates roll to remove the enchanted object once it has adhered to an object or creature.'
+};
+
+wiz5['Bigby\'s Interposing Hand'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Evocation',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'A soft glove',
+    'reference': 'PHB p. 210',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *Bigby’s interposing hand* spell creates a man-sized to gargantuan-sized magical hand that appears between the spellcaster and his chosen opponent. This disembodied hand then moves to remain between the two, regardless of what the spellcaster does or how the opponent tries to get around it. Neither invisibility nor polymorph fools the hand once a creature has been chosen. The hand does not pursue an opponent.\n&emsp;The size of the hand is determined by the wizard, and it can be from human size (5 feet) all the way up to titan size (25 feet). It provides cover for the caster against the selected opponent, with all the attendant combat adjustments. It has as many hit points as the caster in full health ([[@{HP|max}]] hit points) and has an Armor Class of 0.\n&emsp;Any creature weighing less than 2,000 pounds trying to push past the hand is slowed to half its normal movement. If the original opponent is slain, the caster can designate a new opponent for the hand. The caster can command the hand out of existence at any time.'
+};
+
+wiz5['Chaos'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Up to 40-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Special',
+    'materials': 'A small disc of bronze and a small rod of iron',
+    'reference': 'PHB p. 210',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is similar to the 4th-level *confusion* spell, but only the following beings receive a saving throw: fighters, wizards specialized in enchantments, monsters that use no magic and have an Intelligence of 4 or less, creatures of 21 Intelligence or higher, and creatures with more levels or Hit Dice than the caster’s level. Currently [[@{level-wizard}]] levels or Hit Dice.\n&emps;The spell causes disorientation and severe perceptual distortion, creating indecision and the inability to take effective action. The spell affects 1d4 creatures, plus one creature per caster level. Currently [[1d4+[[@{level-wizard}]] ]] creatures. Those allowed saving throws roll them vs. spell with –2 penalties, adjusted for Wisdom. Those who successfully save are unaffected by the spell. Affected creatures react as follows:}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D10 Roll**}}{{c2-1=1}}{{c3-1=2–6}}{{c4-1=7–9}}{{c5-1=10}}{{c1-2=**Action**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused for one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}{{effects2=&emsp;The spell lasts one round for each level of the caster. Those affected are checked by the DM for actions each round for the duration of the spell, or until the “wander away for the duration of the spell” result occurs.\n&emsp;Wandering creatures move as far from the caster as possible using their most typical mode of movement (characters walk, fish swim, bats fly, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.'
+};
+
+wiz5['Cloudkill'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Evocation',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '40 × 20 × 20 foot cloud',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 212',
+    'damage': 'Death or 1d10',
+    'damage-type': 'Poison',
+    'healing': '',
+    'effect': 'This spell generates a billowing cloud of ghastly yellowish green vapors that is so toxic as to slay any creature with fewer than 4+1 Hit Dice, cause creatures with 4+1 to 5+1 Hit Dice to roll saving throws vs. poison with –4 penalties or be slain, and creatures with up to 6 Hit Dice (inclusive) to roll unmodified saving throws vs. poison or be slain. Holding one’s breath has no effect on the lethality of the spell. Those above 6th level (or 6 Hit Dice) must leave the cloud immediately or suffer 1d10 points of poison damage each round while in the area of effect.\n&emsp;The cloudkill moves away from the spellcaster at 10 feet per round, rolling along the surface of the ground. A moderate breeze causes it to alter course (roll for direction), but it does not move back toward its caster. A strong wind breaks it up in four rounds, and a greater wind force prevents the use of the spell. Very thick vegetation will disperse the cloud in two rounds. As the vapors are heavier than air, they sink to the lowest level of the land, even pouring down den or sinkhole openings; thus, the spell is ideal for slaying nests of giant ants, for example. It cannot penetrate liquids, nor can it be cast under water.'
+};
+
+wiz5['Cone of Cold'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Evocation',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': '½',
+    'materials': 'A crystal or glass cone of very small size',
+    'reference': 'PHB p. 212',
+    'damage': '[[ [[@{level-wizard}]]d4+[[@{level-wizard}]] ]]',
+    'damage-type': 'Cold',
+    'healing': '',
+    'effect': 'When this spell is cast, it causes a cone-shaped area of extreme cold, originating at the wizard’s hand and extending outward in a cone 5 feet long and 1 foot in diameter per level of the caster. Currently [[5*[[@{level-wizard}]] ]] feet long and [[@{level-wizard}]] feet in diameter. It drains heat and causes 1d4+1 points of damage per level of experience of the wizard. For example, a 10th-level wizard would cast a cone of cold 10 feet in diameter and 50 feet long, causing 10d4+10 points of damage.'
+};
+
+wiz5['Conjure Elemental'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '60 yards',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A considerable quantity of the element at hand and a small amount of one of the following:\nAir Elemental—burning incense\nEarth Elemental—soft clay\nFire Elemental—sulphur and phosphorus\nWater Elemental—water and sand',
+    'reference': 'PHB p. 212',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'There are actually four spells in the *conjure elemental* spell. The wizard is able to conjure an air, earth, fire, or water elemental with this spell—assuming he has the material component for the particular elemental. (A considerable fire source must be in range to conjure a fire elemental; a large amount of water must be available to conjure a water elemental.) Conjured elementals have 8 Hit Dice.\n&emsp;It is possible to conjure successive elementals of different types if the spellcaster has memorized two or more of these spells. The type of elemental to be conjured must be decided upon before memorizing the spell. Each type of elemental can be conjured only once per day.\n&emsp;The conjured elemental must be controlled by the wizard—the spellcaster must concentrate on the elemental doing his commands—or it turns on the wizard and attacks. The elemental will not break off a combat to do so, but it will avoid creatures while seeking its conjurer. If the wizard is wounded or grappled, his concentration is broken. There is always a 5% chance that the elemental turns on its conjurer regardless of concentration. This check is made at the end of the second and each succeeding round. An elemental that breaks free of its control can be dispelled by the caster, but the chance of success is only 50%. The elemental can be controlled up to 30 yards away per level of the caster. Currently [[30*[[@{level-wizard}]] ]] yards. The elemental remains until its form on this plane is destroyed due to damage or until the spell’s duration expires. Note that water elementals are destroyed if they are ever more than 60 yards from a large body of water.\n&emsp;Special protection from uncontrolled elementals is available by  means of a *protection from evil* spell.'
+};
+
+wiz5['Contact Other Plane'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 212',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard sends his mind to another plane of existence in order to receive advice and information from powers there. As these powers resent such contact, only brief answers are given. (The DM answers all questions with “yes,” “no,” “maybe,” “never,” “irrelevant,” etc.) Any questions asked are answered by the power during the spell’s duration. The character can contact an elemental plane or some plane farther removed. For every two levels of experience of the wizard, one questions may be asked. Currently [[floor([[@{level-wizard}]]/2)]] questions. Contact with minds far removed from the plane of the wizard increases the probability of the spellcaster going insane or dying, but the chance of the power knowing the answer, as well as the probability of the being telling the correct answer, are likewise increased by moving to distant planes. Once the Outer Planes are reached, the Intelligence of the power contacted determines the effects.\n&emsp;The accompanying random table is subject to DM changes, development of extraplanar NPC beings, and so on.\n&emsp;If insanity occurs, it strikes as soon as the first question is asked. This condition lasts for one week for each removal of the plane contacted (see the *DMG* or the *PLANESCAPE™ Campaign Setting* boxed set), to a maximum of 10 weeks. There is a 1% chance per plane that the wizard dies before recovering, unless a remove curse spell is cast upon him. A surviving wizard can recall the answer to the question.\n&emsp;On rare occasions, this divination may be blocked by the action of certain lesser or greater powers.}}{{style=center2 sheet-spell-center3 sheet-spell-center4 sheet-spell-bottom2 sheet-spell-bottom3 sheet-spell-bottom4}}{{cc1-1=bottom}}{{c1-1=**Plane**}}{{c2-1=Elemental Plane}}{{c3-1=Inner Plane}}{{c4-1=Astral Plane}}{{c5-1=Outer Plane, Int 19}}{{c6-1=Outer Plane, Int 20}}{{c7-1=Outer Plane, Int 21}}{{c8-1=Outer Plane, Int 22}}{{c9-1=Outer Plane, Int 23}}{{c10-1=Outer Plane, Int 24}}{{c11-1=Outer Plane, Int 25}}{{cc1-2=fixed}}{{c1-2=**Chance of**\n**Insanity &ast;**}}{{c2-2=20%}}{{c3-2=25%}}{{c4-2=30%}}{{c5-2=35%}}{{c6-2=40%}}{{c7-2=45%}}{{c8-2=50%}}{{c9-2=55%}}{{c10-2=60%}}{{c11-2=65%}}{{cc1-3=fixed}}{{c1-3=**Chance of**\n**Knowledge**}}{{c2-3=55% (90%)}}{{c3-3=60%}}{{c4-3=65%}}{{c5-3=70%}}{{c6-3=75%}}{{c7-3=80%}}{{c8-3=85%}}{{c9-3=90%}}{{c10-3=95%}}{{c11-3=98%}}{{cc1-4=fixed}}{{c1-4=**Chance of**\n**Veracity &ast;&ast;**}}{{c2-4=62% (75%)}}{{c3-4=65%}}{{c4-4=67%}}{{c5-4=70%}}{{c6-4=73%}}{{c7-4=75%}}{{c8-4=78%}}{{c9-4=81%}}{{c10-4=85%}}{{c11-4=90%}}{{effects2=&emsp;&ast; For every point of Intelligence over 15, the wizard reduces the chance of insanity by 5%.\n&emsp;&ast;&ast; If the being does not know an answer, and the chance of veracity is not made, the being will emphatically give an incorrect answer. If the chance of veracity is made, the being will answer “unknown.”\n&emsp;Percentages in parentheses are for questions that pertain to the appropriate elemental plane.\n\n**Optional Rule**\n&emsp;The DM may allow a specific Outer Plane to be contacted (see  the *PLANESCAPE Campaign Setting* boxed set). In this case, the difference in alignment between the caster and the plane contacted alters the maximum Intelligence that can be contacted—each difference in moral or ethical alignment lowers the maximum Intelligence that can be contacted by 1. For example, an 18th-level lawful good caster could contact Mount Celestia (a lawful good plane) on the “Intelligence 20” line, or Elysium (a neutral good plane) on the “Intelligence 19” line.'
+};
+
+//start her
+wiz5['Demishadow Monsters'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '20-foot cube',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 213',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is similar to the 4th-level spell *shadow monsters,* except that the monsters created are effectively 40% of normal hit points. If the saving throw is made, their damage potential is only 40% of normal and their Armor Class is 8. The monsters have none of the special abilities of the real creatures, although victims may be deluded into believing this to be so.'
+};
+
+wiz5['Dismissal'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Abjuration',
+    'range': '10 yards',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 rd.',
+    'saving-throw': 'Neg.',
+    'materials': 'any item that is distasteful to the subject creature',
+    'reference': 'PHB p. 213',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, a wizard on the Prime Material Plane seeks to force or enable a creature from another plane of existence to return to its proper plane. Magic resistance, if any, is checked if this spell is used to force a being home. If the resistance fails, the caster’s level is compared to the creature’s level or Hit Dice. If the wizard’s level is higher, the difference is subtracted from the creature’s die roll for its saving throw vs. spell. If the creature’s level or Hit Dice is higher, the difference is added to the saving throw roll.\n&emsp;If the creature desires to be returned to its home plane, no saving throw is necessary (it chooses to fail the roll).\n&emsp;If the spell is successful, the creature is instantly whisked away, but the spell has a 20% chance of actually sending the subject to a plane other than its own.'
+};
+
+wiz5['Distance Distortion'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Alteration',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[2*[[@{level-wizard}]] ]] turns',
+    'aoe': '[[10*[[@{level-wizard}]]  ]]-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'a small lump of soft clay',
+    'reference': 'PHB p. 213',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell can be cast only in an area completely surrounded or enclosed by earth, rock, sand, or similar materials. The wizard must also cast a *conjure elemental* spell to summon an earth elemental. The elemental serves without attempting to break free when the spellcaster announces that his intent is to cast a *distance distortion* spell. The spell places the earth elemental in the area of effect, and the elemental then causes the area’s dimensions to be either doubled or halved for those traveling over it (spellcaster’s choice). Thus, a 10-foot × 100-foot corridor could seem to be either 5 feet wide and 50 feet long or 20 feet wide and 200 feet long. When the spell duration has elapsed, the elemental returns to its own plane.\n&emsp;The true nature of an area affected by distance distortion is undetectable to any creature traveling along it, but the area dimly radiates magic, and a true seeing spell can reveal that an earth elemental is spread within the area.'
+};
+
+wiz5['Domination'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '1 person',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Neg.',
+    'materials': '',
+    'reference': 'PHB p. 214',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *domination* spell enables the caster to control the actions of any person until the spell is ended by the subject’s Intelligence (see the *charm person* spell). Elves and half-elves resist this enchantment as they do all charm-type spells. When the spell is cast, the subject must roll a saving throw vs. spell at a penalty of –2, but Wisdom adjustments apply. Failure means the wizard has established a telepathic link with the subject’s mind. If a common language is shared, the wizard can generally force the subject to perform as the wizard desires, within the limits of the subject’s body structure and Strength. Note that the caster does not receive direct sensory input from the subject.\n&emsp;Subjects resist this control, and those forced to take actions against their natures receive a new saving throw with a bonus of +1 to +4, depending on the type of action required. Obviously self-destructive orders are not carried out. Once control is established, there is no limit to the range at which it can be exercised, as long as the caster and subject are on the same plane.\n&emsp;A protection from evil spell can prevent the caster from exercising control or using the telepathic link while the subject is so warded, but it cannot prevent the establishment of domination.'
+};
+
+wiz5['Dream'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Invocation, Illusion/Phantasm (Reversible)',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 214',
+    'damage': '[[1d10]] (for reverse only)',
+    'damage-type': 'Psychic',
+    'healing': '',
+    'effect': 'The *dream* spell enables the caster, or a messenger touched by  the caster, to send messages to others in the form of dreams. At the beginning of the spell, the caster must name the recipient or identify him by some title that leaves no doubt as to his identity.\n&emsp;As the caster completes the spell, the person sending the spell falls into a deep trancelike sleep, and instantaneously projects his mind to the recipient. The sender then enters the recipient’s dream and delivers the message unless the recipient is magically protected. If the recipient is awake, the message sender can choose to remain in the trancelike sleep. If the sender is disturbed during this time, the spell is immediately cancelled and the sender comes out of the trance. The whereabouts and current activities of the recipient cannot be learned through this spell.\n&emsp;The sender is unaware of his own surroundings or the activities around him while he is in his trance. He is totally defenseless, both physically and mentally (i.e., he always fails any saving throw) while in the trance.\n&emsp;Once the recipient’s dreams are entered, the sender can deliver a message of any length, which the recipient remembers perfectly upon waking. The communication is one-way; the recipient cannot ask questions or offer information, nor can the sender gain any information by observing the dreams of the recipient. Once the message is delivered, the sender’s mind returns instantly to his body. The duration of the spell is the time required for the sender to enter the recipient’s dream and deliver the message.\n&emsp;The reverse of this spell, *nightmare,* enables the caster to send a hideous and unsettling vision to the recipient, who is allowed a saving throw vs. spell to avoid the effect. The nightmare prevents restful sleep and causes 1d10 points of damage. The nightmare leaves the recipient fatigued and unable to regain spells for the next day. A *dispel evil* spell cast upon the recipient stuns the caster of the nightmare for one turn per level of the cleric countering this evil sending.'
+};
+
+wiz5['Extension II'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 214',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is the same as the 4th-level *extension I* spell, except it  extends the duration of 1st-through 4th-level spells by 50%.'
+};
+
+wiz5['Fabricate'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Enchantment, Alteration',
+    'range': '[[5*[[@{level-wizard}]] yards',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-wizard}]] cu. yards (or cu. ft. for minerals)',
+    'components': 'V, S, M',
+    'cast-time': 'Casting requires one full round per cubic yard (or foot) of material to be affected by the spell',
+    'saving-throw': 'None',
+    'materials': 'the material to be affected by the spell',
+    'reference': 'PHB p. 214',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard is able to convert material of one sort into a product that is of the same material. Thus, the spell-caster can fabricate a wooden bridge from a clump of trees, a rope from a patch of hemp, clothes from flax or wool, and so forth. Magical or living things cannot be created or altered by a fabricate spell. The quality of items made by this spell is commensurate with the quality of material used as the basis for the new fabrication. If the caster works with a mineral, the area of effect is reduced by a factor of 27 (1 cubic foot per level instead of 1 cubic yard).\n&emsp;Articles requiring a high degree of craftsmanship (jewelry, swords, glass, crystal, etc.) cannot be fabricated unless the wizard otherwise has great skill in the appropriate craft.'
+};
+
+wiz5['False Vision'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[1d4+[[@{level-wizard}]] ]] rounds',
+    'aoe': '30-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': 'the ground dust of an emerald worth at least 500 gp, which is sprinkled into the air when the spell is cast',
+    'reference': 'PHB p. 214',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard is able to confound any attempt to scry (by means of either a spell or a magical device) any point within the area of effect of the spell. To use the spell, he must be aware of the scrying attempt, although knowledge of the scryer or the scryer’s location is not necessary. Upon casting the spell, the caster and all he desires within the radius of the spell become undetectable to the scrying. Furthermore, the caster is able to send whatever message he desires, including vision and sound, according to the medium of the scrying method. To do this, the caster must concentrate on the message he is sending. Once concentration is broken, no further images can be sent, although the caster remains undetectable for the duration of the spell.'
+};
+
+wiz5['Feeblemind'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Neg.',
+    'materials': 'a handful of clay, crystal, glass, or mineral spheres, which disappears when the spell is cast',
+    'reference': 'PHB p. 215',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is used solely against people or creatures who use magic spells. The *feeblemind* causes the subject’s intellect to degenerate to that of a moronic child. The subject remains in this state until a heal or wish spell is used to cancel the effects. Magic-using beings are very vulnerable to this spell; thus, their saving throws are made with the following adjustments:\n**Spell Use of Target&emsp;Saving Throw Adjustment**\nPriest&emsp;+1\nWizard (human)&emsp;–4\nCombination or nonhuman&emsp;–2\n&emsp;Wisdom adjustments apply to the saving throw.'
+};
+
+wiz5['Hold Monster'] = {
+    'level': 'Level 5 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '1–4 creatures in a 40-ft cube',
+    'components': 'V, S, M',
+    'cast-time': '5',
+    'saving-throw': 'Neg.',
+    'materials': 'one hard metal bar or rod for each monster to be held; the bar or rod can be as small as a three-penny nail',
+    'reference': 'PHB p. 215',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell immobilizes from one to four creatures of any type within spell range and in sight of the spellcaster. He can opt to hold one, two, three, or four creatures. If three or four are attacked, each saving throw is normal; if two are attacked, each saving throw suffers a –1 penalty; if only one is attacked, the saving throw suffers a –3 penalty.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
 wizardSpells['wiz3'] = wiz3;
 wizardSpells['wiz4'] = wiz4;
+wizardSpells['wiz5'] = wiz5;
 /* ---- Wizard spells end ---- */

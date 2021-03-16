@@ -9,7 +9,7 @@ Get-ChildItem $htmlFolder | ForEach-Object {
     $replace = $content -replace [Regex]::Escape("â€™"), "'" #Weird encoding problem to match ’ character from PHB
     $replace = $content -replace [Regex]::Escape("\'"), "'"
     if ($replace -cne $content) {
-        $content | Set-Content -NoNewline -Path $_.FullName
+        $replace | Set-Content -NoNewline -Path $_.FullName
     }
 }
 
@@ -21,7 +21,7 @@ Get-ChildItem $javascriptFolder | ForEach-Object {
 
     $replace = $content -replace [Regex]::Escape("\\"), "\"
     if ($replace -cne $content) {
-        $content | Set-Content -NoNewline -Path $_.FullName
+        $replace | Set-Content -NoNewline -Path $_.FullName
     }
 }
 ""
