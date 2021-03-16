@@ -130,7 +130,7 @@ wiz1['Charm Person'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell affects any single *person* it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not. \n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the *charm* is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw. \n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands). \n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed person, the *charm* spell is broken. \n&emsp;If two or more *charm* effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells. \n&emsp;Note that the subject has full memory of the events that took place while he was charmed.}}{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence Score**}}{{c2-1=3 or less}}{{c3-1=4–6}}{{c4-1=7–9}}{{c5-1=10–12}}{{c6-1=13–14}}{{c7-1=15–16}}{{c8-1=17}}{{c9-1=18}}{{c10-1=19 or more}}{{c1-2=**Time Between Checks**}}{{c2-2=3 months}}{{c3-2=2 months}}{{c4-2=1 month}}{{c5-2=3 weeks}}{{c6-2=2 weeks}}{{c7-2=1 week}}{{c8-2=3 days}}{{c9-2=2 days}}{{c10-2=1 day}}{{effects2=&emsp;**Note:** The period between checks is the time period during which the check occurs. When to roll the check during this time is determined (randomly or by selection) by the DM. The roll is made secretly.',
+    'effect': 'This spell affects any single *person* it is cast upon. The term person includes any bipedal human, demihuman or humanoid of man-size or smaller, such as brownies, dryads, dwarves, elves, gnolls, gnomes, goblins, half-elves, halflings, half-orcs, hobgoblins, humans, kobolds, lizard men, nixies, orcs, pixies, sprites, troglodytes, and others. Thus, a 10th-level fighter could be charmed, but an ogre could not. \n&emsp;The person receives a saving throw vs. spell to avoid the effect, with any adjustment due to Wisdom (see Table 5). If the person receives damage from the caster’s group in the same round the *charm* is cast, an additional bonus of +1 per hit point of damage received is added to the victim’s saving throw. \n&emsp;If the spell recipient fails his saving throw, he regards the caster as a trusted friend and ally to be heeded and protected. The spell does not enable the caster to control the charmed creature as if it were an automaton, but any word or action of the caster is viewed in the most favorable way. Thus, a charmed person would not obey a suicide command, but he might believe the caster if assured that the only chance to save the caster’s life is for the person to hold back an onrushing red dragon for “just a minute or two.” Note also that the spell does not endow the caster with linguistic capabilities beyond those he normally possesses (i.e., he must speak the victim’s language to communicate his commands). \n&emsp;The duration of the spell is a function of the charmed person’s Intelligence and is tied to the saving throw. The spell may be broken if a successful saving throw is rolled, and this saving throw is checked on a periodic basis, according to the creature’s Intelligence (see the following table). If the caster harms, or attempts to harm, the charmed person by some overt action, or if a *dispel magic* spell is successfully cast upon the charmed person, the *charm* spell is broken. \n&emsp;If two or more *charm* effects simultaneously affect a creature, the result is decided by the DM. This could range from one effect being clearly dominant, to the subject being torn by conflicting desires, to new saving throws that could negate both spells.\n&emsp;Note that the subject has full memory of the events that took place while he was charmed.}}{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence Score**}}{{c2-1=3 or less}}{{c3-1=4–6}}{{c4-1=7–9}}{{c5-1=10–12}}{{c6-1=13–14}}{{c7-1=15–16}}{{c8-1=17}}{{c9-1=18}}{{c10-1=19 or more}}{{c1-2=**Time Between Checks**}}{{c2-2=3 months}}{{c3-2=2 months}}{{c4-2=1 month}}{{c5-2=3 weeks}}{{c6-2=2 weeks}}{{c7-2=1 week}}{{c8-2=3 days}}{{c9-2=2 days}}{{c10-2=1 day}}{{effects2=&emsp;**Note:** The period between checks is the time period during which the check occurs. When to roll the check during this time is determined (randomly or by selection) by the DM. The roll is made secretly.',
 };
 
 wiz1['Chill Touch'] = {
@@ -3296,12 +3296,12 @@ wiz5['Mordenkainen\'s Faithful Hound'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a tiny silver whistle, a  piece of bone, and a thread',
+    'materials': 'A tiny silver whistle, a  piece of bone, and a thread',
     'reference': 'PHB p. 217',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard summons up a phantom watchdog that only he can see. He may then command it to perform as guardian of a passage, room, door, or similar space or portal. The phantom watchdog immediately commences a loud barking if any creature larger than a cat approaches the place it guards. As the faithful hound is able to detect invisible creatures and ward against the approach of ethereal creatures, it is an excellent guardian. It does not react to illusions that are not at least quasi-real.\n&emsp;If the intruding creature exposes its back to the watchdog, the dog delivers a vicious attack as if it were a 10-Hit Dice monster, striking for 3d6 points of damage. It is able to hit opponents of all types, even those normally subject only to magical weapons of +3 or greater. Creatures without backs (for example, ochre jellies) are not attacked. The faithful hound cannot be attacked, but it can be dispelled. The spell lasts for a maximum of [[0.5*[[@{level-wizard}]]+1]] hours, but once it is activated by an intruder, it lasts only [[@{level-wizard}]] rounds. If the spellcaster is ever more than 30 yards distant from the area that the watchdog guards, the spell ends.'
+    'effect': 'By means of this spell, the wizard summons up a phantom watchdog that only he can see. He may then command it to perform as guardian of a passage, room, door, or similar space or portal. The phantom watchdog immediately commences a loud barking if any creature larger than a cat approaches the place it guards. As the faithful hound is able to detect invisible creatures and ward against the approach of ethereal creatures, it is an excellent guardian. It does not react to illusions that are not at least quasi-real.\n&emsp;If the intruding creature exposes its back to the watchdog, the dog delivers a vicious attack as if it were a 10-Hit Dice monster, striking for 3d6 points of damage. It is able to hit opponents of all types, even those normally subject only to magical weapons of +3 or greater. Creatures without backs (for example, ochre jellies) are not attacked. The faithful hound cannot be attacked, but it can be dispelled. The spell lasts for a maximum of 1 hour plus half an hour per caster level ([[1+(0.5*[[@{level-wizard}]])]] hours), but once it is activated by an intruder, it lasts only one round per caster level ([[@{level-wizard}]] rounds). If the spellcaster is ever more than 30 yards distant from the area that the watchdog guards, the spell ends.'
 };
 
 wiz5['Passwall'] = {
@@ -3309,11 +3309,11 @@ wiz5['Passwall'] = {
     'school': 'Alteration',
     'range': '30 yards',
     'duration': '[[6+[[@{level-wizard}]] ]] turns',
-    'aoe': '5 × 8 × 10 ft.',
+    'aoe': '5 × 8 × 10 feet',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a pinch of sesame seeds',
+    'materials': 'A pinch of sesame seeds',
     'reference': 'PHB p. 217',
     'damage': '',
     'damage-type': '',
@@ -3325,7 +3325,7 @@ wiz5['Seeming'] = {
     'level': 'Level 5 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '10-foot radius',
-    'duration': '12 hrs.',
+    'duration': '12 hours',
     'aoe': '[[floor([[@level-wizard}]]/2)]] persons',
     'components': 'V, S',
     'cast-time': '5',
@@ -3347,7 +3347,7 @@ wiz5['Sending'] = {
     'components': 'V, S, M',
     'cast-time': '1 turn',
     'saving-throw': 'None',
-    'materials': 'two tiny cylinders, each with one open end, connected by a short piece of fine copper wire',
+    'materials': 'Two tiny cylinders, each with one open end, connected by a short piece of fine copper wire',
     'reference': 'PHB p. 218',
     'damage': '',
     'damage-type': '',
@@ -3359,7 +3359,7 @@ wiz5['Shadow Door'] = {
     'level': 'Level 5 Wizard',
     'school': 'Illusion/Phantasm',
     'range': '10 yards',
-    'duration': '1 rd./level',
+    'duration': '[[@{level-wizard}]] rounds',
     'aoe': 'Special',
     'components': 'S',
     'cast-time': '2',
@@ -3375,7 +3375,7 @@ wiz5['Shadow Door'] = {
 wiz5['Shadow Magic'] = {
     'level': 'Level 5 Wizard',
     'school': 'Illusion/Phantasm',
-    'range': '[[10*[[@{level-wizard}]]+50]] yards',
+    'range': '[[50+(10*[[@{level-wizard}]])]] yards',
     'duration': 'Special',
     'aoe': 'Special',
     'components': 'V, S',
@@ -3394,11 +3394,11 @@ wiz5['Stone Shape'] = {
     'school': 'Alteration',
     'range': 'Touch',
     'duration': 'Permanent',
-    'aoe': '[[@{level-wizard}]] cu. ft.',
+    'aoe': '[[@{level-wizard}]] cube feet',
     'components': 'V, S, M',
-    'cast-time': '1 rd.',
+    'cast-time': '1 round',
     'saving-throw': 'None',
-    'materials': 'soft clay that must be worked into roughly the desired shape of the stone object and then touched to the stone when the spell is uttered',
+    'materials': 'Soft clay that must be worked into roughly the desired shape of the stone object and then touched to the stone when the spell is uttered',
     'reference': 'PHB p. 218',
     'damage': '',
     'damage-type': '',
@@ -3415,12 +3415,12 @@ wiz5['Summon Shadow'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a bit of smoky quartz',
+    'materials': 'A bit of smoky quartz',
     'reference': 'PHB p. 218',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard conjures up [[floor([[@level-wizard}]]/3)]] shadows (see the MONSTROUS MANUAL). These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
+    'effect': 'When this spell is cast, the wizard conjures up one shadow (see the *MONSTROUS MANUAL*) for every three levels of experience he has attained. Currently [[floor([[@level-wizard}]]/3)]] shadows. These monsters are under the control of the spellcaster and attack his enemies on command. The shadows remain until slain, turned, or the spell duration expires.'
 };
 
 wiz5['Telekinesis'] = {
@@ -3431,13 +3431,13 @@ wiz5['Telekinesis'] = {
     'aoe': '[[10*[[@{level-wizard}]] ]] yards',
     'components': 'V, S',
     'cast-time': '5',
-    'saving-throw': 'None',
+    'saving-throw': 'Negate',
     'materials': '',
     'reference': 'PHB p. 218',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the wizard is able to move objects by concentrating on moving them mentally. The spell can provide either a gentle, sustained force or a single short, violent thrust.\n&emsp;A sustained force enables the wizard to move a weight of up to 25 pounds a distance up to 20 feet per round. The spell lasts [[2+[[@{level-wizard}]] ]] rounds. The weight can be moved vertically, horizontally, or both. An object moved beyond the caster’s range falls or stops. If the caster ceases concentration for any reason, the object falls or stops. The object can be telekinetically manipulated as if with one hand. For example, a lever or rope can be pulled, a key can be turned, an object rotated and so on, if the force required is within the weight limitation. The caster might even be able to untie simple knots, at the discretion of the DM.\n&emsp;Alternatively, the spell energy can be expended in a single round. The caster can hurl one or more objects within range, and within a 10-foot cube, directly away from himself at high speed, to a distance of up to [[10*[[@{level-wizard}]] ]] feet. This is subject to a maximum weight of [[25*[[@{level-wizard}]] ]] pounds. Damage caused by hurled objects is decided by the DM, but cannot exceed [[@{level-wizard}]] points of damage. Opponents who fall within the weight capacity of the spell can be hurled, but they are allowed a saving throw vs. spell to avoid the effect. Furthermore, those able to employ as simple a counter-measure as an *enlarge* spell, for example (thus making the body weight go over the maximum spell limit), can easily counter the spell. The various *Bigby’s hand* spells also counter this spell.'
+    'effect': 'By means of this spell, the wizard is able to move objects by concentrating on moving them mentally. The spell can provide either a gentle, sustained force or a single short, violent thrust.\n&emsp;A sustained force enables the wizard to move a weight of up to 25 pounds a distance up to 20 feet per round. The spell lasts two rounds, plus one round per caster level. Currently  [[2+[[@{level-wizard}]] ]] rounds. The weight can be moved vertically, horizontally, or both. An object moved beyond the caster’s range falls or stops. If the caster ceases concentration for any reason, the object falls or stops. The object can be telekinetically manipulated as if with one hand. For example, a lever or rope can be pulled, a key can be turned, an object rotated and so on, if the force required is within the weight limitation. The caster might even be able to untie simple knots, at the discretion of the DM.\n&emsp;Alternatively, the spell energy can be expended in a single round. The caster can hurl one or more objects within range, and within a 10-foot cube, directly away from himself at high speed, to a distance of up to 10 feet per caster level. Currently [[10*[[@{level-wizard}]] ]] feet. This is subject to a maximum weight of 25 pounds per caster level. Currently [[25*[[@{level-wizard}]] ]] pounds. Damage caused by hurled objects is decided by the DM, but cannot exceed 1 point of damage per caster level. Currently [[@{level-wizard}]] points of damage. Opponents who fall within the weight capacity of the spell can be hurled, but they are allowed a saving throw vs. spell to avoid the effect. Furthermore, those able to employ as simple a counter-measure as an *enlarge* spell, for example (thus making the body weight go over the maximum spell limit), can easily counter the spell. The various *Bigby’s hand* spells also counter this spell.'
 };
 
 wiz5['Teleport'] = {
@@ -3454,7 +3454,7 @@ wiz5['Teleport'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is used, the wizard instantly transports himself, along with a certain amount of additional weight that is on or being touched by the spellcaster, to a well-known destination. Distance is not a factor, but interplanar travel is not possible by means of a *teleport* spell. The spellcaster is able to teleport a maximum weight of [[250+150*([[@{level-wizard}]]-10)]] pounds (a 13th-level wizard can teleport up to 700 pounds). If the destination area is very familiar to the wizard (he has a clear mental picture due to previous proximity to and study of the area), it is unlikely that there is any error in arriving, although the caster has no control over his facing upon arrival. Lesser known areas (those seen only magically or from a distance) increase the probability of error. Unfamiliar areas present considerable peril (see table).\n**&emsp;&emsp;Probability of Teleporting:\nDestination Is:&emsp;High&emsp;On Target&emsp;Low**\nVery familiar&emsp;01–02&emsp;03–99&emsp;00\nStudied carefully&emsp;01–04&emsp;05–98&emsp;99–00\nSeen casually&emsp;01–08&emsp;09–96&emsp;97–00\nViewed once&emsp;01–16&emsp;17–92&emsp;93–00\nNever seen&emsp;01–32&emsp;33–84&emsp;85–00\n&emsp;Teleporting high means the wizard arrives 10 feet above the  ground for every 1% he is below the lowest “On Target” probability; this could be as high as 320 feet if the destination area was never seen. Any low result means the instant death of the wizard if the area into which he teleports is solid. A wizard cannot teleport to an area of empty space—a substantial surface must be there, whether a wooden floor, a stone floor, natural ground, etc. Areas of strong physical or magical energies may make teleportation more hazardous or even impossible.'
+    'effect': 'When this spell is used, the wizard instantly transports himself, along with a certain amount of additional weight that is on or being touched by the spellcaster, to a well-known destination. Distance is not a factor, but interplanar travel is not possible by means of a *teleport* spell. The spellcaster is able to teleport a maximum weight of 250 pounds, plus 150 pounds for each level of experience above the 10th (current maximum weight is [[250+150*({[[@{level-wizard}]]-10,0}kh1)]] pounds) (a 13th-level wizard can teleport up to 700 pounds). If the destination area is very familiar to the wizard (he has a clear mental picture due to previous proximity to and study of the area), it is unlikely that there is any error in arriving, although the caster has no control over his facing upon arrival. Lesser known areas (those seen only magically or from a distance) increase the probability of error. Unfamiliar areas present considerable peril (see table).}}{{style=center2 sheet-spell-center3 sheet-spell-center4}}{{c1-1= }}{{c2-1=**Destination Is:**}}{{c3-1=Very familiar}}{{c4-1=Studied carefully}}{{c5-1=Seen casually}}{{c6-1=Viewed once}}{{c7-1=Never seen}}{{cs1-2=3}}{{c1-2=**Probability of Teleporting:**}}{{c2-2=**High**}}{{c3-2=01–02}}{{c4-2=01–04}}{{c5-2=01–08}}{{c6-2=01–16}}{{c7-2=01–32}}{{c2-3=**On Target**}}{{c3-3=03–99}}{{c4-3=05–98}}{{c5-3=09–96}}{{c6-3=17–92}}{{c7-3=33–84}}{{c2-4=**Low**}}{{c3-4=00}}{{c4-4=99–00}}{{c5-4=97–00}}{{c6-4=93–00}}{{c7-4=85–00}}{{effects2=&emsp;Teleporting high means the wizard arrives 10 feet above the ground for every 1% he is below the lowest “On Target” probability; this could be as high as 320 feet if the destination area was never seen. Any low result means the instant death of the wizard if the area into which he teleports is solid. A wizard cannot teleport to an area of empty space—a substantial surface must be there, whether a wooden floor, a stone floor, natural ground, etc. Areas of strong physical or magical energies may make teleportation more hazardous or even impossible.'
 };
 
 wiz5['Transmute Rock to Mud'] = {
@@ -3466,7 +3466,7 @@ wiz5['Transmute Rock to Mud'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'clay and water (or sand, lime, and water for the reverse)',
+    'materials': 'Clay and water (or sand, lime, and water for the reverse)',
     'reference': 'PHB p. 219',
     'damage': '',
     'damage-type': '',
@@ -3478,17 +3478,17 @@ wiz5['Wall of Force'] = {
     'level': 'Level 5 Wizard',
     'school': 'Evocation',
     'range': '30 yards',
-    'duration': '[[10+[[@{level-wizard}]] ]] rounds',
+    'duration': '1 turn + [[@{level-wizard}]] rounds',
     'aoe': '[[10*[[@{level-wizard}]] ]]-foot square',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a pinch of powdered diamond worth 5,000 gp',
+    'materials': 'A pinch of powdered diamond worth 5,000 gp',
     'reference': 'PHB p. 219',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'A *wall of force* spell creates an invisible barrier in the locale desired by the caster, up to the spell’s range. The wall of force cannot move and is totally unaffected by most spells, including dispel magic. However, a *disintegrate* spell will immediately destroy it, as will a *rod of cancellation* or a *sphere of annihilation.* Likewise, the wall of force is not affected by blows, missiles, cold, heat, electricity, etc. Spells and breath weapons cannot pass through it in either direction, although *dimension door, teleport,* and similar effects can bypass the barrier.\n&emsp;The wizard can, if desired, form the wall into a spherical shape with a radius of up to [[@{level-wizard}]] feet or an open hemispherical shape with a radius of [[1.5*[[@{level-wizard}]] ]] feet. The wall of force must be continuous and unbroken when formed; if its surface is broken by any object or creature, the spell fails. The caster can end the spell on command.'
+    'effect': 'A *wall of force* spell creates an invisible barrier in the locale desired by the caster, up to the spell’s range. The wall of force cannot move and is totally unaffected by most spells, including *dispel magic*. However, a *disintegrate* spell will immediately destroy it, as will a *rod of cancellation* or a *sphere of annihilation.* Likewise, the wall of force is not affected by blows, missiles, cold, heat, electricity, etc. Spells and breath weapons cannot pass through it in either direction, although *dimension door, teleport,* and similar effects can bypass the barrier.\n&emsp;The wizard can, if desired, form the wall into a spherical shape with a radius of up to [[@{level-wizard}]] feet or an open hemispherical shape with a radius of [[1.5*[[@{level-wizard}]] ]] feet. The wall of force must be continuous and unbroken when formed; if its surface is broken by any object or creature, the spell fails. The caster can end the spell on command.'
 };
 
 wiz5['Wall of Iron'] = {
@@ -3496,16 +3496,16 @@ wiz5['Wall of Iron'] = {
     'school': 'Evocation',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
     'duration': 'Permanent',
-    'aoe': '[[15*[[@{level-wizard}]] ]] sq. ft.',
+    'aoe': '[[15*[[@{level-wizard}]] ]] square feet or special',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a small piece of sheet iron',
+    'materials': 'A small piece of sheet iron',
     'reference': 'PHB p. 220',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'When this spell is cast, the wizard causes a vertical iron wall to spring into being. This wall can be used to seal off a passage or close a breach, for the wall inserts itself into any surrounding nonliving material if its area is sufficient to do so. The wall of iron is [[0.5*[[@{level-wizard}]] ]] inches thick. The wizard is able to create an iron wall of up to [[15*[[@{level-wizard}]] ]] square feet; thus, a 12th-level wizard can create a wall of iron with an area of 180 square feet. The wizard can double the wall’s area by halving its thickness.\n&emsp;If the caster desires, the wall can be created vertically resting on a flat surface, so that it can be tipped over to fall on and crush any creature beneath it. The wall is 50% likely to tip in either direction. This chance can be modified by a force of not less than 30 Strength and 400 pounds mass—each pound over 400 or Strength point over 30 alters the chance by 1% in favor of the stronger side. Creatures with room to flee the falling wall may do so by making successful saving throws vs. death. Those who fail are killed. Huge and gargantuan creatures cannot be crushed by the wall.\n&emsp;The wall is permanent, unless successfully dispelled, but it is subject to all forces a normal iron wall is subject to—rust, perforation, etc.'
+    'effect': 'When this spell is cast, the wizard causes a vertical iron wall to spring into being. This wall can be used to seal off a passage or close a breach, for the wall inserts itself into any surrounding nonliving material if its area is sufficient to do so. The wall of iron is 1/2-inch thick per level of experience of the spellcaster. Currently [[0.5*[[@{level-wizard}]] ]] inches thick. The wizard is able to create an iron wall of up to 15 square feet per experience level, currently [[15*[[@{level-wizard}]] ]] square feet; thus, a 12th-level wizard can create a wall of iron with an area of 180 square feet. The wizard can double the wall’s area by halving its thickness.\n&emsp;If the caster desires, the wall can be created vertically resting on a flat surface, so that it can be tipped over to fall on and crush any creature beneath it. The wall is 50% likely to tip in either direction. This chance can be modified by a force of not less than 30 Strength and 400 pounds mass—each pound over 400 or Strength point over 30 alters the chance by 1% in favor of the stronger side. Creatures with room to flee the falling wall may do so by making successful saving throws vs. death. Those who fail are killed. Huge and gargantuan creatures cannot be crushed by the wall.\n&emsp;The wall is permanent, unless successfully dispelled, but it is subject to all forces a normal iron wall is subject to—rust, perforation, etc.'
 };
 
 wiz5['Wall of Stone'] = {
@@ -3517,12 +3517,12 @@ wiz5['Wall of Stone'] = {
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
-    'materials': 'a small block of granite',
+    'materials': 'A small block of granite',
     'reference': 'PHB p. 220',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates a wall of granite rock that merges into adjoining rock surfaces. It is typically employed to close passages, portals, and breaches against opponents. The wall of stone is [[0.25*[[@{level-wizard}]] ]] inches thick and up to [[20*[[@{level-wizard}]] ]] square feet. Thus, a 12th-level wizard can create a wall of stone 3 inches thick and up to 240 square feet in surface area (a 12-foot-wide and 20-foot-high wall, for example, to completely close a 10-foot × 16-foot passage). The wall created need not be vertical, nor rest upon any firm foundation (see the wall of iron spell); however, it must merge with and be solidly supported by existing stone. It can be used to bridge a chasm, for instance, or as a ramp. For this use, if the span is more than 20 feet, the wall must be arched and but-tressed. This requirement reduces the area of effect by half. Thus, a 20th-level caster can create a span with a surface area of 200 square feet. The wall can be crudely shaped to allow crenelations, battle-ments, and so forth by likewise reducing the area. The stone is permanent unless destroyed by a dispel magic or disintegrate spell, or by normal means such as breaking or chipping.'
+    'effect': 'This spell creates a wall of granite rock that merges into adjoining rock surfaces. It is typically employed to close passages, portals, and breaches against opponents. The wall of stone is 0.25 inch thick and up to 20 square feet per level of experience of the wizard casting the spell. Currently [[0.25*[[@{level-wizard}]] ]] inches thick and up to [[20*[[@{level-wizard}]] ]] square feet. Thus, a 12th-level wizard can create a wall of stone 3 inches thick and up to 240 square feet in surface area (a 12-foot-wide and 20-foot-high wall, for example, to completely close a 10-foot × 16-foot passage). The wall created need not be vertical, nor rest upon any firm foundation (see the *wall of iron* spell); however, it must merge with and be solidly supported by existing stone. It can be used to bridge a chasm, for instance, or as a ramp. For this use, if the span is more than 20 feet, the wall must be arched and buttressed. This requirement reduces the area of effect by half. Thus, a 20th-level caster can create a span with a surface area of 200 square feet. The wall can be crudely shaped to allow crenelations, battlements, and so forth by likewise reducing the area. The stone is permanent unless destroyed by a *dispel magic* or *disintegrate* spell, or by normal means such as breaking or chipping.'
 };
 
 const wizardSpells = {};
