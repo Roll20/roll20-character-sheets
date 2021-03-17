@@ -1,6 +1,17 @@
+Important: The sheet uses the EJS-Template Engine since Version 0.5
+Please Dont Update only the files in Views to edit the sheet.html
+If you using VS-Code, and Node.js is installed the Projects Supports you with an Render-Workflow.
+
 Version 0.5 changes:
 General:
-Implenenting Template engine Nunjucks for better Code-Quality
+Implenenting Template engine EJS for better Code-Quality
+Adding VS-Code Workspace Configurations and recomendation.
+Adding a Nodejs app (app.js) to Render the Sheet.ejs into a sheet-compiled.html
+Via VS-Extention "Save an Run" the app.js runs automaticly on every ejs file Save.
+
+All Further Updates will came from thease Templates.
+
+
 
 
 Attributes-Tab:

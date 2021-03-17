@@ -1,8 +1,15 @@
-import  "nunjucks";
-import { writeFileSync } from 'fs';
+import ejs from "ejs";
+import { writeFileSync,readFileSync } from 'fs';
 
-var msg="Test";
-nunjucks.configure({ autoescape: true });
-msg=nunjucks.render('template.html',{});
-writeFileSync('test.html', msg);
-console.log("Write file");
+
+ejs.renderFile("views/sheet.ejs",function(err,str){
+    if (str){
+        writeFileSync("sheet-compiled.html",str);
+        console.log("File Written");
+    }
+    else 
+    console.log(err);
+    
+});
+
+
