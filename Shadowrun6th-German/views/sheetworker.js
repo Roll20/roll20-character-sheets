@@ -624,11 +624,12 @@ on("change:repeating_vehicle:vehicle_speed",function(){
 
     
 
-    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun"];
+    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic"];
     const s_attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance"];
-    const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task"];/*,"exoticweapons"*/
+    const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task","conjuring","sorcery","enchanting"];/*,"exoticweapons"*/
     const magicalSkills = ["astral","conjuring","sorcery","enchanting"];
     const spirittypes = ["air","fire","water","earth","man","beast","plant","task","guardian","guidance"];
+
 
 function updateAttribute(attribute){
     getAttrs([`${attribute}_base`,`${attribute}_modifier`,`${attribute}_statusmodifier`], function(v){
@@ -716,12 +717,13 @@ function updateAttribute(attribute){
 
 function updateSkill(skill){
     
-    getAttrs([`skill_${skill}_base`,`skill_${skill}_modifier`,`skill_${skill}_attribute`], (v) => {
+    getAttrs([`skill_${skill}_base`,`skill_${skill}_modifier`,`skill_${skill}_attribute`,`skill_${skill}_statusmodifier`], (v) => {
                 s_attributes.forEach(s_attribute => {
                     getAttrs([`display_${s_attribute}`], function(va){
                         if(`display_${s_attribute}` == v[`skill_${skill}_attribute`]){
-                           // console.log("Update: " + skill + " attrib:" + s_attribute);
+                           
                            let total = pInt(va[`display_${s_attribute}`]) + pInt(v[`skill_${skill}_base`])+ pInt(v[`skill_${skill}_modifier`]) + pInt(v[`skill_${skill}_statusmodifier`])
+                          console.log("Update: " + skill + " attrib:" + s_attribute + " total:" + total);
                             if(v[`skill_${skill}_base`] > 4) {
                                 setAttrs({
                                     [`skill_${skill}_exp_visibility`]:1,
@@ -744,7 +746,7 @@ function updateSkill(skill){
                             if(skill == "astral" || skill == "biotech" || skill == "conjuring" || skill == "exoticweapons" || skill == "sorcery" || skill == "task" || skill == "enchanting"){
                                 if(v[`skill_${skill}_base`] < 1) {
                                     setAttrs({
-                                        [`skill_${skill}_base`]: -1,
+                                        [`skill_${skill}_base`]: 0,
                                         [`skill_${skill}_exp`]:"",
                                         [`skill_${skill}_exp_visibility`]:0,
                                         [`skill_${skill}_spec`]:"",
@@ -757,12 +759,12 @@ function updateSkill(skill){
                             } else {
                                 if(v[`skill_${skill}_base`] < 1) {
                                     setAttrs({
-                                        [`skill_${skill}_base`]: -1,
+                                        [`skill_${skill}_base`]: 0,
                                         [`skill_${skill}_exp`]:"",
                                         [`skill_${skill}_exp_visibility`]:0,
                                         [`skill_${skill}_spec_visibility`]:0,
                                         [`skill_${skill}_spec`]:"",
-                                        [`skill_${skill}_total`]: +va[`display_${s_attribute}`]+ +v[`skill_${skill}_base`]+ +v[`skill_${skill}_modifier`],
+                                        [`skill_${skill}_total`]: pInt(va[`display_${s_attribute}`]) -1 + pInt(v[`skill_${skill}_modifier`]) + pInt(v[`skill_${skill}_statusmodifier`]),
                                         [`skill_${skill}_total_spec`]: 0,
                                         [`skill_${skill}_total_exp`]:0,
                                     })
@@ -774,49 +776,7 @@ function updateSkill(skill){
             })
            
 }
-function updateSkillMagic(skill){
-    getAttrs([`skill_${skill}_base`,`skill_${skill}_modifier`,`magic_${skill}_attribute`], (v) => {
-                s_attributes.forEach(s_attribute => {
-                    getAttrs([`display_${s_attribute}`], (va) => {
-                        if(v[`magic_${skill}_attribute`] == `display_${s_attribute}`){
-                            let total = pInt(va[`display_${s_attribute}`]) + pInt(v[`skill_${skill}_base`])+ pInt(v[`skill_${skill}_modifier`]) + pInt(v[`skill_${skill}_statusmodifier`])
-                            if(v[`skill_${skill}_base`] > 4) {
-                                setAttrs({
-                                    [`skill_${skill}_exp_visibility`]:1,
-                                    [`skill_${skill}_spec_visibility`]:1,
-                                    [`magic_${skill}_total_exp`]: total+3,
-                                    [`magic_${skill}_total_spec`]: total+2,
-                                    [`magic_${skill}_total`]: total,
-                                })
-                            }
-                            if(v[`skill_${skill}_base`] > 0 && v[`skill_${skill}_base`] < 5){
-                                setAttrs({
-                                    [`skill_${skill}_exp`]:"",
-                                    [`skill_${skill}_exp_visibility`]:0,
-                                    [`skill_${skill}_spec_visibility`]:1,
-                                    [`magic_${skill}_total_exp`]:0,
-                                    [`magic_${skill}_total_spec`]: total+2,
-                                    [`magic_${skill}_total`]: total,
-                                })
-                            }
-                            if(v[`skill_${skill}_base`] < 1){
-                                setAttrs({
-                                    [`skill_${skill}_base`]: -1,
-                                    [`skill_${skill}_exp`]:"",
-                                    [`skill_${skill}_exp_visibility`]:0,
-                                    [`skill_${skill}_spec`]:"",
-                                    [`skill_${skill}_spec_visibility`]:0,
-                                    [`magic_${skill}_total_spec`]: 0,
-                                    [`magic_${skill}_total`]: 0,
-                                    [`magic_${skill}_total_exp`]:0,
-                                })
-                            }
-                        }
-                    })
-                })
-            })
-        
-}
+
 on("sheet:opened", function(){
     attributes.forEach(attribute => {
         try {
@@ -834,14 +794,7 @@ on("sheet:opened", function(){
         }
        
     });
-    magicalSkills.forEach(skillm => {
-            try {
-                updateSkillMagic(skillm);
-            } catch (error) {
-                console.log("Error SkillsMagic: "  + skillm + " =>" + error)
-            }
-                   
-        });
+   
 
     getAttrs(["sheetTab"],function(v){
         console.log("TAB:" +v.sheetTab);
@@ -871,9 +824,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
                 skills.forEach(skilla => {
                     updateSkill(skilla);
                 })
-                magicalSkills.forEach(skillm => {
-                    updateSkillMagic(skillm);
-                })
+               
             }
         })
     })
@@ -890,11 +841,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
             updateSkill(skill);
         })
     })
-    magicalSkills.forEach(skill => {
-        on(`change:skill_${skill}_base change:skill_${skill}_modifier change:magic_${skill}_attribute change:display_magic`, function(){
-            updateSkillMagic(skill);
-            })
-    })
+
 
     //Ausblenden von Rolls ohne Spez und Exp
     skills.forEach(skill => {
@@ -907,16 +854,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
             })
         })
     })
-    magicalSkills.forEach(skill => {
-        on(`change:skill_${skill}_spec change:skill_${skill}_exp`, function(){
-            getAttrs([`skill_${skill}_spec`,`skill_${skill}_exp`], function(v){
-                if(!!v[`skill_${skill}_spec`]){setAttrs({[`skill_${skill}_spec_roll_visibility`]:1,})
-                } else {setAttrs({[`skill_${skill}_spec_roll_visibility`]:0,})}
-                if(!!v[`skill_${skill}_exp`]){setAttrs({[`skill_${skill}_exp_roll_visibility`]:1,})
-                } else {setAttrs({[`skill_${skill}_exp_roll_visibility`]:0,})}
-            })
-        })
-    })
+    
 
     on("clicked:hide_illegal_actions",function(){
         setAttrs({mh_dbl_hide:1,
@@ -988,7 +926,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
     on("clicked:reset_magic_visibility", () => { //für den Reiter Magie
         magicalSkills.forEach(skill => {
             setAttrs({
-                [`magic_${skill}_hide`]:0,
+                [`skill_magic${skill}_hide`]:0,
             })
         })
     })
