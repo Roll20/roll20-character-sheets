@@ -382,11 +382,21 @@ with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
     reader = csv.DictReader(f)
     css_rules = []
     for color_def in reader:
-        lines = [
-            ".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-color-%s {"
-            % color_def["color"],
-            "    --header-bg-color: %s;" % color_def["hex"],
+        # Base CSS rules
+        lines_header = [
+            f".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-color-{color_def['color']} {{",
+            f"    --header-bg-color: {color_def['hex']};",
         ]
+        lines_rolls = [
+            f".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-rlcolor-{color_def['color']} .inlinerollresult {{",
+            f"    --roll-bg-color: {color_def['hex']};",
+        ]
+        lines_buttons = [
+            f".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-rlcolor-{color_def['color']} a {{",
+            f"    --button-bg-color: {color_def['hex']};",
+        ]
+
+        # Adapt text color to background color
         hex = color_def["hex"].lstrip("#")
         r, g, b = tuple(int(hex[2 * i : 2 * i + 2], 16) / 255 for i in range(3))
         # Assuming sRGB -> Luma
@@ -394,7 +404,14 @@ with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
         luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
         if luma > 0.5:  # arbitrary threshold
             # switch to black text if luma is high enough
-            lines.append("    --header-text-color: #000;")
-        lines.append("}")
-        css_rules.append("\n".join(lines))
+            lines_header.append("    --header-text-color: #000;")
+            lines_buttons.append("    --button-text-color: #000;")
+        if luma < 0.5:
+            lines_rolls.append("    --roll-text-color: #FFF;")
+
+        # Build the rules
+        for lines in (lines_header, lines_rolls, lines_buttons):
+            lines.append("}")
+            css_rules.append("\n".join(lines))
+
     GLOBALS["custom_rt_color_css"] = "\n".join(css_rules)

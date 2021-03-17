@@ -9522,6 +9522,7 @@ Only takes the first match even if multiple identical entries are found.">
                 </div>
                 <div class="importbuttons">
                     <input class="warningcheckbox" type="checkbox" name="attr_warningcheckbox">
+                    <input type="checkbox" name="attr_experimental" hidden>
                     <div class="warninguncheckedwrapper">
                         <label class="warningunchecked">Import</label>
                     </div>
@@ -9751,6 +9752,7 @@ on("sheet:opened", function() {
         values.warningcheckbox=0;
         values.chummercheckbox=0;
         values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
+        values.experimental=0;
     setAttrs(values);
     });
 });
@@ -9832,6 +9834,7 @@ on("change:chummercheckbox", function(){
             var chummerfile=JSON.parse(text.chummertext);
             }catch(err){
                 goodcode=false;
+                error = err;
             }
             if(goodcode){
                 getSectionIDs("repeating_posqualities", function(idarraya) {
@@ -10233,6 +10236,7 @@ on("change:chummercheckbox", function(){
                                     if(Number(chummerfile.characters.character.weapons.weapon[i-1].ap)!="NaN"){
                                         attributes["weaponnap"+i]=chummerfile.characters.character.weapons.weapon[i-1].ap;
                                     }else{
+                                        console.log(chummerfile.characters.character.weapons.weapon[i-1].ap);
                                         attributes["weaponnap"+i]=0;
                                     }
                                     attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
@@ -10523,7 +10527,7 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
-						if(chummerfile.characters.character.skills.skill[0].name_english !== undefined) {
+						if(chummerfile.characters.character.skills.skill[0].name_english !== "undefined") {
 							for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                                 if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
                                     alchemy=i;
@@ -10708,7 +10712,7 @@ on("change:chummercheckbox", function(){
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)[0];
                                     else
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                                    if(chummerfile.characters.character.spells.spell[i].category=="Rituals"){
+                                    if(chummerfile.characters.character.spells.spell[i].category=="Rituals" || chummerfile.characters.character.spells.spell[i].category_english=="Rituals"){
                                         attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool67}";
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
                                         attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[ritual].total;
@@ -10731,7 +10735,7 @@ on("change:chummercheckbox", function(){
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
                                 else
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                                if(chummerfile.characters.character.spells.spell.category=="Rituals"){
+                                if(chummerfile.characters.character.spells.spell.category=="Rituals" || chummerfile.characters.character.spells.spell[i].category_english=="Rituals"){
                                     attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool67}";
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
                                     attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[ritual].total;
@@ -10751,9 +10755,35 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Spells: " + err;
                     }
+                     if(attributes.experimental !== "undefined"){
+                     //import contacts
+                        try{
+                           if(chummerfile.characters.character.contacts!=null){
+                            if(chummerfile.characters.character.contacts.contact.length>1){
+                                for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
+                                    var newrowid=generateRowID();
+                                    attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
+                                    attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
+                                    attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact[i].connection;
+                                    attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact[i].loyalty;
+                                }
+                            }else{
+                                var newrowid=generateRowID();
+                                attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact.name;
+                                attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
+                                attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact.connection;
+                                attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact.loyalty;
+                            }
+                           }
+                        }catch(err){
+                           goodcode=false;
+                           error="Error with Contacts: " + err;
+                        }
+                    }
+
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
-                    attributes.chummertext="Import sucessfull\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
+                    attributes.chummertext="Import successful\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
                     if(goodcode){
                         try{
                             setAttrs(attributes);
@@ -10774,7 +10804,7 @@ on("change:chummercheckbox", function(){
                 });
             }else{
                 setAttrs({
-                    chummertext:"Error invalid Structure: " +err,
+                    chummertext:"Error invalid Structure: " + error,
                     chummercheckbox:"0",
                     warningcheckbox:"0"
                 });
