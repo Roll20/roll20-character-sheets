@@ -1,4 +1,4 @@
-import  "nunjucks";
+import nunjucks from "nunjucks";
 import { writeFileSync } from 'fs';
 
 var msg="Test";
