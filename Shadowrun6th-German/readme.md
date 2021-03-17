@@ -1,3 +1,16 @@
+Version 0.5 changes:
+General:
+Implenenting Template engine Nunjucks for better Code-Quality
+
+
+Attributes-Tab:
+New Section States/effects
+
+New System to Setup Bonuses for States, Cyberware and Gear
+Bonuses can setup for Attributes and Skills or an Overal Bonus
+Bonuses can be Negativ for states like shocked
+
+
 Version 0.4 changes:
 
 General updates:
