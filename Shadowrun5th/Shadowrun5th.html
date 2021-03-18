@@ -190,7 +190,7 @@
                 </div>
                 <div class="specroll"><label>Judge Intentions (C+I)</label></div>
                 <div class="specroll">
-                    <button type="roll" class="standardroll" name="roll_judgeroll" title="Roll Judge Intetions (Charisma+Intuition)" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=Judge Intentions}}{{val1=Charisma}}{{val1_num=[[@{cha_total}]]}}{{val2=Intuition}}{{val2_num=[[@{int_total}]]}}{{mod_num=[[?{Situational Modifiers|0}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{wounds_num=[[@{wound_total}]]}}{{result=[[(@{cha_total}+@{int_total}+?{Situational Modifiers}-[[@{wound_total}]]+[[@{edgn}*@{edg_total}]])@{standardroll}@{edgeroll}]]}}"></button>
+                    <button type="roll" class="standardroll" name="roll_judgeroll" title="Roll Judge Intentions (Charisma+Intuition)" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=Judge Intentions}}{{val1=Charisma}}{{val1_num=[[@{cha_total}]]}}{{val2=Intuition}}{{val2_num=[[@{int_total}]]}}{{mod_num=[[?{Situational Modifiers|0}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{wounds_num=[[@{wound_total}]]}}{{result=[[(@{cha_total}+@{int_total}+?{Situational Modifiers}-[[@{wound_total}]]+[[@{edgn}*@{edg_total}]])@{standardroll}@{edgeroll}]]}}"></button>
                 </div>
                 <div class="specroll"><label>Memory (L+W)</label></div>
                 <div class="specroll">
@@ -9508,9 +9508,9 @@ Only takes the first match even if multiple identical entries are found.">
                 <div><label>Empty Stun</label></div>
             </div>
             <div class="woundsmodrow">
-                <div><input type="text" name="attr_woundadditive" value="0" title="Ignores that many Boxes of Damage on both Tracks before calculating the Woundpenalty like the High Pain Tolerance Quallity"></div>
-                <div><input type="text" name="attr_woundmultiplikative" value="3" title="Modifies the Multiplier of how many Boxes of Damage before incuring another Penalty like the Low Pain Tolerance Quallity"></div>
-                <div><input type="text" name="attr_overflowmod" value="0" title="Additional empty Overflow Boxes like the Will To Live Quallity"></div>
+                <div><input type="text" name="attr_woundadditive" value="0" title="Ignores that many Boxes of Damage on both Tracks before calculating the Woundpenalty like the High Pain Tolerance Quality"></div>
+                <div><input type="text" name="attr_woundmultiplikative" value="3" title="Modifies the Multiplier of how many Boxes of Damage before incuring another Penalty like the Low Pain Tolerance Quality"></div>
+                <div><input type="text" name="attr_overflowmod" value="0" title="Additional empty Overflow Boxes like the Will To Live Quality"></div>
                 <div><input type="text" name="attr_physicaltrackmod" value="0" title="Additional empty Damage Boxes for the physical Track"></div>
                 <div><input type="text" name="attr_stuntrackmod" value="0" title="Additional empty Damage Boxes for the stun Track"></div>
                 </div>
@@ -9522,6 +9522,7 @@ Only takes the first match even if multiple identical entries are found.">
                 </div>
                 <div class="importbuttons">
                     <input class="warningcheckbox" type="checkbox" name="attr_warningcheckbox">
+                    <input type="checkbox" name="attr_experimental" hidden>
                     <div class="warninguncheckedwrapper">
                         <label class="warningunchecked">Import</label>
                     </div>
@@ -9750,7 +9751,8 @@ on("sheet:opened", function() {
         }
         values.warningcheckbox=0;
         values.chummercheckbox=0;
-        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independet";
+        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
+        values.experimental=0;
     setAttrs(values);
     });
 });
@@ -9832,6 +9834,7 @@ on("change:chummercheckbox", function(){
             var chummerfile=JSON.parse(text.chummertext);
             }catch(err){
                 goodcode=false;
+                error = err;
             }
             if(goodcode){
                 getSectionIDs("repeating_posqualities", function(idarraya) {
@@ -9964,7 +9967,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Character Info"
+                    error="Error with Character Info " +err
                 }
                 try{
                     attributes.bod_base=chummerfile.characters.character.attributes[1].attribute[0].base;
@@ -9994,7 +9997,7 @@ on("change:chummercheckbox", function(){
                     attributes.wil_aug=chummerfile.characters.character.attributes[1].attribute[7].total-chummerfile.characters.character.attributes[1].attribute[7].base;
                 }catch(err){
                     goodcode=false;
-                    error="Error with Attributes"
+                    error="Error with Attributes " +err
                 }
                 try{
                     if(chummerfile.characters.character.powers!=null){
@@ -10014,7 +10017,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Powers"
+                    error="Error with Powers " +err
                 }
                 try{
                     if(chummerfile.characters.character.initiategrade!=null)
@@ -10032,7 +10035,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Initiations"
+                    error="Error with Initiations " +err
                 }
                 try{
                     if(chummerfile.characters.character.martialarts!=null){
@@ -10070,7 +10073,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Martial Arts"
+                    error="Error with Martial Arts " +err
                 }
                 try{
                     if(chummerfile.characters.character.qualities!=null){
@@ -10116,7 +10119,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Qualities"
+                    error="Error with Qualities " +err
                 }
                 try{
                     var essence=0.0;
@@ -10142,7 +10145,7 @@ on("change:chummercheckbox", function(){
                     attributes.ess_total=6-essence;
                 }catch(err){
                     goodcode=false;
-                    error="Error with Ware"
+                    error="Error with Ware " +err
                 }
                 try{
                     if(chummerfile.characters.character.armors!=null){
@@ -10214,7 +10217,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Armor"
+                    error="Error with Armor " +err
                 }
                 try{
                     if(chummerfile.characters.character.weapons!=null){
@@ -10233,6 +10236,7 @@ on("change:chummercheckbox", function(){
                                     if(Number(chummerfile.characters.character.weapons.weapon[i-1].ap)!="NaN"){
                                         attributes["weaponnap"+i]=chummerfile.characters.character.weapons.weapon[i-1].ap;
                                     }else{
+                                        console.log(chummerfile.characters.character.weapons.weapon[i-1].ap);
                                         attributes["weaponnap"+i]=0;
                                     }
                                     attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
@@ -10280,7 +10284,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Weapons"
+                    error="Error with Weapons " +err
                 }
                 try{
                     if(chummerfile.characters.character.complexforms!=null){
@@ -10309,7 +10313,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Complex-Forms"
+                    error="Error with Complex-Forms " +err
                 }
                 try{
                     if(chummerfile.characters.character.gears!=null){
@@ -10347,7 +10351,7 @@ on("change:chummercheckbox", function(){
                     }
                 }catch(err){
                     goodcode=false;
-                    error="Error with Gear"
+                    error="Error with Gear " +err
                 }
                 try{
                     if(chummerfile.characters.character.vehicles!=null){
@@ -10523,7 +10527,7 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
-						if(chummerfile.characters.character.skills.skill[0].name_english !== undefined) {
+						if(chummerfile.characters.character.skills.skill[0].name_english !== "undefined") {
 							for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                                 if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
                                     alchemy=i;
@@ -10708,7 +10712,7 @@ on("change:chummercheckbox", function(){
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)[0];
                                     else
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                                    if(chummerfile.characters.character.spells.spell[i].category=="Rituals"){
+                                    if(chummerfile.characters.character.spells.spell[i].category=="Rituals" || chummerfile.characters.character.spells.spell[i].category_english=="Rituals"){
                                         attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool67}";
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
                                         attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell[i].dicepool-chummerfile.characters.character.skills.skill[ritual].total;
@@ -10731,7 +10735,7 @@ on("change:chummercheckbox", function(){
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
                                 else
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
-                                if(chummerfile.characters.character.spells.spell.category=="Rituals"){
+                                if(chummerfile.characters.character.spells.spell.category=="Rituals" || chummerfile.characters.character.spells.spell[i].category_english=="Rituals"){
                                     attributes["repeating_spells_"+newrowid+"_spellschool"]="@{skilldicepool67}";
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]="*2";
                                     attributes["repeating_spells_"+newrowid+"_spellbonus"]=chummerfile.characters.character.spells.spell.dicepool-chummerfile.characters.character.skills.skill[ritual].total;
@@ -10751,9 +10755,35 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Spells: " + err;
                     }
+                     if(attributes.experimental !== "undefined"){
+                     //import contacts
+                        try{
+                           if(chummerfile.characters.character.contacts!=null){
+                            if(chummerfile.characters.character.contacts.contact.length>1){
+                                for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
+                                    var newrowid=generateRowID();
+                                    attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
+                                    attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
+                                    attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact[i].connection;
+                                    attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact[i].loyalty;
+                                }
+                            }else{
+                                var newrowid=generateRowID();
+                                attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact.name;
+                                attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
+                                attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact.connection;
+                                attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact.loyalty;
+                            }
+                           }
+                        }catch(err){
+                           goodcode=false;
+                           error="Error with Contacts: " + err;
+                        }
+                    }
+
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
-                    attributes.chummertext="REMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
+                    attributes.chummertext="Import successful\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
                     if(goodcode){
                         try{
                             setAttrs(attributes);
@@ -10774,7 +10804,7 @@ on("change:chummercheckbox", function(){
                 });
             }else{
                 setAttrs({
-                    chummertext:"Error: invalid Structure",
+                    chummertext:"Error invalid Structure: " + error,
                     chummercheckbox:"0",
                     warningcheckbox:"0"
                 });
