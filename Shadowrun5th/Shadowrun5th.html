@@ -9522,12 +9522,11 @@ Only takes the first match even if multiple identical entries are found.">
                 </div>
                 <div class="importbuttons">
                     <input class="warningcheckbox" type="checkbox" name="attr_warningcheckbox">
-                    <input type="checkbox" name="attr_experimental" hidden>
                     <div class="warninguncheckedwrapper">
                         <label class="warningunchecked">Import</label>
                     </div>
                     <div class="warningcheckedwrapper">
-                        <label class="warningchecked">Cancle</label>
+                        <label class="warningchecked">Cancel</label>
                     </div>
                     <input class="chummercheckbox" type="checkbox" name="attr_chummercheckbox">
                     <div class="warningcheckedwrapper">
@@ -9535,6 +9534,10 @@ Only takes the first match even if multiple identical entries are found.">
                     </div>
                     <div class="warningtext">This will override everything</div>
                     <div class="waitingtext">Please Wait!</div>
+                </div>
+                <div style="display: inline-flex">
+                    <label>Enable experimental features (import contacts)</label>
+                    <input type="checkbox" name="attr_experimental">
                 </div>
             </div>
         </div>
@@ -9826,7 +9829,7 @@ on("change:reloadcheckbox", function(){
 
 
 on("change:chummercheckbox", function(){
-    getAttrs(["chummertext","chummercheckbox"], function(text) {
+    getAttrs(["chummertext","chummercheckbox", "experimental"], function(text) {
         if(text.chummercheckbox=="on"){
             var goodcode=true;
             var error="";
@@ -9837,6 +9840,13 @@ on("change:chummercheckbox", function(){
                 error = err;
             }
             if(goodcode){
+                console.log("Deleting stuff");
+                if(text.experimental == "on"){
+                    getSectionIDs("repeating_contacts", function(idarraye) {
+                        for(var i=0; i < idarraye.length; i++) {
+                        removeRepeatingRow("repeating_contacts"+idarraye[i] );
+                    }});
+                }
                 getSectionIDs("repeating_posqualities", function(idarraya) {
                     for(var i=0; i < idarraya.length; i++) {
                     removeRepeatingRow("repeating_posqualities_"+idarraya[i] );
@@ -9905,6 +9915,7 @@ on("change:chummercheckbox", function(){
                     attributes["armornotes"+i]="";
                 }
                 try{
+                console.log("Character meta info");
                     if(chummerfile.characters.character.metatype!=null)
                         attributes.metatype=chummerfile.characters.character.metatype;
                     if(chummerfile.characters.character.sex!=null)
@@ -9970,6 +9981,7 @@ on("change:chummercheckbox", function(){
                     error="Error with Character Info " +err
                 }
                 try{
+                    console.log("Importing Attributes");
                     attributes.bod_base=chummerfile.characters.character.attributes[1].attribute[0].base;
                     attributes.agi_base=chummerfile.characters.character.attributes[1].attribute[1].base;
                     attributes.rea_base=chummerfile.characters.character.attributes[1].attribute[2].base;
@@ -10001,6 +10013,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.powers!=null){
+                        console.log("Importing Powers");
                         if(chummerfile.characters.character.powers.power.length>1){
                             for(var i=0;i<chummerfile.characters.character.powers.power.length;i++){
                                 var newrowid=generateRowID();
@@ -10020,6 +10033,7 @@ on("change:chummercheckbox", function(){
                     error="Error with Powers " +err
                 }
                 try{
+                    console.log("Importing initiategrade and metamagic");
                     if(chummerfile.characters.character.initiategrade!=null)
                         attributes.initiationgrade=chummerfile.characters.character.initiategrade;
                     if(chummerfile.characters.character.metamagics!=null){
@@ -10039,6 +10053,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.martialarts!=null){
+                        console.log("Importing martialarts");
                         if(chummerfile.characters.character.martialarts.martialart.length>1){
                             for(var i=0;i<chummerfile.characters.character.martialarts.martialart.length;i++){
                                 if(chummerfile.characters.character.martialarts.martialart[i].martialartadvantages!=null){
@@ -10077,22 +10092,23 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.qualities!=null){
+                        console.log("Importing qualities");
                         if(chummerfile.characters.character.qualities.quality.length>1){
                             for(var i=0;i<chummerfile.characters.character.qualities.quality.length;i++){
                                 var newrowid=generateRowID();
                                 if(chummerfile.characters.character.qualities.quality[i].qualitytype_english=="Negative")
                                 {
-                                    if(chummerfile.characters.character.qualities.quality[i].extra==null)
-                                        attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
-                                    else
-                                        attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality[i].name+": "+chummerfile.characters.character.qualities.quality[i].extra;
+                                    attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
+                                    if(chummerfile.characters.character.qualities.quality[i].extra !== null) {
+                                        attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=chummerfile.characters.character.qualities.quality[i].extra;
+                                    }
                                     attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=chummerfile.characters.character.qualities.quality[i].bp;
                                 }else
                                 {
-                                    if(chummerfile.characters.character.qualities.quality.extra==null)
-                                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
-                                    else
-                                        attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name+": "+chummerfile.characters.character.qualities.quality[i].extra;
+                                    attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality[i].name;
+                                    if(chummerfile.characters.character.qualities.quality[i].extra!==null) {
+                                        attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"]=chummerfile.characters.character.qualities.quality[i].extra;
+                                    }
                                     attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=chummerfile.characters.character.qualities.quality[i].bp;
                                 }
                             }
@@ -10100,18 +10116,16 @@ on("change:chummercheckbox", function(){
                             var newrowid=generateRowID();
                             if(chummerfile.characters.character.qualities.quality.qualitytype_english=="Negative")
                             {
-                                if(chummerfile.characters.character.qualities.quality.extra==null){
-                                    attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name;
-                                }else{
-                                    attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name+": "+chummerfile.characters.character.qualities.quality.extra;
+                                attributes["repeating_negqualities_"+newrowid+"_negqualityname"]=chummerfile.characters.character.qualities.quality.name;
+                                if(chummerfile.characters.character.qualities.quality.extra !== null) {
+                                    attributes["repeating_negqualities_"+newrowid+"_negqualitydescription"]=chummerfile.characters.character.qualities.quality.extra;
                                 }
                                 attributes["repeating_negqualities_"+newrowid+"_negqualitykarma"]=chummerfile.characters.character.qualities.quality.bp;
                             }else
                             {
-                                if(chummerfile.characters.character.qualities.quality.extra==null){
-                                    attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality.name;
-                                }else{
-                                    attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality.name+": "+chummerfile.characters.character.qualities.quality.extra;
+                                attributes["repeating_posqualities_"+newrowid+"_posqualityname"]=chummerfile.characters.character.qualities.quality.name;
+                                if(chummerfile.characters.character.qualities.quality.extra!==null) {
+                                    attributes["repeating_posqualities_"+newrowid+"_posqualitydescription"]=chummerfile.characters.character.qualities.quality.extra;
                                 }
                                 attributes["repeating_posqualities_"+newrowid+"_posqualitykarma"]=chummerfile.characters.character.qualities.quality.bp;
                             }
@@ -10124,6 +10138,7 @@ on("change:chummercheckbox", function(){
                 try{
                     var essence=0.0;
                     if(chummerfile.characters.character.cyberwares!=null){
+                        console.log("Importing Cyberware");
                         if(chummerfile.characters.character.cyberwares.cyberware.length>1){
                             for(var i=0;i<chummerfile.characters.character.cyberwares.cyberware.length;i++){
                                 var newrowid=generateRowID();
@@ -10149,6 +10164,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.armors!=null){
+                        console.log("Importing armors");
                         if(chummerfile.characters.character.armors.armor.length>1){
                             for(var i=1;i<chummerfile.characters.character.armors.armor.length+1&&i<=6;i++){
                                 attributes["armorname"+i]=chummerfile.characters.character.armors.armor[i-1].name;
@@ -10221,8 +10237,9 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.weapons!=null){
+                        console.log("Importing weapons");
                         if(chummerfile.characters.character.weapons.weapon.length>1){
-                            for(var i=1;i<chummerfile.characters.character.weapons.weapon.length+1&&i<=6;i++){
+                            for(var i=1;i<chummerfile.characters.character.weapons.weapon.length+1 && i<=8 ;i++){
                                 if(chummerfile.characters.character.weapons.weapon[i-1].category!="Gear"){
                                     if(chummerfile.characters.character.weapons.weapon[i-1].type=="Ranged"){
                                         attributes["weaponismelee"+i]=0;
@@ -10288,6 +10305,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.complexforms!=null){
+                        console.log("Importing complexforms");
                         if(chummerfile.characters.character.complexforms.complexform.length>1){
                             for(var i=0;i<chummerfile.characters.character.complexforms.complexform.length;i++){
                                 var newrowid=generateRowID();
@@ -10317,6 +10335,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.gears!=null){
+                        console.log("Importing gear");
                         if(chummerfile.characters.character.gears.gear.length>1){
                             for(var i=0;i<chummerfile.characters.character.gears.gear.length;i++){
                                 var newrowid=generateRowID();
@@ -10355,6 +10374,7 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     if(chummerfile.characters.character.vehicles!=null){
+                        console.log("Importing vehicles");
                         if(chummerfile.characters.character.vehicles.vehicle.length>1){
                             for(var i=0;i<chummerfile.characters.character.vehicles.vehicle.length;i++){
                                 var newrowid=generateRowID();
@@ -10527,6 +10547,7 @@ on("change:chummercheckbox", function(){
                     var spellcasting=0;
                     var ritual=0;
                     try{
+                        console.log("Importing Skills");
 						if(chummerfile.characters.character.skills.skill[0].name_english !== "undefined") {
 							for(var i=0;i<chummerfile.characters.character.skills.skill.length;i++){
                                 if(chummerfile.characters.character.skills.skill[i].name_english=="Alchemy"){
@@ -10539,7 +10560,6 @@ on("change:chummercheckbox", function(){
                                     ritual=i;
                                 }
                                 if(chummerfile.characters.character.skills.skill[i].knowledge=="True"){
-                                console.log("Reading knowledge skill");
                                     var newrowid=generateRowID();
                                     attributes["repeating_knowledge_"+newrowid+"_knowledgename"]=chummerfile.characters.character.skills.skill[i].name_english;
                                     if(chummerfile.characters.character.skills.skill[i].skillcategory_english!=null)
@@ -10558,7 +10578,6 @@ on("change:chummercheckbox", function(){
                                 }
 
                                 if(chummerfile.characters.character.skills.skill[i].exotic=="True"){
-                                        console.log("Reading exotic skill");
                                     attributes["skillname"+exotics]=chummerfile.characters.character.skills.skill[i].name_english;
                                     if(chummerfile.characters.character.skills.skill[i].rating>0){
                                         attributes["skillbonus"+exotics]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod;
@@ -10576,7 +10595,6 @@ on("change:chummercheckbox", function(){
                                 }
 
                                 for(var j=1;j<73;j++){
-                                     console.log("Reading normal skills");
                                     var compname='skillname'+j;
                                     if((names[compname]==chummerfile.characters.character.skills.skill[i].name_english)||(chummerfile.characters.character.skills.skill[i].name_english=="Locksmith"&&j==29)||(chummerfile.characters.character.skills.skill[i].name_english=="Pilot Ground Craft"&&j==55)){
                                         attributes["skillattr"+j]="@{"+chummerfile.characters.character.skills.skill[i].attribute.toLowerCase();
@@ -10703,11 +10721,15 @@ on("change:chummercheckbox", function(){
                     }
                     try{
                         if(chummerfile.characters.character.spells!=null){
+                            console.log("Importing spells");
                             if(chummerfile.characters.character.spells.spell.length>1){
                                 for(var i=0;i<chummerfile.characters.character.spells.spell.length;i++){
                                     var newrowid=generateRowID();
                                     attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell[i].name;
                                     attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell[i].type;
+                                    if(chummerfile.characters.character.spells.spell[i].notes!=null){
+                                        attributes["repeating_spells_"+newrowid+"_spelldescription"]=chummerfile.characters.character.spells.spell[i].notes;
+                                    }
                                     if(chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)!=null)
                                         attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell[i].dv.match(/(\-|\+)\d/)[0];
                                     else
@@ -10731,6 +10753,9 @@ on("change:chummercheckbox", function(){
                                 var newrowid=generateRowID();
                                 attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.spells.spell.name;
                                 attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.spells.spell.type;
+                                if(chummerfile.characters.character.spells.spell.notes!=null){
+                                        attributes["repeating_spells_"+newrowid+"_spelldescription"]=chummerfile.characters.character.spells.spell.notes;
+                                    }
                                 if(chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)!=null)
                                     attributes["repeating_spells_"+newrowid+"_spelldrain"]=chummerfile.characters.character.spells.spell.dv.match(/(\-|\+)\d/)[0];
                                 else
@@ -10755,10 +10780,11 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error="Error with Spells: " + err;
                     }
-                     if(attributes.experimental !== "undefined"){
+                     if(text.experimental == "on"){
                      //import contacts
                         try{
                            if(chummerfile.characters.character.contacts!=null){
+                            console.log("Importing Contacts");
                             if(chummerfile.characters.character.contacts.contact.length>1){
                                 for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
                                     var newrowid=generateRowID();
@@ -12792,6 +12818,10 @@ on("change:repeating_knowledge:knowledgeattr", function() {
             <th>
             {{#name}}{{name}} rolls{{#roll_name}} {{roll_name}}{{/roll_name}}{{/name}}</th>
         </tr>
+        {{#subheader}}
+            <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+            <tr><td><div class="sheet-rolltemplate-sectionheading">{{subheader}}</div></td></tr>
+        {{/subheader}}
         <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
         <tr><td><div class="sheet-rolltemplate-sectionheading">Dicepool</div></td></tr>
         {{#val1}}
