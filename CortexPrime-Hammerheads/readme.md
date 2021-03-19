@@ -34,6 +34,11 @@ Character Portraits sourced from https://thispersondoesnotexist.com/
 
 ##Changelog
 
+### V1.2 2021-03-19
+
+Added a Roll Template, to better display the roll results.
+Added black dice icons and dark dice icons to use in roll template
+
 ### V1.1 2021-03-17
 
 Fixed broken images
