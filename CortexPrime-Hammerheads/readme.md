@@ -34,5 +34,11 @@ Character Portraits sourced from https://thispersondoesnotexist.com/
 
 ##Changelog
 
+### V1.1 2021-03-17
+
+Fixed broken images
+Removed Trauma
+Added d10 and d12 settings to relationships
+Minor adjustments
 
 ### v.1.0 2021-03-13"
