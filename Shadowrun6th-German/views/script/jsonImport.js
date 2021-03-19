@@ -3,6 +3,7 @@ on("sheet:opened change:json",function(){
     console.log("json changed");
     setAttrs({jsonerg: " "});
 });
+
 on("clicked:jsonimport",function(){
     console.log("Importjson");
     ;

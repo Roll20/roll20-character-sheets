@@ -19,6 +19,9 @@ const repeatingSum = (destinations, section, fields) => {
     }); 
 };
 
+
+
+
 function getAttributes(idArray,section,allids,attrArray)
 {
     idArray.forEach(id=>{allids.push(section + "_" + id )});
@@ -98,7 +101,7 @@ on("sheet:opened change:wilddie_toggle",function(){
 });   
 
 
-on("change:repeating_states remove:repeating_states change:repeating_cyberware remove:repeating_cyberware change:repeating_perks remove:repeating_perks change:repeating_gear remove:repeating_gear",function(){
+on("sheet:opened change:repeating_states remove:repeating_states change:repeating_cyberware remove:repeating_cyberware change:repeating_perks remove:repeating_perks change:repeating_gear remove:repeating_gear",function(){
    countStates();
 });
 
