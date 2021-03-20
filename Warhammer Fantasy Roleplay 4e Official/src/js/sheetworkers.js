@@ -224,9 +224,8 @@ const wfrpModule = ( () => {
     const toggleInitOption = (new_value) => {
         const init = (new_value === "1") ? `{{init=[[@{initiative}+@{init_bonus} &{tracker}]]}}` :
                      (new_value === "2") ? `{{init=[[@{initiative}+1d10+@{init_bonus} &{tracker}]]}}` :
-                     (new_value === "3") ? `{{init=[[@{agility_bonus}+@{initiatve_bonus}+1d10+@{init_bonus} &{tracker}]]}}` :
-                     `{{init=[[@{initiative}+@{init_bonus}]]}}`;
-
+                     (new_value === "3") ? `{{init=[[@{agility_bonus}+@{initiative_bonus}+1d10+@{init_bonus} &{tracker}]]}}` :
+                     `{{init=[[@{initiative}]]}}`;
         setAttrs({roll_init:init});
     }
 
