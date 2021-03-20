@@ -1,5 +1,13 @@
 Change Log
 ==============================================
+**2021-03-15** v.23 Chuz (James Culp)
+	Made sheet work with current roll20 "enhanced" code that has been partially rolled back
+	Changed Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none
+	Added functionality to the ammo counter, now when primary ranged weapon firing mode is changed the number of rounds updates the the correct amount (1, 2, 4, 10)
+	Added Mod field for skills to allow skill rolls to have bonuses added.  Does not add to the actual skill dicepool just affects the skill roller.
+	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly.
+	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
+
 **2021-03-08** v.22 Chuz (James Culp)
 	Add Defense roll-button and DR roll-button to Core->Combat Info tab
 	Updated Skills to split Skills and Knowledge/Languages into separate tabs
