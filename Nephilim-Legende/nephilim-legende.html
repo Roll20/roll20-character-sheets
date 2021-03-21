@@ -312,7 +312,7 @@
 					
 					var metamorphose = 0;
 					
-					if(ka_element = "kaair")
+					if(ka_element == "kaair")
 						metamorphose = KADA;
 					
 					if(ka_element == "kafeu")
@@ -369,7 +369,7 @@
 					
 					var metamorphose = 0;
 					
-					if(ka_element = "kaair")
+					if(ka_element == "kaair")
 						metamorphose = KADA;
 					
 					if(ka_element == "kafeu")
@@ -396,7 +396,7 @@
 		});
     });
 	
-	on("change:repeating_alch-form:alch-form-art change:repeating_alch-form:alch-form-ka-1 change:repeating_alch-form:alch-form-ka-2 change:repeating_alch-form:alch-form-subs change:repeating_alch-form:alch-form-degre change:repeating_alch-form:alch-oeuvre-noir change:repeating_alch-form:alch-oeuvre-blanc change:repeating_alch-form:alch-oeuvre-rouge change:kaeau change:kafeu change:katerre change:kaair change:kalune change:alch-athanor-kafeu change:alch-athanor-kaeau change:alch-athanor-katerre change:alch-athanor-kalune change:alch-athanor-kaair change:alch-aludel-kafeu change:alch-aludel-kaeau change:alch-aludel-katerre change:alch-aludel-kalune change:alch-aludel-kaair change:alch-alambic-kafeu change:alch-alambic-kaeau change:alch-alambic-katerre change:alch-alambic-kalune change:alch-alambic-kaair change:alch-cornue-kafeu change:alch-cornue-kaeau change:alch-cornue-katerre change:alch-cornue-kalune change:alch-cornue-kaair change:alch-creuset-kafeu change:alch-creuset-kaeau change:alch-creuset-katerre change:alch-creuset-kalune change:alch-creuset-kaair sheet:opened", function()
+	on("change:repeating_alch-form:alch-form-art change:repeating_alch-form:alch-form-ka-1 change:repeating_alch-form:alch-form-ka-2 change:repeating_alch-form:alch-form-subs change:repeating_alch-form:alch-form-degre change:repeating_alch-form:alch-oeuvre-noir change:repeating_alch-form:alch-oeuvre-blanc change:repeating_alch-form:alch-oeuvre-rouge change:kaeau change:kafeu change:katerre change:kaair change:kalune change:alch-athanor-kafeu change:alch-athanor-kaeau change:alch-athanor-katerre change:alch-athanor-kalune change:alch-athanor-kaair change:alch-aludel-kafeu change:alch-aludel-kaeau change:alch-aludel-katerre change:alch-aludel-kalune change:alch-aludel-kaair change:alch-alambic-kafeu change:alch-alambic-kaeau change:alch-alambic-katerre change:alch-alambic-kalune change:alch-alambic-kaair change:alch-cornue-kafeu change:alch-cornue-kaeau change:alch-cornue-katerre change:alch-cornue-kalune change:alch-cornue-kaair change:alch-creuset-kafeu change:alch-creuset-kaeau change:alch-creuset-katerre change:alch-creuset-kalune change:alch-creuset-kaair change:alch-oeuvre-noir change:alch-oeuvre-blanc change:alch-oeuvre-rouge sheet:opened", function()
 	{		
 		getSectionIDs("repeating_alch-form", function(idarray) 
 		{
@@ -426,14 +426,23 @@
 					var alch_oeuvre = values["repeating_alch-form_"+id+"_alch-form-art"];
 					var alch_oeuvre_value = parseInt(values[alch_oeuvre], 10)||0;
 					var degre = parseInt(values["repeating_alch-form_"+id+"_alch-form-degre"], 10)||0;
-
-					var total = (ka_element_value1 + ka_element_value2 + alch_oeuvre_value) - degre;
 					
-					console.log("KA1 : "+ka_element_value1);
-					console.log("KA2 : "+ka_element_value2);
-					console.log("Oeuvre : "+alch_oeuvre_value);
-					console.log("Degré : "+degre);
+					var totalKa = 0;
+					
+					if(alch_oeuvre == "alch-oeuvre-blanc")
+					{
+						if(ka_element1 != "0" && ka_element2 != "0")
+							totalKa = Math.min(ka_element_value1, ka_element_value2);
+						else if(ka_element1 == "0" && ka_element2 != "0")
+							totalKa = ka_element_value2;
+						else if(ka_element1 != "0" && ka_element2 == "0")
+							totalKa = ka_element_value1;
+					}
+					else
+						totalKa = ka_element_value1 + ka_element_value2;
 
+					var total = (totalKa + alch_oeuvre_value) - degre;
+										
 					setAttrs({
 						["repeating_alch-form_"+id+"_alch-form-current"]: total							
 					});
@@ -610,7 +619,7 @@
 <input type="hidden" name="attr_KADEau" value="0" />
 
 <div class="container">
-	<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/logo.PNG" class="logo" alt="logo" />
+	<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/logo.PNG" class="logo" alt="logo" />
 	<div class="menuTop">
 		<label class="sapience">
 			<span>Points de Sapience</span>
@@ -1191,6 +1200,16 @@
 					<span title="10"></span>
 				</label>
 			</div>
+		
+			<div class="equipement">
+				<h1>Équipements</h1>
+				<fieldset class="repeating_equipements">
+					<div class="autoex autoex22">
+						<textarea name="attr_equipement"></textarea>
+						<span name="attr_equipement"></span>
+					</div>
+				</fieldset>
+			</div>
 		</div>
 	</div>
 	
@@ -1676,7 +1695,10 @@
 						<option value="annees-noires">Les années noires</option>
 						<option value="eveil">L'Eveil</option>
 						<option value="chroniques-apocalypse">Les Chroniques de l'Apocalypse</option>
+						<option value="perso">Personnalisé</option>
 					</select>
+					<input type="hidden" name="attr_epoque" value="0" />
+					<input type="text" class="perso" name="attr_epoquePerso" value="" />
 					<input type="hidden" name="attr_expandEpoque" value="1" />
 					<div class="autoex autoex24">
 						<textarea name="attr_epoque_description"></textarea>
@@ -1763,6 +1785,16 @@
 					<div class="autoex autoex22">
 						<textarea name="attr_poss-artefact-def" ></textarea>
 						<span name="attr_poss-artefact-def"></span>
+					</div>
+				</fieldset>
+			</div>
+		
+			<div class="alchimie">
+				<h1>Objets d'alchimie synthétisés</h1>
+				<fieldset class="repeating_objets-alchimie">
+					<div class="autoex autoex22">
+						<textarea name="attr_objets"></textarea>
+						<span name="attr_objets"></span>
 					</div>
 				</fieldset>
 			</div>
@@ -2244,12 +2276,40 @@
 					<option value="pagirie">Spagirie</option>
 				</select>
 			</label>
+			
+			<div class="alchimieSConstruct">
+				<h1>Constructs utilisables</h1>
+				<label>
+					<input type="checkbox" name="attr_sCornue" value="1" checked />
+					<span title="Cornue"></span>
+				</label>
+				
+				<label>
+					<input type="checkbox" name="attr_sAthanor" value="1" checked />
+					<span title="Athanor"></span>
+				</label>
+				
+				<label>
+					<input type="checkbox" name="attr_sAludel" value="1" checked />
+					<span title="Aludel"></span>
+				</label>
+				
+				<label>
+					<input type="checkbox" name="attr_sForge" value="1" checked />
+					<span title="Forge ou Creuset"></span>
+				</label>
+				
+				<label>
+					<input type="checkbox" name="attr_sAlambic" value="1" checked />
+					<span title="Alambic"></span>
+				</label>
+			</div>
 		</div>
 		<div class="col2">
 			<div class="materiaePrimae">
 				<h1>Jauge de Materiae Primae</h1>
 				<div>
-					<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/Feu.png" alt="Feu" />
+					<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/Feu.png" alt="Feu" />
 					<label>
 						<input type="number" name="attr_alch-mp-feu" value="0" />
 						<span>/</span>
@@ -2258,7 +2318,7 @@
 				</div>
 				
 				<div>
-					<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/Air.png" alt="Air" />
+					<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/Air.png" alt="Air" />
 					<label>
 						<input type="number" name="attr_alch-mp-air" value="0" />
 						<span>/</span>
@@ -2267,7 +2327,7 @@
 				</div>
 				
 				<div>
-					<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/Terre.png" alt="Terre" />
+					<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/Terre.png" alt="Terre" />
 					<label>
 						<input type="number" name="attr_alch-mp-terre" value="0" />
 						<span>/</span>
@@ -2276,7 +2336,7 @@
 				</div>
 				
 				<div>
-					<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/Eau.png" alt="Eau" />
+					<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/Eau.png" alt="Eau" />
 					<label>
 						<input type="number" name="attr_alch-mp-eau" value="0" />
 						<span>/</span>
@@ -2285,7 +2345,7 @@
 				</div>
 				
 				<div>
-					<img src="https://raw.githubusercontent.com/Zakarik/roll20-character-sheets/Nephilim/Nephilim-Legende/img/Lune.png" alt="Lune" />
+					<img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Nephilim-Legende/img/Lune.png" alt="Lune" />
 					<label>
 						<input type="number" name="attr_alch-mp-lune" value="0" />
 						<span>/</span>
@@ -2387,7 +2447,13 @@
 	<div class="tab8">
 		<div class="constructs">
 			<h1>Laboratoire et constructs</h1>
-			<div>				
+			<input type="hidden" name="attr_sCornue" class="cornue" value="1" />
+			<input type="hidden" name="attr_sAthanor" class="athanor" value="1" />
+			<input type="hidden" name="attr_sAludel" class="aludel" value="1" />
+			<input type="hidden" name="attr_sForge" class="forge" value="1" />
+			<input type="hidden" name="attr_sAlambic" class="alambic" value="1" />
+			
+			<div class="cornue">				
 				<span>Ka-Feu</span>
 				<input type="number" name="attr_alch-cornue-kafeu" value="0" />
 				<span>Ka-Terre</span>
@@ -2401,7 +2467,7 @@
 				<input type="number" name="attr_alch-cornue-kaeau" value="0" />
 			</div>
 			
-			<div>			
+			<div class="athanor">			
 				<span>Ka-Feu</span>
 				<input type="number" name="attr_alch-athanor-kafeu" value="0" />
 				<span>Ka-Terre</span>
@@ -2415,7 +2481,7 @@
 				<input type="number" name="attr_alch-athanor-kaeau" value="0" />
 			</div>
 			
-			<div>
+			<div class="aludel">
 				<span>Ka-Feu</span>
 				<input type="number" name="attr_alch-aludel-kafeu" value="0" />
 				<span>Ka-Terre</span>
@@ -2429,7 +2495,7 @@
 				<input type="number" name="attr_alch-aludel-kaeau" value="0" />
 			</div>
 			
-			<div>			
+			<div class="forge">			
 				<span>Ka-Feu</span>
 				<input type="number" name="attr_alch-creuset-kafeu" value="0" />
 				<span>Ka-Terre</span>
@@ -2443,7 +2509,7 @@
 				<input type="number" name="attr_alch-creuset-kaeau" value="0" />
 			</div>
 			
-			<div>			
+			<div class="alambic">			
 				<span>Ka-Feu</span>
 				<input type="number" name="attr_alch-alambic-kafeu" value="0" />
 				<span>Ka-Terre</span>

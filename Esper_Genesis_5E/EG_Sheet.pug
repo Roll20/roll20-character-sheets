@@ -1,3 +1,16 @@
+- var imagePath = 'https://raw.githubusercontent.com/mperes/Esper-Images/main';
+
+-
+  const globalAttributesByCatagory = {
+    abilities: ['strength', 'dexterity', 'constitution', 'intelligence', 'wisdom', 'charisma'],
+    optionalAbilites: ['honor', 'sanity'],
+    alignments: ['Lawful Good', 'Neutral Good', 'Chaotic Good', 'Lawful Neutral', 'Neutral', 'Chaotic Neutral', 'Lawful Evil', 'Neutral Evil', 'Chaotic Evil'],
+    classes: ['artificer', 'bard', 'cleric', 'druid', 'paladin', 'ranger', 'sorcerer', 'warlock', 'wizard'],
+    sizes: ['Tiny', 'Small', 'Medium', 'Large', 'Huge', 'Gargantuan'],
+    diceSizes: ['d4', 'd6', 'd8', 'd10', 'd12']
+  };
+  
+
 include src/mixins/mixins.pug
 
 input(name='attr_version' type='hidden' value!='3.0')
@@ -7,6 +20,8 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
 
 .licensecontainer.compendium-drop-target.monsters.ships(data-licensedsheet='attr_licensedsheet')
   input.npc_toggle(name='attr_npc' type='hidden' value!='0')
+  input.npcspellcastingflag(name='attr_npcspellcastingflag' type='hidden' value!='0')
+  input.sheet-pc-type(name='attr_pc_sheet_type' type='hidden' value='pc')
   input.npcspellcastingflag(name='attr_npcspellcastingflag' type='hidden')
   input.toggleflag(name='attr_rtype' type='hidden')
   .advantagetoggle
@@ -26,7 +41,10 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
       span.togm GM
   
   include src/npc/npc.pug
-  include src/pc/pc.pug
+  .container.pc
+    .sheet-pc-default
+      include src/pc/pc.pug
+    include src/pc/ship.pug
 
   input(accept='Category' name='attr_drop_category' type='hidden')
   input(accept='Name' name='attr_drop_name' type='hidden')
@@ -51,6 +69,10 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
 .mancer_confirm
   span(style='line-height: 25px' data-i18n='do_you_want_mancer') How do you want to create this character?
   div(style='margin-top: 20px;')
+    //
+      div(style='position: relative; display: inline-block; width:130px;')
+        input.yes(type='checkbox' style='width:130px;' name='attr_mancer_confirm')
+        span.yes(style='width:130px;' data-i18n='mancer-confirm-yes') Use the Charactermancer
     div(style='position: relative; display: inline-block; width:80px;')
       input.yes(style='width:80px;' type='checkbox' name='attr_mancer_npc')
       span.yes(style='width:80px;' data-i18n='npc-new') Create an NPC
@@ -58,12 +80,32 @@ input.licensedsheet(name='attr_licensedsheet' type='hidden')
       input.yes(type='checkbox' style='width:90px;' name='attr_mancer_cancel')
       span.yes(style='width:90px;' data-i18n='manual') Edit sheet direclty
 
-include src/charactermancer/repeating/repeating.html
-include src/charactermancer/l1/l1.html
-include src/charactermancer/lp/lp.html
-include src/hiddeninputs/hiddeninputs.pug
-
+//- ROLL TEMPLATES
 include src/rolltemplates/rolltemplates.html
 
-script(type='text/worker')
-    include sheetworkers.js
+//- CHARACTERMANCER REPEATING SECTIONS
+  include src/charactermancer/repeating/repeatingsections.html
+
+//- CHARACTERMANCER LEVEL 1
+  include src/charactermancer/l1/l1.pug
+
+//- CHARACTERMANCER LEVEL UP
+  include src/charactermancer/lp/lp.pug
+
+//- HIDDEN INPUTS
+include src/hiddeninputs/hiddeninputs.pug
+
+//- SHEET WORKERS
+script(type="text/worker")
+  include src/helpers/helperFunctions.js
+  include src/classes/SheetUtils/SheetUtils.js
+  include src/classes/FlagManager/FlagManager.js
+  include src/classes/SheetUpdater/SheetUpdater.js
+  include src/classes/DropClasses/DropClasses.js
+  include src/dragndrop/dropFunctions.js
+  include src/dragndrop/DragAndDrop.js
+  include src/charactermancer/l1/l1.js
+  include src/charactermancer/lp/lp.js
+
+  //include src/js/versioning.js
+  include sheetworkers.js
