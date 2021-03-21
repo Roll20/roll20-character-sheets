@@ -16832,6 +16832,51 @@ function checkRequiredProperties(properties, values) {
 	return { "errors": errors, "missing": missing.toString() };
 }
 
+// Astral Energy: Base value
+function calculateAEBase(values) {
+	var func = "calculateAEBase";
+
+	// Input Sanitation
+	// Part 1: Check Requirements
+	var requiredProperties = ["MU", "IN", "CH", "sf_gefaess_der_sterne"];
+	var reqCheck = checkRequiredProperties(requiredProperties, values);
+
+	if (reqCheck["errors"] > 0) {
+		console.log("Error:", func, "stopped due to missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"]);
+		return;
+	}
+
+	// Input Sanitation
+	// Part 2: Check Values
+	if (!DSAsane(values["MU"], "stat")
+	|| !DSAsane(values["IN"], "stat")
+	|| !DSAsane(values["CH"], "stat")
+	) {
+		console.log(func + ": One or more stats are not sane. Stopping.");
+		return;
+	}
+
+	// Preparation for calculation
+	var MU = parseInt(values["MU"]);
+	var IN = parseInt(values["IN"]);
+	var CH = parseInt(values["CH"]);
+	if (values["sf_gefaess_der_sterne"] === "0") {
+		GdS = 0;
+	} else {
+		GdS = 1;
+	}
+
+	// AE calculation
+	var AE = 0;
+	if (GdS === 0) {
+		AE = DSAround((MU + IN + CH) / 2);
+	} else {
+		AE = DSAround(CH + (MU + IN) / 2);
+	}
+
+    return AE;
+}
+
 // Berechne BE-Basis aus dem gesamten Rüstungs BE und der BE durch Last
 on("change:Ges_BE change:BE_Last", function(eventInfo) {
     getAttrs(["Ges_BE", "BE_Last"], function(values) {
