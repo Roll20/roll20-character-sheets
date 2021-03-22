@@ -16,7 +16,6 @@ TO DO
 	* Add Armor Social Ratings from Firing Squad pg50
 	* Social  / Vehicle repeating delete icon is on the left
 	* Ammo only has one input, there should be an input for per reload and max
-	* Arms -> Roll Buttons don't include "Notes" text, Dicepool attribute doesn't include bonus for spec/expert/attribute
 	* Arms -> Ranged Might need to add a "Gunnery" skill option and when selected change attribute to Logic
 
 **`Grunt Sheet`**
@@ -39,7 +38,6 @@ TO DO
 	* Make Magic updated if Essence drops below it
 	* Armor Social Ratings (Firing Squad p50)
 	* Add Capacity to Armor?
-	* When selecting a skill, have the correct default attribute auto-selected
 	* Skills (Expertise and Specialization Buttons) colorize them ... maybe 2 light shades of purple one lighter than the other
 	* Sheetworker to uncheck speciallization if expertise is checked and vice versa for everywhere those occur (spells, arms)
 	* Have changes to primary ranged weapon firing mode update AR values and DV

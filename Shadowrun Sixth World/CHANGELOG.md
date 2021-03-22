@@ -20,6 +20,7 @@ Change Log
 	Fixed a bug related to sheet_type being misread and making some automatic calculations not fire right (initiative bugs anyone?)
 	Started in on Complex Forms
 	Updated Matrix -> Complex Forms section
+	When selecting a skill, have the correct default attribute auto-selected
 
 **2021-03-15** v.23 Chuz (James Culp)
 	Made sheet work with current roll20 "enhanced" code that has been partially rolled back Changed 
