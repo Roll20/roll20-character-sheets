@@ -3480,12 +3480,45 @@ NOTE: replace worker by javascript for IDE functionality
 	});
 
 	// ___________________________________________________________________________
-	// _________________________ weapon damage primitive _________________________
+	// __________________________ get repeating objects __________________________
 	// ___________________________________________________________________________
 
-	const toJson = function () {
-		/**/
+	/**
+	 * get the attributes from a repeating section and pass them in an array of objects
+	 * @param  {String}   section - name of the repeating section
+	 * @param  {Array}   fields - list of the attributes
+	 * @param  {Function} callback - function to pass the array of objects
+	 */
+	const getSectionObjects = function (section, fields, callback) {
+		if (!Array.isArray(fields)) fields = [fields];
+		getSectionIDs(`repeating_${section}`, idArray => {
+      const attrArray = idArray.reduce( (m,id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${(!Array.isArray(field)) ? field : field[1]}`))],[]);
+      getAttrs(attrArray, v => {
+				const objects = [];
+				idArray.forEach(id => {
+					let obj = { _id : id };
+					fields.forEach( field => {
+						if (!Array.isArray(field)) field = [field, field]
+						let [key, name] = field;
+						obj[`${key}`] = v[`repeating_${section}_${id}_${name}`];
+					});
+					objects.push(obj)
+				});
+				callback(objects);
+      });
+    });
 	}
+
+	const GEAR = [
+		['carry','gear_carry_r'],
+		['name','gear_name_r'],
+		['craftsmanship','gear_crafts_r'],
+		['quantity','gear_quantity_r'],
+		['availability','gear_avail_r'],
+		['weight','gear_weight_r']
+	]
+
+	on('sheet:opened', () => {getSectionObjects('gear', GEAR, values => {console.log(values)})});
 
 </script>
 
