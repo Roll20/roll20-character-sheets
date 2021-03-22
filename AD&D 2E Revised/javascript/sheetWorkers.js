@@ -763,10 +763,58 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
         'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
         'repeating_ammo_damsm2'              : weapon['small-medium'],
         'repeating_ammo_daml2'               : weapon['large'],
-        'repeating_weapons-damage_knockdown2': weapon['knockdown'] || '' 
+        'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
     };
 
     setAttrs(weaponInfo);
+});
+
+//Follower weapons
+function setupFollowerWeaponsAutoFill(repeating, sections) {
+    let prefix = '';
+    let onChange = ''; 
+    if (repeating !== '') {
+        prefix = `repeating_${repeating}_`
+        onChange = `repeating_${repeating}:`
+    }
+    
+    sections.forEach(section => {
+        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+            let weapon = Weapons[eventInfo.newValue];
+            if (weapon === undefined)
+                return;
+            
+            let weaponInfo = {
+                [`${prefix}attacknumhench${section}`] : weapon['rof'] || '1',
+                [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
+                [`${prefix}damlhench${section}`]      : weapon['small-medium'],
+                [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
+                [`${prefix}weaptypehench${section}`]  : weapon['type'],
+                [`${prefix}weapspeedhench${section}`] : weapon['speed'],
+            };
+            
+            setAttrs(weaponInfo);
+        })
+    })
+}
+
+const followerWeapons = [
+    {repeating: '',       sections: ['',    '001', '002']},
+    {repeating: 'hench',  sections: ['003', '004', '005']},
+    {repeating: '',       sections: ['006', '007', '008']},
+    {repeating: 'hench2', sections: ['009', '010', '011']},
+    {repeating: '',       sections: ['012', '013', '014']},
+    {repeating: 'hench3', sections: ['015', '016', '017']},
+    {repeating: '',       sections: ['018', '019', '020']},
+    {repeating: 'hench4', sections: ['021', '022', '023']},
+    {repeating: '',       sections: ['024', '025', '026']},
+    {repeating: 'hench5', sections: ['027', '028', '029']},
+    {repeating: '',       sections: ['030', '031', '032']},
+    {repeating: 'hench6', sections: ['033', '034', '035']},
+];
+
+followerWeapons.forEach(fw => {
+   setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
 });
 
 //Weapon proficiency slots
