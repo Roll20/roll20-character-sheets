@@ -625,7 +625,7 @@ on("change:repeating_vehicle:vehicle_speed",function(){
 
     const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic"];
     const s_attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance"];
-    const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task","conjuring","sorcery","enchanting"];/*,"exoticweapons"*/
+    const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task","conjuring","sorcery","enchanting","exoticweapon1","exoticweapon2"];/*,"exoticweapons"*/
     const magicalSkills = ["astral","conjuring","sorcery","enchanting"];
     const spirittypes = ["air","fire","water","earth","man","beast","plant","task","guardian","guidance"];
 
@@ -772,6 +772,7 @@ function updateSkill(skill){
                         }
                     })
                 })
+                
             })
            
 }
@@ -840,6 +841,38 @@ on("sheet:opened change:stun_monitor_shift", () => {
             updateSkill(skill);
         })
     })
+
+    on("change:skill_exoticweapon1_name", function(){
+        getAttrs(["skill_exoticweapon1_name"],function(v){
+            if(!v.skill_exoticweapon1_name || v.skill_exoticweapon1_name==""){
+                setAttrs({
+                    skill_attackexoticweapon1_hide: 1,
+                    skill_attackexoticweapon2_hide: 1,
+                    skill_exoticweapon2_hide: 1,
+                });
+            }
+            else{
+                setAttrs({
+                    skill_attackexoticweapon1_hide: 0,
+                    
+                });
+            }
+        });
+    });
+    on("change:skill_exoticweapon2_name", function(){
+        getAttrs(["skill_exoticweapon2_name"],function(v){
+            if(!v.skill_exoticweapon2_name || v.skill_exoticweapon2_name==""){
+                setAttrs({
+                    skill_attackexoticweapon2_hide: 1,
+                });
+            }
+            else{
+                setAttrs({
+                    skill_attackexoticweapon2_hide: 0,
+                });
+            }
+        });
+    });
 
 
     //Ausblenden von Rolls ohne Spez und Exp
@@ -914,14 +947,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
         })
     })
     
-    //alle Fertigkeiten sichtbar machen
-    on("clicked:reset_skill_visibility", function(){ //für den Reiter Fertigkeiten
-        skills.forEach(skill => {
-            setAttrs({
-                [`skill_${skill}_hide`]:0,
-            })
-        })
-    })
+
     on("clicked:reset_magic_visibility", () => { //für den Reiter Magie
         magicalSkills.forEach(skill => {
             setAttrs({
@@ -933,7 +959,7 @@ on("sheet:opened change:stun_monitor_shift", () => {
     on("clicked:hide_unused_skills", function(){
         skills.forEach(skill => {
             getAttrs([`skill_${skill}_base`], function(v){
-                if(v[`skill_${skill}_base`] < 0){
+                if(v[`skill_${skill}_base`] <= 0){
                     setAttrs({
                         [`skill_${skill}_hide`]:1,
                     })
@@ -944,9 +970,9 @@ on("sheet:opened change:stun_monitor_shift", () => {
     on("clicked:hide_unused_magics", () => {
         magicalSkills.forEach(skill => {
             getAttrs([`skill_${skill}_base`], (v) => {
-                if(v[`skill_${skill}_base`] < 0){
+                if(v[`skill_${skill}_base`] <= 0){
                     setAttrs({
-                        [`magic_${skill}_hide`]:1,
+                        [`skill_magic${skill}_hide`]:1,
                     })
                 }
             })
