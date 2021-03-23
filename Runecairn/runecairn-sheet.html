@@ -5,20 +5,32 @@
                 <input class="list-input-name" type="text" name="attr_name" />
             </div>
 		<div class="horizontal-separator"></div>
+            <div class="stat-title ability-title" data-i18n="vigour-u"></div>
+            <div class="list-row">
+                <input class="list-input-souls list-input-center-aligned" type="text" name="attr_vigour" />
+            </div>				
+		<div class="horizontal-separator"></div>
             <div class="stat-title ability-title" data-i18n="souls-u"></div>
             <div class="list-row">
-                <input class="list-input-souls" type="text" name="attr_souls" />
+                <input class="list-input-souls list-input-center-aligned" type="text" name="attr_souls" />
             </div>
         </div>		
 		<div class="vertical-separator"></div>
 <div class="flex-container">	
     <div class="stats-column">
         <div class="flex-container">
+            <div class="stat-title hit-points-title" data-i18n="base-hit-points-u"></div>
+            <div class="stat-inputs flex-container">
+				<input class="stat-input list-input-souls" type="text" name="attr_base_hp"  />
+            </div>
+        </div>		
+		<div class="vertical-separator"></div>		
+        <div class="flex-container">
             <div class="stat-title hit-points-title" data-i18n="hit-points-u"></div>
             <div class="stat-inputs flex-container">
                 <input class="stat-input" type="text" name="attr_ability_hit_points" />
                 <div class="stat-input-separator"></div>
-                <input class="stat-input" type="text" name="attr_ability_hit_points_max" />
+                <input class="stat-input" type="text" name="attr_total_hp" readonly />
             </div>
         </div>
 		<div class="vertical-separator"></div>
@@ -257,7 +269,8 @@
         </div>	
 		<div class="vertical-separator"></div>	
 				<div class="list-row">
-                <input type="text" class="list-input grid-80-percent" name="attr_key_item" />
+                <input type="text" class="list-input grid-70-percent" name="attr_key_item" />
+                <input type="text" class="list-input-inline list-input-center-aligned grid-10-percent" name="attr_key_item_hp"  />				
 				<input type="checkbox" class="grid-10-percent" name="attr_key_item_bulk_1" value="1">
 				<input type="checkbox" class="grid-10-percent" name="attr_key_item_bulk_2" value="1">				
 				 </div>
@@ -419,6 +432,20 @@ on("sheet:opened change:armour_bonus1 change:armour_bonus2 change:armour_bonus3"
 		let def = armour_bonus1 + armour_bonus2 + armour_bonus3;
         setAttrs({
             ability_defence: def
+        });
+    });
+});
+</script>
+
+<script type="text/worker">
+on("sheet:opened change:key_item_hp change:base_hp change:vigour", function() {
+    getAttrs(["KEY_ITEM_HP", "BASE_HP", "VIGOUR"], function(values) {
+		let key_item_hp = parseInt(values.KEY_ITEM_HP)||0;
+		let base_hp = parseInt(values.BASE_HP)||0;
+		let vigour = parseInt(values.VIGOUR)||0;
+		let thp = key_item_hp + base_hp + vigour;
+        setAttrs({
+            total_hp: thp
         });
     });
 });
