@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.10" />
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.11" />
 <input type='hidden' name='attr_firstInit' value="0" />
 <input type='hidden' name='attr_namelength' value='0' />
 
@@ -135,7 +135,7 @@
 	}
 
     //Force a change in a field to trigger a sheet worker and then reset the <fieldset>
-        //This may be needed when an existing field is modified that's used in a roll button (e.g. Trademark Weapon modified how the skill formula is called, resulting in each we)
+    //This may be needed when an existing field is modified that's used in a roll button (e.g. Trademark Weapon modified how the skill formula is called, resulting in each we)
     const stepwiseFaux = function(section,field) {
 		//only for repeating Sections
 		//section = the repeating section
@@ -200,7 +200,7 @@
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
     const sheetVersionPrefix = "Official Savage Worlds v";
-	const sheetVersion = "1.00.10";
+	const sheetVersion = "1.00.11";
 
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
@@ -254,6 +254,9 @@
                 setattrvals["newdocumentation"] = "unread";
             }
             if(versionthree < 0.10) {
+                setattrvals["newcontent"] = "unread";
+            }
+            if(versionthree < 0.11) {
                 setattrvals["newcontent"] = "unread";
             }
             else {
@@ -1512,7 +1515,7 @@
 			let button = `${field}button`;
 			let formula = `${field}formula`;
 			let sattrs = {};
-			if(v[field] === "(AGL)" || v[field] === "(STR)" || v[field] === "1") {
+			if(v[field] === "(AGL)" || v[field] === "agl-u" || v[field] === "str-u" || v[field] === "(STR)" || v[field] === "1") {
 				console.log(`Need to set trait (${field}) to use Encumbrance`);
 				sattrs[button] = `@{setmodsenc}`;
 				sattrs[formula] = `@{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance]`;
@@ -3113,8 +3116,9 @@
                 let finalCharacterDetails = {};
                 //set Pace
                 typeof monsterObj.pace !== "undefined" ? finalCharacterDetails["pace"] = monsterObj.pace : log("Pace","Not found",r20color);
-                //set Token URL
+                //set Token  and Avatar URLs
                 typeof monsterObj.Token !== "undefined" ? finalCharacterDetails["tokenURL"] = monsterObj.Token : log("Token URL","Not found",r20color);
+                typeof monsterObj.avatarURL !== "undefined" ? finalCharacterDetails["avatarURL"] = monsterObj.avatarURL : typeof monsterObj.Token !== "undefined" ? finalCharacterDetails["avatarURL"] = monsterObj.Token : log("Avatar URL","Not found",r20color);
                 //set description
                 typeof monsterObj.biography !== "undefined" ? finalCharacterDetails["physdescription"] = monsterObj.biography : log("Biography","Not found",r20color);
                 //set Edges
@@ -5577,7 +5581,7 @@
 	    						</div>
 	    						<input type='hidden' name='attr_stealth_rank' value='1d4!' />
 	    						<input type='hidden' name='attr_stealth_display' value='d4' />
-	    						<input type='hidden' name='attr_rolltStealth' value='{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{skill_roll=[[@{stealth_rank} + @{StealthskillMod}+ @{ModSum}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{ModSum}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}' />
+	    						<input type='hidden' name='attr_rolltStealth' value='{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{skill_roll=[[@{stealth_rank} + @{StealthskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}' />
 	    						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
 	    						<div class='sheet-SkillSpec'>
 	    						    <fieldset class="repeating_stealthspec">
@@ -7960,6 +7964,9 @@
                         <label class='sheet-miscItem'>
                             <span data-i18n="token-url"></span>: <input type='text' name='attr_tokenURL' />
                         </label>
+                        <label class='sheet-miscItem'>
+                            <span data-i18n="avatar-url"></span>: <input type='text' name='attr_avatarURL' />
+                        </label>
     			    </div>
     			</div>
                 <div class='sheet-configSection'>
@@ -8011,6 +8018,27 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.11 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10011' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.11</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10011' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="bug-fix-release">Bug Fix Release</h2>
+                    <p data-i18n="bug-fix-release-info">
+						This release focuses on Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="avatar-url-for-compendium-macro">Fixed the issue of the missing avatar URL for the target-pic macro included with the the Savage Worlds Core Rules Bundle Compendium.</span></li>
+                        <li><span class="sheet-black" data-i18n="agility-linked-skills-not-applying-encumbrance-penalty">Fixed an issue where some Agility linked skills (and all Agility-linked custom skills) weren't applying the encumbrance penalty.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.10 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10010' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.10</h4></span>
@@ -8582,9 +8610,9 @@
 </div>
 <span data-i18n="using-character-sheet">Using character sheet</span>: <span name='attr_character_sheet'></span>
 
-<div class="sheet-compendium_warning"> <!-- Warning -->
-    <span style="font-weight: bold; font-size: 1.2em;" data-i18n="accepting-drop-u">ACCEPTING DROP FROM COMPENDIUM</span>
-</div>
+<!-- <div class="sheet-compendium_warning"> --><!-- Warning -->
+    <!--<span style="font-weight: bold; font-size: 1.2em;" data-i18n="accepting-drop-u">ACCEPTING DROP FROM COMPENDIUM</span>
+</div> -->
 <!-- <div class="sheet-disclaimer">
     <input class="sheet-logo" type="hidden" name="attr_logo" value="1" />
 	<span data-i18n="the">The</span>&nbsp;<span class="sheet-logotext"></span>&nbsp;<span class="sheet-logostandard" data-i18n="logo-info">logo is a trademark of</span>&nbsp;<span class="sheet-trademarkholder"></span><span class="sheet-logoallforone" data-i18n="all-for-one-logo-info">logo &copy; 2016 Triple Ace Games Ltd. All for One: R&eacute;gime Diabolique and all related marks and logos are trademarks of  Triple Ace Games Ltd. Ubiquity Roleplaying System, Exile Games Studio, and all associated logos and trademarks are copyright, Exile Games Studio, LLC</span><span class="sheet-logorifts" data-i18n="rifts-logo-info">logo and Megaverse are registered trademarks of PALLADIUM BOOKS, INC. All character names and likenesses are copyright and trademarks owned by Palladium Books, Inc. Savage Worlds logo is a trademark of Pinnacle Entertainment Group</span>. <span data-i18n="used-with-permission-visit-website">Used with permission. Visit their website at</span>:&nbsp;<span class="sheet-website"></span>
