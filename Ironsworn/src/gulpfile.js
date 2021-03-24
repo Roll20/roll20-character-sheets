@@ -1,6 +1,7 @@
 const pug = require('gulp-pug')
 const stylus = require('gulp-stylus')
 const gulp = require('gulp')
+// const browserSync = require('browser-sync');
 
 gulp.task('css', () => {
   return gulp.src('./app/Ironsworn.styl')
@@ -17,4 +18,9 @@ gulp.task('html', () => {
     .pipe(gulp.dest('../'))
 })
 
-gulp.task('default',  gulp.series(['css','html']))
+gulp.task('watch', gulp.series(['css', 'html'], () => {
+  gulp.watch('./app/**/*.styl', gulp.series(['css']))
+  gulp.watch(['./app/**/*.pug','./app/**/*.js'], gulp.series(['html']))
+}))
+
+gulp.task('build',  gulp.series(['css','html']))
