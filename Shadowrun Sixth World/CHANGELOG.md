@@ -1,5 +1,6 @@
 Change Log
 ==============================================
+
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
 	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
