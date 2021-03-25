@@ -58,7 +58,7 @@ function chosenDifficulty (rank) {
   }
 }
 
-on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress', function(values) {
+on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress change:repeating_sites:mark_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
   getAttrs([
     `repeating_${type}_rank`,
@@ -92,7 +92,7 @@ on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress',
   });
 });
 
-on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress', function(values) {
+on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress change:repeating_sites:clear_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
   setAttrs({ 
     ['repeating_' + type + '_progress_' + progressStrings[0]]: '0',
