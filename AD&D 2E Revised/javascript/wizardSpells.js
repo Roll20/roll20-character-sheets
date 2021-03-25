@@ -239,7 +239,7 @@ wiz1['Enlarge'] = {
     'level': 'Level 1 Wizard',
     'school': 'Alteration (Reversible)',
     'range': '[[5*[[@{level-wizard}]] ]] yards',
-    'duration': '[[5*LEVEL#]] rounds',
+    'duration': '[[5*[[@{level-wizard}]] ]] rounds',
     'aoe': '1 creature or object',
     'components': 'V, S, M',
     'cast-time': '1',
