@@ -1,7 +1,6 @@
 const pug = require('gulp-pug')
 const stylus = require('gulp-stylus')
 const gulp = require('gulp')
-// const browserSync = require('browser-sync');
 
 gulp.task('css', () => {
   return gulp.src('./app/Ironsworn.styl')
