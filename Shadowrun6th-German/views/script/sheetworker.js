@@ -1313,12 +1313,56 @@ on("sheet:opened change:stun_monitor_shift", () => {
             if(v.conjuring_summoning_type == v.spirit_detection_type){totalbonus += +v.conjuring_detection}
             totalbonus += +v.mod_magic;
             totalbonus += +v.mod_conjuring;
+            log(totalbonus+ "= " + v.mod_magic+ " +" +v.mod_conjuring + "+ " + v.conjuring_combat  )
             setAttrs({
                 conjuring_bonus: +totalbonus,
             })
         })
     });
-    on("change:spell_combat_bonus change:spell_health_bonus change:spell_illusion_bonus change:spell_manipulation_bonus change:spell_detection_bonus change:mod_magic change:mod_spells change:repeating_spells:spellscategory", () => {
+
+
+
+    on("sheet:opened change:skill_sorcery_exp change:skill_sorcery_spec change:spell_combat_bonus change:spell_health_bonus change:spell_illusion_bonus change:spell_manipulation_bonus change:spell_detection_bonus change:mod_magic change:mod_spells",function(){
+        getSectionIDs("repeating_spells", pids=>{
+            getAttrs(["spell_combat_bonus","spell_health_bonus","spell_illusion_bonus","spell_manipulation_bonus",
+                      "spell_detection_bonus","mod_magic","mod_spells","skill_sorcery_spec","skill_sorcery_exp"], (v) => {
+                let attrArray =[];
+                pids.forEach(id=>{attrArray.push("repeating_spells_" + id + "_spellscategory" )});
+                
+                getAttrs(attrArray,(vr)=>{
+
+                    const getValue = (id, field) => vr[`repeating_spells_${id}_${field}`];
+        
+                    pids.forEach(id=>{
+                //   log("Check:" + id )
+                        let cat=getValue(id,"spellscategory");
+                            log(cat);
+                        let totalbonus = 0;
+                        if(cat == "spells_combat_indirect" || cat == "spells_combat_direct"){totalbonus += +v.spell_combat_bonus;}
+                        if(cat == "spells_health"){totalbonus += +v.spell_health_bonus;}
+                        if(cat == "spells_illusion"){totalbonus += +v.spell_illusion_bonus;}
+                        if(cat == "spells_manipulation"){totalbonus += +v.spell_manipulation_bonus;}
+                        if(cat == "spells_detection"){totalbonus += +v.spell_detection_bonus;}
+                        
+                        if(v.skill_sorcery_spec.toLowerCase() ==getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_spec.toLowerCase() == "sorcery"){totalbonus += 2; }
+                        
+                        if(v.skill_sorcery_exp.toLowerCase() == getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_exp.toLowerCase() == "sorcery"){totalbonus += 3}
+                        totalbonus += +v.mod_magic;
+                        totalbonus += +v.mod_spells;
+                        console.log("Over base " + totalbonus + " = " + v.spell_combat_bonus + " " + v.spell_health_bonus + " " + v.spell_illusion_bonus + " " + v.spell_manipulation_bonus + " " + v.spell_detection_bonus + " / " + v.mod_magic + " / " + v.mod_spells + " | " + cat);
+                        setAttrs({
+                            ["repeating_spells_"+ id + "_sorcery_bonus"]: +totalbonus,
+                        })
+                    });
+                    
+                });
+                
+
+            });
+        });
+    });
+
+    on("change:repeating_spells:spellscategory", () => {
             getAttrs(["spell_combat_bonus","spell_health_bonus","spell_illusion_bonus","spell_manipulation_bonus","spell_detection_bonus","mod_magic","mod_spells","repeating_spells_spellscategory","skill_sorcery_spec","skill_sorcery_exp"], (v) => {
                 let totalbonus = 0;
                 if(v.repeating_spells_spellscategory == "spells_combat_indirect" || v.repeating_spells_spellscategory == "spells_combat_direct"){totalbonus += +v.spell_combat_bonus;}
@@ -1326,10 +1370,10 @@ on("sheet:opened change:stun_monitor_shift", () => {
                 if(v.repeating_spells_spellscategory == "spells_illusion"){totalbonus += +v.spell_illusion_bonus;}
                 if(v.repeating_spells_spellscategory == "spells_manipulation"){totalbonus += +v.spell_manipulation_bonus;}
                 if(v.repeating_spells_spellscategory == "spells_detection"){totalbonus += +v.spell_detection_bonus;}
-                console.log("#1");
-                if(v.skill_sorcery_spec == "Spruchzauberei" || v.skill_sorcery_spec == "sorcery"){totalbonus += 2; console.log("#2");}
-                console.log("#3");
-                if(v.skill_sorcery_exp == "Spruchzauberei" || v.skill_sorcery_exp == "sorcery"){totalbonus += 2}
+                
+                if(v.skill_sorcery_spec.toLowerCase()  ==getTranslationByKey("sorcery").toLowerCase()|| v.skill_sorcery_spec.toLowerCase() == "sorcery"){totalbonus += 2; console.log("#2");}
+                
+                if(v.skill_sorcery_exp.toLowerCase()  ==getTranslationByKey("sorcery").toLowerCase()|| v.skill_sorcery_exp.toLowerCase() == "sorcery"){totalbonus += 3}
                 totalbonus += +v.mod_magic;
                 totalbonus += +v.mod_spells;
                 console.log(totalbonus + " = " + v.spell_combat_bonus + " " + v.spell_health_bonus + " " + v.spell_illusion_bonus + " " + v.spell_manipulation_bonus + " " + v.spell_detection_bonus + " / " + v.mod_magic + " / " + v.mod_spells + " | " + v.repeating_spells_spellscategory);

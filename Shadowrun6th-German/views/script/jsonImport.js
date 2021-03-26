@@ -91,7 +91,7 @@ c["charisma_modifier"]=(parseInt(data["attributes"][7]["modifiedValue"])||0)-c["
 c["edge_base"]=parseInt(data["attributes"][8]["points"])||0;
 c["edge_modifier"]=(parseInt(data["attributes"][8]["modifiedValue"])||0)-c["edge_base"];
 
-c["display_magic"]=parseInt(data["attributes"][9]["modifiedValue"])||0;
+c["magic_base"]=parseInt(data["attributes"][9]["modifiedValue"])||0;
 c["display_inigrade"]=parseInt(data["initiation"])||0;
 c["display_resonance"]=parseInt(data["attributes"][10]["modifiedValue"])||0;
 
@@ -105,6 +105,8 @@ attrtranslate["Intuition"]="intuition";
 attrtranslate["Willenskraft"]="willpower";
 attrtranslate["Stärke"]="strength";
 attrtranslate["Reaktion"]="reaction";
+attrtranslate["Magie"]="magic";
+attrtranslate["Resonanze"]="resonance";
 
 getSectionIDs("repeating_language", function(idarray) {
     for(var i=0; i < idarray.length; i++) {
