@@ -883,9 +883,9 @@ on("sheet:opened change:stun_monitor_shift", () => {
     skills.forEach(skill => {
         on(`change:skill_${skill}_spec change:skill_${skill}_exp`, function(){
             getAttrs([`skill_${skill}_spec`,`skill_${skill}_exp`], function(v){
-                if(!!v[`skill_${skill}_spec`]){setAttrs({[`skill_${skill}_spec_roll_visibility`]:1,})
+                if(!!v[`skill_${skill}_spec`] && v[`skill_${skill}_spec`]!=""){setAttrs({[`skill_${skill}_spec_roll_visibility`]:1,})
                 } else {setAttrs({[`skill_${skill}_spec_roll_visibility`]:0,})}
-                if(!!v[`skill_${skill}_exp`]){setAttrs({[`skill_${skill}_exp_roll_visibility`]:1,})
+                if(!!v[`skill_${skill}_exp`] && v[`skill_${skill}_exp`]!=""){setAttrs({[`skill_${skill}_exp_roll_visibility`]:1,})
                 } else {setAttrs({[`skill_${skill}_exp_roll_visibility`]:0,})}
             })
         })
@@ -1365,9 +1365,9 @@ on("sheet:opened change:stun_monitor_shift", () => {
                         if(cat == "spells_manipulation"){totalbonus += +v.spell_manipulation_bonus;}
                         if(cat == "spells_detection"){totalbonus += +v.spell_detection_bonus;}
                         
-                        if(v.skill_sorcery_spec.toLowerCase() ==getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_spec.toLowerCase() == "sorcery"){totalbonus += 2; }
+                        if(v.skill_sorcery_spec.toLowerCase() ==getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_spec.toLowerCase() == "spellingcasting"){totalbonus += 2; }
                         
-                        if(v.skill_sorcery_exp.toLowerCase() == getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_exp.toLowerCase() == "sorcery"){totalbonus += 3}
+                        if(v.skill_sorcery_exp.toLowerCase() == getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_exp.toLowerCase() == "spellingcasting"){totalbonus += 3}
                         totalbonus += +v.mod_magic;
                         totalbonus += +v.mod_spells;
                         console.log("Over base " + totalbonus + " = " + v.spell_combat_bonus + " " + v.spell_health_bonus + " " + v.spell_illusion_bonus + " " + v.spell_manipulation_bonus + " " + v.spell_detection_bonus + " / " + v.mod_magic + " / " + v.mod_spells + " | " + cat);
