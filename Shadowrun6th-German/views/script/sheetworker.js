@@ -303,14 +303,18 @@ on("change:repeating_vehicle:vehicle_speed",function(){
 
    
     on("change:repeating_kf:kf_at1 change:repeating_kf:kf_at2 change:repeating_kf:kf_mod",function(){
-        getAttrs(["repeating_kf_kf_at1","repeating_kf_kf_at2",,"repeating_kf_kf_mod","display_logic","display_body","display_agility","display_reaction" ,
-                  "display_strength" ,"display_willpower","display_logic","display_intuition","display_charisma" ,"display_resonance"],
+        getAttrs(["repeating_kf_kf_at1","repeating_kf_kf_at2","repeating_kf_kf_mod","display_logic","display_body","display_agility","display_reaction" ,
+                  "display_strength" ,"display_willpower","display_logic","display_intuition","display_charisma" ,"display_resonance",
+                  "skill_electronics_base","skill_cracking_base","skill_piloting_base","skill_electronics_mod","skill_cracking_mod","skill_piloting_mod",
+                  "skill_electronics_statusmodifier","skill_cracking_statusmodifier","skill_piloting_statusmodifier"],
                     function (v) {
             
             let at1=v["repeating_kf_kf_at1"]||"";
             let at2=v["repeating_kf_kf_at2"]||"";
             let v1=parseInt(v[at1])||0;
-            let v2=parseInt(v[at2])||0;
+            let v2=parseInt(v[at2 + "_base"])||0;
+                v2+=parseInt(v[at2 + "_mod"])||0;
+                v2+=parseInt(v[at2 + "_statusmodifier"])||0;
             let mod=parseInt(v["repeating_kf_kf_mod"])||0;
             let val=v1+v2+mod;
             val=val>0?val:0;
@@ -1303,19 +1307,36 @@ on("sheet:opened change:stun_monitor_shift", () => {
     on("clicked:repeating_spells:lockrules", function(){setAttrs({'repeating_spells_toggle_rule_spells': 0,});});
     on("clicked:repeating_spells:unlockrules", function(){setAttrs({'repeating_spells_toggle_rule_spells': 1,});});
 
-    on("change:spirit_combat_type change:spirit_health_type change:spirit_illusion_type change:spirit_manipulation_type change:spirit_detection_type change:conjuring_combat change:conjuring_health change:conjuring_illusion change:conjuring_manipulation change:conjuring_detection change:mod_magic change:mod_conjuring change:conjuring_summoning_type", () => {
-        getAttrs(["spirit_combat_type","spirit_health_type","spirit_illusion_type","spirit_manipulation_type","spirit_detection_type","conjuring_combat","conjuring_health","conjuring_illusion","conjuring_manipulation","conjuring_detection","mod_magic","mod_conjuring","conjuring_summoning_type"], (v) => {
+    on("change:spirit_con_type1 change:spirit_con_type2 change:spirit_con_type3 change:spirit_con_type4 change:spirit_con_type1_bonus change:spirit_con_type2_bonus change:spirit_con_type3_bonus change:spirit_con_type4_bonus change:mod_magic change:mod_conjuring change:conjuring_summoning_type change:skill_conjuring_exp change:skill_conjuring_spec", () => {
+        getAttrs(["spirit_con_type1","spirit_con_type2","spirit_con_type3","spirit_con_type4",
+                  "spirit_con_type1_bonus","spirit_con_type2_bonus","spirit_con_type3_bonus","spirit_con_type4_bonus",
+                  "mod_magic","mod_conjuring","conjuring_summoning_type","skill_conjuring_spec","skill_conjuring_exp"], (v) => {
             let totalbonus = 0;
-            if(v.conjuring_summoning_type == v.spirit_combat_type){totalbonus += +v.conjuring_combat}
-            if(v.conjuring_summoning_type == v.spirit_health_type){totalbonus += +v.conjuring_health}
-            if(v.conjuring_summoning_type == v.spirit_illusion_type){totalbonus += +v.conjuring_illusion}
-            if(v.conjuring_summoning_type == v.spirit_manipulation_type){totalbonus += +v.conjuring_manipulation}
+            let banbonus=0
+            if("con_" + v.conjuring_summoning_type == v.spirit_con_type1){totalbonus += +v.spirit_con_type1_bonus}
+            if("con_" + v.conjuring_summoning_type == v.spirit_con_type2){totalbonus += +v.spirit_con_type2_bonus}
+            if("con_" + v.conjuring_summoning_type == v.spirit_con_type3){totalbonus += +v.spirit_con_type3_bonus}
+            if("con_" + v.conjuring_summoning_type == v.spirit_con_type4){totalbonus += +v.spirit_con_type4_bonus}
+            if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type1){banbonus += +v.spirit_con_type1_bonus}
+            if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type2){banbonus += +v.spirit_con_type2_bonus}
+            if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type3){banbonus += +v.spirit_con_type3_bonus}
+            if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type4){banbonus += +v.spirit_con_type4_bonus}
             if(v.conjuring_summoning_type == v.spirit_detection_type){totalbonus += +v.conjuring_detection}
             totalbonus += +v.mod_magic;
             totalbonus += +v.mod_conjuring;
-            log(totalbonus+ "= " + v.mod_magic+ " +" +v.mod_conjuring + "+ " + v.conjuring_combat  )
+            banbonus += +v.mod_magic;
+            banbonus += +v.mod_conjuring;
+
+            if(v.skill_conjuring_spec.toLowerCase() ==getTranslationByKey("conjuration_title").toLowerCase() || v.skill_conjuring_spec.toLowerCase() == "conjuring"){totalbonus += 2; }
+            if(v.skill_conjuring_exp.toLowerCase() ==getTranslationByKey("conjuration_title").toLowerCase() || v.skill_conjuring_exp.toLowerCase() == "conjuring"){totalbonus += 3; }
+            if(v.skill_conjuring_spec.toLowerCase() ==getTranslationByKey("banishing_title").toLowerCase() || v.skill_conjuring_spec.toLowerCase() == "banishing"){banbonus += 2; }
+            if(v.skill_conjuring_exp.toLowerCase() ==getTranslationByKey("banishing_title").toLowerCase() || v.skill_conjuring_exp.toLowerCase() == "banishing"){banbonus += 3; }
+
+
+            log(totalbonus+ "= " + v.mod_magic+ " +" +v.mod_conjuring + "+ " + v.conjuring_summoning_type + " =?" + v.spirit_con_type1 + " " + v.spirit_con_type1_bonus  )
             setAttrs({
                 conjuring_bonus: +totalbonus,
+                banishing_bonus: +banbonus
             })
         })
     });
