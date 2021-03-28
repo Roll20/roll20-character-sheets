@@ -2,7 +2,7 @@ var ConanAPI = ConanAPI || (function()
 {
 	'use strict';
 
-    let version = '2.0',
+    let version = '2.1',
         DeadTokenImgSrc = 'https://s3.amazonaws.com/files.d20.io/images/120063604/QZmTLXMVBSqFoqENP6LTkA/thumb.png?15864718355',
 		WoundMarkers = ['Wounds1::1402922', 'Wounds2::1402925', 'Wounds3::1402927','Wounds4::1644476','Wounds5::1644475'],
 		TraumaMarkers = ['Trauma1::1644483', 'Trauma2::1644484', 'Trauma3::1644485','Trauma4::1644486','Trauma5::1644482'],
@@ -88,10 +88,8 @@ var ConanAPI = ConanAPI || (function()
 
 	startCombatToken = function(whosToken) {
 		var tokens = findObjs({_subtype: 'token'});
-		//log("searching for combat :" + whosToken);
 		tokens.forEach(function(token) {
 			if (token.get('name') == whosToken) {
-				//log("Starting combat flash for token:" + token.get('name'));
 				setTimeout(flashCombatToken, combatFlashing.delay, token);
 			}
         });
@@ -111,8 +109,6 @@ var ConanAPI = ConanAPI || (function()
 			imgsrc: DeadTokenImgSrc,
 			name: 'DeadToken'
 		}));
-		//obj.set("status_skull", "2");
-		//Rob's new status are: 1Wound..4Wound; 1Trauma..4Trauma
 	},
 
 
@@ -133,13 +129,6 @@ var ConanAPI = ConanAPI || (function()
 				token.set('rotation', rotation);
 				dyingTokenConfig.rotationDirection = -1;
 				addDeadToken(token);
-				/*
-				var badge = 1;
-				var value = getInteger(token.get("status_skull"));
-				if (!isNaN(value)) badge = ++value;
-				//log("Badge:" + String(badge));
-				token.set("status_skull", String(badge));
-				*/
 				return;	//dying animation complete
 			}
 		}
@@ -273,21 +262,41 @@ var ConanAPI = ConanAPI || (function()
 				
 		}
 		else {
-		    if(msg.inlinerolls) {
-                var inlinerolls = msg.inlinerolls;
+		    if(msg.rolltemplate == "skill" && msg.inlinerolls) {
+				//1 is skilled roll; 2 is unskilled roll
+				var ninteens = 0;
+				var ninteens1 = -1;
+				var ninteens2 = 0;
                 var twenties = 0;
+				var twenties1 = -1;
+				var twenties2 = 0;
+				var inlinerolls = msg.inlinerolls;
                 inlinerolls.forEach(function(inlineObj){
                     if (inlineObj.results.resultType == "success") {
+						ninteens = 0;
+						twenties = 0;
                         var rolls = inlineObj.results.rolls;
-                        for(var r = 0; r < rolls.length; r++)
+                        for(var r = 0; r < rolls.length; r++) {
                             for(var v = 0; v < rolls[r].results.length; v++) {
+								if (rolls[r].results[v].v == 19)
+									ninteens++;
                                 if (rolls[r].results[v].v == 20)
                                     twenties++;
                             }
+						}
+						if (ninteens1 == -1)
+							ninteens1 = ninteens;
+						else
+							ninteens2 = ninteens
+						if (twenties1 == -1)
+							twenties1 = twenties;
+						else
+							twenties2 = twenties
                     }
                 });
-                if(twenties > 1) {
-                    sendChat("Conan","&{template:conan-default} {{title=DOUBLE TROUBLE !!!}} {{subtitle1="+msg.who+" rolled MULTIPLE Twenties!!!}}")					
+                if((content.indexOf("{{expertise=0}}") == -1 && twenties1 > 1) ||
+					(content.indexOf("{{expertise=0}}") !== -1 && (ninteens2 + twenties2) > 1)) {
+                    sendChat("Conan","&{template:conan-default} {{title=DOUBLE TROUBLE !!!}} {{subtitle1="+msg.who+" rolled MULTIPLE complications!!!}}")					
                 }
             }
                 
