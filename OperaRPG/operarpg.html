@@ -1172,7 +1172,18 @@
   /*Controlling contact weapons damage total*/
   on('change:repeating_contactweapons:weapondamage change:physicaldamage', function(eventInfo) {
     console.log('weapon damage total');
-    setRollTotal(['repeating_contactweapons_weapondamage', 'physicaldamage'], 'repeating_contactweapons_weapondamagetotal');
+    
+    /* recovering all weapons IDs */
+    getSectionIDs(`repeating_contactweapons`, idArray => {
+      idArray.forEach(id => {
+
+        setRollTotal([`repeating_contactweapons_${id}_weapondamage`, 'physicaldamage'], `repeating_contactweapons_${id}_weapondamagetotal`);
+
+      });
+    
+    });
+
+    
   });
 
   /* calculating physical damage */
@@ -1187,7 +1198,7 @@
       factor = Math.floor(eval(parse));
 
       total = Math.floor(factor/8);
-
+      console.log(`physical damage total: ${total}`);
       setAttrs({
         physicaldamage: total
       });
