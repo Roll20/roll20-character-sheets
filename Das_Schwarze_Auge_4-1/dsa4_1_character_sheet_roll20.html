@@ -11205,7 +11205,7 @@
                     </th>
                     <th>BE <input class="sheet-stat-immutable" disabled="disabled" type="text" name="attr_Ges_BE_Anzeige" value="@{BE_TaW}" style="width: 2em">
                     </th>
-                    <th><button name="Initiative" type="roll" value="@{gm_roll_opt} &{template:DSA-Initiative} {{char=@{Name}}} {{mod=[[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]]}} {{dice=[[@{INI_dice_count}]]}} {{IB=[[@{INIBasis2}]]}} {{be=[[@{BE_TaW}]]}} {{ini=[[(@{INI_dice_count}d6 + @{INIBasis2} - @{BE_TaW} + [[@{ShieldParryINI}]] + [[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]])&{tracker}]]}}"> <span>Initiative</span></button> mit <select type="number" name="attr_INI_dice_count" style="width: 4em">
+                    <th><button name="Initiative" type="roll" value="@{gm_roll_opt} &{template:DSA-Initiative} {{char=@{Name}}} {{mod=[[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]]}} {{dice=[[@{INI_dice_count}]]}} {{IB=[[@{INIBasis2}]]}} {{be=[[@{BE_TaW}]]}} {{ini=[[(@{INI_dice_count}d6 + @{INIBasis2} - @{BE_TaW} + ([[@{INI_mod_hauptwaffe}]]) + ([[@{ShieldParryINI}]]) + [[?{Bonus (+) oder Malus (−)|0}d1cs0cf2]])&{tracker}]]}}"> <span>Initiative</span></button> mit <select type="number" name="attr_INI_dice_count" style="width: 4em">
                 <option value="1" selected="selected">1</option>
                 <option value="2">2</option>
             </select><span class="sheet-abbr" title="sechsseitiger Würfel" style="margin-right: 1em;">W6</span>
@@ -16332,10 +16332,10 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
 // sowie den PA Wert sowohl für die aktive Waffe, als auch für die Schildparade
 // Not working: Peitsche
 on("change:PABasis " +
-"change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:NKW1_Spez change:NKW_Aktiv1 " +
-"change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:NKW2_Spez change:NKW_Aktiv2 " +
-"change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:NKW3_Spez change:NKW_Aktiv3 " +
-"change:NKW_AT_typ4 change:NKW4ATMod change:NKW_PA_typ4 change:NKW4PAMod change:NKW4_Spez change:NKW_Aktiv4 " +
+"change:NKW_AT_typ1 change:NKW1ATMod change:NKW_PA_typ1 change:NKW1PAMod change:INIModNKW1 change:NKW1_Spez change:NKW_Aktiv1 " +
+"change:NKW_AT_typ2 change:NKW2ATMod change:NKW_PA_typ2 change:NKW2PAMod change:INIModNKW2 change:NKW2_Spez change:NKW_Aktiv2 " +
+"change:NKW_AT_typ3 change:NKW3ATMod change:NKW_PA_typ3 change:NKW3PAMod change:INIModNKW3 change:NKW3_Spez change:NKW_Aktiv3 " +
+"change:NKW_AT_typ4 change:NKW4ATMod change:NKW_PA_typ4 change:NKW4PAMod change:INIModNKW4 change:NKW4_Spez change:NKW_Aktiv4 " +
 "change:repeating_shields change:be_at_mod change:be_pa_mod",
 function(eventInfos) {
     calculateCombatValues();
@@ -16368,7 +16368,11 @@ function calculateCombatValues() {
             setAttrs(attrsToChange);
             return;
         }
-        var variablesToGet = [ "NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod", "NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod", "NKW" + weapon + "_Spez", 
+        var variablesToGet = [
+        	"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
+        	"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
+        	"INIModNKW" + weapon,
+        	"NKW" + weapon + "_Spez", 
             "AT_Anderthalbhander", "AT_dolche", "AT_fechtwaffen", "AT_hiebwaffen", 
             "AT_infanteriewaffen", "AT_kettenstabe", "AT_kettenwaffen", "AT_lanzenreiten", "AT_peitsche", "AT_raufen", "AT_ringen", "AT_sabel", 
             "AT_schwerter", "AT_speere", "AT_stabe", "AT_zweihandflegel", "AT_zweihand-hiebwaffen", "AT_zweihandschwerter", 
@@ -16516,6 +16520,14 @@ function calculateCombatValues() {
             }
             attrsToChange["shield_pa"] = shieldPa;
             attrsToChange["parryweapon_pa"] = parryweaponPa;
+
+			// Set INI modifier from (main) weapon
+			var weaponini = 0;
+			if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
+				console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
+				weaponini = parseInt(values["INIModNKW" + weapon]);
+			}
+			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
 
             // Set INI modifier from shields/parry weapons
             var shieldparryini = 0;
