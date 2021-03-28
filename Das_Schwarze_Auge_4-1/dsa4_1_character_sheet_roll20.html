@@ -16799,15 +16799,24 @@ function roundDecimals (num, digits) {
 function DSAsane (value, type) {
 	var func = "DSAsane";
 	var errors = false;
+
+	function limitedIntValid(value, minimum, maximum) {
+		if (isNaN(value)
+		|| isNaN(parseInt(value))
+		|| parseInt(value) < minimum
+		|| parseInt(value) > maximum) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	switch(type) {
 		case "stat":
 			// MU, KL, IN, ...
 			// Must be number or parseInt()-able number
 			// Must be integer in range [0, 99]
-			if (isNaN(value)
-			|| isNaN(parseInt(value))
-			|| parseInt(value) < 0
-			|| parseInt(value) > 99) {
+			if (!limitedIntValid(value, 0, 99)) {
 				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
@@ -16815,11 +16824,8 @@ function DSAsane (value, type) {
 		case "ini-mod-weapon":
 			// INI modifiers of weapons
 			// Must be number or parseInt()-able number
-			// Must be integer in range [-99, 99]
-			if (isNaN(value)
-			|| isNaN(parseInt(value))
-			|| parseInt(value) < -99
-			|| parseInt(value) > 99) {
+			// Must be integer in range [-9, 9]
+			if (!limitedIntValid(value, -9, 9)) {
 				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
