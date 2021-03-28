@@ -660,18 +660,18 @@
                   <div></div>
                   <input class="weapons-base" name="attr_weaponblowtotal" type="text" title="@{weaponblowtotal}"
                     disabled="true"
-                    value="@{weaponlevel} + @{weaponblow} + @{fightblow} + (@{chardexterity} @{weaponeffect})" />
+                    value="@{weaponlevel} + @{weaponblow} + (@{chardexterity} @{weaponeffect})" />
                   <button type="roll" class="roll-button" name="roll_weaponblow_check" title="@{weaponblow_check}"
-                    value="&{template:main} {{charname=@{character_name}}} {{action=@{weaponname} - @{blow}}} {{value=[[@{weaponlevel} + @{weaponblow} + @{fightblow} + (@{chardexterity} @{weaponeffect})]]}} {{dispute=[[ [[2d6cs>2cf<5]] + @{weaponlevel} + @{weaponblow} + @{fightblow} + (@{chardexterity} @{weaponeffect}) ]] }} {{roll=$[[1]]}} {{damage=[[@{weapondamagetotal}]]}} {{bodyroll=[[2d6cs0cf0]]}}"></button>
+                    value="&{template:main} {{charname=@{character_name}}} {{action=@{weaponname} - @{blow}}} {{value=[[@{weaponblowtotal}]]}} {{dispute=[[ [[2d6cs>2cf<5]] + @{weaponblowtotal} ]] }} {{roll=$[[1]]}} {{damage=[[@{weapondamagetotal}]]}} {{bodyroll=[[2d6cs0cf0]]}}"></button>
                 </div>
 
                 <div class="weapons-subheader-grid">
                   <div></div>
                   <input class="weapons-base" name="attr_weaponparrytotal" type="text" title="@{weaponparrytotal}"
                     disabled="true"
-                    value="@{weaponlevel} + @{weaponparry} + @{fightparry} + (@{chardexterity} @{weaponeffect})" />
+                    value="@{weaponlevel} + @{weaponparry} + (@{chardexterity} @{weaponeffect})" />
                   <button type="roll" class="roll-button" name="roll_weaponparry_check" title="@{weaponparry_check}"
-                    value="&{template:main} {{charname=@{character_name}}} {{action=@{weaponname} - @{parry}}} {{value=[[@{weaponlevel} + @{weaponparry} + @{fightparry} + (@{chardexterity} @{weaponeffect})]]}} {{dispute=[[ [[2d6cs>2cf<5]] + @{weaponlevel} + @{weaponparry} + @{fightparry} + (@{chardexterity} @{weaponeffect}) ]] }} {{roll=$[[1]]}}"></button>
+                    value="&{template:main} {{charname=@{character_name}}} {{action=@{weaponname} - @{parry}}} {{value=[[@{weaponparrytotal}]]}} {{dispute=[[ [[2d6cs>2cf<5]] + @{weaponparrytotal} ]] }} {{roll=$[[1]]}}"></button>
                 </div>
 
                 <div class="showhidebutton arrowtype">
@@ -721,7 +721,7 @@
                       value="0" />
                     <input class="weapons-damage-total" name="attr_weaponblowtotal" type="text"
                       title="@{weaponblowtotal}" disabled="true"
-                      value="@{weaponlevel} + @{weaponblow} + @{fightblow} + (@{chardexterity} @{weaponeffect})" />
+                      value="@{weaponlevel} + @{weaponblow} + (@{chardexterity} @{weaponeffect})" />
                   </div>
 
                   <div class="weapons-subheader-grid">
@@ -729,7 +729,7 @@
                       value="0" />
                     <input class="weapons-damage-total" name="attr_weaponparrytotal" type="text"
                       title="@{weaponparrytotal}" disabled="true"
-                      value="@{weaponlevel} + @{weaponparry} + @{fightparry} + (@{chardexterity} @{weaponeffect})" />
+                      value="@{weaponlevel} + @{weaponparry} + (@{chardexterity} @{weaponeffect})" />
                   </div>
 
                 </div>
@@ -1335,15 +1335,15 @@
     },
     {
       fightblow: 1,
-      fightparry: 0,
+      fightparry: 1,
       fightdodgebonus: 0,
       fightdamage: 'd2-1' 
     },
     {
-      fightblow: 1,
-      fightparry: 1,
+      fightblow: 2,
+      fightparry: 2,
       fightdodgebonus: 1,
-      fightdamage: '1' 
+      fightdamage: 'd2-1' 
     },
     {
       fightblow: 2,
@@ -1356,6 +1356,18 @@
       fightparry: 3,
       fightdodgebonus: 2,
       fightdamage: '1' 
+    },
+    {
+      fightblow: 4,
+      fightparry: 4,
+      fightdodgebonus: 2,
+      fightdamage: '1' 
+    },
+    {
+      fightblow: 4,
+      fightparry: 4,
+      fightdodgebonus: 2,
+      fightdamage: '1' 
     }
   ];
 
@@ -1366,7 +1378,9 @@
     out = {};
     
     let skillCost = getSkillCost(skillLevel);
-    let fightParams = fightParameters[skillLevel];
+    
+    /* fight levels beyond 6 give no more bonus, so we have to use the level 6 bonus */
+    let fightParams = skillLevel>6 ? fightParameters[6]:fightParameters[skillLevel];
     
     out.fightcost = skillCost;
     out = Object.assign(out, fightParams);
