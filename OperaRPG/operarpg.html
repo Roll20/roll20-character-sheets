@@ -899,11 +899,11 @@
             <input class="row-item-margin" readonly="true" name="attr_fight_name" type="text" title="@{fight_name}"
               data-i18n-placeholder="fight" placeholder="Briga" />
             <span class="secondary-font" data-i18n="dexterity">Destreza</span>
-            <input type="hidden" name="attr_fightattribute" value="@{chardexterity}" />
+            
             <input class="row-item-margin" name="attr_fightlevel" type="text" title="@{fightlevel}" value="0" />
             <input class="row-item-margin" name="attr_fightcost" type="text" readonly title="@{fightcost}" value="1" />
-            <input class="row-item-margin" name="attr_fighttotal" type="number" disabled="true" title="@{fighttotal}"
-              value="@{fightattribute} + @{fightlevel}" />
+            <input class="row-item-margin" name="attr_fighttotal" type="number" readonly title="@{fighttotal}"
+              value="0" />
 
             <div>
             </div>
@@ -921,20 +921,20 @@
                   value="&{template:main} {{charname=@{character_name}}} {{action=@{skill}}} {{value=[[@{skilltotal}]]}}  {{dispute=[[ [[2d6cs>2cf<5]] + @{skilltotal}]]}} {{roll=$[[1]]}}"></button>
                 <input class="row-item-margin" name="attr_skill" type="text" title="@{skill}" />
                 <select class="select row-item-margin" name="attr_skillattribute" title="@{skillattribute}">
-                  <option value="@{charphysique}" data-i18n="physique" selected="selected">Físico</option>
-                  <option value="@{chardexterity}" data-i18n="dexterity">Destreza</option>
-                  <option value="@{charintelligence}" data-i18n="intelligence">Inteligência</option>
-                  <option value="@{charwill}" data-i18n="will">Vontade</option>
-                  <option value="@{charmind}" data-i18n="mind">Mente</option>
-                  <option value="@{charmagic}" data-i18n="magic">Magia</option>
-                  <option value="@{charperception}" data-i18n="perception">Percepção</option>
-                  <option value="@{charluck}" data-i18n="luck">Sorte</option>
+                  <option value="charphysique" data-i18n="physique" selected="selected">Físico</option>
+                  <option value="chardexterity" data-i18n="dexterity">Destreza</option>
+                  <option value="charintelligence" data-i18n="intelligence">Inteligência</option>
+                  <option value="charwill" data-i18n="will">Vontade</option>
+                  <option value="charmind" data-i18n="mind">Mente</option>
+                  <option value="charmagic" data-i18n="magic">Magia</option>
+                  <option value="charperception" data-i18n="perception">Percepção</option>
+                  <option value="charluck" data-i18n="luck">Sorte</option>
                 </select>
                 <input class="row-item-margin" name="attr_skilllevel" type="text" title="@{skilllevel}" value="1" />
                 <input class="row-item-margin" name="attr_skillcost" type="text" readonly title="@{skillcost}"
                   value="1" />
-                <input class="row-item-margin" name="attr_skilltotal" type="number" disabled="true"
-                  title="@{skilltotal}" value="@{skillattribute} + @{skilllevel}" />
+                <input class="row-item-margin" name="attr_skilltotal" type="number" readonly
+                  title="@{skilltotal}" value="0" />
 
                 <div class="showhidebutton arrowtype">
                   <input type="checkbox" name="attr_showhide_checkbox" value="1" />
@@ -1252,6 +1252,66 @@
 
     setAttrs({
       repeating_skills_skillcost: skillCost
+    });
+  });
+
+  /*sets a skill total. If the total exceeds 14, sets the maximum 14 */
+  function setSkillTotal(attributeField, levelField, totalField) {
+
+    getAttrs([attributeField, levelField], function(values) {
+      let total = 0;
+      let target = {};
+      
+      total += parseInt(values[attributeField])||0;
+      total += parseInt(values[levelField])||0;
+
+      console.log(total);
+
+      target[totalField] = total > 14? 14 : total;
+      
+      setAttrs(target);
+    });
+  }
+
+  /* setting the Fight Skill Total */
+  on('change:chardexterity change:fightlevel', function(eventInfo) {
+    setSkillTotal('chardexterity', 'fightlevel', 'fighttotal');
+  });
+
+  /* Since the repeating_skills skillattribute has changed from @{attributeName} to
+   * simply attributeName, this parse is needed to make the skill total calc worker
+   * with old sheets */
+  function parseAttributeName(attrName) {
+    let ret = attrName.replace('@{','').replace('}','');
+
+    return ret;
+  }
+
+  /* setting skill total */
+  on('change:repeating_skills:skillattribute change:repeating_skills:skilllevel ' +
+  'change:charphysique '+
+  'change:chardexterity '+
+  'change:charintelligence '+
+  'change:charperception '+
+  'change:charwill '+
+  'change:charmind '+
+  'change:charmagic '+
+  'change:charluck '
+  , function(eventInfo) {
+    
+    /* recovering all skills IDs */
+    getSectionIDs(`repeating_skills`, idArray => {
+      idArray.forEach(id => {
+
+        /*recovering skill attribute name */
+        getAttrs([`repeating_skills_${id}_skillattribute`], values => {
+          let attrName = parseAttributeName(values[`repeating_skills_${id}_skillattribute`]);
+          
+          setSkillTotal(attrName, `repeating_skills_${id}_skilllevel` , `repeating_skills_${id}_skilltotal`)
+          
+        });
+      });
+    
     });
   });
 
