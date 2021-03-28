@@ -668,6 +668,23 @@ setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogu
 setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue');
 // --- End setup Rogue skills total --- //
 
+//Rogue armor modifier auto fill
+on('change:armorname', function(eventInfo) {
+    let armor = rogueArmor[eventInfo.newValue];
+    if (armor === undefined)
+        return;
+    
+    let armorModifiers = {
+        'pparmorp': armor['Pick Pockets'],
+        'olarmorp': armor['Open Locks'] || '-0',
+        'rtarmorp': armor['Find/Remove Traps'] || '-0',
+        'msarmorp': armor['Move Silently'] || '-0',
+        'hsarmorp': armor['Hide in Shadows'] || '-0',
+        'dnarmorp': armor['Detect Noise'],
+        'cwarmorp': armor['Climb Walls'],
+    };
+    setAttrs(armorModifiers);
+});
 //Rogue Custom Skills level sum
 on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
@@ -702,7 +719,7 @@ on('change:nonprof-penalty', function (eventInfo) {
 
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo){
-    let weapon = Weapons[eventInfo.newValue];
+    let weapon = weapons[eventInfo.newValue];
     if (weapon === undefined)
         return;
 
@@ -720,7 +737,7 @@ on('change:repeating_weapons:weaponname', function(eventInfo){
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
-    let weapon = Weapons[eventInfo.newValue];
+    let weapon = weapons[eventInfo.newValue];
     if (weapon === undefined)
         return;
 
@@ -735,7 +752,7 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
 
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo){
-    let weapon = Weapons[eventInfo.newValue];
+    let weapon = weapons[eventInfo.newValue];
     if (weapon === undefined)
         return;
 
@@ -755,7 +772,7 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo){
-    let weapon = Weapons[eventInfo.newValue];
+    let weapon = weapons[eventInfo.newValue];
     if (weapon === undefined)
         return;
 
@@ -780,7 +797,7 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     
     sections.forEach(section => {
         on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
-            let weapon = Weapons[eventInfo.newValue];
+            let weapon = weapons[eventInfo.newValue];
             if (weapon === undefined)
                 return;
             

@@ -1,5 +1,5 @@
-const Weapons = {};
-Weapons['Arquebus'] = {
+const weapons = {};
+weapons['Arquebus'] = {
     'rof': '1/3',
     'range': '50/150/210',
     'size': 'M',
@@ -9,7 +9,7 @@ Weapons['Arquebus'] = {
     'large': '1d10',
     'knockdown': 'd8'
 }
-Weapons['Battle axe'] = {
+weapons['Battle axe'] = {
     'size': 'M',
     'type': 'S',
     'speed': 7,
@@ -17,7 +17,7 @@ Weapons['Battle axe'] = {
     'large': '1d8',
     'knockdown': 'd10'
 }
-Weapons['Blowgun (Barbed Dart)'] = {
+weapons['Blowgun (Barbed Dart)'] = {
     'rof': '2/1',
     'range': '10/20/30',
     'size': 'L',
@@ -27,7 +27,7 @@ Weapons['Blowgun (Barbed Dart)'] = {
     'large': '1d2',
     'knockdown': 'd4'
 }
-Weapons['Blowgun (Needle)'] = {
+weapons['Blowgun (Needle)'] = {
     'rof': '2/1',
     'range': '10/20/30',
     'size': 'L',
@@ -36,7 +36,7 @@ Weapons['Blowgun (Needle)'] = {
     'small-medium': '1',
     'large': '1',
 }
-Weapons['Short bow (Flight arrow)'] = {
+weapons['Short bow (Flight arrow)'] = {
     'rof': '2/1',
     'range': '50/100/150',
     'size': 'M',
@@ -46,7 +46,7 @@ Weapons['Short bow (Flight arrow)'] = {
     'large': '1d6',
     'knockdown': 'd6'
 }
-Weapons['Long bow (Flight arrow)'] = {
+weapons['Long bow (Flight arrow)'] = {
     'rof': '2/1',
     'range': '70/140/210',
     'size': 'L',
@@ -56,7 +56,7 @@ Weapons['Long bow (Flight arrow)'] = {
     'large': '1d6',
     'knockdown': 'd6'
 }
-Weapons['Long bow (Sheaf arrow)'] = {
+weapons['Long bow (Sheaf arrow)'] = {
     'rof': '2/1',
     'range': '50/100/150',
     'size': 'L',
@@ -66,7 +66,7 @@ Weapons['Long bow (Sheaf arrow)'] = {
     'large': '1d8',
     'knockdown': 'd6'
 }
-Weapons['Composite short bow (Flight arrow)'] = {
+weapons['Composite short bow (Flight arrow)'] = {
     'rof': '2/1',
     'range': '50/100/180',
     'size': 'M',
@@ -76,7 +76,7 @@ Weapons['Composite short bow (Flight arrow)'] = {
     'large': '1d6',
     'knockdown': 'd6'
 }
-Weapons['Composite long bow (Flight arrow)'] = {
+weapons['Composite long bow (Flight arrow)'] = {
     'rof': '2/1',
     'range': '60/120/210',
     'size': 'L',
@@ -86,7 +86,7 @@ Weapons['Composite long bow (Flight arrow)'] = {
     'large': '1d6',
     'knockdown': 'd6'
 }
-Weapons['Composite long bow (Sheaf arrow)'] = {
+weapons['Composite long bow (Sheaf arrow)'] = {
     'rof': '2/1',
     'range': '40/80/170',
     'size': 'L',
@@ -96,7 +96,7 @@ Weapons['Composite long bow (Sheaf arrow)'] = {
     'large': '1d8',
     'knockdown': 'd6'
 }
-Weapons['Club'] = {
+weapons['Club'] = {
     'strength': true,
     'rof': '1',
     'range': '10/20/30',
@@ -107,7 +107,7 @@ Weapons['Club'] = {
     'large': '1d3',
     'knockdown': 'd8'
 }
-Weapons['Hand crossbow'] = {
+weapons['Hand crossbow'] = {
     'rof': '1',
     'range': '20/40/60',
     'size': 'S',
@@ -117,7 +117,7 @@ Weapons['Hand crossbow'] = {
     'large': '1d2',
     'knockdown': 'd4'
 }
-Weapons['Light crossbow'] = {
+weapons['Light crossbow'] = {
     'rof': '1',
     'range': '60/120/180',
     'size': 'M',
@@ -127,7 +127,7 @@ Weapons['Light crossbow'] = {
     'large': '1d4',
     'knockdown': 'd6'
 }
-Weapons['Heavy crossbow'] = {
+weapons['Heavy crossbow'] = {
     'rof': '1/2',
     'range': '80/160/240',
     'size': 'M',
@@ -137,7 +137,7 @@ Weapons['Heavy crossbow'] = {
     'large': '1d6+1',
     'knockdown': 'd6'
 }
-Weapons['Dagger'] = {
+weapons['Dagger'] = {
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -148,7 +148,7 @@ Weapons['Dagger'] = {
     'large': '1d3',
     'knockdown': 'd6'
 }
-Weapons['Dirk'] = {
+weapons['Dirk'] = {
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -159,7 +159,7 @@ Weapons['Dirk'] = {
     'large': '1d3',
     'knockdown': 'd6'
 }
-Weapons['Dart'] = {
+weapons['Dart'] = {
     'strength': true,
     'rof': '3/1',
     'range': '10/20/40',
@@ -170,7 +170,7 @@ Weapons['Dart'] = {
     'large': '1d2',
     'knockdown': 'd4'
 }
-Weapons['Footman\'s flail'] = {
+weapons['Footman\'s flail'] = {
     'size': 'M',
     'type': 'B',
     'speed': 7,
@@ -178,7 +178,7 @@ Weapons['Footman\'s flail'] = {
     'large': '2d4',
     'knockdown': 'd12'
 }
-Weapons['Footman\'s mace'] = {
+weapons['Footman\'s mace'] = {
     'size': 'M',
     'type': 'B',
     'speed': 7,
@@ -186,7 +186,7 @@ Weapons['Footman\'s mace'] = {
     'large': '1d6',
     'knockdown': 'd10'
 }
-Weapons['Footman\'s pick'] = {
+weapons['Footman\'s pick'] = {
     'size': 'M',
     'type': 'P',
     'speed': 7,
@@ -194,7 +194,7 @@ Weapons['Footman\'s pick'] = {
     'large': '2d4',
     'knockdown': 'd8'
 }
-Weapons['Hand axe'] = {
+weapons['Hand axe'] = {
     'strength': true,
     'rof': '1',
     'range': '10/20/30',
@@ -205,7 +205,7 @@ Weapons['Hand axe'] = {
     'large': '1d4',
     'knockdown': 'd10'
 }
-Weapons['Harpoon'] = {
+weapons['Harpoon'] = {
     'strength': true,
     'rof': '1',
     'range': '10/20/30',
@@ -216,7 +216,7 @@ Weapons['Harpoon'] = {
     'large': '2d6',
     'knockdown': 'd8'
 }
-Weapons['Horseman\'s flail'] = {
+weapons['Horseman\'s flail'] = {
     'size': 'M',
     'type': 'B',
     'speed': 6,
@@ -224,7 +224,7 @@ Weapons['Horseman\'s flail'] = {
     'large': '1d4+1',
     'knockdown': 'd10'
 }
-Weapons['Horseman\'s mace'] = {
+weapons['Horseman\'s mace'] = {
     'size': 'M',
     'type': 'B',
     'speed': 6,
@@ -232,7 +232,7 @@ Weapons['Horseman\'s mace'] = {
     'large': '1d4',
     'knockdown': 'd8'
 }
-Weapons['Horseman\'s pick'] = {
+weapons['Horseman\'s pick'] = {
     'size': 'M',
     'type': 'P',
     'speed': 5,
@@ -240,7 +240,7 @@ Weapons['Horseman\'s pick'] = {
     'large': '1d4',
     'knockdown': 'd6'
 }
-Weapons['Javelin'] = {
+weapons['Javelin'] = {
     'strength': true,
     'rof': '1',
     'range': '20/40/60',
@@ -251,7 +251,7 @@ Weapons['Javelin'] = {
     'large': '1d6',
     'knockdown': 'd6'
 }
-Weapons['Knife'] = {
+weapons['Knife'] = {
     'strength': true,
     'rof': '2/1',
     'range': '10/20/30',
@@ -262,7 +262,7 @@ Weapons['Knife'] = {
     'large': '1d2',
     'knockdown': 'd4'
 }
-Weapons['Heavy horse lance'] = {
+weapons['Heavy horse lance'] = {
     'size': 'L',
     'type': 'P',
     'speed': 8,
@@ -270,7 +270,7 @@ Weapons['Heavy horse lance'] = {
     'large': '3d6',
     'knockdown': 'd12'
 }
-Weapons['Light horse lance'] = {
+weapons['Light horse lance'] = {
     'size': 'L',
     'type': 'P',
     'speed': 6,
@@ -278,7 +278,7 @@ Weapons['Light horse lance'] = {
     'large': '1d8',
     'knockdown': 'd8'
 }
-Weapons['Jousting lance'] = {
+weapons['Jousting lance'] = {
     'size': 'L',
     'type': 'P',
     'speed': 10,
@@ -286,7 +286,7 @@ Weapons['Jousting lance'] = {
     'large': '1d2-1',
     'knockdown': 'd6'
 }
-Weapons['Medium horse lance'] = {
+weapons['Medium horse lance'] = {
     'size': 'L',
     'type': 'P',
     'speed': 7,
@@ -294,7 +294,7 @@ Weapons['Medium horse lance'] = {
     'large': '2d6',
     'knockdown': 'd10'
 }
-Weapons['Mancatcher'] = {
+weapons['Mancatcher'] = {
     'size': 'L',
     'type': '',
     'speed': 7,
@@ -302,7 +302,7 @@ Weapons['Mancatcher'] = {
     'large': '—',
     'knockdown': 'd6'
 }
-Weapons['Morning star'] = {
+weapons['Morning star'] = {
     'size': 'M',
     'type': 'P/B',
     'speed': 7,
@@ -310,7 +310,7 @@ Weapons['Morning star'] = {
     'large': '1d6+1',
     'knockdown': 'd10'
 }
-Weapons['Awl pike'] = {
+weapons['Awl pike'] = {
     'size': 'L',
     'type': 'P',
     'speed': 13,
@@ -318,7 +318,7 @@ Weapons['Awl pike'] = {
     'large': '1d12',
     'knockdown': 'd8'
 }
-Weapons['Bardiche'] = {
+weapons['Bardiche'] = {
     'size': 'L',
     'type': 'S',
     'speed': 9,
@@ -326,7 +326,7 @@ Weapons['Bardiche'] = {
     'large': '2d6',
     'knockdown': 'd12'
 }
-Weapons['Bec de corbin'] = {
+weapons['Bec de corbin'] = {
     'size': 'L',
     'type': 'P/B',
     'speed': 9,
@@ -334,7 +334,7 @@ Weapons['Bec de corbin'] = {
     'large': '1d6',
     'knockdown': 'd10'
 }
-Weapons['Bill-guisarme'] = {
+weapons['Bill-guisarme'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 10,
@@ -342,7 +342,7 @@ Weapons['Bill-guisarme'] = {
     'large': '1d10',
     'knockdown': 'd10'
 }
-Weapons['Fauchard'] = {
+weapons['Fauchard'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 8,
@@ -350,14 +350,14 @@ Weapons['Fauchard'] = {
     'large': '1d8',
     'knockdown': 'd8'
 }
-Weapons['Fauchard-fork'] = {
+weapons['Fauchard-fork'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 8,
     'small-medium': '1d8',
     'large': '1d10',
 }
-Weapons['Glaive'] = {
+weapons['Glaive'] = {
     'size': 'L',
     'type': 'S',
     'speed': 8,
@@ -365,7 +365,7 @@ Weapons['Glaive'] = {
     'large': '1d10',
     'knockdown': 'd10'
 }
-Weapons['Glaive-guisarme'] = {
+weapons['Glaive-guisarme'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 9,
@@ -373,7 +373,7 @@ Weapons['Glaive-guisarme'] = {
     'large': '2d6',
     'knockdown': 'd10'
 }
-Weapons['Guisarme'] = {
+weapons['Guisarme'] = {
     'size': 'L',
     'type': 'S',
     'speed': 8,
@@ -381,14 +381,14 @@ Weapons['Guisarme'] = {
     'large': '1d8',
     'knockdown': 'd10'
 }
-Weapons['Guisarme-voulge'] = {
+weapons['Guisarme-voulge'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 10,
     'small-medium': '2d4',
     'large': '2d4',
 }
-Weapons['Halberd'] = {
+weapons['Halberd'] = {
     'size': 'L',
     'type': 'P/S',
     'speed': 9,
@@ -396,14 +396,14 @@ Weapons['Halberd'] = {
     'large': '2d6',
     'knockdown': 'd12'
 }
-Weapons['Hook fauchard'] = {
+weapons['Hook fauchard'] = {
     'size': 'L',
     'type': 'P',
     'speed': 9,
     'small-medium': '1d4',
     'large': '1d4',
 }
-Weapons['Lucern hammer'] = {
+weapons['Lucern hammer'] = {
     'size': 'L',
     'type': 'P/B',
     'speed': 9,
@@ -411,7 +411,7 @@ Weapons['Lucern hammer'] = {
     'large': '1d6',
     'knockdown': 'd10'
 }
-Weapons['Military fork'] = {
+weapons['Military fork'] = {
     'size': 'L',
     'type': 'P',
     'speed': 7,
@@ -419,7 +419,7 @@ Weapons['Military fork'] = {
     'large': '2d4',
     'knockdown': 'd8'
 }
-Weapons['Partisan'] = {
+weapons['Partisan'] = {
     'size': 'L',
     'type': 'P',
     'speed': 9,
@@ -427,7 +427,7 @@ Weapons['Partisan'] = {
     'large': '1d6+1',
     'knockdown': 'd8'
 }
-Weapons['Ranseur'] = {
+weapons['Ranseur'] = {
     'size': 'L',
     'type': 'P',
     'speed': 8,
@@ -435,7 +435,7 @@ Weapons['Ranseur'] = {
     'large': '2d4',
     'knockdown': 'd8'
 }
-Weapons['Spetum'] = {
+weapons['Spetum'] = {
     'size': 'L',
     'type': 'P',
     'speed': 8,
@@ -443,7 +443,7 @@ Weapons['Spetum'] = {
     'large': '2d6',
     'knockdown': 'd8'
 }
-Weapons['Voulge'] = {
+weapons['Voulge'] = {
     'size': 'L',
     'type': 'S',
     'speed': 10,
@@ -451,7 +451,7 @@ Weapons['Voulge'] = {
     'large': '2d4',
     'knockdown': 'd12'
 }
-Weapons['Quarterstaff'] = {
+weapons['Quarterstaff'] = {
     'size': 'L',
     'type': 'B',
     'speed': 4,
@@ -459,7 +459,7 @@ Weapons['Quarterstaff'] = {
     'large': '1d6',
     'knockdown': 'd10'
 }
-Weapons['Scourge'] = {
+weapons['Scourge'] = {
     'size': 'S',
     'type': '',
     'speed': 5,
@@ -467,7 +467,7 @@ Weapons['Scourge'] = {
     'large': '1d2',
     'knockdown': 'd4'
 }
-Weapons['Sickle'] = {
+weapons['Sickle'] = {
     'size': 'S',
     'type': 'S',
     'speed': 4,
@@ -475,7 +475,7 @@ Weapons['Sickle'] = {
     'large': '1d4',
     'knockdown': 'd4'
 }
-Weapons['Sling (Bullet)'] = {
+weapons['Sling (Bullet)'] = {
     'strength': true,
     'rof': '1',
     'range': '50/100/200',
@@ -486,7 +486,7 @@ Weapons['Sling (Bullet)'] = {
     'large': '1d6+1',
     'knockdown': 'd4'
 }
-Weapons['Sling (Stone)'] = {
+weapons['Sling (Stone)'] = {
     'strength': true,
     'rof': '1',
     'range': '40/80/160',
@@ -497,7 +497,7 @@ Weapons['Sling (Stone)'] = {
     'large': '1d4',
     'knockdown': 'd4'
 }
-Weapons['Spear'] = {
+weapons['Spear'] = {
     'strength': true,
     'rof': '1',
     'range': '10/20/30',
@@ -508,7 +508,7 @@ Weapons['Spear'] = {
     'large': '1d8',
     'knockdown': 'd6'
 }
-Weapons['Staff sling (Bullet)'] = {
+weapons['Staff sling (Bullet)'] = {
     'strength': true,
     'rof': '2/1',
     'range': '—/30-60/90',
@@ -518,7 +518,7 @@ Weapons['Staff sling (Bullet)'] = {
     'small-medium': '1d4+1',
     'large': '1d6+1',
 }
-Weapons['Staff sling (Stone)'] = {
+weapons['Staff sling (Stone)'] = {
     'strength': true,
     'rof': '2/1',
     'range': '—/30-60/90',
@@ -529,7 +529,7 @@ Weapons['Staff sling (Stone)'] = {
     'large': '1d4',
     'knockdown': 'd6'
 }
-Weapons['Bastard sword (One-handed)'] = {
+weapons['Bastard sword (One-handed)'] = {
     'size': 'M',
     'type': 'S',
     'speed': 6,
@@ -537,7 +537,7 @@ Weapons['Bastard sword (One-handed)'] = {
     'large': '1d12',
     'knockdown': 'd8'
 }
-Weapons['Bastard sword (Two-handed)'] = {
+weapons['Bastard sword (Two-handed)'] = {
     'size': 'M',
     'type': 'S',
     'speed': 8,
@@ -545,7 +545,7 @@ Weapons['Bastard sword (Two-handed)'] = {
     'large': '2d8',
     'knockdown': 'd10'
 }
-Weapons['Broad sword'] = {
+weapons['Broad sword'] = {
     'size': 'M',
     'type': 'S',
     'speed': 5,
@@ -553,7 +553,7 @@ Weapons['Broad sword'] = {
     'large': '1d6+1',
     'knockdown': 'd8'
 }
-Weapons['Khopesh'] = {
+weapons['Khopesh'] = {
     'size': 'M',
     'type': 'S',
     'speed': 9,
@@ -561,7 +561,7 @@ Weapons['Khopesh'] = {
     'large': '1d6',
     'knockdown': 'd8'
 }
-Weapons['Long sword'] = {
+weapons['Long sword'] = {
     'size': 'M',
     'type': 'S',
     'speed': 5,
@@ -569,7 +569,7 @@ Weapons['Long sword'] = {
     'large': '1d12',
     'knockdown': 'd8'
 }
-Weapons['Scimitar'] = {
+weapons['Scimitar'] = {
     'size': 'M',
     'type': 'S',
     'speed': 5,
@@ -577,7 +577,7 @@ Weapons['Scimitar'] = {
     'large': '1d8',
     'knockdown': 'd8'
 }
-Weapons['Short sword'] = {
+weapons['Short sword'] = {
     'size': 'S',
     'type': 'P',
     'speed': 3,
@@ -585,7 +585,7 @@ Weapons['Short sword'] = {
     'large': '1d8',
     'knockdown': 'd6'
 }
-Weapons['Two-handed sword'] = {
+weapons['Two-handed sword'] = {
     'size': 'L',
     'type': 'S',
     'speed': 10,
@@ -593,7 +593,7 @@ Weapons['Two-handed sword'] = {
     'large': '3d6',
     'knockdown': 'd12'
 }
-Weapons['Trident'] = {
+weapons['Trident'] = {
     'size': 'L',
     'type': 'P',
     'speed': 7,
@@ -601,7 +601,7 @@ Weapons['Trident'] = {
     'large': '3d4',
     'knockdown': 'd8'
 }
-Weapons['Warhammer'] = {
+weapons['Warhammer'] = {
     'strength': true,
     'rof': '1',
     'range': '10/20/30',
@@ -612,7 +612,7 @@ Weapons['Warhammer'] = {
     'large': '1d4',
     'knockdown': 'd8'
 }
-Weapons['Whip'] = {
+weapons['Whip'] = {
     'size': 'M',
     'type': '',
     'speed': 8,
