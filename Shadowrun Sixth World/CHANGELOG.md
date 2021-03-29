@@ -1,6 +1,21 @@
 Change Log
 ==============================================
 
+**2021-03-29** v.25 Chuz (James Culp)
+	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
+	Started changes for NPC sheets.
+	Updated npc sheets image, settings and toggle headers.
+	Styled npc toggles and attribute buttons
+	Updated attribute roll buttons to be consistent with PC sheet buttons.
+	Made Magic now visible if Awakened OR Spirit are selected
+	Made Force only visible if Spirit is selected
+	Updated styles and html to make settings hide/reveal correctly for non-pc sheets
+	Updated matrix grid to work properly with 0 for a stat
+	Changed npc pain tolerance to be in options
+	Updated npc options -> grunt type (mundane, awakened, emergent, spirit) to be a select labeled Archetype
+	Updated "Bonuses" and "Modifier" column variables for non-PC sheets.  They now have the proper name='' fields.
+	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
+
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
 	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
