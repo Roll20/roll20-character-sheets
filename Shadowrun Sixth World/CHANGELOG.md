@@ -15,6 +15,8 @@ Change Log
 	Updated npc options -> grunt type (mundane, awakened, emergent, spirit) to be a select labeled Archetype
 	Updated "Bonuses" and "Modifier" column variables for non-PC sheets.  They now have the proper name='' fields.
 	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
+	Some more style updates to npc sheets
+	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
 
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
