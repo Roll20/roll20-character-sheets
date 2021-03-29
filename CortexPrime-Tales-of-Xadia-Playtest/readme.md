@@ -4,20 +4,18 @@ Tales of Xadia: The Dragon Prince RPG - Playtest Character Sheet - Cortex Prime
 
 - Open the Journal tab, and add a new Character.
 - Click on save changes.
-- Open the Attributes and Abilities tab.
-- Add an attribute called 'Edit' and assign it the value'on'.
-- Now switch to the Character Sheet tab.
-- Select if this is going to be a PC or Catalyst character. 
-- Select the Character name from the list - this will select the character portrait and fill out the distinction blocks. Select 'None' if you are not using any of the pregen characters.
+- Click on the Character Sheet tab
+- Check the Edit box in the top left. 
+- Select the Profile of the Pregen Character from the list - this will select the character portrait and fill out the distinction blocks. Select 'Tales of Xadia logo' if you are not using any of the pregen characters.
 - Set the dice values for the Attributes, Values, and Specialities using the further drop downs.
-- Hide the Editor by removing the edit field from the Attributes and Abilities tab, or by assigning it the value 'off'.
-- Enter the remaining details - Name, Description, Value statements, Asset details and custom Distinctions in the editable text fields.
+- Hide the Editor by unchecking the box.
+- Enter the remaining details - Name, Description, Value statements, Asset details and custom Distinctions (Pregen Character distinctions are included already) in the editable text fields.
 
 - Repeat this for each of the remaining characters.
 
 ##Dice Pool Builder
 
-The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and keeps highest two dice in the pool by default. I refer to this as the suggested best result. If you create a Catalyst character the roller will adjust if you specified this in the edit feature.
+The inbuilt Dice Pool Builder pulls from the character's attributes, rolls displays the results.
 
 ##Stress and Trauma
 
@@ -39,5 +37,10 @@ Artwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.
 
 ##Changelog
 
+### v.1.3 2021-03-30
+
+Recoded the backend structure to match coding standards in Hammerheads Sheet
+Added the Cortex Roll Template and customised it to the ToX build.
+Added a mobile layout - which will support the Beta Mobile Character App.
 
 ### v.1.2 2021-03-05
