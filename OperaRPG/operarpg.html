@@ -34,8 +34,8 @@
           <span class="column-header  secondary-font" data-i18n="used">Usado</span>
 
           <input class="bigger-number-input" name="attr_max_creation_points" type="number" title="@{max_creation_points}" value="0" />
-          <input class="bigger-number-input" name="attr_used_creation_points" type="number" disabled="true" title="@{used_creation_points}"
-            value="@{powers_total_cost} + @{skills_total_cost} + @{features_total_cost} + @{fightcost}" />
+          <input class="bigger-number-input" name="attr_used_creation_points" type="number" readonly title="@{used_creation_points}"
+            value="0" />
         </div>
       </div>
 
@@ -1228,19 +1228,105 @@
       repeatingSum("totalpenalty","protection", "protectionpenalty");        
   });
 
+  /* Declaring a Cost Object to be used on creation points calculation */
+  function Cost(negative, positive) {
+    this.negative = negative;
+    this.positive = positive;
+  }
+
+  /* calculates total Cost of a repeating section */
+  function calculateCost(section, field, total) {
+    
+    getSectionIDs(section, idArray => {
+      const fields = idArray.map(id => `${section}_${id}_${field}`);
+      
+      getAttrs(fields, function(values) {
+        console.log(`begin calc Cost for ${total} `);
+        let out = {};
+        out[total] = new Cost(0,0);
+
+        for (let key in values) {
+          let parsedValue = parseInt(values[key])||0;
+
+          if (parsedValue > 0) {
+            out[total].positive += parsedValue;
+          } else {
+            out[total].negative += parsedValue;
+          }
+
+        }
+
+        console.log(out);
+
+        setAttrs(out);
+      });
+    
+    });
+  }
+
+  function getIntValue(value) {
+    return parseInt(value)||0;
+  }
+  
+  /* calculating total creation points */
+  on('sheet:opened change:fightcost ' +
+     'change:powers_total_cost ' +
+     'change:skills_total_cost ' +
+     'change:features_total_cost'
+     , function() {
+      
+      getAttrs(['fightcost', 'powers_total_cost', 'skills_total_cost', 'features_total_cost'], values =>{
+        let totalNegative = 0;
+        let totalPositive = 0;
+        console.log('begin calc creation points');
+        for (let key in values) {
+          v = values[key];
+          console.log(v);
+          if (v.positive !== undefined) {
+            totalPositive += getIntValue(v.positive);
+            totalNegative += getIntValue(v.negative);
+          } else {
+            /*if it doesn't have the positive property, than it is the simple fightcost value */
+            totalPositive += getIntValue(v);
+          }
+        }
+
+        /* each negative point beyond -10 costs half rounded down. 
+         * Ex: -15 has -5 past -10, so -15 will be (-10) + (-5/2) = -10 -2 = -12.
+         */
+        if (totalNegative < -10) {
+          
+          totalNegative = -10 + Math.floor((totalNegative+10)/2);
+        }
+
+        /* the max negative cost is -20 */
+        if (totalNegative < -20) {
+          totalNegative = -20;
+        }
+
+        console.log(`total negative = ${totalNegative}`);
+        console.log(`total positive = ${totalPositive}`);
+
+        setAttrs({
+          used_creation_points: totalPositive+totalNegative
+        });
+      });
+  });
+
+
   /* calculating total powers cost */
   on('sheet:opened change:repeating_powers remove:repeating_powers', function() {
-      repeatingSum("powers_total_cost","powers", "powercost");        
+    calculateCost("repeating_powers", "powercost", "powers_total_cost");
   });
 
   /* calculating total skills cost */
   on('sheet:opened change:repeating_skills remove:repeating_skills', function() {
-      repeatingSum("skills_total_cost","skills", "skillcost");        
+    calculateCost("repeating_skills", "skillcost", "skills_total_cost");        
   });
 
   /* calculating total features cost */
   on('sheet:opened change:repeating_features remove:repeating_features', function() {
-      repeatingSum("features_total_cost","features", "featurecost");        
+    calculateCost("repeating_features", "featurecost", "features_total_cost");        
   });
 
   function getSkillCost(skillLevel) {
