@@ -1949,6 +1949,52 @@
   // ___________________________________________________________________________
   // ________________Unnatural Characteristics Mod sheet worker_________________
   // ___________________________________________________________________________
+  
+  /**
+   * skillRoll description
+   * @param {string} skill name of the skill
+   * @param {string} focus short name of the characteristic
+   */
+   /*
+  const skillRoll = (skill, focus) => {
+	let attr = {};
+	  attr[`${skill}_focus`] = `@{${focus}Total}`;
+	  attr[`${skill}_unnat`]=`@{${focus.toUpperCase()}_unnat}`;
+	return attr;
+  };
+  let skills = ['acrobatics','athletics','awareness','charm','command','commerce','deceive','dodge','inquiry',
+	'interrogation','intimidate','logic','medicae','nav_surface','nav_stellar','nav_warp','op_aero','op_surface','op_void',
+	'parry','psyniscience','scrutiny','security','sleight','stealth','survival','tech_use',
+	'linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
+  let repeatingSkills = ['skill','linguistics','common-lore','scholastic-lore','forbidden-lore','trade'];
+  on('sheet:opened ' + skills.map(skill => `change:${skill}_char change:${skill}_name`).join(' ') + repeatingSkills.map(skill => `change:repeating_${skill}:${skill}_r_char change:repeating_${skill}:${skill}_name`).join(' '), function () {
+	console.log('== UPDATING SKILLS ==');
+	getAttrs(skills.map( skill => `${skill}_char`), (values) => {
+	  let attr = {};
+	  for (var [skill, focus] of Object.entries(values)) {
+		attr = {...attr, ...skillRoll(skill.replace('_char', ''), focus)};
+	  }
+	  setAttrs(attr);
+	});
+	repeatingSkills.forEach(field => {
+	  var repSkills = [];
+	  getSectionIDs(field, ids => {
+		ids.forEach( id => {
+		  repSkills.push(`repeating_${field}_${id}_${field}_r_char`);
+		});
+		getAttrs(repSkills, (values) => {
+		  let attr;
+		  for (var [skill, focus] of Object.entries(values)) {
+			attr = {...attr, ...skillRoll(skill.replace('_char', ''), focus)};
+		  }
+		  if (attr) setAttrs(attr);
+		});
+	  });
+	});
+	console.log('== SKILLS UPDATED ==');
+  });*/
+  
+
   on('sheet:opened change:ws_unnat change:bs_unnat change:str_unnat change:tou_unnat change:agi_unnat change:int_unnat change:per_unnat change:wp_unnat change:fel_unnat ', function() {
 	getAttrs([
 	'ws_unnat', 'bs_unnat', 'str_unnat',
@@ -1989,19 +2035,23 @@
 
 	});
   });
+  
+
 
 
 
   // ___________________________________________________________________________
   // ____________________Movement and Weight sheet worker_______________________
-  // ___________________________and Fatigue Pts_________________________________
-  on('sheet:opened change:size change:str change:str_unnat change:str_advancement change:tou change:tou_unnat change:tou_advancement change:agi change:agi_unnat change:agi_advancement', function() {
-	getAttrs([
+  // ___________________________________________________________________________
+  
+  let fieldsMW = [
 	'size',
 	'str', 'str_unnat', 'str_advancement',
 	'tou', 'tou_unnat', 'tou_advancement',
 	'agi', 'agi_unnat', 'agi_advancement'
-	], function(values) {
+  ];
+  on('sheet:opened ' + fieldsMW.map(field => 'change:' + field).join(' '), function() {
+	getAttrs(fieldsMW, function(values) {
 	  var size = parseInt(values['size'], 10) || 0;
 	  var agi = parseInt(values['agi'], 10) || 0;
 	  var agi_unnat = parseInt(values['agi_unnat'], 10) || 0;
