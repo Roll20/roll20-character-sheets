@@ -1,88 +1,4 @@
 
-function pInt(val){
-    return parseInt(val)||0;
-};
-const repeatingSum = (destinations, section, fields) => {
-    if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
-    if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
-    getSectionIDs(`repeating_${section}`, idArray => {
-        const attrArray = idArray.reduce((m, id) => [...m, ...(fields.map(field => `repeating_${section}_${id}_${field}`))], []);
-        getAttrs([...attrArray], v => {
-            const getValue = (section, id, field) => v[`repeating_${section}_${id}_${field}`] === 'on' ? 1 : parseFloat(v[`repeating_${section}_${id}_${field}`]) || 0;
-            const commonMultipliers = (fields.length <= destinations.length) ? [] : fields.splice(destinations.length, fields.length - destinations.length);
-            const output = {};
-            destinations.forEach((destination, index) => {
-                output[destination] = idArray.reduce((total, id) => total + getValue(section, id, fields[index]) * commonMultipliers.reduce((subtotal, mult) => subtotal * getValue(section, id, mult), 1), 0);
-            });
-            setAttrs(output);
-        }); 
-    }); 
-};
-
-
-
-
-function getAttributes(idArray,section,allids,attrArray)
-{
-    idArray.forEach(id=>{allids.push(section + "_" + id )});
-    idArray.forEach(id=>{attrArray.push(section + "_" + id + "_attribute" )});
-    idArray.forEach(id=>{attrArray.push(section + "_" + id + "_bonus" )});
-    idArray.forEach(id=>{attrArray.push(section + "_" + id + "_attribute2" )});
-    idArray.forEach(id=>{attrArray.push(section + "_" + id + "_bonus2" )});
-    idArray.forEach(id=>{attrArray.push(section + "_" + id + "_active" )});
-}
-function updatestatusmodifier(allids,attrArray)
-{
-    const output = {body_statusmodifier:0,agility_statusmodifier:0,reaction_statusmodifier:0,strength_statusmodifier:0,willpower_statusmodifier:0,
-        logic_statusmodifier:0,intuition_statusmodifier:0,charisma_statusmodifier:0,edge_statusmodifier:0,composure_statusmodifier:0,soak_statusmodifier:0,soakstun_statusmodifier:0,
-        phys_monitor_shift:0,stun_monitor_shift:0,allmod:0,
-        wounds_mod:0,judgeintent_statusmodifier:0,memory_statusmodifier:0,liftcarry_statusmodifier:0,ini_statusmodifier:0,inidice_statusmodifier:0,iniphys_statusmodifier:0,
-        inidicematrix_statusmodifier:0,inimatrix_statusmodifier:0,iniastral_statusmodifier:0,skill_astral_statusmodifier:0,skill_athletics_statusmodifier:0,skill_biotech_statusmodifier:0,
-        skill_cracking_statusmodifier:0,skill_influence_statusmodifier:0,skill_electronics_statusmodifier:0,skill_firearms_statusmodifier:0,skill_stealth_statusmodifier:0,
-        skill_engineering_statusmodifier:0,skill_melee_statusmodifier:0,skill_outdoors_statusmodifier:0,skill_piloting_statusmodifier:0,skill_con_statusmodifier:0,
-        skill_perception_statusmodifier:0,skill_conjuring_statusmodifier:0,skill_sorcery_statusmodifier:0,skill_enchanting_statusmodifier:0,skill_task_statusmodifier:0};
-    //  log("Getattrs:" + attrArray )
-    getAttrs([...attrArray], v => {
-
-        const getValue = (id, field) => v[`${id}_${field}`];
-        
-        allids.forEach(id=>{
-         //   log("Check:" + id )
-         
-            if (getValue(id,"active")==1){
-                let attr=getValue(id,"attribute");
-                if (attr && attr!="") output[attr]+=pInt(getValue(id,"bonus"));
-                attr=getValue(id,"attribute2");
-                if (attr && attr!="") output[attr]+=pInt(getValue(id,"bonus2"));
-            }   
-            
-            
-        });
-        setAttrs(output);
-       }); 
-}
-
-function countStates(){
-    let attrArray =[]
-    let allids =[]
-    getSectionIDs("repeating_states", idArray => {
-        getAttributes(idArray,"repeating_states",allids,attrArray);
-        //LoadCyberware
-        getSectionIDs("repeating_cyberware", cids=>{
-            getAttributes(cids,"repeating_cyberware",allids,attrArray);
-            getSectionIDs("repeating_perks", pids=>{
-                getAttributes(pids,"repeating_perks",allids,attrArray);
-                getSectionIDs("repeating_gear", pids=>{
-                    getAttributes(pids,"repeating_gear",allids,attrArray);
-                    updatestatusmodifier(allids,attrArray);
-                });
-            });
-        });
-    }); 
-}
-
-
-
 on("sheet:opened change:wilddie_toggle",function(){
     getAttrs(["wilddie_toggle"], function (v) {
         console.log("Check Wilddie_Toggle");
@@ -100,10 +16,17 @@ on("sheet:opened change:wilddie_toggle",function(){
     });
 });   
 
+on("sheet:opened change:sustain_count change:sustain_mod change:sustain_mod2", function(){
+    getAttrs(["sustain_count","sustain_mod","sustain_mod2"], function (v) {
+        let val=pInt(v.sustain_count)+pInt(v.sustain_mod)+pInt(v.sustain_mod2)
+        log("Sustain val:" + val)
+        setAttrs({
+            sustain_malus:Math.max(val,0)
+        });
 
-on("sheet:opened change:repeating_states remove:repeating_states change:repeating_cyberware remove:repeating_cyberware change:repeating_perks remove:repeating_perks change:repeating_gear remove:repeating_gear",function(){
-   countStates();
+    });
 });
+
 
 on("change:repeating_armor remove:repeating_armor",function(){
        repeatingSum("armor_total_prot","armor",["armor_prot","armor_selected"]);
@@ -131,10 +54,12 @@ on("sheet:opened change:display_angriff change:display_angriffmod change:display
                 });
 })
 
-on("change:armor_total_prot change:optionalarmorrule",function(){
-    getAttrs(["armor_total_prot","display_body","optionalarmorrule"], function (v) {
-        let dr=pInt(v.display_body)+pInt(v.armor_total_prot);
+on("change:armor_total_prot change:defence_statusmodifier change:optionalarmorrule",function(){
+    getAttrs(["armor_total_prot","display_body","optionalarmorrule","defence_statusmodifier"], function (v) {
+
+        let dr=pInt(v.display_body)+pInt(v.armor_total_prot)+pInt(v.defence_statusmodifier);
             let a=Math.floor( pInt(v.armor_total_prot)/4);
+            log("defence_Update: " + dr)
         if (pInt(v.optionalarmorrule)==1){
             
             setAttrs({defense_rating: dr,
@@ -1307,20 +1232,47 @@ on("sheet:opened change:stun_monitor_shift", () => {
     on("clicked:repeating_spells:lockrules", function(){setAttrs({'repeating_spells_toggle_rule_spells': 0,});});
     on("clicked:repeating_spells:unlockrules", function(){setAttrs({'repeating_spells_toggle_rule_spells': 1,});});
 
-    on("change:spirit_con_type1 change:spirit_con_type2 change:spirit_con_type3 change:spirit_con_type4 change:spirit_con_type1_bonus change:spirit_con_type2_bonus change:spirit_con_type3_bonus change:spirit_con_type4_bonus change:mod_magic change:mod_conjuring change:conjuring_summoning_type change:skill_conjuring_exp change:skill_conjuring_spec", () => {
+    on("change:spirit_con_type1 change:spirit_con_type2 change:spirit_con_type3 change:spirit_con_type4 change:spirit_con_type1_bonus change:spirit_con_type2_bonus change:spirit_con_type3_bonus change:spirit_con_type4_bonus change:mod_magic change:mod_conjuring change:conjuring_summoning_type change:skill_conjuring_exp change:skill_conjuring_spec  change:con_fire_bonus change:con_water_bonus change:con_earth_bonus change:con_air_bonus change:con_man_bonus change:con_beast_bonus change:con_task_bonus change:con_guardian_bonus change:con_plant_bonus change:con_blood_bonus change:banishing_fire_bonus change:banishing_water_bonus change:banishing_earth_bonus change:banishing_air_bonus change:banishing_man_bonus change:banishing_beast_bonus change:banishing_task_bonus change:banishing_guardian_bonus change:banishing_plant_bonus change:banishing_blood_bonus", () => {
         getAttrs(["spirit_con_type1","spirit_con_type2","spirit_con_type3","spirit_con_type4",
                   "spirit_con_type1_bonus","spirit_con_type2_bonus","spirit_con_type3_bonus","spirit_con_type4_bonus",
-                  "mod_magic","mod_conjuring","conjuring_summoning_type","skill_conjuring_spec","skill_conjuring_exp"], (v) => {
+                  "mod_magic","mod_conjuring","conjuring_summoning_type","skill_conjuring_spec","skill_conjuring_exp",
+                  "con_fire_bonus", "con_water_bonus", "con_earth_bonus", "con_air_bonus", "con_man_bonus", "con_beast_bonus", "con_task_bonus", "con_guardian_bonus", "con_plant_bonus", "con_blood_bonus",
+                  "banishing_fire_bonus", "banishing_water_bonus", "banishing_earth_bonus", "banishing_air_bonus", "banishing_man_bonus", "banishing_beast_bonus", "banishing_task_bonus", "banishing_guardian_bonus", "banishing_plant_bonus", "banishing_blood_bonus"], (v) => {
             let totalbonus = 0;
             let banbonus=0
             if("con_" + v.conjuring_summoning_type == v.spirit_con_type1){totalbonus += +v.spirit_con_type1_bonus}
             if("con_" + v.conjuring_summoning_type == v.spirit_con_type2){totalbonus += +v.spirit_con_type2_bonus}
             if("con_" + v.conjuring_summoning_type == v.spirit_con_type3){totalbonus += +v.spirit_con_type3_bonus}
             if("con_" + v.conjuring_summoning_type == v.spirit_con_type4){totalbonus += +v.spirit_con_type4_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_fire"){totalbonus += +v.con_fire_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_water"){totalbonus += +v.con_water_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_earth"){totalbonus += +v.con_earth_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_air"){totalbonus += +v.con_air_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_man"){totalbonus += +v.con_man_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_beast"){totalbonus += +v.con_beast_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_task"){totalbonus += +v.con_task_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_guardian"){totalbonus += +v.con_guardian_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_plant"){totalbonus += +v.con_plant_bonus}
+            if("con_" + v.conjuring_summoning_type == "con_blood"){totalbonus += +v.con_blood_bonus}
+
+            
             if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type1){banbonus += +v.spirit_con_type1_bonus}
             if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type2){banbonus += +v.spirit_con_type2_bonus}
             if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type3){banbonus += +v.spirit_con_type3_bonus}
             if("banishing_" + v.conjuring_summoning_type == v.spirit_con_type4){banbonus += +v.spirit_con_type4_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_fire"){banbonus += +v.banishing_fire_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_water"){banbonus += +v.banishing_water_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_earth"){banbonus += +v.banishing_earth_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_air"){banbonus += +v.banishing_air_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_man"){banbonus += +v.banishing_man_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_beast"){banbonus += +v.banishing_beast_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_task"){banbonus += +v.banishing_task_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_guardian"){banbonus += +v.banishing_guardian_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_plant"){banbonus += +v.banishing_plant_bonus}
+            if("banishing_" + v.conjuring_summoning_type == "banishing_blood"){banbonus += +v.banishing_blood_bonus}
+            
+
+            
             if(v.conjuring_summoning_type == v.spirit_detection_type){totalbonus += +v.conjuring_detection}
             totalbonus += +v.mod_magic;
             totalbonus += +v.mod_conjuring;
@@ -1341,12 +1293,20 @@ on("sheet:opened change:stun_monitor_shift", () => {
         })
     });
 
+    on("change:repeating_spells:spellaktive",function(eventInfo){
+        getAttrs(["repeating_spells_spellaktive","sustain_count"],function(v){
+            let sc=pInt(v.sustain_count);
+            let change=pInt(eventInfo.newValue)-pInt(eventInfo .previousValue)
+            setAttrs({sustain_count:sc+change});
+        });
+    }
+    );
 
-
-    on("sheet:opened change:skill_sorcery_exp change:skill_sorcery_spec change:spell_combat_bonus change:spell_health_bonus change:spell_illusion_bonus change:spell_manipulation_bonus change:spell_detection_bonus change:mod_magic change:mod_spells",function(){
+    on("sheet:opened change:skill_sorcery_exp change:skill_sorcery_spec change:spell_combat_bonus change:spell_health_bonus change:spell_illusion_bonus change:spell_manipulation_bonus change:spell_detection_bonus change:mod_magic change:mod_spells change:spell_combat_bonus2 change:spell_health_bonus2 change:spell_illusion_bonus2 change:spell_manipulation_bonus2 change:spell_detection_bonus2",function(){
         getSectionIDs("repeating_spells", pids=>{
             getAttrs(["spell_combat_bonus","spell_health_bonus","spell_illusion_bonus","spell_manipulation_bonus",
-                      "spell_detection_bonus","mod_magic","mod_spells","skill_sorcery_spec","skill_sorcery_exp"], (v) => {
+                      "spell_detection_bonus","mod_magic","mod_spells","skill_sorcery_spec","skill_sorcery_exp",
+                      "spell_combat_bonus2", "spell_health_bonus2", "spell_illusion_bonus2", "spell_manipulation_bonus2", "spell_detection_bonus2"], (v) => {
                 let attrArray =[];
                 pids.forEach(id=>{attrArray.push("repeating_spells_" + id + "_spellscategory" )});
                 
@@ -1355,15 +1315,15 @@ on("sheet:opened change:stun_monitor_shift", () => {
                     const getValue = (id, field) => vr[`repeating_spells_${id}_${field}`];
         
                     pids.forEach(id=>{
-                //   log("Check:" + id )
+                   log("Check:" + id )
                         let cat=getValue(id,"spellscategory");
                             log(cat);
                         let totalbonus = 0;
-                        if(cat == "spells_combat_indirect" || cat == "spells_combat_direct"){totalbonus += +v.spell_combat_bonus;}
-                        if(cat == "spells_health"){totalbonus += +v.spell_health_bonus;}
-                        if(cat == "spells_illusion"){totalbonus += +v.spell_illusion_bonus;}
-                        if(cat == "spells_manipulation"){totalbonus += +v.spell_manipulation_bonus;}
-                        if(cat == "spells_detection"){totalbonus += +v.spell_detection_bonus;}
+                        if(cat == "spells_combat_indirect" || cat == "spells_combat_direct"){totalbonus += +pInt(v.spell_combat_bonus)+pInt(v.spell_combat_bonus2);}
+                        if(cat == "spells_health"){totalbonus += +v.spell_health_bonus + pInt(v.spell_health_bonus2);}
+                        if(cat == "spells_illusion"){totalbonus += +v.spell_illusion_bonus+pInt(v.spell_illusion_bonus2);}
+                        if(cat == "spells_manipulation"){totalbonus += +v.spell_manipulation_bonus+pInt(v.spell_manipulation_bonus2);}
+                        if(cat == "spells_detection"){totalbonus += +v.spell_detection_bonus+pInt(v.spell_detection_bonus2);}
                         
                         if(v.skill_sorcery_spec.toLowerCase() ==getTranslationByKey("sorcery").toLowerCase() || v.skill_sorcery_spec.toLowerCase() == "spellingcasting"){totalbonus += 2; }
                         
