@@ -58,7 +58,7 @@
   <div class="sheet-bravadoscore"><input name="attr_bravado" type="number"></div>
   <div class="sheet-inittitle">INITIATIVE BONUS</div>
   <div class="sheet-initscore"><input name="attr_initiative" type="number"><button type="roll"value="&{template:initiative} {{name=initiative}}{{initiative=[[1d10+@{initiative}&{tracker}]]}}">&nbsp;</button></div>
-  <div class="sheet-lucktitle">LUCK</div>
+  <div class="sheet-lucktitle"><input name="attr_luckflux" type="text"></div>
   <div class="sheet-luckmaxtitle">MAX</div>
   <div class="sheet-luckcurrtitle">CURRENT</div>
   <div class="sheet-luckmaxscore"><input name="attr_luck" type="number" min=0 max=6></div>
@@ -1332,21 +1332,21 @@
 
 <rolltemplate class="sheet-rolltemplate-initiative">
     <div class="container">
-        <div><h1>{{name}}</h1></div>
+        <div><h3>{{name}}</h3></div>
         <div class="arrow-container"><div class="arrow-right"></div></div>
         <div class="rowcolor"><span class="tcat">Initiative: </span>{{initiative}}</div>
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-skill">
     <div class="container">
-        <div><h1>{{name}}</h1></div>
+        <div><h3>{{name}}</h3></div>
         <div class="arrow-container"><div class="arrow-right"></div></div>
         <div class="rowcolor"><span class="tcat">Success: </span>{{success}} | <span class="tcat">Skill: </span> {{skill}}</div>
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-weapon">
     <div class="container">
-        <div><h1>{{name}}</h1></div>
+        <div><h3>{{name}}</h3></div>
         <div class="arrow-container"><div class="arrow-right"></div></div>
         <div class="rowcolor"><span class="tcat">Success: </span>{{success}} | <span class="tcat">Skill: </span> {{skill}}</div>
         <div class="rowcolor"><span class="tcat">Dam: </span>{{damage}} | <span class="tcat">Min. Dam: </span> {{mindmg}} | <span class="tcat">AD: </span> {{ad}}</div>
@@ -1366,8 +1366,28 @@ on("change:species", function() {
       var aspecies_closing = [0,4,2,2,2,2,2,3,3,4,4];
       var aspecies_rushing = [0,7,5,5,5,5,5,6,6,6,8];
       var aspecies_hpbase = [0,20,14,14,15,14,11,19,22,20,14];
-	  var aspecies_abil1=["","FAMILIAR BREED","CONTROL OF THE EBB","CONTROL OF THE EBB","DRUG ADDICT","ADAPTABLE","BORN MANIPULATOR","HONOUR BOUND","REGENERATION (2)","REGENERATION (1)","SKILLED HUNTER"];
+	  var aspecies_abil1=["","FAMILIAR BREED","CONTROL OF THE EBB","CONTROL OF THE EBB","DRUG ADDICT","ADAPTABLE","CHARM OFFENSIVE","HONOUR BOUND","REGENERATION (2)","REGENERATION (1)","SKILLED HUNTER"];
 	  var aspecies_abil2=["","AGAINST ALL ODDS","","","FEEL NO PAIN","SOCIABLE","INQUISITIVE MIND","PREHENSILE TAIL","PHYSICAL FAVOURITE","ADAPTIVE SKIN","ACUTE SENSES"];
+	  var aspecies_abildesc1=["","While a far cry from their kin, Advanced Carrien are able to communicate flawlessly with other members of the Carrien genus. To reflect this, Advanced Carrien receive a +2 modifier to the Success Die for all CHA and COOL based skill rolls when dealing directly with members of the Carrien species.",
+	  "All Ebonites can manipulate the Ebb to perform actions that would be otherwise impossible to others. To represent this, Ebonite characters replace their LUCK stat with the FLUX stat. See “The Ebb” on page 124 for more information.",
+	  "All Ebonites can manipulate the Ebb to perform actions that would be otherwise impossible to others. To represent this, Ebonite characters replace their LUCK stat with the FLUX stat. See “The Ebb” on page 124 for more information.",
+	  "All Frother characters must take at least rank 1 in the Drug Addict trait during character creation. In addition, any drugs used by a Frother are considered to have an additional 30 minutes’ duration, one additional dose is required before an Addiction Test is made and all Addiction Ratings are reduced by one.",
+	  "Humans are the most adaptable species on Mort and as a result, are the most prominent as SLA Operatives. At the end of character creation, a Human character may select any two skills that they do not already possess and gain them both at rank 1. Additionally, Human characters pay 1 experience point less than the usual cost to increase their skills during downtime sessions",
+	  "The Neophron are talkers, born to a world where speech is their greatest weapon. On the streets of Mort, the Neophron’s silver tongue is a vital tool in investigation and PR. A Neophron character receives a +1 modifier to the Success Die for all Diplomacy, Oratory and Persuasion rolls. This bonus is not applied when dealing with other members of the Neophron species - they are just too wise to be drawn in",
+	  "A Shaktar is a deeply honourable creature who lives to a warrior’s code. A Shaktar may never flee if it means leaving a comrade behind. In addition, a Shaktar’s COOL stat is increased by 1 (even over the species maximum) whenever they are defending an injured ally.",
+	  "Stormers are capable of regenerating themselves at a highly efficient rate, healing injuries and rebuilding damaged tissue automatically. A Malice has a Regeneration Rate of 2. Full details on Regeneration can be found in the Rules & Mechanics chapter of this book.",
+	  "Stormers are capable of regenerating themselves at a highly efficient rate, healing injuries and rebuilding damaged tissue automatically. A Xeno has a Regeneration Rate of 1. Full details on Regeneration can be found in the Rules & Mechanics chapter of this book",
+	  "Wraithen are natural hunters, a skill set instilled in them from birth. As such, a Wraithen is considered to have one additional Skill Dice success when making a Tracking roll."];
+	  var aspecies_abildesc2=["","The upbringing of any Carrien is far more brutal than almost any other species can imagine. The hardships and violence experienced during their early years, paired with the challenges overcome with escaping the cannibal sectors and being accepted by SLA Industries make the Advanced Carrien extremely hardy. To reflect this, Advanced Carrien are considered to have one additional Skill Die success when making a Survival roll",
+	  "","",
+	  "Frothers are notoriously hardy and will continue to push forward in the face of life-threatening injury, either through sheer determination or utter disregard for their personal safety. To represent this during game play, a Frother ignores the rules and modifiers applied to them by any one wound that they have received, so for example, if a Frother has suffered three wounds, they only apply the modifiers for two of them. The player may always choose which wound to ignore",
+	  "While many are not, the vast majority of Humans are naturally sociable creatures, with a natural flair for communication, particularly with other Humans. To reflect, this a Human character receives a +1 modifier to the Success Die for all Diplomacy and Persuasion rolls when dealing with other Humans.",
+	  "A Neophron’s understanding of the power of words generally leads the youth of their race to focus on studies and communication techniques. By most standards, a Neophron is generally educated to a higher standard than even the Humans found on Mort. To reflect this, the Neophron has more starting racial skills (discussed later) than other races. In addition, at the end of character creation, a Neophron character may select one rank 3 KNOW or CHArelated skills on their character sheet and increase it to rank 4, ignoring the usual restrictions.",
+	  "Shaktars have huge heavy tails which they can manipulate. The tail aids in climbing, balance, gives an increased sense of touch and can be used to entangle opponents. To reflect this, Shaktars receive a +1 modifier to the Success Die for all Climbing rolls and opponents in hand-to-hand combat may not use Acrobatic Defence.",
+	  "The cameras love a Stormer. All Stormer 313 ‘Malice’ characters start with an additional 1 Ratings Point in the Body category. If a Malice starts any game session with 0 Ratings Points in the Body category, they immediately gain 1.",
+	  "Xeno has chameleon like skin that begins to blend with its surroundings as it stops moving. Any Detect rolls to spot a stationary Xeno receive a -1 modifier to the Success Die. This modifier is increased to -2 if the Xeno has been stationary for any significant length of time. Armoured Skin - A Xeno’s skin is also armoured, removing the need for them to wear other armour and keep their adaptive camouflage in play. A Xeno’s armoured skin has PV 5 and Resistance equal to its Hit Points. Whenever a Xeno regenerates any Hit Points it also regenerates an equal value of Resistance. A Xeno takes great pride in their capabilities and may never wear any other armour. In addition to the protective capabilities, the skin also has a number of small pockets, allowing the Xeno to carry items such as ammo, knives and other essentials without conventional means.",
+ 	  "A Wraithen’s heightened senses extend to their strong survival instinct, giving them an uncanny knack at detecting dangerous situations. A Wraithen adds 1 to their Initiative Bonus, making them more likely to act before others in combat."]; 
+	  var aspecies_luckflux=["LUCK","LUCK","FLUX","FLUX","LUCK","LUCK","LUCK","LUCK","LUCK","LUCK","LUCK"];
 	  var speciesindex = parseInt(values["species"])||0;
 	  var athletics = parseInt(values["athletics"])||0;
 	  var bribery = parseInt(values["bribery"])||0;
@@ -1394,6 +1414,9 @@ on("change:species", function() {
 	  var unarmed = parseInt(values["unarmed"])||0;
 	  var abil1=aspecies_abil1[speciesindex]||"";
 	  var abil2=aspecies_abil2[speciesindex]||"";
+	  var skilldesc1=aspecies_abildesc1[speciesindex]||"";
+	  var skilldesc2=aspecies_abildesc2[speciesindex]||"";
+	  var luckflux=aspecies_luckflux[speciesindex]||"";
 
 	  var setathletics = (speciesindex == 8 || speciesindex == 10) ? 1 : 0;
 	  var setbribery = (speciesindex == 6)  ? 1 : 0;
@@ -1464,6 +1487,9 @@ on("change:species", function() {
 		"unarmed": setunarmed,
 		"species_ability_1": abil1,
 		"species_ability_2": abil2,
+		"species_ability_desc1": skilldesc1,
+		"species_ability_desc2": skilldesc2,
+		"luckflux":luckflux,
       });
   });
 });
