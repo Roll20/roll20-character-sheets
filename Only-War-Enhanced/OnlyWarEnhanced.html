@@ -2603,6 +2603,139 @@
 	});
   };
 
+
+
+  // ___________________________________________________________________________
+  // _________________________ weapon damage primitive _________________________
+  // ___________________________________________________________________________
+/**
+ * calculate real damage roll
+ * @param  {string} source row id of the weapon
+ */
+  const calcDmg = function (sources, fields) {
+	var redice = /^(\d+)?(d\d+)\s?((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?\s?(?:[\+|-]\d+)?)?/;
+
+	getAttrs(fields, v => {
+		let attr = {};
+		sources.forEach( source => {
+			// to avoid retyping long strings because ChtiKenny is lazy
+			var dam = source + 'weapon_dam-roll',
+					ven = source + 'weapon_vengeful', // crit
+					min = source + 'weapon_min',      // proven
+					max = source + 'weapon_max',      // primitive
+					set = source + 'weapon_setting';  // overcharge/load / maximal
+
+			let dmg = redice.exec(v[dam]);
+					ven = parseInt(v[ven], 10) || 0,
+					min = parseInt(v[min], 10) || 0,
+					max = parseInt(v[max], 10) || 0,
+					set = parseInt(v[set], 10) || 0;
+
+			if (!dmg) {
+				console.log('no damage found');
+				attr[`${source}weapon_real_dmg`] = v[dam];
+			} else {
+				let dicenum = parseInt(dmg[1], 10) || 1,
+						dicetype = dmg[2],
+						mod = dmg[3];
+				let damTotal = '{';
+				if (set === 3) dicenum ++;
+
+				for (var i = 0; i < dicenum; i++) {
+					if (i) damTotal += ', '
+					if (min > 0) damTotal += '{';
+					if (max > 0) damTotal += '{';
+					damTotal += (dicetype == 'd5') ? 'ceil(1d10/2)' : '1d10';
+					if (ven > 0) damTotal += 'cs>' + ven;
+					if (spray) damTotal += 'cf9';
+					if (min > 0) damTotal += ', {' + min + '}}kh1';
+					if (max > 0) damTotal += ', {' + max + '}}kl1';
+				}
+				damTotal += '}';
+				if (mod) damTotal += mod;
+				if (set === 2) damTotal += '+1';
+				if (set === 4) {
+					damTotal += '+2';
+					attr[`${source}weapon_pen2`] = 2;
+				} else {
+					attr[`${source}weapon_pen2`] = 0;
+				}
+				attr[`${source}weapon_real_dmg`] = damTotal;
+			}
+		});
+		setAttrs(attr);
+	});
+  };
+
+	let fieldsDMG = [
+		'vehiclerangedweapons:V_R_weapon_dam-roll', 'vehiclerangedweapons:V_R_weapon_vengeful', 'vehiclerangedweapons:V_R_weapon_min', 'vehiclerangedweapons:V_R_weapon_max', 'vehiclerangedweapons:V_R_weapon_setting',
+		'rangedweapons:R_weapon_dam-roll', 'rangedweapons:R_weapon_vengeful', 'rangedweapons:R_weapon_min', 'rangedweapons:R_weapon_max', 'rangedweapons:R_weapon_setting',
+		'vehiclemeleeweapons:V_M_weapon_dam-roll', 'vehiclemeleeweapons:V_M_weapon_vengeful', 'vehiclemeleeweapons:V_M_weapon_min', 'vehiclemeleeweapons:V_M_weapon_max',
+		'meleeweapons:M_weapon_dam-roll', 'meleeweapons:M_weapon_vengeful', 'meleeweapons:M_weapon_min', 'meleeweapons:M_weapon_max',
+		];
+	on('sheet:opened ' + fieldsDMG.map(field => 'change:repeating_' + field).join(' '), () => {
+		getSectionIDs('rangedweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
+			idArray.forEach( id => {
+				sources.push(`repeating_rangedweapons_${id}_R_`);
+				fieldnames.push(
+				`repeating_rangedweapons_${id}_R_weapon_dam-roll`,
+				`repeating_rangedweapons_${id}_R_weapon_vengeful`,
+				`repeating_rangedweapons_${id}_R_weapon_min`,
+				`repeating_rangedweapons_${id}_R_weapon_max`,
+				`repeating_rangedweapons_${id}_R_weapon_setting`
+				);
+			});
+			calcDmg(sources, fieldnames);
+		});
+		getSectionIDs('meleeweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
+			idArray.forEach( id => {
+				sources.push(`repeating_meleeweapons_${id}_M_`);
+				fieldnames.push(
+				`repeating_meleeweapons_${id}_M_weapon_dam-roll`,
+				`repeating_meleeweapons_${id}_M_weapon_vengeful`,
+				`repeating_meleeweapons_${id}_M_weapon_min`,
+				`repeating_meleeweapons_${id}_M_weapon_max`
+				);
+			});
+			calcDmg(sources, fieldnames);
+		});
+		getSectionIDs('vehiclerangedweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
+			idArray.forEach( id => {
+				sources.push(`repeating_vehiclerangedweapons_${id}_V_R_`);
+				fieldnames.push(
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_dam-roll`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_vengeful`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_min`,
+				`repeating_vehiclerangedweapons_${id}_V_R_weapon_max`,
+				`repeating_rangedweapons_${id}_V_R_weapon_setting`
+				);
+			});
+			calcDmg(sources, fieldnames);
+		});
+		getSectionIDs('vehiclemeleeweapons', (idArray) => {
+			let sources = [];
+			let fieldnames = [];
+			idArray.forEach( id => {
+				sources.push(`repeating_vehiclemeleeweapons_${id}_V_M_`);
+				fieldnames.push(
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_dam-roll`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_vengeful`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_min`,
+				`repeating_vehiclemeleeweapons_${id}_V_M_weapon_max`
+				);
+			});
+			calcDmg(sources, fieldnames);
+		});
+		console.log('DAMAGES UPDATED');
+	});
+
+
 </script>
 
 
