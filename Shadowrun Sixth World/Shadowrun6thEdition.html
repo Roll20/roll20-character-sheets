@@ -3577,6 +3577,66 @@
 		{{#opp}}<div class="template-row">{{opp}}</div>{{/opp}}
 	</div>
 </rolltemplate>
+<!--Roll Template for rolling without Focus-->
+<rolltemplate class="sheet-rolltemplate-rolls">
+	<div class="sheet-template-body">
+		<div class="sheet-template-header">
+			{{#header}}{{header}}{{/header}}{{#spec}}<span> ({{spec}})</span>{{/spec}}<br />
+			{{#arm}}<span>{{arm}}</span>{{/arm}}
+			{{#base}}<span>{{base}}</span>{{/base}}
+			{{#rollLess() wound 0}}<span> & </span><span data-i18n="wounds">Wounds</span>{{/rollLess() wound 0}}
+			{{#rollLess() mod 0}}<span> & </span><span data-i18n="modifier">Modifier</span>{{/rollLess() mod 0}}
+			{{#rollGreater() mod 0}}<span> & </span><span data-i18n="modifier">Modifier</span>{{/rollGreater() mod 0}}
+			{{#rollGreater() edge 0}}<span> & </span><span data-i18n="edge">Edge</span>{{/rollGreater() edge 0}}
+			{{#effecttype}}<br /><span>{{effecttype}}</span>{{/effecttype}}
+		</div>
+		{{#dice}}<div class="sheet-template-row">Hits: {{dice}}</div>{{/dice}}
+		{{#rollGreater() wilddie 0}}
+			<div class="sheet-template-row">Wild Die Rolled! {{wilddie}}<br>
+			{{#rollLess() wilddie 2}}
+				<div class="sheet-template-row"><span class="sheet-red">Remove all 5s!</span></div>
+			{{/rollLess() wilddie 2}}
+			{{#rollBetween() wilddie 2 4}}
+				<div class="sheet-template-row">No Change!</div>
+			{{/rollBetween() wilddie 2 4}}
+			{{#rollGreater() wilddie 4}}
+				<div class="sheet-template-row green"><span class="sheet-green">+3 Hits!</span></div>
+			{{/rollGreater() wilddie 4}}
+			</div>
+		{{/rollGreater() wilddie 0}}
+		{{#rating}}<div class="sheet-template-row">{{rating}}</div>{{/rating}}
+		{{#ampup}}{{#rollGreater() ampup 0}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">Amp Up: {{ampup}}</span>
+		</div>
+		{{/rollGreater() ampup 0}}{{/ampup}}
+		{{#drain}}{{#rollGreater() drain 0}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">Drain: {{drain}}</span>
+		</div>
+		{{/rollGreater() drain 0}}{{/drain}}
+		{{#increasearea}}{{#rollGreater() increasearea 0}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">Increase Area: {{increasearea}}m</span>
+		</div>
+		{{/rollGreater() increasearea 0}}{{/increasearea}}
+		{{#fade}}{{#rollGreater() fade 0}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">Fade: {{fade}}</span>
+		</div>
+		{{/rollGreater() fade 0}}{{/fade}}
+		{{#desc}}
+		<div class="sheet-template-row">
+			<span class="sheet-template-desc">
+			{{desc}}
+			{{#rollGreater() rea 0}}, <span data-i18n="reach">Reach<span> {{rea}}{{/rollGreater() rea 0}}
+			{{#rollLess() drain 2}}, <span data-i18n="drain-2">Drain 2<span>{{/rollLess() drain 2}}
+			</span>
+		</div>
+		{{/desc}}
+		{{#opp}}<div class="sheet-template-row">{{opp}}</div>{{/opp}}
+	</div>
+</rolltemplate>
 </div>
 <input type="hidden" name="attr_wounds" value="0" />
 <input type="hidden" name="attr_explode_toggle" value="" />
@@ -3717,14 +3777,14 @@
 <input type="hidden" name="attr_tasking" min="0" value="0" />
 <input type="hidden" name="attr_throwingweapons" min="0" value="0" />
 <input type="hidden" name="attr_tracking" min="0" value="0" />
-<input type="hidden" name="attr_unarmedcombat" min="0" value="0" /><script type="text/worker">
+<input type="hidden" name="attr_unarmedcombat" min="0" value="0" />
+<input type="hidden" name="attr_sheet_version" value="0.25">
 
+<script type="text/worker">
 //Sheet workers
 on("sheet:opened", function() {
-	const version = '0.25';
-	console.log(`%c Shadowrun 6th World v`+version, "color: blue; font-weight:bold");
-
-	getAttrs(['sheet_type'], (v) => {
+	getAttrs(['sheet_type', 'sheet_version'], (v) => {
+		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
 		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
 	});
 });
