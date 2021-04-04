@@ -4645,10 +4645,8 @@ on("change:host_rating change:data_processing change:pilot change:intuition chan
 				matrix_tot = hot_sim_tot;
 				break;
 			case 'sprite':
-				matrix_tot = dat + lev;
-				cold_sim_tot = dat + lev + pil;
-				hot_sim_tot = dat + lev + pil;
-				break;
+				/* Handled when sprite_type and level are changed */
+				return;
 			default:
 				matrix_tot = rea + int;
 				cold_sim_tot = int + dat;
@@ -5205,7 +5203,107 @@ on("change:repeating_vehicle", (eventinfo) => {
 });
 */
 
-// CHARACTERMANCER IMPORTER
+
+
+/******************/
+/* Sprite Scripts */
+/******************/
+on("change:sprite_type change:level", (eventInfo) => {
+	getAttrs(['level', 'sprite_type'], (v) => {
+		var level = parseInt(v.level);
+		var attack = 1,
+			 sleaze = 1,
+			 dataproc = 1,
+			 firewall = 1,
+			 resonance = 1,
+			 hot_base = 1,
+			 hot_dice = 1;
+
+		switch(v.sprite_type) {
+			case 'Courier':
+				attack = level;
+				sleaze = level + 3;
+				dataproc = level + 1;
+				firewall = level + 2;
+				resonance = level;
+				hot_base = (level * 2) + 1;
+				hot_dice = 4;
+				skills = ['Electronics', 'Cracking'];
+				powers = ['Cookie', 'Hash'];
+				break;
+			case 'Crack':
+				attack = level;
+				sleaze = level + 3;
+				dataproc = level + 2;
+				firewall = level + 1;
+				resonance = level;
+				hot_base = (level * 2) + 2;
+				hot_dice = 4;
+				break;
+			case 'Data':
+				attack = (level - 1) || 1;
+				sleaze = level;
+				dataproc = level + 4;
+				firewall = level + 1;
+				resonance = level;
+				hot_base = (level * 2) + 4;
+				hot_dice = 4;
+				break;
+			case 'Fault':
+				attack = level + 3;
+				sleaze = level;
+				dataproc = level + 1;
+				firewall = level + 2;
+				resonance = level;
+				hot_base = (level * 2) + 1;
+				hot_dice = 4;
+				break;
+			case 'Machine':
+				attack = level + 1;
+				sleaze = level;
+				dataproc = level + 3;
+				firewall = level + 2;
+				resonance = level;
+				hot_base = (level * 2) + 3;
+				hot_dice = 4;
+				break;
+			default:
+				attack = level;
+				sleaze = level;
+				dataproc = level;
+				firewall = level;
+				resonance = level;
+				hot_base = (level * 2) + 1;
+				hot_dice = 4;
+				skills = [];
+				powers = [];
+				break;
+		}
+
+		setAttrs({
+			'attack': attack,
+			'sleaze': sleaze,
+			'data_processing': dataproc,
+			'firewall': firewall,
+			'resonance': resonance,
+			'hot_sim_initiative_base': hot_base,
+			'hot_sim_initiative_dice': hot_dice
+		});
+
+
+		// Check if there are already skills
+
+
+	});
+});
+
+
+
+
+
+/****************************/
+/* CHARACTERMANCER IMPORTER */
+/****************************/
 on("clicked:import_launch", (eventinfo) => {
 	startCharactermancer("importer");
 });
@@ -5295,6 +5393,8 @@ const clean = () => {
 		});
 	});
 };
+
+
 
 //USEFUL FUNCTIONS
 const capitialize = (string) => {
