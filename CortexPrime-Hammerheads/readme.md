@@ -11,16 +11,15 @@ Cortex Prime: Hammerhead Character Sheet
 - Untick the Edit check box to hide the editor
 - Enter the remaining details - Name, Description, Value statements, Relationship names, Distinctions title and description in the editable text fields.
 
-##Dice Pool Builder
+##Stress
 
-The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and keeps highest two dice in the pool by default. I refer to this as the suggested best result.
+I have been using API macro's to adjust Stress values. But these are simply Attributes (PhysicalStress, MentalStress, SocialStress).
 
-##Stress and Trauma
+You can add these to the Attributes and Abilities tab manually, and assign values ranging from 2 to show the character has no stress - 4,6,8,10 or 12 corresponding to the dice value, or a value of 14 indicates the character has been stressed out.
 
-I have been using API macro's to adjust Stress values. But these are simply Attributes (PhysicalStress, MentalStress, SocialStress and PhysicalTrauma, MentalTrauma, SocialTrauma ).
-You can add these to the Attributes and Abilities tab manually, and assign values ranging from the 4,6,8,10 or 12 corresponding to the dice value.
+###Diceroller
 
-If you have added a stress and it's not showing check the spelling, Capitalisation, and dice value to be sure you got those all correct.
+Using the 'Dice Pool Builder' button will ask the player which traits to include and roll in a dice pool. The output to the chat panel will also indicate if the character is shaken or stricken. 
 
 Any feedback, or requests - I'm happy to hear.
 
@@ -33,6 +32,19 @@ Character Portraits sourced from https://thispersondoesnotexist.com/
 
 
 ##Changelog
+
+### V1.2 2021-03-22
+
+Added mobile layout support - which includes support for the beta release of the mobile app.
+Currently the beta release of the mobile app does not support the dice pool builder macros.
+Roll Template includes prompts when the character is shaken or stricken.
+Stress can now go higher than 12, if set a value of 14 the icon shows as 12+ to indicate being stressed out.
+
+
+### V1.2 2021-03-19
+
+Added a Roll Template, to better display the roll results.
+Added black dice icons and dark dice icons to use in roll template
 
 ### V1.1 2021-03-17
 

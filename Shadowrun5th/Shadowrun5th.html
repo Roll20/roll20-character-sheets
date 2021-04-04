@@ -7812,7 +7812,7 @@ Click again to switch to Manual and Remote">
                    <label class="armorlabel">Total Armor</label>
                 </div>
                 <div class="armortotal">
-                    <input type="number" name="attr_armor_total" value="@{armorworn1}+@{armorworn2}+@{armorworn3}+@{armorworn4}+@{armorworn5}+@{armorworn6}+@{armorworn7}+@{armorworn8}" title="Sum of all worn Armor" disabled="true">
+                    <input type="number" name="attr_armor_total" value="(@{armorworn1})+(@{armorworn2})+(@{armorworn3})+(@{armorworn4})+(@{armorworn5})+(@{armorworn6})+(@{armorworn7})+(@{armorworn8})" title="Sum of all worn Armor" disabled="true">
                 </div>
                 <button type="roll" class="armorroll" name="roll_armorroll" title="Roll to Absorb Damage" value="@{gmroll}&{template:shadowrun}{{name=@{character_name}}}{{roll_name=to Absorb Damage}}{{val1=Body}}{{val1_num=[[@{bod_total}]]}}{{val2=Armor}}{{val2_num=[[@{armor_total}]]}}{{val3=Armor Penetration}}{{val3_num=[[?{Armor Penetration|-0}]]}}{{edge=@{edgeroll}}}{{edge_num=[[@{edg_total}]]}}{{result=[[(@{bod_total}+@{armor_total}+?{Armor Penetration}+[[@{edgn}*@{edg_total}]])@{standardroll}@{edgeroll}]]}}"></button>
             </div>
@@ -9433,7 +9433,7 @@ Only takes the first match even if multiple identical entries are found.">
                         <input type="text" name="attr_contactdescription" title="Type of the Contact">
                     </div>
                     <div class="contactconnectionwrapper">
-                        <input type="text" name="attr_contactconncetion" title="Connection of the Contact">
+                        <input type="text" name="attr_contactconnection" title="Connection of the Contact">
                     </div>
                     <div class="contactloyaltywrapper">
                         <input type="text" name="attr_contactloyalty" title="Loyalty of the Contact">
@@ -9535,9 +9535,11 @@ Only takes the first match even if multiple identical entries are found.">
                     <div class="warningtext">This will override everything</div>
                     <div class="waitingtext">Please Wait!</div>
                 </div>
-                <div style="display: inline-flex">
-                    <label>Enable experimental features (import contacts)</label>
-                    <input type="checkbox" name="attr_experimental">
+                <div class="experimental">
+                    <label>
+                        <input class="experimental-checkbox" type="checkbox" name="attr_experimental">
+                        Enable experimental import of contacts, AI programs and gear extras
+                    </label>
                 </div>
             </div>
         </div>
@@ -9739,7 +9741,7 @@ Only takes the first match even if multiple identical entries are found.">
 
 on("sheet:opened", function() {
     var names=[];
-    for(var i=1;i<77;i++)
+    for(var i=1; i<77; i++)
     {
         var name='skillspec'+i;
         names[i-1]=name;
@@ -9842,57 +9844,69 @@ on("change:chummercheckbox", function(){
             if(goodcode){
                 console.log("Deleting stuff");
                 if(text.experimental == "on"){
-                    getSectionIDs("repeating_contacts", function(idarraye) {
-                        for(var i=0; i < idarraye.length; i++) {
-                        removeRepeatingRow("repeating_contacts"+idarraye[i] );
-                    }});
+                    getSectionIDs("repeating_contacts", function(idarray) {
+                        for(var i=0; i < idarray.length; i++) {
+                            removeRepeatingRow("repeating_contacts_"+idarray[i]);
+                        }
+                    });
                 }
-                getSectionIDs("repeating_posqualities", function(idarraya) {
-                    for(var i=0; i < idarraya.length; i++) {
-                    removeRepeatingRow("repeating_posqualities_"+idarraya[i] );
-                }});
-                getSectionIDs("repeating_negqualities", function(idarrayb) {
-                    for(var i=0; i < idarrayb.length; i++) {
-                    removeRepeatingRow("repeating_negqualities_"+idarrayb[i] );
-                }});
-                getSectionIDs("repeating_powers", function(idarrayc) {
-                    for(var i=0; i < idarrayc.length; i++) {
-                    removeRepeatingRow("repeating_powers_"+idarrayc[i] );
-                }});
-                getSectionIDs("repeating_ware", function(idarrayd) {
-                    for(var i=0; i < idarrayd.length; i++) {
-                    removeRepeatingRow("repeating_ware_"+idarrayd[i] );
-                }});
-                getSectionIDs("repeating_martial", function(idarrayd) {
-                    for(var i=0; i < idarrayd.length; i++) {
-                    removeRepeatingRow("repeating_martial_"+idarrayd[i] );
-                }});
-                getSectionIDs("repeating_spells", function(idarraye) {
-                    for(var i=0; i < idarraye.length; i++) {
-                    removeRepeatingRow("repeating_spells_"+idarraye[i] );
-                }});
-                getSectionIDs("repeating_initiation", function(idarraye) {
-                    for(var i=0; i < idarraye.length; i++) {
-                    removeRepeatingRow("repeating_initiation_"+idarraye[i] );
-                }});
-                getSectionIDs("repeating_programs", function(idarrayf) {
-                    for(var i=0; i < idarrayf.length; i++) {
-                    removeRepeatingRow("repeating_programs_"+idarrayf[i] );
-                }});
-                getSectionIDs("repeating_equipment", function(idarrayf) {
-                    for(var i=0; i < idarrayf.length; i++) {
-                    removeRepeatingRow("repeating_equipment_"+idarrayf[i] );
-                }});
-                getSectionIDs("repeating_knowledge", function(idarrayg) {
-                    for(var i=0; i < idarrayg.length; i++) {
-                    removeRepeatingRow("repeating_knowledge_"+idarrayg[i] );
-                }});
-                getSectionIDs("repeating_vehicles", function(idarrayg) {
-                    for(var i=0; i < idarrayg.length; i++) {
-                    removeRepeatingRow("repeating_vehicles_"+idarrayg[i] );
-                }});
+                getSectionIDs("repeating_posqualities", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_posqualities_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_negqualities", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_negqualities_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_powers", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_powers_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_ware", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_ware_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_martial", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_martial_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_spells", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_spells_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_initiation", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_initiation_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_programs", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_programs_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_equipment", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_equipment_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_knowledge", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_knowledge_"+idarray[i]);
+                    }
+                });
+                getSectionIDs("repeating_vehicles", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_vehicles_"+idarray[i]);
+                    }
+                });
                 var attributes={};
-                for(var i=1;i<7;i++){
+                for(var i=1;i<9;i++){
                     attributes["weaponismelee"+i]="on";
                     attributes["weaponname"+i]="";
                     attributes["weaponcategory"+i]="@{skilldicepool49}";
@@ -9905,9 +9919,9 @@ on("change:chummercheckbox", function(){
                     attributes["weaponrc"+i]="0";
                     attributes["weaponmode"+i]="11";
                     attributes["weaponnotes"+i]="";
-                    getSectionIDs("repeating_equipment"+i, function(idarrayg) {
-                        for(var i=0; i < idarrayg.length; i++) {
-                        removeRepeatingRow("repeating_equipment"+i+idarrayg[i] );
+                    getSectionIDs("repeating_equipment"+i, function(idarray) {
+                        for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_equipment"+i+idarray[i]);
                     }});
                     attributes["armorworn"+i]="0";
                     attributes["armorname"+i]="";
@@ -10238,26 +10252,43 @@ on("change:chummercheckbox", function(){
                 try{
                     if(chummerfile.characters.character.weapons!=null){
                         console.log("Importing weapons");
+                        ammunition = [];
+                        for( var j = 0; j < chummerfile.characters.character.gears.gear.length; j++) {
+                            if(chummerfile.characters.character.gears.gear[j].category_english == "Ammunition"){
+                                ammunition.push(chummerfile.characters.character.gears.gear[j]);
+                            }
+                        }
+
                         if(chummerfile.characters.character.weapons.weapon.length>1){
-                            for(var i=1;i<chummerfile.characters.character.weapons.weapon.length+1 && i<=8 ;i++){
+                            for(var i=1;i<chummerfile.characters.character.weapons.weapon.length+1 && i<9; i++){
                                 if(chummerfile.characters.character.weapons.weapon[i-1].category!="Gear"){
                                     if(chummerfile.characters.character.weapons.weapon[i-1].type=="Ranged"){
                                         attributes["weaponismelee"+i]=0;
                                         attributes["weaponrc"+i]=chummerfile.characters.character.weapons.weapon[i-1].rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                        if(chummerfile.characters.character.weapons.weapon[i-1].rawdamage != "undefined") {
+                                            attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\d*/);
+                                            attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\D*/);
+                                        }
+                                        else {
+                                            attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
+                                            attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\D*/);
+                                        }
                                     }else{
                                         attributes["weaponismelee"+i]="on";
                                         attributes["weaponreach"+i]=chummerfile.characters.character.weapons.weapon[i-1].reach;
+                                        attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
+                                        attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\D*/);
                                     }
+
                                     attributes["weaponname"+i]=chummerfile.characters.character.weapons.weapon[i-1].name;
                                     attributes["weaponaccuracy"+i]=chummerfile.characters.character.weapons.weapon[i-1].accuracy;
                                     if(Number(chummerfile.characters.character.weapons.weapon[i-1].ap)!="NaN"){
-                                        attributes["weaponnap"+i]=chummerfile.characters.character.weapons.weapon[i-1].ap;
+                                        attributes["weaponap"+i]=chummerfile.characters.character.weapons.weapon[i-1].ap;
                                     }else{
-                                        console.log(chummerfile.characters.character.weapons.weapon[i-1].ap);
-                                        attributes["weaponnap"+i]=0;
+                                        attributes["weaponap"+i]=0;
                                     }
-                                    attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
                                     attributes["weaponnotes"+i]="";
+
                                     if(typeof chummerfile.characters.character.weapons.weapon[i-1].accessories != "undefined"){
                                         if(chummerfile.characters.character.weapons.weapon[i-1].accessories.accessory.length>1){
                                             for(var j=0;j<chummerfile.characters.character.weapons.weapon[i-1].accessories.accessory.length;j++){
@@ -10267,6 +10298,30 @@ on("change:chummercheckbox", function(){
                                             attributes["weaponnotes"+i]+=chummerfile.characters.character.weapons.weapon[i-1].accessories.accessory.name+"\n";
                                         }
                                     }
+
+                                    if(text.experimental== "on" && chummerfile.characters.character.weapons.weapon[i-1].clips !== null){
+                                        if(chummerfile.characters.character.weapons.weapon[i-1].clips.clip.length>1){
+                                            for(var j=0; j<chummerfile.characters.character.weapons.weapon[i-1].clips.clip.length; j++){
+                                                var newrowid=generateRowID();
+                                                //find ammo to get stats
+                                                ammo = ammuntion.find(clip => clip.guid === chummerfile.characters.character.weapons.weapon[i-1].clips.clip[j].id);
+                                                attributes["repeating_equipment"+i+"_"+newrowid+"_ammoname"+i]=ammo.name;
+                                                attributes["repeating_equipment"+i+"_"+newrowid+"_ammodv"+i]=ammo.weaponbonusdamage_english.match(/\d*/);
+                                                attributes["repeating_equipment"+i+"_"+newrowid+"_ammodmgtype"+i]=ammo.weaponbonusdamage_english.match(/\D*/);
+                                                attributes["repeating_equipment"+i+"_"+newrowid+"_ammoap"+i]=ammo.weaponbonusap;
+                                                attributes["repeating_equipment"+i+"_"+newrowid+"_ammoacc"+i]="";
+                                            }
+                                        }else{
+                                            var newrowid=generateRowID();
+                                            //find ammo to get stats
+                                            ammo = ammuntion.find(clip => clip.guid === chummerfile.characters.character.weapons.weapon[i-1].clips.clip.id);
+                                            attributes["repeating_equipment"+i+"_"+newrowid+"_ammoname"+i]=ammo.name;
+                                            attributes["repeating_equipment"+i+"_"+newrowid+"_ammodv"+i]=ammo.weaponbonusdamage_english.match(/\d*/);
+                                            attributes["repeating_equipment"+i+"_"+newrowid+"_ammodmgtype"+i]=ammo.weaponbonusdamage_english.match(/\D*/);
+                                            attributes["repeating_equipment"+i+"_"+newrowid+"_ammoap"+i]=ammo.weaponbonusap;
+                                            attributes["repeating_equipment"+i+"_"+newrowid+"_ammoacc"+i]="";
+                                        }
+                                    }
                                 }
                             }
                         }else{
@@ -10274,18 +10329,27 @@ on("change:chummercheckbox", function(){
                                 if(chummerfile.characters.character.weapons.weapon.type=="Ranged"){
                                     attributes["weaponismelee1"]=0;
                                     attributes["weaponrc1"]=chummerfile.characters.character.weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                    if(chummerfile.characters.character.weapons.weapon.rawdamage != "undefined") {
+                                            attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\d*/);
+                                            attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\D*/);
+                                        }
+                                        else {
+                                            attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\d*/);
+                                            attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\D*/);
+                                        }
                                 }else{
                                     attributes["weaponismelee1"]="on";
                                     attributes["weaponreach1"]=chummerfile.characters.character.weapons.weapon.reach;
+                                    attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\d*/);
+                                    attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\D*/);
                                 }
                                 attributes["weaponname1"]=chummerfile.characters.character.weapons.weapon.name;
                                 attributes["weaponaccuracy1"]=chummerfile.characters.character.weapons.weapon.accuracy;
                                 if(Number(chummerfile.characters.character.weapons.weapon.ap)!="NaN"){
-                                    attributes["weaponnap1"]=chummerfile.characters.character.weapons.weapon.ap;
+                                    attributes["weaponap1"]=chummerfile.characters.character.weapons.weapon.ap;
                                 }else{
-                                    attributes["weaponnap1"]=0;
+                                    attributes["weaponap1"]=0;
                                 }
-                                attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\d*/);
                                 attributes["weaponnotes1"]="";
                                 if(typeof chummerfile.characters.character.weapons.weapon.accessories != "undefined"){
                                     if(chummerfile.characters.character.weapons.weapon.accessories.accessory.length>1){
@@ -10296,6 +10360,29 @@ on("change:chummercheckbox", function(){
                                         attributes["weaponnotes1"]+=chummerfile.characters.character.weapons.weapon.accessories.accessory.name+"\n";
                                     }
                                 }
+                                if(text.experimental== "on" && chummerfile.characters.character.weapons.weapon.clips !== null){
+                                        if(chummerfile.characters.character.weapons.weapon.clips.clip.length>1){
+                                            for(var j=0; j<chummerfile.characters.character.weapons.weapon.clips.clip.length; j++){
+                                                var newrowid=generateRowID();
+                                                //find ammo to get stats
+                                                ammo = ammuntion.find(clip => clip.guid === chummerfile.characters.character.weapons.weapon.clips.clip[j].id);
+                                                attributes["repeating_equipment1_"+newrowid+"_ammoname1"]=ammo.name;
+                                                attributes["repeating_equipment1_"+newrowid+"_ammodv1"]=ammo.weaponbonusdamage_english.match(/\d*/);
+                                                attributes["repeating_equipment1_"+newrowid+"_ammodmgtype1"]=ammo.weaponbonusdamage_english.match(/\D*/);
+                                                attributes["repeating_equipment1_"+newrowid+"_ammoap1"]=ammo.weaponbonusap;
+                                                attributes["repeating_equipment1_"+newrowid+"_ammoacc1"]="";
+                                            }
+                                        }else{
+                                            var newrowid=generateRowID();
+                                            //find ammo to get stats
+                                            ammo = ammuntion.find(clip => clip.guid === chummerfile.characters.character.weapons.weapon.clips.clip.id);
+                                            attributes["repeating_equipment1_"+newrowid+"_ammoname1"]=ammo.name;
+                                            attributes["repeating_equipment1_"+newrowid+"_ammodv1"]=ammo.weaponbonusdamage_english.match(/\d*/);
+                                            attributes["repeating_equipment1_"+newrowid+"_ammodmgtype1"]=ammo.weaponbonusdamage_english.match(/\D*/);
+                                            attributes["repeating_equipment1_"+newrowid+"_ammoap1"]=ammo.weaponbonusap;
+                                            attributes["repeating_equipment1_"+newrowid+"_ammoacc1"]="";
+                                        }
+                                    }
                             }
                         }
                     }
@@ -10372,6 +10459,30 @@ on("change:chummercheckbox", function(){
                     goodcode=false;
                     error="Error with Gear " +err
                 }
+
+                try {
+                    if(text.experimental == "on"){
+                     //import ai programs
+                     if(chummerfile.characters.character.aiprograms != null){
+                        console.log("import ai programs");
+
+                           if(chummerfile.characters.character.aiprograms.aiprogram.length > 1){
+                               for(var i=0; i < chummerfile.characters.character.aiprograms.aiprogram.length; i++){
+                                var newrowid=generateRowID();
+                                attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.aiprograms.aiprogram[i].name;
+                               }
+                           }
+                           else {
+                            var newrowid=generateRowID();
+                            attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.aiprograms.aiprogram.name;
+                           }
+                     }
+                    }
+                }catch(err){
+                       goodcode=false;
+                       error="Error with AI programs " +err
+                }
+
                 try{
                     if(chummerfile.characters.character.vehicles!=null){
                         console.log("Importing vehicles");
@@ -10611,7 +10722,7 @@ on("change:chummercheckbox", function(){
                                             attributes["skillspec"+j]="none";
                                         if(chummerfile.characters.character.weapons!=null){
                                             if(chummerfile.characters.character.weapons.weapon.length>1){
-                                                for(var h=1;h<chummerfile.characters.character.weapons.weapon.length+1&&h<=6;h++){
+                                                for(var h=1;h<chummerfile.characters.character.weapons.weapon.length+1&&h<9;h++){
                                                     if(chummerfile.characters.character.weapons.weapon[h-1].category!="Gear"){
                                                         if(names[compname]==chummerfile.characters.character.weapons.weapon[h-1].skill){
                                                             attributes["weaponcategory"+h]="@{skilldicepool"+j+"}";
@@ -10809,7 +10920,7 @@ on("change:chummercheckbox", function(){
 
                     attributes.warningcheckbox="0";
                     attributes.chummercheckbox="0";
-                    attributes.chummertext="Import successful\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles"
+                    attributes.chummertext="Import successful\nREMEMBER THIS IS ONLY A HELP AND YOU NEED TO DOUBLE CHECK EVERYTHING.\nSpecifically check the following values manually:\n-Character Name\n-Limitmodifiers global or applying to single skills\n-Cyberdeck and Matrix Actions\n-Vehicle and Drone Autosofts\n-SINs + Lifestyles\nWeapon AP, Acc, RC"
                     if(goodcode){
                         try{
                             setAttrs(attributes);
