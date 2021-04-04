@@ -15669,24 +15669,46 @@ on("sheet:opened change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3 change:fk
 	}
 );
 
-on("sheet:opened change:wound_kopf change:wound_ra change:wound_la change:wound_rb change:wound_lb change:wound_brust change:wound_bauch change:mu_basis change:mu_mod change:kl_basis change:kl_mod change:in_basis change:in_mod change:ch_basis change:ch_mod change:ff_basis change:ff_mod change:ge_basis change:ge_mod change:ko_basis change:ko_mod change:kk_basis change:kk_mod change:gs_basis change:gs_mod change:erschoepfung_mod change:eisern change:aspzugek change:auszugek change:lezugek change:mrzugek change:inizugek change:sf_gefaess_der_sterne", function(eventInfo) {
-    getAttrs(["wound_kopf", "wound_ra", "wound_la", "wound_rb", "wound_lb", "wound_brust", "wound_bauch", "mu_basis", "mu_mod", "kl_basis", "kl_mod", "in_basis", "in_mod", "ch_basis", "ch_mod", "ff_basis", "ff_mod", "ge_basis", "ge_mod", "ko_basis", "ko_mod", "kk_basis", "kk_mod", "gs_basis", "gs_mod", "erschoepfung_mod", "eisern", "aspzugek", "auszugek", "lezugek", "mrzugek", "inizugek", "sf_gefaess_der_sterne"], function(v) {
-        let wundeKopf = +v.wound_kopf || 0;
-        let wundeRA = +v.wound_ra || 0;
-        let wundeLA = +v.wound_la || 0;
-        let wundeRB = +v.wound_rb || 0;
-        let wundeLB = +v.wound_lb || 0;
-        let wundeBrust = +v.wound_brust || 0;
-        let wundeBauch = +v.wound_bauch || 0;
+on(
+	"sheet:opened " +
+	"change:mu_basis change:mu_mod change:MU_mod_wounds " +
+	"change:in_basis change:in_mod change:IN_mod_wounds " +
+	"change:kl_basis change:kl_mod change:KL_mod_wounds " +
+	"change:ch_basis change:ch_mod " +
+	"change:ff_basis change:ff_mod change:FF_mod_wounds " +
+	"change:ge_basis change:ge_mod change:GE_mod_wounds " +
+	"change:ko_basis change:ko_mod change:KO_mod_wounds " +
+	"change:kk_basis change:kk_mod change:KK_mod_wounds " +
+	"change:gs_basis change:gs_mod change:GS_mod_wounds " +
+	"change:lezugek change:auszugek change:aspzugek " +
+	"change:mrzugek change:inizugek change:erschoepfung_mod " +
+	"change:eisern " +
+	"change:sf_gefaess_der_sterne " +
+	"change:IB_mod_wounds ",
+	function(eventInfo) {
+	getAttrs(["mu_basis", "mu_mod", "MU_mod_wounds",
+		"in_basis", "in_mod", "IN_mod_wounds",
+		"kl_basis", "kl_mod", "KL_mod_wounds",
+		"ch_basis", "ch_mod",
+		"ff_basis", "ff_mod", "FF_mod_wounds",
+		"ge_basis", "ge_mod", "GE_mod_wounds",
+		"ko_basis", "ko_mod", "KO_mod_wounds",
+		"kk_basis", "kk_mod", "KK_mod_wounds",
+		"gs_basis", "gs_mod", "GS_mod_wounds",
+		"lezugek", "auszugek", "aspzugek",
+		"mrzugek", "inizugek", "erschoepfung_mod",
+		"eisern",
+		"sf_gefaess_der_sterne",
+		"IB_mod_wounds"], function(v) {
         let update = {
-            'MU': +v.mu_basis + +v.mu_mod - wundeKopf,
-            'KL': +v.kl_basis + +v.kl_mod - wundeKopf,
-            'IN': +v.in_basis + +v.in_mod - wundeKopf,
+            'MU': Math.max(0, +v.mu_basis + +v.mu_mod + v.MU_mod_wounds),
+            'KL': Math.max(0, +v.kl_basis + +v.kl_mod + v.KL_mod_wounds),
+            'IN': Math.max(0, +v.in_basis + +v.in_mod + v.IN_mod_wounds),
             'CH': +v.ch_basis + +v.ch_mod,
-            'FF': +v.ff_basis + +v.ff_mod - wundeRA - wundeLA,
-            'GE': +v.ge_basis + +v.ge_mod - wundeLB - wundeRB,
-            'KO': +v.ko_basis + +v.ko_mod - wundeBrust - wundeBauch,
-            'KK': +v.kk_basis + +v.kk_mod - wundeBrust - wundeBauch - wundeRA - wundeLA,
+            'FF': Math.max(0, +v.ff_basis + +v.ff_mod + v.FF_mod_wounds),
+            'GE': Math.max(0, +v.ge_basis + +v.ge_mod + v.GE_mod_wounds),
+            'KO': Math.max(0, +v.ko_basis + +v.ko_mod + v.KO_mod_wounds),
+            'KK': Math.max(0, +v.kk_basis + +v.kk_mod + v.KK_mod_wounds),
             'erschoepfung_basis': +v.ko_basis,
             'erschoepfung_max': +v.ko_basis + +v.erschoepfung_mod,
             'wundschwelle': Math.ceil((+v.ko_basis) / 2) + +v.eisern,
@@ -15700,23 +15722,24 @@ on("sheet:opened change:wound_kopf change:wound_ra change:wound_la change:wound_
             'mr_max': Math.round((+v.mu_basis + +v.kl_basis + +v.ko_basis) / 5) + +v.mrzugek,
             'ueberanstrengung_max': +v.ko_basis,
             'inibasis': Math.round((+v.mu_basis + +v.mu_basis + +v.in_basis + +v.ge_basis) / 5),
-            'atbasis': Math.round(((+v.mu_basis + +v.ge_basis + +v.kk_basis) / 5) - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB),
-            'pabasis': Math.round(((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5) - wundeBrust - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB),
-            'fkbasis': Math.round(((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5) - wundeBrust - wundeBauch - wundeRA - wundeLA - wundeRB - wundeLB)
+            'atbasis': Math.round((+v.mu_basis + +v.ge_basis + +v.kk_basis) / 5),
+            'pabasis': Math.round((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5),
+            'fkbasis': Math.round((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5)
         };
-        update['inibasis2'] = update['inibasis'] + +v.inizugek - wundeKopf - wundeBauch - wundeLB - wundeRB;
+        update['inibasis2'] = Math.max(0, update['inibasis'] + +v.inizugek + v.IB_mod_wounds);
         let GS = {
             'Basis': +v.gs_basis,
-            'Mod': +v.gs_mod,
-            'GE-Einfluss': 0,
-            'Wunden': wundeBauch - (wundeRB / 2) - (wundeLB / 2)
+            'Mod': +v.gs_mod + v.GS_mod_wounds,
+            'GE-Einfluss': 0
         };
         if (update['GE'] < 11) {
             GS['GE-Einfluss'] = -1;
         } else if (update['GE'] > 15) {
             GS['GE-Einfluss'] = 1;
         }
-        update['GS'] = GS['Basis'] + GS['Mod'] + GS['GE-Einfluss'] + GS['Wunden'];
+
+        // Speed (GS) cannot be lower than 1
+        update['GS'] = Math.max(1, GS['Basis'] + GS['Mod'] + GS['GE-Einfluss']);
         setAttrs(update);
     }); 
 });
