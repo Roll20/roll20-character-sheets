@@ -1,11 +1,51 @@
 Change Log
 ==============================================
+
+**2021-03-29** v.25 Chuz (James Culp)
+	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
+	Started changes for NPC sheets.
+	Updated npc sheets image, settings and toggle headers.
+	Styled npc toggles and attribute buttons
+	Updated attribute roll buttons to be consistent with PC sheet buttons.
+	Made Magic now visible if Awakened OR Spirit are selected
+	Made Force only visible if Spirit is selected
+	Updated styles and html to make settings hide/reveal correctly for non-pc sheets
+	Updated matrix grid to work properly with 0 for a stat
+	Changed npc pain tolerance to be in options
+	Updated npc options -> grunt type (mundane, awakened, emergent, spirit) to be a select labeled Archetype
+	Updated "Bonuses" and "Modifier" column variables for non-PC sheets.  They now have the proper name='' fields.
+	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
+	Some more style updates to npc sheets
+	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
+
+**2021-03-22** v.24 Chuz (James Culp)
+	Beginning v.24
+	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
+	Fix to patreon and roll20userid fields in sheet.json, maybe I'll be listed as a sheet author now.
+	Finished adding Wild Die option to all dice rollers (I think) on PC sheet.
+	Matrix Tab layout more or less complete and ready for script magic
+	Settled on layout changes
+	Completed Sheetworker to tie ASDF device buttons together (only one selected at a time)
+	Completed Sheetworker to tie device primary checkboxes together (only one selected at a time)
+	Completed Sheetworker to update Matrix Attack Rating and Matrix Defense Rating when A/S/D/F are updated
+	Completed Sheetworker to update A/S/D/F to W/I/L/C when emergent checkbox is selected in options (making the character a technomancer)
+	Matrix Device Essence Cost is now included in Essence automatic calculations
+	Matrix Device Initiative Bonus is now included in Initiative automatic calculations
+	Made Technomancer attributes and Complex Forms sections hide for non-technomancers
+	Made device A/S/D/F assignment buttons and matrix condition monitor hide for technomancers
+	Removed empty buttons in skills when no specialization or expertise was set.
+	Linked primary device condition monitor to the condition monitor hexes in the Persona section
+	Fixed a bug related to sheet_type being misread and making some automatic calculations not fire right (initiative bugs anyone?)
+	Started in on Complex Forms
+	Updated Matrix -> Complex Forms section
+	When selecting a skill, have the correct default attribute auto-selected
+
 **2021-03-15** v.23 Chuz (James Culp)
-	Made sheet work with current roll20 "enhanced" code that has been partially rolled back
-	Changed Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none
-	Added functionality to the ammo counter, now when primary ranged weapon firing mode is changed the number of rounds updates the the correct amount (1, 2, 4, 10)
-	Added Mod field for skills to allow skill rolls to have bonuses added.  Does not add to the actual skill dicepool just affects the skill roller.
-	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly.
+	Made sheet work with current roll20 "enhanced" code that has been partially rolled back Changed 
+	Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none 
+	Added functionality to the ammo counter, now when primary ranged weapon firing mode is changed the number of rounds updates the the correct amount (1, 2, 4, 10) 
+	Added Mod field for skills to allow skill rolls to have bonuses added. Does not add to the actual skill dicepool just affects the skill roller. 
+	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly. 
 	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
 
 **2021-03-08** v.22 Chuz (James Culp)
