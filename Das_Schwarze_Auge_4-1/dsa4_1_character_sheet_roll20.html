@@ -15684,6 +15684,8 @@ on(
 	"change:mrzugek change:inizugek change:erschoepfung_mod " +
 	"change:eisern " +
 	"change:sf_gefaess_der_sterne " +
+	"change:sf_kampfgespur change:sf_kampfreflexe change:sf_klingentanzer " +
+	"change:BE_TaW " +
 	"change:IB_mod_wounds ",
 	function(eventInfo) {
 	getAttrs(["mu_basis", "mu_mod", "MU_mod_wounds",
@@ -15699,6 +15701,8 @@ on(
 		"mrzugek", "inizugek", "erschoepfung_mod",
 		"eisern",
 		"sf_gefaess_der_sterne",
+		"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
+		"BE_TaW",
 		"IB_mod_wounds"], function(v) {
         let update = {
             'MU': Math.max(0, +v.mu_basis + +v.mu_mod + v.MU_mod_wounds),
@@ -15726,7 +15730,41 @@ on(
             'pabasis': Math.round((+v.in_basis + +v.ge_basis + +v.kk_basis) / 5),
             'fkbasis': Math.round((+v.in_basis + +v.ff_basis + +v.kk_basis) / 5)
         };
-        update['inibasis2'] = Math.max(0, update['inibasis'] + +v.inizugek + v.IB_mod_wounds);
+
+		/*
+			Calculation of "real" base initiative (inibasis2)
+
+			Hints regarding rule interpretation:
+			* Kampfreflexe requires an armour with max. encumbrance of 4 (WdS, p. 75)
+			** This is interpreted to mean a total encumbrance of 4 as well (due to high load)
+			* Kampfgespür has no requirements per se, but required Kampfreflexe
+			** Kampfreflexe needs to be active, so encumbrance rules of Kampfreflexe apply to Kampfgespür as well
+			* Klingentänzer requires a total encumbrance of 2
+			** This is the reason for also treating Kampfreflexe's encumbrance as total encumbrance, not as encumbrance from armour only.
+		*/
+		var inibasis2 = update['inibasis'] + +v.inizugek + v.IB_mod_wounds;
+
+		// Kampfreflexe is a prerequisite for the others, so stop if not active
+		var IBbonus = 0;
+		var INIdicecount = "1";
+		if (v.sf_kampfreflexe !== "0" && v.BE_TaW <= 4) {
+			IBbonus += 4;
+			if (v.sf_kampfgespur !== "0" && v.BE_TaW <= 4) {
+				IBbonus += 2;
+				if (v.sf_klingentanzer !== "0" && v.BE_TaW <= 2) {
+					INIdicecount = "2";
+				} else {
+					INIdicecount = "1";
+				}
+			}
+		}
+
+		inibasis2 += IBbonus;
+		inibasis2 = Math.max(0, inibasis2);
+
+        update['inibasis2'] = inibasis2;
+        update['INI_dice_count'] = INIdicecount;
+
         let GS = {
             'Basis': +v.gs_basis,
             'Mod': +v.gs_mod + v.GS_mod_wounds,
