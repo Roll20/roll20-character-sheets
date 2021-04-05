@@ -16060,7 +16060,12 @@ function migrateTo99999999(migrationChain) {
 			"wound_RA1", "wound_RA2", "wound_RA3",
 			"wound_LA1", "wound_LA2", "wound_LA3",
 			"wound_RB1", "wound_RB2", "wound_RB3",
-			"wound_LB1", "wound_LB2", "wound_LB3"
+			"wound_LB1", "wound_LB2", "wound_LB3",
+
+			"inibasis", "inizugek",
+			"INIModNKW1", "INIModNKW2", "INIModNKW3", "INIModNKW4",
+			"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
+			"BE_TaW"
 		];
 		// Updates for shield attack
 		var activeShieldRowId = values["activeShieldRowId"];
@@ -16107,6 +16112,42 @@ function migrateTo99999999(migrationChain) {
 				"KO_mod_wounds": mods["KO"],
 				"KK_mod_wounds": mods["KK"]
 			});
+
+			// Updates for INI modifiers
+			// Set INI modifier from (main) weapon
+			var weaponini = 0;
+			for (weapon = 1; weapon <= 4; weapon++) {
+				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
+					console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
+					weaponini = parseInt(values["INIModNKW" + weapon]);
+				}
+			}
+			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
+
+			// Calculate initiative base considering special skills and encumbrance
+			var inibasis2 = parseInt(values['inibasis']) + parseInt(values.inizugek) + parseInt(attrsToChange["IB_mod_wounds"]);
+
+			// Kampfreflexe is a prerequisite for the others, so stop if not active
+			var IBbonus = 0;
+			var INIdicecount = "1";
+			if (values.sf_kampfreflexe !== "0" && values.BE_TaW <= 4) {
+				IBbonus += 4;
+				if (values.sf_kampfgespur !== "0" && values.BE_TaW <= 4) {
+					IBbonus += 2;
+					if (values.sf_klingentanzer !== "0" && values.BE_TaW <= 2) {
+						INIdicecount = "2";
+					} else {
+						INIdicecount = "1";
+					}
+				}
+			}
+
+			inibasis2 += IBbonus;
+			inibasis2 = Math.max(0, inibasis2);
+
+		    attrsToChange["inibasis2"] = inibasis2;
+		    attrsToChange["INI_dice_count"] = INIdicecount;
+
 		    setAttrs(attrsToChange, {}, function(){
 		        callNextMigration(migrationChain);
 		    });
