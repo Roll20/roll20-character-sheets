@@ -17,4 +17,9 @@ gulp.task('html', () => {
     .pipe(gulp.dest('../'))
 })
 
-gulp.task('default',  gulp.series(['css','html']))
+gulp.task('watch', gulp.series(['css', 'html'], () => {
+  gulp.watch('./app/**/*.styl', gulp.series(['css']))
+  gulp.watch(['./app/**/*.pug','./app/**/*.js'], gulp.series(['html']))
+}))
+
+gulp.task('build',  gulp.series(['css','html']))
