@@ -58,7 +58,7 @@ function chosenDifficulty (rank) {
   }
 }
 
-on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress', function(values) {
+on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress change:repeating_sites:mark_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
   getAttrs([
     `repeating_${type}_rank`,
@@ -92,7 +92,7 @@ on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress',
   });
 });
 
-on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress', function(values) {
+on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress change:repeating_sites:clear_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
   setAttrs({ 
     ['repeating_' + type + '_progress_' + progressStrings[0]]: '0',
@@ -110,16 +110,16 @@ on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress
 
 on('change:clear_misses', function() {
   setAttrs({ 
-    'miss-0': '0',
-    'miss-1': '0',
-    'miss-2': '0',
-    'miss-3': '0',
-    'miss-4': '0',
-    'miss-5': '0',
-    'miss-6': '0',
-    'miss-7': '0',
-    'miss-8': '0',
-    'miss-9': '0',
+    'miss_0': '0',
+    'miss_1': '0',
+    'miss_2': '0',
+    'miss_3': '0',
+    'miss_4': '0',
+    'miss_5': '0',
+    'miss_6': '0',
+    'miss_7': '0',
+    'miss_8': '0',
+    'miss_9': '0',
     'clear_misses': 'off'
   });
 });
