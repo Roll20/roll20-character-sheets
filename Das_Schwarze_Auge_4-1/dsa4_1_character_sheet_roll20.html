@@ -16044,12 +16044,26 @@ function migrateTo20200809(migrationChain) {
 
 function migrateTo99999999(migrationChain) {
 
-    getAttrs(["activeShieldRowId"], function(rowIdValues) {
-        var activeShieldRowId = rowIdValues["activeShieldRowId"];
-    
-        let variablesToGet = [ "kk", "AT_raufen", "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", 
-                                "NKW1_Schwellenwert", "NKW1_SchwellenwertKK", "NKW2_Schwellenwert",
-                                "NKW2_SchwellenwertKK", "NKW3_Schwellenwert", "NKW3_SchwellenwertKK", "NKW4_Schwellenwert", "NKW4_SchwellenwertKK"];
+    getAttrs(["activeShieldRowId"], function(values) {
+		var variablesToGet = [
+			"sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag",
+			"KK_Basis", "KK_mod",
+			"AT_raufen",
+			"NKW_Aktiv1", "NKW1_Schwellenwert", "NKW1_SchwellenwertKK",
+			"NKW_Aktiv2", "NKW2_Schwellenwert", "NKW2_SchwellenwertKK",
+			"NKW_Aktiv3", "NKW3_Schwellenwert", "NKW3_SchwellenwertKK",
+			"NKW_Aktiv4", "NKW4_Schwellenwert", "NKW4_SchwellenwertKK",
+
+			"wound_kopf1", "wound_kopf2", "wound_kopf3",
+			"wound_brust1", "wound_brust2", "wound_brust3",
+			"wound_bauch1", "wound_bauch2", "wound_bauch3",
+			"wound_RA1", "wound_RA2", "wound_RA3",
+			"wound_LA1", "wound_LA2", "wound_LA3",
+			"wound_RB1", "wound_RB2", "wound_RB3",
+			"wound_LB1", "wound_LB2", "wound_LB3"
+		];
+		// Updates for shield attack
+		var activeShieldRowId = values["activeShieldRowId"];
     
         // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
         if (activeShieldRowId) {
@@ -16057,23 +16071,46 @@ function migrateTo99999999(migrationChain) {
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         }
-    
-        getAttrs(variablesToGet, function(values) {
-            let attrsToChange = {};
-    
-            for (var i = 1; i <= 4; i++) {
-                attrsToChange["NKW" + i + "_SB"] = calculateTpKKMod(values, i);
-            }
-    
-            let result = calculateShieldAttack(values, activeShieldRowId);
-            
-            attrsToChange["shield_at_mod"] = result.shieldAtMod;
-            attrsToChange["shield_at_available"] = result.shieldAtAvailable;
-    
-            setAttrs(attrsToChange, {}, function(){
-                callNextMigration(migrationChain);
-            });
-        });
+
+		getAttrs(variablesToGet, function(values) {
+			/*
+				* KK might be ill-defined right now (NaN)
+				* Reason: sheet:opened recalculates KK, but requires KK_mod_wounds
+				* KK_mod_wounds is existing at that point
+				* Make up our own little KK here for migration purposes
+			*/
+			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
+		    let attrsToChange = {};
+
+		    for (var i = 1; i <= 4; i++) {
+		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKMod(values, i);
+		    }
+
+		    let result = calculateShieldAttack(values, activeShieldRowId);
+
+		    attrsToChange["shield_at_mod"] = result.shieldAtMod;
+		    attrsToChange["shield_at_available"] = result.shieldAtAvailable;
+
+			// Updates for wound modifiers
+			var mods = calculateWoundModifiers(values);
+			Object.assign(attrsToChange, {
+				"AT_mod_wounds": mods["AT"],
+				"PA_mod_wounds": mods["PA"],
+				"FK_mod_wounds": mods["FK"],
+				"IB_mod_wounds": mods["IB"],
+				"GS_mod_wounds": mods["GS"],
+				"MU_mod_wounds": mods["MU"],
+				"IN_mod_wounds": mods["IN"],
+				"KL_mod_wounds": mods["KL"],
+				"FF_mod_wounds": mods["FF"],
+				"GE_mod_wounds": mods["GE"],
+				"KO_mod_wounds": mods["KO"],
+				"KK_mod_wounds": mods["KK"]
+			});
+		    setAttrs(attrsToChange, {}, function(){
+		        callNextMigration(migrationChain);
+		    });
+		});
     });
 }
 
