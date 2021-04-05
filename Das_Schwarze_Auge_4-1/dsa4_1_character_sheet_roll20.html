@@ -16510,10 +16510,18 @@ function calculateCombatValues() {
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
             variablesToGet.push("KK");
+            variablesToGet.push("KK_Basis");
+            variablesToGet.push("KK_mod");
         }
 
         getAttrs(variablesToGet, function(values) {
             var attrsToChange = {};
+
+			// Prepare against NaN KK
+			if (isNaN(values["KK"])) {
+				values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
+			}
+
             // Used for AT, PA and TP calc
             let tpkkMod = parseInt(values["NKW" + weapon + "_SB"]);
 
@@ -17406,7 +17414,7 @@ on(
 on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_SchwellenwertKK change:NKW2_Schwellenwert change:NKW3_SchwellenwertKK change:NKW3_Schwellenwert change:NKW4_SchwellenwertKK change:NKW4_Schwellenwert", function(eventInfo) {
 
     var weaponsToCalculate = [];
-    let attrsToGet = [ "kk" ];
+    let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
 
     // Gather all affected melee weapons (NKW)
     // Changes to KK (strength) can affect all weapons
@@ -17426,6 +17434,10 @@ on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_
     }
 
     getAttrs(attrsToGet, function(values) {
+		// Prepare against NaN KK
+		if (isNaN(values["KK"])) {
+			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
+		}
         let attrsToChange = {};
         for (var i = 0; i < weaponsToCalculate.length; i++) {
             let weapon = weaponsToCalculate[i];
@@ -17486,7 +17498,7 @@ Str. Dif. Flo. Res.
 
 */
 function calculateTpKKMod(values, weapon) {
-    let KK = parseInt(values["kk"]);
+    let KK = parseInt(values["KK"]);
     let weaponKK = parseInt(values["NKW" + weapon + "_SchwellenwertKK"]);
     let threshold = parseInt(values["NKW" + weapon + "_Schwellenwert"]);
 
