@@ -70,6 +70,7 @@
 	  <input type="hidden" name='attr_wpB' value=''>
 	  <input type="hidden" name='attr_felTotal' value=''>
 	  <input type="hidden" name='attr_felB' value=''>
+<!-- TODO: setup the sheetworker to calc statTotal and statB -->
 	  <button title="Weapon Skill" name='WS' type='roll' class='clear full_width characteristics_button stats_grid_1' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{roll-name=Weapon Skill}}  {{dos=[[[[1+floor(abs([[{{ {@{wsTotal}+@{inlinemod-toggle}}, {@{wsTotal}-@{limiter}}}kh1, {@{wsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]}} {{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}'>WS |<input name='attr_WS_total' value='@{WS} + @{WS_advancement}' class='input_background input_char_background' disabled /></button>
 	  <button title="Ballistic Skill" name='BS' type='roll' class='clear full_width characteristics_button stats_grid_2' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{roll-name=Ballistic Skill}}  {{dos=[[[[1+floor(abs([[{{ {@{bsTotal}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{BS_unnat}/2)]]}} {{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}'>BS |<input name='attr_BS_total' value='@{BS} + @{BS_advancement}' class='input_background input_char_background' disabled /></button>
 	  <button title="Strength" name='STR' type='roll' class='clear full_width characteristics_button stats_grid_3' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{roll-name=Strength}}  {{dos=[[[[1+floor(abs([[{{ {@{strTotal}+@{inlinemod-toggle}}, {@{strTotal}-@{limiter}}}kh1, {@{strTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{STR_unnat}/2)]]}} {{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}'>STR |<input name='attr_STR_total' value='@{STR} + @{STR_advancement}' class='input_background input_char_background' disabled /></button>
@@ -1771,18 +1772,19 @@
 			  <div class='psykana_ability_gs_b7'>Pen</div>
 			  <input class='psykana_ability_gs_b8 full_width' type='text' value='0' name='attr_P_pen' />
 			</div>
-			
 			<!--TODO: get the focus button right-->
 			<div class='psykana_ability_grid3'>
 			  <div class='psykana_ability_gs_c1'>Focus Power</div>
 			  <select name='attr_P_focus' class='psykana_ability_gs_c2 full_width bottomless'>
-				<option value='@{wptotal}' selected='selected'>Willpower</option>
-				<option value='@{pertotal}'>Perception</option>
+				<option value='@{wpTotal}' selected='selected'>Willpower</option>
+				<option value='@{perTotal}'>Perception</option>
 				<option value='@{psyniscience_total}'>Psyniscience</option>
 			  </select>
+			  <input class='hidden' type='text' name='attr_psy_atk_total_finder' readonly />
+			  <input class='hidden' type='text' name='attr_psy_atk_unnat_finder' readonly />
 			  <div class='psykana_ability_gs_c3 collapsible_entity_toggle'>Power Mod</div>
 			  <input class='psykana_ability_gs_c4 full_width' type='text' value='0' name='attr_P_mod1' />
-			  <button name='psy_hit' class='equipment_weapon_rep_c5_psy full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}}{{psy= }}{{attack= }}{{weapon= @{P_name}}} {{dos=[[[[1+floor(abs([[{{ {@{P_total}+@{inlinemod-toggle}}, {@{P_focus}-@{limiter}}}kh1, {@{P_focus}+@{limiter}}}kl1]]-[[1d100cs>90@{psy_roll}]])/10)]]+ceil(@{WP_unnat}/2)]]}} {{target=$[[0]]}} {{roll=$[[1]]}} {{dof=$[[2]]}} {{class=[[@{psykana_class}]]}} {{limit=[[@{psykana_limit}]]}} {{focus=[[@{P_focus}]]}} {{pmod=[[@{P_mod1}]]}} {{sustain=[[@{psykana_sustain}]]}} {{modifier=[[@{inlinemod-toggle}]]}} {{P_multi=[[@{P_multi}]]}} {{epr=[[5*@{effective_psy_rating}]]}}'>Cast |<input name='attr_P_total' value='@{P_focus}+@{P_mod1}+5*@{effective_psy_rating}+@{psykana_sustain}' class='input_background input_char_background' disabled /></button>
+			  <button name='psy_hit' class='equipment_weapon_rep_c5_psy full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}}{{psy= }}{{attack= }}{{weapon= @{P_name}}} {{dos=[[[[1+floor(abs([[{{ {@{P_total}+@{inlinemod-toggle}}, {@{P_total}-@{limiter}}}kh1, {@{P_total}+@{limiter}}}kl1]]-[[1d100cs>90@{psy_roll}]])/10)]]+ceil(@{wp_unnat}/2)]]}} {{target=$[[0]]}} {{roll=$[[1]]}} {{dof=$[[2]]}} {{class=[[@{psykana_class}]]}} {{limit=[[@{psykana_limit}]]}} {{focus=[[@{P_focus}]]}} {{pmod=[[@{P_mod1}]]}} {{sustain=[[@{psykana_sustain}]]}} {{modifier=[[@{inlinemod-toggle}]]}} {{P_multi=[[@{P_multi}]]}} {{epr=[[5*@{effective_psy_rating}]]}}'>Cast |<input name='attr_P_total' value='@{P_focus}+@{P_mod1}+5*@{effective_psy_rating}+@{psykana_sustain}' class='input_background input_char_background' disabled /></button>
 			  <button name='psy_dmg' class='psykana_ability_gs_c6 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{P_type}}} {{weapon= @{P_name}}} {{damage=[[@{P_dam-roll}]] }} {{pen=[[@{P_pen}]] }} {{@{settings_weapondescription}=@{P_ability_r} }}' >DMG</button>
 			</div>
 			
@@ -2549,6 +2551,7 @@
   ];
   on('sheet:opened ' + fieldsFA.map(field => 'change:' + field).join(' '), function() {
 	getAttrs(fieldsFA, function(values) {
+	  var fatigue_mod = parseInt(values['fatigue_mod'], 10) || 0;
 	  var tou = parseInt(values['tou'], 10) || 0;
 	  var tou_unnat = parseInt(values['tou_unnat'], 10) || 0;
 	  var tou_advancement = parseInt(values['tou_advancement'], 10) || 0;
@@ -2757,32 +2760,27 @@
 //  ['change:repeating_psychicabilities:p_focus','wptotal','pertotal','psyniscience_total',
 //  'wp_unnat','per_unnat','psyniscience_unnat'
 //  ];
-/* TODO: get this sheetworker right
- const repeatingSkills = 'active', 'knowledge', 'language';
-
-  repeatingSkills.forEach(skill => {
-    getSectionIDs(skill, idarray => {
-      let attributes = []
-      idarray.forEach(id => attributes.push(`repeating_${skill}_${id}_limit`))
-
-     //You will probably need to join the attributes array above with whatever other attributes you want to get
-
-      getAttrs(attributes, values => {
-        let update = {}
-        for (let [key, value] of Object.entries(values)) {
-          const repRowID = processingFunctions.getReprowid(key)
-
-           // You may want to do this and another getAttrs if your value is like this @{strength}
-           // value.slice(2, -1)
-
-           update[`${repRowID}_display_limit`] = //Do Math
-        }
-       setAttrs(update)
-      })
-    })
-  })
-  */
-
+/* TODO: make this work
+  on('sheet:opened change:repeating_psychicabilities:p_focus change:wptotal change:wp_unnat', function() {
+	getAttrs([
+	'p_focus', 'wptotal', 'wp_unnat'
+	], function(values) {
+	  var p_focus = parseInt(values['p_focus']) || 0;
+	  var wptotal = values.wptotal;
+	  var wp_unnat = parseInt(values['wp_unnat']) || 0;
+	  
+	  switch (p_focus) {
+		case 0:
+		  setAttrs({
+			psy_ab_total_finder: wptotal,
+			psy_ab_unnat.finder: wp_unnat
+		  });
+		  break;
+	  }
+	  
+	});
+  });
+*/
 
 
 
@@ -3095,7 +3093,7 @@
 		</div>
 		<div class="template-2x2">
 		  <div class="template-row template-right">Roll</div>
-		  <div class="template-row">{{roll}}</div>
+		  <div class="template-row inlinerollresult">{{roll}}</div>
 		</div>
 	  </div>
 	<div class="template-content">
@@ -3113,11 +3111,12 @@
 
 <!--TODO: lots of these would look better if the key/value pairs were left/right rather than centered-->
   {{#attack}}
-  <div class="template-header">{{character}} rolls to {{#psy}}focus{{/psy}}{{^psy}}hit{{/psy}} with {{weapon}}</div>
+  <div class="template-header">{{character}} rolls to hit with {{weapon}}</div>
   {{#loc}}<div class="template-content template-content_top">{{/loc}}
 	{{^loc}}<div class="template-content">{{/loc}}
 
 	  <div class="rolltemplate-collapsible_entity_switch">
+		<!--TODO: visual bug: the divider line here is the "outside border" light green, but I want a darker green-->
 		<div class="template-2x2 template-content">
 		  <div class="template-2x2">
 			<div class="template-row template-right">Target:</div>
