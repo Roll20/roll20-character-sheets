@@ -15,9 +15,9 @@ npm run build:css
 ```
 These will then generate a dist folder that will have the finished code. From their you can upload them into the custom sheet sandbox for testing.
 ## Pushing Changes
-Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally and then the Ironsworn.html and Ironsworn.css need to be copied from the /dist directory and replace the ones in the base directory for Ironsworn.
+Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
 ## Translations
-To keep our translation and fallback html content consistent. We opted to store a duplicate of the translation.json file at `src\data\translations.pug`. This should be treated as a mirror of `translations.json`. And when a change is done to `translation.json` copy the json into `translations.pug`. (Ideally there will be no need for this file and we will import the json during build to populate our content, but currently it is fairly complex work)
+To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|
