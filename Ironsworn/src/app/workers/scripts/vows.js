@@ -81,7 +81,6 @@ on("sheet:opened", function() {
     } else {
       for (currentVow = 1; currentVow <= 5; currentVow++) {
         fillRepeatingVow(currentVow);
-        console.log(currentVow);
       }
       setAttrs({vows_migrated: true});
     };
