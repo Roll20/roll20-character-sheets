@@ -1,5 +1,17 @@
 Change Log
 ==============================================
+**2021-04-05** v.26 Chuz (James Culp)
+	Fixed NPC defense roll buttons
+	Added attr_speed for npc-vehicle sheet so it can be tracked on tokens
+	Fixed NPC soak roll buttons
+	Added cold sim and hot sim initiative modifiers and dice modifiers for all sheets
+	Hid unnecessary Matrix AR and Cold Sim VR initiative for Vehicles, Sprites and Hosts
+	NPC-Sprite - populate ASDF, Resonance and Initiative when sprite level or type is changed.
+	NPC-Sprite when changing level or sprite type, if powers or skills are empty the sheet will auto populate them with the values from the CRB
+	Added a bit of color to differentiate Skill vs. Speciallized vs. Expertise roll buttons.
+	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
+	New section now holds Complex Forms tab and submersion tab
+	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
 
 **2021-03-29** v.25 Chuz (James Culp)
 	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
