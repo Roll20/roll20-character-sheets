@@ -1784,7 +1784,7 @@
 			  <input class='hidden' type='text' name='attr_psy_atk_unnat_finder' readonly />
 			  <div class='psykana_ability_gs_c3 collapsible_entity_toggle'>Power Mod</div>
 			  <input class='psykana_ability_gs_c4 full_width' type='text' value='0' name='attr_P_mod1' />
-			  <button name='psy_hit' class='equipment_weapon_rep_c5_psy full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}}{{psy= }}{{attack= }}{{weapon= @{P_name}}} {{dos=[[[[1+floor(abs([[{{ {@{P_total}+@{inlinemod-toggle}}, {@{P_total}-@{limiter}}}kh1, {@{P_total}+@{limiter}}}kl1]]-[[1d100cs>90@{psy_roll}]])/10)]]+ceil(@{wp_unnat}/2)]]}} {{target=$[[0]]}} {{roll=$[[1]]}} {{dof=$[[2]]}} {{class=[[@{psykana_class}]]}} {{limit=[[@{psykana_limit}]]}} {{focus=[[@{P_focus}]]}} {{pmod=[[@{P_mod1}]]}} {{sustain=[[@{psykana_sustain}]]}} {{modifier=[[@{inlinemod-toggle}]]}} {{P_multi=[[@{P_multi}]]}} {{epr=[[5*@{effective_psy_rating}]]}}'>Cast |<input name='attr_P_total' value='@{P_focus}+@{P_mod1}+5*@{effective_psy_rating}+@{psykana_sustain}' class='input_background input_char_background' disabled /></button>
+			  <button name='psy_hit' class='equipment_weapon_rep_c5_psy full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}}{{psy= }}{{attack= }}{{weapon= @{P_name}}} {{dos=[[[[1+floor(abs([[{{ {@{P_total}+@{inlinemod-toggle}}, {@{P_total}-@{limiter}}}kh1, {@{P_total}+@{limiter}}}kl1]]-[[1d100cs>90@{psy_roll}]])/10)]]+ceil(@{wp_unnat}/2)]]}} {{target=$[[0]]}} {{roll=$[[1]]}} {{dof=$[[2]]}} {{class=[[@{psykana_class}]]}} {{limit=[[@{psykana_limit}]]}} {{focus=[[@{P_focus}]]}} {{pmod=[[@{P_mod1}]]}} {{sustain=[[@{psykana_sustain}]]}} {{modifier=[[@{inlinemod-toggle}]]}} {{P_multi=[[@{P_multi}]]}} {{eprmod=[[5*@{effective_psy_rating}]]}} {{epr=[[@{effective_psy_rating}]]}}'>Cast |<input name='attr_P_total' value='@{P_focus}+@{P_mod1}+5*@{effective_psy_rating}+@{psykana_sustain}' class='input_background input_char_background' disabled /></button>
 			  <button name='psy_dmg' class='psykana_ability_gs_c6 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{P_type}}} {{weapon= @{P_name}}} {{damage=[[@{P_dam-roll}]] }} {{pen=[[@{P_pen}]] }} {{@{settings_weapondescription}=@{P_ability_r} }}' >DMG</button>
 			</div>
 			
@@ -3225,7 +3225,7 @@
 		  {{#epr}}
 			<div class="sheet-template-2x2 sheet-template-row">
 			  <div class="sheet-template-right">EPR Mod</div>
-			  <div>{{epr}}</div>
+			  <div>{{eprmod}}</div>
 			</div>
 		  {{/epr}}
 		  {{#focus}}
@@ -3250,9 +3250,104 @@
 	  </div>
 	  
 	  <!-- TODO: see if you really like the way DoS/DoF is bugged out here, or if it needs fix -->
+	  <!-- {{burstwin= ceil([[$[[2]]/2]])}} -->
 	  {{#^rollGreater() roll target}}
 		<div class="template-2x2 template-row">Degrees of Success: {{dos}}</div>
+		{{#R_type}}
+		  {{#rollTotal() R_type 0}}
+			<div class="sheet-template-center">Semi Auto:
+			  {{#rollBetween() dos 1 2}}1 Hit {{/rollBetween() dos 1 2}}
+			  {{#rollBetween() dos 3 4}}2 Hits {{/rollBetween() dos 3 4}}
+			  {{#rollBetween() dos 5 6}}3 Hits {{/rollBetween() dos 5 6}}
+			  {{#rollBetween() dos 7 8}}4 Hits {{/rollBetween() dos 7 8}}
+			  {{#rollBetween() dos 9 10}}5 Hits {{/rollBetween() dos 9 10}}
+			  {{#rollBetween() dos 11 12}}6 Hits {{/rollBetween() dos 11 12}}
+			  {{#rollBetween() dos 13 14}}7 Hits {{/rollBetween() dos 13 14}}
+			  {{#rollBetween() dos 15 16}}8 Hits {{/rollBetween() dos 15 16}}
+			  {{#rollBetween() dos 17 18}}9 Hits {{/rollBetween() dos 17 18}}
+			  {{#rollBetween() dos 19 20}}10 Hits {{/rollBetween() dos 19 20}}
+			  {{#rollGreater() dos 20}}10+ Hits {{/rollGreater() dos 20}}
+			  / Max: {{burst}}
+			</div>
+		  {{/rollTotal() R_type 0}}
+		  {{#rollTotal() R_type -10}}
+			<div class="sheet-template-center">Full Auto:
+			  {{#rollTotal() dos 1}}1 Hit {{/rollTotal() dos 1}}
+			  {{#^rollTotal() dos 1}}{{dos}} Hits {{/^rollTotal() dos 1}}
+			  / Max: {{auto}}
+			</div>
+		  {{/rollTotal() R_type -10}}
+		  <!-- TODO: This line procs on Called Shot, but fixing that bug will bloat the code considerably. -->
+		  {{#rollTotal() R_type -20}}
+			<div class="sheet-template-center">Suppression:
+			  {{#rollBetween() dos 1 2}}1 Hit {{/rollBetween() dos 1 2}}
+			  {{#rollBetween() dos 3 4}}2 Hits {{/rollBetween() dos 3 4}}
+			  {{#rollBetween() dos 5 6}}3 Hits {{/rollBetween() dos 5 6}}
+			  {{#rollBetween() dos 7 8}}4 Hits {{/rollBetween() dos 7 8}}
+			  {{#rollBetween() dos 9 10}}5 Hits {{/rollBetween() dos 9 10}}
+			  {{#rollBetween() dos 11 12}}6 Hits {{/rollBetween() dos 11 12}}
+			  {{#rollBetween() dos 13 14}}7 Hits {{/rollBetween() dos 13 14}}
+			  {{#rollBetween() dos 15 16}}8 Hits {{/rollBetween() dos 15 16}}
+			  {{#rollBetween() dos 17 18}}9 Hits {{/rollBetween() dos 17 18}}
+			  {{#rollBetween() dos 19 20}}10 Hits {{/rollBetween() dos 19 20}}
+			  {{#rollGreater() dos 20}}10+ Hits {{/rollGreater() dos 20}}
+			  / Max: {{burst}} or {{auto}}
+			</div>
+		  {{/rollTotal() R_type -20}}
+		{{/R_type}}
+		{{#M_type}}
+		  {{#rollTotal() multi -10}}
+			<div class="sheet-template-center">Swift Attack:
+			  {{#rollBetween() dos 1 2}}1 Hit {{/rollBetween() dos 1 2}}
+			  {{#rollBetween() dos 3 4}}2 Hits {{/rollBetween() dos 3 4}}
+			  {{#rollBetween() dos 5 6}}3 Hits {{/rollBetween() dos 5 6}}
+			  {{#rollBetween() dos 7 8}}4 Hits {{/rollBetween() dos 7 8}}
+			  {{#rollBetween() dos 9 10}}5 Hits {{/rollBetween() dos 9 10}}
+			  {{#rollBetween() dos 11 12}}6 Hits {{/rollBetween() dos 11 12}}
+			  {{#rollBetween() dos 13 14}}7 Hits {{/rollBetween() dos 13 14}}
+			  {{#rollBetween() dos 15 16}}8 Hits {{/rollBetween() dos 15 16}}
+			  {{#rollBetween() dos 17 18}}9 Hits {{/rollBetween() dos 17 18}}
+			  {{#rollBetween() dos 19 20}}10 Hits {{/rollBetween() dos 19 20}}
+			  {{#rollGreater() dos 20}}10+ Hits {{/rollGreater() dos 20}}
+			  / Max: {{WS_bonus}}
+			</div>
+		  {{/rollTotal() multi -10}}
+		  {{#rollTotal() multi -20}}
+			<div class="sheet-template-center">Ltng Attack:
+			  {{#rollTotal() dos 1}}1 Hit {{/rollTotal() dos 1}}
+			  {{#^rollTotal() dos 1}}{{dos}} Hits {{/^rollTotal() dos 1}}
+			  / Max: {{WS_bonus}}
+			</div>
+		  {{/rollTotal() multi -20}}
+		{{/M_type}}
+		{{#P_multi}}
+		  {{#rollTotal() P_multi 2}}
+			<div class="sheet-template-center">Psy Barrage:
+			  {{#rollBetween() dos 1 2}}1 Hit {{/rollBetween() dos 1 2}}
+			  {{#rollBetween() dos 3 4}}2 Hits {{/rollBetween() dos 3 4}}
+			  {{#rollBetween() dos 5 6}}3 Hits {{/rollBetween() dos 5 6}}
+			  {{#rollBetween() dos 7 8}}4 Hits {{/rollBetween() dos 7 8}}
+			  {{#rollBetween() dos 9 10}}5 Hits {{/rollBetween() dos 9 10}}
+			  {{#rollBetween() dos 11 12}}6 Hits {{/rollBetween() dos 11 12}}
+			  {{#rollBetween() dos 13 14}}7 Hits {{/rollBetween() dos 13 14}}
+			  {{#rollBetween() dos 15 16}}8 Hits {{/rollBetween() dos 15 16}}
+			  {{#rollBetween() dos 17 18}}9 Hits {{/rollBetween() dos 17 18}}
+			  {{#rollBetween() dos 19 20}}10 Hits {{/rollBetween() dos 19 20}}
+			  {{#rollGreater() dos 20}}10+ Hits {{/rollGreater() dos 20}}
+			  / Max: {{epr}}
+			</div>
+		  {{/rollTotal() P_multi 2}}
+		  {{#rollTotal() P_multi 3}}
+			<div class="sheet-template-center">Psy Storm:
+			  {{#rollTotal() dos 1}}1 Hit {{/rollTotal() dos 1}}
+			  {{#^rollTotal() dos 1}}{{dos}} Hits {{/^rollTotal() dos 1}}
+			  / Max: {{epr}}
+			</div>
+		  {{/rollTotal() P_multi 3}}
+		{{/P_multi}}
 	  {{/^rollGreater() roll target}}
+	
+	  
 	  {{#rollGreater() roll target}}
 		<div class="template-2x2 template-row">Degrees of Failure: {{dof}}</div>
 	  {{/rollGreater() roll target}}
