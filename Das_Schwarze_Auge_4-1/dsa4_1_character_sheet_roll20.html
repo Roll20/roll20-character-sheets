@@ -15951,210 +15951,6 @@ on("change:kegrundw change:kezugek", function(eventInfo) {
 });
 
 /*
-    Migration steps:
-    - if more than one close range weapon is active, only keep the first one of them as active
-    - if no close range weapon is active, set the first one active
-    - calculate attack value for "Peitsche" talent
-    - calculate fighting values
-    - set shield_pa and parryweapon_pa to 0
-    - set shield_pa_available and parryweapon_pa_available to "0"
-    - change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
-    - calculate BE from armor
-    - calculate BE modifications for weapons
-*/
-function migrateTo20200809(migrationChain) {
-    console.log("migrateTo20200809 invoked");
-
-    getAttrs([
-            "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
-            "RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
-            "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "Ges_BE", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
-            "BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
-            "NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
-        
-        var attrsToChange = {};
-        var activeCount = 0;
-        for (var i = 1; i <= 4; i++) {
-            if (v["NKW_Aktiv" + i] === "1") {
-                activeCount += 1;
-            }
-            if (activeCount > 1) {
-                attrsToChange["NKW_Aktiv" + i] = "0";
-            }
-        }
-        if (activeCount === 0) {
-            attrsToChange["NKW_Aktiv1"] = "1";
-        }
-
-        var peitscheAT = 0;
-        if (v["TaW_peitsche"]) {
-            peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
-        }
-        attrsToChange["AT_peitsche"] = peitscheAT;
-
-        if (v["sf_rustungsgewonungII"] === "1") {
-            attrsToChange["sf_rustungsgewohnungII"] = "1";
-        }
-
-        // take calculated values into "v" so that they are available to following computation steps
-        Object.assign(v, attrsToChange);
-
-        var calculatedRuestungBE = calculateRuestungBE(v, {});
-        // apply calculated values to attrsToChange
-        Object.assign(attrsToChange, calculatedRuestungBE);
-
-        var beTaw = 0;
-        // take Ges_BE from calculated values
-        if (calculatedRuestungBE["Ges_BE"]) {
-            beTaw += parseInt(calculatedRuestungBE["Ges_BE"]);
-        }
-        if (v["BE_Last"]) {
-            beTaw += parseInt(v["BE_Last"]);
-        }
-        attrsToChange["BE_TaW"] = beTaw;
-        v["BE_TaW"] = beTaw;
-
-        var weaponBE = calculateWeaponBE(v);
-        attrsToChange["be_at_mod"] = weaponBE.be_at;
-        attrsToChange["be_pa_mod"] = weaponBE.be_pa;
-
-        setAttrs(attrsToChange, {}, function(){
-            callNextMigration(migrationChain);
-        });
-    });
-}
-
-/*
-    Migration steps:
-    - Check for shield attack availability
-    - Update wound modifiers
-    - Update initiative modifiers from the main (melee) weapon
-    - Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
-*/
-function migrateTo20210413(migrationChain) {
-    console.log("migrateTo20210413 invoked");
-
-    getAttrs(["activeShieldRowId"], function(values) {
-		var variablesToGet = [
-			"sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag",
-			"KK_Basis", "KK_mod",
-			"AT_raufen",
-			"NKW_Aktiv1", "NKW1_Schwellenwert", "NKW1_SchwellenwertKK",
-			"NKW_Aktiv2", "NKW2_Schwellenwert", "NKW2_SchwellenwertKK",
-			"NKW_Aktiv3", "NKW3_Schwellenwert", "NKW3_SchwellenwertKK",
-			"NKW_Aktiv4", "NKW4_Schwellenwert", "NKW4_SchwellenwertKK",
-
-			"wound_kopf1", "wound_kopf2", "wound_kopf3",
-			"wound_brust1", "wound_brust2", "wound_brust3",
-			"wound_bauch1", "wound_bauch2", "wound_bauch3",
-			"wound_RA1", "wound_RA2", "wound_RA3",
-			"wound_LA1", "wound_LA2", "wound_LA3",
-			"wound_RB1", "wound_RB2", "wound_RB3",
-			"wound_LB1", "wound_LB2", "wound_LB3",
-
-			"inibasis", "inizugek",
-			"INIModNKW1", "INIModNKW2", "INIModNKW3", "INIModNKW4",
-			"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
-			"BE_TaW"
-		];
-		// Updates for shield attack
-		var activeShieldRowId = values["activeShieldRowId"];
-    
-        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
-        if (activeShieldRowId) {
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
-            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-        }
-
-		getAttrs(variablesToGet, function(values) {
-			/*
-				* KK might be ill-defined right now (NaN)
-				* Reason: sheet:opened recalculates KK, but requires KK_mod_wounds
-				* KK_mod_wounds is existing at that point
-				* Make up our own little KK here for migration purposes
-			*/
-			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
-		    let attrsToChange = {};
-
-		    for (var i = 1; i <= 4; i++) {
-		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKMod(values, i);
-		    }
-
-		    let result = calculateShieldAttack(values, activeShieldRowId);
-
-		    attrsToChange["shield_at_mod"] = result.shieldAtMod;
-		    attrsToChange["shield_at_available"] = result.shieldAtAvailable;
-
-			// Updates for wound modifiers
-			var mods = calculateWoundModifiers(values);
-			Object.assign(attrsToChange, {
-				"AT_mod_wounds": mods["AT"],
-				"PA_mod_wounds": mods["PA"],
-				"FK_mod_wounds": mods["FK"],
-				"IB_mod_wounds": mods["IB"],
-				"GS_mod_wounds": mods["GS"],
-				"MU_mod_wounds": mods["MU"],
-				"IN_mod_wounds": mods["IN"],
-				"KL_mod_wounds": mods["KL"],
-				"FF_mod_wounds": mods["FF"],
-				"GE_mod_wounds": mods["GE"],
-				"KO_mod_wounds": mods["KO"],
-				"KK_mod_wounds": mods["KK"]
-			});
-
-			// Updates for INI modifiers
-			// Set INI modifier from (main) weapon
-			var weaponini = 0;
-			for (weapon = 1; weapon <= 4; weapon++) {
-				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
-					console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
-					weaponini = parseInt(values["INIModNKW" + weapon]);
-				}
-			}
-			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
-
-			// Calculate initiative base considering special skills and encumbrance
-			var inibasis2 = parseInt(values['inibasis']) + parseInt(values.inizugek) + parseInt(attrsToChange["IB_mod_wounds"]);
-
-			// Kampfreflexe is a prerequisite for the others, so stop if not active
-			var IBbonus = 0;
-			var INIdicecount = "1";
-			if (values.sf_kampfreflexe !== "0" && values.BE_TaW <= 4) {
-				IBbonus += 4;
-				if (values.sf_kampfgespur !== "0" && values.BE_TaW <= 4) {
-					IBbonus += 2;
-					if (values.sf_klingentanzer !== "0" && values.BE_TaW <= 2) {
-						INIdicecount = "2";
-					} else {
-						INIdicecount = "1";
-					}
-				}
-			}
-
-			inibasis2 += IBbonus;
-			inibasis2 = Math.max(0, inibasis2);
-
-		    attrsToChange["inibasis2"] = inibasis2;
-		    attrsToChange["INI_dice_count"] = INIdicecount;
-
-		    setAttrs(attrsToChange, {}, function(){
-		        callNextMigration(migrationChain);
-		    });
-		});
-    });
-}
-
-/*
- this list has to be always ordered ascending in order to apply the migration steps in the correct order
-*/
-var versionsWithMigrations = [
-    20190427,
-    20200809,
-    20210413
-]
-
-/*
 # Old Data Conversion
 Always try to migrate as much data as possible
 
@@ -16164,6 +15960,9 @@ Relevant character sheet versions
 *           shields and parry weapons. AT- and PA value calculation using sheet workers
 *           migrates BE calculation to sheetworkers
 *           weapon BE calculation: attack and parry values for weapons and shields are affected by the eBE
+* 20210413: shield attack
+*           INI mod from main weapon
+*           wound mods
 */
 function migrationCheck() {
     getAttrs(["character_sheet_version", "data_version"], function(v) {
@@ -16229,6 +16028,14 @@ function callNextMigration(migrationChain) {
     }
 }
 
+/*
+ this list has to be always ordered ascending in order to apply the migration steps in the correct order
+*/
+var versionsWithMigrations = [
+    20190427,
+    20200809,
+    20210413
+]
 
 /*
 ## From version 20171014 to 20190427
@@ -16429,6 +16236,201 @@ function migrateTo20190427 (migrationChain) {
                     });
             });
         });
+    });
+}
+
+/*
+    Migration steps:
+    - if more than one close range weapon is active, only keep the first one of them as active
+    - if no close range weapon is active, set the first one active
+    - calculate attack value for "Peitsche" talent
+    - calculate fighting values
+    - set shield_pa and parryweapon_pa to 0
+    - set shield_pa_available and parryweapon_pa_available to "0"
+    - change name of sf Ruestungsgewoehnung II to correct "sf_rustungsgewohnungII" instead of "sf_rustungsgewonungII"
+    - calculate BE from armor
+    - calculate BE modifications for weapons
+*/
+function migrateTo20200809(migrationChain) {
+    console.log("migrateTo20200809 invoked");
+
+    getAttrs([
+            "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
+            "RS_gBE1", "rs1_rg1", "RS_gBE2", "rs2_rg1", "RS_gBE3", "rs3_rg1", "RS_gBE4", "rs4_rg1", 
+            "RS_Aktiv1", "RS_Aktiv2", "RS_Aktiv3", "RS_Aktiv4", "Ges_BE", "BE_Last", "sf_rustungsgewohnungI", "sf_rustungsgewonungII", "sf_rustungsgewohnungIII",
+            "BE_TaW", "NKW_AT_typ1", "NKW_PA_typ1", "NKW_AT_typ2", "NKW_PA_typ2",  
+            "NKW_AT_typ3", "NKW_PA_typ3", "NKW_AT_typ4", "NKW_PA_typ4"], function(v) {
+        
+        var attrsToChange = {};
+        var activeCount = 0;
+        for (var i = 1; i <= 4; i++) {
+            if (v["NKW_Aktiv" + i] === "1") {
+                activeCount += 1;
+            }
+            if (activeCount > 1) {
+                attrsToChange["NKW_Aktiv" + i] = "0";
+            }
+        }
+        if (activeCount === 0) {
+            attrsToChange["NKW_Aktiv1"] = "1";
+        }
+
+        var peitscheAT = 0;
+        if (v["TaW_peitsche"]) {
+            peitscheAT = parseInt(v["ATbasis"]) + parseInt(v["TaW_peitsche"]);
+        }
+        attrsToChange["AT_peitsche"] = peitscheAT;
+
+        if (v["sf_rustungsgewonungII"] === "1") {
+            attrsToChange["sf_rustungsgewohnungII"] = "1";
+        }
+
+        // take calculated values into "v" so that they are available to following computation steps
+        Object.assign(v, attrsToChange);
+
+        var calculatedRuestungBE = calculateRuestungBE(v, {});
+        // apply calculated values to attrsToChange
+        Object.assign(attrsToChange, calculatedRuestungBE);
+
+        var beTaw = 0;
+        // take Ges_BE from calculated values
+        if (calculatedRuestungBE["Ges_BE"]) {
+            beTaw += parseInt(calculatedRuestungBE["Ges_BE"]);
+        }
+        if (v["BE_Last"]) {
+            beTaw += parseInt(v["BE_Last"]);
+        }
+        attrsToChange["BE_TaW"] = beTaw;
+        v["BE_TaW"] = beTaw;
+
+        var weaponBE = calculateWeaponBE(v);
+        attrsToChange["be_at_mod"] = weaponBE.be_at;
+        attrsToChange["be_pa_mod"] = weaponBE.be_pa;
+
+        setAttrs(attrsToChange, {}, function(){
+            callNextMigration(migrationChain);
+        });
+    });
+}
+
+/*
+    Migration steps:
+    - Check for shield attack availability
+    - Update wound modifiers
+    - Update initiative modifiers from the main (melee) weapon
+    - Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
+*/
+function migrateTo20210413(migrationChain) {
+    console.log("migrateTo20210413 invoked");
+
+    getAttrs(["activeShieldRowId"], function(values) {
+		var variablesToGet = [
+			"sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag",
+			"KK_Basis", "KK_mod",
+			"AT_raufen",
+			"NKW_Aktiv1", "NKW1_Schwellenwert", "NKW1_SchwellenwertKK",
+			"NKW_Aktiv2", "NKW2_Schwellenwert", "NKW2_SchwellenwertKK",
+			"NKW_Aktiv3", "NKW3_Schwellenwert", "NKW3_SchwellenwertKK",
+			"NKW_Aktiv4", "NKW4_Schwellenwert", "NKW4_SchwellenwertKK",
+
+			"wound_kopf1", "wound_kopf2", "wound_kopf3",
+			"wound_brust1", "wound_brust2", "wound_brust3",
+			"wound_bauch1", "wound_bauch2", "wound_bauch3",
+			"wound_RA1", "wound_RA2", "wound_RA3",
+			"wound_LA1", "wound_LA2", "wound_LA3",
+			"wound_RB1", "wound_RB2", "wound_RB3",
+			"wound_LB1", "wound_LB2", "wound_LB3",
+
+			"inibasis", "inizugek",
+			"INIModNKW1", "INIModNKW2", "INIModNKW3", "INIModNKW4",
+			"sf_kampfgespur", "sf_kampfreflexe", "sf_klingentanzer",
+			"BE_TaW"
+		];
+		// Updates for shield attack
+		var activeShieldRowId = values["activeShieldRowId"];
+    
+        // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
+        if (activeShieldRowId) {
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_at_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
+            variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
+        }
+
+		getAttrs(variablesToGet, function(values) {
+			/*
+				* KK might be ill-defined right now (NaN)
+				* Reason: sheet:opened recalculates KK, but requires KK_mod_wounds
+				* KK_mod_wounds is existing at that point
+				* Make up our own little KK here for migration purposes
+			*/
+			values["KK"] = Math.max(0, parseInt(values["KK_Basis"]) + parseInt(values["KK_mod"]));
+		    let attrsToChange = {};
+
+		    for (var i = 1; i <= 4; i++) {
+		        attrsToChange["NKW" + i + "_SB"] = calculateTpKKMod(values, i);
+		    }
+
+		    let result = calculateShieldAttack(values, activeShieldRowId);
+
+		    attrsToChange["shield_at_mod"] = result.shieldAtMod;
+		    attrsToChange["shield_at_available"] = result.shieldAtAvailable;
+
+			// Updates for wound modifiers
+			var mods = calculateWoundModifiers(values);
+			Object.assign(attrsToChange, {
+				"AT_mod_wounds": mods["AT"],
+				"PA_mod_wounds": mods["PA"],
+				"FK_mod_wounds": mods["FK"],
+				"IB_mod_wounds": mods["IB"],
+				"GS_mod_wounds": mods["GS"],
+				"MU_mod_wounds": mods["MU"],
+				"IN_mod_wounds": mods["IN"],
+				"KL_mod_wounds": mods["KL"],
+				"FF_mod_wounds": mods["FF"],
+				"GE_mod_wounds": mods["GE"],
+				"KO_mod_wounds": mods["KO"],
+				"KK_mod_wounds": mods["KK"]
+			});
+
+			// Updates for INI modifiers
+			// Set INI modifier from (main) weapon
+			var weaponini = 0;
+			for (weapon = 1; weapon <= 4; weapon++) {
+				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
+					console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
+					weaponini = parseInt(values["INIModNKW" + weapon]);
+				}
+			}
+			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
+
+			// Calculate initiative base considering special skills and encumbrance
+			var inibasis2 = parseInt(values['inibasis']) + parseInt(values.inizugek) + parseInt(attrsToChange["IB_mod_wounds"]);
+
+			// Kampfreflexe is a prerequisite for the others, so stop if not active
+			var IBbonus = 0;
+			var INIdicecount = "1";
+			if (values.sf_kampfreflexe !== "0" && values.BE_TaW <= 4) {
+				IBbonus += 4;
+				if (values.sf_kampfgespur !== "0" && values.BE_TaW <= 4) {
+					IBbonus += 2;
+					if (values.sf_klingentanzer !== "0" && values.BE_TaW <= 2) {
+						INIdicecount = "2";
+					} else {
+						INIdicecount = "1";
+					}
+				}
+			}
+
+			inibasis2 += IBbonus;
+			inibasis2 = Math.max(0, inibasis2);
+
+		    attrsToChange["inibasis2"] = inibasis2;
+		    attrsToChange["INI_dice_count"] = INIdicecount;
+
+		    setAttrs(attrsToChange, {}, function(){
+		        callNextMigration(migrationChain);
+		    });
+		});
     });
 }
 
