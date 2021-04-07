@@ -8,76 +8,52 @@ import {
     tieredSkillsAdvanced
 } from './domain/skills/skills-list'
 
-// const recalculateSkills = () => {
-//     getSectionIDs("skills", ids =>
-//         ids.forEach(
-//             id => getAttrs(["repeating_skills_" + id + "_skill_xp", ],
-//                 values =>
-//                 skillXPChanged({
-//                     newValue: values["repeating_skills_" + id + "_skill_xp"],
-//                     id,
-//                 })
-//             )
-//         )
-//     )
-// }
+const skillXPChanged = ({
+    id,
+    newValue
+}) => {
+    // When the sheet is opened, or data migrations are run, the skills are retrieved via ID, and thus must have their
+    // ID included in the attribute name when setting attributes.
+    const skillId = id !== undefined ? id + "_" : ""
 
-// on("change:repeating_skills:skill change:repeating_skills:sub_skill", _ => {
-//     getAttrs(["repeating_skills_skill_xp", ], ({
-//         repeating_skills_skill_xp
-//     }) => {
-//         skillXPChanged({
-//             newValue: repeating_skills_skill_xp,
-//         })
-//     })
-// })
+    const skill = "repeating_skills_" + skillId + "skill"
+    const skillLevel = "repeating_skills_" + skillId + "skill_level"
+    const subSkillAttrName = "repeating_skills_" + skillId + "sub_skill"
 
-// const skillXPChanged = ({
-//     id,
-//     newValue
-// }) => {
-//     // When the sheet is opened, or data migrations are run, the skills are retrieved via ID, and thus must have their
-//     // ID included in the attribute name when setting attributes.
-//     const skillId = id !== undefined ? id + "_" : ""
+    getAttrs([skill, subSkillAttrName, "learning_speed", ], values => {
+        const skillName = values[skill]
+        const skillNameLookupKey = skillName.split("_")[0]
+        const subSkill = values[subSkillAttrName]
 
-//     const skill = "repeating_skills_" + skillId + "skill"
-//     const skillLevel = "repeating_skills_" + skillId + "skill_level"
-//     const subSkillAttrName = "repeating_skills_" + skillId + "sub_skill"
+        let skillAttributesToSet = {}
 
-//     getAttrs([skill, subSkillAttrName, "learning_speed", ], values => {
-//         const skillName = values[skill]
-//         const skillNameLookupKey = skillName.split("_")[0]
-//         const subSkill = values[subSkillAttrName]
+        skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 
-//         let skillAttributesToSet = {}
+        const skillData = getSkill(
+            skillNameLookupKey,
+            skillAttributesToSet[skillLevel],
+            tieredSkills.includes(skillNameLookupKey)
+        )
 
-//         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
+        skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity
+        skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber
 
-//         const skillData = getSkill(
-//             skillNameLookupKey,
-//             skillAttributesToSet[skillLevel],
-//             tieredSkills.includes(skillNameLookupKey)
-//         )
+        getAttrs(skillData.linkedAttributes, values => {
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_modifier"] = Object.values(values)
+                .reduce((total, num) => Number(total) + Number(num)) + Number(skillAttributesToSet[skillLevel])
 
-//         skillAttributesToSet["repeating_skills_" + skillId + "skill_tnc"] = skillData.targetNumber + "/" + skillData.complexity
-//         skillAttributesToSet["repeating_skills_" + skillId + "target_number"] = skillData.targetNumber
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_linked_attributes"] = skillData.linkedAttributes
+                .map(linkAtr => linkedAttributeDisplayNames[linkAtr] + " (" + values[linkAtr] + ")")
+                .join(" + ")
 
-//         getAttrs(skillData.linkedAttributes, values => {
-//             skillAttributesToSet["repeating_skills_" + skillId + "skill_modifier"] = Object.values(values)
-//                 .reduce((total, num) => Number(total) + Number(num)) + Number(skillAttributesToSet[skillLevel])
+            skillAttributesToSet["repeating_skills_" + skillId + "skill_roll_value"] =
+                getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
+                "Margin of Success: [[2d6 + @{skill_modifier}[MOD] - @{target_number}[TN]]]"
 
-//             skillAttributesToSet["repeating_skills_" + skillId + "skill_linked_attributes"] = skillData.linkedAttributes
-//                 .map(linkAtr => linkedAttributeDisplayNames[linkAtr] + " (" + values[linkAtr] + ")")
-//                 .join(" + ")
-
-//             skillAttributesToSet["repeating_skills_" + skillId + "skill_roll_value"] =
-//                 getSkillDisplayName(skillData, skillName, subSkill) + " Skill Check:\n" +
-//                 "Margin of Success: [[2d6 + @{skill_modifier}[MOD] - @{target_number}[TN]]]"
-
-//             setAttrs(skillAttributesToSet, {}, () => {})
-//         })
-//     })
-// }
+            setAttrs(skillAttributesToSet, {}, () => {})
+        })
+    })
+}
 
 export const calculateSkillLevel = (skillXP, learningSpeedModifier) => {
     const learningSpeedPercentageModifier = 1 + 0.2 * learningSpeedModifier

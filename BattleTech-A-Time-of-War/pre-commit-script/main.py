@@ -1,7 +1,10 @@
+import os
 from typing import List
 
 
 def main():
+    os.system("npm --prefix ../development/ run compile")
+
     output: List[str] = []
 
     with open('../BattleTech-A-Time-of-War.html', 'r') as character_sheet:
@@ -10,7 +13,7 @@ def main():
             if line == '<script type="text/worker">\n':
                 break
 
-    with open('../development/sheet-worker.js') as sheet_worker:
+    with open('../development/output/sheet-worker.js') as sheet_worker:
         output.append(sheet_worker.read())
         output.append("\n</script>\n")
 
