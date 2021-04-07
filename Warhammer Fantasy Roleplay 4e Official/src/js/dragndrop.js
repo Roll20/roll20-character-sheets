@@ -182,8 +182,6 @@ const wfrpDragAndDrop = ( () => {
             updateAttrs[`${characteristic.replace(/ /g,"_")}_bonus`] = Math.floor(characteristics[characteristic]/10);
         } 
 
-        console.log(updateAttrs);
-
         const trait_map = new Map();
 
         for (const trait of traits) {
@@ -495,8 +493,6 @@ const wfrpDragAndDrop = ( () => {
         }
 
         getAttrs(token_values, settings => {
-
-            console.log(settings)
             
             const default_attr = {
                 width: 70,
@@ -510,8 +506,6 @@ const wfrpDragAndDrop = ( () => {
             }
 
             getAttrs(attrs, values => {
-
-                console.log(values)
 
                 for (const item in settings) {    
                     if (settings[item] !== "") {
