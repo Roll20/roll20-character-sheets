@@ -1,3 +1,6 @@
+### Version 2.34 (2021-04-09):
+- fix invalid CSS code
+
 ### Version 2.33 (2021-04-06):
 - remove duplicated control force power name field
 - fix force power section width
