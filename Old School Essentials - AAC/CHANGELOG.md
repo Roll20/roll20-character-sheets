@@ -2,6 +2,57 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.2
+
+### Fixed
+
+- Fix a bug where the modifier inputs would throw validation errors when less than 0
+- Fix a bug where the modifiers could be changed
+
+## 1.9.1
+
+### Fixed
+
+- Fix a bug where the Death/Poison save incorrectly added the modifier
+
+## 1.9.0
+
+### Added
+
+- Add modifiers to attribute scores
+- Add roll button for NPC Reaction
+- Add spells tab
+- Add default sheet setting for default character type
+
+### Changed
+
+- Change rolltemplates to show character name
+- Change button hover color to orange for better contrast
+
+## 1.8.0
+
+### Changed
+
+- Change damage die to a text field to provide more flexibility
+
+## 1.7.1
+
+### Fixed
+
+- Fix a bug where newly created monsters did not have a die button
+
+## 1.7.0
+
+### Added
+
+- Add retainers tab for charisma based retainer modifiers
+- Add prompt for Wisdom bonus on saving throws
+
+### Fixed
+
+- Fix a bug where the spell level input was wider than the space in the grid
+- Fix a bug where setting the default sheet to DAC wouldn't create DAC characters
+
 ## 1.6.2
 
 ### Fixed

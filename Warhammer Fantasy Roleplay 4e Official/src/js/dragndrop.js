@@ -11,7 +11,7 @@ const wfrpDragAndDrop = ( () => {
     
         let parsed_data = helperFunctions.parseJSON(drop_data);
 
-        if (parsed_data.Category === "Careers") handleCareer(dpage_name, parsed_data);
+        if (parsed_data.Category === "Careers") handleCareer(page_name, parsed_data);
         else if (parsed_data.Category === "Blessings" || parsed_data.Category === "Spells" || parsed_data.Category === "Miracles" ) handleSpell(page_name, parsed_data, drop_content);
         else if (parsed_data.Category === "Items") handleItem(page_name, parsed_data);
         else if (parsed_data.Category === "Monsters") handleMonster(page_name, parsed_data, drop_content);
@@ -181,8 +181,6 @@ const wfrpDragAndDrop = ( () => {
             updateAttrs[characteristic.replace(/ /g,"_")] = characteristics[characteristic];
             updateAttrs[`${characteristic.replace(/ /g,"_")}_bonus`] = Math.floor(characteristics[characteristic]/10);
         } 
-
-        console.log(updateAttrs);
 
         const trait_map = new Map();
 
@@ -495,8 +493,6 @@ const wfrpDragAndDrop = ( () => {
         }
 
         getAttrs(token_values, settings => {
-
-            console.log(settings)
             
             const default_attr = {
                 width: 70,
@@ -510,8 +506,6 @@ const wfrpDragAndDrop = ( () => {
             }
 
             getAttrs(attrs, values => {
-
-                console.log(values)
 
                 for (const item in settings) {    
                     if (settings[item] !== "") {
