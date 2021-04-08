@@ -1,3 +1,10 @@
+### Version 2.33 (2021-04-06):
+- remove duplicated control force power name field
+- fix force power section width
+
+### Version 2.32 (2021-02-09):
+- add missing lightsaber damage roll button
+
 ### Version 2.31 (2020-10-03):
 - removed broken logo at top
 - revamp of starship section
