@@ -20,20 +20,20 @@
             </div>
             <div class="sheet-row">
                 <div class="sheet-stats">
-                    <label>Leben</label>
                     <div>
+                    <label>Leben</label>
                         <input type="number" name="attr_leben" placeholder="Aktuell" /> / <input type="number"
                             name="attr_leben_max" />
                     </div>
-                    <label class="moreleft">Rüstung</label><input type="number" name="attr_ruestung" />
-                    <label>Modifier</label><input type="number" name="attr_global_modifier" value="0" />
-                </div>
-                <div class="sheet-gmroll">
-                    <select name="attr_gmroll">
-                        <option value="nogm" selected="selected">Für alle sichtbar w&uuml;rfeln</option>
-                        <option value="gm">Für GM w&uuml;rfeln</option>
-                    </select>
-                    <input type="hidden" name="attr_abilityroll" />
+                    <div>
+                        <label class="moreleft">Rüstung</label><input type="number" name="attr_ruestung" />
+                    </div>
+                    <div>
+                        <label>&larr; Modifier</label><input type="number" name="attr_ruestung_modifier" value="0" />
+                    </div>
+                    <div>
+                        <label>Gl. Modifier</label><input type="number" name="attr_global_modifier" value="0" />
+                    </div>
                 </div>
             </div>
         </div>
@@ -65,11 +65,12 @@
             </div>
             <div class="sheet-row sheet-settings">
                 <div>
-                    <label class="sheet-switch">
-                        <input type="checkbox" name="attr_calcmoney" value="1" checked />
-                        <span class="sheet-slider"></span>
-                    </label>
-                    Geldberechnung
+                    <select name="attr_gmroll">
+                        <option value="0" selected disabled>Auswahl treffen</option>
+                        <option value="nogm">Für alle sichtbar würfeln</option>
+                        <option value="gm">Für GM würfeln</option>
+                    </select>
+                    <input type="hidden" name="attr_abilityroll" />
                 </div>
                 <div>
                     <label class="sheet-switch">
@@ -79,7 +80,11 @@
                     Lebensberechnung
                 </div>
                 <div>
-
+                    <label class="sheet-switch">
+                        <input type="checkbox" name="attr_calcmoney" value="1" checked />
+                        <span class="sheet-slider"></span>
+                    </label>
+                    Geldberechnung
                 </div>
                 <div>
                     <label class="sheet-switch">
@@ -99,6 +104,7 @@
             <div class="sheet-grid">
                 <div>Attribut</div>
                 <div>Wert</div>
+                <div>Mod</div>
                 <div style="background-color: transparent;"></div>
                 <div>Bonus</div>
                 <div>Roll</div>
@@ -109,27 +115,31 @@
                     <div class="repitem">
                         <div class="sheet-name"><strong>St</strong>ärke</div>
                         <input type="number" name="attr_st" />
+                        <input type="number" name="attr_st_bonus" value="0" />
                         <div class="sheet-arrow"></div>
                         <input type="number" name="attr_stb" readOnly />
                         <button type="roll" name="roll_st"
-                            value="@{abilityroll} versucht sich in Stärke [[1d10! + @{stb} + @{global_modifier} + ?{Modifier?|0}]]"></button>
+                            value="@{abilityroll} versucht sich in Stärke [[1d10! + @{stb} + @{ruestung_modifier} + @{global_modifier} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name"><strong>Ge</strong>schicklichkeit</div>
                         <input type="number" name="attr_ge" />
+                        <input type="number" name="attr_ge_bonus" value="0" />
                         <div class="sheet-arrow"></div>
                         <input type="number" name="attr_geb" readOnly />
                         <button type="roll" name="roll_ge"
-                            value="@{abilityroll} versucht sich in Geschicklichkeit [[1d10! + @{geb} + @{global_modifier} + ?{Modifier?|0}]]"></button>
+                            value="@{abilityroll} versucht sich in Geschicklichkeit [[1d10! + @{geb} + @{ruestung_modifier} + @{global_modifier} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name"><strong>Ko</strong>nstitution</div>
                         <input type="number" name="attr_ko" />
+                        <input type="number" name="attr_ko_bonus" value="0" />
                         <div class="sheet-arrow"></div>
                         <input type="number" name="attr_kob" readOnly />
                         <button type="roll" name="roll_ko"
-                            value="@{abilityroll} versucht sich in Konstitution [[1d10! + @{kob} + @{global_modifier} + ?{Modifier?|0}]]"></button>
+                            value="@{abilityroll} versucht sich in Konstitution [[1d10! + @{kob} + @{ruestung_modifier} + @{global_modifier} + ?{Modifier?|0}]]"></button>
 
                         <div class="sheet-name"><strong>In</strong>telligenz</div>
                         <input type="number" name="attr_in" />
+                        <input type="number" name="attr_in_bonus" value="0" />
                         <div class="sheet-arrow"></div>
                         <input type="number" name="attr_inb" readOnly />
                         <button type="roll" name="roll_in"
@@ -137,6 +147,7 @@
 
                         <div class="sheet-name"><strong>Ch</strong>arisma</div>
                         <input type="number" name="attr_ch" />
+                        <input type="number" name="attr_ch_bonus" value="0" />
                         <div class="sheet-arrow"></div>
                         <input type="number" name="attr_chb" readOnly />
                         <button type="roll" name="roll_ch"
@@ -169,7 +180,7 @@
                     <div>Magie</div>
                     <div>Attr.</div>
                     <div>Wert</div>
-                    <div>Bonus</div>
+                    <div>Mod</div>
                     <div>Roll</div>
                 </div>
                 <div class="sheet-gridplace">
@@ -178,9 +189,6 @@
                             <div>Magie entwickeln</div>
                             <div>
                                 <select name="attr_mag_attribut">
-                                    <option value="@{stb}">ST</option>
-                                    <option value="@{geb}">GE</option>
-                                    <option value="@{kob}">KO</option>
                                     <option value="@{inb}" selected>IN</option>
                                     <option value="@{chb}">CH</option>
                                 </select>
@@ -193,9 +201,6 @@
                             <div>Gezielte Sprüche</div>
                             <div>
                                 <select name="attr_gezsp_attribut">
-                                    <option value="@{stb}">ST</option>
-                                    <option value="@{geb}">GE</option>
-                                    <option value="@{kob}">KO</option>
                                     <option value="@{inb}" selected>IN</option>
                                     <option value="@{chb}">CH</option>
                                 </select>
@@ -218,7 +223,7 @@
                 <div>Fertigkeit</div>
                 <div>Attr.</div>
                 <div>Wert</div>
-                <div>Bonus</div>
+                <div>Mod</div>
                 <div>Roll</div>
             </div>
             <div class="sheet-gridplace">
@@ -228,9 +233,9 @@
                         <div>Athletik</div>
                         <div>
                             <select name="attr_athletik_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}" selected>GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}" selected>GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -245,9 +250,9 @@
                         <div>Einflussnahme</div>
                         <div>
                             <select name="attr_einflussnahme_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}">GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}">GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}" selected>CH</option>
                             </select>
@@ -262,9 +267,9 @@
                         <div>List</div>
                         <div>
                             <select name="attr_list_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}" selected>GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}" selected>GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -279,9 +284,9 @@
                         <div>Natur</div>
                         <div>
                             <select name="attr_natur_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}" selected>GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}" selected>GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -296,9 +301,9 @@
                         <div>Reiten</div>
                         <div>
                             <select name="attr_reiten_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}" selected>GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}" selected>GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -313,9 +318,9 @@
                         <div>Schwimmen</div>
                         <div>
                             <select name="attr_schwimmen_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}" selected>GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}" selected>GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}">IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -330,9 +335,9 @@
                         <div>Wahrnehmung</div>
                         <div>
                             <select name="attr_wa_attribut">
-                                <option value="@{stb}">ST</option>
-                                <option value="@{geb}">GE</option>
-                                <option value="@{kob}">KO</option>
+                                <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                                <option value="@{geb} + @{ruestung_modifier}">GE</option>
+                                <option value="@{kob} + @{ruestung_modifier}">KO</option>
                                 <option value="@{inb}" selected>IN</option>
                                 <option value="@{chb}">CH</option>
                             </select>
@@ -352,7 +357,7 @@
                 <div>Fertigkeit</div>
                 <div>Attr.</div>
                 <div>Wert</div>
-                <div>Bonus</div>
+                <div>Mod</div>
                 <div>Roll</div>
             </div>
             <div class="sheet-gridplace">
@@ -360,9 +365,9 @@
                     <div><input class="sheet-textcenter" type="text" name="attr_fertigkeit_name" /></div>
                     <div>
                         <select name="attr_fertigkeit_attribut">
-                            <option value="@{stb}">ST</option>
-                            <option value="@{geb}">GE</option>
-                            <option value="@{kob}">KO</option>
+                            <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                            <option value="@{geb} + @{ruestung_modifier}">GE</option>
+                            <option value="@{kob} + @{ruestung_modifier}">KO</option>
                             <option value="@{inb}">IN</option>
                             <option value="@{chb}">CH</option>
                         </select>
@@ -394,8 +399,8 @@
                     <div><input class="sheet-textcenter" type="text" name="attr_kampf_waffenname"
                             placeholder="Kurzschwert" /></div>
                     <select name="attr_kampf_attribut">
-                        <option value="@{stb}">ST</option>
-                        <option value="@{geb}">GE</option>
+                        <option value="@{stb} + @{ruestung_modifier}">ST</option>
+                        <option value="@{geb} + @{ruestung_modifier}">GE</option>
                     </select>
                     <div><input class="sheet-textcenter" type="text" name="attr_kampf_fertigkeit"
                             placeholder="Kurze Klingenwaffe" /></div>
@@ -406,7 +411,7 @@
                             value="@{abilityroll} nutzt @{kampf_waffenname} mit einer Initiative von [[@{geb} + @{kampf_inib} &{tracker}]]"></button>
                     </div>
                     <div><button type="roll" name="roll_kampf_angr"
-                            value="@{abilityroll} greift mit @{kampf_waffenname} an würfelt eine [[1d10! + ?{Offensivbonus?|@{kampf_kb}} + @{global_modifier} + ?{Kampf-Modifier?|0}]] mit [[@{kampf_schaden} + ?{Schaden-Modifier?|0}]] Schaden. Der DB beträgt [[floor(@{kampf_KB}-?{Offensivbonus?})]]"></button>
+                            value="@{abilityroll} greift mit @{kampf_waffenname} an würfelt eine [[1d10!+ ?{Offensivbonus?|@{kampf_kb}} + @{global_modifier} + ?{Kampf-Modifier?|0}]] mit [[@{kampf_schaden} + ?{Schaden-Modifier?|0}]] Schaden. Der DB beträgt [[floor(@{kampf_KB}-?{Offensivbonus?})]]"></button>
                     </div>
                 </fieldset>
             </div>
@@ -460,9 +465,9 @@
         });
     });
 
-    on("change:st", function() {
-        getAttrs(["st"], function(values) {
-            let st = parseInt(values.st) || 0;
+    on("change:st change:st_bonus", function() {
+        getAttrs(["st", "st_bonus"], function(values) {
+            let st = parseInt(values.st) + parseInt(values.st_bonus) || 0;
             if (st == 1) {
                 setAttrs({ stb: -3 });
             }
@@ -493,9 +498,9 @@
         });
     });
 
-    on("change:ge", function() {
-        getAttrs(["ge"], function(values) {
-            let ge = parseInt(values.ge) || 0;
+    on("change:ge change:ge_bonus", function() {
+        getAttrs(["ge", "ge_bonus"], function(values) {
+            let ge = parseInt(values.ge) + parseInt(values.ge_bonus) || 0;
             if (ge == 1) {
                 setAttrs({ geb: -3 });
             }
@@ -526,9 +531,9 @@
         });
     });
 
-    on("change:ko", function() {
-        getAttrs(["ko"], function(values) {
-            let ko = parseInt(values.ko) || 0;
+    on("change:ko change:ko_bonus", function() {
+        getAttrs(["ko", "ko_bonus"], function(values) {
+            let ko = parseInt(values.ko) + parseInt(values.ko_bonus) || 0;
             if (ko == 1) {
                 setAttrs({ kob: -3 });
             }
@@ -559,9 +564,9 @@
         });
     });
     
-    on("change:in", function() {
-        getAttrs(["in"], function(values) {
-            let int = parseInt(values.in) || 0;
+    on("change:in change:in_bonus", function() {
+        getAttrs(["in", "in_bonus"], function(values) {
+            let int = parseInt(values.in) + parseInt(values.in_bonus) || 0;
             if (int == 1) {
                 setAttrs({ inb: -3 });
             }
@@ -592,9 +597,9 @@
         });
     });
 
-    on("change:ch", function() {
-        getAttrs(["ch"], function(values) {
-            let ch = parseInt(values.ch) || 0;
+    on("change:ch change:ch_bonus", function() {
+        getAttrs(["ch", "ch_bonus"], function(values) {
+            let ch = parseInt(values.ch) + parseInt(values.ch_bonus) || 0;
             if (ch == 1) {
                 setAttrs({ chb: -3 });
             }
