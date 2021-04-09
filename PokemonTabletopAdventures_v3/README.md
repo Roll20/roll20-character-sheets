@@ -12,13 +12,10 @@ Things we want to add to the character sheet, presented in no particular order o
 
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
-- [ ] Allow modifications to movement (maybe just an extra box)
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
 - [ ] JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters
 - [ ] Add Struggle to the move lists automatically
-- [ ] Add status effects that you can click
-  - [ ] Burn, Poison/Toxified, and Paralyzed should modify stats automatically
-- [ ] Somehow make it easier to get tokens into initiative. No idea how to accomplish this.
+- [X] ~~Somehow make it easier to get tokens into initiative. No idea how to accomplish this.~~
 - [x] ~~Display the full bonus to skill checks~~
 - [x] ~~Handle temporary stat changes somehow, this may be a lot of work~~
 - [x] ~~Prevent critical range from going below 0 or above 20, maybe do similar to other fields~~
@@ -28,8 +25,20 @@ Things we want to add to the character sheet, presented in no particular order o
 - [X] ~~Moves deserve a section for "bonuses that apply to all moves." Things that should go here include:~~
   - [X] ~~A spot for Attack and Special Attack bonuses, for things like Ace Trainer~~
   - [X] ~~The critical hit range for the moves, as this is used for passives, items, etc.~~
+- [X] ~~Allow modifications to movement (maybe just an extra box)~~
+- [X] ~~Add status effects that you can click~~
+  - [X] ~~Burn, Poison/Toxified, and Paralyzed should modify stats automatically~~
 
 ## Changelog
+
+### Mar 21st, 2021
+- You can now set Afflictions in the character sheet, and they modify stats accordingly!
+  - Not everyone will use these, so they can be mostly hidden with just a click
+- Automatic initiative macro - if you have a token associated with a character sheet, you get a free token action
+- Add bonus movement field
+- Rename Attack Damage Bonus and Special Attack Damage Bonus for clarity
+- Fix typo in config page
+- Remove leftover debug logging
 
 ### Mar 7th, 2021
 
