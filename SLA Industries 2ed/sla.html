@@ -1351,9 +1351,9 @@ on("change:strength", function() {
     };
       var strength = parseInt(values["strength"])||0;
 	  var species = values["species"]||"";
-      var strengthmin = speciesdetails[species]["strength"]||0;
-      var strengthmax = speciesdetails[species]["strengthmax"]||20;
-	  var hpbase = speciesdetails[species]["hpbase"]||20;
+      var strengthmin = parseInt(speciesdetails[species]["strength"])||0;
+      var strengthmax = parseInt(speciesdetails[species]["strengthmax"])||20;
+	  var hpbase = parseInt(speciesdetails[species]["hpbase"])||20;
 
 	  if (strength > strengthmax) { strength = strengthmax;}
 	  if (strength < strengthmin) { strength = strengthmin;}
@@ -1732,12 +1732,31 @@ on("change:appraisal", function() {
   });
 });
 on("change:athletics", function() {
-  getAttrs(["athletics","dexterity"], function(values) {
+  getAttrs(["athletics","dexterity","species","move_rushing"], function(values) {
+     const speciesdetails = {
+        "Advanced Carrien":		{move_rushing:'7'},
+        "ADV": 					{move_rushing:'7'},
+        "Brain Waster": 		{move_rushing:'5'},
+        "Eban": 				{move_rushing:'5'},
+        "Ebon": 				{move_rushing:'5'},
+        "Frother": 				{move_rushing:'5'},
+        "Human": 				{move_rushing:'5'},
+        "Neophron": 			{move_rushing:'5'},
+		"Shaktar": 				{move_rushing:'6'},
+        "Stormer 313 'Malice'":	{move_rushing:'6'},
+        "Stormer 711 'Xeno'": 	{move_rushing:'6'},
+        "Wraithen": 			{move_rushing:'8'},
+    };
+	  var species = values["species"]||"";
+      var move_rushing = parseInt(values["move_rushing"])||0;
+      var sp_rushing = parseInt(speciesdetails[species]["move_rushing"])||move_rushing;
       var athletics = parseInt(values["athletics"])||0;
       var dexterity = parseInt(values["dexterity"])||0;
-      var output = athletics + dexterity;
-      setAttrs({
-        "athletics_total": output,
+	  var rushingtotal = sp_rushing + Math.floor(athletics/2);
+      var athleticstotal = athletics + dexterity;
+	  setAttrs({
+        "athletics_total": athleticstotal,
+		"move_rushing": rushingtotal,
       });
   });
 });
