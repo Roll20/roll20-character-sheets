@@ -3021,7 +3021,7 @@
         </label><span class="settings">+</span>
         <label class="settings" data-i18n-title="initiativedice" title="Initiative Dice">
           <input min="0" max="4" name="attr_initiative_dice" placeholder="0" title="@{initiative_dice}" type="number" value="0"/>
-        </label><span class="settings" data-i18n="d6">d6</span><span class="settings tiny-span">=</span><span name="attr_display_initiative_base"></span><span class="tiny-span">+</span><span name="attr_initiative_dice"></span><span class="tiny-span" data-i18n="d6">d6</span>
+        </label><span class="settings" data-i18n="d6">d6</span><span class="settings tiny-span">=</span><span name="attr_initiative_base"></span><span class="tiny-span">+</span><span name="attr_initiative_dice"></span><span class="tiny-span" data-i18n="d6">d6</span>
       </div>
       <div class="rows grunt hide-magic">
         <button data-i18n="astralinitiative" name="Astral Initiative" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{astralinitiative}}}{{dice=[[(@{astral_initiative_base}+@{wounds_toggle}+@{modifiers_toggle})+(@{astral_initiative_dice})d6cf0 &{tracker}]]}}{{wilddie=[[@{wild_die}d6]]}}">Astral Initiative</button>
@@ -3030,7 +3030,7 @@
         </label><span class="settings">+</span>
         <label class="settings" data-i18n-title="astral_initiative_dice" title="Astral Initiative Dice">
           <input min="0" max="4" name="attr_astral_initiative_dice" placeholder="0" title="@{astral_initiative_dice}" type="number" value="0"/>
-        </label><span class="settings" data-i18n="d6">d6</span><span class="settings tiny-span">=</span><span name="attr_display_astral_initiative_base"></span><span class="tiny-span">+</span><span name="attr_astral_initiative_dice"></span><span class="tiny-span" data-i18n="d6">d6</span>
+        </label><span class="settings" data-i18n="d6">d6</span><span class="settings tiny-span">=</span><span name="attr_astral_initiative_base"></span><span class="tiny-span">+</span><span name="attr_astral_initiative_dice"></span><span class="tiny-span" data-i18n="d6">d6</span>
       </div>
       <div class="rows grunt">
         <button data-i18n="matrixinitiative" name="Matrix Initiative" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{matrixinitiative}}}{{dice=[[(@{matrix_initiative_base}+@{wounds_toggle}+@{modifiers_toggle})+(@{matrix_initiative_dice})d6cf0 &{tracker}]]}}{{wilddie=[[@{wild_die}d6]]}}">Matrix Initiative</button>
@@ -3076,16 +3076,16 @@
         <label class="settings" data-i18n-title="conditionmonitor" title="Condition Monitor">
           <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value=""/>
         </label>
-        <span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical_modifier}"></span>
+        <span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical}"></span>
       </div>
       <div class="rows vehicle">
         <button data-i18n="conditionmonitorpm" name="act_cond_reset" type="action">Condition Monitor (P/M)</button>
         <label class="settings" data-i18n-title="physicalbonus" title="physicalbonus">
-          <input name="attr_physical_modifier" placeholder="0" title="@{physical_modifier}" type="number" value="0"/>
+          <input name="attr_physical" placeholder="0" title="@{physical}" type="number" value="0"/>
         </label><span class="settings">/</span>
-        <label class="settings" data-i18n-title="matrixbonus" title="matrixbonus">
-          <input name="attr_matrix_modifier" placeholder="0" title="@{matrix_modifier}" type="number" value="0"/>
-        </label><span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical_modifier}"></span><span>/</span><span name="attr_matrix" title="@{matrix_modifier}"></span>
+        <label class="settings" data-i18n-title="matrix" title="matrix">
+          <input name="attr_matrix" placeholder="0" title="@{matrix}" type="number" value="0"/>
+        </label><span class="settings tiny-span">=</span><span name="attr_physical" title="@{physical}"></span><span>/</span><span name="attr_matrix" title="@{matrix}"></span>
       </div>
       <div class="rows host sprite">
         <button data-i18n="conditionmonitor" name="act_cond_reset" type="action">Condition Monitor</button><span name="attr_matrix"></span>
@@ -4738,7 +4738,6 @@ const update_common_rolls = (attrs) => {
 const update_track = (track) => {
 	let attrs = [`${track}_modifier`, `${track}_damage`];
 	(track === "stun") ? attrs.push("willpower") : attrs.push("body", "sheet_type", "flag_drone");
-
 	getAttrs(attrs, (v) =>{
 		const attr1 = attrs[2], stat1 = parseInt(v[`${attr1}`]) || 0; //Willpower or Body
 		const mod = parseInt(v[`${track}_modifier`]) || 0;
@@ -4748,9 +4747,9 @@ const update_track = (track) => {
 		if (track === "stun" || v["sheet_type"] === "pc" || v["sheet_type"] === "grunt") {
 			tot = Math.ceil(stat1/2) + 8 + mod;
 		} else if (v["sheet_type"] === "vehicle" && v["flag_drone"]  === "drone") {
-			tot = (Math.ceil(stat1/2) + 6 + mod);
+			tot = (Math.ceil(stat1/2) + 8 + mod);
 		} else if (v["sheet_type"] === "vehicle") {
-			tot = (Math.ceil(stat1/2) + 12 + mod);
+			tot = (Math.ceil(stat1/2) + 8 + mod);
 		} else {
 			tot = 0; //Sprites don't have Stun or Physical track
 		};
@@ -4821,9 +4820,11 @@ const update_wounds = () => {
 
 
 // Trigger initiative updates
-['initiative_mod', 'initiative_dice_mod', 'initiative_dice', 'initiative_temp', 'initiative_temp_flag', 'initiative_dice_temp', 'initiative_dice_temp_flag'].forEach(attr => {
+['initiative_mod', 'initiative_dice_mod', 'initiative_temp', 'initiative_temp_flag', 'initiative_dice_temp', 'initiative_dice_temp_flag'].forEach(attr => {
 	on(`change:${attr}`, (eventinfo) => {
-		update_initiative();
+		if(eventinfo.sourceType == 'player') {
+			update_initiative();
+		}
 	});
 });
 
@@ -4853,7 +4854,7 @@ var update_initiative = () => {
 
 
 // Trigger astral initiative updates
-['astral_initiative_mod', 'astral_initiative_dice_mod', 'astral_initiative_dice', 'astral_initiative_temp', 'astral_initiative_temp_flag', 'astral_initiative_dice_temp', 'astral_initiative_dice_temp_flag'].forEach(attr => {
+['astral_initiative_mod', 'astral_initiative_dice_mod', 'astral_initiative_temp', 'astral_initiative_temp_flag', 'astral_initiative_dice_temp', 'astral_initiative_dice_temp_flag'].forEach(attr => {
 	on(`change:${attr}`, (eventinfo) => {
 		update_astral_initiative();
 	});
@@ -4885,7 +4886,7 @@ var update_astral_initiative = () => {
 
 
 //Calculate Matrix Initiatve.
-on("change:host_rating change:data_processing change:pilot change:intuition change:reaction change:level change:matrix_initiative_mod change:matrix_initiative_dice_mod change:matrix_initiative_temp change:matrix_initiative_temp_flag change:matrix_initiative_dice_temp change:matrix_initiative_dice_temp_flag change:cold_sim_initiative_mod change:cold_sim_initiative_dice_mod change:cold_sim_initiative_temp change:cold_sim_initiative_temp_flag change:cold_sim_initiative_dice_temp change:cold_sim_initiative_dice_temp_flag change:hot_sim_initiative_mod change:hot_sim_initiative_dice_mod change:hot_sim_initiative_temp change:hot_sim_initiative_temp_flag change:hot_sim_initiative_dice_temp change:hot_sim_initiative_dice_temp_flag change:matrix_device_initiative_bonus", () => {
+on("change:host_rating change:data_processing change:pilot change:intuition change:reaction change:level change:matrix_initiative_mod change:matrix_initiative_dice_mod change:matrix_initiative_temp change:matrix_initiative_temp_flag change:matrix_initiative_dice_temp change:matrix_initiative_dice_temp_flag change:cold_sim_initiative_mod change:cold_sim_initiative_dice_mod change:cold_sim_initiative_temp change:cold_sim_initiative_temp_flag change:cold_sim_initiative_dice_temp change:cold_sim_initiative_dice_temp_flag change:hot_sim_initiative_mod change:hot_sim_initiative_dice_mod change:hot_sim_initiative_temp change:hot_sim_initiative_temp_flag change:hot_sim_initiative_dice_temp change:hot_sim_initiative_dice_temp_flag change:matrix_device_initiative_bonus", (eventInfo) => {
 	getAttrs(["sheet_type", "data_processing", "pilot", "intuition", "reaction", "host_rating", "level", "matrix_initiative_mod", "matrix_initiative_dice_mod", "matrix_initiative_temp", "matrix_initiative_temp_flag", "matrix_initiative_dice_temp", "matrix_initiative_dice_temp_flag", "cold_sim_initiative_mod", "cold_sim_initiative_dice_mod", "cold_sim_initiative_temp", "cold_sim_initiative_temp_flag", "cold_sim_initiative_dice_temp", "cold_sim_initiative_dice_temp_flag", "hot_sim_initiative_mod", "hot_sim_initiative_dice_mod", "hot_sim_initiative_temp", "hot_sim_initiative_temp_flag", "hot_sim_initiative_dice_temp", "hot_sim_initiative_dice_temp_flag", "matrix_device_initiative_bonus"], (v) => {
 		const dat = parseInt(v.data_processing) || 0;
 		const pil = parseInt(v.pilot) || 0;
