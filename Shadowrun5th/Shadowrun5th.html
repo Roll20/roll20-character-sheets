@@ -9539,7 +9539,7 @@ Only takes the first match even if multiple identical entries are found.">
             <div class="experimental">
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_experimental">
-                    Enable experimental import of contacts, AI programs and gear extras
+                    Enable experimental import of AI programs and gear extras
                 </label>
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_nightly">
@@ -9760,7 +9760,7 @@ on("sheet:opened", function() {
         }
         values.warningcheckbox=0;
         values.chummercheckbox=0;
-        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and past it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
+        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and paste it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
         values.experimental=0;
         values.nightly=0;
     setAttrs(values);
@@ -9848,13 +9848,11 @@ on("change:chummercheckbox", function(){
             }
             if(goodcode){
                 console.log("Deleting stuff");
-                if(text.experimental == "on"){
-                    getSectionIDs("repeating_contacts", function(idarray) {
-                        for(var i=0; i < idarray.length; i++) {
-                            removeRepeatingRow("repeating_contacts_"+idarray[i]);
-                        }
-                    });
-                }
+                getSectionIDs("repeating_contacts", function(idarray) {
+                    for(var i=0; i < idarray.length; i++) {
+                        removeRepeatingRow("repeating_contacts_"+idarray[i]);
+                    }
+                });
                 getSectionIDs("repeating_posqualities", function(idarray) {
                     for(var i=0; i < idarray.length; i++) {
                         removeRepeatingRow("repeating_posqualities_"+idarray[i]);
@@ -10894,31 +10892,28 @@ on("change:chummercheckbox", function(){
                         goodcode=false;
                         error= error + "\n" + "Error with Spells: " + err;
                     }
-                     if(text.experimental == "on"){
-                     //import contacts
-                        try{
-                           if(chummerfile.characters.character.contacts!=null){
-                            console.log("Importing Contacts");
-                            if(chummerfile.characters.character.contacts.contact.length>1){
-                                for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
-                                    var newrowid=generateRowID();
-                                    attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
-                                    attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
-                                    attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact[i].connection;
-                                    attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact[i].loyalty;
-                                }
-                            }else{
+                    try{
+                       if(chummerfile.characters.character.contacts!=null){
+                        console.log("Importing Contacts");
+                        if(chummerfile.characters.character.contacts.contact.length>1){
+                            for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
                                 var newrowid=generateRowID();
-                                attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact.name;
-                                attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
-                                attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact.connection;
-                                attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact.loyalty;
+                                attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
+                                attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
+                                attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact[i].connection;
+                                attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact[i].loyalty;
                             }
-                           }
-                        }catch(err){
-                           goodcode=false;
-                           error= error + "\n" + "Error with Contacts: " + err;
+                        }else{
+                            var newrowid=generateRowID();
+                            attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact.name;
+                            attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
+                            attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact.connection;
+                            attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact.loyalty;
                         }
+                       }
+                    }catch(err){
+                       goodcode=false;
+                       error= error + "\n" + "Error with Contacts: " + err;
                     }
 
                     attributes.warningcheckbox="0";
