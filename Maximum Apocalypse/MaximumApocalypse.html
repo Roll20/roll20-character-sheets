@@ -9,8 +9,6 @@
 <input type="hidden" name="attr_roll_perc" value="@{roll_perc_adv}+@{roll_perc_dis}+@{roll_perc_nomod}+(1d10cs>0cf<0)"/>
 <input type="hidden" name="attr_roll_perc_simple" value="(((1d10cs<2cf>9)-1)*10)+(1d10)"/>
 <input type="hidden" name="attr_roll_thresh_mod" value="((({@{mod_query}, 1}kh1-1)*5)+@{threshold_modifier})"/>
-<!-- dmg_query attribute will be replaced by on("sheet:opened") function with translated version -->
-<input type="hidden" name="attr_dmg_query" value="?{Damage Code|Light.,1d4|Average.,2d4|Heavy.,1d6+3|Massive.,d6+3|Extreme.,1d8+7|Devastating.,2d8+7|Ferocious.,1d10+11|Ruinous.,2d10+11|Ruinous Light.,2d10+1d4+11|Ruinous Average.,2d10+2d4+11|Ruinous Heavy.,2d10+1d6+14|Ruinous Massive.,2d10+2d6+14|Ruinous Extreme.,2d10+1d8+18|Ruinous Devastating.,2d10+2d8+18|Ruinous Ferocious.,3d10+22|Ruinous Ruinous.,4d10+220}"/>
 <div class="main">
     <div class="character section">
         <div class="character-name-input data-entry"><input name="attr_character_name" type="text"/></div>
@@ -748,10 +746,18 @@
       </div>
       <div class="roll-modifiers">
           <span class="label" data-i18n="threshold_modifier_text">Threshold modifier prompt on every roll ?.</span>
-          <input type="checkbox" value="?{Threshold Modifier.|0}" name="attr_threshold_modifier"/>
+          <input type="checkbox" value="?{Threshold Modifier|0}" name="attr_threshold_modifier"/>
           <br/>
+          <span class="label" data-i18n="damage_code_text">Damage code prompt on every attack ?.</span>
+          <input type="checkbox" name="attr_prompt_dmg" value="on"/>
+          <input type="hidden" name="attr_dmg_query" value="0"/>
+      </div> 
+      <div class="gm-modifiers">
           <span class="label" data-i18n="use_api_text">Use API for rolls (Requires Pro Account) ?.</span>
           <input type="checkbox" value="!ma roll" name="attr_api_use"/>
+          <br/>
+          <span class="label" data-i18n="disable_calc_text">Manually set Special Stats and Dodge ?.</span>
+          <input type="checkbox" name="attr_disabled_attrs" value="build, build_dc, health_max, init, salvage, resilience, resolve, immunity, armor_max, dodge"/>
       </div>
       <div class="luck-label">
         <button value="@{api_use} &{template:maxapoc} {{subtitle=^{luck}}} {{firstdegree1=[[@{luck}+@{threshold_modifier}+1]]}} {{firstdegree=[[@{luck}+@{threshold_modifier}]]}} {{seconddegree1=[[floor((@{luck}+@{threshold_modifier})/2)+1]]}} {{seconddegree=[[floor((@{luck}+@{threshold_modifier})/2)]]}} {{thirddegree1=[[floor((@{luck}+@{threshold_modifier})/4)+1]]}} {{thirddegree=[[floor((@{luck}+@{threshold_modifier})/4)]]}} {{profroll=[[@{roll_perc_simple}]]}} {{mod=[[0]]}} {{absmod=[[0]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button luck-button">
@@ -797,8 +803,9 @@
       <div class="sp-stats-lbr"></div>
       <div class="armor-shield">
           <div class="shield-label subheading"><span data-i18n="armor">Armor.</span></div>
-          <div class="shield-input-max">
-              <input class="shield shield-max" type="number" name="attr_armor_max" readonly/> 
+          <div class="shield-input-max notallowed-optional">
+              <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+              <input class="shield shield-max readonly-optional" type="number" name="attr_armor_max"/> 
           </div>
           <div class="shield-input-max-label self-center shield-label">
               <span data-i18n="max">Max.</span>
@@ -834,11 +841,13 @@
                 <span class="has-giant-genetics"> + 50 </span>
             </div>
           </div>
-          <div class="build-input"> 
-              <input class="build-lozenge" type="number" name="attr_build" width="18" readonly/>
+          <div class="build-input notallowed-optional"> 
+              <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+              <input class="build-lozenge readonly-optional" type="number" name="attr_build" width="18"/>
           </div>
-          <div class="dc-input"> 
-              <input class="dc-lozenge" type="number" name="attr_build_dc" width="18" readonly/>
+          <div class="dc-input notallowed-optional"> 
+              <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+              <input class="dc-lozenge readonly-optional" type="number" name="attr_build_dc" width="18"/>
           </div>
           <div class="dc-input-label"> 
               <span class="dc-input-label">DC</span><br/>
@@ -857,8 +866,9 @@
             <div class="subheading"><span data-i18n="health_points" class="subheading">Health Points.</span></div>
             <div class="footing"><span class="footing">(BUILD / 5)</span></div>
           </div>
-          <div class="health-max"> 
-              <input class="health-lozenge" type="number" name="attr_health_max" readonly/>
+          <div class="health-max notallowed-optional"> 
+              <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+              <input class="health-lozenge readonly-optional" type="number" name="attr_health_max"/>
           </div>
           <div class="health-current">
             <input class="health-current" type="number" name="attr_health" value="0"/> 
@@ -884,8 +894,9 @@
                 <span class="footing">) / 10</span>
             </div>
           </div>
-          <div class="init"> 
-              <input class="init-lozenge" type="number" name="attr_init" width="18" readonly/>
+          <div class="init notallowed-optional"> 
+              <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+              <input class="init-lozenge readonly-optional" type="number" name="attr_init" width="18"/>
           </div>
           <div class="init- init-5">
             <input class="init- init-5" type="number" name="attr_init_5" readonly/> 
@@ -927,7 +938,10 @@
                 </div>
                 <div class="footing"><span class="footing">(INS + LUCK) / 2</span></div>
             </div>
-            <div class="salvage-input"><input class="stat" type="number" name="attr_salvage" readonly/></div>
+            <div class="salvage-input notallowed-optional">
+                <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+                <input class="stat readonly-optional" type="number" name="attr_salvage"/>
+            </div>
             <div class="half salvage-h"><input class="stat-half" type="number" name="attr_salvage_half" readonly/></div>
             <div class="half salvage-h-label">1/2&nbsp;&nbsp;&nbsp;</div>
             <div class="quarter salvage-q"><input class="stat-quarter" type="number" name="attr_salvage_quarter" readonly/></div>
@@ -942,7 +956,10 @@
                 </div>
                 <div class="footing"><span class="footing">(STR + FORT) / 2</span></div>
             </div>
-            <div class="resilience-input"><input class="stat" type="number" name="attr_resilience" readonly/></div>
+            <div class="resilience-input notallowed-optional">
+                <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+                <input class="stat readonly-optional" type="number" name="attr_resilience"/>
+            </div>
             <div class="half resilience-h"><input class="stat-half" type="number" name="attr_resilience_half" readonly/></div>
             <div class="half resilience-h-label">1/2&nbsp;&nbsp;&nbsp;</div>
             <div class="quarter resilience-q"><input class="stat-quarter" type="number" name="attr_resilience_quarter" readonly/></div>
@@ -957,7 +974,10 @@
                 </div>
                 <div class="footing"><span class="footing">(INT + INS) / 2</span></div>
             </div>
-            <div class="resolve-input"><input class="stat" type="number" name="attr_resolve" readonly/></div>
+            <div class="resolve-input">
+                <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+                <input class="stat readonly-optional" type="number" name="attr_resolve"/>
+            </div>
             <div class="half resolve-h"><input class="stat-half" type="number" name="attr_resolve_half" readonly/></div>
             <div class="half resolve-h-label">1/2&nbsp;&nbsp;&nbsp;</div>
             <div class="quarter resolve-q"><input class="stat-quarter" type="number" name="attr_resolve_quarter" readonly/></div>
@@ -972,7 +992,10 @@
                 </div>
                 <div class="footing"><span class="footing">(FOR + LUCK) / 2</span></div>
             </div>
-            <div class="immunity-input"><input class="stat" type="number" name="attr_immunity" readonly/></div>
+            <div class="immunity-input notallowed-optional">
+                <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+                <input class="stat readonly-optional" type="number" name="attr_immunity"/>
+            </div>
             <div class="half immunity-h"><input class="stat-half" type="number" name="attr_immunity_half" readonly/></div>
             <div class="half immunity-h-label">1/2&nbsp;&nbsp;&nbsp;</div>
             <div class="quarter immunity-q"><input class="stat-quarter" type="number" name="attr_immunity_quarter" readonly/></div>
@@ -1000,7 +1023,10 @@
                         <span class="has-moving-target footing"> +5 </span>
                     </button>
               </div>
-              <div class="dodge-threshold table-cell"><input name="attr_dodge" class="defense-threshold" type="number" readonly/></div>
+              <div class="dodge-threshold table-cell notallowed-optional">
+                <input type="hidden" name="attr_disabled_attrs" class="sheet-disable-calc"/>
+                <input name="attr_dodge" class="defense-threshold readonly-optional" type="number" />
+              </div>
               <div class="dodge-threshold-h table-cell"><input name="attr_dodge_half" class="defense-threshold-h" type="number" readonly/></div>
               <div class="dodge-threshold-q table-cell"><input name="attr_dodge_quarter" class="defense-threshold-q" type="number" readonly/></div>
           </div>
@@ -1050,7 +1076,7 @@
       <div class="attack-table">
           <div class="attack-head">
               <div class="table-head attack-weapon"><span data-i18n="weapon">Weapon.</span></div>
-              <div class="table-head attack-skill"><span data-i18n="skill">Skill.</span></div>
+              <div class="table-head attack-skill"><span data-i18n="type">Type.</span></div>
               <div class="table-head attack-dc">DC</div>
               <div class="table-head attack-threshold"><span data-i18n="threshold">Threshold.</span></div>
               <div class="table-head attack-threshold-h">1/2</div>
@@ -1070,26 +1096,26 @@
               </div>
           </div>
           <div class="attack-row-brawl table-row">
-             <input name="attr_brawl_weapon" class="attack-cell attack-weapon table-cell" type="text" data-i18n="unarmed" value="Unarmed." readonly/>
-             <input class="attack-cell attack-skill table-cell brawl" type="text" data-i18n="brawl" value="Brawl." readonly/>
+             <input class="attack-cell attack-weapon table-cell" data-i18n="unarmed" value="Unarmed." name="attr_brawl_skill" readonly/>
+             <input class="attack-cell attack-skill table-cell brawl" data-i18n="brawl" value="Brawl." name="attr_brawl_weapon" readonly/>
              <select name="attr_brawl_dc" class="attack-cell attack-dc table-cell">
                  <option value="0"></option>
-                 <option title="Light." data-i18n-title="light" value="1d4">L</option>
-                 <option title="Average." data-i18n-title="average" value="2d4">A</option>
-                 <option title="Heavy." data-i18n-title="heavy" value="1d6+3">H</option>
-                 <option title="Massive." data-i18n-title="massive" value="d6+3">M</option>
-                 <option title="Extreme." data-i18n-title="extreme" value="1d8+7">E</option>
-                 <option title="Devastating." data-i18n-title="devastating" value="2d8+7">D</option>
-                 <option title="Ferocious." data-i18n-title="ferocious" value="1d10+11">F</option>
-                 <option title="Ruinous" data-i18n-title="ruinous" value="2d10+11">R</option>
-                 <option title="Ruinous + Light." data-i18n-title="ruinous_light" value="2d10+1d4+11">R+L</option>
-                 <option title="Ruinous + Average." data-i18n-title="ruinous_average" value="2d10+2d4+11">R+A</option>
-                 <option title="Ruinous + Heavy." data-i18n-title="ruinous_heavy" value="2d10+1d6+14">R+H</option>
-                 <option title="Ruinous + Massive." data-i18n-title="ruinous_massive" value="2d10+2d6+14">R+M</option>
-                 <option title="Ruinous + Extreme." data-i18n-title="ruinous_extreme" value="2d10+1d8+18">R+E</option>
-                 <option title="Ruinous + Devastating." data-i18n-title="ruinous_devastating" value="2d10+2d8+18">R+D</option>
-                 <option title="Ruinous + Ferocious." data-i18n-title="ruinous_ferocious" value="3d10+22">R+F</option>
-                 <option title="Ruinous + Ruinous." data-i18n-title="ruinous_ruinous" value="4d10+22">R+R</option>
+                 <option title="Light (1d4)." data-i18n-title="light" value="1d4">L</option>
+                 <option title="Average (2d4)." data-i18n-title="average" value="2d4">A</option>
+                 <option title="Heavy (1d6+3)." data-i18n-title="heavy" value="1d6+3">H</option>
+                 <option title="Massive (2d6+3)." data-i18n-title="massive" value="2d6+3">M</option>
+                 <option title="Extreme (1d8+7)." data-i18n-title="extreme" value="1d8+7">E</option>
+                 <option title="Devastating (2d8+7)." data-i18n-title="devastating" value="2d8+7">D</option>
+                 <option title="Ferocious (1d10+11)." data-i18n-title="ferocious" value="1d10+11">F</option>
+                 <option title="Ruinous (2d10+11)" data-i18n-title="ruinous" value="2d10+11">R</option>
+                 <option title="Ruinous + Light (2d10+1d4+11)." data-i18n-title="ruinous_light" value="2d10+1d4+11">R+L</option>
+                 <option title="Ruinous + Average (2d10+2d4+11)." data-i18n-title="ruinous_average" value="2d10+2d4+11">R+A</option>
+                 <option title="Ruinous + Heavy (2d10+1d6+14)." data-i18n-title="ruinous_heavy" value="2d10+1d6+14">R+H</option>
+                 <option title="Ruinous + Massive (2d10+2d6+14)." data-i18n-title="ruinous_massive" value="2d10+2d6+14">R+M</option>
+                 <option title="Ruinous + Extreme (2d10+1d8+18)." data-i18n-title="ruinous_extreme" value="2d10+1d8+18">R+E</option>
+                 <option title="Ruinous + Devastating (2d10+2d8+18)." data-i18n-title="ruinous_devastating" value="2d10+2d8+18">R+D</option>
+                 <option title="Ruinous + Ferocious (3d10+22)." data-i18n-title="ruinous_ferocious" value="3d10+22">R+F</option>
+                 <option title="Ruinous + Ruinous (4d10+22)." data-i18n-title="ruinous_ruinous" value="4d10+22">R+R</option>
              </select>
              <input name="attr_brawl" class="attack-threshold table-cell" type="number" readonly/>
              <input name="attr_brawl_half" class="attack-threshold-h table-cell" type="number" readonly/>
@@ -1097,13 +1123,13 @@
              <input name="attr_brawl_ammo" class="attack-ammo table-cell" type="text" value="n/a" readonly/>
              <input name="attr_brawl_traits" class="attack-traits table-cell" type="text"/>
              <input name="attr_brawl_cp" class="attack-cp table-cell" type="text" value="n/a" readonly/>
-             <button value="@{api_use} &{template:maxapoc} {{subtitle=^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
+             <button value="@{api_use} &{template:maxapoc} {{subtitle=^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{brawl_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
                 <span data-i18n="attack">Attack.</span>
              </button>
              <button value="@{api_use} &{template:maxapoc} {{subtitle=^{parry}: ^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button parry-roll">
                 <span data-i18n="parry">Parry.</span>
              </button>
-             <button value="@{api_use} &{template:maxapoc} {{subtitle=^{riposte}: ^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{selected|token_name}}} {{dmgroll=[[@{dmg_query}]]}} [[3 &{tracker:-}]]" type="roll" class="blank-roll-button riposte-roll">
+             <button value="@{api_use} &{template:maxapoc} {{subtitle=^{riposte}: ^{brawl}}} {{firstdegree1=[[@{brawl}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{brawl}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{brawl}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{brawl}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{brawl}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{selected|token_name}}} {{dmgroll=[[@{brawl_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}} [[3 &{tracker:-}]]" type="roll" class="blank-roll-button riposte-roll">
                 <span data-i18n="riposte">Riposte.</span>
              </button>
           </div>
@@ -1120,42 +1146,44 @@
                      <option value="firearms" data-i18n="firearms" data-i18n-list-item="firearms">Firearms.</option>
                      <option value="fs_thresh" data-i18n-list-item="fs">FS</option>
                      <option value="heavyweapons" data-i18n="heavy_weapons" data-i18n-list-item="heavy_weapons">Heavy Weapns.</option>
+                     <option value="throwing" data-i18n="throw" data-i18n-list-item="throw">Throw.</option>
                      <option value="wrangle" data-i18n="wrangle" data-i18n-list-item="wrangle">Wrangle.</option>
                  </select>
                  <select name="attr_attack_dc" class="attack-cell attack-dc table-cell shortened-select">
                      <option value="0"></option>
-                     <option title="Light." data-i18n-title="light" value="1d4">L</option>
-                     <option title="Average." data-i18n-title="average" value="2d4">A</option>
-                     <option title="Heavy." data-i18n-title="heavy" value="1d6+3">H</option>
-                     <option title="Massive." data-i18n-title="massive" value="d6+3">M</option>
-                     <option title="Extreme." data-i18n-title="extreme" value="1d8+7">E</option>
-                     <option title="Devastating." data-i18n-title="devastating" value="2d8+7">D</option>
-                     <option title="Ferocious." data-i18n-title="ferocious" value="1d10+11">F</option>
-                     <option title="Ruinous" data-i18n-title="ruinous" value="2d10+11">R</option>
-                     <option title="Ruinous + Light." data-i18n-title="ruinous_light" value="2d10+1d4+11">R+L</option>
-                     <option title="Ruinous + Average." data-i18n-title="ruinous_average" value="2d10+2d4+11">R+A</option>
-                     <option title="Ruinous + Heavy." data-i18n-title="ruinous_heavy" value="2d10+1d6+14">R+H</option>
-                     <option title="Ruinous + Massive." data-i18n-title="ruinous_massive" value="2d10+2d6+14">R+M</option>
-                     <option title="Ruinous + Extreme." data-i18n-title="ruinous_extreme" value="2d10+1d8+18">R+E</option>
-                     <option title="Ruinous + Devastating." data-i18n-title="ruinous_devastating" value="2d10+2d8+18">R+D</option>
-                     <option title="Ruinous + Ferocious." data-i18n-title="ruinous_ferocious" value="3d10+22">R+F</option>
-                     <option title="Ruinous + Ruinous." data-i18n-title="ruinous_ruinous" value="4d10+22">R+R</option>
+                     <option title="Light (1d4)." data-i18n-title="light" value="1d4">L</option>
+                     <option title="Average (2d4)." data-i18n-title="average" value="2d4">A</option>
+                     <option title="Heavy (1d6+3)." data-i18n-title="heavy" value="1d6+3">H</option>
+                     <option title="Massive (2d6+3)." data-i18n-title="massive" value="2d6+3">M</option>
+                     <option title="Extreme (1d8+7)." data-i18n-title="extreme" value="1d8+7">E</option>
+                     <option title="Devastating (2d8+7)." data-i18n-title="devastating" value="2d8+7">D</option>
+                     <option title="Ferocious (1d10+11)." data-i18n-title="ferocious" value="1d10+11">F</option>
+                     <option title="Ruinous (2d10+11)" data-i18n-title="ruinous" value="2d10+11">R</option>
+                     <option title="Ruinous + Light (2d10+1d4+11)." data-i18n-title="ruinous_light" value="2d10+1d4+11">R+L</option>
+                     <option title="Ruinous + Average (2d10+2d4+11)." data-i18n-title="ruinous_average" value="2d10+2d4+11">R+A</option>
+                     <option title="Ruinous + Heavy (2d10+1d6+14)." data-i18n-title="ruinous_heavy" value="2d10+1d6+14">R+H</option>
+                     <option title="Ruinous + Massive (2d10+2d6+14)." data-i18n-title="ruinous_massive" value="2d10+2d6+14">R+M</option>
+                     <option title="Ruinous + Extreme (2d10+1d8+18)." data-i18n-title="ruinous_extreme" value="2d10+1d8+18">R+E</option>
+                     <option title="Ruinous + Devastating (2d10+2d8+18)." data-i18n-title="ruinous_devastating" value="2d10+2d8+18">R+D</option>
+                     <option title="Ruinous + Ferocious (3d10+22)." data-i18n-title="ruinous_ferocious" value="3d10+22">R+F</option>
+                     <option title="Ruinous + Ruinous (4d10+22)." data-i18n-title="ruinous_ruinous" value="4d10+22">R+R</option>
                  </select>
                  <input name="attr_attack_threshold" class="attack-cell attack-threshold table-cell" type="number"/>
-                 <input name="attr_attack_threshold_quarter" class="attack-cell attack-threshold-h table-cell" type="number"/>
-                 <input name="attr_attack_threshold_half" class="attack-cell attack-threshold-q table-cell" type="number"/>
+                 <input name="attr_attack_threshold_half" class="attack-cell attack-threshold-h table-cell" type="number"/>
+                 <input name="attr_attack_threshold_quarter" class="attack-cell attack-threshold-q table-cell" type="number"/>
                  <input name="attr_attack_ammo" class="attack-cell attack-ammo table-cell" type="number"/>
                  <input name="attr_attack_traits" class="attack-cell attack-traits table-cell" type="text"/>
                  <input name="attr_attack_unreliable" type="hidden" value="0"/>
                  <input name="attr_attack_cp" class="attack-cell attack-cp table-cell" type="number"/>
-                 <button value="@{api_use} &{template:maxapoc} {{unreliable=[[@{attack_unreliable}]]}} {{subtitle=@{attack_weapon}}} {{firstdegree1=[[@{attack_threshold}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{attack_threshold}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
+                 <input name="attr_attack_id" type="hidden"/>
+                 <button value="@{api_use} &{template:maxapoc} {{unreliable=[[@{attack_unreliable}]]}} {{subtitle=@{attack_weapon}}} {{firstdegree1=[[@{attack_threshold}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{attack_threshold}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}} {{dmgroll=[[@{attack_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}}" type="roll" class="blank-roll-button attack-roll">
                     <span data-i18n="attack">Attack.</span>
                  </button>
                  <input type="hidden" name="attr_attack_defense" class="attack-defense-check" value="0"/>
                  <button value="@{api_use} &{template:maxapoc} {{subtitle=^{parry}: @{attack_weapon}}} {{firstdegree1=[[@{attack_threshold}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{attack_threshold}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button parry-roll defense-roll">
                     <span data-i18n="parry">Parry.</span>
                  </button>
-                 <button value="@{api_use} &{template:maxapoc} {{subtitle=^{riposte}: @{attack_weapon}}} {{firstdegree1=[[@{attack_threshold}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{attack_threshold}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{selected|token_name}}} {{dmgroll=[[@{dmg_query}]]}} [[3 &{tracker:-}]]" type="roll" class="blank-roll-button riposte-roll defense-roll">
+                 <button value="@{api_use} &{template:maxapoc} {{subtitle=^{riposte}: @{attack_weapon}}} {{firstdegree1=[[@{attack_threshold}+@{roll_thresh_mod}+1]]}} {{firstdegree=[[@{attack_threshold}+@{roll_thresh_mod}]]}} {{seconddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)+1]]}} {{seconddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/2)]]}} {{thirddegree1=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)+1]]}} {{thirddegree=[[floor((@{attack_threshold}+@{roll_thresh_mod})/4)]]}} {{profroll=[[@{roll_perc}]]}} {{mod=[[@{mod_query}]]}} {{absmod=[[abs(@{mod_query})]]}} {{title=@{selected|token_name}}} {{dmgroll=[[@{attack_dc}]]}} {{dmgqueryroll=[[@{dmg_query}]]}} [[3 &{tracker:-}]]" type="roll" class="blank-roll-button riposte-roll defense-roll">
                     <span data-i18n="riposte">Riposte.</span>
                  </button>
                  <!--button value="@{api_use} &{template:maxapoc} {{subtitle=@{attack_weapon}}} {{dmgroll=[[@{attack_dc}]]}} {{title=@{character_name}}}" type="roll" class="blank-roll-button damage-roll">
@@ -1171,13 +1199,17 @@
       <div class="gear-table">
           <div class="gear-head">
               <div class="gear-col-head-1 table-head gear-item"><span data-i18n="item">Item.</span></div>
+              <div class="gear-col-head-2 table-head gear-characteristic-expand expand-colum-header">+</div>
               <div class="gear-col-head-3 table-head gear-characteristic"><span data-i18n="characteristic">Characteristic.</span></div>
               <div class="gear-col-head-8 table-head gear-cp">CP</div>
           </div>
           <div class="gear-row table-row">
               <fieldset class="repeating_gear"> 
                  <input name="attr_gear_item" class="gear-item table-cell" type="text"/>
-                 <textarea name="attr_gear_characteristic" class="gear-characteristic table-cell" rows="1"></textarea>
+                 <input name="attr_gear_characteristic_expanded" type="checkbox" class="ability-effect-expand"/>
+                 <input name="attr_gear_characteristic_expanded" type="hidden" class="textarea-expand" value="0"/>
+                 <textarea name="attr_gear_characteristic" class="gear-characteristic table-cell textarea-collapsed" rows="1"></textarea>
+                 <textarea name="attr_gear_characteristic" class="gear-characteristic table-cell textarea-expanded" rows="6"></textarea>
                  <input name="attr_gear_cp" class="gear-cp table-cell" type="number"/>
               </fieldset>
           </div>
@@ -1190,13 +1222,17 @@
           <div class="abilities-head">
               <div class="table-head table-cell ability-source"><span data-i18n="source" class="ability-head-text">Source.</span></div>
               <div class="table-head table-cell ability-name"><span data-i18n="ability_name" class="ability-head-text">Ability Name.</span></div>
+              <div class="table-head table-cell ability-effect-expand expand-colum-header">+</div>
               <div class="table-head table-cell ability-effect"><span data-i18n="effect" class="ability-head-text">Effect.</span></div>
           </div>
           <div class="abilities-row table-row">
               <fieldset class="repeating_abilities"> 
                  <input name="attr_ability_source" class="ability-source table-cell" type="text"/>
                  <input name="attr_ability_name" class="ability-name table-cell" type="text"/>
-                 <textarea name="attr_ability_effect" class="ability-effect table-cell" rows="1"></textarea>
+                 <input name="attr_ability_effect_expanded" type="checkbox" class="ability-effect-expand"/>
+                 <input name="attr_ability_effect_expanded" type="hidden" class="textarea-expand" value="0"/>
+                 <textarea name="attr_ability_effect" class="ability-effect table-cell textarea-collapsed" rows="1"></textarea>
+                 <textarea name="attr_ability_effect" class="ability-effect table-cell textarea-expanded" rows="6"></textarea>
               </fieldset>
           </div>
       </div>
@@ -1381,8 +1417,14 @@
 <span style="display: none" data-i18n="ruinous_ferocious">Ruinous + Ferocious</span>
 <span style="display: none" data-i18n="ruinous_ruinous">Ruinous + Ruinous</span>
 
+<input type="hidden" name="disabled_attrs" value=""/>
+
 <script type="text/worker">
 
+/*
+ * START: TRANSLATED ROLL QUERIES
+ */
+ 
 const prof_mod_labels = [];
 prof_mod_labels[prof_mod_labels.length] = {key: 'none', name: 'None', value: '0'};
 prof_mod_labels[prof_mod_labels.length] = {key: '1_advantage', name: '1 Advantage.', value: '1'};
@@ -1422,44 +1464,128 @@ on("sheet:opened", function(eventInfo)
         let mod = prof_mod_labels[i];
         let translation = getTranslationByKey(mod.key);
         if(!translation) translation = mod.name;
-        console.log('prof_mod_translation: ' + translation);
+        //console.log('prof_mod_translation: ' + translation);
         modQuery += "|" + translation + "," + mod.value;
     }
     modQuery += "}";
     
-    // concatenate damage code roll query
-    var dmgQuery = "?{";
-    var dmgQueryLabel = getTranslationByKey("damage_code");
-    if (!dmgQueryLabel) dmgQueryLabel = "Damage Code."
-    dmgQuery += dmgQueryLabel;
-    for(var i=0;i<dmg_codes.length;i++)
-    {
-        let dmg = dmg_codes[i];
-        let translation = getTranslationByKey(dmg.key);
-        if(!translation) translation = dmg.name;
-        console.log('dmg_code_translation: ' + translation);
-        dmgQuery += "|" + translation + "," + dmg.roll;
-    }
-    dmgQuery += "}";
+    // Brawl translation
+    var brawlSkillName = getTranslationByKey("unarmed");
+    if (!brawlSkillName) brawlSkillName = "Unarmed.";
+    var brawlWeaponName = getTranslationByKey("brawl");
+    if (!brawlWeaponName) brawlWeaponName = "Brawl.";
     
-    // update threshold modifier query
-    var thresholdModifierText = getTranslationByKey("threshold_modifier");
-    if (!thresholdModifierText) thresholdModifierText = "Threshold Modifier."
-    var thresholdModiferQuery = '?{' + thresholdModifierText + '|0}';
     
     // console output
     console.log('modQuery: ' + modQuery);
-    console.log('dmgQuery: ' + dmgQuery);
-    console.log('thresholdModiferQuery: ' + thresholdModiferQuery);
+    console.log('brawlSkillName: ' + brawlSkillName);
+    console.log('brawlWeaponName: ' + brawlWeaponName);
     
     // update translated roll queries
     setAttrs({
         mod_query: modQuery,
-        dmg_query: dmgQuery,
-        threshold_modifier: thresholdModiferQuery
+        brawl_skill: brawlSkillName,
+        brawl_weapon: brawlWeaponName
     });
-    
+
 });
+
+on("change:prompt_dmg", function(eventInfo)
+{
+    var dmgQuery = "0";
+    
+    if(eventInfo.newValue === 'on')
+    {
+        // ?{Damage Code|1d4|2d4|1d6+3|2d6+3|1d8+7|2d8+7|1d10+11|2d10+11|2d10+1d4+11|2d10+2d4+11|2d10+1d6+14|2d10+2d6+14|2d10+1d8+18|2d10+2d8+18|3d10+22|4d10+220}
+        
+        // concatenate damage code roll query
+        dmgQuery = "?{";
+        var dmgQueryLabel = getTranslationByKey("damage_code");
+        if (!dmgQueryLabel) dmgQueryLabel = "Damage Code."
+        dmgQuery += dmgQueryLabel;
+        for(var i=0;i<dmg_codes.length;i++)
+        {
+            let dmg = dmg_codes[i];
+            let translation = getTranslationByKey(dmg.key);
+            if(!translation) translation = dmg.name;
+            dmgQuery += "|" + translation + "," + dmg.roll;
+        }
+        dmgQuery += "}";
+    }
+            
+    // console output
+    console.log('dmgQuery: ' + dmgQuery);
+    
+
+    // update translated roll query
+    setAttrs({
+        dmg_query: dmgQuery
+    });
+});
+
+/*
+ * END: TRANSLATED ROLL QUERIES
+ */
+
+/*
+ * START: SUPPORT DISABLE ATTRIBUTE CALCULATION 
+ */
+const BASE_ATTRS = ['str', 'for', 'agi', 'int', 'ins', 'cha', 'fs', 'bs', 'luck'];
+
+const csvToIndexedObject = function(csv)
+{
+  var retVal = {};
+  var arr = csv ? csv.split(',') : [];
+  
+  _.each(arr, function(arrValue)
+  {
+      retVal[arrValue.trim()] = true;
+  });
+  
+  return retVal;
+};
+
+// SET GLOBAL VAR ON SHEET OPEN AND WHEN CHECKBOX CHANGED
+on("change:disabled_attrs", function(eventInfo) 
+{
+    if(eventInfo.newValue === '0')
+    {
+        console.log('toggle disabled_attrs re-enabling...');
+    
+        // update disabled_attrs & trigger re-calculation (prefix all base attrs with zero & then set back)
+        getAttrs(BASE_ATTRS, function(values)
+        {
+            var correctValues = {};
+            var triggerValues = {};
+            
+            _.each(values, function(value, attr)
+            {
+                correctValues[attr] = parseInt(value) || value;
+                triggerValues[attr] = "0" + value;
+            });
+                
+            console.log('toggle disabled_attrs trigger calc:' + JSON.stringify(triggerValues));
+            console.log('toggle disabled_attrs reset calc:' + JSON.stringify(correctValues));
+                
+            setAttrs(triggerValues, '', function()
+            {
+                console.log('toggle disabled_attrs re-calc complete. Triggering reset.');
+                
+                // recalc armor
+                repeatingSum("armor_max","armor","armor_ap");
+                
+                // recalc from base attr
+                setAttrs(correctValues, '', function() {
+                    console.log('toggle disabled_attrs re-set complete.');
+                });
+            });
+        });
+    }
+});
+
+/*
+ * END: DISABLE ATTRIBUTE CALCULATION 
+ */
 
 /*  ======================================================
             BEGIN MULTIVERSAL SHEET WORKER GENERATOR
@@ -1470,6 +1596,10 @@ on("sheet:opened", function(eventInfo)
     VERSION 1.
     READMORE: https://app.roll20.net/forum/permalink/7664925/
     ======================================================*/
+
+/* 
+ * START OF MULTIVERSAL SHEET LOGIC
+ */
 
 const multistats = {
     luck_uses_max: {rule: 'luck_uses', attributes: ['luck', 'has_faith', "has_luck_stars"], modifier: 10},
@@ -1492,7 +1622,7 @@ const multistats = {
     init_10: {rule: 'add', attributes: ['init'], modifier: -10},
     init_15: {rule: 'add', attributes: ['init'], modifier: -15},
     salvage: {rule: 'special_stat', attributes: ['ins', 'luck'], modifier: 2},
-    resilience: {rule: 'special_stat', attributes: ['str', 'fort'], modifier: 2},
+    resilience: {rule: 'special_stat', attributes: ['str', 'for'], modifier: 2},
     resolve: {rule: 'special_stat', attributes: ['int', 'ins'], modifier: 2},
     immunity: {rule: 'special_stat', attributes: ['for', 'luck'], modifier: 2},
     dodge: {rule: 'dodge', attributes: ['agi', 'ins', 'has_reflex', 'has_moving_target'], modifier: 2},
@@ -1514,7 +1644,7 @@ stats.forEach(stat => {
     multistats[`${stat}_half`] = {rule: 'half', attributes: [stat]};
     multistats[`${stat}_quarter`] = {rule: 'quarter', attributes: [stat]};
     multistats[`${stat}_temp`] = {rule: 'toggle', values: -1, attributes: ['starving'], modifier: -10};
-    multistats[`${stat}_temp_check`] = {rule: 'sum', attributes: [`${stat}_temp`]}; /* just copy the temp value */
+    multistats[`${stat}_temp_check`] = {rule: 'sum', attributes: [`${stat}_temp`]}; // just copy the temp value
     multistats[`${stat}_thresh`] = {rule: 'sum', attributes: [`${stat}`, `${stat}_temp`]};
 });
 
@@ -1542,7 +1672,6 @@ build_dc_mods[1] = {food_units: 3, contort_mod: 0};
 build_dc_mods[2] = {food_units: 4, contort_mod: -10};
 build_dc_mods[3] = {food_units: 5, contort_mod: -20};
 
-
 const multifunctions = {
     sum: (arr) => arr.reduce((total, add) => total + add),  // add up any number of attributes
     pick_from_list: (arr) => arr[ arr[0] ], // get the value of an attribute, from a select.
@@ -1559,7 +1688,8 @@ const multifunctions = {
     toggle: (arr, modifier) => arr[0] === 'on' ? modifier : 0,
     contains: (arr, modifier) => arr.join('').toLowerCase().indexOf(modifier)>-1 ? 1 : 0,
     is_defense_skill: (arr) => arr[0] === 'blades' || arr[0] === 'brawl' || arr[0] === 'clubs'  ? '1' : '0',
-    luck_uses: function(arr, divisor) {
+    luck_uses: function(arr, divisor) 
+    {
       let luck = arr[0];
       let has_faith = arr[1];
       let has_luck_stars = arr[2];
@@ -1578,39 +1708,46 @@ const multifunctions = {
       dodge += has_moving_target > 0 ? 5 : 0;
       return dodge;
     },
-    prof: function(arr) {
+    prof: function(arr) 
+    {
         let stat_val = parseInt(arr[0]) || 0;
         let prof_mod = prof_mods[arr[1]];
         return stat_val + prof_mod.mod;
     },
-    prof_desc: function(arr) {
+    prof_desc: function(arr) 
+    {
         let prof_mod = prof_mods[arr[0]];
         return prof_mod.desc;
     },
-    special_stat: function(arr, divisor) {
+    special_stat: function(arr, divisor) 
+    {
     	let sum = multifunctions.sum(arr);
     	let stat = Math.floor(sum / divisor);
     	return stat;
     },
-    build: function(arr) {
+    build: function(arr) 
+    {
         let str = arr[0];
         let fort = arr[1];
         let hasGiantGenetics = arr[2];
         return str + fort + (hasGiantGenetics > 0 ? 50 : 0);
     },
-    hungry: function(arr) {
+    hungry: function(arr) 
+    {
         let hunger = arr[0];
         let threshold = arr[1];
         return hunger >= threshold ? 'on' : '0';
     },
-    hunger_threshold: function(arr, modifier) {
+    hunger_threshold: function(arr, modifier) 
+    {
         let baseThreshold = arr[0];
         let hasTighteningTheBelt = arr[1];
         let hasCollar = arr[2];
         let threshold = baseThreshold + (hasTighteningTheBelt > 0 ? modifier : 0);
         return hasCollar > 0 ? 999 : threshold;
     },
-    init: function(arr, divisor) {
+    init: function(arr, divisor) 
+    {
         let agi = parseInt(arr[0]) || 0;
         let luck = parseInt(arr[1]) || 0;
         let initTemp = parseInt(arr[2]) || 0;
@@ -1637,9 +1774,18 @@ const multifunctions = {
     }
 };
 
+/*
+ * END OF MULTIVERSAL SHEET LOGIC
+ */
+
 // ======================================================*/
 //           DO NOT EDIT BELOW THIS LINE                 //
 // ======================================================*/
+
+/* 
+ * START OF MULTIVERSAL FUNCTIONS
+ */
+ 
 const mvlog = (title, text, color = 'green', style='font-size:12px; font-weight:normal;', headerstyle = 'font-size:13px; font-weight:bold;') => {
     let titleStyle = `color:${color}; ${headerstyle} text-decoration:underline;`;
     let textStyle = `color:${color}; ${style}`;
@@ -1710,7 +1856,8 @@ Object.keys(multistats).forEach(destination => {
     if (isMixed(attributes, realdestination)) {
         const changes = attributes.reduce((change, step) => `${change} change:${step.replace('repeating_' + section + '_','repeating_' +section + ':')}`,
             `remove:repeating_${section} sheet:opened`);
-        on(changes.toLowerCase(), function (event) {
+        on(changes.toLowerCase(), function (event) 
+        {
             const trigger = event.sourceAttribute || '';
             const triggerRow = (trigger && trigger.includes('_') && trigger.length >2) ? trigger.split('_')[2] : '';
             // if triggerRow, only update initial row
@@ -1746,16 +1893,30 @@ Object.keys(multistats).forEach(destination => {
     } else {
         const changes = attributes.reduce((change, step) => `${change} change:${step.replace('repeating_' + section + '_','repeating_' +section + ':')}`,
             `${someRepeating([...attributes,realdestination]) ? '' : 'sheet:opened '}${section ? `remove:repeating_${section}` : ''}`);
-        on(changes.toLowerCase(), function () {
-            getAttrs(attributes, function (values) {
-                const result = processFunction(destination,values, section);
-                const max = multistats[destination].max || 'current';
-                const settings = processMax(realdestination, result, max);
-                setAttrs(settings);
+        on(changes.toLowerCase(), function () 
+        {
+            getAttrs([...attributes, 'disabled_attrs'], function (values)
+            {
+                if(csvToIndexedObject(values['disabled_attrs'])[destination])
+                {
+                    mvlog(`MULTIVERSAL DISABLED - ${destination}`,`${values['disabled_attrs']}`,'orange');
+                }
+                else
+                {
+                    const result = processFunction(destination,values, section);
+                    const max = multistats[destination].max || 'current';
+                    const settings = processMax(realdestination, result, max);
+                    setAttrs(settings);
+                }
             });
         });
     }
 });
+
+/*
+ * END OF MULTIVERSAL FUNCTIONS
+ */
+
 // ======================================================*/
 //           END Multiversal Sheet Worker Generator      //
 // ======================================================*/
@@ -1769,6 +1930,11 @@ destinations = the name of the attribute that stores the total quantity
           destination and fields both can be a single attribute: 'weight'
           or an array of attributes: ['weight','number','equipped']
 */
+
+/* 
+ * START OF REPEATING SUMS
+ */
+ 
 const repeatingSum = (destinations, section, fields) => {
     if (!Array.isArray(destinations)) destinations = [destinations.replace(/\s/g, '').split(',')];
     if (!Array.isArray(fields)) fields = [fields.replace(/\s/g, '').split(',')];
@@ -1807,32 +1973,46 @@ const repeatingPresence = (destinations, section, fields, names) => {
 };
 
 
-/* armor point total */
-on('change:repeating_armor:armor_ap remove:repeating_armor', function() {
-	repeatingSum("armor_max","armor","armor_ap");
+// armor point total 
+on('change:repeating_armor:armor_ap remove:repeating_armor', function() 
+{
+    getAttrs(['disabled_attrs'], function(values) 
+    {
+        // if armor_max calc disabled skip
+        if(csvToIndexedObject(values['disabled_attrs'])['armor_max'])
+        {    
+            console.log(`MULTIVERSAL DISABLED - armor_max (${values['disabled_attrs']})`);
+            return;
+        }
+        repeatingSum("armor_max","armor","armor_ap");
+    });
 });
 
-/* armor cp total */
+// armor cp total 
 on('change:repeating_armor:armor_cp remove:repeating_armor', function() {
 	repeatingSum("armor_cp_total","armor","armor_cp");
 });
 
-/* weapon cp total */
+// weapon cp total 
 on('change:repeating_attack:attack_cp remove:repeating_attack', function() {
 	repeatingSum("attack_cp_total","attack","attack_cp");
 });
 
-/* gear cp total */
+// gear cp total 
 on('change:repeating_gear:gear_cp remove:repeating_gear', function() {
 	repeatingSum("gear_cp_total","gear","gear_cp");
 });
 
-/* END OF REPEATING SUMS */
+/*
+ * END OF REPEATING SUMS 
+ */
 
 
-/* START OF REPEATING ABILITY PRESENCE */
+/* 
+ * START OF REPEATING ABILITY PRESENCE 
+ */
 
-/* detect special abilities */
+// detect special abilities 
 on('change:repeating_abilities:ability_name remove:repeating_abilities', function() {  
     
     var abilitieNames = ["faith", "reflex", "tightening_the_belt", "moving_target", "giant_genetics", "luck_stars", "collar", "instinctive"];
@@ -1841,12 +2021,17 @@ on('change:repeating_abilities:ability_name remove:repeating_abilities', functio
 	repeatingPresence(abilityAttrs, "abilities", "ability_name", abilitieNames);
 });
 
-/* END OF REPEATING ABILITY PRESENCE */
+/*
+ * END OF REPEATING ABILITY PRESENCE 
+ */
 
-/* START OF ATTACK THRESHOLD CALCULATIONS */
+/* 
+ * START OF ATTACK THRESHOLD CALCULATIONS 
+ */
 
 // update attack thresholds when attack skill changed
-on("change:repeating_attack:attack_skill", function(eventInfo) {
+on("change:repeating_attack:attack_skill", function(eventInfo) 
+{
    getAttrs([eventInfo.newValue], function(values) {
       let skillThreshold = values[eventInfo.newValue];
       setAttrs({
@@ -1898,7 +2083,37 @@ attackSkills.forEach(attackSkill => {
         });
     });
 });
-/* END OF ATTACK THRESHOLD CALCULATIONS */
+/*
+ * END OF ATTACK THRESHOLD CALCULATIONS 
+ */
+
+/* 
+ * START OF SETTING ATTACK ID ATTR 
+ */
+ 
+on("sheet:opened change:repeating_attack", function() 
+{
+    setRepeatingFieldId("attack", "attack_id");
+});
+
+const setRepeatingFieldId = function(repeatingSectionName, attrName)
+{
+    getSectionIDs("repeating_" + repeatingSectionName, function(idarray) 
+    {
+        var attrs = {};
+        for(var i=0; i < idarray.length; i++) 
+        {
+            var repeatingFieldId = 'repeating_' + repeatingSectionName + '_' + idarray[i] + '_' + attrName;
+            attrs[repeatingFieldId] = repeatingFieldId;
+            
+        }
+        setAttrs(attrs,{silent:true});
+    });
+};
+
+/*
+ * END OF SETTING ATTACK ID ATTR 
+ */
 
 </script>
 
@@ -1985,33 +2200,53 @@ attackSkills.forEach(attackSkill => {
               {{#rollTotal() profroll 1}}
                                                                <div class="sheet-value"><span data-i18n="critical_success">Critical Success.</span> !!!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">4</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                 
               {{/rollTotal() profroll 1}}
               {{#rollBetween() profroll 2 thirddegree}}
                                                                <div class="sheet-value"><span data-i18n="amazing_success">Amazing Success.</span> !!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">3</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                 
               {{/rollBetween() profroll 2 thirddegree}}
               {{#rollBetween() profroll thirddegree1 seconddegree}}
                                                                <div class="sheet-value"><span data-i18n="great_success">Great Success.</span> !</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">2</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                 
               {{/rollBetween() profroll thirddegree1 seconddegree}}
               {{#rollBetween() profroll seconddegree1 firstdegree}}
                                                                <div class="sheet-value" data-i18n="success">Success.</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success</div><div class="sheet-value">1</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                 
               {{/rollBetween() profroll seconddegree1 firstdegree}}
                   
@@ -2022,25 +2257,40 @@ attackSkills.forEach(attackSkill => {
               {{#rollTotal() profroll 1}}
                                                                <div class="sheet-value"><span data-i18n="critical_success">Critical Success.</span> !!!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">3</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                   
               {{/rollTotal() profroll 1}}
               {{#rollBetween() profroll 2 thirddegree}}
                                                                <div class="sheet-value"><span data-i18n="amazing_success">Amazing Success.</span> !!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">2</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                   
               {{/rollBetween() profroll 2 thirddegree}}
               {{#rollBetween() profroll thirddegree1 seconddegree}}
                                                                <div class="sheet-value"><span data-i18n="great_success">Great Success.</span> !</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">1</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
                   
               {{/rollBetween() profroll thirddegree1 seconddegree}}
               {{#rollBetween() profroll seconddegree1 firstdegree}}
@@ -2053,17 +2303,27 @@ attackSkills.forEach(attackSkill => {
               {{#rollTotal() profroll 1}}
                                                                <div class="sheet-value"><span data-i18n="critical_success">Critical Success.</span> !!!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">2</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
               
               {{/rollTotal() profroll 1}}
               {{#rollBetween() profroll 2 thirddegree}}
                                                                <div class="sheet-value"><span data-i18n="amazing_success">Amazing Success.</span> !!</div>
                 <div class="sheet-key" data-i18n="degrees_of_success">Degrees of Success.</div><div class="sheet-value">1</div>
-                {{#dmgroll}}
-                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
-                {{/dmgroll}}
+                {{#rollGreater() dmgqueryroll 0}}
+                <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgqueryroll}}</div>
+                {{/rollGreater() dmgqueryroll 0}}
+                {{#rollTotal() dmgqueryroll 0}}
+                    {{#dmgroll}}
+                    <div class="sheet-key" data-i18n="damage">Damage.</div><div class="sheet-value">{{dmgroll}}</div>
+                    {{/dmgroll}}
+                {{/rollTotal() dmgqueryroll 0}}
               
               {{/rollBetween() profroll 2 thirddegree}}
               {{#rollBetween() profroll thirddegree1 seconddegree}}

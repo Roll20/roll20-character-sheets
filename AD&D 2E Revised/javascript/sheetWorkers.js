@@ -1,4 +1,6 @@
 // --- ALL SHEET WORKERS START --- //
+const SheetWorker = 'sheetworker';
+const Player = 'player';
 
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
@@ -473,35 +475,37 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
 function setupAutoFillSpellInfo(section, spellsTable) {
-    on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
+    if (spellsTable[section]) {
+        on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
 
-        let spell = spellsTable[section][eventInfo.newValue];
-        if (spell === undefined)
-            return;
+            let spell = spellsTable[section][eventInfo.newValue];
+            if (spell === undefined)
+                return;
 
-        let spellInfo ={
-            [`repeating_spells-${section}_spell-name`]         : spell['name'],
-            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]        : spell['level'],
-            [`repeating_spells-${section}_spell-school`]       : spell['school'],
-            [`repeating_spells-${section}_spell-components`]   : spell['components'],
-            [`repeating_spells-${section}_spell-range`]        : spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-        }
-        if (section.startsWith('pri')) {
-            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-        }
+            let spellInfo ={
+                [`repeating_spells-${section}_spell-name`]         : spell['name'],
+                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+                [`repeating_spells-${section}_spell-level`]        : spell['level'],
+                [`repeating_spells-${section}_spell-school`]       : spell['school'],
+                [`repeating_spells-${section}_spell-components`]   : spell['components'],
+                [`repeating_spells-${section}_spell-range`]        : spell['range'],
+                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+                [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
+            }
+            if (section.startsWith('pri')) {
+                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+            }
 
-        setAttrs(spellInfo);
-    });
+            setAttrs(spellInfo);
+        });
+    }
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
@@ -564,30 +568,30 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
 let wizardSpellLevelsSections = [
     {level: 1, sections: ['', '2', '3', 'wiz1']},
     {level: 2, sections: ['4', '5', '6', 'wiz2']},
-    {level: 3, sections: ['7', '8', '9']},
-    {level: 4, sections: ['10', '11', '12']},
-    {level: 5, sections: ['70', '71', '72']}, //... legacy naming convention
-    {level: 6, sections: ['13', '14', '15']},
-    {level: 7, sections: ['16', '17', '18']},
-    {level: 8, sections: ['19', '20', '21']},
-    {level: 9, sections: ['22', '23', '24']},
-    {level: 10, sections: ['25', '26', '27']},
-    {level: 11, sections: ['52', '53', '54']}, //... legacy naming convention
-    {level: 12, sections: ['55', '56', '57']},
-    {level: 13, sections: ['58', '59', '60']},
-    {level: 14, sections: ['61', '62', '63']},
-    {level: 15, sections: ['64', '65', '66']},
+    {level: 3, sections: ['7', '8', '9', 'wiz3']},
+    {level: 4, sections: ['10', '11', '12', 'wiz4']},
+    {level: 5, sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: 6, sections: ['13', '14', '15', 'wiz6']},
+    {level: 7, sections: ['16', '17', '18', 'wiz7']},
+    {level: 8, sections: ['19', '20', '21', 'wiz8']},
+    {level: 9, sections: ['22', '23', '24', 'wiz9']},
+    {level: 10, sections: ['25', '26', '27', 'wiz10']},
+    {level: 11, sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: 12, sections: ['55', '56', '57', 'wiz12']},
+    {level: 13, sections: ['58', '59', '60', 'wiz13']},
+    {level: 14, sections: ['61', '62', '63', 'wiz14']},
+    {level: 15, sections: ['64', '65', '66', 'wiz15']},
 ];
 
 let priestSpellLevelsSections = [
     {level: '1', sections: ['28', '29', '30', 'pri1']},
     {level: '2', sections: ['31', '32', '33', 'pri2']},
-    {level: '3', sections: ['34', '35', '36']},
-    {level: '4', sections: ['37', '38', '39']},
-    {level: '5', sections: ['40', '41', '42']},
-    {level: '6', sections: ['43', '44', '45']},
-    {level: '7', sections: ['46', '47', '48']},
-    {level: 'q', sections: ['49', '50', '51']},
+    {level: '3', sections: ['34', '35', '36', 'pri3']},
+    {level: '4', sections: ['37', '38', '39', 'pri4']},
+    {level: '5', sections: ['40', '41', '42', 'pri5']},
+    {level: '6', sections: ['43', '44', '45', 'pri6']},
+    {level: '7', sections: ['46', '47', '48', 'pri7']},
+    {level: 'q', sections: ['49', '50', '51', 'priq']},
 ];
 
 // --- Start setup Spell Slots --- //
@@ -682,6 +686,21 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 });
 // --- End setup Rogue skills total --- //
 
+//Related weapons / familiarity penalty
+on('change:nonprof-penalty', function (eventInfo) {
+    if (eventInfo.sourceType === SheetWorker) {
+        return;
+    }
+    getAttrs(['nonprof-penalty'], function(values) {
+        let nonprof = Math.abs(parseInt(values['nonprof-penalty'])) * -1;
+        let famil = Math.floor(nonprof / 2)
+        setAttrs({
+            ['nonprof-penalty']: nonprof,
+            ['famil-penalty']: famil
+        });
+    });
+})
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
@@ -700,7 +719,7 @@ on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeat
 
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
-on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored change:on-mount change:gear-stored-weight change:gear-stored-qty', function(){
+on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(){
 
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')

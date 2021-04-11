@@ -1,12 +1,14 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.09" />
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.11" />
 <input type='hidden' name='attr_firstInit' value="0" />
 <input type='hidden' name='attr_namelength' value='0' />
 
 <script type="text/worker">
-
+    // Define colors for Logs
+    const r20color = "#E948C9";
 	// Better Logging Functionality
     on("sheet:opened change:character_name", function() {
-        getAttrs(['character_name'], function(v) {
+        getAttrs(['character_name','CompendiumData'], function(v) {
+            log("CompendiumData",JSON.stringify(v.CompendiumData),r20color);
             let name = v.character_name;
             let namelen = name.length;
             let nameclass;
@@ -133,7 +135,7 @@
 	}
 
     //Force a change in a field to trigger a sheet worker and then reset the <fieldset>
-        //This may be needed when an existing field is modified that's used in a roll button (e.g. Trademark Weapon modified how the skill formula is called, resulting in each we)
+    //This may be needed when an existing field is modified that's used in a roll button (e.g. Trademark Weapon modified how the skill formula is called, resulting in each we)
     const stepwiseFaux = function(section,field) {
 		//only for repeating Sections
 		//section = the repeating section
@@ -198,7 +200,7 @@
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
     const sheetVersionPrefix = "Official Savage Worlds v";
-	const sheetVersion = "1.00.09";
+	const sheetVersion = "1.00.11";
 
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
@@ -250,6 +252,12 @@
                 fauxChange("RaiseHBRule","3");
                 setattrvals["newcontent"] = "unread";
                 setattrvals["newdocumentation"] = "unread";
+            }
+            if(versionthree < 0.10) {
+                setattrvals["newcontent"] = "unread";
+            }
+            if(versionthree < 0.11) {
+                setattrvals["newcontent"] = "unread";
             }
             else {
                 log("Upgrade",`Sheet already updgraded (${characterName})`,"lime");
@@ -526,12 +534,50 @@
 		setToughness();
 	});
 
+    //check Parry updates for Shields
+    on("change:repeating_shields change:repeating_shields:shieldworn change:repeating_shield:shieldparry remove:repeating_shields", function() {
+        //get all shields
+        getSectionIDs("repeating_shields", function(idArray) {
+            log("Shields","Get Shields ID","green");
+			//Construct Array of fields to get attributes for...
+			let sumFields = [];
+			for (let a=0; a< idArray.length; a++) {
+				sumFields[sumFields.length] = "repeating_shields_" + idArray[a] + "_shieldWorn";
+				sumFields[sumFields.length] = "repeating_shields_" + idArray[a] + "_ShieldParry";
+			}
+            log("Shields ID Array Length",sumFields.length,"green");
+			//sumFields[sumFields.length] = "toughnessArmor"
+			getAttrs(sumFields, function(v) {
+                //Find the highest Parry value that's "Worn" and use that update Parry
+                let highestParry = 0;
+                let repSectionID;
+                let parryScore;
+                log("idArray Length",idArray.length,"green");
+                if(idArray.length > 0) {
+                    log("Array Loop","Loop through the array","green");
+                    for (let a=0; a < idArray.length; a++) {
+                        repSectionID = idArray[a];
+                        log("Shield Parry",v[`repeating_shields_${repSectionID}_ShieldParry`],"green");
+                        parryScore = parseInt(v[`repeating_shields_${repSectionID}_ShieldParry`]) || 0;
+                        log("Shield Worn",v[`repeating_shields_${repSectionID}_shieldWorn`],"green");
+                        if(v[`repeating_shields_${repSectionID}_shieldWorn`] === "1" && parryScore > highestParry) {
+                            highestParry = parryScore;
+                        }
+                    }
+                }
+                log("Highest Parry",highestParry,"green");
+                setAttrs({shieldparry: highestParry});
+            });
+        });
+    });
+
 	//Set Parry
-	on("sheet:opened change:fighting change:fightingmod change:parry change:parryMod", function() {
-		getAttrs(["fighting", "fightingmod", "parryMod"], function(pvalue) {
+	on("sheet:opened change:fighting change:fightingmod change:parry change:parryMod change:shieldparry", function() {
+		getAttrs(["fighting", "fightingmod", "parryMod", "shieldparry"], function(pvalue) {
 			console.log("fighting value: " + pvalue.fighting);
 			console.log("mod value: " + pvalue.FightingMod);
 			console.log("parry mod: " + pvalue.parryMod);
+            console.log("shield parry: " + pvalue.shieldparry);
 			var Fighting = parseInt(pvalue.fighting);
 			var FightingMod = parseInt(pvalue.fightingmod);
 			var totFighting = Fighting + FightingMod;
@@ -556,9 +602,10 @@
 			}
 
 			var parryMod = parseInt(pvalue.parryMod);
+            let shieldParry = parseInt(pvalue.shieldparry) || 0;
 			var parryCalc = Math.floor(totFighting/2) + 2;
 			setAttrs({ parry: parryCalc  });
-			setAttrs({ parryCur:  parryCalc + parryMod });
+			setAttrs({ parryCur:  parryCalc + parryMod + shieldParry });
 		});
 	});
 
@@ -592,6 +639,11 @@
 		repeatingSimpleSumWCheck('armor','ArmorTypeWeight','armortotalweightcarried','ArmorCarried','on');
 	});
 
+    //Calculate Total Shield Weight
+    on("change:repeating_shields:shieldtypeweight change:repeating_shields:shieldworn remove:repeating_shields", function(eventInfo) {
+        repeatingSimpleSumWCheck('shields','ShieldTypeWeight','shieldtotalweightcarried','shieldWorn','1');
+    })
+
 	//Calculate Total Weapon Weight
 	on("change:repeating_weapons:weaponweight change:repeating_weapons:weaponcarried remove:repeating_weapons", function(eventInfo) {
 		repeatingSimpleSumWCheck('weapons','weaponweight','weapontotalweightcarried','weaponcarried','on');
@@ -613,12 +665,13 @@
 	});
 
 	//Calculate Total Load Carried
-	on("change:armortotalweightcarried change:weapontotalweightcarried change:rangedtotalweightcarried change:geartotalweightcarried",function(){
-		getAttrs(["armortotalweightcarried", "weapontotalweightcarried", "geartotalweightcarried"], function(lvalue) {
+	on("change:armortotalweightcarried change:shieldtotalweightcarried change:weapontotalweightcarried change:rangedtotalweightcarried change:geartotalweightcarried",function(){
+		getAttrs(["armortotalweightcarried", "shieldtotalweightcarried", "weapontotalweightcarried", "geartotalweightcarried"], function(lvalue) {
 			let armor = parseFloat(lvalue.armortotalweightcarried)||0;
 			let weapon = parseFloat(lvalue.weapontotalweightcarried)||0;
 			let gear = parseFloat(lvalue.geartotalweightcarried)||0;
-			setAttrs({ totalloadcarried: armor + weapon + gear });
+            let shields = parseFloat(lvalue.shieldtotalweightcarried)||0;
+			setAttrs({ totalloadcarried: armor + weapon + gear + shields });
 		});
 	});
 
@@ -1462,7 +1515,7 @@
 			let button = `${field}button`;
 			let formula = `${field}formula`;
 			let sattrs = {};
-			if(v[field] === "(AGL)" || v[field] === "(STR)" || v[field] === "1") {
+			if(v[field] === "(AGL)" || v[field] === "agl-u" || v[field] === "str-u" || v[field] === "(STR)" || v[field] === "1") {
 				console.log(`Need to set trait (${field}) to use Encumbrance`);
 				sattrs[button] = `@{setmodsenc}`;
 				sattrs[formula] = `@{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance]`;
@@ -2296,57 +2349,6 @@
 		getAttrs(staticlist, function(v) {
 			let charskills = '';
 			for(let i = 0; i < staticlist.length; i++) {
-				//cycle through the array
-				/* Commenting out following chunk of JS because I believe the refactor has obviated its need
-				if (staticlist[i] === "staticFighting" || staticlist[i] === "staticAcademics" || staticlist[i] === "staticCommonKnowledge" || staticlist[i] === "staticLanguage") {
-					switch(staticlist[i]) {
-						case 'staticFighting':
-							if(charskills.length < 1) {
-								//no skills added to the list yet
-								charskills = "[@{fightingname} @{fighting_display}](~tFightingRoll)";
-							}
-							else {
-								charskills += ", [@{fightingname} @{fighting_display}](~tFightingRoll)";
-							}
-							break;
-						case 'staticAcademics':
-							if(v[staticlist[i]] != "0") {
-								if(charskills.length < 1) {
-									//no skills added to the list yet
-									charskills = "[@{academicsname} @{academics_display}](~tAcademicsRoll)";
-								}
-								else {
-									charskills += ", [@{academicsname} @{academics_display}](~tAcademicsRoll)";
-								}
-							}
-							break;
-						case 'staticCommonKnowledge':
-							if(v[staticlist[i]] != "0") {
-								if(charskills.length < 1) {
-									//no skills added to the list yet
-									charskills = "[@{commonknowledgename} @{commonknowledge_display}](~tCommonKnowledgeRoll)";
-								}
-								else {
-									charskills += ", [@{commonknowledgename} @{commonknowledge_display}](~tCommonKnowledgeRoll)";
-								}
-							}
-							break;
-						case 'staticLanguage':
-							if(v[staticlist[i]] != "0") {
-								if(charskills.length < 1) {
-									//no skills added to the list yet
-									charskills = "[@{native-languagename} @{language_display}](~tLanguageRoll)";
-								}
-								else {
-									charskills += ", [@{native-languagename} @{language_display}](~tLanguageRoll)";
-								}
-							}
-							break;
-						default:
-							console.log("Nothing to report");
-					}
-				}
-				else if(v[staticlist[i]] != "0") { /* */
 				if(v[staticlist[i]] != "0") {
 					//skill is turned on
 					let skillname = staticlist[i];
@@ -2389,9 +2391,6 @@
 		})
 	});
 
-	//const derivedstats = ["usecharisma","usescholarship","Corruption","potsmFame","izFirewall","hfGlory","DLGrit","neuraltoughness","ripReason","tdsanity","ripStatus","izStrain","izStreetCred","izStreetCredThree"];
-	//const derivedlabels = ["Charisma","Scholarship","Corruption","Fame","Firewall","Glory","Grit","Neural Toughness","Reason","Sanity","Status","Strain","Street Cred"];
-	//const derivedcurfields = ["@{charismaCur}","@{scholarshipCur}","@{corruptionCur}","@{fameCur}","@{FirewallCur}","@{gloryCur}","@{gritCur}","@{ntoughnesscur}","@{reasonCur}","@{sanityCur}","@{statusCur}","@{StrainCur}","@{StreetCredCur}"];
     const getCustomDerivedStats = function(charderived) {
         log("Custom Derived Stats","Made it here...","yellow");
         log("charderived",charderived,"yellow");
@@ -2532,7 +2531,7 @@
 
 	on("change:repeating_armor change:repeating_weapons change:repeating_gear remove:repeating_armor remove:repeating_weapons remove:repeating_gear", function() {
 		gearStatBlock();
-	})
+	});
 
 	const specabilityStatBlock = function() {
 		let charhindrances = '';
@@ -2740,6 +2739,514 @@
 		}
 		else {log("Is not worn","Don't need to carried...","darkblue");}
 	});
+
+    const resetCompendiumFields = function() {
+        let setObj = {}
+        setObj["CompendiumName"] = "";
+        setObj["CompendiumCategory"] = "";
+        setObj["CompendiumContent"] = "";
+        setObj["CompendiumData"] = "";
+        setAttrs(setObj,{silent:true});
+        //return setObj;
+    }
+
+    //Start Compendium Drop
+    const cleanCompendiumData = function(jsonData) {
+        const leftRegEx = /(\"\[)/g;
+        const rightRegEx = /(\]\")/g;
+        const newLineRegEx = /(\\\\n)/g;
+        const slashRegEx = /(\\\")/g;
+        const singleQuote = /(\{')/g; //replace with {"
+        const singleQuoteColonRight = /(':)/g; //replace with ":
+        const doubleSingleQuote = /('')/g; //replace with ""
+        const singleQuotecolonLeft = /(: ')/g; //replace with : "
+        const singleQuoteCommaSeparated = /(', ')/g; //replace with ", "
+        const doubleQuoteCommaSingle = /(\", ')/g; //replace with ", "
+        const spaceSingleQuote = /( ')/g; //replace with , "
+        const doubleComma = /(,,)/g; //replace with ,
+        let newString = jsonData;
+        newString = newString.replace(leftRegEx,'[');
+        newString = newString.replace(rightRegEx,']');
+        newString = newString.replace(newLineRegEx,"\\n");
+        log("newString Brackets Replaced",newString,r20color);
+        newString = newString.replace(slashRegEx,'"');
+        log("Monster String","newString Remove single Quotes",r20color);
+        newString = newString.replace(singleQuote,'{"');
+        newString = newString.replace(singleQuoteColonRight,'":');
+        newString = newString.replace(doubleSingleQuote,'""');
+        newString = newString.replace(singleQuotecolonLeft,': "');
+        newString = newString.replace(singleQuoteCommaSeparated,'", "');
+        newString = newString.replace(doubleQuoteCommaSingle,'", "');
+        newString = newString.replace(spaceSingleQuote,', "');
+        newString = newString.replace(doubleComma,',');
+        log("newString",newString,r20color);
+        return(newString);
+    }
+
+    //Set attribute field names...these are all in repeating sections unless otherwise noted
+    const hindrancefields = ["hindrance","hindrancedescription","hindranceType"];
+    const edgefields = ["edge","edgedescription"];
+    const gearfields = ["item","itemWeight","description"];
+    const powerfields =["power","powerduration","powerrange","pp","trappings","spelldamageatt","spelldmgnumdice","spelldmgdietype","spelldmgbonusnum","spellnotes"];
+    const weaponfields = ["weapon","range","rof","weaponap","shots_max","damageatt","dmgnumdice","dmgdietype","dmgbonusnum","weaponnotes","weaponweight","weaponminstrength"];
+    const vehicleweaponfields = ["ShipWeaponType","ShipWeaponRange","ShipWeaponRoF","NoDmgDice","DmgType","DmgMod","ShipWeaponPlacement","ShipWeaponNotes","ShipWeaponAP"];
+    const badVehicleWeaponFields = ["weapon","range","rof","dmgnumdice","dmgdietype","dmgbonusnum","placement","description","weaponap"];
+    const vehiclefields = ["vehicletype","vehiclewounds_max","vehiclesize","vehiclehandling","vehicletopspeed","vehicletoughness","vehiclecrew","vehiclecargo","vehiclenotes"];
+    //vehiclefields are non-repeating fields
+    const armorfields = ["ArmorType","armorminstrength","areaprotected","armorTypeProtection","armorstack","ArmorTypeWeight","ArmorNotes"];
+    const shieldfields = ["ShieldType","ShieldParry","ShieldCover","ShieldTypeWeight","ShieldNotes","shieldminstrength"];
+    const badshieldfields = ["ArmorType","parry","cover","ArmorTypeWeight","ArmorNotes","armorminstrength"];
+
+    const convertPersonalToVehicle = function(jsonObj,convertType = "vehicle") {
+        log("jsonObj",JSON.stringify(jsonObj),r20color);
+        let fieldArray;
+        let badFields;
+        convertType === "vehicle" ? fieldArray = vehicleweaponfields : fieldArray = shieldfields;
+        convertType === "vehicle" ? badFields = badVehicleWeaponFields : badFields = badshieldfields;
+        if(jsonObj) {
+            //create Keys for Vehicle Weapons
+            for(let i = 0; i < vehicleweaponfields.length; i++) {
+                jsonObj[fieldArray[i]] = jsonObj[badFields[i]];
+            }
+            log("Ship Weapon JSON",JSON.stringify(jsonObj),r20color);
+            return(jsonObj);
+        }
+        else {
+            log("jsonObj","Not Found",r20color);
+        }
+    }
+
+    const getDropInfo = function(jsonObj,targetObj,repSection) {
+        let fields;
+        let repSectionID;
+        (typeof repSection !== "undefined" || repSection) ? repSectionID = generateRowID() : log("Repeating Section","Not Found",r20color);
+        switch(repSection) {
+            case "gear":
+                fields = gearfields;
+                targetObj[`repeating_${repSection}_${repSectionID}_itemcarried`] = "on";
+                break;
+            case "npc_hindrance":
+                repSection = "hindrances";
+                targetObj[`repeating_${repSection}_${repSectionID}_whisperDeets`] = "/w gm ";
+                //fall through to hindrances
+            case "hindrances":
+                fields = hindrancefields;
+                targetObj[`repeating_${repSection}_${repSectionID}_showHindraceDesc`] = "0";
+                break;
+            case "npc_Edge":
+                repSection = "edges";
+                targetObj[`repeating_${repSection}_${repSectionID}_tookat`] = "GM";
+                targetObj[`repeating_${repSection}_${repSectionID}_showEdgeDesc`] = "0";
+                targetObj[`repeating_${repSection}_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
+                //fall through to edges
+            case "edges":
+                fields = edgefields;
+                break;
+            case "weapons":
+                fields = weaponfields;
+                jsonObj["weaponnotes"] = jsonObj["description"];
+                //check Rate of Fire to see if we need to change the Button Action
+                parseInt(jsonObj["rof"] || 0) > 1 ? targetObj[`repeating_weapons_${repSectionID}_weaponbutton`] = "2" /* Atkx+Dmg */ : targetObj[`repeating_weapons_${repSectionID}_weaponbutton`] = "0"; /* Atk + Dmg */
+                //set skill to use
+                //determine range
+                let shortRange = 0;
+                typeof jsonObj["range"] !== "undefined" ? shortRange = Number(jsonObj["range"].substring(0,2).replace(/(\/)/g,'')) : log("Range","Not found...melee weapons",r20color);
+                shortRange === 0 ? /*Set Skill to Fighting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "fighting" : shortRange < 12 ? /*Set Skill to Athletics*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "athletics" : /*Set Skill to Shooting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "shooting";
+                //if damageatt is not passed, set to na
+                typeof jsonObj["damageatt"] === "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_damageatt`] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                targetObj[`repeating_${repSection}_${repSectionID}_weaponcarried`] = "on";
+                if(jsonObj["dmgdietype"] === "dmgdietype") {
+                    //check if the format is correct
+                    (typeof jsonObj["dmgdietype"] !== "undefined" && (parseInt(jsonObj["dmgdietype"] || 0) > 0)) ? (jsonObj["dmgdietype"] = "d" + jsonObj["dmgdietype"] + "!") : log("dmgdietype","Either isn't defined or is formatted correctly, hopefully",r20color);
+                }
+                break;
+            case "spells":
+                fields = powerfields;
+                if(typeof jsonObj.spelldamageatt === "undefined" && typeof jsonObj.spelldmgnumdice === "undefined" && typeof jsonObj.spelldmgdietype === "undefined" && typeof jsonObj.spelldmgbonusnum === "undefined"){
+                    //Non-Damaging Power, set button to Cast instead of Damage
+                    targetObj[`repeating_${repSection}_${repSectionID}_spellbutton`] = "2";
+                    targetObj[`repeating_${repSection}_${repSectionID}_spelldmgnumdice`] = "0";
+                }
+                else {
+                    //Damaging Power, do nothing so button remains with Damage.
+                    log("Power Type","Att: " + jsonObj.spelldamageatt + ", Number of Dice " + jsonObj.spelldmgnumdice + ", Die Type: " + jsonObj.spelldmgdietype + ",Bonus: " + jsonObj.spelldmgbonusnum + " ergo: Damage causing power",r20color);
+                }
+                break;
+            case "armor":
+                fields = armorfields;
+                break;
+            case "shields":
+                jsonObj = convertPersonalToVehicle(jsonObj,"shields");
+                fields = shieldfields;
+                targetObj[`repeating_${repSection}_${repSectionID}_shieldWorn`] = "1";
+                break;
+            case "vehicle_non-repeating":
+                log("Vehicle Info","Made it to getting Vehicle Fields",r20color);
+                fields = vehiclefields;
+                repSection = false;
+                break;
+            case "shipweapons":
+                log("jsonObj","Convert for Vehicle Weapons",r20color);
+                jsonObj = convertPersonalToVehicle(jsonObj);
+                log("Weapon JSON",JSON.stringify(jsonObj),r20color);
+                fields = vehicleweaponfields;
+                break;
+            default:
+                log("repSection","Not Found",r20color);
+                break;
+        }
+        if(fields.length) {
+            if (repSection) {
+                log("Repeating Fields","Fields Found",r20color);
+                fields.forEach(field => {
+                    typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
+                });
+            }
+            else {
+                log("Non-Repeating Fields","Fields Found",r20color);
+                fields.forEach(field => {
+                    typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
+                });
+            }
+        }
+
+        return(targetObj);
+    }
+
+    const compendiumDrop = function(category) {
+        //do stuff
+        getAttrs(["CompendiumData","CompendiumContent"], function(v) {
+            //reset the compendium drop fields
+            resetCompendiumFields();
+            //Set up setAttrs object variable AND add Compendium variables to be reset to blank
+            let setattrvalues = {};
+            //clean the data
+            v.CompendiumData = cleanCompendiumData(v.CompendiumData);
+            //parse the JSON Object
+            let jsonObj = JSON.parse(v.CompendiumData);
+            let repSection;
+            switch(jsonObj.Category) {
+                case "Gear":
+                    repSection = "gear";
+                    break;
+                case "Hindrances":
+                    repSection = "hindrances";
+                    break;
+                case "Edges":
+                    repSection = "edges";
+                    break;
+                case "Powers":
+                    repSection = "spells";
+                    break;
+                case "Weapons":
+                    (jsonObj.category1 === "Vehicular Weapons" || jsonObj.category2 === "Vehicular Weapons" || jsonObj.category3 === "Vehicular Weapons") ? repSection = "shipweapons" : repSection ="weapons";
+                    break;
+                case "Armor":
+                    repSection = "armor";
+                    break;
+                case "Shields":
+                    repSection= "shields";
+                    break;
+                case "Vehicles":
+                    //clear all fields in preparation for updated
+                    let resetObj = {};
+                    vehiclefields.forEach(field => {
+                        resetObj[`${field}`] = "";
+                    });
+                    setAttrs(resetObj,{silent:true});
+                    //Check if Vehicle Type is cared for; if not, will need to set it here.
+                    typeof jsonObj["vehicletype"] !== "undefined" ? log("Vehicle Type","Should already be cared for",r20color) : setattrvalues["vehicletype"] = jsonObj.name;
+                    //if not already set, show vehicle tab
+                    setattrvalues["vehicle"] = "on";
+                    setattrvalues["vehiclewounds"] = "0";
+                    repSection = "vehicle_non-repeating"; //Vehicles don't have a Repeating Sections for the core vehicle
+                    break;
+                case "Vehicle Weapons":
+                    repSection = "shipweapons";
+                    break;
+                default:
+                    repSection = false;
+                    break;
+            }
+            setattrvalues = getDropInfo(jsonObj,setattrvalues,repSection);
+            if(jsonObj.Category === "Vehicles" && typeof jsonObj["data-Weapons"] !== "undefined") {
+                //if this is a vehicle with weapons, then need to add more stuff to the JSON
+                log("Weapons Array","Found",r20color);
+                log("Weapons",JSON.stringify(jsonObj["data-Weapons"]),r20color);
+                for (let weapon of jsonObj["data-Weapons"]) {
+                    log("Import Weapon",weapon.data.weapon,r20color);
+                    setattrvalues = getDropInfo(weapon.data,setattrvalues,"shipweapons");
+                }
+            }
+            setAttrs(setattrvalues);
+        });
+    }
+
+    //Bestiary Compendium Drop
+    const attributeNames = ["agility","smarts","spirit","strength","vigor"];
+
+    const compendiumBestiary = function() {
+        log("Compendium Drop","Bestiary Entry dropped to table top",r20color);
+        getAttrs(["CompendiumData","CompendiumContent","settings_bar1value","settings_bar1max","settings_bar1link","settings_bar2value","settings_bar2max","settings_bar2link","settings_bar3value","settings_bar3max","settings_bar3link"], function(monster) {
+            log("settings_bar3max",monster["settings_bar3max"],r20color);
+            log("jsonObj",JSON.stringify(monster.CompendiumData),r20color);
+            //let monsterStats = resetCompendiumFields();
+            const leftRegEx = /(\"\[)/g;
+            const rightRegEx = /(\]\")/g;
+            const newLineRegEx = /(\\\\n)/g;
+            const slashRegEx = /(\\\")/g;
+            const singleQuote = /(\{')/g; //replace with {"
+            const singleQuoteColonRight = /(':)/g; //replace with ":
+            const doubleSingleQuote = /('')/g; //replace with ""
+            const singleQuotecolonLeft = /(: ')/g; //replace with : "
+            const singleQuoteCommaSeparated = /(', ')/g; //replace with ", "
+            const doubleQuoteCommaSingle = /(\", ')/g; //replace with ", "
+            const spaceSingleQuote = /( ')/g; //replace with , "
+            const doubleComma = /(,,)/g; //replace with ,
+            let monsterString = monster.CompendiumData;
+            monsterString = monsterString.replace(leftRegEx,'[');
+            monsterString = monsterString.replace(rightRegEx,']');
+            monsterString = monsterString.replace(newLineRegEx,"\\n");
+            log("monsterString Brackets Replaced",monsterString,r20color);
+            monsterString = monsterString.replace(slashRegEx,'"');
+            log("Monster String","monsterString Remove single Quotes",r20color);
+            monsterString = monsterString.replace(singleQuote,'{"');
+            monsterString = monsterString.replace(singleQuoteColonRight,'":');
+            monsterString = monsterString.replace(doubleSingleQuote,'""');
+            monsterString = monsterString.replace(singleQuotecolonLeft,': "');
+            monsterString = monsterString.replace(singleQuoteCommaSeparated,'", "');
+            monsterString = monsterString.replace(doubleQuoteCommaSingle,'", "');
+            monsterString = monsterString.replace(spaceSingleQuote,', "');
+            monsterString = monsterString.replace(doubleComma,',');
+            //monsterString = monsterString.replace("'","\"");
+            log("monsterString",monsterString,r20color);
+            let monsterStats = {};
+            //let monsterObj = JSON.parse(monster.CompendiumData);
+            let monsterObj = JSON.parse(monsterString);
+            log("Monster Stats",JSON.stringify(monsterStats),r20color);
+            log("monsterObj",JSON.stringify(monsterObj),r20color);
+            let woundsMax = 0;
+            let isWildCard = false;
+            //set Wild Card Status
+            if(typeof monsterObj.is_npc !== "undefined") {
+                //if is_npc = TRUE, then set as Wild Card
+                monsterObj.is_npc === "TRUE" ? monsterStats["is_npc"] = "0" : monster["is_npc"] = "1";
+                monsterObj.is_npc === "TRUE" ? isWildCard = true : log("Extra","isWildCard false",r20color);
+                monsterObj.is_npc === "TRUE" ? woundsMax = 3 : log("Extra","Leave Wounds at 0",r20color);
+            }
+            //set Size
+            let monsterSize, tokenSize;
+            typeof monsterObj.size !== "undefined" ? monsterSize = monsterObj.size : log("Size","Not found",r20color);
+            monsterStats["size"] = monsterSize;
+            //adjust woundsMax based on Size
+            switch(monsterSize) {
+                case "-4":
+                case "-3":
+                case "-2":
+                case "-1":
+                case "0":
+                case "1":
+                case "2":
+                case "3":
+                    woundsMax += 0;
+                    tokenSize = 1;
+                    break;
+                case "4":
+                case "5":
+                case "6":
+                case "7":
+                    woundsMax += 1;
+                    tokenSize = 2;
+                    break;
+                case "8":
+                case "9":
+                case "10":
+                case "11":
+                    woundsMax += 2;
+                    tokenSize = 3;
+                    break;
+                default:
+                    woundsMax += 3;
+                    tokenSize = 4;
+                    break;
+            }
+            //Set Wounds Values
+            monsterStats["wounds"] = 0;
+            monsterStats["wounds_max"] = woundsMax;
+            log("woundsMax",woundsMax,r20color);
+            //set character Core Attributes
+            attributeNames.forEach(coreattribute => {
+                (typeof monsterObj[`${coreattribute}`] !== "undefined" && monsterObj[`${coreattribute}`] !== "0") ? monsterStats[`${coreattribute}`] = monsterObj[`${coreattribute}`] : log(`${coreattribute}`,"Not found or 0",r20color);
+                typeof monsterObj[`${coreattribute}mod`] !== "undefined" ? monsterStats[`${coreattribute}mod`] = monsterObj[`${coreattribute}mod`] : log(`${coreattribute}mod`,"Not found",r20color);
+                //Don't set the attribute if it's equal to 0, because it should be a minimum of 4.
+            });
+            //set Skills
+            log("Skills","Begin setting Skills",r20color);
+            skillnamelist.forEach(skillname => {
+                if(typeof monsterObj[`${skillname}`] !== "undefined" && monsterObj[`${skillname}`] !== "0") {
+                    //if the skillname is defined AND not equal 0, then we need to show the skill and set the value
+                    log(monsterObj[`${skillname}`],"Found this skill",r20color);
+                    monsterStats[`static${skillname}`] = "on";
+                    monsterStats[`${skillname}`] = monsterObj[`${skillname}`];
+                }
+                //Set Skill Mod
+                typeof monsterObj[`${skillname}mod`] !== "undefined" ? monsterStats[`${skillname}mod`] = monsterObj[`${skillname}mod`] : log(`${skillname}mod`,"Not found or 0",r20color);
+            })
+            //Set the sheet Attributes
+            log("Character Sheet","Setting Values",r20color);
+            setAttrs(monsterStats, function(){
+                //Begin Token Settings...
+                //Token size: 4-7 = 2, 8-11 = 3, 12+ = 4
+                const square_size = 70; // Default Roll20 square size (in px)
+                let squares = 1.0; // Default number of squares for a token (if grid is used)
+                let squaresize = parseInt(square_size * tokenSize);
+                let default_attr = {};
+                default_attr["width"] = squaresize;
+                default_attr["height"] = squaresize;
+                //Bar 1 (Link to parryCur)
+                default_attr["bar1_link"] = "parryCur";
+                //Bar 2 (Link to toughnesscur)
+                default_attr["bar2_link"] = "toughnesscur";
+                //Bar 3 (values of wounds)
+                default_attr["bar3_link"] = "wounds";
+                //default_attr["bar3_max"] = woundsMax;
+                log("Token Defaults","Setting token defaults",r20color);
+                setDefaultToken(default_attr);
+                log("Final Details","Setting final details",r20color);
+                let finalCharacterDetails = {};
+                //set Pace
+                typeof monsterObj.pace !== "undefined" ? finalCharacterDetails["pace"] = monsterObj.pace : log("Pace","Not found",r20color);
+                //set Token  and Avatar URLs
+                typeof monsterObj.Token !== "undefined" ? finalCharacterDetails["tokenURL"] = monsterObj.Token : log("Token URL","Not found",r20color);
+                typeof monsterObj.avatarURL !== "undefined" ? finalCharacterDetails["avatarURL"] = monsterObj.avatarURL : typeof monsterObj.Token !== "undefined" ? finalCharacterDetails["avatarURL"] = monsterObj.Token : log("Avatar URL","Not found",r20color);
+                //set description
+                typeof monsterObj.biography !== "undefined" ? finalCharacterDetails["physdescription"] = monsterObj.biography : log("Biography","Not found",r20color);
+                //set Edges
+                log("Edges","Check for Edges",r20color);
+                if (typeof monsterObj["data-Edges"] !== "undefined" && monsterObj["data-Edges"].length > 0) {
+    				for (let edge of monsterObj["data-Edges"]) {
+    					log("Import Edge",edge.name,r20color);
+                        log("Monster Edge",JSON.stringify(edge),r20color);
+                        //finalCharacterDetails = getEdgeInfo(monsterObj["data-Edges"],finalCharacterDetails);
+                        finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
+    					// let repSectionID = generateRowID();
+    					// typeof edge.name !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edge`] = edge.name : log("Edge Name","Not Found",r20color);
+    					// typeof edge.description !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edgedescription`] = edge.description : log("Edge Description","Not Found",r20color);
+    					// finalCharacterDetails[`repeating_edges_${repSectionID}_tookat`] = "GM";
+                        // finalCharacterDetails[`repeating_edges_${repSectionID}_showEdgeDesc`] = "0";
+                        // finalCharacterDetails[`repeating_edges_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
+    				}
+    			}
+                //set Hindrances
+                if (typeof monsterObj["data-Hinderances"] !== "undefined" && monsterObj["data-Hinderances"].length > 0) {
+    				for (let hindrance of monsterObj["data-Hinderances"]) {
+    					log("Import Hindrances",hindrance.hindrance,r20color);
+                        log("Monster Hindrance",JSON.stringify(hindrance),r20color);
+                        //finalCharacterDetails = getHindranceInfo(monsterObj["data-Hindrances"],)
+    					// let repSectionID = generateRowID();
+    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrance`] = hindrance.hindrance;
+    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrancedescription`] = hindrance.hindrancedescription;
+    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_showHindraceDesc`] = "0";
+                        // (typeof hindrance.hindranceType !== "undefined" && hindrance.hindranceType !== "Both") ? finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindranceType`] = hindrance.hindranceType : log("Hindrance Type","Both, so leave it blank",r20color);
+                        // finalCharacterDetails[`repeating_hindrances_${repSectionID}_whisperDeets`] = "/w gm ";
+                        finalCharacterDetails = getDropInfo(hindrance.data,finalCharacterDetails,"npc_hindrance");
+    				}
+    			}
+
+                log("Edges & Hindrances","Write Edges and Hindrances to the Character",r20color);
+                setAttrs(finalCharacterDetails);
+                finalCharacterDetails = {};
+                //Set Weapons
+                //const weaponfields = ["weapon","range","rof","damageatt","dmgnumdice","dmgdietype","dmgbonusnum","weaponap","weaponminstrength","weaponweight"];
+                log("Weapons","Check for Weapons",r20color);
+                typeof monsterObj["data-Weapons"] !== "undefined" ? log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color) : log("Monster Weapons","Not Found",r20color);
+                if (typeof monsterObj["data-Weapons"] !== "undefined" && monsterObj["data-Weapons"].length > 0) {
+                    log("Weapons Array","Found",r20color);
+                    log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color);
+    				for (let weapon of monsterObj["data-Weapons"]) {
+    					log("Import Weapon",weapon.data.weapon,r20color);
+    					// let repSectionID = generateRowID();
+                        // weaponfields.forEach(field => {
+                        //     if(field === "dmgdietype") {
+                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] = "d" + weapon[`${field}`] + "!" : log(field,"Not Damage Die Type",r20color);
+                        //     }
+                        //     else {
+                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] =  weapon[`${field}`] : log(field,"Not found",r20color);
+                        //     }
+                        // });
+                        // finalCharacterDetails[`repeating_weapons_${repSectionID}_showweaponconfig`] = "0"
+                        finalCharacterDetails = getDropInfo(weapon.data,finalCharacterDetails,"weapons");
+                    }
+    			}
+
+                log("Armor","Check for Armor",r20color);
+                typeof monsterObj["data-Armors"] !== "undefined" ? log("Monster Armor",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
+                if (typeof monsterObj["data-Armors"] !== "undefined" && monsterObj["data-Armors"].length > 0) {
+                    log("Armor Array","Found",r20color);
+    				for (let armor of monsterObj["data-Armors"]) {
+    					log("Import Armor",armor.data.ArmorType,r20color);
+                        finalCharacterDetails = getDropInfo(armor.data,finalCharacterDetails,"armor");
+                    }
+    			}
+
+                log("Weapons and Armor","Write weapons to the character sheet",r20color);
+                setAttrs(finalCharacterDetails);
+                //Set Special Abilities
+                log("Special Abilities","Begin processing...",r20color);
+                log("Special Abilities",monsterObj["data-SpecialAbilities"],r20color);
+                log("Number of Special Abilities",monsterObj["data-SpecialAbilities"].length,r20color);
+                //if (typeof monsterObj["data-SpecialAbilities"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
+                if (typeof monsterObj["descriptionList"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
+                    finalCharacterDetails["showSpecAbilities"] = "1";
+    				for (let compendiumSpecialAbility of monsterObj["data-SpecialAbilities"]) {
+    					log("Special Ability",compendiumSpecialAbility.name,r20color);
+    					let repSectionID = generateRowID();
+    					typeof compendiumSpecialAbility.name !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialability`] = compendiumSpecialAbility.name : log("Special Ability Name","Not Found",r20color);
+    					typeof compendiumSpecialAbility.description !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialabilitydescription`] = compendiumSpecialAbility.description : log("Special Ability Description","Not Found",r20color);
+                        finalCharacterDetails[`repeating_specialabilities_${repSectionID}_showSpecAbilityDesc`] = "0";
+                        finalCharacterDetails[`repeating_specialabilities_${repSectionID}_whisperSpecAbilityDeets`] = "/w gm ";
+    				}
+                    log("Special Abilities","Finished Processing",r20color);
+    			}
+                //switch character sheet view to mini-view
+                finalCharacterDetails["miniDisplay"] = "1";
+                log("Finish","Write remaining attributes to character sheet",r20color);
+                setAttrs(finalCharacterDetails);
+            });
+        });
+    }
+
+
+
+    on("change:CompendiumCategory", function(eventInfo) {
+        log("Compendium Drop",eventInfo.newValue,"#E948C9");
+    	if (eventInfo.newValue !== "") {
+            let compendiumCategory = eventInfo.newValue;
+            let resetFields;
+            switch (compendiumCategory) {
+                case "Edges":
+                case "Hindrances":
+                case "Powers":
+                case "Weapons":
+                case "Armor":
+                case "Vehicles":
+                case "Gear":
+                case "Shields":
+                    compendiumDrop(compendiumCategory);
+                    break;
+                case "Bestiary":
+                    compendiumBestiary();
+                    break;
+                default:
+                    log(`Category: ${compendiumCategory}`,`Not recognized`,r20color);
+                    resetFields = resetCompendiumFields();
+                    setAttrs(resetFields,{silent:true});
+                    break;
+            }
+    	}
+    	else { log("Compendium Drop","Nothing dropped","#E948C9");}
+    });
+    //End Compendium Drop
 
 	//JSON Importer
 	on("change:jsonimport", function(eventInfo){
@@ -3233,7 +3740,11 @@
 <input type="hidden" name="attr_unshakeTemplate" value="{{shaken=[[0d6+@{isShaken}]]}} {{unshake=[<span data-i18n='roll-unshake-button'></span>](~unshakeroll)}}" />
 <input type="hidden" name="attr_templateConditions" value="{{wildcard=[[@{is_npc}d1]]}} {{wcicon=@{WCI}}} {{vulnerable=[[0d6+@{vulnerable}]]}} {{stunned=[[0d6+@{stunned}]]}} {{distracteds=[[0d6+@{distracted}]]}}" />
 <!-- End Stat Block Fields -->
-<div class='sheet-maindiv'>
+<div class='sheet-maindiv compendium-drop-target bestiary'>
+    <input type="text" class="sheet-hiddenInput" name="attr_CompendiumName" accept="Name" />
+    <input type="text" class="sheet-hiddenInput" name="attr_CompendiumCategory" accept="Category" />
+    <input type="text" class="sheet-hiddenInput" name="attr_CompendiumContent" accept="Content" />
+    <input type="text" class="sheet-hiddenInput" name="attr_CompendiumData" accept="data" />
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="1" checked />
     <!--<input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="2" />
     <input type="checkbox" class="sheet-useBackground" style="display: none;" name="attr_background" value="3" />
@@ -3262,7 +3773,7 @@
                     <button type="action" name="act_configurationtab2" class="sheet-topbuttons sheet-configurationtab"><span class="sheet-jumpto" data-i18n-title="jump-to-sheet-configuration-tab">x</span><span class="sheet-ontab" data-i18n-title="on-sheet-configuration-tab">x</span></button>
                 </div>
                 <div class="sheet-functions">
-                    <input class="sheet-isWC" type="hidden" name="attr_is_npc" value="1" />
+                    <input class="sheet-isWC" type="hidden" name="attr_is_npc" value="1" /> <!-- value of 0 = Wild Card -->
                     <button class="sheet-statblock" type="roll" name="roll_fullstatblock" data-i18n-title="send-statblock-chatlog" value="@{whisperstatblock} &{template:statblock} @{chardesc} {{charatts=@{charatts}}} {{charskills=@{charskills}}} {{charderived=@{charderived}}} {{chargear=@{chargear}}} {{charhindrances=@{charhindrances}}} {{charedges=@{charedges}}} {{showspec=@{showspec}}} {{charspecabilities=@{charspecabilities}}} {{powercount=[[1d0+@{powercount}]]}} {{charpowers=@{charpowers}}}"><span class="sheet-showWCicon" name="attr_WCI"></span><img style="height: 28px;" src="http://imgsrv.roll20.net/?src=github.com/finderski/SWT/blob/master/BackgroundImages/statblock_profile.png%3Fraw%3Dtrue"></button>
                     <input type="checkbox" class="sheet-showFear" name="attr_showFear" value="1" checked />
                     <button class="sheet-topbuttons sheet-fearButton" type='roll' name='roll_fearCheckRoll' title="@{fearCheckRoll}" value='@{spiritbutton} {{ReRoll=^{reroll}(~fearCheckRoll)}}  {{DmgRoll=[Fear Result](~fearRoll)}}'>&#128561;</button>
@@ -5070,7 +5581,7 @@
 	    						</div>
 	    						<input type='hidden' name='attr_stealth_rank' value='1d4!' />
 	    						<input type='hidden' name='attr_stealth_display' value='d4' />
-	    						<input type='hidden' name='attr_rolltStealth' value='{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{skill_roll=[[@{stealth_rank} + @{StealthskillMod}+ @{ModSum}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{ModSum}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}' />
+	    						<input type='hidden' name='attr_rolltStealth' value='{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{skill_roll=[[@{stealth_rank} + @{StealthskillMod}+ @{ModSumEnc}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ 1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{ModSumEnc}[Distracted, Wounds, Fatigue] + @{traitmods}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}' />
 	    						<input type="checkbox" class="sheet-useSkillSpec" name="attr_altRuleSkillSpec" style="display: none;" />
 	    						<div class='sheet-SkillSpec'>
 	    						    <fieldset class="repeating_stealthspec">
@@ -5949,6 +6460,7 @@
 					<div class='sheet-basetrait sheet-parrymodplus'>
     					<h4 class="sheet-configHeader" data-i18n="parry-configuration">Parry Configuration</h4>
     					<label class="sheet-parryLabel" data-i18n="base">Base:</label> <input type="number" name="attr_parry" title="@{parry}" class="sheet-derivedStat sheet-parryInput" />
+                        <label class="sheet-parryLabel" data-i18n="shield">Shield:</label> <input type="number" name="attr_shieldparry" value="0" title="@{shieldparry}" class="sheet-derivedStat sheet-parryInput" readonly />
     					<input type="text" class="sheet-parryLabelInput" data-i18n-placeholder="edge-hindrance-modifier-abbr" name="attr_parryModReason" /> <input type="number" name="attr_parryMod" title="@{parryMod}" class="sheet-derivedStat sheet-parryInput sheet-inputLabel" value="0" />
     				</div>
 					<!-- Toughness Config -->
@@ -6858,64 +7370,138 @@
     					<hr class="sheet-sectionSeperator" />
 					</div>
 				</div>
-				<div class="sheet-base sheet-bottomHalf">
+				<div class="sheet-base sheet-bottomArmorAndShields">
 					<!-- ----------- -->
 					<!-- -- Armor -- -->
 					<!-- ----------- -->
-					<input type="checkbox" class="sheet-hideArmor" name="attr_hideArmor" /><span class="sheet-showNhide"></span>
-					<h1 class="sheet-groupHeader sheet-armorSection" data-i18n="armor">Armor</h1>
-					<div class="sheet-armor">
-					    <h4 class="sheet-repeatingHeader sheet-armorWorn" data-i18n="worn">Worn</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorType" style="text-align: left;" data-i18n="armor-type">Armor Type</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorMinStr" data-i18n="minimum-strength-abbr">Min. Str.</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorProtected" data-i18n="area-protected">Area Protected</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorProtection" data-i18n="protection">Protection</h4>
-						<h4 class="sheet-armorStacks" data-i18n="protection-stacks">Stacks</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorWeight" data-i18n="weight">Weight</h4>
-						<h4 class="sheet-repeatingHeader sheet-armorCarried" data-i18n="carried">Carried</h4>
-						<!--<h4 class="sheet-repeatingHeader" data-i18n="description-notes">Description/Notes</h4>-->
-						<fieldset class="repeating_armor">
-						    <div class="sheet-armorWornContainer"><input class="sheet-armorWorn sheet-isWorn" type="checkbox" name="attr_armorWorn" value="1" checked /><span class="sheet-isWornIcon"></span></div>
-							<input class="sheet-armorType" type="text" name="attr_ArmorType" title="@{repeating_armor_$#_ArmorType}" data-i18n-placeholder="leather" placeholder="Leather" />
-                            <input type='hidden' name='attr_minstrength' value="4" />
-                            <select class="sheet-armorMinStr sheet-dtype" name="attr_armorminstrength" title="@{repeating_weapons_$#_minstrength}">
-								<option value="0" data-i18n="not-applicable-abbr-u">N/A</option>
-								<option value="4" data-i18n="d4" selected>d4</option>
-								<option value="6" data-i18n="d6">d6</option>
-								<option value="8" data-i18n="d8">d8</option>
-								<option value="10" data-i18n="d10">d10</option>
-								<option value="12" data-i18n="d12">d12</option>
-							</select>
-							<select class="sheet-armorProtected" name="attr_AreaProtected" style="text-align-last: center;">
-            					<option value="1" data-i18n="head"> Head</option>
-            					<option value="2" data-i18n="torso" selected>Torso</option>
-            					<option value="3" data-i18n="torso-plus-arms">Torso+Arms</option>
-            					<option value="4" data-i18n="torso-plus-legs">Torso+Legs</option>
-            					<option value="5" data-i18n="torso-plus-arms-plus-legs">Torso+Arms+Legs</option>
-            					<option value="6" data-i18n="arms">Arms</option>
-            					<option value="7" data-i18n="legs">Legs</option>
-            					<option value="8" data-i18n="full-body">Full Body</option>
-            				</select>
-							<input class="sheet-armorProtection" style="margin-left: -5px; width: 75px;" type="number" name="attr_ArmorTypeProtection" title="@{repeating_armor_$#_ArmorTypeProtection}" placeholder="1" />
-							<select class="sheet-armorStacks" style="margin-left: -5px;" name="attr_armorstack">
-							    <option Value="0" data-i18n="no" selected>No</option>
-							    <option value=".5">50%</option>
-							    <option value="1">100%</option>
-							</select>
-							<input class="sheet-armorWeight" style="width:50px;" type="number" step="any" name="attr_ArmorTypeWeight" title="@{repeating_armor_$#_ArmorTypeWeight}" />
-							<div class="sheet-armorCarriedContainer"><input class="sheet-armorCarried sheet-armorisCarried" type="checkbox" name="attr_ArmorCarried" title="@{repeating_armor_$#_ArmorCarried}" checked /><span class="sheet-armorisCarriedIcon"></span></div>
-							<textarea class="sheet-armorDesc" name="attr_ArmorNotes" title="@{repeating_armor_$#_ArmorNotes}" style="height:50px;" placeholder="Description/Notes" data-i18n-placeholder="description-notes"></textarea>
-						</fieldset>
-						<!-- <input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked /> -->
-						<div class='sheet-armorTotalWeight sheet-loadstuff' style="margin-left: 504px;"><!-- Set up the Total Weight Carried box -->
-							<div class='sheet-col' style='width:200px; text-align:right;'> <!-- Protection (240px)-->
-								<h4 class="sheet-weight"><span data-i18n="total-armor-weight-carried">Total Armor Weight Carried</span>:</h4>
-							</div>
-							<div class='sheet-col' style='width:60px;'> <!-- Weight (60px)-->
-								<input type="number" name="attr_armortotalweightcarried" title="@{armortotalweightcarried}" class="sheet-armorWeight" value="0" readonly />
-							</div>
-						</div>
-					</div><!-- End Armor -->
+                    <div class="sheet-armorHalf">
+                        <input type="checkbox" class="sheet-hideArmor" name="attr_hideArmor" /><span class="sheet-showNhide"></span>
+    					<h1 class="sheet-groupHeader sheet-armorSection" data-i18n="armor">Armor</h1>
+    					<div class="sheet-armor">
+    					    <h4 class="sheet-repeatingHeader sheet-armorWorn" data-i18n="worn">Worn</h4>
+    						<h4 class="sheet-repeatingHeader sheet-armorType" style="text-align: left;" data-i18n="armor-type">Armor Type</h4>
+    						<!-- <h4 class="sheet-repeatingHeader sheet-armorMinStr" data-i18n="minimum-strength-abbr">Min. Str.</h4> -->
+    						<h4 class="sheet-repeatingHeader sheet-armorProtected" data-i18n="area-protected">Area Protected</h4>
+    						<h4 class="sheet-repeatingHeader sheet-armorProtection" data-i18n="armor">Armor</h4> <!-- Used to be Protection -->
+    						<!-- <h4 class="sheet-armorStacks" data-i18n="protection-stacks">Stacks</h4> -->
+    						<h4 class="sheet-repeatingHeader sheet-armorWeight" data-i18n="weight">Weight</h4>
+    						<h4 class="sheet-repeatingHeader sheet-armorCarried" data-i18n="carried">Carried</h4>
+    						<!--<h4 class="sheet-repeatingHeader" data-i18n="description-notes">Description/Notes</h4>-->
+    						<fieldset class="repeating_armor">
+    						    <div class="sheet-armorWornContainer"><input class="sheet-armorWorn sheet-isWorn" type="checkbox" name="attr_armorWorn" value="1" checked /><span class="sheet-isWornIcon"></span></div>
+    							<input class="sheet-armorType" type="text" name="attr_ArmorType" title="@{repeating_armor_$#_ArmorType}" data-i18n-placeholder="leather" placeholder="Leather" />
+                                <!-- <input type='hidden' name='attr_minstrength' value="4" /> -->
+                                <!-- <select class="sheet-armorMinStr sheet-dtype" name="attr_armorminstrength" title="@{repeating_weapons_$#_minstrength}">
+    								<option value="0" data-i18n="not-applicable-abbr-u">N/A</option>
+    								<option value="4" data-i18n="d4" selected>d4</option>
+    								<option value="6" data-i18n="d6">d6</option>
+    								<option value="8" data-i18n="d8">d8</option>
+    								<option value="10" data-i18n="d10">d10</option>
+    								<option value="12" data-i18n="d12">d12</option>
+    							</select> -->
+    							<select class="sheet-armorProtected" name="attr_AreaProtected" style="text-align-last: center;">
+                					<option value="1" data-i18n="head"> Head</option>
+                					<option value="2" data-i18n="torso" selected>Torso</option>
+                					<option value="3" data-i18n="torso-plus-arms">Torso+Arms</option>
+                					<option value="4" data-i18n="torso-plus-legs">Torso+Legs</option>
+                					<option value="5" data-i18n="torso-plus-arms-plus-legs">Torso+Arms+Legs</option>
+                					<option value="6" data-i18n="arms">Arms</option>
+                					<option value="7" data-i18n="legs">Legs</option>
+                					<option value="8" data-i18n="full-body">Full Body</option>
+                				</select>
+    							<input class="sheet-armorProtection" type="number" name="attr_ArmorTypeProtection" title="@{repeating_armor_$#_ArmorTypeProtection}" placeholder="1" />
+    							<!-- <select class="sheet-armorStacks" style="margin-left: -5px;" name="attr_armorstack">
+    							    <option Value="0" data-i18n="no" selected>No</option>
+    							    <option value=".5">50%</option>
+    							    <option value="1">100%</option>
+    							</select> -->
+    							<input class="sheet-armorWeight" style="width:50px;" type="number" step="any" name="attr_ArmorTypeWeight" title="@{repeating_armor_$#_ArmorTypeWeight}" />
+    							<div class="sheet-armorCarriedContainer"><input class="sheet-armorCarried sheet-armorisCarried" type="checkbox" name="attr_ArmorCarried" title="@{repeating_armor_$#_ArmorCarried}" checked /><span class="sheet-armorisCarriedIcon"></span></div>
+                                <label class="sheet-morearmor"><input class='sheet-showarmorconfig' type='checkbox' name='attr_showarmorconfig' checked /><span>y</span></label>
+                                <input class='sheet-hiddenInput sheet-showarmorconfig' type='checkbox' name='attr_showarmorconfig' checked />
+                                <textarea class="sheet-armorDesc" name="attr_ArmorNotes" title="@{repeating_armor_$#_ArmorNotes}" placeholder="Description/Notes" data-i18n-placeholder="description-notes"></textarea>
+                                <div class="sheet-armorconfig">
+                                    <!--Stacking-->
+                                    <p>
+                                        <h4 class="sheet-armorStacks armorConfigHeader" data-i18n="protection-stacks">Stacks</h4>
+                                        <select class="sheet-armorStacks" style="margin-left: -5px;" name="attr_armorstack">
+            							    <option Value="0" data-i18n="no" selected>No</option>
+            							    <option value=".5">50%</option>
+            							    <option value="1">100%</option>
+            							</select>
+                                    </p>
+
+                                    <!-- Min Strength -->
+                                    <p>
+                                        <h4 class="sheet-armorConfigHeader sheet-armorMinStr" data-i18n="minimum-strength-abbr">Min. Str.</h4>
+                                        <input type='hidden' name='attr_minstrength' value="4" />
+                                        <select class="sheet-armorMinStr sheet-dtype" name="attr_armorminstrength" title="@{repeating_weapons_$#_minstrength}">
+            								<option value="0" data-i18n="not-applicable-abbr-u">N/A</option>
+            								<option value="4" data-i18n="d4" selected>d4</option>
+            								<option value="6" data-i18n="d6">d6</option>
+            								<option value="8" data-i18n="d8">d8</option>
+            								<option value="10" data-i18n="d10">d10</option>
+            								<option value="12" data-i18n="d12">d12</option>
+            							</select>
+                                    </p>
+                                </div>
+    						</fieldset>
+    						<!-- <input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked /> -->
+    						<div class='sheet-armorTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
+    							<h4 class="sheet-armorweight"><span data-i18n="total-armor-weight-carried">Total Armor Weight Carried</span>:</h4>
+    							<input type="number" name="attr_armortotalweightcarried" title="@{armortotalweightcarried}" class="sheet-armorWeight" value="0" readonly />
+    						</div>
+    					</div><!-- End Armor -->
+                    </div>
+                    <!-- ------------- -->
+					<!-- -- Shields -- -->
+					<!-- ------------- -->
+                    <div class="sheet-shieldHalf">
+                        <input type="checkbox" class="sheet-hideShields" name="attr_hideShield" /><span class="sheet-showNhide"></span>
+    					<h1 class="sheet-groupHeader sheet-shieldSection" data-i18n="shields">Shields</h1>
+                        <div class="sheet-shield">
+    					    <h4 class="sheet-repeatingHeader sheet-shieldWorn" data-i18n="worn">Worn</h4>
+    						<h4 class="sheet-repeatingHeader sheet-shieldType" style="text-align: left;" data-i18n="shield-type">Shield Type</h4>
+    						<!-- <h4 class="sheet-repeatingHeader sheet-armorMinStr" data-i18n="minimum-strength-abbr">Min. Str.</h4> -->
+    						<h4 class="sheet-repeatingHeader sheet-shieldParry" data-i18n="parry">Parry</h4>
+    						<h4 class="sheet-repeatingHeader sheet-shieldCover" data-i18n="cover">Cover</h4> <!-- Used to be Protection -->
+    						<!-- <h4 class="sheet-armorStacks" data-i18n="protection-stacks">Stacks</h4> -->
+    						<h4 class="sheet-repeatingHeader sheet-shieldWeight" data-i18n="weight">Weight</h4>
+    						<!-- <h4 class="sheet-repeatingHeader sheet-shieldCarried" data-i18n="carried">Carried</h4> -->
+    						<!--<h4 class="sheet-repeatingHeader" data-i18n="description-notes">Description/Notes</h4>-->
+    						<fieldset class="repeating_shields">
+    						    <div class="sheet-shieldWornContainer"><input class="sheet-shieldWorn sheet-isWorn" type="checkbox" name="attr_shieldWorn" value="1" checked /><span class="sheet-isWornIcon"></span></div>
+    							<input class="sheet-shieldType" type="text" name="attr_ShieldType" title="@{repeating_shields_$#_ShieldType}" />
+                                <input class="sheet-shieldParry" type="number" name="attr_ShieldParry" title="@{repeating_shields_$#_ShieldParry}" />
+    							<input class="sheet-shieldCover" type="number" name="attr_ShieldCover" title="@{repeating_shields_$#_Cover}" placeholder="1" />
+    							<input class="sheet-shieldWeight" type="number" step="any" name="attr_ShieldTypeWeight" title="@{repeating_shields_$#_ShieldTypeWeight}" />
+    							<!-- <div class="sheet-shieldCarriedContainer"><input class="sheet-shieldCarried sheet-shieldisCarried" type="checkbox" name="attr_ShieldCarried" title="@{repeating_shields_$#_ShieldCarried}" checked /><span class="sheet-armorisCarriedIcon"></span></div> -->
+                                <label class="sheet-moreshields"><input class='sheet-showshieldconfig' type='checkbox' name='attr_showshieldconfig' checked /><span>y</span></label>
+                                <input class='sheet-hiddenInput sheet-showshieldconfig' type='checkbox' name='attr_showshieldconfig' checked />
+                                <textarea class="sheet-shieldDesc" name="attr_ShieldNotes" title="@{repeating_shields_$#_ShieldNotes}" placeholder="Description/Notes" data-i18n-placeholder="description-notes"></textarea>
+                                <div class="sheet-shieldconfig">
+                                    <!-- Min Strength -->
+                                    <p>
+                                        <h4 class="sheet-armorConfigHeader sheet-armorMinStr" data-i18n="minimum-strength-abbr">Min. Str.</h4>
+                                        <input type='hidden' name='attr_shieldminstrength' value="4" />
+                                        <select class="sheet-shieldMinStr sheet-dtype" name="attr_shieldminstrength" title="@{repeating_shields_$#_shieldminstrength}">
+            								<option value="0" data-i18n="not-applicable-abbr-u">N/A</option>
+            								<option value="4" data-i18n="d4" selected>d4</option>
+            								<option value="6" data-i18n="d6">d6</option>
+            								<option value="8" data-i18n="d8">d8</option>
+            								<option value="10" data-i18n="d10">d10</option>
+            								<option value="12" data-i18n="d12">d12</option>
+            							</select>
+                                    </p>
+                                </div>
+    						</fieldset>
+    						<!-- <input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked /> -->
+    					</div>
+                        <div class='sheet-shieldTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
+                            <h4 class="sheet-shieldweight"><span data-i18n="total-shield-weight-carried">Total Shield Weight Carried</span>:</h4>
+                            <input type="number" name="attr_shieldtotalweightcarried" title="@{shieldtotalweightcarried}" class="sheet-shieldWeight" value="0" readonly />
+                        </div>
+                    </div> <!-- End Shields -->
                 </div>
             </div>
             <div class='sheet-notes'>
@@ -7082,6 +7668,7 @@
     			                <h4 class="sheet-weaponItem sheet-shiprange" data-i18n="range">Range</h4>
     			                <h4 class="sheet-weaponItem sheet-shiprof" data-i18n="rate-of-fire-abbr">ROF</h4>
     			                <h4 class="sheet-weaponItem sheet-shipdamage" data-i18n="damage">Damage</h4>
+                                <h4 class="sheet-weaponItom sheet-shipAP" data-i18n="armor-piercing-abbr">AP</h4>
     			                <h4 class="sheet-weaponItem sheet-shipplacement" data-i18n="placement">Placement</h4>
     			                <fieldset class='repeating_shipweapons'>
     			                    <div class="sheet-shipWeapons">
@@ -7099,6 +7686,7 @@
     											<option value="d12!" data-i18n="d12">d12</option>
     										</select>+<input class="sheet-shipDamageMod" type="text" name="attr_DmgMod" value="0" />
 										</div>
+                                        <input type="number" class="sheet-weaonItem sheet-weaponAP" name="attr_ShipWeaponAP" value="0" />
 										<input type="text" class="sheet-weaponItem sheet-shipplacement" name="attr_ShipWeaponPlacement" data-i18n-placeholder="placement" placeholder="Placement" />
 										<textarea class="sheet-weaponItem sheet-shipweaponnotes" name="attr_ShipWeaponNotes"></textarea>
 									</div>
@@ -7376,6 +7964,9 @@
                         <label class='sheet-miscItem'>
                             <span data-i18n="token-url"></span>: <input type='text' name='attr_tokenURL' />
                         </label>
+                        <label class='sheet-miscItem'>
+                            <span data-i18n="avatar-url"></span>: <input type='text' name='attr_avatarURL' />
+                        </label>
     			    </div>
     			</div>
                 <div class='sheet-configSection'>
@@ -7427,11 +8018,62 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
-                <!-- Release 1.00.07 -->
-				<label class="sheet-rowlabel">
-			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10007' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.07</h4></span>
+                <!-- Release 1.00.11 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10011' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.11</h4></span>
 				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10011' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="bug-fix-release">Bug Fix Release</h2>
+                    <p data-i18n="bug-fix-release-info">
+						This release focuses on Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="avatar-url-for-compendium-macro">Fixed the issue of the missing avatar URL for the target-pic macro included with the the Savage Worlds Core Rules Bundle Compendium.</span></li>
+                        <li><span class="sheet-black" data-i18n="agility-linked-skills-not-applying-encumbrance-penalty">Fixed an issue where some Agility linked skills (and all Agility-linked custom skills) weren't applying the encumbrance penalty.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
+                <!-- Release 1.00.10 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10010' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.10</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10010' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="support-for-shields">Added support for shields.</span></li>
+                        <li><span class="sheet-black" data-i18n="compendium-support">Support for Compendium drag and drop</span></li>
+					</ul>
+                    <!--<h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="special-abilities-in-stat-block-macro-button">TBD</span></li>
+                    </ul>-->
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="encumbrance-bug">Invetigating a bug where encumbrance isn't accurately applied to Agility-linked skills (except for Fighting); in some cases, the penalty shows in the list of modifiers, though it wasn't applied to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.08 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10008' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.08</h4></span>
+				</label>
                 <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10008' value='1' />
 				<div class='sheet-releasenotes'>
 					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
@@ -7463,6 +8105,9 @@
 					</ul>
 				</div>
                 <!-- Release 1.007 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10007' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.07</h4></span>
+				</label>
 				<input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10007' value='1' />
 				<div class='sheet-releasenotes'>
 					<h2 class='sheet-releaseNotesSubHeader' data-i18n="bug-fix-release">Bug Fix Release</h2>
@@ -7566,11 +8211,11 @@
                     <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
                     <ul class="sheet-releaseNotesList">
 						<li><span class="sheet-black" data-i18n="stealth-rerolling-spellcasting">Fixed a bug where re-rolling Stealth tried to re-roll Spellcasting.</span></li>
-                        <li><span class="sheet-black" data-i18n="fighting-skill-on-older-sheets">Fixed some styling issues for Roll Templates.</span></li>
+                        <li><span class="sheet-black" data-i18n="fixed-styling-issues-roll-templates">Fixed some styling issues for Roll Templates.</span></li>
                     </ul>
 					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
 					<ul class='sheet-releaseNotesList'>
-						<li><span class='sheet-black' data-i18n="trademark-weapon">Support for Trademark Weapon</span></li>
+						<li><span class='sheet-black' data-i18n="support-for-trademark-weapon">Support for Trademark Weapon</span></li>
 						<li><span class='sheet-black' data-i18n="variable-base-damage">Support for variable base damage for things such as Shotguns</span></li>
 						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
 						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
@@ -7964,6 +8609,10 @@
     </div>
 </div>
 <span data-i18n="using-character-sheet">Using character sheet</span>: <span name='attr_character_sheet'></span>
+
+<!-- <div class="sheet-compendium_warning"> --><!-- Warning -->
+    <!--<span style="font-weight: bold; font-size: 1.2em;" data-i18n="accepting-drop-u">ACCEPTING DROP FROM COMPENDIUM</span>
+</div> -->
 <!-- <div class="sheet-disclaimer">
     <input class="sheet-logo" type="hidden" name="attr_logo" value="1" />
 	<span data-i18n="the">The</span>&nbsp;<span class="sheet-logotext"></span>&nbsp;<span class="sheet-logostandard" data-i18n="logo-info">logo is a trademark of</span>&nbsp;<span class="sheet-trademarkholder"></span><span class="sheet-logoallforone" data-i18n="all-for-one-logo-info">logo &copy; 2016 Triple Ace Games Ltd. All for One: R&eacute;gime Diabolique and all related marks and logos are trademarks of  Triple Ace Games Ltd. Ubiquity Roleplaying System, Exile Games Studio, and all associated logos and trademarks are copyright, Exile Games Studio, LLC</span><span class="sheet-logorifts" data-i18n="rifts-logo-info">logo and Megaverse are registered trademarks of PALLADIUM BOOKS, INC. All character names and likenesses are copyright and trademarks owned by Palladium Books, Inc. Savage Worlds logo is a trademark of Pinnacle Entertainment Group</span>. <span data-i18n="used-with-permission-visit-website">Used with permission. Visit their website at</span>:&nbsp;<span class="sheet-website"></span>
