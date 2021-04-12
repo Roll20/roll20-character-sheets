@@ -286,7 +286,7 @@
   <div class="sheet-squadscore"><input name="attr_squad" type="text"></div>
   <div class="sheet-scltitle">SCL</div>
   <div class="sheet-sclscore"><input name="attr_scl" type="text"></div>
-  <div class="sheet-version">ver: 0.9c</div>
+  <div class="sheet-version">ver: 1.0</div>
   
   <div class="sheet-slaimage"><img width=119 height=155 src="slalogo.png"></div>
   <div class="sheet-strtitle">STRENGTH</div>
@@ -729,6 +729,9 @@
   <div class="sheet-meleeweapon4rollscore"><button type="roll" name="attr_meleeweapon_roll_4">&nbsp;</button></div>
   <div class="sheet-meleeweapon4equipscore"><input name="attr_meleeweapon_enc_4" type="text"></div>
 
+  <div class="sheet-equip">EQUIPMENT</div>
+  <div class="sheet-equipscore"><textarea name="attr_equip"></textarea></div>
+  
   <div class="sheet-physique">PHYSIQUE</div>
   <div class="sheet-description">DESCRIPTION</div>
   <div class="sheet-agetitle">AGE</div>
@@ -906,26 +909,14 @@
   <div class="sheet-armour2dam16"><input name="attr_armour_2_damage_16" type="checkbox"></div>
   <div class="sheet-armour2dam17"><input name="attr_armour_2_damage_17" type="checkbox"></div>
   <div class="sheet-armour2dam18"><input name="attr_armour_2_damage_18" type="checkbox"></div>
-  <div class="sheet-armour2dam19"><input name="attr_armour_2_damage_19" type="checkbox"></div>
-  <div class="sheet-armour2dam20"><input name="attr_armour_2_damage_20" type="checkbox"></div>
-  <div class="sheet-armour2dam21"><input name="attr_armour_2_damage_21" type="checkbox"></div>
-  <div class="sheet-armour2dam22"><input name="attr_armour_2_damage_22" type="checkbox"></div>
-  <div class="sheet-armour2dam23"><input name="attr_armour_2_damage_23" type="checkbox"></div>
-  <div class="sheet-armour2dam24"><input name="attr_armour_2_damage_24" type="checkbox"></div>
-  <div class="sheet-armour2dam25"><input name="attr_armour_2_damage_25" type="checkbox"></div>
-  <div class="sheet-armour2dam26"><input name="attr_armour_2_damage_26" type="checkbox"></div>
-  <div class="sheet-armour2dam27"><input name="attr_armour_2_damage_27" type="checkbox"></div>
-  <div class="sheet-armour2dam28"><input name="attr_armour_2_damage_28" type="checkbox"></div>
-  <div class="sheet-armour2dam29"><input name="attr_armour_2_damage_29" type="checkbox"></div>
-  <div class="sheet-armour2dam30"><input name="attr_armour_2_damage_30" type="checkbox"></div>
-  <div class="sheet-armour2dam31"><input name="attr_armour_2_damage_31" type="checkbox"></div>
-  <div class="sheet-armour2dam32"><input name="attr_armour_2_damage_32" type="checkbox"></div>
-  <div class="sheet-armour2dam33"><input name="attr_armour_2_damage_33" type="checkbox"></div>
-  <div class="sheet-armour2dam34"><input name="attr_armour_2_damage_34" type="checkbox"></div>
-  <div class="sheet-armour2dam35"><input name="attr_armour_2_damage_35" type="checkbox"></div>
-  <div class="sheet-armour2dam36"><input name="attr_armour_2_damage_36" type="checkbox"></div>
- 
-  <div class="sheet-space65">&nbsp;</div>
+  <div class="sheet-ebbenhancetitle">EBB ENHANCE</div>
+  <div class="sheet-ebbboosttitle">Boost/Advanced/Ebb Beast</div>
+  <div class="sheet-ebbboostscore"><input name="attr_ebbboostactive" type="checkbox" value="1"></div>
+  <div class="sheet-ebbadvancedscore"><input name="attr_ebbadvancedactive" type="checkbox" value="1"></div>
+  <div class="sheet-ebbbeastscore"><input name="attr_ebbbeastactive" type="checkbox" value="1"></div>
+  <div class="sheet-notestitle">NOTES</div>
+  <div class="sheet-notesscore"><textarea name="attr_notes"></textarea></div>
+  <div class="sheet-space67">&nbsp;</div>
 
 </div>
 
@@ -1558,6 +1549,52 @@ on("change:drugactive1 change:drugactive2 change:drugactive3 change:drugactive4 
         "charismadrugs": charismadrugs,
         "cooldrugs": cooldrugs,
         "initiativedrugs": initiativedrugs,
+      });
+  });
+});
+on("change:ebbboostactive change:ebbadvancedactive change:ebbbeastactive", function() {
+  getAttrs(["ebbboostactive","ebbadvancedactive","ebbbeastactive", "charisma"], function(values) {
+      var ebbboostactive = values["ebbboostactive"]||0;
+      var ebbadvancedactive = values["ebbadvancedactive"]||0;
+      var ebbbeastactive = values["ebbbeastactive"]||0;
+      var charisma = values["charisma"]||0;
+	  
+	  var strengthebb = 0;
+	  var dexterityebb = 0;
+	  var closingebb = 0;
+	  var rushingebb = 0;
+	  var charismaebb = 0;
+	  var coolebb = 0;
+	  var concentrationebb = 0;
+	  
+	  if (ebbboostactive == 1) {
+		strengthebb = strengthebb + 1;
+		dexterityebb = dexterityebb + 1;
+	  }; 
+	  if (ebbadvancedactive == 1) {
+		strengthebb = strengthebb + 2;
+		dexterityebb = dexterityebb + 2;
+		closingebb = closingebb + 1;
+		rushingebb = rushingebb + 1;
+	  }; 
+	  if (ebbbeastactive == 1) {
+		strengthebb = strengthebb + 4;
+		dexterityebb = dexterityebb + 4;
+		coolebb = coolebb + 4;
+		concentrationebb = concentrationebb - 2;
+		charismaebb = charismaebb - charisma;
+		closingebb = closingebb + 2;
+		rushingebb = rushingebb + 2;
+	  }; 
+	  
+      setAttrs({
+        "strengthebb": strengthebb,
+        "dexterityebb": dexterityebb,
+        "move_closingebb": closingebb,
+        "concentrationebb": concentrationebb,
+        "charismaebb": charismaebb,
+        "coolebb": coolebb,
+        "move_rushingebb": rushingebb,
       });
   });
 });
