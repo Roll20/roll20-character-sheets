@@ -258,14 +258,16 @@
 	  </div>
 	  <div class='characteristics2_movement'>
 		<p class='movementgs1 unnatgs_heading'><b>Character Movement</b></p>
-		<input name='attr_half_move' type='text' class='movementgs2 unnatgs_width' readonly />
-		<input name='attr_full_move' type='text' class='movementgs3 unnatgs_width' readonly />
-		<input name='attr_charge_move' type='text' class='movementgs4 unnatgs_width' readonly />
-		<input name='attr_run_move' type='text' class='movementgs5 unnatgs_width' readonly />
-		<p class='movementgs6 '>Half</p>
-		<p class='movementgs7 '>Full</p>
-		<p class='movementgs8 '>Charge</p>
-		<p class='movementgs9 '>Run</p>
+		<input name='attr_agi_mov_mod' type='text' value='0' class='movementgs2 unnatgs_width' /> <!-- NOTE: this add a modifier to the AgB for movement only -->
+		<input name='attr_half_move' type='text' class='movementgs3 unnatgs_width' readonly />
+		<input name='attr_full_move' type='text' class='movementgs4 unnatgs_width' readonly />
+		<input name='attr_charge_move' type='text' class='movementgs5 unnatgs_width' readonly />
+		<input name='attr_run_move' type='text' class='movementgs6 unnatgs_width' readonly />
+		<p title='Modifier to AgB specifically for movement' class='movementgs7 '>(Mod)</p>
+		<p title='Half Action of move' class='movementgs8 '>Half</p>
+		<p title='Full Action of move' class='movementgs9 '>Full</p>
+		<p title='Move at least 4m, make a Charge attack' class='movementgs10 '>Charge</p>
+		<p title='Full Action. Easier to slap, harder to shoot' class='movementgs11 '>Run</p>
 	  </div>
 	  <div class='characteristics2_carry'>
 		<p class='carrygs1 unnatgs_heading'><b>Weight Capacity</b></p>
@@ -1857,7 +1859,12 @@
 	
 	<h3>Vehicle Sheet</h3>
 	<label class='text_centered bttn_top_padding'><input type='checkbox' name='attr_vehicle_sheet' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Vehicle</span></label>
+	<br>
 	
+	<label title='Toggles Export text' class='text_centered bttn_top_padding'><input type='checkbox' name='attr_exportimport' value='1' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Export Sheet</span></label>
+	<label title='Toggles Import area' class='text_centered bttn_top_padding'><input type='checkbox' name='attr_exportimport' value='2' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Import Sheet</span></label>
+<!-- TODO: prep the Exporter -->
+
 	<br>
 	<br>
   </div>
@@ -3091,6 +3098,478 @@
     });
 	}
 	
+	
+	// ___________________________________________________________________________
+	// ________________________________ Importer _________________________________
+	// ___________________________________________________________________________ TODO: Prep the Importer
+	on('clicked:import_clear', () => {
+		setAttrs({
+			import_value: ''
+		});
+	});
+	on('clicked:import', () => {
+		getAttrs(['import_value'], (v) => {
+			try {
+      	var data = JSON.parse(v.import_value);
+			} catch(e) {
+				setAttrs({import_value: 'ERROR: verify if you have copied the whole of the Export text'}); return console.log(e);
+			}
+			console.log('Importing Character');
+			var attributes = {}
+
+			// functions
+			const mapInfo = (data) => {
+				let attr = {};
+				attr['character_name'] = data.name || '';
+				attr['Homeworld'] = data.homeworld || '';
+				attr['Background'] = data.background || '';
+				attr['Role'] = data.role || '';
+			  attr['EliteAdvances'] = data.eliteAdvances || '';
+			  attr['Notes'] = data.note || '';
+			  attr['Player'] = data.player || '';
+			  attr['appearance'] = data.appearance || '';
+			  attr['Quirks'] = data.quirks || '';
+			  attr['Divination'] = data.divination || '';
+			  attr['Superstition'] = data.superstition || '';
+			  attr['size'] = data.size || '';
+			  attr['xp_total'] = data.xp || '';
+			  attr['agi_mov_mod'] = data.movementModifier || '';
+				return attr;
+			};
+			const mapStat = (statName, stat) => {
+				let attr = {};
+				attr[`${statName}`] = stat.base || 0;
+				attr[`${statName}_advancement`] = stat.advancement || 0;
+				attr[`${statName}_mod`] = stat.modifier || 0;
+				attr[`${statName}_unnat`] = stat.unnatural || 0;
+				return attr;
+			};
+			const mapWounds = (wounds) => {
+				let attr = {};
+				attr['wounds'] = wounds.current || '';
+				attr['wounds_max'] = wounds.max || '';
+				attr['head'] = wounds.critical?.head || '';
+				attr['body'] = wounds.critical?.body || '';
+				attr['arm_left'] = wounds.critical?.arm_left || '';
+				attr['arm_right'] = wounds.critical?.arm_right || '';
+				attr['leg_left'] = wounds.critical?.leg_left || '';
+				attr['leg_right'] = wounds.critical?.leg_right || '';
+				return attr;
+			};
+			const mapFate = (fate) => {
+				let attr = {};
+				attr['fate'] = fate.current || '';
+				attr['fate_max'] = fate.max || '';
+				attr['settings_fate'] = fate.setting || '';
+				return attr;
+			};
+			const mapFatigue = (fatigue) => {
+				let attr = {};
+				attr['fatigue'] = fatigue.current || '';
+				attr['fatigue_mod'] = fatigue.modifier || '';
+				return attr;
+			};
+			const mapForceField = (forcefield) => {
+				let attr = {};
+				attr['forcefield_name'] = forcefield.name || '';
+				attr['forcefield_protection'] = forcefield.protection || '';
+				attr['forcefield_overload'] = forcefield.overload || '';
+				return attr;
+			};
+			const mapCondition = (condition) => {
+				if (!condition) return ;
+				let attr = {},
+						section = 'condition',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_condition_r`] = condition.name || '';
+				attr[`repeating_${section}_${id}_condition_desc_r`] = condition.description || '';
+				return attr;
+			};
+			const mapSkill = (skill) => {
+				if (!skill) return ;
+				let attr = {}
+				attr[`mod2_${skill.name}`] = skill.modifier || 0;
+				attr[`mod3_${skill.name}`] = skill.level || 0;
+				return attr;
+			};
+			const mapRepeatingSkill = (skill, section) => {
+				if (!skill) return ;
+				let attr = {},
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_${section}_name`] = skill.name || '';
+				attr[`repeating_${section}_${id}_${section}_r_mod2`] = skill.modifier || '';
+				attr[`repeating_${section}_${id}_${section}_r_mod3`] = skill.level || '';
+				return attr;
+			};
+	    const mapAbility = (ability) => {
+				if (!ability) return ;
+				let attr = {},
+						section = 'abilities',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_ability_r`] = ability.name || '';
+				attr[`repeating_${section}_${id}_ability_desc_r`] = ability.description || '';
+				return attr;
+			};
+	    const mapTrait = (trait) => {
+				if (!trait) return ;
+				let attr = {},
+						section = 'traits',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_trait_r`] = trait.name || '';
+				attr[`repeating_${section}_${id}_trait_desc_r`] = trait.description || '';
+				return attr;
+			}
+			const mapAptitudes = (aptitudes) => {
+	    	var attr = {};
+	    	var	section = 'aptitudes';
+	      for (var i = 0; i < aptitudes?.length; i += 3) {
+	        let id = generateRowID();
+	        attr[`repeating_${section}_${id}_aptitude_nameL_r`] = aptitudes[i] || '';
+	        attr[`repeating_${section}_${id}_aptitude_nameM_r`] = aptitudes[i+1] || '';
+	        attr[`repeating_${section}_${id}_aptitude_nameR_r`] = aptitudes[i+2] || '';
+	      }
+	    	return attr;
+	    };
+			const mapRangedWeapon = (weapon, vehicle) => {
+				if (!weapon) return ;
+				let attr = {},
+						section = (vehicle) ? 'vehiclerangedweapons' : 'rangedweapons',
+						id = generateRowID();
+				if (vehicle) id += '_V';
+				attr[`repeating_${section}_${id}_R_weapon_name`] = weapon.name || '';
+				attr[`repeating_${section}_${id}_R_weapon_class`] = weapon.class || '';
+				attr[`repeating_${section}_${id}_R_weapon_range`] = weapon.range || '';
+				attr[`repeating_${section}_${id}_R_weapon_dam-roll`] = weapon.damage || '';
+				attr[`repeating_${section}_${id}_R_weapon_pen`] = weapon.pen || '';
+				attr[`repeating_${section}_${id}_R_weapon_type`] = weapon.type || '';
+				attr[`repeating_${section}_${id}_R_weapon_max`] = weapon.max || '';
+				attr[`repeating_${section}_${id}_R_weapon_min`] = weapon.min || '';
+				attr[`repeating_${section}_${id}_R_weapon_vengeful`] = weapon.vengeful || '';
+				attr[`repeating_${section}_${id}_R_weapon_accurate`] = weapon.accurate || '';
+				attr[`repeating_${section}_${id}_R_weapon_burst`] = weapon.burst || '';
+				attr[`repeating_${section}_${id}_R_weapon_auto`] = weapon.auto || '';
+				attr[`repeating_${section}_${id}_R_weapon_mag`] = weapon.mag || '';
+				attr[`repeating_${section}_${id}_R_weapon_mag_max`] = weapon.mag_max || '';
+				attr[`repeating_${section}_${id}_R_weapon_trained`] = weapon.trained || '';
+				attr[`repeating_${section}_${id}_R_weapon_mod1`] = weapon.mod1 || '';
+				attr[`repeating_${section}_${id}_R_weapon_reload`] = weapon.reload || '';
+				attr[`repeating_${section}_${id}_R_weapon_weight`] = weapon.weight || '';
+				attr[`repeating_${section}_${id}_R_weapon_domain`] = weapon.domain || '';
+				attr[`repeating_${section}_${id}_R_weapon_mishap_chance`] = weapon.mishap_chance || '';
+				attr[`repeating_${section}_${id}_R_weapon_carry`] = weapon.carry || '';
+				attr[`repeating_${section}_${id}_R_weapon_ability_r`] = weapon.special || '';
+				attr[`repeating_${section}_${id}_R_weapon_ability_desc_r`] = weapon.description || '';
+				return attr;
+			}
+			const mapMeleeWeapon = (weapon, vehicle) => {
+				if (!weapon) return ;
+				let attr = {},
+						section = (vehicle) ? 'vehiclemeleeweapons' : 'meleeweapons',
+						id = generateRowID();
+				if (vehicle) id += '_V';
+				attr[`repeating_${section}_${id}_M_weapon_name`] = weapon.name || '';
+				attr[`repeating_${section}_${id}_M_weapon_class`] = weapon.class || '';
+				attr[`repeating_${section}_${id}_M_weapon_reach`] = weapon.reach || '';
+				attr[`repeating_${section}_${id}_M_weapon_dam-roll`] = weapon.damage || '';
+				attr[`repeating_${section}_${id}_M_weapon_pen`] = weapon.pen || '';
+				attr[`repeating_${section}_${id}_M_weapon_type`] = weapon.type || '';
+				attr[`repeating_${section}_${id}_M_weapon_max`] = weapon.max || '';
+				attr[`repeating_${section}_${id}_M_weapon_min`] = weapon.min || '';
+				attr[`repeating_${section}_${id}_M_weapon_vengeful`] = weapon.vengeful || '';
+				attr[`repeating_${section}_${id}_M_weapon_trained`] = weapon.trained || '';
+				attr[`repeating_${section}_${id}_M_weapon_mod1`] = weapon.mod1 || '';
+				attr[`repeating_${section}_${id}_M_weapon_weight`] = weapon.weight || '';
+				attr[`repeating_${section}_${id}_M_weapon_domain`] = weapon.domain || '';
+				attr[`repeating_${section}_${id}_M_weapon_carry`] = weapon.carry || '';
+				attr[`repeating_${section}_${id}_M_weapon_ability_r`] = weapon.special || '';
+				attr[`repeating_${section}_${id}_M_weapon_ability_desc_r`] = weapon.description || '';
+				return attr;
+			}
+			const mapGear = (gear) => {
+				if (!gear) return ;
+				let attr = {},
+						section = 'gear',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_carry_r`] = gear.carry || '';
+				attr[`repeating_${section}_${id}_name_r`] = gear.name || '';
+				attr[`repeating_${section}_${id}_crafts_r`] = gear.craftsmanship || '';
+				attr[`repeating_${section}_${id}_quantity_r`] = gear.quantity || '';
+				attr[`repeating_${section}_${id}_avail_r`] = gear.availability || '';
+				attr[`repeating_${section}_${id}_weight_r`] = gear.weight || '';
+				attr[`repeating_${section}_${id}_ability_desc_r`] = gear.description || '';
+				return attr;
+			}
+			const mapCybernetic = (cybernetic) => {
+				if (!cybernetic) return ;
+				let attr = {},
+						section = 'cybernetics',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_cybernetic_name_r`] = cybernetic.name || '';
+				attr[`repeating_${section}_${id}_cybernetic_location_r`] = cybernetic.location || '';
+				attr[`repeating_${section}_${id}_cybernetic_desc_r`] = cybernetic.description || '';
+				return attr;
+			}
+			const mapOldArmor = (armor) => {
+				let attr = {};
+				attr.armor_AGI = armor.maxAgi || '';
+				attr.armor_limit = armor.limit || '';
+				attr.armor_head = armor.head || '';
+				attr.armor_body = armor.body || '';
+				attr.armor_arm_right = armor.arm_right || '';
+				attr.armor_arm_left = armor.arm_left || '';
+				attr.armor_leg_right = armor.leg_right || '';
+				attr.armor_leg_left = armor.leg_left || '';
+				attr.armor_name = armor.description || '';
+				return attr;
+			}
+			const mapAdvance = (advance) => {
+	    	var attr = {};
+	    	var	section = 'advance';
+	      for (var i = 0; i < advance?.length; i += 2) {
+	        let id = generateRowID();
+	        attr[`repeating_${section}_${id}_advancement_nameL_r`] = advance[i]?.name || '';
+	        attr[`repeating_${section}_${id}_advancement_costL_r`] = advance[i]?.cost || '';
+	        attr[`repeating_${section}_${id}_advancement_nameR_r`] = advance[i+1]?.name || '';
+	        attr[`repeating_${section}_${id}_advancement_costR_r`] = advance[i+1]?.cost || '';
+	      }
+	    	return attr;
+	    };
+			const mapDisorder = (disorder) => {
+				if (!disorder) return;
+				let attr = {},
+						section = 'disorders',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_disorder_r`] = disorder.name || '';
+				attr[`repeating_${section}_${id}_disorder_desc_r`] = disorder.description || '';
+				return attr;
+			}
+			const mapMutation = (mutation) => {
+				if (!mutation) return;
+				let attr = {},
+						section = 'mutations',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_mutation_r`] = mutation.name || '';
+				attr[`repeating_${section}_${id}_mutation_desc_r`] = mutation.description || '';
+				return attr;
+			}
+			const mapObjective = (objective) => {
+				if (!objective) return;
+				let attr = {},
+						section = 'objectives',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_objective_r`] = objective.name || '';
+				attr[`repeating_${section}_${id}_objective_completed`] = objective.complete || '';
+				return attr;
+			}
+			const mapNote = (note) => {
+				if (!note) return;
+				let attr = {},
+						section = 'notes',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_notes`] = note.name || '';
+				return attr;
+			}
+			const mapVehicle = (vehicle) => {
+				if (!vehicle) return;
+				let attr = {},
+						section = 'vehicles-R',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_vehicle-name`] = vehicle.name || '';
+				attr[`repeating_${section}_${id}_vehicle-size`] = vehicle.size || '';
+				attr[`repeating_${section}_${id}_vehicle-world`] = vehicle.world || '';
+				attr[`repeating_${section}_${id}_vehicle-type`] = vehicle.type || '';
+				attr[`repeating_${section}_${id}_vehicle-tactical`] = vehicle.tactical || '';
+				attr[`repeating_${section}_${id}_vehicle-cruising`] = vehicle.cruising || '';
+				attr[`repeating_${section}_${id}_vehicle-maneuver`] = vehicle.maneuver || '';
+				attr[`repeating_${section}_${id}_vehicle-crew`] = vehicle.crew || '';
+				attr[`repeating_${section}_${id}_vehicle-compliment`] = vehicle.compliment || '';
+				attr[`repeating_${section}_${id}_vehicle-integrity`] = vehicle.integrity || '';
+				attr[`repeating_${section}_${id}_vehicle-integrity_max`] = vehicle.integrity_max || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-front`] = vehicle['armor-front'] || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-side`] = vehicle['armor-side'] || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-rear`] = vehicle['armor-rear'] || '';
+				attr[`repeating_${section}_${id}_armaments`] = vehicle.armaments || '';
+				attr[`repeating_${section}_${id}_armaments_desc`] = vehicle.armaments_desc || '';
+				attr[`repeating_${section}_${id}_vehicle_traits`] = vehicle.traits || '';
+				attr[`repeating_${section}_${id}_vehicle_traits_desc`] = vehicle.traits_desc || '';
+				attr[`repeating_${section}_${id}_modifications`] = vehicle.modifications || '';
+				attr[`repeating_${section}_${id}_modifications_desc`] = vehicle.modifications_desc || '';
+				return attr;
+			}
+			const mapPsykana = (psykana) => {
+				let attr = {};
+				attr[`psykana_class`] = psykana.class || '';
+				attr[`psykana_limit`] = psykana.limit || '';
+				attr[`psy_rating`] = psykana.rating || '';
+				attr[`psy_push`] = psykana.push || '';
+				attr[`psykana_sustain`] = psykana.sustain || '';
+				attr[`focus_mod`] = psykana.focus_mod || '';
+				attr[`psykana_sustain_count`] = psykana.sustain_count || '';
+				return attr;
+			};
+			const mapPsyMinor = (minor) => {
+				if (!minor) return
+				let attr = {},
+						section = 'minormanifestation';
+				attr[`repeating_${section}_${id}_P_minor_r`] = minor.name || '';
+				attr[`repeating_${section}_${id}_P_minor_desc_r`] = minor.description || '';
+				return attr;
+			}
+			const mapPsyNote = (note) => {
+				if (!note) return
+				let attr = {},
+						section = 'psynotes';
+				attr[`repeating_${section}_${id}_P_note_r`] = note.name || '';
+				attr[`repeating_${section}_${id}_P_note_desc_r`] = note.description || '';
+				return attr;
+			}
+			const mapPsyPower = (power) => {
+				if (!power) return;
+				let attr = {},
+						section = 'psychicabilities',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_P_name`] = power.name || '';
+				attr[`repeating_${section}_${id}_P_subtype`] = power.subtype || '';
+				attr[`repeating_${section}_${id}_P_range`] = power.range || '';
+				attr[`repeating_${section}_${id}_P_dam-roll`] = power.damage || '';
+				attr[`repeating_${section}_${id}_P_type`] = power.type || '';
+				attr[`repeating_${section}_${id}_P_pen`] = power.pen || '';
+				attr[`repeating_${section}_${id}_P_focus`] = power.focus || '';
+				attr[`repeating_${section}_${id}_P_mod1`] = power.mod || '';
+				attr[`repeating_${section}_${id}_P_multi`] = power.multi || '';
+				attr[`repeating_${section}_${id}_P_action`] = power.action || '';
+				attr[`repeating_${section}_${id}_P_sustained`] = power.sustained || '';
+				attr[`repeating_${section}_${id}_P_hitloc`] = power.hitloc || '';
+				attr[`repeating_${section}_${id}_P_ability_r`] = power.ability || '';
+				attr[`repeating_${section}_${id}_P_desc_r`] = power.desc || '';
+				return attr;
+			}
+
+			// info Block
+			attributes = {...attributes, ...mapInfo(data)}
+
+			// STATS
+			attributes = {...attributes, ...mapStat('WS', data.weaponSkill)};
+			attributes = {...attributes, ...mapStat('BS', data.ballisticSkill)};
+			attributes = {...attributes, ...mapStat('STR', data.strenght)};
+			attributes = {...attributes, ...mapStat('TOU', data.toughness)};
+			attributes = {...attributes, ...mapStat('AGI', data.agility)};
+			attributes = {...attributes, ...mapStat('INT', data.intelligence)};
+			attributes = {...attributes, ...mapStat('PER', data.perception)};
+			attributes = {...attributes, ...mapStat('WP', data.willpower)};
+			attributes = {...attributes, ...mapStat('FEL', data.fellowship)};
+			attributes = {...attributes, ...mapStat('INF', data.influence)};
+
+			// WOUNDS, FATE, FATIGUE, FORCEFIELD
+			attributes = {...attributes, ...mapWounds(data.wounds)};
+			attributes = {...attributes, ...mapFate(data.fate)};
+			attributes = {...attributes, ...mapFatigue(data.fatigue)};
+			attributes = {...attributes, ...mapForceField(data.forcefield)};
+
+			// CONDITIONS
+			data?.conditions?.forEach((condition) => {
+				attributes = {...attributes, ...mapCondition(condition)};
+			});
+
+			// SKILLS, REPEATING SKILLS
+			data?.skills?.forEach(skill => {
+				attributes = {...attributes, ...mapSkill(skill)};
+			});
+			data?.lores?.common?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'common-lore')};
+			});
+			data?.lores?.scholastic?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'scholastic-lore')};
+			});
+			data?.lores?.forbidden?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'forbidden-lore')};
+			});
+			data?.linguistics?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'linguistics')};
+			});
+			data?.trades?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'trades')};
+			});
+
+			// TALENTS, TRAITS
+	    data?.abilities?.forEach(ability => {
+	      attributes = {...attributes, ...mapAbility(ability, 'abilities')};
+	    });
+	    data?.traits?.forEach(trait => {
+	      attributes = {...attributes, ...mapTrait(trait)};
+	    });
+
+	    // INVENTORY
+	    data?.inventory?.weapons?.ranged?.forEach( weapon => {
+	      attributes = {...attributes, ...mapRangedWeapon(weapon)};
+	    });
+	    data?.inventory?.weapons?.melee?.forEach( weapon => {
+	      attributes = {...attributes, ...mapMeleeWeapon(weapon)};
+	    });
+	    data?.inventory?.gears?.forEach( gear => {
+	      attributes = {...attributes, ...mapGear(gear)};
+	    });
+	    // data?.inventory?.tools?.forEach( tool => {
+	    //   attributes = {...attributes, ...mapTool(tool)};
+	    // });
+	    // data?.inventory?.consumables?.forEach( drug => {
+	    //   attributes = {...attributes, ...mapDrug(drug)};
+	    // });
+	    attributes = {...attributes, ...mapOldArmor(data?.inventory?.armor)};
+	    // data?.inventory?.armors?.forEach( armor => {
+	    //   attributes = {...attributes, ...mapArmor(armor)};
+	    // });
+	    // data?.inventory?.ammos?.forEach( ammo => {
+	    //   attributes = {...attributes, ...mapAmmo(ammo)};
+	    // });
+	    data?.inventory?.cybernetics?.forEach( cybernetic => {
+	      attributes = {...attributes, ...mapCybernetic(cybernetic)};
+	    });
+
+	    // ADVANCEMENTS
+	    attributes = {...attributes, ...mapAptitudes(data?.advancements?.aptitudes)};
+      attributes = {...attributes, ...mapAdvance(data?.advancements?.advances)};
+	    for (var training in data?.advancements?.training) {
+	      attributes[`weapons_training_${training}`] = data?.advancements?.training[training];
+	    }
+
+	    // INSANITY, CORRUPTION
+	    attributes[`insanity_pts`] = data?.insanity?.points;
+	    data?.insanity?.disorders?.forEach( disorder => {
+	        attributes = {...attributes, ...mapDisorder(disorder)};
+	    })
+	    attributes[`corruption_pts`] = data?.corruption?.points;
+	    data?.corruption?.mutations?.forEach( mutation => {
+	        attributes = {...attributes, ...mapMutation(mutation)};
+	    })
+
+	    // OBJECTIVES, NOTES
+	    data?.objectives?.forEach( objective => {
+	        attributes = {...attributes, ...mapObjective(objective)};
+	    });
+	    data?.notes?.forEach( note => {
+	        attributes = {...attributes, ...mapNote(note)};
+	    });
+
+	    // VEHICLES
+	    data?.vehicles?.list?.forEach( vehicle => {
+	        attributes = {...attributes, ...mapVehicle(vehicle)};
+	    });
+	    data?.vehicles?.weapons?.ranged?.forEach( weapon => {
+	      attributes = {...attributes, ...mapRangedWeapon(weapon, true)};
+	    });
+	    data?.vehicles?.weapons?.melee?.forEach( weapon => {
+	      attributes = {...attributes, ...mapMeleeWeapon(weapon, true)};
+	    });
+
+	    // PSYKANA
+	    attributes = {...attributes, ...mapPsykana(data?.psykana)};
+
+			console.log('setting attributes');
+			attributes.import_value = 'Success: Character Imported Successfully\n\nRemember to add the token manually';
+			setAttrs(attributes, true);
+		})
+	})
 	
 	
 </script>
