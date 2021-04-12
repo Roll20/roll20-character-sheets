@@ -45,6 +45,9 @@ Also see the API script which implements the logic to handle initiative tracking
 
 ## Change Log
 
+### April 5th 2021 v10.0
+- Correct weapon attacks' half and quarter threshold field value order
+
 ### February 7th 2021 v9.0
 - Add checkbox for special ability & gear textareas to toggle height between 1 & 6
 
