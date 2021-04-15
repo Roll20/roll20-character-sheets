@@ -286,7 +286,7 @@
   <div class="sheet-squadscore"><input name="attr_squad" type="text"></div>
   <div class="sheet-scltitle">SCL</div>
   <div class="sheet-sclscore"><input name="attr_scl" type="text"></div>
-  <div class="sheet-version">ver: 1.0a</div>
+  <div class="sheet-version">ver: 1.0c</div>
   
   <div class="sheet-slaimage"><img width=119 height=155 src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/SLA%20Industries%202ed/slalogo.png"></div>
   <div class="sheet-strtitle">STRENGTH</div>
@@ -314,7 +314,7 @@
   <div class="sheet-bravadotitle">BRAVADO</div>
   <div class="sheet-bravadoscore"><input name="attr_bravado" type="number" min=0></div>
   <div class="sheet-inittitle">INITIATIVE BONUS</div>
-  <div class="sheet-initscore"><input name="attr_initiative" type="number"><input name="attr_initiativedrugs" type="hidden"><input name="attr_initiativearmour" type="hidden"><button type="roll"value="&{template:initiative} {{name=initiative}}{{initiative=[[1d10+@{initiative+initiativearmour+initiativedrugs}&{tracker}]]}}">&nbsp;</button></div>
+  <div class="sheet-initscore"><input name="attr_initiative" type="number"><input name="attr_initiativedrugs" type="hidden"><input name="attr_initiativearmour" type="hidden"><button type="roll"value="&{template:initiative} {{name=initiative}}{{initiative=[[1d10+@{initiative}+@{initiativearmour}+@{initiativedrugs}&{tracker}]]}}">&nbsp;</button></div>
   <div class="sheet-lucktitle"><span name="attr_luckflux"/></div>
   <div class="sheet-luckmaxtitle">MAX</div>
   <div class="sheet-luckcurrtitle">CURRENT</div>
@@ -1075,8 +1075,8 @@ on('change:species', event => {
  	  "A Wraithen’s heightened senses extend to their strong survival instinct, giving them an uncanny knack at detecting dangerous situations. A Wraithen adds 1 to their Initiative Bonus, making them more likely to act before others in combat."]; 
 */
 
-on("change:dexteritybase change:dexterityarmour change:dexteritydrugs change:dexterityebb", function() {
-  getAttrs(["dexteritybase","species","concentration","acrobatics","athletics","drivemot","forgery","pistol","rifle","sleight","stealth","dexterityarmour","dexteritydrugs","dexterityebb"], function(values) {
+on("change:dexteritybase change:dexterityarmour change:dexteritydrugs change:dexterityebb change:initiativedrugs change:initiativearmour", function() {
+  getAttrs(["dexteritybase","species","concentration","acrobatics","athletics","drivemot","forgery","pistol","rifle","sleight","stealth","dexterityarmour","dexteritydrugs","dexterityebb","initiativedrugs","initiativearmour"], function(values) {
      const speciesdetails = {
         "Advanced Carrien":		{dexteritybase: '1', dexteritymax: '5'},
         "ADV": 					{dexteritybase: '1', dexteritymax: '5'},
@@ -1095,6 +1095,8 @@ on("change:dexteritybase change:dexterityarmour change:dexteritydrugs change:dex
       var dexterityarmour = parseInt(values["dexterityarmour"])||0;
       var dexteritydrugs = parseInt(values["dexteritydrugs"])||0;
       var dexterityebb = parseInt(values["dexterityebb"])||0;
+      var initiativedrugs = parseInt(values["initiativedrugs"])||0;
+      var initiativearmour = parseInt(values["initiativearmour"])||0;
 	  var species = values["species"]||"";
 
       var dexteritymin = parseInt(speciesdetails[species]["dexteritybase"])||0;
@@ -1122,7 +1124,7 @@ on("change:dexteritybase change:dexterityarmour change:dexteritydrugs change:dex
       var rifletotal = rifle + dexterity;
       var sleighttotal = sleight + dexterity;
       var stealthtotal = stealth + dexterity;
-	  var initiative = dexterity + concentration;
+	  var initiative = dexterity + concentration + initiativearmour + initiativedrugs;
       setAttrs({
 		"dexterity": dexterity,
 		"dexteritybase": dexteritybase,
