@@ -2843,20 +2843,14 @@
   });
 
   on("clicked:generate-export", function() {
-    let idmoves = [];
-    let idfeatures = [];
     getSectionIDs("repeating_moves", function (moveIDs) {
       getSectionIDs("repeating_features", function (featureIDs) {
-        moveIDs.forEach(function(id){
-          r20export_moves.forEach(function(moveAttr){
-            idmoves.push(`repeating_moves_${id}_${moveAttr}`);
-          });
-        });
-        featureIDs.forEach(function(id){
-          r20export_features.forEach(function(featureAttr){
-            idfeatures.push(`repeating_features_${id}_${featureAttr}`);
-          });
-        });
+        const idmoves = moveIDs.flatMap(id =>
+            r20export_moves.map(moveAttr => `repeating_moves_${id}_${moveAttr}`)
+        );
+        const idfeatures = featureIDs.flatMap(id =>
+            r20export_features.map(featureAttr => `repeating_features_${id}_${featureAttr}`)
+        );
         getAttrs([...r20export_attrs, ...idmoves, ...idfeatures], function (values) {
           let topLevelAttrs = includeOnlyKeysInArray(values, r20export_attrs);
           let moveAttrs = includeOnlyKeysInArray(values, idmoves);
