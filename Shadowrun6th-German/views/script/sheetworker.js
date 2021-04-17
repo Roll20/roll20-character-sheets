@@ -18,7 +18,7 @@ on("sheet:opened change:wilddie_toggle",function(){
 
 on("sheet:opened change:sustain_count change:sustain_mod change:sustain_mod2", function(){
     getAttrs(["sustain_count","sustain_mod","sustain_mod2"], function (v) {
-        let val=pInt(v.sustain_count)+pInt(v.sustain_mod)+pInt(v.sustain_mod2)
+        let val=Math.max(pInt(v.sustain_count)-1,0) *2+(pInt(v.sustain_mod)+pInt(v.sustain_mod2))
         log("Sustain val:" + val)
         setAttrs({
             sustain_malus:Math.max(val,0)
@@ -552,7 +552,7 @@ on("change:repeating_vehicle:vehicle_speed",function(){
 
     
 
-    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic"];
+    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic","adeptpowerpoints"];
     const s_attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance"];
     const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task","conjuring","sorcery","enchanting","exoticweapon1","exoticweapon2"];/*,"exoticweapons"*/
     const magicalSkills = ["astral","conjuring","sorcery","enchanting"];
@@ -621,6 +621,7 @@ function updateAttribute(attribute){
                     getAttrs(["display_reaction","display_willpower","display_logic","display_datenverarbeitung"], function(val){
                         setAttrs({
                             composure_base: total + pInt(val.display_willpower),
+                            judgeintent_base: +total + pInt(val.display_willpower),
                             ini_base: total + pInt(val.display_reaction),
                             iniastral_base: total + pInt(val.display_logic),
                             inimatrix_base: total + pInt(val.display_datenverarbeitung),
@@ -1294,11 +1295,8 @@ on("sheet:opened change:stun_monitor_shift", () => {
     });
 
     on("change:repeating_spells:spellaktive",function(eventInfo){
-        getAttrs(["repeating_spells_spellaktive","sustain_count"],function(v){
-            let sc=pInt(v.sustain_count);
-            let change=pInt(eventInfo.newValue)-pInt(eventInfo .previousValue)
-            setAttrs({sustain_count:sc+change});
-        });
+        repeatingSum("sustain_count","spells",["spellaktive"]);
+        
     }
     );
 
