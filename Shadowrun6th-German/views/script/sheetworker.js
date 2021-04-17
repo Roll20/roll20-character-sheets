@@ -18,7 +18,7 @@ on("sheet:opened change:wilddie_toggle",function(){
 
 on("sheet:opened change:sustain_count change:sustain_mod change:sustain_mod2", function(){
     getAttrs(["sustain_count","sustain_mod","sustain_mod2"], function (v) {
-        let val=pInt(v.sustain_count)*2+(pInt(v.sustain_mod)+pInt(v.sustain_mod2))
+        let val=Math.max(pInt(v.sustain_count)-1,0) *2+(pInt(v.sustain_mod)+pInt(v.sustain_mod2))
         log("Sustain val:" + val)
         setAttrs({
             sustain_malus:Math.max(val,0)
@@ -552,7 +552,7 @@ on("change:repeating_vehicle:vehicle_speed",function(){
 
     
 
-    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic"];
+    const attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance","composure","judgeintent","memory","liftcarry","ini","inidice","iniphys","inimatrix","iniastral","soak","soakstun","magic","adeptpowerpoints"];
     const s_attributes = ["body","agility","reaction","strength","willpower","logic","intuition","charisma","edge","magic","resonance"];
     const skills = ["athletics","influence","electronics","firearms","stealth","engineering","melee","outdoors","piloting","con","perception","astral","biotech","cracking","task","conjuring","sorcery","enchanting","exoticweapon1","exoticweapon2"];/*,"exoticweapons"*/
     const magicalSkills = ["astral","conjuring","sorcery","enchanting"];
