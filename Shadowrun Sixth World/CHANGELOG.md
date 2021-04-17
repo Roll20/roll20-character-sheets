@@ -1,5 +1,47 @@
 Change Log
 ==============================================
+**2021-04-12** v.27 Chuz (James Culp)
+	PC - Magic - Conjuration  - Finished spirit roster section
+	Added Resist Drain button to Spirit Summoning Resist roll output
+	Fixed initiatives (meatspace and astral) on npc sheets being overwritten by automatic calculations
+	Fixed Condition Monitor for Drones/Vehicles being overwritten and with wrong values.  Now they'll auto calculate when body changes but otherwise can be overwritten by the player.
+	Added "legacy": false to sheet.json
+	Added "Summon Spirit" button to Magic->Conjuring.  Using this button prompts for Type and Force of the spirit, does the roll then offers a "Spirit Resist" button in the output that the player or GM can click to roll the spirit's restist roll (Force x 2) which then outputs the hits from that so the player can roll drain.
+	NPC - Made magic, resonance, force inputs disappear correctly when not needed or settings aren't being adjusted
+	NPC - Made resists display when not in settings mode
+	NPC - Grunt/Vehicle - Weapon section now uses same attributes as PC Ranged section so a previously created PC can be relatively seamlessly made into a grunt.
+	Added Autosofts to PC Vehicles tab
+	Added an indicator to PC-Matrix-Programs and NPC-Matrix-Programs to indicate which programs are running.
+**2021-04-05** v.26 Chuz (James Culp)
+	Fixed NPC defense roll buttons
+	Added attr_speed for npc-vehicle sheet so it can be tracked on tokens
+	Fixed NPC soak roll buttons
+	Added cold sim and hot sim initiative modifiers and dice modifiers for all sheets
+	Hid unnecessary Matrix AR and Cold Sim VR initiative for Vehicles, Sprites and Hosts
+	NPC-Sprite - populate ASDF, Resonance and Initiative when sprite level or type is changed.
+	NPC-Sprite when changing level or sprite type, if powers or skills are empty the sheet will auto populate them with the values from the CRB
+	Added a bit of color to differentiate Skill vs. Speciallized vs. Expertise roll buttons.
+	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
+	New section now holds Complex Forms tab and submersion tab
+	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
+
+**2021-03-29** v.25 Chuz (James Culp)
+	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
+	Started changes for NPC sheets.
+	Updated npc sheets image, settings and toggle headers.
+	Styled npc toggles and attribute buttons
+	Updated attribute roll buttons to be consistent with PC sheet buttons.
+	Made Magic now visible if Awakened OR Spirit are selected
+	Made Force only visible if Spirit is selected
+	Updated styles and html to make settings hide/reveal correctly for non-pc sheets
+	Updated matrix grid to work properly with 0 for a stat
+	Changed npc pain tolerance to be in options
+	Updated npc options -> grunt type (mundane, awakened, emergent, spirit) to be a select labeled Archetype
+	Updated "Bonuses" and "Modifier" column variables for non-PC sheets.  They now have the proper name='' fields.
+	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
+	Some more style updates to npc sheets
+	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
+
 **2021-03-22** v.24 Chuz (James Culp)
 	Beginning v.24
 	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
