@@ -142,3 +142,5 @@ Neue Features:
 - Attributs-Modifikatoren hinzugefügt (z.B. bei Stärkung durch Elixiere oder Attributo)
 - Repeating Sections bei Waffen und Fernkampfwaffen eingefügt, falls mehr als 5 oder 3 nötig sind.
 - Kleine Layout-Anpassungen.
+
+1.7.1: Fix der Anzeige bei Verschlagenheit III(u).
