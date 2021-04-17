@@ -2042,7 +2042,7 @@ on('change:is_mounted change:injury_total change:fatigue_total change:encumbranc
         var inj = parseInt(values.injury_total)||0;
 		var fat = parseInt(values.fatigue_total)||0;
 		var enc = parseInt(values.encumbrance)||0;
-        if (values.is_mounted == 'on') { fat = Math.round(fat / 2) };
+        if (values.is_mounted == 1) { fat = Math.round(fat / 2) };
         var upenalty = inj + fat;
 		var ppenalty = enc + upenalty;
         setAttrs({
@@ -2070,9 +2070,13 @@ on('change:hinjury_total change:hfatigue_total change:hencumbrance', function() 
 
 <!-- Move speed in combat /-->
 	
-on('change:encumbrance change:universal_penalty change:agl sheet:opened', function() {
-    getAttrs(['agl', 'universal_penalty', 'encumbrance'], function(values) {
+on('change:encumbrance change:universal_penalty change:agl change:is_mounted change:hcombat_move sheet:opened', function() {
+    getAttrs(['agl', 'universal_penalty', 'encumbrance', 'is_mounted', 'hcombat_move'], function(values) {
         var cmove = parseInt(values.agl) - parseInt(values.universal_penalty) - parseInt(values.encumbrance);
+		var currenthcmove = parseInt(values.hcombat_move);
+		cmove = Math.max(cmove, 1); <!-- move is never less than 1 -->
+		if (values.is_mounted == 1) { cmove = currenthcmove }; <!-- use horse move when mounted --> 
+		console.log("combat move", cmove, "horse move", currenthcmove, "mounted?" , values.is_mounted);
 		setAttrs({
             'combat_move': cmove
         });
@@ -2196,6 +2200,7 @@ on('change:repeating_missileweapon', function() {
 		var longdmg = Math.max(mdmg - 2, mdmg/2); <!-- dmg is never less than 50% weapon dmg --> 
 		var extremedmg = Math.max(mdmg - 3, mdmg/2); <!-- dmg is never less than 50% weapon dmg --> 
 		<!-- console.log("ML", wml, "ATK", watk, "DEF", wdef, "Weapon AML", waml, "Weapon DML", wdml); --> 
+		<!-- note: mounted penalty calculated in roll button, don't add here -->
         setAttrs({
             'repeating_missileweapon_missileweapon_short_aml': shortaml,
 			'repeating_missileweapon_missileweapon_medium_aml': mediumaml,
