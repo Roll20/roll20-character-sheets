@@ -11276,7 +11276,7 @@
 				<span class="grid-label sheet-hideable-shield-active">Schild</span>
 				<div class="flex-container flex-container-melee-head sheet-hideable-shield-active">
 					<div><span name="attr_shield_name"></span></div>
-					<div>AT: <span name="attr_at_raufen"></span></div>
+					<div>AT: <span name="attr_shield_at"></span></div>
 					<div>PA: <span name="attr_shield_pa"></span></div>
 					<div>TP(A): <span name="attr_shield_tp"></span></div>
 					<div>TP/KK: <span name="attr_shield_tpkk"></span></div>
@@ -16238,6 +16238,8 @@ function migrateTo20210413(migrationChain) {
 				"KO_mod_wounds": mods["KO"],
 				"KK_mod_wounds": mods["KK"]
 			});
+			
+		    attrsToChange["shield_at"] = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(attrsToChange["AT_mod_wounds"]));
 
 			// Updates for INI modifiers
 			// Set INI modifier from (main) weapon
@@ -17430,7 +17432,7 @@ function calculateTpKKMod(values, weapon) {
 }
 
 // calculate shield attack modifier
-on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:AT_raufen", function(eventInfos) {
+on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:AT_raufen change:AT_mod_wounds", function(eventInfos) {
     getAttrs(["activeShieldRowId"], function(rowIdValues) {
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
         if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
@@ -17441,7 +17443,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             }
         }
 
-        let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag"]
+        let variablesToGet = [ "sf_schildkampfI", "sf_schildkampfII", "sf_schmutzigetricks", "sf_knaufschlag", "AT_raufen", "AT_mod_wounds"]
 
         // Wenn es ein aktives Schild (oder Parierwaffe) gibt, möchten wir auch dessen Werte mit laden
         if (activeShieldRowId) {
@@ -17450,7 +17452,11 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         } else {
             console.log("no active shield found");
-            setAttrs({ shield_at_available: "0", shield_at_mod: 0 });
+            setAttrs({
+				"shield_at": 0,
+				"shield_at_available": "0",
+				"shield_at_mod": 0
+			});
             return;
         }
 
@@ -17458,7 +17464,11 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             let result = calculateShieldAttack(values, activeShieldRowId);
             console.log('calculated shield attack');
             console.log(result);
-            setAttrs({ shield_at_mod: result.shieldAtMod, shield_at_available: result.shieldAtAvailable });
+            setAttrs({
+				"shield_at": result["shield_at"],
+				"shield_at_mod": result["shieldAtMod"],
+				"shield_at_available": result["shieldAtAvailable"]
+            });
         });
 
     });
@@ -17475,16 +17485,19 @@ function calculateShieldAttack(values, activeShieldRowId) {
     var schildkampfII = values["sf_schildkampfII"];
     var knaufschlag = values["sf_knaufschlag"];
     var schmutzigeTricks = values["sf_schmutzigetricks"];
+    var shieldAt = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(values["AT_mod_wounds"]));
 
 	// Without a Shield, no Shield Attack
 	if (shieldType !== "shield" || !activeShieldRowId) {
 		shieldAtAvailable = "0";
+		shieldAt = 0;
 		console.log("ping");
 
     // Without Shield Combat I, no Shield Attacks
 	} else if (schildkampfI !== "1") {
     	console.log("schildkampfI:", schildkampfI);
 		shieldAtAvailable = "0";
+		shieldAt = 0;
 		console.log("pong");
 
 	// Good to go, check for modifier reduction
@@ -17498,6 +17511,10 @@ function calculateShieldAttack(values, activeShieldRowId) {
 	if (activeShieldAtMod) {
 		shieldAtMod -= activeShieldAtMod;
 	}
-    return {shieldAtMod: shieldAtMod, shieldAtAvailable: shieldAtAvailable };
+    return {
+		"shield_at": shieldAt,
+		"shieldAtMod": shieldAtMod,
+		"shieldAtAvailable": shieldAtAvailable
+    };
 }
 </script>
