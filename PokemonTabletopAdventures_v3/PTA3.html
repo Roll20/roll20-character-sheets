@@ -2926,19 +2926,17 @@
       if(innerData["Type_2"]) response["type2"] = innerData["Type_2"].toLowerCase();
       remapIfExists(innerData, response, "Held_Item", "item");
 
-      if(characterData["Moves"]) {
-        characterData["Moves"].forEach(function(move) {
-          const id = generateRowID();
-          remapIfExists(move, response, "Name", `repeating_moves_${id}_move_name`);
-          remapMoveFrequency(move, response, id);
-          remapIfExists(move, response, "Range", `repeating_moves_${id}_move_range`);
-          if(move["num_dice"]) response[`repeating_moves_${id}_move_dicenumber`] = parseInt(move["num_dice"]) || 0;
-          if(move["die_size"]) response[`repeating_moves_${id}_damage_dice`] = move["die_size"].substring(1);
-          if(move["Type"]) response[`repeating_moves_${id}_move_type`] = (move["Type"] == "No-Type" ? "typeless" : move["Type"].toLowerCase());
-          remapMoveCategory(move, response, id);
-          remapIfExists(move, response, "Effect", `repeating_moves_${id}_move_effect`);
-        });
-      }
+      characterData["Moves"]?.forEach(function(move) {
+        const id = generateRowID();
+        remapIfExists(move, response, "Name", `repeating_moves_${id}_move_name`);
+        remapMoveFrequency(move, response, id);
+        remapIfExists(move, response, "Range", `repeating_moves_${id}_move_range`);
+        if(move["num_dice"]) response[`repeating_moves_${id}_move_dicenumber`] = parseInt(move["num_dice"]) || 0;
+        if(move["die_size"]) response[`repeating_moves_${id}_damage_dice`] = move["die_size"].substring(1);
+        if(move["Type"]) response[`repeating_moves_${id}_move_type`] = (move["Type"] == "No-Type" ? "typeless" : move["Type"].toLowerCase());
+        remapMoveCategory(move, response, id);
+        remapIfExists(move, response, "Effect", `repeating_moves_${id}_move_effect`);
+      });
 
       if(characterData["Stats"]) {
         const innerData = characterData["Stats"];
@@ -2963,18 +2961,14 @@
       // Identify as a roll20 sheet
       let response = includeOnlyKeysInArray(characterData, r20export_attrs);
       response["json_import_response"] = "Error - Unable to parse all attributes";
-      if(characterData["exportmoves"]) {
-        characterData["exportmoves"].forEach(function(move) {
-          const id = generateRowID();
-          Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
-        });
-      }
-      if(characterData["exportfeatures"]) {
-        characterData["exportfeatures"].forEach(function(feature) {
-          const id = generateRowID();
-          Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
-        });
-      }
+      characterData["exportmoves"].forEach(function(move) {
+        const id = generateRowID();
+        Object.entries(move).forEach(([key, value]) => response[`repeating_moves_${id}_${key}`] = value);
+      });
+      characterData["exportfeatures"].forEach(function(feature) {
+        const id = generateRowID();
+        Object.entries(feature).forEach(([key, value]) => response[`repeating_features_${id}_${key}`] = value);
+      });
       response["json_import_response"] = "Character sheet data successfully imported from " + source + "!";
       return response;
     } else {
