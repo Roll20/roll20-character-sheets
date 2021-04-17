@@ -3605,7 +3605,7 @@
 			<input name="attr_skill" type="hidden" value=""/>
 			<input class="flag-primary" name="attr_primary" type="hidden" value=""/>
 			<input class="flag-primary" name="attr_additional" type="hidden" value=""/>
-			<button name="roll_range_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon} = @{skill} + ^{agility}}}{{dice=[[((@{rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{agility})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Dicepool = @{skill} + (Spec / Expertise) + ^{agility} = [[@{dicepool} + @{agility}]] + Wounds @{wounds_toggle} + Modifiers @{modifiers_toggle} + Edge @{edge_toggle}, Notes @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
+			<button name="roll_range_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Dicepool @{dicepool}}}{{dice=[[(@{dicepool}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Dicepool = @{dicepool} + Wounds @{wounds_toggle} + Modifiers @{modifiers_toggle} + Edge @{edge_toggle}, Notes @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
 			<span class="center" name="attr_dicepool"></span>
 			<span class="center" name="attr_damage"></span>
 			<span class="center" name="attr_close"></span>
@@ -3670,25 +3670,6 @@
 					<label data-i18n-title="modifier" title="modifier">
 						<input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" placeholder='0' type="number"/>
 					</label>
-				</div>
-				<div class="row">
-					<h3 data-i18n="skill">skill</h3>
-					<select name="attr_skill" title="@{repeating_range_${x}_skill}" value="@{firearms}">
-						<option data-i18n="firearms" value="Firearms" selected="selected">Firearms</option>
-						<option data-i18n="exoticweapons" value="Exotic Weapons">Exotic Weapons</option>
-						<option data-i18n="athletics" value="Athletics">Athletics</option>
-					</select>
-					<h3 data-i18n="specialization">specialization</h3>
-					<label data-i18n-title="specialization" title="specialization">
-						<input name="attr_spec" value="2" title="@{repeating_range_${x}_spec}" type="checkbox"/>
-					</label>
-					<h3 data-i18n="expertise">expertise</h3>
-					<label data-i18n-title="expertise" title="expertise">
-						<input name="attr_expert" value="3" title="@{repeating_range_${x}_expert}" type="checkbox"/>
-					</label>
-					<input name="attr_skill" type="hidden" value=""/>
-					<input name="attr_rating" type="hidden" value=""/>
-					<div class="exotic-warning"><i data-i18n="exoticnote">Exotic weapons are not linked to a skill. Use Modifier input to set dicepool.</i></div>
 				</div>
 				<h3 data-i18n="notes">notes</h3>
 				<label data-i18n-title="notes" title="notes">
@@ -5489,7 +5470,10 @@ on("change:repeating_skills:name", (eventInfo) => {
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
 
-		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`], (v) => {
+		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `sheet_type`], (v) => {
+			if(v.sheet_type != 'pc') {
+				return;
+			}
 			const mod = parseInt(v[`${weap}_dicepool_modifier`]) || 0;
 			const spec = parseInt(v[`${weap}_spec`]) || 0;
 			const expert = parseInt(v[`${weap}_expert`]) || 0;
