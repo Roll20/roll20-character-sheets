@@ -1,12 +1,158 @@
 # Warhammer 4e Character Sheet (Djjus)
 
-This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet, which itself is a port of a original WHFRP2e Template.
+
+///// ============ About this Sheet ============ ///// 
+
+This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet, which itself is a port of a original Havoc roll20 WHFRP2e sheet.
 
 This Character Sheet has been updated to fix and enhance mostly in the original style. And uploaded to Roll20 for all to use. 
 I'm a active WFRP player and I plan to further enhance this sheet at time goes on.
 
+This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accompilshed by a combination of manual configuation for each character, as every character is different, and a highly integrated and standardized roll template. There is also some TEW companion rule integration but its minor.
+
+My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip
+
+
+
+///// ============ Main Features ============ ///// 
+
+- Attack / Opposed / Ranged with active weapon selection system. with integrated Defensive and Impale mechanics.
+
+- Skill system, Basic / Advanced Skill List is fully implemented.
+
+- Roll outcome modifier fields allowing Talent Test modifiers to be addded to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which just records what talent have been learned. avialable for all PC combat and skill rolls.
+
+- Armor and Damage absorbtion system with Enc, AP, Durable, Damage, Damage point & Robust Talent tracking.
+
+- Magic system with seperate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modiferes (like, atheryic attunement and instictive diction) including miscast management.
+
+- Intergated SL results for all rolls, which aids in the manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self calcualted approach while providing the maximum possible information.)
+
+- Full combat Advantage & Condition Tracking, per core rules. Additionally advantage can be disabled for spells in the settings tab, allowing for seemless integration the Unoffical Grimoire rules (@ http://www.lahiette.com/leratierbretonnien/wp-content/uploads/2020/09/WFRP4-Unofficial-Grimoire-2.02-PDF.pdf).
+
+- Inventory: Full Encumbrance Management system, with automatic Overencumbrance modifiers (-move/agi), and Container & Vehicle Management section (TEW compatible) .
+
+- Full Roll integration for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God, with clicky buttons in the roll template output. 
+
+- Custom NPC tab, on sheet area to quickly add NPC for GM and players alike. Not meant to replace a full character sheet, but handy for quick trash mob types. The idea is to make a full char sheet for the "boss" and to have his henchmen as Custom NPC's on the NPC tab. 
+
+
+
+///// ============ Usage Notes ============ ///// 
+
+- SETTINGS: Check setting (cog) tab ever time when setting up any new Char sheet for all players, and select correct options for your game.
+- Wounds: ensure correct Race and Hardy level are chosen. Wounds are subtracted by adding damage, and given back by subtracting it. Wounds can not exceed Max Wounds limit.
+- Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge) automatically, and shows i the roll result.
+- For an advanced Skill you must select the taken checkbox in order for target to be above 0.
+- Adv fields add advance point to skills, this value are automatically added to the roll target as SKILL.
+- Weapons/Spells Mod fields, allow players to pre-populate the roll modifier popup box and is only avialble with .
+- Weapons/Spells Target fields, display the final roll target including all variables calculated by the sheet at that momment, e.g. CHAR + SKILL + MOD + ADVANTAGE - CONDITIONS.
+- On Weapons ensure you select the coresponding skill (e.g. Melee Basic, Melee Parrying, Ranged Bow, Ranged Blackpowder etc), and that the correct skill is learned with advance points in it.
+- Themes, see setting tab for various theme which change the look of the char sheet overall. Inclung Emprie/Dwarf & Elf themes.
+- Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players.
+- NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
+- Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. 
+
+This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip) due to naming convention.
+
+It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being perceived, such situational occasions will have to be handled by the GM and no attempt to add complication is made. 
+
+Condition effects are currently hard coded as follows:
+
+Broken/Fatigued/Poisoned/Stunned = Effects all Melee/Spellcast and skill rolls (only excludes roll tables like Misscast/Oops etc.)
+Entangled/Prone = Effects Movement based rolls, all Melee/Spellcast, combat actions and any skill which would require movement like dodge/athletics/climb etc.
+Blinded/Deafened = Effects Weapon & Spells casts rolls
+Unconscious = Effects all rolls except endurance (Roll block essentially)
+
+Prayers are effected by Fatigued/Poisoned only for now. (v1.32)
+
+Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When thisoccurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had the Fatigued and Prone Conditions, you would suffer a –20 penalty to all active Tests, not –30.
+
+Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
+
+
 
 ///// ============ Change Log ============ ///// 
+
+April 5th 2021 v1.35
+
+- Added Max corruption modifier to allow for Pure Soul and other effects to be integrated in the sheet.
+
+
+February 1st 2021 v1.34
+
+- Added coin converters buttons on the inventory page.
+- Various Qualities text fields now align to the left.
+- Changed spellbook Channel button label from "Cast" to "Channel".
+
+
+January 18th 2021 v1.33
+
+- Various fixes for NPC pages which were PC deafened condition attributes rather the individual NPC value.
+- Added option to turn of Advantage for arcance spells, to support custom houserules.
+
+
+January 18th 2021 v1.32
+
+
+- Endurance roll fix
+- Melee Modifier adds twice fix
+- Changed movement section, now has stating stat fields.
+- Added Overburdened rule integration in Inventory. Modifies Agility and Move stats.
+- New marker set 2.0 https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip
+
+
+January 11th 2021 v1.31
+
+- Reroll clicky buttons now integrated into the roll template out put for most rolls, including all repeating sections. This is diplayed in the Test value row.
+- NPC Tab rework, a number of modifications have been made to increase it performance when alot of NPC hare created. All NPC rolls are now integrated into the crit and reroll buttons. Weapons have been split into Melee(upto 3)/Ranged(upto 2) and Spell into Magic(upto 3)/Prayer(upto 2). Notes now no longer has a hider checkbox and is always shows and the Roll outcome modifer are removed entirely, both were to greater performance hogs within the repeating section. Use the quality text field instead. 
+- Channelling Roll template has been altered to be more inline with other rolls to allow the reroll intergation.
+- Weapons & Spells Tab rework, cleaned it up and added a Mod and Target display fields which matches the roll target.
+- All Mod fields will now prepopulate the Roll Modifider popup with the set value.
+- Fixed the Talents tab text field dragging issue from the last update.
+- Armor Tab rework: Seperated AP from Armor Damage points and added field to add Durable value to increase Damage Points only without inceasing AP. Also added a Robust talent lvl selector which modifies the right hand body location total AP display.
+- New GM whisper button in the Combat Actions title row, and adjusted matched the Conditions hider button to match it.
+- The sheet will perform a repeating section ID scan and set them as attributes inside the sections on first opening after this update to populate the required ID's of existing sections to allow new features to function correctly. There is a check to only allow this to happen once as it does take a few seconds to complete.
+
+
+December 28st 2020 v1.3
+
+- Roll Modifier Text: Most roll buttons now have a optional configuration cog next too them allow players to add text to the roll template output (can be conditional on test outcome, ie success/fail). This includes Skills/Weapons/Spells & NPC tabs. Handy for adding text related to Talent based roll outcomes, i.e. +1 SL on success or Reverse Result on fail.
+- Skill Tab rework, decluttered Melee/Ranged/Channelling/Language Magick Specialisations groups, these skills are now hidden by default and have to be checked to be visible. Removed the Cast group, Language Magick is now in Language group, and Pray is now a ungrouped advanced skill.
+- Crit/fumble logic update: Auto Failure on 99 roll result, will always result in a fumble, even if target is above 100.
+- Renamed critical success/failure to auto success/failure, so not to confuse with critical hit.
+- Roll template now has Critical / Fumble(Oops) / Miscast / Wrath buttons integrated, they only show when these events happen and are useable by anyone with control of that character sheet.
+- Advanded Skills will now always have base skill 0 (unmodified) when they are not Taken (i.e. trained). This is intended to prevent any untaken advanced skills to be rolled by accident. Note Ranged Crossbow and Ranged Thrown are always rollable as per core rules. Also fixed Rt header display for advanced grouped skills which will now display the user entered name field as well as the grouped skill name.
+- Marginal fail rolls (-0) will now show correctly in SL results
+- Corruption Section now has a Max Corruption value field, based on TB+WPB.
+- New hard coded skills for Channelling Witch, Dark & Chaos added.
+- Roll Tags have been added to the formulas for all combat skills. Other skills to follow.
+- Added some further missing translation tags.
+
+
+December 21st 2020 v1.23.4
+
+- Cleaned up critical roll text for casting and channeling to make it clearer that theses are happening.
+- PC & NPC Characterisitc rolls now show success/failure message.
+- Added some further missing translation tags
+
+
+November 2nd th 2020 v1.23.3
+
+- Added translation tag for modifier text in the roll template.
+
+
+October 12th 2020 v1.23.2
+
+- translation.json update, attempting to fix the translation issue which was introduced last week which prevent the new json from use on the live server sheet.
+- Fixed issue with Heavy Head armor capping at 1 carried Enc.
+
+
+October 5th 2020 v1.23.1
+
+- Further modification of how Armor tab works. Worn? check will now add/remove ENC and AP appropriately. Some descriptive text has been added to these sections too.
+- Continued adding IL8N tags that were missing from a lot of the new content. This work is now mostly complete.
+- Workable Italian translation is now implemented (Translation credit to Andrezzo/Roll20). (change language to Italian on Roll20 website/account config, then start server to see it). I am more then willing to work with others to implement more languages, but can not do this by myself.
 
 
 September 7th 2020 v1.22
@@ -171,65 +317,14 @@ Dec 24 2019
 
 
 
-Features:
-
-- Attack / Opposed / Ranged Seprated combat sytem with roll template which relevant information
-
-- Skill system, Basic / Advanced Skill List is fully implemented
-
-- Armor system with Enc, AP and Damage tracking
-
-- Spell book system, with core book spell name list, and optional custom spell function.
-
-- SL indicator for all rolls, also aids manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self calcualted approach while providing the maximum possible information in miminal mouse clicks to enable that easily.)
-
-- Advantage & Condition Tracking
-
-- Full Encumbrance Management system 
-
-- Cointainer & Vehicle carry space Management
-
-- Roll Table integration for Critical / Oops / Miscast & Wrath of the God
-
-
-Usage Notes:
-
-
-- SETTING: Check setting (cog) tab ever time when setting up any new Char sheet for all players, and select correct options for your game.
-- Wounds: ensure correct Race and Hardy level are chosen. Wounds are subtracted by adding damage, and given back by subtracting it. Will not go our of 0-Max Wounds range.
-- Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge) automatically, and shows i the roll result.
-- For an advanced Skill you must select the taken checkbox in order for target to be above 0.
-- On Weapons ensure you select the coresponding skill (e.g. Melee Basic, Melee Parrying, Ranged Bow, Ranged Blackpowder etc), and that the correct skill is learned and advance points in it.
-- Themes, see setting tab for various theme which change the look of the char sheet overall. Inclung Emprie/Dwarf & Elf themes.
-- Arcane Spells need to have a number in CN and Damage Field or they will not roll correctly, both fields will default to Zero.
-- Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players. (NPC tab has channelling on all spells for simplicity)
-- NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
-- Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only (new default) on all combat rolls and all non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. 
-
-This has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it also requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset1.0.zip) 
-
-It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being perceived, such situational occasions will have to be handled by the GM and no attempt to add complication is made. 
-
-Condition effects are currently bound as follows:
-
-Broken/Fatigued/Poisoned/Stunned = Effects all Melee/Spellcast and skill rolls (only excludes roll tables like Misscast/Oops etc.)
-Entangled/Prone = Effects Movement based rolls, all Melee/Spellcast, combat actions and any skill which would require movement like dodge/athletics/climb etc.
-Blinded = Effects Weapon & Spells casts rolls
-Deafened = Effects Spells casts rolls
-Unconscious = Effects all rolls except endurance (Roll block essentially)
-
-Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When thisoccurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had the Fatigued and Prone Conditions, you would suffer a –20 penalty to all active Tests, not –30.
-
-Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
-
 
 
 
 Future release wish list :
 
-- More themes. (v1.3)
-- Talents Tab rework, with possible roll integration. (v1.3)
-- WFRP 4e Roll API with SL resolution API. (v1.x)
+- Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe)
+- More themes. (v1.4)
+- WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x)
 
 
 

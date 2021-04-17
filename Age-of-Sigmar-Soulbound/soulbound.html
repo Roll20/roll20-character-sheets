@@ -18,10 +18,19 @@
         <select name="attr_sheet_tab">
             <option value="player" selected="selected">player</option>
             <option value="npc">npc</option>
+            <option value="party">party</option>
+        </select>
+    </div>
+    <div class="option-entry">
+        <div>Initiative:</div>
+        <select name="attr_initiative_dice">
+            <option value="0" selected="selected">none</option>
+            <option value="d6">d6</option>
+            <option value="2d6">2d6</option>
         </select>
     </div>
     <div>Sheet version:
-        <input type="text" name="attr_version" value="2.0" disabled="true" hidden="true">
+        <input type="text" name="attr_version" value="3.0" disabled="true" hidden="true">
         <span name="attr_version"></span>
     </div>
 </div>
@@ -93,21 +102,21 @@
                         <input type="number" name="attr_body" value="1">
                         <button type="roll" class="text-button text-big"
                                 value="&{template:default} {{name=Body}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{body}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                                name="roll_might">Body
+                                name="roll_body">Body
                         </button>
                     </div>
                     <div>
                         <input type="number" name="attr_mind" value="1">
                         <button type="roll" class="text-button text-big"
                                 value="&{template:default} {{name=Mind}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{mind}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                                name="roll_might">Mind
+                                name="roll_mind">Mind
                         </button>
                     </div>
                     <div>
                         <input type="number" name="attr_soul" value="1">
                         <button type="roll" class="text-button text-big"
                                 value="&{template:default} {{name=Soul}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{soul}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                                name="roll_might">Soul
+                                name="roll_soul">Soul
                         </button>
                     </div>
                 </div>
@@ -707,7 +716,7 @@
                     <div class="combat-misc">
                         <div class="combat-ability-entry">
                             <button type="roll" class="sheet-text-button"
-                                    value="&{template:default} {{name=Initiative}} {{Result=[[@{initiative} &{tracker}]]}}">
+                                    value="&{template:default} {{name=Initiative}} {{Result=[[@{initiative_dice} + @{initiative} &{tracker}]]}}">
                                 Initiative
                             </button>
                             <div>
@@ -1159,13 +1168,16 @@
         </div>
         <div class="section-npc-stats">
             <div class="line"></div>
-            <div class="npc-details">
+            <div class="npc-details combat-misc">
                 <div>
                     <div>Speed:</div>
                     <input type="text" name="attr_npc_speed"/>
                 </div>
                 <div>
-                    <div>Initiative:</div>
+                    <button type="roll" class="sheet-text-button"
+                            value="&{template:default} {{name=Initiative}} {{Result=[[@{initiative_dice} + @{npc_initiative} &{tracker}]]}}">
+                        Initiative:
+                    </button>
                     <input type="number" name="attr_npc_initiative"/>
                 </div>
                 <div>
@@ -1263,24 +1275,185 @@
                 <div class="npc-body">
                     <button type="roll" class="text-button npc-base-stat"
                             value="&{template:default} {{name=Body}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{body}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                            name="roll_might">Body
+                            name="roll_body">Body
                     </button>
                     <input type="number" name="attr_body" value="1"/>
                 </div>
                 <div class="npc-mind">
                     <button type="roll" class="text-button npc-base-stat"
                             value="&{template:default} {{name=Mind}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{mind}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                            name="roll_might">Mind
+                            name="roll_mind">Mind
                     </button>
                     <input type="number" name="attr_mind" value="1"/>
                 </div>
                 <div class="npc-soul">
                     <button type="roll" class="text-button npc-base-stat"
                             value="&{template:default} {{name=Soul}} {{DN=?{Target DN? |2|3|4|5|6}}} {{Result=[[@{soul}d6s>?{Target DN? |2|3|4|5|6}]] successes}}"
-                            name="roll_might">Soul
+                            name="roll_soul">Soul
                     </button>
                     <input type="number" name="attr_soul" value="1"/>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sheet-party">
+        <div class="npc-name">
+            <input type="text" class="npc-name" name="attr_character_name"/>
+            <div class="options-check stack">
+                <input type="checkbox" class="options-button" name="attr_options" value="1"/>
+                <span></span>
+            </div>
+        </div>
+        <div class="soulfire">
+            <div class="soulfire-sides">
+                <div class="header">Party Members</div>
+                <div class="line"></div>
+                <fieldset class="repeating_party-members">
+                    <input type="text" name="attr_party_member">
+                </fieldset>
+            </div>
+            <div class="soulfire-info">
+                <div class="header">Using Soulfire</div>
+                <div class="line"></div>
+                <button type="roll" class="text-button soulfire-entry"
+                        value="/em uses soulfire to maximise successes - everything counts as a 6"
+                        name="roll_soulfire_success">Maximise Successes - Everything counts as a 6
+                </button>
+                <button type="roll" class="text-button soulfire-entry"
+                        value="/em uses soulfire to reroll as many dice as they like"
+                        name="roll_soulfire_reroll">Reroll as many dice as you like
+                </button>
+                <button type="roll" class="text-button soulfire-entry"
+                        value="/em uses soulfire to regain all of their spent Mettle"
+                        name="roll_soulfire_mettle">Regain all spent Mettle
+                </button>
+                <button type="roll" class="text-button soulfire-entry"
+                        value="/em uses soulfire to recover all of their Toughness"
+                        name="roll_soulfire_toughness">Recover all your Toughness
+                </button>
+                <button type="roll" class="text-button soulfire-entry"
+                        value="/em uses soulfire to cheat death - they are no longer Mortally Wounded"
+                        name="roll_soulfire_death">Cheat Death - you are no longer Mortally Wounded
+                </button>
+            </div>
+            <div class="soulfire-sides">
+                <button type="roll" class="sheet-text-button header"
+                        value="&{template:default} {{name=Souldfire}} {{Current Soulfire points=@{soulfire}/@{soulfire|max}}}"
+                        name="roll_soulfire">Soulfire
+                </button>
+                <div class="line"></div>
+                <div class="soulfire-stat">
+                    <input type="number" name="attr_soulfire">/
+                    <input type="number" name="attr_soulfire_max">
+                </div>
+            </div>
+        </div>
+        <div class="party-info">
+            <div class="party-goals">
+                <div>
+                    <div class="header">Short term goals</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_short-term-goals">
+                        <textarea name="attr_short_term_goal"></textarea>
+                    </fieldset>
+                </div>
+                <div>
+                    <div class="header">Long term goals</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_long-term-goals">
+                        <textarea name="attr_long_term_goal"></textarea>
+                    </fieldset>
+                </div>
+                <div>
+                    <div class="header">Rumours</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_rumours">
+                        <textarea name="attr_rumours"></textarea>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="party-contacts">
+                <div>
+                    <div class="header">Allies</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_allies">
+                        <textarea name="attr_allies"></textarea>
+                    </fieldset>
+                </div>
+                <div>
+                    <div class="header">Enemies</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_enemies">
+                        <textarea name="attr_enemies"></textarea>
+                    </fieldset>
+                </div>
+                <div>
+                    <div class="header">Fears</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_fears">
+                        <textarea name="attr_fears"></textarea>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="party-resources-threats">
+                <div>
+                    <div class="header">Resources</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_resources">
+                        <textarea name="attr_resources"></textarea>
+                    </fieldset>
+                </div>
+                <div>
+                    <div class="header">Threats</div>
+                    <div class="line"></div>
+                    <fieldset class="repeating_threats">
+                        <textarea name="attr_threats"></textarea>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+        <div class="doom">
+            <button type="roll" class="sheet-text-button header"
+                    value="&{template:default} {{name=Doom}} {{Current Doom level=@{doom}}}" name="roll_doom">Doom
+            </button>
+            <div class="line"></div>
+
+            <div class="dots">
+                <input type="hidden" name="attr_doom" class="dot" value="0"/>
+                <button type="action" name="act_doom_0" class="dot">
+                    <span class="checked">0</span>
+                </button>
+                <button type="action" name="act_doom_1" class="dot gt-0">
+                    <span class="checked">1</span>
+                </button>
+                <button type="action" name="act_doom_2" class="dot gt-0 gt-1">
+                    <span class="checked">2</span>
+                </button>
+                <button type="action" name="act_doom_3" class="dot gt-0 gt-1 gt-2">
+                    <span class="checked">3</span>
+                </button>
+                <button type="action" name="act_doom_4" class="dot gt-0 gt-1 gt-2 gt-3">
+                    <span class="checked">4</span>
+                </button>
+                <button type="action" name="act_doom_5" class="dot gt-0 gt-1 gt-2 gt-3 gt-4">
+                    <span class="checked">5</span>
+                </button>
+                <button type="action" name="act_doom_6" class="dot gt-0 gt-1 gt-2 gt-3 gt-4 gt-5">
+                    <span class="checked">6</span>
+                </button>
+                <button type="action" name="act_doom_7" class="dot gt-0 gt-1 gt-2 gt-3 gt-4 gt-5 gt-6">
+                    <span class="checked">7</span>
+                </button>
+                <button type="action" name="act_doom_8" class="dot gt-0 gt-1 gt-2 gt-3 gt-4 gt-5 gt-6 gt-7">
+                    <span class="checked">8</span>
+                </button>
+                <button type="action" name="act_doom_9" class="dot gt-0 gt-1 gt-2 gt-3 gt-4 gt-5 gt-6 gt-7 gt-8">
+                    <span class="checked">9</span>
+                </button>
+                <button type="action" name="act_doom_10" class="dot gt-0 gt-1 gt-2 gt-3 gt-4 gt-5 gt-6 gt-7 gt-8 gt-9">
+                    <span class="checked">10</span>
+                </button>
             </div>
         </div>
     </div>
@@ -1414,4 +1587,12 @@
         });
     });
 
+    const doomValues = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    doomValues.forEach(function (value) {
+        on(`clicked:doom_${value}`, function () {
+            setAttrs({
+                "doom": value
+            });
+        });
+    });
 </script>
