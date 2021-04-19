@@ -717,13 +717,45 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
+function getWeaponWithBonus(weaponName) {
+    if (!weaponName)
+        return undefined;
+    
+    let baseWeapon = weapons[weaponName];
+    if (baseWeapon !== undefined) {
+        return {
+            ...baseWeapon,
+            bonus: '0'
+        };
+    }
+    
+    let match = weaponName.match(/\+[0-9]+$/);
+    if (!match)
+        return undefined;
+    
+    let split = weaponName.split('+');
+    baseWeapon = weapons[split[0].trim()];
+    let bonus = parseInt(split[1].trim());
+    if (split.length !== 2 || baseWeapon === undefined || isNaN(bonus))
+        return undefined;
+    
+    let weaponWithBonus = {
+        ...baseWeapon,
+        'speed' : Math.max(baseWeapon['speed'] - bonus, 1),
+        'bonus' : `+${bonus}`
+    }
+    console.log(weaponWithBonus);
+    return weaponWithBonus;
+}
+
 //melee hit autofill
 on('change:repeating_weapons:weaponname', function(eventInfo){
-    let weapon = weapons[eventInfo.newValue];
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
     if (weapon === undefined)
         return;
 
     let weaponInfo = {
+        'repeating_weapons_attackadj'      : weapon['bonus'],
         'repeating_weapons_range'          : 'Melee',
         'repeating_weapons_size'           : weapon['size'],
         'repeating_weapons_weapspeed'      : weapon['speed'],
@@ -737,11 +769,12 @@ on('change:repeating_weapons:weaponname', function(eventInfo){
 
 //melee damage autofill
 on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
-    let weapon = weapons[eventInfo.newValue];
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
     if (weapon === undefined)
         return;
 
     let weaponInfo = {
+        'repeating_weapons-damage_damadj'    : weapon['bonus'],
         'repeating_weapons-damage_damsm'     : weapon['small-medium'],
         'repeating_weapons-damage_daml'      : weapon['large'],
         'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
@@ -752,13 +785,14 @@ on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
 
 //range hit autofill
 on('change:repeating_weapons2:weaponname2', function(eventInfo){
-    let weapon = weapons[eventInfo.newValue];
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
     if (weapon === undefined)
         return;
 
     let weaponInfo = {
         'repeating_weapons2_strbonus2'       : weapon['strength'] ? 1 : 0,
         'repeating_weapons2_attacknum2'      : weapon['rof'] || '',
+        'repeating_weapons2_attackadj2'      : weapon['bonus'],
         'repeating_weapons2_range2'          : weapon['range'] || '',
         'repeating_weapons2_size2'           : weapon['size'],
         'repeating_weapons2_weapspeed2'      : weapon['speed'],
@@ -772,12 +806,13 @@ on('change:repeating_weapons2:weaponname2', function(eventInfo){
 
 //range damage autofill
 on('change:repeating_ammo:ammoname', function(eventInfo){
-    let weapon = weapons[eventInfo.newValue];
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
     if (weapon === undefined)
         return;
 
     let weaponInfo = {
         'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
+        'repeating_ammo_damadj2'             : weapon['bonus'],
         'repeating_ammo_damsm2'              : weapon['small-medium'],
         'repeating_ammo_daml2'               : weapon['large'],
         'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
@@ -797,12 +832,14 @@ function setupFollowerWeaponsAutoFill(repeating, sections) {
     
     sections.forEach(section => {
         on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
-            let weapon = weapons[eventInfo.newValue];
+            let weapon = getWeaponWithBonus(eventInfo.newValue);
             if (weapon === undefined)
                 return;
             
             let weaponInfo = {
                 [`${prefix}attacknumhench${section}`] : weapon['rof'] || '1',
+                [`${prefix}attackadjhench${section}`] : weapon['bonus'],
+                [`${prefix}damadjhench${section}`]    : weapon['bonus'],
                 [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
                 [`${prefix}damlhench${section}`]      : weapon['small-medium'],
                 [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
