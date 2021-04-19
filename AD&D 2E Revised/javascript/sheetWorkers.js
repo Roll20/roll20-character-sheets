@@ -744,7 +744,6 @@ function getWeaponWithBonus(weaponName) {
         'speed' : Math.max(baseWeapon['speed'] - bonus, 1),
         'bonus' : `+${bonus}`
     }
-    console.log(weaponWithBonus);
     return weaponWithBonus;
 }
 
