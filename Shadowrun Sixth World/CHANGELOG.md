@@ -1,5 +1,23 @@
 Change Log
 ==============================================
+**2021-04-19** v.28 Chuz (James Culp)
+	Removed "Astral Combat" from skills dropdown.
+	Changed "Influence" to "Connection" in Social->Contacts
+	Updated Social->Contacts layout
+	Added send to chat button (chat bubble) to share contact information in chat and provide a connections and loyalty roll button to the GM (they whisper to GM)
+	Added Social and Capacity to Arms->Armor section
+	Added Summon Sprite button to Matrix->Technomancer->Submersion tab that links to Sprite Resist which in turn offers a Resist Fade button (similar functionality to Spirits)
+	Bugfix - Fixed an issue with dicepools on non-pc sheets making it so you couldn't manually set the dicepools for weapons.
+	Turned off auto-calculations for npc weapons and removed skill/spec/expert section since npcs are usually just assigned a dicepool
+	Bugfix - fixed a bug with Core->Weapons roll button not updating when the weapon was updated in Arms->Weapon (things like Spec/Expert and Dice Mod changes weren't carrying over)
+	Updated Qualities roll template to include Rating if there is one
+	Added a send to chat button (chat bubble) to the Gear section, now you can show your GM the descriptions of your gear.
+	Added Melee weapons to the NPC->Grunts and Vehicles sheets
+	Updated a bunch of roll buttons across all sheets, at this point all buttons should print the character name in big text at the top, then what the roll is for below that.  If anybody finds some I missed let me know.
+	Added the Sprint Modifier (normally +1 for PCs) to the PC sheet
+	Added a Sprint roll button to the NPC sheets.
+	Added Notes tab and section so the player can keep any notes they want.
+	Added Rolls tab and (empty) section, this will be used for a future feature to give many commonly used rolls all together in one tab, currently it is just blank space.
 **2021-04-12** v.27 Chuz (James Culp)
 	PC - Magic - Conjuration  - Finished spirit roster section
 	Added Resist Drain button to Spirit Summoning Resist roll output
