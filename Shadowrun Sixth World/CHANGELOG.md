@@ -1,5 +1,10 @@
 Change Log
 ==============================================
+**2021-04-20** v.29 Chuz (James Culp)
+	Minor bugfixes and typo fixes
+	Bugfix - Removed mention of "Force" in npc->grunt spell roll button
+	Bugfix - PC->Magic->Spells->Dicepool Modifier lost it's value constantly
+	Bugfix - Sheets were losing Attributes, Initiative values, Matrix values (ASDF, AR, DR) resulting in many roll buttons not firing correctly, this seemed to be triggered only when importing a character to another lobby and was fixable by re-entering the base attribute values.
 **2021-04-19** v.28 Chuz (James Culp)
 	Removed "Astral Combat" from skills dropdown.
 	Changed "Influence" to "Connection" in Social->Contacts
