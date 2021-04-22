@@ -4310,6 +4310,7 @@
 <input type="hidden" name="attr_primary_melee_weapon_dicepool" />
 <input type="hidden" name="attr_primary_melee_weapon_reach" />
 
+<input type="hidden" name="attr_aug_essence_cost" value="0" />
 <input type="hidden" name="attr_initiative_mod" value="0" />
 <input type="hidden" name="attr_initiative_dice" value="1" />
 <input type="hidden" name="attr_astral_mod" value="6" />
@@ -4429,6 +4430,7 @@ on("sheet:opened", function() {
 		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
 	});
 
+	update_essence();
 	techno_update();
 	update_initiative();
 	update_astral_initiative();
@@ -4628,19 +4630,15 @@ on("change:default_attribute", (eventinfo) => {
 // Update the essence count (6 - aug_mods - calculated augmentation costs = total)
 var update_essence = () => {
 	let ess = 6;
-	let aug_ess_cost = 0;
 
 	getSectionIDs("augmentations", (ids) => {
 		_.each(ids, (id) => {
 			getAttrs([`repeating_augmentations_${id}_essence_cost`], (aug_ess) => {
-				aug_ess_cost += aug_ess[`repeating_augmentations_${id}_essence_cost`];
-				setAttrs({
-					aug_essence_cost: parseFloat(aug_ess_cost).toFixed(2)
-				});
-
 				ess -= aug_ess[`repeating_augmentations_${id}_essence_cost`];
+				aug_cost = 6 - parseFloat(ess);
 				setAttrs({
-					essence: parseFloat(ess).toFixed(2)
+					essence: parseFloat(ess).toFixed(2),
+					aug_essence_cost: parseFloat(aug_cost).toFixed(2)
 				});
 			});
 		});
