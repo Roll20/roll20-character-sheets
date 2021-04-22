@@ -85,7 +85,7 @@ rogueArmor['Plate Mail (Disguise)'] = rogueArmor['Bronze Plate Mail (Disguise)']
     'Detect Noise'     : '-50',
     'Climb Walls'      : '-95',
 };
-rogueArmor['Field Plate (Thief Disguise)'] = rogueArmor['Full Plate (Disguise)'] = {
+rogueArmor['Field Plate (Disguise)'] = rogueArmor['Full Plate (Disguise)'] = {
     'Pick Pockets'     : '-95',
     'Open Locks'       : '-80',
     'Find/Remove Traps': '-80',
