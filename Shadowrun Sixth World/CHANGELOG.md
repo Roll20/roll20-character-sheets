@@ -5,6 +5,12 @@ Change Log
 	Bugfix - Removed mention of "Force" in npc->grunt spell roll button
 	Bugfix - PC->Magic->Spells->Dicepool Modifier lost it's value constantly
 	Bugfix - Sheets were losing Attributes, Initiative values, Matrix values (ASDF, AR, DR) resulting in many roll buttons not firing correctly, this seemed to be triggered only when importing a character to another lobby and was fixable by re-entering the base attribute values.
+	Bugfix - roll20 can't make up their mind whether rolltemplate classes need to have sheet- or not.  Have templates now with and without, because, why not?
+	Bugfix - Fixed a bug causing weapon dicepool to be displayed incorrectly (example: 2+0 was showing up as 20)  Rolls were correct.
+	Bugfix - Display of essence cost was incorrect, fixed this.
+	Bugfix - Added indication that the rating for a skill has not been entered.  Some users were entering the Skill Rating in the Mod box, causing all sorts of mayhem with roll buttons and such.
+	NPC->Sprite sheet Added Attribute selector to Sprite skill roll button Intuition, Logic, Willpower, Charisma replaced with their ASDF equivelents.
+	NPC->Spirit sheet now exists, doesn't have sheet-worker magic like the sprite sheet...yet.
 **2021-04-19** v.28 Chuz (James Culp)
 	Removed "Astral Combat" from skills dropdown.
 	Changed "Influence" to "Connection" in Social->Contacts
