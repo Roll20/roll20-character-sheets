@@ -4,9 +4,22 @@ This is the source code for the A Fistful of Darkness character sheet on Roll20.
 
 ## Changelog
 
+### 1.4
+
+* Skipping version 1.3 to be in sync with version from the book
+* Name change of The Law Special Ability
+* Better readability for resisting via updated background picture
+* Fixed image preloading (from dropbox to github)
+* Fixed text for rolling Riders
+
+### 1.3
+
+* skipped, see 1.4
+
 ### 1.2
 
 * Fine Hellstone fixed (was 2 not connected boxes, now 3 connected boxes)
+* Changed asset location from dropbox to roll20 server
 
 ### 1.1
 
@@ -19,3 +32,4 @@ This is the source code for the A Fistful of Darkness character sheet on Roll20.
 ### 1.0
 
 * Initial release
+
