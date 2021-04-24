@@ -10,9 +10,69 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.4 [Screenshot](coc_v2.png)
+3.9.0 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.9.0 (2021-03-30)
+
+- Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
+  - Migration automatique d'une version antérieure : la première ligne de la capacité est considérée comme titre
+  - Prise en compte dans les autres fonctions (liaison d'un jet de capacité à une voie+rang, import de données de profil JSON)
+- Correction d'un bug après suppression du seul modificateur d'attaque ou de DM de la liste (le modificateur n'est plus pris en compte dans les jets d'attaque)
+
+## v3.8.1 (2021-03-01)
+
+Suppression du code de remise en forme des textes de capacités par élimination des retours à la ligne
+
+## v3.8 (2021-02-22)
+
+_Fiche de PJ_
+
+- Déplacement de l'initiative sur la 1ère ligne de la section combat
+- Amélioration de la reconnaissance des propriétés d'équipement
+  - **DEF : x** pour indiquer le bonus de DEFense d'une armure
+  - **DEF- : x** pour indiquer le malus d'encombrement d'une armure
+  - **RD : x** pour indiquer la réduction des DM d'une armure
+  - **DM : dm type** pour indiquer les dés et le type de DM
+    - Où _dm_ est {nombre}d{faces}
+    - Suffixer _dm_ avec + ou ! pour des DM explosifs
+  - **DM2 : dm2 type2** pour indiquer un second type et dés de DM
+
+_Fiche de Véhicule_
+
+- Ajout d'un type de véhicule et d'un bouton sur l'onglet Configuration
+- Cliquer sur le bouton permet de générer une liste par défaut des jets de véhicule
+
+## v3.7 (2020-12-21)
+
+- Ajout d'un compteur optionnel sur l'onglet Caractéristiques sous les états préjudiciables
+  - comporte un intitulé et une valeur (pas de valeur max.)
+  - l'activation du compteur et son intitulé sont déterminés par le setting choisi sur l'onglet Configuration
+  - permet de comptabiliser les Points de Folie (Cthulhu), Tension (Menace-X), Pulsion (Monstres), Ame/Rage/Sang (Surhumains Démons/Loups-garous/Vampires), etc...
+- Ajout d'un champ Origine sous les champs Profil et Famille dans l'entête de la fiche. Les intitulés 'Profil', 'Famille' et 'Origine' sont modifiés en fonction du setting
+- Pour le setting Monstres, remplacement de l'état Affaibli par la Poisse (moins bon de deux d20) pour tous les états préjudiciables utilisant le d12.
+- Sur une fiche de véhicule, la section des traits physiques (sexe, âge, taille, poids) n'est pas affichée
+
+## v3.6 (2020-09-04)
+
+- Case à cocher sur l'onglet Capacités de la fiche de PJ permettant de basculer entre :
+  - le mode Affichage, avec nom et description textuelle complète des capacités
+  - le mode Edition, où l'utilisateur peut entrer le texte des capacités (la première ligne de texte est toujours considérée comme étant le nom de la capacité).
+- Possibilité d'importer la liste des voies et des capacités du profil du personnage. Consulter la [documentation](https://stephaned68.github.io/ChroniquesContemporaines/import-abilities) pour plus de détails.
+- Possibilité de lier un jet de capacité avec l'une des capacités de la grille, en indiquant le numéro de voie et le rang correspondant. Cette information est principalement utilisée par le script API COlib.
+
+Le script API compagnon [COlib](https://github.com/stephaned68/COlib) permet un import des données, non seulement dans la fiche de personnage mais aussi dans le journal Roll20. Consulter la [documentation](https://stephaned68.github.io/COlib/commands) pour plus de détails.
+
+## v3.5 (2020-08-22)
+
+- Gestion des dés d'usure en mode CO Bitume. Pour chaque pièce d'équipement concernée, indiquer dans la liste des propriétés une propriété nommée Ud et donner en valeur le chiffre du dé d'usure (8 pour d8, 10 pour d10, etc...). Un bouton sous la liste des équipements permet de lancer un test d'usure en sélectionnant d'abord l'équipement concerné. En cas d'échec (le chiffre du jet dans le chat apparait en rouge), le dé d'usure de cette équipement doit être baissé d'un cran (ex : de 'Ud : 8' à 'Ud : 6', cf livre de règles).
+- Gestion de la fiche de véhicule spécifique à Bitume avec :
+  - Une liste des modifications du véhicule pour laquelle on peut indiquer :
+    - le nombre d'emplacements pris par la modification, en cas de dépassement du nombre maximum (valeur de la caractéristique EMP) le nombre d'emplacement est remis à 0.
+    - une liste éventuelle des caractéristiques que la modification booste (RAP, MAN, IMP).
+    - une case permettant d'activer ou non la modification (et donc d'appliquer le buff correspondant)
+  - Une gestion des dés d'usure du véhicule, avec possibilité d'indiquer le Ud maximum et le Ud courant et de faire les jets d'usure correspondant. Le Ud courant est automatiquement mis à jour d'une part en fonction du Ud maximum, et d'autre part en fonction des points d'avaries accumulés.
 
 ## v3.4 (2020-08-15)
 

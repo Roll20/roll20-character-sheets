@@ -1,7 +1,7 @@
 <!-- WRATH & GLORY Multi-tab character sheet integrated with the Wrath & Glory API Die Roller  -->
-<!-- Version: 3.0 Revised Edition -->
-<input  type="hidden" value="3.0" name="attr_sheetversion"/>
-<input  type="hidden" value="3.0" name="attr_release"/>
+<!-- Version: 3.1 Revised Edition -->
+<input  type="hidden" value="3.1" name="attr_sheetversion"/>
+<input  type="hidden" value="3.1" name="attr_release"/>
 <!-- Begin Character sheets with Background -->
 <div class="wrapper">
 
@@ -1543,6 +1543,14 @@
 				<div class="sheet-col">	
 					<div class="sheet-header">Traumatic Injuries</div>
 					<table>
+						<tr>		
+							<td class="sheet-width-W65 sheet-left"><Span class="sheet-block-text" title="Check when the character is dying."><b>Dying?&nbsp;&nbsp;</b></span><input type="checkbox" name="attr_isDying" value="1" title="Check when the character is dying."/><br>	
+							
+							<td class="sheet-width-W30 sheet-right"><span class="sheet-background">Trauma Count:&nbsp;&nbsp;</span></td>
+							<td class="sheet-width-W5 sheet-left"><span class="sheet-circle"><input type="number" readonly value="0" name="attr_tcount" title="Count of Traumatic Injuries."/></span></td>
+						</tr>
+					</table>
+					<table>
 						<tr>				
 							<th class="sheet-width-W40 sheet-left"><h3 class="sheet-header-override">Trauma</h3></th>
 						</tr>
@@ -1554,11 +1562,6 @@
 							</tr>	
 						</table>	
 					</fieldset>
-					<table>
-						<tr>				
-							<td class="sheet-width-W95 sheet-right"><span class="sheet-background">Trauma Count:</span></td>
-							<td class="sheet-width-W5 sheet-left"><span class="sheet-circle"><input type="number" readonly value="0" name="attr_tcount" title="Count of Traumatic Injuries."/></span></td>
-						</tr>
 				</div>
 				<div class="sheet-col">	
 					<div class="sheet-header">Memorable Injuries</div>
@@ -1660,7 +1663,7 @@
 								</button>
 								<button class="sheet-diebutton-simple sheet-diebutton-damage" type="roll"
 										title="Click to make a Damage roll with @{Weapon}" 
-										value="@{sendinlinestring}{template:roll_dicepool_nowrath} {{name=@{character_name} does damage with @{Weapon}.}} {{dice=[[@{wpnED} + @{wpnDmgBD}]]}} {{roll=[[[[@{wpnED} + @{wpnDmgMod}]]d6>4cs>6cf<0]]}}"
+										value="@{sendinlinestring}{template:roll_dicepool_damage} {{name=@{character_name} does damage with @{Weapon}.}} {{dice=[[@{wpnED} + @{wpnDmgBD}]]}} {{dmgmod=@{wpnDmgMod}}} {{roll=[[[[@{wpnED} + @{wpnDmgBD}]]d6>4cs>6cf<0]]}}"
 										name="roll_dice4wpnDamage" style="font-size: 175%;">F</button>
 								</button>	
 							</td>											
@@ -2850,7 +2853,7 @@
 								</button>
 								<button class="sheet-diebutton-simple sheet-diebutton-damage" type="roll"
 										title="Click to make a Damage roll with @{Weapon}." 
-										value="@{sendinlinestring}{template:roll_dicepool_nowrath} {{name=@{character_name} does damage with @{Weapon}.}} {{dice=[[@{wpnED} + @{wpnDmgBD}]]}} {{roll=[[[[@{wpnED} + @{wpnDmgBD}]]d6>4cs>6cf<0]]}}"
+										value="@{sendinlinestring}{template:roll_dicepool_damage} {{name=@{character_name} does damage with @{Weapon}.}} {{dice=[[@{wpnED} + @{wpnDmgBD}]]}} {{dmgmod=@{wpnDmgMod}}} {{roll=[[[[@{wpnED} + @{wpnDmgBD}]]d6>4cs>6cf<0]]}}"
 										name="roll_dice4wpnDamage" style="font-size: 175%;">F</button>
 								</button>	
 							</td>											
@@ -3518,6 +3521,15 @@
 			<tr><td><span style="text-align:left"><b># Icons(4-6) Rolled:</b>&nbsp;{{roll}}</span></td></tr>
 		</table>
 	</rolltemplate>
+	<rolltemplate class="sheet-rolltemplate-roll_dicepool_damage">
+		<table>
+			<tr><th colspan="2">{{name}}</th></tr>
+			<tr><td><span style="text-align:left"><b>Pool of Dice:</b>&nbsp;{{dice}}<b>d6</b></span></td></tr>  
+			<tr><td><span style="text-align:left"><b>Damage Modifier:</b>&nbsp;{{dmgmod}}</span></td></tr>  
+			<tr><td  colspan="2"><span style="text-align:left"><i>Dmg Mod will need to be added manually to determine icons.</i></span></td></tr>  
+			<tr><td><span style="text-align:left"><b># Icons(4-6) Rolled:</b>&nbsp;{{roll}}</span></td></tr>
+		</table>
+	</rolltemplate>
 	<rolltemplate class="sheet-rolltemplate-recovershock_roll">
 		<table>
 			<tr><th colspan="2">{{name}}</th></tr>
@@ -3559,6 +3571,7 @@
 		on('sheet:opened',function(){
 			getAttrs(["sheetversion"], function(values) {
 				var version = (values.sheetversion)*1;
+				// console.log("current sheet version: " + version);
 				// section 2.2 and lower update
 				if(version < 2.2) {
 					
@@ -3840,14 +3853,61 @@
 						setAttrs({tcount:startvalue});
 					});
 				} // END OF section 3.0 update
-			});
 			
-			// Update Version = to current release
-			getAttrs(["release","sheetversion"], function(values) {
-				var release = (values.release)*1;
-				setAttrs({sheetversion: release});
-			});				
-		});	
+				// section 3.1 update				
+				if(version < 3.1) {
+					getAttrs(["tcount","isdying"], function(values) {
+						var dying = (values.isdying)*1;
+						var tc = 1; // base TC is 1 for the single wrath die with all rolls - this is setup for the ISDYING feature
+				
+						if(dying === 1){tc = ((values.tcount)*1) + 1;} // to be reworked with the ISDYING feature
+						// console.log("Dying: " + dying);
+						// console.log("TC: " + tc);
+
+						updateAttributePools(tc);
+						updateSkillPools(tc);
+						updateRepeatingSkillPools(tc);
+						updateWeaponPools(tc);
+						updatePsychicPools(tc);
+					});
+					// Errata Changes to Wounds
+					getAttrs(["wounds","tier","tghbase","tghmod","woundsmod","customtier"], function(values) { 
+						var cw = (values.wounds*1);
+						
+						// calculate wound max and shock max
+						var t = (values.tier)*1;
+						var tgh = ((values.tghbase)*1)+((values.tghmod)*1);
+						var wm = (values.woundsmod)*1;
+						var ct = (values.customtier)*1;
+						var totalw = tgh + (2*t) + wm;
+						
+						cw = cw + t;
+						
+						if(t === 6) {
+							totalw = tgh + (2*ct) + wm;
+							cw = cw + ct;
+						}
+						if(t < 6) {
+							setAttrs({customtier:0});
+						}
+						
+						// set updated values
+						setAttrs({wounds_max:totalw});
+						setAttrs({wounds:cw});
+					});
+				} // END OF section 3.1 update
+				
+				 // NEW VERSION UPDATES GET INSERTED ABOVE THIS LINE
+				
+			
+				// After all updates have been applied, update sheet version = to current release
+				getAttrs(["release"], function(values) {
+					var release = (values.release)*1;
+					setAttrs({sheetversion: release});
+					// console.log("release: " + release);
+				});			
+			}); // END OF GET VERSION NUMBER
+		}); // END OF UPDATE SECTION
 
 		//******************************************************************************************** 
 		//******************************** Vehicle Heavy Wounds ************************************** 
@@ -3952,10 +4012,10 @@
 				var tgh = ((values.tghbase)*1)+((values.tghmod)*1);
 				var wm = (values.woundsmod)*1;
 				var ct = (values.customtier)*1;
-				var total = tgh + t + wm;
+				var total = tgh + (t*2) + wm;
 				if(t === 6) {
-					total = tgh + ct + wm;
-				}
+					total = tgh + (ct*2)  + wm;
+				}							
 				
 				setAttrs({wounds_max:total});
 				setAttrs({wounds:total});
@@ -4266,7 +4326,7 @@
 				});
 			});	
 		
-		// update tcount on revmoing a trauma
+		// update tcount on removing a trauma
 		on("sheet:opened remove:repeating_trauma", function(eventInfo) {
 			getAttrs(["tcount"], function(values) { 
 				var currentcount = 0;				
@@ -4281,22 +4341,48 @@
 		//********************************************************************************************
 		//******************************** Set Wrath dice based on trauma changes ******************** 
 		//********************************************************************************************
-		
 		// Note this does not include vehicle or voidship tests till they release those rules; assuming players will use the old rules.
 		
 		//==================================================================
-		//ATTRIBUTES + Conviction, Resist Corruption, Resolve, and Influence
+		//UPDATE Base Dice Pools for Attributes, Skills, Weapons, and Psychic Powers
 		//==================================================================
-		on("sheet:opened change:tcount change:strbase change:aglbase change:tghbase change:intbase change:willbase change:felbase change:initbase change:strmod change:aglmod change:tghmod change:intmod change:willmod change:felmod change:initmod change:strbonusroll change:aglbonusroll change:tghbonusroll change:intbonusroll change:willbonusroll change:felbonusroll change:initbonusroll change:convadj change:convbonusroll change:corrresistadj change:corrresistbonusroll change:resvadj change:resvbonusroll change:infladj change:inflbonusroll", function(eventInfo) {
-			var wrath = 0;
-			var tc = 0;
-			var base = 0;
-			var attr = "";
-			var bonus = 0;
+		// Due to asyncrhonous firing of js and the sequential updates needed - Attributes to skills to weapons/psychic powers - this will be a single sheet worker that will call functions.  This also allows for updates on upgrade.
+
+		on("change:tcount change:isdying change:strbase change:aglbase change:tghbase change:intbase change:willbase change:felbase change:initbase change:strmod change:aglmod change:tghmod change:intmod change:willmod change:felmod change:initmod change:strbonusroll change:aglbonusroll change:tghbonusroll change:intbonusroll change:willbonusroll change:felbonusroll change:initbonusroll change:convadj change:convbonusroll change:corrresistadj change:corrresistbonusroll change:resvadj change:resvbonusroll change:infladj change:inflbonusroll change:athbaserat change:athattrrat change:athbonusroll change:awarebaserat change:awareattrrat change:awarebonusroll change:ballbaserat change:ballattrrat change:ballbonusroll change:cunnbaserat change:cunnattrrat change:cunnbonusroll change:decepbaserat change:decepattrrat change:decepbonusroll change:insightbaserat change:insightattrrat change:insightbonusroll change:intimbaserat change:intimattrrat change:intimbonusroll change:investbaserat change:investattrrat change:investbonusroll change:leadbaserat change:leadattrrat change:leadbonusroll change:medibaserat change:mediattrrat change:medibonusroll change:persbaserat change:persattrrat change:persbonusroll change:pilotbaserat change:pilotattrrat change:pilotbonusroll change:psychicbaserat change:psychicattrrat change:psychicbonusroll change:schobaserat change:schoattrrat change:schobonusroll change:stealthbaserat change:stealthattrrat change:stealthbonusroll change:survbaserat change:survattrrat change:survbonusroll change:techbaserat change:techattrrat change:techbonusroll change:wpnskillbaserat change:wpnskillattrrat change:wpnskillbonusroll change:repeating_skill:repskillbaserat change:repeating_skill:repskillattrrat change:repeating_skill:repskilllinkedattr change:repeating_skill:repskillbonusroll change:repeating_weapon:wpnattbd change:repeating_weapon:wpnattackskill change:balllinkedattr change:wpnskilllinkedattr change:repeating_psychicpower:psypowertestbasepmrate change:repeating_psychicpower:psypowertestlinkedattr change:repeating_psychicpower:psypowerbonusroll change:repeating_psychicpower:psypowerpush", function(eventInfo) {
 			
+			getAttrs(["tcount","isdying"], function(values) {
+				var dying = (values.isdying)*1;
+				var tc = 1; // base TC is 1 for the single wrath die with all rolls - this is setup for the ISDYING feature
+			
+				if(dying === 1){tc = ((values.tcount)*1) + 1;} // to be reworked with the ISDYING feature
+				//console.log("Dying: " + dying);
+				//console.log("TC: " + tc);
+
+				updateAttributePools(tc);
+				updateSkillPools(tc);
+				updateRepeatingSkillPools(tc);
+				updateWeaponPools(tc);
+				updatePsychicPools(tc);
+				
+			});
+		});
+		
+		//====================================================
+		// FUNCTIONS 
+		//====================================================
+		
+		// FUNCTION: Update Attribute Base and Wrath Dice Pools
+		updateAttributePools = function(tc) {	
+		
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
-			getAttrs(["tcount","strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod","strbonusroll","aglbonusroll","tghbonusroll","intbonusroll","willbonusroll","felbonusroll","initbonusroll","convadj","convbonusroll","corrresistadj","corrresistbonusroll","resvadj","resvbonusroll","infladj","inflbonusroll"], function(values) {
-				tc = ((values.tcount)*1) + 1; // +1 accounts for the one wrath die... so total possible wrath dice is TC + 1
+			getAttrs(["strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod","strbonusroll","aglbonusroll","tghbonusroll","intbonusroll","willbonusroll","felbonusroll","initbonusroll","convadj","convbonusroll","corrresistadj","corrresistbonusroll","resvadj","resvbonusroll","infladj","inflbonusroll"], function(values) {
+				
+				// console.log("***** Attribute Pool Updates  *******");
+				
+				var wrath = 0;
+				var base = 0;
+				var attr = "";
+				var bonus = 0;
 				
 				// Update Strength		
 				attr = "str";	
@@ -4339,7 +4425,7 @@
 				base = (values[attr + "base"])*1 + (values[attr + "mod"])*1;	
 				bonus = (values[attr + "bonusroll"])*1;
 				setupdice(attr,tc,base,bonus,wrath);
-								
+				
 				// Update Conviction	
 				attr = "conv";	
 				base = (values[attr + "adj"])*1;	
@@ -4365,26 +4451,25 @@
 				setupdice(attr,tc,base,bonus,wrath);
 				
 			});
-		});   // End of Attributes Adjustment of Wrath
+		};   // End of Updates to Attribute Dice Pools
 		
-		//==========================================
-		//ATTRIBUTE LINKED DEPENDENT ROLLS - SKILLS 
-		//==========================================
-		on("sheet:opened change:tcount change:athbaserat change:athattrrat change:athbonusroll change:awarebaserat change:awareattrrat change:awarebonusroll change:ballbaserat change:ballattrrat change:ballbonusroll change:cunnbaserat change:cunnattrrat change:cunnbonusroll change:decepbaserat change:decepattrrat change:decepbonusroll change:insightbaserat change:insightattrrat change:insightbonusroll change:intimbaserat change:intimattrrat change:intimbonusroll change:investbaserat change:investattrrat change:investbonusroll change:leadbaserat change:leadattrrat change:leadbonusroll change:medibaserat change:mediattrrat change:medibonusroll change:persbaserat change:persattrrat change:persbonusroll change:pilotbaserat change:pilotattrrat change:pilotbonusroll change:psychicbaserat change:psychicattrrat change:psychicbonusroll change:schobaserat change:schoattrrat change:schobonusroll change:stealthbaserat change:stealthattrrat change:stealthbonusroll change:survbaserat change:survattrrat change:survbonusroll change:techbaserat change:techattrrat change:techbonusroll change:wpnskillbaserat change:wpnskillattrrat change:wpnskillbonusroll", function(eventInfo) {
-			var tc = 0;
-			var skill = "";
-			var attr = "";
-			var attrbase = 0;
-			var base = 0;
-			var bonus = 0;
-			var wrath = 0;
+		// --------------------------------------------------------------------------------
+		
+		// FUNCTION: Update Skill Base and Wrath Dice Pools
+		updateSkillPools = function(tc) {	
 			
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
 			getAttrs(["tcount","athbaserat","athbonusroll","athlinkedattr","awarebaserat","awarebonusroll","awarelinkedattr","ballbaserat","ballbonusroll","balllinkedattr","cunnbaserat","cunnbonusroll","cunnlinkedattr","decepbaserat","decepbonusroll","deceplinkedattr","insightbaserat","insightbonusroll","insightlinkedattr","intimbaserat","intimbonusroll","intimlinkedattr","investbaserat","investbonusroll","investlinkedattr","leadbaserat","leadbonusroll","leadlinkedattr","medibaserat","medibonusroll","medilinkedattr","persbaserat","persbonusroll","perslinkedattr","pilotbaserat","pilotbonusroll","pilotlinkedattr","psychicbaserat","psychicbonusroll","psychiclinkedattr","schobaserat","schobonusroll","scholinkedattr","stealthbaserat","stealthbonusroll","stealthlinkedattr","survbaserat","survbonusroll","survlinkedattr","techbaserat","techbonusroll","techlinkedattr","wpnskillbaserat","wpnskillbonusroll","wpnskilllinkedattr","strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod"], function(values) {
-			
-				tc = ((values.tcount)*1) + 1; // +1 accounts for the one wrath die... so total possible wrath dice is TC + 1
-	
-				//NON-REPEATING ATTRIBUTE LINKED ROLLS
+				
+				var skill = "";
+				var attr = "";
+				var attrbase = 0;
+				var base = 0;
+				var bonus = 0;
+				var wrath = 0;
+				
+				// console.log("***** Skill Pool Updates  *******");
+				
 				// Note: dice total in Attributes = skill base + skill bonus + attribute total (without rollbonus)
 				
 				// ATHLETICS		
@@ -4531,20 +4616,18 @@
 				bonus = (values[skill + "bonusroll"])*1;
 				setupdice(skill,tc,base,bonus,wrath);
 				
-	
 			});
-		});  // End of Static Skills Adjustment of Wrath
+		};   // End of Updates to Skill Dice Pools
 		
-		//====================================================
-		//ATTRIBUTE LINKED DEPENDENT ROLLS - REPEATING SKILLS 
-		//====================================================
+		// --------------------------------------------------------------------------------
 		
-		on("sheet:opened change:tcount change:repeating_skill:repskillbaserat change:repeating_skill:repskillattrrat change:repeating_skill:repskilllinkedattr change:repeating_skill:repskillbonusroll", function(eventInfo) { 
-			var tc = 0;
+	 	// FUNCTION: Update Repeating Skill Base and Wrath Dice Pools
+		updateRepeatingSkillPools = function(tc) {	
 			
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
-			getAttrs(["tcount","strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod"], function(v) { 
-				tc = ((v.tcount)*1) + 1; // +1 accounts for the one wrath die... so total possible wrath dice is TC + 1
+			getAttrs(["strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod"], function(v) { 
+				
+				// console.log("***** Repeating Skill Pool Updates  *******");
 				
 				// get all repeating custom skills
 				getSectionIDs("repeating_skill", function(IDArray) {
@@ -4584,41 +4667,45 @@
 							bonus = parseInt(values["repeating_skill_" + currentID + "_repskillbonusroll"]);
 							//console.log("base: " + base);	
 							//console.log("bonus: " + bonus);	
-
+							
 							if(tc > (base + bonus)) {wrath = (base + bonus);} else {wrath = tc;}
-							newbase = Math.max(0,base + bonus - wrath);
+							newbase =  ((base + bonus) - wrath);
 							//console.log("wrath: " + wrath);	
 							//console.log("newbase: " + newbase);	
-
+							
 							setAttrs({["repeating_skill_" + currentID + "_repskillnewbase"]: newbase});
 							setAttrs({["repeating_skill_" + currentID + "_repskillwrath"]: wrath});
 						});
 					});
 				});	 	// End of get repeating skills
 			});	 		// End of getattr (tcount + attributes)
-		});  			// End of Repeating Skills Adjustment of Wrath
-
-		//====================================================
-		//ATTRIBUTE LINKED DEPENDENT ROLLS - REPEATING WEAPONS 
-		//====================================================
+		};  			// End of Repeating Skills Dice Pool updates
 		
-		on("sheet:opened change:tcount change:repeating_weapon:wpnattbd change:repeating_weapon:wpnattackskill change:balllinkedattr change:wpnskilllinkedattr change:ballbaserat change:wpnskillbaserat", function(eventInfo) { 
-			var tc = 0;
+		// --------------------------------------------------------------------------------
+		
+	 	// FUNCTION: Update Weapon Base and Wrath Dice Pools
+		updateWeaponPools = function(tc) {	
 			
 			// Update Attributes as tcount change impacts all of their base and wrath dice totals
 			getAttrs(["tcount","strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod","ballbaserat","wpnskillbaserat","balllinkedattr","wpnskilllinkedattr"], function(v) { 
+				
+				// console.log("***** Weapon  Pool Updates  *******");	
+				
 				var bsla = ""; // Ballistic Skill Linked Attribute
 				var wsla = ""; // Weapon Skill Linked Attribute
 				var bsattrtotal = 0; // Ballistic Skill Attribute Base + Mod
 				var wsattrtotal = 0; // Weapon Skill Attribute Base + Mod
 				
-				tc = ((v.tcount)*1) + 1; // +1 accounts for the one wrath die... so total possible wrath dice is TC + 1
-				
 				bsla = convertRefAttr((v.balllinkedattr)); // convert from the string in the dropdown
 				bsattrtotal = (v[bsla + "base"])*1 + (v[bsla + "mod"])*1; // set to Ballistic Skill Attribute Base + Mod
 				wsla = convertRefAttr((v.wpnskilllinkedattr)); // convert from the string in the dropdown
 				wsattrtotal = (v[wsla + "base"])*1 + (v[wsla + "mod"])*1; // set to Weapon Skill Attribute Base + Mod
-				
+					
+							// console.log("bsla: " + bsla);
+							// console.log("bsattrtotal: " + bsattrtotal);	
+							// console.log("wsla: " + bsla);
+							// console.log("wsattrtotal: " + wsattrtotal);	
+							
 				// get all repeating weapons
 				getSectionIDs("repeating_weapon", function(IDArray) {
 					var fieldNames = [];
@@ -4642,34 +4729,38 @@
 							switch(attr) {
 								case "(0)":						base = 0;  	//None
 								case "(@{BallTotal})":			base = (bsattrtotal)+(v.ballbaserat)*1;break; 	//BS + AG
-								case "(@{WpnSkillTotal})":		base = (wsattrtotal)+(v.ballbaserat)*1;break;	//WS + INIT
+								case "(@{WpnSkillTotal})":		base = (wsattrtotal)+(v.wpnskillbaserat)*1;break;	//WS + INIT
 								case "(@{WpnSkilAgilTotal})":	base = (v.aglbase)*1+(v.aglmod)*1+(v.wpnskillbaserat)*1;break;	//WS + AG
 								case "default": 				base = 0;
 							};	
 							
+							// console.log("base: " + base);	
+							// console.log("bonus: " + bonus);	
 							bonus = parseInt(values["repeating_weapon_" + currentID + "_wpnattbd"]);
-							
+							// if trauma plus 1 wrath die is > base plus bonus then set wrath = base + bonus as you cannot have more dice than the base pool
 							if(tc > (base + bonus)) {wrath = (base + bonus);} else {wrath = tc;}
-							newbase = Math.max(0,base + bonus - wrath);
-							
+							//console.log("wrath: " + wrath);	
+							newbase = ((base + bonus) - wrath); 	// Testing fix - removed Math.max(0,base + bonus - wrath)
+							// console.log("new base: " + newbase);	
+							// console.log("wrath: " + wrath);	
+
 							setAttrs({["repeating_weapon_" + currentID + "_repweaponnewbase"]: newbase});
 							setAttrs({["repeating_weapon_" + currentID + "_repweaponwrath"]: wrath});
 						});
 					});
 				});	 	// End of get weapon skills
 			});	 		// End of getattr (tcount + attributes)
-		});  			// End of Repeating Weapons Adjustment of Wrath
-
-		//====================================================
-		//ATTRIBUTE LINKED DEPENDENT ROLLS - PSYCHIC POWERS 
-		//====================================================
+		};  			// End of Repeating Weapons Adjustment of Wrath
 		
-		on("sheet:opened change:tcount change:psychicbaserat change:repeating_psychicpower:psypowertestbasepmrate change:repeating_psychicpower:psypowertestlinkedattr change:repeating_psychicpower:psypowerbonusroll change:repeating_psychicpower:psypowerpush", function(eventInfo) { 
-			var tc = 0;
+		// --------------------------------------------------------------------------------
+		
+	 	// FUNCTION: Update Psychic Power Base and Wrath Dice Pools
+		updatePsychicPools = function(tc) {	
 			
 			// Update psychic powers as tcount change impacts all of their base and wrath dice totals
 			getAttrs(["tcount","strbase","aglbase","tghbase","intbase","willbase","felbase","initbase","strmod","aglmod","tghmod","intmod","willmod","felmod","initmod","psychicbaserat"], function(v) { 
-				tc = ((v.tcount)*1) + 1; // +1 accounts for the one wrath die... so total possible wrath dice is TC + 1
+				
+				// console.log("***** Psychic Power Pool Updates *******");	
 				
 				// get all repeating custom skills
 				getSectionIDs("repeating_psychicpower", function(IDArray) {
@@ -4719,24 +4810,29 @@
 					});
 				});	 	// End of get repeating psychic powers
 			});	 		// End of getattr (tcount + attributes)
-		});  			// End of Repeating Psychic Powers Dice Rolling setup
+		};  			// End of Repeating Psychic Powers Dice Rolling setup
 		
-		//====================================================
-		//SUPPORTING FUNCTIONS 
-		//====================================================
+		// --------------------------------------------------------------------------------
 		
 	 	// FUNCTION: set dice fields for standard (base) and wrath dice
 	 	setupdice = function(item,tc,base,bonus,wrath) {	
 	 		var newbase = 0;
 			if(tc > (base + bonus)) {wrath = (base + bonus);} else {wrath = tc;}
-			newbase = Math.max(0,base + bonus - wrath);			
+			newbase =  ((base + bonus) - wrath);
+			// console.log("***** run setup dice for " + item);
+			// console.log("item: " + item);
+			// console.log("newbase: " + newbase);	
+			// console.log("wrath: " + wrath);				
 			setAttrs({[item + "newbase"]: newbase});
 			setAttrs({[item + "wrath"]: wrath});
 	 	};
-
+		
+		// --------------------------------------------------------------------------------
+		
 	 	// FUNCTION: convert the linked attribute into a simple string for cocatenation
 	 	var convertRefAttr = function(attrstring) {	
-				// console.log("attrstring: " + attrstring); // USED FOR TESTING:
+				// console.log("Convert Attr string"); // USED FOR TESTING:
+				// console.log("Convert Attr string: " + attrstring); // USED FOR TESTING:
 				switch(attrstring) {
 					case "(@{STRAdj})":	 return "str";break;
 					case "(@{AGLAdj})":	 return "agl";break;
@@ -4748,6 +4844,7 @@
 					case "default": return "";
 				};	
 	 	};
+		
 		//********************************************************************************************				
 		//******************************** Lookup Tables ********************************************* 
 		//********************************************************************************************		
@@ -4861,3 +4958,4 @@
 			};	
 		};			
 </script> 
+		
