@@ -1,5 +1,47 @@
 Change Log
 ==============================================
+**2021-04-19** v.28 Chuz (James Culp)
+	Removed "Astral Combat" from skills dropdown.
+	Changed "Influence" to "Connection" in Social->Contacts
+	Updated Social->Contacts layout
+	Added send to chat button (chat bubble) to share contact information in chat and provide a connections and loyalty roll button to the GM (they whisper to GM)
+	Added Social and Capacity to Arms->Armor section
+	Added Summon Sprite button to Matrix->Technomancer->Submersion tab that links to Sprite Resist which in turn offers a Resist Fade button (similar functionality to Spirits)
+	Bugfix - Fixed an issue with dicepools on non-pc sheets making it so you couldn't manually set the dicepools for weapons.
+	Turned off auto-calculations for npc weapons and removed skill/spec/expert section since npcs are usually just assigned a dicepool
+	Bugfix - fixed a bug with Core->Weapons roll button not updating when the weapon was updated in Arms->Weapon (things like Spec/Expert and Dice Mod changes weren't carrying over)
+	Updated Qualities roll template to include Rating if there is one
+	Added a send to chat button (chat bubble) to the Gear section, now you can show your GM the descriptions of your gear.
+	Added Melee weapons to the NPC->Grunts and Vehicles sheets
+	Updated a bunch of roll buttons across all sheets, at this point all buttons should print the character name in big text at the top, then what the roll is for below that.  If anybody finds some I missed let me know.
+	Added the Sprint Modifier (normally +1 for PCs) to the PC sheet
+	Added a Sprint roll button to the NPC sheets.
+	Added Notes tab and section so the player can keep any notes they want.
+	Added Rolls tab and (empty) section, this will be used for a future feature to give many commonly used rolls all together in one tab, currently it is just blank space.
+**2021-04-12** v.27 Chuz (James Culp)
+	PC - Magic - Conjuration  - Finished spirit roster section
+	Added Resist Drain button to Spirit Summoning Resist roll output
+	Fixed initiatives (meatspace and astral) on npc sheets being overwritten by automatic calculations
+	Fixed Condition Monitor for Drones/Vehicles being overwritten and with wrong values.  Now they'll auto calculate when body changes but otherwise can be overwritten by the player.
+	Added "legacy": false to sheet.json
+	Added "Summon Spirit" button to Magic->Conjuring.  Using this button prompts for Type and Force of the spirit, does the roll then offers a "Spirit Resist" button in the output that the player or GM can click to roll the spirit's restist roll (Force x 2) which then outputs the hits from that so the player can roll drain.
+	NPC - Made magic, resonance, force inputs disappear correctly when not needed or settings aren't being adjusted
+	NPC - Made resists display when not in settings mode
+	NPC - Grunt/Vehicle - Weapon section now uses same attributes as PC Ranged section so a previously created PC can be relatively seamlessly made into a grunt.
+	Added Autosofts to PC Vehicles tab
+	Added an indicator to PC-Matrix-Programs and NPC-Matrix-Programs to indicate which programs are running.
+**2021-04-05** v.26 Chuz (James Culp)
+	Fixed NPC defense roll buttons
+	Added attr_speed for npc-vehicle sheet so it can be tracked on tokens
+	Fixed NPC soak roll buttons
+	Added cold sim and hot sim initiative modifiers and dice modifiers for all sheets
+	Hid unnecessary Matrix AR and Cold Sim VR initiative for Vehicles, Sprites and Hosts
+	NPC-Sprite - populate ASDF, Resonance and Initiative when sprite level or type is changed.
+	NPC-Sprite when changing level or sprite type, if powers or skills are empty the sheet will auto populate them with the values from the CRB
+	Added a bit of color to differentiate Skill vs. Speciallized vs. Expertise roll buttons.
+	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
+	New section now holds Complex Forms tab and submersion tab
+	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
 
 **2021-03-29** v.25 Chuz (James Culp)
 	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
