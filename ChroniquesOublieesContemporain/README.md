@@ -14,6 +14,10 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Notes de version
 
+## v3.9.1 (2021-04-25)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie n°3 dupliquée dans la voie n°8
+
 ## v3.9.0 (2021-03-30)
 
 - Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
