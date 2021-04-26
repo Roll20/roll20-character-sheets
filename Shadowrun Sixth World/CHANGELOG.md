@@ -1,6 +1,9 @@
 Change Log
 ==============================================
-**2021-04-20** v.29 Chuz (James Culp)
+**2021-05-03**
+	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
+	
+**2021-04-26** v.29 Chuz (James Culp)
 	Minor bugfixes and typo fixes
 	Minor NPC sheet layout tweaks
 	Bugfix - Removed mention of "Force" in npc->grunt spell roll button
