@@ -10,9 +10,15 @@ Le jeu complet est paru dans le magazine [Casus Belli](http://www.black-book-edi
 
 # Version courante
 
-V3.114 [Screenshot](cog_v3.png)
+V3.114.1 [Screenshot](cog_v3.png)
 
 # Notes de version
+
+## V3.114.1 (2021.04.28)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie 3 dupliquée sur le rang 3 de la voie 8
+- Correction d'un bug sur le nom d'attribut de la capacité de rang 4 de la voie 2
+- Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
 
 ## V3.114 (2021.04.12)
 
