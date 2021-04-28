@@ -1,6 +1,11 @@
 Change Log
 ==============================================
-**2021-04-20** v.29 Chuz (James Culp)
+**2021-05-03**
+	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
+	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
+	Bugfix - Core->DR roll button wasn't updating all of the time as it should.
+	Added mouseover titles for weapon ranges C, N, M, F, E to define their ranges in meters.
+**2021-04-26** v.29 Chuz (James Culp)
 	Minor bugfixes and typo fixes
 	Minor NPC sheet layout tweaks
 	Bugfix - Removed mention of "Force" in npc->grunt spell roll button
