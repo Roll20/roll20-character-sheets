@@ -1,5 +1,91 @@
 Change Log
 ==============================================
+**2021-04-12** v.27 Chuz (James Culp)
+	PC - Magic - Conjuration  - Finished spirit roster section
+	Added Resist Drain button to Spirit Summoning Resist roll output
+	Fixed initiatives (meatspace and astral) on npc sheets being overwritten by automatic calculations
+	Fixed Condition Monitor for Drones/Vehicles being overwritten and with wrong values.  Now they'll auto calculate when body changes but otherwise can be overwritten by the player.
+	Added "legacy": false to sheet.json
+	Added "Summon Spirit" button to Magic->Conjuring.  Using this button prompts for Type and Force of the spirit, does the roll then offers a "Spirit Resist" button in the output that the player or GM can click to roll the spirit's restist roll (Force x 2) which then outputs the hits from that so the player can roll drain.
+	NPC - Made magic, resonance, force inputs disappear correctly when not needed or settings aren't being adjusted
+	NPC - Made resists display when not in settings mode
+	NPC - Grunt/Vehicle - Weapon section now uses same attributes as PC Ranged section so a previously created PC can be relatively seamlessly made into a grunt.
+	Added Autosofts to PC Vehicles tab
+	Added an indicator to PC-Matrix-Programs and NPC-Matrix-Programs to indicate which programs are running.
+**2021-04-05** v.26 Chuz (James Culp)
+	Fixed NPC defense roll buttons
+	Added attr_speed for npc-vehicle sheet so it can be tracked on tokens
+	Fixed NPC soak roll buttons
+	Added cold sim and hot sim initiative modifiers and dice modifiers for all sheets
+	Hid unnecessary Matrix AR and Cold Sim VR initiative for Vehicles, Sprites and Hosts
+	NPC-Sprite - populate ASDF, Resonance and Initiative when sprite level or type is changed.
+	NPC-Sprite when changing level or sprite type, if powers or skills are empty the sheet will auto populate them with the values from the CRB
+	Added a bit of color to differentiate Skill vs. Speciallized vs. Expertise roll buttons.
+	PC-Matrix-Technomancer (formerly PC-Matrix-Complex Forms) created
+	New section now holds Complex Forms tab and submersion tab
+	Added Submersion tab with Resist Fade button (for compiling), submersion level, echoes and sprites
+
+**2021-03-29** v.25 Chuz (James Culp)
+	Fixed Matrix ASDF indicator bubbles so 0 doesn't light up all 10 indicators
+	Started changes for NPC sheets.
+	Updated npc sheets image, settings and toggle headers.
+	Styled npc toggles and attribute buttons
+	Updated attribute roll buttons to be consistent with PC sheet buttons.
+	Made Magic now visible if Awakened OR Spirit are selected
+	Made Force only visible if Spirit is selected
+	Updated styles and html to make settings hide/reveal correctly for non-pc sheets
+	Updated matrix grid to work properly with 0 for a stat
+	Changed npc pain tolerance to be in options
+	Updated npc options -> grunt type (mundane, awakened, emergent, spirit) to be a select labeled Archetype
+	Updated "Bonuses" and "Modifier" column variables for non-PC sheets.  They now have the proper name='' fields.
+	DR, I/ID, AC, CM and Move (from npc stat blocks) are now represented along with common rolls (DR, Defense and Soak)	
+	Some more style updates to npc sheets
+	Updated some of the variables and layouts of the areas below Bonuses, Modifier and Options (still not ready for use really)
+
+**2021-03-22** v.24 Chuz (James Culp)
+	Beginning v.24
+	Rearranged player/character names, toggles and navigation buttons in header - still tweaking layout
+	Fix to patreon and roll20userid fields in sheet.json, maybe I'll be listed as a sheet author now.
+	Finished adding Wild Die option to all dice rollers (I think) on PC sheet.
+	Matrix Tab layout more or less complete and ready for script magic
+	Settled on layout changes
+	Completed Sheetworker to tie ASDF device buttons together (only one selected at a time)
+	Completed Sheetworker to tie device primary checkboxes together (only one selected at a time)
+	Completed Sheetworker to update Matrix Attack Rating and Matrix Defense Rating when A/S/D/F are updated
+	Completed Sheetworker to update A/S/D/F to W/I/L/C when emergent checkbox is selected in options (making the character a technomancer)
+	Matrix Device Essence Cost is now included in Essence automatic calculations
+	Matrix Device Initiative Bonus is now included in Initiative automatic calculations
+	Made Technomancer attributes and Complex Forms sections hide for non-technomancers
+	Made device A/S/D/F assignment buttons and matrix condition monitor hide for technomancers
+	Removed empty buttons in skills when no specialization or expertise was set.
+	Linked primary device condition monitor to the condition monitor hexes in the Persona section
+	Fixed a bug related to sheet_type being misread and making some automatic calculations not fire right (initiative bugs anyone?)
+	Started in on Complex Forms
+	Updated Matrix -> Complex Forms section
+	When selecting a skill, have the correct default attribute auto-selected
+
+**2021-03-15** v.23 Chuz (James Culp)
+	Made sheet work with current roll20 "enhanced" code that has been partially rolled back Changed 
+	Condition Monitors -> Settings -> Pain Tolerance to a select so it's obvious whether pc is selecting Low, High or none 
+	Added functionality to the ammo counter, now when primary ranged weapon firing mode is changed the number of rounds updates the the correct amount (1, 2, 4, 10) 
+	Added Mod field for skills to allow skill rolls to have bonuses added. Does not add to the actual skill dicepool just affects the skill roller. 
+	Fixed Initiatives (Meat, Astral, Matrix x3) to now apply mods, dice mods and Config->Temp mods correctly. 
+	Added Magic AR that auto calculates when logic/charisma, tradition or magic change to the Magic -> Meta box
+
+**2021-03-08** v.22 Chuz (James Culp)
+	Add Defense roll-button and DR roll-button to Core->Combat Info tab
+	Updated Skills to split Skills and Knowledge/Languages into separate tabs
+	Finished Magic->Spells, Preparations, Rituals, Adept Powers, Conjuring and Metamagic sections
+	Minor formatting changes to css and html
+	Bugfix DR not adding Body in
+	Bugfix calculations for Cold and Hot Sim initiative roll buttons
+	Bugfix Essence Mod not allowing a zero value
+	Bugfix Removed roll query from flat attribute rolls
+	Bugfix Added Athletics skill to ranged weapons
+	
+**2021-03-03** Chuz (James Culp)
+	Included in roll20 repository for one-click access
+
 **2021-02-28** Chuz (James Culp)
 	Updated Social Tab, Contacts and SINs
 	Changed the header Shadowrun logo to a smaller version, this may change again depending on feedback.
