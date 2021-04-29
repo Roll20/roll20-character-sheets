@@ -17,7 +17,7 @@ TO DO
 	* Arms -> Ranged Might need to add a "Gunnery" skill option and when selected change attribute to Logic
 
 **`NPC Sheets`**
-	* Most sections are useable if not optimally styled now.  Spirits will be changing to their own sheet instead of being a sub-type of Grunts
+	* Most sections are useable if not optimally styled now.
 
 **`Future Features Wishlist`**
 	* Extended Tests Roller?
