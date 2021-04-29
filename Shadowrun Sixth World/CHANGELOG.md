@@ -1,6 +1,10 @@
 Change Log
 ==============================================
-**2021-05-03**
+**2021-04-  ** v.31 Chuz (James Culp)
+	Added Birth Name to Social Tab
+	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
+	Added New Roll Template {template:multirow} with available fields header, base, desc, desc2,...desc6, bigdesc, bigdesc2...bigdesc6 for your macro display joy
+**2021-04-28** v.30 Chuz (James Culp)
 	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
 	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
 	Bugfix - Core->DR roll button wasn't updating all of the time as it should.
