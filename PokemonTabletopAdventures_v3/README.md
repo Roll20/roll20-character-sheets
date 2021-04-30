@@ -13,7 +13,6 @@ Things we want to add to the character sheet, presented in no particular order o
 - [ ] Allow a second ability score to apply to skill checks
 - [ ] Allow formula calculations for the extra damage fields
 - [ ] Refactor the sheet workers to remove the cascading change observation; each `setAttrs` call takes way too long, so we want to capitalise on making them as low as possible
-- [ ] JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters
 - [ ] Add Struggle to the move lists automatically
 - [X] ~~Somehow make it easier to get tokens into initiative. No idea how to accomplish this.~~
 - [x] ~~Display the full bonus to skill checks~~
@@ -28,8 +27,13 @@ Things we want to add to the character sheet, presented in no particular order o
 - [X] ~~Allow modifications to movement (maybe just an extra box)~~
 - [X] ~~Add status effects that you can click~~
   - [X] ~~Burn, Poison/Toxified, and Paralyzed should modify stats automatically~~
+- [X] ~~JSON import and export of sheet data, to support the Pokelicious Sheets and also migrating/copying characters~~
 
 ## Changelog
+
+### Apr 11th, 2021
+- Import/Export support
+  - Supports either roll20 or Pokelicious Google Sheet data
 
 ### Mar 21st, 2021
 - You can now set Afflictions in the character sheet, and they modify stats accordingly!
