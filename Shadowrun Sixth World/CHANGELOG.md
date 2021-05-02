@@ -1,5 +1,26 @@
 Change Log
 ==============================================
+**2021-05-03**
+	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
+	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
+	Bugfix - Core->DR roll button wasn't updating all of the time as it should.
+	Added mouseover titles for weapon ranges C, N, M, F, E to define their ranges in meters.
+**2021-04-26** v.29 Chuz (James Culp)
+	Minor bugfixes and typo fixes
+	Minor NPC sheet layout tweaks
+	Bugfix - Removed mention of "Force" in npc->grunt spell roll button
+	Bugfix - PC->Magic->Spells->Dicepool Modifier lost it's value constantly
+	Bugfix - Sheets were losing Attributes, Initiative values, Matrix values (ASDF, AR, DR) resulting in many roll buttons not firing correctly, this seemed to be triggered only when importing a character to another lobby and was fixable by re-entering the base attribute values.
+	Bugfix - roll20 can't make up their mind whether rolltemplate classes need to have sheet- or not.  Have templates now with and without, because, why not?
+	Bugfix - Fixed a bug causing weapon dicepool to be displayed incorrectly (example: 2+0 was showing up as 20)  Rolls were correct.
+	Bugfix - Display of essence cost was incorrect, fixed this.
+	Bugfix - Added indication that the rating for a skill has not been entered.  Some users were entering the Skill Rating in the Mod box, causing all sorts of mayhem with roll buttons and such.
+	Bugfix - Fixed a display issue with Social -> Contacts that had creeped in.
+	Bugfix - Exotic Weapons for melee weapons wasn't adding the Exotic Weapons skill rating to the roll.
+	NPC->Sprite sheet Added Attribute selector to Sprite skill roll button Intuition, Logic, Willpower, Charisma replaced with their ASDF equivelents.
+	NPC->Spirit sheet now exists, doesn't have sheet-worker magic like the sprite sheet...yet.
+	NPC->Spirit sheet now has the automation added.  attributes, DR, Initiatives, Condition Monitor, Move, Skills, Powers and Attacks will populate when spirit type or Force are first entered.  On subsequent changes to Spirit Type or Force skills, powers and attacks will be left alone UNLESS the "Reset?" toggle is turned on, in which case all will be set to the defaults for the new Spirit Type at the new Force.
+	NPC->Vehicles sheet now has the autosoft toggles including 3 Targeting autosofts with weapon input box.
 **2021-04-19** v.28 Chuz (James Culp)
 	Removed "Astral Combat" from skills dropdown.
 	Changed "Influence" to "Connection" in Social->Contacts
