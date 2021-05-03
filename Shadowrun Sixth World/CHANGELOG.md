@@ -9,6 +9,7 @@ Change Log
 	Added a Notes field to all NPC sheets
 	Added Name field to all NPC sheets, tied to the actual character_name attribute
 	Added Metatype field for NPC->Grunt sheet.
+	Added Matrix Action roll buttons to the new Rolls tab.
 **2021-04-28** v.30 Chuz (James Culp)
 	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
 	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
