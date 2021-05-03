@@ -4176,6 +4176,7 @@
 		<div class="rows host repeating-container ic">
 			<h1 data-i18n="intrusioncountermeasures">Intrusion Countermeasures</h1>
 			<div class="row-long headers">
+				<span>&nbsp;</span>
 				<h2 data-i18n="ic">IC</h2>
 				<h2 data-i18n="pool">Pool</h2>
 				<h2 data-i18n="ar">AR</h2>
@@ -4187,6 +4188,8 @@
 			</div>
 			<fieldset class="repeating_IC">
 				<input name="attr_IC" type="hidden" value=""/>
+				<input class="toggle" name="attr_powered_on_IC" type="checkbox" value='1'/>
+				<span class="pictos">Q</span>
 				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{IC_attack}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_IC_name"></span></button>
 				<span class="center" name="attr_IC_dice"></span>
 				<span class="center" name="attr_IC_ar"></span>
@@ -4194,11 +4197,7 @@
 					<input name="attr_IC_cm" title="@{repeating_form_${x}_cm}" type="number"/>
 				</label>
 				<button name="roll_IC_init" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}:IC}}{{base=^{ic}: ^{initiative}}}{{dice=[[(@{IC_initdice}+@{modifiers_toggle}+@{edge_toggle})d6+@{IC_init}]]}}"><span data-i18n="initiative"></span></button>
-				<span class="center" class="defense_attributes">
-					<span name="attr_IC_attribute"></span>
-					<span class="tiny">+</span>
-					<span name="attr_IC_matrix"></span>
-				</span>
+				<span class="center" name="attr_IC_defense"></span>
 				<input class="collapse-flag" name="attr_display_flag" type="checkbox" />
 				<span class="pictos">i</span>
 				<input class="settings-toggle" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked" />
@@ -4206,6 +4205,7 @@
 				<div class="collapse"><span name="attr_IC_note"></span></div>
 
 				<div class="settings">
+					<span>&nbsp;</span>
 					<label data-i18n-title="name" title="Name">
 						<input name="attr_IC_name" placeholder="Black" title="@{repeating_IC_${x}_name}" type="text"/>
 					</label>
@@ -4230,12 +4230,14 @@
 					</span>
 					<span class="defense_attributes center">
 						<select name="attr_IC_attribute" title="@{repeating_IC_${x}_attribute}">
+							<option data-i18n="none" value="None">None</option>
 							<option data-i18n="intuition" value="Intuition">intuition</option>
 							<option data-i18n="logic" value="Logic">logic</option>
 							<option data-i18n="willpower" value="Willpower" selected="selected">willpower</option>
 						</select>
 						<span class="tiny">+</span>
 						<select name="attr_IC_matrix" title="@{repeating_IC_${x}_matrix}">
+							<option data-i18n="none" value="None">None</option>
 							<option data-i18n="attack" value="Attack">attack</option>
 							<option data-i18n="sleaze" value="Sleaze">sleaze</option>
 							<option data-i18n="data_processing" value="Data Processing">data_processing</option>
@@ -4286,6 +4288,14 @@
 		</label>
     </div>
 
+
+    <div class="textrow grunt host sprite spirit vehicle notes">
+      <h1 data-i18n="notes">Notes</h1><br>
+      <span name='attr_notes'></span>
+		<label class="settings" data-i18n-title="notes" title="Notes">
+        <textarea class="full-row" name="attr_notes" placeholder="" title="@{notes}"></textarea>
+		</label>
+    </div>
 
   </div>
 
@@ -5914,8 +5924,15 @@ on("change:repeating_IC", () => {
 		const mat = v.repeating_IC_IC_matrix;
 		const not = v.repeating_IC_IC_note;
 
+		var def = 'None';
+		if(attr == 'None' && mat == 'None') {
+			def = 'None';
+		} else {
+			def = `${attr} \+ ${mat}`;
+		}
+
 		  setAttrs({
-			repeating_IC_IC: ` ([${host}] vs. ${attr} + ${mat}, ${note})` : `([${att}] vs. ${attr} + ${mat}, ${note})`
+			repeating_IC_IC_defense: def
 		  });
 	 });
 });
