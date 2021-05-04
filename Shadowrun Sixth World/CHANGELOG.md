@@ -1,6 +1,17 @@
 Change Log
 ==============================================
-**2021-05-03**
+**2021-05-03 ** v.31 Chuz (James Culp)
+	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
+	Added Birth Name to Social Tab
+	Added New Roll Template {template:multirow} with available fields header, base, desc, desc2,...desc6, bigdesc, bigdesc2...bigdesc6 for your macro display joy
+	Added Augmentation Grades drop down to PC->Augs section
+	Updated NPC->Host->IC section to make them more useful during encounters.  Separate AR/CM/Initiative Roll Button/etc
+	Added a Notes field to all NPC sheets
+	Added Name field to all NPC sheets, tied to the actual character_name attribute
+	Added Metatype field for NPC->Grunt sheet.
+	Added Matrix Action roll buttons to the new Rolls tab.
+	Styled Rolls->Matrix Action roll buttons to indicate legal/illegal
+**2021-04-28** v.30 Chuz (James Culp)
 	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
 	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
 	Bugfix - Core->DR roll button wasn't updating all of the time as it should.
