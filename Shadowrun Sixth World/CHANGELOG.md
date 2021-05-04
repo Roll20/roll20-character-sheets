@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2021-05-10 ** v.32 Chuz (James Culp)
+	
 **2021-05-03 ** v.31 Chuz (James Culp)
 	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
 	Added Birth Name to Social Tab
