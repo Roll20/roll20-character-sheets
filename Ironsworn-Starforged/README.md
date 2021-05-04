@@ -1,4 +1,4 @@
-# Ironsworn - Character Sheet
+# Ironsworn: Starforged - Character Sheet
 ## Building Sheet
 This sheet uses [pugjs](https://www.google.com) for HTML templating, along with [Stylus](https://www.google.com) from CSS templating.
 To build finished sheet run the following commands from command line or terminal:

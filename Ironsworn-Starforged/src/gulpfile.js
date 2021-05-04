@@ -3,13 +3,13 @@ const stylus = require('gulp-stylus')
 const gulp = require('gulp')
 
 gulp.task('css', () => {
-  return gulp.src('./app/Ironsworn.styl')
+  return gulp.src('./app/Ironsworn-starforged.styl')
     .pipe(stylus())
     .pipe(gulp.dest('../'))
 })
  
 gulp.task('html', () => {
-  return gulp.src('./app/Ironsworn.pug')
+  return gulp.src('./app/Ironsworn-starforged.pug')
     .pipe(pug({
       pretty: true,
       locals: require('../translation.json')
