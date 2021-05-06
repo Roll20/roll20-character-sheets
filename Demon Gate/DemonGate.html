@@ -3507,6 +3507,48 @@
     {
         UpdateW6DmgMod();
     });
+
+    on("change:honorrep change:corruptrep", function()
+    {
+        getAttrs(["HonorRep", "CorruptRep"], function(values)
+        {
+            var goodRepDetails = GetReputationDetails(values.HonorRep);
+
+            var badRepDetails = GetReputationDetails(values.CorruptRep);
+
+            var totalReputation = Number.parseInt(values.HonorRep) + Number.parseInt(values.CorruptRep);
+            var totalRepDetails = GetReputationDetails(totalReputation);
+            var talents = totalRepDetails.level - 1;
+            var totalReputationString = totalReputation.toLocaleString();
+
+            setAttrs({
+                TotalReputation: totalReputationString,
+                TotalReputationForNextLevel: totalRepDetails.nextLevel,
+                ReputationTalents: talents,
+                Glory: totalRepDetails.glory,
+                HonorTitle: goodRepDetails.goodTitle,
+                CorruptionTitle: badRepDetails.badTitle
+            });
+        });
+    });
+
+
+    function GetReputationDetails(reputation)
+    {
+        if(reputation < 100) return { level: 1, nextLevel: '100', glory: 0, goodTitle: 'Unknown', badTitle: 'Unknown' };
+        if(reputation < 250) return { level: 2, nextLevel: '250', glory: 10, goodTitle: 'Known', badTitle: 'Wanted' };
+        if(reputation < 600) return { level: 3, nextLevel: '600', glory: 20, goodTitle: 'Respected', badTitle: 'Hunted' };
+        if(reputation < 1000) return { level: 4, nextLevel: '1,000', glory: 30, goodTitle: 'Highly Respected', badTitle: 'Feared' };
+        if(reputation < 1450) return { level: 5, nextLevel: '1,450', glory: 40, goodTitle: 'Local Hero', badTitle: 'Villain' };
+        if(reputation < 2000) return { level: 6, nextLevel: '2,000', glory: 50, goodTitle: 'Great Hero', badTitle: 'Infamous Villain' };
+        if(reputation < 3000) return { level: 7, nextLevel: '3,000', glory: 55, goodTitle: 'Immortal Hero', badTitle: 'Immortal Villain' };
+        if(reputation < 5000) return { level: 8, nextLevel: '5,000', glory: 60, goodTitle: 'Epic Hero', badTitle: 'Arch-villain' };
+        if(reputation < 8000) return { level: 9, nextLevel: '8,000', glory: 65, goodTitle: 'Revered Hero', badTitle: 'Nemesis' };
+        if(reputation < 12000) return { level: 10, nextLevel: '12,000', glory: 70, goodTitle: 'Legendary Hero', badTitle: 'Arch-nemesis' };
+        if(reputation < 50000) return { level: 11, nextLevel: '50,000', glory: 80, goodTitle: 'Great Legendary Hero', badTitle: 'Legendary Arch-nemesis' };
+        if(reputation < 100000) return { level: 12, nextLevel: '100,000', glory: 90, goodTitle: 'Exalted Legendary Hero', badTitle: 'Unhallowed Scourge' };
+        return { level: 13, nextLevel: '-', glory: 99, goodTitle: 'Demigod', badTitle: 'Demigod' };
+    }
 </script>
 
 
@@ -9360,43 +9402,56 @@
 
                         <table class="sheet-spacer-top-margin">
                             <tr>
-                                <th colspan="2">
+                                <th colspan="3">
                                     <h2>Money</h2>
                                 </th>
                             </tr>
                             <tr>
                                 <th class="sheet-small-table-header">Type</th>
                                 <th class="sheet-small-table-header">Amount</th>
+                                <th class="sheet-small-table-header">Worth</th>
                             </tr>
                             <tr>
-                                <th>Mertacullum</th>
+                                <th>Mertacullum (m)</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_Mertacullum" value="0" />
                                 </td>
+                                <td class="sheet-text-centred">1m = 20g</td>
                             </tr>
                             <tr>
-                                <th>Gold Talons</th>
+                                <th>Valcrium (v)</th>
+                                <td class="sheet-cell-numeric">
+                                    <input type="number" name="attr_Mertacullum" value="0" />
+                                </td>
+                                <td class="sheet-text-centred">1v = 12g</td>
+                            </tr>
+                            <tr>
+                                <th>Gold (g)</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_Gold" value="0" />
                                 </td>
+                                <td class="sheet-text-centred">1g = 4s</td>
                             </tr>
                             <tr>
-                                <th>Silver (shillings)</th>
+                                <th>Silver (s))</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_Silver" value="0" />
                                 </td>
+                                <td class="sheet-text-centred">1s = 5c</td>
                             </tr>
                             <tr>
-                                <th>Copper (crets)</th>
+                                <th>Copper (c)</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_Copper" value="0" />
                                 </td>
+                                <td class="sheet-text-centred">1c = 5b</td>
                             </tr>
                             <tr>
-                                <th>Bones (bits)</th>
+                                <th>Bones (b or p)</th>
                                 <td class="sheet-cell-numeric">
                                     <input type="number" name="attr_Bones" value="0" />
                                 </td>
+                                <td></td>
                             </tr>
                         </table>
 
@@ -9670,7 +9725,7 @@
                     <div class="sheet-column-grow">
                         <h2 class="sheet-spiritual-influence-header">Spiritual Influence</h2>
 
-                        <div class="sheet-spiritual-influence-wrapper">
+                        <div class="sheet-centred-section">
                             <div class="sheet-spiritual-influence-image">
                                 <input type="hidden" name="attr_ClassSI" value="2" />
                                 <input type="number" class="sheet-spiritual-influence" name="attr_SpiritInf" value="2" />
@@ -10580,8 +10635,25 @@
                                 <div>
                                     <input type="checkbox" name="attr_ClassAbilExpanded" checked="true" class="sheet-expand-collapse-checkbox">
                                     <span class="sheet-expand-collapse-symbol"></span>
-                                    <textarea class="sheet-text-area-full sheet-collapsible" name="attr_ClassAbilDesc" value=""
-                                        placeholder="Description of class ability"></textarea>
+                                    <div class="sheet-collapsible">
+                                        <table class="sheet-embedded-table">
+                                            <tr>
+                                                <th>Rating</th>
+                                                <td class="sheet-cell-numeric">
+                                                    <input type="number" name="attr_ClassAbilRating" value="1" />
+                                                </td>
+                                                <th>Max. Rating</th>
+                                                <td class="sheet-cell-numeric">
+                                                    <input type="number" name="attr_ClassAbilMaxRating" value="1" />
+                                                </td>
+                                                <th>Power</th>
+                                                <td class="sheet-cell-numeric">
+                                                    <input type="number" name="attr_ClassAbilPower" value="1" />
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <textarea name="attr_ClassAbilDesc" value="" class="sheet-text-area-full" placeholder="Description of class ability" />
+                                        </div>
                                 </div>
                             </div>
                         </fieldset>
@@ -10603,71 +10675,128 @@
 
                         <div class="sheet-flex-section">
                             <div class="sheet-column-grow">
+                                <h2>Good Reputation</h2>
                                 <table>
                                     <tr>
-                                        <td class="sheet-skillname">Total Rep Pts</td>
-                                        <td class="sheet-cell-numeric">
-                                            <input type="number" name="attr_TotalReputation" value="0" />
+                                        <td class="sheet-skillname">Honor</td>
+                                        <td>
+                                            <input type="number" name="attr_HonorRep" value="0" class="sheet-numeric-wide" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Honor</td>
-                                        <td class="sheet-cell-numeric">
-                                            <input type="number" name="attr_HonorRep" value="0" />
+                                        <td class="sheet-skillname">Title</td>
+                                        <td class="sheet-read-only-field">
+                                            <input type="text" name="attr_HonorTitle" value="Unknown" readonly class="sheet-text-centred" />
                                         </td>
                                     </tr>
                                 </table>
 
-                                <fieldset class="repeating_honorrep">
-                                    <table>
-                                        <tr>
-                                            <th class="sheet-small-table-header">Location</th>
-                                            <th class="sheet-small-table-header">Amt</th>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="text" name="attr_HonorRepName" value="" />
-                                            </td>
-                                            <td class="sheet-cell-numeric">
-                                                <input type="number" name="attr_HonorRepAmt" value="0" />
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </fieldset>
+                                <div class="sheet-collapse-wrapper">
+                                    <h2 class="sheet-table-header-collapse">Good Renown</h2>
+                                    <div class="sheet-collapse-section">
+                                        <input type="checkbox" name="attr_GoodRenownExpanded" checked="true" class="sheet-expand-collapse-checkbox">
+                                        <span class="sheet-expand-collapse-symbol"></span>
+                                        <div class="sheet-collapsible">
+                                            <fieldset class="repeating_honorrep">
+                                                <table>
+                                                    <tr>
+                                                        <th class="sheet-small-table-header">Location</th>
+                                                        <th class="sheet-small-table-header">Amount</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" name="attr_HonorRepName" value="" />
+                                                        </td>
+                                                        <td class="sheet-cell-numeric">
+                                                            <input type="number" name="attr_HonorRepAmt" value="0" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
 
                             <div class="sheet-column-grow">
+                                <h2>Bad Reputation</h2>
                                 <table>
                                     <tr>
-                                        <td class="sheet-skillname">Glory</td>
-                                        <td class="sheet-cell-numeric">
-                                            <input type="number" name="attr_Glory" value="0" />%
+                                        <td class="sheet-skillname">Corruption</td>
+                                        <td>
+                                            <input type="number" name="attr_CorruptRep" value="0" class="sheet-numeric-wide" />
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td class="sheet-skillname">Corruption</td>
-                                        <td class="sheet-cell-numeric">
-                                            <input type="number" name="attr_CorruptRep" value="0" />
+                                        <td class="sheet-skillname">Title</td>
+                                        <td class="sheet-read-only-field">
+                                            <input type="text" name="attr_CorruptionTitle" value="Unknown" readonly class="sheet-text-centred" />
                                         </td>
                                     </tr>
                                 </table>
 
-                                <fieldset class="repeating_corruptrep">
-                                    <table>
-                                        <tr>
-                                            <th class="sheet-small-table-header">Location</th>
-                                            <th class="sheet-small-table-header">Amt</th>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <input type="text" name="attr_CorruptRepName" value="" />
-                                            </td>
-                                            <td class="sheet-cell-numeric">
-                                                <input type="number" name="attr_CorruptRepAmt" value="0" />
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </fieldset>
+                                <div class="sheet-collapse-wrapper">
+                                    <h2 class="sheet-table-header-collapse">Bad Renown</h2>
+                                    <div class="sheet-collapse-section">
+                                        <input type="checkbox" name="attr_BadRenownExpanded" checked="true" class="sheet-expand-collapse-checkbox">
+                                        <span class="sheet-expand-collapse-symbol"></span>
+                                        <div class="sheet-collapsible">
+                                            <fieldset class="repeating_corruptrep">
+                                                <table>
+                                                    <tr>
+                                                        <th class="sheet-small-table-header">Location</th>
+                                                        <th class="sheet-small-table-header">Amount</th>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>
+                                                            <input type="text" name="attr_CorruptRepName" value="" />
+                                                        </td>
+                                                        <td class="sheet-cell-numeric">
+                                                            <input type="number" name="attr_CorruptRepAmt" value="0" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </fieldset>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sheet-column-grow">
+                                <h2>Total Reputation</h2>
+                                <table>
+                                    <tr>
+                                        <td class="sheet-skillname">Total Reputation</td>
+                                        <td class="sheet-read-only-field">
+                                            <input type="text" name="attr_TotalReputation" value="0" readonly class="sheet-text-centred" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sheet-skillname">Next Tier</td>
+                                        <td class="sheet-read-only-field">
+                                            <input type="text" name="attr_TotalReputationForNextLevel" value="0" readonly class="sheet-text-centred" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sheet-skillname">Additional Talents</td>
+                                        <td class="sheet-cell-numeric-readonly">
+                                            <input type="number" name="attr_ReputationTalents" value="0" readonly />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="sheet-skillname">Glory</td>
+                                        <td class="sheet-cell-numeric-readonly">
+                                            <input type="number" name="attr_Glory" value="0" readonly />%
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <div class="sheet-centred-section sheet-vertical-margin-moderate">
+                                    <button type="roll" value="&{template:default} {{name=Glory Check}}  {{Successes = [[{(1d100 + ?{Modifier|0})}<@{Glory}]]}}">
+                                        Roll Glory Check
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -10694,10 +10823,9 @@
                             </fieldset>
                         </div>
                     </div>
+
                 </div>
-
             </div>
-
 
 
             <!-- ----------------------------------------------------------------------------------------------------------------------------------------------------
@@ -10717,8 +10845,8 @@
                                     <input type="checkbox" name="attr_Note1Expanded" checked="true" class="sheet-expand-collapse-checkbox">
                                     <span class="sheet-expand-collapse-symbol"></span>
                                     <textarea class="sheet-text-area-large sheet-collapsible" name="attr_Note1Content" value="" placeholder="Note"></textarea>
+                                    </div>
                                 </div>
-                            </div>
                         </fieldset>
                     </div>
 
