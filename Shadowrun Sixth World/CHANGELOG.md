@@ -4,6 +4,7 @@ Change Log
 	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
 	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
 	Added Core->Direct Magic Defense button and Core->Indirect Magic Defense buttons
+	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
 **2021-05-03 ** v.31 Chuz (James Culp)
 	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
 	Added Birth Name to Social Tab
