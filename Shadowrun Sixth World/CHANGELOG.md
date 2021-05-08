@@ -5,6 +5,7 @@ Change Log
 	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
 	Added Core->Direct Magic Defense button and Core->Indirect Magic Defense buttons
 	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
+	Added disclaimer to Rolls section, specialization/expertise and mods from augs/magic/etc are not included in those rolls, the way to add those dice to the pools is to use the [Modifiers] toggle at the top of the sheet.
 **2021-05-03 ** v.31 Chuz (James Culp)
 	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
 	Added Birth Name to Social Tab
