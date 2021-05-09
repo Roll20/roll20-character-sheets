@@ -7,6 +7,7 @@ Change Log
 	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
 	Added disclaimer to Rolls section, specialization/expertise and mods from augs/magic/etc are not included in those rolls, the way to add those dice to the pools is to use the [Modifiers] toggle at the top of the sheet.
 	Bugfix - Long weapon names threw off the display in Core->Weapons and Arms.
+	Bugfix - Delete icons were showing up on the left for Social and Vehicles covering the move icon preventing rearranging.
 **2021-05-03 ** v.31 Chuz (James Culp)
 	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
 	Added Birth Name to Social Tab
