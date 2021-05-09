@@ -4,6 +4,11 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Quickstart/B
 
 ### Changelog
 
+**v.1.70(2021-05-04)**
+* refactor sheet in PUG & SCSS
+* update the sheet to work with [CSE](https://wiki.roll20.net/CSE)
+* replace page buttons
+* add datalists for race, origin, class 
 
 **v.1.55(2020-11-03)**
 * more stats on Settings page
