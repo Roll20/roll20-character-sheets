@@ -588,6 +588,7 @@
 
 			<div class="row-long cc-arm">
 				<div class="armor-info">
+					<div>&nbsp;</div>
 					<button type="roll" name="roll_dr" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{defense} ^{rating}}}{{rating=@{armor_rating}}}">
 						<span class="center"><span data-i18n="dr">DR</span> <span name="attr_armor_rating"></span></span>
 					</button>
@@ -598,6 +599,17 @@
 					<div>&nbsp;</div>
 					<button type="roll" name="roll_soak" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{soak} ^{damage}}}{{dice=[[((@{soak})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{wilddie=[[@{wild_die}d6]]}}">
 						<span class="center" name="soak" title="@{soak}">Soak Damage</span>
+					</button>
+					<div>&nbsp;</div>
+				</div>
+				<div class="magic-defense">
+					<div>&nbsp;</div>
+					<button type="roll" name="roll_direct_magic_defense" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{direct} ^{magic} ^{defense}}}{{dice=[[((@{willpower}+@{intuition})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=Willpower + Intuition}}{{wilddie=[[@{wild_die}d6]]}}">
+						<span class="center"><span class="center" data-i18n="directmagicdefense">Direct Magic Defense</span></span>
+					</button>
+					<div>&nbsp;</div>
+					<button type="roll" name="roll_indirect_magic_defense" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{indirect} ^{magic} ^{defense}}}{{dice=[[((@{reaction}+@{willpower})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{desc=Reaction + Willpower}}{{wilddie=[[@{wild_die}d6]]}}">
+						<span class="center"><span class="center" data-i18n="indirectmagicdefense">Indirect Magic Defense</span></span>
 					</button>
 					<div>&nbsp;</div>
 				</div>
@@ -870,6 +882,12 @@
           <h1 data-i18n="melee">Melee</h1>
           <div class="right-tri"></div>
         </div>
+        <div class="header htab">
+          <div class="triangle"></div>
+          <input class="tab-switch" name="attr_weapon_type_toggle" type="radio" value="grenade"/>
+          <h1 data-i18n="grenade">Grenade</h1>
+          <div class="right-tri"></div>
+        </div>
       </div>
       <div class="border-box">
         <div class="pc-box medium-box">
@@ -1073,6 +1091,77 @@
                 <h3 data-i18n="notes">notes</h3>
                 <label data-i18n-title="notes" title="notes">
                   <textarea name="attr_notes" placeholder="Notes" title="@{repeating_melee_${x}_notes}"></textarea>
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
+
+          <div class="rows repeating-container weapon-grenade">
+            <button name="roll_GrenadeScatterAndDistance" style="display: none !important;" type="roll" value="/w GM &{template:multirow}{{header=Grenade}}{{base=Bounce & Scatter}}{{desc=Scatter Direction [[2d6]]}}{{desc2=Bounce Distance [[{[[2d6]]-(?{Hits?|0}?{Range?|Close,+4|Near,+2|Medium,+0|Far,-2|Extreme,-4}),0}kh1]]m}}"></button>
+            <div class="row-long headers">
+              <h2 data-i18n="weapon">Grenade</h2>
+              <h2 data-i18n="pool">Pool</h2>
+              <h2 data-i18n="gz" title="Ground Zero ~1m">GZ</h2>
+              <h2 data-i18n="c" title="Close 1-3">C</h2>
+              <h2 data-i18n="n" title="Near 4-50">N</h2>
+              <h2 data-i18n="blast" title="Blast Area">Blast</h2>
+            </div>
+            <fieldset class="repeating_grenade">
+              <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
+              <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
+              <button name="roll_grenade_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon}}}{{dice=[[(@{type}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{ground_zero}/@{close}/@{near}, Blase Area: @{blast}, Notes: @{notes} [GM Roll Scatter](~@{character_name}|GrenadeScatterAndDistance)}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
+              <span class="center" name="attr_dicepool"></span>
+              <span class="center" name="attr_ground_zero"></span>
+              <span class="center" name="attr_close"></span>
+              <span class="center" name="attr_near"></span>
+              <span class="center" name="attr_blast"></span>
+              <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
+              <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
+              <div class="collapse"><span name="attr_notes"></span></div>
+              <div class="settings">
+                <label data-i18n-title="weapon" title="weapon">
+                  <input name="attr_weapon" placeholder="Fragmentation" title="@{repeating_grenade_${x}_weapon}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="pool" title="pool">
+                  <input name="attr_dicepool" title="@{repeating_grenade_${x}_dicepool}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="gz" title="Ground Zero <1m">
+                  <input name="attr_ground_zero" placeholder="16P" title="@{repeating_grenade_${x}_ground_zero}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="close" title="Close 1-3">
+                  <input name="attr_close" placeholder="12P" title="@{repeating_grenade_${x}_close}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="near" title="Near 4-50">
+                  <input name="attr_near" placeholder="8P" title="@{repeating_grenade_${x}_near}" type="text" value=""/>
+                </label>
+                <label data-i18n-title="blast" title="Blast Area">
+                  <input name="attr_blast" placeholder="20m" title="@{repeating_grenade_${x}_blast}" type="text" value=""/>
+                </label>
+                <div class="row">
+                  <h3 data-i18n="type">type</h3>
+                  <select name="attr_type" title="@{repeating_grenade_${x}_type}">
+						  <option data-i18n="thrown" value="@{athletics}+@{agility}">thrown</option>
+                    <option data-i18n="launcher" value="@{exotic_weapons}+@{logic}">Exotic Weapons</option>
+                  </select>
+                  <h3 data-i18n="specialization">specialization</h3>
+                  <label data-i18n-title="specialization" title="specialization">
+                    <input name="attr_spec" value="2" title="@{repeating_grenade_${x}_spec}" type="checkbox"/>
+                  </label>
+                  <h3 data-i18n="expertise">expertise</h3>
+                  <label data-i18n-title="expertise" title="expertise">
+                    <input name="attr_expert" value="3" title="@{repeating_grenade_${x}_expert}" type="checkbox"/>
+                  </label>
+                </div>
+                <div class="row">
+                  <h3 data-i18n="modifier">modifier</h3>
+                  <label data-i18n-title="modifier" title="modifier">
+                    <input name="attr_dicepool_modifier" title="@{repeating_grenade_${x}_dicepool_modifier}" placeholder='0' type="number"/>
+                  </label>
+                </div>
+                <h3 data-i18n="notes">notes</h3>
+                <label data-i18n-title="notes" title="notes">
+                  <textarea name="attr_notes" placeholder="Notes" title="@{repeating_grenade_${x}_notes}"></textarea>
                 </label>
               </div>
             </fieldset>
@@ -2953,6 +3042,7 @@
 					<div class="rolls-col">
 						<div class="rolls-matrix">
 							<h1 data-i18n="matrixactions">Matrix Actions</h1>
+							<h3 data-i18n="rollbuttonsdisclaimer"></h3>
 							<h2 data-i18n="matrixmajor">Matrix Major Actions</h2>
 							<button type="roll" class="illegal outsider" name="roll_matrix_backdoor_entry" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Backdoor Entry}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), vs. Willpower + Firewall}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="backdoorentry"></span></button>
 							<button type="roll" class="illegal outsider user admin" name="roll_matrix_brute_force" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Brute Force}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), vs. Willpower + Firewall}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="bruteforce"></span></button>
@@ -2969,7 +3059,9 @@
 							<span class="matrix-action legal outsider user admin" data-i18n="fullmatrixdefense"></span>
 							<button type="roll" class="illegal user" name="roll_matrix_hash_check" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Hash Check}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{electronics}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), CRB pg.182}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="hashcheck"></span></button>
 							<button type="roll" class="illegal outsider user admin" name="roll_matrix_hide" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Hide}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{intuition}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), vs. Intuition + Data Processing |or| Data Processing + Sleaze}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="hide"></span></button>
-							<span class="matrix-action legal outsider user admin" data-i18n="jackout"></span>
+
+							<button type="roll" class="legal outsider user admin" name="roll_matrix_jackout" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Jack Out}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{electronics}+@{willpower}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Legal), vs. Charisma + Data Processing |or| Attack + Data Processing}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="jackout"></span></button>
+
 							<button type="roll" class="illegal admin" name="roll_matrix_jam_signals" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Jam Signals}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), CRB pg.182}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="jamsignals"></span></button>
 							<button type="roll" class="legal user admin" name="roll_matrix_jump_into_rigged_device" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Jump Into Rigged Device}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{electronics}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Legal), vs. Willpower + Firewall |or| Firewall x 2}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="jumpintoriggeddevice"></span></button>
 							<button type="roll" class="legal outsider user admin" name="roll_matrix_matrix_perception" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Matrix Perception}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{electronics}+@{intuition}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Legal), * Without Resonance or Cyberdeck), vs. Willpower + Sleaze}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="matrixperception"></span></button>
@@ -4235,7 +4327,7 @@
 				<input name="attr_IC" type="hidden" value=""/>
 				<input class="toggle" name="attr_powered_on_IC" type="checkbox" value='1'/>
 				<span class="pictos">Q</span>
-				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{IC_attack}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_IC_name"></span></button>
+				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{dice}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_IC_name"></span></button>
 				<span class="center" name="attr_IC_dice"></span>
 				<span class="center" name="attr_IC_ar"></span>
 				<label data-i18n-title="cm" title="Condition Monitor">
@@ -4982,7 +5074,7 @@
 <input type="hidden" name="attr_throwingweapons" value="0" />
 <input type="hidden" name="attr_tracking" value="0" />
 <input type="hidden" name="attr_unarmedcombat" value="0" />
-<input type="hidden" name="attr_sheet_version" value="0.31">
+<input type="hidden" name="attr_sheet_version" value="0.32">
 
 <script type="text/worker">
 //Sheet workers
@@ -4992,9 +5084,13 @@ on("sheet:opened", function() {
 		console.log(`%c Sheet Type: ${v['sheet_type']}`, "color: red; font-weight:bold");
 	});
 
+	// fixe broken soak values
+	update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
+
 	['body', 'agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma', 'magic', 'resonance'].forEach(attr => {
 		update_attributes(attr);
 	});
+
 	update_essence();
 	techno_update();
 	update_initiative();
@@ -5093,7 +5189,7 @@ on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
 	//ONLY RUN ON BODY CHANGE
 	if (source.includes("body")) {
 		update_common_rolls(["body", "body", "overflow_modifier"]);
-		update_common_rolls(["body", "armor_rating", "soak_modifier", "soak_temp", `soak_temp_flag`]);
+		update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
 		update_track("physical");
 	};
 });
@@ -5175,6 +5271,8 @@ on("change:default_attribute", (eventinfo) => {
 		update_attributes(attr);
 	});
 });
+
+
 var update_attributes = (attr) => {
 	// Load attribute values
 	getAttrs([`${attr}_base`, `${attr}_modifier`, `${attr}_temp`, `${attr}_temp_flag`], (v) => {
@@ -5192,6 +5290,7 @@ var update_attributes = (attr) => {
 		});
 	});
 };
+
 
 // Update the essence count (6 - aug_mods - calculated augmentation costs = total)
 var update_essence = () => {
@@ -5571,15 +5670,11 @@ const update_common_rolls = (attrs) => {
 
 		//DEFENSE & SOAK HAVE TWO EXTRA ATTRIBUTES. TEMP IS NEEDED BUT ONLY IF THE FLAG IS CHECKED IN SETTINGS
 		const array = (name === "defense" || name === "soak") ? (v[`${name}_temp_flag`] === "on") ? attrs.splice(0, 4) : attrs.splice(0, 3) : attrs;
-console.log(array);
 		_.each(array, (attr) => {
-console.log('attr: ' + attr);
-console.log('v[attr]: ' + v[`${attr}`]);
 			numbers.push(parseInt(v[`${attr}`]) || 0);
 		});
 		const add   = (a, b) => a + b, sum = numbers.reduce(add);
-console.log('add: ' + add);
-console.log('sum: ' + sum);
+
 		setAttrs({[`${name}`]: sum});
 	});
 };
