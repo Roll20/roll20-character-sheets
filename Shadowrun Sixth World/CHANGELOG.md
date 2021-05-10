@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2021-05-17 ** v.33 Chuz (James Culp)
+	
 **2021-05-10 ** v.32 Chuz (James Culp)
 	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
 	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
