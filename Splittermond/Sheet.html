@@ -1075,19 +1075,19 @@
 
         <div class="value-overview ml--3 mr--3">
             <div class="form__group mr--1 ml--3">
-                <input type="number" name="attr_vtdoben" value="0" placeholder="17" class="form__field text--right" />
+                <input type="number" name="attr_vtdoben" value="0" placeholder="17" class="form__field" readonly="readonly" />
                 <label class="form__label">VTD</label>
             </div>
             <div class="form__group mr--1 ml--1">
-                <input type="number" name="attr_gwoben" value="0" placeholder="15" class="form__field text--right" />
+                <input type="number" name="attr_gwoben" value="0" placeholder="15" class="form__field" readonly="readonly" />
                 <label class="form__label">GW</label>
             </div>
             <div class="form__group mr--1 ml--1">
-                <input type="number" name="attr_kwoben" value="0" placeholder="15" class="form__field text--right" />
+                <input type="number" name="attr_kwoben" value="0" placeholder="15" class="form__field" readonly="readonly" />
                 <label class="form__label">KW</label>
             </div>
             <div class="form__group mr--1 ml--1">
-                <input type="number" name="attr_sroben" value="0" placeholder="0" class="form__field text--right" />
+                <input type="number" name="attr_sroben" value="0" placeholder="0" class="form__field" readonly="readonly" />
                 <label class="form__label">SR</label>
             </div>
             <div class="moon-fragment mr--3 ml--1">
@@ -1123,8 +1123,9 @@
                     <span></span>
                     <span></span>
                 </div> -->
-                <div class="form__group">
+                <div class="form__group d--flex d--flex--align-bottom">
                     <input type="number" name="attr_splitterpunkte" value="0" min="0" class="form__field" />
+                    &#47;<input type="number" name="attr_splitterpunktemax" value="0" min="0" class="form__field" readonly="readonly" />
                     <input type="hidden" name="attr_hiddensplitterpunkte" value="0" />
                     <input type="hidden" name="attr_hiddensplitterpunktehg" value="0" />
                     <label class="form__label">Splitterpunkte</label>
@@ -6269,12 +6270,21 @@
 <script type="text/worker">
 
 on('sheet:opened',function(){
-    getAttrs(["epgesamt"], function(v) {
+    getAttrs(["epgesamt", "abilityroll", "skillmasterymigrationisexecuted"], function(v) {
         if (v.epgesamt == 0)
         {
             setAttrs({
                 epgesamt: 15
             });
+        }
+        let update = {};
+        if (v.abilityroll == ""){
+            update["abilityroll"] = "&{template:splittermond_generic}";
+        }
+        setAttrs(update);
+
+        if (!v.skillmasterymigrationisexecuted) {
+            migrateFightAndMagicSkillMastery();
         }
     });
 	getSectionIDs("fertigkeitennsc", function(idarray) {
@@ -6295,16 +6305,10 @@ on('sheet:opened',function(){
             setAttrs(newrowattrs);
         }
     });
-    getAttrs(["abilityroll", "skillmasterymigrationisexecuted"], function(v) {
-        let update = {};
-        if (v.abilityroll == ""){
-            update["abilityroll"] = "&{template:splittermond_generic}";
-        }
-        setAttrs(update);
-
-        if (!v.skillmasterymigrationisexecuted) {
-            migrateFightAndMagicSkillMastery();
-        }
+    getAttrs(["hiddensplitterpunkte", "hiddensplitterpunktehg"], function(v) {
+        setAttrs({
+            splitterpunktemax: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg
+        });
     });
     transferRessources();
 });
@@ -6861,7 +6865,8 @@ on("change:repeating_staerken:staerkenwert change:repeating_staerken:staerke", f
 on("change:hiddensplitterpunkte change:hiddensplitterpunktehg", function() {
     getAttrs(["hiddensplitterpunkte", "hiddensplitterpunktehg"], function(v) {
         setAttrs({
-            splitterpunkte: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg
+            splitterpunkte: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg,
+            splitterpunktemax: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg
         });
     });
 });
