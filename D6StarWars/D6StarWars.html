@@ -276,6 +276,7 @@
     <!-- --------------------------------------------- Attributes&Skills ------------------------------------------- -->
 
     <div class="section pc npc">
+      <label style="text-align: center">Attributes & Skills</label>
       <div class="flex-box">
         <div class="flex-col">
 
@@ -464,129 +465,92 @@
 
     <div class="section pc npc shop-inventory">
       <label style="text-align: center">Weapon & Armor</label>
-      <table>
-        <tr>
-          <td style="width:210px"><label>Weapon</label></td>
-          <td style="width:70px">Skill Roll</td>
-          <td style="width:72px">Damage</td>
-          <td style="width:45px">Short</td>
-          <td style="width:50px">Med</td>
-          <td style="width:45px">Long</td>
-          <td style="width:35px">ROF</td>
-          <td style="width:30px;text-align:center;">Ammo</td>
-        </tr>
-      </table>
-      <fieldset class="repeating_weapons">
-        <input class="skilltext" name="attr_weapon" style="width:200px" type="text"/>
-        <input class="smallnumber" min="1" name="attr_weaponskill" type="number" value="1"/>D+<input class="pipnumber"
-                                                                                                     max="2"
-                                                                                                     min="0"
-                                                                                                     name="attr_weaponskillpip" type="number"
-                                                                                                     value="0"/>
-        <input class="smallnumber shortnumber" min="1" name="attr_damagedice" type="number" value="1"/>D+<input
-          class="pipnumber shortnumber" max="2" min="0" name="attr_damagepip" type="number" value="0"/>
-        <input class="smallnumber shortnumber" name="attr_shortrange" type="number"/>
-        <input class="mediumnumber shortnumber" name="attr_medrange" type="number"/>
-        <input class="mediumnumber shortnumber" name="attr_longrange" type="number"/>
-        <input class="smallnumber shortnumber" name="attr_ROF" type="number"/>
-        <input class="mediumnumber shortnumber" name="attr_Ammo" type="number"/>
-        <!-- roll buttons with roll queries -->
-        <button class="d6-dice rollmod" name="roll_attack" type="roll"
-                value="&{template:red} {{name=@{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}">
-          Atk
-        </button>
-        <button class="d6-dice rollmod-no" name="roll_attack" type="roll"
-                value="&{template:red} {{name=@{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}">
-          Atk
-        </button>
+      <div>
+        <div class="weapon row">
+          <div class="cell cell-name">Weapon</div>
+          <div class="cell cell-dice">Attack</div>
+          <div class="cell cell-dice">Damage</div>
+          <div class="cell cell-4">
+            <div>Range</div>
+            <div class="part" title="Point Blank Range (Very Easy)">PB</div> - <div class="part" title="Short Range (Easy)">S</div> / <div class="part" title="Medium Range (Moderate)">M</div> / <div class="part" title="Long Range (Difficult)">L</div>
+          </div>
+          <div class="cell cell-1"><abbr title="Rate of Fire">ROF</abbr></div>
+          <div class="cell cell-1">Ammo</div>
+        </div>
 
+        <fieldset class="repeating_weapons">
+          <div class="weapon row skill">
+            <div class="cell cell-name">
+              <label class="unified-dice unified-dice-text">
+                <input name="attr_weapon" type="text"/>
+              </label>
+            </div>
+            <div class="cell cell-dice">
+              <input name="attr_weaponskill" type="number" min="0" value="0" class="unified-dice unified-dice-input"/>D+<input name="attr_weaponskillpip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_attack" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Attack: @{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-dice">
+              <input name="attr_damagedice" type="number" value="0" min="0" class="unified-dice unified-dice-input"/>D+<input name="attr_damagepip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
+              <button type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Damage: @{weapon}}} {{Roll=[[(@{damagedice} + ?{Dice mods|0} - 1)d6cf0cs7 + @{damagepip} + ?{Other Mods(pip)|0} + (1d6@{wilddie})]]}}"></button>
+              <button type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage: @{weapon}}} {{Roll=[[(@{damagedice} + ?{Dice mods|0} - 1)d6cf0cs7 + @{damagepip} + ?{Other Mods(pip)|0} + (1d6@{wilddie})]]}}"><span class="redtxt">GM</span></button>
+              <button type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Damage: @{weapon}}} {{Roll=[[(@{damagedice}- 1)d6cf0cs7 + @{damagepip} + (1d6@{wilddie})]]}}"></button>
+              <button type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage: @{weapon}}} {{Roll=[[(@{damagedice}- 1)d6cf0cs7 + @{damagepip} + (1d6@{wilddie})]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-4"><input name="attr_pointblankrange" type="number" min=0" class="unified-dice unified-dice-input"/>-<input name="attr_shortrange" type="number" min="0" class="unified-dice unified-dice-input"/>/<input name="attr_medrange" type="number" min="0" class="unified-dice unified-dice-input"/>/<input name="attr_longrange" type="number" min="0" class="unified-dice unified-dice-input"/></div>
+            <div class="cell cell-1"><input name="attr_ROF" type="number" value="1" class="unified-dice unified-dice-input"/></div>
+            <div class="cell cell-1"><input name="attr_Ammo" type="number" value="30" class="unified-dice unified-dice-input"/></div>
+          </div>
+        </fieldset>
+      </div>
 
-        <button class="d6-dice rollmod gmroll gmroll-hide" name="roll_attack-w" type="roll"
-                value="/w gm &{template:red} {{name=@{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} + ?{Dice mods|0} -1)d6cf0cs0 + @{weaponskillpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>Atk
-        </button>
-        <button class="d6-dice rollmod-no gmroll gmroll-hide" name="roll_attack-w" type="roll"
-                value="/w gm &{template:red} {{name=@{weapon}}} {{Roll=[[(@{weaponskill} -@{WoundMod} +@{Force_Up} -1)d6cf0cs0 + @{weaponskillpip} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>Atk
-        </button>
+      <div>
+        <div class="armor row">
+          <div class="cell cell-name">Armor</div>
+          <div class="cell cell-dice">Physical <span style="font-family: 'Pictos Custom'; font-size: large">t</span></div>
+          <div class="cell cell-dice">Energy <span style="font-family: 'Pictos'; font-size: large">e</span></div>
+          <div class="cell cell-2">Str</div>
+          <div class="cell cell-4">Other</div>
+        </div>
 
-        <button class="d6-dice" name="roll_dmg" type="roll"
-                value="&{template:red} {{name=@{weapon} damage}} {{Roll=[[(@{damagedice}- 1)d6cf0cs7 + @{damagepip} + (1d6@{wilddie})]]}}">
-          Dmg
-        </button>
-        <button class="d6-dice gmroll gmroll-hide" name="roll_dmg-w" type="roll"
-                value="/w gm &{template:red} {{name=@{weapon} damage}} {{Roll=[[(@{damagedice}- 1)d6cf0cs7 + @{damagepip} + (1d6@{wilddie})]]}}">
-          <span class="redtxt">GM</span>Dmg
-        </button>
-      </fieldset>
-      <table>
-        <tr>
-          <td style="width:200px"><label>Armor</label></td>
-          <td style="width:80px">Physical</td>
-          <td style="width:80px">Energy</td>
-          <td style="width:180px">Other</td>
-          <td style="width:180px">Damage Soak Rolls</td>
-        </tr>
-      </table>
-      <fieldset class="repeating_armors">
-        <input class="skilltext" name="attr_armorname" style="width:200px" type="text"/>
-        <input class="smallnumber shortnumber" min="0" name="attr_armorPhDice" type="number" value="1"/>D+<input
-          class="pipnumber shortnumber" max="2" min="0" name="attr_armorPhPip" type="number" value="0"/>
-        <input class="smallnumber shortnumber" min="0" name="attr_armorEnDice" type="number" value="1"/>D+<input
-          class="pipnumber shortnumber" max="2" min="0" name="attr_armorEnPip" type="number" value="0"/>
-        <input class="skilltext" name="attr_armor_other" type="text"/>
-        <button class="d6-dice rollmod-no physical" name="roll_dmg_soak_en" type="roll"
-                value="&{template:red} {{name=Damage Soak(Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} -1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} +1d6@{wilddie}]]}}">
-          t
-        </button>
-        <button class="d6-dice rollmod-no energy" name="roll_dmg_soak_ph" type="roll"
-                value="&{template:red} {{name=Damage Soak(Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} -1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} +1d6@{wilddie}]]}}">
-          e
-        </button>
-        <button class="d6-dice rollmod-no" name="roll_dmg_soak_str" type="roll"
-                value="&{template:red} {{name=Damage Soak(Strength only)}} {{Roll=[[(@{strength} -1)d6cf0cs0 +@{strengthpip} +1d6@{wilddie}]]}}">
-          Str only
-        </button>
+        <fieldset class="repeating_armors">
+          <div class="armor row skill">
+            <div class="cell cell-name">
+              <label class="unified-dice unified-dice-text">
+                <input name="attr_armorname" type="text"/>
+              </label>
+            </div>
+            <div class="cell cell-dice">
+              <input name="attr_armorPhDice" type="number" min="0" value="0" class="unified-dice unified-dice-input"/>D+<input name="attr_armorPhPip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
+              <button name="roll_dmg_soak_ph" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Damage Soak (Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_ph" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Damage Soak (Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} - 1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_ph" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_dmg_soak_ph" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} - 1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-dice">
+              <input name="attr_armorEnDice" type="number" value="0" min="0" class="unified-dice unified-dice-input"/>D+<input name="attr_armorEnPip" type="number" value="0" min="0" max="2" class="unified-dice unified-dice-pip"/>
+              <button name="roll_dmg_soak_en" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Damage Soak (Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_en" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Damage Soak (Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} - 1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_en" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_dmg_soak_en" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} - 1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-2">
+              <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod" value="&{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no" value="&{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} - 1)d6cf0cs0 +@{strengthpip} +1d6@{wilddie}]]}}"></button>
+              <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} + ?{Dice mods|0} - 1)d6cf0cs0 +@{strengthpip} + ?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+              <button name="roll_dmg_soak_str" type="roll" class="d6-dice unified-dice unified-dice-roll rollmod-no gmroll gmroll-hide" value="/w gm &{template:swd6} {{name=Damage Soak (Strength Only)}} {{Roll=[[(@{strength} - 1)d6cf0cs0 +@{strengthpip} +1d6@{wilddie}]]}}"><span class="redtxt">GM</span></button>
+            </div>
+            <div class="cell cell-4">
+              <label class="unified-dice unified-dice-text" style="width: 100%;">
+                <input name="attr_armor_other" type="text"/>
+              </label>
+            </div>
+          </div>
+        </fieldset>
+      </div>
 
-        <button class="d6-dice rollmod-no gmroll physical gmroll-hide" name="roll_dmg_soak_en-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} -1)d6cf0cs0 +@{strengthpip} + @{armorPhPip} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>t
-        </button>
-        <button class="d6-dice rollmod-no gmroll energy gmroll-hide" name="roll_dmg_soak_ph-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} -1)d6cf0cs0 +@{strengthpip} + @{armorEnPip} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>e
-        </button>
-        <button class="d6-dice rollmod-no gmroll gmroll-hide" name="roll_dmg_soak_str-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Strength only)}} {{Roll=[[(@{strength} -1)d6cf0cs0 +@{strengthpip} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>S
-        </button>
-
-        <button class="d6-dice rollmod physical" name="roll_dmg_soak_en" type="roll"
-                value="&{template:red} {{name=Damage Soak(Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} +?{Dice mods|0} -1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}">
-          t
-        </button>
-        <button class="d6-dice rollmod energy" name="roll_dmg_soak_ph" type="roll"
-                value="&{template:red} {{name=Damage Soak(Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} +?{Dice mods|0} -1)d6cf0cs0 +@{strengthpip} +@{armorEnPip} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}">
-          e
-        </button>
-        <button class="d6-dice rollmod" name="roll_dmg_soak_str" type="roll"
-                value="&{template:red} {{name=Damage Soak(Strength only)}} {{Roll=[[(@{strength} +?{Dice mods|0} -1)d6cf0cs0 +@{strengthpip} +?{Other Mods(pip)|0} +1d6@{wilddie}]]}}">
-          Str only
-        </button>
-
-        <button class="d6-dice rollmod-no gmroll physical gmroll-hide" name="roll_dmg_soak_en-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Physical)}} {{Roll=[[(@{strength} +@{armorPhDice} +?{Dice mods|0} -1)d6cf0cs0 +@{strengthpip} +@{armorPhPip} +?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>t
-        </button>
-        <button class="d6-dice rollmod-no gmroll energy gmroll-hide" name="roll_dmg_soak_ph-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Energy)}} {{Roll=[[(@{strength} +@{armorEnDice} +?{Dice mods|0} -1)d6cf0cs0  +@{strengthpip} +@{armorEnPip} +?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>e
-        </button>
-        <button class="d6-dice rollmod-no gmroll gmroll-hide" name="roll_dmg_soak_str-w" type="roll"
-                value="/w gm &{template:red} {{name=Damage Soak(Strength only)}} {{Roll=[[(@{strength} +?{Dice mods|0} -1)d6cf0cs0 +@{strengthpip} +?{Other Mods(pip)|0} + 1d6@{wilddie}]]}}">
-          <span class="redtxt">GM</span>S
-        </button>
-      </fieldset>
     </div>
 
     <!-- ----------------------------------------------- Force Section --------------------------------------------- -->
