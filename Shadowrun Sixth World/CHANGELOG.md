@@ -1,6 +1,25 @@
 Change Log
 ==============================================
-**2021-05-03**
+**2021-05-10 ** v.32 Chuz (James Culp)
+	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
+	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
+	Added Core->Direct Magic Defense button and Core->Indirect Magic Defense buttons
+	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
+	Added disclaimer to Rolls section, specialization/expertise and mods from augs/magic/etc are not included in those rolls, the way to add those dice to the pools is to use the [Modifiers] toggle at the top of the sheet.
+	Bugfix - Long weapon names threw off the display in Core->Weapons and Arms.
+	Bugfix - Delete icons were showing up on the left for Social and Vehicles covering the move icon preventing rearranging.
+**2021-05-03 ** v.31 Chuz (James Culp)
+	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
+	Added Birth Name to Social Tab
+	Added New Roll Template {template:multirow} with available fields header, base, desc, desc2,...desc6, bigdesc, bigdesc2...bigdesc6 for your macro display joy
+	Added Augmentation Grades drop down to PC->Augs section
+	Updated NPC->Host->IC section to make them more useful during encounters.  Separate AR/CM/Initiative Roll Button/etc
+	Added a Notes field to all NPC sheets
+	Added Name field to all NPC sheets, tied to the actual character_name attribute
+	Added Metatype field for NPC->Grunt sheet.
+	Added Matrix Action roll buttons to the new Rolls tab.
+	Styled Rolls->Matrix Action roll buttons to indicate legal/illegal
+**2021-04-28** v.30 Chuz (James Culp)
 	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
 	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
 	Bugfix - Core->DR roll button wasn't updating all of the time as it should.
