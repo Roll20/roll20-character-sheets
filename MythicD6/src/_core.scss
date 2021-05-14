@@ -203,6 +203,32 @@
 
   /* --------------- Universal Section ------------------- */
 
+  .border{
+      border-style: solid;
+      border-radius: 13px;
+  }
+
+  :is(div.section section) hr{
+    display: block;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    border-style: solid;
+    border-width: 2px;
+    border-color: black;
+  }
+
+  .section,
+  section {
+    display: flex;
+    padding: 5px;
+    border: none;
+    background: white;
+    opacity: 0.9;
+    min-height: 90%;
+    max-width: 800px;
+  }
   .flex-row {
     display: flex;
     flex-flow: row wrap;
@@ -214,42 +240,11 @@
   }
 
   .flex-center {
-    align-items: center;
-    justify-content: center;
+    place-items: center;
   }
 
   .gap{
     gap: 10px;
-  }
-
-  .section {
-      padding: 5px;
-      min-height: 90%;
-  }
-
-  div.border{
-      border-style: solid;
-      border-radius: 13px;
-  }
-
-  div.section hr{
-    display: block;
-    margin-top: 0.5em;
-    margin-bottom: 0.5em;
-    margin-left: auto;
-    margin-right: auto;
-    border-style: solid;
-    border-width: 2px;
-    border-color: black;
-  }
-
-  .section {
-    display: flex;
-    padding: 5px;
-    border: none;
-    background: white;
-    opacity: 0.9;
-    max-width: 800px;
   }
 
   .columnflex {
@@ -661,32 +656,86 @@
   }
 
 
-  /* -------------------------- Page 2 ----------------------- */
+  /* -------------------------- Page 2/Notes --------------------- */
 
-  main.pg2 textarea{
-    height: 140px;
+  main.pg2 {
+
+    textarea{
+      height: 140px;
+    }
   }
 
-  /* -------------------------- Page 3 ----------------------- */
+  /* -------------------------- Page 3/Settings ------------------ */
 
-  main.pg3 input[type="number"]{
-    height: 24px;
+  main.pg3 {
+    input[type="number"]{
+      height: 24px;
+    }
+
+    span.dice{
+      margin-top: 5px;
+    }
   }
 
-  main.pg3 span.dice{
-    margin-top: 5px;
+
+  /* -------------------------- Page 3/Settings ------------------ */
+
+  main.npc{
+
+    * {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+    }
+    h3{
+      text-align: center;
+    }
+    .mookgrid{
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(4, 1fr) 3fr;
+      place-items: center;
+
+      .orange {
+        background-color: orange;
+        font-size: 1.3em;
+        place-self: stretch;
+      }
+
+      .name {
+        grid-column: span 5;
+
+        label{
+          width: 40px;
+        }
+        input{
+          font-size: 1.7em;
+          text-align: center;
+          margin-bottom: 5px;
+        }
+      }
+
+      .al{
+        grid-column: span 2;
+      }
+      .notes{
+        grid-column: span 5;
+        background-color: LemonChiffon;
+      }
+
+    }
   }
 
 
   /*------------------------------------*\
-    #PAGE TABS/BUTTONS
+    #PAGE LAYOUT/ PAGE BUTTONS
   \*------------------------------------*/
 
 
 
   /* Defines core layout of each page */
 
-  main.pg1 {
+  main.character {
     display: grid;
     grid-gap: 4px;
     grid-template-columns: 13fr 5fr 4fr;
@@ -704,7 +753,7 @@
     position: relative;
   }
 
-  main.pg2 {
+  main.notes {
     display: grid;
     width: 750px;
     position: relative;
@@ -712,75 +761,54 @@
 
 
 
-  main.pg3 {
+  main.settings {
     display: grid;
+    grid-template-columns: 1fr 1fr;
     width: 750px;
     position: relative;
   }
 
-  main.tab-content { display: none; }
+  main.npc {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 50px auto;
+    width: 750px;
+    position: relative;
+  }
 
+  /* -------------- page buttons ------------- */
 
+  main.character,
+  main.notes,
+  main.npc,
+  button[type="action"].npc,
+  button[type="action"].pc,
+  main.settings {
+      display: none;
+  }
 
-  /* styling/position tab button */
-
-  input.tab1:checked ~ main.tab1,
-  input.tab2:checked ~ main.tab2,
-  input.tab3:checked ~ main.tab3
-  {
+  /* show the selected page */
+  input.tabstoggle[value="character"] ~ main.character,
+  input.tabstoggle[value="notes"] ~ main.notes,
+  input.tabstoggle[value="npc"] ~ main.npc,
+  input.tabstoggle[value="settings"] ~ main.settings {
       display: grid;
   }
 
-
-  input.tab
-  {
-      width: 150px;
-      height: 26px;
-      position: relative;
-      top: -20px;
-      left: 15px;
-
-      margin: 5px 0px 5px 0px;
-      padding: 0px;
-      cursor: pointer;
-      z-index: 1;
-      opacity: 0;
+  /* shows/hides page buttons */
+  input.npctoggle[value="0"] ~ button[type="action"].pc,
+  input.npctoggle[value="1"] ~ button[type="action"].npc{
+      display: flex;
   }
 
-  input.tab + span::before
-  {
-      content: attr(title);
+  div.tab-buttons{
+    display: flex;
+    gap: 10px;
 
-      width: 150px;
-      height: 22px;
-      position: absolute;
-      top: 50px;
-      left: 43px;
-
-      border: solid 2px grey;
-      border-radius: 13px;
-      padding-bottom: 2px;
-      text-align: center;
-      font-size: 18px;
-      display: inline-block;
-      background: white;
+    button{
+      font-size: 1.5em;
+    }
   }
-
-  input.tab:checked + span::before
-  {
-      background: grey;
-  }
-
-  input.tab2 + span::before
-  {
-      left: 197px;
-  }
-
-  input.tab3 + span::before
-  {
-      left: 352px;
-  }
-
 
 
 
@@ -843,7 +871,9 @@
       opacity: 0;
   }
 }
-/* mobile styling */
+  /*------------------------------------*\
+    #MOBILE
+  \*------------------------------------*/
 
 @media only screen and (max-width: 480px) {
 
