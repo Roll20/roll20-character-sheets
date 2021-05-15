@@ -21,6 +21,7 @@
 			"vehicle_land", "vehicle_space", "vehicle_water", "dummy"],
 		psionic: ["biopsionics", "metapsionics", "precognition", "telekinesis", "telepathy", "teleportation"],
 		magic: ["know_magic", "use_magic", "sunblade"],
+		wwn: ["administer", "connect", "convince", "craft", "exert", "heal", "know", "lead", "magic", "notice", "perform", "pray", "punch", "ride", "sail", "shoot", "sneak", "stab", "survive", "trade", "work"],
 	};
 
 //- We have foci in two locations, so they are outsourced to this mixin
@@ -139,9 +140,10 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 		.main-content
 			+text-input-duo("HP", "HP_max", false, {value: "0"}).important
 				.label
-					button.unstyled-button(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{character_name}}} {{title=^{HIT_POINTS}}} {{=[[{abs(@{setting_heroic_enable}-1)*@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, abs(@{setting_heroic_enable}-1)*@{hp|max} + 1d1, 0d0 + @{setting_heroic_enable}*ceil(([[6*@{level}]] [Level] + [[@{level}*@{constitution_mod}]] [Con] + [[@{level}*@{extra_hp_query}]] [Bonus])/2)}kh1]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
-			+text-input-duo("strain", "strain_max", "SYSTEM_STRAIN", {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"})(min="0", value="0")
-			+text-input-duo("strain_permanent_extra", "strain_permanent", "PERMANENT_STRAIN", {readonly: true, "data-i18n-title": "PERMANENT_STRAIN"})(type="number", min="0", value="0", data-i18n-title="PERMANENT_STRAIN_EXTRA").center
+					button.unstyled-button.dice-icon(type="roll", name="roll_HP", data-i18n="HIT_POINTS" value!="&{template:swn-default} {{charname=@{character_name}}} {{title=^{HIT_POINTS}}} {{=[[{abs(@{setting_heroic_enable}-1)*@{level}d6 + @{level}*@{constitution_mod}[CON] + @{level}*@{extra_hp_query}, abs(@{setting_heroic_enable}-1)*@{hp|max} + 1d1, 0d0 + @{setting_heroic_enable}*ceil(([[6*@{level}]] [Level] + [[@{level}*@{constitution_mod}]] [Con] + [[@{level}*@{extra_hp_query}]] [Bonus])/2)}kh1]]}} {{info=^{MAXIMUM_HP_1} @{level}d6 + @{level}&ast;[[@{constitution_mod}[CON] + @{extra_hp_query}]] ^{MAXIMUM_HP_2} [[@{hp|max} + 1]]}}")
+			+text-input-duo("strain_permanent_extra", "cyberware_strain_total", "PERMANENT_STRAIN", {readonly: true, "data-i18n-title": "TOTAL_CYBERWARE_STRAIN"}, "", "+", "+")(type="number", min="0", value="0", data-i18n-title="PERMANENT_STRAIN_EXTRA").center
+			input(type="hidden" name="attr_strain_above_max", value="0").strain-above-max
+			+text-input-trio("strain_extra", "strain", "strain_max", "SYSTEM_STRAIN_/_MAX", {readonly: true, title: "Total Strain", "data-i18n-title": "TOTAL_STRAIN", class: "total-strain"}, {value: "10", readonly: true, "data-i18n-title": "CONSTITUTION"}, "", "=")(min="0", value="0", data-i18n-title="STRAIN_EXTRA", title: "Strain Extra") System Strain / Max
 			+text-input-duo("xp", "xp_next", "XP_NEXT_LEVEL", {min: "0", value: "3"})(min="0", value="0")
 			+text-input("AC", "ARMOR_CLASS")(type="number", value="10", readonly, data-i18n-title="AC_DESC").center
 			+text-input("attack_bonus", "ATTACK_BONUS")(type="number", min="0", value="0").center
@@ -294,6 +296,11 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 							option.skills-revised(value="@{skill_punch}", data-i18n="PUNCH")
 							option.skills-revised(value="@{skill_shoot}", data-i18n="SHOOT", selected)
 							option.skills-revised(value="@{skill_stab}", data-i18n="STAB")
+							option.skills-wwn(value="@{skill_exert}", data-i18n="EXERT")
+							option.skills-wwn(value="@{skill_punch}", data-i18n="PUNCH")
+							option.skills-wwn(value="@{skill_shoot}", data-i18n="SHOOT", selected)
+							option.skills-wwn(value="@{skill_stab}", data-i18n="STAB")
+							option.skills-wwn(value="@{skill_magic}", data-i18n="MAGIC")
 							option.skills-first(value="@{skill_combat_energy}", data-i18n="COMBAT_ENERGY")
 							option.skills-first(value="@{skill_combat_gunnery}", data-i18n="COMBAT_GUNNERY")
 							option.skills-first(value="@{skill_combat_primitive}", data-i18n="COMBAT_PRIMITIVE")
@@ -617,6 +624,16 @@ input(type="hidden", name="attr_setting_transhuman_enable", value="").transhuman
 						input(type="number", min="0", value="0", name="attr_unspent_skill_points").level
 			.skills-first.skill-container(data-i18n-list="SKILL_ORDER_FIRST")
 				each skill in skills.first
+					+makeSkill(skill, !!customSkills[skill], customSkills[skill])
+				.skill.skill-points
+					.display.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						span(name="attr_unspent_skill_points").level
+					.edit.flex-center
+						span(data-i18n="UNSPENT_SKILL_POINTS").name
+						input(type="number", min="0", value="0", name="attr_unspent_skill_points").level
+			.skills-wwn.skill-container(data-i18n-list="SKILL_ORDER_WWN")
+				each skill in skills.wwn
 					+makeSkill(skill, !!customSkills[skill], customSkills[skill])
 				.skill.skill-points
 					.display.flex-center

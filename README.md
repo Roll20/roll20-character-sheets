@@ -12,11 +12,15 @@ Pull requests are processed weekly and should be **submitted no later than 6am P
 
 ## Internationalization &amp; Translations
 
-Help us make these sheets accessible in as many languages as possible. We use [Crowdin](https://crowdin.com/) to crowdsource translations.
+We use [Crowdin](https://crowdin.com/) to crowdsource and manage translations for various aspects of our site. 
 
-**The best way to translate an existing character sheet is to become a translator by emailing a request to team@roll20.net.** 
+Check out the Help Center articles and Community Wiki documentation below to learn about translations and to help us make Roll20 accessible in as many languages as possible!
 
-Character Sheet authors have a number of controls over how the sheet is translated and how the translation is displayed. Full documentation can be found in the [Roll20 Wiki](https://wiki.roll20.net/Character_Sheet_i18n). Sheets that are duplicated and translated manually rather than using this translation process will not be accept.
+* [How to Become a Translation Volunteer](https://roll20.zendesk.com/hc/en-us/articles/360058423993-How-to-Become-a-Translation-Volunteer)
+* [How to Translate Content on Crowdin](https://roll20.zendesk.com/hc/en-us/articles/360057432414-How-to-Translate-Content-on-Crowdin)
+* [Roll20 Community Wiki](https://wiki.roll20.net/Character_Sheet_i18n)
+
+**Sheet translations submitted outside of Crowdin will not be accepted and/or will be overwritten by Crowdin.**
 
 ## Improving Existing Character Sheets
 
@@ -28,16 +32,17 @@ If you would like to contribute a new sheet for the community to use, just clone
 
 **Creating a sheet.json File**
 
-When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the kitchensink folder for an example sheet.json file). This file is required to be named `sheet.json`. The file has the following fields:
+When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the [kitchensink](https://github.com/Roll20/roll20-character-sheets/tree/master/kitchensink) folder for an example [sheet.json](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/sheet.json) file). This file is required to be named `sheet.json`. The file has the following fields:
 
 * `html`: The **exact** name, including capitzation, of the HTML file for the sheet (e.g. `kitchensink.html`).
 * `css`: The **exact** name, including capitzation, of the CSS file for the sheet (e.g. `kitchensink.css`).
-* `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton`)
+* `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton` or `Riley Dutton, John Doe`)
 * `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
-* `patreon`: Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
-* `tipeee`: Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
+* `patreon`: *(optional)* Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
+* `tipeee`: *(optional)* Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
 * `preview`: The **exact** name, including capitzation, of an image file which included in your sheet folder showing a preview/screenshot of the sheet (will be displayed in-app at 500x500 resolution) (e.g. `kitchensink.png`).
-* `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct.
+* `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct. If you have sheet instructions elsewhere, it can be a good idea to provide a link here (e.g. `full sheet instructions in the [Readme](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/README.md)` or `Sheet instuctions, Roll20 Wiki: [Example PRG](https://wiki.roll20.net/ExampleRPG)`)
+* `legacy` : set to either `true` or `false`. If the sheet code have been updated to work with the [Character Sheet Enhancement](https://wiki.roll20.net/Character_Sheet_Enhancement)-update (released [March 2021](https://app.roll20.net/forum/permalink/9883156/)), set it to `false`. Otherwise, set it to `true`.
 
 After we have reviewed your sheet if we approve it we will add it to the `approved.yaml` file in the root directory which will cause it to be available to everyone on the main Roll20 site. If we reject your sheet, we will comment on your Github commit and let you know what changes need to be made before it can be accepted. 
 
@@ -52,4 +57,4 @@ The former guidelines found here have been moved and expanded on in the [Roll20 
 License
 =======
 
-All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see LICENSE file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
+All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see [LICENSE](https://github.com/Roll20/roll20-character-sheets/blob/master/LICENSE) file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
