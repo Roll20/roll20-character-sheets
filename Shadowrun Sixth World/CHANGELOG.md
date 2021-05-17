@@ -4,6 +4,7 @@ Change Log
 	Bugfix - PC->Grenades launched grenades didn't work properly
 	Bugfix - Nuyen symbol keeps disappearing, another attempt to lock it in
 	Added mouseover text to Rolls->Matrix Actions to identify skill and attribute for each.
+	Updated NPC-Spells to follow the same format as PC-Spells, to include using the same roll button format.
 **2021-05-10 ** v.32 Chuz (James Culp)
 	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
 	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
