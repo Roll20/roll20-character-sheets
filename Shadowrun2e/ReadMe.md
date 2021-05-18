@@ -6,6 +6,37 @@ This sheet is designed to be functional for any level of subscription, but API h
 
 ## Changelog
 
+### 01/02/2021 
+Added and changed by [Darren H](https://app.roll20.net/users/3856359/darren-h)
+
+
+This sheet has been vastly changed and adapted from the original, and have been working on it for a
+a few months now in my spare time. It has been fixed and made into a workable sheet.
+
+Many parts have been upgraded and/or added such as new tabs, a major retool on the look of the sheet. 
+It has used code from the original creator as well as others and myself.
+
+NEW TABS  - General/Lifestyle (Attributes and lifestyle section)
+          - Skills/Edges/Flaws (all in one area for easy access)
+          - Magic and Spells (Spells Tables and area for recording spell desrcriptions if needed,
+          - Physical adept Section and NEW Shaman section)
+          - Decks (no Change)
+          - Gear (Better layout for Gear Cyberware/Bioware)
+          - Vehicles/Drones (no change)
+          - Combat (ALL combat related stuff in this section, including weapons, easier to detrmine
+            modifiers and working out damage etc without having to switch Tabs)
+
+-All dice rolls now have a dice template attached to them making it easier to see in Roll20.
+
+-Sheet is a working sheet as it has been tested by players and myself.
+
+-Weapons and Spells table was added
+
+Unfortunatly no logo as I was working on this before update below.
+I do intend to maintain and upkeep this sheet.
+
+
+
 ### 26th January 2021
 Added by [RafaelLVX](https://app.roll20.net/users/2403046/rafaellvx).
 
