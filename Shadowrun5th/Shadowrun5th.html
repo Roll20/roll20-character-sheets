@@ -9401,11 +9401,11 @@ Only takes the first match even if multiple identical entries are found.">
             <div class="experimental">
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_experimental">
-                    Enable experimental import of AI programs and gear extras
+                    Enable experimental import of gear extras and cyberdecks
                 </label>
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_nightly">
-                    Enable additional imports which use Chummer nightly features
+                    Enable additional imports which use Chummer nightly only features
                 </label>
             </div>
         </div>
@@ -10285,7 +10285,7 @@ on("sheet:opened", function() {
         }
         values.warningcheckbox=0;
         values.chummercheckbox=0;
-        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and paste it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent";
+        values.chummertext="In Chummer make sure to mark your character as created\nwith a created character go to File->Export->Export JSON\ncopy the file and paste it into this textfield overriding this text\nclick import and accept\nWhen using Chummer 5.213.95 or later the import is language independent\nIf you find bugs, please report them at https://github.com/Roll20/roll20-character-sheets/issues";
         values.experimental=0;
         values.nightly=0;
     setAttrs(values);
@@ -10649,31 +10649,36 @@ on("change:chummercheckbox", function(){
                 }
                 try{
                     console.log("Importing Attributes");
-                    attributes.bod_base=chummerfile.characters.character.attributes[1].attribute[0].base;
-                    attributes.agi_base=chummerfile.characters.character.attributes[1].attribute[1].base;
-                    attributes.rea_base=chummerfile.characters.character.attributes[1].attribute[2].base;
-                    attributes.str_base=chummerfile.characters.character.attributes[1].attribute[3].base;
-                    attributes.cha_base=chummerfile.characters.character.attributes[1].attribute[4].base;
-                    attributes.int_base=chummerfile.characters.character.attributes[1].attribute[5].base;
-                    attributes.log_base=chummerfile.characters.character.attributes[1].attribute[6].base;
-                    attributes.wil_base=chummerfile.characters.character.attributes[1].attribute[7].base;
-                    attributes.edg_total=chummerfile.characters.character.attributes[1].attribute[8].base;
-                    if(chummerfile.characters.character.technomancer=="True"){
-                        attributes.mag_base=chummerfile.characters.character.attributes[1].attribute[10].total;
-                        attributes.istechnomancer=1;
+                    var attributesChummer = chummerfile.characters.character.attributes[1].attribute;
+                    attributes.bod_base=attributesChummer.find(a => a.name_english === "BOD").base;
+                    attributes.agi_base=attributesChummer.find(a => a.name_english === "AGI").base;
+                    attributes.rea_base=attributesChummer.find(a => a.name_english === "REA").base;
+                    attributes.str_base=attributesChummer.find(a => a.name_english === "STR").base;
+                    attributes.cha_base=attributesChummer.find(a => a.name_english === "CHA").base;
+                    attributes.int_base=attributesChummer.find(a => a.name_english === "INT").base;
+                    attributes.log_base=attributesChummer.find(a => a.name_english === "LOG").base;
+                    attributes.wil_base=attributesChummer.find(a => a.name_english === "WIL").base;
+                    attributes.edg_total=attributesChummer.find(a => a.name_english === "EDG").base;
+                    if(chummerfile.characters.character.technomancer==="True"){
+                        attributes.mag_base=attributesChummer.find(a => a.name_english === "RES").total;
+                        attributes.istechnomancer = 1;
                     }
-                    else{
-                        attributes.mag_base=chummerfile.characters.character.attributes[1].attribute[9].total;
-                        attributes.istechnomancer=0;
+                    else if(chummerfile.characters.character.magician==="True"){
+                        attributes.mag_base=attributesChummer.find(a => a.name_english === "MAG").total;
+                        attributes.istechnomancer = 0;
                     }
-                    attributes.bod_aug=chummerfile.characters.character.attributes[1].attribute[0].total-chummerfile.characters.character.attributes[1].attribute[0].base;
-                    attributes.agi_aug=chummerfile.characters.character.attributes[1].attribute[1].total-chummerfile.characters.character.attributes[1].attribute[1].base;
-                    attributes.rea_aug=chummerfile.characters.character.attributes[1].attribute[2].total-chummerfile.characters.character.attributes[1].attribute[2].base;
-                    attributes.str_aug=chummerfile.characters.character.attributes[1].attribute[3].total-chummerfile.characters.character.attributes[1].attribute[3].base;
-                    attributes.cha_aug=chummerfile.characters.character.attributes[1].attribute[4].total-chummerfile.characters.character.attributes[1].attribute[4].base;
-                    attributes.int_aug=chummerfile.characters.character.attributes[1].attribute[5].total-chummerfile.characters.character.attributes[1].attribute[5].base;
-                    attributes.log_aug=chummerfile.characters.character.attributes[1].attribute[6].total-chummerfile.characters.character.attributes[1].attribute[6].base;
-                    attributes.wil_aug=chummerfile.characters.character.attributes[1].attribute[7].total-chummerfile.characters.character.attributes[1].attribute[7].base;
+                    else {
+                        attributes.mag_base = 0;
+                        attributes.istechnomancer = 0;
+                    }
+                    attributes.bod_aug=attributesChummer.find(a => a.name_english === "BOD").total-attributesChummer.find(a => a.name_english === "BOD").base;
+                    attributes.agi_aug=attributesChummer.find(a => a.name_english === "AGI").total-attributesChummer.find(a => a.name_english === "AGI").base;
+                    attributes.rea_aug=attributesChummer.find(a => a.name_english === "REA").total-attributesChummer.find(a => a.name_english === "REA").base;
+                    attributes.str_aug=attributesChummer.find(a => a.name_english === "STR").total-attributesChummer.find(a => a.name_english === "STR").base;
+                    attributes.cha_aug=attributesChummer.find(a => a.name_english === "CHA").total-attributesChummer.find(a => a.name_english === "CHA").base;
+                    attributes.int_aug=attributesChummer.find(a => a.name_english === "INT").total-attributesChummer.find(a => a.name_english === "INT").base;
+                    attributes.log_aug=attributesChummer.find(a => a.name_english === "LOG").total-attributesChummer.find(a => a.name_english === "LOG").base;
+                    attributes.wil_aug=attributesChummer.find(a => a.name_english === "WIL").total-attributesChummer.find(a => a.name_english === "WIL").base;
                 }catch(err){
                     goodcode=false;
                     error= error + "\n" + "Error with Attributes " +err
@@ -10928,18 +10933,18 @@ on("change:chummercheckbox", function(){
                                 if(chummerfile.characters.character.weapons.weapon[i-1].category!="Gear"){
                                     if(chummerfile.characters.character.weapons.weapon[i-1].type=="Ranged"){
                                         attributes["weaponismelee"+i]=0;
-                                        attributes["weaponrc"+i]=chummerfile.characters.character.weapons.weapon[i-1].rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
-                                        attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\d*/);
-                                        attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\D+/);
+                                        attributes["weaponrc"+i]=chummerfile.characters.character.weapons.weapon[i-1].rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                        attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\d/)[0];
+                                        attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].rawdamage.match(/\D+/)[0];
                                     }else{
                                         attributes["weaponismelee"+i]="on";
                                         attributes["weaponreach"+i]=chummerfile.characters.character.weapons.weapon[i-1].reach;
-                                        attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d*/);
-                                        attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\D+/);
+                                        attributes["weapondv"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\d/)[0];
+                                        attributes["weapondmgtype"+i]=chummerfile.characters.character.weapons.weapon[i-1].damage_english.match(/\D+/)[0];
                                     }
 
                                     attributes["weaponname"+i]=chummerfile.characters.character.weapons.weapon[i-1].name;
-                                    attributes["weaponaccuracy"+i]=chummerfile.characters.character.weapons.weapon[i-1].accuracy;
+                                    attributes["weaponaccuracy"+i]=chummerfile.characters.character.weapons.weapon[i-1].accuracy.match(/\d/g).pop();
                                     if(isNaN(chummerfile.characters.character.weapons.weapon[i-1].ap)){
                                         attributes["weaponap"+i]=0;
                                     }else{
@@ -11028,17 +11033,17 @@ on("change:chummercheckbox", function(){
                             if(chummerfile.characters.character.weapons.weapon.category!="Gear"){
                                 if(chummerfile.characters.character.weapons.weapon.type=="Ranged"){
                                     attributes["weaponismelee1"]=0;
-                                    attributes["weaponrc1"]=chummerfile.characters.character.weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
-                                    attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\d*/);
-                                    attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\D+/);
+                                    attributes["weaponrc1"]=chummerfile.characters.character.weapons.weapon.rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                    attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\d*/)[0];
+                                    attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.rawdamage.match(/\D+/)[0];
                                 }else{
                                     attributes["weaponismelee1"]="on";
                                     attributes["weaponreach1"]=chummerfile.characters.character.weapons.weapon.reach;
-                                    attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\d*/);
-                                    attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\D+/);
+                                    attributes["weapondv1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\d*/)[0];
+                                    attributes["weapondmgtype1"]=chummerfile.characters.character.weapons.weapon.damage_english.match(/\D+/)[0];
                                 }
                                 attributes["weaponname1"]=chummerfile.characters.character.weapons.weapon.name;
-                                attributes["weaponaccuracy1"]=chummerfile.characters.character.weapons.weapon.accuracy;
+                                attributes["weaponaccuracy1"]=chummerfile.characters.character.weapons.weapon.accuracy.match(/\d/g).pop();
                                 if(Number(chummerfile.characters.character.weapons.weapon.ap)!="NaN"){
                                     attributes["weaponap1"]=chummerfile.characters.character.weapons.weapon.ap;
                                 }else{
@@ -11215,22 +11220,19 @@ on("change:chummercheckbox", function(){
                 }
 
                 try {
-                    if(text.experimental == "on"){
-                     //import ai programs
-                     if(chummerfile.characters.character.aiprograms != null){
+                    //import ai programs
+                    if(chummerfile.characters.character.aiprograms != null){
                         console.log("import ai programs");
-
-                           if(chummerfile.characters.character.aiprograms.aiprogram.length > 1){
-                               for(var i=0; i < chummerfile.characters.character.aiprograms.aiprogram.length; i++){
+                        if(chummerfile.characters.character.aiprograms.aiprogram.length > 1){
+                            for(var i=0; i < chummerfile.characters.character.aiprograms.aiprogram.length; i++){
                                 var newrowid=generateRowID();
                                 attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.aiprograms.aiprogram[i].name;
-                               }
-                           }
-                           else {
+                            }
+                        }
+                        else {
                             var newrowid=generateRowID();
                             attributes["repeating_programs_"+newrowid+"_programname"]=chummerfile.characters.character.aiprograms.aiprogram.name;
-                           }
-                     }
+                        }
                     }
                 }catch(err){
                        goodcode=false;
@@ -11262,9 +11264,9 @@ on("change:chummercheckbox", function(){
                                                 if(!(chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.length>1)){
                                                     if(chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.category!="Gear"){
                                                         attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.name;
-                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.accuracy;
+                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.accuracy.match(/\d/g).pop();
                                                         if(chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.type=="Ranged")
-                                                            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                                            attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
                                                         if(Number(chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.ap)!="NaN"){
                                                             attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod[j].weapons.weapon.ap;
                                                         }else{
@@ -11292,9 +11294,9 @@ on("change:chummercheckbox", function(){
                                             if(!(chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.length>1)){
                                                 if(chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.category!="Gear"){
                                                     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.name;
-                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.accuracy;
+                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.accuracy.match(/\d/g).pop();
                                                     if(chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.type=="Ranged")
-                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
                                                     if(Number(chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.ap)!="NaN"){
                                                         attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"]=chummerfile.characters.character.vehicles.vehicle[i].mods.mod.weapons.weapon.ap;
                                                     }else{
@@ -11339,9 +11341,9 @@ on("change:chummercheckbox", function(){
                                             if(!(chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.length>1)){
                                                 if(chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.category!="Gear"){
                                                     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.name;
-                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accuracy;
+                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.accuracy.match(/\d/g).pop();
                                                     if(chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.type=="Ranged")
-                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                                        attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
                                                     if(Number(chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.ap)!="NaN"){
                                                         attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"]=chummerfile.characters.character.vehicles.vehicle.mods.mod[j].weapons.weapon.ap;
                                                     }else{
@@ -11369,9 +11371,9 @@ on("change:chummercheckbox", function(){
                                         if(!(chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.length>1)){
                                             if(chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.category!="Gear"){
                                                 attributes["repeating_vehicles_"+newrowid+"_vehicleweaponname"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.name;
-                                                attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accuracy;
+                                                attributes["repeating_vehicles_"+newrowid+"_vehicleweaponaccuracy"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.accuracy.match(/\d/g).pop();
                                                 if(chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.type=="Ranged")
-                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.rc-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
+                                                    attributes["repeating_vehicles_"+newrowid+"_vehicleweaponrc"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.rc.match(/\d/g).pop()-Math.ceil(chummerfile.characters.character.attributes[1].attribute[3].total/3)- 1;
                                                 if(Number(chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.ap)!="NaN"){
                                                     attributes["repeating_vehicles_"+newrowid+"_vehicleweaponap"]=chummerfile.characters.character.vehicles.vehicle.mods.mod.weapons.weapon.ap;
                                                 }else{
@@ -11646,20 +11648,24 @@ on("change:chummercheckbox", function(){
                         error= error + "\n" + "Error with Spells: " + err;
                     }
                     try{
-                       if(chummerfile.characters.character.contacts!=null){
+                       if(chummerfile.characters.character.contacts!=null && false){
                         console.log("Importing Contacts");
                         if(chummerfile.characters.character.contacts.contact.length>1){
-                            for(var i=0;i<chummerfile.characters.character.contacts.contact.length;i++){
+                            for(var i=0; i<chummerfile.characters.character.contacts.contact.length; i++){
                                 var newrowid=generateRowID();
                                 attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact[i].name;
-                                attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
+                                if(chummerfile.characters.character.contacts.contact[i].role !== null) {
+                                    attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact[i].role;
+                                }
                                 attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact[i].connection;
                                 attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact[i].loyalty;
                             }
                         }else{
                             var newrowid=generateRowID();
                             attributes["repeating_contacts_"+newrowid+"_contactname"]=chummerfile.characters.character.contacts.contact.name;
-                            attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
+                            if(chummerfile.characters.character.contacts.contact.role !== null) {
+                                    attributes["repeating_contacts_"+newrowid+"_contactdescription"]=chummerfile.characters.character.contacts.contact.role;
+                                }
                             attributes["repeating_contacts_"+newrowid+"_contactconnection"]=chummerfile.characters.character.contacts.contact.connection;
                             attributes["repeating_contacts_"+newrowid+"_contactloyalty"]=chummerfile.characters.character.contacts.contact.loyalty;
                         }
@@ -11698,11 +11704,11 @@ on("change:chummercheckbox", function(){
                         try{
                             setAttrs(attributes);
                         }catch(err){
-                        setAttrs({
-                            chummertext:"Error setting Attributes: " + err,
-                            chummercheckbox:"0",
-                            warningcheckbox:"0"
-                        });
+                            setAttrs({
+                                chummertext:"Error setting Attributes: " + err,
+                                chummercheckbox:"0",
+                                warningcheckbox:"0"
+                            });
                         }
                     }else{
                         setAttrs({
