@@ -2325,10 +2325,408 @@ pri5['Wall of Fire'] = {
     'effect': 'The *wall of fire* spell brings forth an immobile, blazing curtain of magical fire of shimmering color—yellow-green or amber (different from the 4th-level wizard version). The spell creates an opaque sheet of flame up to one 20-foot square per level of the spellcaster ([[20*[[@{level-priest}]] ]] foot square), or a ring with a radius of up to 10 feet + 5 feet for every two levels of experience of the spellcaster ([[10+floor([[@{level-priest}]]/2)*5]] foot radius), and 20 feet high.\n&emsp;The wall of fire must be cast so that it is vertical with respect to the caster. One side of the wall, selected by the caster, sends forth waves of heat, inflicting 2d4 points of damage upon creatures within 10 feet and 1d4 points of damage upon those within 20 feet. In addition, the wall inflicts 4d4 points of damage, plus 1 point of damage per level of the spellcaster (4d4+[[@{level-priest}]] damage), to any creature passing through it. Creatures especially subject to fire may take additional damage, and undead always take twice normal damage. Note that attempting to directly catch moving creatures with a newly created wall of fire is difficult. A successful saving throw enables the creature to avoid the wall, while its rate and direction of movement determine which side of the created wall it is on. The wall of fire lasts as long as the priest concentrates on maintaining it, or one round per level of experience of the priest in the event he does not wish to concentrate upon it. Currently [[@{level-priest}]] rounds.'
 };
 
+const pri6 = {};
+pri6['Aerial Servant'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Summoning',
+    'range': '10 yards',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 287',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell summons an invisible aerial servant to find and bring back an object or creature described to it by the priest. Unlike an elemental, an aerial servant cannot be commanded to fight for the caster. When it is summoned, the priest must have cast a *protection from evil* spell, be within a protective circle, or have a special item used to control the aerial servant. Otherwise, it attempts to slay its summoner and return from whence it came.\n&emsp;The object or creature to be brought must be such as to allow the aerial servant to physically bring it to the priest (an aerial servant can carry at least 1,000 pounds). If prevented, for any reason, from completing the assigned duty, the aerial servant returns to its own plane whenever the spell lapses, its duty is fulfilled, it is dispelled, the priest releases it, or the priest is slain. The spell lasts for a maximum of one day for each level of experience of the priest who cast it.\n&emsp;If the creature to be fetched cannot detect invisible objects, the aerial servant attacks, automatically gaining surprise. If the creature involved can detect invisible objects, it still suffers a -2 penalty to all surprise rolls caused by the aerial servant. Each round of combat, the aerial servant must roll to attack. When a hit is scored, the aerial servant has grabbed the item or creature it was sent for.\n&emsp;A creature with a Strength rating is allowed an evasion roll, equal to twice its *bend bars* chance, to escape the hold. If the creature in question does not have a Strength rating, roll 1d8 for each Hit Die the aerial servant and the creature grabbed have. The higher total is the stronger.\n&emsp;Once seized, the creature cannot free itself by Strength or Dexterity and is flown to the priest forthwith.'
+};
+
+pri6['Animal Summoning III'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration, Summoning',
+    'sphere': 'Animal, Summoning',
+    'range': '[[100*[[@{level-priest}]] ]] yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 287',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is the same in duration and effect as the 4th-level *animal summoning I* spell, except that up to four animals of no more than 16 Hit Dice each can be summoned, or eight of no more than 8 Hit Dice, or 16 creatures of no more than 4 Hit Dice. Only animals within range of the caster at the time the spell is cast will come. The caster can try three times to summon three different types of animals—e.g., suppose that wild dogs are first summoned to no avail, then hawks are unsuccessfully called, and finally the caster calls for wild horses that may or may not be within summoning range. Your DM will determine the chance of a summoned animal type being within range of the spell. The animals summoned will aid the caster by whatever means they possess, staying until a fight is over, a specific mission is finished, the caster is safe, he sends them away, etc. Only normal or giant animals can be summoned; fantastic animals or monsters cannot be summoned by this spell (no chimerae, dragons, gorgons, manticores, etc.).'
+};
+
+pri6['Animate Object'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Creation, Summoning',
+    'range': '30 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '[[@{level-prist}]] cubic feet',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 287',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful spell enables the priest casting it to imbue inanimate objects with mobility and a semblance of life. The animated object, or objects, then attacks whomever or whatever the priest first designates. The animated object can be of any nonmagical material whatsoever—wood, metal, stone, fabric, leather, ceramic, glass, etc. Attempting to animate an object in someone’s possession grants that person a saving throw to prevent the spell’s effect. The speed of movement of the object depends on its means of propulsion and its weight. A large wooden table would be rather heavy, but its legs would give it speed. A rug could only slither along. A jar would roll. Thus a large stone pedestal would rock forward at 10 feet per round, a stone statue would move at 40 feet per round, a wooden statue 80 feet per round, an ivory stool of light weight would move at 120 feet per round. Slithering movement is about 10 feet to 20 feet per round; rolling is 30 feet to 60 feet per round. The damage caused by the attack of an animated object depends on its form and composition. Light, supple objects can only obscure vision, obstruct movement, bind, trip, smother, etc. Light, hard objects can fall upon or otherwise strike for 1d2 points of damage or possibly obstruct and trip, as do light, supple objects. Hard, medium-weight objects can crush or strike for 2d4 points of damage, while larger and heavier objects may inflict 3d4, 4d4, or even 5d4 points of damage.\n&emsp;The frequency of attack of animated objects depends on their method of locomotion, appendages, and method of attack. This varies from as seldom as once every five melee rounds to as frequently as once per round. The Armor Class of the object animated is basically a function of material and movement ability. Damage depends on the type of weapon and the object struck. A sharp cutting weapon is effective against fabric, leather, wood, and like substances. Heavy smashing and crushing weapons are useful against wood, stone, and metal objects. Your DM will determine all of these factors, as well as how much damage the animated object can sustain before being destroyed. The priest can animate one cubic foot of material for each experience level he has attained. Thus, a 14th-level priest could animate one or more objects whose solid volume did not exceed 14 cubic feet—a large statue, two rugs, three chairs, or a dozen average crocks.'
+};
+
+pri6['Antianimal Shell'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Animal, Protection',
+    'range': '0',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '10-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The caster’s holy symbol and a handful of pepper',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the caster brings into being a hemispherical force field that prevents the entrance of any sort of living creature that is wholly or partially animal (not magical or extraplanar). Thus a sprite, a giant, or a chimera would be kept out, but undead or conjured creatures could pass through the shell of force, as could such monsters as aerial servants, imps, quasits, golems, elementals, etc. The anti-animal shell functions normally against crossbreeds, such as cambions, and lasts for one turn for each level of experience the caster has attained. Forcing the barrier against creatures strains and ultimately collapses the field.'
+};
+
+pri6['Blade Barrier'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Evocation',
+    'sphere': 'Guardian, Creation',
+    'range': '30 yards',
+    'duration': '[[3*[[@{level-priest}]] ]] rounds',
+    'aoe': '5-60 feet square',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest employs this spell to set up a wall of circling, razor-sharp blades. These whirl and flash around a central point, creating an immobile barrier. Any creature attempting to pass through the blade barrier suffers 8d8 points of damage. The plane of rotation of the blades can be horizontal, vertical, or in between. Creatures within the area of the barrier when it is invoked are entitled to a saving throw vs. spell. If this is successful, the blades are avoided and no damage is suffered; the creature escapes the area of the blade barrier by the shortest possible route. The barrier remains for three rounds for every experience level of the priest casting it. The barrier can cover an area from as small as 5 feet square to as large as 60 feet square.'
+};
+
+pri6['Conjure Animals'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Summoning',
+    'range': '30 yards',
+    'duration': '[[2*[[@{level-priest}]] ]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The conjure animals spell enables the priest to magically create one or more mammals to attack his opponents. The total Hit Dice of the mammals cannot exceed twice the level of the priest (Currently [[2*[[@{level-priest}]] ]] Hit Dice), if the creature conjured is determined randomly. If a specific animal type is requested, the animal’s Hit Dice cannot exceed his level (Currently [[@{level-priest}]]). The DM selects the type of animal that appears if it is randomly called. Thus, a priest of 12th level could randomly conjure two mammals with 12 Hit Dice each, four with 6 Hit Dice each, six with 4 Hit Dice each, eight with 3 Hit Dice each, 12 with 2 Hit Dice each, or 24 with 1 Hit Die each. Count every +1 hit point added to a creature’s Hit Dice as ¼ of a Hit Die. Thus a creature with 4 + 3 Hit Dice equals a 4¾ Hit Dice creature. The conjured animals remain for two rounds for each level of the conjuring priest, or until slain, and they follow the caster’s verbal commands. Conjured animals unfailingly attack the priest’s opponents, but resist being used for any other purpose—they do not like it, become noticeably more difficult to control, and may refuse any action, break free, or turn on the caster, depending on the nature of the creature and the details of the situation. The conjured animals disappear when slain.'
+};
+
+pri6['Conjure Fire Elemental'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration/Summoning (Reversible)',
+    'sphere': 'Elemental (Fire)',
+    'range': '80 yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '6 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting a *conjure fire elemental* spell, the caster opens a special gate to the elemental plane of Fire, and a fire elemental is summoned to the vicinity of the spellcaster. It is 65% likely that a 12 Hit Dice elemental appears, 20% likely that a 16 Hit Dice elemental appears, 9% likely that two to four salamanders appear, 4% likely that an efreeti appears, and 2% likely that a huge fire elemental of 21 to 24 Hit Dice appears. The caster need not fear that the elemental force summoned will turn on him, so concentration upon the activities of the fire elemental (or other creatures summoned) or protection from the creature is not necessary. The elemental summoned helps the caster however possible, including attacking the caster’s opponents. The fire elemental or other creature summoned remains for a maximum of one turn per level of the caster, or until it is slain, sent back by a *dispel magic* spell, the reverse of this spell, *dismiss fire elemental,* or similar magic.'
+};
+
+pri6['Find the Path'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Divination (Reversible)',
+    'sphere': 'Divination',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '3 rounds',
+    'saving-throw': 'None',
+    'materials': 'A set of divination counters of the sort favored by the priest—bones, ivory counters, sticks, carved runes, or whatever',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The recipient of this spell can find the shortest, most direct physical route that he is seeking, be it the way into or out of a locale. The locale can be outdoors or under ground, a trap, or even a *maze* spell. Note that the spell works with respect to locales, not objects or creatures within a locale. Thus, the spell could not find the way to “a forest where a green dragon lives” or to the location of “a hoard of platinum pieces.” The location must be in the same plane as the caster.\n&emsp;The spell enables the subject to sense the correct direction that will eventually lead him to his destination, indicating at the appropriate times the exact path to follow or physical actions to take. For example, with concentration the spell enables the subject to sense trip wires or the proper word to bypass a glyph. The spell ends when the destination is reached or when one turn for each caster level has elapsed. The spell frees the subject, and those with him, from a *maze* spell in a single round, and will continue to do so as long as the spell lasts.\n&emsp;Note that this divination is keyed to the caster, not his companions, and that, like the *find traps* spell, it does not predict or allow for the actions of creatures.\n&emsp;The reverse spell, *lose the path,* makes the creature touched totally lost and unable to find its way for the duration of the spell—although it can be led, of course.'
+};
+
+pri6['Fire Seeds'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration',
+    'sphere': 'Elemental (Fire)',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] turns or until used',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 round/seed',
+    'saving-throw': '½',
+    'materials': 'Acorns or holly berries',
+    'reference': 'PHB p. 288',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *fire seeds* spell creates special missiles or timed incendiaries that burn with great heat. The spell can be cast to create either fire seed missiles or fire seed incendiaries, as chosen when the spell is cast.\n&emsp;**Fire seed missiles:** This casting turns up to four acorns into special grenadelike missiles that can be hurled up to 40 yards. An attack roll is required to strike the intended target, and proficiency penalties are considered. Each acorn bursts upon striking any hard surface, causing 2d8 points of damage and igniting any combustible materials within a 10-foot diameter of the point of impact. If a successful saving throw vs. spell is made, a creature within the burst area receives only one-half damage, but a creature struck directly suffers full damage (i.e., no saving throw).\n&emsp;**Fire seed incendiaries:** This casting turns up to eight holly berries into special incendiaries. The holly berries are most often placed, being too light to make effective missiles. They can be tossed only up to 6 feet away. They burst into flame if the caster is within 40 yards and speaks a word of command. The berries instantly ignite, causing 1d8 points of damage to any creature and igniting any combustible within a 5-foot-diameter burst area. Creatures within the area that successfully save vs. spell suffer half damage.\n&emsp;All fire seeds lose their power after a duration equal to one turn per experience level of the caster—e.g., the seeds of a 13th-level caster remain potent for a maximum of 13 turns after their creation.'
+};
+
+pri6['Forbiddance'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Abjuration',
+    'sphere': 'Protection',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-priest}]] 60-foot cube',
+    'components': 'V, S, M',
+    'cast-time': '6 rounds',
+    'saving-throw': 'Special',
+    'materials': 'The priest’s holy symbol, holy water, and rare incenses worth at least 1,000 gp per 60-foot cube; if a password lock is desired, this also requires the burning of rare incenses worth at least 5,000 gp per 60-foot cube',
+    'reference': 'PHB p. 289',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell can be used to secure a consecrated area (see the *Dungeon Master Guide*). The spell seals the area from teleportation, plane shifting, and ethereal penetration. At the option of the caster, the ward can be locked by a password, in which case it can be entered only by those speaking the proper words. Otherwise, the effect on those entering the enchanted area is based on their alignment, relative to the caster’s. The most severe penalty is used.\n&emsp;**Alignment identical:** No effect. If password locked, cannot enter area unless password is known (no saving throw).\n&emsp;**Alignment different with respect to law and chaos:** Save vs. spell to enter the area; if failed, suffer 2d6 points of damage. If password locked, cannot enter unless password is known.\n&emsp;**Alignment different with respect to good and evil:** Save vs. spell to enter this area; if failed, suffer 4d6 points of damage. If word locked, cannot enter unless password is known. The attempt does cause damage if the save is failed.\n&emsp;Once a saving throw is failed, an intruder cannot enter the forbidden area until the spell ceases. The ward cannot be dispelled by a caster of lesser level than the one who established it. Intruders who enter by rolling successful saving throws feel uneasy and tense, despite their success.'
+};
+
+pri6['Heal'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Healing',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 289',
+    'damage': '',
+    'damage-type': '',
+    'healing': 'All hit points and diseases',
+    'effect': 'The very potent *heal* spell enables the priest to wipe away disease and injury in the creature who receives the benefits of the spell. It completely cures all diseases or blindness of the recipient and heals all points of damage suffered due to wounds or injury. It dispels a *feeblemind* spell. It cures those mental disorders caused by spells or injury to the brain. Naturally, the effects can be negated by later wounds, injuries, and diseases.\n&emsp;The reverse, *harm,* infects the victim with a disease and causes loss of all but 1d4 hit points, if a successful touch is inflicted. For creatures that are not affected by the *heal* or *harm* spell, see the *cure light wounds* spell.'
+};
+
+pri6['Heroes\' Feast'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Evocation',
+    'sphere': 'Creation',
+    'range': '10 yards',
+    'duration': '1 hour',
+    'aoe': '[[@{level-priest}]] feasters',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol and specially fermented honey taken from the cells of bee larvae destined for royal status',
+    'reference': 'PHB p. 289',
+    'damage': '',
+    'damage-type': '',
+    'healing': '[[1d4+4]] hit points and cured of all diseases. Also becomes immune to poison, fear, hopelessness, panic and gain *bless* for 12 hours',
+    'effect': 'This spell enables the priest to bring forth a great feast that serve as many creatures as the priest has levels of experience. The spell creates a magnificent table, chairs, service, and all the necessary food and drink. The feast takes one full hour to consume, and the beneficial effects do not set in until after this hour is over. Those partaking of the feast are cured of all diseases, are immune to poison for 12 hours, and are healed of 1d4+4 points of damage after imbibing the nectarlike beverage that is part of the feast. The ambrosialike food that is consumed is equal to a *bless* spell that lasts for 12 hours. Also, during this same period, the people who consumed the feast are immune to fear, hopelessness, and panic. If the feast is interrupted for any reason, the spell is ruined and all effects of the spell are negated.'
+};
+
+pri6['Liveoak'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Enchantment',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] days',
+    'aoe': '1 oak tree',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol',
+    'reference': 'PHB p. 290',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the caster to charm a healthy oak tree (or other type if the DM allows) to cause it to serve as a protector. The spell can be cast on a single tree at a time. While a *liveoak* spell cast by a particular caster is in effect, he cannot cast another such spell. The tree upon which the spell is cast must be within 10 feet of the caster’s dwelling place, within a place sacred to the caster, or within 100 yards of something that the caster wishes to guard or protect.\n&emsp;The *liveoak* spell can be cast upon a healthy tree of small, medium, or large size, according to desire and availability. A triggering phrase of up to maximum of one word per level of the spellcaster is then placed upon the targeted oak. For instance, “Attack any persons who come near without first saying *sacred mistletoe*” is an 11-word trigger phrase that could be used by a caster of 11th level or higher casting the spell. The *liveoak* spell triggers the tree into animating as a treant of equivalent size, an Armor Class of 0 and with two attacks per round, but with only a 30-feet-per-round movement rate.}}{{style=bottom sheet-spell-center3 sheet-spell-center4}}{{c1-1=**Tree Size**}}{{c2-1=Small}}{{c3-1=Medium}}{{c4-1=Large}}{{c1-2=**Height**}}{{c2-2=12’–14’}}{{c3-2=16’–19’}}{{c4-2=20’–23’+}}{{c1-3=**Hit Dice**}}{{c2-3=7–8}}{{c3-3=9–10}}{{c4-3=11–12}}{{c1-4=**Damage per Attack**}}{{c2-4=2d8}}{{c3-4=3d6}}{{c4-4=4d6}}{{effects2=&emsp;A tree enchanted by this spell radiates a magical aura (if checked for), and can be returned to normal by a successful casting of a *dispel magic* spell, or upon the desire of the caster who enchanted it. If dispelled, the tree takes root immediately. If released by the caster, it tries to return to its original location before taking root. Damage to the tree can be healed with a *plant growth* spell, which restores 3d4 points of damage. A *plant growth* spell used in this fashion does not increase the size or hit points of the liveoak beyond the original value.'
+};
+
+pri6['Part Water'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Water)',
+    'range': '[[20*[[@{level-priest}]] ]] yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '[[3*[[@{level-priest}]] ]] feet × [[20*[[@{level-priest}]] ]] yards x 30 yards',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol',
+    'reference': 'PHB p. 290',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By employing a *part water* spell, the priest is able to cause water or similar liquid to move apart, thus forming a trough. The depth and length of the trough created by the spell depends on the level of the priest. A trough 3 feet deep per caster level, by 30 yards wide, by 20 yards long per level is created. Thus at 12th level, the priest would part water 36 feet deep by 30 yards wide by 240 yards long. The trough remains as long as the spell lasts or until the priest who cast it opts to end its effects. Existing currents appear to flow through the parted water, although swimming creatures and physical objects such as boats do not enter the rift without strenuous and deliberate effort. If cast underwater, this spell creates an air cylinder of appropriate length and diameter. If cast directly on a water elemental or other water-based creature, the creature suffers 48 points of damage and must roll a successful saving throw vs. spell or flee in panic for 3d4 rounds.'
+};
+
+pri6['Speak With Monsters'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Divination',
+    'range': '30 yards',
+    'duration': '[[2*[[@{level-priest}]] ]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 290',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When cast, the *speak with monsters* spell enables the priest to converse with any type of creature that has any form of communicative ability (including empathic, tactile, pheromonic, etc.). That is, the monster understands, in its own language or equivalent, the intent of what is said to it by the priest and vice versa. The creature thus spoken to is checked by the DM to determine a reaction. All creatures of the same type as that chosen by the priest can likewise understand if they are within range. The priest can speak to different types of creatures during the spell duration, but he must speak separately to each type. The spell lasts for two rounds per caster level.'
+};
+
+pri6['Stone Tell'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Divination',
+    'sphere': 'Elemental (Earth), Divination',
+    'range': 'Touch',
+    'duration': '1 turn',
+    'aoe': '1 cubic yard',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A drop of mercury and a bit of clay',
+    'reference': 'PHB p. 290',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the priest casts a *stone tell* spell upon an area, the very stones speak and relate to the caster who or what has touched them as well as revealing what is covered, concealed, or simply behind them. The stones relate complete descriptions, if asked. Note that a stone’s perspective, perception, and knowledge may hinder this divination. Such details, if any, are decided by the DM.'
+};
+
+pri6['Transmute Water to Dust'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration (Reversible)',
+    'sphere': 'Elemental (Water, Earth)',
+    'range': '60 yards',
+    'duration': 'Permanent',
+    'aoe': '[[@{level-priest}]] cubic yards',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'Special',
+    'materials': 'Diamond dust of at least 500 gp value, a bit of sea shell, and the caster’s holy symbol plus a pinch of normal dust for the reverse',
+    'reference': 'PHB p. 291',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the subject area instantly undergoes a change from liquid to powdery dust. Note that if the water is already muddy, the area of effect is doubled, while if wet mud is present, the area of effect is quadrupled. If water remains in contact with the transmuted dust, the former quickly permeates the latter, turning the dust into silty mud. If there is not a sufficient quantity of water to cause that effect, it simply soaks or dampens the dust accordingly.\n&emsp;Only the liquid actually in the area of effect at the moment of spellcasting is affected. Potions that contain water as a component part are rendered useless. Living creatures are unaffected, except for those native to the elemental plane of Water. Such creatures must roll a successful saving throws vs. death or be slain. However, only one such creature can be affected by any single casting of this spell, regardless of the creature’s size or the size of the spell’s area of effect.\n&emsp;The reverse of this spell is simply a very high-powered *create water* spell that requires a pinch of normal dust as an additional material component.'
+};
+
+pri6['Transport Via Plants'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 291',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster is able to enter any plant (human-sized or larger) and pass any distance to a plant of the same species in a single round, regardless of the distance separating the two. The entry plant must be alive. The destination plant need not be familiar to the caster, but it also must be alive. If the caster is uncertain of the destination plant, he need merely determine direction and distance, and the *transport via plants* spell moves him as close as possible to the desired location. There is a 20% chance, reduced by 1% per level of experience of the caster (Currently [[20-[[@{level-priest}]] ]]%), that the transport delivers the caster to a similar species of plant from 1 to 100 miles away from the desired destination plant. If a particular destination plant is desired, but the plant is not living, the spell fails and the caster must come forth from the entrance plant within 24 hours. Note that this spell does not function with plantlike creatures such as shambling mounds, treants, etc. The destruction of an occupied plant slays the caster (see the *plant door* spell).'
+};
+
+pri6['Turn Wood'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Plant',
+    'range': '0',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '[[20*[[@{level-priest}]] ]] ft. × 120 feet',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 291',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, waves of force roll forth from the caster, moving in the direction he faces and causing all wooden objects in the path of the spell to be pushed away from the caster to the limit of the area of effect. Wooden objects above 3 inches in diameter that are fixed firmly are not affected, but loose objects (movable mantles, siege towers, etc.) move back. Objects less than 3 inches in diameter that are fixed splinter and break, and the pieces move with the wave of force. Thus, objects such as wooden shields, spears, wooden weapon shafts and hafts, and arrows and bolts are pushed back, dragging those carrying them with them. If a spear is planted to prevent this forced movement, it splinters. Even magical items with wooden sections are turned, although an anti-magic shell blocks the effects. A successful *dispel magic* spell ends the effect. Otherwise, the *turn wood* spell lasts for one round for each experience level of the caster.\n&emsp;The waves of force continue to sweep down the set path for the spell’s duration, pushing back wooden objects in the area of effect at a rate of 40 feet per melee round. The length of the path is 20 feet per level of the caster. Currently [[20*[[@{level-priest}]] ]] feet. Thus if a 14th-level priest casts a *turn wood* spell, the area of effect is 120 feet wide by 280 feet long, and the spell lasts 14 rounds. After casting the spell, the path is set and the caster can then do other things or go elsewhere without affecting the spell’s power.'
+};
+
+pri6['Wall of Thorns'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Plant, Creation',
+    'range': '80 yards',
+    'duration': '[[@{level-priest}]] turns',
+    'aoe': '[[@{level-priest}]] 10-foot cubes',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 291',
+    'damage': '8 + creatures AC',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *wall of thorns* spell creates a barrier of very tough, pliable, tangled brush bearing needle-sharp thorns as long as a person’s finger. Any creature breaking through (or crashing into) the wall of thorns suffers 8 points of damage, plus an additional amount of damage equal to the creature’s AC. Negative ACs subtract from the base 8 points of damage, but no adjustment is made for Dexterity. Any creature within the area of effect of the spell when it is cast, crashes into the *wall of thorns* and must break through to move. The damage is based on each 10-foot thickness of the barrier.\n&emsp;If the wall of thorns is chopped at, it takes at least four turns to cut a path through a 10-foot thickness. Normal fire cannot harm the barrier, but magical fires burn away the barrier in two turns, creating a wall of fire effect while doing so (see *wall of fire* spell). In this case, the cool side of the wall is that closest to the caster of the thorn wall.\n&emsp;The nearest edge of the wall of thorns appears up to 80 yards distant from the caster, as he desires. The spell’s duration is one turn for each level of experience of the caster, and it covers one 10-foot cube per level of the caster in whatever shape the caster desires. Thus a 14th-level caster could create a wall of thorns up to 70 feet long by 20 feet high (or deep) by 10 feet deep (or high), a 10-foot-high by 10-foot-wide by 140-foot-long wall to block a dungeon passage, or any other sort of shape that suited his needs. The caster can also create a wall of 5-foot thickness, which inflicts half damage but can be doubled in one of the other dimensions. Note that those with the ability to pass through overgrown areas are not hindered by this barrier. The caster can dismiss the barrier on command.'
+};
+
+pri6['Weather Summoning'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Weather',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 292',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By this spell, the caster calls forth weather appropriate to the climate and season of the area he is in. Thus, in spring a tornado, thunderstorm, sleet storm, or hot weather could be summoned. In summer a torrential rain, heat wave, hail storm, etc., can be called for. In autumn, hot or cold weather, fog, sleet, etc., could be summoned. Winter enables great cold, blizzard, or thaw conditions to be summoned. Hurricane-force winds can be summoned near coastal regions in the later winter or early spring. The summoned weather is not under the control of the caster. It might last but a single turn, in the case of a tornado, or for hours or even days in other cases. The area of effect likewise varies from about 1 square mile to 100 square miles. Note that several casters can act in concert to greatly affect weather, controlling winds, and working jointly to summon very extreme weather conditions.\n&emsp;Within four turns after the spell is cast, the trend of the weather to come is apparent—e.g., clearing skies, gusts of warm or hot air, a chill breeze, overcast skies, etc. Summoned weather arrives [[1d12+5]] turns after the spell is cast. Note that the new weather condition cannot be changed by the caster once it has been summoned. Once the weather is fully summoned, it cannot be dispelled. If the summoning is successfully dispelled before it has been completed, the weather slowly reverts to its original condition.'
+};
+
+pri6['Word of Recall'] = {
+    'level': 'Level 6 Priest',
+    'school': 'Alteration',
+    'sphere': 'Summoning',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'The caster',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 292',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The word of recall spell takes the priest instantly back to his sanctuary when the word is uttered. The sanctuary must be specifically designated in advance by the priest and must be a well-known place. The actual point of arrival is a designated area no larger than 10’ × 10’. The priest can be transported any distance, from above or below ground. Transportation by the *word of recall* spell is safe within a plane, but for each plane the priest is removed, there is a 10% cumulative chance that the priest is irrevocably lost. The priest is able to transport, in addition to himself, 25 pounds of weight per experience level. Currently [[25*[[@{level-priest}]] ]] pounds of weight. Thus, a 15th-level priest could transport his person and an additional 375 pounds. This extra matter can be equipment, treasure, or even living material, such as another person. Exceeding this limit causes the spell to fail. Note that unusually strong physical fields, such as magnetic or gravitational forces, or even magical applications can, at the DM’s option, make the use of this spell hazardous or impossible.'
+};
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
 priestSpells['pri3'] = pri3;
 priestSpells['pri4'] = pri4;
 priestSpells['pri5'] = pri5;
+priestSpells['pri6'] = pri6;
 /* ---- Priest spells end ---- */
