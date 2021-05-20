@@ -1,7 +1,7 @@
-### Version 2.40 (2021-5):
+### Version 2.41 (2021-05):
 - fix broken styles
 
-### Version 2.40 (2021-5):
+### Version 2.40 (2021-05):
 - refactor sheet to be able to use the new Roll20 Sheet framework
 - Feature: Skill name auto-suggestions, suggest relevant names as you start typing
 - more code cleanup
