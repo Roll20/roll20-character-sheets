@@ -34,9 +34,19 @@
 				<div data-i18n="custom-aspects-desc"></div>
 			</div>
 			<div>
-				<b><span data-i18n="custom-conditions"></span>:</b>
-				<input type="text" name="attr_custom-conditions" value="">
-				<div data-i18n="custom-conditions-desc"></div>
+				<b><span data-i18n="custom-skills"></span>:</b>
+				<input type="text" name="attr_custom-skills" value="">
+				<div data-i18n="custom-skills-desc"></div>
+			</div>
+			<div>
+				<b><span data-i18n="custom-combos-columns"></span>:</b>
+				<input type="text" name="attr_custom-combos" value="">
+				<div data-i18n="custom-combos-desc"></div>
+			</div>
+			<div>
+				<b><span data-i18n="custom-stress"></span>:</b>
+				<input type="text" name="attr_custom-stress" value="">
+				<div data-i18n="custom-stress-desc"></div>
 			</div>
 			<div>
 				<b><span data-i18n="custom-consequences"></span>:</b>
@@ -44,14 +54,9 @@
 				<div data-i18n="custom-consequences-desc"></div>
 			</div>
 			<div>
-				<b><span data-i18n="custom-skills"></span>:</b>
-				<input type="text" name="attr_custom-skills" value="">
-				<div data-i18n="custom-skills-desc"></div>
-			</div>
-			<div>
-				<b><span data-i18n="custom-stress"></span>:</b>
-				<input type="text" name="attr_custom-stress" value="">
-				<div data-i18n="custom-stress-desc"></div>
+				<b><span data-i18n="custom-conditions"></span>:</b>
+				<input type="text" name="attr_custom-conditions" value="">
+				<div data-i18n="custom-conditions-desc"></div>
 			</div>
 		</div>
 	</div>
@@ -2073,6 +2078,8 @@ var gamesets = {
 		consequences: [],
 		conditions: [],
 		skills: [],
+		combos: [[],[],[]],
+		combosnames: [],
 		settings: {}
 	},
 	ngen: {
@@ -3174,10 +3181,11 @@ var loadGame = function(key) {
 			if ( key === "custom" ) {
 				
 				getAttrs(
-					[ "custom-aspects", "custom-consequences", "custom-skills", "custom-stress", "custom-conditions" ],
+					[ "custom-aspects", "custom-consequences", "custom-skills", "custom-stress", "custom-conditions", "custom-combos" ],
 					function(c) {
 						var aspects = c["custom-aspects"].trim();
 						var skills = c["custom-skills"].trim();
+						var combos = c["custom-combos"].trim();
 						var consequences = c["custom-consequences"].trim();
 						var conditions = c["custom-conditions"].trim();
 						var stresses = c["custom-stress"].trim();
@@ -3187,6 +3195,41 @@ var loadGame = function(key) {
 						if ( skills !== "" ) { 
 							set.skills = skills.toString().split(/\s*,\s*/);
 							set.settings["SkillStyle"] = "list"; // So it'll display something at all
+						}
+						if ( combos !== "" ) { 
+							var tempsplit = [];
+							set.combos = combos.toString().split(/\s*;\s*/); // column groups are separated by semicolons
+							set.combosnames = ["","",""]; // ZOD
+							if ( typeof set.combos[0] !== "undefined" && set.combos[0] !== "" ) {
+								set.combos[0] = set.combos[0].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							if ( typeof set.combos[1] !== "undefined" && set.combos[1] !== "" ) {
+								set.combos[1] = set.combos[1].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							if ( typeof set.combos[2] !== "undefined" && set.combos[2] !== "" ) {
+								set.combos[2] = set.combos[2].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							tempsplit = set.combos[0][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[0] = tempsplit[0];
+								set.combos[0][0] = tempsplit[1];
+							}
+							tempsplit = set.combos[1][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[1] = tempsplit[0];
+								set.combos[1][0] = tempsplit[1];
+							}
+							tempsplit = set.combos[1][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[2] = tempsplit[0];
+								set.combos[2][0] = tempsplit[1];
+							}
 						}
 						if ( consequences !== "" ) { 
 							var cons = consequences.toString().split(/\s*,\s*/);
@@ -3677,6 +3720,14 @@ var addSkills = function(values) {
 	}
 	var attrs = { addskills: "" };
 	
+	if ( typeof values.combosnames === "object" ) {
+		// ZOD combocol1, 2, 3 
+		for(var i=0; i < values.combosnames.length; i++) {
+			var colnum = i+1;
+			attrs["combocol"+colnum] = values.combosnames[i];
+		}
+	}
+	
 	getSectionIDs("skills", function(currentskills) {
 
 		var skillFilter = {};
@@ -3709,7 +3760,20 @@ var addSkills = function(values) {
 						var skillid = "repeating_skills_" + newid + "_skill";
 						attrs[skillid] = skillname;
 						attrs["repeating_skills_" + newid + "_rating"] = 0;
-						attrs["repeating_skills_" + newid + "_column"] = 1;
+						attrs["repeating_skills_" + newid + "_column"] = 1; // ZOD ZOD ZOD ZOD ZOD ZOD ZOD ZOD
+						if ( typeof values.combos === "object" ) {
+							for(var x=0;x < values.combos.length;x++) {
+								var stopnow = false;
+								for(var y=0;y < values.combos[x].length;y++) {
+									if ( skillname === values.combos[x][y] ) {
+										attrs["repeating_skills_" + newid + "_column"] = x+1;
+										stopnow = true; break;
+									}
+								}
+								if (stopnow) { break; }
+							}
+						}
+
 						// loadSkills() does this work too, but this makes sure that it won't have weird gaps if the rating attribute is encountered before the skill
 						skillFilter[skillname] = true;
 						skillNameByID[skillid] = skillname;
@@ -4660,7 +4724,7 @@ on("clicked:repeating_swaps:loadswap", function(e) {
 // their at-rest state is empty anyway.
 
 const attributes = [
-	"character_name", "uninitialized", "SheetOptions", "Show-Aspects", "Show-Combinable", "Show-Conditions", "Show-Consequences", "Show-Corruption", "Show-Diceprompts", "Show-Extras", "Show-FP", "Show-Logo", "Show-Modes", "Show-Notes", "Show-Packages", "Show-Powers", "Show-Refresh", "Show-Roles", "Show-RollableAspects", "Show-Skills", "Show-Skillswaps", "Show-Stress", "Show-Stunts", "Show-TempAspects", "EditAspects", "EditCombos", "EditConditions", "EditConsequences", "EditExtras", "EditModes", "EditNotes", "EditPackages", "EditPowers", "EditRoles", "EditSkills", "EditStress", "EditStunts", "EditSwaps", "EditTempAspects", "aspectlist", "combomulti", "combotally", "combotext", "combocol1", "combocol2", "combocol3", "corruption", "custom-aspects", "custom-conditions", "custom-consequences", "custom-skills", "custom-stress", "focused", "fp", "lastswapped", "pronouns", "refresh", "rolllist", "rolltally", "setgame", "skillcount", "SkillStyle", "specialized", "stuntcount", "theme"
+	"character_name", "uninitialized", "SheetOptions", "Show-Aspects", "Show-Combinable", "Show-Conditions", "Show-Consequences", "Show-Corruption", "Show-Diceprompts", "Show-Extras", "Show-FP", "Show-Logo", "Show-Modes", "Show-Notes", "Show-Packages", "Show-Powers", "Show-Refresh", "Show-Roles", "Show-RollableAspects", "Show-Skills", "Show-Skillswaps", "Show-Stress", "Show-Stunts", "Show-TempAspects", "EditAspects", "EditCombos", "EditConditions", "EditConsequences", "EditExtras", "EditModes", "EditNotes", "EditPackages", "EditPowers", "EditRoles", "EditSkills", "EditStress", "EditStunts", "EditSwaps", "EditTempAspects", "aspectlist", "combomulti", "combotally", "combotext", "combocol1", "combocol2", "combocol3", "corruption", "custom-aspects", "custom-combos", "custom-conditions", "custom-consequences", "custom-skills", "custom-stress", "focused", "fp", "lastswapped", "pronouns", "refresh", "rolllist", "rolltally", "setgame", "skillcount", "SkillStyle", "specialized", "stuntcount", "theme"
 ];
 
 const fieldsets = {
