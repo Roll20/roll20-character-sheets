@@ -3,7 +3,7 @@
 
 ### Version 2.40 (2021-05):
 - refactor sheet to be able to use the new Roll20 Sheet framework
-- Feature: Skill name auto-suggestions, suggest relevant names as you start typing
+- Feature: Skills, Species, Force Powers auto-suggestions, suggest relevant names as you start typing
 - more code cleanup
 
 ### Version 2.34 (2021-05):
