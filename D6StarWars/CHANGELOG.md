@@ -1,13 +1,3 @@
-### Version 2.34 (2021-05-17):
-- Enhance Player Core info section's layout
-- Reformats Player Secondary Info section
-- Enhance Attributes & Skills section's layout
-- Enhance Weapons & Armors section's layout
-- Enhance Force section's layout
-- FIX: cleaning up HTML code
-- FIX: removes invalid CSS code
-- FIX: Resist Pain effect works as expected
-
 ### Version 2.33 (2021-04-06):
 - remove duplicated control force power name field
 - fix force power section width
