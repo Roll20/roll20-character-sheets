@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.11" />
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.12" />
 <input type='hidden' name='attr_firstInit' value="0" />
 <input type='hidden' name='attr_namelength' value='0' />
 
@@ -200,7 +200,7 @@
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
     const sheetVersionPrefix = "Official Savage Worlds v";
-	const sheetVersion = "1.00.11";
+	const sheetVersion = "1.00.12";
 
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
@@ -257,6 +257,9 @@
                 setattrvals["newcontent"] = "unread";
             }
             if(versionthree < 0.11) {
+                setattrvals["newcontent"] = "unread";
+            }
+            if(versionthree < 0.12) {
                 setattrvals["newcontent"] = "unread";
             }
             else {
@@ -344,6 +347,7 @@
 		setWildDie();
 	});
 
+    //Ranks and Advances Stuff
 	on("change:repeating_edges:edge change:repeating_edges:tookat remove:repeating_edges", function(v) {
 		log("Change in Edges","Look for Advances","yellow");
 		getSectionIDs("edges", function(idArray) {
@@ -2028,6 +2032,29 @@
 		});
 	});
 
+    const moneylist = ["money","gold","silver","electrum","copper"];
+    const moneylabels = ["money","moneyone","moneytwo","moneythree","moneyfour"];
+    moneylabels.forEach(moneyLabel => {
+        on("sheet:opened", function() {
+            log("Money","Setting up money","darkgreen");
+            getAttrs([`${moneyLabel}name`], function(v) {
+                if (v[`${moneyLabel}name`] === "") {
+                    //label is empty, so fill it
+                    const labelIndex = moneylabels.lastIndexOf(moneyLabel);
+                    const moneyType = moneylist[labelIndex];
+                    const typeOfMoney = getTranslationByKey(`${moneyType}`);
+                    log("Money Type",typeOfMoney,"darkgreen");
+                    const setmoney = {};
+                    setmoney[`${moneyLabel}name`] = typeOfMoney;
+                    setAttrs(setmoney);
+                }
+                else {
+                    log("Money","Already set","darkgreen");
+                }
+            });
+        });
+    });
+
 	function setSkillDropdown(section, field, value, rowid) {
 		let repsection = `repeating_${section}`;
 		let setskill = {};
@@ -2740,17 +2767,18 @@
 		else {log("Is not worn","Don't need to carried...","darkblue");}
 	});
 
+    //Start Compendium Drop
     const resetCompendiumFields = function() {
         let setObj = {}
         setObj["CompendiumName"] = "";
         setObj["CompendiumCategory"] = "";
         setObj["CompendiumContent"] = "";
         setObj["CompendiumData"] = "";
+        log("Compendium Reset",JSON.stringify(setObj),r20color);
         setAttrs(setObj,{silent:true});
         //return setObj;
     }
 
-    //Start Compendium Drop
     const cleanCompendiumData = function(jsonData) {
         const leftRegEx = /(\"\[)/g;
         const rightRegEx = /(\]\")/g;
@@ -2784,6 +2812,30 @@
     }
 
     //Set attribute field names...these are all in repeating sections unless otherwise noted
+    const specialAbiltyUpdates = {
+        "Construct":{
+            "unshakemodtype":"Construct",
+            "unshakemod":"2",
+            "reducereason":"Construct",
+            "reducewoundsby":"1"
+        },
+        "Elemental":{
+            "reducereason":"Elemental",
+            "reducewoundsby":"1"
+        },
+        "Undead":{
+            "toughnessModReason":"Undead",
+            "tufnessMod":"2",
+            "unshakemodtype":"Undead",
+            "unshakemod":"2",
+            "reducereason":"Undead",
+            "reducewoundsby":"1"
+        },
+        "Dense Body": {
+            "toughnessModReason":"Dense Body",
+            "tufnessMod":"2"
+        }
+    }
     const hindrancefields = ["hindrance","hindrancedescription","hindranceType"];
     const edgefields = ["edge","edgedescription"];
     const gearfields = ["item","itemWeight","description"];
@@ -2806,7 +2858,8 @@
         if(jsonObj) {
             //create Keys for Vehicle Weapons
             for(let i = 0; i < vehicleweaponfields.length; i++) {
-                jsonObj[fieldArray[i]] = jsonObj[badFields[i]];
+                // jsonObj[fieldArray[i]] = jsonObj[badFields[i]];
+                typeof jsonObj[badFields[i]] !== "undefined" ? jsonObj[fieldArray[i]] = jsonObj[badFields[i]] : log("Bad Field","Doesn't exist...nothing to convert",r20color);
             }
             log("Ship Weapon JSON",JSON.stringify(jsonObj),r20color);
             return(jsonObj);
@@ -2905,6 +2958,7 @@
             else {
                 log("Non-Repeating Fields","Fields Found",r20color);
                 fields.forEach(field => {
+                    log("JSON So Far",JSON.stringify(targetObj),r20color);
                     typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
                 });
             }
@@ -2948,14 +3002,15 @@
                     repSection= "shields";
                     break;
                 case "Vehicles":
-                    //clear all fields in preparation for updated
+                    //clear all character sheet vehicle fields in preparation for updated
+                    //This is to avoid getting mixed data if there was another vehicle on the sheet already when the drop occurred.
                     let resetObj = {};
                     vehiclefields.forEach(field => {
                         resetObj[`${field}`] = "";
                     });
                     setAttrs(resetObj,{silent:true});
                     //Check if Vehicle Type is cared for; if not, will need to set it here.
-                    typeof jsonObj["vehicletype"] !== "undefined" ? log("Vehicle Type","Should already be cared for",r20color) : setattrvalues["vehicletype"] = jsonObj.name;
+                    typeof jsonObj["vehicletype"] !== "undefined" ? log("Vehicle Type","Should already be cared for",r20color) : typeof jsonObj.name !== "undefined" ? setattrvalues["vehicletype"] = jsonObj.name : typeof jsonObj["display_name"] !== "undefined" ? setattrvalues["vehicletype"] = jsonObj["display_name"] : log("Vehicle Name","Nothing defined...leave blank",r20color);
                     //if not already set, show vehicle tab
                     setattrvalues["vehicle"] = "on";
                     setattrvalues["vehiclewounds"] = "0";
@@ -2969,16 +3024,19 @@
                     break;
             }
             setattrvalues = getDropInfo(jsonObj,setattrvalues,repSection);
+            jsonObj.Category === "Vehicles" ? log("Returned","Made it back to compendiumDrop",r20color) : console.log("Ignore me");
             if(jsonObj.Category === "Vehicles" && typeof jsonObj["data-Weapons"] !== "undefined") {
                 //if this is a vehicle with weapons, then need to add more stuff to the JSON
-                log("Weapons Array","Found",r20color);
-                log("Weapons",JSON.stringify(jsonObj["data-Weapons"]),r20color);
+                log("Vehicle Weapons Array","Found",r20color);
+                log("Vehicle Weapons",JSON.stringify(jsonObj["data-Weapons"]),r20color);
                 for (let weapon of jsonObj["data-Weapons"]) {
-                    log("Import Weapon",weapon.data.weapon,r20color);
+                    log("Import Vehicle Weapon",weapon.data.weapon,r20color);
                     setattrvalues = getDropInfo(weapon.data,setattrvalues,"shipweapons");
                 }
             }
+            log("setattrvalues",JSON.stringify(setattrvalues),r20color);
             setAttrs(setattrvalues);
+            log("Values","Set...character sheet is updated",r20color);
         });
     }
 
@@ -3030,12 +3088,13 @@
             //set Wild Card Status
             if(typeof monsterObj.is_npc !== "undefined") {
                 //if is_npc = TRUE, then set as Wild Card
-                monsterObj.is_npc === "TRUE" ? monsterStats["is_npc"] = "0" : monster["is_npc"] = "1";
+                monsterObj.is_npc === "TRUE" ? monsterStats["is_npc"] = "0" : monsterStats["is_npc"] = "1";
                 monsterObj.is_npc === "TRUE" ? isWildCard = true : log("Extra","isWildCard false",r20color);
                 monsterObj.is_npc === "TRUE" ? woundsMax = 3 : log("Extra","Leave Wounds at 0",r20color);
             }
             //set Size
-            let monsterSize, tokenSize;
+            let monsterSize = "0";
+            let tokenSize;
             typeof monsterObj.size !== "undefined" ? monsterSize = monsterObj.size : log("Size","Not found",r20color);
             monsterStats["size"] = monsterSize;
             //adjust woundsMax based on Size
@@ -3094,7 +3153,9 @@
             })
             //Set the sheet Attributes
             log("Character Sheet","Setting Values",r20color);
+            log("To be set",JSON.stringify(monsterStats),r20color);
             setAttrs(monsterStats, function(){
+                log("Inside","Made it inside the setAttrs",r20color);
                 //Begin Token Settings...
                 //Token size: 4-7 = 2, 8-11 = 3, 12+ = 4
                 const square_size = 70; // Default Roll20 square size (in px)
@@ -3123,23 +3184,26 @@
                 typeof monsterObj.biography !== "undefined" ? finalCharacterDetails["physdescription"] = monsterObj.biography : log("Biography","Not found",r20color);
                 //set Edges
                 log("Edges","Check for Edges",r20color);
-                if (typeof monsterObj["data-Edges"] !== "undefined" && monsterObj["data-Edges"].length > 0) {
-    				for (let edge of monsterObj["data-Edges"]) {
-    					log("Import Edge",edge.name,r20color);
-                        log("Monster Edge",JSON.stringify(edge),r20color);
-                        //finalCharacterDetails = getEdgeInfo(monsterObj["data-Edges"],finalCharacterDetails);
-                        finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
-    					// let repSectionID = generateRowID();
-    					// typeof edge.name !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edge`] = edge.name : log("Edge Name","Not Found",r20color);
-    					// typeof edge.description !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edgedescription`] = edge.description : log("Edge Description","Not Found",r20color);
-    					// finalCharacterDetails[`repeating_edges_${repSectionID}_tookat`] = "GM";
-                        // finalCharacterDetails[`repeating_edges_${repSectionID}_showEdgeDesc`] = "0";
-                        // finalCharacterDetails[`repeating_edges_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
-    				}
-    			}
+                if (typeof monsterObj["data-Edges"] !== "undefined" && typeof monsterObj["data-Edges"] !== "string") {
+                    if (monsterObj["data-Edges"].length > 0) {
+                        for (let edge of monsterObj["data-Edges"]) {
+        					log("Import Edge",edge.name,r20color);
+                            log("Monster Edge",JSON.stringify(edge),r20color);
+                            //finalCharacterDetails = getEdgeInfo(monsterObj["data-Edges"],finalCharacterDetails);
+                            finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
+        					// let repSectionID = generateRowID();
+        					// typeof edge.name !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edge`] = edge.name : log("Edge Name","Not Found",r20color);
+        					// typeof edge.description !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edgedescription`] = edge.description : log("Edge Description","Not Found",r20color);
+        					// finalCharacterDetails[`repeating_edges_${repSectionID}_tookat`] = "GM";
+                            // finalCharacterDetails[`repeating_edges_${repSectionID}_showEdgeDesc`] = "0";
+                            // finalCharacterDetails[`repeating_edges_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
+        				}
+                    }
+                }
+
                 //set Hindrances
-                if (typeof monsterObj["data-Hinderances"] !== "undefined" && monsterObj["data-Hinderances"].length > 0) {
-    				for (let hindrance of monsterObj["data-Hinderances"]) {
+                if (typeof monsterObj["data-Hindrances"] !== "undefined" && monsterObj["data-Hindrances"].length > 0) {
+    				for (let hindrance of monsterObj["data-Hindrances"]) {
     					log("Import Hindrances",hindrance.hindrance,r20color);
                         log("Monster Hindrance",JSON.stringify(hindrance),r20color);
                         //finalCharacterDetails = getHindranceInfo(monsterObj["data-Hindrances"],)
@@ -3156,6 +3220,12 @@
                 log("Edges & Hindrances","Write Edges and Hindrances to the Character",r20color);
                 setAttrs(finalCharacterDetails);
                 finalCharacterDetails = {};
+                //Set Power Points if any
+                if (typeof monsterObj.PowerPoints !== "undefined") {
+                    finalCharacterDetails["PowerPoints"] = monsterObj.PowerPoints;
+                    finalCharacterDetails["PowerPoints_max"] = monsterObj.PowerPoints;
+                }
+
                 //Set Weapons
                 //const weaponfields = ["weapon","range","rof","damageatt","dmgnumdice","dmgdietype","dmgbonusnum","weaponap","weaponminstrength","weaponweight"];
                 log("Weapons","Check for Weapons",r20color);
@@ -3179,6 +3249,16 @@
                     }
     			}
 
+                log("Powers","Check for Powers",r20color);
+                typeof monsterObj["data-Powers"] !== "undefined" ? log("Monster Power",JSON.stringify(monsterObj["data-Powers"]),r20color) : log("Monster Powers","Not Found",r20color);
+                if (typeof monsterObj["data-Powers"] !== "undefined" && monsterObj["data-Powers"].length > 0) {
+                    log("Power Array","Found",r20color);
+    				for (let power of monsterObj["data-Powers"]) {
+    					log("Import Power",power.data.power,r20color);
+                        finalCharacterDetails = getDropInfo(power.data,finalCharacterDetails,"spells");
+                    }
+    			}
+
                 log("Armor","Check for Armor",r20color);
                 typeof monsterObj["data-Armors"] !== "undefined" ? log("Monster Armor",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
                 if (typeof monsterObj["data-Armors"] !== "undefined" && monsterObj["data-Armors"].length > 0) {
@@ -3189,22 +3269,34 @@
                     }
     			}
 
+                log("Shields","Check for Shields",r20color);
+                typeof monsterObj["data-Shields"] !== "undefined" ? log("Monster Shield",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
+                if (typeof monsterObj["data-Shields"] !== "undefined" && monsterObj["data-Shields"].length > 0) {
+                    log("Shield Array","Found",r20color);
+    				for (let shield of monsterObj["data-Shields"]) {
+    					log("Import Shield",shield.data.ShieldType,r20color);
+                        finalCharacterDetails = getDropInfo(shield.data,finalCharacterDetails,"shields");
+                    }
+    			}
+
                 log("Weapons and Armor","Write weapons to the character sheet",r20color);
                 setAttrs(finalCharacterDetails);
                 //Set Special Abilities
                 log("Special Abilities","Begin processing...",r20color);
-                log("Special Abilities",monsterObj["data-SpecialAbilities"],r20color);
-                log("Number of Special Abilities",monsterObj["data-SpecialAbilities"].length,r20color);
+                log("Special Abilities",typeof monsterObj["data-SpecialAbilities"],r20color);
+                //log("Number of Special Abilities",monsterObj["data-SpecialAbilities"].length,r20color);
                 //if (typeof monsterObj["data-SpecialAbilities"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
-                if (typeof monsterObj["descriptionList"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
+                if (typeof monsterObj["descriptionList"] !== "undefined" && typeof monsterObj["data-SpecialAbilities"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
                     finalCharacterDetails["showSpecAbilities"] = "1";
     				for (let compendiumSpecialAbility of monsterObj["data-SpecialAbilities"]) {
     					log("Special Ability",compendiumSpecialAbility.name,r20color);
     					let repSectionID = generateRowID();
-    					typeof compendiumSpecialAbility.name !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialability`] = compendiumSpecialAbility.name : log("Special Ability Name","Not Found",r20color);
+    					typeof compendiumSpecialAbility.name !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialability`] = compendiumSpecialAbility.name.trim() : log("Special Ability Name","Not Found",r20color);
     					typeof compendiumSpecialAbility.description !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialabilitydescription`] = compendiumSpecialAbility.description : log("Special Ability Description","Not Found",r20color);
                         finalCharacterDetails[`repeating_specialabilities_${repSectionID}_showSpecAbilityDesc`] = "0";
                         finalCharacterDetails[`repeating_specialabilities_${repSectionID}_whisperSpecAbilityDeets`] = "/w gm ";
+                        //compendiumSpecialAbility.name.trim() === "Undead" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Undead"]} : compendiumSpecialAbility.name.trim() === "Construct" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Construct"]} : compendiumSpecialAbility.name.trim() === "Elemental" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Elemental"]} : log("Special Ability","Nothing additional needed",r20color);
+                        typeof specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`] ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`]} : log("Special Ability","Nothing additional needed",r20color);
     				}
                     log("Special Abilities","Finished Processing",r20color);
     			}
@@ -3216,14 +3308,13 @@
         });
     }
 
-
-
     on("change:CompendiumCategory", function(eventInfo) {
         log("Compendium Drop",eventInfo.newValue,"#E948C9");
+        log("Compendium Change Source",eventInfo.sourceType,r20color);
     	if (eventInfo.newValue !== "") {
-            let compendiumCategory = eventInfo.newValue;
+            let cCategory = eventInfo.newValue;
             let resetFields;
-            switch (compendiumCategory) {
+            switch (cCategory) {
                 case "Edges":
                 case "Hindrances":
                 case "Powers":
@@ -3232,15 +3323,16 @@
                 case "Vehicles":
                 case "Gear":
                 case "Shields":
-                    compendiumDrop(compendiumCategory);
+                    compendiumDrop(cCategory);
                     break;
                 case "Bestiary":
                     compendiumBestiary();
                     break;
                 default:
-                    log(`Category: ${compendiumCategory}`,`Not recognized`,r20color);
-                    resetFields = resetCompendiumFields();
-                    setAttrs(resetFields,{silent:true});
+                    log(`Category: ${cCategory}`,`Not recognized`,r20color);
+                    //resetFields = resetCompendiumFields();
+                    //setAttrs(resetFields,{silent:true});
+                    resetCompendiumFields();
                     break;
             }
     	}
@@ -6316,6 +6408,61 @@
     				<input type="checkbox" class="sheet-hideArcanum sheet-hiddenInput" name="attr_ArcanumTab">
     				<div class='sheet-collapsedSectionView sheet-arcanum'>
                     	<h1 class="sheet-groupHeader"><span name="attr_powerlabelplural"></span></h1>
+                        <!-- New Stuff Added -->
+                        <div class="sheet-powerpoints">
+                            <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab1color" value="white" />
+                            <div class="sheet-ppcontainer">
+                                <label class="sheet-ablabel"><span name='attr_ablabel'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_PowerPoints" title="@{PowerPoints}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_PowerPoints_max" title="@{PowerPoints_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_ppelabel'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab2color" value="red" />
+                            <div class="sheet-ppcontainer sheet-label2">
+                                <label class="sheet-ablabel"><span name='attr_ablabel2'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints2" title="@{powerpoints2}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints2_max" title="@{powerpoints2_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel2'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab3color" value="blue" />
+                            <div class="sheet-ppcontainer sheet-label3">
+                                <label class="sheet-ablabel"><span name='attr_ablabel3'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints3" title="@{powerpoints3}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints3_max" title="@{powerpoints3_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel3'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab4color" value="green" />
+                            <div class="sheet-ppcontainer sheet-label4">
+                                <label class="sheet-ablabel"><span name='attr_ablabel4'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints4" title="@{powerpoints4}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints4_max" title="@{powerpoints4_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel4'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab5color" value="purple" />
+                            <div class="sheet-ppcontainer sheet-label5">
+                                <label class="sheet-ablabel"><span name='attr_ablabel5'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints5" title="@{powerpoints5}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints5_max" title="@{powerpoints5_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel5'></span></label>
+                            </div>
+                        </div>
+                        <!-- End New Stuff Added -->
                     	<fieldset class='repeating_spells'>
                     		<span class="sheet-spellsMini">
 								<button class="sheet-traitbutton sheet-miniButton" type='roll' name='roll_tPower' value="@{spellroll}"><input type="hidden" name="attr_spellbutton" class="sheet-spellbutton" value="1" /><span class="sheet-buttonand">⚔️</span><span class="sheet-buttondo">&#x1f5e1;</span><span class="sheet-buttonsk">&#x1f64c;</span> <span name="attr_power"></span></button>
@@ -6577,27 +6724,23 @@
 					<div class='sheet-base sheet-miscderived'>
     					<!-- Money -->
 						<input type="checkbox" class="sheet-usewealth" name="attr_usewealth" style="display: none;" />
-    					<input type="checkbox" class="sheet-useLankhmar" name="attr_50fPo8Clams" value="0" style="display: none;"/>
-    					<!-- <div class="sheet-basederived sheet-lankhmar" style='font-weight: bold; font-size: .75em; margin-top: 5px; margin-bottom: -3px;'>
-					        <div class="sheet-derivelabel">&nbsp;</div>
-					        <div class="sheet-derivebase" data-i18n="iron-tiks">Tiks</div>
-					        <div class="sheet-derivemod" data-i18n="bronze-agols">Agols</div>
-					        <div class="sheet-derivecurrent" data-i18n="silver-smerduks">Smerduks</div>
-					        <div class="sheet-derivemisc" data-i18n="gold-rilks">Rilks</div>
-					    </div> -->
-					    <div class="sheet-basederived sheet-nonwealth">
-					        <input type="hidden" class="sheet-usePieces" value="0" name="attr_50fPo8Clams" />
-					        <!-- Labels -->
-					        <div class="sheet-derivelabel sheet-money" data-i18n="money">Money</div>
-					        <!-- <div class='sheet-derivelabel sheet-PofE' data-i18n="pieces-of-eight">Pieces of Eight</div>
-					        <div class="sheet-derivelabel sheet-Clams" data-i18n="money-clams">Clams</div> -->
-					        <div class="sheet-derivelabel sheet-Credits" data-i18n="money-credits">Credits</div>
-					        <!-- <div class="sheet-derivelabel sheet-Livre" data-i18n="livre">Livre</div> -->
-					        <!-- Money Fields -->
-					        <div class="sheet-derivebase"><input class="sheet-derivedStat sheet-moneyfield" type="number" step="any" name="attr_money" title="@{money}" value="0" /></div>
-							<!-- <div class="sheet-derivemod sheet-lankhmar"><input type="number" step="any" name="attr_bagols" title="@{bagols}" class="sheet-derivedStat" value="0" /></div>
-							<div class="sheet-derivecurrent sheet-lankhmar"><input type="number" step="any" name="attr_ssmerduks" title="@{ssmerduks}" class="sheet-derivedStat" value="0" /></div>
-							<div class="sheet-derivemisc sheet-lankhmar"><input type="number" step="any" name="attr_grilks" title="@{grilks}" class="sheet-derivedStat" value="0" /></div> -->
+    					<input type="hidden" class="sheet-useMultiCurrency" name="attr_moneyfields" value="1" />
+                        <div class="sheet-basederived sheet-multiMoney sheet-moneyLabels">
+                            <div class="sheet-derivelabel sheet-money"> </div>
+                            <div class="sheet-derivebase"><span name='attr_moneyonename'></span></div>
+                            <div(class="sheet-derivemod"><span name="attr_moneytwoname"></span></div>
+                            <div class="sheet-derivecurrent sheet-money3"><span name="attr_moneythreename"></span></div>
+                            <div class="sheet-derivemisc sheet-money4"><span name="attr_moneyfourname"></span></div>
+                        </div>
+
+					    <div class="sheet-basederived sheet-nonwealth sheet-multiMoney">
+                            <!-- Label -->
+                            <div class="sheet-derivelabel sheet-money"><span name="attr_moneyname"></span></div>
+                            <!-- Money Fields -->
+                            <div class="sheet-derivebase"><input class="derivedStat moneyfield" type="number" step="any" name="attr_money" title="@{money}" value="0" /></div>
+                            <div class="sheet-derivemod sheet-additionalCurrency sheet-money2"><input type="number" step="any" name="attr_money2" title="@{money2}" class="sheet-derivedStat" value="0" /></div>
+                            <div class="sheet-derivecurrent sheet-additionalCurrency sheet-money3"><input type="number" step="any" name="attr_money3" title="@{money3}" class="sheet-derivedStat" value="0" /></div>
+                            <div class="sheet-derivemisc sheet-additionalCurrency sheet-money4"><input type="number" step="any" name="attr_money4" title="@{money4}" class="sheet-derivedStat" value="0" /></div>
 					    </div>
 						<div class="sheet-basederived sheet-usewealth">
 							<!-- Label -->
@@ -6652,7 +6795,7 @@
                 	<img class="sheet-logo sheet-SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
                     <img class="sheet-logo sheet-Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png" />
                     <input type='hidden' name='wilddie' value='6' />
-                    <div class='sheet-condionsnew'>
+                    <div class='sheet-conditionsnew'>
                     	<!-- Conditions -->
         				<input type="checkbox" class="sheet-showconditions" name="attr_showconditions" style="display: none" checked />
         				<div class='sheet-conditions'>
@@ -7495,12 +7638,12 @@
                                     </p>
                                 </div>
     						</fieldset>
+                            <div class='sheet-shieldTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
+                                <h4 class="sheet-shieldweight"><span data-i18n="total-shield-weight-carried">Total Shield Weight Carried</span>:</h4>
+                                <input type="number" name="attr_shieldtotalweightcarried" title="@{shieldtotalweightcarried}" class="sheet-shieldWeight" value="0" readonly />
+                            </div>
     						<!-- <input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked /> -->
     					</div>
-                        <div class='sheet-shieldTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
-                            <h4 class="sheet-shieldweight"><span data-i18n="total-shield-weight-carried">Total Shield Weight Carried</span>:</h4>
-                            <input type="number" name="attr_shieldtotalweightcarried" title="@{shieldtotalweightcarried}" class="sheet-shieldWeight" value="0" readonly />
-                        </div>
                     </div> <!-- End Shields -->
                 </div>
             </div>
@@ -7898,6 +8041,21 @@
                         </div>
 						<label class="sheet-srmItem sheet-usewealthmod"><input type="checkbox" name="attr_useWealthMod" value="1" />&nbsp;<span data-i18n="use-wealth-modifier-field">Use the Wealth Modifier field</span></label>
                         <!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
+                        <label class="sheet-srmItem sheet-multiMoney"><span data-i18n="money-label"></span> : <input type="text" class="sheet-injury" name="attr_moneyname" /></label>
+                        <div class="sheet-srmItem sheet-multiMoney">
+                            <select name="attr_moneyfields" class="sheet-traitdie" title="@{moneyfields}">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <label class="sheet-moneycountlabel" data-i18n="number-of-money-fields">Number of money fields</label>
+                        </div>
+                        <input type="hidden" class="moneycount" name="attr_moneyfields" value="1" />
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money1"><span data-i18n="currency1-label"></span>: <input type="text" class="sheet-injury" name="attr_moneyonename" /></label>
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money2"><span data-i18n="currency2-label"></span>: <input type="text" class="sheet-injury" name="attr_moneytwoname" /></label>
+                        <label(class="sheet-srmItem sheet-multiMoney sheet-money3"><span data-i18n="currency3-label"></span>: <input type="text" class="sheet-injury" name="attr_moneythreename" /></label>
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money4"><span data-i18n="currency4-label"></span>: <input type="text" class="sheet-injury" name="attr_moneyfourname" /></label>
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -8018,6 +8176,37 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.12 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10012' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.12</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10012' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="support-for-deadlands-compendium">Added support for the Deadlands: The Weird West compendium.</span></li>
+                        <li><span class="sheet-black" data-i18n="additional-currency">Support for additional money/currency fields. These labels are customizeable.</span></li>
+					</ul>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="bestiary-drag-and-drop-fix">Fixed a drag and drop issue where some bestiary entries didn't have all the necessary updates. For example, Zombies Undead special ability didn't update/change the creatures Toughness, etc.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.11 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10011' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.11</h4></span>
