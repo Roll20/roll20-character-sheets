@@ -829,6 +829,24 @@ pri2['Snake Charm'] = {
     'effect': 'When this spell is cast, a hypnotic pattern is set up that causes one or more snakes to cease all activity except a semierect, swaying movement. If the snakes are charmed while in a torpor, the duration of the spell is 1d4+2 turns; if the snakes are not torpid, but are not aroused and angry, the charm lasts 1d3 turns; if the snakes are angry or attacking, the spell lasts 1d4+4 rounds. The priest casting the spell can charm snakes whose total hit points are less than or equal to those of the priest. On the average, a 1st-level priest could charm snakes with a total of 4 or 5 hit points; a 2nd-level priest could charm 9 hit points, etc. The hit points can be those of a single snake or those of several of the reptiles, but the total hit points cannot exceed those of the priest casting the spell. A 23-hit point caster charming a dozen 2-hit point snakes would charm 11 of them. This spell is also effective against any ophidian or ophidianoid monster, such as naga, couatl, etc., subject to magic resistance, hit points, and so forth. \n&emsp;Variations of this spell may exist, allowing other creatures significant to a particular mythos to be affected. Your DM will inform you if such spells exist.'
 };
 
+pri2['Speak With Animals'] = {
+    'level': 'Level 2 Priest',
+    'school': 'Alteration',
+    'sphere': 'Animal, Divination',
+    'range': '0',
+    'duration': '[[2*[[@{level-priest}]] ]] rounds',
+    'aoe': '1 animal within 30 feet',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 263',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell empowers the priest to comprehend and communicate with any warm- or cold-blooded normal or giant animal that is not mindless. The priest is able to ask questions of and receive answers from the creature, although friendliness and cooperation are by no means assured. Furthermore, terseness and evasiveness are likely in basically wary and cunning creatures (the more stupid ones will instead make inane comments). If the animal is friendly or of the same general alignment as the priest, it may do some favor or service for the priest (as determined by the DM). Note that this spell differs from the *speak with monsters* spell, for this spell allows conversation only with normal or giant nonfantastic creatures such as apes, bears, cats, dogs, elephants, and so on.'
+};
+
 pri2['Spiritual Hammer'] = {
     'level': 'Level 2 Priest',
     'school': 'Invocation',
