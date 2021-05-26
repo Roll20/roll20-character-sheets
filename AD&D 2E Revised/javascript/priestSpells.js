@@ -2740,6 +2740,403 @@ pri6['Word of Recall'] = {
     'effect': 'The word of recall spell takes the priest instantly back to his sanctuary when the word is uttered. The sanctuary must be specifically designated in advance by the priest and must be a well-known place. The actual point of arrival is a designated area no larger than 10’ × 10’. The priest can be transported any distance, from above or below ground. Transportation by the *word of recall* spell is safe within a plane, but for each plane the priest is removed, there is a 10% cumulative chance that the priest is irrevocably lost. The priest is able to transport, in addition to himself, 25 pounds of weight per experience level. Currently [[25*[[@{level-priest}]] ]] pounds of weight. Thus, a 15th-level priest could transport his person and an additional 375 pounds. This extra matter can be equipment, treasure, or even living material, such as another person. Exceeding this limit causes the spell to fail. Note that unusually strong physical fields, such as magnetic or gravitational forces, or even magical applications can, at the DM’s option, make the use of this spell hazardous or impossible.'
 };
 
+const pri7 = {};
+pri7['Animate Rock'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Earth)',
+    'range': '40 yards',
+    'duration': '[[@{level-priest}]] rounds',
+    'aoe': '[[2*[[@{level-priest}]] ]] cubic feet',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A stone and drop of the caster’s blood',
+    'reference': 'PHB p. 292',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By employing an *animate rock* spell, the caster causes a stone object of up to the indicated size to move (see the 6th-level *animate object* spell.). The animated stone object must be separate (not a part of a huge boulder or the like). It follows the desire of the caster—attacking, breaking objects, blocking—while the magic lasts. It has no intelligence or volition of its own, but it follows instructions exactly as spoken. Only one set of instructions for one single action can be given to the animated rock, and the directions must be brief, about a dozen words or so. The rock remains animated for one round per experience level of the caster. The volume of rock that can be animated is also based on the experience level of the caster—2 cubic feet of stone per level, such as 24 cubic feet, a mass of about man-sized, at 12th level.\n&emsp;While the exact details of the animated rock are decided by the DM, its Armor Class is no worse than 5, and it has 1d3 hit points per cubic foot of volume. It uses the attack roll of the caster. The maximum damage it can inflict is 1d2 points per caster level. Thus, a 12th-level caster’s rock might inflict 12 to 24 points of damage. Movement for a man-sized rock is 60 feet per round. A rock generally weighs from 100 to 300 pounds per cubic foot.'
+};
+
+pri7['Astral Spell'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Astral',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '½ hour',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 293',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, a priest is able to project his astral body into the Astral plane, leaving his physical body and material possessions behind on the Prime Material plane. As the Astral plane touches upon the first levels of all the outer planes, the priest can travel astrally to the first level of any of these outer planes as he wills. The priest then leaves the Astral plane, forming a body on the plane of existence he has chosen to enter. It is also possible to travel astrally anywhere in the Prime Material plane by means of the *astral* spell. However, a second body cannot be formed on the Prime Material plane.\n&emsp;As a general rule, a person astrally projected can be seen only by creatures on the Astral plane. The astral body is connected at all times to the material body by a silvery cord. If the cord is broken, the affected person is killed, astrally and materially, but generally only the psychic wind can cause the cord to break. When a second body is formed on a different plane, the silvery cord remains invisibly attached to the new body. If the second body or astral form is slain, the cord simply returns to the caster’s body where the body rests on the Prime Material plane, reviving it from its state of suspended animation. Although astral projections are able to function on the Astral plane, their actions affect only creatures existing on the Astral plane; a physical body must be materialized on other planes.\n&emsp;The spell lasts until the priest desires to end it, or until it is terminated by some outside means, such as *dispel magic* spell or destruction of the priest’s body on the Prime Material plane—which kills the priest. The priest can project the astral forms of up to seven other creatures with himself by means of the *astral* spell, providing the creatures are linked in a circle with the priest. These fellow travelers are dependent upon the priest and can be stranded if something happens to the priest. Travel in the Astral plane can be slow or fast, according to the priest’s desire. The ultimate destination arrived at is subject to the desire of the priest.'
+};
+
+pri7['Changestaff'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Evocation, Enchantment',
+    'sphere': 'Plant, Creation',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'The caster’s staff',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'None',
+    'materials': 'A specially prepared staff (see below) and either his holy symbol or leaves (ash, oak, or yew) of the same sort as the staff',
+    'reference': 'PHB p. 293',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the caster is able to change a specially prepared staff into a treantlike creature of the largest size, about 24 feet tall. When the priest plants the end of the staff in the ground and speaks a special command and invocation, the staff turns into a treantlike creature with 12 Hit Dice, 40 hit points, and Armor Class 0. It attacks twice per round, inflicting 4d6 points of damage with every successful attack. The staff-treant defends the caster and obeys any spoken commands. However, it is by no means a true treant; it cannot converse with actual treants or control trees. The transformation lasts either for as many turns as the caster has experience levels, currently [[@{level-priest}]] turns, until the caster commands the staff to return to its true form, or until the staff is destroyed, whichever occurs first. If the staff-treant is reduced to 0 hit points or less, it crumbles to a sawdustlike powder and the staff is destroyed. Otherwise, the staff can be used again after 24 hours and the staff-treant is at full strength.\n&emsp;The staff for the *changestaff* spell must be specially prepared. The staff must be a sound limb cut from an ash, oak, or yew tree struck by lightning no more than 24 hours before the limb is cut. The limb must then be cured by sun drying and special smoke for 28 days. Then it must be shaped, carved, and polished for another 28 days. The caster cannot adventure or engage in other strenuous activity during either of these periods. The finished staff, engraved with woodland scenes, is then rubbed with the juice of holly berries, and the end of it is thrust into the earth of the caster’s grove while he casts a *speak with plant* spell, calling upon the staff to assist in time of need. The item is then charged with a magic that will last for many changes from staff to treant and back again.'
+};
+
+pri7['Chariot of Sustarre'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Evocation',
+    'sphere': 'Elemental (Fire), Creation',
+    'range': '10 yards',
+    'duration': '12 hours',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A small piece of wood, two holly berries, and a fire source at least equal to a torch',
+    'reference': 'PHB p. 294',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, it brings forth a large, flaming chariot pulled by two fiery horses from the elemental plane of Fire. These appear in a clap of thunder amid a cloud of smoke. The vehicle moves at 24 on the ground, 48 flying, and can carry the caster and up to seven other creatures of man-size or less. The passengers must be touched by the caster to protect them from the flames of the chariot. Creatures other than the caster and his designated passengers sustain 2d4 points of fire damage each round if they come within 5 feet of the horses or chariot. Such creatures suffer no damage if they evade the area by rolling successful saving throws vs. petrification, with Dexterity adjustments.\n&emsp;The caster controls the chariot by verbal command, causing the flaming steeds to stop or go, walk, trot, run or fly, and turn left or right as he desires. Note that the chariot of Sustarre is a physical manifestation and can sustain damage. The vehicle and steeds are struck only by magical weapons or by water (one quart of which inflicts 1 point of damage). They are Armor Class 2, and each requires 30 points of damage to dispel. Naturally, fire has no effect upon either the vehicle or its steeds, but magical fires other than those of the chariot can affect the riders. Other spells, such as a successful *dispel magic* or *holy word,* will force the chariot back to its home plane, without its passengers. The chariot can be summoned only once per week.'
+};
+
+pri7['Confusion'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Enchantment/Charm',
+    'sphere': 'Charm',
+    'range': '80 yards',
+    'duration': '[[@[level-priest}]] rounds',
+    'aoe': '[[1d4+floor([[@{level-priest}]]/2)]] creatures in a 40-foot square',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'A set of three nut shells',
+    'reference': 'PHB p. 294',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell causes confusion in one or more creatures within the area, creating indecision and the inability to take effective action. The spell affects 1d4 creatures, plus one creature per two caster levels. Thus, seven to ten creatures can be affected by a 12th- or 13th-level caster, eight to 11 by a 14th- or 15th-level caster, etc. These creatures are allowed saving throws vs. spell with -2 penalties, adjusted for Wisdom. Those successfully saving are unaffected by the spell. Confused creatures react as follows (roll 1d10):}}{{style=center1}}{{c1-1=**d10**}}{{c2-1=1}}{{c3-1=2-6}}{{c4-1=7-9}}{{c5-1=10}}{{c1-2=**Reaction**}}{{c2-2=Wander away (unless prevented) for duration of spell}}{{c3-2=Stand confused one round (then roll again)}}{{c4-2=Attack nearest creature for one round (then roll again)}}{{c5-2=Act normally for one round (then roll again)}}{{effects2=&emsp;The spell lasts one round for each level of the caster. Those who fail their saving throws are checked by the DM for actions each round, for the duration of the spell, or until they “wander away.”\n&emsp;Wandering creatures move as far from the caster as possible in their most typical mode of movement (characters walk, fish swim, bats fly, etc.). This is not panicked flight. Wandering creatures also have a 50% chance of using any special innate movement abilities (plane shift, burrowing, flight, etc.). Saving throws and actions are checked at the beginning of each round. Any confused creature that is attacked perceives the attacker as an enemy and acts according to its basic nature.\n&emsp;Note: If there are many creatures involved, the DM may decide to assume average results. For example, if there are 16 orcs affected and 25% could be expected to successfully roll the saving throw, then four are assumed to have succeeded, one wanders away, four attack the nearest creature, six stand confused and the last acts normally but must check next round. Since the orcs are not near the party, the DM decides that two who are supposed to attack the nearest creature attack each other, one attacks an orc that saved, and one attacks a confused orc, which strikes back. The next round, the base is 11 orcs, since four originally saved and one wandered off. Another one wanders off, five stands confused, four attack, and one acts normally.'
+};
+
+pri7['Conjure Earth Elemental'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Conjuration/Summoning (Reversible)',
+    'sphere': 'Elemental (Earth), Summoning',
+    'range': '40 yards',
+    'duration': '[[@[level-priest}]] turns',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 294',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A caster who performs a *conjure earth elemental* spell summons an earth elemental to do his bidding. The elemental is 60% likely to have 12 Hit Dice, 35% likely to have 16 Hit Dice, and 5% likely have 21 to 24 Hit Dice (20 + 1d4). Further, the caster needs but to command it, and it does as desired. The elemental regards the caster as a friend to be obeyed. The elemental remains until destroyed, dispelled, sent away by dismissal, the reverse of this spell, or a *holy word* spell (see the *conjure fire elemental* spell), or the spell duration expires.'
+};
+
+pri7['Control Weather'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Weather',
+    'range': '0',
+    'duration': '[[4d12]] hours',
+    'aoe': '[[4d4]] square miles',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol, incense, and prayer beads or similar prayer object',
+    'reference': 'PHB p. 294',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *control weather* spell enables a priest to change the weather in the local area. The spell affects the weather for 4d12 hours in an area of 4d4 square miles. It requires one turn to cast the spell, and an additional [[1d4]] turns for the effects of the spell to be felt. The current weather conditions are decided by the DM, depending on the climate and season. Weather conditions have three components: precipitation, temperature, and wind. The spell can change these conditions according to the following chart.\n&emsp;The upper-case headings represent existing weather conditions. The lower-case headings below are the new conditions to which the caster can change the existing conditions. In addition, the caster can control the direction of the wind. For example, a day that is clear, warm, and with moderate wind can be controlled to become hazy, hot, and calm. Contradictions are not possible—fog and strong wind, for example. Multiple *control weather* spells can be used only in succession.\n&emsp;Obviously, the spell functions only in areas where there are appropriate climatic conditions. If Weather is a major sphere for the priest (as it is for druids), duration and area are doubled, and the caster can change the prevailing weather by two places. For example, he can cause precipitation to go from partly cloudy to heavy sleet, temperature to go from cool to arctic, and wind to go from calm to strong.}}{{c1-1=**Precipitation**}}{{c2-1=&ensp;}}{{c3-1=CLEAR}}{{c4-1=&ensp;very clear}}{{c5-1=&ensp;light clouds or hazy}}{{c6-1=PARTLY CLOUDY}}{{c7-1=&ensp;clear weather}}{{c8-1=&ensp;cloudy}}{{c9-1=&ensp;mist/light rain/hail}}{{c10-1=&ensp;sleet/light snow}}{{c11-1=CLOUDY}}{{c12-1=&ensp;partly cloudy}}{{c13-1=&ensp;deep clouds}}{{c14-1=&ensp;fog}}{{c15-1=&ensp;heavy rain/large hail}}{{c16-1=&ensp;driving sleet/snow}}{{c1-2=**Temperature**}}{{c3-2=HOT}}{{c4-2=&ensp;sweltering heat}}{{c5-2=&ensp;warm}}{{c6-2=WARM}}{{c7-2=&ensp;hot}}{{c8-2=&ensp;cool}}{{c9-2=COOL}}{{c10-2=&ensp;warm}}{{c11-2=&ensp;cold}}{{c12-2=COLD}}{{c13-2=&ensp;cool}}{{c14-2=&ensp;arctic cold}}{{c15-2=&ensp;storm}}{{c16-2=STORM}}{{c1-3=**Wind**}}{{c3-3=CALM}}{{c4-3=&ensp;dead calm}}{{c5-3=&ensp;light wind}}{{c6-3=&ensp;moderate wind}}{{c7-3=MODERATE WIND}}{{c8-3=&ensp;calm}}{{c9-3=&ensp;strong wind}}{{c10-3=STRONG WIND}}{{c11-3=&ensp;moderate wind}}{{c12-3=&ensp;gale}}{{c13-3=GALE}}{{c14-3=&ensp;strong wind}}{{c15-3=&ensp;gale}}{{c16-3=&ensp;hurricane'
+};
+
+pri7['Creeping Doom'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Animal, Summoning',
+    'range': '0',
+    'duration': '[[4*[[@{level-priest}]] ]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 295',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the caster utters the spell of *creeping doom,* he calls forth a mass of from 500 to 1,000 ([[(1d6+4)*100)]]) venomous, biting and stinging arachnids, insects, and myriapods. This carpetlike mass swarms in an area 20 feet square. Upon command from the caster, the swarm creeps forth at 10 feet per round toward any prey within 80 yards, moving in the direction in which the caster commands. The creeping doom slays any creature subject to normal attacks, as each of the small horrors inflicts 1 point of damage (each then dies after its attack), so that up to 1,000 points of damage can be inflicted on creatures within the path of the creeping doom. If the creeping doom travels more than 80 yards away from the summoner, it loses 50 of its number for each 10 yards beyond 80 yards. For example, at 100 yards, its number has shrunk by 100. There are a number of ways to thwart or destroy the creatures forming the swarm. The solutions are left to the imaginations of players and DMs.'
+};
+
+pri7['Earthquake'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Earth)',
+    'range': '120 yards',
+    'duration': '1 round',
+    'aoe': '[[5*[[@{level-priest}]] ]]-foot diameter',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A pinch of dirt, a piece of rock, and a lump of clay',
+    'reference': 'PHB p. 295',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast by a priest, a local tremor of fairly high strength rips the ground. The shock is over in one round. The earthquake affects all terrain, vegetation, structures, and creatures in its area of effect. The area of effect of the *earthquake* spell is circular, with a diameter of 5 feet for every experience level of the priest casting it. Thus a 20th-level priest casts an *earthquake* spell with a 100-foot-diameter area of effect.\n&emsp;Solidly built structures with foundations reaching down to bedrock sustain one-half damage; one-quarter damage if they score above 50% on a saving throw. An earth elemental opposed to the caster in the area of effect can negate 10% to 100% (roll 1d10, 0 = 100%) of the effect. Other magical protections and wards allowed by the DM may also reduce or negate this effect. If cast undersea, this spell may, at the discretion of the DM, create a tsunami or tidal wave.\n\n**Earthquake Effects**\n\nTERRAIN\n**Cave or cavern—**Collapses roof\n**Cliffs—**Crumble, causing landslide\n**Ground—**Cracks open, causing the following fractions of creatures to fall in and die:\n&emsp;Size S: 1 in 4\n&emsp;Size M: 1 in 6\n&emsp;Size L: 1 in 8\n**Marsh—**Drains water to form muddy, rough ground.\n**Tunnel—**Caves in\n\nVEGETATION\n**Small growth—**No effect\n**Trees—**1 in 3 are uprooted and fall\n\nSTRUCTURES\n**All structures—**Sustain 5d12 points of structural damage; those suffering full damage are thrown down in rubble\n\nCREATURES (See TERRAIN entry)'
+};
+
+pri7['Exaction'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Evocation, Alteration',
+    'sphere': 'Charm, Summoning',
+    'range': '10 yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'The priest’s holy symbol, some matter or substance from the plane of the creature from whom an exaction is expected, and knowledge of the creature’s nature or actions that is written out on a parchment that is burned to seal the pledge',
+    'reference': 'PHB p. 295',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is employed, the priest confronts some powerful creature from another plane (including devas and other powerful minions, for instance, but not demigods or deities of any sort) and requires of it some duty or quest. A creature of an alignment opposed to the priest (e.g., evil if the priest is good, chaotic if the priest is lawful) cannot be ordered around unless it is willing. Note that an absolute (true) neutral creature is effectively opposed to both good and evil, and both law and chaos.\n&emsp;The spellcaster must know something about the creature to exact service from it, or else he must offer some fair trade in return for the service. That is, if the priest is aware that the creature has received some favor from someone of the priest’s alignment, then the *exaction* spell can name this as cause. If no balancing reason for service is known, then some valuable gift or service must be pledged in return for the exaction. The service exacted must be reasonable with respect to the past or promised favor or reward, and with the being’s effort and risk. The spell then acts, subject to a magic resistance roll, as a quest upon the being that is to perform the required service. Immediately upon completion of the service, the being is transported to the vicinity of the priest, and the priest must then and there return the promised reward, whether it is irrevocable cancellation of a past debt or the giving of some service or other material reward. After this is done, the creature is instantly freed to return to its own plane.\n&emsp;The DM adjudicates when an equitable arrangement has been reached. If the caster requests too much, the creature is free to depart or to attack the priest (as if the agreement were breached) according to its nature. If circumstances leave the situation unbalanced (for example, the creature dies while achieving a result that was not worth dying for), then this might create a debt owed by the caster to the creature’s surviving kith and kin, making the caster vulnerable to a future *exaction* spell from that quarter. Agreeing to a future exaction or release in the event of catastrophic failure or death are common caster pledges in securing an exaction. Failure to fulfill the promise to the letter results in the priest being subject to exaction by the subject creature or by its master, liege, etc., at the very least. At worst, the creature can attack the reneging priest without fear of any of his spells affecting it, for the priest’s failure to live up to the bargain gives the creature immunity from the priest’s spell powers.'
+};
+
+pri7['Fire Storm'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Evocation (Reversible)',
+    'sphere': 'Elemental (Fire)',
+    'range': '160 yards',
+    'duration': '1 round',
+    'aoe': '[[2*[[@{level-priest}]] ]] 10-foot cubes',
+    'components': 'V, S',
+    'cast-time': '1 round',
+    'saving-throw': '½',
+    'materials': '',
+    'reference': 'PHB p. 296',
+    'damage': '[[2d8+[[@{level-priest}]] ]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'When a *fire storm* spell is cast, the whole area is shot through with sheets of roaring flame that equal a *wall of fire* spell in effect. Creatures within the area of fire and 10 feet or less from the edge of the affected area receive 2d8 points of damage plus additional damage equal to the caster’s level (2d8 +1/level). Creatures that roll successful saving throws vs. spell suffer only one-half damage. The damage is inflicted each round the creature stays in the area of effect. The area of effect is equal to two 10-foot × 10-foot cubes per level of the caster—e.g., a 13th-level caster can cast a fire storm measuring 130 feet × 20 feet × 10 feet. The height of the storm is 10 or 20 feet; the imbalance of its area must be in length and width.\n&emsp;The reverse spell, *fire quench,* smothers twice the area of effect of a *fire storm* spell with respect to normal fires, and the normal area of effect with respect to magical fires. Fire-based creatures, such as elementals, salamanders, etc., of less than demigod status have a 5% chance per experience level of the caster of being extinguished. Currently [[5*[[@{level-priest}]] ]]% chance. If cast only against a *flametongue* sword, the sword must roll a successful saving throw vs. crushing blow or be rendered nonmagical. Such a sword in the possession of a creature first receives the creature’s saving throw, and if this is successful, the second saving throw is automatically successful.'
+};
+
+pri7['Gate'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Summoning',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 296',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Casting a *gate* spell has two effects: it causes an interdimensional connection between the plane of existence the priest is in and the plane in which dwells a specific being of great power. The result of this connection is that the sought-after being can step through the gate or portal, from its plane to that of the priest. Uttering the spell attracts the attention of the dweller on the other plane. When casting the spell, the priest must name the entity he desires to make use of the gate and to come to his aid. There is a 100% chance that *something* steps through the gate. The actions of the being that comes through depend on many factors, including the alignment of the priest, the nature of those accompanying him, and who or what opposes or threatens the priest. The DM will decide the exact result of the spell, based on the creature called, the desires of the caster and the needs of the moment. The being gated in either returns immediately or remains to take action. Casting this spell ages the priest five years.'
+};
+
+pri7['Holy Word'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Conjuration/Summoning (Reversible)',
+    'sphere': 'Combat',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': '30-foot radius',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 296',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Uttering a *holy word* spell creates magic of tremendous power. It drives off evil creatures from other planes, forcing them to return to their own planes of existence, provided the speaker is in his home plane. Creatures so banished cannot return for at least a day. The spell further affects creatures of differing alignment as shown on the table below:}}{{style=fixed2 sheet-spell-fixed5 sheet-spell-bottom3 sheet-spell-bottom4 sheet-spell-bottom5 sheet-spell-center3 sheet-spell-center4 sheet-spell-center5}}{{c1-1=**Effects of Holy Word**\n&emsp;}}{{cs1-1=5}}{{cc1-1=center}}{{c2-1=**Creature’s**\n**Hit Dice or Level**}}{{c3-1=Less than 4}}{{c4-1=4 to 7+}}{{c5-1=8 to 11+}}{{c6-1=12 or more}}{{c7-1= }}{{c2-2=**General**}}{{cc2-2=bottom}}{{c3-2=Kills}}{{c4-2=Paralyzes\n1d4 turns}}{{c5-2=Slows\n2d4 rounds}}{{c6-2=Deafens\n1d4 rounds}}{{c7-2= }}{{c2-3=**Attack Move**}}{{c3-3=—}}{{c4-3=—}}{{c5-3=–50%}}{{c6-3=–25%}}{{c7-3= }}{{c2-4=**Dice**}}{{c3-4=—}}{{c4-4=—}}{{c5-4=–4*}}{{c6-4=–2}}{{c7-4= }}{{c2-5=**Spells**}}{{c3-5=—}}{{c4-5=—}}{{c5-5=—}}{{c6-5=50%}}{{c7-5=chance\nof failure}}{{effects2=* Slowed creatures attack only on even-numbered rounds until the effect wears off.\n\n&emsp;Affected creatures are those within the 30-foot-radius area of effect, which is centered on the priest casting the spell. The side effects are negated for deafened or silenced creatures, but such are still driven off if other-planar.\n&emsp;The reverse, *unholy word,* operates exactly the same way but affects creatures of good alignment.'
+};
+
+pri7['Regenerate'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Permnanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '3 rounds',
+    'saving-throw': 'None',
+    'materials': 'A holy symbol and holy water (or unholy water for the reverse)',
+    'reference': 'PHB p. 297',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *regenerate* spell is cast, body members (fingers, toes, hands, feet, arms, legs, tails, or even the heads of multi-headed creatures), bones, and organs grow back. The process of regeneration requires but one round if the severed member(s) is (are) present and touching the creature, [[2d4]] turns otherwise. The creature must be living to receive the benefit of this spell. If the severed member is not present, or if the injury is older than one day per caster level, currently [[@{level-priest}]] days, the recipient must roll a successful system shock check to survive the spell.\n&emsp;The reverse, *wither,* causes the member or organ touched to shrivel and cease functioning in one round, dropping off into dust in [[2d4]] turns. The creature must be touched for the harmful effect to occur.'
+};
+
+pri7['Reincarnate'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Necromancy',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 person',
+    'components': 'V, S',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 297',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the priest can bring back a dead person in another body, if death occurred no more than one week before the casting of the spell. Reincarnation does not require any saving throw, system shock, or resurrection survival roll. The corpse is touched, and a new incarnation of the person appears in the area in [[1d6]] turns. The person reincarnated recalls the majority of his former life and form, but the character class, if any, of the new incarnation might be very different indeed. The new incarnation is determined on the accompanying table or by DM choice. If a player character race is indicated, the character must be created. At the DM’s option, certain special (expensive) incenses can be used that may increase the chance for a character to return as a specific race or species. A *wish* spell can restore a reincarnated character to its original form and status.\n&emsp;If an unusual creature form is indicated, the DM can (at his option only) use the guidelines for new player character races to allow the character to earn experience and advance in levels, although this may not be in the same class as before. If the reincarnated character returns as a creature eligible to be the same class as he was previously (i.e., a human fighter returns as an elf), the reincarnated character has half his previous levels and hit points. If the character returns as a new character class, his hit points are half his previous total, but he must begin again at 1st level. If the character returns as a creature unable to have a class, he has half the hit points and saving throws of his previous incarnation.}}{{style=center1 sheet-spell-center3}}{{c1-1=**Reincarnated Forms**\n&emsp;}}{{cs1-1=4}}{{c2-1=**D100**\n**Roll**}}{{c3-1=&emsp;}}{{c4-1=01-03}}{{c5-1=04-08}}{{c6-1=09-12}}{{c7-1=13-16}}{{c8-1=17-19}}{{c9-1=20-23}}{{c10-1=24-28}}{{c11-1=29-31}}{{c12-1=32-34}}{{c13-1=35-36}}{{c14-1=37-40}}{{c2-2=**Incarnation**}}{{cc2-2=bottom}}{{c4-2=Badger}}{{c5-2=Bear, black}}{{c6-2=Bear, brown}}{{c7-2=Boar, wild}}{{c8-2=Centaur}}{{c9-2=Dryad}}{{c10-2=Eagle}}{{c11-2=Elf}}{{c12-2=Faun/satyr}}{{c13-2=Fox}}{{c14-2=Gnome}}{{c2-3=**D100**\n**Roll**}}{{c4-3=41-44}}{{c5-3=45-58}}{{c6-3=59-61}}{{c7-3=62-64}}{{c8-3=65-68}}{{c9-3=69-70}}{{c10-3=71-75}}{{c11-3=76-80}}{{c12-3=81-85}}{{c13-3=86-00}}{{c2-4=**Incarnation**}}{{cc2-4=bottom}}{{c4-4=Hawk}}{{c5-4=Human}}{{c6-4=Lynx}}{{c7-4=Owl}}{{c8-4=Pixie}}{{c9-4=Raccoon}}{{c10-4=Stag}}{{c11-4=Wolf}}{{c12-4=Wolverine}}{{c13-4=DM’s choice'
+};
+
+pri7['Restoration'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '3 rounds',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 298',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the life energy level of the recipient creature is raised by one. This reverses any previous life energy level drain of the creature by a force or monster. Thus, if a 10th-level character had been struck by a wight and drained to 9th level, the *restoration* spell would bring the character up to exactly the number of experience points necessary to restore him to 10th level once again, restoring additional Hit Dice (or hit points) and level functions accordingly. Restoration is effective only if the spell is cast within one day of the recipient’s loss of life energy, per experience level of the priest casting it. Currently [[@{level-priest}]] days. A *restoration* spell restores the intelligence of a creature affected by a *feeblemind* spell. It also negates all forms of insanity. Casting this spell ages both the caster and the recipient by two years.\n&emsp;The reverse, *energy drain,* draws away one life energy level (see such undead as spectre, wight, and vampire, in the MONSTROUS MANUAL). The energy drain requires the victim to be touched. Casting this form of the spell does not age the caster.'
+};
+
+pri7['Resurrection'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Necromancy (Reversible)',
+    'sphere': 'Necromantic',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'The priest’s religious symbol and holy water (unholy water for the reverse spell)',
+    'reference': 'PHB p. 298',
+    'damage': '',
+    'damage-type': '',
+    'healing': 'Full',
+    'effect': 'The priest is able to restore life and complete strength to any living creature, including elves, by bestowing the *resurrection* spell. The creature can have been dead up to 10 years per level of the priest casting the spell. Currently [[10*[[@{level-priest}]] ]] years. Thus, a 19th-level priest can resurrect the bones of a creature dead up to 190 years. The creature, upon surviving a resurrection survival check, is immediately restored to full hit points and can perform strenuous activity. The spell cannot bring back a creature that has reached its allotted life span (i.e., died of natural causes). Casting this spell makes it impossible for the priest to cast further spells or engage in combat until he has had one day of bed rest for each experience level or Hit Die of the creature brought back to life. The caster ages three years upon casting this spell.\n&emsp;The reverse, *destruction,* causes the victim of the spell to be instantly dead and turned to dust. A *wish* spell or equivalent is required for recovery. Destruction requires a touch, either in combat or otherwise, and does not age the caster. In addition, the victim is allowed a saving throw (with a -4 penalty). If the save is successful, the victim receives 8d6 points of damage instead.\n&emsp;The DM may reduce the chances of successful resurrection if little of the creature’s remains are available.\n&emsp;The DM may reduce the chances of successful resurrection if little of the creature’s remains are available.'
+};
+
+pri7['Succor'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration, Enchantment (Reversible)',
+    'sphere': 'Summoning',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '1 person',
+    'components': 'V, S, M',
+    'cast-time': '1 day',
+    'saving-throw': 'None',
+    'materials': 'The object to be prepared, which costs between 2,000 and 5,000 gp to prepare (see below)',
+    'reference': 'PHB p. 298',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the priest creates a powerful magic aura in some specially prepared object—a string of prayer beads, a small clay tablet, an ivory baton, etc. This object radiates magic, for it contains the power to instantaneously transport its possessor to the sanctuary of the priest who created its magic. Once the item is enchanted, the priest must give it willingly to an individual, at the same time informing him of a command word to be spoken when the item is to be used. To make use of the item, the recipient must speak the command word at the same time that he rends or breaks the item. When this is done, the individual and all that he is wearing and carrying (up to the maximum encumbrance limit for the character) are instantly transported to the sanctuary of the priest, just as if the individual were capable of speaking a *word of recall* spell. No other creatures can be affected.\n&emsp;The reversed application of the spell causes the priest to be transported to the immediate vicinity of the possessor of the item when it is broken and the command word said. The priest has a general idea of the location and situation of the item’s possessor, and can choose not to be affected by this summons. This decision is made at the instant when the transportation is to take place. However, if he chooses not to go, the opportunity is gone forever and the spell is wasted.\n&emsp;The cost of preparing the special item (for either version of the spell) varies from 2,000 to 5,000 gp. The more costly items can transport the subject from one plane of existence to another, if the DM allows. Note that the same factors that can prevent the operation of the *plane shift* and *teleport* spells can also prevent the use of this spell.'
+};
+
+pri7['Sunray'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Evocation, Alteration',
+    'sphere': 'Sun',
+    'range': '[[10*[[@{level-priest}]] ]] yards',
+    'duration': '[[1+1d4]] rounds',
+    'aoe': '5-foot radius (special)',
+    'components': 'V, S, M',
+    'cast-time': '4',
+    'saving-throw': 'Special',
+    'materials': 'An aster seed and a piece of adventuring feldspar (sunstone)',
+    'reference': 'PHB p. 299',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, the caster can evoke a dazzling beam of light each round in which no action other than movement is performed. The sunray is like a ray of natural sunlight. All creatures in the 10-foot-diameter area of effect must roll successful saving throws vs. spell or be blinded for 1d3 rounds, those using infravision at the time for 2d4 rounds. Creatures to whom sunlight is harmful or unnatural suffer permanent blindness if the saving throw is failed, and are blinded for 2d6 rounds if the saving throw is successful. Those within its area of effect, as well as creatures within 20 feet of its perimeter, lose any infravision capabilities for 1d4+1 rounds.\n&emsp;Undead caught within the sunray’s area of effect receive 8d6 points of damage, one-half if a saving throw vs. spell is successful. Those undead 20 feet to either side of the sunray’s area of effect receive 3d6 points of damage, no damage if a save is successful. In addition, the ray may result in the total destruction of those undead specifically affected by sunlight, if their saving throws are failed. The ultraviolet light generated by the spell inflicts damage on fungoid creatures and subterranean fungi just as if they were undead, but no saving throw is allowed.'
+};
+
+pri7['Symbol'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Conjuration/Summoning',
+    'sphere': 'Guardian',
+    'range': 'Touch',
+    'duration': '[[@[level-priest}]] turns',
+    'aoe': '60 f00t radius',
+    'components': 'V, S, M',
+    'cast-time': '3',
+    'saving-throw': 'Negate',
+    'materials': 'Mercury and phosphorous (see 8th-level wizard spell, *symbol*)',
+    'reference': 'PHB p. 299',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The priest casting this spell inscribes a glowing symbol in the air upon any surface, according to his desire. Any creature looking at the completed symbol within 60 feet must roll a successful saving throw vs. spell or suffer the effect. The symbol glows for one turn for each experience level of the caster. The particular symbol used is selected by the caster at the time of casting. The caster will not be affected by his own symbol. One of the following effects is chosen by the caster:\n&emsp;**Hopelessness:** Creatures seeing it must turn back in dejection or surrender to capture or attack unless they roll successful saving throws vs. spell. Its effects last for 3d4 turns.\n&emsp;**Pain:** Creatures affected suffer –4 penalties to their attack rolls and –2 penalties to their Dexterity ability scores due to wracking pains. The effects last for 2d10 turns.\n&emsp;**Persuasion:** Creatures seeing the symbol become of the same alignment as and friendly to the priest who scribed the symbol for 1d20 turns unless a saving throw vs. spell is successful.'
+};
+
+pri7['Transmute Metal to Wood'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Earth)',
+    'range': '80 yards',
+    'duration': 'Permanent',
+    'aoe': '1 metal object',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 299',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *transmute metal to wood* spell enables the caster to change an object from metal to wood. The volume of metal cannot exceed a maximum weight of 10 pounds per experience level of the priest. Currently [[10*[[@{level-priest}]] ]] pounds. Magical objects made of metal are 90% resistant to the spell, and those on the person of a creature receive the creature’s saving throw as well. Artifacts and relics cannot be transmuted. Note that only a *wish* spell or similar magic can restore a transmuted object to its metallic state. Otherwise, for example, a metal door changed to wood would be forevermore a wooden door.'
+};
+
+pri7['Wind Walk'] = {
+    'level': 'Level 7 Priest',
+    'school': 'Alteration',
+    'sphere': 'Elemental (Air)',
+    'range': 'Touch',
+    'duration': '[[@{level-priest}]] hours',
+    'aoe': 'Caster + [[floor([[@{level-priest}]]/8)]] persons',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'Fire and holy water',
+    'reference': 'PHB p. 299',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the priest (and possibly one or two other persons) to alter the substance of his body to a cloudlike vapor. A magical wind then wafts the priest along at a movement rate of 60, or as slow as 6, as the spellcaster wills. The *wind walk* spell lasts as long as the priest desires, up to a maximum duration of six turns (one hour) per experience level of the caster. For every eight levels of experience the priest has attained, up to 24, he is able to touch another person and carry that person, or those persons, along on the wind walk. Persons wind walking are not invisible, but rather appear misty and translucent. If fully clothed in white, they are 80% likely to be mistaken for clouds, fog, vapors, etc. The priest can regain his physical form as desired, each change to and from vaporous form requiring five rounds. While in vaporous form, the priest and companions are hit only by magic or magical weaponry, though they may be subject to high winds at the DM’s discretion. No spellcasting is possible in vaporous form.'
+};
+
 const priestSpells = {};
 priestSpells['pri1'] = pri1;
 priestSpells['pri2'] = pri2;
@@ -2747,4 +3144,5 @@ priestSpells['pri3'] = pri3;
 priestSpells['pri4'] = pri4;
 priestSpells['pri5'] = pri5;
 priestSpells['pri6'] = pri6;
+priestSpells['pri7'] = pri7;
 /* ---- Priest spells end ---- */
