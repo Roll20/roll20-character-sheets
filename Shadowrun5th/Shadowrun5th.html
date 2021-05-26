@@ -7859,14 +7859,6 @@ Click again to switch to Manual and Remote">
         </div>
         <div class="weapon">
             <h2>Melee + Ranged Weapons</h2>
-            <div class="reloadwrapper">
-                <input class="reloadcheckbox" type="checkbox" name="attr_reloadcheckbox" title="Searches the equipment list for matching names.
-Will refill any ammunition below its maximum if enough rounds are in the inventory.
-The inventory name can have additional letters or words
-eg 'APDS-Rounds' when the ammunition is ony called 'APDS'
-Only takes the first match even if multiple identical entries are found.">
-                <div class="reloadlabel"><label>Reload</label></div>
-            </div>
             <div class="weaponrow">
                 <div class="weaponmeleewrapper">
                     <label class="weaponlabel">Melee</label>
@@ -10376,72 +10368,6 @@ on("sheet:opened", function() {
 });
 
 
-on("change:reloadcheckbox", function(){
-    getSectionIDs("repeating_equipment", function(equipmentids){
-        for(var i=1;i<9;i++){
-            (function(i){
-                getSectionIDs("repeating_equipment"+i, function(ammoids){
-                    var attrs=[];
-                    var eqname=[];
-                    var eqqty=[];
-                    var ammoname=[];
-                    var ammoqty=[];
-                    var ammomax=[];
-                    for(var j=0;j<equipmentids.length;j++){
-                        attrs.push("repeating_equipment_"+equipmentids[j]+"_equipmentname");
-                        eqname.push(attrs.length-1);
-                    }
-                    for(var j=0;j<equipmentids.length;j++){
-                        attrs.push("repeating_equipment_"+equipmentids[j]+"_equipmentnumber");
-                        eqqty.push(attrs.length-1);
-                    }
-                    for(var j=0;j<ammoids.length;j++){
-                        attrs.push("repeating_equipment"+i+"_"+ammoids[j]+"_ammoname"+i);
-                        ammoname.push(attrs.length-1);
-                    }
-                    for(var j=0;j<ammoids.length;j++){
-                        attrs.push("repeating_equipment"+i+"_"+ammoids[j]+"_ammonumber"+i);
-                        ammoqty.push(attrs.length-1);
-                    }
-                    for(var j=0;j<ammoids.length;j++){
-                        attrs.push("repeating_equipment"+i+"_"+ammoids[j]+"_ammomaxnumber"+i);
-                        ammomax.push(attrs.length-1);
-                    }
-                    getAttrs(attrs, function(values){
-                        var change=false
-                        if(eqname.length>0&&ammoname.length>0){
-                            for(var j=0;j<eqname.length;j++){
-                                for(var k=0;k<ammoname.length;k++){
-                                    if(values[attrs[eqname[j]]]&&values[attrs[ammoname[k]]]){
-                                        if(values[attrs[eqname[j]]].length>1&&values[attrs[ammoname[k]]].length>1&&parseInt(values[attrs[ammomax[k]]])>0&&parseInt(values[attrs[ammoqty[k]]])>0&&parseInt(values[attrs[eqqty[k]]])>0){
-                                            if(values[attrs[eqname[j]]].match(values[attrs[ammoname[k]]])){
-                                                if(parseInt(values[attrs[ammoqty[k]]])<parseInt(values[attrs[ammomax[k]]])){
-                                                    change=true
-                                                    if((parseInt(values[attrs[ammomax[k]]])-parseInt(values[attrs[ammoqty[k]]]))<=parseInt(values[attrs[eqqty[j]]])){
-                                                        values[attrs[eqqty[j]]]=parseInt(values[attrs[eqqty[j]]])+parseInt(values[attrs[ammoqty[k]]])-parseInt(values[attrs[ammomax[k]]])
-                                                        values[attrs[ammoqty[k]]]=parseInt(values[attrs[ammomax[k]]])
-                                                    }else{
-                                                        values[attrs[ammoqty[k]]]=parseInt(values[attrs[ammoqty[k]]])+parseInt(values[attrs[eqqty[j]]])
-                                                        values[attrs[eqqty[j]]]=0
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        if(change){
-                            setAttrs(values)
-                        }
-                    });
-                });
-            })(i);
-        }
-
-    });
-});
-
 function clearSheet(attributes, experimental) {
     console.log("Removing old data");
     getSectionIDs("repeating_contacts", function(idarray) {
@@ -11018,8 +10944,14 @@ on("change:chummercheckbox", function(){
                                             var newrowid=generateRowID();
                                             //find ammo to get stats
                                             ammo = ammunition.find(clip => clip.guid === chummerfile.characters.character.weapons.weapon[i-1].clips.clip.id);
+
+                                            if(chummerfile.characters.character.weapons.weapon[i-1].clips.clip.location === "loaded") {
+                                                //skip loaded, they will be found later anyway
+                                                continue;
+                                            }
+
                                             attributes["repeating_equipment"+i+"_"+newrowid+"_ammoname"+i]=ammo.name;
-                                            if(ammo.weaponbonusdamage_english != null) {
+                                            if(ammo.weaponbonusdamage_english != null && ammo.weaponbonusap != null && ammo.weaponbonusacc != null)  {
                                                     attributes["repeating_equipment"+i+"_"+newrowid+"_ammodv"+i]=ammo.weaponbonusdamage_english.substring(0,2);
                                                     attributes["repeating_equipment"+i+"_"+newrowid+"_ammodmgtype"+i]=ammo.weaponbonusdamage_english.substring(2);
                                                     if(ammo.name_english === "Ammo: Stick-n-Shock") {
@@ -13906,6 +13838,11 @@ on('change:repeating_armors remove:repeating_armors', function(){
              <td>{{after2}}({{after2_num}})</td>
         </tr>
         {{/after2}}
+        {{#after3}}
+        <tr class="sheet-rolltemplate-after">
+            <td>{{after3}}({{after3_num}})</td>
+        </tr>
+        {{/after3}}
         {{#description}}
         <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
         <tr><td><div class="sheet-rolltemplate-sectionheading">Description</div></td></tr>
