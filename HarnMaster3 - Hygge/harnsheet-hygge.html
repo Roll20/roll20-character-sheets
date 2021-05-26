@@ -5,12 +5,14 @@
    <button id=settingstab type="action" name="act_settings" >Settings<span class="buttonicon">&nbspx</span></button>
 </div>
 
+<!-- some inputs to switch tabs and toggle themes --> 
 <input type='hidden' class='tabstoggle' name='attr_sheettab'  value='character'  />
+<input type='hidden' class='themeactivator' name='attr_colorthemeselector' value='light' ></span>
 
+<!-- actual character sheet, divided in tabs -->
 <div class='character'> <!-- CHARACTER TAB -->
     <h1>HarnMaster Character Profile</h1>
     <div class='character-grid'> <!-- grid container-->
-
         <div class='character-grid-section personal personal-grid'>
     		<div class="skill-section-title">PERSONAL</div>
             <label for=charname>Name</label><input type="text" id=charname name="attr_name" class="personal-input">
@@ -210,11 +212,12 @@
             <button type="roll" value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls @{ridingpersonal_name}}} {{rolltarget=[[{[[{[[@{ridingpersonal_ml} - [[(@{physical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{physical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=@{ridingpersonal_ml}}}" name="roll_RidingPersonalCheck">
             </button>
             
-            <input type="text" class="skill-label" name="attr_ridinghorse_name" value="Riding EML" disabled="true">
-            <div >&nbsp;</div>
-            <input type="text" name="attr_ridinghorse_sb" class="skill-value" value="na" readonly>
-            <input name="attr_ridinghorse_ml" class="skill-value" readonly>
-            <button type="roll" value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls riding @{hname}}} {{rolltarget=[[{[[{[[@{ridinghorse_ml} + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=@{ridinghorse_ml}}}" name="roll_RidingHorseCheck" class="harntooltip"><span class="tooltiptext">Your effective ML for your current horse,<br> calculated based on personal riding skill and horse initiative</span>
+			<input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/><!-- hide calculated EML for horse-riding if horse is not shown on sheet --> 
+            <input type="text" class="skill-label horse-section" name="attr_ridinghorse_name" value="Riding EML" disabled="true">
+            <div class="horse-section">&nbsp;</div>
+            <input type="text" name="attr_ridinghorse_sb" class="skill-value horse-section" value="na" readonly>
+            <input name="attr_ridinghorse_ml" class="skill-value horse-section" readonly>
+            <button type="roll" value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls riding @{hname}}} {{rolltarget=[[{[[{[[@{ridinghorse_ml} + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=@{ridinghorse_ml}}}" name="roll_RidingHorseCheck" class="harntooltip horse-section" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative">
             </button>
             
             <input type="text" class="skill-label" name="attr_stealth_name" value="Stealth" disabled="true">
@@ -367,9 +370,11 @@
     		<div>&nbsp;</div>
     
     		<label for=combatcarry>ArmourCarry</label>
-    		  <input id=combatcarry type="number" name="attr_combat_armourcarry" class="skill-value" value="0" readonly>
+    		  <input id=combatcarry type="number" name="attr_combat_effectivecondition" class="skill-value" value="0" readonly>
     		<div>&nbsp;</div>
     
+			<input type="hidden" name="attr_healing_effectivecondition" class="skill-value" value="0" readonly><!-- place to store condition based endurance if this rule is enabled in the settings -->
+			
     		<label for=combatdex>Dexterity</label>
     		  <input id=combatdex type="number" name="attr_dex" readonly class="skill-value" readonly>
     		<div>&nbsp;</div>
@@ -385,6 +390,7 @@
     		<label for=combatdodge>Dodge</label>
     		  <input id=combatdodge type="number" name="attr_dodge_ml" class="skill-value" readonly>
     		<button type="roll"	value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls dodge}} {{rolltarget=[[{[[{[[@{dodge_ml} - [[(@{physical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{physical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=@{dodge_ml}}}"	name="roll_CombatDodgeCheck"></button>	
+			<span>load only / endurance:</span><input name="attr_hrcondition4load" value="0" readonly><input name="attr_hrcondition4endurance" value="0" readonly>
     	</div>
         <div class='character-grid-section load load-grid colored-grid'>
     	    <div class="skill-section-title">LOAD CARRIED</div>
@@ -394,8 +400,9 @@
     		  <input id=armorload type="number" name="attr_load_armor_total" class="skill-value" value="0" class="number-value" readonly>
     		<label for=invenload>Inventory</label>
     		  <input id=invenload type="number" name="attr_load_inventory_total" class="skill-value" value="0" class="number-value" readonly>
-    		<label for=totalweight>Total Weight</label>
-    		  <input id=totalweight type="number" name="attr_load_total" class="skill-value" value="0" readonly>
+    		<label for=totalweight class="sumrow">Total Weight</label>
+    		  <input id=totalweight type="number" name="attr_load_total" class="skill-value sumrow" value="0" readonly>
+			<div>&nbsp;</div>  <div>&nbsp;</div>
     		<label for=mountedtoggle>Mounted?</label>
     		  <input id=mountedtoggle type="checkbox" name="attr_is_mounted" value="1">		
     	</div>    
@@ -405,12 +412,12 @@
     			  <input id=injurylvl type="number" name="attr_injury_total" value="0" class="skill-value" readonly>
     			<label for=fatigue>Fatigue</label>
     			  <input id=fatigue type="number" name="attr_fatigue_total" class="skill-value">
-    			<label for=universalpenalty>Universal</label>
-    			  <input id=universalpenalty type="number" name="attr_universal_penalty" class="skill-value" readonly>
+    			<label for=universalpenalty class="sumrow">Universal</label>
+    			  <input id=universalpenalty type="number" name="attr_universal_penalty" class="skill-value sumrow" readonly>
     			<label for=encumbrance>Encumb.</label>
     			  <input id=encumbrance type="number" name="attr_encumbrance" value="0" class="skill-value" readonly>
-    			<label for=physicalpenalty>Physical</label>
-    			  <input id=physicalpenalty type="number" name="attr_physical_penalty" value="0" class="skill-value" readonly>
+    			<label for=physicalpenalty class="sumrow">Physical</label>
+    			  <input id=physicalpenalty type="number" name="attr_physical_penalty" value="0" class="skill-value sumrow" readonly>
     	</div>   
         <div class='character-grid-section injuries injuries-grid colored-grid'>
     	    <div class="skill-section-title">INJURIES</div>
@@ -433,12 +440,11 @@
     				<input type="number" name="attr_injury_level" class="skill-value" value="0">
     				<input type="number" name="attr_injury_healingroll" class="skill-value" value="0">
     				<input type="number" name="attr_injury_day" class="skill-value" value="0">				
-    				<button type="roll" value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls a healing check}} {{infected=[[@{injury_infected_feedback}]]}} {{rolltarget=[[{[[{[[(@{injury_healingroll} * [[@{combat_endurance}]]) + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[0]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=[[@{injury_healingroll} * [[@{combat_endurance}]]]]}} {{note=@{injury_location} @{injury_severity}@{injury_level} h@{injury_healingroll}}}" name="roll_healingcheck"></button>
+    				<button type="roll" value="&{template:rollcheck} {{character_name=@{name}}} {{rolldesc=rolls a healing check}} {{infected=[[@{injury_infected_feedback}]]}} {{rolltarget=[[{[[{[[(@{injury_healingroll} * [[@{healing_effectivecondition}]]) + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[0]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=[[@{injury_healingroll} * [[@{healing_effectivecondition}]]]]}} {{note=@{injury_location} @{injury_severity}@{injury_level} h@{injury_healingroll}}}" name="roll_healingcheck"></button>
     				<input type="checkbox" name="attr_injury_infected"><span></span>
     				<input type="hidden" name="attr_injury_infected_feedback" value="0" readonly>
     			</fieldset>			
     	</div>
-    	
         <div class='character-grid-section armorprotection armorprotection-grid colored-grid'>
     	    <div class="skill-section-title">ARMOR PROTECTION</div>
     		<div class="skill-label skill-header">Location</div>
@@ -667,7 +673,6 @@
     			</div>
     		</fieldset>		
     	</div>
-       
         <div class='character-grid-section carriedmissileweapons missileweapons-grid colored-grid'>
         	<div class="skill-section-title">CARRIED MISSILE WEAPONS</div>
     		<div class="skill-header weapon-label">Missile Weapon</div>
@@ -797,8 +802,9 @@
 				<input type="number" name="attr_piety_points" class="skill-value" value="0">
 			</fieldset>
 		</div>   
-        <div class='character-grid-section section-title'><h2>Horse</h2></div> 
-        <div class='character-grid-section basichorseinfo bhigrid colored-grid'>
+        <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+		<div class='character-grid-section horse-section section-title'><h2>Horse</h2></div> 
+        <div class='character-grid-section horse-section basichorseinfo bhigrid colored-grid'>
 			<label for=horsename>Horse Name</label>
 			<input id=horsename type="text" name="attr_hname" class="skill-label">
 			<label for=horsebreed>Horse Breed</label>
@@ -812,7 +818,7 @@
 				<option value="merrie">Merrie</option>
 			</select>				
 		</div>
-		<div class='character-grid-section horseattribs horseattribs-grid bordered-grid'>
+		<div class='character-grid-section horse-section horseattribs horseattribs-grid bordered-grid'>
 			<div class="skill-section-title">ATTRIBUTES</div>
 			<label for=horsestr>STR</label>
 			<input id=horsestr type="number" name="attr_hstr" class="skill-value" value="0">
@@ -838,7 +844,7 @@
 			<div class="labelinputjoin">&nbsp </div>
 			<input id=horseloadlimit type="number" name="attr_hloadlimit" class="skill-value" readonly>
 		</div>   
-        <div class='character-grid-section horseabilities horseabilities-grid colored-grid'>
+        <div class='character-grid-section horse-section horseabilities horseabilities-grid colored-grid'>
 			<div class="skill-section-title">ABILITIES</div>
 			<div class="skill-header">Skill</div>
 			<div class="skill-header">SB</div>
@@ -873,7 +879,7 @@
 			<input type="number" name="attr_htrample_sb" class="skill-value" value="0">
 			<input type="number" name="attr_htrample_ml" class="skill-value" value="0">
 		</div>
-        <div class='character-grid-section horsecombat horsecombat-grid colored-grid'>
+        <div class='character-grid-section horse-section horsecombat horsecombat-grid colored-grid'>
 			<div class="skill-section-title">COMBAT</div>
 			<label for=horseinit>Horse Init</label>
 			<input id=horseinit type="number" name="attr_hcombat_initiative" value="0" class="skill-value" readonly>
@@ -887,7 +893,7 @@
 			<label for=horsecombatmove>Move / min. move</label>
 			<input id=horsecombatmove type="number" name="attr_hcombat_move" class="skill-value" value="0" readonly>
 			<div>/ 
-				<span name="attr_hcombat_min_move" class="skill-value">
+				<span name="attr_hcombat_min_move" class="skill-value"></span>
 			</div>
 			<label for=horseturn>60&deg; turn (hex)</label>
 			<input id=horseturn type="number" name="attr_hturn" readonly value="0" class="skill-value">
@@ -905,20 +911,20 @@
 				<option value=3>Gallop</option>
             </select>
 		</div>    
-        <div class='character-grid-section horseload horseload-grid colored-grid'>
-			<div class="skill-section-title">LOAD CARRIED</div><!-- TODO change below to labels -->
-			<input type="text" name="attr_hload_rider" class="skill-label" value="Total Rider Load" readonly>
-			<input type="number" name="attr_hload_rider_total" class="skill-value" value="0" readonly>
-			<input type="text" name="attr_hload_armor" class="skill-label" value="Horse Armor" readonly>
-			<input type="number" name="attr_hload_armor_total" class="skill-value" value="0" class="number-value" readonly>
-			<input type="text" name="attr_hload_inventory" class="skill-label" value="Horse Inventory" readonly>
-			<input type="number" name="attr_hload_inventory_total" class="skill-value" value="0" class="number-value" readonly>
-			<label for=htotalweight>Total Weight:</label>
-			<input id=htotalweight type="number" name="attr_hload_total" class="skill-value" value="0" readonly>
-			<label for=hadjload>Adjusted Load:</label>
-			<input id=hadjload type="number" name="attr_hadjusted_load" class="skill-value" value="0" readonly>
+        <div class='character-grid-section horse-section horseload horseload-grid colored-grid'>
+			<div class="skill-section-title">LOAD CARRIED</div>
+			<label for=riderload>Total Rider Load</label>
+			<input id=horseriderload type="number" name="attr_hload_rider_total" class="skill-value" value="0" readonly>
+			<label for=horsearmorload>Horse Armor</label>
+			<input id=horsearmorload type="number" name="attr_hload_armor_total" class="skill-value" value="0" class="number-value" readonly>
+			<label for=horseinvenload>Horse Inventory</label>
+			<input id=horseinvenload type="number" name="attr_hload_inventory_total" class="skill-value" value="0" class="number-value" readonly>
+			<label for=htotalweight class="sumrow">Total Weight</label>
+			<input id=htotalweight type="number" name="attr_hload_total" class="skill-value sumrow" value="0" readonly>
+			<label for=hadjload class="sumrow">Adjusted Load</label>
+			<input id=hadjload type="number" name="attr_hadjusted_load" class="skill-value sumrow" value="0" readonly>
 		</div>   
-        <div class='character-grid-section horseap horseap-grid colored-grid'>
+        <div class='character-grid-section horse-section horseap horseap-grid colored-grid'>
 			<div class="skill-section-title">ARMOR PROTECTION</div>
 			<div class="info-label skill-header">Location</div>
 			<div class="skill-header">Compound Layers</div>
@@ -942,7 +948,7 @@
 			<input type="number" name="attr_hall_p" class="skill-value" value="0">
 			<input type="number" name="attr_hall_f" class="skill-value" value="0">			
 	</div>
-        <div class='character-grid-section horseinjuries horseinjuries-grid colored-grid'>
+        <div class='character-grid-section horse-section horseinjuries horseinjuries-grid colored-grid'>
 			<div class="skill-section-title">INJURIES</div>
 			<div class="skill-header">Location/Type</div>
 			<div class="skill-header skill-value">SV</div>
@@ -968,7 +974,7 @@
 				<input type="hidden" name="attr_hinjury_infected_feedback" value="0" readonly>
 			</fieldset>			
 		</div> 
-        <div class='character-grid-section horseattacks horseattacks-grid colored-grid'>
+        <div class='character-grid-section horse-section horseattacks horseattacks-grid colored-grid'>
 			<div class="skill-section-title">ATTACKS</div>
 			<div class="skill-header skill-label">Attack</div>
 			<div class="skill-header skill-value">B</div>
@@ -986,19 +992,19 @@
 			<button type="roll" value="&{template:rollcheck} {{character_name=@{hname}}} {{rolldesc=tramples}} {{rolltarget=[[{[[{[[@{htrample_ml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{ml=@{htrample_ml}}} {{note=b(@{trample_weapon_b}) e(@{trample_weapon_e}) p(@{trample_weapon_p})}}" name="roll_trampleweaponamlskillcheck">
 			</button>
 		</div>
-        <div class='character-grid-section horsepenalties horsepenalties-grid colored-grid'>
-		<div class="skill-section-title">PENALTIES</div><!-- TODO change below to labels -->
-			<div class="combat-label font-light">Injury Levels</div>
-			<input type="number" name="attr_hinjury_total" value="0" class="skill-value" readonly>
-			<div class="combat-label font-light">Fatigue</div>
-			<input type="number" name="attr_hfatigue_total" class="skill-value" value="0">
-			<div class="combat-label font-heavy">Universal</div>
-			<input type="number" value="0" class="skill-value" name="attr_huniversal_penalty" readonly>
-			<div class="combat-label font-light">Encumb.</div>
-			<input type="number" name="attr_hencumbrance" class="skill-value" value="0" readonly>
-			<div class="combat-label font-heavy">Physical</div>
-			<input type="number" name="attr_hphysical_penalty" class="skill-value" value="0" readonly>
-		</div>    
+        <div class='character-grid-section horse-section horsepenalties horsepenalties-grid colored-grid'>
+		    <div class="skill-section-title">PENALTIES</div>
+			<label for=hinjurylvl>Injury Levels</label>
+			<input id=hinjurylvl type="number" name="attr_hinjury_total" value="0" class="skill-value" readonly>
+			<label for=hfatigue>Fatigue</label>
+			<input id=hfatigue type="number" name="attr_hfatigue_total" class="skill-value" value="0">
+			<label for=hunipenalty class="sumrow">Universal</label>
+			<input id=hunipenalty type="number" value="0" class="skill-value sumrow" name="attr_huniversal_penalty" readonly>
+			<label for=hencumbrance>Encum.</label>
+			<input id=hencumbrance type="number" name="attr_hencumbrance" class="skill-value" value="0" readonly>
+			<label for=hphyspenalty class="sumrow">Physical</label>
+			<input id=hphyspenalty type="number" name="attr_hphysical_penalty" class="skill-value sumrow" value="0" readonly>
+		    </div>    
     </div> 
 </div>
 
@@ -1051,7 +1057,6 @@
 		</fieldset>
 		<div class="footnote"> Note: checking the "C"  checkbox denotes the weapon is carried, and the weight will count towards the characters encumbrance</div>
     </div>   
-
     <div class='inventory-grid-section inven-missileweapons missileweapons-grid colored-grid'>
 		<div class="skill-section-title">MISSILE WEAPONS</div>
 		<div class="skill-header weapon-label">Missile Weapon</div>
@@ -1102,7 +1107,7 @@
 		
 	</div>    
     <div class='inventory-grid-section inven-armor armorinvengrid colored-grid'>
-	    <div class="skill-section-title">ARMOR</div><!-- TODO replace pipe separator div by color grades to separate sections (use same wrapper as character tab armor section-->
+	    <div class="skill-section-title">ARMOR</div>
 		<div class="skill-header">Armor/Clothing</div>
 		<div class="skill-header">C</div>
 		<div class="skill-header skill-value">WGT</div>
@@ -1228,7 +1233,8 @@
 		</fieldset>
 		<div class="footnote"> Note: Carried (C) armor will count towards encumbrance (weight) and armor protection (B/E/P/F values) on the character tab.</div>
 	</div>   
-    <div class='inventory-grid-section inven-personal personalinvengrid colored-grid'>
+    <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+	<div class='inventory-grid-section inven-personal personalinvengrid colored-grid'>
 	<div class="skill-section-title">PERSONAL INVENTORY</div>
 		<div class="skill-header skill-label">Item</div>
 		<div class="skill-header skill-value">WGT</div>
@@ -1241,7 +1247,8 @@
 		<div class="footnote"> Note: checking the "C" checkbox denotes the item is carried, </div>
 		<div class="footnote"> and the weight will count towards the characters encumbrance</div>
 	</div>
-    <div class='inventory-grid-section inven-horse horseinvengrid colored-grid'>
+    <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+	<div class='inventory-grid-section horse-section inven-horse horseinvengrid colored-grid'>
 	<div class="skill-section-title">HORSE INVENTORY</div>
 		<div class="skill-header skill-label">Item</div>
 		<div class="skill-header skill-value">WGT</div>
@@ -1251,8 +1258,9 @@
 		</fieldset>
 		<div class="footnote">Note: these items count towards horse's encumbrance</div>
 		<div class="footnote">on the character tab</div>	
-	</div> 
-    <div class='inventory-grid-section inven-horsearmor horsearmorinvengrid colored-grid'>
+	</div>
+    <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>	
+    <div class='inventory-grid-section horse-section inven-horsearmor horsearmorinvengrid colored-grid'>
        	<div class="skill-section-title">HORSE ARMOR WORN</div>
        	<div class="skill-header skill-label">Armor</div>
        	<div class="skill-header skill-value">AQ</div>
@@ -1311,8 +1319,28 @@
 </div>
 
 <div class='settings'> <!-- SETTINGS TAB -->
-	<h1>Character Sheet settings</h1>
+	<h1>Character Sheet settings</h1><!-- TODO add tooltips to clarify settings -->
 	<div class='settings-grid'> <!-- grid container-->
+    	<div class='settings-grid-section settingsgroup'>
+    	    <div class="skill-section-title">Houserules</div>
+			<label for=conditionloadtoggle>Condition for load only</label>
+			<input id=conditionloadtoggle name="attr_hrcondition4load" type="checkbox" value="1">
+			<label for=conditionendurancetoggle>Condition for all Endurance checks</label>
+			<input id=conditionendurancetoggle name="attr_hrcondition4endurance" type="checkbox" value="1"> 	
+    	</div>
+    	<div class='settings-grid-section settingsgroup'>
+    	    <div class="skill-section-title">Sheet settings</div>
+			<select class="colorselector" name="attr_colorthemeselector"> 
+               <option value="light" id="theme-light">Light theme</option>
+               <option value="dark" id="theme-dark">Dark theme</option>			
+			</select>
+    	</div>
+    	<div class='settings-grid-section settingsgroup'>
+    	    <div class="skill-section-title">Various</div>
+			<label for=showhorsetoggle>Show Horse on sheet?</label>
+			<input id=showhorsetoggle name="attr_hrhorseonsheet" type="checkbox" value="1" checked>    
+			 
+    	</div>
 	</div>
 </div>
 
@@ -1602,34 +1630,50 @@ function() {
     });
 });
 	
-<!-- armourcarry - based on condition skill /-->
+<!-- condition/5 for use in load, shock and healing rolls (depending on rules settings); see Skills 9 of HarnMaster rulebook  /-->
 
 on('change:condition_ml change:combat_endurance', 
 function() {
     getAttrs(['condition_ml', 'combat_endurance'], 
 	function(values) {
-        var carryml = parseInt(values['condition_ml'])||0;
-		var carryvalue = Math.round(carryml / 5)||0;
+        var conditionml = parseInt(values['condition_ml'])||0;
+		var condasendvalue = Math.round(conditionml / 5)||0;
         var endurancevalue = parseInt(values['combat_endurance'])||0;
-		var carrylimit = Math.round(endurancevalue*1.4)||0;
-        var carry = Math.min(carryvalue,carrylimit)||0;
+		var conditionlimit = Math.round(endurancevalue*1.4)||0;
+        var effectivecondition = Math.min(condasendvalue,conditionlimit)||0;
+		if(values.hrcondition4endurance == 1) { 
+			var healeffcondition = effectivecondition;
+		} else {
+			var healeffcondition = endurancevalue;
+		}
+		console.log("effective condition", effectivecondition, "healing condition", healeffcondition , "condition ml", conditionml, "condition limit" , conditionlimit);
         setAttrs({
-            'combat_armourcarry': carry
+            'combat_effectivecondition': effectivecondition,
+			'healing_effectivecondition': healeffcondition
 		});
     });
 });
 
+
+
 <!-- load and encumbrance /-->
 
-on('change:load_weapons_total change:load_armor_total change:load_inventory_total change:combat_armourcarry change:is_mounted', function() {
+on('change:load_weapons_total change:load_armor_total change:load_inventory_total change:combat_effectivecondition change:combat_endurance change:is_mounted change:hrcondition4load change:hrcondition4endurance', function() {
     var total = 0.0;
-    getAttrs(['load_armor_total', 'load_weapons_total', 'load_inventory_total', 'combat_armourcarry', 'is_mounted'], function(values) {
+    getAttrs(['load_armor_total', 'load_weapons_total', 'load_inventory_total', 'combat_effectivecondition','combat_endurance' ,'is_mounted', 'hrcondition4endurance', 'hrcondition4load'], function(values) {
         total += parseFloat(values['load_armor_total'])||0.0;
         total += parseFloat(values['load_weapons_total'])||0.0;
         total += parseFloat(values['load_inventory_total'])||0.0;
+		if(values.hrcondition4load == 1) { 
+			var carrycapacity = parseInt(values['combat_effectivecondition']);
+		} else if(values.hrcondition4endurance == 1) {
+			var carrycapacity = parseInt(values['combat_effectivecondition']);
+		} else {
+			var carrycapacity = parseInt(values['combat_endurance']);
+		}
+		var encumbrance = Math.round(total/carrycapacity)||0;
 
-        var encumbrance = Math.round(total/values['combat_armourcarry'])||0;
-        if(values.is_mounted != 0) { encumbrance = Math.round(encumbrance/2)};
+		console.log("carry capacity", carrycapacity, "encumbrance", encumbrance);
         setAttrs({
             'load_total': parseInt(total)||0,
             'encumbrance': encumbrance
@@ -1742,7 +1786,7 @@ on('change:hinjury_total change:hfatigue_total change:hencumbrance', function() 
 
 <!-- Move speed in combat /-->
 	
-on('change:encumbrance change:universal_penalty change:agl change:is_mounted change:hcombat_move sheet:opened', function() {
+on('change:encumbrance change:universal_penalty change:agl change:is_mounted change:hcombat_move', function() {
     getAttrs(['agl', 'universal_penalty', 'encumbrance', 'is_mounted', 'hcombat_move'], function(values) {
         var cmove = parseInt(values.agl) - parseInt(values.universal_penalty) - parseInt(values.encumbrance);
 		var currenthcmove = parseInt(values.hcombat_move);
