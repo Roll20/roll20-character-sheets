@@ -1808,7 +1808,7 @@ wiz3['Item'] = {
     'school': 'Alteration',
     'range': 'Touch',
     'duration': '[[ [[@{level-wizard}]]*4]] hours',
-    'aoe': '[[ [[@{level-wizard}]]*2]] cu. ft.',
+    'aoe': '[[ [[@{level-wizard}]]*2]] cubic feet',
     'components': 'V, S, M',
     'cast-time': '3',
     'saving-throw': 'Special',
@@ -4206,6 +4206,449 @@ wiz6['Veil'] = {
     'effect': 'The *veil* spell enables the wizard to instantly change the appearance of his surroundings and party or create hallucinatory terrain so as to fool even the most clever creatures (unless they have the *true seeing* spell, a *gem of seeing,* or a similar magical aid). The veil can make a sumptuous room seem like a filthy den; even tactile impressions conform to the visual illusion. Likewise, a party might be made to resemble a mixed band of brownies, pixies, and faeries led by a treant. If hallucinatory terrain is created, touch does not cause it to vanish.'
 };
 
+const wiz7 = {};
+wiz7['Banishment'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Abjuration',
+    'range': '20 yards',
+    'duration': 'Instantaneous',
+    'aoe': '60-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Special',
+    'materials': 'Substances harmful, hateful, or opposed to the nature of the subject(s) of the spell (see additional considerations below)',
+    'reference': 'PHB p. 232',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *banishment* spell enables the caster to force some extraplanar creature out of the caster’s home plane. The effect is instantaneous, and the subject cannot come back without some special summoning or means of egress from its own plane to the one from which it was banished. Up to 2 Hit Dice or levels of creature per caster level can be banished. Currently [[2*[[@{level-wizard}]] ]] Hit Dice or levels.\n&emsp;The caster must both name the type of creature(s) to be sent away and give its name and title as well, if any. In any event, the creature’s magic resistance must be overcome for the spell to be effective.\n&emsp;The material components of the spell are substances harmful, hateful, or opposed to the nature of the subject(s) of the spell. For every such substance included in the casting, the subject creature(s) loses 5% from its magic resistance and suffers a –2 penalty to its saving throw vs. spell. For example, if iron, holy water, sunstone, and a sprig of rosemary were used in casting a banishment upon a being that hates those things, its saving throw versus the spell would be made with a –8 penalty (four substances times the factor of –2). Special items, such as hair from the tail of a ki-rin or couatl feathers, could also be added to change the factor to –3 or –4 per item. In contrast, a titan’s hair or mistletoe blessed by a druid might lower the factor to –1 with respect to the same creature. If the subject creature successfully rolls its saving throw vs. spell, the caster is stung by a backlash of energy, suffers 2d6 points of damage, and is stunned for one round.'
+};
+
+wiz7['Bigby\'s Grasping Hand'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Evocation',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'A leather glove',
+    'reference': 'PHB p. 232',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': '*Bigby’s grasping hand* is a superior version of the 6th-level spell *Bigby’s forceful hand.* It creates a man-sized (5 feet) to gargantuan-sized (21 feet) hand that appears and grasps a creature designated by the caster, regardless of what the spellcaster does or how the opponent tries to escape it. The grasping hand can hold motionless a creature or object of up to 1,000 pounds weight, slow movement to 10 feet per round if the creature weighs between 1,000 and 4,000 pounds, or slow movement by 50% if the creature weighs upto 16,000 pounds. The hand itself inflicts no damage. The grasping hand has an Armor Class of 0, has as many hit points as its caster in full health, and vanishes when destroyed. The caster can order it to release a trapped opponent or can dismiss it on command.'
+};
+
+wiz7['Charm Plants'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '30 yards',
+    'duration': 'Permanent',
+    'aoe': '10 × 30 feet',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'Negate',
+    'materials': 'A pinch of humus, a drop of water, and a twig or leaf',
+    'reference': 'PHB p. 232',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *charm plants* spell enables the spellcaster to bring under command vegetable life forms and communicate with them. These plants obey instructions to the best of their ability. The spell will charm plants in a 30-foot × 10-foot area. While the spell does not endow the vegetation with new abilities, it does enable the wizard to command the plants to use whatever they have in order to fulfill his instructions. If the plants in the area of effect do have special or unusual abilities, these are used as commanded by the wizard.\n&emsp;For example, this spell can generally duplicate the effects of the 1st-level priest spell *entangle,* if the caster desires. The saving throw applies only to intelligent plants, and it is made with a –4 penalty to the die roll.'
+};
+
+wiz7['Control Undead'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Necromancy',
+    'range': '60 feet',
+    'duration': '[[3d4+[[@{level-wizard}]] ]] rounds',
+    'aoe': '[[1d6]] undead',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'Special',
+    'materials': 'A small piece each of bone and raw meat',
+    'reference': 'PHB p. 232',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the wizard to command 1d6 undead creatures for a short period of time. Upon casting the spell, the wizard selects one point within range of the spell. Those undead nearest to this point are affected, until either undead equal in Hit Dice to the caster’s level ([[@{level-wizard}]]) or six undead are affected. Undead with 3 Hit Dice or less are automatically controlled. Those of greater Hit Dice are allowed a saving throw vs. spell, which, if successful, negates the attempt to control that creature. Regardless of the success or failure of the saving throw, each creature required to make a check counts toward the Hit Dice limit of the spell.\n&emsp;Those creatures under the control of the wizard can be commanded by the caster if they are within hearing range. There is no telepathic communication or language requirement between the caster and the controlled undead. Even if communication is impossible, the controlled undead do not attack the spellcaster. At the end of the spell, the controlled undead revert to their normal behaviors. Those not mindless will remember the control exerted by the wizard.'
+};
+
+wiz7['Delayed Blast Fireball'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Evocation',
+    'range': '[[100+10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '20-foot radius',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': '½',
+    'materials': 'A tiny ball of bat guano and sulphur',
+    'reference': 'PHB p. 233',
+    'damage': '[[ [[{[[@{level-wizard}]],10}kl1]]d6+[[{[[@{level-wizard}]],10}kl1]]]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'This spell creates a fireball, with a +1 bonus to each of its dice of damage, which releases its blast anytime from instantly to five rounds later, according to the command given by the wizard. In other respects, the spell is the same as the 3rd-level spell *fireball.*'
+};
+
+wiz7['Drawmij\'s Instant Summons'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': 'Infinite + special',
+    'duration': 'Instantaneous',
+    'aoe': '1 small object',
+    'components': 'V, S, M',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': 'A gem of not less than 5,000 gp value and the desired item',
+    'reference': 'PHB p. 233',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard teleports some desired item from virtually any location directly to his hand. The single object can be no longer in any dimension than a sword, can have no more weight than a shield (about eight pounds), and must be nonliving.\n&emsp;To prepare this spell, the wizard must hold a gem of not less than 5,000 gp value in his hand and utter all but the final word of the conjuration. At some point in the future, he must crush the gem and utter the final word. The desired item is then transported instantly into the spellcaster’s right or left hand, as he desires.\n&emsp;The item must have been previously touched during the initial incantation and specifically named; only that particular item is summoned by the spell. During the initial incantation, the gem becomes magically inscribed with the name of the item to be summoned. The inscription is invisible and unreadable, except by means of a *read magic* spell, to all but the wizard who cast the summons.\n&emsp;If the item is in the possession of another creature, the spell does not work, and the caster knows who the possessor is and roughly where he, she, or it is located when the summons is cast. Items can be summoned from other planes of existence, but only if such items are not in the possession (not necessarily the physical grasp) of another creature. For each level of experience above the 14th, the wizard is able to summon a desired item from one plane farther removed from the plane he is in at the time the spell is cast (one plane away at 14th level, two planes away at 15th, etc.). Thus, a wizard of 16th level could cast the spell even if the desired item was on the second layer of one of the Outer Planes, but at 14th level the wizard would be able to summon the item only if it were no farther than one of the Inner Planes, the Ethereal Plane, or the Astral Plane (see the *PLANESCAPE Campaign Setting* boxed set). Note that special wards or barriers, or factors that block the *teleport* or *plane shift* spells, may also block the operation of this spell. Objects in Leomund’s secret chest cannot be recovered by using this spell. Note: If the item is wizard marked, it can be summoned from anywhere on the same plane unless special local conditions apply. Furthermore, the details of the location of the item are more specific, and the item is more easily traceable with other types of scrying magic.'
+};
+
+wiz7['Duo-Dimension'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[3+[[@{level-wizard}]] ]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'A flat ivory likeness of the spellcaster (which must be of finest workmanship, gold filigreed, and enameled and gem-studded at an average cost of 500 to 1,000 gp) and a strip of parchment',
+    'reference': 'PHB p. 233',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *duo-dimension* spell causes the caster to have only two dimensions, height and width, with no depth. He is thus invisible when turned sideways. This invisibility can be detected only by means of a *true seeing* spell or similar methods. In addition, the duo-dimensional wizard can pass through the thinnest of spaces as long as these have the proper height—going through the space between a door and its frame is a simple matter. The wizard can perform all actions normally. He can turn and become invisible, move in this state, and appear again next round and cast a spell, disappearing on the following round.\n&emsp;Note that when turned, the wizard cannot be affected by any form of attack, but when visible, he is subject to double the amount of damage normal for an attack form; for example, a dagger thrust would inflict 2d4 points of damage if it struck a duo-dimensional wizard. Furthermore, the wizard has a portion of his existence in the Astral Plane when the spell is in effect, and he is subject to possible notice by creatures there. If noticed, it is 25% probable that the wizard is pulled entirely into the Astral Plane by any attack from an astral creature. Such an attack (and any subsequent attack received on the Astral Plane) inflicts normal damage.\n&emsp;As the spell is uttered, the parchment is given half a twist and joined at the ends. The figurine is then passed through the parchment loop, and both disappear forever.'
+};
+
+wiz7['Finger of Death'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Necromancy',
+    'range': '60 yards',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '5',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 233',
+    'damage': 'Death or [[2d8+1]]',
+    'damage-type': 'Negative energy',
+    'healing': '',
+    'effect': 'The *finger of death* spell snuffs out the victim’s life force. If successful, the victim can be neither raised nor resurrected. In addition, in human subjects the spell initiates changes to the body such that after three days the caster can, by means of a special ceremony costing not less than 1,000 gp plus 500 gp per body, animate the corpse as a juju zombie under the control of the caster. The changes can be reversed before animation by a *limited wish* or similar spell cast directly upon the body, and a full *wish* restores the subject to life.\n&emsp;The caster utters the *finger of death* spell incantation, points his index finger at the creature to be slain, and unless the victim succeeds in a saving throw vs. spell, death occurs. A creature successfully saving still receives 2d8+1 points of damage. If the subject dies of damage, no internal changes occur and the victim can then be revived normally.'
+};
+
+wiz7['Forcecage'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Evocation',
+    'range': '[[10*floor([[@{level-wizard}}]]/2)]] yards',
+    'duration': '[[6+[[@{level-wizard}]] ]] turns',
+    'aoe': '20-foot cube',
+    'components': 'V, S, special',
+    'cast-time': '3–4',
+    'saving-throw': 'None',
+    'materials': 'Powder of a diamond of at least 1,000 gp value, consumed during memorization',
+    'reference': 'PHB p. 234',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful spell enables the caster to bring into being a cube of force, but it is unlike the magical item of that name in one important respect: The forcecage does not have solid walls of force; it has alternating bands of force with 1⁄2-inch gaps between. Thus, it is truly a cage, rather than an enclosed space with solid walls. Creatures within the area of effect of the spell are caught and contained unless they are able to pass through the openings—and, of course, all spells and breath weapons can pass through the gaps in the bars of force of the forcecage.\n&emsp;A creature with magic resistance has a single attempt to pass through the walls of the cage. If the resistance check is successful, the creature escapes. If it fails, the creature is caged. Note that a successful check does not destroy the cage, nor does it enable other creatures (save familiars) to flee with the escaping creature. The forcecage is also unlike the solid-walled protective device, cube of force, in that it can be gotten rid of only by means of a *dispel magic* spell or by the expiration of the spell.\n&emsp;By means of special preparation at the time of memorization, a *forcecage* spell can be altered to a *forcecube* spell. The cube created is 10 feet on a side, and the spell then resembles that of a cube of force in all respects save that of the differences between a cast spell and the magic of a device, including the methods of defeating its power.\n&emsp;Although the actual casting of either application of the spell requires no material component, the study required to commit it to memory does demand that the wizard powder a diamond of at least 1,000 gp value, using the diamond dust to trace the outlines of the cage or cube he desires to create via spellcasting at some later time. Thus, in memorization, the diamond dust is employed and expended, for upon completion of study, the wizard must then toss the dust into the air and it will disappear.'
+};
+
+wiz7['Limited Wish'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Conjuration/Summoning, Invocation/Evocation',
+    'range': 'Unlimited',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': 'Special',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 234',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *limited wish* is a very potent but difficult spell. It will fulfill literally, but only partially or for a limited duration, the utterance of the spellcaster. Thus, the actuality of the past, present, or future might be altered (but possibly only for the wizard unless the wording of the spell is most carefully stated) in some limited manner. The use of a limited wish will not substantially change major realities, nor will it bring wealth or experience merely by asking. The spell can, for example, restore some hit points (or all hit points for a limited duration) lost by the wizard. It can reduce opponent hit probabilities or damage, increase duration of some magical effect, cause a creature to be favorably disposed to the spellcaster, mimic a spell of 7th level or less, and so on (see the 9th-level *wish* spell). Greedy desires usually end in disaster for the wisher. Casting time is based on the time spent preparing the wording for the spell (clever players decide what they want to say before using the spell). Normally, the casting time is one round (most of it being taken up by deciding what to say). Casting this spell ages the caster one year per 100 years of regular life span.'
+};
+
+wiz7['Mass Invisibility'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '[[10*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '60 × 60 yards',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'An eyelash and a bit of gum arabic, the former encased in the latter',
+    'reference': 'PHB p. 234',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This is a more extensive adaptation of the *invisibility* spell for  battlefield use. It can hide creatures in a 60-yard × 60-yard area: up to 400 man-sized creatures, 30 to 40 giants, or six to eight large dragons. The effect is mobile with the unit and is broken when the unit attacks. Individuals leaving the unit become visible. The wizard can end this spell upon command.'
+};
+
+wiz7['Monster Summoning V'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': 'Special',
+    'duration': '[[6+[[@{level-wizard}]] ]] rounds',
+    'aoe': '70-yard radius',
+    'components': 'V, S, M',
+    'cast-time': '6',
+    'saving-throw': 'None',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'reference': 'PHB p. 234',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is much like the 3rd-level *monster summoning I* spell, except that this spell summons [[1d3]] 5th-level monsters. These appear within the spell’s area of effect and attack the caster’s opponents until either he commands them to cease, the spell duration expires, or the monsters are slain. These creatures do not check morale, and they vanish when slain. If no opponent exists to fight, summoned monsters can, if the wizard can communicate with them, and if they are physically capable, perform other services for the summoning wizard.'
+};
+
+wiz7['Mordenkainen\'s Magnificent Mansion'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration, Conjuration',
+    'range': '10 yards',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': '[[300*[[@{level-wizard}]] ]] square feet',
+    'components': 'V, S, M',
+    'cast-time': '7 rounds',
+    'saving-throw': 'None',
+    'materials': 'A miniature portal carved from ivory, a small piece of polished marble, and a tiny silver spoon. These are utterly destroyed when the spell is cast.',
+    'reference': 'PHB p. 234',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard conjures up an extradimensional dwelling, entrance to which can be gained only at a single point of space on the plane from which the spell was cast. From the entry point, those creatures observing the area see only a faint shimmering in the air, in an area 4 feet wide and 8 feet high. The caster of the spell controls entry to the mansion, and the portal is shut and made invisible behind him when he enters. He may open it again from his own side at will. Once observers have passed beyond the entrance, they behold a magnificent foyer and numerous chambers beyond. The place is furnished and contains sufficient foodstuffs to serve a nine-course banquet to as many dozens of people as the spellcaster has levels of experience. Currently [[@{level-wizard}]] dozen ([[12*[[@{level-wizard}]] ]]) people. There is a staff of near-transparent servants, liveried and obedient, to wait upon all who enter. The atmosphere is clean, fresh, and warm.\n&emsp;Since the place can be entered only through its special portal, outside conditions do not affect the mansion, nor do conditions inside it pass to the plane beyond. Rest and relaxation within the place is normal, but the food is not. It seems excellent and quite filling as long as one is within the place. Once outside, however, its effects disappear immediately, and if those resting have not eaten real food within a reasonable time span, ravenous hunger strikes. Failure to eat normal food immediately results in the onset of fatigue or starvation penalties as decided by the DM.\n&emsp;(It is worth mentioning that this spell has been used in conjunction with a normal portal, as well as with illusion magic. There is evidence that the design and interior of the space created can be altered to suit the caster’s wishes.)'
+};
+
+wiz7['Mordenkainen\'s Sword'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Evocation',
+    'range': '30 yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'A miniature platinum sword with a grip and pommel of copper and zinc, which costs 500 gp to construct, and which disappears after the spell’s completion',
+    'reference': 'PHB p. 235',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting this spell, the wizard brings into being a shimmering, swordlike plane of force. The spellcaster is able to mentally wield this weapon (to the exclusion of all activities other than movement), causing it to move and strike as if it were being used by a fighter. The basic chance for Mordenkainen’s sword to hit is the same as the chance for a sword wielded by a fighter of half the level of the spellcaster. Currently a [[floor([[@{level-wizard}]]/2)]] level fighter. For example, if cast by a 14th-level wizard, the weapon has the same hit probability as a sword wielded by a 7th-level fighter.\n&emsp;The sword has no magical attack bonuses, but it can hit nearly any sort of opponent, even those normally struck only by +3 weapons or those who are astral, ethereal, or out of phase. It hits any Armor Class on a roll of 19 or 20. It inflicts 5d4 points of damage to opponents of man size or smaller, and 5d6 points of damage to opponents larger than man size. It lasts until the spell duration expires, a *dispel magic* is used successfully upon it, or its caster no longer desires it.'
+};
+
+wiz7['Phase Door'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[floor([[@{level-wizard}]]/2)]] usages',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 235',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard attunes his body, and a section of wall is affected as if by a *passwall* spell. The phase door is invisible to all creatures save the spellcaster, and only he can use the space or passage the spell creates, disappearing when the phase door is entered, and appearing when it is exited. If the caster desires, one other creature of man size or less can be taken through the door; this counts as two uses of the door. The door does not pass light, sound, or spell effects, nor can the caster see through it without using it. Thus, the spell can provide an escape route, though certain creatures, such as phase spiders, can follow with ease. A *gem of true seeing* and similar magic will reveal the presence of a phase door but will not allow its use.\n&emsp;The phase door lasts for one usage for every two levels of experience of the spellcaster. It can be dispelled only by a casting of *dispel magic* from a higher-level wizard, or from several lower-level wizards, casting in concert, whose combined levels of experience are more than double that of the wizard who cast the spell (this is the only instance in which dispel effects can be combined).\n&emsp;Rumor has it that this spell has been adapted by a certain powerful wizard (or wizards) to create renewable (or permanent) portals, which may (or may not) be keyed to specific individuals (henchmen) or items (such as rings).'
+};
+
+wiz7['Power Word, Stun'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 235',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *power word, stun* spell is uttered, any creature of the wizard’s choice is stunned—reeling and unable to think coherently or act—for a duration dependent on its current hit points. Of course, the wizard must be facing the creature, and the creature must be within the range of 5 yards per experience level of the caster. Creatures with 1 to 30 hit points are stunned for 4d4 rounds, those with 31 to 60 hit points are stunned for 2d4 rounds, those with 61 to 90 hit points are stunned for 1d4 rounds, and creatures with over 90 hit points are not affected. Note that if a creature is weakened so that its hit points are below its usual maximum, the current number of hit points is used.'
+};
+
+wiz7['Prismatic Spray'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': '70 × 15 foot spray',
+    'components': 'V, S',
+    'cast-time': '7',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 235',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, the wizard causes seven shimmering, multicolored rays of light to flash from his hand in a triangular spray. This spray is 70 feet long and spreads to 15 feet wide at the end. It includes all colors of the visible spectrum; each ray has a different power and purpose. Any creature with fewer than 8 Hit Dice struck by a ray is blinded for 2d4 rounds, regardless of any other effect.\n&emsp;Any creature in the area of effect will be touched by one or more of the rays. To determine which ray strikes a creature, roll 1d8 and consult the following table:}}{{cs1-1=3}}{{c1-1=&emsp;**Prismatic Spray Results**\n&emsp;}}{{cs2-1=2}}{{c2-1=1 = red}}{{cs3-1=2}}{{c3-1=2 = orange}}{{cs4-1=2}}{{c4-1=3 = yellow}}{{cs5-1=2}}{{c5-1=4 = green}}{{c2-2=5 = blue}}{{c3-2=6 = indigo}}{{c4-2=7 = violet}}{{c5-2=8 = struck by two rays, roll again twice\n&emsp;(ignoring any 8s)\n&emsp;}}{{c6-1=**Color**\n**of Ray**}}{{c7-1=Red}}{{c8-1=Orange}}{{c9-1=Yellow}}{{c10-1=Green}}{{c11-1=Blue}}{{c12-1=Indigo}}{{c13-1=Violet}}{{cc6-2=center sheet-spell-fixed}}{{c6-2=**Order**\n**of Ray**}}{{cc7-2=center}}{{c7-2=1st}}{{cc8-2=center}}{{c8-2=2nd}}{{cc9-2=center}}{{c9-2=3rd}}{{cc10-2=center}}{{c10-2=4th}}{{cc11-2=center}}{{c11-2=5th}}{{cc12-2=center}}{{c12-2=6th}}{{cc13-2=center}}{{c13-2=7th}}{{cc6-3=bottom}}{{c6-3=**Effect of Ray**}}{{c7-3=Inflicts 20 points of damage,\nsave vs. spell for half.}}{{c8-3=Inflicts 40 points of damage,\nsave vs. spell for half.}}{{c9-3=Inflicts 80 points of damage,\nsave vs. spell for half.}}{{c10-3=Save vs. poison or die; survivors\nsuffer 20 points of poison damage.}}{{c11-3=Save vs. petrification or\nbe turned to stone.}}{{c12-3=Save vs. wand or go insane.}}{{c13-3=Save vs. spell or\nbe sent to another plane.'
+};
+
+wiz7['Reverse Gravity'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': '30 feet × 30 feet',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'Lodestone and iron filings',
+    'reference': 'PHB p. 236',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell reverses gravity in the area of effect, causing all unattached objects and creatures within it to “fall” upward. The reverse gravity lasts as long as the caster desires or until the spell expires. If some solid object is encountered in this “fall,” the object strikes it in the same manner as it would during a normal downward fall. At the end of the spell duration, the affected objects and creatures fall downward. As the spell affects an area, objects tens, hundreds, or even thousands of feet in the air above the area can be affected.'
+};
+
+wiz7['Sequester'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Illusion/Phantasm, Abjuration',
+    'range': 'Touch',
+    'duration': '[[7+[[@{level-wizard}]] ]] days',
+    'aoe': '[[@{level-wizard}]] 2-foot cubes',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Special',
+    'materials': 'A basilisk eyelash, gum arabic, and a dram of whitewash',
+    'reference': 'PHB p. 236',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When cast, this spell not only prevents detection and location spells from working to detect or locate the objects affected by the *sequester* spell, it also renders the affected object(s) invisible to any form of sight or seeing. Thus, a *sequester* spell can mask a secret door, a treasure vault, etc. Of course, the spell does not prevent the subject from being discovered through tactile means or through the use of devices (such as a *robe of eyes* or a *gem of seeing*). If cast upon a creature who is unwilling to be affected, the creature receives a normal saving throw. Living creatures (and even undead types) affected by a *sequester* spell become comatose and are effectively in a state of suspended animation until the spell wears off or is dispelled.'
+};
+
+wiz7['Shadow Walk'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Illusion, Enchantment',
+    'range': 'Touch',
+    'duration': '[[6*[[@{level-wizard}]] ]] turns',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 236',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'In order to use the *shadow walk* spell, the wizard must be in an area of heavy shadows. The caster and any creature he touches are then transported to the edge of the Prime Material Plane where it borders the Demiplane of Shadow. In this region, the wizard can move at a rate of up to 7 miles per turn, moving normally on the borders of the Demiplane of Shadow but much more rapidly relative to the Prime Material Plane. Thus, a wizard can use this spell to travel rapidly by stepping onto the Demiplane of Shadow, moving the desired distance, and then stepping back onto the Prime Material Plane. The wizard knows where he will come out on the Prime Material Plane.\n&emsp;The *shadow walk* spell can also be used to travel to other planes that border on the Demiplane of Shadow, but this requires the potentially perilous transit of the Demiplane of Shadow to arrive at a border with another plane of reality.\n&emsp;Any creatures touched by the wizard when *shadow walk* is cast also make the transition to the borders of the Demiplane of Shadow. They may opt to follow the wizard, wander off through the plane, or stumble back into the Prime Material Plane (50% chance for either result if they are lost or abandoned by the wizard). Creatures unwilling to accompany the wizard into the Demiplane of Shadow receive a saving throw, negating the effect if successful.'
+};
+
+wiz7['Simulacrum'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': 'Special',
+    'saving-throw': 'None',
+    'materials': 'Ice or snow to form the body, some piece of the creature to be duplicated, and powdered ruby',
+    'reference': 'PHB p. 236',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of this spell, the wizard is able to create a duplicate of any creature. The duplicate appears to be exactly the same as the original, but there are differences: The simulacrum has only 51% to 60% (50% + 1d10% = [[50+1d10]]%) of the hit points of the real creature, there are personality differences, there are areas of knowledge that the duplicate does not have, and a *detect magic* spell will instantly reveal it as a simulacrum, as will a *true seeing* spell. At all times the simulacrum remains under the absolute command of the wizard who created it. No special telepathic link exists, so command must be exercised in some other manner. The spell creates the form of the creature, but it is only a zombielike creation. A *reincarnation* spell must be used to give the duplicate a vital force, and a *limited wish* spell must be used to empower the duplicate with 40% to 65% (35% + 5 to 30%) of the knowledge and personality of the original. The level of the simulacrum, if any, is from 20% to 50% of that of the original creature.\n&emsp;The duplicate creature is formed from ice or snow. The spell is cast over the rough form and some piece of the creature to be duplicated must be placed inside the snow or ice. Additionally, the spell requires powdered ruby.\n&emsp;The simulacrum has no ability to become more powerful; it cannot increase its level or abilities. If destroyed, it reverts to snow and melts into nothingness. Damage to the simulacrum can be repaired by a complex process requiring at least one day, 100 gp per hit point, and a fully equipped laboratory.'
+};
+
+wiz7['Spell Turning'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Abjuration',
+    'range': '0',
+    'duration': 'Up to [[3*[[@{level-wizard}]] ]] rounds',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'A small silver mirror',
+    'reference': 'PHB p. 237',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This powerful abjuration causes spells cast against the wizard to rebound on the original caster. This includes spells cast from scrolls and innate spell-like abilities, but specifically excludes the following: area effects that are not centered directly upon the protected wizard, spell effects delivered by touch, and spell effects from devices such as wands, staves, etc. Thus, a *light* spell cast to blind the protected wizard could be turned back upon and possibly blind the caster, while the same spell would be unaffected if cast to light an area within which the protected wizard is standing.\n&emsp;From seven to ten spell levels are affected by the turning. The exact number is secretly rolled by the DM; the player never knows for certain how effective the spell is.\n&emsp;A spell may be only partially turned—divide the number of remaining levels that can be turned by the spell level of the incoming spell to see what fraction of the effect is turned, with the remainder affecting the caster. For example, an incoming fireball is centered on a wizard with one level of spell turning left. This means that ⅔ of the fireball affects the protected wizard, ⅓ affects the caster, and each is the center of a fireball effect. If the rolled damage is 40 points, the protected wizard receives 27 points of damage and the caster suffers 13. Both (and any creatures in the respective areas) can roll saving throws vs. spell for half damage. A partially turned *hold* or *paralysis* spell will act as a *slow* spell on those who are 50% or more affected.\n&emsp;If the protected wizard and a spellcasting attacker both have spell turning effects operating, a resonating field is created that has the following effects:}}{{style=center1}}{{c1-1=**D100 Roll**}}{{c2-1=01–70}}{{c3-1=71–80}}{{c4-1=81–97}}{{c5-1=98–00}}{{c1-2=**Effect**}}{{cc1-2=bottom}}{{c2-2=Spell drains away without effect}}{{c3-2=Spell affects both equally at full damage}}{{c4-2=Both turning effects are rendered nonfunctional for 1d4 turns}}{{c5-2=Both casters go through a rift into the Positive Energy plane'
+};
+
+wiz7['Statue'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': '[[@{level-wizard}]] hours',
+    'aoe': 'Creature touched',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'Special',
+    'materials': 'Lime, sand, and a drop of water stirred by an iron bar, such as a nail or spike',
+    'reference': 'PHB p. 237',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *statue* spell is cast, the wizard or other creature is apparently turned to solid stone, along with any garments and equipment worn or carried. The initial transformation from flesh to stone requires one full round after the spell is cast.\n&emsp;During the transformation, there’s an 18% chance that the targeted creature suffers a system shock failure and dies. The creature must roll percentile dice and add its Constitution score to the roll. If the total is 18 or less, the creature dies. If the total is 19 or more, the creature survives the transformation; the creature can withstand any inspection and appear to be a stone statue, although faint magic is detected from the stone if someone checks for it. Note that a creature with a Constitution of 18 or more will always survive the transformation.\n&emsp;Despite being in this condition, the petrified individual can see, hear, and smell normally. Feeling is limited to those sensations that can affect the granite-hard substance of the individual’s body—i.e., chipping is equal to a slight wound, but breaking off one of the statue’s arms is serious damage.\n&emsp;The individual under the magic of a *statue* spell can return to his normal state instantly, act, and then return to the statue state, if he so desires, as long as the spell duration is in effect.'
+};
+
+wiz7['Teleport Without Error'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 238',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is similar to the *teleport* spell. The caster is able to transport himself, along with the material weight noted for a *teleport* spell, to any known location in his home plane with no chance for error. The spell also enables the caster to travel to other planes of existence, but any such plane is, at best, “studied carefully.” This assumes that the caster has, in fact, actually been to the plane and carefully perused an area for an eventual *teleportation without error* spell. The table for the *teleport* spell is used, with the caster’s knowledge of the area to which transportation is desired used to determine the chance of error. (For an exception, see the 9th-level wizard spell *succor*.) The caster can do nothing else in the round that he appears from a teleport.'
+};
+
+wiz7['Vanish'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '1 object',
+    'components': 'V',
+    'cast-time': '2',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 238',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the wizard employs this spell, he causes an object to vanish (i.e., to be teleported as if by a *teleport* spell) if it weighs no more than 50 pounds per caster level. Currently [[50*[[@{level-wizard}]] ]] pounds. Thus, a 14th-level caster can vanish, and cause to reappear at a desired location, an object up to 700 pounds in weight. The maximum volume of material that can be affected is 3 cubic feet per level of experience. Currently [[3*[[@{level-wizard}]] ]] cubic feet. Thus, both weight and volume limit the spell. An object that exceeds either limitation is unaffected and the spell fails.\n&emsp;If desired, a vanished object can be placed deep within the Ethereal Plane. In this case, the point from which the object vanished remains faintly magical until the item is retrieved. A successful *dispel magic* spell cast on the point will bring the vanished item back from the Ethereal Plane. Note that creatures and magical forces cannot be made to vanish.\n&emsp;There is a 1% chance that a vanished item will be disintegrated instead. There is also a 1% chance that a creature from the Ethereal Plane is able to gain access to the Prime Material Plane through the vanished item’s connection.'
+};
+
+wiz7['Vision'] = {
+    'level': 'Level 7 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '7',
+    'saving-throw': 'None',
+    'materials': 'The sacrifice of something valued by the spellcaster or by the power supplicated (see below)',
+    'reference': '',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a wizard wishes to gain supernatural guidance, he casts a *vision* spell, calling upon whatever power he desires aid from and asking a question that will be answered with a vision. Two six-sided dice are rolled. If they total 2 to 6, the power is annoyed and refuses to answer the question; instead, the power causes the wizard to perform some service (by an ultrapowerful geas or quest). If the dice total 7 to 9, the power is indifferent and gives some minor vision, though it may be unrelated to the question. If the dice total 10 or better, the power grants the vision.\n&emsp;The material component of the spell is the sacrifice of something valued by the spellcaster or by the power supplicated. The more precious the sacrifice, the better the chance of spell success. A very precious item grants a bonus of +1 to the dice roll, an extremely precious item adds +2, and a priceless item adds +3.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
@@ -4213,4 +4656,5 @@ wizardSpells['wiz3'] = wiz3;
 wizardSpells['wiz4'] = wiz4;
 wizardSpells['wiz5'] = wiz5;
 wizardSpells['wiz6'] = wiz6;
+wizardSpells['wiz7'] = wiz7;
 /* ---- Wizard spells end ---- */
