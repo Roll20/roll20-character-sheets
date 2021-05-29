@@ -1125,7 +1125,7 @@
                 </div> -->
                 <div class="form__group d--flex d--flex--align-bottom">
                     <input type="number" name="attr_splitterpunkte" value="0" min="0" class="form__field" />
-                    &#47;<input type="number" name="attr_splitterpunktemax" class="form__field" disabled="true" value="3+@{hiddensplitterpunkte}+@{hiddensplitterpunktehg}"/>
+                    &#47;<input type="number" name="attr_splitterpunktemax" class="form__field" readonly />
                     <input type="hidden" name="attr_hiddensplitterpunkte" value="0" />
                     <input type="hidden" name="attr_hiddensplitterpunktehg" value="0" />
                     <label class="form__label">Splitterpunkte</label>
@@ -1134,7 +1134,8 @@
         </div>
 
         <div class="section section-Grundwerte">
-            <h1 class="mb--2">Grundwerte</h1>  
+            <h1 class="mb--2">Grundwerte</h1> 
+            <input type="hidden" name="attr_skillmasterymigrationisexecuted" value=0 />
             <div class="d--flex d--flex--wrap mb--3">
                 <div class="mr--3 mb--3 d--flex__item--grow2">
                     <span class="form-header pl--1 pr--1">Persönliche Informationen</span>
@@ -1933,6 +1934,7 @@
                             <div class="pr--2">
                                 <div class="input-circle center--horizontally">
                                     <input type="test" name="attr_geschichteundmythen" value="@{geschichteundmythen1}+@{geschichteundmythen2}+@{geschichteundmythenpunkte}" disabled="true" class="form__field text--700" />
+                                    <input type="test" name="attr_geschichteundmythen" class="form__field text--700" readonly />
                                 </div>
                             </div>
                             <div class="pr--2">
@@ -1968,6 +1970,7 @@
                             <div class="pr--2">
                                 <div class="input-circle center--horizontally">
                                     <input type="text" name="attr_handwerk" value="@{handwerk1}+@{handwerk2}+@{handwerkpunkte}" disabled="true" class="form__field text--700" />
+                                    <input type="text" name="attr_handwerk" class="form__field text--700" readonly />
                                 </div>
                             </div>
                             <div class="pr--2">
@@ -6394,7 +6397,7 @@ on('sheet:opened',function(){
         }
         setAttrs(update);
 
-        if (!v.skillmasterymigrationisexecuted) {
+        if (v.skillmasterymigrationisexecuted == 0) {
             migrateFightAndMagicSkillMastery();
         }
     });
@@ -6445,12 +6448,12 @@ function migrateFightAndMagicSkillMastery() {
                     setAttrs({[repeatingPrefix + newRowId + "_meisterschaftswirkung"]: value[meisterschaftswirkung]});
 
                     removeRepeatingRow("repeating_meisterschaften_" + idarray[i]);  
-
-                    setAttrs({"skillmasterymigrationisexecuted" : 1});
                 }
             });
         });
     });
+    
+    setAttrs({"skillmasterymigrationisexecuted" : 1});
 }
 
 function transferRessources() {
@@ -6971,7 +6974,6 @@ on("change:repeating_staerken:staerkenwert change:repeating_staerken:staerke", f
 on("change:hiddensplitterpunkte change:hiddensplitterpunktehg", function() {
     getAttrs(["hiddensplitterpunkte", "hiddensplitterpunktehg"], function(v) {
         setAttrs({
-            splitterpunkte: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg,
             splitterpunktemax: 3 + +v.hiddensplitterpunkte + +v.hiddensplitterpunktehg
         });
     });
