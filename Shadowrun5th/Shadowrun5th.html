@@ -9785,7 +9785,7 @@ Click again to switch to Manual and Remote">
             <div class="experimental">
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_experimental">
-                    Enable experimental import of gear extras and cyberdecks
+                    Enable experimental import of critter powers, gear extras and cyberdecks
                 </label>
                 <label>
                     <input class="experimental-checkbox" type="checkbox" name="attr_nightly">
@@ -12001,6 +12001,42 @@ on("change:chummercheckbox", function(){
                     }catch(err){
                         goodcode=false;
                         error= error + "\n" + "Error with Spells: " + err;
+                    }
+                    try{
+                        if(chummerfile.characters.character.critterpowers != null && text.experimental == "on"){
+                            console.log("Importing critter powers");
+                            if(chummerfile.characters.character.critterpowers.critterpower.length>1){
+                                for(var i=0;i<chummerfile.characters.character.critterpowers.critterpower.length;i++){
+                                    var newrowid=generateRowID();
+                                    attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.critterpowers.critterpower[i].fullname;
+                                    attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.critterpowers.critterpower[i].type;
+                                    if(chummerfile.characters.character.critterpowers.critterpower[i].notes!=null){
+                                        attributes["repeating_spells_"+newrowid+"_spelldescription"]=chummerfile.characters.character.critterpowers.critterpower[i].notes;
+                                    }
+                                    attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+
+                                    attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.critterpowers.critterpower[i].category;
+                                    attributes["repeating_spells_"+newrowid+"_spellbonus"]=0;
+                                    attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.critterpowers.critterpower[i].range;
+                                    attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.critterpowers.critterpower[i].duration;
+                                }
+                            }else{
+                                var newrowid=generateRowID();
+                                attributes["repeating_spells_"+newrowid+"_spellname"]=chummerfile.characters.character.critterpowers.critterpower.fullname;
+                                attributes["repeating_spells_"+newrowid+"_spelltype"]=chummerfile.characters.character.critterpowers.critterpower.type;
+                                if(chummerfile.characters.character.critterpowers.critterpower.notes!=null){
+                                        attributes["repeating_spells_"+newrowid+"_spelldescription"]=chummerfile.characters.character.critterpowers.critterpower.notes;
+                                    }
+                                attributes["repeating_spells_"+newrowid+"_spelldrain"]="-0";
+                                attributes["repeating_spells_"+newrowid+"_spellcategory"]=chummerfile.characters.character.critterpowers.critterpower.category;
+                                attributes["repeating_spells_"+newrowid+"_spellbonus"]=0;
+                                attributes["repeating_spells_"+newrowid+"_spellrange"]=chummerfile.characters.character.critterpowers.critterpower.range;
+                                attributes["repeating_spells_"+newrowid+"_spellduration"]=chummerfile.characters.character.critterpowers.critterpower.duration;
+                            }
+                        }
+                    }catch(err){
+                        goodcode=false;
+                        error= error + "\n" + "Error with Critterpowers: " + err;
                     }
                     try{
                        if(chummerfile.characters.character.contacts!=null){
