@@ -4684,6 +4684,159 @@ wiz8['Bigby\'s Clenched Fist'] = {
     'effect': 'The *Bigby’s clenched fist* spell brings forth a huge, disembodied hand that is balled into a fist. This magical member is under the mental control of the spellcaster, who can cause it to strike one opponent each round. No concentration is required once the spell is cast. The clenched fist never misses, but it can only strike as directed by the caster. Thus, it can be fooled by invisibility or other methods of concealment and misdirection. The effectiveness of its blows varies from round to round.}}{{style=center1 sheet-spell-bottom2}}{{c1-1=**D20 Roll**}}{{c2-1=1–12}}{{c3-1=13–16}}{{c4-1=17–19}}{{c5-1=20}}{{c1-2=**Result**}}{{c2-2=Glancing blow—1d6 hp}}{{c3-2=Solid punch—2d6 hp}}{{c4-2=Hard punch—3d6 hp; opponent is stunned for next round}}{{c5-2=Crushing blow*—4d6 hp; opponent is stunned for next three rounds}}{{effects2=* The wizard adds +4 to the die rolls of subsequent attacks if the opponent is stunned, as the opponent is not capable of dodging or defending against the attack effectively.\n\n&emsp;The fist has an Armor Class of 0, and is destroyed by damage equal to the hit points of its caster at full health.'
 };
 
+wiz8['Binding'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Enchantment, Evocation',
+    'range': '10 yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': 'Special',
+    'saving-throw': 'Special',
+    'materials': 'A miniature chains of special metal (silver for lycanthropes, etc.), soporific herbs of the rarest sort, a corundum or diamond gem of great size (1,000 gp value per Hit Die of the subject creature), and a vellum depiction or carved statuette of the subject to be captured.',
+    'reference': 'PHB p. 239',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *binding* spell creates a magical restraint to hold a creature, usually from another plane of existence. Extraplanar creatures must be confined by a circular diagram; other creatures can be physically confined. The duration of the spell depends upon the form of the binding and the level of the caster(s), as well as the length of time the spell is actually uttered. The components vary according to the form of the spell, but they include a continuous chanting utterance read from the scroll or book page giving the spell; gestures appropriate to the form of binding;\n&emsp;Magic resistance applies unless the subject’s true name is used. A saving throw is not applicable as long as the experience level of the caster is at least twice as great as the Hit Dice of the subject. The caster’s level can be augmented by one-third of the levels of each assisting wizard of 9th level or higher, and by one level for each assistant of 4th through 8th level. No more than six other wizards can assist with this spell. If the caster’s level is less than twice the Hit Dice of the subject, the subject gains a saving throw vs. spell, modified by the form of binding being attempted. The various forms of binding are:\n&emsp;*Chaining:* The subject is confined by restraints that generate an *antipathy* spell affecting all creatures who approach the subject, except the caster. Duration is as long as one year per level of the caster(s). The subject of this form of binding (as well as in the slumber and bound slumber versions) remains within the restraining barrier.\n&emsp;*Slumber:* Brings a comatose sleep upon the subject for a duration of up to one year per level of the caster(s).\n&emsp;*Bound Slumber:* A combination of chaining and slumber that lasts for up to one month per level of the caster(s).\n&emsp;*Hedged Prison:* The subject is transported to or otherwise brought within a confined area from which it cannot wander by any means until freed. The spell remains until the magical hedge is somehow broken.\n&emsp;*Metamorphosis:* Causes the subject to change to some noncorporeal form, save for its head or face. The binding is permanent until some prescribed act frees the subject.\n&emsp;*Minimus Containment:* The subject is shrunken to a height of 1 inch or even less and held within the hedged prison of some gem or similar object. The subject of a minimus containment, metamorphosis, or hedged prison radiates a very faint aura of magic.\n&emsp;The subject of the chaining form of the spell receives a saving throw with no modifications. However, slumber allows the subject a +1 bonus, bound slumber a +2 bonus, hedged prison a +3 bonus, metamorphosis a +4 bonus, and minimus containment a +5 bonus to the saving throw. If the subject is magically weakened, the DM can assign a –1, –2, or even –4 penalty to the saving throw. A successful saving throw enables the subject to burst its bonds and do as it pleases.\n&emsp;A *binding* spell can be renewed in the case of the first three forms of the spell, for the subject does not have the opportunity to break the bonds. (If anything has caused a weakening of a chaining or slumber version, such as attempts to contact the subject or magically touch it, a normal saving throw applies to the renewal of the spell.) Otherwise, after one year, and each year thereafter, the subject gains a normal saving throw vs. the spell. Whenever it is successful, the *binding* spell is broken and the creature is free.'
+};
+
+wiz8['Clone'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Necromancy',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 clone',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'None',
+    'materials': 'A small piece of the flesh from the person to be duplicated.',
+    'reference': 'PHB p. 240',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell creates a duplicate of a human, demihuman, or humanoid creature. This clone is in most respects the duplicate of the individual, complete to the level of experience, memories, etc. However, the duplicate really *is* the person, so if the original and a duplicate exist at the same time, each knows of the other’s existence; the original person and the clone will each desire to do away with the other, for such an alter-ego is unbearable to both. If one cannot destroy the other, one will go insane and destroy itself (90% likely to be the clone), or possibly both will become mad and destroy themselves (2% chance). These events nearly always occur within one week of the dual existence.\n&emsp;Note that the clone is the person as he existed at the time at which the flesh was taken for the spell component, and all subsequent knowledge, experience, etc., is totally unknown to the clone. The clone is a physical duplicate, and possessions of the original are another matter entirely. A clone takes [[2d4]] months to grow, and only after that time is dual existence established. Furthermore, the clone has one less Constitution point than the body it was cloned from; the cloning fails if the clone would have a Constitution of 0.\n&emsp;The DM may, in addition, add other stipulations to the success of a cloning effort, requiring that some trace of life must remain in the flesh sample, that some means of storing and preserving the sample must be devised and maintained, etc.'
+};
+
+wiz8['Demand'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Evocation, Enchantment/Charm',
+    'range': 'Unlimited',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '1 turn',
+    'saving-throw': 'Special',
+    'materials': 'A pair of cylinders, each open at one end, connected by a thin piece of copper wire and some small part of the subject creature—a hair, a bit of nail, etc.',
+    'reference': 'PHB p. 240',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is very much like the 5th-level wizard spell *sending*, allowing a brief contact with a far distant creature. However, with this spell the message can also contain a suggestion (see the 3rd-level wizard spell *suggestion*), which the subject will do its best to carry out if it fails its saving throw vs. spell, made with a –2 penalty. Of course, if the message is impossible or meaningless according to the circumstances that exist for the subject at the time the demand comes, the message is understood but no saving throw is necessary and the suggestion is ineffective.\n&emsp;The caster must be familiar with the creature contacted and must know its name and appearance well. If the creature in question is not in the same plane of existence as the spellcaster, there is a base 5% chance that the demand does not arrive. Local conditions on other planes may worsen this chance considerably at the option of the DM. The demand, if received, will be understood even if the creature has an Intelligence ability score as low as 1 (animal Intelligence). Creatures of demigod status or higher can choose to come or not, as they please.\n&emsp;The demand message to the creature must be 25 words or less, including the suggestion. The creature can also give a short reply immediately.'
+};
+
+wiz8['Glassteel'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': 'Object touched',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'A small piece of glass and a small piece of steel.',
+    'reference': 'PHB p. 240',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *glassteel* spell turns normal, nonmagical crystal or glass into a transparent substance that has the tensile strength and unbreakability of actual steel. Only a relatively small volume of material can be affected (a maximum weight of 10 pounds per level of experience of the spellcaster, currently [[10*[[@{level-wizard}]] ]] pounds), and it must form one whole object. The Armor Class of the substance is 1.'
+};
+
+wiz8['Incendiary Cloud'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Alteration, Evocation',
+    'range': '30 yards',
+    'duration': '[[4+1d6]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '2',
+    'saving-throw': '½',
+    'materials': 'An available fire source (just as with a *pyrotechnics* spell), scrapings from beneath a dung pile, and a pinch of dust.',
+    'reference': 'PHB p. 240',
+    'damage': '[[@{level-wizard}]]d2 + [[@{level-wizard}]]d4 + [[@{level-wizard}]]d2 (see below for details)',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'An *incendiary cloud* spell exactly resembles the smoke effects of a *pyrotechnics* spell, except that its minimum dimensions are a cloud 10 feet tall, 20 feet wide, and 20 feet long. This dense vapor cloud billows forth, and on the third round of its existence begins to flame, causing 1–2 points of damage per level of the spellcaster. On the fourth round it inflicts 1d4 points of damage per level of the caster, and on the fifth round this drops back to 1–2 points of damage per level as its flames burn out. In any successive rounds of existence, the cloud is simply harmless smoke that obscures vision within its confines. Creatures within the cloud need to make only one saving throw if it is successful, but if they fail the first saving throw, they roll again on the fourth and fifth rounds (if necessary) to attempt to reduce the damage sustained by one-half.'
+};
+
+wiz8['Mass Charm'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Enchantment/Charm',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '30-foot cube',
+    'components': 'V',
+    'cast-time': '8',
+    'saving-throw': 'Negate',
+    'materials': '',
+    'reference': 'PHB p. 241',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'A *mass charm* spell affects either persons or monsters just as a *charm person* or *charm monster* spell. The *mass charm* spell, however, affects a number of creatures whose combined levels of experience or Hit Dice does not exceed twice the level of experience of the spellcaster. Currently [[2*[[@{level-wizard}]]]] levels or Hit Dice. All affected creatures must be within the spell range and within a 30-foot cube. Note that the creatures’ saving throws are unaffected by the number of recipients (see the *charm person* and *charm monster* spells), but all target creatures are subject to a penalty of –2 on their saving throws because of the efficiency and power of this spell. The Wisdom bonus against charm spells does apply.'
+};
+
+wiz8['Maze'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': 'Special',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '3',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 241',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'An extradimensional space is brought into being upon the utterance of a *maze* spell. The subject vanishes into the shifting labyrinth of force planes for a period of time that is dependent upon its Intelligence. (Note: Minotaurs are not affected by this spell.)}}{{style=center1 sheet-spell-center2}}{{c1-1=**Intelligence of**\n**Mazed Creature**}}{{c2-1=under 3}}{{c3-1=3–5}}{{c4-1=6–8}}{{c5-1=9–11}}{{c6-1=12–14}}{{c7-1=15–17}}{{c8-1=18+}}{{c1-2=**Time Trapped**\n**in Maze**}}{{c2-2=2d4 turns}}{{c3-2=1d4 turns}}{{c4-2=5d4 rounds}}{{c5-2=4d4 rounds}}{{c6-2=3d4 rounds}}{{c7-2=2d4 rounds}}{{c8-2=1d4 rounds}}{{effects2=\n&emsp;Note that teleport and *dimension door* spells will not help a character escape a *maze* spell, although a *plane shifting* spell will.'
+};
+
+wiz8['Mind Blank'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Abjuration',
+    'range': '30 yards',
+    'duration': '1 day',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 241',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When the very powerful *mind blank* spell is cast, the creature is totally protected from all devices and spells that detect, influence, or read emotions or thoughts. This protects against *augury, charm, command, confusion, divination, empathy* (all forms), *ESP, fear, feeblemind, mass suggestion, phantasmal killer, possession, rulership, soul trapping, suggestion,* and *telepathy*. Cloaking protection also extends to the prevention of discovery or information gathering by *crystal balls* or other scrying devices, *clairaudience, clairvoyance, communing, contacting other planes*, or wish-related methods (*wish* or *limited wish*). Of course, exceedingly powerful deities can penetrate the spell’s barrier.'
+};
+
+wiz8['Monster Summoning VI'] = {
+    'level': 'Level 8 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': 'Special',
+    'duration': '[[7+[[@{level-wizard}]] ]] rounds',
+    'aoe': '80-yard radius',
+    'components': 'V, S, M',
+    'cast-time': '8',
+    'saving-throw': 'None',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle.',
+    'reference': 'PHB p. 241',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is much like the 3rd-level spell *monster summoning I*, except that it summons [[1d3]] 6th-level monsters. These monsters appear in [[1d3]] rounds within the spell’s area of effect and attack the caster’s opponents, until either he commands them to cease, the spell duration expires, or the monsters are slain. These creatures do not check morale, and they vanish when slain. If no opponent exists to fight, summoned monsters can, if the wizard can communicate with them, and if they are physically capable, perform other services for the summoning wizard.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
