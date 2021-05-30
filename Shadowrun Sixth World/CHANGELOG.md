@@ -1,5 +1,18 @@
 Change Log
 ==============================================
+**2021-05-17 ** v.33 Chuz (James Culp)
+	Bugfix - PC->Grenades launched grenades didn't work properly
+	Bugfix - Nuyen symbol keeps disappearing, another attempt to lock it in
+	Added mouseover text to Rolls->Matrix Actions to identify skill and attribute for each.
+	Updated NPC-Spells to follow the same format as PC-Spells, to include using the same roll button format.
+**2021-05-10 ** v.32 Chuz (James Culp)
+	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
+	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
+	Added Core->Direct Magic Defense button and Core->Indirect Magic Defense buttons
+	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
+	Added disclaimer to Rolls section, specialization/expertise and mods from augs/magic/etc are not included in those rolls, the way to add those dice to the pools is to use the [Modifiers] toggle at the top of the sheet.
+	Bugfix - Long weapon names threw off the display in Core->Weapons and Arms.
+	Bugfix - Delete icons were showing up on the left for Social and Vehicles covering the move icon preventing rearranging.
 **2021-05-03 ** v.31 Chuz (James Culp)
 	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
 	Added Birth Name to Social Tab
