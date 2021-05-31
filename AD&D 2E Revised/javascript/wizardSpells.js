@@ -5024,6 +5024,313 @@ wiz8['Trap the Soul'] = {
     'effect': 'This spell forces the creature’s life force (and its material body) into a special prison gem enchanted by the spellcaster. The creature must be seen by the caster when the final word is uttered.\n&emsp;The spell can be triggered in one of two ways. First, the final word of the spell can be spoken when the creature is within spell range. This allows magic resistance (if any) and a saving throw vs. spell to avoid the effect. If the creature’s real name is spoken as well, any magic resistance is ignored and the saving throw vs. spell suffers a penalty of –2. If the saving throw is successful, the prison gem shatters.\n&emsp;The second method is far more insidious, for it tricks the victim into accepting a trigger object inscribed with the final spell word, automatically placing the creature’s soul in the trap. To use this method, both the creature’s true name and the trigger word must be inscribed on the trigger item when the gem is enchanted. A *sympathy* spell can also be placed on the trigger item. As soon as the subject creature picks up or accepts the trigger item, its life force is automatically transferred to the gem, without the benefit of magic resistance or saving throw.\n&emsp;The gem prison will hold the trapped entity indefinitely, or until the gem is broken and the life force is released, allowing the material body to reform. If the trapped creature is a powerful creature from another plane (which could mean a character trapped by an inhabitant of another plane when the character is not on the Prime Material Plane), it can be required to perform a service immediately upon being freed. Otherwise, the creature can go free once the gem imprisoning it is broken.\n&emsp;Before the actual casting of the *trap the soul* spell, the wizard must prepare the prison, a gem of at least 1,000 gp value for every Hit Die or level of experience possessed by the creature to be trapped (for example, it requires a gem of 10,000 gp value to trap a 10 Hit Die or 10th-level creature). If the gem is not valuable enough, it shatters when the entrapment is attempted. (Note that while characters have no concept of level as such, the value of the gem needed to trap an individual can be researched. Remember that this value can change over time as characters advance.) Creating the prison gem requires an *enchant an item* spell and the placement of a *maze* spell into the gem, thereby forming the prison to contain the life force.'
 };
 
+const wiz9 = {};
+wiz9['Astral Spell'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Evocation',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 245',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By means of the *astral spell,* a wizard can project his astral body into the Astral Plane, leaving his physical body and material possessions behind in the Prime Material Plane. Only magical items can be brought into the Astral Plane (although nonmagical items could be rendered temporarily magical through the use of some spells, if the DM allows). As the Astral Plane touches upon the first levels of all of the Outer Planes, the wizard can travel astrally to any of the Outer Planes at will. The caster then leaves the Astral Plane, forming a body in the plane of existence he has chosen to enter. It is also possible to travel astrally anywhere in the Prime Material Plane by means of the *astral spell,* but a second body cannot be formed in the Prime Material Plane. As a general rule, a person astrally projected can be seen only by creatures in the Astral Plane.\n&emsp;At all times, the astral body is connected to the material body by a silvery cord. If the cord is broken, the affected person is killed, astrally and materially; however, normally only a psychic wind can cause the cord to break. When a second body is formed in a different plane, the silvery cord remains invisibly attached to the new body. If the astral form is slain, the cord simply returns to the original body where it rests in the Prime Material Plane, reviving it from its state of suspended animation.\n&emsp;Although astrally projected persons are able to function in the Astral Plane, their actions do not affect creatures not existing in the Astral Plane. The spell lasts until the wizard desires to end it, or until it is terminated by some outside means (such as a *dispel magic* spell or the destruction of the wizard’s body in the Prime Material Plane).\n&emsp;The wizard can project the astral forms of up to seven other creatures with him by means of the *astral spell,* providing the creatures are linked in a circle with the wizard. These fellow travelers are dependent upon the wizard and can be stranded. Travel in the Astral Plane can be slow or fast, according to the wizard’s desire. The ultimate destination arrived at is subject to the conceptualization of the wizard. (See the *Planescape Campaign Setting* boxed set for further information on the Astral Plane.)\n&emsp;Any magical items can go into the Astral Plane, but most become temporarily nonmagical therein, or in any planes removed from the Prime Material Plane. Armor and weapons of +3 or better might function in other planes, at the DM’s option. Artifacts and relics function anywhere. Items drawing their power from a given plane are more powerful in that plane (for example, a *ring of fire resistance* in the Elemental Plane of Fire or a *sword of life stealing* in the Negative Energy plane).'
+};
+
+wiz9['Bigby\'s Crushing Hand'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Evocation',
+    'range': '[[5*[[@{level-wizard}]] ]] yards',
+    'duration': '[[@{level-wizard}]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': 'A glove of snake skin and the shell of an egg',
+    'reference': 'PHB p. 247',
+    'damage': '1st round [[1d10]] points. 2nd round 2d10 points. 3rd round 2d10 points. 4th round 4d10 points. 4d10 damage per additional round',
+    'damage-type': 'Constriction',
+    'healing': '',
+    'effect': 'The *Bigby’s crushing hand* spell creates a huge, disembodied hand similar to those of the other *Bigby’s hand* spells. The crushing hand is under the mental control of the caster, and he can cause it to grasp and squeeze an opponent. No attack roll is necessary; the hand automatically grasps and inflicts constriction damage in any round in which the wizard concentrates. The damage inflicted depends on the number of rounds it acts upon the victim:}}{{c1-1=1st round}}{{c2-1=2nd & 3rd rounds}}{{c3-1=4th & beyond}}{{c1-2=1d10 points}}{{c2-2=2d10 points}}{{c3-2=4d10 points}}{{effects2=&emsp;The crushing hand has an Armor class of 0, has as many hit points as its caster at full strength, currently [[@{HP|max}]] hit points, and vanishes when destroyed. The hand is susceptible to normal combat attacks and damaging spells, but if it is struck by an area-effect spell, the person held suffers the same fate as the hand (i.e., if the hand fails its saving throw, the victim automatically fails his). The hand is not effective against noncorporeal or gaseous forms, but it does prevent creatures that are able to slip through small cracks from escaping. If the hand grasps an item or construction, the appropriate saving throw must be made as if squeezed by a Strength of 25.'
+};
+
+wiz9['Crystalbrittle'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '[[2*[[@{level-wizard}]] ]] cubic feet',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 247',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The magic of this spell causes metal, whether as soft as gold or  as hard as adamantite, to turn to a crystalline substance as brittle and fragile as crystal. Thus, a sword, metal shield, metal armor, or even an iron golem can be changed to a delicate, glasslike material easily shattered by any forceful blow. Furthermore, this change is unalterable by any means short of a *wish* spell; a *dispel magic* will not reverse the spell.\n&emsp;The caster must physically touch the item; if it is an opponent or something an opponent is using or wearing, the wizard must get into melee and make a successful attack roll. Any single metal item can be affected by the spell. Thus, a suit of armor worn by a creature can be changed to crystal, but the creature’s shield would not be affected, and vice versa. All items gain a saving throw equal to their magical bonus value or protection (the DM has this information). A +1/+3 sword would get a 10% (average of the two pluses) chance to save; +5 magical armor has a 25% chance to be unaffected; an iron golem has a 15% chance to save (for it is hit only by magical weapons of +3 or better quality). Artifacts and relics constructed of metal may be affected at the discretion of the DM, though it is highly unlikely. Affected items not immediately protected are shattered and permanently destroyed if struck by a normal blow from a metal tool or any weighty weapon, including a staff.'
+};
+
+wiz9['Energy Drain'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Evocation, Necromancy',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S, M',
+    'cast-time': '3',
+    'saving-throw': 'None',
+    'materials': 'Essence of spectre or vampire dust',
+    'reference': 'PHB p . 247',
+    'damage': '',
+    'damage-type': 'Negative energy',
+    'healing': '',
+    'effect': 'By casting this spell, the wizard opens a channel between the plane he is in and the Negative Energy plane, becoming the conductor between the two planes. As soon as he touches (equal to a hit if melee is involved) any living creature, the victim loses two levels (as if struck by a spectre). A monster loses 2 Hit Dice permanently, both for hit points and attack ability. A character loses levels, Hit Dice, hit points, and abilities permanently (until regained through adventuring, if applicable).\n&emsp;The material component of this spell is essence of spectre or vampire dust. Preparation requires mere moments; the material component is then cast forth, and, upon touching the victim, the wizard speaks the triggering word, causing the spell to take effect instantly.\n&emsp;The spell remains effective for only a single round. Humans or humanoids brought below zero energy levels by this spell can be animated as juju zombies under the control of the caster.\n&emsp;The caster always has a 5% (1 in 20) chance to be affected by the dust, losing one point of Constitution at the same time as the victim is drained. When the number of Constitution points lost equals the caster’s original Constitution ability score, the caster dies and becomes a shade.'
+};
+
+wiz9['Foresight'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Divination',
+    'range': '0',
+    'duration': '[[2d4+[[@{level-wizard}]] ]] rounds',
+    'aoe': 'Special',
+    'components': 'V, S, M',
+    'cast-time': '1 round',
+    'saving-throw': 'None',
+    'materials': 'A hummingbird’s feather',
+    'reference': 'PHB p. 247',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell grants the caster a powerful sixth sense in relation to  himself or another. Although cast upon himself, the wizard can specify that he or another is the beneficiary of the spell. Once the spell is cast, the wizard receives instantaneous warnings of impending danger or harm to the object of the spell. Thus, if he were the object of the spell, the wizard would be warned in advance if a thief were about to attempt to backstab him, or if a creature were about to leap out from an unexpected direction, or if an attacker were specifically targeting him with a spell or missile weapon. When the warnings are about him personally, the wizard cannot be surprised and always knows the direction from which any attack on him is made. In addition, the spell gives the wizard a general idea of what action he might take to best protect himself—duck, jump right, close his eyes, etc.—and gives him a defensive bonus of 2 to his Armor Class.\n&emsp;When another person is the object of the spell, the wizard receives warnings about that person. He must still communicate this to the other person to negate any surprise. Shouting a warning, yanking the person back, and even telepathically communicating through a *crystal ball* can all be accomplished before the trap is sprung, if the wizard does not hesitate. However, the object of the spell does not gain the defensive bonus to his Armor Class.'
+};
+
+wiz9['Gate'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '30 yards',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 248',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The casting of a *gate* spell has two effects. First, it causes an interdimensional connection between the plane of existence the wizard is on and the plane on which dwells a specific being of great power; thus, the being is able to merely step through the gate or portal from its plane to that of the caster. Second, the utterance of the spell attracts the attention of the sought-after dweller on the other plane. When casting the spell, the wizard must name the entity he desires to use the gate and come to the wizard’s aid. There is a 100% certainty that something steps through the gate. Unless the DM has some facts prepared regarding the minions serving the being called forth by the *gate* spell, the being itself comes.\n&emsp;If the matter is trifling, the being might leave, inflict an appropriate penalty on the wizard, or attack the wizard. If the matter is of middling importance, the being can take some positive action to set matters right, then demand appropriate repayment. If the matter is urgent, the being can act accordingly and ask whatever is its wont thereafter, if appropriate. The actions of the being that comes through depend on many factors, including the alignments of the wizard and the being, the nature of his companions, and who or what opposes or threatens the wizard. Such beings generally avoid direct conflict with their equals or betters. The being gated in will either return immediately (very unlikely) or remain to take action. Casting this spell ages the wizard five years.'
+};
+
+wiz9['Imprisonment'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Abjuration (Reversible)',
+    'range': 'Touch',
+    'duration': 'Permanent',
+    'aoe': '1 creature',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 248',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When an *imprisonment* spell is cast and the victim is touched, the recipient is entombed in a state of suspended animation (see the 9th-level wizard spell *temporal stasis*) in a small sphere far beneath the surface of the earth. The victim remains there unless a reverse of the spell, with the creature’s name and background, is cast. Magical search by a *crystal ball,* a *locate object* spell, or similar means will not reveal the fact that a creature is imprisoned. The *imprisonment* spell functions only if the subject creature’s name and background are known.\n&emsp;The reverse spell, *freedom,* cast upon the spot at which a creature was entombed and sunk into the earth, causes it to reappear at that spot. If the caster does not perfectly intone the name and background of the creature to be freed, there is a 10% chance that 1 to 100 creatures will be freed from imprisonment at the same time.\n&emsp;Note: The exact details of any creatures freed are up to the DM. A random method of determining this is to roll percentile dice twice (once for imprisoned creature density and once for a base number of creatures at maximum density). The rolls are multiplied and rounded to the nearest whole number. Each released creature has a 10% chance to be in the area of the spellcaster. If monsters are being generated randomly, roll 1d20 for level, with rolls of 9+ considered 9, and the exact monsters determined by the random encounter tables.\n&emsp;For example, if the initial rolls were 22 and 60, the number of monsters released is 0.22 × 0.60 = 0.1320 = 13 monsters. Since only 10% of these will be in the immediate vicinity of the caster, the wizard may encounter only one or two of them.'
+};
+
+wiz9['Meteor Swarm'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Evocation',
+    'range': '[[40+[[@{level-wizard}]]*10]] yards',
+    'duration': 'Instantaneous',
+    'aoe': 'Special',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': '½',
+    'materials': '',
+    'reference': 'PHB p. 248',
+    'damage': '*Large spheres:* [[10d4]], [[10d4]], [[10d4]], [[10d4]]. *Small spheres:* [[5d4]], [[5d4]], [[5d4]], [[5d4]], [[5d4]], [[5d4]], [[5d4]], [[5d4]]',
+    'damage-type': 'Fire',
+    'healing': '',
+    'effect': 'A *meteor swarm* is a very powerful and spectacular spell which is similar to the *fireball* spell in many aspects. When it is cast, either four spheres of 2-foot diameter or eight spheres of 1-foot diameter spring from the outstretched hand of the wizard and streak in a straight line to the distance demanded by the spellcaster, up to the maximum range. Any creature in the straight-line path of these missiles receives the full effect, without benefit of a saving throw. The meteor missiles leave a fiery trail of sparks, and each bursts as a fireball.\n&emsp;The large spheres (2-foot diameter) inflict 10d4 points of damage, bursting in a diamond or box pattern. Each has a 30-foot diameter area of effect, and each sphere is 20 feet apart along the sides of the pattern, creating overlapping areas of effect and exposing the center to all four blasts.\n&emsp;The smaller spheres (1-foot diameter) each have a 15-foot diameter area of effect, and each inflicts 5d4 points of damage. They burst in a pattern of a box within a diamond or vice versa, with each of the outer sides 20 feet long. Note that the center has four areas of overlapping effect, and there are numerous peripheral areas that have two overlapping areas of effect. A saving throw for each area of effect will indicate whether full damage or half damage is sustained by creatures within each area, except as already stated with regard to the missiles impacting.'
+};
+
+wiz9['Monster Summoning VII'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': 'Special',
+    'duration': '[[8+[[@{level-wizard}]] ]] rounds',
+    'aoe': '90-yard radius',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': 'A tiny bag and a small (not necessarily lit) candle',
+    'reference': 'PHB p. 249',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell is much like the 3rd-level spell *monster summoning I,* except that this spell summons one or two 7th-level monsters that appear one round after the spell is cast, or one 8th-level monster that appears two rounds after the spell is cast.'
+};
+
+wiz9['Mordenkainen\'s Disjunction'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration, Enchantment',
+    'range': '0',
+    'duration': 'Instantaneous',
+    'aoe': '30-foot radius',
+    'components': 'V',
+    'cast-time': '9',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 249',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When this spell is cast, all magic and magical items within the radius of the spell, except those on the person of or being touched by the spellcaster, are disjoined. That is, spells being cast are separated into their individual components (usually spoiling the effect as a *dispel magic* spell does), and permanent and enchanted magical items must successfully save (vs. spell if actually cast on a creature, or vs. a *dispel magic* spell otherwise) or be turned into normal items. Even artifacts and relics are subject to Mordenkainen’s disjunction, though there is only a 1% chance per caster experience level of actually affecting such powerful items. Currently [[@{level-wizard}]]% chance. Thus, all potions, scrolls, rings, rods, miscellaneous magical items, artifacts and relics, arms and armor, swords, and miscellaneous weapons within 30 feet of the spellcaster can possibly lose all their magical properties when the *Mordenkainen’s disjunction* spell is cast. The caster also has a 1% chance per level of destroying an antimagic shell. Currently [[@{level-wizard}]]% chance. If the shell survives the disjunction, no items within it are disjoined.\n&emsp;Note: Destroying artifacts is a dangerous business, and 95% likely to attract the attention of some powerful being who has an interest or connection with the device. Additionally, if an artifact is destroyed, the casting wizard must roll a successful saving throw vs. spell with a –4 penalty or permanently lose all spellcasting abilities.'
+};
+
+wiz9['Power Word, Kill'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': '[[5*[[floor([[@{level-wizard}]]/2)]] yards',
+    'duration': 'Permanent',
+    'aoe': '10-foot radius',
+    'components': 'V',
+    'cast-time': '1',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 249',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'When a *power word, kill* spell is uttered, one or more creatures of any type within the spell range and area of effect are slain. The power word kills either one creature with up to 60 hit points, or multiple creatures with 10 or fewer hit points each, to a maximum of 120 hit points total. The option to attack a single creature or multiple creatures must be stated along with the spell range and center of the area of effect. The current hit points of the creatures are used.'
+};
+
+wiz9['Prismatic Sphere'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Abjuration, Conjuration/Summoning',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': '10-ft. radius',
+    'components': 'V',
+    'cast-time': '7',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 249',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell enables the wizard to conjure up an immobile, opaque  globe of shimmering, multicolored light to surround him, giving protection from all forms of attack. The sphere flashes in all colors of the visible spectrum, seven of which have distinct powers and purposes. Any creature with fewer than 8 Hit Dice is blinded for 2d4 turns by the colors of the sphere. Only the spellcaster can pass in and out of the prismatic sphere without harm, though he can cast it over others to protect them. The sphere can be destroyed, color by color, in consecutive order, by various magical effects; however, the first must be brought down before the second can be affected, and so on. Any creature passing through the barrier receives the effect of every color still remaining. The following table shows the colors and effects of the prismatic sphere, as well as what will negate each globe.\n&emsp;Note that typically the upper hemisphere of the globe is visible, as the spellcaster is at the center of the sphere, so the lower half is usually hidden by the floor surface he is standing on.\n&emsp;Furthermore, a *rod of cancellation* or a *Mordenkainen’s disjunction* spell will destroy a prismatic sphere (but an antimagic shell will fail to penetrate it). Otherwise, anything short of an artifact or relic entering the sphere is destroyed, and any creature is subject to the effects of every color still active—i.e., 70–140 points of damage plus death, petrification, insanity, and instantaneous transportation to another plane.\n**Prismatic Sphere Effects\nColor&emsp;Order&emsp;Effect of Color&emsp;Spell Negated By**\nRed&emsp;1st&emsp;Stops nonmagical missiles—inflicts 20 points of damage, save for half&emsp;*cone of cold*\nOrange&emsp;2nd&emsp;Stops magical missiles—inflicts 40 points of damage, save for half&emsp;*gust of wind*\nYellow&emsp;3rd&emsp;Stops poisons, gases, and petrification—inflicts 80 points of damage, save for half&emsp;*disintegrate*\nGreen&emsp;4th&emsp;Stops breath weapons—save vs. poison or die; survivors suffer 20 points of damage&emsp;*passwall*\nBlue&emsp;5th&emsp;Stops location/detection and mental attacks—save vs. petrification or turn to stone&emsp;*magic missile*\nIndigo&emsp;6th&emsp;Stops magical spells—save vs. wand or go insane&emsp;*continual light*\nViolet&emsp;7th&emsp;Force field protection—save vs. spell or be sent to another plane&emsp;*dispel magic*'
+};
+
+wiz9['Shape Change'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': '[[@{level-wizard}]] turns',
+    'aoe': 'The caster',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': 'A jade circlet worth no less than 5,000 gp',
+    'reference': 'PHB p. 250',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'With this spell, a wizard is able to assume the form of any living thing or creature below demigod status (greater or lesser deity, singular dragon type, or the like). The spellcaster becomes the creature he wishes, and has all of its abilities save those dependent upon Intelligence, innate magical abilities, and magic resistance, for the mind of the creature is that of the spellcaster. Thus, he can change into a griffon and fly away, then to an efreet and fly through a roaring flame, then to a titan to lift up a wagon, etc. These creatures have whatever hit points the wizard had at the time of the shape change. Each alteration in form requires only a second, and no system shock is incurred.\n&emsp;For example, a wizard is in combat and assumes the form of a will o’ wisp. When this form is no longer useful, the wizard changes into a stone golem and walks away. When pursued,  the  golem-shape  is changed to that of a flea, which hides on a horse until it can hop off and become a bush. If detected as the latter, the wizard can become a dragon, an ant, or just about anything he is familiar with.\n&emsp;A wizard adopting another form also adopts its vulnerabilities. For example, a wizard who becomes a spectre is powerless in daylight, and is subject to being turned, controlled, or destroyed by opposing clerics. Unlike similar spells, a wizard who is killed in another form does not revert to his original shape, which may disallow certain types of revivification.\n&emsp;The material component is a jade circlet worth no less than 5,000 gp, which shatters at the end of the spell’s duration. In the meantime, the circlet is left in the wake of the shape change, and premature shattering ends the spell immediately.'
+};
+
+wiz9['Succor'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration, Enchantment',
+    'range': 'Touch',
+    'duration': 'Special',
+    'aoe': '1 individual',
+    'components': 'V, S, M',
+    'cast-time': '1 to 4 days',
+    'saving-throw': 'None',
+    'materials': 'Gemstones totaling not  less than 5,000 gp value (whether they are faceted gems or not is immaterial)',
+    'reference': 'PHB p. 250',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'By casting this spell, the wizard creates a powerful magic in some specially prepared object—a statuette, a jeweled rod, a gem, etc. This object radiates magic, for it contains the power to instantaneously transport its possessor to the abode of the wizard who created it. Once the item is enchanted, the wizard must give it willingly to an individual, at the same time inform-ing him of a command word to be spoken when the item is to be used. To make use of the item, the recipient must speak the com-mand word at the same time that he rends or breaks the item. When this is done, the individual and all that he is wearing and carrying are instantly transported to the abode of the wizard. No other creatures can be affected.\n&emsp;The reversed application of the spell transports the wizard to the immediate vicinity of the possessor of the enchanted item, when it is broken and the command word spoken. The wizard will have a general idea of the location and situation of the item possessor, but has no choice whether or not to go (making this a rare casting indeed!).\n&emsp;The material components used include gemstones totaling not  less than 5,000 gp value (whether they are faceted gems or not is immaterial). The components can be enchanted only once per month (usually on a night of a clear, full moon). At that time, the object is set for the type of succor and its final destination (either the location of the spellcasting or an area well known to the wizard).'
+};
+
+wiz9['Temporal Stasis'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration',
+    'range': '10 yards',
+    'duration': 'Permanent',
+    'aoe': '1 creatu',
+    'components': 'V, S, M',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': 'A powder composed of diamond, emerald, ruby, and sapphire dust, with each crushed stone worth at least 100 gp',
+    'reference': 'PHB p. 251',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting this spell, the wizard places the recipient creature into a state of suspended animation. This cessation of time means that the creature does not grow older. Its body functions virtually cease. This state persists until the magic is removed by a *dispel magic* spell or the reverse of the spell (temporal reinstatement) is uttered. Note that the reverse requires only a single word and no somatic or material components.'
+};
+
+wiz9['Time Stop'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Alteration',
+    'range': '0',
+    'duration': 'Special',
+    'aoe': '15-ft. radius',
+    'components': 'V',
+    'cast-time': '9',
+    'saving-throw': 'None',
+    'materials': '',
+    'reference': 'PHB p. 251',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'Upon casting a time stop spell, the wizard causes the flow of time to stop for one round in the area of effect. Outside this area the sphere simply seems to shimmer for an instant. Inside the sphere, the caster is free to act for 1d3 rounds of apparent time. The wizard can move and act freely within the area where time is stopped, but all other creatures, except for those of demigod and greater status or unique creatures, are frozen in their actions, for they are literally between ticks of the time clock. (The spell duration is subjective to the caster.) Nothing can enter the area of effect without being stopped in time also. If the wizard leaves the area, the spell is immediately negated. When the spell duration ceases, the wizard is again operating in normal time.\n&emsp;Note: It is recommended that the DM use a stopwatch or silently count to time this spell. If the caster is unable to complete the intended action before the spell duration expires, he will probably be caught in an embarrassing situation. The use of a *teleport* spell before the expiration of the time stop spell is permissible.'
+};
+
+wiz9['Weird'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Illusion/Phantasm',
+    'range': '30 yards',
+    'duration': 'Concentration',
+    'aoe': '20-ft. radius',
+    'components': 'V, S',
+    'cast-time': '9',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 251',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'This spell confronts those affected by it with phantasmal images of their most feared enemies, forcing an imaginary combat that seems real, but actually occurs in the blink of an eye. When this spell is cast, the wizard must be able to converse with the victims to bring the spell into being. During the casting, the wizard must call out to the creatures to be affected, informing one or all that their final fate, indeed their doom, is now upon them.\n&emsp;The force of the magic is such that even if the creatures make their saving throws vs. spell, fear will paralyze them for a full round, and they will lose 1d4 Strength points from this fear (the lost Strength will return in one turn). Failure to save vs. spell causes the creature or creatures to face their nemeses, the opponents most feared and inimical to them. Actual combat must then take place, for no magical means of escape is possible. The foe fought is real for all intents and purposes; affected creatures that lose will die. If a creature’s phantasmal nemesis from the *weird* spell is slain, the creature emerges with no damage, no loss of items seemingly used in the combat, and no loss of spells likewise seemingly expended. The creature also gains any experience for defeating the weird, if applicable.\n&emsp;Although each round of combat seems normal, it takes only one-tenth of a round. During the course of the spell, the caster must concentrate fully upon maintaining it. If the combat goes beyond 10 rounds, those who saved against the spell can take action. If the caster is disturbed, the *weird* spell ends immediately. Creatures attacked while paralyzed with fear are free of the paralysis immediately.'
+};
+
+wiz9['Wish'] = {
+    'level': 'Level 9 Wizard',
+    'school': 'Conjuration/Summoning',
+    'range': 'Unlimited',
+    'duration': 'Special',
+    'aoe': 'Special',
+    'components': 'V',
+    'cast-time': 'Special',
+    'saving-throw': 'Special',
+    'materials': '',
+    'reference': 'PHB p. 251',
+    'damage': '',
+    'damage-type': '',
+    'healing': '',
+    'effect': 'The *wish* spell is a more potent version of a *limited wish.* If it is used to alter reality with respect to damage sustained by a party, to bring a dead creature to life, or to escape from a difficult situation by lifting the spellcaster (and his party) from one place to another, it will not cause the wizard any disability. Other forms of wishes, however, cause the spellcaster to weaken (–3 on Strength) and require 2d4 days of bed rest due to the stresses the *wish* places upon time, space, and his body. Regardless of what is wished for, the exact terminology of the *wish* spell is likely to be carried out. Casting a *wish* spell ages the caster five years.\n&emsp;Discretionary power of the DM is necessary in order to maintain game balance. For example, wishing another creature dead is grossly unfair; the DM might well advance the spellcaster to a future period in which the creature is no longer alive, effectively putting the wishing character out of the campaign.'
+};
+
 const wizardSpells = {};
 wizardSpells['wiz1'] = wiz1;
 wizardSpells['wiz2'] = wiz2;
@@ -5033,4 +5340,5 @@ wizardSpells['wiz5'] = wiz5;
 wizardSpells['wiz6'] = wiz6;
 wizardSpells['wiz7'] = wiz7;
 wizardSpells['wiz8'] = wiz8;
+wizardSpells['wiz9'] = wiz9;
 /* ---- Wizard spells end ---- */
