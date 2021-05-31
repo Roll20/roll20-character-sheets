@@ -5243,7 +5243,7 @@ wiz9['Shape Change'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'With this spell, a wizard is able to assume the form of any living thing or creature below demigod status (greater or lesser deity, singular dragon type, or the like). The spellcaster becomes the creature he wishes, and has all of its abilities save those dependent upon Intelligence, innate magical abilities, and magic resistance, for the mind of the creature is that of the spellcaster. Thus, he can change into a griffon and fly away, then to an efreet and fly through a roaring flame, then to a titan to lift up a wagon, etc. These creatures have whatever hit points the wizard had at the time of the shape change. Each alteration in form requires only a second, and no system shock is incurred.\n&emsp;For example, a wizard is in combat and assumes the form of a will o’ wisp. When this form is no longer useful, the wizard changes into a stone golem and walks away. When pursued,  the  golem-shape  is changed to that of a flea, which hides on a horse until it can hop off and become a bush. If detected as the latter, the wizard can become a dragon, an ant, or just about anything he is familiar with.\n&emsp;A wizard adopting another form also adopts its vulnerabilities. For example, a wizard who becomes a spectre is powerless in daylight, and is subject to being turned, controlled, or destroyed by opposing clerics. Unlike similar spells, a wizard who is killed in another form does not revert to his original shape, which may disallow certain types of revivification.\n&emsp;The material component is a jade circlet worth no less than 5,000 gp, which shatters at the end of the spell’s duration. In the meantime, the circlet is left in the wake of the shape change, and premature shattering ends the spell immediately.'
+    'effect': 'With this spell, a wizard is able to assume the form of any living thing or creature below demigod status (greater or lesser deity, singular dragon type, or the like). The spellcaster becomes the creature he wishes, and has all of its abilities save those dependent upon Intelligence, innate magical abilities, and magic resistance, for the mind of the creature is that of the spellcaster. Thus, he can change into a griffon and fly away, then to an efreet and fly through a roaring flame, then to a titan to lift up a wagon, etc. These creatures have whatever hit points the wizard had at the time of the shape change. Each alteration in form requires only a second, and no system shock is incurred.\n&emsp;For example, a wizard is in combat and assumes the form of a will o’ wisp. When this form is no longer useful, the wizard changes into a stone golem and walks away. When pursued, the golem-shape is changed to that of a flea, which hides on a horse until it can hop off and become a bush. If detected as the latter, the wizard can become a dragon, an ant, or just about anything he is familiar with.\n&emsp;A wizard adopting another form also adopts its vulnerabilities. For example, a wizard who becomes a spectre is powerless in daylight, and is subject to being turned, controlled, or destroyed by opposing clerics. Unlike similar spells, a wizard who is killed in another form does not revert to his original shape, which may disallow certain types of revivification.\n&emsp;The material component is a jade circlet worth no less than 5,000 gp, which shatters at the end of the spell’s duration. In the meantime, the circlet is left in the wake of the shape change, and premature shattering ends the spell immediately.'
 };
 
 wiz9['Succor'] = {
@@ -5260,24 +5260,24 @@ wiz9['Succor'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By casting this spell, the wizard creates a powerful magic in some specially prepared object—a statuette, a jeweled rod, a gem, etc. This object radiates magic, for it contains the power to instantaneously transport its possessor to the abode of the wizard who created it. Once the item is enchanted, the wizard must give it willingly to an individual, at the same time inform-ing him of a command word to be spoken when the item is to be used. To make use of the item, the recipient must speak the com-mand word at the same time that he rends or breaks the item. When this is done, the individual and all that he is wearing and carrying are instantly transported to the abode of the wizard. No other creatures can be affected.\n&emsp;The reversed application of the spell transports the wizard to the immediate vicinity of the possessor of the enchanted item, when it is broken and the command word spoken. The wizard will have a general idea of the location and situation of the item possessor, but has no choice whether or not to go (making this a rare casting indeed!).\n&emsp;The material components used include gemstones totaling not  less than 5,000 gp value (whether they are faceted gems or not is immaterial). The components can be enchanted only once per month (usually on a night of a clear, full moon). At that time, the object is set for the type of succor and its final destination (either the location of the spellcasting or an area well known to the wizard).'
+    'effect': 'By casting this spell, the wizard creates a powerful magic in some specially prepared object—a statuette, a jeweled rod, a gem, etc. This object radiates magic, for it contains the power to instantaneously transport its possessor to the abode of the wizard who created it. Once the item is enchanted, the wizard must give it willingly to an individual, at the same time informing him of a command word to be spoken when the item is to be used. To make use of the item, the recipient must speak the command word at the same time that he rends or breaks the item. When this is done, the individual and all that he is wearing and carrying are instantly transported to the abode of the wizard. No other creatures can be affected.\n&emsp;The reversed application of the spell transports the wizard to the immediate vicinity of the possessor of the enchanted item, when it is broken and the command word spoken. The wizard will have a general idea of the location and situation of the item possessor, but has no choice whether or not to go (making this a rare casting indeed!).\n&emsp;The material components used include gemstones totaling not less than 5,000 gp value (whether they are faceted gems or not is immaterial). The components can be enchanted only once per month (usually on a night of a clear, full moon). At that time, the object is set for the type of succor and its final destination (either the location of the spellcasting or an area well known to the wizard).'
 };
 
 wiz9['Temporal Stasis'] = {
     'level': 'Level 9 Wizard',
-    'school': 'Alteration',
+    'school': 'Alteration (Reversible)',
     'range': '10 yards',
     'duration': 'Permanent',
-    'aoe': '1 creatu',
+    'aoe': '1 creature',
     'components': 'V, S, M',
     'cast-time': '9',
     'saving-throw': 'None',
-    'materials': 'A powder composed of diamond, emerald, ruby, and sapphire dust, with each crushed stone worth at least 100 gp',
+    'materials': '*Temporal stasis:* A powder composed of diamond, emerald, ruby, and sapphire dust, with each crushed stone worth at least 100 gp. *Temporal reinstatement:* None',
     'reference': 'PHB p. 251',
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting this spell, the wizard places the recipient creature into a state of suspended animation. This cessation of time means that the creature does not grow older. Its body functions virtually cease. This state persists until the magic is removed by a *dispel magic* spell or the reverse of the spell (temporal reinstatement) is uttered. Note that the reverse requires only a single word and no somatic or material components.'
+    'effect': 'Upon casting this spell, the wizard places the recipient creature into a state of suspended animation. This cessation of time means that the creature does not grow older. Its body functions virtually cease. This state persists until the magic is removed by a *dispel magic* spell or the reverse of the spell (*temporal reinstatement*) is uttered. Note that the reverse requires only a single word and no somatic or material components.'
 };
 
 wiz9['Time Stop'] = {
@@ -5285,7 +5285,7 @@ wiz9['Time Stop'] = {
     'school': 'Alteration',
     'range': '0',
     'duration': 'Special',
-    'aoe': '15-ft. radius',
+    'aoe': '15-foot radius',
     'components': 'V',
     'cast-time': '9',
     'saving-throw': 'None',
@@ -5294,7 +5294,7 @@ wiz9['Time Stop'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'Upon casting a time stop spell, the wizard causes the flow of time to stop for one round in the area of effect. Outside this area the sphere simply seems to shimmer for an instant. Inside the sphere, the caster is free to act for 1d3 rounds of apparent time. The wizard can move and act freely within the area where time is stopped, but all other creatures, except for those of demigod and greater status or unique creatures, are frozen in their actions, for they are literally between ticks of the time clock. (The spell duration is subjective to the caster.) Nothing can enter the area of effect without being stopped in time also. If the wizard leaves the area, the spell is immediately negated. When the spell duration ceases, the wizard is again operating in normal time.\n&emsp;Note: It is recommended that the DM use a stopwatch or silently count to time this spell. If the caster is unable to complete the intended action before the spell duration expires, he will probably be caught in an embarrassing situation. The use of a *teleport* spell before the expiration of the time stop spell is permissible.'
+    'effect': 'Upon casting a *time stop* spell, the wizard causes the flow of time to stop for one round in the area of effect. Outside this area the sphere simply seems to shimmer for an instant. Inside the sphere, the caster is free to act for [[1d3]] rounds of apparent time. The wizard can move and act freely within the area where time is stopped, but all other creatures, except for those of demigod and greater status or unique creatures, are frozen in their actions, for they are literally between ticks of the time clock. (The spell duration is subjective to the caster.) Nothing can enter the area of effect without being stopped in time also. If the wizard leaves the area, the spell is immediately negated. When the spell duration ceases, the wizard is again operating in normal time.\n&emsp;Note: It is recommended that the DM use a stopwatch or silently count to time this spell. If the caster is unable to complete the intended action before the spell duration expires, he will probably be caught in an embarrassing situation. The use of a *teleport* spell before the expiration of the *time stop* spell is permissible.'
 };
 
 wiz9['Weird'] = {
@@ -5302,7 +5302,7 @@ wiz9['Weird'] = {
     'school': 'Illusion/Phantasm',
     'range': '30 yards',
     'duration': 'Concentration',
-    'aoe': '20-ft. radius',
+    'aoe': '20-foot radius',
     'components': 'V, S',
     'cast-time': '9',
     'saving-throw': 'Special',
