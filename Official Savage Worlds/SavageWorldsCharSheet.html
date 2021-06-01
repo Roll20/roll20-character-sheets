@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.13" />
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.14" />
 <input type='hidden' name='attr_firstInit' value="0" />
 <input type='hidden' name='attr_namelength' value='0' />
 
@@ -200,7 +200,7 @@
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
     const sheetVersionPrefix = "Official Savage Worlds v";
-	const sheetVersion = "1.00.12";
+	const sheetVersion = "1.00.14";
 
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
@@ -362,12 +362,12 @@
 			}
 			getAttrs(listOfFields, function(v) {
 				let arrayOfAdvances = Object.values(v);
-				log("contents of v",arrayOfAdvances,"yellow");
+				//log("contents of v",arrayOfAdvances,"yellow");
 				let countOfAdvances = 0;
 				for(let i = 0; i < arrayOfAdvances.length; i++) {
 					arrayOfAdvances[i] === "Advance" ? countOfAdvances++ : log("Not an Advance","True","yellow");
 				}
-				log("Number of Advances",countOfAdvances,"yellow");
+				//log("Number of Advances",countOfAdvances,"yellow");
 				setAttrs({xp: countOfAdvances});
 			});
 		});
@@ -2846,6 +2846,7 @@
             "parryMod":"2"
         }
     };
+
     const hindrancefields = ["hindrance","hindrancedescription","hindranceType"];
     const edgefields = ["edge","edgedescription"];
     const gearfields = ["item","itemWeight","description"];
@@ -3115,7 +3116,10 @@
                 typeof jsonObj["range"] !== "undefined" ? shortRange = Number(jsonObj["range"].substring(0,2).replace(/(\/)/g,'')) : log("Range","Not found...melee weapons",r20color);
                 shortRange === 0 ? /*Set Skill to Fighting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "fighting" : shortRange < 12 ? /*Set Skill to Athletics*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "athletics" : /*Set Skill to Shooting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "shooting";
                 //if damageatt is not passed, set to na
-                typeof jsonObj["damageatt"] === "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_damageatt`] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                log("Damage Att",typeof jsonObj["damageatt"] + " and the Value is: " + jsonObj["damageatt"],r20color);
+                //typeof jsonObj["damageatt"] === "undefined" || jsonObj["damageatt"] === "" ? targetObj[`repeating_${repSection}_${repSectionID}_damageatt`] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                typeof jsonObj["damageatt"] === "undefined" || jsonObj["damageatt"] === "" ? jsonObj["damageatt"] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                log("Damage Att Value",targetObj[`repeating_${repSection}_${repSectionID}_damageatt`],r20color);
                 targetObj[`repeating_${repSection}_${repSectionID}_weaponcarried`] = "on";
                 if(jsonObj["dmgdietype"] === "dmgdietype") {
                     //check if the format is correct
@@ -3164,9 +3168,9 @@
                 let nameCheck;
                 fields.forEach(field => {
                     if(typeof jsonObj[`${field}`] !== "undefined"){
-                        log("Field",jsonObj[`${field}`],r20color);
+                        log("Field",jsonObj[`${field}`] + ` || ${field}`,r20color);
                         targetObj[`repeating_${repSection}_${repSectionID}_${field}`] = jsonObj[`${field}`];
-                        nameCheck = jsonObj[`${field}`].trim();
+                        typeof jsonObj[`${field}`] === "string" ? nameCheck = jsonObj[`${field}`].trim() : nameCheck = jsonObj[`${field}`];
                         log("nameCheck",nameCheck,r20color);
                         typeof abilitiesUpdates[`${nameCheck}`] !== "undefined" ? targetObj = {...targetObj, ...abilitiesUpdates[`${nameCheck}`]} : log("Ability","Nothing additional needed",r20color);
                     }
@@ -3453,16 +3457,9 @@
                 if (typeof monsterObj["data-Edges"] !== "undefined" && typeof monsterObj["data-Edges"] !== "string") {
                     if (monsterObj["data-Edges"].length > 0) {
                         for (let edge of monsterObj["data-Edges"]) {
-        					log("Import Edge",edge.name,r20color);
-                            log("Monster Edge",JSON.stringify(edge),r20color);
-                            //finalCharacterDetails = getEdgeInfo(monsterObj["data-Edges"],finalCharacterDetails);
+        					//log("Import Edge",edge.name,r20color);
+                            //log("Monster Edge",JSON.stringify(edge),r20color);
                             finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
-        					// let repSectionID = generateRowID();
-        					// typeof edge.name !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edge`] = edge.name : log("Edge Name","Not Found",r20color);
-        					// typeof edge.description !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edgedescription`] = edge.description : log("Edge Description","Not Found",r20color);
-        					// finalCharacterDetails[`repeating_edges_${repSectionID}_tookat`] = "GM";
-                            // finalCharacterDetails[`repeating_edges_${repSectionID}_showEdgeDesc`] = "0";
-                            // finalCharacterDetails[`repeating_edges_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
         				}
                     }
                 }
@@ -3470,15 +3467,8 @@
                 //set Hindrances
                 if (typeof monsterObj["data-Hindrances"] !== "undefined" && monsterObj["data-Hindrances"].length > 0) {
     				for (let hindrance of monsterObj["data-Hindrances"]) {
-    					log("Import Hindrances",hindrance.hindrance,r20color);
-                        log("Monster Hindrance",JSON.stringify(hindrance),r20color);
-                        //finalCharacterDetails = getHindranceInfo(monsterObj["data-Hindrances"],)
-    					// let repSectionID = generateRowID();
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrance`] = hindrance.hindrance;
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrancedescription`] = hindrance.hindrancedescription;
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_showHindraceDesc`] = "0";
-                        // (typeof hindrance.hindranceType !== "undefined" && hindrance.hindranceType !== "Both") ? finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindranceType`] = hindrance.hindranceType : log("Hindrance Type","Both, so leave it blank",r20color);
-                        // finalCharacterDetails[`repeating_hindrances_${repSectionID}_whisperDeets`] = "/w gm ";
+    					//log("Import Hindrances",hindrance.hindrance,r20color);
+                        //log("Monster Hindrance",JSON.stringify(hindrance),r20color);
                         finalCharacterDetails = getDropInfo(hindrance.data,finalCharacterDetails,"npc_hindrance");
     				}
     			}
@@ -3492,58 +3482,42 @@
                     finalCharacterDetails["PowerPoints_max"] = monsterObj.PowerPoints;
                 }
 
-                //Set Weapons
-                //const weaponfields = ["weapon","range","rof","damageatt","dmgnumdice","dmgdietype","dmgbonusnum","weaponap","weaponminstrength","weaponweight"];
-                log("Weapons","Check for Weapons",r20color);
-                typeof monsterObj["data-Weapons"] !== "undefined" ? log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color) : log("Monster Weapons","Not Found",r20color);
-                if (typeof monsterObj["data-Weapons"] !== "undefined" && monsterObj["data-Weapons"].length > 0) {
-                    log("Weapons Array","Found",r20color);
-                    log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color);
-    				for (let weapon of monsterObj["data-Weapons"]) {
-    					log("Import Weapon",weapon.data.weapon,r20color);
-    					// let repSectionID = generateRowID();
-                        // weaponfields.forEach(field => {
-                        //     if(field === "dmgdietype") {
-                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] = "d" + weapon[`${field}`] + "!" : log(field,"Not Damage Die Type",r20color);
-                        //     }
-                        //     else {
-                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] =  weapon[`${field}`] : log(field,"Not found",r20color);
-                        //     }
-                        // });
-                        // finalCharacterDetails[`repeating_weapons_${repSectionID}_showweaponconfig`] = "0"
-                        finalCharacterDetails = getDropInfo(weapon.data,finalCharacterDetails,"weapons");
+                //Get Gear, Weapons, Powers, Armor, and Shields
+                const stuffType = ["Gear","Weapons","Powers","Armors","Shields"];
+                stuffType.forEach((things) => {
+                    log(`${things}`,`Check for ${things}`,r20color);
+                    let section;
+                    switch (things) {
+                        case 'Gear':
+                            section = "gear";
+                            break;
+                        case 'Weapons':
+                            section = "weapons";
+                            break;
+                        case 'Powers':
+                            section = "spells";
+                            break;
+                        case 'Armors':
+                            section = "armor";
+                            break;
+                        case 'Shields':
+                            section = "shields";
+                            break;
+                        default:
+                            section = things.toLowerCase();
                     }
-    			}
+                    typeof monsterObj[`data-${things}`] !== "undefined" ? log(`Monster ${things}`,JSON.stringify(monsterObj[`data-${things}`]),r20color) : log(`Monster ${things}`,"Not Found",r20color);
+                    if (typeof monsterObj[`data-${things}`] !== "undefined" && monsterObj[`data-${things}`].length > 0) {
+                        log(`${things} Array`,"Found",r20color);
+                        log(`Monster ${things}`,JSON.stringify(monsterObj[`data-${things}`]),r20color);
+        				for (let thing of monsterObj[`data-${things}`]) {
+        					log(`Import ${things}`,things.data,r20color);
+                            finalCharacterDetails = getDropInfo(thing.data,finalCharacterDetails,section);
+                        }
+        			}
+                })
 
-                log("Powers","Check for Powers",r20color);
-                typeof monsterObj["data-Powers"] !== "undefined" ? log("Monster Power",JSON.stringify(monsterObj["data-Powers"]),r20color) : log("Monster Powers","Not Found",r20color);
-                if (typeof monsterObj["data-Powers"] !== "undefined" && monsterObj["data-Powers"].length > 0) {
-                    log("Power Array","Found",r20color);
-    				for (let power of monsterObj["data-Powers"]) {
-    					log("Import Power",power.data.power,r20color);
-                        finalCharacterDetails = getDropInfo(power.data,finalCharacterDetails,"spells");
-                    }
-    			}
 
-                log("Armor","Check for Armor",r20color);
-                typeof monsterObj["data-Armors"] !== "undefined" ? log("Monster Armor",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
-                if (typeof monsterObj["data-Armors"] !== "undefined" && monsterObj["data-Armors"].length > 0) {
-                    log("Armor Array","Found",r20color);
-    				for (let armor of monsterObj["data-Armors"]) {
-    					log("Import Armor",armor.data.ArmorType,r20color);
-                        finalCharacterDetails = getDropInfo(armor.data,finalCharacterDetails,"armor");
-                    }
-    			}
-
-                log("Shields","Check for Shields",r20color);
-                typeof monsterObj["data-Shields"] !== "undefined" ? log("Monster Shield",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
-                if (typeof monsterObj["data-Shields"] !== "undefined" && monsterObj["data-Shields"].length > 0) {
-                    log("Shield Array","Found",r20color);
-    				for (let shield of monsterObj["data-Shields"]) {
-    					log("Import Shield",shield.data.ShieldType,r20color);
-                        finalCharacterDetails = getDropInfo(shield.data,finalCharacterDetails,"shields");
-                    }
-    			}
 
                 log("Weapons and Armor","Write weapons to the character sheet",r20color);
                 setAttrs(finalCharacterDetails);
@@ -8454,6 +8428,38 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.14 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10014' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.14</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10014' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="additional-support-for-deadlands-compendium">Added additional support for the Deadlands: The Weird West compendium.</span></li>
+					</ul>
+                    <!--
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="bestiary-drag-and-drop-fix">Fixed a drag and drop issue where some bestiary entries didn't have all the necessary updates. For example, Zombies Undead special ability didn't update/change the creatures Toughness, etc.</span></li>
+                    </ul>
+                    -->
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.13 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10013' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.13</h4></span>
