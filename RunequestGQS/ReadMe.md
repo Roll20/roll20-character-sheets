@@ -51,6 +51,7 @@ Fixed 2nd Button under Spirit Magic to behave correctly.
 Added Cast label to clarify buttons under Spirit Magic.
 Fixed criticals < 10%
 Added input for bonuses to spirit combat damage
+Changed critical crush  damage from full weapon damage + max damage bonus + rolled damage bonus to weapon damage + max damage bonus + max damage bonus
 
 
 
