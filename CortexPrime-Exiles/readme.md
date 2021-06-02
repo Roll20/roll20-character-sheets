@@ -8,8 +8,6 @@ Exiles - Character Sheet - Cortex Prime
 - There is a green Edit button to make changes to the sheet.
 - Click the Edit button again to hide the editor.
 
-- Repeat this for each of the remaining characters.
-
 ##Dice Pool Builder
 
 The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and displays the dice used and what they rolled. Hitches show up with black icons.
@@ -28,5 +26,10 @@ Exiles and all associated characters and elements are © Marvel Entertainment, L
 
 
 ##Changelog
+
+### v.1.0.01 2021-06-02
+
+Fixed the dice icons in the Distinctions and Hinder SFX
+Made the Dice roller visible, was only showing in the edit feature.
 
 ### v.1.0 2021-06-01
