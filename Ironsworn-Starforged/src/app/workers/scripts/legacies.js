@@ -14,12 +14,12 @@ function setLegacyProgressAttrs (type) {
 
 on('change:mark_legacy_quests_button change:mark_legacy_bonds_button change:mark_legacy_discoveries_button', function(values) {
   const type = values.sourceAttribute.match(/mark_legacy_(.*?)_/)[1]
-  const progressBoxAttrs = generateAttrArray(type)
+  const progressBoxAttrs = generateLegacyAttrArray(type)
 
   updateProgressBoxes({ mark_button: `mark_legacy_${type}_button`, attributes: progressBoxAttrs, rank: {kind: 'static', value: 5}});
 });
 
-function generateAttrArray (type) {
+function generateLegacyAttrArray (type) {
   let attrs = new Array();
   for(let index = 1; index <= 10; index++) {
     attrs.push(`legacy_progress_${type}_${index}`); 

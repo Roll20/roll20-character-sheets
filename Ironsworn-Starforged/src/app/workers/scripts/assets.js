@@ -5,6 +5,13 @@ on('change:repeating_assets:assettype', function(values) {
   });
 });
 
+on('change:repeating_assets:asset', function(values) {
+  setAttrs({
+      ['repeating_assets_' + values.previousValue]: 'off',
+      ['repeating_assets_' + values.newValue]: 'on'
+  });
+});
+
 on('change:repeating_assets:assetDropdownCompanion', function(values) {
   setAttrs({
       ['repeating_assets_AssetCompanionDiv' + values.previousValue]: 'off',
