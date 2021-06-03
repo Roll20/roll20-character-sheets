@@ -1,7 +1,9 @@
 // --- ALL SHEET WORKERS START --- //
-const SheetWorker = 'sheetworker';
-const Player = 'player';
+const sheetWorker = 'sheetworker';
+const player = 'player';
 
+const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
+const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
@@ -14,7 +16,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(/18\[([0-9]{1,3})]/) || abilityScoreString.match(/18\(([0-9]{1,3})\)/);
+        let exceptionalMatch = abilityScoreString.match(squareBracketsRegex) || abilityScoreString.match(parenthesisRegex);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -482,7 +484,7 @@ function setupAutoFillSpellInfo(section, spellsTable) {
             if (spell === undefined) 
                 return;
 
-            let spellInfo ={
+            let spellInfo = {
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
                 [`repeating_spells-${section}_spell-level`]        : spell['level'],
                 [`repeating_spells-${section}_spell-school`]       : spell['school'],
@@ -497,7 +499,7 @@ function setupAutoFillSpellInfo(section, spellsTable) {
                 [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
                 [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
                 [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            }
+            };
             if (section.startsWith('pri')) {
                 spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
             }
@@ -625,6 +627,77 @@ priestSpellLevelsSections.forEach(spellLevel => {
 });
 // --- End setup Spell Slots --- //
 
+const primarySphereRegex =      /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
+const noElementalRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
+const elementalRegex = /Earth|Air|Fire|Water/gi
+function capitalizeFirst(s) {
+    if (typeof s !== 'string') 
+        return '';
+    
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function parseSpheres(spheresStrings, regex) {
+    let spheres = new Set();
+    spheresStrings.map(s => s.match(regex))
+        .flat()
+        .filter(Boolean)
+        .map(s => capitalizeFirst(s))
+        .forEach(s => spheres.add(s));
+    return spheres;
+}
+
+function isSpellAvailable(spellSphereString, availableSpheres, elementalSpheres) {
+    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
+    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
+    if (isAvailable)
+        return true;
+
+    if (!availableSpheres.has('Elemental'))
+        return false;
+    
+    if (!spellSphereString.includes('Elemental'))
+        return false;
+    
+    if (spellSphereString.includes('Elemental ('))
+        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
+    
+    // The player and the spell has the elemental sphere (without any sub elements)
+    return true;
+}
+
+on("clicked:test", function () {
+    console.log("clicked!");
+    TAS.repeating('spells-pri1')
+        .attrs('sphere-major','sphere-minor')
+        .fields('spell-name')
+        .reduce(function(memo, row){
+            memo.add(row.S['spell-name']);
+            return memo;
+        }, new Set(), function (knownSpells,_,a){
+            let primarySpheres = parseSpheres([a.S['sphere-major'], a.S['sphere-minor']], primarySphereRegex);
+            let elementalSpheres = parseSpheres([a.S['sphere-major'], a.S['sphere-minor']], elementalRegex);
+            
+            if (primarySpheres.size === 0)
+                return;
+
+            let spellsToAdd = [];
+            for (const [name, spell] of Object.entries(pri1)) {
+                if (knownSpells.has(name)) {
+                    console.log(`${name} is already known. Skipping ahead`)
+                    continue;
+                }
+
+                let isAvailable = isSpellAvailable(spell['sphere'], primarySpheres, elementalSpheres);
+                if (isAvailable)
+                    spellsToAdd.push(name);
+            }
+            
+            console.log(spellsToAdd);
+        })
+        .execute();
+});
+
 // --- Start setup Spell Points, Arc, and Wind --- //
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
@@ -704,7 +777,7 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === SheetWorker) {
+    if (eventInfo.sourceType === sheetWorker) {
         return;
     }
     getAttrs(['nonprof-penalty'], function(values) {
