@@ -21177,7 +21177,7 @@ visualize what it will look like in chat.
         
     }
     
-    on("change:start_velocity change:current_move change:enhanced_move_current change:current_air change:current_water change:change_velocity", function(event) {
+    on("change:turning_move_type change:start_velocity change:current_move change:enhanced_move_current change:current_air change:current_water change:change_velocity", function(event) {
         
         updateTurnRadiusMovements();
         
@@ -21228,7 +21228,7 @@ visualize what it will look like in chat.
                         // normal move, no tight turn penalty
                         tightTurnPenalty = 0;
                         
-                        baseMove = Number(values.current_move);
+                        baseMove = getBaseMove(values.current_move);
                         
                     } else {
                         
@@ -21242,11 +21242,11 @@ visualize what it will look like in chat.
                     
                 case "air":
                     
-					baseMove = getBaseMove(values.current_air);
+                    baseMove = getBaseMove(values.current_air);
 					
                     tightTurnPenalty = getTightTurnPenalty(velocityFinal, baseMove);
 					
-					break;
+                    break;
                     
                 case "water":
                     baseMove = getBaseMove(values.current_water);
@@ -21269,7 +21269,7 @@ visualize what it will look like in chat.
                 
                 decelerationPenalty = 0;
                 
-			}
+            }
 			
             // --
             if (baseMove && velocityFinal) {
@@ -21337,33 +21337,42 @@ visualize what it will look like in chat.
     /**
      * Gets base move from a number or two values.
      * If move = 8/16, basemove = 8.
-     * If move = 8, basemove = 8
+     * If move = 8, basemove = 8.
+     * If move = 8/16 (1), basemove = 8.
+     * if move = 8 (1), basemove = 8.
      */
     function getBaseMove(moveValue) {
         
         var move = 0;
         
-        if ( moveValue && moveValue.toString().includes("/") ) {
+        if (moveValue) {
+    
+            // Remove number in parentheses
+            moveValue = moveValue.toString().replace(/ *\([^)]*\)/g, "");
+
+            if (moveValue.includes("/")) {
+              
+                // split the value
+                // move = 8/16
+                // 8 = base move
+                // 16 = enhanced move
+                arrMoveValue = moveValue.split("/");
+                
+                // get first part, convert to number
+                move = Number(arrMoveValue[0]);
+                
+            } else {
+                
+                move = Number(moveValue);
+                
+            }
             
-            // split the value
-            // move = 8/16
-            // 8 = base move
-            // 16 = max move
-            arrMoveValue = moveValue.split("/");
-            
-            // get second part, convert to number
-            move = Number(arrMoveValue[0]);
-            
-        } else {
-            
-            move = Number(moveValue);
-            
-		}
-		
-		if (isNaN(move)) {
-			move = 0;
-		}
-        
+        }
+
+        if (isNaN(move)) {
+            move = 0;
+        }
+
         return move;
     }
     
