@@ -1,6 +1,9 @@
 Change Log
 ==============================================
-**2021-06-07 ** v.35 Chuz (James Culp)
+**2021-06-07 ** v.36 Chuz (James Culp)
+
+**2021-06-03 ** v.35 Chuz (James Culp)
+	PC->Magic->Meta tab, added alternative Tradition attributes to the drop down.
 	Added Matrix AR and Matrix DR to Host sheet
 **2021-05-25 ** v.34 Chuz (James Culp)
 	Bugfix - Changed HTML top display the nuyen symbol instead of translations as the character was breaking the translation stuff
