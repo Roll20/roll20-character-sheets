@@ -477,36 +477,38 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
 function setupAutoFillSpellInfo(section, spellsTable) {
-    if (spellsTable[section]) {
-        on(`change:repeating_spells-${section}:spell-name`, function(eventInfo){
+    if (!spellsTable[section])
+        return;
+    
+    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
 
-            let spell = spellsTable[section][eventInfo.newValue];
-            if (spell === undefined) 
-                return;
+        let spell = spellsTable[section][eventInfo.newValue];
+        console.log(spell);
+        if (spell === undefined)
+            return;
 
-            let spellInfo = {
-                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : spell['level'],
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
-                [`repeating_spells-${section}_spell-components`]   : spell['components'],
-                [`repeating_spells-${section}_spell-range`]        : spell['range'],
-                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            };
-            if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-            }
+        let spellInfo = {
+            [`repeating_spells-${section}_spell-cast-time`]: spell['cast-time'],
+            [`repeating_spells-${section}_spell-level`]: spell['level'],
+            [`repeating_spells-${section}_spell-school`]: spell['school'],
+            [`repeating_spells-${section}_spell-components`]: spell['components'],
+            [`repeating_spells-${section}_spell-range`]: spell['range'],
+            [`repeating_spells-${section}_spell-aoe`]: spell['aoe'],
+            [`repeating_spells-${section}_spell-duration`]: spell['duration'],
+            [`repeating_spells-${section}_spell-damage`]: spell['damage'],
+            [`repeating_spells-${section}_spell-damage-type`]: spell['damage-type'],
+            [`repeating_spells-${section}_spell-saving-throw`]: spell['saving-throw'],
+            [`repeating_spells-${section}_spell-healing`]: spell['healing'],
+            [`repeating_spells-${section}_spell-materials`]: spell['materials'],
+            [`repeating_spells-${section}_spell-reference`]: spell['reference'],
+            [`repeating_spells-${section}_spell-effect`]: spell['effect']
+        };
+        if (section.startsWith('pri')) {
+            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+        }
 
-            setAttrs(spellInfo);
-        });
-    }
+        setAttrs(spellInfo);
+    });
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
@@ -566,6 +568,112 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
     });
 }
 
+// --- Start setup for priest spells based on spheres --- //
+const primarySphereRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
+const noElementalRegex =   /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
+const elementalRegex = /Earth|Air|Fire|Water/gi
+function capitalizeFirst(s) {
+    if (typeof s !== 'string')
+        return '';
+
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function parseSpheres(spheresStrings, regex) {
+    let spheres = new Set();
+    spheresStrings.map(s => s.match(regex))
+        .flat()
+        .filter(Boolean)
+        .map(s => capitalizeFirst(s))
+        .forEach(s => spheres.add(s));
+    return spheres;
+}
+
+function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
+    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
+    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
+    if (isAvailable)
+        return true;
+
+    if (!availableSpheres.has('Elemental'))
+        return false;
+
+    if (!spellSphereString.includes('Elemental'))
+        return false;
+
+    if (spellSphereString.includes('Elemental ('))
+        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
+
+    // The player and the spell has the elemental sphere (without any sub elements)
+    return true;
+}
+
+function setupAddPriestSpell(postfix) {
+    if (!priestSpells[postfix])
+        return;
+
+    on(`clicked:add-spells-${postfix}`, function () {
+        console.log("clicked!");
+        const section = `spells-${postfix}`;
+        const field = 'spell-name';
+        let errorMessage = `add-spell-error-${postfix}`;
+        let attributes = ['sphere-major'];
+        if (postfix.match(/[123]/)) 
+            attributes.push("sphere-minor");
+            
+        TAS.repeating(section)
+            .attrs(attributes)
+            .fields(field)
+            .reduce(function(memo, row){
+                memo.add(row.S[field]);
+                return memo;
+            }, new Set(), function (knownSpells,_,a){
+                let primarySpheres = parseSpheres(attributes.map(aField => a.S[aField]), primarySphereRegex);
+                let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
+
+                let newValue = {};
+                newValue[errorMessage] = '';
+                if (primarySpheres.size < 1) {
+                    newValue[errorMessage] = 'No valid spheres found. Please write or select some spheres';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                let spellsToAdd = [];
+                for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
+                    let isAvailable = isSpellAvailable(spellName, spell['sphere'], primarySpheres, elementalSpheres);
+                    if (isAvailable)
+                        spellsToAdd.push(spellName);
+                }
+
+                console.log(spellsToAdd);
+                if (spellsToAdd.length < 1) {
+                    newValue[errorMessage] = 'No spells found for the selected spheres';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
+                console.log(spellsToAdd);
+                if (spellsToAdd.length < 1) {
+                    newValue[errorMessage] = 'All spells already added.';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                spellsToAdd.forEach(spell => {
+                    let newrowid = generateRowID();
+                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
+                });
+
+                setAttrs(newValue);
+
+            })
+            .execute();
+    });
+}
+// --- End setup for priest spells based on spheres --- //
+
 let wizardSpellLevelsSections = [
     {level: 1, sections: ['', '2', '3', 'wiz1']},
     {level: 2, sections: ['4', '5', '6', 'wiz2']},
@@ -623,80 +731,10 @@ priestSpellLevelsSections.forEach(spellLevel => {
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells);
+        setupAddPriestSpell(lastSection);
     }
 });
 // --- End setup Spell Slots --- //
-
-const primarySphereRegex =      /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
-const noElementalRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
-const elementalRegex = /Earth|Air|Fire|Water/gi
-function capitalizeFirst(s) {
-    if (typeof s !== 'string') 
-        return '';
-    
-    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
-}
-
-function parseSpheres(spheresStrings, regex) {
-    let spheres = new Set();
-    spheresStrings.map(s => s.match(regex))
-        .flat()
-        .filter(Boolean)
-        .map(s => capitalizeFirst(s))
-        .forEach(s => spheres.add(s));
-    return spheres;
-}
-
-function isSpellAvailable(spellSphereString, availableSpheres, elementalSpheres) {
-    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
-    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
-    if (isAvailable)
-        return true;
-
-    if (!availableSpheres.has('Elemental'))
-        return false;
-    
-    if (!spellSphereString.includes('Elemental'))
-        return false;
-    
-    if (spellSphereString.includes('Elemental ('))
-        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
-    
-    // The player and the spell has the elemental sphere (without any sub elements)
-    return true;
-}
-
-on("clicked:test", function () {
-    console.log("clicked!");
-    TAS.repeating('spells-pri1')
-        .attrs('sphere-major','sphere-minor')
-        .fields('spell-name')
-        .reduce(function(memo, row){
-            memo.add(row.S['spell-name']);
-            return memo;
-        }, new Set(), function (knownSpells,_,a){
-            let primarySpheres = parseSpheres([a.S['sphere-major'], a.S['sphere-minor']], primarySphereRegex);
-            let elementalSpheres = parseSpheres([a.S['sphere-major'], a.S['sphere-minor']], elementalRegex);
-            
-            if (primarySpheres.size === 0)
-                return;
-
-            let spellsToAdd = [];
-            for (const [name, spell] of Object.entries(pri1)) {
-                if (knownSpells.has(name)) {
-                    console.log(`${name} is already known. Skipping ahead`)
-                    continue;
-                }
-
-                let isAvailable = isSpellAvailable(spell['sphere'], primarySpheres, elementalSpheres);
-                if (isAvailable)
-                    spellsToAdd.push(name);
-            }
-            
-            console.log(spellsToAdd);
-        })
-        .execute();
-});
 
 // --- Start setup Spell Points, Arc, and Wind --- //
 let wizardSpellPoints = 'spell-points';
