@@ -5,13 +5,16 @@ input(type="hidden" name="attr_version" value=`${version}`)
 - var url = "https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Stargate-RPG/images/";
 - var urldev = "https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Stargate-RPG/images/";
 - var pages = ["character", "background", "npc", "settings"];
-//- var attr-abr = []; //- kye-value instead?
-//- var attr-name = [];
+//- var attr-abr = ["str", "dex", "con", "wis", "int", "cha"]; //- kye-value instead?
+- var attrnames = {str: "strength", dex: "dexterity", con: "constitution", wis: "wisdom", int: "intelligence", cha: "charisma"};
+- var skills = [{"attr": "acrobatics","name": "Acrobatics","keyattr": "dex"},{"attr": "animalhandling","name": "Animal Handling","keyattr": "wis"},{"attr": "athletics","name": "Athletics","keyattr": "str"},{"attr": "culture","name": "Culture","keyattr": "wis"},{"attr": "deception","name": "Deception","keyattr": "cha"},{"attr": "engineering","name": "Engineering","keyattr": "int"},{"attr": "history","name": "History","keyattr": "int"},{"attr": "insight","name": "Insight","keyattr": "wis"},{"attr": "intimidation","name": "Intimidation","keyattr": "cha"},{"attr": "investigation","name": "Investigation","keyattr": "int"},{"attr": "medicine","name": "Medicine","keyattr": "wis"},{"attr": "nature","name": "Nature","keyattr": "int"},{"attr": "perception","name": "Perception","keyattr": "wis"},{"attr": "performance","name": "performance","keyattr": "cha"},{"attr": "persuasion","name": "Persuasion","keyattr": "cha"},{"attr": "pilot","name": "Pilot","keyattr": "dex"},{"attr": "science","name": "Science","keyattr": "int"},{"attr": "sleight","name": "Sleight of Hand","keyattr": "dex"},{"attr": "stealth","name": "Stealth","keyattr": "dex"},{"attr": "survival","name": "Survival","keyattr": "wis"}];
+- var condition = {1: "Disadv ability checks", 2: "Speed Halved", 3: "Disadv Attacks, Saves", 4: "Max HP Halved", 5: "Speed Zero", 6: "Death"};
 //- var skill-at = [];
 //- var skill-name = [];
 - var dice = ["d4", "d6", "d8", "d10", "d12"];
-- var attack = ["attack1", "attack2", "attack3", "attack4", "attack5"];
-- var ammo = ["1", "2", "3", "4"];
+//- capitalize
+//- word.charAt(0).toUpperCase() + word.slice(1);
+
 //- sheet start
 .tab-buttons.middle.center
   input.npctoggle(type="hidden" name="attr_npc" value="0")
@@ -68,133 +71,20 @@ main.character
           option(value="d12") d12
   //- ATTRIBUTES SECTION
   .attr.columnflex.nowrap.spaced.center
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_str" title="%{str}" type="roll" value="@{whisper}&{template:stargate} {{title=Strength Check}} @{show_name} {{[[d20+(@{str_mod})]]=[[d20+(@{str_mod})]]}}") STR
-      input(name="attr_str" type="number" value="10")
-      span.mod(name="attr_str_mod" title="@{str_mod}")
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_dex" type="roll" title="%{dex}" value="@{whisper}&{template:stargate} {{title=Dexterity Check}} @{show_name} {{[[d20+(@{dex_mod})]]=[[d20+(@{dex_mod})]]}}") DEX
-      input(name="attr_dex" type="number" value="10")
-      span.mod(name="attr_dex_mod" title="@{dex_mod}")
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_con" type="roll" title="%{con}" value="@{whisper}&{template:stargate} {{title=Constitution Check}} @{show_name} {{[[d20+(@{con_mod})]]=[[d20+(@{con_mod})]]}}") CON
-      input(name="attr_con" type="number" value="10")
-      span.mod(name="attr_con_mod" title="@{con_mod}")
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_int" type="roll" title="%{int}" value="@{whisper}&{template:stargate} {{title=Intelligence Check}} @{show_name} {{[[d20+(@{int_mod})]]=[[d20+(@{int_mod})]]}}") INT
-      input(name="attr_int" type="number" value="10")
-      span.mod(name="attr_int_mod" title="@{int_mod}")
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_wis" type="roll" title="%{wis}" value="@{whisper}&{template:stargate} {{title=Wisdom Check}} @{show_name} {{[[d20+(@{wis_mod})]]=[[d20+(@{wis_mod})]]}}") WIS
-      input(name="attr_wis" type="number" value="10")
-      span.mod(name="attr_wis_mod" title="@{wis_mod}")
-    .stat.columnflex.nowrap.center.middle
-      button.txt-btn.large(name="roll_cha" type="roll" title="%{cha}" value="@{whisper}&{template:stargate} {{title=Charisma Check}} @{show_name} {{[[d20+(@{cha_mod})]]=[[d20+(@{cha_mod})]]}}") CHA
-      input(name="attr_cha" type="number" value="10")
-      span.mod(name="attr_cha_mod" title="@{cha_mod}")
+    each key , val in attrnames
+      .stat.columnflex.nowrap.center.middle
+        button.txt-btn.large(name=`roll_${val}` title=`%{${val}}` type="roll" value=`@{whisper}&{template:stargate} {{title=${key.charAt(0).toUpperCase()}${key.slice(1)} Check}} @{show_name} {{[[d20+(@{${val}_mod})]]=[[d20+(@{${val}_mod})]]}}`)= val.toUpperCase()
+        input(name=`attr_${val}` type="number" value="10")
+        span.mod(name=`attr_${val}_mod` title=`@{${val}_mod}`)
   //- Skills (20)
   section.skills.columnflex.nowrap.spaced
     h3 Skills
-    .rowflex.nowrap
-      input(name="attr_acrobatics_c" type="checkbox" value="1")
-      input.w30(name="attr_acrobatics" type="number" title="@{acrobatics}" value="0")
-      button.txt-btn(name="roll_acrobatics" type="roll" value="@{whisper}&{template:stargate} {{title=Acrobatics Check}} @{show_name} {{[[d20+(@{acrobatics})]]=[[d20+(@{acrobatics})]]}}") Acrobatics
-      span (dex)
-    .rowflex.nowrap
-      input(name="attr_animalhandling_c" type="checkbox" value="1")
-      input.w30(name="attr_animalhandling" type="number" title="@{animalhandling}" value="0")
-      button.txt-btn(name="roll_animalhandling" type="roll" value="@{whisper}&{template:stargate} {{title=Animal Handling Check}} @{show_name} {{[[d20+(@{animalhandling})]]=[[d20+(@{animalhandling})]]}}") Animal Handling
-      span (wis)
-    .rowflex.nowrap
-      input(name="attr_athletics_c" type="checkbox" value="1")
-      input.w30(name="attr_athletics" type="number" title="@{athletics}" value="0")
-      button.txt-btn(name="roll_athletics" type="roll" value="@{whisper}&{template:stargate} {{title=Athletics Check}} @{show_name} {{[[d20+(@{athletics})]]=[[d20+(@{athletics})]]}}") Athletics
-      span (str)
-    .rowflex.nowrap
-      input(name="attr_culture_c" type="checkbox" value="1")
-      input.w30(name="attr_culture" type="number" title="@{culture}" value="0")
-      button.txt-btn(name="roll_culture" type="roll" value="@{whisper}&{template:stargate} {{title=Culture Check}} @{show_name} {{[[d20+(@{culture})]]=[[d20+(@{culture})]]}}") Culture
-      span (wis)
-    .rowflex.nowrap
-      input(name="attr_deception_c" type="checkbox" value="1")
-      input.w30(name="attr_deception" type="number" title="@{deception}" value="0")
-      button.txt-btn(name="roll_deception" type="roll" value="@{whisper}&{template:stargate} {{title=Deception Check}} @{show_name} {{[[d20+(@{deception})]]=[[d20+(@{deception})]]}}") Deception
-      span (cha)
-    .rowflex.nowrap
-      input(name="attr_engineering_c" type="checkbox" value="1")
-      input.w30(name="attr_engineering" type="number" title="@{engineering}" value="0")
-      button.txt-btn(name="roll_engineering" type="roll" value="@{whisper}&{template:stargate} {{title=Engineering Check}} @{show_name} {{[[d20+(@{engineering})]]=[[d20+(@{engineering})]]}}") engineering
-      span (int)
-    .rowflex.nowrap
-      input(name="attr_history_c" type="checkbox" value="1")
-      input.w30(name="attr_history" type="number" title="@{history}" value="0")
-      button.txt-btn(name="roll_history" type="roll" value="@{whisper}&{template:stargate} {{title=History Check}} @{show_name} {{[[d20+(@{history})]]=[[d20+(@{history})]]}}") history
-      span (int)
-    .rowflex.nowrap
-      input(name="attr_insight_c" type="checkbox" value="1")
-      input.w30(name="attr_insight" type="number" title="@{insight}" value="0")
-      button.txt-btn(name="roll_insight" type="roll" value="@{whisper}&{template:stargate} {{title=Insight Check}} @{show_name} {{[[d20+(@{insight})]]=[[d20+(@{insight})]]}}") insight
-      span (wis)
-    .rowflex.nowrap
-      input(name="attr_intimidation_c" type="checkbox" value="1")
-      input.w30(name="attr_intimidation" type="number" title="@{intimidation}" value="0")
-      button.txt-btn(name="roll_intimidation" type="roll" value="@{whisper}&{template:stargate} {{title=Intimidation Check}} @{show_name} {{[[d20+(@{intimidation})]]=[[d20+(@{intimidation})]]}}") intimidation
-      span (cha)
-    .rowflex.nowrap
-      input(name="attr_investigation_c" type="checkbox" value="1")
-      input.w30(name="attr_investigation" type="number" title="@{investigation}" value="0")
-      button.txt-btn(name="roll_investigation" type="roll" value="@{whisper}&{template:stargate} {{title=Investigation Check}} @{show_name} {{[[d20+(@{investigation})]]=[[d20+(@{investigation})]]}}") investigation
-      span (int)
-    .rowflex.nowrap
-      input(name="attr_medicine_c" type="checkbox" value="1")
-      input.w30(name="attr_medicine" type="number" title="@{medicine}" value="0")
-      button.txt-btn(name="roll_medicine" type="roll" value="@{whisper}&{template:stargate} {{title=medicine Check}} @{show_name} {{[[d20+(@{medicine})]]=[[d20+(@{medicine})]]}}") medicine
-      span (wis)
-    .rowflex.nowrap
-      input(name="attr_nature_c" type="checkbox" value="1")
-      input.w30(name="attr_nature" type="number" title="@{nature}" value="0")
-      button.txt-btn(name="roll_nature" type="roll" value="@{whisper}&{template:stargate} {{title=nature Check}} @{show_name} {{[[d20+(@{nature})]]=[[d20+(@{nature})]]}}") nature
-      span (int)
-    .rowflex.nowrap
-      input(name="attr_perception_c" type="checkbox" value="1")
-      input.w30(name="attr_perception" type="number" title="@{perception}" value="0")
-      button.txt-btn(name="roll_perception" type="roll" value="@{whisper}&{template:stargate} {{title=perception Check}} @{show_name} {{[[d20+(@{perception})]]=[[d20+(@{perception})]]}}") perception
-      span (wis)
-    .rowflex.nowrap
-      input(name="attr_performance_c" type="checkbox" value="1")
-      input.w30(name="attr_performance" type="number" title="@{performance}" value="0")
-      button.txt-btn(name="roll_performance" type="roll" value="@{whisper}&{template:stargate} {{title=performance Check}} @{show_name} {{[[d20+(@{performance})]]=[[d20+(@{performance})]]}}") performance
-      span (cha)
-    .rowflex.nowrap
-      input(name="attr_persuasion_c" type="checkbox" value="1")
-      input.w30(name="attr_persuasion" type="number" title="@{persuasion}" value="0")
-      button.txt-btn(name="roll_persuasion" type="roll" value="@{whisper}&{template:stargate} {{title=Persuasion Check}} @{show_name} {{[[d20+(@{persuasion})]]=[[d20+(@{persuasion})]]}}") persuasion
-      span (cha)
-    .rowflex.nowrap
-      input(name="attr_pilot_c" type="checkbox" value="1")
-      input.w30(name="attr_pilot" type="number" title="@{}" value="0")
-      button.txt-btn(name="roll_pilot" type="roll" value="@{whisper}&{template:stargate} {{title=pilot Check}} @{show_name} {{[[d20+(@{pilot})]]=[[d20+(@{pilot})]]}}") pilot
-      span (dex)
-    .rowflex.nowrap
-      input(name="attr_science_c" type="checkbox" value="1")
-      input.w30(name="attr_science" type="number" title="@{science}" value="0")
-      button.txt-btn(name="roll_science" type="roll" value="@{whisper}&{template:stargate} {{title=science Check}} @{show_name} {{[[d20+(@{science})]]=[[d20+(@{science})]]}}") science
-      span (int)
-    .rowflex.nowrap
-      input(name="attr_sleight_c" type="checkbox" value="1")
-      input.w30(name="attr_sleight" type="number" title="@{sleight}" value="0")
-      button.txt-btn(name="roll_sleight" type="roll" value="@{whisper}&{template:stargate} {{title=Sleight of Hand Check}} @{show_name} {{[[d20+(@{sleight})]]=[[d20+(@{sleight})]]}}") Sleight of Hand
-      span (dex)
-    .rowflex.nowrap
-      input(name="attr_stealth_c" type="checkbox" value="1")
-      input.w30(name="attr_stealth" type="number" title="@{stealth}" value="0")
-      button.txt-btn(name="roll_stealth" type="roll" value="@{whisper}&{template:stargate} {{title=stealth Check}} @{show_name} {{[[d20+(@{stealth})]]=[[d20+(@{stealth})]]}}") stealth
-      span (dex)
-    .rowflex.nowrap
-      input(name="attr_survival_c" type="checkbox" value="1")
-      input.w30(name="attr_survival" type="number" title="@{survival}" value="0")
-      button.txt-btn(name="roll_survival" type="roll" value="@{whisper}&{template:stargate} {{title=survival Check}} @{show_name} {{[[d20+(@{survival})]]=[[d20+(@{survival})]]}}") survival
-      span (wis)
+    each skill in skills
+      .rowflex.nowrap
+        input(name=`attr_${skill.attr}_c` type="checkbox" value="1")
+        input.w30(name=`attr_${skill.attr}` type="number" title=`@{${skill.attr}}` value="0")
+        button.txt-btn(name=`roll_${skill.attr}` type="roll" value=`@{whisper}&{template:stargate} {{title=${skill.name} Check}} @{show_name} {{[[d20+(@{${skill.attr}})]]=[[d20+(@{${skill.attr}})]]}}`)= skill.name
+        span="(" + skill.keyattr + ")"
   //- hp
   section.hp.rowflex.nowrap
     .section.columnflex.nowrap.middle.center
@@ -215,24 +105,10 @@ main.character
     .rowflex.nowrap
       input(name="attr_condition" type="radio" value="0" checked="true")
       span Normal
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="1")
-      span Disadv ability checks
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="2")
-      span speed halved
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="3")
-      span disadv attacks, saves
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="4")
-      span HP max halved
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="5")
-      span speed zero
-    .rowflex.nowrap
-      input(name="attr_condition" type="radio" value="6")
-      span death
+    each val, key in condition
+      .rowflex.nowrap
+        input(name="attr_condition" type="radio" value=`${key}`)
+        span= val
   //- prof
   .prof.rowflex.nowrap
     .section.columnflex.nowrap.middle.center
@@ -263,47 +139,25 @@ main.character
     .section.death.columnflex.nowrap.middle.center
       button.txt-btn.large(name="roll_deathsave" type="roll" value="@{whisper}&{template:stargate} {{color=black}} {{title=Death Save}} @{show_name} {{Result=[[d20]]}}" title="%{deathsave}") Death Save
       .rowflex.nowrap
-        input(name="attr_death_success1" type="checkbox" value="1")
-        input(name="attr_death_success2" type="checkbox" value="1")
-        input(name="attr_death_success3" type="checkbox" value="1")
+        each num in [1,2,3]
+          input(name=`attr_death_success${num}` type="checkbox" value="1")
         span Sucesses
       .rowflex.nowrap
-        input(name="attr_death_failure1" type="checkbox" value="1")
-        input(name="attr_death_failure2" type="checkbox" value="1")
-        input(name="attr_death_failure3" type="checkbox" value="1")
+        each num in [1,2,3]
+          input(name=`attr_death_failure${num}` type="checkbox" value="1")
         span Failures
   //- saves
   section.saves.columnflex.nowrap
     h3 Saves
-    .rowflex.nowrap
-      input(name="attr_str_save_c" type="checkbox" value="1")
-      input.w30(name="attr_str_save" title="@{str_save}" type="number" value="0")
-      button.txt-btn(name="roll_str_save" title="%{str_save}" type="roll" value="@{whisper}&{template:stargate} {{title=Strength Save}} @{show_name} {{[[d20+(@{str_save})]]=[[d20+(@{str_save})]]}}") Strength
-    .rowflex.nowrap
-      input(name="attr_dex_save_c" type="checkbox" value="1")
-      input.w30(name="attr_dex_save" type="number" value="0" title="@{dex_save}")
-      button.txt-btn(name="roll_dex_save" type="roll" value="@{whisper}&{template:stargate} {{title=Dexterity Save}} @{show_name} {{[[d20+(@{dex_save})]]=[[d20+(@{dex_save})]]}}" title="%{dex_save}") Dexterity
-    .rowflex.nowrap
-      input(name="attr_con_save_c" type="checkbox" value="1")
-      input.w30(name="attr_con_save" type="number" value="0")
-      button.txt-btn(name="roll_con_save" type="roll" value="@{whisper}&{template:stargate} {{title=Constitution Save}} @{show_name} {{[[d20+(@{con_save})]]=[[d20+(@{con_save})]]}}") Constitution
-    .rowflex.nowrap
-      input(name="attr_int_save_c" type="checkbox" value="1")
-      input.w30(name="attr_int_save" type="number" value="0")
-      button.txt-btn(name="roll_int_save" type="roll" value="@{whisper}&{template:stargate} {{title=Intelligence Save}} @{show_name} {{[[d20+(@{int_save})]]=[[d20+(@{int_save})]]}}") Intelligence
-    .rowflex.nowrap
-      input(name="attr_wis_save_c" type="checkbox" value="1")
-      input.w30(name="attr_wis_save" type="number" value="0")
-      button.txt-btn(name="roll_wis_save" type="roll" value="@{whisper}&{template:stargate} {{title=Wisdom Save}} @{show_name} {{[[d20+(@{wis_save})]]=[[d20+(@{wis_save})]]}}") Wisdom
-    .rowflex.nowrap.mb20
-      input(name="attr_cha_save_c" type="checkbox" value="1")
-      input.w30(name="attr_cha_save" type="number" value="0")
-      button.txt-btn(name="roll_cha_save" type="roll" value="@{whisper}&{template:stargate} {{title=Charisma Save}} @{show_name} {{[[d20+(@{cha_save})]]=[[d20+(@{cha_save})]]}}") Charisma
+    each key , val in attrnames
+      .rowflex.nowrap
+        input(name=`attr_${val}_save_c` type="checkbox" value="1")
+        input.w30(name=`attr_${val}_save` title=`@{${val}_save}` type="number" value="0")
+        button.txt-btn(name=`roll_${val}_save` title=`%{${val}_save}` type="roll" value=`@{whisper}&{template:stargate} {{title=${key.charAt(0).toUpperCase()}${key.slice(1)} Save}} @{show_name} {{[[d20+(@{${val}_save})]]=[[d20+(@{${val}_save})]]}}`)= key.charAt(0).toUpperCase() + key.slice(1)
   //- bulk
   section.bulk.columnflex.nowrap.middle.center
     h3 Tactical Vest Bulk
     input.stat.w40(name="attr_bulk" type="number" value="8")
-  //- ammo
   //- inventory mini
   section.inventory.columnflex.nowrap.center
     h4 Inventory
@@ -317,86 +171,24 @@ main.character
     span.bold range
     span.bold Cap/Reload
     span.bold.pl20 special
-    //- attack1
-    .rowflex.nowrap
-      button(name="roll_attack1" type="roll" title="%{attack1}" value="@{whisper}&{template:stargate} {{title=@{attack1}}} @{show_name} {{[[d20+(@{attack1_to_hit})]]=[[d20+(@{attack1_to_hit})]]}} {{Damage=[[@{attack1_dmg}+0]] @{attack1_dmgtype} }} {{desc=@{attack1_special} }}")
-      input.ml15(name="attr_attack1" type="text" placeholder="Sidearm(Beretta M9)")
-    div
-      input.w40(name="attr_attack1_to_hit" type="text" placeholder="4")
-    div
-      input.w70.mr15(name="attr_attack1_dmg" type="text" placeholder="1d6")
-    div
-      input.w50(name="attr_attack1_dmgtype" type="text" placeholder="piercing")
-    div
-      input.w50(name="attr_attack1_range" type="text" placeholder="50/100")
-    div
-      input.w50(name="attr_attack1_reload" type="text" placeholder="15/1")
-    div
-      input.w110.mr15(name="attr_attack1_special" type="text")
-    //- attack2
-    .rowflex.nowrap
-      button(name="roll_attack2" type="roll" title="%{attack2}" value="@{whisper}&{template:stargate} {{title=@{attack2}}} @{show_name} {{[[d20+(@{attack2_to_hit})]]=[[d20+(@{attack2_to_hit})]]}} {{Damage=[[@{attack2_dmg}+0]] @{attack2_dmgtype} }} {{desc=@{attack2_special} }}")
-      input.ml15(name="attr_attack2" type="text" placeholder="attack/action name")
-    div
-      input.w40(name="attr_attack2_to_hit" type="text" placeholder="4")
-    div
-      input.w70.mr15(name="attr_attack2_dmg" type="text" placeholder="1d6")
-    div
-      input.w50(name="attr_attack2_dmgtype" type="text")
-    div
-      input.w50(name="attr_attack2_range" type="text")
-    div
-      input.w50(name="attr_attack2_reload" type="text")
-    div
-      input.w110.mr15(name="attr_attack2_special" type="text")
-    //- attack3
-    .rowflex.nowrap
-      button(name="roll_attack3" type="roll" title="%{attack3}" value="@{whisper}&{template:stargate} {{title=@{attack3}}} @{show_name} {{[[d20+(@{attack3_to_hit})]]=[[d20+(@{attack3_to_hit})]]}} {{Damage=[[@{attack3_dmg}+0]] @{attack3_dmgtype} }} {{desc=@{attack3_special} }}")
-      input.ml15(name="attr_attack3" type="text" placeholder="attack/action name")
-    div
-      input.w40(name="attr_attack3_to_hit" type="text" placeholder="4")
-    div
-      input.w70.mr15(name="attr_attack3_dmg" type="text" placeholder="1d6")
-    div
-      input.w50(name="attr_attack3_dmgtype" type="text")
-    div
-      input.w50(name="attr_attack3_range" type="text")
-    div
-      input.w50(name="attr_attack3_reload" type="text")
-    div
-      input.w110.mr15(name="attr_attack3_special" type="text")
-    //- attack4
-    .rowflex.nowrap
-      button(name="roll_attack4" type="roll" title="%{attack4}" value="@{whisper}&{template:stargate} {{title=@{attack4}}} @{show_name} {{[[d20+(@{attack4_to_hit})]]=[[d20+(@{attack4_to_hit})]]}} {{Damage=[[@{attack4_dmg}+0]] @{attack4_dmgtype} }} {{desc=@{attack4_special} }}")
-      input.ml15(name="attr_attack4" type="text" placeholder="attack/action name")
-    div
-      input.w40(name="attr_attack4_to_hit" type="text" placeholder="4")
-    div
-      input.w70.mr15(name="attr_attack4_dmg" type="text" placeholder="1d6")
-    div
-      input.w50(name="attr_attack4_dmgtype" type="text")
-    div
-      input.w50(name="attr_attack4_range" type="text")
-    div
-      input.w50(name="attr_attack4_reload" type="text")
-    div
-      input.w110.mr15(name="attr_attack4_special" type="text")
-    //- attack5
-    .rowflex.nowrap
-      button(name="roll_attack5" type="roll" title="%{attack5}" value="@{whisper}&{template:stargate} {{title=@{attack5}}} @{show_name} {{[[d20+(@{attack5_to_hit})]]=[[d20+(@{attack5_to_hit})]]}} {{Damage=[[@{attack5_dmg}+0]] @{attack5_dmgtype} }} {{desc=@{attack5_special} }}")
-      input.ml15(name="attr_attack5" type="text" placeholder="attack/action name")
-    div
-      input.w40(name="attr_attack5_to_hit" type="text" placeholder="4")
-    div
-      input.w70.mr15(name="attr_attack5_dmg" type="text" placeholder="1d6+@{td}")
-    div
-      input.w50(name="attr_attack5_dmgtype" type="text")
-    div
-      input.w50(name="attr_attack5_range" type="text")
-    div
-      input.w50(name="attr_attack5_reload" type="text")
-    div
-      input.w110.mr15(name="attr_attack5_special" type="text")
+    //- attacks 1 - 5
+    each num in [1, 2, 3, 4, 5]
+      .rowflex.nowrap
+        button(name=`roll_attack${num}` type="roll" title=`%{attack${num}}` value=`@{whisper}&{template:stargate} {{title=@{attack${num}}}} @{show_name} {{[[d20+(@{attack${num}_to_hit})]]=[[d20+(@{attack${num}_to_hit})]]}} {{Damage=[[@{attack${num}_dmg}+0]] @{attack${num}_dmgtype} }} {{desc=@{attack${num}_special} }}`)
+        input.ml15(name=`attr_attack${num}` type="text" placeholder="Sidearm(Beretta M9)")
+      div
+        input.w40(name=`attr_attack${num}_to_hit` type="text" placeholder="4")
+      div
+        input.w70.mr15(name=`attr_attack${num}_dmg` type="text" placeholder="1d6")
+      div
+        input.w50(name=`attr_attack${num}_dmgtype` type="text" placeholder="piercing")
+      div
+        input.w50(name=`attr_attack${num}_range` type="text" placeholder="50/100")
+      div
+        input.w50(name=`attr_attack${num}_reload` type="text" placeholder="15/1")
+      div
+        input.w110.mr15(name=`attr_attack${num}_special` type="text")
+
 //- ---------------------------------------------------------------------------------
 //- --------------------------- BACKGORUND ----------------------------------------------
 //- ---------------------------------------------------------------------------------
@@ -485,12 +277,12 @@ main.settings
     button.txt-btn(name="roll_help" type="roll" value="@{whisper}&{template:stargate} {{title=[(Link)Sheet Userguide](https://wiki.roll20.net/Stargate) }} {{subtitle=Roll20 Wiki}} {{desc=  (Right-click to open in a new tab)\n**Official Stargate RPG**\n**Roll20 Character Sheet**\n created by **Andreas J.**([@anduh_](https://twitter.com/anduh_)) }}") Sheet Documentation
     br
     h1 Changelog
-    label v.1.72 (June)
+    label "v.1.72 (June)"
     span
       |* code refactor
       br
       |       * page navigation made always visible
-    label v.1.70 (May)
+    label "v.1.70 (May)"
     span
       | * replace page buttons
       br
@@ -499,10 +291,10 @@ main.settings
       |       * refactor sheet in PUG &amp; SCSS
       br
       |       * update the sheet to work with CSE
-    label v.1.55(Nov. 3rd)
+    label "v.1.55(Nov. 3rd)"
     span
       | * more stats to track on Settings page
-    label v.1.50(Oct. 20th)
+    label "v.1.50(Oct. 20th)"
     span
       | * add Stargate Phoenix image to roll template
       br
@@ -523,18 +315,10 @@ main.settings
         span Stargaterpg.com character link
         input.w40(name="attr_cahracter_link" type="text" style="width:350px" placeholder="The url to your character sheet" value="")
     .ammo.grid
-      .section.columnflex.nowrap.middle.center
-        label Ammo Weapon 1
-        input(name="attr_ammo1" type="number" value="0")
-      .section.columnflex.nowrap.middle.center
-        label Ammo Weapon 2
-        input(name="attr_ammo2" type="number" value="0")
-      .section.columnflex.nowrap.middle.center
-        label Ammo Weapon 3
-        input(name="attr_ammo3" type="number" value="0")
-      .section.columnflex.nowrap.middle.center
-        label Ammo Weapon 4
-        input(name="attr_ammo4" type="number" value="0")
+      each num in ["1", "2", "3", "4"]
+        .section.columnflex.nowrap.middle.center
+          label="Ammo Weapon " + num
+          input(name=`attr_ammo${num}` type="number" value="0")
 //-    .rowflex.nowrap
 //-     span(title="@{npc}") NPC sheet?
 //-      input(name="attr_npc" title="@{npc}" type="checkbox" value="1")
