@@ -1,9 +1,35 @@
 
+//current sheet version
+const currentversion = "1.72";
+
 const int = score => parseInt(score, 10) || 0;
 
 const stats = ["str", "dex", "con", "wis", "int", "cha"];
 const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
 const statmods = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "prof"];
+
+// Sheet Version
+on("sheet:opened", function() {
+    getAttrs(["version", "sheettype"], function(v) {
+        const version = parseInt(v.version) || 0;
+        var attrs = {};
+
+        // get attribute updates for each version until the sheet has completed all steps
+        // NOTE: to maintain backwards compatibility with sheets predating the version attribute, all steps will be performed for new sheets
+        //if (version < currentversion) {
+        //    attrs["version"] = currentversion;
+        //}
+        
+        if (version < currentversion) {
+             attrs["version"] = currentversion;
+             console.log("Sheet updated to v." + currentversion);
+        }
+
+        if (Object.keys(attrs).length) {
+            setAttrs(attrs);
+        }
+    });
+});
 
 // tabs
 

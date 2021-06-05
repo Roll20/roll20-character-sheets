@@ -1,4 +1,5 @@
 
+<input type="hidden" name="attr_version" value="1.72"/>
 <div class="tab-buttons middle center">
   <input class="npctoggle" type="hidden" name="attr_npc" value="0"/>
   <button class="pc" type="action" name="act_character">Character</button>
@@ -480,9 +481,6 @@
         <option value=" ">No</option>
       </select>
     </div>
-    <div class="rowflex nowrap"><span title="@{npc}">NPC sheet?</span>
-      <input name="attr_npc" title="@{npc}" type="checkbox" value="1"/>
-    </div>
     <div class="rowflex nowrap">
       <button name="roll_hd" type="roll" title="%{hd}" value="@{whisper}&amp;{template:stargate} {{color=green}} {{title=Short Rest}} @{show_name} !modbattr --silent --name @{character_name} --hp|{{Healing=[[@{hd}]]}}!!! {{desc=One roll of the Hit Dice.}}">Short Rest</button>
       <button name="roll_longrest" type="roll" title="%{longrest}" value="@{whisper}&amp;{template:stargate} {{color=green}} {{title=Long Rest}} @{show_name}  !modbattr --silent --name @{character_name} --hp|{{Healing=[[@{rank}@{hd}]]}}!!! {{desc=Rolls a number of Hit Dice equal to the characters level, and recovers that amount of health. }}">Long Rest</button>
@@ -528,7 +526,7 @@
 **Roll20 Character Sheet**
  created by **Andreas J.**([@anduh_](https://twitter.com/anduh_)) }}">Sheet Documentation</button><br/>
     <h1>Changelog</h1>
-    <label>v.1.80 (June)</label><span>* Simple NPC page</span>
+    <label>v.1.71 (June)</label><span>* code refactor</span>
     <label>v.1.70 (May)</label><span>* replace page buttons<br/>      * add datalists for race, origin, class<br/>      * refactor sheet in PUG &amp; SCSS<br/>      * update the sheet to work with CSE</span>
     <label>v.1.55(Nov. 3rd)</label><span>* more stats to track on Settings page</span>
     <label>v.1.50(Oct. 20th)</label><span>* add Stargate Phoenix image to roll template<br/>      * integrate ChatSetAttr commands to Short/Long Rest buttons<br/>      * added whisper toggle to Saves<br/>      * Link to sheet wiki page (button on settings page)</span>
@@ -564,22 +562,6 @@
     </div>
   </div>
 </main>
-<rolltemplate class="sheet-rolltemplate-stargate">
-  <div class="sheet-container sheet-color-{{color}}">
-    <div class="sheet-header">{{#title}}
-      <div class="sheet-title">{{title}}<img class="sheet-phoenix" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Stargate-RPG/images/SG-phoenix.png" alt="Stargate Phoenix logo"/></div>{{/title}}
-            {{#subtitle}}
-      <div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
-    </div>
-    <div class="sheet-content">{{#allprops() title subtitle desc color}}
-      <div class="sheet-key">{{key}}</div>
-      <div class="sheet-value">{{value}}</div>      {{/allprops() title subtitle desc color}}
-            {{#desc}}
-      <div class="sheet-desc">{{desc}}</div>{{/desc}}
-    </div>
-  </div>
-</rolltemplate>
-<input type="hidden" name="attr_version" value="1.80"/>
 <datalist id="race">
   <option value="Aturen">Aturen</option>
   <option value="Noxian Pacifist">Noxian Pacifist</option>
@@ -625,12 +607,53 @@
 <input name="attr_wis_mod" type="hidden" value="+0"/>
 <input name="attr_int_mod" type="hidden" value="+0"/>
 <input name="attr_cha_mod" type="hidden" value="+0"/>
+<rolltemplate class="sheet-rolltemplate-stargate">
+  <div class="sheet-container sheet-color-{{color}}">
+    <div class="sheet-header">{{#title}}
+      <div class="sheet-title">{{title}}<img class="sheet-phoenix" src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Stargate-RPG/images/SG-phoenix.png" alt="Stargate Phoenix logo"/></div>{{/title}}
+            {{#subtitle}}
+      <div class="sheet-subtitle">{{subtitle}}</div>{{/subtitle}}
+    </div>
+    <div class="sheet-content">{{#allprops() title subtitle desc color}}
+      <div class="sheet-key">{{key}}</div>
+      <div class="sheet-value">{{value}}</div>      {{/allprops() title subtitle desc color}}
+            {{#desc}}
+      <div class="sheet-desc">{{desc}}</div>{{/desc}}
+    </div>
+  </div>
+</rolltemplate>
 <script type="text/worker">
+//current sheet version
+const currentversion = "1.72";
+
 const int = score => parseInt(score, 10) || 0;
 
 const stats = ["str", "dex", "con", "wis", "int", "cha"];
 const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
 const statmods = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "prof"];
+
+// Sheet Version
+on("sheet:opened", function() {
+    getAttrs(["version", "sheettype"], function(v) {
+        const version = parseInt(v.version) || 0;
+        var attrs = {};
+
+        // get attribute updates for each version until the sheet has completed all steps
+        // NOTE: to maintain backwards compatibility with sheets predating the version attribute, all steps will be performed for new sheets
+        //if (version < currentversion) {
+        //    attrs["version"] = currentversion;
+        //}
+        
+        if (version < currentversion) {
+             attrs["version"] = currentversion;
+             console.log("Sheet updated to v." + currentversion);
+        }
+
+        if (Object.keys(attrs).length) {
+            setAttrs(attrs);
+        }
+    });
+});
 
 // tabs
 

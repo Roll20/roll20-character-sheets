@@ -4,9 +4,9 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Quickstart/B
 
 ### Changelog
 
-**v.1.80(2021-06)**
-* Simple NPC sheet
+**v.1.72(2021-06)**
 * update in-sheet changelog
+* page navigation made always visible
 * refactor code
 
 **v.1.70(2021-05-04)**
