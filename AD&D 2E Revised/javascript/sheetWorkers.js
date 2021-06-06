@@ -674,6 +674,52 @@ function setupAddPriestSpell(postfix) {
 }
 // --- End setup for priest spells based on spheres --- //
 
+// --- Start setup rest buttons --- //
+function setupRest(longRest) {
+    
+    let rest = longRest ? 'long-rest' : 'short-rest'
+    on(`clicked:${rest}`, function () {
+        console.log('clicked!');
+        let sections = ['', '2', '3', 'wiz1'];
+        sections.forEach(section => {
+            let repSection;
+            let castField;
+            let memField;
+            if (isNewSpellSection(section)) {
+                repSection = `spells-${section}`;
+                castField = 'spell-cast-value';
+                memField = 'spell-memorized';
+            } else {
+                repSection = `spells${section}`;
+                castField = `cast-value${section}`;
+                memField = `cast-max${section}`;
+            }
+
+            let updateFunction;
+            if (longRest) {
+                updateFunction = (row) => {
+                    row.I[memField] = 0;
+                    row.I[castField] = 0;
+                }
+            } else {
+                updateFunction = (row) => {
+                    row.I[memField] = row.I[memField] - row.I[castField];
+                    row.I[castField] = 0;
+                }
+            }
+            console.log(updateFunction);
+
+            TAS.repeating(repSection)
+                .fields(castField, memField)
+                .each(updateFunction)
+                .execute();
+        });
+    });
+}
+setupRest(false);
+setupRest(true);
+// --- End setup rest buttons --- //
+
 let wizardSpellLevelsSections = [
     {level: 1, sections: ['', '2', '3', 'wiz1']},
     {level: 2, sections: ['4', '5', '6', 'wiz2']},
