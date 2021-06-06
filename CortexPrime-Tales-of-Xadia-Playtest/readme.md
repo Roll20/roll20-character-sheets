@@ -36,6 +36,10 @@ Artwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.
 
 ##Changelog
 
+### v.1.5 2021-06-02
+
+Added further Pre-Gen characters.
+
 ### v.1.4 2021-05-26
 
 Added further Pre-Gen characters.
