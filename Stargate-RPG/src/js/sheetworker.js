@@ -1,13 +1,39 @@
 
+//current sheet version
+const currentversion = "1.72";
+
 const int = score => parseInt(score, 10) || 0;
 
 const stats = ["str", "dex", "con", "wis", "int", "cha"];
 const skillslist = ["acrobatics", "animalhandling", "athletics", "culture", "deception", "engineering", "history", "insight", "intimidation", "investigation", "medicine", "nature", "perception", "performance", "persuasion", "pilot", "science", "sleight", "stealth", "survival"];
 const statmods = ["str_mod", "dex_mod", "con_mod", "wis_mod", "int_mod", "cha_mod", "prof"];
 
+// Sheet Version
+on("sheet:opened", function() {
+    getAttrs(["version", "sheettype"], function(v) {
+        const version = parseInt(v.version) || 0;
+        var attrs = {};
+
+        // get attribute updates for each version until the sheet has completed all steps
+        // NOTE: to maintain backwards compatibility with sheets predating the version attribute, all steps will be performed for new sheets
+        //if (version < currentversion) {
+        //    attrs["version"] = currentversion;
+        //}
+        
+        if (version < currentversion) {
+             attrs["version"] = currentversion;
+             console.log("Sheet updated to v." + currentversion);
+        }
+
+        if (Object.keys(attrs).length) {
+            setAttrs(attrs);
+        }
+    });
+});
+
 // tabs
 
-const buttonlist = ["character","background","settings"];
+const buttonlist = ["character","background","npc","settings"];
 buttonlist.forEach(button => {
     on(`clicked:${button}`, function() {
         setAttrs({
@@ -16,7 +42,34 @@ buttonlist.forEach(button => {
     });
 });
 
+on("sheet:opened", function() {
 
+  getAttrs(["npc", "sheetTab"], values => {
+
+    let npc = int(values["npc"]);
+    let sheetTab = values["sheetTab"];
+    console.log("sheetTab: ", sheetTab);
+    //let page = "character";
+
+    if (sheetTab === "character"){
+      npc = 0;
+      console.log("sheetTab was char, set NPC=0: ", npc);
+    }
+    else if (sheetTab === "npc"){
+      npc = 1;
+      console.log("sheetTab was npc, set NPC=1: ", npc);
+    }
+    else if (sheetTab === "background"){
+      console.log("sheetTab was note");
+    }
+    else if (sheetTab === "settings"){
+      console.log("sheetTab was settings");
+    }
+    setAttrs({
+        npc: npc
+    });
+  });
+});
 // Calculate Stat modifier
 
 stats.forEach(stat => {
