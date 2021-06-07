@@ -1,0 +1,94 @@
+//- functions
+- var N = number => [...Array(number+1).keys()].slice(1)
+//- {{title=${key.charAt(0).toUpperCase()}${key.slice(1)} Check}} 
+- var cap = word => word.charAt(0).toUpperCase() + word.slice(1)
+//- variables
+- var skills = ["combat", "craft", "lore", "physical", "social", "sorcery", "stealth"];
+//- mixin
+//- sheet start
+main
+  //-  name 
+  section.name.flex-row
+    span.border.flex-col
+      span(data-i18n="name") Name
+      input.bold(type="text", name="attr_character_name")
+    span.border.flex-col
+      span(data-i18n="heritage") heritage
+      input(name="attr_heritage", type="text", list="heritage")
+    span.border.flex-col
+      span(data-i18n="endurance") endurance
+      input(name="attr_endurance", type="number")
+    span.border.flex-col
+      span(data-i18n="lifeblood") lifeblood
+      input(name="attr_lifeblood", type="number")
+    span.border.flex-col.pad
+      span(data-i18n="fatigued-") Fatigued?
+      input(name="attr_fatigue", type="checkbox", value="1")
+    span.border.pad
+      span(data-i18n="hero-points") hero points
+      input(name="attr_heropoints", type="number")
+    span.border.flex-col
+      span(data-i18n="player") Player
+      input(name="attr_player_name", type="text")
+  //- skills
+  section.skills.flex-col
+    label(data-i18n="skills") skills
+    each skill in skills
+      .section.flex-row
+        input.txtfield.warn-missing(type="number", name=`attr_${skill}`, placeholder="0")
+        button.blank(name=`roll_${skill}`, type="roll", value=`&{template:rolls} {{title=${cap(skill)}}} {{subtitle=@{character_name} }} {{color=black}} {{^{roll-i18n}=[[ [[2d6]]+@{${skill}} ]]}} {{baseroll=$[[0]]}}`)
+          span(data-i18n=`${skill}`)= skill
+  section.border.traits
+    label(for, data-i18n="traits") traits
+    textarea.iflex(name="attr_traits", value)
+  //- combat
+  section.combat
+    .flex-row.section
+      button.d6(name="roll_", type="roll", value="&{template:rolls} {{title=^{initiative} }} {{subtitle=@{character_name} }} {{color=black}} {{^{roll-i18n}[[2d6+(@{combat} &{tracker}]]}}")
+        span(data-i18n="initative") Initiative
+      .armor.border
+        label(for, data-i18n="armor") armor
+        input(name="attr_armorname", type="text")
+        input(name="attr_armor", type="number")
+    .border.grid-weapon
+      span
+      span(data-i18n="weapons") weapons
+      span(data-i18n="range") range
+      span.damage(data-i18n="damage") damage
+      span(data-i18n="notes") notes
+      //- 5 weapons
+      each n in N(5)
+        button.d6(name=`roll_weapon${n}`, type="roll", value=`&{template:rolls} {{title=^{weapon}: @{wpn${n}name} }} {{color=black}} {{subtitle=@{character_name} }} {{color=black}} {{^{range}= @{wpn${n}range} }}  {{^{roll-i18n}=[[ [[2d6]]+@{combat} ]]}} {{baseroll=$[[0]]}} {{^{damage}= [[@{wpn${n}dmg}6]] }}`)
+        input.weapon-name(name=`attr_wpn${n}name`, type="text")
+        input.dmg(name=`attr_wpn${n}range`, type="text")
+        input.dmg(name=`attr_wpn${n}dmg`, placeholder="2d", type="text")
+        input.weapon-notes(name=`attr_wpn${n}notes`, type="text")
+  section.border.equip
+    label(for, data-i18n="equipment") equipment
+    textarea.iflex(name="attr_equipment", value)
+  section.border.sorcery
+    label(for, data-i18n="sorcery-notes") sorcery/notes
+    textarea.iflex(name="attr_sorcery", value)
+  //- xp
+  section.xp.flex-col
+    label(data-i18n="xp") XP
+    span(data-i18n="experienced") experienced
+    div
+      each n in N(5)
+        input(type="checkbox", name=`attr_experienced${n}`, value="1")
+    span(data-i18n="expert") expert
+    div
+      each n in N(5)
+        input(type="checkbox", name=`attr_expert${n}`, value="1")
+    span(data-i18n="master") master
+    div
+      each n in N(5)
+        input(type="checkbox", name=`attr_master${n}`, value="1")
+    span(data-i18n="grandmster") grandmster
+    div
+      each n in N(5)
+        input(type="checkbox", name=`attr_grandmaster${n}`, value="1")
+    span(data-i18n="legend") legend
+    div
+      each n in N(5)
+        input(type="checkbox", name=`attr_legend${n}`, value="1")
