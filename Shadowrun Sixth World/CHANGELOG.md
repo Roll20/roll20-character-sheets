@@ -1,5 +1,9 @@
 Change Log
 ==============================================
+**2021-06-07 ** v.35 Chuz (James Culp)
+	Added Matrix AR and Matrix DR to Host sheet
+**2021-05-25 ** v.34 Chuz (James Culp)
+	Bugfix - Changed HTML top display the nuyen symbol instead of translations as the character was breaking the translation stuff
 **2021-05-17 ** v.33 Chuz (James Culp)
 	Bugfix - PC->Grenades launched grenades didn't work properly
 	Bugfix - Nuyen symbol keeps disappearing, another attempt to lock it in

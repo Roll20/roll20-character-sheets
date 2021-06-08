@@ -11,6 +11,11 @@ head over to our [Discord](https://discord.gg/rc9Fwgp9qv) to learn more.
 + make a changelog page
 + add a crit table (reuse the righteous fury)
 + weapons qualities and traits
++ any chance you could update the Sustain rules on Psykana to be fixed?
+  It only recognises 1 power and uses the wrong numbers
+  #📜︱imperial-rules-bulletin Psyker Rules has the new stuff for it
+  basically, -10 per Power on Focus and +10 per Power on Phenomena
+  Hmm, actually, it changes around a bit based on rank...
 
 #### v 0.1.4 Inventory update
 + fixed accurate damage

@@ -1980,7 +1980,11 @@
             <label data-i18n-title="tradition" title="tradition">
             	<select name='attr_tradition' title='@{tradition}'>
             		<option data-i18n="hermeticism" value="Hermeticism">Hermeticism</option>
+            		<option data-i18n="hermeticism-intuition" value="Hermeticism (Intuition)">Hermeticism (Intuition)</option>
+            		<option data-i18n="hermeticism-charisma" value="Hermeticism (Charisma)">Hermeticism (Charisma)</option>
             		<option data-i18n="shamanism" value="Shamanism">Shamanism</option>
+            		<option data-i18n="shamanism-logic" value="Shamanism (Logic)">Shamanism (Logic)</option>
+            		<option data-i18n="shamanism-intuition" value="Shamanism (Intuition)">Shamanism (Intuition)</option>
             	</select>
             </label>
             <h2 data-i18n="magicar">Magic AR</h2>
@@ -3602,11 +3606,12 @@
 
     <div class="column">
 
-      <div class="rows sprite host">
-        <button data-i18n="attackrating" name="roll_ar" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{attackrating} = ^{attack} + ^{sleaze}}}{{rating=[[@{attack}+@{sleaze}]]}}">attackrating</button>
+
+		<div class="rows sprite host">
+        <button data-i18n="attackrating" name="roll_ar" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{attackrating} = ^{attack} + ^{sleaze}}}{{rating=[[@{attack}+@{sleaze}]]}}">attackrating</button> <span name="attr_matrix_attack_rating"></span>
       </div>
       <div class="rows sprite host">
-        <button data-i18n="defenserating" name="roll_dr" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defenserating} = ^{data_processing} + ^{firewall}}}{{rating=[[@{data_processing}+@{firewall}]]}}{{wilddie=[[@{wild_die}d6]]}}">defenserating</button>
+        <button data-i18n="defenserating" name="roll_dr" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defenserating} = ^{data_processing} + ^{firewall}}}{{rating=[[@{data_processing}+@{firewall}]]}}{{wilddie=[[@{wild_die}d6]]}}">defenserating</button> <span name="attr_matrix_defense_rating"></span>
       </div>
       <div class="rows grunt spirit">
         <button data-i18n="defenserating" name="roll_dr" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{defenserating}}}{{rating=@{defense_rating}}}">defenserating</button>
@@ -5195,7 +5200,7 @@
 <input type="hidden" name="attr_throwingweapons" value="0" />
 <input type="hidden" name="attr_tracking" value="0" />
 <input type="hidden" name="attr_unarmedcombat" value="0" />
-<input type="hidden" name="attr_sheet_version" value="0.34">
+<input type="hidden" name="attr_sheet_version" value="0.35">
 
 <script type="text/worker">
 //Sheet workers
@@ -5460,15 +5465,29 @@ on("change:essence_mod remove:repeating_augmentations change:repeating_augmentat
 
 // Catch changes to magic, tradition, logic or charisma to update magic AR
 on("change:magic change:tradition change:logic change: charisma", (eventinfo) => {
-	getAttrs(["magic", "tradition", "logic", "charisma"], (v) => {
+	getAttrs(["magic", "tradition", "logic", "intuition", "charisma"], (v) => {
 		var magic_ar = v.magic;
 
 		switch(v.tradition) {
+			case "Hermeticism (Logic)":
 			case "Hermeticism":
 				magic_ar += v.logic;
 				break;
+			case "Hermeticism (Intuition)":
+				magic_ar += v.intuition;
+				break;
+			case "Hermeticism (Charisma)":
+				magic_ar += v.charisma;
+				break;
+			case "Shamanism (Charisma)":
 			case "Shamanism":
 				magic_ar += v.charisma;
+				break;
+			case "Shamanism (Logic)":
+				magic_ar += v.logic;
+				break;
+			case "Shamanism (Intuition)":
+				magic_ar += v.intuition;
 				break;
 			default:
 				magic_ar = 0;
@@ -5604,7 +5623,7 @@ on("sheet:opened change:attack change:sleaze", (eventInfo) => {
 		const attack = v['attack'] || 0;
 		const sleaze = v['sleaze'] || 0;
 		setAttrs({
-			matrix_attack_rating: parseInt(attack + sleaze)
+			matrix_attack_rating: parseInt(attack) + parseInt(sleaze)
 		});
 	});
 });
@@ -5615,7 +5634,7 @@ on("sheet:opened change:data_processing change:firewall", (eventInfo) => {
 		const data_processing = v['data_processing'] || 0;
 		const firewall = v['firewall'] || 0;
 		setAttrs({
-			matrix_defense_rating: parseInt(data_processing + firewall)
+			matrix_defense_rating: parseInt(data_processing) + parseInt(firewall)
 		});
 	});
 });
