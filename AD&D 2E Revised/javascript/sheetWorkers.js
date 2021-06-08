@@ -675,12 +675,19 @@ function setupAddPriestSpell(postfix) {
 // --- End setup for priest spells based on spheres --- //
 
 // --- Start setup rest buttons --- //
-function setupRest(longRest) {
-    
-    let rest = longRest ? 'long-rest' : 'short-rest'
-    on(`clicked:${rest}`, function () {
+function resetSpentSlots(row, memField, castField) {
+    row.I[memField] = row.I[memField] - row.I[castField];
+    row.I[castField] = 0;
+}
+
+function resetAllSlots(row, memField, castField) {
+    row.I[memField] = 0;
+    row.I[castField] = 0;
+}
+
+function setupSpellSlotsReset(buttonName, sections, updateFunction) {
+    on(`clicked:${buttonName}`, function () {
         console.log('clicked!');
-        let sections = ['', '2', '3', 'wiz1'];
         sections.forEach(section => {
             let repSection;
             let castField;
@@ -695,29 +702,17 @@ function setupRest(longRest) {
                 memField = `cast-max${section}`;
             }
 
-            let updateFunction;
-            if (longRest) {
-                updateFunction = (row) => {
-                    row.I[memField] = 0;
-                    row.I[castField] = 0;
-                }
-            } else {
-                updateFunction = (row) => {
-                    row.I[memField] = row.I[memField] - row.I[castField];
-                    row.I[castField] = 0;
-                }
-            }
             console.log(updateFunction);
 
             TAS.repeating(repSection)
                 .fields(castField, memField)
-                .each(updateFunction)
+                .each(function(row) {
+                    updateFunction(row, memField, castField);
+                })
                 .execute();
         });
     });
 }
-setupRest(false);
-setupRest(true);
 // --- End setup rest buttons --- //
 
 let wizardSpellLevelsSections = [
@@ -782,7 +777,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
 });
 // --- End setup Spell Slots --- //
 
-// --- Start setup Spell Points, Arc, and Wind --- //
+// --- Start setup Spell Points, Arc, and Wind. Also setups reset buttons --- //
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
@@ -791,6 +786,8 @@ setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${
 setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
 setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
+setupSpellSlotsReset('reset-spent-slots-wiz', allWizardSpellSections, resetSpentSlots);
+setupSpellSlotsReset('reset-all-slots-wiz', allWizardSpellSections, resetAllSlots);
 
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
@@ -800,6 +797,8 @@ setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${
 setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
+setupSpellSlotsReset('reset-spent-slots-pri', allPriestSpellSections, resetSpentSlots);
+setupSpellSlotsReset('reset-all-slots-pri', allPriestSpellSections, resetAllSlots);
 // --- End setup Spell Points, Arc, and Wind --- //
 
 // --- Start setup Granted Powers --- //
