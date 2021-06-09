@@ -4112,8 +4112,6 @@ NOTE: replace worker by javascript for IDE functionality
                         attr = {...attr, ...skillRoll(skill.replace('_char', ''), focus)};
                     }
                     if (attr) setAttrs(attr);
-                    console.table(values)
-                    console.table(attr)
                 });
             });
         });
@@ -4492,6 +4490,7 @@ NOTE: replace worker by javascript for IDE functionality
             idArray.forEach(id => fieldset_quantity.push (`repeating_gear_${id}_gear_quantity_r`));
             idArray.forEach(id => fieldset_carry.push (`repeating_gear_${id}_gear_carry_r`));
             getAttrs(['M_weapon_weight_t','R_weapon_weight_t','weight_total', 'gear_carry', 'gear_weight', 'gear_quantity', ...fieldset_weight, ...fieldset_quantity, ...fieldset_carry], v => {
+				//console.table(v)
                 const getValue = (id, field) => parseFloat(v[`repeating_gear_${id}_${field}`]) || 0
                 const weight_base = parseFloat(v.gear_weight) * parseFloat(v.gear_quantity) * parseFloat(v.gear_carry)
                 const weight_repeating = idArray.reduce((total, id) => total + (getValue(id, 'gear_weight_r') * getValue(id, 'gear_quantity_r') * getValue(id, 'gear_carry_r')), 0)
@@ -4693,14 +4692,14 @@ NOTE: replace worker by javascript for IDE functionality
     const getSectionObjects = function (section, fields, callback) {
         if (!Array.isArray(fields)) fields = [fields];
         getSectionIDs(`repeating_${section}`, idArray => {
-            const attrArray = idArray.reduce( (m,id) => [...m, ...(Object.values(fields).map(field => `repeating_${section}_${id}_${field}`))],[]);
+            const attrArray = idArray.reduce( (m,id) => [...m, ...(Object.values(fields).map(field => `repeating_${section}_${id}_${(Array.isArray(field) ? field[1] : field)}`))],[]);
             getAttrs(attrArray, v => {
                 const objects = [];
                 idArray.forEach(id => {
                     let obj = { _id : id, _source: `repeating_${section}_${id}` };
-                    for (var property in fields) {
-                        obj[property] = v[`repeating_${section}_${id}_${fields[property]}`]
-                    }
+                    fields.forEach( field => {
+                        obj[field[0]] = v[`repeating_${section}_${id}_${field[1]}`]
+                    })
                     objects.push(obj)
                 });
                 callback(objects);
@@ -4902,10 +4901,10 @@ NOTE: replace worker by javascript for IDE functionality
     on('sheet:opened', () => {
         getAttrs(oldVariables, values => {
             var attributes = {} 
-            let gear = {carry: values['gear_carry'], name: values['gear_name'], craft: values['gear_crafts'], quantity: values['gear_quantity'], avail: values['gear_avail'], weight: values['gear_weight'], desc: values['gear_desc']}
+            let gear = {carry: values['gear_carry'], name: values['gear_name'], craftsmanship: values['gear_crafts'], quantity: values['gear_quantity'], avail: values['gear_avail'], weight: values['gear_weight'], desc: values['gear_desc']}
             if (!gear.name == '') attributes = {...attributes, ...mapGear(gear)}
             console.table(gear)
-            console.log(attributes)
+            console.table(attributes)
         })
     })
 
