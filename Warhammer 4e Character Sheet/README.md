@@ -73,7 +73,7 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 ///// ============ Change Log ============ ///// 
 
-May 24th 2021 v1.4
+June 14th 2021 v1.4
 
 - Unified Roll target number tooltips, to clearly show the roll componenets.
 - Rework of condition system, which now scales fully with all PC/NPC rolls and immidately modifes all roll target windows on the skills tabs.
