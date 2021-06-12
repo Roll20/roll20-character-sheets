@@ -1,5 +1,8 @@
 # Troika Roll20 Character Sheet
 ## Changelog
+### Version 1.02 - David Janning
+- Bugfix: Add 'text' type to name and background input
+- Bugfix: Removed CSS Vars as they stopped working in Sandbox Mode
 ### Version 1.01 - David Janning
 - Rebuilt using PugJS and Sass.
 - Updated the styling

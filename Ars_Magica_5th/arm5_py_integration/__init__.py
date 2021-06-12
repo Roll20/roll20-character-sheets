@@ -392,7 +392,7 @@ with open(Path(__file__).parent / "css_colors.csv", newline="") as f:
             f"    --roll-bg-color: {color_def['hex']};",
         ]
         lines_buttons = [
-            f".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-rlcolor-{color_def['color']} a {{",
+            f".sheet-rolltemplate-custom .sheet-crt-container.sheet-crt-btcolor-{color_def['color']} a {{",
             f"    --button-bg-color: {color_def['hex']};",
         ]
 

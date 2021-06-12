@@ -74,6 +74,10 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 ///// ============ Change Log ============ ///// 
 
+April 5th 2021 v1.35
+
+- Added Max corruption modifier to allow for Pure Soul and other effects to be integrated in the sheet.
+
 
 February 1st 2021 v1.34
 

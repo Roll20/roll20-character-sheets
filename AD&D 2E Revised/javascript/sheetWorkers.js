@@ -476,14 +476,13 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 
 function setupAutoFillSpellInfo(section, spellsTable) {
     if (spellsTable[section]) {
-        on(`change:repeating_spells-${section}:spell-select`, function(eventInfo){
+        on(`change:repeating_spells-${section}:spell-name`, function(eventInfo){
 
             let spell = spellsTable[section][eventInfo.newValue];
-            if (spell === undefined)
+            if (spell === undefined) 
                 return;
 
             let spellInfo ={
-                [`repeating_spells-${section}_spell-name`]         : spell['name'],
                 [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
                 [`repeating_spells-${section}_spell-level`]        : spell['level'],
                 [`repeating_spells-${section}_spell-school`]       : spell['school'],
@@ -669,6 +668,23 @@ setupRepeatingRowCalculateTotal('crnoarmort', ['crt', 'crnoarmorb'], 'customrogu
 setupRepeatingRowCalculateTotal('crarmort', ['crt', 'crarmorp'], 'customrogue');
 // --- End setup Rogue skills total --- //
 
+//Rogue armor modifier auto fill
+on('change:armorname', function(eventInfo) {
+    let armor = rogueArmor[eventInfo.newValue];
+    if (armor === undefined)
+        return;
+    
+    let armorModifiers = {
+        'pparmorp': armor['Pick Pockets'],
+        'olarmorp': armor['Open Locks'] || '-0',
+        'rtarmorp': armor['Find/Remove Traps'] || '-0',
+        'msarmorp': armor['Move Silently'] || '-0',
+        'hsarmorp': armor['Hide in Shadows'] || '-0',
+        'dnarmorp': armor['Detect Noise'],
+        'cwarmorp': armor['Climb Walls'],
+    };
+    setAttrs(armorModifiers);
+});
 //Rogue Custom Skills level sum
 on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
@@ -701,6 +717,159 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
+function getWeaponWithBonus(weaponName) {
+    if (!weaponName)
+        return undefined;
+    
+    let baseWeapon = weapons[weaponName];
+    if (baseWeapon !== undefined) {
+        return {
+            ...baseWeapon,
+            bonus: '0'
+        };
+    }
+    
+    let match = weaponName.match(/\+[0-9]+$/);
+    if (!match)
+        return undefined;
+    
+    let split = weaponName.split('+');
+    baseWeapon = weapons[split[0].trim()];
+    let bonus = parseInt(split[1].trim());
+    if (split.length !== 2 || baseWeapon === undefined || isNaN(bonus))
+        return undefined;
+    
+    let weaponWithBonus = {
+        ...baseWeapon,
+        'speed' : Math.max(baseWeapon['speed'] - bonus, 1),
+        'bonus' : `+${bonus}`
+    }
+    return weaponWithBonus;
+}
+
+//melee hit autofill
+on('change:repeating_weapons:weaponname', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons_attackadj'      : weapon['bonus'],
+        'repeating_weapons_range'          : 'Melee',
+        'repeating_weapons_size'           : weapon['size'],
+        'repeating_weapons_weapspeed'      : weapon['speed'],
+        'repeating_weapons_weaptype-slash' : weapon['type'].includes('S') ? 1 : 0,
+        'repeating_weapons_weaptype-pierce': weapon['type'].includes('P') ? 1 : 0,
+        'repeating_weapons_weaptype-blunt' : weapon['type'].includes('B') ? 1 : 0,
+    };
+    
+    setAttrs(weaponInfo);
+});
+
+//melee damage autofill
+on('change:repeating_weapons-damage:weaponname1', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons-damage_damadj'    : weapon['bonus'],
+        'repeating_weapons-damage_damsm'     : weapon['small-medium'],
+        'repeating_weapons-damage_daml'      : weapon['large'],
+        'repeating_weapons-damage_knockdown1': weapon['knockdown'] || ''
+    };
+
+    setAttrs(weaponInfo);
+});
+
+//range hit autofill
+on('change:repeating_weapons2:weaponname2', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons2_strbonus2'       : weapon['strength'] ? 1 : 0,
+        'repeating_weapons2_attacknum2'      : weapon['rof'] || '',
+        'repeating_weapons2_attackadj2'      : weapon['bonus'],
+        'repeating_weapons2_range2'          : weapon['range'] || '',
+        'repeating_weapons2_size2'           : weapon['size'],
+        'repeating_weapons2_weapspeed2'      : weapon['speed'],
+        'repeating_weapons2_weaptype-slash2' : weapon['type'].includes('S') ? 1 : 0,
+        'repeating_weapons2_weaptype-pierce2': weapon['type'].includes('P') ? 1 : 0,
+        'repeating_weapons2_weaptype-blunt2' : weapon['type'].includes('B') ? 1 : 0,
+    };
+
+    setAttrs(weaponInfo);
+});
+
+//range damage autofill
+on('change:repeating_ammo:ammoname', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        'repeating_weapons2_strbonus3'       : weapon['strength'] ? 1 : 0,
+        'repeating_ammo_damadj2'             : weapon['bonus'],
+        'repeating_ammo_damsm2'              : weapon['small-medium'],
+        'repeating_ammo_daml2'               : weapon['large'],
+        'repeating_weapons-damage_knockdown2': weapon['knockdown'] || ''
+    };
+
+    setAttrs(weaponInfo);
+});
+
+//Follower weapons
+function setupFollowerWeaponsAutoFill(repeating, sections) {
+    let prefix = '';
+    let onChange = ''; 
+    if (repeating !== '') {
+        prefix = `repeating_${repeating}_`
+        onChange = `repeating_${repeating}:`
+    }
+    
+    sections.forEach(section => {
+        on(`change:${onChange}weaponnamehench${section}`, function(eventInfo) {
+            let weapon = getWeaponWithBonus(eventInfo.newValue);
+            if (weapon === undefined)
+                return;
+            
+            let weaponInfo = {
+                [`${prefix}attacknumhench${section}`] : weapon['rof'] || '1',
+                [`${prefix}attackadjhench${section}`] : weapon['bonus'],
+                [`${prefix}damadjhench${section}`]    : weapon['bonus'],
+                [`${prefix}damsmhench${section}`]     : weapon['small-medium'],
+                [`${prefix}damlhench${section}`]      : weapon['small-medium'],
+                [`${prefix}rangehench${section}`]     : weapon['range'] || 'Melee',
+                [`${prefix}weaptypehench${section}`]  : weapon['type'],
+                [`${prefix}weapspeedhench${section}`] : weapon['speed'],
+            };
+            
+            setAttrs(weaponInfo);
+        })
+    })
+}
+
+const followerWeapons = [
+    {repeating: '',       sections: ['',    '001', '002']},
+    {repeating: 'hench',  sections: ['003', '004', '005']},
+    {repeating: '',       sections: ['006', '007', '008']},
+    {repeating: 'hench2', sections: ['009', '010', '011']},
+    {repeating: '',       sections: ['012', '013', '014']},
+    {repeating: 'hench3', sections: ['015', '016', '017']},
+    {repeating: '',       sections: ['018', '019', '020']},
+    {repeating: 'hench4', sections: ['021', '022', '023']},
+    {repeating: '',       sections: ['024', '025', '026']},
+    {repeating: 'hench5', sections: ['027', '028', '029']},
+    {repeating: '',       sections: ['030', '031', '032']},
+    {repeating: 'hench6', sections: ['033', '034', '035']},
+];
+
+followerWeapons.forEach(fw => {
+   setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
+});
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
@@ -710,6 +879,18 @@ on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', func
 on('change:repeating_profs:profslots remove:repeating_profs', function(){
 
     TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
+});
+//Nonweapon proficiency autofill
+on('change:repeating_profs:profname', function (eventInfo) {
+    let nonweaponProficiency = NonweaponProficiencies[eventInfo.newValue];
+    if (nonweaponProficiency === undefined)
+        return;
+    
+    setAttrs({
+        'repeating_profs_profslots'  : nonweaponProficiency['slots'],
+        'repeating_profs_profstatnum': nonweaponProficiency['abilityScore'],
+        'repeating_profs_profmod'    : nonweaponProficiency['modifier'],
+    });
 });
 
 //Equipment Carried Section
