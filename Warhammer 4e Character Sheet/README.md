@@ -8,7 +8,7 @@ This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet
 This Character Sheet has been updated to fix and enhance mostly in the original style. And uploaded to Roll20 for all to use. 
 I'm a active WFRP player and I plan to further enhance this sheet at time goes on.
 
-This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accompilshed by a combination of manual configuation for each character, as every character is different, and a highly integrated and standardized roll template. There is also some TEW companion rule integration but its minor.
+This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accompilshed by a combination of manual configuation for each character, as every character is different, and a highly integrated and standardized roll template. There is also some TEW companion rule integration.
 
 My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip
 
@@ -20,11 +20,13 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 
 - Skill system, Basic / Advanced Skill List is fully implemented.
 
-- Roll outcome modifier fields allowing Talent Test modifiers to be addded to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which just records what talent have been learned. avialable for all PC combat and skill rolls.
+- Roll outcome modifier fields allowing Talent Test modifiers to be addded to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which only records what talent have been learned. Available for PC combat and skill rolls, but not on the NPC tab due to perforance issues.
+
+- Sheet Integrated Critical/Oops/Mutation/Misscast and Wrath of the Gods tables.
 
 - Armor and Damage absorbtion system with Enc, AP, Durable, Damage, Damage point & Robust Talent tracking.
 
-- Magic system with seperate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modiferes (like, atheryic attunement and instictive diction) including miscast management.
+- Magic system with seperate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modiferes (like, atheryic attunement and instictive diction) and including miscast management and clickies in the roll template output.
 
 - Intergated SL results for all rolls, which aids in the manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self calcualted approach while providing the maximum possible information.)
 
@@ -40,10 +42,10 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 
 ///// ============ Usage Notes ============ ///// 
 
-- SETTINGS: Check setting (cog) tab ever time when setting up any new Char sheet for all players, and select correct options for your game.
+- Settings: Check setting (cog) tab ever time when setting up any new Char sheet for all players, and select correct options for your game.
 - Wounds: ensure correct Race and Hardy level are chosen. Wounds are subtracted by adding damage, and given back by subtracting it. Wounds can not exceed Max Wounds limit.
-- Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge) automatically, and shows i the roll result.
-- For an advanced Skill you must select the taken checkbox in order for target to be above 0.
+- Advantage Field applied to Attacks and appropriate Combat Skills (Cool & Dodge) automatically, and shows in the roll template output.
+- For an advanced Skill you must select the taken checkbox in order for target to go above 0.
 - Adv fields add advance point to skills, this value are automatically added to the roll target as SKILL.
 - Weapons/Spells Mod fields, allow players to pre-populate the roll modifier popup box and is only avialble with .
 - Weapons/Spells Target fields, display the final roll target including all variables calculated by the sheet at that momment, e.g. CHAR + SKILL + MOD + ADVANTAGE - CONDITIONS.
@@ -51,28 +53,40 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 - Themes, see setting tab for various theme which change the look of the char sheet overall. Inclung Emprie/Dwarf & Elf themes.
 - Extended Channelling Test (spellbook tab, Arcane Spells only), set Accu Ext SL to 0 before beginning a new Channelling action. Increment with Success level of roll until finished. Allows easy tracking of CN v Accu Ext SL for all players.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage ingration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommed seperate character sheet for actual NPC bosses/major characters). 
-- Condition Tracking integration into roll template, first pass. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. 
+- Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stuned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too. 
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens  (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip) due to naming convention.
+This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v2 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip) due to naming convention.
 
-It should be noted that some conditons can we highly situational, like Perception test could be impacted by Blinded/Deafened or not depending on what is being perceived, such situational occasions will have to be handled by the GM and no attempt to add complication is made. 
+Condition effects are currently hard coded as follows (updated May 24th 2021):
 
-Condition effects are currently hard coded as follows:
+Broken/Fatigued/Poisoned/Stunned = Effects all roll tests (this excludes non test rolls and roll tables like Initiative/Misscast/Crit/Oops etc.).
+Entangled/Prone = Effects all combat/spellcast, and any skill that would require movement like dodge/athletics/climb etc. Includes WS/BS/S/AGI/DEX rolls
+Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. incluing WS/BS/S/AGI/DEX rolls.
+Deafened = Not included in automated conditions due to being too cirmculstancial. GM should determine when penalty apply.
+Unconscious = Effects all rolls except endurance (Blocks rolling acitons essentially)
 
-Broken/Fatigued/Poisoned/Stunned = Effects all Melee/Spellcast and skill rolls (only excludes roll tables like Misscast/Oops etc.)
-Entangled/Prone = Effects Movement based rolls, all Melee/Spellcast, combat actions and any skill which would require movement like dodge/athletics/climb etc.
-Blinded/Deafened = Effects Weapon & Spells casts rolls
-Unconscious = Effects all rolls except endurance (Roll block essentially)
-
-Prayers are effected by Fatigued/Poisoned only for now. (v1.32)
-
-Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When thisoccurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had the Fatigued and Prone Conditions, you would suffer a –20 penalty to all active Tests, not –30.
+Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When this occurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had 3 Fatigued and 2 Broken Conditions, you would suffer a –30 penalty to all active Tests, not –20.
 
 Note conditions are not inteneded for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll.
 
 
 
 ///// ============ Change Log ============ ///// 
+
+May 24th 2021 v1.4
+
+- Unified Roll target number tooltips, to clearly show the roll componenets.
+- Rework of condition system, which now scales fully with all PC/NPC rolls and immidately modifes all roll target windows on the skills tabs.
+
+Condition effects are now hard coding changed:
+
+Broken/Fatigued/Poisoned/Stunned = Effects all roll tests (this excludes non test rolls and roll tables like Initiative/Misscast/Crit/Oops etc.).
+Entangled/Prone = Effects all combat/spellcast, and any skill that would require movement like dodge/athletics/climb etc. Includes WS/BS/S/AGI/DEX rolls
+Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. incluing WS/BS/S/AGI/DEX rolls.
+Deafened = Not included in automated conditions due to being too cirmculstancial. GM should determine when penalty apply.
+Unconscious = Effects all rolls except endurance (Blocks rolling acitons essentially)
+
+
 
 April 5th 2021 v1.35
 
@@ -325,7 +339,6 @@ Future release wish list :
 - Optional integrated Fast SL, this has been request a number of times, but it's hard to implement a secondary SL system. (maybe)
 - More themes. (v1.4)
 - WFRP 4e Roll API, fully integrated. This is the dream, very hard to do.. (x.x)
-
 
 
 Enjoy.
