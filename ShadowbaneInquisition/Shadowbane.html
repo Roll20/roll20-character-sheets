@@ -1,10 +1,6 @@
 <!-- Every fieldset requires to be of class repeating_[word1word2]. -->
 <!-- Every fieldset requires its named element to be of attr_ prefix. -->
-<input 
-	type='checkbox' 
-	name='attr_vehicle_sheet' 
-	class='sheet-collapsible_entity_switch sheet-hidden' 
-/>
+<input type="hidden" name="attr_sheet_version"/>
 <div class='sheet-background_radius sheet-collapsible_entity_toggle'>
 	<div class='sheet-background sheet-radius_border_heading'>
 
@@ -2794,17 +2790,16 @@
 		<div class='sheet-ssc sheet-auto_margin sheet-90width'>
 			<h3 class='sheet-radius_border_top'>Aptitudes</h3>
 			<div class='sheet-aptitudes_grid'>
-				<input class='sheet-aptitudes_grid_gs1' name='attr_aptitude_nameL' type='text' list="Aptitudes" />
-				<input class='sheet-aptitudes_grid_gs2' name='attr_aptitude_nameM' type='text' list="Aptitudes" />
-				<input class='sheet-aptitudes_grid_gs3' name='attr_aptitude_nameR' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_1' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_2' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_3' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_4' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_5' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_6' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_7' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_8' type='text' list="Aptitudes" />
+				<input class='' name='attr_aptitude_9' type='text' list="Aptitudes" />
 			</div>
-			<fieldset name='aptitudes' class='repeating_aptitudes'>
-				<div class='sheet-aptitudes_grid'>
-					<input class='sheet-aptitudes_grid_gs1' name='attr_aptitude_nameL_r' type='text' list="Aptitudes" />
-					<input class='sheet-aptitudes_grid_gs2' name='attr_aptitude_nameM_r' type='text' list="Aptitudes" />
-					<input class='sheet-aptitudes_grid_gs3' name='attr_aptitude_nameR_r' type='text' list="Aptitudes" />
-				</div>
-			</fieldset>
 		</div>
 		<br />
 		<datalist id="Advances">
@@ -4335,10 +4330,10 @@ NOTE: replace worker by javascript for IDE functionality
     // __________________________Script for Ammo API______________________________
     // ___________________________________________________________________________
     on("sheet:opened change:repeating_rangedweapons:r_weapon_attack change:repeating_rangedweapons:r_weapon_burst change:repeating_rangedweapons:r_weapon_auto remove:repeating_rangedweapons change:repeating_vehiclerangedweapons:v_r_weapon_attack change:repeating_vehiclerangedweapons:v_r_weapon_burst change:repeating_vehiclerangedweapons:v_r_weapon_auto remove:repeating_vehiclerangedweapons", function() {
-        getSectionIDs("rangedweapons", function(idarray) {
+        getSectionIDs("rangedweapons", function(idArray) {
             // first get the attribute names for all rows in put in one array
             const fieldnames = [];
-            idarray.forEach(id => fieldnames.push(
+            idArray.forEach(id => fieldnames.push(
                 `repeating_rangedweapons_${id}_R_weapon_attack`,
                 `repeating_rangedweapons_${id}_R_weapon_burst`,
                 `repeating_rangedweapons_${id}_R_weapon_auto`
@@ -4347,7 +4342,7 @@ NOTE: replace worker by javascript for IDE functionality
                 // create a variable to hold all the attribute values you re going to create.
                 const attr = {};
                 // now loop through the rows again
-                idarray.forEach(id => {
+                idArray.forEach(id => {
                     let row = 'repeating_rangedweapons_' + id;
                     let attack = +values[`${row}_R_weapon_attack`] || 0,
                         burst = +values[`${row}_R_weapon_burst`] || 0,
@@ -4361,10 +4356,10 @@ NOTE: replace worker by javascript for IDE functionality
                 setAttrs(attr);
             });
         });
- getSectionIDs("vehiclerangedweapons", function(idarray) {
+ getSectionIDs("vehiclerangedweapons", function(idArray) {
             // first get the attribute names for all rows in put in one array
             const fieldnames = [];
-            idarray.forEach(id => fieldnames.push(
+            idArray.forEach(id => fieldnames.push(
                 `repeating_vehiclerangedweapons_${id}_V_R_weapon_attack`,
                 `repeating_vehiclerangedweapons_${id}_V_R_weapon_burst`,
                 `repeating_vehiclerangedweapons_${id}_V_R_weapon_auto`
@@ -4373,7 +4368,7 @@ NOTE: replace worker by javascript for IDE functionality
                 // create a variable to hold all the attribute values you re going to create.
                 const attr = {};
                 // now loop through the rows again
-                idarray.forEach(id => {
+                idArray.forEach(id => {
                     let row = 'repeating_vehiclerangedweapons_' + id;
                     let attack = +values[`${row}_V_R_weapon_attack`] || 0,
                         burst = +values[`${row}_V_R_weapon_burst`] || 0,
@@ -5414,6 +5409,32 @@ NOTE: replace worker by javascript for IDE functionality
         'gear_carry','gear_name','gear_crafts', 'gear_quantity','gear_avail','gear_weight','gear_pg#','gear_desc'
     ]
     on('sheet:opened', () => {
+		getAttrs(['sheet_version'], v => {
+			var version = v['sheet_version']
+			console.log(`version : ${version}`)
+			if (!version) {
+				version = 'V 1.0.0'
+				getSectionIDs('aptitudes', idArray => {
+					const fieldnames = []
+					idArray.forEach(id => fieldnames.push(
+						`repeating_aptitudes_${id}_aptitude_nameL_r`,
+						`repeating_aptitudes_${id}_aptitude_nameM_r`,
+						`repeating_aptitudes_${id}_aptitude_nameR_r`
+					))
+					fieldnames.push('aptitude_nameL','aptitude_nameM','aptitude_nameR')
+					getAttrs(fieldnames, values => {
+						var attr = []
+						for(const i in values) {
+							attr.push(values[i]);
+							values[i] = ''
+						}
+						attr = mapAptitudes(attr)
+						setAttrs({...attr, ...values})
+						idArray.forEach(id => removeRepeatingRow(`repeating_aptitudes_${id}`))
+					})
+				})
+			}
+		})
         getAttrs(oldVariables, values => {
             var attributes = {} 
             let gear = {carry: values['gear_carry'], name: values['gear_name'], craftsmanship: values['gear_crafts'], quantity: values['gear_quantity'], avail: values['gear_avail'], weight: values['gear_weight'], desc: values['gear_desc']}
@@ -5527,12 +5548,8 @@ NOTE: replace worker by javascript for IDE functionality
     }
     const mapAptitudes = (aptitudes) => {
         var attr = {};
-        var	section = 'aptitudes';
-        for (var i = 0; i < aptitudes?.length; i += 3) {
-            let id = generateRowID();
-            attr[`repeating_${section}_${id}_aptitude_nameL_r`] = aptitudes[i] || '';
-            attr[`repeating_${section}_${id}_aptitude_nameM_r`] = aptitudes[i+1] || '';
-            attr[`repeating_${section}_${id}_aptitude_nameR_r`] = aptitudes[i+2] || '';
+        for (var i = 0; i < aptitudes?.length; i ++) {
+            attr[`aptitude_${i+1}`] = aptitudes[i] || '';
         }
         return attr;
     };
