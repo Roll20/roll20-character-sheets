@@ -61,9 +61,9 @@ Condition effects are currently hard coded as follows (updated May 24th 2021):
 
 Broken/Fatigued/Poisoned/Stunned = Effects all roll tests (this excludes non test rolls and roll tables like Initiative/Misscast/Crit/Oops etc.).
 Entangled/Prone = Effects all combat/spellcast, and any skill that would require movement like dodge/athletics/climb etc. Includes WS/BS/S/AGI/DEX rolls
-Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. incluing WS/BS/S/AGI/DEX rolls.
-Deafened = Not included in automated conditions due to being too cirmculstancial. GM should determine when penalty apply.
-Unconscious = Effects all rolls except endurance (Blocks rolling acitons essentially)
+Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. including WS/BS/S/AGI/DEX rolls.
+Deafened = Not included in automated conditions due to being too circumstantial. GM should determine when penalty apply.
+Unconscious = Effects all rolls except endurance (Blocks rolling actions essentially)
 
 Multiple condtions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When this occurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had 3 Fatigued and 2 Broken Conditions, you would suffer a –30 penalty to all active Tests, not –20.
 
@@ -75,16 +75,16 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 June 14th 2021 v1.4
 
-- Unified Roll target number tooltips, to clearly show the roll componenets.
-- Rework of condition system, which now scales fully with all PC/NPC rolls and immidately modifes all roll target windows on the skills tabs.
+- Unified Roll target number tooltips, to clearly show the roll components.
+- Rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs.
 
 Condition effects are now hard coding changed:
 
 Broken/Fatigued/Poisoned/Stunned = Effects all roll tests (this excludes non test rolls and roll tables like Initiative/Misscast/Crit/Oops etc.).
 Entangled/Prone = Effects all combat/spellcast, and any skill that would require movement like dodge/athletics/climb etc. Includes WS/BS/S/AGI/DEX rolls
-Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. incluing WS/BS/S/AGI/DEX rolls.
-Deafened = Not included in automated conditions due to being too cirmculstancial. GM should determine when penalty apply.
-Unconscious = Effects all rolls except endurance (Blocks rolling acitons essentially)
+Blinded = Effects all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. including WS/BS/S/AGI/DEX rolls.
+Deafened = Not included in automated conditions due to being too circumstantial. GM should determine when penalty apply.
+Unconscious = Effects all rolls except endurance (Blocks rolling actions essentially)
 
 
 
