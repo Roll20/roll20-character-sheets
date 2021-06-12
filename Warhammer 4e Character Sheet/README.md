@@ -75,8 +75,11 @@ Note conditions are not inteneded for out of combat situations, GM simply makes 
 
 June 14th 2021 v1.4
 
+- Various bug fixes, mostly small visual issues.
 - Unified Roll target number tooltips, to clearly show the roll components.
-- Rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs.
+- Sin updated to trigger Wrath of the Gods correctly based on units die v sin result for all pray tests, aswell as fumbling pray tests.
+- Movement section updated to show penalites from prone and encumbered conditions, and added to Walk/Run speed calculations.
+- Full rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs.
 
 Condition effects are now hard coding changed:
 
