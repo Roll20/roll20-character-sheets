@@ -9,9 +9,8 @@ This is a fork of https://github.com/vicberg/Roll20-Warhammer-4e-Character-Sheet
 This Character Sheet has been updated to fix and enhance mostly in the original style. And uploaded to Roll20 for all to use.  
 I'm a active WFRP player and I plan to further enhance this sheet at time goes on. 
 
-This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is also some TEW companion rule integration. 
+This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is some additional integration like TEW companion rules, and options for certain custom house rules.
 
-  
 
 My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip 
 
@@ -21,23 +20,21 @@ My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com
 
 - Attack / Opposed / Ranged with active weapon selection system. with integrated Defensive and Impale mechanics. 
 
-- Skill system, Basic / Advanced Skill List is fully implemented. 
+- Skill system, Basic / Advanced Skill List is fully implemented. With Roll outcome modifiers allowing player to tie custom text and other bonuses to roll out comes like success/failure/always.
 
-- Roll outcome modifier fields allowing Talent Test modifiers to be added to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which only records what talent have been learned. Available for PC combat and skill rolls, but not on the NPC tab due to performance issues. 
+- Roll outcome modifier fields allowing Talent Test modifiers and other bonuses to be added to skill and action rolls by the player depending their choices. These are configured on the skills which make use of them rather then centrally managed from the talent tab which only records what talents have been learned. Available for PC combat and skill rolls, but not on the NPC tab due to performance issues. 
 
-- Sheet Integrated Critical/Oops/Mutation/Miscast and Wrath of the Gods tables. 
+- Integrated SL results for all rolls, which aids in the manual calculation for opposed rolls (due to underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self-calculated approach while providing the maximum possible information options for talent and other bonuses.) 
+
+- Roll Tables for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God integrated, also traggerable from clicky buttons in the roll template output when they occur.  
 
 - Armor and Damage absorption system with Enc, AP, Durable, Damage, Damage point & Robust Talent tracking. 
 
-- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. 
+- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ http://www.lahiette.com/leratierbretonnien/wp-content/uploads/2021/04/WFRP4-Grimoire-Non-Officiel-VF-2.03-PDF.pdf).
 
-- Integrated SL results for all rolls, which aids in the manual calculation for opposed rolls (due underlying limits with Roll20 full Opposed SL resolution is not a straight forward matter for now, i have chosen the visual self-calculated approach while providing the maximum possible information.) 
+- Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs.
 
-- Full combat Advantage & Condition Tracking, per core rules. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ http://www.lahiette.com/leratierbretonnien/wp-content/uploads/2020/09/WFRP4-Unofficial-Grimoire-2.02-PDF.pdf). 
-
-- Inventory: Full Encumbrance Management system, with automatic Over encumbrance modifiers (-move/Agi), and Container & Vehicle Management section (TEW compatible) . 
-
-- Full Roll integration for Critical / Oops / Mutations (TEW extended tables) / Miscast & Wrath of the God, with clicky buttons in the roll template output.  
+- Inventory: Full Encumbrance Management system, with integrated Over encumbrance modifiers (-move/Agi), and Container & Vehicle Management section (TEW compatible) . 
 
 - Custom NPC tab, on sheet area to quickly add NPC for GM and players alike. Not meant to replace a full character sheet, but handy for quick trash mob types. The idea is to make a full char sheet for the "boss" and to have his henchmen as Custom NPC's on the NPC tab.  
 
@@ -68,7 +65,6 @@ Blinded = Effects all combat/magic, and any skill that would require sight like 
 Deafened = Not included in automated conditions due to being too circumstantial. GM should determine when penalty apply. 
 Unconscious = Effects all rolls except endurance (Blocks rolling actions essentially) 
 
-  
 Multiple conditions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When this occurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had 3 Fatigued and 2 Broken Conditions, you would suffer a –30 penalty to all active Tests, not –20. 
 
 Note conditions are not intended for out of combat situations, GM simply makes the roll difficulty harder with a custom roll modifier (-20 etc) if any particular condition is to apply to a situational roll. 
@@ -81,8 +77,9 @@ June 14th 2021 v1.4
 
 - Various bug fixes, mostly small visual issues. 
 - Unified Roll target number tooltips, to clearly show the roll components. 
+- Added Release Notes button to the settings tab, which post a clickable url in the chat menu when clicked.
 - Sin updated to trigger Wrath of the Gods correctly based on units die v sin result for all pray tests, as well as fumbling pray tests. 
-- Movement section updated to show penalties from being encumbered conditions, and added to Walk/Run speed calculations. 
+- Movement section updated to shows penalties from being encumbered and adds to Move/Walk/Run speed calculations. 
 - Advantage now applies and shows in the roll template output on all appropriate combat type rolls in the skill tab, e.g. Dodge/Cool/Melee/Ranged/LangMagick. 
 - Full rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs. 
 
@@ -101,7 +98,6 @@ April 5th 2021 v1.35
 
 
 February 1st 2021 v1.34 
-
 
 - Added coin converters buttons on the inventory page. 
 - Various Qualities text fields now align to the left. 
