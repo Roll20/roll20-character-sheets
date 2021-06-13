@@ -80,6 +80,7 @@ June 14th 2021 v1.4
 - Added Release Notes button to the settings tab, which post a clickable url in the chat menu when clicked.
 - Sin updated to trigger Wrath of the Gods correctly based on units die v sin result for all pray tests, as well as fumbling pray tests. 
 - Movement section updated to shows penalties from being encumbered and adds to Move/Walk/Run speed calculations. 
+- Reset Conditions button added next to the right of the Conditions show/hide button, this will reset all conditions to 0 in one click.
 - Advantage now applies and shows in the roll template output on all appropriate combat type rolls in the skill tab, e.g. Dodge/Cool/Melee/Ranged/LangMagick. 
 - Full rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs. 
 
