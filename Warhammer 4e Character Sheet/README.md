@@ -13,6 +13,7 @@ This sheet attempts to simplify the WFRP 4e Core book rules into a workable most
 
 
 My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip 
+The sheet should work on latest version of Firefox, MS Egde & Chrome.
 
   
 ///// ============ Main Features ============ /////  
@@ -72,7 +73,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+
+June 14th 2021 v1.41 
+
+- Vastly improved performance of Target value re-calculations due to condition changes, by moving them to the sheet worker. This was particularly bad on Firefox, while MS Edge(Chromium) and Chrome were less impacted but also benefit from the changes. No actual changes in functionality just faster!
  
+
 June 14th 2021 v1.4 
 
 - Various bug fixes, mostly small visual issues. 
@@ -80,6 +86,7 @@ June 14th 2021 v1.4
 - Added Release Notes button to the settings tab, which post a clickable url in the chat menu when clicked.
 - Sin updated to trigger Wrath of the Gods correctly based on units die v sin result for all pray tests, as well as fumbling pray tests. 
 - Movement section updated to shows penalties from being encumbered and adds to Move/Walk/Run speed calculations. 
+- XP tab rework, centered and changed how its calculated.
 - Reset Conditions button added next to the right of the Conditions show/hide button, this will reset all conditions to 0 in one click.
 - Advantage now applies and shows in the roll template output on all appropriate combat type rolls in the skill tab, e.g. Dodge/Cool/Melee/Ranged/LangMagick. 
 - Full rework of condition system, which now scales fully with all PC/NPC rolls and immediately modifies all roll target windows on the skills tabs. 
