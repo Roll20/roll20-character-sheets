@@ -63,7 +63,7 @@ Condition effects are currently hard coded as follows (updated June 15th 2021):
 Broken/Fatigued/Poisoned/Stunned = Effects all roll tests (this excludes non test rolls and roll tables like Initiative/Miscast/Crit/Oops etc.). 
 Entangled/Prone = Effects WS/BS/I/AGI/DEX characteristic rolls, all combat, and any skill that would require movement like dodge/athletics/climb etc.
 Blinded = Effects WS/BS/AGI/DEX characteristic rolls, all combat/magic, and any skill that would require sight like art/dodge/drive/perception etc. 
-Deafened = Effects I characteristic rolls, and any skill that would require hearing Perception/Intuition.
+Deafened = Effects I characteristic rolls, and any skill that would require hearing like Perception/Intuition.
 Unconscious = Effects all rolls except endurance (Blocks rolling actions essentially) 
 
 Multiple conditions: You can be subject to the same Condition more than once; indeed, sometimes you will receive multiples of the same Condition from a single event. If this occurs, any penalties suffered are stacked. So, if you have three Bleeding Conditions, you’re losing a worrying 3 Wounds per Round; or if you have 3 Fatigued Conditions, you suffer –30 to all Tests. You can also be subject to multiple, different Conditions at once. When this occurs, the effects do not stack; you suffer the highest of the two penalties and apply it. So, if you had 3 Fatigued and 2 Broken Conditions, you would suffer a –30 penalty to all active Tests, not –20. 
@@ -76,7 +76,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 June 14th 2021 v1.41 
 
 - Vastly improved performance of Target value re-calculations due to condition changes, by moving them to the sheet worker. This was particularly bad on Firefox, while MS Edge(Chromium) and Chrome were less impacted but also benefit from the changes. No actual changes in functionality just faster!
-- Deafened = Effects Initiative characteristic rolls, and any skill that would require hearing Perception/Intuition.
+- Deafened = Effects Initiative characteristic rolls, and any skill that would require hearing like Perception/Intuition.
  
 
 June 14th 2021 v1.4 
