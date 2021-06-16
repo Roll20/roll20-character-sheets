@@ -1381,130 +1381,14 @@ props:
 * ml:  Unmodified target of the roll.
 * rolltarget:  Actual target of roll, derived from 'ml + (penalty * 5) + targetmod'
 * rollresult: Die roll result.
-* note: Optional property for any additional text at the end of table.
-* infection:  sepcial row just for infected wounds, value either 0 or on or not present.
-* TODO: clarify new props used.
+* description: Optional property for any additional text at the end of table.
+* infected:  sepcial row just for infected wounds, value either 0 or on or not present.
+* nocrit: optional property for rolls that cannot crit. If left out the roll reports crits on -0 and -5 rolls, if set to any value the roll will only report success or failure, no crits
+* skilldevrol. optional property for rolls that cannot crit. If left out rolls lower than target are succesful, if set to any value any rolls higher than the target are succesful.
 
 /-->
 
-<rolltemplate class="sheet-rolltemplate-rollcheck">
-    <table>
-        <tr>
-            <th><span class="tcat">{{character_name}} {{rolldesc}}</span></th>
-        </tr>
-        {{#infected}}
-            {{#rollTotal() infected 1}}
-                <tr>
-                    <td class="sheet-infected">Infected</td>
-                </tr>
-            {{/rollTotal() infected 1}}
-        {{/infected}}
-        <tr>
-            <td><span class="sheet-tcat">Target Mods:</span>
-                ML({{ml}}),
-                {{#penalty}}Penalty(-{{penalty}}), {{/penalty}}
-                {{#targetmod}}Mod({{targetmod}}){{/targetmod}}
-            </td>
-        </tr>
-        <tr><td><span class="sheet-tcat">Target EML:</span> {{rolltarget}}</td></tr>
-        {{#rolltype}}
-		<tr><td><span class="sheet-tcat">Roll({{rolltype}}):</span> {{rollresult}}</td></tr>
-		{{/rolltype}}
-		{{#^rolltype}}
-		<tr><td><span class="sheet-tcat">Roll(1d100):</span> {{rollresult}}</td></tr>
-		{{/^rolltype}}
-        {{#^rollGreater() rollresult rolltarget}}
-        {{#rollWasCrit() rollresult }}
-        <tr>
-            <td class="sheet-crit-success">Critical Success!!</td>
-        </tr>
-        {{/rollWasCrit() rollresult }}
-        {{#^rollWasCrit() rollresult }}
-        <tr>
-            <td class="sheet-success">Marginal Success.</td>
-        </tr>
-        {{/^rollWasCrit() rollresult }}
-        {{/^rollGreater() rollresult rolltarget}}
-
-        {{#rollGreater() rollresult rolltarget}}
-        {{#rollWasCrit() rollresult }}
-        <tr>
-            <td class="sheet-crit-failure">Critical Failure!!</td>
-        </tr>
-        {{/rollWasCrit() rollresult }}
-        {{#^rollWasCrit() rollresult }}
-        <tr>
-            <td class="sheet-failure">Marginal Failure.</td>
-        </tr>
-        {{/^rollWasCrit() rollresult }}
-        {{/rollGreater() rollresult rolltarget}}
-
-
-        {{#note}}
-        <tr>
-            <td class="sheet-note">{{note}}</td>
-        </tr>
-        {{/note}}
-
-    </table>
-</rolltemplate>
-
-<!-- template for shock, fumble, stumble -->
-<rolltemplate class="sheet-rolltemplate-check-lt">
-    <table>
-        <tr>
-            <th><span class="tcat">{{character_name}} {{rolldesc}}</span></th>
-        </tr>
-
-
-        {{#rollGreater() penalty 0}}
-        <tr>
-            <td><span class="tcat">Target EML: </span>({{base}}-{{penalty}}) = {{rolltarget}}</td>
-        </tr>
-        {{/rollGreater() penalty 0}}
-        {{#^rollGreater() penalty 0}}
-        <tr>
-            <td><span class="tcat">Target EML: </span>{{rolltarget}}</td>
-        </tr>
-        {{/^rollGreater() penalty 0}}
-        <tr>
-            <td><span class="tcat">Roll({{rolltype}}): </span> {{rollresult}}</td>
-        </tr>
-        {{#^rollGreater() rollresult rolltarget}}
-        <tr>
-            <td class="sheet-success">Success.</td>
-        </tr>
-        {{/^rollGreater() rollresult rolltarget}}
-        {{#rollGreater() rollresult rolltarget}}
-        <tr>
-            <td class="sheet-failure">Failure.</td>
-        </tr>
-        {{/rollGreater() rollresult rolltarget}}
-    </table>
-</rolltemplate>
-
-<!-- template for skill development -->
-<rolltemplate class="sheet-rolltemplate-skilldev">
-    <div class="sheet-container sheet-color-{{color}}">
-        <div class="sheet-header">
-            <div class="sheet-title">{{character_name}} {{rolldesc}}</div>
-        </div>
-		<div class="sheet-content">
-			<div class="sheet-key">Current ML:</div> <div class="sheet-value"> {{rolltarget}}</div>
-			<div class="sheet-key">Roll(1d100 + SB):</div>  <div class="sheet-value">{{rollresult}}</div>
-			{{#^rollGreater() rollresult rolltarget}}
-			<div class="sheet-failure">Failure.</div>
-			{{/^rollGreater() rollresult rolltarget}}
-			{{#rollGreater() rollresult rolltarget}}
-			<div class="sheet-success">Success.</div>
-			{{/rollGreater() rollresult rolltarget}}
-		</div>
-    </div>
-</rolltemplate>
-
-
-
-<!-- inlcude Jakob's better default Rolltemplate; adjusted to include reporting success and failure and infection feedback. -->
+<!-- based on Jakob's better default Rolltemplate; adjusted to include reporting success and failure and infection feedback, plus many other tweaks for Harn. -->
 <rolltemplate class="sheet-rolltemplate-custom">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
