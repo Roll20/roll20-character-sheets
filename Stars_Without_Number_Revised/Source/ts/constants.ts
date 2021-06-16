@@ -61,7 +61,7 @@ const reverseHullTypes = {
     [translate("HEAVY_FRIGATE").toString().toLowerCase()]: "heavy_frigate",
     [translate("LARGE_STATION").toString().toLowerCase()]: "large_station",
     [translate("PATROL_BOAT").toString().toLowerCase()]: "patrol_boat",
-    [translate("SMALL_STATION").toString().toLowerCase()]: "small station",
+    [translate("SMALL_STATION").toString().toLowerCase()]: "small_station",
     [translate("STRIKE_FIGHTER").toString().toLowerCase()]: "strike_fighter",
     [translate("SHUTTLE").toString().toLowerCase()]: "shuttle",
 };
