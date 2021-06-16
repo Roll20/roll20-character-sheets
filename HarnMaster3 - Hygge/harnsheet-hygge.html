@@ -455,11 +455,11 @@
 						name="roll_ShockCheck">Shock
 				</button>
 				<button type="roll" class="injuryroll"
-						value="&{template:custom} {{color=harn}} {{nocrit=16}} {{title=@{character_name} rolls stumble}} {{rolltarget=[[@{agl}]]}} {{rollresult=[[[[3d6]] + @{universal_penalty}]]}} {{base=@{agl}}} {{rolltype=3d6+[[@{physical_penalty}]]}}"
+						value="&{template:custom} {{color=harn}} {{nocrit=16}} {{title=@{character_name} rolls stumble}} {{rolltarget=[[@{agl}]]}} {{rollresult=[[[[3d6]] + @{fumblestumblepenalty}]]}} {{base=@{agl}}} {{rolltype=3d6+[[@{fumblestumblepenalty}]]}}"
 						name="roll_StumbleCheck">Stumble
 				</button>
 				<button type="roll" class="injuryroll"
-						value="&{template:custom} {{color=harn}} {{title=@{character_name} rolls fumble}} {{rolltarget=[[@{dex}]]}} {{rollresult=[[[[3d6]] + @{universal_penalty}]]}} {{base=@{dex}}} {{rolltype=3d6+[[@{physical_penalty}]]}}"
+						value="&{template:custom} {{color=harn}} {{title=@{character_name} rolls fumble}} {{rolltarget=[[@{dex}]]}} {{rollresult=[[[[3d6]] + @{fumblestumblepenalty}]]}} {{base=@{dex}}} {{rolltype=3d6+[[@{fumblestumblepenalty}]]}}"
 						name="roll_FumbleCheck">Fumble
 				</button>
 				<div>&nbsp;</div>
@@ -1350,7 +1350,9 @@
 			<label for=conditionloadtoggle>Condition as Endurance for load only</label>
 			<input id=conditionloadtoggle name="attr_hrcondition4endurance" type="radio" value="1">
 			<label for=conditionendurancetoggle>Condition for all Endurance checks</label>
-			<input id=conditionendurancetoggle name="attr_hrcondition4endurance" type="radio" value="2"> 	
+			<input id=conditionendurancetoggle name="attr_hrcondition4endurance" type="radio" value="2"> 
+			<label for=fumblestumblehrtoggle>Use universal penalty instead of physical penalty for Fumble/Stumble?</label>
+			<input id=fumblestumblehrtoggle name="attr_hrfumblestumblepenalty" type="checkbox" value="1">			
     	</div>
     	<div class='settings-grid-section settingsgroup colored-grid'>
     	    <div class="skill-section-title">Sheet settings</div>
@@ -1564,6 +1566,7 @@ on('sheet:opened', function() {
     });
 });
 
+
 <!-- weapon load totals /-->
 
 on('change:repeating_weapon remove:repeating_weapon', function() {
@@ -1751,18 +1754,35 @@ on('change:repeating_hinjury:hinjury_infected', function() {
 
 <!-- universal and physical penalties /-->
 
-on('change:is_mounted change:injury_total change:fatigue_total change:encumbrance', function() {
-    getAttrs(['injury_total', 'fatigue_total', 'encumbrance', 'is_mounted'], function(values) {
+on('change:is_mounted change:injury_total change:fatigue_total change:encumbrance change:hrfumblestumblepenalty', function() {
+    getAttrs(['hrfumblestumblepenalty', 'injury_total', 'fatigue_total', 'encumbrance', 'is_mounted'], function(values) {
         var inj = parseInt(values.injury_total)||0;
 		var fat = parseInt(values.fatigue_total)||0;
 		var enc = parseInt(values.encumbrance)||0;
         if (values.is_mounted == 1) { fat = Math.round(fat / 2) };
         var upenalty = inj + fat;
 		var ppenalty = enc + upenalty;
+		if (values.hrfumblestumblepenalty == 1) { var fspenalty = upenalty; }
+		else { var fspenalty = ppenalty; }
         setAttrs({
             'universal_penalty': upenalty,
-			'physical_penalty': ppenalty
+			'physical_penalty': ppenalty,
+			'fumblestumblepenalty': fspenalty
         });
+    });
+});
+
+<!-- settings: toggle between Physical Penalty (default rules) or Universal penalty (houserule) for Fumble and Stumble rolls -->
+
+on('change:hrfumblestumblepenalty', function() {
+    getAttrs(['hrfumblestumblepenalty', 'universal_penalty', 'physical_penalty'], 
+	function(values) {
+        if(values.charnameupdated != 1) {var charname = values['name']};
+		console.log("Character name", charname);
+        setAttrs({
+            'character_name': charname,
+			'charnameupdated': 1,
+		});
     });
 });
 
