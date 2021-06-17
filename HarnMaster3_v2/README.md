@@ -8,9 +8,9 @@ Use of the sheet is pretty straight forward.  The sheet includes a number of fea
 
 Features:
 * 3 Tabs for Character, Inventory and Settings (new in V2)
-  * Character Tab shows all information relevant during play, including an optional Horse section (new in V2)
-  * Inventory tab has space for weapons, inventory, money, general notes and more. Denote on any item if it's actively carried or not (stored on horse or other location for example) (new in V2)
-  * Settings tab provides options to show the Horse section, split out Piety tracking per god, and toggle some houserules. (new in V2)
+  * Character Tab shows all information relevant during play, including an optional Horse section 
+  * Inventory tab has space for weapons, inventory, money, general notes and more. Denote on any item if it's actively carried or not (stored on horse or other location for example) 
+  * Settings tab provides options to show the Horse section, split out Piety tracking per god, and toggle some houserules. 
 * Roll buttons for each skill that includes appropriate physical/universal penalty.
 * Development roll buttons for each skill (new in V2)
 * Shock/Fumble/Stumble checks.
