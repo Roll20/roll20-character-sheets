@@ -57,7 +57,7 @@ This is **NOT** a character generator.  Due to limits in logic it does not calcu
 CREDITS
 ===========
 
-This sheet based of the main HarnMaster3 sheet (https://github.com/Roll20/roll20-character-sheets/tree/master/HarnMaster3) by wing-it (https://github.com/wing-it) . In addition to adding new features I've also included our houserules that can be opted in to via the settings tab.
+This sheet based of the original HarnMaster3 sheet (https://github.com/Roll20/roll20-character-sheets/tree/master/HarnMaster3) by wing-it (https://github.com/wing-it) . In addition to adding new features I've also included our houserules that can be opted in to via the settings tab.
 
 
 
