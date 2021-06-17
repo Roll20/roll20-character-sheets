@@ -24,6 +24,12 @@ If you feel you've contributed to the development of this character sheet, don't
 
 ### Changelog
 
+
+#### 2020-05-26
+* fixed attribute ArmorLethalSoak so it now saves properly
+* point image urls to main repo, some code cleanup
+
+
 #### 2019-12-03
 * Dragonblooded abilities are now tracked by separate Roll20 attributes, as not to interfere with the default Solar abililtes. The Solars abilities are no longer hidden with the red checkbox by default.
 
