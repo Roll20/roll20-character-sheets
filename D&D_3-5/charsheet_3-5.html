@@ -3,8 +3,9 @@
 <!-- based on Pathfinder sheets from Barry R., Sam, Brian, and Justin N. -->
 <!-- with lots of help from Toby-->
 <!-- Version 2.7.8 1/7/19 (Fix roll buttons)-->
-
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="7.8"/>
+<!-- Version 2.7.9 12/7/20 (change repeating_spells to spells11)-->
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="7.9"/>
+<input type="hidden" name="attr_code_version" title="code_version" value="0"/>
 <input type="radio" class="sheet-switch-pc-show sheet-switch" title="npc-show" name="attr_npc-show" value="1" checked /><span style="text-align: left;" data-i18n="pc" >PC </span><span> &nbsp; &nbsp; &nbsp; &nbsp;</span>
 <input type="radio" class="sheet-switch-npc-show sheet-switch" title="npc-show" name="attr_npc-show" value="2" /><span style="text-align: left;" data-i18n="npc">NPC</span>
 
@@ -2611,7 +2612,7 @@
 										<td style="width: 160px;" data-i18n="emote-macro">Emote/macro</td>
 								</tr>
 							</table>
-								<fieldset class="repeating_spells">
+								<fieldset class="repeating_spells11">
 									<table style="width: 350px;" class="sheet-table-row">
 										<tr>
 											<td><input type="text" style="width: 25px;" name="attr_spellused11" title="repeating_spells_#_spellused11" />/<input type="text" style="width: 25px;" name="attr_spellprep11" title="repeating_spells_#_spellprep11" /></td>
@@ -4857,5 +4858,52 @@ on("change:totalequipmentweight change:equipmentweightcopy", function() {
 	 });
   });
 });
+
+/*  ======================================
+            VERSION MANAGEMENT
+    ====================================== */
+on('sheet:opened', () => {
+    getAttrs(['code_version'], function (v) {
+        let code_version = parseFloat(v['code_version']) || 0;
+        console.log('Current sheet code version:' + code_version);
+        versionator(code_version);
+    });
+});
+const versionator = (code_version) => {
+    if (code_version < 0.1) {
+        repSpellsFix(0.1);
+    } else {
+        console.log('Current sheet code version:' + code_version);
+    }
+};
+
+const repSpellsFix = function (code_version) {
+    // copy repeating_spells to repeating_spells11
+    const fields = ['spellused11','spellprep11', 'spellname11', 'spelllevel11', 'spellmacro11'];
+    const getRepeatingName = (section, id, field) => `repeating_${section}_${id}_${field}`;
+    getSectionIDs('repeating_spells', function (idarray) { //Get oldSectionID
+        const fieldnames = idarray.reduce((arr, id) => {
+            fields.forEach(field => arr.push(getRepeatingName('spells', id, field)));
+            return arr;
+        }, []);
+        getAttrs([...fieldnames], function (v) {
+            const update = {};
+            idarray.forEach(id => {
+                const rowid = generateRowID();
+                fields.forEach(field => {
+					const fieldvalue = v[getRepeatingName('spells', id, field)];
+					console.log(`${getRepeatingName('spells', id, field)} = ${fieldvalue}`);
+                    if (typeof fieldvalue !== 'undefined') update[getRepeatingName('spells11', rowid, field)] = fieldvalue;
+                });
+            });
+			update.code_version = code_version;
+			console.log(JSON.stringify(update));
+            setAttrs(update, {
+                silent: true
+            }, versionator(code_version));
+        });
+    });
+};
+// ======================================
 
 </script>

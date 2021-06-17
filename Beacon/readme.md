@@ -22,5 +22,17 @@ Interm updates 2020-04-16:
 Interm updates 2020-04-22:
 	- add in some levelup info to update tab
 	- Fix speed and dex calculations for worn armor
+
 Updates 2020-05-13:
 	- additional fixes for armor dex calculations, streamline weapon row dropdowns and fix ranged weapon calcs. Add support for rogues using light weapons.
+
+Updates 2020-07:
+ - Fix fix issue with 2hand weapons, update weapon damage calculations.
+- update hafling starting Dex modifier
+
+Updates 2020-08:
+- add carry capacity (in bulk-weight units)
+- Rename inventory text boxes
+- change coin weigh calculation (500:1 weight)
+- update inventory page with provisions and carry capcaity
+- update beastman starting bonuses
