@@ -416,6 +416,27 @@ function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
 
+function isRemoving0(eventInfo, fieldNames) {
+    let removedInfo = eventInfo.removedInfo;
+    if (!removedInfo)
+        return false;
+    
+    if (fieldNames.length < 1)
+        return false;
+
+    console.log(fieldNames)
+    
+    let doEarlyReturn = true;
+    fieldNames.forEach(fieldName => {
+        let removingFieldName = `${eventInfo.sourceAttribute}_${fieldName}`;
+        let removingValue = removedInfo[removingFieldName];
+        doEarlyReturn &&= removingValue === undefined || removingValue === "0";
+        console.log(`${removingFieldName} was ${removingValue}. DoEarlyReturn is ${doEarlyReturn}`);
+    });
+    
+    return doEarlyReturn;
+}
+
 // --- Start summing numbers from repeating spells for wizard and priest --- //
 function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
 
@@ -450,7 +471,7 @@ function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
         .execute(() => recursiveSpellSum(tail, acc, oldField, newField, resultFieldName)); // Fat arrow function to lazy load value.
 }
 
-function setupSpellSumming(sections, oldField, newField, resultFieldName) {
+function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldName) {
     sections.forEach(section => {
         let repeatingName;
         let fieldName;
@@ -463,9 +484,11 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
         }
 
         let onChange = `change:repeating_${repeatingName}:${fieldName} remove:repeating_${repeatingName}`;
-        on(onChange, function () {
-
-            console.log(`Summing started by section ${repeatingName}`);
+        on(onChange, function (eventInfo) {
+            if (isRemoving0(eventInfo, [fieldName]))
+                return;
+            
+            console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
             let levelsCopy = [...sections];
             let accumulator = 0;
@@ -483,7 +506,6 @@ function setupAutoFillSpellInfo(section, spellsTable) {
     on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
 
         let spell = spellsTable[section][eventInfo.newValue];
-        console.log(spell);
         if (spell === undefined)
             return;
 
@@ -535,8 +557,6 @@ function setupCalculateTotal(totalField, fieldsToSum) {
                 total += parseInt(values[field]) || 0;
             });
 
-            console.log(total);
-
             setAttrs({
                 [totalField]: total
             });
@@ -549,20 +569,19 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
+        if (eventInfo.removedInfo)
+            return;
+        
         TAS.repeating(repeatingName)
             .fields(allFields)
             .tap(function(rowSet) {
-                console.log(eventInfo);
                 let rowId = eventInfo.sourceAttribute.split('_')[2];
                 let row = rowSet[rowId];
-                console.log(rowId);
-                console.log(row);
                 let total = 0;
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
                 row[repeatingTotalField] = total;
-                console.log(total);
             })
             .execute();
     });
@@ -613,7 +632,6 @@ function setupAddPriestSpell(postfix) {
         return;
 
     on(`clicked:add-spells-${postfix}`, function () {
-        console.log("clicked!");
         const section = `spells-${postfix}`;
         const field = 'spell-name';
         let errorMessage = `add-spell-error-${postfix}`;
@@ -782,8 +800,8 @@ let priestSpellLevelsSections = [
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 
@@ -797,8 +815,8 @@ wizardSpellLevelsSections.forEach(spellLevel => {
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 
@@ -816,8 +834,8 @@ let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
 setupCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
-setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`);
-setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
+setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
+setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
 setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
 
@@ -825,8 +843,8 @@ let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
 setupCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
-setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`);
-setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
+setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
+setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
 // --- End setup Spell Points, Arc, and Wind --- //
@@ -842,8 +860,8 @@ setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections,
 // --- Start setup Granted Powers --- //
 let powerSpellSections = ['67', '68', '69'];
 let spellPower = 'spell-power';
-setupSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
-setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
+setupRepeatingSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
+setupRepeatingSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
 setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
@@ -1068,13 +1086,16 @@ followerWeapons.forEach(fw => {
 });
 
 //Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
+    if (isRemoving0(eventInfo, ['weapprofnum']))
+        return;
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
 });
 
 //Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs', function(){
-
+on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo){
+    if (isRemoving0(eventInfo, ['profslots']))
+        return;
     TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
 });
 //Nonweapon proficiency autofill
@@ -1091,14 +1112,18 @@ on('change:repeating_profs:profname', function (eventInfo) {
 });
 
 //Equipment Carried Section
-on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(){
+on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(eventInfo){
+    if (isRemoving0(eventInfo, ['gearweight', 'gearqty']))
+        return;
     repeatingMultipleSum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
 });
 
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
-on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(){
-
+on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
+    if (isRemoving0(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
+        return;
+    
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -1114,10 +1139,14 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         .execute();
 })
 
-function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, repeatingSection) {
+function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, section) {
+    let repeatingSection = `repeating_${section}`;
     let onChange = `change:${valueField} change:${multiplierField} change:${repeatingSection}:${valueField} change:${repeatingSection}:${multiplierField} remove:${repeatingSection}`
-    on(onChange, function(){
-        TAS.repeating(repeatingSection)
+    on(onChange, function(eventInfo){
+        if (isRemoving0(eventInfo, [valueField, multiplierField]))
+            return;
+        
+        TAS.repeating(section)
             .attrs(totalField, valueField, multiplierField)
             .fields(valueField, multiplierField)
             .reduce(function(m,r){
