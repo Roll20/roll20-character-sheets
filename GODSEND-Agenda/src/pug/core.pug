@@ -1,0 +1,179 @@
+//- PUG variables/lists
+- var pages = ["character", "notes", "settings"];
+- var attrs1 = ["con", "dex", "spd", "str", "cr"];
+- var attrs2 = ["cha", "int", "per", "wil", "mr"];
+- var attrsall = ["con", "dex", "spd", "str", "cr", "cha", "int", "per", "wil", "mr", "none"];
+- var points = ["body", "mind", "hero"];
+- var disadv = ["personal", "internal", "external"];
+- var notes = ["archetype", "weapons", "powers", "equipment", "notes"];
+- var notes1 = ["archetype", "equipment", "notes"];
+//- Mixins
+mixin attrsrolls(name)
+  div.rowflex.nowrap
+    button(name=`roll_${name}` value!=`@{whisper}&{template:rolls} {{title=${name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{${name}}[${name}]@{modquery}]]}}` type="roll")= name
+    input(name=`attr_${name}` type="number" title=`@{${name}}` value="")
+
+mixin attrselect
+  select(name="attr_attribute")
+    each name in attrsall
+      option.cap(value=`[[@{${name}}]]`)= name
+//- end of mixins
+
+//- SHEET CODE START
+input.gamesys(type="hidden" name="attr_gametype" value="")
+.tab-buttons.spaced.center
+  //- <input type="hidden" class="npctoggle" name="attr_npc"  value="0">
+  //- each tab in pages
+  //-  button(type="action" name=`act_${tab}`) tab
+  //- <button class="npc" type="action" name="act_npc" >NPC</button>
+  input.tabstoggle(type="hidden" name="attr_sheetTab" value="character")
+  input.gametoggle(type="hidden" name="attr_gametype" value="godsend")
+  h1.godsend='GODSEND AGENDA'
+  h1.talislanta='Talislanta'
+  h1.hellas='Hellas'
+  h1.atlantis='Atlantis Second Age'
+  div
+    span Page selection
+    select(name="attr_sheetTab")
+      each tab in pages
+        option(value=`${tab}`)= tab
+  .version
+    span Sheet Version: 
+    span(name="attr_version")
+input.tabstoggle(type="hidden" name="attr_sheetTab" value="character")
+main.character
+  section.common.spaced
+    .columnflex.nowrap
+      label Name
+      input(name="attr_character_name" title="@{character_name}" type="text" class="name")
+    .columnflex.nowrap
+      label Species
+      input(name="attr_species" title="@{species}" type="text")
+    .columnflex.nowrap
+      label Archetype
+      input(name="attr_archetype_name" title="@{archetype_name}" type="text")
+    .columnflex.nowrap
+      label Renown
+      input(name="attr_renown" title="@{renown}" type="number")
+  section.points.rowflex.nowrap.spaced
+    each type in points
+      .rowflex.nowrap
+        span.cap= type + ' Points'
+        input.txtfield(name=`attr_${type}_points` type="number" value="")
+        span /
+        input.txtfield(name=`attr_${type}_points_max` type="number" value="")
+    .rowflex.nowrap
+      span Wealth Rating
+      input.txtfield(name="attr_wealth" title="@{wealth}" type="number" value="")
+    .rowflex.nowrap
+      span AL
+      input.txtfield(name="attr_al" title="Ability Level @{al}" type="number" value="")
+      span PD
+      input.txtfield(name="attr_xp_pd" title="Physical Defence @{pd}" type="number" value="")
+      span MD
+      input.txtfield(name="attr_xp_md" title="Mental Defence @{md}" type="number" value="")
+  section.attrs.columnflex.nowrap
+    h2 Attributes
+    .rowflex.nowrap.middle.spaced
+      each name in attrs1
+        +attrsrolls(name)
+    .rowflex.nowrap.middle.spaced
+      each name in attrs2
+        +attrsrolls(name)
+  section.skills.columnflex.nowrap
+    h2 Skills
+    fieldset.repeating_skills
+      input.name(name="attr_name" title="@{name}" list="skillsgodsend" type="text")
+      input(name="attr_level" title="@{level}" type="number")
+      +attrselect
+      button(name="roll_roll" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{level}[skill level]+@{attribute}[attribute]@{modquery}]]}}" type="roll")
+        span(name="attr_name")
+    h2 powers
+    .desc-row
+      span.powers name
+      span rank
+      span base cost
+      span rank cost
+      span cost tot
+      span desc
+    fieldset.repeating_powers
+      button.sendtext.power(name="roll_roll" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{rank= [[@{rank}]] }} {{desc=@{desc} }}" type="roll")
+      input.name(name="attr_name" title="@{name}" type="text")
+      input.txtfield(name="attr_rank" title="@{rank}" type="number")
+      input.txtfield(name="attr_cost_base" type="number")
+      input.txtfield(name="attr_cost_rank" type="number")
+      input.txtfield(name="attr_cost_total" type="number")
+      input.name(name="attr_desc" title="@{desc}" type="text")
+    h2 Weapons
+    .desc-row
+      span.weapons name
+      span acc
+      span dr
+      span RoF
+      span Ammo
+      span rng
+      span='R#'
+      span attr
+      span skill
+    fieldset.repeating_weapons
+      input.name(name="attr_name" title="@{name}"  type="text")
+      input.txtfield(name="attr_acc" type="number")
+      input.txtfield(name="attr_dr" type="number")
+      input.txtfield(name="attr_rof" type="number")
+      input(name="attr_ammo" type="text")
+      input(name="attr_rng" type="text")
+      input(name="attr_rsharp" type="text")
+      +attrselect
+      input(name="attr_skill" type="text")
+      button.power(name="roll_roll" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{acc}[accuracy]+@{skill}[skill level]+@{attribute}[attribute]@{modquery}]]}}" type="roll")
+    h2 Armor
+    .desc-row
+      span.armor name
+      span acc
+      span pr
+      span enc
+      span='R#'
+    fieldset.repeating_armor
+      input.name(name="attr_name" title="@{name}"  type="text")
+      input.txtfield(name="attr_acc" type="number")
+      input.txtfield(name="attr_pr" type="number")
+      input.txtfield(name="attr_enc" type="number")
+      input(name="attr_rsharp" type="text")
+  section.notes.columnflex.nowrap
+    h2 Disadvantages
+    for item in disadv
+      div.rowflex.middle
+        span
+          span= item 
+          input(name=`attr_${item}` title=`@{${item}}` type="text")
+    each option in notes1
+      h2= option
+      textarea(name=`attr_${option}`)
+main.notes
+  h1 Notes
+  each option in notes
+    section
+      h3= option
+      textarea(name=`attr_${option}`)
+main.settings
+  h1 Settings
+  .section.columnflex.nowrap
+    span='Ask for Roll Modifiers?'
+    select(name="attr_modquery" title="@{modquery}")
+      option(value="+(?{Roll Modifier|0}[Modifiers])") Yes
+      option(value=" ") No
+  .section.rowflex.nowrap.gap
+    span(title="@{whisper}") Whisper rolls to GM?
+    input(name="attr_whisper" title="@{whisper}" type="checkbox" value="/w gm")
+  .section.rowflex.nowrap.gap
+    span Dice type
+    select(name="attr_dice" title="@{dice}")
+      option(value="2d10cf0cs0" selected)= '2d10 (GODSEND Agenda)'
+      option(value="1d20")= 'd20 (Talislanta, Hellas, Atlantis)'
+  .section.rowflex.nowrap.gap
+    span= 'Game System(Header & layout)'
+    select(name="attr_gametype" )
+      option(value="godsend" selected)= 'GODSEND Agenda'
+      option(value="talislanta")= 'Talislanta'
+      option(value="hellas")= 'Hellas'
+      option(value="atlantis")= 'Atlantis: Second Age'
