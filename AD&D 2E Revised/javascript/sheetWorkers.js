@@ -674,63 +674,92 @@ function setupAddPriestSpell(postfix) {
 }
 // --- End setup for priest spells based on spheres --- //
 
-// --- Start setup rest buttons --- //
-function resetSpentSlots(row, memField, castField) {
+// --- Start defining rest buttons --- //
+function resetCastSlots(row, castField, memField) {
+    row.I[castField] = 0;
+}
+
+function resetCastAndMemSlots(row, castField, memField) {
+    row.I[castField] = 0;
+    row.I[memField] = 0;
+}
+
+function resetSpentSlots(row, castField, memField) {
     row.I[memField] = row.I[memField] - row.I[castField];
     row.I[castField] = 0;
 }
 
-function resetAllSlots(row, memField, castField) {
-    row.I[memField] = 0;
-    row.I[castField] = 0;
-}
-
-function setupSpellSlotsReset(buttonName, sections, updateFunction) {
+function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
     on(`clicked:${buttonName}`, function () {
-        console.log('clicked!');
-        sections.forEach(section => {
-            let repSection;
-            let castField;
-            let memField;
-            if (isNewSpellSection(section)) {
-                repSection = `spells-${section}`;
-                castField = 'spell-cast-value';
-                memField = 'spell-memorized';
-            } else {
-                repSection = `spells${section}`;
-                castField = `cast-value${section}`;
-                memField = `cast-max${section}`;
+
+        getAttrs([tab, 'spell-slot-reset-sections', 'spell-slot-reset-function'], function (values) {
+            let resetSection = values['spell-slot-reset-sections'];
+            let resetFunction = values['spell-slot-reset-function'];
+
+            let sections = [];
+            if (resetSection === 'all')
+                sections = allSections;
+            else if (resetSection === 'level') {
+                let level = values[tab];
+                sections = spellLevels.find(sl => sl.level === level)?.sections;
             }
+            
+            if (!sections?.length)
+                return
+            
+            let updateFunction;
+            if (resetFunction === '1')
+                updateFunction = resetCastSlots;
+            if (resetFunction === '2')
+                updateFunction = resetCastAndMemSlots;
+            if (resetFunction === '3')
+                updateFunction = resetSpentSlots;
+            
+            if (!updateFunction)
+                return;
 
-            console.log(updateFunction);
+            sections.forEach(section => {
+                let repSection;
+                let castField;
+                let memField;
+                if (isNewSpellSection(section)) {
+                    repSection = `spells-${section}`;
+                    castField = 'spell-cast-value';
+                    memField = 'spell-memorized';
+                } else {
+                    repSection = `spells${section}`;
+                    castField = `cast-value${section}`;
+                    memField = `cast-max${section}`;
+                }
 
-            TAS.repeating(repSection)
-                .fields(castField, memField)
-                .each(function(row) {
-                    updateFunction(row, memField, castField);
-                })
-                .execute();
+                TAS.repeating(repSection)
+                    .fields(castField, memField)
+                    .each(function(row) {
+                        updateFunction(row, castField, memField);
+                    })
+                    .execute();
+            });
         });
     });
 }
-// --- End setup rest buttons --- //
+// --- End defining rest buttons --- //
 
 let wizardSpellLevelsSections = [
-    {level: 1, sections: ['', '2', '3', 'wiz1']},
-    {level: 2, sections: ['4', '5', '6', 'wiz2']},
-    {level: 3, sections: ['7', '8', '9', 'wiz3']},
-    {level: 4, sections: ['10', '11', '12', 'wiz4']},
-    {level: 5, sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
-    {level: 6, sections: ['13', '14', '15', 'wiz6']},
-    {level: 7, sections: ['16', '17', '18', 'wiz7']},
-    {level: 8, sections: ['19', '20', '21', 'wiz8']},
-    {level: 9, sections: ['22', '23', '24', 'wiz9']},
-    {level: 10, sections: ['25', '26', '27', 'wiz10']},
-    {level: 11, sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
-    {level: 12, sections: ['55', '56', '57', 'wiz12']},
-    {level: 13, sections: ['58', '59', '60', 'wiz13']},
-    {level: 14, sections: ['61', '62', '63', 'wiz14']},
-    {level: 15, sections: ['64', '65', '66', 'wiz15']},
+    {level: '1', sections: ['', '2', '3', 'wiz1']},
+    {level: '2', sections: ['4', '5', '6', 'wiz2']},
+    {level: '3', sections: ['7', '8', '9', 'wiz3']},
+    {level: '4', sections: ['10', '11', '12', 'wiz4']},
+    {level: '5', sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: '6', sections: ['13', '14', '15', 'wiz6']},
+    {level: '7', sections: ['16', '17', '18', 'wiz7']},
+    {level: '8', sections: ['19', '20', '21', 'wiz8']},
+    {level: '9', sections: ['22', '23', '24', 'wiz9']},
+    {level: '10', sections: ['25', '26', '27', 'wiz10']},
+    {level: '11', sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: '12', sections: ['55', '56', '57', 'wiz12']},
+    {level: '13', sections: ['58', '59', '60', 'wiz13']},
+    {level: '14', sections: ['61', '62', '63', 'wiz14']},
+    {level: '15', sections: ['64', '65', '66', 'wiz15']},
 ];
 
 let priestSpellLevelsSections = [
@@ -777,7 +806,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
 });
 // --- End setup Spell Slots --- //
 
-// --- Start setup Spell Points, Arc, and Wind. Also setups reset buttons --- //
+// --- Start setup Spell Points, Arc, and Wind --- //
 let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
@@ -786,8 +815,6 @@ setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${
 setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
 setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
-setupSpellSlotsReset('reset-spent-slots-wiz', allWizardSpellSections, resetSpentSlots);
-setupSpellSlotsReset('reset-all-slots-wiz', allWizardSpellSections, resetAllSlots);
 
 let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
@@ -797,9 +824,15 @@ setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${
 setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
-setupSpellSlotsReset('reset-spent-slots-pri', allPriestSpellSections, resetSpentSlots);
-setupSpellSlotsReset('reset-all-slots-pri', allPriestSpellSections, resetAllSlots);
 // --- End setup Spell Points, Arc, and Wind --- //
+
+// --- Start setup reset buttons --- //
+//tab6 = wizard levels
+//tab7 = priest levels
+setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', wizardSpellLevelsSections, allWizardSpellSections);
+let allPriestSectionsExceptQuest = priestSpellLevelsSections.slice(0, -1).flatMap(sl => sl.sections);
+setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections, allPriestSectionsExceptQuest);
+// --- End setup reset buttons --- //
 
 // --- Start setup Granted Powers --- //
 let powerSpellSections = ['67', '68', '69'];
@@ -878,21 +911,22 @@ function getWeaponWithBonus(weaponName) {
         return undefined;
     
     let baseWeapon = weapons[weaponName];
-    if (baseWeapon !== undefined) {
+    if (baseWeapon) {
         return {
             ...baseWeapon,
             bonus: '0'
         };
     }
     
-    let match = weaponName.match(/\+[0-9]+$/);
+    let match = weaponName.match(/\s*\+[0-9]+\s*/);
     if (!match)
         return undefined;
-    
-    let split = weaponName.split('+');
-    baseWeapon = weapons[split[0].trim()];
-    let bonus = parseInt(split[1].trim());
-    if (split.length !== 2 || baseWeapon === undefined || isNaN(bonus))
+
+    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+    baseWeapon = weapons[baseWeaponName];
+    let bonusString = match[0].trim().replace('+', '');
+    let bonus = parseInt(bonusString)
+    if (!baseWeapon || isNaN(bonus))
         return undefined;
     
     let weaponWithBonus = {

@@ -953,7 +953,7 @@ pri3['Animate Dead'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'This spell creates the lowest of the undead monsters, skeletons or zombies, usually from the bones or bodies of dead humans, demihumans, or humanoids. The spell causes these remains to become animated and obey the simple verbal commands of the caster, regardless of how they communicated in life. The skeletons or zombies can follow the caster, remain in an area and attack any creature (or just a specific type of creature) entering the place, etc. The undead remain animated until they are destroyed in combat or are turned; the magic cannot be dispelled.\n&emsp;The priest can animate one skeleton or one zombie for each experience level he has attained. Currently [[@{priest-level}]] skeletons. If creatures with more than 1+ Hit Dice are animated, the number is determined by the monster Hit Dice. Skeletal forms have the Hit Dice of the original creature, while zombie forms have 1 more Hit Die. Thus, a 12th-level priest could animate 12 dwarven skeletons (or six zombies), four zombie gnolls, or a single zombie fire giant. Note that this is based on the standard racial Hit Die norm; thus, a high-level adventurer would be animated as a skeleton or zombie of 1 or 2 Hit Dice, and without special class or racial abilities. The caster can, alternatively, animate two small animal skeletons (1-1 Hit Die or less) for every level of experience he has achieved. Currently [[2*[[@{priest-level}]] ]] animal skeletons.\n&emsp;Casting this spell is not a good act, and only evil priests use it frequently.'
+    'effect': 'This spell creates the lowest of the undead monsters, skeletons or zombies, usually from the bones or bodies of dead humans, demihumans, or humanoids. The spell causes these remains to become animated and obey the simple verbal commands of the caster, regardless of how they communicated in life. The skeletons or zombies can follow the caster, remain in an area and attack any creature (or just a specific type of creature) entering the place, etc. The undead remain animated until they are destroyed in combat or are turned; the magic cannot be dispelled.\n&emsp;The priest can animate one skeleton or one zombie for each experience level he has attained. Currently [[@{level-priest}]] skeletons. If creatures with more than 1+ Hit Dice are animated, the number is determined by the monster Hit Dice. Skeletal forms have the Hit Dice of the original creature, while zombie forms have 1 more Hit Die. Thus, a 12th-level priest could animate 12 dwarven skeletons (or six zombies), four zombie gnolls, or a single zombie fire giant. Note that this is based on the standard racial Hit Die norm; thus, a high-level adventurer would be animated as a skeleton or zombie of 1 or 2 Hit Dice, and without special class or racial abilities. The caster can, alternatively, animate two small animal skeletons (1-1 Hit Die or less) for every level of experience he has achieved. Currently [[2*[[@{level-priest}]] ]] animal skeletons.\n&emsp;Casting this spell is not a good act, and only evil priests use it frequently.'
 };
 
 pri3['Call Lightning'] = {
@@ -1088,7 +1088,7 @@ pri3['Flame Walk'] = {
     'sphere': 'Elemental (Fire)',
     'range': 'Touch',
     'duration': '[[1+[[@{level-priest}]] ]] rounds',
-    'aoe': '[[ [[@{priest-level}]]-4]] Creature(s) touched',
+    'aoe': '[[ [[@{level-priest}]]-4]] Creature(s) touched',
     'components': 'V, S, M',
     'cast-time': '5',
     'saving-throw': 'None',
@@ -1133,7 +1133,7 @@ pri3['Hold Animal'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of this spell, the caster holds one to four animals rigid. Animals affected are normal or giant-sized mammals, birds, or rep-tiles, but not monsters such as centaurs, gorgons, harpies, naga, etc. Apes, bears, crocodiles, dogs, eagles, foxes, giant beavers, and similar animals are subject to this spell. The hold lasts for two rounds per caster level. The caster decides how many animals can be affected, but the greater the number, the better chance each has to successfully save against the spell. Each animal gets a saving throw: If only one is the subject of the spell, it has a penalty of –4 on its roll; if two are subject, each receives a penalty of –2 on its roll; if three are subject, each receives a penalty of –1 on its roll; and if four are subject, each gets an unmodified saving throw.\n&emsp;A maximum body weight of 400 pounds (100 pounds for non-mammals) per animal per caster level can be affected. (Currently [[400*[[@{priest-level}]] ]]-pound mammals or [[100*[[@{priest-level}]] ]]-pound nonmammals) —for example, an 8th-level caster can affect up to four 3,200-pound mammals or a like number of 800-pound nonmammals, such as birds or reptiles.'
+    'effect': 'By means of this spell, the caster holds one to four animals rigid. Animals affected are normal or giant-sized mammals, birds, or rep-tiles, but not monsters such as centaurs, gorgons, harpies, naga, etc. Apes, bears, crocodiles, dogs, eagles, foxes, giant beavers, and similar animals are subject to this spell. The hold lasts for two rounds per caster level. The caster decides how many animals can be affected, but the greater the number, the better chance each has to successfully save against the spell. Each animal gets a saving throw: If only one is the subject of the spell, it has a penalty of –4 on its roll; if two are subject, each receives a penalty of –2 on its roll; if three are subject, each receives a penalty of –1 on its roll; and if four are subject, each gets an unmodified saving throw.\n&emsp;A maximum body weight of 400 pounds (100 pounds for non-mammals) per animal per caster level can be affected. (Currently [[400*[[@{level-priest}]] ]]-pound mammals or [[100*[[@{level-priest}]] ]]-pound nonmammals) —for example, an 8th-level caster can affect up to four 3,200-pound mammals or a like number of 800-pound nonmammals, such as birds or reptiles.'
 };
 
 pri3['Locate Object'] = {
@@ -1231,7 +1231,7 @@ pri3['Prayer'] = {
     'school': 'Conjuration/Summoning',
     'sphere': 'Combat',
     'range': '0',
-    'duration': '[[@{priest-level}]] rounds',
+    'duration': '[[@{level-priest}]] rounds',
     'aoe': '60-foot. radius',
     'components': 'V, S, M',
     'cast-time': '6',
@@ -2035,7 +2035,7 @@ pri5['Commune'] = {
     'damage': '',
     'damage-type': '',
     'healing': '',
-    'effect': 'By use of a *commune* spell, the priest is able to contact his deity—or agents thereof—and request information in the form of questions that can be answered by a simple “yes” or “no.” The priest is allowed one such question for every experience level he has attained. Currently [[@{priest-level}]] questions. The answers given are correct within the limits of the entity’s knowledge. “I don’t know” is a legitimate answer, as powerful outer planar beings are not necessarily omniscient. Optionally, the DM may give a single short answer of five words or less. The spell will, at best, provide information to aid character decisions. Entities communed with structure their answers to further their own purposes. It is probable that the DM will limit the use of *commune* spells to one per adventure, one per week, or even one per month, for the greater powers dislike frequent interruptions. Likewise, if the caster lags, discusses the answers, or goes off to do anything else, the spell immediately ends.\n&emsp;If a sacrifice is required and the offering is insufficient, no information or only partial information is gained.'
+    'effect': 'By use of a *commune* spell, the priest is able to contact his deity—or agents thereof—and request information in the form of questions that can be answered by a simple “yes” or “no.” The priest is allowed one such question for every experience level he has attained. Currently [[@{level-priest}]] questions. The answers given are correct within the limits of the entity’s knowledge. “I don’t know” is a legitimate answer, as powerful outer planar beings are not necessarily omniscient. Optionally, the DM may give a single short answer of five words or less. The spell will, at best, provide information to aid character decisions. Entities communed with structure their answers to further their own purposes. It is probable that the DM will limit the use of *commune* spells to one per adventure, one per week, or even one per month, for the greater powers dislike frequent interruptions. Likewise, if the caster lags, discusses the answers, or goes off to do anything else, the spell immediately ends.\n&emsp;If a sacrifice is required and the offering is insufficient, no information or only partial information is gained.'
 };
 
 pri5['Commune With Nature'] = {
