@@ -4561,7 +4561,7 @@ Unmodified: <span name="attr_perception_base"></span>
 						<input type="number" name="attr_perception_points" value="0" step="5" title="Macro name: perception_points" />
 					</div>
 					<div class="cell col4">
-						<button type="roll" value="&@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Perception Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{perception} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsPer" />
+						<button type="roll" value="@{roll}&{template:skillRoll} {{sheetStyle=@{sheetstyle}}} {{type=Attribute Check}} {{activeDefense=[[0]]}} {{showSuccessLabel=[[1]]}} {{characterName=@{character_name}}} {{skillName=Perception Roll}} {{rollResult=[[3d6]]}} {{effectiveSkill=[[@{perception} + @{modifier}]]}} {{useCriticalPlusTen=[[@{use_critical_plus_10}]]}}" name="roll_vsPer" />
 					</div>
 				</div> <!-- .row -->
 				<div class="row sub-row row-vision">
@@ -7543,7 +7543,7 @@ PU2:126 = Power-Ups 2. Page 126<br />
 							<span data-i18n="apply-label">Apply</span>
 						</div>
 						<span class="tooltip">
-							<span data-i18n="close-reach-tooltip">If checked, character point costs for Strength and Hit Points will be modified.<br />See B15, B16, <strong>B19</strong></span>
+							<span data-i18n="apply-size-modifier-tooltip">If checked, character point costs for Strength and Hit Points will be modified.<br />See B15, B16, <strong>B19</strong></span>
 						</span>
 					</div>
 					<div class="cell col-input">
@@ -11469,7 +11469,7 @@ visualize what it will look like in chat.
 										<div class="cell col-input">
 											<input type="number" default="0" name="attr_malfunction" value="0" title="Macro table name: repeating_ranged. Field name: malfunction" />
 										</div>
-										<div class="cell col-verify custom-checkbox">
+										<div class="cell custom-checkbox">
 											<div class="popup">
 												<strong>...<span data-i18n="verify-label">Verify</span></strong>
 											</div>
@@ -15611,7 +15611,7 @@ visualize what it will look like in chat.
                 </tr>
 				{{/recoil}}
 				
-				{{#noteBoxOneShow}}
+        {{#rollTotal() noteBoxOneShow 1}}
                 {{#noteBoxOneContent}}
                 <tr>
                     <td class="label">{{noteBoxOneLabel}}</td>
@@ -15620,9 +15620,9 @@ visualize what it will look like in chat.
                     </td>
                 </tr>
                 {{/noteBoxOneContent}}
-                {{/noteBoxOneShow}}
+        {{/rollTotal() noteBoxOneShow 1}}
 
-				{{#noteBoxTwoShow}}
+        {{#rollTotal() noteBoxTwoShow 1}}
                 {{#noteBoxTwoContent}}
                 <tr>
                     <td class="label">{{noteBoxTwoLabel}}</td>
@@ -15631,9 +15631,9 @@ visualize what it will look like in chat.
                     </td>
                 </tr>
                 {{/noteBoxTwoContent}}
-				{{/noteBoxTwoShow}}
-				
-				{{#noteBoxThreeShow}}
+        {{/rollTotal() noteBoxTwoShow 1}}
+
+        {{#rollTotal() noteBoxThreeShow 1}}
                 {{#noteBoxThreeContent}}
                 <tr>
                     <td class="label">{{noteBoxThreeLabel}}</td>
@@ -15642,9 +15642,9 @@ visualize what it will look like in chat.
                     </td>
                 </tr>
                 {{/noteBoxThreeContent}}
-				{{/noteBoxThreeShow}}
-				
-				{{#noteBoxFourShow}}
+        {{/rollTotal() noteBoxThreeShow 1}}
+
+        {{#rollTotal() noteBoxFourShow 1}}
                 {{#noteBoxFourContent}}
                 <tr>
                     <td class="label">{{noteBoxFourLabel}}</td>
@@ -15653,7 +15653,7 @@ visualize what it will look like in chat.
                     </td>
                 </tr>
                 {{/noteBoxFourContent}}
-				{{/noteBoxFourShow}}
+        {{/rollTotal() noteBoxFourShow 1}}
 
             </table>
         </div>
@@ -20981,24 +20981,26 @@ visualize what it will look like in chat.
      * Update the defense note.
      */
     function updateDefenseNote() {
-        
-        getAttrs(['repeating_defense_info'], function(values) {
-			
-			if (values && values.repeating_defense_info) {
 
-				var note = getDefenseNote(values.repeating_defense_info);
-            
-				// update the note
-				setAttrs({
-					repeating_defense_info_description: note
-				});
-				
-			}
-            
+        getAttrs(['repeating_defense_info'], function(values) {
+
+            var defenseInfo = "";
+
+            if (values) {
+                defenseInfo = values.repeating_defense_info;
+            }
+
+            var note = getDefenseNote(defenseInfo);
+
+            // update the note
+            setAttrs({
+                repeating_defense_info_description: note
+            });
+
         });
-        
+
     }
-    
+
     /**
      * Get defense note based on initial defense info field
      * 
@@ -21007,30 +21009,27 @@ visualize what it will look like in chat.
      * @return string
      */
     function getDefenseNote(defenseInfo) {
-        
+
         var note = "";
-        
-        switch(defenseInfo.toLowerCase()) {
-        
-            case "u":
-                note = "Info: U\nThe weapon is unbalanced. You cannot use it to parry if you've already attacked with it this turn.\nSee B208";
-                break;
-                
-            case "f":
-                note = "Info: F\nThis is a fencing weapon. +3 to retreat, instead of +1. -2 for each additional parry for the round.\nSee B208";
-                break;
-                
-            case "":
-                note = "";
-                break;
-                
-            default:
-                note = "Info: " + values.repeating_defense_info;
-                break;
+
+        if (defenseInfo) {
+
+            switch(defenseInfo.toLowerCase()) {
+
+                case "u":
+                    note = "Info: U\nThe weapon is unbalanced. You cannot use it to parry if you've already attacked with it this turn.\nSee B208";
+                    break;
+
+                case "f":
+                    note = "Info: F\nThis is a fencing weapon. +3 to retreat, instead of +1. -2 for each additional parry for the round.\nSee B208";
+                    break;
+
+            }
+
         }
-        
+
         return note;
-        
+
     }
 
 	/**
@@ -21177,7 +21176,7 @@ visualize what it will look like in chat.
         
     }
     
-    on("change:start_velocity change:current_move change:enhanced_move_current change:current_air change:current_water change:change_velocity", function(event) {
+    on("change:turning_move_type change:start_velocity change:current_move change:enhanced_move_current change:current_air change:current_water change:change_velocity", function(event) {
         
         updateTurnRadiusMovements();
         
@@ -21228,7 +21227,7 @@ visualize what it will look like in chat.
                         // normal move, no tight turn penalty
                         tightTurnPenalty = 0;
                         
-                        baseMove = Number(values.current_move);
+                        baseMove = getBaseMove(values.current_move);
                         
                     } else {
                         
@@ -21242,11 +21241,11 @@ visualize what it will look like in chat.
                     
                 case "air":
                     
-					baseMove = getBaseMove(values.current_air);
+                    baseMove = getBaseMove(values.current_air);
 					
                     tightTurnPenalty = getTightTurnPenalty(velocityFinal, baseMove);
 					
-					break;
+                    break;
                     
                 case "water":
                     baseMove = getBaseMove(values.current_water);
@@ -21269,7 +21268,7 @@ visualize what it will look like in chat.
                 
                 decelerationPenalty = 0;
                 
-			}
+            }
 			
             // --
             if (baseMove && velocityFinal) {
@@ -21337,33 +21336,42 @@ visualize what it will look like in chat.
     /**
      * Gets base move from a number or two values.
      * If move = 8/16, basemove = 8.
-     * If move = 8, basemove = 8
+     * If move = 8, basemove = 8.
+     * If move = 8/16 (1), basemove = 8.
+     * if move = 8 (1), basemove = 8.
      */
     function getBaseMove(moveValue) {
         
         var move = 0;
         
-        if ( moveValue && moveValue.toString().includes("/") ) {
+        if (moveValue) {
+    
+            // Remove number in parentheses
+            moveValue = moveValue.toString().replace(/ *\([^)]*\)/g, "");
+
+            if (moveValue.includes("/")) {
+              
+                // split the value
+                // move = 8/16
+                // 8 = base move
+                // 16 = enhanced move
+                arrMoveValue = moveValue.split("/");
+                
+                // get first part, convert to number
+                move = Number(arrMoveValue[0]);
+                
+            } else {
+                
+                move = Number(moveValue);
+                
+            }
             
-            // split the value
-            // move = 8/16
-            // 8 = base move
-            // 16 = max move
-            arrMoveValue = moveValue.split("/");
-            
-            // get second part, convert to number
-            move = Number(arrMoveValue[0]);
-            
-        } else {
-            
-            move = Number(moveValue);
-            
-		}
-		
-		if (isNaN(move)) {
-			move = 0;
-		}
-        
+        }
+
+        if (isNaN(move)) {
+            move = 0;
+        }
+
         return move;
     }
     
@@ -22945,9 +22953,10 @@ visualize what it will look like in chat.
 
 					const totalpenalty = checkedcount * penalty;
 		
-					setAttrs({
-						[`spell_${onormaintained}_penalty_total`]: totalpenalty
-					})
+                    setAttrs({
+                        [`spell_${onormaintained}_count`]: checkedcount,
+                        [`spell_${onormaintained}_penalty_total`]: totalpenalty
+                    })
 		
 				});
 			});

@@ -1,5 +1,5 @@
 var genefunk2090 = genefunk2090 || (function() {
-	const version = 1.12;
+	const version = 1.20;
 	const displayControllers = ['sheet_view','advantage_state','character_type','whisper_state'],
 	importControls = ['import','import_cancel'],
 	abilityScores = {str:'strength',dex:'dexterity',con:'constitution',int:'intelligence',wis:'wisdom',cha:'charisma'},
@@ -1005,7 +1005,9 @@ var genefunk2090 = genefunk2090 || (function() {
 
 	var registerEventHandlers = function(){
 		on('sheet:opened',openSheet);
-		on('change:repeating_action:attack_enable_item change:repeating_hack:attack_enable_item',updateActionMacro);
+		['repeating_action:attack_enable_item','repeating_hack:attack_enable_item','repeating_action:damage_1_enable_item','repeating_hack:damage_1_enable_item','repeating_action:damage_2_enable_item','repeating_hack:damage_2_enable_item'].forEach((name)=>{
+			on(`change:${name}`,updateActionMacro);
+		});
 		displayControllers.forEach((attr)=>{
 			on(`change:${attr}`,importReact);
 		});
@@ -1017,7 +1019,7 @@ var genefunk2090 = genefunk2090 || (function() {
 		});
 		on('change:character_type',changeCharacter);
 		on('change:challenge',convertChallenge);
-		on('change:hp',averageHP);
+		on('change:hit_dice',averageHP);
 		hitDice.forEach((attr)=>{
 			on(`change:${attr}`,updateHDmacro);
 		});
@@ -1131,16 +1133,24 @@ var genefunk2090 = genefunk2090 || (function() {
 			return;
 		}
 		getAttrs(['character_type'],(attributes)=>{
-			log('got attributes for action update');
 			const setObj = {};
-			let macroAttr = event.sourceAttribute.replace(/attack_enable_item/,'attack_macro');
-			if(event.newValue*1){
-				setObj[macroAttr] = `{{d20=[[@{advantage_state} ${attributes.character_type === 'pc' ? '+ @{attack_ability} + @{action_proficiency}' : ''} + 0@{attack_bonus}]]}}`;
-			}else{
-				setObj[macroAttr] = ' ';
-			}
+			adjustActionMacro(event,attributes,setObj);
 			set(setObj);
 		});
+	},
+
+	adjustActionMacro = function(event,attributes,setObj = {}){
+		let macroAttr = event.sourceAttribute.replace(/enable_item/,'macro');
+		if(event.newValue*1){
+			setObj[macroAttr] = `{{d20=[[@{advantage_state} ${attributes.character_type === 'pc' ? '+ @{attack_ability} + @{action_proficiency}' : ''} + 0@{attack_bonus}]]}}`;
+		}else if(/{{damage_type_\d=@{damage_type_\d}}} @{damage_\d_macro}/.test(event.newValue)){
+			event.sourceAttribute.replace(/_(\d)_/,(match,num)=>{
+				setObj[macroAttr] = `{{damage_${num}=[[0@{damage_${num}}${attributes.character_type === 'pc' ? `+ @{damage_ability_${num}}` : ''}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`;
+			});
+		}else{
+			setObj[macroAttr] = ' ';
+		}
+		set(setObj);
 	},
 
 	trueCopy = function(obj){
@@ -1422,7 +1432,6 @@ var genefunk2090 = genefunk2090 || (function() {
 	},
 
 	beginImport = function(toGet,sections){
-		log('Beginning import');
 		let setObj = {};
 		wipeSheet(sections,setObj);
 		getAttrs(toGet,(attributes)=>{
@@ -1434,7 +1443,6 @@ var genefunk2090 = genefunk2090 || (function() {
 				attributes = {...attributes,...setObj};
 				setObj = {...setObj,...processDisplayChange(attributes)};
 			}
-			log({setObj});
 			set(setObj);
 		});
 	},
@@ -1532,12 +1540,12 @@ var genefunk2090 = genefunk2090 || (function() {
 			'^\\s*languages\\s+(.+)':[['languages']],
 			'^\\s*challenge\\s+([\\d\\/]+)\\s*\\(([\\d,]+)\\s*xp\\)':[['challenge'],['experience_points']]
 		};
-		let line = lines.shift();
+		let line = assembleDetailLine(lines);
 		if(/^\s*skills\s+/i.test(line)){
-			line = assembleSkills(line,lines);
 			parseSkills(setObj,line);
+		}else if(/^\s*senses\s+/i.test(line)){
+			parseSenses(setObj,line);
 		}else{
-			log({'detail line':line});
 			processRegex(setObj,line,regexs);
 		}
 		if(/^\s*challenge/i.test(line) && !/^\s*(hacking\.|actions)/i.test(lines[0])){
@@ -1546,16 +1554,21 @@ var genefunk2090 = genefunk2090 || (function() {
 		return [setObj,lines];
 	},
 
-	assembleSkills = function(line,lines){
-		while(lines.length && !/\d\s*$/.test(line)){
-			line = `${line} ${lines.shift()}`;
-		}
-		return line;
+	assembleDetailLine = function(lines,line){
+		line = line ? `${line} ${lines.shift()}` : lines.shift();
+		return /^\s*(?:saves|skills|senses|languages|challenge|damage resistance|hacking|actions)/i.test(lines[0]) ? line : assembleDetailLine(lines,line);
 	},
 
 	parseSkills = function(setObj,line){
 		line.replace(/(?:,\s*|skills\s+)(.+?)\s+\+?(\-?\d+)/ig,(match,skill,bonus)=>{
 			setObj[skill.replace(/\s+/,'_').toLowerCase()]=bonus;
+		});
+	},
+
+	parseSenses = function(setObj,line){
+		line.replace(/senses\s*(?:(.+?),\s*)?passive \s*perception\s*(\d+)(?:,\s*(.+?))?$/i,(match,senses,pp='',senses2)=>{
+			setObj.passive_perception = pp;
+			setObj.senses = [senses,senses2].filter(a=>a).join(', ');
 		});
 	},
 
@@ -1797,8 +1810,20 @@ var genefunk2090 = genefunk2090 || (function() {
     		}
     		if(attr.sheet_version*1 < 1.1) updateTo1_1(attr,setObj);//First update applied
     		if(attr.sheet_version*1 < 1.12) updateTo1_12(attr,setObj);//update 1.12; npc hp attribute change
+    		if(attr.sheet_version*1 < 1.20) updateTo1_20(attr,setObj);
     		set(setObj);
     	});
+    },
+
+    updateTo1_20 = function(attr,setObj){
+    	const damageEnablers = Object.keys(attr).filter(k => /(?:attack|damage_\d)_enable_item/.test(k));
+    	damageEnablers.forEach(d => adjustActionMacro({sourceAttribute:d,triggerName:d,newValue:attr[d]},attr,setObj));
+    	if(attr.character_type === 'npc'){
+    		setObj.hit_points = attr.hp
+    		setObj.hit_points_max = attr.hp_max;
+    	}
+    	attr = {...attr,...setObj};
+    	setObj.sheet_version = 1.20;
     },
 
     updateTo1_12 = function(attr,setObj){

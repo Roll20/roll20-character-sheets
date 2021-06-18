@@ -12661,7 +12661,11 @@
             <input type="text" class="sheet-selectable-text" style="width: 45em" value="https://www.youtube.com/watch?v=l2SCwz51T9g&list=PLGBXxa8pcNCqzNe4CrKvy-_QgjfgLDOZ-" />
         </p>
 
-        <h4>Updates auf Versio 20210415</h4>
+        <h4>Update auf Version 20210425</h4>
+        <p>Es wurden mehrere kleine Fehler behoben, die insbesondere bei neuen Charakteren zu allerlei obskuren Problemen führen konnten. Der Code ist jetzt wieder ein Stückchen robuster und ein Fehler, der dafür gesorgt hat, dass der Paradewert der aktiven Nahkampfwaffe 0 war, solange noch nie eine Wunde aktiviert war, wurde behoben. Danke an alle, die weiterhin fleißig Fehler melden! Ihr helft dabei mit, dass dieser Charakterbogen besser wird.</p>
+        <p>Zu dieser Version wird es voraussichtlich kein Video geben.</p>
+
+        <h4>Updates auf Version 20210415</h4>
         <p>Beim letzten Update habe ich versehentlich einen sehr ärgerlichen Fehler eingebaut, der verhindert hat, dass der TP-Würfel-Knopf von Nahkampfwaffen funktioniert. Mit dieser Version wurde dies behoben.</p>
         <p><strong>Hinweis:</strong> Wer einen der Workarounds benutzt hat, sollte die im Zuge dessen angelegten Attribute &bdquo;TP_W_Aktiv&ldquo; und &bdquo;TP_Bonus_Aktiv&ldquo; wieder löschen. Mehr Infos dazu gibt es in einem Video.</p>
 
@@ -12776,7 +12780,7 @@
     </div>
 
 
-    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20210415"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
+    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20210425"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
     </table>
 </div>
 
@@ -16421,6 +16425,7 @@ function calculateCombatValues() {
             return;
         }
         var variablesToGet = [
+            "KK", "KK_Basis", "KK_mod",
         	"NKW_AT_typ" + weapon, "NKW" + weapon + "ATMod",
         	"NKW_PA_typ" + weapon, "NKW" + weapon + "PAMod",
         	"INIModNKW" + weapon,
@@ -16449,9 +16454,6 @@ function calculateCombatValues() {
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tp");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_tpkk");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
-            variablesToGet.push("KK");
-            variablesToGet.push("KK_Basis");
-            variablesToGet.push("KK_mod");
         }
 
         getAttrs(variablesToGet, function(values) {
@@ -16506,7 +16508,8 @@ function calculateCombatValues() {
                 }
                 var paMod = parseInt(values["NKW" + weapon +"PAMod"]);
                 var spec = parseInt(values["NKW" + weapon + "_Spez"]);
-                paValue = basePa + paMod + spec + values.PA_mod_wounds;
+                var wounds = isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds'];
+                paValue = basePa + paMod + spec + wounds;
 
                 if (values["be_pa_mod"]) {
                     paValue -= parseInt(values["be_pa_mod"]);
@@ -16579,7 +16582,7 @@ function calculateCombatValues() {
                     }
                 }
                 // Wundeinfluss (bei Parierwaffe über PA-Wert der Hauptwaffe bereits drin)
-                shieldPa = Math.max(0, shieldPa + values.PA_mod_wounds);
+                shieldPa = Math.max(0, shieldPa + (isNaN(values['PA_mod_wounds']) ? 0 : values['PA_mod_wounds']));
             }
             
             if (shieldPa > 0) {
@@ -17351,14 +17354,15 @@ on(
 	});
 });
 
-on("change:kk change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_SchwellenwertKK change:NKW2_Schwellenwert change:NKW3_SchwellenwertKK change:NKW3_Schwellenwert change:NKW4_SchwellenwertKK change:NKW4_Schwellenwert", function(eventInfo) {
+on("change:KK change:NKW1_SchwellenwertKK change:NKW1_Schwellenwert change:NKW2_SchwellenwertKK change:NKW2_Schwellenwert change:NKW3_SchwellenwertKK change:NKW3_Schwellenwert change:NKW4_SchwellenwertKK change:NKW4_Schwellenwert", function(eventInfo) {
 
     var weaponsToCalculate = [];
     let attrsToGet = [ "KK", "KK_Basis", "KK_mod" ];
 
     // Gather all affected melee weapons (NKW)
     // Changes to KK (strength) can affect all weapons
-    if (eventInfo.sourceAttribute === "KK") {
+    // Compare with lowercase as all attribute names are lowercase in eventInfo
+    if (eventInfo.sourceAttribute === "kk") {
         for (var weapon = 1; weapon <= 4; weapon++) {
             weaponsToCalculate.push(weapon);
             attrsToGet.push("NKW" + weapon + "_Schwellenwert");
@@ -17506,7 +17510,9 @@ function calculateShieldAttack(values, activeShieldRowId) {
     var schildkampfII = values["sf_schildkampfII"];
     var knaufschlag = values["sf_knaufschlag"];
     var schmutzigeTricks = values["sf_schmutzigetricks"];
-    var shieldAt = Math.max(0, parseInt(values["AT_raufen"]) + parseInt(values["AT_mod_wounds"]));
+    var raufenAT = isNaN(values["AT_raufen"]) ? 0 : parseInt(values["AT_raufen"]);
+    var ATmods = isNaN(values["AT_mod_wounds"]) ? 0 : parseInt(values["AT_mod_wounds"]);
+    var shieldAt = Math.max(0, raufenAT + ATmods);
 
 	// Without a Shield, no Shield Attack
 	if (shieldType !== "shield" || !activeShieldRowId) {

@@ -258,14 +258,16 @@
 	  </div>
 	  <div class='characteristics2_movement'>
 		<p class='movementgs1 unnatgs_heading'><b>Character Movement</b></p>
-		<input name='attr_half_move' type='text' class='movementgs2 unnatgs_width' readonly />
-		<input name='attr_full_move' type='text' class='movementgs3 unnatgs_width' readonly />
-		<input name='attr_charge_move' type='text' class='movementgs4 unnatgs_width' readonly />
-		<input name='attr_run_move' type='text' class='movementgs5 unnatgs_width' readonly />
-		<p class='movementgs6 '>Half</p>
-		<p class='movementgs7 '>Full</p>
-		<p class='movementgs8 '>Charge</p>
-		<p class='movementgs9 '>Run</p>
+		<input name='attr_agi_mov_mod' type='text' value='0' class='movementgs2 unnatgs_width' /> <!-- NOTE: this add a modifier to the AgB for movement only -->
+		<input name='attr_half_move' type='text' class='movementgs3 unnatgs_width' readonly />
+		<input name='attr_full_move' type='text' class='movementgs4 unnatgs_width' readonly />
+		<input name='attr_charge_move' type='text' class='movementgs5 unnatgs_width' readonly />
+		<input name='attr_run_move' type='text' class='movementgs6 unnatgs_width' readonly />
+		<p title='Modifier to AgB specifically for movement' class='movementgs7 '>(Mod)</p>
+		<p title='Half Action of move' class='movementgs8 '>Half</p>
+		<p title='Full Action of move' class='movementgs9 '>Full</p>
+		<p title='Move at least 4m, make a Charge attack' class='movementgs10 '>Charge</p>
+		<p title='Full Action. Easier to slap, harder to shoot' class='movementgs11 '>Run</p>
 	  </div>
 	  <div class='characteristics2_carry'>
 		<p class='carrygs1 unnatgs_heading'><b>Weight Capacity</b></p>
@@ -336,10 +338,10 @@
 		<label title='If selected, all rolls from this sheet will be whispered to GM, instead of posted in public'><input type='checkbox' name='attr_to-gm' value='/w gm' class='select_button hidden' /><span class='select_text'>To GM</span></label>
 		<label title='If selected, most rolls made will also ask for a situational Modifier'><input type='checkbox' name='attr_inlinemod-toggle' value='0?{Modifier|0}' class='select_button hidden' checked='checked' /><span class='select_text'>Inline Mod</span></label>
 		<p></p>
-		<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[(?{Degrees of Failiure|1})+?{Modifier|0}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
+		<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[?{Number of Dice|1}d?{Dice Roll|Xd10,10|Xd5,5}+@{inlinemod-toggle}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
 		<button class='clear minimisable_infographic_override' type='roll' name='shock' title='Used when character fails some types of Fear test' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{shock= [[(?{Fear DoF|1})*10 + 1d100]]}}">Shock</button>
 		<button class='clear minimisable_infographic_override' type='roll' name='d100' value="@{to-gm}&{template:mythic} [[ ([[?{Target Number|50}]] - [[1d100]])/10]] {{d100= }} {{character= @{character_name}}} {{target= $[[0]]}} {{roll=$[[1]]}} {{difference=$[[2]]}}">1d100</button>
-		<button class='clear minimisable_infographic_override' type='roll' name='righteousfury' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{righteousfury= }} {{@{settings_crunchsummary}= }} {{target=  [[?{Target|Person, 0|Vehicle, 1}]] }} {{location= [[?{Location|Arm/Weapon, 0|Body/Propulsion, 1|Head/Turret, 2|Leg/Hull, 3}]]}} {{type= [[?{Damage Type|Energy, 0|Explosive, 1|Impact, 2|Rending, 3}]] }} {{roll=[[ ceil(?{Dice Roll|1d5, 1d5|1d10, 1d10} / ?{Mitigation|None, 1| True Grit, 2}) ]] }} ">Righteous Fury</button>
+		<button class='clear minimisable_infographic_override' type='roll' name='righteousfury' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{righteousfury= }} {{@{settings_crunchsummary}= }} {{target=  [[?{Target|Person, 0|Vehicle, 1}]] }} {{location= [[?{Location|Arm/Weapon, 0|Body/Propulsion, 1|Head/Turret, 2|Leg/Hull, 3}]]}} {{type= [[?{Damage Type|Energy, 0|Explosive, 1|Impact, 2|Rending, 3}]] }} {{roll=[[ ceil(?{Dice Roll|1d5, 1d5|1d10, 1d10} / ?{Mitigation|None, 1| True Grit, 2}) +@{inlinemod-toggle}} ]] }} ">Righteous Fury</button>
 	  </div>
 	  <input type='checkbox' name='attr_infographic' class='collapsible_entity_switch hidden' />
 	  <div class='collapsible_entity_block'>
@@ -1166,9 +1168,9 @@
 				<option value='10' >Half Aim (+10)</option>
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
-			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos=$[[3]]}}@{settings_hitroll}{{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Ballistic Skill}}{{stat=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{hitmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}-20]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
+			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos=$[[3]]}} @{settings_hitroll} {{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Ballistic Skill}}{{stat=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{hitmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}-20]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
 !ammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit |<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}+@{fatigued}' class='input_background input_char_background' disabled ></button>
-			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}]] }} {{spray= [[@{R_weapon_spray}]] }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }} @{R_weapon_accurate}'>DMG</button>
+			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}+@{R_weapon_accurate}]] }} {{spray= [[@{R_weapon_spray}]] }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }} '>DMG</button>
 			</div>
 			<div class='equipment_ranged_weapons_grid2'>
 			  <input name='attr_wep_display' type='checkbox' value='min' class='collapsible_entity_switch hidden' />
@@ -1204,7 +1206,7 @@
 			  <input class='equipment_ranged_weapons_gs_d6 full_width' type='text' value='0' name='attr_R_weapon_vengeful' />
 			  <input type='hidden' value='' name='attr_R_weapon_real_dmg' />
 			  <div class='equipment_ranged_weapons_gs_d7'>Accurate</div>
-			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='{{accurate=?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}}}' name='attr_R_weapon_accurate' />
+			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}' name='attr_R_weapon_accurate' />
 			</div>
 			<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle '>
 			  <div class='equipment_ranged_weapons_gs_e1'>RoF</div>
@@ -1288,7 +1290,7 @@
 				<option value='10' >Half Aim (+10)</option>
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
-			  <button name='weapon_hit' class='equipment_melee_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}}{{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{M_weapon_target}+@{inlinemod-toggle}}, {@{wsTotal}-@{limiter}}}kh1, {@{wsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos= $[[3]]}}@{settings_hitroll} {{aim= [[@{M_weapon_aim}]]}}{{M_type= [[@{M_weapon_attack}]]}}{{multi= [[@{M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Weapon Skill}}{{stat=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{hitmod=[[@{M_weapon_mod1}]]}}{{trained=[[@{M_weapon_trained}-20]]}}{{WS_bonus=[[@{wsB}]]}}{{fatigued=[[@{fatigued}]]}}' >Hit |<input name='attr_M_weapon_target' value='@{wsTotal}+@{M_weapon_trained}-20+@{M_weapon_mod1}+@{M_weapon_attack}+@{M_weapon_aim}+@{M_weapon_multi}+@{fatigued}' class='input_background input_char_background' disabled ></button>
+			  <button name='weapon_hit' class='equipment_melee_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{M_weapon_name}}}{{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{M_weapon_target}+@{inlinemod-toggle}}, {@{wsTotal}-@{limiter}}}kh1, {@{wsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos= $[[3]]}} @{settings_hitroll} {{aim= [[@{M_weapon_aim}]]}}{{M_type= [[@{M_weapon_attack}]]}}{{multi= [[@{M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Weapon Skill}}{{stat=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{hitmod=[[@{M_weapon_mod1}]]}}{{trained=[[@{M_weapon_trained}-20]]}}{{WS_bonus=[[@{wsB}]]}}{{fatigued=[[@{fatigued}]]}}' >Hit |<input name='attr_M_weapon_target' value='@{wsTotal}+@{M_weapon_trained}-20+@{M_weapon_mod1}+@{M_weapon_attack}+@{M_weapon_aim}+@{M_weapon_multi}+@{fatigued}' class='input_background input_char_background' disabled ></button>
 			  <button name='weapon_dmg' class='equipment_melee_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{M_weapon_name}}} {{type= @{M_weapon_type}}} {{damage=[[@{M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{M_weapon_pen}]] }} {{@{settings_weapondescription}=@{M_ability_r} }}'>DMG</button>
 			</div>
 			<div class='equipment_melee_weapons_grid2'>
@@ -1516,8 +1518,10 @@
 			  <input class='comrade_name_status_gs2 full_width' type='text' placeholder='Name' name='attr_C_name' />
 			</div>
 			<div class='comrade_name_status_grid2'>
-			  <div class='comrade_name_status_gs3'>Status</div>
-			  <input class='comrade_name_status_gs4 full_width' type='text' placeholder='Healthy?' name='attr_C_status' />
+			  <div class='comrade_name_status_gs3'>Demeanor</div>
+			  <input class='comrade_name_status_gs4 full_width' type='text' placeholder='Demeanor' name='attr_C_demeanor' />
+			  <div class='comrade_name_status_gs5'>Status</div>
+			  <input class='comrade_name_status_gs6 full_width' type='text' placeholder='Healthy?' name='attr_C_status' />
 			</div>
 		  </div>
 		  <hr>
@@ -1826,7 +1830,7 @@
 	<!-- Settings -->
 	<h2>Settings</h2>
 	
-	<h3>Initiative Overrides</h3>
+	<h3>Initiative Tiebreakers</h3>
 	<select name='attr_initmod0' class='full_width edge_padding'>
 	  <option selected='selected' value='[[floor'>No tiebreaker</option>
 	  <option value='[['>Decimal tiebreaker</option>
@@ -1836,8 +1840,8 @@
 
 	<h3>Auto Roll Hit Locations</h3>
 	<select name='attr_settings_hitroll' class='full_width edge_padding'>
-	  <option value='{{loc=[[1d100]]}}'>Automatically roll hit locations from an independent d100</option>
-	  <option value=' ' selected='selected'>Don't automatically roll hit locations</option>
+	  <option value='{{loc= }}' selected='selected'>Automatically roll hit locations</option>
+	  <option value=' '>Don't automatically roll hit locations</option>
 	</select>
 	<br>
 
@@ -1857,7 +1861,470 @@
 	
 	<h3>Vehicle Sheet</h3>
 	<label class='text_centered bttn_top_padding'><input type='checkbox' name='attr_vehicle_sheet' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Vehicle</span></label>
-	
+	<br>
+	<!-- TODO: fix the Exporter before enabling functionality
+	<label title='Toggles Export text' class='text_centered bttn_top_padding'><input type='checkbox' name='attr_exportimport' value='1' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Export Sheet</span></label>
+	<input type='checkbox' name='attr_exportimport' value='1' class='collapsible_entity_switch hidden' />
+	<div class='json_container collapsible_entity_block'>
+	  {
+		"name": "<span name='attr_character_name'></span>",
+		"homeworld": "<span name='attr_home_world'></span>",
+		"regiment": "<span name='attr_regiment'></span>",
+		"specialty": "<span name='attr_specialty'></span>",
+		"demeanor": "<span name='attr_demeanor'></span>",
+		"note": "<span name='attr_notes'></span>",
+		"player":"<span name='attr_player_name'></span>",
+		"appearance":"<span name='attr_appearance'></span>",
+		"appearance2":"<span name='attr_appearance2'></span>",
+		"quirks":"<span name='attr_quirks'></span>",
+		"allies":"<span name='attr_allies'></span>",
+		"enemies":"<span name='attr_enemies'></span>",
+		"size":"<span name='attr_size'></span>",
+		"xp": "<span name='attr_xp_total'></span>",
+		"movementModifier": "<span name='attr_agi_mov_mod'></span>",
+		"weaponSkill": {"base": <span name='attr_WS'></span>, "advancement": <span name='attr_WS_advancement'></span>, "modifier": <span name='attr_WS_mod'></span>, "unnatural": <span name='attr_WS_unnat'></span>},
+		"ballisticSkill": {"base": <span name='attr_BS'></span>, "advancement": <span name='attr_BS_advancement'></span>, "modifier": <span name='attr_BS_mod'></span>, "unnatural": <span name='attr_STR_unnat'></span>},
+		"strength": {"base": <span name='attr_STR'></span>, "advancement": <span name='attr_STR_advancement'></span>, "modifier": <span name='attr_STR_mod'></span>, "unnatural": <span name='attr_STR_unnat'></span>},
+		"toughness": {"base": <span name='attr_TOU'></span>, "advancement": <span name='attr_TOU_advancement'></span>, "modifier": <span name='attr_TOU_mod'></span>, "unnatural": <span name='attr_TOU_unnat'></span>},
+		"agility": {"base": <span name='attr_AGI'></span>, "advancement": <span name='attr_AGI_advancement'></span>, "modifier": <span name='attr_AGI_mod'></span>, "unnatural": <span name='attr_AGI_unnat'></span>},
+		"intelligence": {"base": <span name='attr_INT'></span>, "advancement": <span name='attr_INT_advancement'></span>, "modifier": <span name='attr_INT_mod'></span>, "unnatural": <span name='attr_INT_unnat'></span>},
+		"perception": {"base": <span name='attr_PER'></span>, "advancement": <span name='attr_PER_advancement'></span>, "modifier": <span name='attr_PER_mod'></span>, "unnatural": <span name='attr_PER_unnat'></span>},
+		"willpower": {"base": <span name='attr_WP'></span>, "advancement": <span name='attr_WP_advancement'></span>, "modifier": <span name='attr_WP_mod'></span>, "unnatural": <span name='attr_WP_unnat'></span>},
+		"fellowship": {"base": <span name='attr_FEL'></span>, "advancement": <span name='attr_FEL_advancement'></span>, "modifier": <span name='attr_FEL_mod'></span>, "unnatural": <span name='attr_FEL_unnat'></span>},
+		"wounds": {"current": <span name='attr_wounds'></span>, "max": <span name='attr_wounds_max'></span>, "critical": <span name='attr_critical_dmg'></span>},
+		"fate": {"current": <span name='attr_fate'></span>, "max": <span name='attr_fate_max'></span>},
+		"fatigue": {"current": <span name='attr_fatigue'></span>, "threshold": <span name='attr_fatigue_threshold'></span>},
+		"forcefield": {"name": "<span name='attr_forcefield_name'></span>", "protection": "<span name='attr_forcefield_protection'></span>", "overload": "<span name='attr_forcefield_overload'></span>"},
+		"skills": [<span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_acrobatics' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_acrobatics' checked>
+			<span class='json_skill'>{"name": "acrobatics", "modifier": <span name='attr_mod2_acrobatics'></span>, "level": <span name='attr_mod3_acrobatics'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_athletics' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_athletics' checked>
+			<span class='json_skill'>{"name": "athletics", "modifier": <span name='attr_mod2_athletics'></span>, "level": <span name='attr_mod3_athletics'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_awareness' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_awareness' checked>
+			<span class='json_skill'>{"name": "awareness", "modifier": <span name='attr_mod2_awareness'></span>, "level": <span name='attr_mod3_awareness'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_charm' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_charm' checked>
+			<span class='json_skill'>{"name": "charm", "modifier": <span name='attr_mod2_charm'></span>, "level": <span name='attr_mod3_charm'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_command' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_command' checked>
+			<span class='json_skill'>{"name": "command", "modifier": <span name='attr_mod2_command'></span>, "level": <span name='attr_mod3_command'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_commerce' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_commerce' checked>
+			<span class='json_skill'>{"name": "commerce", "modifier": <span name='attr_mod2_commerce'></span>, "level": <span name='attr_mod3_commerce'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_deceive' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_deceive' checked>
+			<span class='json_skill'>{"name": "deceive", "modifier": <span name='attr_mod2_deceive'></span>, "level": <span name='attr_mod3_deceive'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_dodge' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_dodge' checked>
+			<span class='json_skill'>{"name": "dodge", "modifier": <span name='attr_mod2_dodge'></span>, "level": <span name='attr_mod3_dodge'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_inquiry' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_inquiry' checked>
+			<span class='json_skill'>{"name": "inquiry", "modifier": <span name='attr_mod2_inquiry'></span>, "level": <span name='attr_mod3_inquiry'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_interrogation' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_interrogation' checked>
+			<span class='json_skill'>{"name": "interrogation", "modifier": <span name='attr_mod2_interrogation'></span>, "level": <span name='attr_mod3_interrogation'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_intimidate' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_intimidate' checked>
+			<span class='json_skill'>{"name": "intimidate", "modifier": <span name='attr_mod2_intimidate'></span>, "level": <span name='attr_mod3_intimidate'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_logic' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_logic' checked>
+			<span class='json_skill'>{"name": "logic", "modifier": <span name='attr_mod2_logic'></span>, "level": <span name='attr_mod3_logic'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_medicae' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_medicae' checked>
+			<span class='json_skill'>{"name": "medicae", "modifier": <span name='attr_mod2_medicae'></span>, "level": <span name='attr_mod3_medicae'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_nav_surface' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_nav_surface' checked>
+			<span class='json_skill'>{"name": "nav_surface", "modifier": <span name='attr_mod2_nav_surface'></span>, "level": <span name='attr_mod3_nav_surface'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_nav_stellar' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_nav_stellar' checked>
+			<span class='json_skill'>{"name": "nav_stellar", "modifier": <span name='attr_mod2_nav_stellar'></span>, "level": <span name='attr_mod3_nav_stellar'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_nav_warp' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_nav_warp' checked>
+			<span class='json_skill'>{"name": "nav_warp", "modifier": <span name='attr_mod2_nav_warp'></span>, "level": <span name='attr_mod3_nav_warp'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_op_aero' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_op_aero' checked>
+			<span class='json_skill'>{"name": "op_aero", "modifier": <span name='attr_mod2_op_aero'></span>, "level": <span name='attr_mod3_op_aero'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_op_surface' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_op_surface' checked>
+			<span class='json_skill'>{"name": "op_surface", "modifier": <span name='attr_mod2_op_surface'></span>, "level": <span name='attr_mod3_op_surface'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_op_void' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_op_void' checked>
+			<span class='json_skill'>{"name": "op_void", "modifier": <span name='attr_mod2_op_void'></span>, "level": <span name='attr_mod3_op_void'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_parry' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_parry' checked>
+			<span class='json_skill'>{"name": "parry", "modifier": <span name='attr_mod2_parry'></span>, "level": <span name='attr_mod3_parry'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_psyniscience' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_psyniscience' checked>
+			<span class='json_skill'>{"name": "psyniscience", "modifier": <span name='attr_mod2_psyniscience'></span>, "level": <span name='attr_mod3_psyniscience'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_scrutiny' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_scrutiny' checked>
+			<span class='json_skill'>{"name": "scrutiny", "modifier": <span name='attr_mod2_scrutiny'></span>, "level": <span name='attr_mod3_scrutiny'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_security' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_security' checked>
+			<span class='json_skill'>{"name": "security", "modifier": <span name='attr_mod2_security'></span>, "level": <span name='attr_mod3_security'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_sleight' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_sleight' checked>
+			<span class='json_skill'>{"name": "sleight", "modifier": <span name='attr_mod2_sleight'></span>, "level": <span name='attr_mod3_sleight'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_stealth' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_stealth' checked>
+			<span class='json_skill'>{"name": "stealth", "modifier": <span name='attr_mod2_stealth'></span>, "level": <span name='attr_mod3_stealth'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_survival' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_survival' checked>
+			<span class='json_skill'>{"name": "survival", "modifier": <span name='attr_mod2_survival'></span>, "level": <span name='attr_mod3_survival'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_mod2_tech_use' checked><input type="checkbox" value='0' class="hidden" name='attr_mod3_tech_use' checked>
+			<span class='json_skill'>{"name": "tech_use", "modifier": <span name='attr_mod2_tech_use'></span>, "level": <span name='attr_mod3_tech_use'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_forbidden-lore_mod2' checked><input type="checkbox" value='0' class="hidden" name='attr_forbidden-lore_mod3' checked>
+			<span class='json_skill'>{"name": "forbidden-lore", "modifier": <span name='attr_forbidden-lore_mod2'></span>, "level": <span name='attr_forbidden-lore_mod3'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_scholastic-lore_mod2' checked><input type="checkbox" value='0' class="hidden" name='attr_scholastic-lore_mod3' checked>
+			<span class='json_skill'>{"name": "scholastic-lore", "modifier": <span name='attr_scholastic-lore_mod2'></span>, "level": <span name='attr_scholastic-lore_mod3'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_common-lore_mod2' checked><input type="checkbox" value='0' class="hidden" name='attr_common-lore_mod3' checked>
+			<span class='json_skill'>{"name": "common-lore", "modifier": <span name='attr_common-lore_mod2'></span>, "level": <span name='attr_common-lore_mod3'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_trade_mod2' checked><input type="checkbox" value='0' class="hidden" name='attr_trade_mod3' checked>
+			<span class='json_skill'>{"name": "trade", "modifier": <span name='attr_trade_mod2'></span>, "level": <span name='attr_trade_mod3'></span>},</span>
+		</span>
+		<span>
+			<input type="checkbox" value='0' class="hidden" name='attr_linguistics_mod2' checked><input type="checkbox" value='0' class="hidden" name='attr_linguistics_mod3' checked>
+			<span class='json_skill'>{"name": "linguistics", "modifier": <span name='attr_linguistics_mod2'></span>, "level": <span name='attr_linguistics_mod3'></span>},</span>
+		</span>
+		null
+		</span>],
+		"lores": {
+			"common": [<span>
+				<fieldset name='common-lore' class='repeating_common-lore'>
+					{"name" : "<span name='attr_common-lore_name'></span>", "modifier": <span name='attr_common-lore_r_mod2'></span>, "level": <span name='attr_common-lore_r_mod3'></span>},
+				</fieldset>
+				null
+			</span>],
+			"scholastic": [<span>
+				<fieldset name='scholastic-lore' class='repeating_scholastic-lore'>
+					{"name" : "<span name='attr_scholastic-lore_name'></span>", "modifier": <span name='attr_scholastic-lore_r_mod2'></span>, "level": <span name='attr_scholastic-lore_r_mod3'></span>},
+				</fieldset>
+				null
+			</span>],
+			"forbidden": [<span>
+				<fieldset name='forbidden-lore' class='repeating_forbidden-lore'>
+					{"name" : "<span name='attr_forbidden-lore_name'></span>", "modifier": <span name='attr_forbidden-lore_r_mod2'></span>, "level": <span name='attr_forbidden-lore_r_mod3'></span>},
+				</fieldset>
+				null
+			</span>]
+		},
+		"skills": [<span>
+			<fieldset name='skills' class='repeating_skill'>
+				{"name" : "<span name='attr_skill_name'></span>", "modifier": <span name='attr_skill_r_mod2'></span>, "level": <span name='attr_skill_r_mod3'></span>},
+			</fieldset>
+			null
+		</span>],
+		"linguistics": [<span>
+			<fieldset name='linguistics' class='repeating_linguistics'>
+				{"name" : "<span name='attr_linguistics_name'></span>", "modifier": <span name='attr_linguistics_r_mod2'></span>, "level": <span name='attr_linguistics_r_mod3'></span>},
+			</fieldset>
+			null
+		</span>],
+		"trades": [<span>
+			<fieldset name='trade' class='repeating_trade'>
+				{"name" : "<span name='attr_trade_name'></span>", "modifier": <span name='attr_trade_r_mod2'></span>, "level": <span name='attr_trade_r_mod3'></span>},
+			</fieldset>
+			null
+		</span>],
+		"abilities": [<span>
+			{"name": "<span name='attr_ability'></span>",	"description":"<span name='attr_ability_desc'></span>"},
+			<fieldset name='abilities' class='repeating_abilities'>
+				{"name": "<span name='attr_ability_r'></span>",	"description":"<span name='attr_ability_desc_r'></span>"},
+			</fieldset>
+			null
+		</span>],
+		"inventory": {
+			"weapons": {
+				"ranged": [<span>
+					<fieldset name='rangedweapons' class='repeating_rangedweapons'>{
+						"name": "<span name='attr_R_weapon_name'></span>",
+						"class":"<span name='attr_R_weapon_class'></span>",
+						"range":"<span name='attr_R_weapon_range'></span>",
+						"damage":"<span name='attr_R_weapon_dam-roll'></span>",
+						"pen":"<span name='attr_R_weapon_pen'></span>",
+						"type":"<span name='attr_R_weapon_type'></span>",
+						"min":"<span name='attr_R_weapon_min'></span>",
+						"max":"<span name='attr_R_weapon_max'></span>",
+						"vengeful":"<span name='attr_R_weapon_vengeful'></span>",
+						"accurate":"<span name='attr_R_weapon_accurate'></span>",
+						"standard":"<span name='attr_R_weapon_standard'></span>",
+						"burst":"<span name='attr_R_weapon_burst'></span>",
+						"auto":"<span name='attr_R_weapon_auto'></span>",
+						"mag":"<span name='attr_R_weapon_mag'></span>",
+						"mag_max":"<span name='attr_R_weapon_mag_max'></span>",
+						"carry":"<span name='attr_R_weapon_carry'></span>",
+						"trained":"<span name='attr_R_weapon_trained'></span>",
+						"mod1":"<span name='attr_R_weapon_mod1'></span>",
+						"reload":"<span name='attr_R_weapon_reload'></span>",
+						"weight":"<span name='attr_R_weapon_weight'></span>",
+						"domain":"<span name='attr_R_weapon_domain'></span>",
+						"mishap_chance":"<span name='attr_R_weapon_mishap_chance'></span>",
+						"spray":"<span name='attr_R_weapon_spray'></span>",
+						"special":"<span name='attr_R_ability_r'></span>",
+						"description":"<span name='attr_R_ability_desc_r'></span>"
+					},</fieldset>
+					null
+				</span>],
+				"melee": [<span>
+					<fieldset name='meleeweapons' class='repeating_meleeweapons'>{
+						"name": "<span name='attr_M_weapon_name'></span>",
+						"class":"Melee",
+						"reach":"<span name='attr_M_weapon_reach'></span>",
+						"damage":"<span name='attr_M_weapon_dam-roll'></span>",
+						"pen":"<span name='attr_M_weapon_pen'></span>",
+						"type":"<span name='attr_M_weapon_type'></span>",
+						"min":"<span name='attr_M_weapon_min'></span>",
+						"max":"<span name='attr_M_weapon_max'></span>",
+						"vengeful":"<span name='attr_M_weapon_vengeful'></span>",
+						"trained":"<span name='attr_M_weapon_trained'></span>",
+						"mod1":"<span name='attr_M_weapon_mod1'></span>",
+						"weight":"<span name='attr_M_weapon_weight'></span>",
+						"domain":"<span name='attr_M_weapon_domain'></span>",
+						"carry":"<span name='attr_M_weapon_carry'></span>",
+						"special":"<span name='attr_M_ability_r'></span>",
+						"description":"<span name='attr_M_ability_desc_r'></span>"
+					},</fieldset>
+					null
+				</span>]
+			},
+			"gears": [<span>
+				{"carry":"<span name='attr_gear_carry'></span>", "name":"<span name='attr_gear_name'></span>", "craftsmanship":"<span name='attr_gear_crafts'></span>", "quantity":"<span name='attr_gear_quantity'></span>", "availability":"<span name='attr_gear_avail'></span>", "weight":"<span name='attr_gear_weight'></span>", "description":"<span name='attr_gear_desc'></span>", "pg#":"<span name='attr_gear_pg#'></span>"},
+				<fieldset name='gear' class='repeating_gear'>{
+			    "carry":"<span name='attr_gear_carry_r'></span>",
+			    "name":"<span name='attr_gear_name_r'></span>",
+			    "craftsmanship":"<span name='attr_gear_crafts_r'></span>",
+			    "quantity":"<span name='attr_gear_quantity_r'></span>",
+			    "availability":"<span name='attr_gear_avail_r'></span>",
+			    "weight":"<span name='attr_gear_weight_r'></span>",
+				"pg":"<span name='attr_gear_pg#_r'></span>",
+			    "description":"<span name='attr_ability_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>],
+			"armor": {"maxAgi": "<span name='attr_armor_AGI'></span>","limit": "<span name='attr_armor_limit'></span>","head": "<span name='attr_armor_head'></span>","body": "<span name='attr_armor_body'></span>","arm_right": "<span name='attr_armor_arm_right'></span>","arm_left": "<span name='attr_armor_arm_left'></span>","leg_right": "<span name='attr_armor_leg_right'></span>","leg_left": "<span name='attr_armor_leg_left'></span>", "description": "<span name='attr_armor_name'></span>"},
+			"cybernetics": [<span>
+				{"name":"<span name='attr_cybernetic_name'></span>","location":"<span name='attr_cybernetic_location'></span>","page":"<span name='attr_cybernetic_page'></span>","description":"<span name='attr_cybernetic_desc'></span>"},
+				<fieldset name='cybernetics' class='repeating_cybernetics'>{
+			    "name":"<span name='attr_cybernetic_name_r'></span>",
+			    "location":"<span name='attr_cybernetic_location_r'></span>",
+				"page":"<span name='attr_cybernetic_page_r'></span>",
+			    "description":"<span name='attr_cybernetic_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>]
+		},
+		"comrade": {
+			"comrades":[<span>
+				<fieldset name="comradename" class="repeating_comradename">
+					{"name": "<span name='attr_C_name'></span>", "description": "<span name='attr_C_status'></span>"},
+				</fieldset>
+				null
+			</span>]
+			"comradeabilities":[<span>
+				<fieldset name="comradeability" class="repeating_comradeability">
+					{"name": "<span name='attr_C_ability_r'></span>", "description": "<span name='attr_C_ability_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>]
+		}
+		"advancements": {
+			"aptitudes": [<span>
+				"<span name='attr_aptitude_nameL'></span>","<span name='attr_aptitude_nameM'></span>","<span name='attr_aptitude_nameR'></span>",
+				<fieldset name='aptitudes' class='repeating_aptitudes'>
+					"<span name='attr_aptitude_nameL_r'></span>","<span name='attr_aptitude_nameM_r'></span>","<span name='attr_aptitude_nameR_r'></span>",
+				</fieldset>
+				null
+			</span>],
+			"advances": [<span>
+				{"name":"<span name='attr_advancement_nameL' ></span>","cost":"<span name='attr_advancement_costL'></span>","page":"<span name='attr_advancement_pg#L'></span>"},
+				{"name":"<span name='attr_advancement_nameR' ></span>","cost":"<span name='attr_advancement_costR'></span>","page":"<span name='attr_advancement_pg#R'></span>"},
+				{"desc":"<span name='attr_advancement_desc' ></span>"},
+				<fieldset name='advancements' class='repeating_advancements'>
+					{"name":"<span name='attr_advancement_nameL_r' ></span>","cost":"<span name='attr_advancement_costL_r'></span>","page":"<span name='attr_advancement_pg#L_r'></span>"},
+					{"name":"<span name='attr_advancement_nameR_r' ></span>","cost":"<span name='attr_advancement_costR_r'></span>","page":"<span name='attr_advancement_pg#R_r'></span>"},
+					{"desc":"<span name='attr_advancement_desc_r' ></span>"},
+				</fieldset>
+				null
+			</span>],
+			"training":{<span>
+				"bolt": "<span name='attr_weapons_training_bolt'></span>",
+				"chain": "<span name='attr_weapons_training_chain'></span>",
+				"flame": "<span name='attr_weapons_training_flame'></span>",
+				"las": "<span name='attr_weapons_training_las'></span>",
+				"launcher": "<span name='attr_weapons_training_launcher'></span>",
+				"melta": "<span name='attr_weapons_training_melta'></span>",
+				"plasma": "<span name='attr_weapons_training_plasma'></span>",
+				"power": "<span name='attr_weapons_training_power'></span>",
+				"low-tech": "<span name='attr_weapons_training_low-tech'></span>",
+				"shock": "<span name='attr_weapons_training_shock'></span>",
+				"solid-projectile": "<span name='attr_weapons_training_solid-projectile'></span>",
+				"heavy": "<span name='attr_weapons_training_heavy'></span>"
+			</span>}
+		},
+		"insanity": {
+			"points": "<span name='attr_insanity_pts'></span>",
+			"disorders": [<span>
+				"minor": "<span name='attr_insanity_disorder_minor'></span>",
+				"severe": "<span name='attr_insanity_disorder_severe'></span>",
+				"acute": "<span name='attr_insanity_disorder_acute'></span>"
+			</span>]
+		},
+		"corruption": {
+			"points": "<span name='attr_corruption_pts'></span>",
+			"mutations": [<span>
+				<fieldset name="mutations" class="repeating_mutations">
+					{"name": "<span name='attr_mutation_r'></span>", "description": "<span name='attr_mutation_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>]
+		},
+		"objectives": [<span>
+			<fieldset name='objectives' class='repeating_objectives'>
+				{"name":"<span name='attr_objective'></span>","complete":"<span name='attr_objective_completed'></span>"},
+			</fieldset>
+			null
+		</span>],
+		"notes": [<span>
+			<fieldset name='notes' class='repeating_notes'>
+				"<span name='attr_notes'></span>",
+			</fieldset>
+			null
+		</span>],
+		"psykana":{
+			"class":"<span name='attr_psykana_class'></span>",
+			"limit":"<span name='attr_psykana_limit'></span>",
+			"rating":"<span name='attr_psy_rating'></span>",
+			"push":"<span name='attr_psy_push'></span>",
+			"sustain":"<span name='attr_psykana_sustain'></span>",
+			"sustain_count":"<span name='attr_psykana_sustain_count'></span>",
+			"minor":[<span>
+				<fieldset name='minormanifestation' class='repeating_minormanifestation'>
+					{"name":"<span name='attr_P_minor_r'></span>","description":"<span name='attr_P_minor_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>],
+			"notes":[<span>
+				<fieldset name='psynotes' class='repeating_psynotes'>
+					{"name":"<span name='attr_P_note_r'></span>","description":"<span name='attr_P_note_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>],
+			"powers":[<span>
+				<fieldset name='psychicabilities' class='repeating_psychicabilities'>
+					{"name":"<span name='attr_P_name'></span>","subtype":"<span name='attr_P_subtype'></span>","range":"<span name='attr_P_range'></span>","damage":"<span name='attr_P_dam-roll'></span>","type":"<span name='attr_P_type'></span>","pen":"<span name='attr_P_pen'></span>","focus":"<span name='attr_P_focus'></span>","mod":"<span name='attr_P_mod1'></span>","multi":"<span name='attr_P_multi'></span>","action":"<span name='attr_P_action'></span>","sustained":"<span name='attr_P_sustained'></span>","ability":"<span name='attr_P_ability_r'></span>","desc":"<span name='attr_P_desc_r'></span>"},
+				</fieldset>
+				null
+			</span>]
+		},
+		"vehicles": {
+			"list": [<span>
+				<fieldset name='vehicles-R' class='repeating_vehicles'>
+					{"name": "<span name='attr_vehicle-name'></span>", "size": "<span name='attr_vehicle-size'></span>","world":"<span name='attr_vehicle-world'></span>","type":"<span name='attr_vehicle-type'></span>","tactical":"<span name='attr_vehicle-tactical'></span>","cruising":"<span name='attr_vehicle-cruising'></span>","maneuver":"<span name='attr_vehicle-maneuver'></span>", "crew":"<span name='attr_vehicle-crew'></span>", "complement":"<span name='attr_vehicle-complement'></span>", "integrity":"<span name='attr_vehicle-integrity'></span>", "integrity_max":"<span name='attr_vehicle-integrity_max'></span>", "armor-front":"<span name='attr_vehicle-armor-front'></span>", "armor-side":"<span name='attr_vehicle-armor-side'></span>", "armor-side-right":"<span name='attr_vehicle-armor-side-right'></span>", "armor-rear":"<span name='attr_vehicle-armor-rear'></span>", "armaments":"<span name='attr_armaments'></span>", "armaments_desc":"<span name='attr_armaments_desc'></span>", "traits":"<span name='attr_vehicle_traits'></span>", "traits_desc":"<span name='attr_vehicle_traits_desc'></span>", "modifications":"<span name='attr_modifications'></span>", "modifications_desc":"<span name='attr_modifications_desc'></span>"}, "notes":"<span name='attr_vehicle_notes'></span>", "notes_desc":"<span name='attr_vehicle_notes_desc'></span>"},
+				</fieldset>
+				null
+			</span>],
+			"weapons": {
+				"ranged": [<span>
+					<fieldset name='vehiclerangedweapons' class='repeating_vehiclerangedweapons'>{
+					"name": "<span name='attr_V_R_weapon_name'></span>",
+					"class":"<span name='attr_R_weapon_class'></span>",
+					"range":"<span name='attr_V_R_weapon_range'></span>",
+					"damage":"<span name='attr_V_R_weapon_dam-roll'></span>",
+					"pen":"<span name='attr_V_R_weapon_pen'></span>",
+					"type":"<span name='attr_V_R_weapon_type'></span>",
+					"min":"<span name='attr_V_R_weapon_min'></span>",
+					"max":"<span name='attr_V_R_weapon_max'></span>",
+					"vengeful":"<span name='attr_V_R_weapon_vengeful'></span>",
+					"accurate":"<span name='attr_V_R_weapon_accurate'></span>",
+					"standard":"<span name='attr_V_R_weapon_standard'></span>",
+					"burst":"<span name='attr_V_R_weapon_burst'></span>",
+					"auto":"<span name='attr_V_R_weapon_auto'></span>",
+					"mag":"<span name='attr_V_R_weapon_mag'></span>",
+					"mag_max":"<span name='attr_V_R_weapon_mag_max'></span>",
+					"focus":"<span name='attr_V_R_focus'></span>",
+					"trained":"<span name='attr_V_R_weapon_trained'></span>",
+					"mod1":"<span name='attr_V_R_weapon_mod1'></span>",
+					"reload":"<span name='attr_V_R_weapon_reload'></span>",
+					"weight":"<span name='attr_V_R_weapon_weight'></span>",
+					"domain":"<span name='attr_V_R_weapon_domain'></span>",
+					"mishap_chance":"<span name='attr_V_R_weapon_mishap_chance'></span>",
+					"spray":"<span name='attr_V_R_weapon_spray'></span>",
+					"special":"<span name='attr_V_R_ability_r'></span>",
+					"description":"<span name='attr_V_R_ability_desc_r'></span>"
+					},</fieldset>
+					null
+				</span>],
+				"melee": [<span>
+					<fieldset name='vehiclemeleeweapons' class='repeating_vehiclemeleeweapons'>{
+					"name": "<span name='attr_V_M_weapon_name'></span>",
+					"class":"Melee",
+					"domain":"<span name='attr_V_M_weapon_domain'></span>",
+					"reach":"<span name='attr_V_M_weapon_reach'></span>",
+					"damage":"<span name='attr_V_M_weapon_dam-roll'></span>",
+					"pen":"<span name='attr_V_M_weapon_pen'></span>",
+					"type":"<span name='attr_V_M_weapon_type'></span>",
+					"min":"<span name='attr_V_M_weapon_min'></span>",
+					"max":"<span name='attr_V_M_weapon_max'></span>",
+					"vengeful":"<span name='attr_V_M_weapon_vengeful'></span>",
+					"trained":"<span name='attr_V_M_weapon_trained'></span>",
+					"mod1":"<span name='attr_V_M_weapon_mod1'></span>",
+					"weight":"<span name='attr_V_M_weapon_weight'></span>",
+					"special":"<span name='attr_V_M_ability_r'></span>",
+					"description":"<span name='attr_V_M_ability_desc_r'></span>"
+					},</fieldset>
+					null
+				</span>]
+			}
+		}
+	  }
+	</div>
+	<label title='Toggles Import area' class='text_centered bttn_top_padding'><input type='checkbox' name='attr_exportimport' value='2' class='collapsible_entity_switch select_button hidden' /><span class='select_text'>Import Sheet</span></label>
+	<input type='checkbox' name='attr_exportimport' value='2' class='collapsible_entity_switch hidden' />
+	<div class='collapsible_entity_block'>
+		<textarea name="attr_import_value" placeholder="Copy the Export text here"></textarea>
+		<button name='act_import_clear' type='action' class='core_bttn bold_text'>Clear</button>
+		<button name='act_import' type='action' class='core_bttn bold_text'>Import</button>
+	</div>
+-->
+
 	<br>
 	<br>
   </div>
@@ -1886,10 +2353,10 @@
 	<label><input type='checkbox' name='attr_to-gm' value='/w gm' class='select_button hidden' /><span class='select_text'>To GM</span></label>
 	<label><input type='checkbox' name='attr_inlinemod-toggle' value='?{Modifier|0}' class='select_button hidden' checked='checked'><span class='select_text'>Inline Mod</span></label>
 	<label><input type='checkbox' name='attr_vehicle_sheet' class='auto_margin collapsible_entity_switch select_button hidden' /><span class='select_text'>Vehicle</span></label>
-	<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[(?{Degrees of Failiure|1})+?{Distance Mod|0}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
-	<p></p>
+	<button class='clear minimisable_infographic_override' type='roll' name='scatter' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{scatter-range= [[?{Number of Dice|1}d?{Dice Roll|Xd10,10|Xd5,5}+@{inlinemod-toggle}]]}} {{scatter-direction=[[1d10]]}}">Scatter</button>
+	<button class='clear minimisable_infographic_override' type='roll' name='shock' title='Used when character fails some types of Fear test' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{shock= [[(?{Fear DoF|1})*10 + 1d100]]}}">Shock</button>
 	<button class='clear minimisable_infographic_override' type='roll' name='d100' value="@{to-gm}&{template:mythic} [[ ([[?{Target Number|50}]] - [[1d100]])/10]] {{d100= }} {{character= @{character_name}}} {{target= $[[0]]}} {{roll=$[[1]]}} {{difference=$[[2]]}}">1d100</button>
-	<button class='clear minimisable_infographic_override' type='roll' name='righteousfury' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{righteousfury= }} {{@{settings_crunchsummary}= }} {{target=  [[?{Target|Person, 0|Vehicle, 1}]] }} {{location= [[?{Location|Arm/Weapon, 0|Body/Propulsion, 1|Head/Turret, 2|Leg/Hull, 3}]]}} {{type= [[?{Damage Type|Energy, 0|Explosive, 1|Impact, 2|Rending, 3}]] }} {{roll=[[ ceil(?{Dice Roll|1d5, 1d5|1d10, 1d10} / ?{Mitigation|None, 1| True Grit, 2}) ]] }}">Righteous Fury</button>
+	<button class='clear minimisable_infographic_override' type='roll' name='righteousfury' value="@{to-gm}&{template:mythic} {{character= @{character_name}}} {{righteousfury= }} {{@{settings_crunchsummary}= }} {{target=  [[?{Target|Person, 0|Vehicle, 1}]] }} {{location= [[?{Location|Arm/Weapon, 0|Body/Propulsion, 1|Head/Turret, 2|Leg/Hull, 3}]]}} {{type= [[?{Damage Type|Energy, 0|Explosive, 1|Impact, 2|Rending, 3}]] }} {{roll=[[ ceil(?{Dice Roll|1d5, 1d5|1d10, 1d10} / ?{Mitigation|None, 1| True Grit, 2}) +@{inlinemod-toggle}} ]] }} ">Righteous Fury</button>
   </div>
 
   	<!-- Vehicles -->
@@ -2033,9 +2500,9 @@
 				<option value='10' >Half Aim (+10)</option>
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
-			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{V_R_weapon_target}+@{inlinemod-toggle}}, {@{veh_atk_total_finder}-@{limiter}}}kh1, {@{veh_atk_total_finder}+@{limiter}}}kl1]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{veh_atk_unnat_finder}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos= $[[3]]}}@{settings_hitroll}{{aim= [[@{V_R_weapon_aim}]]}}{{R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= @{V_R_focus}}}{{stat=[[@{veh_atk_total_finder}]]}}{{hitmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}-20]]}}{{burst=@{V_R_weapon_burst}}}{{auto=@{V_R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
+			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{V_R_weapon_target}+@{inlinemod-toggle}}, {@{veh_atk_total_finder}-@{limiter}}}kh1, {@{veh_atk_total_finder}+@{limiter}}}kl1]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{veh_atk_unnat_finder}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos= $[[3]]}} @{settings_hitroll} {{aim= [[@{V_R_weapon_aim}]]}}{{R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= @{V_R_focus}}}{{stat=[[@{veh_atk_total_finder}]]}}{{hitmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}-20]]}}{{burst=@{V_R_weapon_burst}}}{{auto=@{V_R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
 !ammo @{character_id} repeating_rangedweapons_@{id}_V_R_weapon_mag [[@{ammo}*@{V_R_weapon_setting}]]'>Hit |<input name='attr_V_R_weapon_target' value='@{veh_atk_total_finder} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range}+@{veh_fatigue_finder}' class='input_background input_char_background' disabled ></button>
-			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg}]] }} {{spray= [[@{V_R_weapon_spray}]] }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }} @{V_R_weapon_accurate}'>DMG</button>
+			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg} + @{V_R_weapon_accurate}]] }} {{spray= [[@{V_R_weapon_spray}]] }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }} '>DMG</button>
 			</div>
 			<input class='hidden' type='text' name='attr_veh_atk_total_finder' readonly />
 			<input class='hidden' type='text' name='attr_veh_atk_unnat_finder' readonly />
@@ -2074,7 +2541,7 @@
 			  <input class='equipment_ranged_weapons_gs_d6 full_width' type='text' value='0' name='attr_V_R_weapon_vengeful' />
 			  <input type='hidden' value='' name='attr_V_R_weapon_real_dmg' />
 			  <div class='equipment_ranged_weapons_gs_d7'>Accurate</div>
-			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='{{accurate=?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}}}' name='attr_V_R_weapon_accurate' />
+			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}' name='attr_V_R_weapon_accurate' />
 			</div>
 			<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle '>
 			  <div class='equipment_ranged_weapons_gs_e1'>RoF</div>
@@ -2162,7 +2629,7 @@
 				<option value='10' >Half Aim (+10)</option>
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
-			  <button name='weapon_hit' class='equipment_melee_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{V_M_weapon_name}}}{{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{V_M_weapon_target}+@{inlinemod-toggle}}, {@{wsTotal}-@{limiter}}}kh1, {@{wsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos=$[[3]]}}@{settings_hitroll} {{aim= [[@{V_M_weapon_aim}]]}}{{M_type= [[@{V_M_weapon_attack}]]}}{{multi= [[@{V_M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Weapon Skill}}{{stat=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{hitmod=[[@{V_M_weapon_mod1}]]}}{{trained=[[@{V_M_weapon_trained}-20]]}}{{WS_bonus=[[@{wsB}]]}}{{fatigued=[[@{fatigued}]]}}' >Hit |<input name='attr_V_M_weapon_target' value='@{wsTotal}+@{V_M_weapon_trained}-20+@{V_M_weapon_mod1}+@{V_M_weapon_attack}+@{V_M_weapon_aim}+@{V_M_weapon_multi}+@{fatigued}' class='input_background input_char_background' disabled ></button>
+			  <button name='weapon_hit' class='equipment_melee_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }}{{weapon= @{V_M_weapon_name}}}{{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{V_M_weapon_target}+@{inlinemod-toggle}}, {@{wsTotal}-@{limiter}}}kh1, {@{wsTotal}+@{limiter}}}kl1]]-[[1d100]])/10)]]+ceil(@{WS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos=$[[3]]}} @{settings_hitroll} {{aim= [[@{V_M_weapon_aim}]]}}{{M_type= [[@{V_M_weapon_attack}]]}}{{multi= [[@{V_M_weapon_multi}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Weapon Skill}}{{stat=[[@{WS}]]}}{{advancement=[[@{WS_advancement}]]}}{{hitmod=[[@{V_M_weapon_mod1}]]}}{{trained=[[@{V_M_weapon_trained}-20]]}}{{WS_bonus=[[@{wsB}]]}}{{fatigued=[[@{fatigued}]]}}' >Hit |<input name='attr_V_M_weapon_target' value='@{wsTotal}+@{V_M_weapon_trained}-20+@{V_M_weapon_mod1}+@{V_M_weapon_attack}+@{V_M_weapon_aim}+@{V_M_weapon_multi}+@{fatigued}' class='input_background input_char_background' disabled ></button>
 			  <button name='weapon_dmg' class='equipment_melee_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{weapon= @{V_M_weapon_name}}} {{type= @{V_M_weapon_type}}} {{damage=[[@{V_M_weapon_real_dmg}+[[floor((@{strTotal})/10) + @{str_unnat}]]]] }} {{pen= [[@{V_M_weapon_pen}]] }} {{@{settings_weapondescription}=@{V_M_ability_r} }}'>DMG</button>
 			</div>
 			<div class='equipment_melee_weapons_grid2'>
@@ -2933,7 +3400,7 @@
 	 * @param  {string} source row id of the weapon
 	 */
 	const calcDmg = function (sources, fields) {
-		var redice = /^(\d+)?(d\d+)\s?((?:kh?\d+)?(?:kl\d+)?(?:dl?\d+)?(?:dh\d+)?\s?(?:[\+|-]\d+)?)?/;
+		var redice = /^(\d+)?(d\d+)(.*)?/;
 
 		getAttrs(fields, v => {
 			let attr = {};
@@ -3092,6 +3559,479 @@
 	}
 	
 	
+	// ___________________________________________________________________________
+	// ________________________________ Importer _________________________________
+	// ___________________________________________________________________________TODO: make this work
+	/*
+	on('clicked:import_clear', () => {
+		setAttrs({
+			import_value: ''
+		});
+	});
+	
+	on('clicked:import', () => {
+		getAttrs(['import_value'], (v) => {
+			try {
+      	var data = JSON.parse(v.import_value);
+			} catch(e) {
+				setAttrs({import_value: 'ERROR: verify that you have copied the whole Export text'}); return console.log(e);
+			}
+			console.log('Importing Character');
+			var attributes = {}
+
+			// functions
+			const mapInfo = (data) => {
+				let attr = {};
+				attr['character_name'] = data.name || '';
+				attr['home_world'] = data.homeworld || '';
+				attr['regiment'] = data.regiment || '';
+				attr['specialty'] = data.specialty || '';
+			  attr['demeanor'] = data.demeanor || '';
+			  attr['notes'] = data.note || '';
+			  attr['player_name'] = data.player || '';
+			  attr['appearance'] = data.appearance || '';
+			  attr['appearance2'] = data.appearance2 || '';
+			  attr['quirks'] = data.quirks || '';
+			  attr['allies'] = data.allies || '';
+			  attr['enemies'] = data.enemies || '';
+			  attr['size'] = data.size || '';
+			  attr['xp_total'] = data.xp || '';
+			  attr['agi_mov_mod'] = data.movementModifier || '';
+				return attr;
+			};
+			const mapStat = (statName, stat) => {
+				let attr = {};
+				attr[`${statName}`] = stat.base || 0;
+				attr[`${statName}_advancement`] = stat.advancement || 0;
+				attr[`${statName}_mod`] = stat.modifier || 0;
+				attr[`${statName}_unnat`] = stat.unnatural || 0;
+				return attr;
+			};
+			const mapWounds = (wounds) => {
+				let attr = {};
+				attr['wounds'] = wounds.current || '';
+				attr['wounds_max'] = wounds.max || '';
+				attr['critical_dmg'] = wounds.critical || '';
+				return attr;
+			};
+			const mapFate = (fate) => {
+				let attr = {};
+				attr['fate'] = fate.current || '';
+				attr['fate_max'] = fate.max || '';
+				return attr;
+			};
+			const mapFatigue = (fatigue) => {
+				let attr = {};
+				attr['fatigue'] = fatigue.current || '';
+				attr['fatigue_threshold'] = fatigue.threshold || '';
+				return attr;
+			};
+			const mapForceField = (forcefield) => {
+				let attr = {};
+				attr['forcefield_name'] = forcefield.name || '';
+				attr['forcefield_protection'] = forcefield.protection || '';
+				attr['forcefield_overload'] = forcefield.overload || '';
+				return attr;
+			};
+			const mapSkill = (skill) => {
+				if (!skill) return ;
+				let attr = {}
+				attr[`mod2_${skill.name}`] = skill.modifier || 0;
+				attr[`mod3_${skill.name}`] = skill.level || 0;
+				return attr;
+			};
+			const mapRepeatingSkill = (skill, section) => {
+				if (!skill) return ;
+				let attr = {},
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_${section}_name`] = skill.name || '';
+				attr[`repeating_${section}_${id}_${section}_r_mod2`] = skill.modifier || '';
+				attr[`repeating_${section}_${id}_${section}_r_mod3`] = skill.level || '';
+				return attr;
+			};
+			
+	    const mapAbility = (ability) => {
+				if (!ability) return ;
+				let attr = {},
+				attr['ability'] = ability.name || '';
+				attr['ability_desc'] = ability.description || '';
+						section = 'abilities',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_ability_r`] = ability.name || '';
+				attr[`repeating_${section}_${id}_ability_desc_r`] = ability.description || '';
+				return attr;
+			};
+			const mapRangedWeapon = (weapon, vehicle) => {
+				if (!weapon) return ;
+				let attr = {},
+						section = (vehicle) ? 'vehiclerangedweapons' : 'rangedweapons',
+						id = generateRowID();
+				if (vehicle) id += '_V';
+				attr[`repeating_${section}_${id}_R_weapon_name`] = weapon.name || '';
+				attr[`repeating_${section}_${id}_R_weapon_class`] = weapon.class || '';
+				attr[`repeating_${section}_${id}_R_weapon_range`] = weapon.range || '';
+				attr[`repeating_${section}_${id}_R_weapon_dam-roll`] = weapon.damage || '';
+				attr[`repeating_${section}_${id}_R_weapon_pen`] = weapon.pen || '';
+				attr[`repeating_${section}_${id}_R_weapon_type`] = weapon.type || '';
+				attr[`repeating_${section}_${id}_R_weapon_min`] = weapon.min || '';
+				attr[`repeating_${section}_${id}_R_weapon_max`] = weapon.max || '';
+				attr[`repeating_${section}_${id}_R_weapon_vengeful`] = weapon.vengeful || '';
+				attr[`repeating_${section}_${id}_R_weapon_accurate`] = weapon.accurate || '';
+				attr[`repeating_${section}_${id}_R_weapon_standard`] = weapon.standard || '';
+				attr[`repeating_${section}_${id}_R_weapon_burst`] = weapon.burst || '';
+				attr[`repeating_${section}_${id}_R_weapon_auto`] = weapon.auto || '';
+				attr[`repeating_${section}_${id}_R_weapon_mag`] = weapon.mag || '';
+				attr[`repeating_${section}_${id}_R_weapon_mag_max`] = weapon.mag_max || '';
+				attr[`repeating_${section}_${id}_R_weapon_carry`] = weapon.carry || '';
+				attr[`repeating_${section}_${id}_R_weapon_trained`] = weapon.trained || '';
+				attr[`repeating_${section}_${id}_R_weapon_mod1`] = weapon.mod1 || '';
+				attr[`repeating_${section}_${id}_R_weapon_reload`] = weapon.reload || '';
+				attr[`repeating_${section}_${id}_R_weapon_weight`] = weapon.weight || '';
+				attr[`repeating_${section}_${id}_R_weapon_domain`] = weapon.domain || '';
+				attr[`repeating_${section}_${id}_R_weapon_mishap_chance`] = weapon.mishap_chance || '';
+				attr[`repeating_${section}_${id}_R_weapon_spray`] = weapon.spray || '';
+				attr[`repeating_${section}_${id}_R_weapon_ability_r`] = weapon.special || '';
+				attr[`repeating_${section}_${id}_R_weapon_ability_desc_r`] = weapon.description || '';
+				return attr;
+			}
+			const mapMeleeWeapon = (weapon, vehicle) => {
+				if (!weapon) return ;
+				let attr = {},
+						section = (vehicle) ? 'vehiclemeleeweapons' : 'meleeweapons',
+						id = generateRowID();
+				if (vehicle) id += '_V';
+				attr[`repeating_${section}_${id}_M_weapon_name`] = weapon.name || '';
+				attr[`repeating_${section}_${id}_M_weapon_class`] = weapon.class || '';
+				attr[`repeating_${section}_${id}_M_weapon_reach`] = weapon.reach || '';
+				attr[`repeating_${section}_${id}_M_weapon_dam-roll`] = weapon.damage || '';
+				attr[`repeating_${section}_${id}_M_weapon_pen`] = weapon.pen || '';
+				attr[`repeating_${section}_${id}_M_weapon_type`] = weapon.type || '';
+				attr[`repeating_${section}_${id}_M_weapon_min`] = weapon.min || '';
+				attr[`repeating_${section}_${id}_M_weapon_max`] = weapon.max || '';
+				attr[`repeating_${section}_${id}_M_weapon_vengeful`] = weapon.vengeful || '';
+				attr[`repeating_${section}_${id}_M_weapon_trained`] = weapon.trained || '';
+				attr[`repeating_${section}_${id}_M_weapon_mod1`] = weapon.mod1 || '';
+				attr[`repeating_${section}_${id}_M_weapon_weight`] = weapon.weight || '';
+				attr[`repeating_${section}_${id}_M_weapon_domain`] = weapon.domain || '';
+				attr[`repeating_${section}_${id}_M_weapon_carry`] = weapon.carry || '';
+				attr[`repeating_${section}_${id}_M_weapon_ability_r`] = weapon.special || '';
+				attr[`repeating_${section}_${id}_M_weapon_ability_desc_r`] = weapon.description || '';
+				return attr;
+			}
+			const mapGear = (gear) => {
+				if (!gear) return ;
+				let attr = {},
+				attr['gear_carry'] = gear.carry || '';
+				attr['gear_name'] = gear.name || '';
+				attr['gear_crafts'] = gear.craftsmanship || '';
+				attr['gear_quantity'] = gear.quantity || '';
+				attr['gear_avail'] = gear.availability || '';
+				attr['gear_weight'] = gear.weight || '';
+				attr['gear_pg#'] = gear.pg || '';
+				attr['gear_ability_desc'] = gear.description || '';
+						section = 'gear',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_carry_r`] = gear.carry || '';
+				attr[`repeating_${section}_${id}_name_r`] = gear.name || '';
+				attr[`repeating_${section}_${id}_crafts_r`] = gear.craftsmanship || '';
+				attr[`repeating_${section}_${id}_quantity_r`] = gear.quantity || '';
+				attr[`repeating_${section}_${id}_avail_r`] = gear.availability || '';
+				attr[`repeating_${section}_${id}_weight_r`] = gear.weight || '';
+				attr[`repeating_${section}_${id}_pg#_r`] = gear.pg || '';
+				attr[`repeating_${section}_${id}_ability_desc_r`] = gear.description || '';
+				return attr;
+			}
+			const mapArmor = (armor) => {
+				let attr = {};
+				attr['armor_AGI'] = armor.maxAgi || '';
+				attr['armor_limit'] = armor.limit || '';
+				attr['armor_head'] = armor.head || '';
+				attr['armor_body'] = armor.body || '';
+				attr['armor_arm_right'] = armor.arm_right || '';
+				attr['armor_arm_left'] = armor.arm_left || '';
+				attr['armor_leg_right'] = armor.leg_right || '';
+				attr['armor_leg_left'] = armor.leg_left || '';
+				attr['armor_name'] = armor.description || '';
+				return attr;
+			}
+			const mapCybernetic = (cybernetic) => {
+				if (!cybernetic) return ;
+				let attr = {},
+				attr['cybernetic_name'] = cybernetic.name || '';
+				attr['cybernetic_location'] = cybernetic.location || '';
+				attr['cybernetic_page'] = cybernetic.page || '';
+				attr['cybernetic_desc'] = cybernetic.description || '';
+						section = 'cybernetics',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_cybernetic_name_r`] = cybernetic.name || '';
+				attr[`repeating_${section}_${id}_cybernetic_location_r`] = cybernetic.location || '';
+				attr[`repeating_${section}_${id}_cybernetic_page_r`] = cybernetic.page || '';
+				attr[`repeating_${section}_${id}_cybernetic_desc_r`] = cybernetic.description || '';
+				return attr;
+			}
+			const mapComrades = (comrades) => {
+				if (!comrades) return//do comrades load?
+				let attr = {},
+						section = 'comradename';
+				attr[`repeating_${section}_${id}_C_name`] = comrades.name || '';
+				attr[`repeating_${section}_${id}_C_status`] = comrades.description || '';
+				return attr;
+			}
+			const mapComradeAbilities = (comradeability) => {
+				if (!comradeability) return
+				let attr = {},
+						section = 'comradeability';
+				attr[`repeating_${section}_${id}_C_ability_r`] = comradeability.name || '';
+				attr[`repeating_${section}_${id}_C_ability_desc_r`] = comradeability.description || '';
+				return attr;
+			}
+			const mapAptitudes = (aptitudes) => {
+	    	var attr = {};
+			attr['aptitude_nameL'] = aptitudes[0] || '';
+	        attr['aptitude_nameM'] = aptitudes[1] || '';
+	        attr['aptitude_nameR'] = aptitudes[2] || '';
+	    	var	section = 'aptitudes';
+	      for (var i = 0; i < aptitudes?.length; i += 3) {
+	        let id = generateRowID();
+	        attr[`repeating_${section}_${id}_aptitude_nameL_r`] = aptitudes[i] || '';
+	        attr[`repeating_${section}_${id}_aptitude_nameM_r`] = aptitudes[i+1] || '';
+	        attr[`repeating_${section}_${id}_aptitude_nameR_r`] = aptitudes[i+2] || '';
+	      }
+	    	return attr;
+	    };//check how the aptitude and advancement lists are affected by Import
+			const mapAdvance = (advance) => {
+	    	var attr = {};
+	    	var	section = 'advance';
+	      for (var i = 0; i < advance?.length; i += 2) {
+	        let id = generateRowID();
+	        attr[`repeating_${section}_${id}_advancement_nameL_r`] = advance[i]?.name || '';
+	        attr[`repeating_${section}_${id}_advancement_costL_r`] = advance[i]?.cost || '';
+			attr[`repeating_${section}_${id}_advancement_pg#L_r`] = advance[i]?.page || '';
+	        attr[`repeating_${section}_${id}_advancement_nameR_r`] = advance[i+1]?.name || '';
+	        attr[`repeating_${section}_${id}_advancement_costR_r`] = advance[i+1]?.cost || '';
+			attr[`repeating_${section}_${id}_advancement_pg#R_r`] = advance[i+1]?.page || '';
+	      }
+	    	return attr;
+	    };
+			const mapDisorder = (disorder) => {
+				if (!disorder) return;
+				let attr = {},
+				attr['insanity_disorder_minor'] = disorder.minor || '';
+				attr['insanity_disorder_severe'] = disorder.severe || '';
+				attr['insanity_disorder_acute'] = disorder.acute || '';
+				return attr;
+			}
+			const mapMutation = (mutation) => {
+				if (!mutation) return;
+				let attr = {},
+						section = 'mutations',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_mutation_r`] = mutation.name || '';
+				attr[`repeating_${section}_${id}_mutation_desc_r`] = mutation.description || '';
+				return attr;
+			}
+			const mapObjective = (objective) => {
+				if (!objective) return;
+				let attr = {},
+						section = 'objectives',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_objective_r`] = objective.name || '';
+				attr[`repeating_${section}_${id}_objective_completed`] = objective.complete || '';
+				return attr;
+			}
+			const mapNote = (note) => {
+				if (!note) return;
+				let attr = {},
+						section = 'notes',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_notes`] = note.name || '';
+				return attr;
+			}
+			const mapPsykana = (psykana) => {
+				let attr = {};
+				attr[`psykana_class`] = psykana.class || '';
+				attr[`psykana_limit`] = psykana.limit || '';
+				attr[`psy_rating`] = psykana.rating || '';
+				attr[`psy_push`] = psykana.push || '';
+				attr[`psykana_sustain`] = psykana.sustain || '';
+				attr[`psykana_sustain_count`] = psykana.sustain_count || '';
+				return attr;
+			};
+			const mapPsyMinor = (minor) => {
+				if (!minor) return
+				let attr = {},
+						section = 'minormanifestation';
+				attr[`repeating_${section}_${id}_P_minor_r`] = minor.name || '';
+				attr[`repeating_${section}_${id}_P_minor_desc_r`] = minor.description || '';
+				return attr;
+			}
+			const mapPsyNote = (note) => {
+				if (!note) return
+				let attr = {},
+						section = 'psynotes';
+				attr[`repeating_${section}_${id}_P_note_r`] = note.name || '';
+				attr[`repeating_${section}_${id}_P_note_desc_r`] = note.description || '';
+				return attr;
+			}
+			const mapPsyPower = (power) => {
+				if (!power) return;
+				let attr = {},
+						section = 'psychicabilities',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_P_name`] = power.name || '';
+				attr[`repeating_${section}_${id}_P_subtype`] = power.subtype || '';
+				attr[`repeating_${section}_${id}_P_range`] = power.range || '';
+				attr[`repeating_${section}_${id}_P_dam-roll`] = power.damage || '';
+				attr[`repeating_${section}_${id}_P_type`] = power.type || '';
+				attr[`repeating_${section}_${id}_P_pen`] = power.pen || '';
+				attr[`repeating_${section}_${id}_P_focus`] = power.focus || '';
+				attr[`repeating_${section}_${id}_P_mod1`] = power.mod || '';
+				attr[`repeating_${section}_${id}_P_multi`] = power.multi || '';
+				attr[`repeating_${section}_${id}_P_action`] = power.action || '';
+				attr[`repeating_${section}_${id}_P_sustained`] = power.sustained || '';
+				attr[`repeating_${section}_${id}_P_ability_r`] = power.ability || '';
+				attr[`repeating_${section}_${id}_P_desc_r`] = power.desc || '';
+				return attr;
+			}
+			const mapVehicle = (vehicle) => {
+				if (!vehicle) return;
+				let attr = {},
+						section = 'vehicles-R',
+						id = generateRowID();
+				attr[`repeating_${section}_${id}_vehicle-name`] = vehicle.name || '';
+				attr[`repeating_${section}_${id}_vehicle-size`] = vehicle.size || '';
+				attr[`repeating_${section}_${id}_vehicle-world`] = vehicle.world || '';
+				attr[`repeating_${section}_${id}_vehicle-type`] = vehicle.type || '';
+				attr[`repeating_${section}_${id}_vehicle-tactical`] = vehicle.tactical || '';
+				attr[`repeating_${section}_${id}_vehicle-cruising`] = vehicle.cruising || '';
+				attr[`repeating_${section}_${id}_vehicle-maneuver`] = vehicle.maneuver || '';
+				attr[`repeating_${section}_${id}_vehicle-crew`] = vehicle.crew || '';
+				attr[`repeating_${section}_${id}_vehicle-complement`] = vehicle.complement || '';
+				attr[`repeating_${section}_${id}_vehicle-integrity`] = vehicle.integrity || '';
+				attr[`repeating_${section}_${id}_vehicle-integrity_max`] = vehicle.integrity_max || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-front`] = vehicle['armor-front'] || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-side`] = vehicle['armor-side'] || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-side-right`] = vehicle['armor-side-right'] || '';
+				attr[`repeating_${section}_${id}_vehicle-armor-rear`] = vehicle['armor-rear'] || '';
+				attr[`repeating_${section}_${id}_armaments`] = vehicle.armaments || '';
+				attr[`repeating_${section}_${id}_armaments_desc`] = vehicle.armaments_desc || '';
+				attr[`repeating_${section}_${id}_vehicle_traits`] = vehicle.traits || '';
+				attr[`repeating_${section}_${id}_vehicle_traits_desc`] = vehicle.traits_desc || '';
+				attr[`repeating_${section}_${id}_modifications`] = vehicle.modifications || '';
+				attr[`repeating_${section}_${id}_modifications_desc`] = vehicle.modifications_desc || '';
+				attr[`repeating_${section}_${id}_notes`] = vehicle.notes || '';
+				attr[`repeating_${section}_${id}_notes_desc`] = vehicle.notes_desc || '';
+				return attr;
+			}
+
+			// info Block
+			attributes = {...attributes, ...mapInfo(data)}
+
+			// STATS
+			attributes = {...attributes, ...mapStat('WS', data.weaponSkill)};
+			attributes = {...attributes, ...mapStat('BS', data.ballisticSkill)};
+			attributes = {...attributes, ...mapStat('STR', data.strength)};
+			attributes = {...attributes, ...mapStat('TOU', data.toughness)};
+			attributes = {...attributes, ...mapStat('AGI', data.agility)};
+			attributes = {...attributes, ...mapStat('INT', data.intelligence)};
+			attributes = {...attributes, ...mapStat('PER', data.perception)};
+			attributes = {...attributes, ...mapStat('WP', data.willpower)};
+			attributes = {...attributes, ...mapStat('FEL', data.fellowship)};
+
+			// WOUNDS, FATE, FATIGUE, FORCEFIELD
+			attributes = {...attributes, ...mapWounds(data.wounds)};
+			attributes = {...attributes, ...mapFate(data.fate)};
+			attributes = {...attributes, ...mapFatigue(data.fatigue)};
+			attributes = {...attributes, ...mapForceField(data.forcefield)};
+
+			// SKILLS, REPEATING SKILLS
+			data?.skills?.forEach(skill => {
+				attributes = {...attributes, ...mapSkill(skill)};
+			});
+			data?.lores?.common?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'common-lore')};
+			});
+			data?.lores?.scholastic?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'scholastic-lore')};
+			});
+			data?.lores?.forbidden?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'forbidden-lore')};
+			});
+			data?.linguistics?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'linguistics')};
+			});
+			data?.trades?.forEach(skill => {
+				attributes = {...attributes, ...mapRepeatingSkill(skill, 'trades')};
+			});
+
+			// TALENTS, TRAITS
+	    data?.abilities?.forEach(ability => {
+	      attributes = {...attributes, ...mapAbility(ability, 'abilities')};
+	    });
+	    data?.traits?.forEach(trait => {
+	      attributes = {...attributes, ...mapTrait(trait)};
+	    });
+
+	    // INVENTORY
+	    data?.inventory?.weapons?.ranged?.forEach( weapon => {
+	      attributes = {...attributes, ...mapRangedWeapon(weapon)};
+	    });
+	    data?.inventory?.weapons?.melee?.forEach( weapon => {
+	      attributes = {...attributes, ...mapMeleeWeapon(weapon)};
+	    });
+	    data?.inventory?.gears?.forEach( gear => {
+	      attributes = {...attributes, ...mapGear(gear)};
+	    });
+
+	    attributes = {...attributes, ...mapArmor(data?.inventory?.armor)};
+
+	    data?.inventory?.cybernetics?.forEach( cybernetic => {
+	      attributes = {...attributes, ...mapCybernetic(cybernetic)};
+	    });
+
+	    // ADVANCEMENTS
+	    attributes = {...attributes, ...mapAptitudes(data?.advancements?.aptitudes)};
+      attributes = {...attributes, ...mapAdvance(data?.advancements?.advances)};
+	    for (var training in data?.advancements?.training) {
+	      attributes[`weapons_training_${training}`] = data?.advancements?.training[training];
+	    }
+
+	    // INSANITY, CORRUPTION
+	    attributes[`insanity_pts`] = data?.insanity?.points;
+
+	    attributes[`corruption_pts`] = data?.corruption?.points;
+	    data?.corruption?.mutations?.forEach( mutation => {
+	        attributes = {...attributes, ...mapMutation(mutation)};
+	    })
+
+	    // OBJECTIVES, NOTES
+	    data?.objectives?.forEach( objective => {
+	        attributes = {...attributes, ...mapObjective(objective)};
+	    });
+	    data?.notes?.forEach( note => {
+	        attributes = {...attributes, ...mapNote(note)};
+	    });
+
+	    // VEHICLES
+	    data?.vehicles?.list?.forEach( vehicle => {
+	        attributes = {...attributes, ...mapVehicle(vehicle)};
+	    });
+	    data?.vehicles?.weapons?.ranged?.forEach( weapon => {
+	      attributes = {...attributes, ...mapRangedWeapon(weapon, true)};
+	    });
+	    data?.vehicles?.weapons?.melee?.forEach( weapon => {
+	      attributes = {...attributes, ...mapMeleeWeapon(weapon, true)};
+	    });
+
+	    // PSYKANA
+	    attributes = {...attributes, ...mapPsykana(data?.psykana)};
+
+			console.log('setting attributes');
+			attributes.import_value = 'Success: Character Imported Successfully\n\nRemember to add the token manually';
+			setAttrs(attributes, true);
+		})
+	})
+	*/
 	
 </script>
 
@@ -3400,20 +4340,429 @@
 	{{#loc}}
 	  {{^attack}}<div class="template-content template-round">{{/attack}}
 	  {{#attack}} <div class="template-content">{{/attack}}
-		<div class="template-row template-center template-break">Hit Location {{loc}}</div>
-		<div class="template-row template-center">
-		  {{#rollBetween() loc 1 10}}   HEAD		{{/rollBetween() loc 1 10}}
-		  {{#rollBetween() loc 11 20}}  RIGHT ARM	{{/rollBetween() loc 11 20}}
-		  {{#rollBetween() loc 21 30}}  LEFT ARM	{{/rollBetween() loc 21 30}}
-		  {{#rollBetween() loc 31 70}}  BODY		{{/rollBetween() loc 31 70}}
-		  {{#rollBetween() loc 71 85}}  RIGHT LEG	{{/rollBetween() loc 71 85}}
-		  {{#rollBetween() loc 86 100}} LEFT LEG	{{/rollBetween() loc 86 100}}
-		  
-		  {{#rollBetween() loc 1 20}} / MOTIVE SYSTEM	{{/rollBetween() loc 1 20}}
-		  {{#rollBetween() loc 21 60}} / HULL			{{/rollBetween() loc 21 60}}
-		  {{#rollBetween() loc 61 80}} / WEAPON			{{/rollBetween() loc 61 80}}
-		  {{#rollBetween() loc 81 100}} / TURRET		{{/rollBetween() loc 81 100}}
-		</div>
+	  <!-- Hit location: Head -->
+	  {{#rollTotal() roll 10}}
+		<div class="template-row template-center template-break">Hit Location: 01</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 10}}
+	  {{#rollTotal() roll 20}}
+		<div class="template-row template-center template-break">Hit Location: 02</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 20}}
+	  {{#rollTotal() roll 30}}
+		<div class="template-row template-center template-break">Hit Location: 03</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 30}}
+	  {{#rollTotal() roll 40}}
+		<div class="template-row template-center template-break">Hit Location: 04</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 40}}
+	  {{#rollTotal() roll 50}}
+		<div class="template-row template-center template-break">Hit Location: 05</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 50}}
+	  {{#rollTotal() roll 60}}
+		<div class="template-row template-center template-break">Hit Location: 06</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 60}}
+	  {{#rollTotal() roll 70}}
+		<div class="template-row template-center template-break">Hit Location: 07</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 70}}
+	  {{#rollTotal() roll 80}}
+		<div class="template-row template-center template-break">Hit Location: 08</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 80}}
+	  {{#rollTotal() roll 90}}
+		<div class="template-row template-center template-break">Hit Location: 09</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 90}}
+	  {{#rollTotal() roll 1}}
+		<div class="template-row template-center template-break">Hit Location: 10</div>
+		<div class="template-row template-center">HEAD / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 1}}
+	  <!-- Hit Location: Right Arm -->
+	  {{#rollTotal() roll 11}}
+		<div class="template-row template-center template-break">Hit Location: 11</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 11}}
+	  {{#rollTotal() roll 21}}
+		<div class="template-row template-center template-break">Hit Location: 12</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 21}}
+	  {{#rollTotal() roll 31}}
+		<div class="template-row template-center template-break">Hit Location: 13</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 31}}
+	  {{#rollTotal() roll 41}}
+		<div class="template-row template-center template-break">Hit Location: 14</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 41}}
+	  {{#rollTotal() roll 51}}
+		<div class="template-row template-center template-break">Hit Location: 15</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 51}}
+	  {{#rollTotal() roll 61}}
+		<div class="template-row template-center template-break">Hit Location: 16</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 61}}
+	  {{#rollTotal() roll 71}}
+		<div class="template-row template-center template-break">Hit Location: 17</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 71}}
+	  {{#rollTotal() roll 81}}
+		<div class="template-row template-center template-break">Hit Location: 18</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 81}}
+	  {{#rollTotal() roll 91}}
+		<div class="template-row template-center template-break">Hit Location: 19</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 91}}
+	  {{#rollTotal() roll 2}}
+		<div class="template-row template-center template-break">Hit Location: 20</div>
+		<div class="template-row template-center">RIGHT ARM / MOTIVE SYSTEM</div>
+	  {{/rollTotal() roll 2}}
+	  <!-- Hit Location: Left Arm -->
+	  {{#rollTotal() roll 12}}
+		<div class="template-row template-center template-break">Hit Location: 21</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 12}}
+	  {{#rollTotal() roll 22}}
+		<div class="template-row template-center template-break">Hit Location: 22</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 22}}
+	  {{#rollTotal() roll 32}}
+		<div class="template-row template-center template-break">Hit Location: 23</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 32}}
+	  {{#rollTotal() roll 42}}
+		<div class="template-row template-center template-break">Hit Location: 24</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 42}}
+	  {{#rollTotal() roll 52}}
+		<div class="template-row template-center template-break">Hit Location: 25</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 52}}
+	  {{#rollTotal() roll 62}}
+		<div class="template-row template-center template-break">Hit Location: 26</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 62}}
+	  {{#rollTotal() roll 72}}
+		<div class="template-row template-center template-break">Hit Location: 27</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 72}}
+	  {{#rollTotal() roll 82}}
+		<div class="template-row template-center template-break">Hit Location: 28</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 82}}
+	  {{#rollTotal() roll 92}}
+		<div class="template-row template-center template-break">Hit Location: 29</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 92}}
+	  {{#rollTotal() roll 3}}
+		<div class="template-row template-center template-break">Hit Location: 30</div>
+		<div class="template-row template-center">LEFT ARM / HULL</div>
+	  {{/rollTotal() roll 3}}
+	  <!-- Hit Location: Body -->
+	  {{#rollTotal() roll 13}}
+		<div class="template-row template-center template-break">Hit Location: 31</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 13}}
+	  {{#rollTotal() roll 23}}
+		<div class="template-row template-center template-break">Hit Location: 32</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 23}}
+	  {{#rollTotal() roll 33}}
+		<div class="template-row template-center template-break">Hit Location: 33</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 33}}
+	  {{#rollTotal() roll 43}}
+		<div class="template-row template-center template-break">Hit Location: 34</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 43}}
+	  {{#rollTotal() roll 53}}
+		<div class="template-row template-center template-break">Hit Location: 35</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 53}}
+	  {{#rollTotal() roll 63}}
+		<div class="template-row template-center template-break">Hit Location: 36</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 63}}
+	  {{#rollTotal() roll 73}}
+		<div class="template-row template-center template-break">Hit Location: 37</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 73}}
+	  {{#rollTotal() roll 83}}
+		<div class="template-row template-center template-break">Hit Location: 38</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 83}}
+	  {{#rollTotal() roll 93}}
+		<div class="template-row template-center template-break">Hit Location: 39</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 93}}
+	  {{#rollTotal() roll 4}}
+		<div class="template-row template-center template-break">Hit Location: 40</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 4}}
+	  {{#rollTotal() roll 14}}
+		<div class="template-row template-center template-break">Hit Location: 41</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 14}}
+	  {{#rollTotal() roll 24}}
+		<div class="template-row template-center template-break">Hit Location: 42</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 24}}
+	  {{#rollTotal() roll 34}}
+		<div class="template-row template-center template-break">Hit Location: 43</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 34}}
+	  {{#rollTotal() roll 44}}
+		<div class="template-row template-center template-break">Hit Location: 44</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 44}}
+	  {{#rollTotal() roll 54}}
+		<div class="template-row template-center template-break">Hit Location: 45</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 54}}
+	  {{#rollTotal() roll 64}}
+		<div class="template-row template-center template-break">Hit Location: 46</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 64}}
+	  {{#rollTotal() roll 74}}
+		<div class="template-row template-center template-break">Hit Location: 47</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 74}}
+	  {{#rollTotal() roll 84}}
+		<div class="template-row template-center template-break">Hit Location: 48</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 84}}
+	  {{#rollTotal() roll 94}}
+		<div class="template-row template-center template-break">Hit Location: 49</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 94}}
+	  {{#rollTotal() roll 5}}
+		<div class="template-row template-center template-break">Hit Location: 50</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 5}}
+	  {{#rollTotal() roll 15}}
+		<div class="template-row template-center template-break">Hit Location: 51</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 15}}
+	  {{#rollTotal() roll 25}}
+		<div class="template-row template-center template-break">Hit Location: 52</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 25}}
+	  {{#rollTotal() roll 35}}
+		<div class="template-row template-center template-break">Hit Location: 53</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 35}}
+	  {{#rollTotal() roll 45}}
+		<div class="template-row template-center template-break">Hit Location: 54</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 45}}
+	  {{#rollTotal() roll 55}}
+		<div class="template-row template-center template-break">Hit Location: 55</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 55}}
+	  {{#rollTotal() roll 65}}
+		<div class="template-row template-center template-break">Hit Location: 56</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 65}}
+	  {{#rollTotal() roll 75}}
+		<div class="template-row template-center template-break">Hit Location: 57</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 75}}
+	  {{#rollTotal() roll 85}}
+		<div class="template-row template-center template-break">Hit Location: 58</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 85}}
+	  {{#rollTotal() roll 95}}
+		<div class="template-row template-center template-break">Hit Location: 59</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 95}}
+	  {{#rollTotal() roll 6}}
+		<div class="template-row template-center template-break">Hit Location: 60</div>
+		<div class="template-row template-center">BODY / HULL</div>
+	  {{/rollTotal() roll 6}}
+	  {{#rollTotal() roll 16}}
+		<div class="template-row template-center template-break">Hit Location: 61</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 16}}
+	  {{#rollTotal() roll 26}}
+		<div class="template-row template-center template-break">Hit Location: 62</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 26}}
+	  {{#rollTotal() roll 36}}
+		<div class="template-row template-center template-break">Hit Location: 63</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 36}}
+	  {{#rollTotal() roll 46}}
+		<div class="template-row template-center template-break">Hit Location: 64</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 46}}
+	  {{#rollTotal() roll 56}}
+		<div class="template-row template-center template-break">Hit Location: 65</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 56}}
+	  {{#rollTotal() roll 66}}
+		<div class="template-row template-center template-break">Hit Location: 66</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 66}}
+	  {{#rollTotal() roll 76}}
+		<div class="template-row template-center template-break">Hit Location: 67</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 76}}
+	  {{#rollTotal() roll 86}}
+		<div class="template-row template-center template-break">Hit Location: 68</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 86}}
+	  {{#rollTotal() roll 96}}
+		<div class="template-row template-center template-break">Hit Location: 69</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 96}}
+	  {{#rollTotal() roll 7}}
+		<div class="template-row template-center template-break">Hit Location: 70</div>
+		<div class="template-row template-center">BODY / WEAPON</div>
+	  {{/rollTotal() roll 7}}
+	  <!-- Hit Location: Right Leg -->
+	  {{#rollTotal() roll 17}}
+		<div class="template-row template-center template-break">Hit Location: 71</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 17}}
+	  {{#rollTotal() roll 27}}
+		<div class="template-row template-center template-break">Hit Location: 72</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 27}}
+	  {{#rollTotal() roll 37}}
+		<div class="template-row template-center template-break">Hit Location: 73</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 37}}
+	  {{#rollTotal() roll 47}}
+		<div class="template-row template-center template-break">Hit Location: 74</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 47}}
+	  {{#rollTotal() roll 57}}
+		<div class="template-row template-center template-break">Hit Location: 75</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 57}}
+	  {{#rollTotal() roll 67}}
+		<div class="template-row template-center template-break">Hit Location: 76</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 67}}
+	  {{#rollTotal() roll 77}}
+		<div class="template-row template-center template-break">Hit Location: 77</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 77}}
+	  {{#rollTotal() roll 87}}
+		<div class="template-row template-center template-break">Hit Location: 78</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 87}}
+	  {{#rollTotal() roll 97}}
+		<div class="template-row template-center template-break">Hit Location: 79</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 97}}
+	  {{#rollTotal() roll 8}}
+		<div class="template-row template-center template-break">Hit Location: 80</div>
+		<div class="template-row template-center">RIGHT LEG / WEAPON</div>
+	  {{/rollTotal() roll 8}}
+	  {{#rollTotal() roll 18}}
+		<div class="template-row template-center template-break">Hit Location: 81</div>
+		<div class="template-row template-center">RIGHT LEG / TURRET</div>
+	  {{/rollTotal() roll 18}}
+	  {{#rollTotal() roll 28}}
+		<div class="template-row template-center template-break">Hit Location: 82</div>
+		<div class="template-row template-center">RIGHT LEG / TURRET</div>
+	  {{/rollTotal() roll 28}}
+	  {{#rollTotal() roll 38}}
+		<div class="template-row template-center template-break">Hit Location: 83</div>
+		<div class="template-row template-center">RIGHT LEG / TURRET</div>
+	  {{/rollTotal() roll 38}}
+	  {{#rollTotal() roll 48}}
+		<div class="template-row template-center template-break">Hit Location: 84</div>
+		<div class="template-row template-center">RIGHT LEG / TURRET</div>
+	  {{/rollTotal() roll 48}}
+	  {{#rollTotal() roll 58}}
+		<div class="template-row template-center template-break">Hit Location: 85</div>
+		<div class="template-row template-center">RIGHT LEG / TURRET</div>
+	  {{/rollTotal() roll 58}}
+	  <!-- Hit Location: Left Leg -->
+	  {{#rollTotal() roll 68}}
+		<div class="template-row template-center template-break">Hit Location: 86</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 68}}
+	  {{#rollTotal() roll 78}}
+		<div class="template-row template-center template-break">Hit Location: 87</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 78}}
+	  {{#rollTotal() roll 88}}
+		<div class="template-row template-center template-break">Hit Location: 88</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 88}}
+	  {{#rollTotal() roll 98}}
+		<div class="template-row template-center template-break">Hit Location: 89</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 98}}
+	  {{#rollTotal() roll 9}}
+		<div class="template-row template-center template-break">Hit Location: 90</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 9}}
+	  {{#rollTotal() roll 19}}
+		<div class="template-row template-center template-break">Hit Location: 91</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 19}}
+	  {{#rollTotal() roll 29}}
+		<div class="template-row template-center template-break">Hit Location: 92</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 29}}
+	  {{#rollTotal() roll 39}}
+		<div class="template-row template-center template-break">Hit Location: 93</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 39}}
+	  {{#rollTotal() roll 49}}
+		<div class="template-row template-center template-break">Hit Location: 94</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 49}}
+	  {{#rollTotal() roll 59}}
+		<div class="template-row template-center template-break">Hit Location: 95</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 59}}
+	  {{#rollTotal() roll 69}}
+		<div class="template-row template-center template-break">Hit Location: 96</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 69}}
+	  {{#rollTotal() roll 79}}
+		<div class="template-row template-center template-break">Hit Location: 97</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 79}}
+	  {{#rollTotal() roll 89}}
+		<div class="template-row template-center template-break">Hit Location: 98</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 89}}
+	  {{#rollTotal() roll 99}}
+		<div class="template-row template-center template-break">Hit Location: 99</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 99}}
+	  {{#rollTotal() roll 100}}
+		<div class="template-row template-center template-break">Hit Location: 00</div>
+		<div class="template-row template-center">LEFT LEG / TURRET</div>
+	  {{/rollTotal() roll 100}}
+		
+		<!--
+			<div class="template-row template-center template-break">Hit Location {{loc}}</div>
+			<div class="template-row template-center">
+			{{#rollBetween() loc 1 10}}   HEAD		{{/rollBetween() loc 1 10}}
+			{{#rollBetween() loc 11 20}}  RIGHT ARM	{{/rollBetween() loc 11 20}}
+			{{#rollBetween() loc 21 30}}  LEFT ARM	{{/rollBetween() loc 21 30}}
+			{{#rollBetween() loc 31 70}}  BODY		{{/rollBetween() loc 31 70}}
+			{{#rollBetween() loc 71 85}}  RIGHT LEG	{{/rollBetween() loc 71 85}}
+			{{#rollBetween() loc 86 100}} LEFT LEG	{{/rollBetween() loc 86 100}}
+			
+			{{#rollBetween() loc 1 20}} / MOTIVE SYSTEM	{{/rollBetween() loc 1 20}}
+			{{#rollBetween() loc 21 60}} / HULL			{{/rollBetween() loc 21 60}}
+			{{#rollBetween() loc 61 80}} / WEAPON			{{/rollBetween() loc 61 80}}
+			{{#rollBetween() loc 81 100}} / TURRET		{{/rollBetween() loc 81 100}}
+			</div>
+		-->
 	  </div>
 	{{/loc}}
 
