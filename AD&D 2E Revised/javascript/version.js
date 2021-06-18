@@ -3,25 +3,6 @@
 const sheetName = 'AD&D 2E Revised';
 const sheetVersion = '4.1.0';
 
-function moveStaticToRepeating(section, fieldsToMove) {
-    getAttrs(fieldsToMove, function (values) {
-        if (values[fieldsToMove[0]]) {
-            
-            console.log(`${fieldsToMove[0]} has a value. Moving static to repeating`);
-            
-            let newrowid = generateRowID();
-            let newValue = {};
-
-            for (const [field, value] of Object.entries(values)) {
-                newValue[`repeating_${section}_${newrowid}_${field}`] = value;
-                newValue[field] = '';
-            }
-            
-            setAttrs(newValue);
-        }
-    });
-}
-
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
         let cs=_.rest((attrs.character_sheet||'').match(/(.*?)(?:\s+v(.*))?$/)),

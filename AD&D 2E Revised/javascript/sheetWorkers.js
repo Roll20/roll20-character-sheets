@@ -907,6 +907,7 @@ on('change:nonprof-penalty', function (eventInfo) {
 })
 
 function getWeaponWithBonus(weaponName) {
+    weaponName = weaponName?.toLowerCase();
     if (!weaponName)
         return undefined;
     
