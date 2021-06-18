@@ -3489,7 +3489,7 @@
 							</div>
 							<div class='sheet-equipment_ranged_weapons_grid1 sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min'>
 								<div class='sheet-equipment_ranged_weapons_gs1'>Name</div>
-								<input class='sheet-equipment_ranged_weapons_gs2 sheet-full_width' type='text' name='attr_V_R_weapon_name' />
+								<input class='sheet-equipment_ranged_weapons_gs2 sheet-full_width' type='text' name='attr_V_R_weapon_name' list='RangedWeapons' />
 								<div class='sheet-equipment_ranged_weapons_gs3'>Class</div>
 								<select class='sheet-equipment_ranged_weapons_gs4 sheet-full_width sheet-select_corection' name='attr_R_weapon_class'>
 									<option value='-'>N/A</option>
@@ -3636,7 +3636,7 @@
 					 </div>
 					 <div class='sheet-equipment_melee_weapons_grid1 sheet-collapsible_entity_toggle sheet-collapsible_entity_toggle_min'>
 					 <div class='sheet-equipment_melee_weapons_gs1'>Name</div>
-					 <input class='sheet-equipment_melee_weapons_gs2 sheet-full_width' type='text' name='attr_V_M_weapon_name' />
+					 <input class='sheet-equipment_melee_weapons_gs2 sheet-full_width' type='text' name='attr_V_M_weapon_name' list='MeleeWeapons' />
 					 <div class='sheet-equipment_melee_weapons_gs3'>Class</div>
 					 <select class='sheet-equipment_melee_weapons_gs4 sheet-full_width sheet-select_corection' name='attr_R_weapon_class'>
 					 <option value='-'>N/A</option>
@@ -5537,6 +5537,68 @@ NOTE: replace worker by javascript for IDE functionality
 		})
 	})
 
+	on('change:repeating_vehiclerangedweapons:V_R_weapon_name', () => {
+		getAttrs(['repeating_vehiclerangedweapons_V_R_weapon_name'], (v) => {
+			let weapon = RANGED_WEAPONS.find( weap => weap.name == v['repeating_vehiclerangedweapons_V_R_weapon_name'])
+			if (!weapon) return
+			let attributes = {}
+			let RoF = weapon.RoF.split('/')
+
+			let damage = weapon.damage
+
+			if (weapon.special.includes('Tearing')) {
+				var redice = /^(\d+)?(d\d+)(.*)?/;
+				let dmg = redice.exec(damage)
+				let dicenum = parseInt(dmg[1], 10) || 1,
+					dicetype = dmg[2],
+					mod = dmg[3]
+				dicenum++
+				damage = `${dicenum}${dicetype}d1${mod}`
+			}
+
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_max`]		= ''
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_min`]		= ''
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_vengeful`]= ''
+
+			if (weapon.special.includes('Primitive')) {
+				let regex = /Primitive \((\d)\)/;
+				let max = regex.exec(weapon.special)
+				attributes[`repeating_vehiclerangedweapons_V_R_weapon_max`]		= max[1]
+			}
+
+			if (weapon.special.includes('Proven')) {
+				let regex = /Proven \((\d)\)/;
+				let min = regex.exec(weapon.special)
+				attributes[`repeating_vehiclerangedweapons_V_R_weapon_min`]		= min[1]
+			}
+
+			if (weapon.special.includes('Vengeful')) {
+				let regex = /Vengeful \((\d)\)/;
+				let vengeful = regex.exec(weapon.special)
+				attributes[`repeating_vehiclerangedweapons_V_R_weapon_vengeful`]= vengeful[1]
+			}
+
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_name`]		= weapon.name
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_domain`]		= weapon.family
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_class`]		= weapon.class
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_range`]		= weapon.range
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_standard`]	= RoF[0]
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_burst`]		= RoF[1]
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_auto`]		= RoF[2]
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_dam-roll`]	= damage
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_pen`]			= weapon.pen
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_type`]		= weapon.type
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_mag`]			= weapon.clip
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_mag_max`]		= weapon.clip
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_reload`]		= weapon.reload
+			attributes[`repeating_vehiclerangedweapons_V_R_weapon_weight`]		= weapon.weight
+			attributes[`repeating_vehiclerangedweapons_V_R_ability_r`]			= weapon.special
+			attributes[`repeating_vehiclerangedweapons_V_R_ability_desc_r`]		= weapon.notes
+
+			setAttrs(attributes)
+		})
+	})
+
 	const MELEE_WEAPONS = [
 		{name: "Chainaxe", family: "Chain", class:"Melee", range: "-", damage: "1d10+4 ", type: "Rending", pen: "2", special: "Tearing", availability: "Scarce (-10)", weight: "13", origin: "Imperium", notes: "Two-Handed"},
 		{name: "Chainblade", family: "Chain", class:"Melee", range: "-", damage: "1d10+1 ", type: "Rending", pen: "1", special: "Tearing", availability: "Scarce (-10)", weight: "2", origin: "Imperium", notes: "-"},
@@ -5616,26 +5678,26 @@ NOTE: replace worker by javascript for IDE functionality
 				damage = `${dicenum}${dicetype}d1${mod}`
 			}
 
-			attributes[`repeating_rangedweapons_M_weapon_max`]		= ''
-			attributes[`repeating_rangedweapons_M_weapon_min`]		= ''
-			attributes[`repeating_rangedweapons_M_weapon_vengeful`]	= ''
+			attributes[`repeating_meleeweapons_M_weapon_max`]		= ''
+			attributes[`repeating_meleeweapons_M_weapon_min`]		= ''
+			attributes[`repeating_meleeweapons_M_weapon_vengeful`]	= ''
 
 			if (weapon.special.includes('Primitive')) {
 				let regex = /Primitive \((\d)\)/;
 				let max = regex.exec(weapon.special)
-				attributes[`repeating_rangedweapons_M_weapon_max`]		= max[1]
+				attributes[`repeating_meleeweapons_M_weapon_max`]		= max[1]
 			}
 
 			if (weapon.special.includes('Proven')) {
 				let regex = /Proven \((\d)\)/;
 				let min = regex.exec(weapon.special)
-				attributes[`repeating_rangedweapons_M_weapon_min`]		= min[1]
+				attributes[`repeating_meleeweapons_M_weapon_min`]		= min[1]
 			}
 
 			if (weapon.special.includes('Vengeful')) {
 				let regex = /Vengeful \((\d)\)/;
 				let vengeful = regex.exec(weapon.special)
-				attributes[`repeating_rangedweapons_M_weapon_vengeful`]		= vengeful[1]
+				attributes[`repeating_meleeweapons_M_weapon_vengeful`]		= vengeful[1]
 			}
 
 			attributes[`repeating_meleeweapons_M_weapon_name`]			= weapon.name
@@ -5648,6 +5710,62 @@ NOTE: replace worker by javascript for IDE functionality
 			attributes[`repeating_meleeweapons_M_weapon_weight`]		= weapon.weight
 			attributes[`repeating_meleeweapons_M_ability_r`]			= weapon.special
 			attributes[`repeating_meleeweapons_M_ability_desc_r`]		= weapon.notes
+
+			setAttrs(attributes)
+		})
+	})
+
+
+	on('change:repeating_vehiclemeleeweapons:V_M_weapon_name', () => {
+		getAttrs(['repeating_vehiclemeleeweapon_V_M_weapon_name'], (v) => {
+			let weapon = MELEE_WEAPONS.find( weap => weap.name == v['repeating_vehiclemeleeweapon_V_M_weapon_name'])
+			if (!weapon) return
+			let attributes = {}
+
+			let damage = weapon.damage
+
+			if (weapon.special.includes('Tearing')) {
+				var redice = /^(\d+)?(d\d+)(.*)?/;
+				let dmg = redice.exec(damage)
+				let dicenum = parseInt(dmg[1], 10) || 1,
+					dicetype = dmg[2],
+					mod = dmg[3]
+				dicenum++
+				damage = `${dicenum}${dicetype}d1${mod}`
+			}
+
+			attributes[`repeating_vehiclemeleeweapons_V_M_weapon_max`]		= ''
+			attributes[`repeating_vehiclemeleeweapons_V_M_weapon_min`]		= ''
+			attributes[`repeating_vehiclemeleeweapons_V_M_weapon_vengeful`]	= ''
+
+			if (weapon.special.includes('Primitive')) {
+				let regex = /Primitive \((\d)\)/;
+				let max = regex.exec(weapon.special)
+				attributes[`repeating_vehiclemeleeweapons_V_M_weapon_max`]		= max[1]
+			}
+
+			if (weapon.special.includes('Proven')) {
+				let regex = /Proven \((\d)\)/;
+				let min = regex.exec(weapon.special)
+				attributes[`repeating_vehiclemeleeweapons_V_M_weapon_min`]		= min[1]
+			}
+
+			if (weapon.special.includes('Vengeful')) {
+				let regex = /Vengeful \((\d)\)/;
+				let vengeful = regex.exec(weapon.special)
+				attributes[`repeating_vehiclemeleeweapons_V_M_weapon_vengeful`]		= vengeful[1]
+			}
+
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_name`]			= weapon.name
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_domain`]		= weapon.family
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_class`]			= weapon.class
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_reach`]			= weapon.range
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_dam-roll`]		= damage
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_pen`]			= weapon.pen
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_type`]			= weapon.type
+			attributes[`repeating_vehiclemeleeweapon_V_M_weapon_weight`]		= weapon.weight
+			attributes[`repeating_vehiclemeleeweapon_V_M_ability_r`]			= weapon.special
+			attributes[`repeating_vehiclemeleeweapon_V_M_ability_desc_r`]		= weapon.notes
 
 			setAttrs(attributes)
 		})
