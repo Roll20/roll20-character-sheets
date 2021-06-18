@@ -13,6 +13,7 @@ Features:
   * Settings tab provides options to show the Horse section, split out Piety tracking per god, and toggle some houserules. 
 * Roll buttons for each skill that includes appropriate physical/universal penalty.
 * Development roll buttons for each skill (new in V2)
+* Roll buttons to do Attribute checks (with a prompt to select DM determined multiplier) (new in V2)
 * Shock/Fumble/Stumble checks.
 * Healing Rolls
 * Weapon Quality Checks
