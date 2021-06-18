@@ -2490,13 +2490,13 @@
 					<option value="Eviscerator">Chain</option>
 					<option value="Brazier of Holy Fire">Flame</option>
 					<option value="Fire Gauntlets, Magnus Pattern">Flame</option>
-					<option value="Animus Hammer">Force</option>
+					<option value="Animus Hammer*">Force</option>
 					<option value="Force Hammer">Force</option>
 					<option value="Force Sword">Force</option>
 					<option value="Force Staff">Force</option>
-					<option value="Nemesis Daemon Hammer">Force</option>
-					<option value="Sanctus Hammer">Force</option>
-					<option value="Tempus Hammer">Force</option>
+					<option value="Nemesis Daemon Hammer*">Force</option>
+					<option value="Sanctus Hammer*">Force</option>
+					<option value="Tempus Hammer*">Force</option>
 					<option value="Axe of Retribution">Low-Tech</option>
 					<option value="Flail of Chastisement">Low-Tech</option>
 					<option value="Great Weapon">Low-Tech</option>
@@ -2514,17 +2514,17 @@
 					<option value="Wailing Trident">Low-Tech</option>
 					<option value="Warhammer">Low-Tech</option>
 					<option value="Whip">Low-Tech</option>
-					<option value="Ebenus Hammer">Power</option>
+					<option value="Ebenus Hammer*">Power</option>
 					<option value="Ordo Malleus Power Glaive">Power</option>
 					<option value="Omnissian Axe">Power</option>
-					<option value="Power Fist">Power</option>
+					<option value="Power Fist*">Power</option>
 					<option value="Power Sword">Power</option>
 					<option value="Power Axe">Power</option>
 					<option value="Power Maul (High)">Power</option>
 					<option value="Power Maul (Low)">Power</option>
 					<option value="Power Shield">Power</option>
 					<option value="Power Stake">Power</option>
-					<option value="Thunder Hammer">Power</option>
+					<option value="Thunder Hammer*">Power</option>
 					<option value="Electro-Flail">Shock</option>
 					<option value="Shock Maul">Shock</option>
 					<option value="Shock Whip">Shock</option>
@@ -2534,7 +2534,7 @@
 					<option value="Silver Shield">Xenos</option>
 					<option value="Agoniser">Xenos</option>
 					<option value="Eldar Power Sword">Xenos</option>
-					<option value="Harlequin's Kiss">Xenos</option>
+					<option value="Harlequin's Kiss*">Xenos</option>
 					<option value="Big Choppa">Xenos</option>
 					<option value="Burna (Melee)">Xenos</option>
 					<option value="Choppa">Xenos</option>
@@ -5450,10 +5450,21 @@ NOTE: replace worker by javascript for IDE functionality
 	on('change:repeating_rangedweapons:R_weapon_name', () => {
 		getAttrs(['repeating_rangedweapons_R_weapon_name'], (v) => {
 			let weapon = RANGED_WEAPONS.find( weap => weap.name == v['repeating_rangedweapons_R_weapon_name'])
-			console.table(RANGED_WEAPONS)
 			if (!weapon) return
 			let attributes = {}
 			let RoF = weapon.RoF.split('/')
+
+			let damage = weapon.damage
+
+			if (weapon.special.includes('Tearing')) {
+				var redice = /^(\d+)?(d\d+)(.*)?/;
+				let dmg = redice.exec(damage)
+				let dicenum = parseInt(dmg[1], 10) || 1,
+					dicetype = dmg[2],
+					mod = dmg[3]
+				dicenum++
+				damage = `${dicenum}${dicetype}d1${mod}`
+			}
 
 			attributes[`repeating_rangedweapons_R_weapon_name`]			= weapon.name
 			attributes[`repeating_rangedweapons_R_weapon_domain`]		= weapon.family
@@ -5462,7 +5473,7 @@ NOTE: replace worker by javascript for IDE functionality
 			attributes[`repeating_rangedweapons_R_weapon_standard`]		= RoF[0]
 			attributes[`repeating_rangedweapons_R_weapon_burst`]		= RoF[1]
 			attributes[`repeating_rangedweapons_R_weapon_auto`]			= RoF[2]
-			attributes[`repeating_rangedweapons_R_weapon_dam-roll`]		= weapon.damage
+			attributes[`repeating_rangedweapons_R_weapon_dam-roll`]		= damage
 			attributes[`repeating_rangedweapons_R_weapon_pen`]			= weapon.pen
 			attributes[`repeating_rangedweapons_R_weapon_type`]			= weapon.type
 			attributes[`repeating_rangedweapons_R_weapon_mag`]			= weapon.clip
@@ -5476,6 +5487,99 @@ NOTE: replace worker by javascript for IDE functionality
 		})
 	})
 
+	const MELEE_WEAPONS = [
+		{name: "Chainaxe", family: "Chain", class:"Melee", range: "-", damage: "1d10+4 ", type: "Rending", pen: "2", special: "Tearing", availability: "Scarce (-10)", weight: "13", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Chainblade", family: "Chain", class:"Melee", range: "-", damage: "1d10+1 ", type: "Rending", pen: "1", special: "Tearing", availability: "Scarce (-10)", weight: "2", origin: "Imperium", notes: "-"},
+		{name: "Chainsword", family: "Chain", class:"Melee", range: "-", damage: "1d10+2 ", type: "Rending", pen: "2", special: "Balanced, Tearing", availability: "Average (+0)", weight: "6", origin: "Imperium", notes: "-"},
+		{name: "Eviscerator", family: "Chain", class:"Melee", range: "-", damage: "2d10 ", type: "Rending", pen: "9", special: "Razor Sharp, Tearing, Unwieldy", availability: "Very Rare (-30)", weight: "15", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Brazier of Holy Fire", family: "Flame", class:"Melee", range: "-", damage: "1d10+5 ", type: "Energy", pen: "3", special: "Flame, Unbalanced", availability: "Very Rare (-30)", weight: "6", origin: "Imperium", notes: "Any character who can draw line of sight to an ally wielding an active Brazier of Holy Fire gains a +10 bonus to his Willpower tests. Additionally, it can be used as a heavy flamer with a clip size of 1. Once fired, it loses the Flame quality in melee until it is reloaded, a process that takes roughly 20 minutes and involves several special hymns."},
+		{name: "Fire Gauntlets, Magnus Pattern", family: "Flame", class:"Melee", range: "-", damage: "1d10 ", type: "Impact", pen: "2", special: "Flame, Unbalanced", availability: "Very Rare (-30)", weight: "1", origin: "Imperium", notes: "As a Free Action, the user can ignite the gauntlets, granting a +20 bonus to Intimidate tests. They always come in pairs, and the reservoir lasts until the end of the encounter (or 2d10 minutes outside of structured time)."},
+		{name: "Animus Hammer*", family: "Force", class:"Melee", range: "-", damage: "2d10+10 ", type: "Energy", pen: "4", special: "Daemonbane, Force, Power Field, Unwieldy", availability: "Near Unique (-50)", weight: "8", origin: "Imperium", notes: "An Animus hammer acts as a psy-focus (see page 177 of the Dark Heresy Core Rulebook). If the wielder possesses the Psyker trait, the weapon adds +1 to his psy rating.* Add the user’s SBx2 to the damage."},
+		{name: "Force Hammer", family: "Force", class:"Melee", range: "-", damage: "2d10 ", type: "Rending", pen: "0", special: "Force, Unbalanced", availability: "Extremely Rare (-40)", weight: "10", origin: "Imperium", notes: "A force hammer requires two hands to use, unless the wielder has a Strength bonus of 5 or higher."},
+		{name: "Force Sword", family: "Force", class:"Melee", range: "-", damage: "1d10+1 ", type: "Rending", pen: "2", special: "Balanced, Force", availability: "Near Unique (-50)", weight: "5", origin: "Imperium", notes: "-"},
+		{name: "Force Staff", family: "Force", class:"Melee", range: "-", damage: "1d10 ", type: "Impact", pen: "2", special: "Force", availability: "Extremely Rare (-40)", weight: "2", origin: "Imperium", notes: "-"},
+		{name: "Nemesis Daemon Hammer*", family: "Force", class:"Melee", range: "-", damage: "2d10+1 ", type: "Energy", pen: "8", special: "Daemonbane, Force, Power Field, Unwieldy", availability: "Near Unique (-50)", weight: "10", origin: "Imperium", notes: "A nemesis hammer is a one-handed weapon, but when used with two hands it gains the Concussive (X) quality, where X equals the user’s psy rating.* Add the user’s SBx2 to the damage."},
+		{name: "Sanctus Hammer*", family: "Force", class:"Melee", range: "-", damage: "2d10+6 ", type: "Energy", pen: "4", special: "Balanced, Concussive (4), Daemonbane, Force, Power Field", availability: "Near Unique (-50)", weight: "6", origin: "Imperium", notes: "Two-Handed. It also includes an exterminator cartridge (see page 163 of the Dark Heresy Core Rulebook) loaded with Incinerator ammunition (see page 40).* Add the user’s SBx2 to the damage."},
+		{name: "Tempus Hammer*", family: "Force", class:"Melee", range: "-", damage: "2d10+4 ", type: "Energy", pen: "6", special: "Daemonbane, Force, Power Field, Unwieldy", availability: "Near Unique (-50)", weight: "14", origin: "Imperium", notes: "Two Handed. Once per game session, as a Full Action, a character wielding Tempus may smite the ground, causing a blast with a radius of 2d10 metres. Each other character in this area must make a Hard (–20) Agility test or lose a Half Action during his next turn; if a character fails with two or more degrees of failure, he loses his Full Action instead.* Add the user’s SBx2 to the damage."},
+		{name: "Axe of Retribution", family: "Low-Tech", class:"Melee", range: "-", damage: "2d10 ", type: "Rending", pen: "6", special: "Felling (2), Sanctified", availability: "Near Unique (-50)", weight: "8", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Flail of Chastisement", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10+3", type: "Rending", pen: "2", special: "Crippling (2), Flexible, Primitive (8), Snare (0)", availability: "Very Rare (-30)", weight: "3", origin: "Imperium", notes: "Not available to be requisitioned."},
+		{name: "Great Weapon", family: "Low-Tech", class:"Melee", range: "-", damage: "2d10 ", type: "Rending", pen: "0", special: "Unbalanced", availability: "Scarce (-10)", weight: "7", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Hunting Lance", family: "Low-Tech", class:"Melee", range: "-", damage: "2d10+3 ", type: "Explosive", pen: "7", special: "Concussive (3)", availability: "Scarce (-10)", weight: "4", origin: "Imperium", notes: "After a successful attack is made with this weapon, its tip is destroyed and it is treated as a staﬀ."},
+		{name: "Improvised Weapon", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10-2 ", type: "-", pen: "0", special: "Primitive (7), Unbalanced", availability: "-", weight: "-", origin: "Imperium", notes: "Hitting someone with the butt of a Basic ranged weapon (such as a lasgun or boltgun) also counts as using an improvised weapon in combat."},
+		{name: "Knife", family: "Low-Tech", class:"Melee", range: "5m", damage: "1d5 ", type: "Rending", pen: "0", special: "Melee/Thrown", availability: "Plentiful (+20)", weight: "1", origin: "Imperium", notes: "-"},
+		{name: "Man-Catcher", family: "Low-Tech", class:"Melee", range: "2m", damage: "1d10 ", type: "Impact", pen: "0", special: "Snare (4), Unwieldy", availability: "Scarce (-10)", weight: "8", origin: "Imperium", notes: "Two-Handed. The user must spend a Half Action each round in order to maintain a hold of his victim. The Best craftsmanship version is fitted with electrical wiring and gains the Shocking quality."},
+		{name: "Praesidium Protectiva", family: "Low Tech", class:"Melee", range: "-", damage: "1d10 ", type: "Impact", pen: "0", special: "Defensive", availability: "Very Rare (-30)", weight: "14", origin: "Imperium", notes: "The Praesidium Protectiva adds +4 AP to the body and the arm holding the device, and also acts as a force field with a protection rating of 35. It is only available to Acolytes with the Adepta Sororitas background—those without it must provide a rationale to their GM when attempting to acquire this item."},
+		{name: "Rune Weapon (Sword)", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10 ", type: "Rending", pen: "0", special: "Balanced, Tainted, Tearing, Vengeful (8)", availability: "Near Unique (-50)", weight: "3kg", origin: "Imperium", notes: "A rune weapon can take the form of any Low-Tech melee weapon; it uses the profile for that weapon, with the Primitive quality removed if it was present. It gains the Tainted, Tearing, and Vengeful (8) qualities and cannot be destroyed by a weapon with the Power Field quality. Whenever a character wielding a rune weapon triggers Righteous Fury, he gains 1d5 Corruption points."},
+		{name: "Shield", family: "Low-Tech", class:"Melee", range: "-", damage: "1d5 ", type: "Impact", pen: "0", special: "Defensive", availability: "Common (+10)", weight: "3", origin: "Imperium", notes: "Provides 2 AP to the Body and Arm wielding the shield, which stacks with existing armour. As they are not designed for offence, attacks made with shields suﬀer a –20 penalty instead of the normal penalty from the Defensive quality."},
+		{name: "Staff", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10 ", type: "Impact", pen: "0", special: "Balanced, Primitive (7)", availability: "Plentiful (+20)", weight: "3", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Stealth Claw", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10+4 ", type: "Rending", pen: "4", special: "Felling (2), Razor Sharp, Sanctified", availability: "Very Rare (-30)", weight: "1.5", origin: "Imperium", notes: "A stealth claw has the Compact modification (see page 162 of the Dark Heresy Core Rulebook). When a character successfully inflicts a hit as part of an All Out Attack action using a stealth claw, he inflicts additional damage equal to his psy rating."},
+		{name: "Sword", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10 ", type: "Rending", pen: "0", special: "Balanced", availability: "Common (+10)", weight: "3", origin: "Imperium", notes: "-"},
+		{name: "Truncheon", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10 ", type: "Impact", pen: "0", special: "Primitive (7)", availability: "Plentiful (+20)", weight: "2", origin: "Imperium", notes: "-"},
+		{name: "Wailing Trident", family: "Low-Tech", class:"Melee", range: "6m", damage: "1d10+8 ", type: "Rending", pen: "4", special: "Balanced, Crippling (3)*, Felling (3), Sanctified", availability: "Very Rare (-30)", weight: "9", origin: "Imperium", notes: "Two-Handed. * Only against targets with the Daemonic trait."},
+		{name: "Warhammer", family: "Low-Tech", class:"Melee", range: "-", damage: "1d10+3 ", type: "Impact", pen: "1", special: "Concussive (1), Primitive (8)", availability: "Scarce (-10)", weight: "4.5", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Whip", family: "Low-Tech", class:"Melee", range: "3m", damage: "1d10 ", type: "Rending", pen: "0", special: "Flexible, Primitive (6)", availability: "Average (+0)", weight: "2", origin: "Imperium", notes: "-"},
+		{name: "Ebenus Hammer*", family: "Power", class:"Melee", range: "-", damage: "2d10+6 ", type: "Energy", pen: "10", special: "Daemonbane, Power Field Unwieldy", availability: "Near Unique (-50)", weight: "16", origin: "Imperium", notes: "An Ebenus hammer acts as a null rod (see page 177 of the Dark Heresy Core Rulebook) and grants the wielder the Deny the Witch talent.* Add the user’s SBx2 to the damage."},
+		{name: "Ordo Malleus Power Glaive", family: "Power", class:"Melee", range: "3m", damage: "1d10+8 ", type: "Energy", pen: "5", special: "Balanced, Power Field, Proven (4), Sanctified", availability: "Extremely Rare (-40)", weight: "4.5", origin: "Imperium", notes: "Two-Handed. An Ordo Malleus power glaive grants the wielder an additional +10 bonus to Parry tests."},
+		{name: "Omnissian Axe", family: "Power", class:"Melee", range: "-", damage: "2d10+4 ", type: "Energy", pen: "6", special: "Power Field, Unbalanced", availability: "Extremely Rare (-40)", weight: "8", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Power Fist*", family: "Power", class:"Melee", range: "-", damage: "2d10 ", type: "Energy", pen: "9", special: "Power Field, Unwieldy", availability: "Very Rare (-30)", weight: "13", origin: "Imperium", notes: "* Power Fists add the user’s SB×2 to the damage."},
+		{name: "Power Sword", family: "Power", class:"Melee", range: "-", damage: "1d10+5 ", type: "Energy", pen: "5", special: "Balanced, Power Field", availability: "Very Rare (-30)", weight: "3", origin: "Imperium", notes: "-"},
+		{name: "Power Axe", family: "Power", class:"Melee", range: "-", damage: "1d10+7 ", type: "Energy", pen: "7", special: "Power Field, Unbalanced", availability: "Very Rare (-30)", weight: "6", origin: "Imperium", notes: "Two-Handed"},
+		{name: "Power Maul (High)", family: "Power", class:"Melee", range: "-", damage: "1d10+5 ", type: "Energy", pen: "4", special: "Power Field, Shocking", availability: "Very Rare (-30)", weight: "3.5", origin: "Imperium", notes: "This weapon has two entries in the weapons table, representing its two power settings: high and low. Switching the power maul between its two settings is a Free Action. This is a onehanded melee weapon, but when used with two hands it gains the Concussive 0 quality."},
+		{name: "Power Maul (Low)", family: "Power", class:"Melee", range: "-", damage: "1d10+1 ", type: "Energy", pen: "2", special: "Shocking", availability: "Very Rare (-30)", weight: "3.5", origin: "Imperium", notes: "-"},
+		{name: "Power Shield", family: "Power", class:"Melee", range: "-", damage: "1d10 ", type: "Energy", pen: "1", special: "Defensive, Power Field", availability: "Very Rare (-30)", weight: "6", origin: "Imperium", notes: "A power shield adds 4 Armour points to the wearer’s Body and the Arm holding the shield. As they are not designed for offence, attacks made with shields suﬀer a –20 penalty instead of the normal penalty from the Defensive quality."},
+		{name: "Power Stake", family: "Power", class:"Melee", range: "-", damage: "1d10+7 ", type: "Energy", pen: "5", special: "Power Field, Sanctified, Unbalanced", availability: "Very Rare (-30)", weight: "1", origin: "Imperium", notes: "A power stake inflicts an additional 1d10 Energy damage for every point of psy rating the target possesses. Additionally, possessing a power stake grants a +10 bonus to all Interaction tests made with those aligned with the Ordo Hereticus."},
+		{name: "Thunder Hammer*", family: "Power", class:"Melee", range: "-", damage: "2d10+4 ", type: "Energy", pen: "10", special: "Concussive (2), Power Field, Unwieldy", availability: "Very Rare (-30)", weight: "16", origin: "Imperium", notes: "A thunder hammer is a one-handed weapon, but it inflicts an additional +2 damage when used with two hands.* Add the user’s SBx2 to the damage."},
+		{name: "Electro-Flail", family: "Shock", class:"Melee", range: "-", damage: "1d10+2 ", type: "Rending", pen: "0", special: "Flexible, Shocking", availability: "Rare (-20)", weight: "4.5", origin: "Imperium", notes: "-"},
+		{name: "Shock Maul", family: "Shock", class:"Melee", range: "-", damage: "1d10+3 ", type: "Impact", pen: "0", special: "Shocking", availability: "Scarce (-10)", weight: "2.5", origin: "Imperium", notes: "-"},
+		{name: "Shock Whip", family: "Shock", class:"Melee", range: "3m", damage: "1d10+1 ", type: "Impact", pen: "0", special: "Flexible, Shocking", availability: "Rare (-20)", weight: "3", origin: "Imperium", notes: "-"},
+		{name: "Desoleum Power Blade", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+3 ", type: "Energy", pen: "5", clip: "-", reload: "-", special: "Power Field", availability: "Very Rare (-30)", weight: "2", origin: "Armoury Imperialis", notes: "This blade is a power weapon and thus requires the Weapon Training (Power) talent. It has the Compact modification (see page 162 of the Dark Heresy 2 Core Rulebook)."},
+		{name: "Ghostblade", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+5 ", type: "Energy", pen: "6", clip: "-", reload: "-", special: "Felling (4), Razor Sharp, Overheats", availability: "Extremely Rare (-40)", weight: "6", origin: "Armoury Imperialis", notes: "When a ghostblade Overheats, it is damaged and counts as a regular sword until repaired. Its weight includes the backpack power supply."},
+		{name: "Graviton Hammer", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "2d10+5 ", type: "Impact", pen: "7", clip: "-", reload: "-", special: "Blast (3), Concussive (3)", availability: "Near Unique (-50)", weight: "8", origin: "Armoury Imperialis", notes: "Two-Handed"},
+		{name: "Silver Shield", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d5+1 ", type: "Impact", pen: "1", clip: "-", reload: "-", special: "Defensive", availability: "Extremely Rare (-40)", weight: "5", origin: "Armoury Imperialis", notes: "Provides 4 AP to the Body and Arm wielding the shield (this is doubled to 8 AP against weapons that cause Energy damage), which stacks with existing armour. As they are not designed for offence, attacks made with shields suﬀer a –20 penalty instead of the normal penalty from the Defensive quality."},
+		{name: "Agoniser", family: "Xenos", class:"Melee", range: "3m", RoF: "-", damage: "1d10+3 ", type: "Energy", pen: "6", clip: "-", reload: "-", special: "Flexible, Power Field, Tearing, Shocking", availability: "Extremely Rare (-40)", weight: "2", origin: "Eldar Artistry", notes: "When a character suffers Critical damage from an attack with a Best craftsmanship agoniser, his Perception characteristic is also permanently reduced by 1d5."},
+		{name: "Eldar Power Sword", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+5 ", type: "Energy", pen: "4", clip: "-", reload: "-", special: "Balanced, Power Field", availability: "Extremely Rare (-40)", weight: "1", origin: "Eldar Artistry", notes: "-"},
+		{name: "Harlequin's Kiss*", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+8  ", type: "Rending", pen: "10", clip: "-", reload: "-", special: "Felling (4), Tearing", availability: "Extremely Rare (-40)", weight: "1", origin: "Eldar Artistry", notes: "* The wielder’s Strength bonus is not added to the damage inflicted by a Harlequin’s Kiss."},
+		{name: "Big Choppa", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "2d10 ", type: "Rending", pen: "2", clip: "-", reload: "-", special: "Tearing, Unbalanced", availability: "Extremely Rare (-40)", weight: "10", origin: "Orky Know-Whats", notes: "A big choppa is a two-handed weapon. At the GM’s discretion, it can have the Power Field quality; if it does, it should also have the Overheats quality."},
+		{name: "Burna (Melee)", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+5 ", type: "Energy", pen: "5", clip: "-", reload: "-", special: "Power Field, Unwieldy", availability: "Very Rare (-30)", weight: "8", origin: "Orky Know-Whats", notes: "The burna has two profiles (one for melee and one for ranged combat), and requires two hands to use in either mode. Its weight includes the backpack fuel tank."},
+		{name: "Choppa", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+1 ", type: "Rending", pen: "2", clip: "-", reload: "-", special: "Unbalanced", availability: "Rare (-20)", weight: "1", origin: "Orky Know-Whats", notes: "For any non-Ork character with a Strength bonus of 3 or less, a choppa requires two hands to wield."},
+		{name: "Cascade Lance (Melee)", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+6 ", type: "Energy", pen: "8", clip: "-", reload: "-", special: "Concussive (1), Power Field", availability: "Near Unique (-50)", weight: "6", origin: "Cache D-216-98", notes: "A cascade lance requires two hands to wield when it is used as a melee weapon."},
+		{name: "Molecular Blade", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10 ", type: "Rending", pen: "5", clip: "-", reload: "-", special: "Corrosive, Razor Sharp, Tearing", availability: "Near Unique (-50)", weight: "15", origin: "Cache D-216-98", notes: "-"},
+		{name: "Havatian Ringblade (Melee)", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+4 ", type: "Rending", pen: "3", clip: "-", reload: "-", special: "Razor Sharp", availability: "Extremely Rare (-40)", weight: "1", origin: "Artefacts of Lost Races", notes: "A character may use a Havatian ringblade as a melee weapon or as a grenade. If used as a grenade, it explodes on impact and is destroyed."},
+		{name: "Talonblade", family: "Xenos", class:"Melee", range: "-", RoF: "-", damage: "1d10+3 ", type: "Rending", pen: "4", clip: "-", reload: "-", special: "Razorsharp, Tearing", availability: "Very Rare (-30)", weight: "1", origin: "Artefacts of Lost Races", notes: "-"}
+	]
+
+	on('change:repeating_meleeweapons:M_weapon_name', () => {
+		getAttrs(['repeating_meleeweapons_M_weapon_name'], (v) => {
+			let weapon = MELEE_WEAPONS.find( weap => weap.name == v['repeating_meleeweapons_M_weapon_name'])
+			if (!weapon) return
+			let attributes = {}
+
+			let damage = weapon.damage
+
+			if (weapon.special.includes('Tearing')) {
+				var redice = /^(\d+)?(d\d+)(.*)?/;
+				let dmg = redice.exec(damage)
+				let dicenum = parseInt(dmg[1], 10) || 1,
+					dicetype = dmg[2],
+					mod = dmg[3]
+				dicenum++
+				damage = `${dicenum}${dicetype}d1${mod}`
+			}
+
+			attributes[`repeating_meleeweapons_M_weapon_name`]			= weapon.name
+			attributes[`repeating_meleeweapons_M_weapon_domain`]		= weapon.family
+			attributes[`repeating_meleeweapons_M_weapon_class`]			= weapon.class
+			attributes[`repeating_meleeweapons_M_weapon_reach`]			= weapon.range
+			attributes[`repeating_meleeweapons_M_weapon_dam-roll`]		= damage
+			attributes[`repeating_meleeweapons_M_weapon_pen`]			= weapon.pen
+			attributes[`repeating_meleeweapons_M_weapon_type`]			= weapon.type
+			attributes[`repeating_meleeweapons_M_weapon_weight`]		= weapon.weight
+			attributes[`repeating_meleeweapons_M_ability_r`]			= weapon.special
+			attributes[`repeating_meleeweapons_M_ability_desc_r`]		= weapon.notes
+
+			setAttrs(attributes)
+		})
+	})
 
 
     //  get repeating objects 
