@@ -76,8 +76,10 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 June 14th 2021 v1.41 
 
 - Vastly improved performance of Target value re-calculations due to condition changes, by moving them to the sheet worker. This was particularly bad on Firefox, while MS Edge(Chromium) and Chrome were less impacted but also benefit from the changes. No actual changes in functionality just faster!
+- Corrected bug with Characteristics Modifier not reach through to skills/melee/spells
 - Deafened = Effects Initiative characteristic rolls, and any skill that would require hearing like Perception/Intuition.
 - Haggle Skill roll was broken from the last update and is now fixed.
+
  
 
 June 14th 2021 v1.4 
