@@ -8772,7 +8772,7 @@
 </div>
     
 <div class="sheet-tab-content sheet-section-granted-powers">
-    <table class="sheet-default-header-first-row">
+    <table class="sheet-default-header-first-row sheet-inline">
         <tr>
             <td>Powers Available</td>
             <th class="sheet-centering-padding-5">|</th>
@@ -8785,6 +8785,9 @@
         </tr>
     </table>
     <input style="display: none;" name="attr_spell-power-sum" class="sheet-short" value="0">
+    <div class="sheet-inline" style="vertical-align: top;">
+        <button type="action" name="act_reset-spent-slots-pow" title="%{reset-spent-slots-pow}" class="btn">Reset Power Uses-slots to 0</button>
+    </div>
     
     <br><br>
 
@@ -30279,14 +30282,19 @@ function resetSpentSlots(row, castField, memField) {
 }
 
 function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
+    let isPowers = !spellLevels || !tab;
+    let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
+    if (!isPowers)
+        attributes.push(tab);
+    
     on(`clicked:${buttonName}`, function () {
-
-        getAttrs([tab, 'spell-slot-reset-sections', 'spell-slot-reset-function'], function (values) {
+        
+        getAttrs(attributes, function (values) {
             let resetSection = values['spell-slot-reset-sections'];
             let resetFunction = values['spell-slot-reset-function'];
 
             let sections = [];
-            if (resetSection === 'all')
+            if (resetSection === 'all' || isPowers)
                 sections = allSections;
             else if (resetSection === 'level') {
                 let level = values[tab];
@@ -30297,11 +30305,11 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 return
             
             let updateFunction;
-            if (resetFunction === '1')
+            if (resetFunction === '1' || isPowers)
                 updateFunction = resetCastSlots;
-            if (resetFunction === '2')
+            else if (resetFunction === '2')
                 updateFunction = resetCastAndMemSlots;
-            if (resetFunction === '3')
+            else if (resetFunction === '3')
                 updateFunction = resetSpentSlots;
             
             if (!updateFunction)
@@ -30429,6 +30437,7 @@ let spellPower = 'spell-power';
 setupSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
 setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
+setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 
 // --- Start setup Rogue skills total --- //

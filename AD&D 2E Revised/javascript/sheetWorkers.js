@@ -690,14 +690,19 @@ function resetSpentSlots(row, castField, memField) {
 }
 
 function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
+    let isPowers = !spellLevels || !tab;
+    let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
+    if (!isPowers)
+        attributes.push(tab);
+    
     on(`clicked:${buttonName}`, function () {
-
-        getAttrs([tab, 'spell-slot-reset-sections', 'spell-slot-reset-function'], function (values) {
+        
+        getAttrs(attributes, function (values) {
             let resetSection = values['spell-slot-reset-sections'];
             let resetFunction = values['spell-slot-reset-function'];
 
             let sections = [];
-            if (resetSection === 'all')
+            if (resetSection === 'all' || isPowers)
                 sections = allSections;
             else if (resetSection === 'level') {
                 let level = values[tab];
@@ -708,11 +713,11 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 return
             
             let updateFunction;
-            if (resetFunction === '1')
+            if (resetFunction === '1' || isPowers)
                 updateFunction = resetCastSlots;
-            if (resetFunction === '2')
+            else if (resetFunction === '2')
                 updateFunction = resetCastAndMemSlots;
-            if (resetFunction === '3')
+            else if (resetFunction === '3')
                 updateFunction = resetSpentSlots;
             
             if (!updateFunction)
@@ -840,6 +845,7 @@ let spellPower = 'spell-power';
 setupSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
 setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
+setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 
 // --- Start setup Rogue skills total --- //
