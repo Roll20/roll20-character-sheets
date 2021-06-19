@@ -9,6 +9,7 @@
 <input type='hidden' class='tabstoggle' name='attr_sheettab'  value='character'  />
 <input type='hidden' class='themeactivator' name='attr_colorthemeselector' value='light' >
 <input type='hidden' class='characterviewer' name='attr_colorthemeselector' value='light' >
+<input type="hidden" name="attr_sheetversion" value='1'><!-- to facilitate migration from old HarnMaster3 sheet to v2 -->
 
 <!-- actual character sheet, divided in tabs -->
 <div class='character'> <!-- CHARACTER TAB -->
@@ -16,7 +17,7 @@
     <div class='character-grid'> <!-- grid container-->
         <div class='character-grid-section personal personal-grid'>
     		<div class="skill-section-title">PERSONAL</div>
-            <label for=charname>Name</label><input type="text" id=charname name="attr_character_name" class="personal-input"><input type="hidden" name="attr_charnameupdated" value='0'><!-- TODO remove hidden attribute after next session -->
+            <label for=charname>Name</label><input type="text" id=charname name="attr_character_name" class="personal-input">
             <label for=race>Race</label><input type="text" id=race name="attr_species" class="personal-input">
             <label for=gender>Gender</label><input type="text" id=gender name="attr_gender" class="personal-input">
             <label for=birthdate>Birthdate</label><input type="text" id=birthdate name="attr_birthdate" class="personal-input">
@@ -1376,6 +1377,9 @@
 			<input id=showhorsetoggle name="attr_hrhorseonsheet" type="checkbox" value="1" checked>
 			<label for=showpietytoggle>Show consolidated piety?</label>
 			<input id=showpietytoggle name="attr_hrconsolidatedpiety" type="checkbox" value="1">
+			<div class="full-width skill-header">Sheet version</div>
+			<label for=sheetversiondisplay>Sheet version</label>
+			<input id=sheetversiondisplay name="attr_sheetversion" type="text" value="1" readonly>
     	</div>
 	</div>
 </div>
@@ -1561,15 +1565,19 @@ buttonlist.forEach(button => {
     });
 });
 
-  <!-- helper function to fill new character_name attribute (see https://wiki.roll20.net/Building_Character_Sheets#Character_Name ) with old name info   TODO remove hidden attribute after next session -->
+<!-- helper function to migrate from original HarnMaster3 sheet to version 2. It fills new character_name attribute (see https://wiki.roll20.net/Building_Character_Sheets#Character_Name ) with old name info -->
 on('sheet:opened', function() {
-    getAttrs(['character_name', 'name', 'charnameupdated'], 
+    getAttrs(['sheetversion', 'character_name', 'name' ], 
 	function(values) {
-        if(values.charnameupdated != 1) {var charname = values['name']};
-		console.log("Character name", charname);
-        setAttrs({
+		var migrationneed = parseFloat(values['sheetversion'])||0;
+        if(migrationneed != 2 && values['name'] !== 'undefined') {
+			var charname = values['name'];
+			console.log("Character name", charname);
+		}
+		
+		setAttrs({
             'character_name': charname,
-			'charnameupdated': 1,
+			'sheetversion': 2,
 		});
     });
 });
