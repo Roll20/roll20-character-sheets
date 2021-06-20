@@ -830,7 +830,9 @@
 				<input type="number" name="attr_piety_points" class="skill-value" value="0">
 			</fieldset>
 		</div>   
-        <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+    </div>    
+		<input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+	<div class='character-grid horse-grid'>
 		<div class='character-grid-section horse-section section-title'><h2>Horse</h2></div> 
         <div class='character-grid-section horse-section basichorseinfo bhigrid colored-grid'>
 			<label for=horsename>Horse Name</label>
@@ -1379,8 +1381,11 @@
 			<label for=showpietytoggle>Show consolidated piety?</label>
 			<input id=showpietytoggle name="attr_hrconsolidatedpiety" type="checkbox" value="1">
 			<div class="full-width skill-header">Sheet version</div>
-			<label for=sheetversiondisplay>Sheet version</label>
-			<input id=sheetversiondisplay name="attr_sheetversion" type="text" value="1" readonly>
+			<div class="full-width">
+			  <label for=sheetversiondisplay>Sheet version</label>
+			  <input id=sheetversiondisplay name="attr_character_sheet_version" type="text" value="20210801" readonly>
+			  <input type="hidden" name="attr_data_version" value="" readonly>
+			</div>
     	</div>
 	</div>
 </div>
@@ -1566,22 +1571,144 @@ buttonlist.forEach(button => {
     });
 });
 
-<!-- helper function to migrate from original HarnMaster3 sheet to version 2. It fills new character_name attribute (see https://wiki.roll20.net/Building_Character_Sheets#Character_Name ) with old name info -->
-on('sheet:opened', function() {
+<!-- check if we need to data migration when the sheet opens -->
+on("sheet:opened", function() {
+	migrationCheck();
+    setAttrs({ "safe-sheet-open": Date.now() });
+});
+
+/*
+# Old Data Conversion
+Always try to migrate as much data as possible - copied from kreuvf's DSA sheet: https://github.com/kreuvf/roll20-character-sheets/tree/master/Das_Schwarze_Auge_4-1
+
+Relevant character sheet versions
+* 20171225: last version by https://app.roll20.net/users/72360/optionalrule of his original HarnMaster3 sheet
+* 20210801: "version 2" of the sheet, complete rework of original HarnMaster3 sheet by https://app.roll20.net/users/72360/optionalrule ; see readme.md for info.
+*/
+
+
+
+function migrationCheck() {
+    getAttrs(["character_sheet_version", "data_version" , "name"], function(v) {
+        console.log("Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+
+        let dataVersion = parseInt(v["data_version"]);
+        let sheetVersion = parseInt(v["character_sheet_version"]);
+		let oldName = v["name"]||0;
+
+        /*
+        If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
+        Since new characters do not need any migration, we just set the data_version to the current sheet version.
+
+        Why this is necessary
+        * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
+        * Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
+        * If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
+        * This would lead to no migrations being performed.
+        * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
+		* edit OvT:  if it's an old (pre v2) sheet the character name will be stored in "name"  instead of "character_name" ; we use this to migrate old sheets.
+		* Update: checking character_name doesn't work reliably, setting dataversion to 20171225 for sheet that don't have a data version; for now leaving out skipping migration for new sheets, confuses matters. Weapon and Armor migration won't run if there is no info in the repeating sections, that should cover new sheets.
+        */
+		
+		if (oldName !== 0) {
+			let dataVersion = 20171225;
+			console.log("Old name detected, data version set to", dataVersion);
+			}
+
+
+        let functionsToCall = [];
+        let firstFunction;
+        /*
+            we run over the possible migrations and check if they are already applied.
+            if not and it is the first migration, than the function name is saved as "firstFunction"
+            if it is not the first migration to apply it is added to "functionsToCall" array
+        */
+        for (var i = 0; i < versionsWithMigrations.length; i++) {
+            if (dataVersion < versionsWithMigrations[i]) {
+                var functionName = "migrateTo" + versionsWithMigrations[i];
+                console.log("dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
+                if (firstFunction) {
+                    functionsToCall.push(functionName);
+                } else {
+                    firstFunction = functionName;
+                }
+            };
+        }
+        // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+        // then we call the function with name "firstFunction"
+        if (firstFunction) {
+            functionsToCall.push("setCurrentVersion");
+			window[firstFunction](functionsToCall);
+        }
+    });
+}
+
+function setCurrentVersion(v) {
+    setAttrs({ "data_version": versionsWithMigrations.slice(-1).pop() });
+	console.log("Migration done, data version updated");
+}
+
+function callNextMigration(migrationChain) {
+    if (migrationChain && migrationChain.length > 0) {
+        let nextMigration = migrationChain.shift();
+        if (nextMigration) {
+            window[nextMigration](migrationChain);
+        }
+    }
+}
+
+/*
+ this list has to be always ordered ascending in order to apply the migration steps in the correct order
+*/
+var versionsWithMigrations = [
+    20210801
+]
+
+/*
+## From version 20171014 to 20210801
+* Charactername now stored according to best practice recommendations roll20
+*/
+
+function migrateTo20210801 (migrationChain) {
+	/* TODO: optimize code, we're getting and setting attributes twice */
+    console.log("migrateTo20210801 invoked");
+	/* move character name from old "name"  attribute to character_name (roll20 best practice) */
     getAttrs(['sheetversion', 'character_name', 'name' ], 
 	function(values) {
-		var migrationneed = parseFloat(values['sheetversion'])||0;
-        if(migrationneed != 2 && values['name'] !== 'undefined') {
-			var charname = values['name'];
-			console.log("Character name", charname);
-		}
-		
+		var charname = values['name'];
+		console.log("Character name", charname);		
 		setAttrs({
-            'character_name': charname,
-			'sheetversion': 2,
+			'character_name': charname,
+			'name': 0 /* clear the old name so we don't keep resetting back the version */
+			});
 		});
-    });
-});
+	/* re-calculate all weapons in the repeating weapons section. */ 
+	getSectionIDs('weapon', ids => {
+	    if (ids.length === 0) {
+		  console.log("Migration: No weapons found, nothing to migrate.");
+          return;
+        }
+		const fieldArray = [];
+        ids.forEach(id => fieldArray.push(
+            `repeating_weapon_${id}_weapon_ml`, `repeating_weapon_${id}_weapon_atk`, `repeating_weapon_${id}_weapon_def`
+        ));
+		getAttrs(fieldArray , function (values) {
+			const update = {};
+			ids.forEach(id => {
+				console.log("working on:", `${id}`);
+				var wml = parseInt(values[`repeating_weapon_${id}_weapon_ml`]);
+				var watk = parseInt(values[`repeating_weapon_${id}_weapon_atk`]);
+				var wdef = parseInt(values[`repeating_weapon_${id}_weapon_def`]);
+				var waml = wml + watk;
+				var wdml = wml + wdef;
+				console.log("Migrating Weapon data", " ML:", wml, "ATK:", watk, "DEF:", wdef, "Weapon AML:", waml, "Weapon DML:", wdml);
+				update[`repeating_weapon_${id}_weapon_aml`] = waml;
+				update[`repeating_weapon_${id}_weapon_dml`] = wdml;
+			});	
+			setAttrs(update, {}, function() {callNextMigration(migrationChain);} );
+		});
+	});
+}
 
 
 <!-- weapon load totals /-->

@@ -18,6 +18,7 @@ Features:
 * Healing Rolls
 * Weapon Quality Checks
 * Attack/Defense rolls with adjustments.
+* Separate missile weapon section with ranges and their penalties & damage (new in V2)
 * Dedicated roll button to roll attacks with HM penalty (new in V2)
 * Spell/Ritual/Psionic checks.
 * EMLs for in sheet rolls are capped at 5/95 respectively as per rules.
@@ -48,6 +49,8 @@ Due to some code changes (all values are now calculated via Sheetworkers instead
 - Note down your armor before switching sheets, it will need to be input again on the new sheet (you'll also need the armor locations from the rulebook)
 - Verify the settings on the Settings tab 
 - Change something (anything, for example the "carried" checkbox) in each weapon you have so AML and DML are calculated again, they will be empty after a migration of an existing character.
+
+Your weapons will be on the Inventory Tab after migration. Mark the "C" checkbox to select which weapons you're carrying and thus show up on the Character Tab .
 
 NOTE
 ====
