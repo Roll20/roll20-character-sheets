@@ -1,6 +1,7 @@
 <div id='SR6WE'>
 <input class="sheet_type" name="attr_sheet_type" type="hidden" value="pc"/>
 <input class="character-type" name="attr_flag_special" type="hidden" value="mundane"/>
+<input class="enable-modifiers" name="attr_enable_modifiers" type="hidden" value="0"/>
 <div class="pc">
   <img class="shadowrun-logo" alt="Shadowrun sixth edition logo" src="https://s3.amazonaws.com/files.d20.io/images/204802539/QInmmma8HvUBA90c8e8H8Q/max.png?1614545502"/>
   <div class="tabs">
@@ -2374,9 +2375,9 @@
 								</label>
 								</div>
 								<div class="row5">
-								<h3 data-i18n="modifiers">modifiers</h3>
-								<label data-i18n-title="modifiers" title="modifiers">
-									<textarea name="attr_modifiers" placeholder="Attribute: +/-mod" title="@{repeating_devices_${x}_modifiers}"></textarea>
+								<h3 data-i18n="modifications">modifications</h3>
+								<label data-i18n-title="modifications" title="modifications">
+									<textarea name="attr_modifications" placeholder="Attribute: +/-mod" title="@{repeating_devices_${x}_modifications}"></textarea>
 								</label>
 							</div>
 						</div><!-- end rows -->
@@ -2604,9 +2605,6 @@
                   <span>&nbsp;</span>
                   <label data-i18n-title="notes" title="Notes"><span data-i18n="notes">Notes</span>
                     <textarea name="attr_notes" placeholder="Notes" title="@{repeating_sprites_${x}_notes}"></textarea>
-                  </label>
-                  <label data-i18n-title="modifiers" title="modifiers"><span data-i18n="modifiers">Modifiers</span>
-                    <textarea name="attr_modifiers" placeholder="modifiers" title="@{repeating_sprites_${x}_modifiers}"></textarea>
                   </label>
                 </div>
               </fieldset>
@@ -5243,6 +5241,157 @@ on("sheet:opened", function() {
 });
 
 
+on("change:repeating_quality:modifications remove:repeating_quality change:repeating_augmentations:modifications remove:repeating_augmentations change:repeating_items:modifications remove:repeating_items change:repeating_devices:modifications remove:repeating_devices change:repeating_programs:modifications change:repeating_programs:powered_on remove:repeating_programs change:repeating_echoes:modifications remove:repeating:echoes", (eventInfo) => {
+console.log(eventInfo);
+	var allowed_modifiers = [
+		'body_modifier', 'agility_modifier', 'reaction_modifier', 'strength_modifier', 'willpower_modifier', 'logic_modifier', 'intuition_modifier', 'charisma_modifier',
+		'magic_modifier', 'resonance_modifier',
+		'overflow_modifier', 'physical_modifier', 'stun_modifier',
+		'initiative_mod', 'initiative_dice_mod', 'astral_initiative_mod', 'astral_dice_mod', 'matrix_initiative_mod', 'matrix_dice_mod', 'cold_sim_initiative_mod', 'cold_sim_dice_mod', 'hot_sim_initiative_mod', 'hot_sim_dice_mod',
+		'composure_modifier', 'judge_intentions_modifier', 'memory_modifier', 'lift_carry_modifier', 'move_speed', 'sprint_speed', 'sprint_modifier',
+		'attack_modifier', 'sleaze_modifier', 'data_processing_modifier', 'firewall_modifier',
+	];
+	var attrsToGet = ['enable_modifiers', 'enable_unrestricted_modifiers'];
+
+	var prog = /(.+)_modifications$/.exec(eventInfo.triggerName);
+	if(prog && prog[1]) {
+		attrsToGet.push(`${prog[1]}_powered_on`);
+	}
+
+	var rep_prog = /(.+)_powered_on$/.exec(eventInfo.triggerName);
+	if(eventInfo.triggerName.endsWith("_powered_on")) {
+		attrsToGet.push(`${rep_prog[1]}_modifications`);
+	}
+
+	getAttrs(attrsToGet, (v) => {
+		if(v.enable_modifiers != "1") {
+console.log("Modifiers not enabled.");
+			return;
+		}
+
+		if(prog && prog[1] && v[`${prog[1]}_powered_on`] !== "on") {
+console.log("Program not active");
+			return;
+		}
+
+		if(rep_prog && v[`${rep_prog[1]}_modifications`]) {
+			if(eventInfo.newValue === "on") {
+				eventInfo.previousValue = '';
+				eventInfo.newValue = v[`${rep_prog[1]}_modifications`];
+			} else {
+				eventInfo.newValue = '';
+				eventInfo.previousValue = v[`${rep_prog[1]}_modifications`];
+			}
+		}
+
+		if(eventInfo.removedInfo) {
+			eventInfo.previousValue = eventInfo.removedInfo[`${eventInfo.sourceAttribute}_modifications`];
+			eventInfo.newValue = '';
+		}
+
+		// if previousValue and newValue are the same and it wasn't removed it was added. Not sure why roll20 gives us the newValue as previousValue when creating an entry
+		if(eventInfo.previousValue === eventInfo.newValue) {
+			eventInfo.previousValue = '';
+		}
+
+
+		var oldParts = (eventInfo.previousValue) ? eventInfo.previousValue.split(/\s*,\s*/) : [];
+		var newParts = (eventInfo.newValue) ? eventInfo.newValue.split(/\s*,\s*/) : [];
+
+		var op = {},
+			 np = {},
+			 mods = {},
+			 keys = {};
+		mods.old = {};
+		mods.new = {};
+
+		oldParts.forEach(e => {
+			parts = e.split(/\s*:\s*/);
+			mods.old[parts[0]] = parts[1];
+			(typeof keys[parts[0]] === 'undefined') ? keys[parts[0]] = 1 : keys[parts[0]]++;
+		})
+
+		newParts.forEach(e => {
+			parts = e.split(/\s*:\s*/);
+			mods.new[parts[0]] = parts[1];
+			(typeof keys[parts[0]] === 'undefined') ? keys[parts[0]] = 1 : keys[parts[0]]++;
+		})
+
+
+		Object.keys(keys).forEach(k => {
+			if(! allowed_modifiers.includes(k) && v[`enable_unrestricted_modifiers`] != 1) {
+				console.log('Unrestricted Modifiers not enabled, tried to update ('+k+') which is not whitelisted');
+			} else if(k !== "0" && k !== "on") {
+				update_attribute({
+					'key': k,
+					'old': mods.old[k],
+					'new': mods.new[k]
+				});
+			}
+		})
+
+	});
+});
+
+
+
+var update_attribute = (attr) => {
+	getAttrs([`${attr.key}`], (v) => {
+		if(v[`${attr.key}`]) {
+			currentV = /([+-]*\d+)(.*)/.exec(v[`${attr.key}`]);
+		} else {
+			currentV = [0, 0, ''];
+		}
+
+		var newV = 0;
+
+		// the mod was removed, undo the old value
+		if(attr.old && ! attr.new) {
+			newV = parseInt(currentV[1]) - parseInt(attr.old)
+		}
+
+		// the mod was added, use the new value
+		if(! attr.old && attr.new) {
+			newV = parseInt(currentV[1]) + parseInt(attr.new);
+		}
+
+		// it's an update to the mod, figure out the difference and apply it
+		if(attr.old && attr.new && attr.old != attr.new) {
+			var diff = modify_value([attr.old, attr.new]);
+
+			newV = parseInt(v[`${attr.key}`]) + parseInt(diff)
+		}
+
+
+		setAttrs({
+			[`${attr.key}`]: newV + currentV[2]
+		});
+	});
+
+};
+
+
+
+var modify_value = (params) => {
+	var diff = 0;
+	var re = /([+-]*)([\d+])/;
+
+	var oldV = re.exec(params[0]);
+	var newV = re.exec(params[1]);
+
+	if(parseInt(oldV[0]) > parseInt(newV[0])) { // oldV is higher, we are subtracting
+		diff = -1 * (parseInt(oldV[0]) - parseInt(newV[0]));
+	} else if(parseInt(oldV[0]) < parseInt(newV[0])) { // newV is higher, we are adding
+		diff = parseInt(newV[0]) - parseInt(oldV[0]);
+	} else { // they are equal
+		// no change diff still 0;
+	}
+
+	return diff;
+};
+
+
+
 on("clicked:shots_remove clicked:shots_add", (eventinfo) => {
 	getAttrs([`shots_fired`], (v) => {
 		let shots = parseInt(v[`shots_fired`]) || 0;
@@ -5335,6 +5484,10 @@ on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
 		update_common_rolls(["body", "soak_modifier", "soak_temp", `soak_temp_flag`]);
 		update_track("physical");
 	};
+});
+
+on("change:overflow_modifier", (eventinfo) => {
+	update_common_rolls(["body", "body", "overflow_modifier"]);
 });
 
 on("change:reaction change:intuition", (eventinfo) => {
