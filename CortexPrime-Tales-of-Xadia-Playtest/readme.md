@@ -5,12 +5,12 @@ Tales of Xadia: The Dragon Prince RPG - Playtest Character Sheet - Cortex Prime
 - Open the Journal tab, and add a new Character.
 - Click on save changes.
 - Now switch to the Character Sheet tab.
-- There are two green buttons, one to edit the attributes, one to edit stress and trauma, click on the first of these.
-- Select the Character Portrait from the list - this will select and fill out the distinction blocks.
- Select 'Tales of Xadia logo' if you are not using any of the pregen characters.
+- There is a green Edit button to make changes to the sheet.
+- Select the Character Portrait from the list - this will also select and fill out the distinction blocks.
+- Select 'Custom Character' option if you are not using any of the pregen characters.
 - Set the dice values for the Attributes, Values, and Specialities using the further drop downs.
-- Click the Edit button again to hide the editor.
 - Enter the remaining details - Name, Description, Value statements, Asset details and (if needed) custom Distinctions in the editable text fields.
+- Click the Edit button again to hide the editor.
 
 - Repeat this for each of the remaining characters.
 
@@ -22,11 +22,7 @@ The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and d
 
 ##Stress and Trauma
 
-I have been using API macro's to adjust Stress values. But these are simply Attributes (Afraid, Angry, Corrupted, Exhausted, Injured, Insecure and AfraidTrauma, AngryTrauma, CorruptedTrauma, ExhaustedTrauma, InjuredTrauma, InsecureTrauma).
-As with the Edit attribute you can add these to the Attributes and Abilities tab manually, and assign values ranging from the 4,6,8,10 or 12 corresponding to the dice value.
-
-The traits will only display on the character sheet as they are assigned to the character, in the same manner as the Specialities. If you have added a stress and it's not showing check the spelling, Capitalisation, and dice value to be sure you got those all correct.
-*NOTE* ToX does not use d4 stress so this value can be used to hide these fields on the character sheet.
+These traits will only display on the character sheet as they are assigned to the character, in the same manner as the Specialities.
 
 Any feedback, or requests - I'm happy to hear.
 
@@ -39,6 +35,16 @@ Artwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.
 
 
 ##Changelog
+
+### v.1.5 2021-06-02
+
+Added further Pre-Gen characters.
+
+### v.1.4 2021-05-26
+
+Added further Pre-Gen characters.
+Overhauled the edit function.
+Corrected minor issues and faults, including a change to the description field which was incorrectly named.
 
 ### v.1.3.5 2021-05-05
 

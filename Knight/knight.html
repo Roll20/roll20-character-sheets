@@ -4924,9 +4924,17 @@
 				{
 					path = "repeating_armeCaC_";
 					
+					let raw = result.raw-lAspects.bête.mineur-lAspects.bête.majeur;
+					
+					if(raw < 0)
+						raw = 0;
+					
 					newrowattrs[path + newrowid + "_ArmeCaC"] = result.name;
 					newrowattrs[path + newrowid + "_armeCaCDegat"] = result.dices;
-					newrowattrs[path + newrowid + "_armeCaCBDegat"] = result.raw;
+					newrowattrs[path + newrowid + "_armeCaCBDegat"] = raw;
+					newrowattrs[path + newrowid + "_armeCaCViolence"] = result.violenceDices;
+					newrowattrs[path + newrowid + "_armeCaCBDegat"] = raw;
+					newrowattrs[path + newrowid + "_armeCaCBViolence"] = result.violenceRaw
 					newrowattrs[path + newrowid + "_armeCaCPortee"] = "^{portee-"+range+"}";
 				}
 				else
@@ -4935,7 +4943,9 @@
 				
 					newrowattrs[path + newrowid + "_ArmeDist"] = result.name;
 					newrowattrs[path + newrowid + "_armeDistDegat"] = result.dices;
+					newrowattrs[path + newrowid + "_armeDistViolence"] = result.violenceDices;
 					newrowattrs[path + newrowid + "_armeDistBDegat"] = result.raw;
+					newrowattrs[path + newrowid + "_armeDistBViolence"] = result.violenceRaw
 					newrowattrs[path + newrowid + "_armeDistPortee"] = "^{portee-"+range+"}";
 				}
 				
@@ -13218,7 +13228,7 @@
 						<input type="hidden" name="attr_degatsEvolRanger" value="{{Degats=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						<input type="hidden" name="attr_violenceEvolRanger" value="{{Violence=[[ [[{ [[@{rangerArmeViolenceEvol}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						
-						<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
+						<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
 						
 						<input type="hidden" name="attr_styleBMRanger" value="[[@{atkAkimbo}]]+[[@{atkAmbidextre}]]+[[{@{atkCouvert}+@{interfaceGuidageRanger}, 0}kl1]]+[[@{atkDefensif}]]+[[@{atkAgressif}]]+[[@{atkPilonnage}]]" />
 						
@@ -16106,7 +16116,7 @@
 							<input type="hidden" name="attr_degatsEvolRanger" value="{{Degats=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							<input type="hidden" name="attr_violenceEvolRanger" value="{{Violence=[[ [[{ [[@{rangerArmeViolenceEvol}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							
-							<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
+							<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
 							
 							<input type="hidden" name="attr_styleBMRanger" value="[[@{atkAkimbo}]]+[[@{atkAmbidextre}]]+[[{@{atkCouvert}+@{interfaceGuidageRanger}, 0}kl1]]+[[@{atkDefensif}]]+[[@{atkAgressif}]]+[[@{atkPilonnage}]]" />
 							
@@ -30892,7 +30902,7 @@
 		</div>
 	
 		<div class="center">
-			<div class="fichePJ armeDistancePJ">
+			<div class="fichePJ armeDistancePJ armeVehiculePJ">
 				<div class="titreBS2L">
 					<label>
 						<input type="checkbox" name="attr_bonusCarac" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" value="1" />
@@ -32552,8 +32562,8 @@
 								<span data-i18n="noyaux">Noyaux</span>
 							</div>
 							<div>
-								<div><input type="text" name="attr_MANOGStationPortee" value="Moyenne" readonly /></div>
 								<div><input type="text" name="attr_MANOGStationDuree" value="Sans limite" readonly /></div>
+								<div><input type="text" name="attr_MANOGStationPortee" value="Moyenne" readonly /></div>
 								<div><input type="text" name="attr_MANOGStationNoyaux" value="3" readonly /></div>
 							</div>
 							<div>
@@ -32577,16 +32587,24 @@
 							<div>
 								<div>
 									<span data-i18n="debordement">Débordement</span>
-									<button type="roll" name="roll_MANOGStationDebordement" value=""></button>
+									<button type="roll" name="roll_MANOGStationDebordement" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{debordement}}} {{arme=[[1]]}} {{Debordement=[[10*@{MANOGStationTourDebordement}]]}} {{situationnel=[[0]]}}"></button>
 								</div>
 								<div>
 									<span data-i18n="pod-missile">Pod Missile</span>
-									<button type="roll" name="roll_MANOGStationMissile" value=""></button>
+									<button type="roll" name="roll_MANOGStationMissile" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{pod-missile}}} {{arme=[[1]]}} {{Degats=[[6D6+3]]}} {{Violence=[[1D6+6]]}} {{Portee=^{portee-longue}}} {{situationnel=[[0]]}} {{effets=^{artillerie} / ^{anti-vehicule}}}"></button>
 								</div>
 								<div>
 									<span data-i18n="pod-roquette">Pod Roquette</span>
-									<button type="roll" name="roll_MANOGStationRoquette" value=""></button>
+									<button type="roll" name="roll_MANOGStationRoquette" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{pod-roquette}}} {{arme=[[1]]}} {{Degats=[[1D6+3]]}} {{Violence=[[8D6+12]]}} {{Portee=^{portee-longue}}} {{situationnel=[[0]]}} {{effets=^"></button>
 								</div>
+							</div>
+							<div>
+								<div>
+									<span data-i18n="tour-actuel">Tour Actuel</span>
+									<input type="number" name="attr_MANOGStationTourDebordement" value="1" />
+								</div>
+								<div></div>
+								<div></div>
 							</div>
 						</div>
 					</div>
@@ -39265,10 +39283,10 @@
 			<span>+{{carac4}}</span>
 			<span>{{jCarac4}}</span>
 		</div>
-			<div>
-				<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
-				<span>{{OD4}}</span>
-			</div>
+		<div>
+			<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
+			<span>{{OD4}}</span>
+		</div>
 	{{/rollTotal() carSup 2}}
 	{{#moduleWraith}}
 		<div>
@@ -39277,10 +39295,12 @@
 		</div>
 	{{/moduleWraith}}
 	{{#arme}}
+		{{#Degats}}
 		<div class="success">
 			<span data-i18n="degats">Dégâts</span>
 			<span>{{Degats}}</span>
 		</div>
+		{{/Degats}}
 		{{#akimbo}}
 			<div>
 				<span>+<span data-i18n="style">Style</span></span>
@@ -39299,10 +39319,12 @@
 				<span>{{DegatsMax}}</span>
 			</div>
 		{{/moduleWraith}}
-		<div class="success">
-			<span data-i18n="violence">Violence</span>
-			<span>{{Violence}}</span>
-		</div>
+		{{#Violence}}
+			<div class="success">
+				<span data-i18n="violence">Violence</span>
+				<span>{{Violence}}</span>
+			</div>
+		{{/Violence}}
 		{{#akimbo}}
 			<div>
 				<span>+<span data-i18n="style">Style</span></span>
@@ -39321,6 +39343,12 @@
 				<span>{{ultraviolence}}</span>
 			</div>
 		{{/ultraviolence}}
+		{{#Debordement}}
+			<div class="success">
+				<span data-i18n="debordement">Débordement</span>
+				<span>{{Debordement}}</span>
+			</div>
+		{{/Debordement}}
 		<h2 data-i18n="effets-de-l'arme">Effets de l'Arme</h2>
 		<span>
 			{{effets}}

@@ -1,4 +1,4 @@
-<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.11" />
+<input type='hidden' name='attr_character_sheet' value="Official Savage Worlds v1.00.14" />
 <input type='hidden' name='attr_firstInit' value="0" />
 <input type='hidden' name='attr_namelength' value='0' />
 
@@ -200,7 +200,7 @@
 	/* ---- Begin Sheet Version Validation & Update ---- */
 
     const sheetVersionPrefix = "Official Savage Worlds v";
-	const sheetVersion = "1.00.11";
+	const sheetVersion = "1.00.14";
 
 	const upgradeSheet = function(version, versionone, versiontwo, versionthree,characterName) {
         //version format 1.00.01 (string)
@@ -258,6 +258,13 @@
             }
             if(versionthree < 0.11) {
                 setattrvals["newcontent"] = "unread";
+            }
+            if(versionthree < 0.12) {
+                setattrvals["newcontent"] = "unread";
+            }
+            if(versionthree < 0.13) {
+                setattrvals["newcontent"] = "unread";
+                setattrvals["newdocumentation"] = "unread";
             }
             else {
                 log("Upgrade",`Sheet already updgraded (${characterName})`,"lime");
@@ -344,6 +351,7 @@
 		setWildDie();
 	});
 
+    //Ranks and Advances Stuff
 	on("change:repeating_edges:edge change:repeating_edges:tookat remove:repeating_edges", function(v) {
 		log("Change in Edges","Look for Advances","yellow");
 		getSectionIDs("edges", function(idArray) {
@@ -354,12 +362,12 @@
 			}
 			getAttrs(listOfFields, function(v) {
 				let arrayOfAdvances = Object.values(v);
-				log("contents of v",arrayOfAdvances,"yellow");
+				//log("contents of v",arrayOfAdvances,"yellow");
 				let countOfAdvances = 0;
 				for(let i = 0; i < arrayOfAdvances.length; i++) {
 					arrayOfAdvances[i] === "Advance" ? countOfAdvances++ : log("Not an Advance","True","yellow");
 				}
-				log("Number of Advances",countOfAdvances,"yellow");
+				//log("Number of Advances",countOfAdvances,"yellow");
 				setAttrs({xp: countOfAdvances});
 			});
 		});
@@ -624,7 +632,7 @@
 				totPace = pace_base + pace_mod - wound_mod;
 			}
 
-			if (totPace < 1) { totPace = 1;}
+			if (totPace < 0) { totPace = 0;}
 			setAttrs({ paceCur: totPace  });
 		});
 	}
@@ -2028,6 +2036,29 @@
 		});
 	});
 
+    const moneylist = ["money","gold","silver","electrum","copper"];
+    const moneylabels = ["money","moneyone","moneytwo","moneythree","moneyfour"];
+    moneylabels.forEach(moneyLabel => {
+        on("sheet:opened", function() {
+            log("Money","Setting up money","darkgreen");
+            getAttrs([`${moneyLabel}name`], function(v) {
+                if (v[`${moneyLabel}name`] === "") {
+                    //label is empty, so fill it
+                    const labelIndex = moneylabels.lastIndexOf(moneyLabel);
+                    const moneyType = moneylist[labelIndex];
+                    const typeOfMoney = getTranslationByKey(`${moneyType}`);
+                    log("Money Type",typeOfMoney,"darkgreen");
+                    const setmoney = {};
+                    setmoney[`${moneyLabel}name`] = typeOfMoney;
+                    setAttrs(setmoney);
+                }
+                else {
+                    log("Money","Already set","darkgreen");
+                }
+            });
+        });
+    });
+
 	function setSkillDropdown(section, field, value, rowid) {
 		let repsection = `repeating_${section}`;
 		let setskill = {};
@@ -2740,17 +2771,18 @@
 		else {log("Is not worn","Don't need to carried...","darkblue");}
 	});
 
+    //Start Compendium Drop
     const resetCompendiumFields = function() {
         let setObj = {}
         setObj["CompendiumName"] = "";
         setObj["CompendiumCategory"] = "";
         setObj["CompendiumContent"] = "";
         setObj["CompendiumData"] = "";
+        log("Compendium Reset",JSON.stringify(setObj),r20color);
         setAttrs(setObj,{silent:true});
         //return setObj;
     }
 
-    //Start Compendium Drop
     const cleanCompendiumData = function(jsonData) {
         const leftRegEx = /(\"\[)/g;
         const rightRegEx = /(\]\")/g;
@@ -2784,6 +2816,37 @@
     }
 
     //Set attribute field names...these are all in repeating sections unless otherwise noted
+    const specialAbiltyUpdates = {
+        "Construct":{
+            "unshakemodtype":"Construct",
+            "unshakemod":"2",
+            "reducereason":"Construct",
+            "reducewoundsby":"1"
+        },
+        "Elemental":{
+            "reducereason":"Elemental",
+            "reducewoundsby":"1"
+        },
+        "Undead":{
+            "toughnessModReason":"Undead",
+            "tufnessMod":"2",
+            "unshakemodtype":"Undead",
+            "unshakemod":"2",
+            "reducereason":"Undead",
+            "reducewoundsby":"1"
+        },
+        "Dense Body": {
+            "toughnessModReason":"Dense Body",
+            "tufnessMod":"2"
+        },
+        "Swarm":{
+            "unshakemodtype":"Swarm",
+            "unshakemod":"2",
+            "parryModReason":"Swarm",
+            "parryMod":"2"
+        }
+    };
+
     const hindrancefields = ["hindrance","hindrancedescription","hindranceType"];
     const edgefields = ["edge","edgedescription"];
     const gearfields = ["item","itemWeight","description"];
@@ -2806,7 +2869,8 @@
         if(jsonObj) {
             //create Keys for Vehicle Weapons
             for(let i = 0; i < vehicleweaponfields.length; i++) {
-                jsonObj[fieldArray[i]] = jsonObj[badFields[i]];
+                // jsonObj[fieldArray[i]] = jsonObj[badFields[i]];
+                typeof jsonObj[badFields[i]] !== "undefined" ? jsonObj[fieldArray[i]] = jsonObj[badFields[i]] : log("Bad Field","Doesn't exist...nothing to convert",r20color);
             }
             log("Ship Weapon JSON",JSON.stringify(jsonObj),r20color);
             return(jsonObj);
@@ -2816,7 +2880,206 @@
         }
     }
 
-    const getDropInfo = function(jsonObj,targetObj,repSection) {
+    const getDropInfo = function(jsonObj,targetObj,repSection,miscFieldsObj) {
+        typeof miscFieldsObj === "undefined" ? miscFieldsObj = {} : log("getDropInfo - First miscFieldsObj",JSON.stringify(miscFieldsObj),r20color);
+        let clawsID = generateRowID();
+        let sectionID = generateRowID();
+        //abilitiesupdates will contain stuff for Edges and Hindrances...
+        const abilitiesUpdates = {
+            "Brawny":{
+                "loadlimitdietypedelta": typeof miscFieldsObj["loadlimitdietypedelta"] !== "undefined" ? miscFieldsObj["loadlimitdietypedelta"] + 1 : "1",
+                "size": typeof miscFieldsObj["size"] !== "undefined" ? miscFieldsObj["size"] + 1 : "1"
+            },
+            "Fleet-Footed":{
+                "paceModReason": typeof miscFieldsObj["paceModReason"] !== "undefined" ? miscFieldsObj["paceModReason"] + " Fleet-Footed" : "Fleet-Footed",
+                "paceMod": typeof miscFieldsObj["paceMod"] !== "undefined" ? miscFieldsObj["paceMod"] + 2 :"2",
+                "runningDie": miscFieldsObj["runningDie"] === "1d4" ? "1d6" : miscFieldsObj["runningDie"] === "1d6" ? "1d8" : miscFieldsObj["runningDie"] === "1d8" ? "1d10" : miscFieldsObj["runningDie"] === "1d10" ? "1d12" : "1d8"
+            },
+            "Block":{
+                "parryModReason": typeof miscFieldsObj["parryModReason"] !== "undefined" ? miscFieldsObj["parryModReason"] + " Block" : "Block",
+                "parryMod": typeof miscFieldsObj["parryMod"] !== "undefined" ? miscFieldsObj["parryMod"] + 1 : "1"
+            },
+            "Improved Block":{
+                "parryModReason": typeof miscFieldsObj["parryModReason"] !== "undefined" ? miscFieldsObj["parryModReason"] + " Improved Block" : "Improved Block",
+                "parryMod": typeof miscFieldsObj["parryMod"] !== "undefined" ? miscFieldsObj["parryMod"] + 1 :"2"
+            },
+            "Brawler":{
+                "toughnessModReason": typeof miscFieldsObj["toughnessModReason"] !== "undefined" ? miscFieldsObj["toughnessModReason"] + " Brawler" : "Brawler",
+                "tufnessMod": typeof miscFieldsObj["tufnessMod"] !== "undefined" ? miscFieldsObj["tufnessMod"] + 1 : "1"
+            },
+            "Bruiser":{
+                "toughnessModReason": typeof miscFieldsObj["toughnessModReason"] !== "undefined" ? miscFieldsObj["toughnessModReason"] + " Bruiser" : "Bruiser",
+                "tufnessMod": typeof miscFieldsObj["tufnessMod"] !== "undefined" ? miscFieldsObj["tufnessMod"] + 1 : "2"
+            },
+            "Combat Reflexes":{
+                "soakmodtype": typeof miscFieldsObj["soakmodtype"] !== "undefined" ? miscFieldsObj["soakmodtype"] + " Combat Reflexes" : "Combat Reflexes",
+                "soakmod": typeof miscFieldsObj["soakmod"] !== "undefined" ? miscFieldsObj["soakmod"] + 2 : "2"
+            },
+            "Iron Jaw":{
+                "soakmodtype": typeof miscFieldsObj["soakmodtype"] !== "undefined" ? miscFieldsObj["soakmodtype"] + " Iron Jaw" : "Iron Jaw",
+                "soakmod": typeof miscFieldsObj["soakmod"] !== "undefined" ? miscFieldsObj["soakmod"] + 2 : "2"
+            },
+            "Nerves of Steel":{
+                "reducereason": typeof miscFieldsObj["reducereason"] !== "undefined" ? miscFieldsObj["reducereason"] + " Nerves of Steel" : "Nerves of Steel",
+                "reducewoundsby": typeof miscFieldsObj["reducewoundsby"] !== "undefined" ? miscFieldsObj["reducewoundsby"] + 1 : "1"
+            },
+            "Improved Nerves of Steel":{
+                "reducereason": typeof miscFieldsObj["reducereason"] !== "undefined" ? miscFieldsObj["reducereason"] + " Improved Nerves of Steel" : "Improved Nerves of Steel",
+                "reducewoundsby": typeof miscFieldsObj["reducewoundsby"] !== "undefined" ? miscFieldsObj["reducewoundsby"] + 1 : "2"
+            },
+            "Mr Fix It":{
+                "repairModType": typeof miscFieldsObj["repairModType"] !== "undefined" ? miscFieldsObj["repairModType"] + " Mr. Fix It" : "Mr. Fix It",
+                "RepairskillMod": typeof miscFieldsObj["RepairskillMod"] !== "undefined" ? miscFieldsObj["RepairskillMod"] + 2 : "2"
+            },
+            "Soldier":{
+                "loadlimitdietypedelta": typeof miscFieldsObj["loadlimitdietypedelta"] !== "undefined" ? miscFieldsObj["loadlimitdietypedelta"] + 1 : "1"
+            },
+            "Thief":{
+                "thieveryModType": typeof miscFieldsObj["thieveryModType"] !== "undefined" ? miscFieldsObj["thieveryModType"] + " Thief" : "Thief",
+                "ThieveryskillMod": typeof miscFieldsObj["ThieveryskillMod"] !== "undefined" ? miscFieldsObj["ThieveryskillMod"] + 1 : "1"
+            },
+            "Menacing":{
+                "intimidateModType": typeof miscFieldsObj["intimidateModType"] !== "undefined" ? miscFieldsObj["intimidateModType"] + " Menacing" : "Menacing",
+                "IntimidationskillMod": typeof miscFieldsObj["intimidateModType"] !== "undefined" ? miscFieldsObj["intimidateModType"] + 2 : "2"
+            },
+            "Healer":{
+                "healingModType": typeof miscFieldsObj["healingModType"] !== "undefined" ? miscFieldsObj["healingModType"] + " Healer" : "Healer",
+                "HealingskillMod": typeof miscFieldsObj["HealingskillMod"] !== "undefined" ? miscFieldsObj["HealingskillMod"] + 2 : "2"
+            },
+            "Tough As Nails":{
+                "wounds_max":"4"
+            },
+            "Tougher Than Nails":{
+                "wounds_max":"5"
+            },
+            "Weapon Master":{
+                "parryModReason": typeof miscFieldsObj["parryModReason"] !== "undefined" ? miscFieldsObj["parryModReason"] + " Weapon Master" : "Weapon Master",
+                "parryMod": typeof miscFieldsObj["parryMod"] !== "undefined" ? miscFieldsObj["parryMod"] + 1 : "1"
+            },
+            "Master of Arms":{
+                "parryModReason": typeof miscFieldsObj["parryModReason"] !== "undefined" ? miscFieldsObj["parryModReason"] + " Master of Arms" : "Master of Arms",
+                "parryMod": typeof miscFieldsObj["parryMod"] !== "undefined" ? miscFieldsObj["parryMod"] + 1 : "1"
+            },
+            "Clumsy":{
+                "athleticsModType":  typeof miscFieldsObj["athleticsModType"] !== "undefined" ? miscFieldsObj["athleticsModType"] + " Clumsy" : "Clumsy",
+                "AthleticsskillMod": typeof miscFieldsObj["AthleticsskillMod"] !== "undefined" ? miscFieldsObj["AthleticsskillMod"] + -2 : "-2",
+                "stealthModType": typeof miscFieldsObj["stealthModType"] !== "undefined" ? miscFieldsObj["stealthModType"] + " Clumsy" : "Clumsy",
+                "StealthskillMod": typeof miscFieldsObj["StealthskillMod"] !== "undefined" ? miscFieldsObj["StealthskillMod"] + -2 : "-2"
+            },
+            "Elderly":{
+                "paceModReason": typeof miscFieldsObj["paceModReason"] !== "undefined" ? miscFieldsObj["paceModReason"] + " Elderly" : "Elderly",
+                "paceMod": typeof miscFieldsObj["paceMod"] !== "undefined" ? miscFieldsObj["paceMod"] + -1 :"-1",
+                "agModType": typeof miscFieldsObj["agModType"] !== "undefined" ? miscFieldsObj["agModType"] + " Elderly" : "Elderly",
+                "agrollMod":  typeof miscFieldsObj["agrollMod"] !== "undefined" ? miscFieldsObj["agrollMod"] + -1 :"-1",
+                "stModType": typeof miscFieldsObj["stModType"] !== "undefined" ? miscFieldsObj["stModType"] + " Elderly" : "Elderly",
+                "strollMod":  typeof miscFieldsObj["strollMod"] !== "undefined" ? miscFieldsObj["strollMod"] + -1 :"-1",
+                "viModType": typeof miscFieldsObj["viModType"] !== "undefined" ? miscFieldsObj["viModType"] + " Elderly" : "Elderly",
+                "virollMod":  typeof miscFieldsObj["virollMod"] !== "undefined" ? miscFieldsObj["virollMod"] + -1 :"-1"
+            },
+            "Mean":{
+                "persuasionModType": typeof miscFieldsObj["persuasionModType"] !== "undefined" ? miscFieldsObj["persuasionModType"] + " Mean" : "Mean",
+                "PersuasionskillMod": typeof miscFieldsObj["PersuasionskillMod"] !== "undefined" ? miscFieldsObj["PersuasionskillMod"] + -1 :"-1"
+            },
+            "Mild Mannered":{
+                "intimidateModType": typeof miscFieldsObj["intimidateModType"] !== "undefined" ? miscFieldsObj["intimidateModType"] + "Mild Mannered " : "Mild Mannered ",
+                "IntimidationskillMod": typeof miscFieldsObj["intimidateModType"] !== "undefined" ? miscFieldsObj["intimidateModType"] + -2 : "-2"
+            },
+            "Obese":{
+                "size": typeof miscFieldsObj["size"] !== "undefined" ? miscFieldsObj["size"] + 1 : "1",
+                "paceModReason": typeof miscFieldsObj["paceModReason"] !== "undefined" ? miscFieldsObj["paceModReason"] + "Obese " : "Obese ",
+                "paceMod": typeof miscFieldsObj["paceMod"] !== "undefined" ? miscFieldsObj["paceMod"] + -1 :"-1",
+                "runningDie": miscFieldsObj["runningDie"] === "1d4" || miscFieldsObj["runningDie"] === "1d6" ? "1d4" : miscFieldsObj["runningDie"] === "1d8" ? "1d6" : miscFieldsObj["runningDie"] === "1d10" ? "1d8" : miscFieldsObj["runningDie"] === "1d12" ? "1d10" : "1d4"
+            },
+            "Small":{
+                "size": typeof miscFieldsObj["size"] !== "undefined" && miscFieldsObj["size"] !== -1 ? miscFieldsObj["size"] + -1 : typeof miscFieldsObj["size"] !== "undefined" && miscFieldsObj["size"] === -1 ? "-1" : "-1",
+                "toughnessModReason": typeof miscFieldsObj["toughnessModReason"] !== "undefined" && miscFieldsObj["size"] === -1 ? miscFieldsObj["toughnessModReason"] + "Small " : miscFieldsObj["toughnessModReason"],
+                "tufnessMod": typeof miscFieldsObj["tufnessMod"] !== "undefined" && miscFieldsObj["size"] === -1 ? miscFieldsObj["tufnessMod"] + -1 : typeof miscFieldsObj["tufnessMod"] === "undefined" && miscFieldsObj["size"] === -1 ? "-1" : miscFieldsObj["tufnessMod"]
+            },
+            "Ugly":{
+                "persuasionModType": typeof miscFieldsObj["persuasionModType"] !== "undefined" ? miscFieldsObj["persuasionModType"] + " Ugly (Minor) " : "Ugly (Minor)",
+                "PersuasionskillMod": typeof miscFieldsObj["PersuasionskillMod"] !== "undefined" ? miscFieldsObj["PersuasionskillMod"] + -1 :"-1"
+            },
+            "Night Terrors":{
+                "spModType": typeof miscFieldsObj["spModType"] !== "undefined" ? miscFieldsObj["spModType"] + "Night Terrors " : "Night Terrors",
+                "sprollMod":  typeof miscFieldsObj["sprollMod"] !== "undefined" ? miscFieldsObj["sprollMod"] + -1 :"-1"
+            },
+            "Tenderfoot":{
+                "increasereason": typeof miscFieldsObj["increasereason"] !== "undefined" ? miscFieldsObj["increasereason"] + "Tenderfoot " : "Tenderfoot ",
+                "increasewoundsby": typeof miscFieldsObj["increasewoundsby"] !== "undefined" ? miscFieldsObj["increasewoundsby"] + 1 :"1"
+            },
+            "Harrowed":{
+                "toughnessModReason": typeof miscFieldsObj["toughnessModReason"] !== "undefined" ? miscFieldsObj["toughnessModReason"] + "Harrowed/Undead " :"Harrowed/Undead",
+                "tufnessMod": typeof miscFieldsObj["tufnessMod"] !== "undefined" ? miscFieldsObj["tufnessMod"] + 2 :"2",
+                "unshakemodtype": typeof miscFieldsObj["unshakemodtype"] !== "undefined" ? miscFieldsObj["unshakemodtype"] + "Harrowed/Undead " :"Harrowed/Undead",
+                "unshakemod": typeof miscFieldsObj["unshakemod"] !== "undefined" ? miscFieldsObj["unshakemod"] + 2 :"2",
+                "reducereason": typeof miscFieldsObj["reducereason"] !== "undefined" ? miscFieldsObj["reducereason"] + "Harrowed/Undead " :"Harrowed/Undead",
+                "reducewoundsby": typeof miscFieldsObj["reducewoundsby"] !== "undefined" ? miscFieldsObj["reducewoundsby"] + 1 :"1",
+                "showDominion":"1"
+            },
+            "Claws":{
+                [`repeating_weapons_${clawsID}_weapon`]: "Claws",
+                [`repeating_weapons_${clawsID}_weaponbutton`]: "0",
+                [`repeating_weapons_${clawsID}_weaponskill`]:"fighting",
+                [`repeating_weapons_${clawsID}_damageatt`]:"strength",
+                [`repeating_weapons_${clawsID}_dmgnumdice`]:"1",
+                [`repeating_weapons_${clawsID}_dmgdietype`]:"d6!"
+            },
+            "Improved Claws":{
+                [`repeating_weapons_${clawsID}_weapon`]: "Improved Claws",
+                [`repeating_weapons_${clawsID}_weaponbutton`]: "0",
+                [`repeating_weapons_${clawsID}_weaponskill`]:"fighting",
+                [`repeating_weapons_${clawsID}_damageatt`]:"strength",
+                [`repeating_weapons_${clawsID}_dmgnumdice`]:"1",
+                [`repeating_weapons_${clawsID}_dmgdietype`]:"d8!"
+            },
+            "Hellfire":{
+                [`repeating_weapons_${clawsID}_weapon`]: "Hellfire",
+                [`repeating_weapons_${clawsID}_range`]: "Cone Template",
+                [`repeating_weapons_${clawsID}_weaponbutton`]: "0",
+                [`repeating_weapons_${clawsID}_weaponskill`]:"athletics",
+                [`repeating_weapons_${clawsID}_damageatt`]:"na",
+                [`repeating_weapons_${clawsID}_dmgnumdice`]:"3",
+                [`repeating_weapons_${clawsID}_dmgdietype`]:"d6!",
+                [`repeating_weapons_${clawsID}_weaponnotes`]:"Hellfire may be evaded."
+            },
+            "Implacable":{
+                "wounds_max": typeof miscFieldsObj["wounds_max"] !== "undefined" ? miscFieldsObj["wounds_max"] + 1 : "4"
+            },
+            "Whateley Blood":{
+                "persuasionModType": typeof miscFieldsObj["persuasionModType"] !== "undefined" ? miscFieldsObj["persuasionModType"] + "Whateley Blood " : "Whateley Blood",
+                "PersuasionskillMod": typeof miscFieldsObj["PersuasionskillMod"] !== "undefined" ? miscFieldsObj["PersuasionskillMod"] + -1 :"-1"
+            },
+            "Territorial Ranger":{
+                [`repeating_armor_${clawsID}_ArmorType`]:"Armored Duster (Ranger)",
+                [`repeating_armor_${clawsID}_AreaProtected`]:"5",
+                [`repeating_armor_${clawsID}_ArmorTypeProtection`]:"2",
+                [`repeating_armor_${clawsID}_ArmorTypeWeight`]:"10",
+                [`repeating_armor_${clawsID}_armorWorn`]:"1",
+                [`repeating_armor_${clawsID}_ArmorCarried`]:"on",
+                [`repeating_armor_${clawsID}_armorminstrength`]:"8",
+                [`repeating_armor_${clawsID}_ArmorNotes`]:"**Ballistic Protection:** This item reduces the damage from bullets by 2. (Ballistic Protection in this era is 2 rather than the 4 of more modern equipment, such as that listed in *Savage Worlds*.) Apply any Armor Piercing values after subtracting 2 from the bullet's damage. All are made from ghost steel, and subject to Malfunction.",
+                [`repeating_gear_${clawsID}_item`]:"Badge",
+                [`repeating_gear_${clawsID}_geardescription`]:"+1 Persuasion to lawful types, +1 Intimidation to outlaws",
+                [`repeating_gear_${clawsID}_itemcarried`]:"on",
+                [`repeating_gear_${sectionID}_item`]:"Fugitives from Justice in the U.S. Territories",
+                [`repeating_gear_${sectionID}_geardescription`]:"Rangers are issued Chapter 13 of that book on attaining the rank of Lieutenant.",
+                [`repeating_gear_${sectionID}_itemcarried`]:"on"
+            },
+            "Agent":{
+                [`repeating_weapons_${sectionID}_weapon`]: "Gatling Pistol",
+                [`repeating_weapons_${sectionID}_range`]: "12/24/48",
+                [`repeating_weapons_${sectionID}_weaponap`]: "1",
+                [`repeating_weapons_${sectionID}_rof`]: "3",
+                [`repeating_weapons_${sectionID}_weaponweight`]: "5",
+                [`repeating_weapons_${sectionID}_weaponcarried`]: "on",
+                [`repeating_weapons_${sectionID}_weaponbutton`]: "2",
+                [`repeating_weapons_${sectionID}_weaponskill`]:"shooting",
+                [`repeating_weapons_${sectionID}_damageatt`]:"na",
+                [`repeating_weapons_${sectionID}_dmgnumdice`]:"2",
+                [`repeating_weapons_${sectionID}_dmgdietype`]:"d6!",
+                [`repeating_weapons_${sectionID}_weaponnotes`]:"Gatling weapons can't fire single shots and must fire their full Rate of Fire. All models have been updated, are fairly well-known in 1884, and are no longer considered infernal devices. A Critical Failure when firing a Gatling means it jams, requiring a Repair roll as an action to get working again. Personal Gatlings have multiple barrels and a drum of ammunition that can be re laced in one action. Pistol drums cost $2 and weigh 1 lbs. unloaded (3 lbs. loaded). Rifle and carbine drums cost $5 and weigh 2 lbs. unloaded (7 lbs. loaded). Shotgun drums cost $5 and weigh 2 lbs. unloaded (3.5 loaded)."
+            }
+        };
         let fields;
         let repSectionID;
         (typeof repSection !== "undefined" || repSection) ? repSectionID = generateRowID() : log("Repeating Section","Not Found",r20color);
@@ -2853,7 +3116,10 @@
                 typeof jsonObj["range"] !== "undefined" ? shortRange = Number(jsonObj["range"].substring(0,2).replace(/(\/)/g,'')) : log("Range","Not found...melee weapons",r20color);
                 shortRange === 0 ? /*Set Skill to Fighting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "fighting" : shortRange < 12 ? /*Set Skill to Athletics*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "athletics" : /*Set Skill to Shooting*/ targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = "shooting";
                 //if damageatt is not passed, set to na
-                typeof jsonObj["damageatt"] === "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_damageatt`] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                log("Damage Att",typeof jsonObj["damageatt"] + " and the Value is: " + jsonObj["damageatt"],r20color);
+                //typeof jsonObj["damageatt"] === "undefined" || jsonObj["damageatt"] === "" ? targetObj[`repeating_${repSection}_${repSectionID}_damageatt`] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                typeof jsonObj["damageatt"] === "undefined" || jsonObj["damageatt"] === "" ? jsonObj["damageatt"] = "na" : log("damageatt","Found...will set appropriately",r20color);
+                log("Damage Att Value",targetObj[`repeating_${repSection}_${repSectionID}_damageatt`],r20color);
                 targetObj[`repeating_${repSection}_${repSectionID}_weaponcarried`] = "on";
                 if(jsonObj["dmgdietype"] === "dmgdietype") {
                     //check if the format is correct
@@ -2895,16 +3161,29 @@
                 log("repSection","Not Found",r20color);
                 break;
         }
+        log("miscFieldsObj",JSON.stringify(miscFieldsObj),r20color);
         if(fields.length) {
             if (repSection) {
                 log("Repeating Fields","Fields Found",r20color);
+                let nameCheck;
                 fields.forEach(field => {
-                    typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
+                    if(typeof jsonObj[`${field}`] !== "undefined"){
+                        log("Field",jsonObj[`${field}`] + ` || ${field}`,r20color);
+                        targetObj[`repeating_${repSection}_${repSectionID}_${field}`] = jsonObj[`${field}`];
+                        typeof jsonObj[`${field}`] === "string" ? nameCheck = jsonObj[`${field}`].trim() : nameCheck = jsonObj[`${field}`];
+                        log("nameCheck",nameCheck,r20color);
+                        typeof abilitiesUpdates[`${nameCheck}`] !== "undefined" ? targetObj = {...targetObj, ...abilitiesUpdates[`${nameCheck}`]} : log("Ability","Nothing additional needed",r20color);
+                    }
+                    //typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`repeating_${repSection}_${repSectionID}_${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
+                    //typeof jsonObj[`${field}`] !== "undefined" ? nameCheck = jsonObj[`${field}`].trim() : log(nameCheck,"Not set",r20color);
+                    //typeof abilitiesUpdates[`${nameCheck}`] !== "undefined" ? targetObj = {...targetObj, ...abilitiesUpdates[`${nameCheck}`]} : log("Ability","Nothing additional needed",r20color);
+                    //typeof specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`] ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`]} : log("Special Ability","Nothing additional needed",r20color);
                 });
             }
             else {
                 log("Non-Repeating Fields","Fields Found",r20color);
                 fields.forEach(field => {
+                    log("JSON So Far",JSON.stringify(targetObj),r20color);
                     typeof jsonObj[`${field}`] !== "undefined" ? targetObj[`${field}`] = jsonObj[`${field}`] : log(`${field}`,"Not Found",r20color);
                 });
             }
@@ -2915,11 +3194,46 @@
 
     const compendiumDrop = function(category) {
         //do stuff
-        getAttrs(["CompendiumData","CompendiumContent"], function(v) {
+        getAttrs(["CompendiumData","CompendiumContent","size","loadlimitdietypedelta","paceModReason","paceMod","runningDie","parryModReason","parryMod","toughnessModReason","tufnessMod","soakmodtype","soakmod","reducereason","reducewoundsby","repairModType","RepairskillMod","thieveryModType","ThieveryskillMod","intimidateModType","IntimidationskillMod","healingModType","HealingskillMod","wounds_max","agModType","agrollMod","stModType","strollMod","viModType","virollMod","spModType","sprollMod","increasereason","increasewoundsby"], function(v) {
             //reset the compendium drop fields
             resetCompendiumFields();
             //Set up setAttrs object variable AND add Compendium variables to be reset to blank
             let setattrvalues = {};
+            miscFieldsObj = {
+                "size":parseInt(v["size"])||0,
+                "loadlimitdietypedelta":parseInt(v["loadlimitdietypedelta"])||0,
+                "paceModReason":v["paceModReason"],
+                "paceMod":parseInt(v["paceMod"])||0,
+                "runningDie":v["runningDie"],
+                "parryModReason":v["parryModReason"],
+                "parryMod":parseInt(v["parryMod"])||0,
+                "toughnessModReason":v["toughnessModReason"],
+                "tufnessMod":parseInt(v["tufnessMod"])||0,
+                "soakmodtype":v["soakmodtype"],
+                "soakmod":parseInt(v["soakmod"])||0,
+                "reducereason":v["reducereason"],
+                "reducewoundsby":parseInt(v["reducewoundsby"])||0,
+                "repairModType":v["repairModType"],
+                "RepairskillMod":parseInt(v["RepairskillMod"])||0,
+                "thieveryModType":v["thieveryModType"],
+                "ThieveryskillMod":parseInt(v["ThieveryskillMod"])||0,
+                "intimidateModType":v["intimidateModType"],
+                "IntimidationskillMod":parseInt(v["IntimidationskillMod"])||0,
+                "healingModType":v["healingModType"],
+                "HealingskillMod":parseInt(v["HealingskillMod"])||0,
+                "wounds_max":parseInt(v["wounds_max"])||0,
+                "agModType":v["agModType"],
+                "agrollMod":parseInt(v["agrollMod"])||0,
+                "stModType":v["stModType"],
+                "strollMod":parseInt(v["strollMod"])||0,
+                "viModType":v["viModType"],
+                "virollMod":parseInt(v["virollMod"])||0,
+                "spModType":v["spModType"],
+                "sprollMod":parseInt(v["sprollMod"])||0,
+                "increasereason":v["increasereason"],
+                "increasewoundsby":parseInt(v["increasewoundsby"])||0
+            }
+            log("Compendium Drop - miscFieldsObj",JSON.stringify(miscFieldsObj),r20color);
             //clean the data
             v.CompendiumData = cleanCompendiumData(v.CompendiumData);
             //parse the JSON Object
@@ -2948,14 +3262,15 @@
                     repSection= "shields";
                     break;
                 case "Vehicles":
-                    //clear all fields in preparation for updated
+                    //clear all character sheet vehicle fields in preparation for updated
+                    //This is to avoid getting mixed data if there was another vehicle on the sheet already when the drop occurred.
                     let resetObj = {};
                     vehiclefields.forEach(field => {
                         resetObj[`${field}`] = "";
                     });
                     setAttrs(resetObj,{silent:true});
                     //Check if Vehicle Type is cared for; if not, will need to set it here.
-                    typeof jsonObj["vehicletype"] !== "undefined" ? log("Vehicle Type","Should already be cared for",r20color) : setattrvalues["vehicletype"] = jsonObj.name;
+                    typeof jsonObj["vehicletype"] !== "undefined" ? log("Vehicle Type","Should already be cared for",r20color) : typeof jsonObj.name !== "undefined" ? setattrvalues["vehicletype"] = jsonObj.name : typeof jsonObj["display_name"] !== "undefined" ? setattrvalues["vehicletype"] = jsonObj["display_name"] : log("Vehicle Name","Nothing defined...leave blank",r20color);
                     //if not already set, show vehicle tab
                     setattrvalues["vehicle"] = "on";
                     setattrvalues["vehiclewounds"] = "0";
@@ -2968,17 +3283,20 @@
                     repSection = false;
                     break;
             }
-            setattrvalues = getDropInfo(jsonObj,setattrvalues,repSection);
+            setattrvalues = getDropInfo(jsonObj,setattrvalues,repSection,miscFieldsObj);
+            jsonObj.Category === "Vehicles" ? log("Returned","Made it back to compendiumDrop",r20color) : console.log("Ignore me");
             if(jsonObj.Category === "Vehicles" && typeof jsonObj["data-Weapons"] !== "undefined") {
                 //if this is a vehicle with weapons, then need to add more stuff to the JSON
-                log("Weapons Array","Found",r20color);
-                log("Weapons",JSON.stringify(jsonObj["data-Weapons"]),r20color);
+                log("Vehicle Weapons Array","Found",r20color);
+                log("Vehicle Weapons",JSON.stringify(jsonObj["data-Weapons"]),r20color);
                 for (let weapon of jsonObj["data-Weapons"]) {
-                    log("Import Weapon",weapon.data.weapon,r20color);
+                    log("Import Vehicle Weapon",weapon.data.weapon,r20color);
                     setattrvalues = getDropInfo(weapon.data,setattrvalues,"shipweapons");
                 }
             }
+            log("setattrvalues",JSON.stringify(setattrvalues),r20color);
             setAttrs(setattrvalues);
+            log("Values","Set...character sheet is updated",r20color);
         });
     }
 
@@ -3030,12 +3348,13 @@
             //set Wild Card Status
             if(typeof monsterObj.is_npc !== "undefined") {
                 //if is_npc = TRUE, then set as Wild Card
-                monsterObj.is_npc === "TRUE" ? monsterStats["is_npc"] = "0" : monster["is_npc"] = "1";
+                monsterObj.is_npc === "TRUE" ? monsterStats["is_npc"] = "0" : monsterStats["is_npc"] = "1";
                 monsterObj.is_npc === "TRUE" ? isWildCard = true : log("Extra","isWildCard false",r20color);
                 monsterObj.is_npc === "TRUE" ? woundsMax = 3 : log("Extra","Leave Wounds at 0",r20color);
             }
             //set Size
-            let monsterSize, tokenSize;
+            let monsterSize = "0";
+            let tokenSize;
             typeof monsterObj.size !== "undefined" ? monsterSize = monsterObj.size : log("Size","Not found",r20color);
             monsterStats["size"] = monsterSize;
             //adjust woundsMax based on Size
@@ -3091,10 +3410,22 @@
                 }
                 //Set Skill Mod
                 typeof monsterObj[`${skillname}mod`] !== "undefined" ? monsterStats[`${skillname}mod`] = monsterObj[`${skillname}mod`] : log(`${skillname}mod`,"Not found or 0",r20color);
-            })
+            });
+            //Set the Trade Skill (stop-gap method)
+            if(typeof monsterObj["trade"] !== "undefined"){
+                //trade exists, so need to set it up
+                repSectionID = generateRowID();
+                monsterStats[`repeating_skills_${repSectionID}_skillnamerank`] = monsterObj["trade"];
+                monsterStats[`repeating_skills_${repSectionID}_custSkillName`] = "Trade";
+                monsterStats[`repeating_skills_${repSectionID}_linkedotherattscore`] = "sma-u";
+                monsterStats[`repeating_skills_${repSectionID}_showOtherRollMod`] = "0";
+                monsterStats[`staticKnowledgeOther`] = "on";
+            }
             //Set the sheet Attributes
             log("Character Sheet","Setting Values",r20color);
+            log("To be set",JSON.stringify(monsterStats),r20color);
             setAttrs(monsterStats, function(){
+                log("Inside","Made it inside the setAttrs",r20color);
                 //Begin Token Settings...
                 //Token size: 4-7 = 2, 8-11 = 3, 12+ = 4
                 const square_size = 70; // Default Roll20 square size (in px)
@@ -3123,32 +3454,21 @@
                 typeof monsterObj.biography !== "undefined" ? finalCharacterDetails["physdescription"] = monsterObj.biography : log("Biography","Not found",r20color);
                 //set Edges
                 log("Edges","Check for Edges",r20color);
-                if (typeof monsterObj["data-Edges"] !== "undefined" && monsterObj["data-Edges"].length > 0) {
-    				for (let edge of monsterObj["data-Edges"]) {
-    					log("Import Edge",edge.name,r20color);
-                        log("Monster Edge",JSON.stringify(edge),r20color);
-                        //finalCharacterDetails = getEdgeInfo(monsterObj["data-Edges"],finalCharacterDetails);
-                        finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
-    					// let repSectionID = generateRowID();
-    					// typeof edge.name !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edge`] = edge.name : log("Edge Name","Not Found",r20color);
-    					// typeof edge.description !== "undefined" ? finalCharacterDetails[`repeating_edges_${repSectionID}_edgedescription`] = edge.description : log("Edge Description","Not Found",r20color);
-    					// finalCharacterDetails[`repeating_edges_${repSectionID}_tookat`] = "GM";
-                        // finalCharacterDetails[`repeating_edges_${repSectionID}_showEdgeDesc`] = "0";
-                        // finalCharacterDetails[`repeating_edges_${repSectionID}_whisperEdgeDeets`] = "/w gm ";
-    				}
-    			}
+                if (typeof monsterObj["data-Edges"] !== "undefined" && typeof monsterObj["data-Edges"] !== "string") {
+                    if (monsterObj["data-Edges"].length > 0) {
+                        for (let edge of monsterObj["data-Edges"]) {
+        					//log("Import Edge",edge.name,r20color);
+                            //log("Monster Edge",JSON.stringify(edge),r20color);
+                            finalCharacterDetails = getDropInfo(edge.data,finalCharacterDetails,"npc_Edge");
+        				}
+                    }
+                }
+
                 //set Hindrances
-                if (typeof monsterObj["data-Hinderances"] !== "undefined" && monsterObj["data-Hinderances"].length > 0) {
-    				for (let hindrance of monsterObj["data-Hinderances"]) {
-    					log("Import Hindrances",hindrance.hindrance,r20color);
-                        log("Monster Hindrance",JSON.stringify(hindrance),r20color);
-                        //finalCharacterDetails = getHindranceInfo(monsterObj["data-Hindrances"],)
-    					// let repSectionID = generateRowID();
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrance`] = hindrance.hindrance;
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindrancedescription`] = hindrance.hindrancedescription;
-    					// finalCharacterDetails[`repeating_hindrances_${repSectionID}_showHindraceDesc`] = "0";
-                        // (typeof hindrance.hindranceType !== "undefined" && hindrance.hindranceType !== "Both") ? finalCharacterDetails[`repeating_hindrances_${repSectionID}_hindranceType`] = hindrance.hindranceType : log("Hindrance Type","Both, so leave it blank",r20color);
-                        // finalCharacterDetails[`repeating_hindrances_${repSectionID}_whisperDeets`] = "/w gm ";
+                if (typeof monsterObj["data-Hindrances"] !== "undefined" && monsterObj["data-Hindrances"].length > 0) {
+    				for (let hindrance of monsterObj["data-Hindrances"]) {
+    					//log("Import Hindrances",hindrance.hindrance,r20color);
+                        //log("Monster Hindrance",JSON.stringify(hindrance),r20color);
                         finalCharacterDetails = getDropInfo(hindrance.data,finalCharacterDetails,"npc_hindrance");
     				}
     			}
@@ -3156,55 +3476,67 @@
                 log("Edges & Hindrances","Write Edges and Hindrances to the Character",r20color);
                 setAttrs(finalCharacterDetails);
                 finalCharacterDetails = {};
-                //Set Weapons
-                //const weaponfields = ["weapon","range","rof","damageatt","dmgnumdice","dmgdietype","dmgbonusnum","weaponap","weaponminstrength","weaponweight"];
-                log("Weapons","Check for Weapons",r20color);
-                typeof monsterObj["data-Weapons"] !== "undefined" ? log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color) : log("Monster Weapons","Not Found",r20color);
-                if (typeof monsterObj["data-Weapons"] !== "undefined" && monsterObj["data-Weapons"].length > 0) {
-                    log("Weapons Array","Found",r20color);
-                    log("Monster Weapons",JSON.stringify(monsterObj["data-Weapons"]),r20color);
-    				for (let weapon of monsterObj["data-Weapons"]) {
-    					log("Import Weapon",weapon.data.weapon,r20color);
-    					// let repSectionID = generateRowID();
-                        // weaponfields.forEach(field => {
-                        //     if(field === "dmgdietype") {
-                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] = "d" + weapon[`${field}`] + "!" : log(field,"Not Damage Die Type",r20color);
-                        //     }
-                        //     else {
-                        //         typeof weapon[`${field}`] !== "undefined" ? finalCharacterDetails[`repeating_weapons_${repSectionID}_${field}`] =  weapon[`${field}`] : log(field,"Not found",r20color);
-                        //     }
-                        // });
-                        // finalCharacterDetails[`repeating_weapons_${repSectionID}_showweaponconfig`] = "0"
-                        finalCharacterDetails = getDropInfo(weapon.data,finalCharacterDetails,"weapons");
-                    }
-    			}
+                //Set Power Points if any
+                if (typeof monsterObj.PowerPoints !== "undefined") {
+                    finalCharacterDetails["PowerPoints"] = monsterObj.PowerPoints;
+                    finalCharacterDetails["PowerPoints_max"] = monsterObj.PowerPoints;
+                }
 
-                log("Armor","Check for Armor",r20color);
-                typeof monsterObj["data-Armors"] !== "undefined" ? log("Monster Armor",JSON.stringify(monsterObj["data-Armors"]),r20color) : log("Monster Armor","Not Found",r20color);
-                if (typeof monsterObj["data-Armors"] !== "undefined" && monsterObj["data-Armors"].length > 0) {
-                    log("Armor Array","Found",r20color);
-    				for (let armor of monsterObj["data-Armors"]) {
-    					log("Import Armor",armor.data.ArmorType,r20color);
-                        finalCharacterDetails = getDropInfo(armor.data,finalCharacterDetails,"armor");
+                //Get Gear, Weapons, Powers, Armor, and Shields
+                const stuffType = ["Gear","Weapons","Powers","Armors","Shields"];
+                stuffType.forEach((things) => {
+                    log(`${things}`,`Check for ${things}`,r20color);
+                    let section;
+                    switch (things) {
+                        case 'Gear':
+                            section = "gear";
+                            break;
+                        case 'Weapons':
+                            section = "weapons";
+                            break;
+                        case 'Powers':
+                            section = "spells";
+                            break;
+                        case 'Armors':
+                            section = "armor";
+                            break;
+                        case 'Shields':
+                            section = "shields";
+                            break;
+                        default:
+                            section = things.toLowerCase();
                     }
-    			}
+                    typeof monsterObj[`data-${things}`] !== "undefined" ? log(`Monster ${things}`,JSON.stringify(monsterObj[`data-${things}`]),r20color) : log(`Monster ${things}`,"Not Found",r20color);
+                    if (typeof monsterObj[`data-${things}`] !== "undefined" && monsterObj[`data-${things}`].length > 0) {
+                        log(`${things} Array`,"Found",r20color);
+                        log(`Monster ${things}`,JSON.stringify(monsterObj[`data-${things}`]),r20color);
+        				for (let thing of monsterObj[`data-${things}`]) {
+        					log(`Import ${things}`,things.data,r20color);
+                            finalCharacterDetails = getDropInfo(thing.data,finalCharacterDetails,section);
+                        }
+        			}
+                })
+
+
 
                 log("Weapons and Armor","Write weapons to the character sheet",r20color);
                 setAttrs(finalCharacterDetails);
                 //Set Special Abilities
                 log("Special Abilities","Begin processing...",r20color);
-                log("Special Abilities",monsterObj["data-SpecialAbilities"],r20color);
-                log("Number of Special Abilities",monsterObj["data-SpecialAbilities"].length,r20color);
+                log("Special Abilities",typeof monsterObj["data-SpecialAbilities"],r20color);
+                //log("Number of Special Abilities",monsterObj["data-SpecialAbilities"].length,r20color);
                 //if (typeof monsterObj["data-SpecialAbilities"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
-                if (typeof monsterObj["descriptionList"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
+                if (typeof monsterObj["descriptionList"] !== "undefined" && typeof monsterObj["data-SpecialAbilities"] !== "undefined" && monsterObj["data-SpecialAbilities"].length > 0) {
                     finalCharacterDetails["showSpecAbilities"] = "1";
     				for (let compendiumSpecialAbility of monsterObj["data-SpecialAbilities"]) {
     					log("Special Ability",compendiumSpecialAbility.name,r20color);
     					let repSectionID = generateRowID();
-    					typeof compendiumSpecialAbility.name !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialability`] = compendiumSpecialAbility.name : log("Special Ability Name","Not Found",r20color);
+    					typeof compendiumSpecialAbility.name !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialability`] = compendiumSpecialAbility.name.trim() : log("Special Ability Name","Not Found",r20color);
     					typeof compendiumSpecialAbility.description !== "undefined" ? finalCharacterDetails[`repeating_specialabilities_${repSectionID}_specialabilitydescription`] = compendiumSpecialAbility.description : log("Special Ability Description","Not Found",r20color);
                         finalCharacterDetails[`repeating_specialabilities_${repSectionID}_showSpecAbilityDesc`] = "0";
                         finalCharacterDetails[`repeating_specialabilities_${repSectionID}_whisperSpecAbilityDeets`] = "/w gm ";
+                        //compendiumSpecialAbility.name.trim() === "Undead" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Undead"]} : compendiumSpecialAbility.name.trim() === "Construct" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Construct"]} : compendiumSpecialAbility.name.trim() === "Elemental" ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates["Elemental"]} : log("Special Ability","Nothing additional needed",r20color);
+                        typeof specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`] ? finalCharacterDetails = {...finalCharacterDetails, ...specialAbiltyUpdates[`${compendiumSpecialAbility.name.trim()}`]} : log("Special Ability","Nothing additional needed",r20color);
     				}
                     log("Special Abilities","Finished Processing",r20color);
     			}
@@ -3216,14 +3548,13 @@
         });
     }
 
-
-
     on("change:CompendiumCategory", function(eventInfo) {
         log("Compendium Drop",eventInfo.newValue,"#E948C9");
+        log("Compendium Change Source",eventInfo.sourceType,r20color);
     	if (eventInfo.newValue !== "") {
-            let compendiumCategory = eventInfo.newValue;
+            let cCategory = eventInfo.newValue;
             let resetFields;
-            switch (compendiumCategory) {
+            switch (cCategory) {
                 case "Edges":
                 case "Hindrances":
                 case "Powers":
@@ -3232,15 +3563,16 @@
                 case "Vehicles":
                 case "Gear":
                 case "Shields":
-                    compendiumDrop(compendiumCategory);
+                    compendiumDrop(cCategory);
                     break;
                 case "Bestiary":
                     compendiumBestiary();
                     break;
                 default:
-                    log(`Category: ${compendiumCategory}`,`Not recognized`,r20color);
-                    resetFields = resetCompendiumFields();
-                    setAttrs(resetFields,{silent:true});
+                    log(`Category: ${cCategory}`,`Not recognized`,r20color);
+                    //resetFields = resetCompendiumFields();
+                    //setAttrs(resetFields,{silent:true});
+                    resetCompendiumFields();
                     break;
             }
     	}
@@ -6316,6 +6648,61 @@
     				<input type="checkbox" class="sheet-hideArcanum sheet-hiddenInput" name="attr_ArcanumTab">
     				<div class='sheet-collapsedSectionView sheet-arcanum'>
                     	<h1 class="sheet-groupHeader"><span name="attr_powerlabelplural"></span></h1>
+                        <!-- New Stuff Added -->
+                        <div class="sheet-powerpoints">
+                            <input type="hidden" class="sheet-showmultipleabs" name="attr_numberofabs" value="1" />
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab1color" value="white" />
+                            <div class="sheet-ppcontainer">
+                                <label class="sheet-ablabel"><span name='attr_ablabel'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_PowerPoints" title="@{PowerPoints}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_PowerPoints_max" title="@{PowerPoints_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_ppelabel'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab2color" value="red" />
+                            <div class="sheet-ppcontainer sheet-label2">
+                                <label class="sheet-ablabel"><span name='attr_ablabel2'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints2" title="@{powerpoints2}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints2_max" title="@{powerpoints2_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel2'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab3color" value="blue" />
+                            <div class="sheet-ppcontainer sheet-label3">
+                                <label class="sheet-ablabel"><span name='attr_ablabel3'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints3" title="@{powerpoints3}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints3_max" title="@{powerpoints3_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel3'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab4color" value="green" />
+                            <div class="sheet-ppcontainer sheet-label4">
+                                <label class="sheet-ablabel"><span name='attr_ablabel4'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints4" title="@{powerpoints4}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints4_max" title="@{powerpoints4_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel4'></span></label>
+                            </div>
+                            <input type="hidden" class="sheet-abcolor" name="attr_ab5color" value="purple" />
+                            <div class="sheet-ppcontainer sheet-label5">
+                                <label class="sheet-ablabel"><span name='attr_ablabel5'></span></label>
+                                <div class="sheet-ppfields">
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints5" title="@{powerpoints5}" value="0"  />
+                                    <span data-i18n="of">&nbsp;of&nbsp;</span>
+                                    <input class="sheet-ppvalue" type="number" name="attr_powerpoints5_max" title="@{powerpoints5_max}" value="0" />
+                                </div>
+                                <label class="sheet-abpplabel"><span name='attr_pplabel5'></span></label>
+                            </div>
+                        </div>
+                        <!-- End New Stuff Added -->
                     	<fieldset class='repeating_spells'>
                     		<span class="sheet-spellsMini">
 								<button class="sheet-traitbutton sheet-miniButton" type='roll' name='roll_tPower' value="@{spellroll}"><input type="hidden" name="attr_spellbutton" class="sheet-spellbutton" value="1" /><span class="sheet-buttonand">⚔️</span><span class="sheet-buttondo">&#x1f5e1;</span><span class="sheet-buttonsk">&#x1f64c;</span> <span name="attr_power"></span></button>
@@ -6428,7 +6815,7 @@
 						</div>
 						<!-- Toughness -->
 						<div class="sheet-base sheet-characterToughness">
-							<div class="sheet-imageContainer">
+                            <div class="sheet-imageContainer">
 								<img class="sheet-statCircle" src="https://raw.githubusercontent.com/finderski/SWT/master/redCircle3.png" />
 								<input type="hidden" name="attr_toughnesscur" title="@{toughnesscur}" class="sheet-derivedStat" readonly />
 								<button type="action" name="act_toughnessCur" class="sheet-curToughnessButton"><span name="attr_toughnesscur"></span> (<span name="attr_toughnessArmor"></span>)</button>
@@ -6473,6 +6860,7 @@
     					<label class="sheet-toughnessLabel" data-i18n="armor">Armor:</label> <input type="number" name="attr_toughnessArmor" title="@{toughnessArmor}" class="sheet-derivedStat sheet-toughnessInput" value="0" />
     				</div>
     				<!-- Additional Derived Stats -->
+                    <input type="hidden" class="sheet-useDominion" name="attr_showDominion" value="0" />
     				<input class='sheet-showadditional' type='checkbox' name='attr_showadditionalderived' />
     				<h1 class='sheet-groupHeader sheet-additionalDerived' data-i18n="additional-derived-stats">Additional Derived Stats</h1>
 					<!-- <input type="checkbox" class="sheet-hideAtts" name="attr_hideCoreDerived" /><span class="sheet-showhide"></span> -->
@@ -6485,6 +6873,14 @@
 					        <div class="sheet-derivemisc" data-i18n="maximum-abbr">Max</div>
 					    </div>
 					    <hr class="sheet-derivedhr" style="border: .45px dashed silver; margin: 2px 0px 2px 0px;"  />
+                        <!-- Dominion -->
+                        <div class="sheet-basederived sheet-showDominion">
+					        <div class="sheet-derivelabel"><button class="sheet-traitbutton sheet-deriveflexbutton sheet-dominionButton" type='roll' name='roll_DominionRoll' value='&{template:info} {{name=@{character_name}}} {{item=Dominion Roll}} {{=[[ 1t[@{dominion-table}] ]] }}'><span data-i18n="dominion">Dominion</span></button></div>
+					        <div class="sheet-derivebase sheet-doubleheight"><span class="sheet-derivedStat" data-i18n="spirit"></span></div>
+							<div class="sheet-derivemod">&nbsp;</div>
+							<div class="sheet-derivecurrent"><input type="number" name="attr_dominion" title="@{dominion}" class="sheet-derivedStat" value="0" /></div>
+							<div class="sheet-derivemisc"><input type="number" name="attr_dominion_max" title="@{dominion_max}" class="sheet-derivedStat" value="0" /></div>
+					    </div>
 					    <!-- First Custom Derived Stat -->
 					    <div class="sheet-basederived">
 					        <div class="sheet-derivelabel"><input type="text" name="attr_derivedFirstName" title="@{derivedFirstName}" class="sheet-derivedStateName" value="Custom" data-i18n-placeholder="derived-stat-name" /></div>
@@ -6577,27 +6973,23 @@
 					<div class='sheet-base sheet-miscderived'>
     					<!-- Money -->
 						<input type="checkbox" class="sheet-usewealth" name="attr_usewealth" style="display: none;" />
-    					<input type="checkbox" class="sheet-useLankhmar" name="attr_50fPo8Clams" value="0" style="display: none;"/>
-    					<!-- <div class="sheet-basederived sheet-lankhmar" style='font-weight: bold; font-size: .75em; margin-top: 5px; margin-bottom: -3px;'>
-					        <div class="sheet-derivelabel">&nbsp;</div>
-					        <div class="sheet-derivebase" data-i18n="iron-tiks">Tiks</div>
-					        <div class="sheet-derivemod" data-i18n="bronze-agols">Agols</div>
-					        <div class="sheet-derivecurrent" data-i18n="silver-smerduks">Smerduks</div>
-					        <div class="sheet-derivemisc" data-i18n="gold-rilks">Rilks</div>
-					    </div> -->
-					    <div class="sheet-basederived sheet-nonwealth">
-					        <input type="hidden" class="sheet-usePieces" value="0" name="attr_50fPo8Clams" />
-					        <!-- Labels -->
-					        <div class="sheet-derivelabel sheet-money" data-i18n="money">Money</div>
-					        <!-- <div class='sheet-derivelabel sheet-PofE' data-i18n="pieces-of-eight">Pieces of Eight</div>
-					        <div class="sheet-derivelabel sheet-Clams" data-i18n="money-clams">Clams</div> -->
-					        <div class="sheet-derivelabel sheet-Credits" data-i18n="money-credits">Credits</div>
-					        <!-- <div class="sheet-derivelabel sheet-Livre" data-i18n="livre">Livre</div> -->
-					        <!-- Money Fields -->
-					        <div class="sheet-derivebase"><input class="sheet-derivedStat sheet-moneyfield" type="number" step="any" name="attr_money" title="@{money}" value="0" /></div>
-							<!-- <div class="sheet-derivemod sheet-lankhmar"><input type="number" step="any" name="attr_bagols" title="@{bagols}" class="sheet-derivedStat" value="0" /></div>
-							<div class="sheet-derivecurrent sheet-lankhmar"><input type="number" step="any" name="attr_ssmerduks" title="@{ssmerduks}" class="sheet-derivedStat" value="0" /></div>
-							<div class="sheet-derivemisc sheet-lankhmar"><input type="number" step="any" name="attr_grilks" title="@{grilks}" class="sheet-derivedStat" value="0" /></div> -->
+    					<input type="hidden" class="sheet-useMultiCurrency" name="attr_moneyfields" value="1" />
+                        <div class="sheet-basederived sheet-multiMoney sheet-moneyLabels">
+                            <div class="sheet-derivelabel sheet-money"> </div>
+                            <div class="sheet-derivebase"><span name='attr_moneyonename'></span></div>
+                            <div(class="sheet-derivemod"><span name="attr_moneytwoname"></span></div>
+                            <div class="sheet-derivecurrent sheet-money3"><span name="attr_moneythreename"></span></div>
+                            <div class="sheet-derivemisc sheet-money4"><span name="attr_moneyfourname"></span></div>
+                        </div>
+
+					    <div class="sheet-basederived sheet-nonwealth sheet-multiMoney">
+                            <!-- Label -->
+                            <div class="sheet-derivelabel sheet-money"><span name="attr_moneyname"></span></div>
+                            <!-- Money Fields -->
+                            <div class="sheet-derivebase"><input class="derivedStat moneyfield" type="number" step="any" name="attr_money" title="@{money}" value="0" /></div>
+                            <div class="sheet-derivemod sheet-additionalCurrency sheet-money2"><input type="number" step="any" name="attr_money2" title="@{money2}" class="sheet-derivedStat" value="0" /></div>
+                            <div class="sheet-derivecurrent sheet-additionalCurrency sheet-money3"><input type="number" step="any" name="attr_money3" title="@{money3}" class="sheet-derivedStat" value="0" /></div>
+                            <div class="sheet-derivemisc sheet-additionalCurrency sheet-money4"><input type="number" step="any" name="attr_money4" title="@{money4}" class="sheet-derivedStat" value="0" /></div>
 					    </div>
 						<div class="sheet-basederived sheet-usewealth">
 							<!-- Label -->
@@ -6652,7 +7044,7 @@
                 	<img class="sheet-logo sheet-SWADE" src="http://www.geeksville.us/roll20/SW_Logo_AE.png" />
                     <img class="sheet-logo sheet-Deadlands" src="http://www.geeksville.us/roll20/Deadlands.png" />
                     <input type='hidden' name='wilddie' value='6' />
-                    <div class='sheet-condionsnew'>
+                    <div class='sheet-conditionsnew'>
                     	<!-- Conditions -->
         				<input type="checkbox" class="sheet-showconditions" name="attr_showconditions" style="display: none" checked />
         				<div class='sheet-conditions'>
@@ -7495,12 +7887,12 @@
                                     </p>
                                 </div>
     						</fieldset>
+                            <div class='sheet-shieldTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
+                                <h4 class="sheet-shieldweight"><span data-i18n="total-shield-weight-carried">Total Shield Weight Carried</span>:</h4>
+                                <input type="number" name="attr_shieldtotalweightcarried" title="@{shieldtotalweightcarried}" class="sheet-shieldWeight" value="0" readonly />
+                            </div>
     						<!-- <input class="sheet-useLoad" type="checkbox" name="attr_useLoad" style="display:none;" checked /> -->
     					</div>
-                        <div class='sheet-shieldTotalWeight sheet-loadstuff'><!-- Set up the Total Weight Carried box -->
-                            <h4 class="sheet-shieldweight"><span data-i18n="total-shield-weight-carried">Total Shield Weight Carried</span>:</h4>
-                            <input type="number" name="attr_shieldtotalweightcarried" title="@{shieldtotalweightcarried}" class="sheet-shieldWeight" value="0" readonly />
-                        </div>
                     </div> <!-- End Shields -->
                 </div>
             </div>
@@ -7873,9 +8265,12 @@
     			<div class='sheet-configSection'>
     			    <input type="checkbox" class="sheet-hideSRM" name="attr_hideSRM" /><span class="sheet-showSRM"></span>
     			    <h3 class='sheet-configSectionTitle' data-i18n="setting-rules">Setting Rules</h3>
-    			    <input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" style="display: none;" />
+    			    <!--<input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" style="display: none;" />-->
     			    <div class="sheet-srmconfig">
     				    <label class="sheet-srmItem" data-i18n-title="additional-derived-stats"><input type='checkbox' name='attr_showadditionalderived' /> <span data-i18n="additional-derived-stats">Additional Derived Stats</span></label>
+                        <label class="sheet-srmItem" data-i18n-title="additional-derived-stats"><input type="checkbox" name="attr_showDominion" value="1" /> <span data-i18n="use-dominion">Use Dominion</span></label>
+                        <input type="hidden" class="sheet-useDominion" name="attr_showDominion" value="0" />
+                        <label class="sheet-srmItem sheet-dominiontable" data-i18n-title="dominion-table-name">Dominion Table Name: <input type='text' class="sheet-injury" name="attr_dominion-table" /></label>
     				    <label class="sheet-srmItem" data-i18n-title="power-pointless"><input type="checkbox" class="sheet-NoPP" name="attr_NoPPRule" /> <span data-i18n="no-power-points">No Power Points</span></label>
                         <label class="sheet-srmItem" data-i18n-title="gritty-damage"><input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" /> <span data-i18n="use-gritty-damage">Use Gritty Damage</span></label>
                         <input type='checkbox' class="sheet-usegritty" name='attr_gritty' value="{{getgritty=gritty}}" style="display: none;" />
@@ -7898,6 +8293,21 @@
                         </div>
 						<label class="sheet-srmItem sheet-usewealthmod"><input type="checkbox" name="attr_useWealthMod" value="1" />&nbsp;<span data-i18n="use-wealth-modifier-field">Use the Wealth Modifier field</span></label>
                         <!-- <label class="sheet-srmItem" data-i18n-title="smooth-dice"><input type="checkbox" name="attr_smooth_dice" value=1>&nbsp;<span data--i18n="smooth-dice">Smooth Dice</span></label> -->
+                        <label class="sheet-srmItem sheet-multiMoney"><span data-i18n="money-label"></span> : <input type="text" class="sheet-injury" name="attr_moneyname" /></label>
+                        <div class="sheet-srmItem sheet-multiMoney">
+                            <select name="attr_moneyfields" class="sheet-traitdie" title="@{moneyfields}">
+                                <option value="1" selected>1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select>
+                            <label class="sheet-moneycountlabel" data-i18n="number-of-money-fields">Number of money fields</label>
+                        </div>
+                        <input type="hidden" class="moneycount" name="attr_moneyfields" value="1" />
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money1"><span data-i18n="currency1-label"></span>: <input type="text" class="sheet-injury" name="attr_moneyonename" /></label>
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money2"><span data-i18n="currency2-label"></span>: <input type="text" class="sheet-injury" name="attr_moneytwoname" /></label>
+                        <label(class="sheet-srmItem sheet-multiMoney sheet-money3"><span data-i18n="currency3-label"></span>: <input type="text" class="sheet-injury" name="attr_moneythreename" /></label>
+                        <label class="sheet-srmItem sheet-multiMoney sheet-money4"><span data-i18n="currency4-label"></span>: <input type="text" class="sheet-injury" name="attr_moneyfourname" /></label>
     			    </div>
     			</div>
     			<div class='sheet-configSection'>
@@ -8018,6 +8428,102 @@
 			<!--                     -->
 			<div class="sheet-release">
 				<h1 class='sheet-groupHeader sheet-documentationHeader' data-i18n="release-notes">Release Notes</h1>
+                <!-- Release 1.00.14 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10014' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.14</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10014' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="additional-support-for-deadlands-compendium">Added additional support for the Deadlands: The Weird West compendium.</span></li>
+					</ul>
+                    <!--
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="bestiary-drag-and-drop-fix">Fixed a drag and drop issue where some bestiary entries didn't have all the necessary updates. For example, Zombies Undead special ability didn't update/change the creatures Toughness, etc.</span></li>
+                    </ul>
+                    -->
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
+                <!-- Release 1.00.13 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10013' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.13</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10013' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="additional-support-for-deadlands-compendium">Added additional support for the Deadlands: The Weird West compendium.</span></li>
+                        <li><span class="sheet-black" data-i18n="added-support-for-dominion">Added support for Dominion, including support for a rollable table</span></li>
+					</ul>
+                    <!--
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="bestiary-drag-and-drop-fix">Fixed a drag and drop issue where some bestiary entries didn't have all the necessary updates. For example, Zombies Undead special ability didn't update/change the creatures Toughness, etc.</span></li>
+                    </ul>
+                    -->
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
+                <!-- Release 1.00.12 -->
+                <label class="sheet-rowlabel">
+			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10012' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.12</h4></span>
+				</label>
+                <input type='checkbox' class='sheet-releasenotes' style='display: none;' name='attr_releasenotes10012' value='1' />
+				<div class='sheet-releasenotes'>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="minor-release">Minor Release</h2>
+					<p data-i18n="minor-release-info">
+						This release focuses on Minor Enhancements and Bug Fixes
+					</p>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="enhancements">Enhancements</h2>
+					<ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="support-for-deadlands-compendium">Added support for the Deadlands: The Weird West compendium.</span></li>
+                        <li><span class="sheet-black" data-i18n="additional-currency">Support for additional money/currency fields. These labels are customizeable.</span></li>
+					</ul>
+                    <h2 class='sheet-releaseNotesSubHeader' data-i18n="bugs-fixed">Bugs Fixed</h2>
+                    <ul class="sheet-releaseNotesList">
+						<li><span class="sheet-black" data-i18n="bestiary-drag-and-drop-fix">Fixed a drag and drop issue where some bestiary entries didn't have all the necessary updates. For example, Zombies Undead special ability didn't update/change the creatures Toughness, etc.</span></li>
+                    </ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="planned-enhancements">Planned Enhancements</h2>
+					<ul class='sheet-releaseNotesList'>
+                        <li><span class='sheet-black' data-i18n="min-strength-enhancement">Take into account minimium strength for Armor and weapons and have modifiers automatically apply to the roll.</span></li>
+						<li><span class='sheet-black' data-i18n="multiple-vehicles">Ability to have multiple vehicles.</span></li>
+						<li><span class='sheet-black' data-i18n="character-update-via-json">Ability to update character progession via the JSON importer</span></li>
+					</ul>
+					<h2 class='sheet-releaseNotesSubHeader' data-i18n="things-to-be-aware-of">Things to be aware of</h2>
+					<ul class="sheet-releaseNotesList">
+                        <li><span class='sheet-black' data-i18n="pace-encumbrance-bug">Pace currently doesn't take into account penalties due to encumbrance; this is being worked on and will be corrected soon.</span></li>
+						<li><span class='sheet-black' data-i18n="condensed-view-and-skill-specialization">The condensed view of the character sheet has problems if you are using skill specialization. In most situations it should be fine, however, you may experience odd display issues if specializations are used.</span></li>
+					</ul>
+				</div>
                 <!-- Release 1.00.11 -->
                 <label class="sheet-rowlabel">
 			        <input type='checkbox' class='sheet-releasenotes' name='attr_releasenotes10011' value='1' /><span class='sheet-releasenotes'> <h4 class="sheet-rnversion"><span data-i18n="version">Version</span> 1.00.11</h4></span>
@@ -8452,6 +8958,9 @@
 		        <p class='sheet-docparagraph'>
 		        	<strong><span data-i18n="additional-derived-stats">Additional Derived Stats</span></strong>: <span data-i18n="derived-stats-paragraph">While this sheet focuses on Core Savage Worlds compliance and doesn't include any additional/custom derived stats be default, the sheet does offer an option configure your own custom derived stats. Checking the <em>Additional Derived Stats</em> checkbox, the sheet will add a section for additional derived stats. Here you can give your derived stat(s) a name and set the details for the derived stat(s). Given that various systems ahve various rules for how derived stats are calculated, none of these fields are automated, so you have maximum flexibility in tracking those stats.</span>
 		        </p>
+                <p class="sheet-docparagraph">
+                    <strong><span data-i18n="dominion"></span></strong>: <span data-i18n="dominion-paragraph">Dominion will appear under the Additional Derived Stats, but the two are independent of one another. Selecting Dominion will show the Header for Additional Derived Stats, but it won't show the fields for additional derived. If you need to an additional derived stat in addition to Dominio you need to check both boxes. Selecting Dominion will also show a field for the Dominion Table Name; this is necessary for the Dominion roll button to know which rollable table to use for a Dominion roll.  This does require the GM to set up a dominion rollable to begin with.  This table name can also be identified in the game Settings as a default so the GM doesn't need to enter the table name on every inidivual character sheet.</span>
+                </p>
 		        <p class='sheet-docparagraph'>
 		        	<strong><span data-i18n="gritty-damage">Gritty Damage</span></strong>: <span data-i18n="gritty-damage-paragraph">If Gritty Damage is turned on, the GM must create a Rollable table for the Injury rolls. If this rollable table is not created and the exact name of the table entered in the Gritting Damage field for the table name, this functionality will not work.</span>
 		        </p>
