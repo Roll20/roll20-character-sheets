@@ -718,11 +718,22 @@
 				<span class="center" name="attr_primary_range_weapon_extreme"></span>
 			</div>
 			<div class="row-long cc-row primary-range-row2">
+				<input type="hidden" name="attr_primary_range_weapon_mode_singleshot" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_mode_semiauto" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_mode_burst" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_mode_fullauto" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_mode_other" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_damage" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_close" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_near" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_medium" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_far" value="0" />
+				<input type="hidden" name="attr_primary_range_weapon_base_extreme" value="0" />
 				<select name="attr_primary_range_weapon_mode" title="@{primary_range_weapon_mode}">
-					<option data-i18n="singleshot" value="SS" selected="selected">Single Shot</option>
-					<option data-i18n="semiauto" value="SA">Semi-Auto</option>
-					<option data-i18n="burstfire" value="BF">Burst Fire</option>
-					<option data-i18n="fullauto" value="FA">Full Auto</option>
+					<option data-i18n="singleshot" value="Single Shot" selected="selected">Single Shot</option>
+					<option data-i18n="semiauto" value="Semi Auto">Semi-Auto</option>
+					<option data-i18n="burstfire" value="Burst Fire">Burst Fire</option>
+					<option data-i18n="fullauto" value="Full Auto">Full Auto</option>
 					<option data-i18n="other" value="Other">Other</option>
 				</select>
 				<span>&nbsp;</span>
@@ -5250,12 +5261,15 @@ console.log(eventInfo);
 		'initiative_mod', 'initiative_dice_mod', 'astral_initiative_mod', 'astral_dice_mod', 'matrix_initiative_mod', 'matrix_dice_mod', 'cold_sim_initiative_mod', 'cold_sim_dice_mod', 'hot_sim_initiative_mod', 'hot_sim_dice_mod',
 		'composure_modifier', 'judge_intentions_modifier', 'memory_modifier', 'lift_carry_modifier', 'move_speed', 'sprint_speed', 'sprint_modifier',
 		'attack_modifier', 'sleaze_modifier', 'data_processing_modifier', 'firewall_modifier',
+		'combat_paralysis'
 	];
 	var attrsToGet = ['enable_modifiers', 'enable_unrestricted_modifiers'];
 
 	var prog = /(.+)_modifications$/.exec(eventInfo.triggerName);
-	if(prog && prog[1]) {
+	if(prog && prog[1] && eventInfo.triggerName.includes("powered_on")) {
 		attrsToGet.push(`${prog[1]}_powered_on`);
+	} else {
+		prog = [];
 	}
 
 	var rep_prog = /(.+)_powered_on$/.exec(eventInfo.triggerName);
@@ -5416,25 +5430,83 @@ on("change:primary_range_weapon_mode", (eventinfo) => {
 	var mode = eventinfo.newValue;
 	var rounds = 1;
 
-	switch(mode) {
-		case "FA":
-			rounds = 10;
-			break;
-		case "BF":
-			rounds = 4;
-			break;
-		case "SA":
-			rounds = 2;
-			break;
-		case "SS":
-		default:
-			rounds = 1;
-	}
+	getAttrs(['primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme'], (v) => {
+		var toSet = {
+			primary_range_weapon_damage: v.primary_range_weapon_base_damage,
+			primary_range_weapon_close: v.primary_range_weapon_base_close,
+			primary_range_weapon_near: v.primary_range_weapon_base_near,
+			primary_range_weapon_medium: v.primary_range_weapon_base_medium,
+			primary_range_weapon_far: v.primary_range_weapon_base_far,
+			primary_range_weapon_extreme: v.primary_range_weapon_base_extreme,
+		};
 
-	setAttrs({
-		shots_fired: rounds
+		switch(mode) {
+			case "Full Auto":
+				// 10 rounds, AR -6, split dice pool... how do I split the dice pool for this without an api
+				rounds = 10;
+				toSet = adjAttrs({
+					attrs: toSet,
+					arMod: -6,
+					dvMod: 0
+				});
+				break;
+			case "Burst Fire":
+				// 4 rounds, AR -4, DV +2
+				rounds = 4;
+				toSet = adjAttrs({
+					attrs: toSet,
+					arMod: -4,
+					dvMod: 2
+				});
+				break;
+			case "Semi Auto":
+				// 2 rounds, AR -2, DV +1
+				rounds = 2;
+				toSet = adjAttrs({
+					attrs: toSet,
+					arMod: -2,
+					dvMod: 1
+				});
+				break;
+			case "Single Shot":
+			default:
+				// 1 round, No changes
+				rounds = 1;
+				toSet = adjAttrs({
+					attrs: toSet,
+					arMod: 0,
+					dvMod: 0
+				});
+		}
+
+		toSet.shots_fired = rounds;
+		setAttrs(toSet);
+
 	});
 });
+
+var adjAttrs = (p) => {
+	Object.keys(p.attrs).forEach(a => {
+		mod = p.arMod;
+		if(a.endsWith("_damage")) {
+			mod = p.dvMod;
+		}
+
+		pieces = /(\d+)(.*)/.exec(p.attrs[`${a}`]);
+		var tot = p.attrs[`${a}`];
+		if(pieces[1] && pieces[1] > 0) {
+			tot = parseInt(pieces[1]) + parseInt(mod);
+			if(tot < 0) {
+				tot = 0;
+			}
+		}
+
+		p.attrs[`${a}`] = tot + pieces[2];
+	});
+
+	return p.attrs;
+}
+
 
 on("clicked:reload", (eventinfo) => {
 	getAttrs([`primary_range_weapon_ammo_max`], (v) => {
@@ -6578,7 +6650,7 @@ on("change:repeating_skills:name", (eventInfo) => {
 		const newV   = eventInfo.newValue;
 		const type   = weap.slice(-5);
 
-		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_primary`, `sheet_type`], (v) => {
+		getAttrs([`${weap}_dicepool_modifier`, `${weap}_spec`, `${weap}_expert`, `${weap}_skill`, `${weap}_primary`, `${weap}_firing_modes`, `${weap}_damage`, `${weap}_close`, `${weap}_near`, `${weap}_medium`, `${weap}_far`, `${weap}_extreme`, `sheet_type`], (v) => {
 			if(v.sheet_type != 'pc') {
 				return;
 			}
@@ -6609,7 +6681,48 @@ on("change:repeating_skills:name", (eventInfo) => {
 				//Add the range or melee specific ones
 				if(type === "range") {
 					array.push("ammo", "ammo_max", "mode");
+
+					// update the primary range firing modes available
+					var modes = v[`repeating_range_firing_modes`].split(/\s*\/\s*/i);
+					var toEnable = {
+						primary_range_weapon_mode_singleshot: 0,
+						primary_range_weapon_mode_semiauto: 0,
+						primary_range_weapon_mode_burst: 0,
+						primary_range_weapon_mode_fullauto: 0,
+						primary_range_weapon_mode_other: 0,
+					};
+					modes.forEach(mode => {
+						switch(mode.toUpperCase()) {
+							case 'SS':
+								toEnable.primary_range_weapon_mode_singleshot = 1;
+								break;
+							case 'SA':
+								toEnable.primary_range_weapon_mode_semiauto = 1;
+								break;
+							case 'BF':
+								toEnable.primary_range_weapon_mode_burst = 1;
+								break;
+							case 'FA':
+								toEnable.primary_range_weapon_mode_fullauto = 1;
+								break;
+							default:
+								toEnable.primary_range_weapon_mode_other = 1;
+								break;
+						};
+					});
+
+					// save the weapon's damage and ARs to the primary base for use in the firing mode calculator
+					toEnable.primary_range_weapon_base_damage = v[`${weap}_damage`];
+					toEnable.primary_range_weapon_base_close = v[`${weap}_close`];
+					toEnable.primary_range_weapon_base_near = v[`${weap}_near`];
+					toEnable.primary_range_weapon_base_medium = v[`${weap}_medium`];
+					toEnable.primary_range_weapon_base_far = v[`${weap}_far`];
+					toEnable.primary_range_weapon_base_extreme = v[`${weap}_extreme`];
+
+					setAttrs(toEnable);
 				}
+
+				// Add any range specific attributes
 				if(type === "melee") {
 
 				}
