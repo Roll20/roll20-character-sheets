@@ -5486,6 +5486,7 @@ on("change:primary_range_weapon_mode", (eventinfo) => {
 });
 
 var adjAttrs = (p) => {
+console.log(p.attrs);
 	Object.keys(p.attrs).forEach(a => {
 		mod = p.arMod;
 		if(a.endsWith("_damage")) {
@@ -5493,15 +5494,18 @@ var adjAttrs = (p) => {
 		}
 
 		pieces = /(\d+)(.*)/.exec(p.attrs[`${a}`]);
-		var tot = p.attrs[`${a}`];
-		if(pieces[1] && pieces[1] > 0) {
-			tot = parseInt(pieces[1]) + parseInt(mod);
-			if(tot < 0) {
-				tot = 0;
-			}
-		}
 
-		p.attrs[`${a}`] = tot + pieces[2];
+		var tot = p.attrs[`${a}`];
+		if(pieces) {
+			if(pieces[1] && pieces[1] > 0) {
+				tot = parseInt(pieces[1]) + parseInt(mod);
+				if(tot < 0) {
+					tot = 0;
+				}
+			}
+
+			p.attrs[`${a}`] = tot + pieces[2];
+		}
 	});
 
 	return p.attrs;
