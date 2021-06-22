@@ -79,7 +79,8 @@ June 14th 2021 v1.41
 - Corrected bug with Characteristics Modifier not reach through to skills/melee/spells
 - Deafened = Effects Initiative characteristic rolls, and any skill that would require hearing like Perception/Intuition.
 - Haggle Skill roll was broken from the last update and is now fixed.
-
+- Corruption table corrections.
+- Armor Qualities are now shown on Dodge rolls.
  
 
 June 14th 2021 v1.4 
