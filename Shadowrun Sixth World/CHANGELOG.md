@@ -1,6 +1,12 @@
 Change Log
 ==============================================
-**2021-06-07 ** v.35 Chuz (James Culp)
+**2021-06-21 ** v.36 Chuz (James Culp)
+	PC Sheet Modifiers text boxes in various places in the sheet (Qualities, Augs, Gear, Matrix Devices, Programs, and Echos) now allow the player to add/subtract from attributes on the sheet.  See roll20 forum thread for further details.
+	PC Sheet Removed Modifications from sprites.
+	PC Sheets Added functionality so when firing mode is changed on the Core tab, the DV and AR are updated appropriately.  Still doesn't split dice pools.
+	Added combat_paralysis flag that will automatically divide the PC's initiative roll in half, rounded up until there is further guidance from Catalyst.  It does not move them to the last  slot for the first round of combat however.
+**2021-06-03 ** v.35 Chuz (James Culp)
+	PC->Magic->Meta tab, added alternative Tradition attributes to the drop down.
 	Added Matrix AR and Matrix DR to Host sheet
 **2021-05-25 ** v.34 Chuz (James Culp)
 	Bugfix - Changed HTML top display the nuyen symbol instead of translations as the character was breaking the translation stuff
