@@ -31,6 +31,10 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jun 22nd, 2021
+- Updated the description of some of the configuration options for better wording, and to make them accurate
+- Allows hiding the accuracy check in a customised `move` roll template, by not supplying an `accuracy` field
+
 ### Apr 11th, 2021
 - Import/Export support
   - Supports either roll20 or Pokelicious Google Sheet data
