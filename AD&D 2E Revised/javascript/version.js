@@ -3,9 +3,9 @@
 const sheetName = 'AD&D 2E Revised';
 const sheetVersion = '4.1.0';
 
-let major = 0;
-let minor = 0;
-let bug   = 0;
+let sheetMajor = 0;
+let sheetMinor = 0;
+let sheetBug   = 0;
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -26,9 +26,9 @@ on('sheet:opened', function(){
             //#region Migrations
             
             let splitVersions = sheet_version.match(/(\d+)\.(\d+)\.(\d+)/);
-            major = parseInt(splitVersions[0]) || 0;
-            minor = parseInt(splitVersions[1]) || 0;
-            bug   = parseInt(splitVersions[2]) || 0;
+            sheetMajor = parseInt(splitVersions[0]) || 0;
+            sheetMinor = parseInt(splitVersions[1]) || 0;
+            sheetBug   = parseInt(splitVersions[2]) || 0;
          
             // Starting with the oldest version, just in case some field has been moved from A -> B, B -> C
             if (isOldVersionBelow(3, 3, 0))
@@ -48,8 +48,18 @@ on('sheet:opened', function(){
 // --- Version change end --- //
 
 //#region Helpers
-function isOldVersionBelow(sMajor, sMinor, sBug) {
-    return sMajor < major || sMinor < minor || sBug < bug;
+function isOldVersionBelow(migrateMajor, migrateMinor, migrateBug) {
+    if (migrateMajor < sheetMajor)
+        return true;
+    if (migrateMajor > sheetMajor)
+        return false;
+
+    if (migrateMinor < sheetMinor)
+        return true;
+    if (migrateMinor > sheetMinor)
+        return false;
+
+    return migrateBug < sheetBug;
 }
 
 function moveStaticToRepeating(section, fieldsToMove) {
