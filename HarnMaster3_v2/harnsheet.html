@@ -1,3 +1,11 @@
+<!-- div to hold notification about new sheet version -->
+
+<input class="showupgradenotification"  name="attr_notifyupgrade"   type="hidden" value="0"/><!-- hide upgrade notice if not relevant or dismissed -->
+<div class="newversion-notifcation">
+	The sheet has been updated to a new version. Please check the information in the settings tab
+	<button type="action" name="act_dismissupgradenotice" class="dismissnotification">Dismiss notification</button>
+</div>
+
 <!-- buttons to select desired tab -->
 <div class="tab-buttons">
    <button id=chartab type="action" name="act_character" >Character<span class="buttonicon">&nbspU </span></button>
@@ -9,6 +17,7 @@
 <input type='hidden' class='tabstoggle' name='attr_sheettab'  value='character'  />
 <input type='hidden' class='themeactivator' name='attr_colorthemeselector' value='light' >
 <input type='hidden' class='characterviewer' name='attr_colorthemeselector' value='light' >
+<input type="hidden" name="attr_sheetversion" value='1'><!-- to facilitate migration from old HarnMaster3 sheet to v2 -->
 
 <!-- actual character sheet, divided in tabs -->
 <div class='character'> <!-- CHARACTER TAB -->
@@ -16,7 +25,7 @@
     <div class='character-grid'> <!-- grid container-->
         <div class='character-grid-section personal personal-grid'>
     		<div class="skill-section-title">PERSONAL</div>
-            <label for=charname>Name</label><input type="text" id=charname name="attr_character_name" class="personal-input"><input type="hidden" name="attr_charnameupdated" value='0'><!-- TODO remove hidden attribute after next session -->
+            <label for=charname>Name</label><input type="text" id=charname name="attr_character_name" class="personal-input">
             <label for=race>Race</label><input type="text" id=race name="attr_species" class="personal-input">
             <label for=gender>Gender</label><input type="text" id=gender name="attr_gender" class="personal-input">
             <label for=birthdate>Birthdate</label><input type="text" id=birthdate name="attr_birthdate" class="personal-input">
@@ -216,14 +225,16 @@
             </button>
             
 			<input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/><!-- hide calculated EML for horse-riding if horse is not shown on sheet --> 
-            <div class="harntooltip horse-section" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" >
-				<input type="text" class="skill-label harntooltip horse-section" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" name="attr_ridinghorse_name" value="Riding EML" disabled="true">
+            <div class="horse-section">
+				<div class="harntooltip" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" >
+					<input type="text" class="skill-label harntooltip " data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" name="attr_ridinghorse_name" value="Riding EML" disabled="true">
+				</div>
+				<div class="horse-section">&nbsp;</div>
+				<input type="text" name="attr_ridinghorse_sb" class="skill-value" value="n/a"  readonly>
+				<input name="attr_ridinghorse_ml" class="skill-value harntooltip" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" readonly>
+				<button type="roll" value="&{template:custom} {{color=harn}} {{title=@{character_name} rolls riding @{hname}}} {{rolltarget=[[{[[{[[@{ridinghorse_ml} + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{Mastery Lvl=[[@{ridinghorse_ml}]]}}" name="roll_RidingHorseCheck" class="harntooltip" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative">
+				</button>
 			</div>
-            <div class="horse-section">&nbsp;</div>
-            <input type="text" name="attr_ridinghorse_sb" class="skill-value horse-section" value="n/a"  readonly>
-            <input name="attr_ridinghorse_ml" class="skill-value harntooltip horse-section" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative" readonly>
-            <button type="roll" value="&{template:custom} {{color=harn}} {{title=@{character_name} rolls riding @{hname}}} {{rolltarget=[[{[[{[[@{ridinghorse_ml} + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{targetmod=[[?{Target Modifier?|0}]]}} {{Mastery Lvl=[[@{ridinghorse_ml}]]}}" name="roll_RidingHorseCheck" class="harntooltip horse-section" data-tooltiptext="Your effective ML for your current horse, calculated based on personal riding skill and horse initiative">
-            </button>
 			
             
             <input type="text" class="skill-label" name="attr_stealth_name" value="Stealth" disabled="true">
@@ -410,8 +421,9 @@
     		<label for=mountedtoggle>Mounted?</label>
     		  <input id=mountedtoggle type="checkbox" name="attr_is_mounted" value="1">	
 				<input type="hidden" name="attr_is_mounted" class="display-mounted-status"> <!-- this is filled with the value set by the is carried checkbox above-->
-    			<div class="mounted-display full-width"> <img class="full-width" src="https://github.com/olafvantol/roll20-character-sheets/blob/77eb88aea6fe38651e24c68cfae1b6f3ab5f4c60/HarnMaster3_v2/mounted-icon-v2.png?raw=true" /> </div>
-				<div class="unmounted-display full-width"> <img class="full-width" src="https://github.com/olafvantol/roll20-character-sheets/blob/77eb88aea6fe38651e24c68cfae1b6f3ab5f4c60/HarnMaster3_v2/on-foot-icon-v2.png?raw=true" />  </div>
+				<input type='hidden' class='themeactivator' name='attr_colorthemeselector' value='light' >
+    			<div class="mounted-display full-width themeactivator"> <img class="full-width" src="https://github.com/olafvantol/roll20-character-sheets/blob/77eb88aea6fe38651e24c68cfae1b6f3ab5f4c60/HarnMaster3_v2/mounted-icon-v2.png?raw=true" /> </div>
+				<div class="unmounted-display full-width themeactivator"> <img class="full-width" src="https://github.com/olafvantol/roll20-character-sheets/blob/77eb88aea6fe38651e24c68cfae1b6f3ab5f4c60/HarnMaster3_v2/on-foot-icon-v2.png?raw=true" />  </div>
 				
     	</div>    
         <div class='character-grid-section penalties penalties-grid colored-grid'>
@@ -481,121 +493,121 @@
             <div class="sectionarmourhead full-width sectionwrapper">
     		<label for=skull>Skull</label>
     		<input id=skull type="text" name="attr_skull_layers" class="armor-label">
-    		<input type="number" name="attr_skull_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_skull_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_skull_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_skull_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sk_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sk_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sk_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sk_f" class="skill-value" value="0" readonly>
     
     		<label for=face>Face</label>
     		<input id=face type="text" name="attr_face_layers" class="armor-label">
-    		<input type="number" name="attr_face_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_face_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_face_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_face_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fa_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fa_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fa_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fa_f" class="skill-value" value="0" readonly>
     
     		<label for=neck>Neck</label>
     		<input id=neck type="text" name="attr_neck_layers" class="armor-label">
-    		<input type="number" name="attr_neck_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_neck_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_neck_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_neck_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_nk_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_nk_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_nk_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_nk_f" class="skill-value" value="0" readonly>
             </div>
     
             <div class="sectionarmourarms full-width sectionwrapper">
     		<label for=shoulder>Shoulder</label>
     		<input id=shoulder type="text" name="attr_shoulder_layers" class="armor-label">
-    		<input type="number" name="attr_shoulder_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_shoulder_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_shoulder_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_shoulder_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sh_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sh_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sh_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_sh_f" class="skill-value" value="0" readonly>
     
     		<label for=upperarm>Upper Arm</label>
     		<input id=upperarm type="text" name="attr_upperarm_layers" class="armor-label">
-    		<input type="number" name="attr_upperarm_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_upperarm_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_upperarm_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_upperarm_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ua_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ua_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ua_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ua_f" class="skill-value" value="0" readonly>
     
     		<label for=elbow>Elbow</label>
     		<input id=elbow type="text" name="attr_elbow_layers" class="armor-label">
-    		<input type="number" name="attr_elbow_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_elbow_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_elbow_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_elbow_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_el_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_el_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_el_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_el_f" class="skill-value" value="0" readonly>
     
     		<label for=forearm>Forearm</label>
     		<input id=forearm type="text" name="attr_forearm_layers" class="armor-label">
-    		<input type="number" name="attr_forearm_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_forearm_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_forearm_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_forearm_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fo_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fo_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fo_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_fo_f" class="skill-value" value="0" readonly>
     
     		<label for=hand>Hand</label>
     		<input id=hand type="text" name="attr_hand_layers" class="armor-label">
-    		<input type="number" name="attr_hand_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hand_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hand_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hand_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ha_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ha_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ha_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ha_f" class="skill-value" value="0" readonly>
             </div>
     
             <div class="sectionarmourtorso full-width sectionwrapper">
     		<label for=thorax>Thorax</label>
     		<input id=thorax type="text" name="attr_thorax_layers" class="armor-label">
-    		<input type="number" name="attr_thorax_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thorax_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thorax_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thorax_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_tx_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_tx_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_tx_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_tx_f" class="skill-value" value="0" readonly>
     
     		<label for=abdomen>Abdomen</label>
     		<input id=abdomen type="text" name="attr_abdomen_layers" class="armor-label">
-    		<input type="number" name="attr_abdomen_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_abdomen_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_abdomen_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_abdomen_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ab_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ab_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ab_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ab_f" class="skill-value" value="0" readonly>
     
     		<label for=hip>Hip</label>
-    		<input id=hip type="text" name="attr_hip_layers" class="armor-label">
-    		<input type="number" name="attr_hip_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hip_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hip_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_hip_f" class="skill-value" value="0" readonly>
+    		<input id=hp type="text" name="attr_hp_layers" class="armor-label">
+    		<input type="number" name="attr_hp_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hp_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hp_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hp_f" class="skill-value" value="0" readonly>
     
     		<label for=groin>Groin</label>
     		<input id=groin type="text" name="attr_groin_layers" class="armor-label">
-    		<input type="number" name="attr_groin_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_groin_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_groin_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_groin_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_gr_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_gr_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_gr_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_gr_f" class="skill-value" value="0" readonly>
             </div>
     		
             <div class="sectionarmourlegs full-width sectionwrapper">
     		<label for=thigh>Thigh</label>
     		<input id=thigh type="text" name="attr_thigh_layers" class="armor-label">
-    		<input type="number" name="attr_thigh_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thigh_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thigh_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_thigh_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_th_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_th_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_th_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_th_f" class="skill-value" value="0" readonly>
     
     		<label for=knee>Knee</label>
     		<input id=knee type="text" name="attr_knee_layers" class="armor-label">
-    		<input type="number" name="attr_knee_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_knee_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_knee_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_knee_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_kn_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_kn_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_kn_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_kn_f" class="skill-value" value="0" readonly>
     
     		<label for=calf>Calf</label>
     		<input id=calf type="text" name="attr_calf_layers" class="armor-label">
-    		<input type="number" name="attr_calf_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_calf_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_calf_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_calf_f" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ca_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ca_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ca_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ca_f" class="skill-value" value="0" readonly>
     
     		<label for=foot>Foot</label>
     		<input id=foot type="text" name="attr_foot_layers" class="armor-label">
-    		<input type="number" name="attr_foot_b" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_foot_e" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_foot_p" class="skill-value" value="0" readonly>
-    		<input type="number" name="attr_foot_f" class="skill-value" value="0" readonly>		
+    		<input type="number" name="attr_ft_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ft_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ft_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_ft_f" class="skill-value" value="0" readonly>		
             </div>
     
     
@@ -760,11 +772,11 @@
         <div class='character-grid-section section-title-half sectionoptions'><h2>Magic & Religion</h2></div>  
 		<span>Show: </span>
 		<span>Spells</span>
-		<input type="checkbox" name="attr_show_spells" class="toggle-show-spells" />
+		<input type="checkbox" name="attr_show_spells" class="toggle-show-spells" checked/>
 		<span>Rituals</span>
-		<input type="checkbox" name="attr_show_rituals" class="toggle-show-rituals" />			
+		<input type="checkbox" name="attr_show_rituals" class="toggle-show-rituals" checked/>			
 		<span>Psionic</span>
-		<input type="checkbox" name="attr_show_psionic" class="toggle-show-psionic" />
+		<input type="checkbox" name="attr_show_psionic" class="toggle-show-psionic" checked/>
 		<input class="showsinglepiety" name="attr_hrconsolidatedpiety" type="hidden" value="1"/>
 		<div class='character-grid-section magic magic-grid mr-spells colored-grid'>
 		    <div class="skill-section-title">SPELLS</div>
@@ -828,7 +840,9 @@
 				<input type="number" name="attr_piety_points" class="skill-value" value="0">
 			</fieldset>
 		</div>   
-        <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+    </div>    
+		<input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
+	<div class='character-grid horse-grid'>
 		<div class='character-grid-section horse-section section-title'><h2>Horse</h2></div> 
         <div class='character-grid-section horse-section basichorseinfo bhigrid colored-grid'>
 			<label for=horsename>Horse Name</label>
@@ -962,10 +976,10 @@
 			<div class="info-label">All (-/- eyes)</div>
 			<input type="text" name="attr_hnatural_layers" class="armor-label" disabled="true" value="Natural Armor">
 			<input type="number" name="attr_hnatural_aq" class="skill-value" value="0">
-			<input type="number" name="attr_hnatural_b" class="skill-value" value="0" readonly >
-			<input type="number" name="attr_hnatural_e" class="skill-value" value="0" readonly >
-			<input type="number" name="attr_hnatural_p" class="skill-value" value="0" readonly >
-			<input type="number" name="attr_hnatural_f" class="skill-value" value="0" readonly >
+			<input type="number" name="attr_hnatural_b" class="skill-value" value="4" readonly >
+			<input type="number" name="attr_hnatural_e" class="skill-value" value="3" readonly >
+			<input type="number" name="attr_hnatural_p" class="skill-value" value="1" readonly >
+			<input type="number" name="attr_hnatural_f" class="skill-value" value="3" readonly >
 			<div class="info-label">All (-/- eyes)</div>
 			<input type="text" name="attr_hall_layers" class="armor-label">
 			<input type="number" name="attr_hall_aq" class="skill-value" value="0">
@@ -974,7 +988,6 @@
 			<input type="number" name="attr_hall_p" class="skill-value" value="0">
 			<input type="number" name="attr_hall_f" class="skill-value" value="0">			
 	</div>
-        <input class="showsinglepiety" name="attr_hrconsolidatedpiety" type="hidden" value="1"/>
 		<div class='character-grid-section horse-section horseinjuries horseinjuries-grid colored-grid'>
 			<div class="skill-section-title">INJURIES</div>
 			<div class="skill-header">Location/Type</div>
@@ -1001,26 +1014,6 @@
 				<input type="hidden" name="attr_hinjury_infected_feedback" value="0" readonly>
 			</fieldset>			
 		</div> 
-        <input class="showsinglepiety" name="attr_hrconsolidatedpiety" type="hidden" value="1"/>
-		<div class='character-grid-section horse-section horseattacks horseattacks-grid colored-grid'>
-			<div class="skill-section-title">ATTACKS</div>
-			<div class="skill-header skill-label">Attack</div>
-			<div class="skill-header skill-value">B</div>
-			<div class="skill-header skill-value">E</div>
-			<div class="skill-header skill-value">P</div>
-			<div class="skill-header skill-value">ML</div>
-			<div class="skill-header skill-value">AML</div>
-			<div class="skill-header skill-value">&nbsp;</div>
-			<input type="text" name="attr_trample_weapon_name" class="skill-label" disabled="true" value="Trample">
-			<input type="number" name="attr_trample_weapon_b" class="skill-value" value="0">
-			<input type="number" name="attr_trample_weapon_e" class="skill-value" disabled="true" value="0">
-			<input type="number" name="attr_trample_weapon_p" class="skill-value" disabled="true" value="0">
-			<input type="number" name="attr_htrample_ml" class="skill-value" readonly>
-			<input type="number" name="attr_htrample_ml" class="skill-value" readonly>
-			<button type="roll" value="&{template:custom} {{color=harn}} {{title=@{hname} tramples}} {{rolltarget=[[{[[{[[@{htrample_ml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{Modifiers=[[?{Target Modifier?|0}]]}} {{Mastery Lvl=[[@{htrample_ml}]]}} {{note=b(@{trample_weapon_b}) e(@{trample_weapon_e}) p(@{trample_weapon_p})}}" name="roll_trampleweaponamlskillcheck">
-			</button>
-		</div>
-        <input class="showsinglepiety" name="attr_hrconsolidatedpiety" type="hidden" value="1"/>
 		<div class='character-grid-section horse-section horsepenalties horsepenalties-grid colored-grid'>
 		    <div class="skill-section-title">PENALTIES</div>
 			<label for=hinjurylvl>Injury Levels</label>
@@ -1033,7 +1026,25 @@
 			<input id=hencumbrance type="number" name="attr_hencumbrance" class="skill-value" value="0" readonly>
 			<label for=hphyspenalty class="sumrow">Physical</label>
 			<input id=hphyspenalty type="number" name="attr_hphysical_penalty" class="skill-value sumrow" value="0" readonly>
-		    </div>    
+		</div> 
+		<div class='character-grid-section horse-section horseattacks horseattacks-grid colored-grid'>
+			<div class="skill-section-title">ATTACKS</div>
+			<div class="skill-header skill-label">Attack</div>
+			<div class="skill-header skill-value">B</div>
+			<div class="skill-header skill-value">E</div>
+			<div class="skill-header skill-value">P</div>
+			<div class="skill-header skill-value">ML</div>
+			<div class="skill-header skill-value">AML</div>
+			<div class="skill-header skill-value">&nbsp;</div>
+			<input type="text" name="attr_trample_weapon_name" class="skill-label" disabled="true" value="Trample">
+			<input type="number" name="attr_trample_weapon_b" class="skill-value" value="8">
+			<input type="number" name="attr_trample_weapon_e" class="skill-value" disabled="true" value="0">
+			<input type="number" name="attr_trample_weapon_p" class="skill-value" disabled="true" value="0">
+			<input type="number" name="attr_htrample_ml" class="skill-value" readonly>
+			<input type="number" name="attr_htrample_ml" class="skill-value" readonly>
+			<button type="roll" value="&{template:custom} {{color=harn}} {{title=@{hname} tramples}} {{rolltarget=[[{[[{[[@{htrample_ml} - [[(@{hphysical_penalty})*5]] + ?{Target Modifier?|0}]],5}kh1]],95}kl1]]}} {{penalty=[[(@{hphysical_penalty})*5]]}} {{rollresult=[[1d100cs5cs10cs15cs20cs25cs30cs35cs40cs45cs50cs55cs60cs65cs70cs75cs80cs85cs90cs95cs100]]}} {{Modifiers=[[?{Target Modifier?|0}]]}} {{Mastery Lvl=[[@{htrample_ml}]]}} {{note=b(@{trample_weapon_b}) e(@{trample_weapon_e}) p(@{trample_weapon_p})}}" name="roll_trampleweaponamlskillcheck">
+			</button>
+		</div>
     </div> 
 </div>
 
@@ -1259,6 +1270,130 @@
 		</fieldset>
 		<div class="footnote"> <details><summary>Note: Carried (C) armor will count towards encumbrance (weight) and armor protection on the character tab.</summary><p>Fill in the B/E/P/F protection values from the rulebook and tick each location that is protected by the armor. The protection values will be added to the Armor Protection table on the Character Tab its weight will count towards the characters encumbrance (automatically calculated).</p></details></div>
 	</div>   
+	<input class="hidelegacyarmor"  name="attr_legacyarmorhidden"   type="hidden" value="0"/>
+	<div class='character-grid-section bordered-grid legacyarmor-grid'>
+            
+			<div class="skill-section-title">ARMOR PROTECTION - LEGACY INFORMATION</div>
+    		<div class="skill-label skill-header">Location</div>
+    		<div class="skill-label skill-header">Compound Layers</div>
+    		<div class="skill-value skill-header">B</div>
+    		<div class="skill-value skill-header">E</div>
+    		<div class="skill-value skill-header">P</div>
+    		<div class="skill-value skill-header">F</div>
+			
+			<div class="skill-label skill-header">Location</div>
+    		<div class="skill-label skill-header">Compound Layers</div>
+    		<div class="skill-value skill-header">B</div>
+    		<div class="skill-value skill-header">E</div>
+    		<div class="skill-value skill-header">P</div>
+    		<div class="skill-value skill-header">F</div>
+			
+    		<label for=skull2>Skull</label>
+    		<input id=skull2 type="text" name="attr_skull_layers" class="armor-label">
+    		<input type="number" name="attr_skull_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_skull_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_skull_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_skull_f" class="skill-value" value="0" readonly>
+			<label for=thorax2>Thorax</label>
+    		<input id=thorax2 type="text" name="attr_thorax_layers" class="armor-label">
+    		<input type="number" name="attr_thorax_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thorax_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thorax_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thorax_f" class="skill-value" value="0" readonly>
+    
+    		<label for=face2>Face</label>
+    		<input id=face2 type="text" name="attr_face_layers" class="armor-label">
+    		<input type="number" name="attr_face_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_face_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_face_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_face_f" class="skill-value" value="0" readonly>
+    		<label for=abdomen2>Abdomen</label>
+    		<input id=abdomen2 type="text" name="attr_abdomen_layers" class="armor-label">
+    		<input type="number" name="attr_abdomen_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_abdomen_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_abdomen_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_abdomen_f" class="skill-value" value="0" readonly>
+       
+    		<label for=neck2>Neck</label>
+    		<input id=neck2 type="text" name="attr_neck_layers" class="armor-label">
+    		<input type="number" name="attr_neck_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_neck_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_neck_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_neck_f" class="skill-value" value="0" readonly>
+ 			<label for=hip2>Hip</label>
+    		<input id=hip2 type="text" name="attr_hip_layers" class="armor-label">
+    		<input type="number" name="attr_hip_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hip_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hip_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hip_f" class="skill-value" value="0" readonly>
+           
+    		<label for=shoulder2>Shoulder</label>
+    		<input id=shoulder2 type="text" name="attr_shoulder_layers" class="armor-label">
+    		<input type="number" name="attr_shoulder_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_shoulder_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_shoulder_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_shoulder_f" class="skill-value" value="0" readonly>
+    		<label for=groin2>Groin</label>
+    		<input id=groin2 type="text" name="attr_groin_layers" class="armor-label">
+    		<input type="number" name="attr_groin_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_groin_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_groin_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_groin_f" class="skill-value" value="0" readonly>
+   
+    		<label for=upperarm2>Upper Arm</label>
+    		<input id=upperarm2 type="text" name="attr_upperarm_layers" class="armor-label">
+    		<input type="number" name="attr_upperarm_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_upperarm_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_upperarm_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_upperarm_f" class="skill-value" value="0" readonly>
+    		<label for=thigh2>Thigh</label>
+    		<input id=thigh2 type="text" name="attr_thigh_layers" class="armor-label">
+    		<input type="number" name="attr_thigh_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thigh_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thigh_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_thigh_f" class="skill-value" value="0" readonly>
+    
+    		<label for=elbow2>Elbow</label>
+    		<input id=elbow2 type="text" name="attr_elbow_layers" class="armor-label">
+    		<input type="number" name="attr_elbow_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_elbow_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_elbow_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_elbow_f" class="skill-value" value="0" readonly>
+     		<label for=knee2>Knee</label>
+    		<input id=knee2 type="text" name="attr_knee_layers" class="armor-label">
+    		<input type="number" name="attr_knee_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_knee_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_knee_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_knee_f" class="skill-value" value="0" readonly>
+   
+    		<label for=forearm2>Forearm</label>
+    		<input id=forearm2 type="text" name="attr_forearm_layers" class="armor-label">
+    		<input type="number" name="attr_forearm_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_forearm_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_forearm_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_forearm_f" class="skill-value" value="0" readonly>
+      		<label for=calf2>Calf</label>
+    		<input id=calf2 type="text" name="attr_calf_layers" class="armor-label">
+    		<input type="number" name="attr_calf_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_calf_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_calf_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_calf_f" class="skill-value" value="0" readonly>
+    
+    		<label for=hand2>Hand</label>
+    		<input id=hand2 type="text" name="attr_hand_layers" class="armor-label">
+    		<input type="number" name="attr_hand_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hand_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hand_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_hand_f" class="skill-value" value="0" readonly>
+    		<label for=foot2>Foot</label>
+    		<input id=foot2 type="text" name="attr_foot_layers" class="armor-label">
+    		<input type="number" name="attr_foot_b" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_foot_e" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_foot_p" class="skill-value" value="0" readonly>
+    		<input type="number" name="attr_foot_f" class="skill-value" value="0" readonly>		
+			<div class="footnote"> <details><summary>Copied over from old sheet, please move to new armor section</summary><p>For more information see the readme in the roll20 repository (https://github.com/roll20/roll20-character-sheets/tree/master/HarnMaster3#readme) . Click the the button below to hide this section</p></details></div>  
+			<div class="footnote"><button type="action" name="act_hidelegacyarmor">Remove legacy armor</button> </div>
+    	</div>
     <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
 	<div class='inventory-grid-section inven-personal personalinvengrid colored-grid'>
 	<div class="skill-section-title">PERSONAL INVENTORY</div>
@@ -1274,7 +1409,7 @@
 		<div class="footnote"> and the weight will count towards the characters encumbrance</div>
 	</div>
     <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>
-	<div class='inventory-grid-section horse-section inven-horse horseinvengrid colored-grid'>
+	<div class='inventory-grid-section horse-inven-section inven-horse horseinvengrid colored-grid'>
 	<div class="skill-section-title">HORSE INVENTORY</div>
 		<div class="skill-header skill-label">Item</div>
 		<div class="skill-header skill-value">WGT</div>
@@ -1286,7 +1421,7 @@
 		<div class="footnote">on the character tab</div>	
 	</div>
     <input class="showhorse"  name="attr_hrhorseonsheet"   type="hidden" value="1"/>	
-    <div class='inventory-grid-section horse-section inven-horsearmor horsearmorinvengrid colored-grid'>
+    <div class='inventory-grid-section horse-inven-section inven-horsearmor horsearmorinvengrid colored-grid'>
        	<div class="skill-section-title">HORSE ARMOR WORN</div>
        	<div class="skill-header skill-label">Armor</div>
        	<div class="skill-header skill-value">AQ</div>
@@ -1350,31 +1485,82 @@
 	<div class='settings-grid'> <!-- grid container-->
     	<div class='settings-grid-section settingsgroup colored-grid'>
     	    <div class="skill-section-title">Houserules</div> 
-			<label for=conditionskillonly>Use Condition only as a skill</label>
+			<div class="full-width skill-header">Use Condition</div>
+			<label for=conditionskillonly>Only as a skill</label>
 			<input id=conditionskillonly name="attr_hrcondition4endurance" type="radio" value="0">
-			<label for=conditionloadtoggle>Condition as Endurance for load only</label>
+			<label for=conditionloadtoggle>as Endurance for load only</label>
 			<input id=conditionloadtoggle name="attr_hrcondition4endurance" type="radio" value="1">
-			<label for=conditionendurancetoggle>Condition for all Endurance checks</label>
-			<input id=conditionendurancetoggle name="attr_hrcondition4endurance" type="radio" value="2"> 
+			<label for=conditionendurancetoggle>for all Endurance checks (default Harn)</label>
+			<input id=conditionendurancetoggle name="attr_hrcondition4endurance" type="radio" value="2" checked> 
+			<input name="attr_hrcondition4endurance" type="hidden" value="2"> <!-- set default for new sheets to HarnMaster3 rules-->
+			<div class="full-width">&nbsp;</div>
+			<div class="full-width skill-header">Fumble/Stumble</div>
 			<label for=fumblestumblehrtoggle>Use universal penalty instead of physical penalty for Fumble/Stumble?</label>
 			<input id=fumblestumblehrtoggle name="attr_hrfumblestumblepenalty" type="checkbox" value="1">
 			<input name="attr_fumblestumblepenalty" type="hidden" value="0"> <!-- provide a default value in case someone rolls before either the option or any penalty is set --> 
     	</div>
     	<div class='settings-grid-section settingsgroup colored-grid'>
     	    <div class="skill-section-title">Sheet settings</div>
+			<div class="full-width skill-header">Theme</div>
 			<select class="colorselector full-width" name="attr_colorthemeselector"> 
                <option value="light" id="theme-light">Light theme</option>
                <option value="dark" id="theme-dark">Dark theme</option>			
 			</select>
-    	</div>
-    	<div class='settings-grid-section settingsgroup colored-grid'>
-    	    <div class="skill-section-title">Various</div>
+			<div class="full-width skill-header">Custom section control</div>
 			<label for=showhorsetoggle>Show Horse on sheet?</label>
 			<input id=showhorsetoggle name="attr_hrhorseonsheet" type="checkbox" value="1" checked>
-			<label for=showpietytoggle>Show consolidated piety?</label>
-			<input id=showpietytoggle name="attr_hrconsolidatedpiety" type="checkbox" value="1">
-			 
+			<label for=showpietytoggle data-tooltiptext="When this is unchecked the sheet will show space for tracking piety per god with repeating rows" >Show consolidated piety?</label>
+			<input id=showpietytoggle data-tooltiptext="When this is unchecked the sheet will show space for tracking piety per god with repeating rows" name="attr_hrconsolidatedpiety" type="checkbox" value="1" checked>
+			<div class="full-width skill-header">Sheet version</div>
+			<div class="full-width">
+			  <input name="attr_character_sheet_version" type="number" value="20210801" readonly>
+			  <input type="hidden" name="attr_data_version" value="" readonly>
+			</div>
     	</div>
+	</div>
+	<div class="changelog">
+		<h2>Changelog</h2>
+		<h3>20210801 - Version 2</h3>
+		<details><summary class="changelog-summary"><p class="changelog-summary">Major overhaul of the original sheet, dubbed "version 2". Many new features, all calculations done via sheetworkers now and styling brought in line with the paper sheet, based on CSS Grid</p></summary>
+		<h4>NEW FEATURES</h4>
+		<ul>
+			<li>3 Tabs for Character, Inventory and Settings
+				<ul>
+				<li>Character Tab shows all information relevant during play, including an optional Horse section </li>
+				<li>Inventory tab has space for weapons, inventory, money, general notes and more. Denote on any item if it's actively carried or not (stored on horse or other location for example) </li>
+				<li>Settings tab provides options to show the Horse section, split out Piety tracking per god, and toggle some houserules. </li>
+				</ul>
+			</li>
+			<li>Development roll buttons for each skill</li>
+			<li>Roll buttons to do Attribute checks (with a prompt to select DM determined multiplier)</li>
+			<li>Separate missile weapon section with ranges and their penalties & damage</li>
+			<li>Dedicated roll button to roll attacks with HM penalty</li>
+			<li>An included horse section to facilitate HarnMaster horse combat rules where character and horse skills are averaged. (this section can be shown/hidden via the Settings tab)</li>
+			<li>Items on the Inventory tab can be marked as "Carried", which affects the Character tab: weight will be added to load carried, armor values will be added to armor protection and weapons will show up on the Character tab to roll attack, defense and WQ checks.</li>
+		</ul>	
+			
+		<h4>NEW/UPDATED CALCULATIONS</h4>
+		<ul>
+			<li>Show move, minimum move and turning hexes based on current Horse Speed. </li>
+			<li>Armor values: add armour pieces (find values in the HM3 Rulebook) in the inventory tab, fill in armor values for B/E/P/F and check locations covered. Check them as "worn/carried (C)" and total armor values are shown on the character tab.</li>
+			<li>Easily drop weapons and reduce inventory load (and encumbrance) on the fly</li>
+			<li>Auto calculate initiave and effective horse riding skill automatically for the horse included in the (optional) horse section, when "Mounted" (checkbox)</li>
+		</ul>
+		
+		<h4>Upgrade information	</h4>
+		<p>A migration script is included to perform the necessary changes when coming from an old sheet. Old armor cannot be migrated automatically, as previously all armor layers were stored in field per location. Old armor information can be found in the Inventory tab. Please:</p>
+		<ol>
+			<li>move this information to the need armor section in the inventory tab, per armor item. </li>
+			<li>Mark which items are carried/worn ("c" column)</li>
+			<li>Total weight and armor protection values for all layers per location is then calculated automatically.</li>
+			<li>Note down your armor before switching sheets, it will need to be input again on the new sheet (you'll also need the armor locations from the rulebook)</li>
+			<li>This is a one-time excercise for each character.</li>
+		</ol>
+		
+		<p>Also please verify the settings on the Settings tab </p>
+		
+		<p>Your weapons will be on the Inventory Tab after migration. Mark the "C" checkbox to select which weapons you're carrying and thus show up on the Character Tab .	</p>
+		</details>
 	</div>
 </div>
 
@@ -1559,18 +1745,152 @@ buttonlist.forEach(button => {
     });
 });
 
-  <!-- helper function to fill new character_name attribute (see https://wiki.roll20.net/Building_Character_Sheets#Character_Name ) with old name info   TODO remove hidden attribute after next session -->
-on('sheet:opened', function() {
-    getAttrs(['character_name', 'name', 'charnameupdated'], 
-	function(values) {
-        if(values.charnameupdated != 1) {var charname = values['name']};
-		console.log("Character name", charname);
-        setAttrs({
-            'character_name': charname,
-			'charnameupdated': 1,
-		});
-    });
+<!-- check if we need to data migration when the sheet opens -->
+on("sheet:opened", function() {
+	migrationCheck();
+    setAttrs({ "safe-sheet-open": Date.now() });
 });
+
+/*
+# Old Data Conversion
+Always try to migrate as much data as possible - copied from kreuvf's DSA sheet: https://github.com/kreuvf/roll20-character-sheets/tree/master/Das_Schwarze_Auge_4-1
+
+Relevant character sheet versions
+* 20171225: last version by https://app.roll20.net/users/72360/optionalrule of his original HarnMaster3 sheet
+* 20210801: "version 2" of the sheet, complete rework of original HarnMaster3 sheet by https://app.roll20.net/users/72360/optionalrule ; see readme.md for info.
+*/
+
+
+
+function migrationCheck() {
+    getAttrs(["character_sheet_version", "data_version" , "name"], function(v) {
+        
+
+        let dataVersion = parseInt(v["data_version"]);
+        let sheetVersion = parseInt(v["character_sheet_version"]);
+		let oldName = v["name"]||0;
+
+        /*
+        If the character is new, data_version (the attribute) is just an empty string and dataVersion (the variable declared in this function) is NaN.
+        Since new characters do not need any migration, we just set the data_version to the current sheet version.
+
+        Why this is necessary
+        * Sheet-defined attributes such as data_version will change automatically if they are different in a new sheet version.
+        * Once a sheet-defined attribute is changed e. g. via setAttrs(), the value will not change with new sheet version.
+        * If a character was not opened for a long time (before data_version was set via script), the character's data version will update when the value is changed in a new sheet
+        * This would lead to no migrations being performed.
+        * On the other hand data_version could be left at its initial value, but that would mean that every new character would get all migrations unnecessarily!
+		* edit OvT:  if it's an old (pre v2) sheet the character name will be stored in "name"  instead of "character_name" ; we use this to migrate old sheets.
+		* Update: checking character_name doesn't work reliably, setting dataversion to 20171225 for sheet that don't have a data version; for now leaving out skipping migration for new sheets, confuses matters. Weapon and Armor migration won't run if there is no info in the repeating sections, that should cover new sheets.
+        */
+		
+		if (oldName !== 0 && isNaN(dataVersion)) {
+			dataVersion = 20171225;
+			console.log("Old name detected, data version set to", dataVersion);
+			} 
+		else if (oldName === 0 && isNaN(dataVersion)) {
+		    setCurrentVersion();
+            console.log("New character detected, data version set to", dataVersion);
+			return;
+		};
+
+		console.log("Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", dataVersion);
+
+        let functionsToCall = [];
+        let firstFunction;
+        /*
+            we run over the possible migrations and check if they are already applied.
+            if not and it is the first migration, than the function name is saved as "firstFunction"
+            if it is not the first migration to apply it is added to "functionsToCall" array
+        */
+        for (var i = 0; i < versionsWithMigrations.length; i++) {
+            if (dataVersion < versionsWithMigrations[i]) {
+                var functionName = "migrateTo" + versionsWithMigrations[i];
+                console.log("dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
+                if (firstFunction) {
+                    functionsToCall.push(functionName);
+                } else {
+                    firstFunction = functionName;
+                }
+            };
+        }
+        // if there is at least one migration to do we add "setCurrentVersion" to the end of the function list which is responsible to set the current dataversion
+        // then we call the function with name "firstFunction"
+        if (firstFunction) {
+			functionsToCall.push("setCurrentVersion");
+			window[firstFunction](functionsToCall);
+        }
+    });
+}
+
+function setCurrentVersion(v) {
+    setAttrs({ "data_version": versionsWithMigrations.slice(-1).pop() });
+	console.log("Migration done, data version updated");
+}
+
+function callNextMigration(migrationChain) {
+    if (migrationChain && migrationChain.length > 0) {
+        let nextMigration = migrationChain.shift();
+        if (nextMigration) {
+            window[nextMigration](migrationChain);
+        }
+    }
+}
+
+/*
+ this list has to be always ordered ascending in order to apply the migration steps in the correct order
+*/
+var versionsWithMigrations = [
+    20210801
+]
+
+/*
+## From version 20171014 to 20210801
+* Charactername now stored according to best practice recommendations roll20. Weapon AML and DML needs to be re-calculated
+*/
+
+function migrateTo20210801 (migrationChain) {
+	/* TODO: optimize code, we're getting and setting attributes twice */
+    console.log("migrateTo20210801 invoked");
+	/* move character name from old "name"  attribute to character_name (roll20 best practice) */
+    getAttrs(['sheetversion', 'character_name', 'name' ], 
+	function(values) {
+		var charname = values['name'];
+		console.log("Character name", charname);		
+		setAttrs({
+			'character_name': charname,
+			'name': 0 /* clear the old name so we don't keep resetting back the version */
+			});
+		});
+	/* re-calculate all weapons in the repeating weapons section. */ 
+	/* add re-calc armor (after moving armor values to new attrib) */ 
+		getSectionIDs('weapon', ids => {
+			if (ids.length === 0) {
+			console.log("Migration: No weapons found, nothing to migrate.");
+			return;
+			}
+			const fieldArray = [];
+			ids.forEach(id => fieldArray.push(
+				`repeating_weapon_${id}_weapon_ml`, `repeating_weapon_${id}_weapon_atk`, `repeating_weapon_${id}_weapon_def`
+			));
+			getAttrs(fieldArray , function (values) {
+				const update = {};
+				ids.forEach(id => {
+					console.log("working on:", `${id}`);
+					var wml = parseInt(values[`repeating_weapon_${id}_weapon_ml`]);
+					var watk = parseInt(values[`repeating_weapon_${id}_weapon_atk`]);
+					var wdef = parseInt(values[`repeating_weapon_${id}_weapon_def`]);
+					var waml = wml + watk;
+					var wdml = wml + wdef;
+					console.log("Migrating Weapon data", " ML:", wml, "ATK:", watk, "DEF:", wdef, "Weapon AML:", waml, "Weapon DML:", wdml);
+					update[`repeating_weapon_${id}_weapon_aml`] = waml;
+					update[`repeating_weapon_${id}_weapon_dml`] = wdml;
+				});	
+				update[`notifyupgrade`] = 1; /* We're updating so turn on upgrade notification */ 
+				setAttrs(update, {}, function() {callNextMigration(migrationChain);} );
+			});
+		});
+}
 
 
 <!-- weapon load totals /-->
@@ -1705,7 +2025,8 @@ function() {
 		var hadjustedload = Math.max(0, hadjustedloadtemp);
 		var hcomend = parseInt(values['hcombat_endurance'])||0;			
         var hencumbrance = Math.round(hadjustedload/hcomend)||0;
-		var riderload = parseFloat(values['weight']) + parseFloat(values['load_total'])||0.0;
+		var riderweight = parseFloat(values['weight'])||0;
+		var riderload = riderweight + parseFloat(values['load_total'])||0.0;
         setAttrs({
             'hloadlimit': hllimit,
 			'hadjusted_load': hadjustedload,
@@ -2022,74 +2343,85 @@ locations.forEach(function (location) {
 }); <!-- end set armour values per location --> 
 
 
-<!-- AP totals per location , could be more elegant with loop, but complicated due to skull vs sk naming . Clean up when everyone has updated their char sheets with armor on inventory tab /-->
+<!-- AP totals per location , could be more elegant with loop, but complicated due to skull vs sk naming . Clean up when everyone has updated their char sheets with armor on inventory tab ; update 21-06-2021: renamed attributes, old info in previous attributes kept around for legacy sheets on inventory tab./-->
 
 on('change:repeating_armoritems remove:repeating_armoritems', function() {
-	repeatingSum('skull_b', 'armoritems',['armor_sk_bvalue', 'armor_loc_sk','armor_iscarried']);
-	repeatingSum('skull_e', 'armoritems',['armor_sk_evalue', 'armor_loc_sk','armor_iscarried']);
-	repeatingSum('skull_p', 'armoritems',['armor_sk_pvalue', 'armor_loc_sk','armor_iscarried']);
-	repeatingSum('skull_f', 'armoritems',['armor_sk_fvalue', 'armor_loc_sk','armor_iscarried']);
-	repeatingSum('face_b', 'armoritems',['armor_fa_bvalue', 'armor_loc_fa','armor_iscarried']);
-	repeatingSum('face_e', 'armoritems',['armor_fa_evalue', 'armor_loc_fa','armor_iscarried']);
-	repeatingSum('face_p', 'armoritems',['armor_fa_pvalue', 'armor_loc_fa','armor_iscarried']);
-	repeatingSum('face_f', 'armoritems',['armor_fa_fvalue', 'armor_loc_fa','armor_iscarried']);
-	repeatingSum('neck_b', 'armoritems',['armor_nk_bvalue', 'armor_loc_nk','armor_iscarried']);
-	repeatingSum('neck_e', 'armoritems',['armor_nk_evalue', 'armor_loc_nk','armor_iscarried']);
-	repeatingSum('neck_p', 'armoritems',['armor_nk_pvalue', 'armor_loc_nk','armor_iscarried']);
-	repeatingSum('neck_f', 'armoritems',['armor_nk_fvalue', 'armor_loc_nk','armor_iscarried']);
-	repeatingSum('shoulder_b', 'armoritems',['armor_sh_bvalue', 'armor_loc_sh','armor_iscarried']);
-	repeatingSum('shoulder_e', 'armoritems',['armor_sh_evalue', 'armor_loc_sh','armor_iscarried']);
-	repeatingSum('shoulder_p', 'armoritems',['armor_sh_pvalue', 'armor_loc_sh','armor_iscarried']);
-	repeatingSum('shoulder_f', 'armoritems',['armor_sh_fvalue', 'armor_loc_sh','armor_iscarried']);
-	repeatingSum('upperarm_b', 'armoritems',['armor_ua_bvalue', 'armor_loc_ua','armor_iscarried']);
-	repeatingSum('upperarm_e', 'armoritems',['armor_ua_evalue', 'armor_loc_ua','armor_iscarried']);
-	repeatingSum('upperarm_p', 'armoritems',['armor_ua_pvalue', 'armor_loc_ua','armor_iscarried']);
-	repeatingSum('upperarm_f', 'armoritems',['armor_ua_fvalue', 'armor_loc_ua','armor_iscarried']);
-	repeatingSum('elbow_b', 'armoritems',['armor_el_bvalue', 'armor_loc_el','armor_iscarried']);
-	repeatingSum('elbow_e', 'armoritems',['armor_el_evalue', 'armor_loc_el','armor_iscarried']);
-	repeatingSum('elbow_p', 'armoritems',['armor_el_pvalue', 'armor_loc_el','armor_iscarried']);
-	repeatingSum('elbow_f', 'armoritems',['armor_el_fvalue', 'armor_loc_el','armor_iscarried']);
-	repeatingSum('forearm_b', 'armoritems',['armor_fo_bvalue', 'armor_loc_fo','armor_iscarried']);
-	repeatingSum('forearm_e', 'armoritems',['armor_fo_evalue', 'armor_loc_fo','armor_iscarried']);
-	repeatingSum('forearm_p', 'armoritems',['armor_fo_pvalue', 'armor_loc_fo','armor_iscarried']);
-	repeatingSum('forearm_f', 'armoritems',['armor_fo_fvalue', 'armor_loc_fo','armor_iscarried']);
-	repeatingSum('hand_b', 'armoritems',['armor_ha_bvalue', 'armor_loc_ha','armor_iscarried']);
-	repeatingSum('hand_e', 'armoritems',['armor_ha_evalue', 'armor_loc_ha','armor_iscarried']);
-	repeatingSum('hand_p', 'armoritems',['armor_ha_pvalue', 'armor_loc_ha','armor_iscarried']);
-	repeatingSum('hand_f', 'armoritems',['armor_ha_fvalue', 'armor_loc_ha','armor_iscarried']);
-	repeatingSum('thorax_b', 'armoritems',['armor_tx_bvalue', 'armor_loc_tx','armor_iscarried']);
-	repeatingSum('thorax_e', 'armoritems',['armor_tx_evalue', 'armor_loc_tx','armor_iscarried']);
-	repeatingSum('thorax_p', 'armoritems',['armor_tx_pvalue', 'armor_loc_tx','armor_iscarried']);
-	repeatingSum('thorax_f', 'armoritems',['armor_tx_fvalue', 'armor_loc_tx','armor_iscarried']);	
-	repeatingSum('abdomen_b', 'armoritems',['armor_ab_bvalue', 'armor_loc_ab','armor_iscarried']);
-	repeatingSum('abdomen_e', 'armoritems',['armor_ab_evalue', 'armor_loc_ab','armor_iscarried']);
-	repeatingSum('abdomen_p', 'armoritems',['armor_ab_pvalue', 'armor_loc_ab','armor_iscarried']);
-	repeatingSum('abdomen_f', 'armoritems',['armor_ab_fvalue', 'armor_loc_ab','armor_iscarried']);		
-	repeatingSum('hip_b', 'armoritems',['armor_hp_bvalue', 'armor_loc_hp','armor_iscarried']);
-	repeatingSum('hip_e', 'armoritems',['armor_hp_evalue', 'armor_loc_hp','armor_iscarried']);
-	repeatingSum('hip_p', 'armoritems',['armor_hp_pvalue', 'armor_loc_hp','armor_iscarried']);
-	repeatingSum('hip_f', 'armoritems',['armor_hp_fvalue', 'armor_loc_hp','armor_iscarried']);	
-	repeatingSum('groin_b', 'armoritems',['armor_gr_bvalue', 'armor_loc_gr','armor_iscarried']);
-	repeatingSum('groin_e', 'armoritems',['armor_gr_evalue', 'armor_loc_gr','armor_iscarried']);
-	repeatingSum('groin_p', 'armoritems',['armor_gr_pvalue', 'armor_loc_gr','armor_iscarried']);
-	repeatingSum('groin_f', 'armoritems',['armor_gr_fvalue', 'armor_loc_gr','armor_iscarried']);		
-	repeatingSum('thigh_b', 'armoritems',['armor_th_bvalue', 'armor_loc_th','armor_iscarried']);
-	repeatingSum('thigh_e', 'armoritems',['armor_th_evalue', 'armor_loc_th','armor_iscarried']);
-	repeatingSum('thigh_p', 'armoritems',['armor_th_pvalue', 'armor_loc_th','armor_iscarried']);
-	repeatingSum('thigh_f', 'armoritems',['armor_th_fvalue', 'armor_loc_th','armor_iscarried']);	
-	repeatingSum('knee_b', 'armoritems',['armor_kn_bvalue', 'armor_loc_kn','armor_iscarried']);
-	repeatingSum('knee_e', 'armoritems',['armor_kn_evalue', 'armor_loc_kn','armor_iscarried']);
-	repeatingSum('knee_p', 'armoritems',['armor_kn_pvalue', 'armor_loc_kn','armor_iscarried']);
-	repeatingSum('knee_f', 'armoritems',['armor_kn_fvalue', 'armor_loc_kn','armor_iscarried']);
-	repeatingSum('calf_b', 'armoritems',['armor_ca_bvalue', 'armor_loc_ca','armor_iscarried']);
-	repeatingSum('calf_e', 'armoritems',['armor_ca_evalue', 'armor_loc_ca','armor_iscarried']);
-	repeatingSum('calf_p', 'armoritems',['armor_ca_pvalue', 'armor_loc_ca','armor_iscarried']);
-	repeatingSum('calf_f', 'armoritems',['armor_ca_fvalue', 'armor_loc_ca','armor_iscarried']);
-	repeatingSum('foot_b', 'armoritems',['armor_ft_bvalue', 'armor_loc_ft','armor_iscarried']);
-	repeatingSum('foot_e', 'armoritems',['armor_ft_evalue', 'armor_loc_ft','armor_iscarried']);
-	repeatingSum('foot_p', 'armoritems',['armor_ft_pvalue', 'armor_loc_ft','armor_iscarried']);
-	repeatingSum('foot_f', 'armoritems',['armor_ft_fvalue', 'armor_loc_ft','armor_iscarried']);
+	repeatingSum('sk_b', 'armoritems',['armor_sk_bvalue', 'armor_loc_sk','armor_iscarried']);
+	repeatingSum('sk_e', 'armoritems',['armor_sk_evalue', 'armor_loc_sk','armor_iscarried']);
+	repeatingSum('sk_p', 'armoritems',['armor_sk_pvalue', 'armor_loc_sk','armor_iscarried']);
+	repeatingSum('sk_f', 'armoritems',['armor_sk_fvalue', 'armor_loc_sk','armor_iscarried']);
+	repeatingSum('fa_b', 'armoritems',['armor_fa_bvalue', 'armor_loc_fa','armor_iscarried']);
+	repeatingSum('fa_e', 'armoritems',['armor_fa_evalue', 'armor_loc_fa','armor_iscarried']);
+	repeatingSum('fa_p', 'armoritems',['armor_fa_pvalue', 'armor_loc_fa','armor_iscarried']);
+	repeatingSum('fa_f', 'armoritems',['armor_fa_fvalue', 'armor_loc_fa','armor_iscarried']);
+	repeatingSum('nk_b', 'armoritems',['armor_nk_bvalue', 'armor_loc_nk','armor_iscarried']);
+	repeatingSum('nk_e', 'armoritems',['armor_nk_evalue', 'armor_loc_nk','armor_iscarried']);
+	repeatingSum('nk_p', 'armoritems',['armor_nk_pvalue', 'armor_loc_nk','armor_iscarried']);
+	repeatingSum('nk_f', 'armoritems',['armor_nk_fvalue', 'armor_loc_nk','armor_iscarried']);
+	repeatingSum('sh_b', 'armoritems',['armor_sh_bvalue', 'armor_loc_sh','armor_iscarried']);
+	repeatingSum('sh_e', 'armoritems',['armor_sh_evalue', 'armor_loc_sh','armor_iscarried']);
+	repeatingSum('sh_p', 'armoritems',['armor_sh_pvalue', 'armor_loc_sh','armor_iscarried']);
+	repeatingSum('sh_f', 'armoritems',['armor_sh_fvalue', 'armor_loc_sh','armor_iscarried']);
+	repeatingSum('ua_b', 'armoritems',['armor_ua_bvalue', 'armor_loc_ua','armor_iscarried']);
+	repeatingSum('ua_e', 'armoritems',['armor_ua_evalue', 'armor_loc_ua','armor_iscarried']);
+	repeatingSum('ua_p', 'armoritems',['armor_ua_pvalue', 'armor_loc_ua','armor_iscarried']);
+	repeatingSum('ua_f', 'armoritems',['armor_ua_fvalue', 'armor_loc_ua','armor_iscarried']);
+	repeatingSum('el_b', 'armoritems',['armor_el_bvalue', 'armor_loc_el','armor_iscarried']);
+	repeatingSum('el_e', 'armoritems',['armor_el_evalue', 'armor_loc_el','armor_iscarried']);
+	repeatingSum('el_p', 'armoritems',['armor_el_pvalue', 'armor_loc_el','armor_iscarried']);
+	repeatingSum('el_f', 'armoritems',['armor_el_fvalue', 'armor_loc_el','armor_iscarried']);
+	repeatingSum('fo_b', 'armoritems',['armor_fo_bvalue', 'armor_loc_fo','armor_iscarried']);
+	repeatingSum('fo_e', 'armoritems',['armor_fo_evalue', 'armor_loc_fo','armor_iscarried']);
+	repeatingSum('fo_p', 'armoritems',['armor_fo_pvalue', 'armor_loc_fo','armor_iscarried']);
+	repeatingSum('fo_f', 'armoritems',['armor_fo_fvalue', 'armor_loc_fo','armor_iscarried']);
+	repeatingSum('ha_b', 'armoritems',['armor_ha_bvalue', 'armor_loc_ha','armor_iscarried']);
+	repeatingSum('ha_e', 'armoritems',['armor_ha_evalue', 'armor_loc_ha','armor_iscarried']);
+	repeatingSum('ha_p', 'armoritems',['armor_ha_pvalue', 'armor_loc_ha','armor_iscarried']);
+	repeatingSum('ha_f', 'armoritems',['armor_ha_fvalue', 'armor_loc_ha','armor_iscarried']);
+	repeatingSum('tx_b', 'armoritems',['armor_tx_bvalue', 'armor_loc_tx','armor_iscarried']);
+	repeatingSum('tx_e', 'armoritems',['armor_tx_evalue', 'armor_loc_tx','armor_iscarried']);
+	repeatingSum('tx_p', 'armoritems',['armor_tx_pvalue', 'armor_loc_tx','armor_iscarried']);
+	repeatingSum('tx_f', 'armoritems',['armor_tx_fvalue', 'armor_loc_tx','armor_iscarried']);	
+	repeatingSum('ab_b', 'armoritems',['armor_ab_bvalue', 'armor_loc_ab','armor_iscarried']);
+	repeatingSum('ab_e', 'armoritems',['armor_ab_evalue', 'armor_loc_ab','armor_iscarried']);
+	repeatingSum('ab_p', 'armoritems',['armor_ab_pvalue', 'armor_loc_ab','armor_iscarried']);
+	repeatingSum('ab_f', 'armoritems',['armor_ab_fvalue', 'armor_loc_ab','armor_iscarried']);		
+	repeatingSum('hp_b', 'armoritems',['armor_hp_bvalue', 'armor_loc_hp','armor_iscarried']);
+	repeatingSum('hp_e', 'armoritems',['armor_hp_evalue', 'armor_loc_hp','armor_iscarried']);
+	repeatingSum('hp_p', 'armoritems',['armor_hp_pvalue', 'armor_loc_hp','armor_iscarried']);
+	repeatingSum('hp_f', 'armoritems',['armor_hp_fvalue', 'armor_loc_hp','armor_iscarried']);	
+	repeatingSum('gr_b', 'armoritems',['armor_gr_bvalue', 'armor_loc_gr','armor_iscarried']);
+	repeatingSum('gr_e', 'armoritems',['armor_gr_evalue', 'armor_loc_gr','armor_iscarried']);
+	repeatingSum('gr_p', 'armoritems',['armor_gr_pvalue', 'armor_loc_gr','armor_iscarried']);
+	repeatingSum('gr_f', 'armoritems',['armor_gr_fvalue', 'armor_loc_gr','armor_iscarried']);		
+	repeatingSum('th_b', 'armoritems',['armor_th_bvalue', 'armor_loc_th','armor_iscarried']);
+	repeatingSum('th_e', 'armoritems',['armor_th_evalue', 'armor_loc_th','armor_iscarried']);
+	repeatingSum('th_p', 'armoritems',['armor_th_pvalue', 'armor_loc_th','armor_iscarried']);
+	repeatingSum('th_f', 'armoritems',['armor_th_fvalue', 'armor_loc_th','armor_iscarried']);	
+	repeatingSum('kn_b', 'armoritems',['armor_kn_bvalue', 'armor_loc_kn','armor_iscarried']);
+	repeatingSum('kn_e', 'armoritems',['armor_kn_evalue', 'armor_loc_kn','armor_iscarried']);
+	repeatingSum('kn_p', 'armoritems',['armor_kn_pvalue', 'armor_loc_kn','armor_iscarried']);
+	repeatingSum('kn_f', 'armoritems',['armor_kn_fvalue', 'armor_loc_kn','armor_iscarried']);
+	repeatingSum('ca_b', 'armoritems',['armor_ca_bvalue', 'armor_loc_ca','armor_iscarried']);
+	repeatingSum('ca_e', 'armoritems',['armor_ca_evalue', 'armor_loc_ca','armor_iscarried']);
+	repeatingSum('ca_p', 'armoritems',['armor_ca_pvalue', 'armor_loc_ca','armor_iscarried']);
+	repeatingSum('ca_f', 'armoritems',['armor_ca_fvalue', 'armor_loc_ca','armor_iscarried']);
+	repeatingSum('ft_b', 'armoritems',['armor_ft_bvalue', 'armor_loc_ft','armor_iscarried']);
+	repeatingSum('ft_e', 'armoritems',['armor_ft_evalue', 'armor_loc_ft','armor_iscarried']);
+	repeatingSum('ft_p', 'armoritems',['armor_ft_pvalue', 'armor_loc_ft','armor_iscarried']);
+	repeatingSum('ft_f', 'armoritems',['armor_ft_fvalue', 'armor_loc_ft','armor_iscarried']);
 
 }); 
+
+
+on("clicked:hidelegacyarmor", function() {
+  setAttrs({'legacyarmorhidden' : 1});
+  console.log("Remove legacy armor button clicked (note: we're just hiding, not removing)"); 
+});
+
+on("clicked:dismissupgradenotice", function() {
+  setAttrs({'notifyupgrade' : 0});
+  console.log("Hiding sheet upgrade notification until next upgrade."); 
+});
 
 </script>

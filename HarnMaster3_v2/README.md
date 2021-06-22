@@ -18,6 +18,7 @@ Features:
 * Healing Rolls
 * Weapon Quality Checks
 * Attack/Defense rolls with adjustments.
+* Separate missile weapon section with ranges and their penalties & damage (new in V2)
 * Dedicated roll button to roll attacks with HM penalty (new in V2)
 * Spell/Ritual/Psionic checks.
 * EMLs for in sheet rolls are capped at 5/95 respectively as per rules.
@@ -40,14 +41,20 @@ Auto-Calculations:
 * Easily drop weapons and reduce inventory load (and encumbrance) on the fly (new in V2)
 * Auto calculate initiave and effective horse riding skill automatically for the horse included in the (optional) horse section, when "Mounted" (checkbox) (new in V2)
 
-V2 changes
+V2 changes & migration from older sheets
 =======
 In addition to the features above marked with "New in V2" the styling has been adjusted to be more in line with the Harn paper sheet. The layout is now done via CSS grid for easier and better alignment. 
 
-Due to some code changes (all values are now calculated via Sheetworkers instead of AutoCalc) it is not a seemless move for exisiting characters from the original version to V2. If you switch to this enhanced version V2 for an existing character please:
+A migration script is included to perform the necessary changes when coming from an old sheet. Old armor cannot be migrated automatically, as previously all armor layers were stored in field per location. Old armor information can be found in the Inventory tab. Please:
+- move this information to the need armor section in the inventory tab, per armor item. 
+- Mark which items are carried/worn ("c" column)
+- Total weight and armor protection values for all layers per location is then calculated automatically.
 - Note down your armor before switching sheets, it will need to be input again on the new sheet (you'll also need the armor locations from the rulebook)
-- Verify the settings on the Settings tab 
-- Change something (anything, for example the "carried" checkbox) in each weapon you have so AML and DML are calculated again, they will be empty after a migration of an existing character.
+- This is a one-time excercise for each character.
+
+Also please verify the settings on the Settings tab 
+
+Your weapons will be on the Inventory Tab after migration. Mark the "C" checkbox to select which weapons you're carrying and thus show up on the Character Tab .
 
 NOTE
 ====
