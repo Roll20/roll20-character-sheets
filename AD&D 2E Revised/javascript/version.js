@@ -31,13 +31,13 @@ on('sheet:opened', function(){
             sheetBug   = parseInt(splitVersions[2]) || 0;
          
             // Starting with the oldest version, just in case some field has been moved from A -> B, B -> C
-            if (isOldVersionBelow(3, 3, 0))
+            if (isOldSheetVersionBelowMigrate(3, 3, 0))
                 migrate3_3_0();
 
-            if (isOldVersionBelow(3, 3, 2))
+            if (isOldSheetVersionBelowMigrate(3, 3, 2))
                 migrate3_3_2();
 
-            if (isOldVersionBelow(3, 4, 0))
+            if (isOldSheetVersionBelowMigrate(3, 4, 0))
                 migrate3_4_0();
             
             //#endregion
@@ -48,18 +48,18 @@ on('sheet:opened', function(){
 // --- Version change end --- //
 
 //#region Helpers
-function isOldVersionBelow(migrateMajor, migrateMinor, migrateBug) {
-    if (migrateMajor < sheetMajor)
+function isOldSheetVersionBelowMigrate(migrateMajor, migrateMinor, migrateBug) {
+    if (sheetMajor < migrateMajor)
         return true;
-    if (migrateMajor > sheetMajor)
+    if (sheetMajor > migrateMajor)
         return false;
 
-    if (migrateMinor < sheetMinor)
+    if (sheetMinor < migrateMinor)
         return true;
-    if (migrateMinor > sheetMinor)
+    if (sheetMinor > migrateMinor)
         return false;
 
-    return migrateBug < sheetBug;
+    return sheetBug < migrateBug;
 }
 
 function moveStaticToRepeating(section, fieldsToMove) {
