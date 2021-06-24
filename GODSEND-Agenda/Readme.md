@@ -5,7 +5,7 @@ Created with PUGjs and SASS by [Andreas J.](https:wiki.roll20.net/Anduh).
 
 ## Changelog
 
-### v.1.3.1
+### v.1.3.0
 - several visual fixes
 - 
 

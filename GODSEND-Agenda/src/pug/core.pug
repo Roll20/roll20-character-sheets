@@ -8,10 +8,10 @@ input.gamesys(type="hidden" name="attr_gametype" value="")
   //- <button class="npc" type="action" name="act_npc" >NPC</button>
   input.tabstoggle(type="hidden" name="attr_sheetTab" value="character")
   input.gametoggle(type="hidden" name="attr_gametype" value="godsend")
-  h1.godsend='GODSEND AGENDA'
-  h1.talislanta='Talislanta'
-  h1.hellas='Hellas'
-  h1.atlantis='Atlantis Second Age'
+  h1.godsend(title="GODSEND Agenda")
+  h1.talislanta(title="Talislanta")
+  h1.hellas(title="Hellas")
+  h1.atlantis(title="Atlantis Second Age")
   div
     span Page selection
     select(name="attr_sheetTab")
@@ -72,11 +72,12 @@ main.character
       span.attr attr
       span.desc notes
     fieldset.repeating_skills
-      button(name="roll_skill" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{level}[skill level]+@{attribute}[attribute]@{modquery}]]}}" type="roll")
+      button(name="roll_skill" value!="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{roll= [[@{dice}[dice]+@{level}[@{name} level]+@{attribute}[attribute] @{modquery}]]}}" type="roll")
       input.name(name="attr_name" title="@{name}" list="skillsgodsend" type="text")
       input(name="attr_level" title="@{level}" type="number")
       +attrselect
       input.desc(name="attr_notes" title="@{notes}" type="text")
+      input(name="attr_attrname" type="hidden")
 
     h2 powers
     .desc-row
@@ -87,7 +88,7 @@ main.character
       span cost total
       span desc
     fieldset.repeating_powers
-      button.sendtext(name="roll_power" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{rank= [[@{rank}]] }} {{desc=@{desc} }}" type="roll")
+      button.sendtext(name="roll_power" value!="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{rank= [[@{rank}]] }} {{desc=@{desc} }}" type="roll")
       input.name(name="attr_name" title="@{name}" type="text")
       input.txtfield(name="attr_rank" title="@{rank}" type="number")
       input.txtfield(name="attr_cost_base" type="number")
@@ -107,7 +108,7 @@ main.character
       span attr
       span skill lvl
     fieldset.repeating_weapons
-      button(name="roll_weapon" value!="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{acc}[accuracy]+@{skill}[skill level]+@{attribute}[attribute]@{modquery}]]}} {{Damage= [[@{dr}]]}}" type="roll")
+      button(name="roll_weapon" value!="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{roll= [[@{dice}[Dice]+@{acc}[accuracy]+@{skill}[skill level]+@{attribute}[attribute] @{modquery}]]}} {{Damage= [[@{dr}]]}}" type="roll")
       input.name(name="attr_name" title="@{name}"  type="text")
       input.txtfield(name="attr_acc" type="number")
       input.txtfield(name="attr_dr" type="number")
@@ -121,13 +122,11 @@ main.character
     h2 Armor
     .desc-row
       span.armor name
-      span acc
       span pr
       span enc
       span='R#'
     fieldset.repeating_armor
       input.name(name="attr_name" title="@{name}"  type="text")
-      input.txtfield(name="attr_acc" type="number")
       input.txtfield(name="attr_pr" type="number")
       input.txtfield(name="attr_enc" type="number")
       input(name="attr_rsharp" type="text")
@@ -142,18 +141,26 @@ main.character
     each option in notes1
       h2= option
       textarea(name=`attr_${option}`)
+  section.footer
+
 main.notes
   h2 Notes
   each option in notes
     section.columnflex
       h3= option
       textarea(name=`attr_${option}`)
+
 main.settings
   h2 Settings
   .section.rowflex.nowrap
     span='Ask for Roll Modifiers?'
     select.short(name="attr_modquery" title="@{modquery}")
       option(value="+(?{Roll Modifier|0}[Modifiers])") Yes
+      option(value=" ") No
+  .section.rowflex.nowrap
+    span='Show Character Name in rolls?'
+    select.short(name="attr_showname" title="@{showname}")
+      option(value="{{subtitle=@{character_name} }}") Yes
       option(value=" ") No
   .section.rowflex.nowrap.gap
     span(title="@{whisper}") Whisper rolls to GM?
@@ -163,6 +170,7 @@ main.settings
     select(name="attr_dice" title="@{dice}")
       option(value="2d10cf0cs0" selected)= '2d10 (GODSEND Agenda)'
       option(value="1d20")= 'd20 (Talislanta, Hellas, Atlantis)'
+      option(value="2d10" selected)= '2d10 (1s & 10s higlighted)'
   .section.rowflex.nowrap.gap
     span= 'Game System (Header & layout)'
     select(name="attr_gametype" )
@@ -170,3 +178,8 @@ main.settings
       option(value="talislanta")= 'Talislanta'
       option(value="hellas")= 'Hellas'
       option(value="atlantis")= 'Atlantis: Second Age'
+  //-.section.rowflex.nowrap
+    span='Show Costs for Powers?'
+    select.short(name="attr_showcost" title="@{showcost}")
+      option(value="{{base cost= @{cost_base} }} {{rank cost= @{cost_rank} }} {{total cost= @{cost_total} }}") Yes
+      option(value=" ") No

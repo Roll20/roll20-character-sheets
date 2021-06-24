@@ -4,10 +4,10 @@
 <div class="tab-buttons spaced center">
   <input class="tabstoggle" type="hidden" name="attr_sheetTab" value="character"/>
   <input class="gametoggle" type="hidden" name="attr_gametype" value="godsend"/>
-  <h1 class="godsend">GODSEND AGENDA</h1>
-  <h1 class="talislanta">Talislanta</h1>
-  <h1 class="hellas">Hellas</h1>
-  <h1 class="atlantis">Atlantis Second Age</h1>
+  <h1 class="godsend" title="GODSEND Agenda"></h1>
+  <h1 class="talislanta" title="Talislanta"></h1>
+  <h1 class="hellas" title="Hellas"></h1>
+  <h1 class="atlantis" title="Atlantis Second Age"></h1>
   <div><span>Page selection</span>
     <select name="attr_sheetTab">
       <option value="character">character</option>
@@ -110,7 +110,7 @@
     <h2>Skills</h2>
     <div class="desc-row"><span>name</span><span>level</span><span class="attr">attr</span><span class="desc">notes</span></div>
     <fieldset class="repeating_skills">
-      <button name="roll_skill" value="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{level}[skill level]+@{attribute}[attribute]@{modquery}]]}}" type="roll"></button>
+      <button name="roll_skill" value="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{roll= [[@{dice}[dice]+@{level}[@{name} level]+@{attribute}[attribute] @{modquery}]]}}" type="roll"></button>
       <input class="name" name="attr_name" title="@{name}" list="skillsgodsend" type="text"/>
       <input name="attr_level" title="@{level}" type="number"/>
       <select name="attr_attribute">
@@ -127,11 +127,12 @@
         <option class="cap" value="[[@{none}]]">none</option>
       </select>
       <input class="desc" name="attr_notes" title="@{notes}" type="text"/>
+      <input name="attr_attrname" type="hidden"/>
     </fieldset>
     <h2>powers</h2>
     <div class="desc-row"><span class="powers">name</span><span>rank</span><span>base cost</span><span>rank cost</span><span>cost total</span><span>desc</span></div>
     <fieldset class="repeating_powers">
-      <button class="sendtext" name="roll_power" value="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{rank= [[@{rank}]] }} {{desc=@{desc} }}" type="roll"></button>
+      <button class="sendtext" name="roll_power" value="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{rank= [[@{rank}]] }} {{desc=@{desc} }}" type="roll"></button>
       <input class="name" name="attr_name" title="@{name}" type="text"/>
       <input class="txtfield" name="attr_rank" title="@{rank}" type="number"/>
       <input class="txtfield" name="attr_cost_base" type="number"/>
@@ -142,7 +143,7 @@
     <h2>Weapons</h2>
     <div class="desc-row"><span class="weapons">name</span><span>acc</span><span>dr</span><span>RoF</span><span>Ammo</span><span>rng</span><span>R#</span><span>attr</span><span>skill lvl</span></div>
     <fieldset class="repeating_weapons">
-      <button name="roll_weapon" value="@{whisper}&{template:rolls} {{title=@{name} }} {{subtitle=@{character_name} }} {{roll= [[@{dice}+@{acc}[accuracy]+@{skill}[skill level]+@{attribute}[attribute]@{modquery}]]}} {{Damage= [[@{dr}]]}}" type="roll"></button>
+      <button name="roll_weapon" value="@{whisper}&{template:rolls} {{title=@{name} }} @{showname} {{roll= [[@{dice}[Dice]+@{acc}[accuracy]+@{skill}[skill level]+@{attribute}[attribute] @{modquery}]]}} {{Damage= [[@{dr}]]}}" type="roll"></button>
       <input class="name" name="attr_name" title="@{name}" type="text"/>
       <input class="txtfield" name="attr_acc" type="number"/>
       <input class="txtfield" name="attr_dr" type="number"/>
@@ -166,10 +167,9 @@
       <input name="attr_skill" type="text"/>
     </fieldset>
     <h2>Armor</h2>
-    <div class="desc-row"><span class="armor">name</span><span>acc</span><span>pr</span><span>enc</span><span>R#</span></div>
+    <div class="desc-row"><span class="armor">name</span><span>pr</span><span>enc</span><span>R#</span></div>
     <fieldset class="repeating_armor">
       <input class="name" name="attr_name" title="@{name}" type="text"/>
-      <input class="txtfield" name="attr_acc" type="number"/>
       <input class="txtfield" name="attr_pr" type="number"/>
       <input class="txtfield" name="attr_enc" type="number"/>
       <input name="attr_rsharp" type="text"/>
@@ -190,6 +190,7 @@
     <h2>notes</h2>
     <textarea name="attr_notes"></textarea>
   </section>
+  <section class="footer"></section>
 </main>
 <main class="notes">
   <h2>Notes</h2>
@@ -222,6 +223,12 @@
       <option value=" ">No</option>
     </select>
   </div>
+  <div class="section rowflex nowrap"><span>Show Character Name in rolls?</span>
+    <select class="short" name="attr_showname" title="@{showname}">
+      <option value="{{subtitle=@{character_name} }}">Yes</option>
+      <option value=" ">No</option>
+    </select>
+  </div>
   <div class="section rowflex nowrap gap"><span title="@{whisper}">Whisper rolls to GM?</span>
     <input name="attr_whisper" title="@{whisper}" type="checkbox" value="/w gm"/>
   </div>
@@ -229,6 +236,7 @@
     <select name="attr_dice" title="@{dice}">
       <option value="2d10cf0cs0" selected="selected">2d10 (GODSEND Agenda)</option>
       <option value="1d20">d20 (Talislanta, Hellas, Atlantis)</option>
+      <option value="2d10" selected="selected">2d10 (1s &amp; 10s higlighted)</option>
     </select>
   </div>
   <div class="section rowflex nowrap gap"><span>Game System (Header &amp; layout)</span>
@@ -318,6 +326,8 @@
 </rolltemplate>
 <!--sheetworkers-->
 <script type="sheet/worker">
+//current sheet version
+const currentversion = "1.3.0";
 
 const int = score => parseInt(score, 10) || 0;
 
@@ -333,6 +343,7 @@ buttonlist.forEach(button => {
       });
     });
 });
+
 
 // game system
 
