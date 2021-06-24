@@ -3,10 +3,6 @@
 const sheetName = 'AD&D 2E Revised';
 const sheetVersion = '4.1.0';
 
-let sheetMajor = 0;
-let sheetMinor = 0;
-let sheetBug   = 0;
-
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
         let cs=_.rest((attrs.character_sheet||'').match(/(.*?)(?:\s+v(.*))?$/)),
@@ -16,7 +12,7 @@ on('sheet:opened', function(){
         // do something with sheet_name and sheet_version, if you might be converting
 
         if(sheet_name !== sheetName || sheet_version !== sheetVersion) {
-            console.log('Updating character sheet version');
+            console.log(`Updating character sheet from ${sheet_version} to ${sheetVersion}`);
             setAttrs({
                 character_sheet: `${sheetName} v${sheetVersion}`,
                 version: `v${sheetVersion}`,
@@ -25,19 +21,16 @@ on('sheet:opened', function(){
             
             //#region Migrations
             
-            let splitVersions = sheet_version.match(/(\d+)\.(\d+)\.(\d+)/);
-            sheetMajor = parseInt(splitVersions[0]) || 0;
-            sheetMinor = parseInt(splitVersions[1]) || 0;
-            sheetBug   = parseInt(splitVersions[2]) || 0;
+            let oldSheetVersion = new SheetVersion(sheet_version);
          
             // Starting with the oldest version, just in case some field has been moved from A -> B, B -> C
-            if (isOldSheetVersionBelowMigrate(3, 3, 0))
+            if (oldSheetVersion.isBelowMigrate(3, 3, 0))
                 migrate3_3_0();
 
-            if (isOldSheetVersionBelowMigrate(3, 3, 2))
+            if (oldSheetVersion.isBelowMigrate(3, 3, 2))
                 migrate3_3_2();
 
-            if (isOldSheetVersionBelowMigrate(3, 4, 0))
+            if (oldSheetVersion.isBelowMigrate(3, 4, 0))
                 migrate3_4_0();
             
             //#endregion
@@ -48,18 +41,24 @@ on('sheet:opened', function(){
 // --- Version change end --- //
 
 //#region Helpers
-function isOldSheetVersionBelowMigrate(migrateMajor, migrateMinor, migrateBug) {
-    if (sheetMajor < migrateMajor)
-        return true;
-    if (sheetMajor > migrateMajor)
-        return false;
+function SheetVersion(sheetVersionString) {
+    let splitVersions = sheetVersionString.match(/(\d+)\.(\d+)\.(\d+)/);
+    this.major = parseInt(splitVersions[1]) || 0;
+    this.minor = parseInt(splitVersions[2]) || 0;
+    this.bug   = parseInt(splitVersions[3]) || 0;
+    this.isBelowMigrate = function (migrateMajor, migrateMinor, migrateBug) {
+        if (this.major < migrateMajor)
+            return true;
+        if (this.major > migrateMajor)
+            return false;
 
-    if (sheetMinor < migrateMinor)
-        return true;
-    if (sheetMinor > migrateMinor)
-        return false;
+        if (this.minor < migrateMinor)
+            return true;
+        if (this.minor > migrateMinor)
+            return false;
 
-    return sheetBug < migrateBug;
+        return this.bug < migrateBug;
+    }
 }
 
 function moveStaticToRepeating(section, fieldsToMove) {
@@ -123,16 +122,15 @@ function migrate3_3_0() {
         let sp = parseInt(values['spell-points']) || 0;
         let psp = parseInt(values['spell-points-priest']) || 0;
 
-        console.log(`Old spell points: ${sp}`);
-        console.log(`Old spell points priest: ${psp}`);
-
         let newValue = {};
         if (sp > 0) {
+            console.log(`Old spell points: ${sp}`);
             newValue['spell-points-lvl'] = sp;
             newValue['spell-points'] = '';
         }
 
         if (psp > 0) {
+            console.log(`Old spell points priest: ${psp}`);
             newValue['spell-points-priest-lvl'] = psp;
             newValue['spell-points-priest'] = '';
         }
