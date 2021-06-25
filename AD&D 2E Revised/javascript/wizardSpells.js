@@ -896,7 +896,7 @@ wiz2['Choke'] = {
     'damage': '[[1d4]]',
     'damage-type': '',
     'healing': '',
-    'effect': 'By means of *choke*, the caster causes a pair of ghostly hands to appear around the throat of a single victim. The victim must be a human, demihuman, or humanoid, and must be within 30 yards of the caster. The hands will choke and strangle the affected victim for the duration of the spell; each round, the victim suffers 1-4 hit points of damage from the choking hands. If the victim makes a successful saving throw, he suffers half- damage each round.\\n&emsp;*Choke* can be negated by *dispel magic* or a similar spell; the victim makes all attack rolls at a -2 penalty while affected by *choke*.'
+    'effect': 'By means of *choke*, the caster causes a pair of ghostly hands to appear around the throat of a single victim. The victim must be a human, demihuman, or humanoid, and must be within 30 yards of the caster. The hands will choke and strangle the affected victim for the duration of the spell; each round, the victim suffers 1-4 hit points of damage from the choking hands. If the victim makes a successful saving throw, he suffers half- damage each round.\n&emsp;*Choke* can be negated by *dispel magic* or a similar spell; the victim makes all attack rolls at a -2 penalty while affected by *choke*.'
 }
 // End
 

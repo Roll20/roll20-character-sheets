@@ -1,8 +1,7 @@
-include ./data/companions
-include ./data/paths
-include ./data/combat-talents
-include ./data/rituals
-include ./data/custom
+include ../../data/translations
+include ./asset-custom
+include ./asset-builder
+
 
 mixin assets()
   .assets
@@ -10,15 +9,19 @@ mixin assets()
       .asset
         .asset-header
           select.asset-type-dropdown(name='attr_assettype')
-            option(value='' disabled='' selected='') Select
-            option(value='companion') Companion
-            option(value='path') Path
-            option(value='combat-talent') Combat Talent
-            option(value='ritual') Ritual
-            option(value='custom') Custom
-        
-        +companionAssets
-        +pathAssets
-        +combatTalentAssets
-        +ritualAssets
+            - var types = ['companion','path','combat-talent','ritual','custom']
+            - var defaultDropdown = 'asset-dropdown-default'
+            option(
+              data-i18n=defaultDropdown
+              value=''
+              disabled=''
+              selected=''
+            )=translations[defaultDropdown]
+            each value in types
+              - var translationValue = `asset-type-${value}`
+              option(data-i18n=translationValue value=value)=translations[translationValue]
+        +companionBuilder
+        +pathBuilder
+        +combatTalentBuilder
+        +ritualBuilder
         +customAssets

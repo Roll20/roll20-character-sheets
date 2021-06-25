@@ -123,3 +123,9 @@ on('change:clear_misses', function() {
     'clear_misses': 'off'
   });
 });
+
+on('change:repeating_progress:challenge-show-button', function(eventinfo) {
+  setAttrs({
+    'repeating_progress_challenge-show': eventinfo.newValue  
+  });
+});

@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '3.4.0';
+const sheetVersion = '3.4.1';
 
 function moveStaticToRepeating(section, fieldsToMove) {
     getAttrs(fieldsToMove, function (values) {

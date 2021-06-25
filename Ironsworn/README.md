@@ -24,130 +24,143 @@ The sheet has been tested across multiple browsers and devices, show below in th
 
 ## Roll Logic
 ### Wield a Rarity
-Structured it using javascript for readability.
+Structured it using pseudo code for readability.
 ```javascript
-if (actionWithRarity == (negativeMomentum + modifiers)) {
-  negateActionDie()
-  if (modifiers > firstChallengeDie) {
-    if (firstChallengeDie == secondChallengeDie) {
-      opportunity()
-    } else {
-      if (modifiers > secondChallengeDie) {
-        strongHit()
-      } else {
-        weakHit()
-      }
-    }
-  } else {
-    if (firstChallengeDie == secondChallengeDie) {
-      complication()
-    } else {
-      if (modifiers > secondChallengeDie) {
-        weakHit()
-      } else {
-        miss()
-      }
-    }
-  }
-} else {
-  if (actionWithRarity > firstChallengeDie) {
-    if (firstChallengeDie == secondChallengeDie) {
-      opportunity()
-      if (actionWithRarity == (6 + modifiers)) {
-        rarityDramatic()
-      }
-      if (actionWithRarity == (5 + modifiers)) {
-        raritySubtle()
-      }
-    } else {
-      if (actionWithRarity > secondChallengeDie) {
-        strongHit()
-        if (actionWithRarity == (6 + modifiers)) {
-          rarityDramatic()
-        }
-        if (actionWithRarity == (5 + modifiers)) {
-          raritySubtle()
-        }
-      } else {
-        if (actionWithRarity == (6 + modifiers)) {
-          strongHit()
-          rarityDramatic()
-        } else {
-          weakHit()
-          if (actionWithRarity == (5 + modifiers)) {
-            raritySubtle()
-          }
-          if (momentum > secondChallengeDie) {
-            burnMomentum('Strong Hit')
-          }
-        }
-      }
-    }
-  } else {
-    if (firstChallengeDie == secondChallengeDie) {
-      if (actionWithRarity == (6 + modifiers)) {
-        strongHit()
-        rarityDramatic()
-      } else {
+if rarityDie6 == rarityAction
+  if challenge1 == challenge2
+    opportunity()
+  else
+    strongHit()
+  if rarityDie6 == rarityAction
+    rarityDramatic()
+else
+  if rarityAction > 10
+    if challenge1 == 10
+      if challenge2 == 10
         complication()
-        if (actionWithRarity == (1 + modifiers)) {
-          rarityMiss()
-        }
-        if (momentum > firstChallengeDie) {
-          burnMomentum('Strong Hit')
-          if (actionWithRarity == (5 + modifiers)) {
-            raritySubtle()
-          }
-        }
-      }
-    } else {
-      if (actionWithRarity > secondChallengeDie) {
-        if (actionWithRarity == (6 + modifiers)) {
+        if rarityDie1 == rarityAction
+          rarityFail()
+      else
+        weakHit()
+        if rarityDie5 == rarityAction
+          raritySubtle()
+    else
+      if challenge2 == 10
+        weakHit
+        if rarityDie5 == rarityAction
+          raritySubtle()
+      else
+        strongHit
+        if rarityDie5 == rarityAction
+          raritySubtle()
+  else
+    if rarityAction > challenge1
+      if challenge1 == challenge2
+        opportunity()
+        if rarityDie5 == rarityAction
+          raritySubtle()
+      else
+        if rarityAction > challenge2
           strongHit()
-          rarityDramatic()
-        } else {
+          if rarityDie5 == rarityAction
+            raritySubtle()   
+        else
           weakHit()
-          if (actionWithRarity == (5 + modifiers)) {
+          if rarityDie5 == rarityAction
             raritySubtle()
-          }
-          if (momentum > firstChallengeDie) {
-            if (momentum > secondChallengeDie) {
-              burnMomentum('Strong Hit')
-            }
-          }
-        }
-      } else {
-        if (actionWithRarity == (6 + modifiers)) {
-          strongHit()
-          rarityDramatic()
-        } else {
+    else
+      if challenge1 == challenge2
+        complication()
+        if rarityDie1 == rarityAction
+          rarityFail()
+      else
+        if rarityAction > challenge2
+          weakHit()
+          if rarityDie5 == rarityAction
+            raritySubtle()
+        else
           miss()
-          if (actionWithRarity == (1 + modifiers)) {
-            rarityMiss()
-          }
-          if (momentum > firstChallengeDie) {
-            if (momentum > secondChallengeDie) {
-              burnMomentum('Strong Hit')
-              if (actionWithRarity == (5 + modifiers)) {
+          if rarityDie1 == rarityAction
+            rarityFail()
+```
+Roll with momentum
+```js
+if rarityDie6 == rarityAction
+  if challenge1 == challenge2
+    opportunity()
+  else
+    strongHit()
+  if rarityDie6 == rarityAction
+    rarityDramatic()
+else
+  if rarityAction > 10
+    if challenge1 == 10
+      if challenge2 == 10
+        complication()
+        if rarityDie1 == rarityAction
+          rarityFail()
+      else
+        weakHit()
+        if rarityDie5 == rarityAction
+          raritySubtle()
+    else
+      if challenge2 == 10
+        weakHit
+        if rarityDie5 == rarityAction
+          raritySubtle()
+      else
+        strongHit
+        if rarityDie5 == rarityAction
+          raritySubtle()
+  else
+    if rarityAction > challenge1
+      if challenge1 == challenge2
+        opportunity()
+        if rarityDie5 == rarityAction
+          raritySubtle()
+      else
+        if rarityAction > challenge2
+          strongHit()
+          if rarityDie5 == rarityAction
+            raritySubtle()
+        else
+          weakHit()
+          if rarityDie5 == rarityAction
+            raritySubtle()
+          if momentum > challenge2
+            momentumStrongHit()
+    else
+      if challenge1 == challenge2
+        complication()
+        if rarityDie1 == rarityAction
+          rarityFail()
+        if momentum > challenge1
+          momentumStrongHit()
+          if rarityDie5 == rarityAction
+            raritySubtle()
+      else
+        if rarityAction > challenge2
+          weakHit()
+          if rarityDie5 == rarityAction
+            raritySubtle()
+          if momentum > challenge1
+            momentumStrongHit()
+        else
+          miss()
+          if rarityDie1 == rarityAction
+            rarityFail()
+          if momentum > challenge1
+            if momentum > challenge2
+              momentumStrongHit()
+              if rarityDie5 == rarityAction
                 raritySubtle()
-              }
-            } else {
-              burnMomentum('Weak Hit')
-              if (actionWithRarity == (5 + modifiers)) {
+            else
+              momentumWeakHit()
+              if rarityDie5 == rarityAction
                 raritySubtle()
-              }
-            }
-          } else {
-            if (momentum > secondChallengeDie) {
-              burnMomentum('Weak Hit')
-              if (actionWithRarity == (5 + modifiers)) {
+          else
+            if momentum > challenge2
+              momentumWeakHit()
+              if rarityDie5 == rarityAction
                 raritySubtle()
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
 ```

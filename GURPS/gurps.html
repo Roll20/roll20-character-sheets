@@ -4364,12 +4364,9 @@
 					<span data-i18n="sheet-version-title">GURPS Character Sheet Version:</span>
 					<input type="text" name="attr_announcement_version" readonly="readonly" value="0" title="GURPS Character Sheet Version" />
 				</h4>
-
+				
 				<ul>
-					<li>Bug fix for Roll Options. If you selected <b>Private Roll</b>, the next time the sheet opens, it changed the option to <b>Custom Roll</b>. Reported by PL M.</li>
-					<li>Chat Box, update display of Armor Divisor when rolling damage to use the same style as skill. Reported by Jared.</li>
-					<li>GCA Import bug. Added some error checking to try to capture null data values for an advantage. Reported by Bob G.</li>
-					<li>Combat Location Tab. Added character and campaign settings options to update <b>Current Hit Points</b> when location damage is changed.</li>
+					<li>GCA Import Bug Fix. With the help of Gata, The Fabulous Iron Chef, and a discord user I was able to find a bug related to multiple attack modes.</li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -4769,9 +4766,7 @@ Confusion Check Table for failures. (Powers p85).
 						<span class="tooltip">
 							<span data-i18n="attribute-unstun-tooltip">
 Recover from physical stun, based on Health.<br />
-Roll at the end of your turn after Do Nothing <br />
-High Pain Threshold +3 to check<br />
-Low Pain Threshold -3 to check
+Roll at the end of your turn after Do Nothing 
 							</span>
 						</span>
 					</div>
@@ -13196,6 +13191,24 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>GCA Import Bug Fix. With the help of Gata, The Fabulous Iron Chef, and a discord user I was able to find a bug related to multiple attack modes.</li>
+			</ul>
+
+			<h4>Version: 2.6.5</h4>
+
+			<p>Pull Request: 3/15/2021</p>
+
+			<ul>
+				<li>GCA Import Bug Fix. This could have prevented a language from importing correctly.</li>
+				<li>Updated tooltip text for Unstun (aka Recover from stun) and death check. Suggestions provided by Justin. S.</li>
+				<li>Fix display of Chat box roll results for Modifier when character sheet sytle is assigned to <b>Fabric</b>. Reported by Jared.</li>
+			</ul>
+
+			<h4>Version: 2.6.4</h4>
+
+			<p>Pull Request: 2/22/2021</p>
+
+			<ul>
 				<li>Bug fix for Roll Options. If you selected <b>Private Roll</b>, the next time the sheet opens, it changed the option to <b>Custom Roll</b>. Reported by PL M.</li>
 				<li>Chat Box, update display of Armor Divisor when rolling damage to use the same style as skill. Reported by Jared.</li>
 				<li>GCA Import bug. Added some error checking to try to capture null data values for an advantage. Reported by Bob G.</li>
@@ -15163,7 +15176,7 @@ visualize what it will look like in chat.
 				
 				<tr>
                     <td class="label"><span data-i18n="modifier-label">Modifier:</span></td>
-                    <td>{{rollModifier}}</td>
+                    <td class="effective-skill">{{rollModifier}}</td>
 				</tr>
 				
 				{{#maneuver}}
@@ -15713,9 +15726,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.4";
+	var version = "2.6.6";
 
-	var latestChangesDate = "2/22/2021";
+	var latestChangesDate = "3/17/2021";
 
 	var modCascade = true;
 	
@@ -27717,7 +27730,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getMeleeAttackFromGcaTrait(uniqueKeys, rows, trait, importNotes, force = false) {
 
-		if (trait.mode && trait.mode.includes("|") && trait.charreach && trait.charreach !== "|") {
+		if (trait.mode && trait.mode.includes("|") && trait.charreach && trait.charreach != "|") {
 
 			getMultipleMeleeAttackModesFromGcaTrait(uniqueKeys, rows, trait, importNotes);
 
@@ -27845,8 +27858,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// tracks which mode to use
 		let index = 0;
 
-		let reach = "c";
-
 		arrModes.forEach(mode => {
 
 			if (mode.toLowerCase() === "thrown") {
@@ -27874,31 +27885,67 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_name`] = fullName;
 
-			let damage = arrDamage[index];
+			let damage = 0;
+
+			let damageNote = "";
+
+			if (arrDamage && arrDamage.length === 1) {
+				damageNote = arrDamage[0];
+				damage = arrDamage[0];
+			} else if (arrDamage && arrDamage.length > 1) {
+				damageNote = arrDamage[index];
+				damage = arrDamage[index];
+			}
 
 			// replace "d" with "d6"
 			damage = damage.replace("d", "d6");
 
+			let damageType = "spec";
+
+			if (arrDamType && arrDamType.length === 1) {
+				damageType = arrDamType[0];
+			} else if (arrDamType && arrDamType.length > 1) {
+				damageType = arrDamType[index];
+			}
+
 			rows[`${baseFieldName}_damage`] = damage;
 
-			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
+			rows[`${baseFieldName}_type`] = getDamageTypeFromGca(damageType);
 
-			if (arrReach) {
+			let reach = "c";
+
+			if (arrReach && arrReach.length === 1) {
+				reach = arrReach[0];
+			} else if (arrReach && arrReach.length > 1) {
 				reach = arrReach[index];
 			}
 
 			rows[`${baseFieldName}_reach`] = reach;
 
-			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
+			let skillLevel = "10";
 
-			damageNote = `${arrDamage[index]} (${arrDamType[index]})`;
+			if (arrSkillLevel && arrSkillLevel.length === 1) {
+				skillLevel = arrSkillLevel[0];
+			} else if (arrSkillLevel && arrSkillLevel.length > 1) {
+				skillLevel = arrSkillLevel[index];
+			}
+
+			rows[`${baseFieldName}_skill`] = skillLevel;
+
+			let damageNotes = `${damageNote} (${damageType})`;
 
 			if (importNotes) {
-				rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index], damageNote);
+				rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index], damageNotes);
 			}
  			
-			divisor = Number(arrDivisor[index]);
+			let divisor = 1;
 
+			if (arrDivisor && arrDivisor.length === 1) {
+				divisor = Number(arrDivisor[0]);
+			} else if (arrDivisor && arrDivisor.length > 1) {
+				divisor = Number(arrDivisor[index]);
+			}
+			
 			if (isNaN(divisor) || divisor < 1) {
 				divisor = 1;
 			}
@@ -27921,11 +27968,11 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getRangedAttackFromGcaTrait(uniqueKeys, rows, trait, importNotes) {
 
-		if (trait.mode && trait.mode.includes("|") && trait.characc && trait.characc !== "|") {
+		if (trait.mode && trait.mode.includes("|") && trait.characc && trait.characc != "|") {
 
 			getMultipleRangedAttackModesFromGcaTrait(uniqueKeys, rows, trait, importNotes);
 
-		} else if (trait.characc) {
+		} else if (trait.characc && trait.characc != "|") {
 
 			getSingleRangedAttackModeFromGcaTrait(uniqueKeys, rows, trait, importNotes);
 
@@ -28042,8 +28089,6 @@ The attacker may choose to hit the original target or the limb you used to parry
 			arrDivisor = trait.chararmordivisor.split("|");
 		}
 
-		let divisor = 1;
-
 		// example: "charskillscore": "11|11|5|5"
 		let arrSkillLevel = trait.charskillscore.split("|");
 
@@ -28129,59 +28174,116 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_name`] = fullName;
 
-			if (arrDamage) {
+			let damage = "0";
 
-				let damage = arrDamage[index];
+			let damageNote = "";
+
+			let damageTypeNote = "";
+
+			if (arrDamage && arrDamage.length === 1) {
+
+				damage = arrDamage[0];
+
+				damageNote = arrDamage[0];
 
 				// replace "d" with "d6"
 				damage = damage.replace("d", "d6");
 
 				rows[`${baseFieldName}_damage`] = damage;
+
+			} else if (arrDamage && arrDamage.length > 1) {
+
+				damage = arrDamage[index];
+
+				damageNote = arrDamage[index];
+
+				// replace "d" with "d6"
+				damage = damage.replace("d", "d6");
+
+				rows[`${baseFieldName}_damage`] = damage;
+
 			}
 
-			if (arrDamType) {
+			if (arrDamType && arrDamType.length === 1) {
+
+				damageTypeNote = arrDamType[0];
+
+				rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[0]);
+
+			} else if (arrDamType && arrDamType.length > 1) {
+
+				damageTypeNote = arrDamType[index];
 
 				rows[`${baseFieldName}_type`] = getDamageTypeFromGca(arrDamType[index]);
 
 			}
 
-			if (arrAcc) {
+			if (arrAcc && arrAcc.length === 1) {
+				rows[`${baseFieldName}_acc`] = arrAcc[0];
+			} else if (arrAcc && arrAcc.length > 1) {
 				rows[`${baseFieldName}_acc`] = arrAcc[index];
 			}
 			
 			let halfRange = "";
 
-			if (arrHalfRange) {
+			if (arrHalfRange && arrHalfRange.length === 1) {
+				halfRange = arrHalfRange[0];
+			} else if (arrHalfRange && arrHalfRange.length > 1) {
 				halfRange = arrHalfRange[index];
 			}
 
 			let maxRange = "";
 
-			if (arrMaxRange) {
+			if (arrMaxRange && arrMaxRange.length === 1) {
+				maxRange = arrMaxRange[0];
+			} else if (arrMaxRange && arrMaxRange.length > 1) {
 				maxRange = arrMaxRange[index];
-			}
+			} 
 
 			rows[`${baseFieldName}_range`] = getRangeFromHalfMax(halfRange, maxRange);
 
-			rows[`${baseFieldName}_skill`] = arrSkillLevel[index];
+			
+			let skillLevel = "10";
 
-			if (arrRof) {
+			if (arrSkillLevel && arrSkillLevel.length === 1) {
+				skillLevel = arrSkillLevel[0];
+			} else if (arrSkillLevel && arrSkillLevel.length > 1) {
+				skillLevel = arrSkillLevel[index];
+			} 
+
+			rows[`${baseFieldName}_skill`] = skillLevel;
+
+			if (arrRof && arrRof.length === 1) {
+				rows[`${baseFieldName}_rof`] = arrRof[0];
+			} else if (arrRof && arrRof.length > 1) {
 				rows[`${baseFieldName}_rof`] = arrRof[index];
 			}
 			
-			if (arrShots) {
+			if (arrShots && arrShots.length === 1) {
+				rows[`${baseFieldName}_shots`] = arrShots[0];
+			} else if (arrShots && arrShots.length > 1) {
 				rows[`${baseFieldName}_shots`] = arrShots[index];
 			}
 			
-			if (arrBulk) {
+			if (arrBulk && arrBulk.length === 1) {
+				rows[`${baseFieldName}_bulk`] = arrBulk[0];
+			} else if (arrBulk && arrBulk.length > 1) {
 				rows[`${baseFieldName}_bulk`] = arrBulk[index];
 			}
 
-			if (arrRecoil) {
+			if (arrRecoil && arrRecoil.length === 1) {
+				rows[`${baseFieldName}_recoil`] = arrRecoil[0];
+			} else if (arrRecoil && arrRecoil.length > 1) {
 				rows[`${baseFieldName}_recoil`] = arrRecoil[index];
 			}
 			
-			divisor = Number(arrDivisor[index]);
+			let divisor = 1;
+
+			if (arrDivisor && arrDivisor.length === 1) {
+				divisor = Number(arrDivisor[0]);
+			} else if (arrDivisor && arrDivisor.length > 1) {
+				divisor = Number(arrDivisor[index]);
+			}
 
 			if (isNaN(divisor) || divisor < 1) {
 				divisor = 1;
@@ -28189,10 +28291,10 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			rows[`${baseFieldName}_armor_divisor`] = divisor;
 			
-			damageNote = `${arrDamage[index]} (${arrDamType[index]})`;
+			let damageNotes = `${damageNote} (${damageTypeNote})`;
 
 			if (importNotes) {
-				rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, arrSkillUsed[index], damageNote);
+				rows[`${baseFieldName}_notes`] = getRangedMeleeNotesFromGca(trait, skillLevel, damageNotes);
 			}
 			
 			index++;
@@ -29115,7 +29217,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let spokenLevel = -3;
 
-		if (basedon && basedbasedon.includes("spoken")) {
+		if (basedon && basedon.includes("spoken")) {
 
 			spokenLevel = getLanguageValueFromGca(advantage.level);
 

@@ -29,6 +29,7 @@ def process_template(
     end_delimiter: str,
     globalns: Dict[str, Any],
     localns: Dict[str, Any],
+    verbose: int = 0,
 ) -> Generator[str, None, None]:
     """
     Read lines from a file and evaluates occurences of occurence_re
@@ -56,20 +57,34 @@ def process_template(
                 value = eval(expr, globalns, localns)
             except Exception as err:
                 print(
-                    f"Expression at line {lineno}{'-' + str(lineno + offset) if offset else ''} raised an exception"
+                    f"Expression at line {lineno}{'-' + str(lineno + offset) if offset else ''} raised: {err.__class__.__name__}: {err}",
+                    end="",
                 )
-                print("Offending expression:", start_delimiter + expr + end_delimiter)
-                print(
-                    "Exception raised:\n\n",
-                    "".join(tb.format_exception(type(err), err, err.__traceback__)),
-                )
+                if verbose < 1:
+                    print(" (use -v to display offending expression)")
+                else:
+                    print(
+                        "\nOffending expression:",
+                        start_delimiter + expr + end_delimiter,
+                    )
+                if verbose < 2:
+                    print("(use -vv to display detailed traceback)")
+                else:
+                    print(
+                        "\nException raised:\n\n",
+                        "".join(tb.format_exception(type(err), err, err.__traceback__)),
+                    )
                 raise HandledException from err
 
             if not isinstance(value, str):
                 print(
                     f"Expression at line {lineno}{'-' + str(lineno + offset) if offset else ''} does not evaluate to a string"
                 )
-                print(f"Offending expression:", start_delimiter + expr + end_delimiter)
+                if verbose > 0:
+                    print(
+                        f"Offending expression: ",
+                        start_delimiter + expr + end_delimiter,
+                    )
                 raise HandledException from ValueError(
                     f"{start_delimiter + expr + end_delimiter} does not evaluate to a string"
                 )
@@ -90,6 +105,7 @@ def main(
     delimiters: Union[Tuple[str], Tuple[str, str]],
     global_namespaces: List[str] = (),
     local_namespaces: List[str] = (),
+    verbose: int = 0,
 ) -> NoReturn:
     """
     Main script entry point
@@ -117,11 +133,16 @@ def main(
                     module = importlib.import_module(module_name)
                     ns.update(getattr(module, attr_name))
             except Exception as err:
-                print(
-                    "error: Could not load {name} due to:",
-                    "".join(tb.format_exception(type(err), err, err.__traceback__)),
-                    sep="\n\n",
-                )
+                print(f"error: Could not load {name}: {err}", end="")
+                if verbose < 1:
+                    print(" (use -v to display detailed traceback)")
+                else:
+                    print(
+                        "\n\n"
+                        + "".join(
+                            tb.format_exception(type(err), err, err.__traceback__)
+                        )
+                    )
                 exit(-1)
 
     # process and write lines
@@ -135,6 +156,7 @@ def main(
                         end_delimiter,
                         globalns,
                         localns,
+                        verbose=verbose,
                     )
                 )
         except HandledException:
@@ -171,6 +193,13 @@ for prettier formatting of the output.""",
         "output",
         type=Path,
         help="File to write the content of the input with evaluated expressions",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        default=0,
+        action="count",
+        help="Increase verbosity",
     )
 
     delimiter_group = parser.add_argument_group(title="delimiter arguments")

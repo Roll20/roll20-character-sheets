@@ -1,21 +1,31 @@
 include ../../data/difficulties
 include ../progress/mixins/box
+include ../../data/translations
 
 - var track = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ]
 - var menaceTrack = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
 - var legacyVows = [ 1, 2, 3, 4, 5 ]
 
+mixin input(id, nameValue)
+  input(
+    type="text"
+    class=id
+    data-i18n-placeholder=id
+    placeholder=translations[id]
+    name=nameValue
+  )
+
 mixin vowLegacy(number)
-  input(type="text" class="vow-name" placeholder='Vow' name=`attr_vow${number}_name`)
+  +input("vow-name", `attr_vow${number}_name`)
   
   input.optional-vow-threat.hide(type='checkbox' name=`attr_optional_vow_threat_${number}` checked)
   .optional-vow-threat.showhide
     .threat-container
       .threat-header
-        input(type="text" class="threat-name" placeholder='Threat' name=`attr_vow${number}_threat-name`)
+        +input("vow-threat", `attr_vow${number}_threat-name`)
         label.menace-show
           input(type='checkbox' class='hide menace-show-button' name=`attr_vow${number}_menace-show-button`)
-          .menace-show-back MENACE
+          .menace-show-back(data-i18n='vow-menace')=translations['vow-menace']
       input(type='checkbox' class='hide menace-show' name=`attr_vow${number}_menace-show`)
       .menace-row.showhide
         each index in menaceTrack
@@ -30,24 +40,28 @@ mixin vowLegacy(number)
           input(type="radio" class="hide" name=`attr_vow${number}_rank` value=index checked)
         else
           input(type="radio" class="hide" name=`attr_vow${number}_rank` value=index)
-        h5=difficulty.text
+        - var translation = `difficulty-${difficulty.text}`
+        h5(data-i18n=translation)=translations[translation]
 
   div.vow
     div
-      label.btn MARK
+      label.btn
         input(class="mark-vow hide" type="checkbox" name=`attr_mark_progress_${number}`)
-      label.btn CLEAR
+        div.btn-div(data-i18n='vow-mark')=translations['vow-mark']
+      label.btn
         input(class="clear-vow hide" type="checkbox" name=`attr_clear_progress_${number}`)
+        div.btn-div(data-i18n='clear-btn')=translations['clear-btn']
       each index in track
         select(name=`attr_vow${number}-${index}` class="progress-input")
           +progressBox
-      label.btn FULFILL 
+      label.btn
         button(
           type="roll"
           class='hide'
           name="rollVow"
           value=`&{template:ironsworn_progress} {{progress_type=Vow}} {{header=@{character_name} <em>Fulfill Your Vow</em> }} {{progress_name=@{vow${number}_name}}} {{progress=[[@{vow${number}-filled}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}`
-        )               
+        )
+        div.btn-div(data-i18n='vow-fulfill')=translations['vow-fulfill']
       input(
         type="text"
         class="hide"
@@ -57,14 +71,14 @@ mixin vowLegacy(number)
       )
 
 mixin repeatingVow()
-  input(type="text" class="vow-name" name="attr_vow_name")
+  +input("vow-name", 'attr_vow_name')
 
   .threat-container
     .threat-header
-      input(type="text" class="threat-name" placeholder='Threat' name=`attr_threat-name`)
+      +input("vow-threat", 'attr_threat-name')
       label.menace-show
         input(type='checkbox' class='hide menace-show-button' name=`attr_menace-show-button` checked)
-        .menace-show-back MENACE
+        .menace-show-back(data-i18n='vow-menace')=translations['vow-menace']
     input(type='checkbox' class='hide menace-show' name=`attr_menace-show` checked)
     .menace-row.showhide
       each index in menaceTrack
@@ -79,24 +93,28 @@ mixin repeatingVow()
           input(type="radio" class="hide" name="attr_rank" value=index checked)
         else
           input(type="radio" class="hide" name="attr_rank" value=index)
-        h5=difficulty.text
+        - var translation = `difficulty-${difficulty.text}`
+        h5(data-i18n=translation)=translations[translation]
 
   div.vow
     div
-      label.btn MARK
+      label.btn
         input(class="mark-vow hide" type="checkbox" name="attr_mark_progress")
-      label.btn CLEAR
+        div.btn-div(data-i18n='vow-mark')=translations['vow-mark']
+      label.btn
         input(class="clear-vow hide" type="checkbox" name="attr_clear_progress")
+        div.btn-div(data-i18n='clear-btn')=translations['clear-btn']
       each index in track
         select(name=`attr_progress_${index}` class="progress-input")
           +progressBox
-      label.btn FULFILL 
+      label.btn
         button(
           type="roll"
           class='hide'
           name="rollVow"
           value="&{template:ironsworn_progress} {{progress_type=Vow}} {{header=@{character_name} <em>Fulfill Your Vow</em> }} {{progress_name=@{vow_name}}} {{progress=[[@{vow-filled}]]}} {{challenge1=[[d10]]}} {{challenge2=[[d10]]}}"
-        )               
+        )
+        div.btn-div(data-i18n='vow-fulfill')=translations['vow-fulfill']     
       input(
         type="text"
         class="hide"
