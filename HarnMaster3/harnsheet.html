@@ -1861,11 +1861,26 @@ function migrateTo20210801 (migrationChain) {
 	/* TODO: optimize code, we're getting and setting attributes twice */
     console.log("migrateTo20210801 invoked");
 	/* move character name from old "name"  attribute to character_name (roll20 best practice) */
-    getAttrs(['sheetversion', 'character_name', 'name' ], 
+    getAttrs(['sheetversion', 'character_name', 'name', 'condition_ml', 'combat_endurance', 'hrcondition4endurance' ], 
 	function(values) {
+		/* align storage of character name with roll20 recommendations */
 		var charname = values['name'];
-		console.log("Character name", charname);		
+		console.log("Character name", charname);
+		/* calculate effectivecondition for migrated characters */
+        var conditionml = parseInt(values['condition_ml']);
+        var endurancevalue = parseInt(values['combat_endurance'])||0;
+		var condasendvalue = Math.round(conditionml / 5)||endurancevalue; /* if there is no condition, set this to be equal to endurance */
+		var conditionlimit = Math.round(endurancevalue*1.4)||0;
+        var effectivecondition = Math.min(condasendvalue,conditionlimit)||0;
+		if(values.hrcondition4endurance == 2) { 
+			var healeffcondition = effectivecondition;
+		} else {
+			var healeffcondition = endurancevalue;
+		}
+		console.log("effective condition", effectivecondition, "healing condition", healeffcondition , "condition ml", conditionml, "condition limit" , conditionlimit);		
 		setAttrs({
+		    'combat_effectivecondition': effectivecondition,
+			'healing_effectivecondition': healeffcondition,
 			'character_name': charname,
 			'name': 0 /* clear the old name so we don't keep resetting back the version */
 			});
@@ -1973,9 +1988,9 @@ on('change:condition_ml change:combat_endurance change:hrcondition4endurance',
 function() {
     getAttrs(['condition_ml', 'combat_endurance', 'hrcondition4endurance'], 
 	function(values) {
-        var conditionml = parseInt(values['condition_ml'])||0;
-		var condasendvalue = Math.round(conditionml / 5)||0;
+        var conditionml = parseInt(values['condition_ml']); /*note: we don't want to set this to 0 if condition is not filled in, this leads to errors later */
         var endurancevalue = parseInt(values['combat_endurance'])||0;
+		var condasendvalue = Math.round(conditionml / 5)||endurancevalue; /* if there is no condition, set this to be equal to endurance */
 		var conditionlimit = Math.round(endurancevalue*1.4)||0;
         var effectivecondition = Math.min(condasendvalue,conditionlimit)||0;
 		if(values.hrcondition4endurance == 2) { 
