@@ -34,6 +34,44 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+## 06.06.2021 
+       Added translation tags for buff spells and hit point labels
+       Fixed issues with a number of translation tags.
+
+## 31.05.2021
+	Changes to sheet so that layout does not break when legacy sheet toggle is switched off
+	
+	HTML datalists added to provide a dropdown for weapons. Note that datalist do not behave as comboboxes the list limited based on the content of the input.
+	
+	Fixed. Hit Locations table 1-4 should be the right leg but is the left, 5-8 should be the left leg but is the right
+	
+	Fixed Improvement rolls which roll exactly the threshold to increase. 
+	
+	Removed yellow box around roll results for improvement rolls
+	
+	The skill value for a weapon skill name that does not exist or is spelt incorrectly will be set to 0
+	
+	Added ability to translate rune affinity labels
+	
+	Fixed wrapping of attribute text labels on Firefox
+	
+	Fixed issues with buff spells
+	
+	Fixed fumble breakpoints for Honor, Passions and Spirit Combat
+	
+	Added Ritual to spell duration for Spirit Magic.
+	
+	Fixed 2nd Button under Spirit Magic to behave correctly.
+	
+	Added Cast label to clarify buttons under Spirit Magic.
+	
+	Fixed criticals < 10%
+	
+	Added input for bonuses to spirit combat damage
+	
+	Changed critical crush  damage from full weapon damage + max damage bonus + rolled damage bonus to weapon damage + max damage bonus + max damage bonus
+	
+
 
 ## 14.12.2019
 	Mobility and Coordination now reducing SR for Melee Weapons
@@ -162,4 +200,3 @@ Fixed crush damage on special
 Removed border highlighting on damage
 
 Fixed some of the fumble calculations (characteristc rolls and weapons).
-

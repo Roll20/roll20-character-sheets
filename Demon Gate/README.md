@@ -1,1 +1,1 @@
-This is a roll20 character sheet for Demon Gate by Arcanum Syndicate.
+Roll20 character sheet for Demon Gate by [Arcanum Syndicate](http://arcanumsyndicate.com/demon-gate).
