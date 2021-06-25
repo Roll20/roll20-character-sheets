@@ -431,7 +431,7 @@
     			<label for=injurylvl>Injury Lvls</label>
     			  <input id=injurylvl type="number" name="attr_injury_total" value="0" class="skill-value" readonly>
     			<label for=fatigue>Fatigue</label>
-    			  <input id=fatigue type="number" name="attr_fatigue_total" class="skill-value">
+    			  <input id=fatigue type="number" name="attr_fatigue_total" value="0" class="skill-value">
     			<label for=universalpenalty class="sumrow">Universal</label>
     			  <input id=universalpenalty type="number" name="attr_universal_penalty" class="skill-value sumrow" readonly>
     			<label for=encumbrance>Encumb.</label>
@@ -1920,7 +1920,6 @@ function migrateTo20210801 (migrationChain) {
 
 on('change:repeating_weapon remove:repeating_weapon', function() {
 	repeatingSum('load_weapons_total', 'weapon',['weapon_wgt','weapon_iscarried']);
-
 }); 
 
 <!-- armor load totals /-->
@@ -2047,7 +2046,13 @@ function() {
         var hadjustedloadtemp = Math.round(total-hllimit);
 		var hadjustedload = Math.max(0, hadjustedloadtemp);
 		var hcomend = parseInt(values['hcombat_endurance'])||0;			
-        var hencumbrance = Math.round(hadjustedload/hcomend)||0;
+        if ( hcomend != 0 ) {
+			var hencumbrance = Math.round(hadjustedload/hcomend)||0;
+		} else {
+			var hencumbrance = 0;
+			console.log("Horse endurance not known, setting encumbrance to 0");
+		}
+			
 		var riderweight = parseFloat(values['weight'])||0;
 		var riderload = riderweight + parseFloat(values['load_total'])||0.0;
         setAttrs({
