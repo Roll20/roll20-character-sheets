@@ -1539,6 +1539,7 @@
 			<ul>
 				<li>Added option to enter the impact and renamed P (pierce) to IMP (impact) for missiles</li>
 				<li>Renamed "Carried" to "Equipped" , except for general equipment which is more likely to be carried than actually equipped</li>
+				<li>Updated calculations for combat stats: If the user chooses not to show the horse information on the sheet, horse statistics are not taken into account for combat stats (such as horse move speed for move, and horse initiative influencing initiative). The basic effect of reducing universal penalty and encumbrance is still calculated.</li>
 			</ul>
 		</details>
 		<h3>20210801 - Version 2</h3>
@@ -1585,8 +1586,7 @@
 </div>
 
 <!-- ROLL TEMPLATES -->
-
-<!--
+<!-- based on Jakob's better default Rolltemplate; adjusted to include reporting success and failure and infection feedback, plus many other tweaks for Harn.
 props:
 * character_name: Name of chaaracter performing action.
 * rolldesc: Text describing roll in header.
@@ -1599,10 +1599,8 @@ props:
 * infected:  sepcial row just for infected wounds, value either 0 or on or not present.
 * nocrit: optional property for rolls that cannot crit. If left out the roll reports crits on -0 and -5 rolls, if set to any value the roll will only report success or failure, no crits
 * skilldevrol. optional property for rolls that cannot crit. If left out rolls lower than target are succesful, if set to any value any rolls higher than the target are succesful.
-
 /-->
 
-<!-- based on Jakob's better default Rolltemplate; adjusted to include reporting success and failure and infection feedback, plus many other tweaks for Harn. -->
 <rolltemplate class="sheet-rolltemplate-custom">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
@@ -1692,11 +1690,8 @@ props:
 </rolltemplate>
 
 <!-- SHEETWORKERS -->
-
 <script type="text/worker">
-
 <!-- reusable repeatingsum code from https://wiki.roll20.net/repeatingsum --> 
-
 const repeatingSum = (destinations, section, fields, ...extras) => {
     const isNumber = value => parseFloat(value).toString() === value.toString();
     const isOption = value => [...checks.valid, ...checks.roundtypes].includes(value);
@@ -1780,12 +1775,9 @@ Relevant character sheet versions
 * 20210801: "version 2" of the sheet, complete rework of original HarnMaster3 sheet by https://app.roll20.net/users/72360/optionalrule ; see readme.md for info.
 */
 
-
-
 function migrationCheck() {
     getAttrs(["character_sheet_version", "data_version" , "name"], function(v) {
         
-
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
 		let oldName = v["name"]||0;
@@ -1868,7 +1860,6 @@ var versionsWithMigrations = [
 ## From version 20171014 to 20210801
 * Charactername now stored according to best practice recommendations roll20. Weapon AML and DML needs to be re-calculated
 */
-
 function migrateTo20210801 (migrationChain) {
 	/* TODO: optimize code, we're getting and setting attributes twice */
     console.log("migrateTo20210801 invoked");
@@ -1929,41 +1920,35 @@ function migrateTo20210801 (migrationChain) {
 
 
 <!-- weapon load totals /-->
-
 on('change:repeating_weapon remove:repeating_weapon', function() {
 	repeatingSum('load_weapons_total', 'weapon',['weapon_wgt','weapon_iscarried']);
 }); 
 
 <!-- armor load totals /-->
-
 on('change:repeating_armoritems remove:repeating_armoritems', function() {
 	repeatingSum('load_armor_total', 'armoritems',['armor_wgt','armor_iscarried']);
 
 }); 
 
 <!-- horse armor load totals /-->
-
 on('change:repeating_harmoritems remove:repeating_harmoritems', function() {
 	repeatingSum('hload_armor_total', 'harmoritems', 'harmor_wgt');
 
 }); 
 
 <!-- item load totals /-->
-
 on('change:repeating_inventoryitems remove:repeating_inventoryitems', function() {
 	repeatingSum('load_inventory_total', 'inventoryitems', ['inventory_wgt','inventory_iscarried']);
 
 }); 
 
 <!-- horse item load totals /-->
-
 on('change:repeating_hinventoryitems remove:repeating_hinventoryitems', function() {
 	repeatingSum('hload_inventory_total', 'hinventoryitems', 'hinventory_wgt');
 
 }); 
 
 <!-- endurance /-->
-
 on('change:str change:sta change:wil', 
 function() {
     getAttrs(['str', 'sta', 'wil'], 
@@ -1994,7 +1979,6 @@ function() {
 });
 	
 <!-- condition/5 for use in load, shock and healing rolls (depending on rules settings); see Skills 9 of HarnMaster rulebook  /-->
-
 on('change:condition_ml change:combat_endurance change:hrcondition4endurance', 
 function() {
     getAttrs(['condition_ml', 'combat_endurance', 'hrcondition4endurance'], 
@@ -2020,7 +2004,6 @@ function() {
 
 
 <!-- load and encumbrance /-->
-
 on('change:load_weapons_total change:load_armor_total change:load_inventory_total change:combat_effectivecondition change:combat_endurance change:is_mounted', function() {
     var total = 0.0;
     getAttrs(['load_armor_total', 'load_weapons_total', 'load_inventory_total', 'combat_effectivecondition','combat_endurance' ,'is_mounted', 'hrcondition4endurance'], function(values) {
@@ -2045,7 +2028,6 @@ on('change:load_weapons_total change:load_armor_total change:load_inventory_tota
 });
 
 <!-- horse load limit, load and encumbrance /-->
-
 on('change:hstr change:weight change:load_total change:hload_armor_total change:hload_inventory_total', 
 function() {
     var total = 0.0;
@@ -2080,21 +2062,18 @@ function() {
 });
 
 <!-- injury totals /-->
-
 on('change:repeating_injury:injury_level remove:repeating_injury', function() {
 	repeatingSum('injury_total', 'injury', 'injury_level');
 
 });
 
 <!-- horse injury totals /-->
-
 on('change:repeating_hinjury:hinjury_level remove:repeating_hinjury', function() {
 	repeatingSum('hinjury_total', 'hinjury', 'hinjury_level');
 
 });
 
 <!-- injury infected feedback /-->
-
 on('change:repeating_injury:injury_infected', function() {
    getAttrs([
       'repeating_injury_injury_infected',
@@ -2108,7 +2087,6 @@ on('change:repeating_injury:injury_infected', function() {
 });
 
 <!-- horse injury infected feedback /-->
-
 on('change:repeating_hinjury:hinjury_infected', function() {
    getAttrs([
       'repeating_injury_hinjury_infected',
@@ -2122,7 +2100,6 @@ on('change:repeating_hinjury:hinjury_infected', function() {
 });
 
 <!-- universal and physical penalties /-->
-
 on('change:is_mounted change:injury_total change:fatigue_total change:encumbrance change:hrfumblestumblepenalty', function() {
     getAttrs(['hrfumblestumblepenalty', 'injury_total', 'fatigue_total', 'encumbrance', 'is_mounted'], function(values) {
         var inj = parseInt(values.injury_total)||0;
@@ -2142,7 +2119,6 @@ on('change:is_mounted change:injury_total change:fatigue_total change:encumbranc
 });
 
 <!-- horse universal and physical penalties  /-->
-
 on('change:hinjury_total change:hfatigue_total change:hencumbrance', function() {
     getAttrs(['hinjury_total', 'hfatigue_total'], function(values) {
         var hfat = parseInt(values.hfatigue_total)||0;
@@ -2158,13 +2134,12 @@ on('change:hinjury_total change:hfatigue_total change:hencumbrance', function() 
 });
 
 <!-- Move speed in combat /-->
-	
 on('change:encumbrance change:universal_penalty change:agl change:is_mounted change:hcombat_move', function() {
-    getAttrs(['agl', 'universal_penalty', 'encumbrance', 'is_mounted', 'hcombat_move'], function(values) {
+    getAttrs(['agl', 'universal_penalty', 'encumbrance', 'is_mounted', 'hcombat_move', 'hrhorseonsheet'], function(values) {
         var cmove = parseInt(values.agl) - parseInt(values.universal_penalty) - parseInt(values.encumbrance);
 		var currenthcmove = parseInt(values.hcombat_move);
 		cmove = Math.max(cmove, 1); <!-- move is never less than 1 -->
-		if (values.is_mounted == 1) { cmove = currenthcmove }; <!-- use horse move when mounted --> 
+		if (values.is_mounted == 1 && values.hrhorseonsheet != 0) { cmove = currenthcmove }; <!-- use horse move when mounted, don't do this if horse is not shown on sheet (horse speed would be 0) --> 
 		console.log("combat move", cmove, "horse move", currenthcmove, "mounted?" , values.is_mounted);
 		setAttrs({
             'combat_move': cmove
@@ -2174,7 +2149,6 @@ on('change:encumbrance change:universal_penalty change:agl change:is_mounted cha
 
 
 <!-- effective riding skill on horse /-->
-
 on('change:ridingpersonal_ml change:hinitiative_ml change:hencumbrance change:huniversal_penalty change:encumbrance change:universal_penalty ', 
 function() {
     getAttrs(['ridingpersonal_ml', 'hinitiative_ml', 'hencumbrance', 'huniversal_penalty', 'encumbrance', 'universal_penalty'], 
@@ -2197,16 +2171,15 @@ function() {
 });
 
 <!-- combat initiative toggle between on and off horse /-->
-
 on('change:is_mounted change:ridinghorse_ml change:initiative_ml change:encumbrance change:universal_penalty', 
 function() {
-    getAttrs(['initiative_ml', 'ridinghorse_ml', 'is_mounted', 'combat_initiative', 'encumbrance', 'universal_penalty'], 
+    getAttrs(['initiative_ml', 'ridinghorse_ml', 'is_mounted', 'combat_initiative', 'encumbrance', 'universal_penalty', 'hrhorseonsheet'], 
 	function(values) {
 		var cinit = parseInt(values['initiative_ml'])||0;
 		var physpen = parseInt(values['encumbrance'])||0;
 		physpen += parseInt(values['universal_penalty'])||0;
 		cinit = Math.round(cinit - physpen*5);
-		if(values.is_mounted != 0) { cinit = parseInt(values['ridinghorse_ml'])};
+		if(values.is_mounted != 0 && values.hrhorseonsheet != 0) { cinit = parseInt(values['ridinghorse_ml'])}; <!-- note: don't use horse ml if horse is not shown on sheet -->
 		setAttrs({
 			'combat_initiative': cinit
 		});
@@ -2228,7 +2201,6 @@ function() {
 });
 
 <!-- Horse Move speed in combat /-->
-
 on('change:horse_speed change:hencumbrance change:huniversal_penalty change:hmove', function() {
     getAttrs(['hmove', 'huniversal_penalty', 'hencumbrance', 'horse_speed'], function(values) {
         var hcmove = parseInt(values.hmove) - parseInt(values.huniversal_penalty) - parseInt(values.hencumbrance);
@@ -2242,7 +2214,6 @@ on('change:horse_speed change:hencumbrance change:huniversal_penalty change:hmov
 });
 
 <!-- horse turning /-->
-
 on('change:horse_speed', function() {
      getAttrs(['horse_speed'], function(values) {
 		var maxturn = 0;
@@ -2258,7 +2229,6 @@ on('change:horse_speed', function() {
 <!-- WEAPON CALCULATIONS -->
 
 <!-- Weapon AML and DML calculations -->
-
 on('change:repeating_weapon', function() {
     getAttrs(['repeating_weapon_weapon_ml', 'repeating_weapon_weapon_atk', 'repeating_weapon_weapon_def'], function(values) {
 		var wml = parseInt(values.repeating_weapon_weapon_ml);
@@ -2275,7 +2245,6 @@ on('change:repeating_weapon', function() {
 });
 
 <!-- Missile Weapon AML and DML calculations -->
-
 on('change:repeating_missileweapon', function() {
     getAttrs(['repeating_missileweapon_missileweapon_ml', 'repeating_missileweapon_missileweapon_p'], function(values) {
 		var mml = parseInt(values.repeating_missileweapon_missileweapon_ml);
@@ -2304,7 +2273,6 @@ on('change:repeating_missileweapon', function() {
 });
 
 <!-- Unarmed AML and DML calculations -->
-
 on('change:unarmed_ml', function() {
     getAttrs(['unarmed_ml', 'punch_weapon_atk', 'kick_weapon_atk', 'punch_weapon_def', 'kick_weapon_def'], function(values) {
 		var uml = parseInt(values.unarmed_ml);
@@ -2372,7 +2340,6 @@ locations.forEach(function (location) {
 
 
 <!-- AP totals per location , could be more elegant with loop, but complicated due to skull vs sk naming . Clean up when everyone has updated their char sheets with armor on inventory tab ; update 21-06-2021: renamed attributes, old info in previous attributes kept around for legacy sheets on inventory tab./-->
-
 on('change:repeating_armoritems remove:repeating_armoritems', function() {
 	repeatingSum('sk_b', 'armoritems',['armor_sk_bvalue', 'armor_loc_sk','armor_iscarried']);
 	repeatingSum('sk_e', 'armoritems',['armor_sk_evalue', 'armor_loc_sk','armor_iscarried']);
@@ -2438,9 +2405,9 @@ on('change:repeating_armoritems remove:repeating_armoritems', function() {
 	repeatingSum('ft_e', 'armoritems',['armor_ft_evalue', 'armor_loc_ft','armor_iscarried']);
 	repeatingSum('ft_p', 'armoritems',['armor_ft_pvalue', 'armor_loc_ft','armor_iscarried']);
 	repeatingSum('ft_f', 'armoritems',['armor_ft_fvalue', 'armor_loc_ft','armor_iscarried']);
-
 }); 
 
+<!-- miscellaneous -->
 
 on("clicked:hidelegacyarmor", function() {
   setAttrs({'legacyarmorhidden' : 1});
