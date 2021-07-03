@@ -1,6 +1,7 @@
 Change Log
 ==============================================
 **2021-07-05 ** v.37 Chuz (James Culp)
+	NPC->Grunt fixed sprint speed being 0 by default
 	PC Sheet -> Condition Modifiers box - added Natural Healing Physical and Stun buttons.  Currently do not update player's CM.
 **2021-06-21 ** v.36 Chuz (James Culp)
 	PC Sheet Modifiers text boxes in various places in the sheet (Qualities, Augs, Gear, Matrix Devices, Programs, and Echos) now allow the player to add/subtract from attributes on the sheet.  See roll20 forum thread for further details.
