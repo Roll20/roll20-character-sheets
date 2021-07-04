@@ -75,7 +75,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
 June 14th 2021 v1.5 
 
-- Automatic XP Spent calculation has been ingrated to the sheet as a optional feature, activate on the XP or settings tab. This will calculate all XP on the fly when Talents or Advances are entered. Special Xp circumstances like changing career/level or free/starting XP needs to be added manually to the "Other XP" section in the XP tab. 
+- Automatic XP Spent calculation (as per core rule book) has been intergrated to the sheet as a optional feature, activate this in the XP or settings tabs. This will calculate all XP on the fly after Talents or Advances are entered in the sheet. Special Xp circumstances like free/starting XP or changing career/level need to be added manually to the "Other XP" section in the XP tab. XP calculation is capped at 50 skill advances/10 talent levels as descibed in the core rules, advances above this will not count toward the overall spent total. You can not mix Auto & Manual modes at the same time, but you can switch between them at anytime.
 - Made Armor Penalties on Perception and Stealth rolls visible on the Rolltempalte so it clear that they are being applied.
 - Fixed some advanced skill target numbers which were calculating conditions twice.
 
