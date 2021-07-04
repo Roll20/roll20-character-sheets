@@ -73,6 +73,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+June 14th 2021 v1.5 
+
+- Automatic XP Spent calculation has been ingrated to the sheet as a optional feature, activate on the XP or settings tab. This will calculate all XP on the fly when Talents or Advances are entered. Special Xp circumstances like changing career/level or free/starting XP needs to be added manually to the "Other XP" section in the XP tab. 
+- Made Armor Penalties on Perception and Stealth rolls visible on the Rolltempalte so it clear that they are being applied.
+- Fixed some advanced skill target numbers which were calculating conditions twice.
+
 June 14th 2021 v1.41 
 
 - Vastly improved performance of Target value re-calculations due to condition changes, by moving them to the sheet worker. This was particularly bad on Firefox, while MS Edge(Chromium) and Chrome were less impacted but also benefit from the changes. No actual changes in functionality just faster!
