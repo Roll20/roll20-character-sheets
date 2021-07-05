@@ -86,6 +86,18 @@ This character sheet was originally made for **Maschinenleben** (released later 
 </details>
 
 ## Latest Changes
+#### Version 1.2.8
+* Improved container width adaption for Edges/Hindrances
+* Improved container height adaption for Abilities
+* Added container height adaption to Quick Notes
+* Added new Custom Skills to Game Settings
+#### Version 1.2.7
+* Added visibility toggles for Apparel, Quick Notes, and Weapons blocks
+* Added option to rename Apparel and Weapons blocks within the sheet
+* Added option to rename non-default skills within the sheet
+* Added four more custom skills for a total of six
+* Fixed incorrect unskilled modifier in track-rolls on the Extra Sheet
+* Fixed custom button roll templates missing control attributes
 #### Version 1.2.6
 * Improved roll macros
 * Improved dice codes in Roll Templates
@@ -107,21 +119,22 @@ This character sheet was originally made for **Maschinenleben** (released later 
 * Added helper button to toggle global Rate of Fire query
 * Added helper button to toggle global Bonus Wild Die query
 * Fixed critical bug that broke nearly all rolls
-#### Version 1.2.2
-* Added damage (re-)roll buttons to Roll Templates
-* Roll Templates now have hooks for descriptions and three custom fields
-* Added injection hook to list rolls to allow custom code
-* Added setting toggles for list roll descriptions and injections
-* Added [Multiplier] option to Augmentations
-* Added [Wild Die Override] option to Engrams, Powers, and Weapons
-* Added [Roll Description] option to Engrams, Powers, and Weapons
-* Added [Roll Injection] option to Engrams, Powers, and Weapons
-* Added help entries for extra sheet, list item options, and raise damage
-* Updated older help entries and translations
-* Reduced HTML and CSS
 
 <details>
   <summary>Previous Versions</summary>
+
+  #### Version 1.2.2
+  * Added damage (re-)roll buttons to Roll Templates
+  * Roll Templates now have hooks for descriptions and three custom fields
+  * Added injection hook to list rolls to allow custom code
+  * Added setting toggles for list roll descriptions and injections
+  * Added [Multiplier] option to Augmentations
+  * Added [Wild Die Override] option to Engrams, Powers, and Weapons
+  * Added [Roll Description] option to Engrams, Powers, and Weapons
+  * Added [Roll Injection] option to Engrams, Powers, and Weapons
+  * Added help entries for extra sheet, list item options, and raise damage
+  * Updated older help entries and translations
+  * Reduced HTML and CSS
 
   #### Version 1.2.1
   * Improved handling for Rate of Fire

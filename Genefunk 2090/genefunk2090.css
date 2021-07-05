@@ -18,15 +18,15 @@
     --mindImage:url('https://s3.amazonaws.com/files.d20.io/images/152964510/vHPnpSbkF2w17SMFcsg9FQ/max.png');
     --softwareImage:url('https://s3.amazonaws.com/files.d20.io/images/152964505/BaIpocrjOA6ZgdM9j7p3Aw/max.png');
 }
-.sheet-rolltemplate-general{
-
-}
 .sheet-master-display-controller:not([value*='character_type:pc']) ~ .sheet-pc,
 .sheet-master-display-controller:not([value*='character_type:npc']) ~ .sheet-npc,
 .sheet-master-display-controller:not([value*='sheet_view:core']) ~ .sheet-pc > .sheet-core,
 .sheet-master-display-controller:not([value*='sheet_view:hacks']) ~ .sheet-pc > .sheet-hacks,
 .sheet-master-display-controller[value*='sheet_view:settings'] ~ .sheet-npc > .sheet-npc-info .sheet-in-play,
 .sheet-master-display-controller[value*='sheet_view:in-play'] ~ .sheet-npc > .sheet-npc-info .sheet-settings,
+.sheet-master-display-controller:not([value*='import:import']) ~ .sheet-npc > .sheet-npc-info > .sheet-statblock > .sheet-settings > .sheet-import,
+.sheet-master-display-controller[value*='import:import'] ~ .sheet-npc > .sheet-npc-info > .sheet-statblock > .sheet-settings > .sheet-import ~ *,
+.sheet-master-display-controller[value*='import:import'] ~ .sheet-npc > .sheet-npc-info > .sheet-repeating-container,
 .sheet-pc > .sheet-settings,
 .sheet-master-display-controller:not([value*='sheet_view:settings']) ~ .sheet-statblock > .sheet-settings{
     display:none;
@@ -1385,6 +1385,51 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 }
 /*End Settings styling*/
 /*NPC styling*/
+.sheet-ability-row{
+    margin-top:0.5em;
+    margin-bottom:0.5em;
+    display:grid;
+    grid-template-rows:repeat(3,auto);
+    grid-template-columns:repeat(6,1fr);
+    grid-template-areas:
+    "str        dex         con         int         wis         cha"
+    "header     header      header      header      header      header"
+    "str-save   dex-save    con-save    int-save    wis-save    cha-save";
+    grid-gap:1em;
+}
+.sheet-ability-row > :is(h1,h2,h3,h4,h5){
+    grid-area:header;
+    place-self:center;
+}
+.sheet-ability-row > .sheet-input-label-container{
+    margin:0;
+}
+.sheet-ability-row > .sheet-input-label-container > *{
+    justify-self:center;
+}
+.sheet-master-display-controller[value*='import:import-process'] ~ .sheet-npc > .sheet-npc-info .sheet-settings > .sheet-import .sheet-grid-container > .sheet-import:before{
+    background-color:#00ff73;
+}
+.sheet-master-display-controller:not([value*='import:import-process']) ~ .sheet-npc > .sheet-npc-info .sheet-settings > .sheet-import > .sheet-import-area > .sheet-import-confirm{
+    display:none;
+}
+.sheet-import-confirm{
+    place-self:center;
+    text-align:center;
+}
+.sheet-import-cancel:before{
+    background-color:#ff002f;
+}
+.sheet-statblock-section.sheet-import-area{
+    display:grid;
+    grid-gap:1em;
+    --importMin:30em;
+    padding-top:1em;
+}
+.sheet-statblock-section.sheet-import-area > textarea{
+    display:grid;
+    min-height:var(--importMin);
+}
 .sheet-npc-info > div{
     width:calc(513px - 2em);
     margin-right:1em;
@@ -1409,6 +1454,9 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
 .sheet-npc-info .sheet-row > *{
     margin-right:1em;
     margin-bottom:1em;
+}
+.sheet-statblock-section > .sheet-row:first-of-type {
+    margin-top: 0.5em;
 }
 .sheet-statblock-section{
     border-bottom:2px solid black;
@@ -1476,10 +1524,13 @@ label:hover .sheet-checkbox-container > span:not(.sheet-check-label),
     display:block;
 }
 .sheet-statblock-section.sheet-hack-display .repcontainer[data-groupname="repeating_hack"]{
-    display:inline-flex;
+    display:inline;
     flex-wrap:wrap;
 }
-.sheet-statblock-section.sheet-hack-display .repitem:after{
+.sheet-statblock-section.sheet-hack-display .repcontainer[data-groupname="repeating_hack"] .repitem{
+    display:inline;
+}
+.sheet-statblock-section.sheet-hack-display .repitem > button:after{
     content:",";
 }
 .sheet-npc-info .repcontainer[data-groupname="repeating_trait"] .sheet-collapsed-view{

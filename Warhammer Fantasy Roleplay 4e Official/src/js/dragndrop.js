@@ -1,21 +1,23 @@
 
 const wfrpDragAndDrop = ( () => {
 
-    const handleDrop = (values, overwrite = false) => {
+    const handleDrop = (values, name) => {
 
         const {drop_name, drop_content, drop_data} = values;
+
+        const page_name = (name) ? name : drop_name;
 
         if (drop_name === ""|| typeof drop_data === "") return;
     
         let parsed_data = helperFunctions.parseJSON(drop_data);
 
-        if (parsed_data.Category === "Careers") handleCareer(drop_name, parsed_data);
-        else if (parsed_data.Category === "Blessings" || parsed_data.Category === "Spells" || parsed_data.Category === "Miracles" ) handleSpell(drop_name, parsed_data, drop_content);
-        else if (parsed_data.Category === "Items") handleItem(drop_name, parsed_data);
-        else if (parsed_data.Category === "Monsters") handleMonster(drop_name, parsed_data, drop_content);
-        else if (parsed_data.Category === "Talents") handleTalent(drop_name, parsed_data);
-        else if (parsed_data.Category === "Conditions") handleCondition(drop_name, parsed_data);
-        else if (parsed_data.Category === "Creature Traits") handleCreatureTrait(drop_name, parsed_data);
+        if (parsed_data.Category === "Careers") handleCareer(page_name, parsed_data);
+        else if (parsed_data.Category === "Blessings" || parsed_data.Category === "Spells" || parsed_data.Category === "Miracles" ) handleSpell(page_name, parsed_data, drop_content);
+        else if (parsed_data.Category === "Items") handleItem(page_name, parsed_data);
+        else if (parsed_data.Category === "Monsters") handleMonster(page_name, parsed_data, drop_content);
+        else if (parsed_data.Category === "Talents") handleTalent(page_name, parsed_data);
+        else if (parsed_data.Category === "Conditions") handleCondition(page_name, parsed_data);
+        else if (parsed_data.Category === "Creature Traits") handleCreatureTrait(page_name, parsed_data);
         else console.warn(`${parsed_data.Category} drop is not supported by the sheet`);
 
         setAttrs({drop_name: "", drop_content: "", drop_data: ""});
@@ -177,6 +179,7 @@ const wfrpDragAndDrop = ( () => {
 
         for (const characteristic in characteristics) {
             updateAttrs[characteristic.replace(/ /g,"_")] = characteristics[characteristic];
+            updateAttrs[`${characteristic.replace(/ /g,"_")}_bonus`] = Math.floor(characteristics[characteristic]/10);
         } 
 
         const trait_map = new Map();
@@ -334,7 +337,7 @@ const wfrpDragAndDrop = ( () => {
 
             let name = trait;
             let damage = "";
-            let type = "Melee";
+            let type = "Weapon Skill";
             let range = "Touch";
             let attacks = "1";
 
@@ -343,7 +346,7 @@ const wfrpDragAndDrop = ( () => {
                 if (trait.match(/range/gi) && trait.match(/\(/)) {
                     [trait, range] = trait.split("(");
                     range = range.substr(0,range.length-1);
-                    type = "Ranged";
+                    type = "Ballistic Skill";
                 }
                 
                 if (trait.match(/[0-9]+X/)) {
@@ -458,13 +461,13 @@ const wfrpDragAndDrop = ( () => {
 
             const trait = compendium_pages;
     
-            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue)/gi)) {
+            if (trait.name.match(/(weapon|ranged|tentacle|bite|horn|tail|tongue|claw)/gi)) {
     
                 const attack = parseAttack(name, trait.data.Description);
     
                 updateAttrs = {...updateAttrs, ...attack};
     
-            } else {
+            } else if (trait) {
                 const repeating_id = generateRowID();    
                 const row = `repeating_traits_${repeating_id}`;
     

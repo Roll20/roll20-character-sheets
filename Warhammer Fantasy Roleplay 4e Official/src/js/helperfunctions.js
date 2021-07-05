@@ -1,3 +1,5 @@
+
+
 const helperFunctions = (() => {
 
     const extractRepeatingId = (attribute, section) => {
