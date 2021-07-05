@@ -1678,7 +1678,7 @@ var genefunk2090 = genefunk2090 || (function() {
 				setObj[`repeating_action_${rowID}_damage_1`] = damageRoll;
 				setObj[`repeating_action_${rowID}_damage_type_1`] = damageType||'';
 				setObj[`repeating_action_${rowID}_damage_1_enable_item`] = '{{damage_type_1=@{damage_type_1}}} @{damage_1_macro}';
-
+				setObj[`repeating_action_${rowID}_damage_1_macro`] = `{{damage_${num}=[[0@{damage_${num}}]]}} {{regular_critical_${num}=[[0@{damage_${num}}]]}} {{is_custom_crit_${num}=@{critical_damage_${num}}}} {{custom_critical_${num}=[[0@{critical_damage_${num}}]]}}`;
 			}
 			if(description){
 				setObj[`repeating_action_${rowID}_description`] = description||'';
