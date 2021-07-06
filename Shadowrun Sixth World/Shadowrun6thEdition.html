@@ -3068,18 +3068,37 @@
 	</div>
 
 
+
+
+
 	<div class="rolls pc-col">
 		<div class="pc-row">
 			<div class="header right-header">
 				<h1 data-i18n="rolls">Rolls</h1>
 				<div class="right-tri"></div>
 			</div>
+			<br>
+			<div class="header right-header">
+			  <div class="header htab">
+				 <div class="triangle"></div>
+				 <input class="tab-switch" name="attr_rolls_toggle" type="radio" value="matrix" checked="checked"/>
+				 <h1 data-i18n="matrixactions">Matrix Actions</h1>
+				 <div class="right-tri"></div>
+			  </div>
+			  <div class="header htab">
+				 <div class="triangle"></div>
+				 <input class="tab-switch" name="attr_rolls_toggle" type="radio" value="misc"/>
+				 <h1 data-i18n="misc">Misc</h1>
+				 <div class="right-tri"></div>
+			  </div>
+			</div>
+
 			<div class="border-box">
 				<div class="pc-box">
 					<div class="rolls-col">
+			         <input class="tab-switch" name="attr_rolls_toggle" type="hidden" value="matrix"/>
 						<div class="rolls-matrix">
-							<h1 data-i18n="matrixactions">Matrix Actions</h1>
-							<h3 data-i18n="rollbuttonsdisclaimer"></h3>
+							<h3 data-i18n="rollbuttonsdisclaimer"></h3><br>
 							<h2 data-i18n="matrixmajor">Matrix Major Actions</h2>
 							<button type="roll" title="Cracking + Logic" class="illegal outsider" name="roll_matrix_backdoor_entry" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Backdoor Entry}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), vs. Willpower + Firewall}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="backdoorentry"></span></button>
 							<button type="roll" title="Cracking + Logic" class="illegal outsider user admin" name="roll_matrix_brute_force" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=Matrix Brute Force}}{{?{Specialization or Expertise?|No,0|Specialized,2|Expertise,3}}}{{dice=[[(@{cracking}+@{logic}+?{Specialization or Expertise?|0}+@{modifiers_toggle}+@{wounds_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=(Illegal), vs. Willpower + Firewall}}{{wilddie=[[@{wild_die}d6]]}}"><span data-i18n="bruteforce"></span></button>
@@ -3116,6 +3135,20 @@
 							<span class="matrix-action legal admin" data-i18n="reconfigurematrixattribute"></span>
 							<span class="matrix-action legal outsider user admin" data-i18n="sendmessage"></span>
 							<span class="matrix-action legal admin" data-i18n="switchinterfacemode"></span>
+						</div>
+
+			         <input class="tab-switch" name="attr_rolls_toggle" type="hidden" value="misc"/>
+						<div class="rolls-misc">
+							<h2 data-i18n="convert">Convert</h2>
+							<span>&nbsp;</span>
+							<input type=number name="attr_measurement1" value="">
+							<select name="attr_conversion">
+								<option data-i18n="lb-kg" value="lb-kg">lb <=> kg</option>
+								<option data-i18n="ft-m" value="ft-m">ft <=> m</option>
+								<option data-i18n="mi-km" value="mi-km">mi <=> km</option>
+							</select>
+							<input type=number name="attr_measurement2" value="">
+							<span>&nbsp;</span>
 						</div>
 					</div>
 				</div>
@@ -5427,17 +5460,17 @@ var modify_value = (params) => {
 
 
 
-on("clicked:shots_remove clicked:shots_add", (eventinfo) => {
+on("clicked:shots_remove clicked:shots_add", (eventInfo) => {
 	getAttrs([`shots_fired`], (v) => {
 		let shots = parseInt(v[`shots_fired`]) || 0;
-		const trigger = eventinfo.triggerName;
+		const trigger = eventInfo.triggerName;
 		setAttrs({
 			shots_fired: (shots > 0 && trigger.includes("remove")) ? shots -= 1 : trigger.includes("add") ? shots += 1 : shots
 		});
 	});
 });
 
-on("clicked:primary_ammo", (eventinfo) => {
+on("clicked:primary_ammo", (eventInfo) => {
 	getAttrs([`primary_range_weapon_ammo`, `shots_fired`], (v) => {
 		let ammo  = parseInt(v[`primary_range_weapon_ammo`]) || 0;
 		const shots = parseInt(v[`shots_fired`]) || 0;
@@ -5447,8 +5480,8 @@ on("clicked:primary_ammo", (eventinfo) => {
 	});
 });
 
-on("change:primary_range_weapon_mode", (eventinfo) => {
-	var mode = eventinfo.newValue;
+on("change:primary_range_weapon_mode", (eventInfo) => {
+	var mode = eventInfo.newValue;
 	var rounds = 1;
 
 	getAttrs(['primary_range_weapon_base_damage', 'primary_range_weapon_base_close', 'primary_range_weapon_base_near', 'primary_range_weapon_base_medium', 'primary_range_weapon_base_far', 'primary_range_weapon_base_extreme'], (v) => {
@@ -5532,7 +5565,7 @@ var adjAttrs = (p) => {
 }
 
 
-on("clicked:reload", (eventinfo) => {
+on("clicked:reload", (eventInfo) => {
 	getAttrs([`primary_range_weapon_ammo_max`], (v) => {
 		const reload  = parseInt(v[`primary_range_weapon_ammo_max`]) || 0;
 		setAttrs({
@@ -5542,19 +5575,19 @@ on("clicked:reload", (eventinfo) => {
 });
 
 ["active", "knowledge", "language"].forEach((attr) => {
-	on(`clicked:repeating_${attr}:skill`, (eventinfo) => {
-		settingsToggle(eventinfo);
+	on(`clicked:repeating_${attr}:skill`, (eventInfo) => {
+		settingsToggle(eventInfo);
 	});
 });
 
 ["quality", "martial", "items", "range", "melee", "armor", "spell", "preps", "ritual", "powers", "forms", "vehicle", "augementations", "lifestyle", "contacts", "programs"].forEach((attr) => {
-	on(`clicked:repeating_${attr}:${attr}`, (eventinfo) => {
-		settingsToggle(eventinfo);
+	on(`clicked:repeating_${attr}:${attr}`, (eventInfo) => {
+		settingsToggle(eventInfo);
 	});
 });
 
-const settingsToggle = (eventinfo) => {
-	const split = eventinfo.sourceAttribute.split("_");
+const settingsToggle = (eventInfo) => {
+	const split = eventInfo.sourceAttribute.split("_");
 	const source = `${split[0]}_${split[1]}_${split[2]}`;
 	getAttrs([`${source}_flag`], (v) => {
 		setAttrs({
@@ -5570,8 +5603,8 @@ const settingsToggle = (eventinfo) => {
 });
 
 
-on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
-	const source = eventinfo.sourceAttribute;
+on("change:body change:strength change:lift_carry_modifier", (eventInfo) => {
+	const source = eventInfo.sourceAttribute;
 	update_common_rolls(["body", "willpower", "lift_carry_modifier"]);
 
 	//ONLY RUN ON BODY CHANGE
@@ -5582,12 +5615,12 @@ on("change:body change:strength change:lift_carry_modifier", (eventinfo) => {
 	};
 });
 
-on("change:overflow_modifier", (eventinfo) => {
+on("change:overflow_modifier", (eventInfo) => {
 	update_common_rolls(["body", "body", "overflow_modifier"]);
 });
 
-on("change:reaction change:intuition", (eventinfo) => {
-	const source = eventinfo.sourceAttribute;
+on("change:reaction change:intuition", (eventInfo) => {
+	const source = eventInfo.sourceAttribute;
 	update_common_rolls(["reaction", "intuition", "defense_modifier", "defense_temp", `defense_temp_flag`]);
 	update_initiative();
 
@@ -5601,18 +5634,18 @@ on("change:willpower", () => {
 	update_track("stun");
 });
 
-on("change:logic change:memory_modifier", (eventinfo) => {
-	const source = eventinfo.sourceAttribute;
+on("change:logic change:memory_modifier", (eventInfo) => {
+	const source = eventInfo.sourceAttribute;
 	update_common_rolls(["logic", "intuition", "memory_modifier"]);
 });
 
-on("change:intuition change:memory_modifier", (eventinfo) => {
-	const source = eventinfo.sourceAttribute;
+on("change:intuition change:memory_modifier", (eventInfo) => {
+	const source = eventInfo.sourceAttribute;
 	update_common_rolls(["logic", "intuition", "memory_modifier"]);
 });
 
-on("change:charisma change:composure_modifier change:judge_intentions_modifier", (eventinfo) => {
-	const source = eventinfo.sourceAttribute;
+on("change:charisma change:composure_modifier change:judge_intentions_modifier", (eventInfo) => {
+	const source = eventInfo.sourceAttribute;
 	//CHARISMA & COMPOSURE UPDATE COMPOSURE
 	(source.includes("charisma") || source.includes("composure")) ? update_common_rolls(["charisma", "willpower", "composure_modifier"]) : false;
 	//CHARISMA & JUDGE INTENTIONS UPDATE JUDGE INTENTIONS
@@ -5658,11 +5691,11 @@ on("change:pain_tolerance", () => {
 
 
 // Update the name of the attribute used when rolling Unskilled Skill Use
-on("change:default_attribute", (eventinfo) => {
+on("change:default_attribute", (eventInfo) => {
 	getAttrs(['default_attribute'], (v) => {
 		var new_attr;
-		if(eventinfo.newValue) {
-			new_attr = eventinfo.newValue;
+		if(eventInfo.newValue) {
+			new_attr = eventInfo.newValue;
 		} else {
 			new_attr = v.default_attribute;
 		}
@@ -5749,7 +5782,7 @@ on("change:essence_mod remove:repeating_augmentations change:repeating_augmentat
 
 
 // Catch changes to magic, tradition, logic or charisma to update magic AR
-on("change:magic change:tradition change:logic change: charisma", (eventinfo) => {
+on("change:magic change:tradition change:logic change: charisma", (eventInfo) => {
 	getAttrs(["magic", "tradition", "logic", "intuition", "charisma"], (v) => {
 		var magic_ar = v.magic;
 
@@ -5953,7 +5986,7 @@ on("change:matrix_hex", (eventInfo) => {
 
 
 /* Complex Forms Sheetworkers */
-on("change:electronics change:resonance", (eventinfo) => {
+on("change:electronics change:resonance", (eventInfo) => {
 	getAttrs(['electronics', 'resonance'], (v) => {
 		var complex_forms_attack_rating = parseInt(v['electronics']) || 0;
 		complex_forms_attack_rating += parseInt(v['resonance']) || 0;
@@ -6157,9 +6190,9 @@ on("change:device_rating change:matrix_modifier", () => {
 
 //Convert physical into the physical damage track boxes and reverse
 ['physical', 'stun'].forEach(attr => {
-	on(`change:${attr} change:${attr}_damage`, (eventinfo) => {
+	on(`change:${attr} change:${attr}_damage`, (eventInfo) => {
 		getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], (v) => {
-			const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventinfo.sourceAttribute;
+			const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventInfo.sourceAttribute;
 			const wou = (source === `${attr}`) ? max - stat : max - dam;
 
 			if (source === `${attr}`) {
@@ -6196,8 +6229,8 @@ const update_wounds = () => {
 
 // Trigger initiative updates
 ['initiative_mod', 'initiative_dice_mod', 'initiative_temp', 'initiative_temp_flag', 'initiative_dice_temp', 'initiative_dice_temp_flag'].forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
-		if(eventinfo.sourceType == 'player') {
+	on(`change:${attr}`, (eventInfo) => {
+		if(eventInfo.sourceType == 'player') {
 			update_initiative();
 		}
 	});
@@ -6234,7 +6267,7 @@ var update_initiative = () => {
 
 // Trigger astral initiative updates
 ['astral_initiative_mod', 'astral_initiative_dice_mod', 'astral_initiative_temp', 'astral_initiative_temp_flag', 'astral_initiative_dice_temp', 'astral_initiative_dice_temp_flag', 'intuition', 'logic'].forEach(attr => {
-	on(`change:${attr}`, (eventinfo) => {
+	on(`change:${attr}`, (eventInfo) => {
 		update_astral_initiative();
 	});
 });
@@ -6378,8 +6411,8 @@ on("clicked:cond_reset", () => {
 	});
 });
 
-on("clicked:cond_reset_physical clicked:cond_reset_stun", (eventinfo) => {
-	const attr = eventinfo.triggerName.split("_")[2];
+on("clicked:cond_reset_physical clicked:cond_reset_stun", (eventInfo) => {
+	const attr = eventInfo.triggerName.split("_")[2];
 	setAttrs({
 		[`${attr}_damage`] : 0
 	});
@@ -6574,12 +6607,12 @@ on("change:repeating_skills:name", (eventInfo) => {
 
 //REFACTORED Skills
 ['repeating_skills','repeating_active','repeating_knowledge','repeating_language', 'agility', 'logic'].forEach(field => {
-	on(`change:${field}`, (eventinfo) => {
-		const source = eventinfo.sourceAttribute;
-		const type   = eventinfo.sourceType;
+	on(`change:${field}`, (eventInfo) => {
+		const source = eventInfo.sourceAttribute;
+		const type   = eventInfo.sourceType;
 
 		// updating agility was causing this to trigger for "repeating_skills_attribute"
-		if(eventinfo.sourceAttribute == 'repeating_skills_attribute') {
+		if(eventInfo.sourceAttribute == 'repeating_skills_attribute') {
 			return;
 		}
 
@@ -6628,7 +6661,7 @@ on("change:repeating_skills:name", (eventInfo) => {
 				});
 			});
 		} else if (source.includes("logic") || source.includes("agility")) {
-			var diff = eventinfo.newValue - eventinfo.previousValue;
+			var diff = eventInfo.newValue - eventInfo.previousValue;
 
 			// Update repeating range weapon dicepool if it uses this attribute
 			getSectionIDs("range", function(ids) {
@@ -6640,7 +6673,7 @@ on("change:repeating_skills:name", (eventInfo) => {
 						if(v2[`${attr}`].toLowerCase() == source.toLowerCase()) {
 							setAttrs({
 								[`${pool}`]: parseInt(v2[`${pool}`]) + diff,
-								[`${attr_rating}`]: eventinfo.newValue
+								[`${attr_rating}`]: eventInfo.newValue
 							});
 						}
 					});
@@ -6657,7 +6690,7 @@ on("change:repeating_skills:name", (eventInfo) => {
 						if(v2[`${attr}`].toLowerCase() == source.toLowerCase()) {
 							setAttrs({
 								[`${pool}`]: parseInt(v2[`${pool}`]) + diff,
-								[`${attr_rating}`]: eventinfo.newValue
+								[`${attr_rating}`]: eventInfo.newValue
 							});
 						}
 					});
@@ -6910,8 +6943,8 @@ on("change:repeating_contacts", () => {
 
 
 
-on("change:repeating_vehicle", (eventinfo) => {
-	const id = eventinfo.triggerName;
+on("change:repeating_vehicle", (eventInfo) => {
+	const id = eventInfo.triggerName;
 
 	getAttrs([`${id}_handling_onroad`, `${id}_handling_offroad`, `${id}_handling_modifier`, `${id}_acceleration_base`, `${id}_acceleration_modifier`, `${id}_speed_base`, `${id}_speed_modifier`, `${id}_speed_max`, `${id}_armor_base`, `${id}_armor_modifier`, `${id}_body_base`, `${id}_body_modifier`, `${id}_pilot_base`, `${id}_pilot_modifier`, `${id}_sensor_base`, `${id}_sensor_modifier`, `${id}_seats`], (v) => {
 		Object.keys(v).forEach(k => {
@@ -7779,11 +7812,63 @@ var spirit_update = () => {
 };
 
 
+on("change:measurement1 change:measurement2", (eventInfo) => {
+	if(eventInfo.sourceType !== "player") {
+		return;
+	}
+
+	getAttrs(['measurement1', 'measurement2', 'conversion'], (v) => {
+		switch (v.conversion) {
+			case 'lb-kg':
+				if(eventInfo.sourceAttribute === 'measurement1') {
+					var kg = v.measurement1 * .453592;
+					setAttrs({
+						'measurement2': kg.toFixed(2)
+					});
+				} else {
+					var lb = v.measurement2 / .453592;
+					setAttrs({
+						'measurement1': lb.toFixed(2)
+					});
+				}
+				break;
+			case 'ft-m':
+				if(eventInfo.sourceAttribute === 'measurement1') {
+					var ft = v.measurement1 * .3048;
+					setAttrs({
+						'measurement2': ft.toFixed(2)
+					});
+				} else {
+					var m = v.measurement2 / .3048;
+					setAttrs({
+						'measurement1': m.toFixed(2)
+					});
+				}
+				break;
+			case 'mi-km':
+				if(eventInfo.sourceAttribute === 'measurement1') {
+					var mi = v.measurement1 * 1.60934;
+					setAttrs({
+						'measurement2': mi.toFixed(2)
+					});
+				} else {
+					var km = v.measurement2 / 1.60934;
+					setAttrs({
+						'measurement1': km.toFixed(2)
+					});
+				}
+				break;
+			default:
+				break;
+		}
+	});
+});
+
 
 /****************************/
 /* CHARACTERMANCER IMPORTER */
 /****************************/
-on("clicked:import_launch", (eventinfo) => {
+on("clicked:import_launch", (eventInfo) => {
 	startCharactermancer("importer");
 });
 
@@ -7857,9 +7942,9 @@ const herolabDirections = `
 		<li>Follow the directions.</li>
 	</ol>`;
 
-on("change:builder", (eventinfo) => {
+on("change:builder", (eventInfo) => {
 	let setText = {};
-	setText[`directions`] = (eventinfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
+	setText[`directions`] = (eventInfo.newValue === "Chummer") ? chummerDirections : herolabDirections;
 	setCharmancerText(setText);
 });
 
