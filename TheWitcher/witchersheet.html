@@ -154,6 +154,7 @@
         		<div class='sheet-grid-item' style='margin: 10px 0px 0px 15px;'>
                     <label class='sheet-stattitle3' data-i18n="stun-u" >STUN</label>
                     <input name='attr_stun' title='@{stun}' class='sheet-statbox3' type='text' value='floor((@{body}+@{will})/2)+@{stunstatsum}' disabled='true'>
+                    <input name='attr_deathsave' hidden class='sheet-statbox3' type='text' value='floor((@{total_body}+@{total_will})/2)+@{stunstatsum}' disabled='true'>
         			<input type="checkbox" checked name='attr_stun_unlock' class="sheet-stun-unlock"><span></span>
         			    <div class='stunstat-container'>
                 			<fieldset class="repeating_stunstat">
@@ -1211,7 +1212,7 @@
         						<label class='sheet-quick-button-maintitle' data-i18n="quick-roll-button-u" >QUICK ROLL BUTTONS</label><br />
         						<hr style='margin-bottom: 10px; margin-top: 5px;'>
         						<label class='sheet-initiativetitle' data-i18n="initiativ-u" >INITIATIVE</label><button class='sheet-initiative-roll' type='roll' value= '@{whisper}&{template:initiative} {{title=INITIATIVE}} {{name=@{character_name}}} {{roll=[[1d10+@{ref}[STAT]&{tracker}+?{INITIATIVE MOD? (Bonuses/Penalties etc)|0}[MOD]]]}}'></button><br />
-                                <label class='sheet-savetitle' data-i18n="stun-death-save-u" >STUN & DEATH SAVE</label><button class='sheet-save-roll' type='roll' value= '@{whisper}&{template:save} {{title=STUN/DEATH SAVE}} {{name=@{character_name}}} {{description=To succeed you need to roll below [[@{stun}+?{STUN/DEATH SAVE MOD? (Bonuses/Penalties etc)|0}[MOD]]]}} {{roll=[[1d10]]}}'></button><br />
+                                <label class='sheet-savetitle' data-i18n="stun-death-save-u" >STUN & DEATH SAVE</label><button class='sheet-save-roll' type='roll' value= '@{whisper}&{template:save} {{title=STUN/DEATH SAVE}} {{name=@{character_name}}} {{stun=To succeed you need to roll below [[@{stun}+?{STUN/DEATH SAVE MOD? (Bonuses/Penalties etc)|0}[MOD]]]}} {{hp=[[@{hp}]]}} {{death=To succeed on a DEATH save you need to roll below [[@{deathsave}+?{STUN/DEATH SAVE MOD? (Bonuses/Penalties etc)|0}[MOD]]]}} {{roll=[[1d10]]}}'></button><br />
         						<label class='sheet-fumbletitle' data-i18n="fumble-u" >FUMBLE</label><button class='sheet-fumble-roll' type='roll' name="roll_fumble" value= '@{whisper}&{template:fumble} {{title=FUMBLE}} {{name=@{character_name}}} {{roll=[[1d10!+1]]}}'></button><br />
         						<label class='sheet-locationtitle' data-i18n="target-locatio-u" >TARGET LOCATION</label><button class='sheet-target-roll' name="roll_location" type='roll' value= '@{whisper}&{template:target} {{title=TARGET LOCATION}} {{name=@{character_name}}} {{roll=[[1d10]]}}'></button>
         					    <hr style='margin-bottom: 10px; margin-top: 5px;'>
@@ -3449,7 +3450,10 @@ function repeatingSum (destination, section, fieldsum, fieldmult, totalmult){
     <table>
         <tr><th>{{title}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
-        <tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
+        <tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DESCRIPTION: </strong> {{stun}}</td></tr>
+		{{#rollTotal() hp 0}}
+        	<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title">DESCRIPTION: </strong> {{death}}</td></tr>
+		{{/rollTotal() hp 0}}
         <tr><td><strong class="template-title">SAVE ROLL: </strong> {{roll}}</td></tr>
     </table>
 </rolltemplate>
