@@ -5,7 +5,7 @@ $inputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\html\2ESheet-base.h
 $sourceFolder = 'D:\git\roll20-character-sheets\AD&D 2E Revised'
 $outputFile = 'D:\git\roll20-character-sheets\AD&D 2E Revised\2ESheet.html'
 
-$replaceConstant = '#REPLACE#'
+$replaceConstant = '#REPLACE{0}#'
 
 $content = Get-Content -Path $inputFile
 
@@ -25,8 +25,10 @@ $inserts | ForEach-Object {
       }
    }
    $rawContent = $fileContent -join "`n"
-   if ($split.Length -gt 2 -and $rawContent.Contains($replaceConstant)) {
-      $rawContent = $rawContent.Replace($replaceConstant, $split[2])
+   $replaces = $split[2..100];
+   for ($i=0; $i -lt $replaces.Length; $i++) {
+      $replace = $replaceConstant -f $i;
+      $rawContent = $rawContent.Replace($replace, $replaces[$i])
    }
    
    $regex = "^" + [Regex]::Escape($_.Line) + "$"
