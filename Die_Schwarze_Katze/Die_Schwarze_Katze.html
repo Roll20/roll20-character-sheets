@@ -86,7 +86,7 @@
                                 <span class="player-character-sheet">(MU + KL + IN) / 3 - 10 + Mod</span>
                                 <input class="player-character-sheet" type="number" name="attr_seelenkraftmod" value="0" />
                                 <span class="player-character-sheet">=</span>
-                                <input class="player-character-sheet" type="number" name="attr_seelenkraft" value="(round((@{mut}+@{klugheit}+@{intuition})/3)-10+@{seelenkraftmod})" disabled />
+                                <input class="player-character-sheet" type="number" name="attr_seelenkraft" value="0" readonly />
                                 <input class="nsc-sheet-inline-block" type="number" name="attr_seelenkraft" value="0" />
                                 <div class="base-info-seelenkraft-detail detail-container">
                                     <label>Notizen</label>
@@ -101,7 +101,7 @@
                                 <span class="player-character-sheet">(KO + KO + KK) / 3 - 10 + Mod</span>
                                 <input class="player-character-sheet" type="number" name="attr_zaehigkeitmod" value="0" />
                                 <span class="player-character-sheet">=</span>
-                                <input class="player-character-sheet" type="number" name="attr_zaehigkeit" value="(round((@{konstitution}+@{konstitution}+@{koerperkraft})/3)-10+@{zaehigkeitmod})" disabled />
+                                <input class="player-character-sheet" type="number" name="attr_zaehigkeit" value="0" readonly />
                                 <input class="nsc-sheet-inline-block" type="number" name="attr_zaehigkeit" value="0" />
                                 <div class="base-info-zaehigkeit-detail detail-container">
                                     <label>Notizen</label>
@@ -1198,7 +1198,7 @@
                 <h3 class="input-label-left">Aktuelle Ahnenenergie</h3>
                 <input class="aktuelleahnenenergie" type="number" name="attr_ahnenenergie" value="0" />
                 <h3 class="input-label-left">Maximale Ahnenenergie</h3>
-                 <input class="fw" type="number" name="attr_ahnenenergie_max" readonly />
+                <input type="number" name="attr_ahnenenergie_max" readonly />
             </div>
             <div class="ancestor-ahnengeschenke">
                 <div class="ancestor-ahnengeschenke-headers">
@@ -1496,25 +1496,6 @@
         return parseInt(attr)||0;
     }
 
-    // Ahnenenergie calculation
-    on("sheet:opened change:leiteigenschaft change:ahnenenergiemod", function() {
-        getAttrs(["leiteigenschaft", "ahnenenergiemod", "charisma", "klugheit", "intuition", "mut", "toggle_nsc_charactersheet"], function(values) {
-
-            if (isNscSheet(values.toggle_nsc_charactersheet)) {
-                return;
-            }
-
-            let ahnenenergiemod = parseIntValue(values.ahnenenergiemod);
-            let leiteigenschaft = values.leiteigenschaft;
-            let leiteigenschaftAttribut = parseIntValue(values.leiteigenschaft);
-            let ahnenenergieCalculated = leiteigenschaftAttribut === 0 ? 0 : 20 + leiteigenschaftAttribut + ahnenenergiemod;
-            // console.log("calculated ahnenenergie_max = " + ahnenenergieCalculated);
-            setAttrs({
-                ahnenenergie_max: ahnenenergieCalculated
-            });
-        });
-    });
-
     // Skill value calculation
     function calculateEw(e1, e2) {
         let e1Int = parseIntValue(e1);
@@ -1548,20 +1529,41 @@
     let skillsListEw2 = skillsList.map(skill => skill + "Ew2");
     let attributeChangeRequiredAttrs = skillsList.concat(skillsListEw1).concat(skillsListEw2).concat(attributeList).concat(["toggle_nsc_charactersheet"]);
 
-    // update derived attributes
-    on("sheet:opened change:initiativemod change:mut change:gewandtheit", function() {
-        getAttrs(["initiativemod", "mut", "gewandtheit", "toggle_nsc_charactersheet"], function(values) {
+
+    // update calculated values
+    on("sheet:opened change:initiativemod change:mut change:gewandtheit change:klugheit change:leiteigenschaft change:ahnenenergiemod change:konstitution change:intuition change:koerperkraft " +
+       "change:lebensenergiemod change:seelenkraftmod change:zaehigkeitmod"
+        , function() {
+        getAttrs(["leiteigenschaft", "ahnenenergiemod", "charisma", "klugheit", "intuition", "konstitution", "initiativemod", "mut",
+                  "gewandtheit", "seelenkraftmod", "toggle_nsc_charactersheet", "lebensenergiemod", "koerperkraft", "zaehigkeitmod"], function(values) {
 
             if (isNscSheet(values.toggle_nsc_charactersheet)) {
-                console.log("NSC Sheet");
                 return;
             }
 
-            let mut = parseIntValue(values["mut"]);
-            let gewandtheit = parseIntValue(values["gewandtheit"]);
-            let initiativemod = parseIntValue(values["initiativemod"]);
+            let mut = parseIntValue(values.mut);
+            let gewandtheit = parseIntValue(values.gewandtheit);
+            let klugheit = parseIntValue(values.klugheit);
+            let konstitution = parseIntValue(values.konstitution);
+            let intuition = parseIntValue(values.intuition);
+            let koerperkraft = parseIntValue(values.koerperkraft);
+
+            let lebensenergiemod = parseIntValue(values.lebensenergiemod);
+            let initiativemod = parseIntValue(values.initiativemod);
+            let ahnenenergiemod = parseIntValue(values.ahnenenergiemod);
+            let seelenkraftmod = parseIntValue(values.seelenkraftmod);
+            let zaehigkeitmod = parseIntValue(values.zaehigkeitmod);
+
+            // Ahnenenergie calculation
+            let leiteigenschaft = values.leiteigenschaft;
+            let leiteigenschaftAttribut = parseIntValue(values[leiteigenschaft]);
+            let ahnenenergieCalculated = leiteigenschaftAttribut === 0 ? 0 : 20 + leiteigenschaftAttribut + ahnenenergiemod;
 
             setAttrs({
+                "lebensenergie_max": (konstitution*2)+lebensenergiemod,
+                "ahnenenergie_max": ahnenenergieCalculated,
+                "seelenkraft": Math.round((mut+klugheit+intuition)/3)-10+seelenkraftmod,
+                "zaehigkeit": Math.round((konstitution+konstitution+koerperkraft)/3)-10+zaehigkeitmod,
                 "initiative": Math.round((mut + gewandtheit) / 2) + initiativemod
             });
         });
