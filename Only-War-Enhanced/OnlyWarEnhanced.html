@@ -1148,7 +1148,7 @@
 		  <div class='equipment_ranged_weapons_rep'>
 			<div class='equipment_ranged_weapons_grid1'>
 			  <input type='hidden' name='attr_id' value=''>
-			  <input type='hidden' name='attr_ammo' value=''>
+			  <input type='hidden' name='attr_ammo' value='0'>
 			  <select name='attr_R_weapon_attack_range' class='equipment_ranged_weapons_gs_a1 full_width clear bottomless'>
 				<option value='30' >Point Blank (+30)</option>
 				<option value='10' >Short Range (+10)</option>
@@ -1169,8 +1169,8 @@
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
 			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{R_weapon_target}+@{inlinemod-toggle}}, {@{bsTotal}-@{limiter}}}kh1, {@{bsTotal}+@{limiter}}}kl1]]-[[1d100@{R_weapon_mishap_chance}]])/10)]]+ceil(@{BS_unnat}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos=$[[3]]}} @{settings_hitroll} {{aim= [[@{R_weapon_aim}]]}}{{R_type= [[@{R_weapon_attack}]]}}{{range= [[@{R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= Ballistic Skill}}{{stat=[[@{BS}]]}}{{advancement= [[@{BS_advancement}]]}}{{hitmod= [[@{R_weapon_mod1}]]}}{{trained= [[@{R_weapon_trained}-20]]}}{{burst=@{R_weapon_burst}}}{{auto=@{R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
-!ammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit |<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range}+@{fatigued}' class='input_background input_char_background' disabled ></button>
-			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}+@{R_weapon_accurate}]] }} {{spray= [[@{R_weapon_spray}]] }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }} '>DMG</button>
+!ammo @{character_id} repeating_rangedweapons_@{id}_R_weapon_mag [[@{ammo}*@{R_weapon_setting}]]'>Hit |<input name='attr_R_weapon_target' value='@{bsTotal} + @{R_weapon_trained} - 20 + @{R_weapon_mod1} + @{R_weapon_attack} + @{R_weapon_aim} + @{R_weapon_attack_range} + @{atk_accurate_aim}+@{fatigued}' class='input_background input_char_background' disabled ></button>
+			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{R_weapon_type}}} {{weapon= @{R_weapon_name}}} {{damage=[[@{R_weapon_real_dmg}+@{atk_accurate_dmg}]] }} {{spray= [[@{R_weapon_spray}]] }} {{pen=[[@{R_weapon_pen}+0@{R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{R_ability_r} }} '>DMG</button>
 			</div>
 			<div class='equipment_ranged_weapons_grid2'>
 			  <input name='attr_wep_display' type='checkbox' value='min' class='collapsible_entity_switch hidden' />
@@ -1206,7 +1206,9 @@
 			  <input class='equipment_ranged_weapons_gs_d6 full_width' type='text' value='0' name='attr_R_weapon_vengeful' />
 			  <input type='hidden' value='' name='attr_R_weapon_real_dmg' />
 			  <div class='equipment_ranged_weapons_gs_d7'>Accurate</div>
-			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}' name='attr_R_weapon_accurate' />
+			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='1' name='attr_R_weapon_accurate' />
+			  <input class='hidden' type='number' value='0' name='attr_atk_accurate_aim' readonly />
+			  <input class='hidden' type='text' value='0' name='attr_atk_accurate_dmg' readonly />
 			</div>
 			<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle '>
 			  <div class='equipment_ranged_weapons_gs_e1'>RoF</div>
@@ -1778,9 +1780,9 @@
 			  <div class='psykana_ability_gs_b7'>Pen</div>
 			  <input class='psykana_ability_gs_b8 full_width' type='text' value='0' name='attr_P_pen' />
 			</div>
-			<input class='hidden' type='text' name='attr_psy_ab_total_finder' readonly />
-			<input class='hidden' type='text' name='attr_psy_ab_unnat_finder' readonly />
-			<input class='hidden' type='text' name='attr_psy_fatigue_finder' readonly />
+			<input class='hidden' type='text' name='attr_psy_ab_total_finder' value='@{wp_total}' readonly />
+			<input class='hidden' type='text' name='attr_psy_ab_unnat_finder' value='@{wp_unnat}' readonly />
+			<input class='hidden' type='text' name='attr_psy_fatigue_finder' value='0' readonly />
 			<div class='psykana_ability_grid3'>
 			  <div class='psykana_ability_gs_c1'>Focus Power</div>
 			  <select name='attr_P_focus' class='psykana_ability_gs_c2 full_width bottomless'>
@@ -2480,7 +2482,7 @@
 		  <div class='equipment_ranged_weapons_rep'>
 			<div class='equipment_ranged_weapons_grid1'>
 			  <input type='hidden' name='attr_id' value=''>
-			  <input type='hidden' name='attr_ammo' value=''>
+			  <input type='hidden' name='attr_ammo' value='0'>
 			  <select name='attr_V_R_weapon_attack_range' class='equipment_ranged_weapons_gs_a1 full_width clear bottomless'>
 				<option value='30' >Point Blank (+30)</option>
 				<option value='10' >Short Range (+10)</option>
@@ -2501,12 +2503,12 @@
 				<option value='20' >Full Aim (+20)</option>
 			  </select>
 			  <button name='weapon_hit' class='equipment_ranged_weapons_gs_a4 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{attack= }} {{weapon= @{V_R_weapon_name}}} {{burstwin=[[ceil([[[[1+ floor(abs([[{{ {@{V_R_weapon_target}+@{inlinemod-toggle}}, {@{veh_atk_total_finder}-@{limiter}}}kh1, {@{veh_atk_total_finder}+@{limiter}}}kl1]]-[[1d100@{V_R_weapon_mishap_chance}]])/10)]]+ceil(@{veh_atk_unnat_finder}/2)]]/2)]]}}{{target= $[[0]]}}{{roll= $[[1]]}}{{dof= $[[2]]}}{{dos= $[[3]]}} @{settings_hitroll} {{aim= [[@{V_R_weapon_aim}]]}}{{R_type= [[@{V_R_weapon_attack}]]}}{{range= [[@{V_R_weapon_attack_range}]]}}{{modifier= [[@{inlinemod-toggle}]]}}{{stat_name= @{V_R_focus}}}{{stat=[[@{veh_atk_total_finder}]]}}{{hitmod= [[@{V_R_weapon_mod1}]]}}{{trained= [[@{V_R_weapon_trained}-20]]}}{{burst=@{V_R_weapon_burst}}}{{auto=@{V_R_weapon_auto}}}{{fatigued=[[@{fatigued}]]}}
-!ammo @{character_id} repeating_rangedweapons_@{id}_V_R_weapon_mag [[@{ammo}*@{V_R_weapon_setting}]]'>Hit |<input name='attr_V_R_weapon_target' value='@{veh_atk_total_finder} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range}+@{veh_fatigue_finder}' class='input_background input_char_background' disabled ></button>
-			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg} + @{V_R_weapon_accurate}]] }} {{spray= [[@{V_R_weapon_spray}]] }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }} '>DMG</button>
+!ammo @{character_id} repeating_rangedweapons_@{id}_V_R_weapon_mag [[@{ammo}*@{V_R_weapon_setting}]]'>Hit |<input name='attr_V_R_weapon_target' value='@{veh_atk_total_finder} + @{V_R_weapon_trained} - 20 + @{V_R_weapon_mod1} + @{V_R_weapon_attack} + @{V_R_weapon_aim} + @{V_R_weapon_attack_range} + @{veh_atk_accurate_aim}+@{veh_fatigue_finder}' class='input_background input_char_background' disabled ></button>
+			  <button name='weapon_dmg' class='equipment_ranged_weapons_gs_a5 full_width clear' type='roll' value='@{to-gm}&{template:mythic} {{character= @{character_name}}} {{type= @{V_R_weapon_type}}} {{weapon= @{V_R_weapon_name}}} {{damage=[[@{V_R_weapon_real_dmg} + @{veh_atk_accurate_dmg}]] }} {{spray= [[@{V_R_weapon_spray}]] }} {{pen=[[@{V_R_weapon_pen}+0@{V_R_weapon_pen2}]] }}  {{@{settings_weapondescription}=@{V_R_ability_r} }} '>DMG</button>
 			</div>
-			<input class='hidden' type='text' name='attr_veh_atk_total_finder' readonly />
-			<input class='hidden' type='text' name='attr_veh_atk_unnat_finder' readonly />
-			<input class='hidden' type='text' name='attr_veh_fatigue_finder' readonly />
+			<input class='hidden' type='text' name='attr_veh_atk_total_finder' value='@{bs_total}' readonly />
+			<input class='hidden' type='text' name='attr_veh_atk_unnat_finder' value='@{bs_unnat}' readonly />
+			<input class='hidden' type='text' name='attr_veh_fatigue_finder' value='0' readonly />
 			<div class='equipment_ranged_weapons_grid2'>
 			  <input name='attr_wep_display' type='checkbox' value='min' class='collapsible_entity_switch hidden' />
 			  <input name='attr_wep_display' type='checkbox' value='half' class='collapsible_entity_switch_half hidden' />
@@ -2541,7 +2543,9 @@
 			  <input class='equipment_ranged_weapons_gs_d6 full_width' type='text' value='0' name='attr_V_R_weapon_vengeful' />
 			  <input type='hidden' value='' name='attr_V_R_weapon_real_dmg' />
 			  <div class='equipment_ranged_weapons_gs_d7'>Accurate</div>
-			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}' name='attr_V_R_weapon_accurate' />
+			  <input class='equipment_ranged_weapons_gs_d8' type='checkbox' value='1' name='attr_V_R_weapon_accurate' />
+			  <input class='hidden' type='number' value='0' name='attr_veh_atk_accurate_aim' readonly />
+			  <input class='hidden' type='text' value='0' name='attr_veh_atk_accurate_dmg' readonly />
 			</div>
 			<div class='equipment_ranged_weapons_grid5 collapsible_entity_toggle '>
 			  <div class='equipment_ranged_weapons_gs_e1'>RoF</div>
@@ -3303,6 +3307,70 @@
 			attr[`${row}_veh_atk_total_finder`] = `@{${v_r_focus}Total}`;
 			attr[`${row}_veh_atk_unnat_finder`] = `@{${v_r_focus.toUpperCase()}_unnat}`;
 			attr[`${row}_veh_fatigue_finder`] = `@{fatigued}`;
+		  }
+		});
+		console.log(values,attr)
+		setAttrs(attr);
+	  });
+	});
+  });
+
+
+
+	// Normal Weapons Accurate
+  on('sheet:opened change:repeating_rangedweapons:r_weapon_accurate change:repeating_rangedweapons:r_weapon_attack change:repeating_rangedweapons:r_weapon_aim', function() {
+	getSectionIDs('rangedweapons', function(idarray) {
+	  // first get the attribute names for all rows in put in one array
+	  const fieldnames = [];
+	  idarray.forEach(id => fieldnames.push(`repeating_rangedweapons_${id}_R_weapon_accurate`,`repeating_rangedweapons_${id}_R_weapon_attack`,`repeating_rangedweapons_${id}_R_weapon_aim`));
+	  
+	  getAttrs(fieldnames, values => {
+		// create a variable to hold all the attribute values you re going to create.
+		const attr = {};
+		// now loop through the rows again
+		idarray.forEach(id => {
+		  let row = 'repeating_rangedweapons_' + id;
+		  let r_weapon_accurate = values[`${row}_R_weapon_accurate`] || 0;
+		  let r_weapon_attack = values[`${row}_R_weapon_attack`] || 10;
+		  let r_weapon_aim = values[`${row}_R_weapon_aim`] || 0;
+		  if ((r_weapon_accurate == 1)&&(r_weapon_attack == 10)&&(r_weapon_aim != 0)) {
+			attr[`${row}_atk_accurate_aim`] = 10;
+			attr[`${row}_atk_accurate_dmg`] = `?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}`;
+		  }
+		  else {
+			attr[`${row}_atk_accurate_aim`] = 0;
+			attr[`${row}_atk_accurate_dmg`] = 0;
+		  }
+		});
+		console.log(values,attr)
+		setAttrs(attr);
+	  });
+	});
+  });
+
+	// Vehicle Weapons Accurate
+  on('sheet:opened change:repeating_vehiclerangedweapons:v_r_weapon_accurate change:repeating_vehiclerangedweapons:v_r_weapon_attack change:repeating_vehiclerangedweapons:v_r_weapon_aim', function() {
+	getSectionIDs('vehiclerangedweapons', function(idarray) {
+	  // first get the attribute names for all rows in put in one array
+	  const fieldnames = [];
+	  idarray.forEach(id => fieldnames.push(`repeating_vehiclerangedweapons_${id}_V_R_weapon_accurate`,`repeating_vehiclerangedweapons_${id}_V_R_weapon_attack`,`repeating_vehiclerangedweapons_${id}_V_R_weapon_aim`));
+	  
+	  getAttrs(fieldnames, values => {
+		// create a variable to hold all the attribute values you re going to create.
+		const attr = {};
+		// now loop through the rows again
+		idarray.forEach(id => {
+		  let row = 'repeating_vehiclerangedweapons_' + id;
+		  let v_r_weapon_accurate = values[`${row}_V_R_weapon_accurate`] || 0;
+		  let v_r_weapon_attack = values[`${row}_V_R_weapon_attack`] || 10;
+		  let v_r_weapon_aim = values[`${row}_V_R_weapon_aim`] || 0;
+		  if ((v_r_weapon_accurate == 1)&&(v_r_weapon_attack == 10)&&(v_r_weapon_aim != 0)) {
+			attr[`${row}_veh_atk_accurate_aim`] = 10;
+			attr[`${row}_veh_atk_accurate_dmg`] = `?{DoS |1, [[0]]|2-3, [[1d10cs0cf0]]|4+, [[2d10cs0cf0]]}`;
+		  }
+		  else {
+			attr[`${row}_veh_atk_accurate_aim`] = 0;
+			attr[`${row}_veh_atk_accurate_dmg`] = 0;
 		  }
 		});
 		console.log(values,attr)
