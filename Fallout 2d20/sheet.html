@@ -2,6 +2,7 @@
 <input type="hidden" class="style-vault-girl" name="attr_style_vault_girl" value="0" />
 <input type="hidden" class="style-outline" name="attr_style_outline" value="0" />
 <input type="hidden" class="style-pip-boy" name="attr_style_pip_boy" value="0" />
+<input type="hidden" class="npc-category" name="attr_npc_category" value="creature" />
 
 <!-- start interface -->
 <div class="interface">
@@ -20,6 +21,14 @@
             name="act_npc">NPC</button></div>
         <div class="tab-settings"><button type="action"
             name="act_settings">Settings</button></div>
+    </div>
+    <div class="roll-dice">
+        <button class="skill character" type="roll" name="roll_skill"
+            value="&{template:foskill} {{name=@{character_name}}} {{attr_num=?{Attribute|Strength,@{strength}|Perception,@{perception}|Endurance,@{endurance}|Charisma,@{charisma}|Intelligence,@{intelligence}|Agility,@{agility}|Luck,@{luck}}}} {{skill_num=?{Skill|Athletics,@{athletics_total}|Barter,@{barter_total}|Big Guns,@{big_guns_total}|Energy Weapons,@{energy_weapons_total}|Explosives,@{explosives_total}|Lockpick,@{lockpick_total}|Medicine,@{medicine_total}|Melee Weapons,@{melee_weapons_total}|Pilot,@{pilot_total}|Repair,@{repair_total}|Science,@{science_total}|Small Guns,@{small_guns_total}|Sneak,@{sneak_total}|Speech,@{speech_total}|Survival,@{survival_total}|Throwing,@{throwing_total}|Unarmed,@{unarmed_total}}}} {{target=[[?{Attribute}+?{Skill}]]}} {{dice_num=?{Number of dice|2}}} {{difficulty=?{Difficulty|1}}} {{result=[[?{Number of dice|22}d20<[[?{Attribute}+?{Skill}]]sacs<?{Critical Success|1}cf>?{Complication|20} ]]}}" />
+        <button class="skill npc" type="roll" name="roll_skill"
+            value="&{template:foskill} {{name=@{character_name}}} {{attr_num=?{Attribute|Body,@{body}|Mind,@{mind}}}} {{skill_num=?{Skill|Melee,@{melee}|Guns,@{guns}|Other,@{other}}}} {{target=[[?{Attribute}+?{Skill}]]}} {{dice_num=?{Number of dice|2}}} {{difficulty=?{Difficulty|1}}} {{result=[[?{Number of dice|22}d20<[[?{Attribute}+?{Skill}]]sacs<?{Critical Success|1}cf>?{Complication|20} ]]}}" />
+        <button class="cd" type="roll" name="roll_cd"
+            value="&{template:focd} {{name=@{character_name}}} {{roll=[[1d6]]}} {{continue=[Roll another die](~cd)}}" />
     </div>
 
     <input type="hidden" class="tabstoggle" name="attr_tab" value="creation"  />
@@ -1511,7 +1520,7 @@
                             value="0" />
                         <span name="attr_melee_damage_total" />
                         <button type="roll" name="roll_meleedmg"
-                            value="&{template:focd} {{name=@{character_name}}} {{dice_num=[[@{melee_damage_total}]]}} {{roll=[[1d6]]}} {{continue=[Roll another die](~meleedmg)}}" />
+                            value="&{template:foraw} {{name=@{character_name}}} {{dice_num=[[@{melee_damage_total}]]}} {{sides=6}} {{result=[[@{melee_damage_total}d6]]}}" />
                     </div>
                     <div class="grid col7-defense">
                         <label>Defense</label>
@@ -1728,8 +1737,8 @@
                     </div>
                     <div><input type="number" name="attr_weapondamage" value=""
                         class="melee-damage" />
-                        <button type="roll" name="roll_weapondamage"
-                            value="&{template:focd} {{name=@{character_name}}} {{dice_num=[[@{weapondamage}]]}} {{roll=[[1d6]]}}" /></div>
+                        <button type="roll" class="die" name="roll_weapondamage"
+                            value="&{template:foraw} {{name=@{character_name}}} {{dice_num=[[@{weapondamage}]]}} {{sides=6}} {{result=[[@{weapondamage}d6]]}}" /></div>
                     <div><input type="text" name="attr_weaponeffects" value="" /></div>
                     <div>
                         <select name="attr_weapontype">
@@ -1899,7 +1908,7 @@
             </div>
 
             <div class="grid col1 npc-stats">
-                <div class="grid col5x">
+                <div class="grid col5x npc">
                     <div class="header">Body</div>
                     <input type="number" name="attr_body"
                         value="" />
@@ -1918,6 +1927,31 @@
                     <input type="number" name="attr_other"
                         value="" />
                 </div>
+
+                <div class="grid col7 character">
+                    <div class="header">S</div>
+                    <input type="number" name="attr_strength"
+                        value="" />
+                    <div class="header">P</div>
+                    <input type="number" name="attr_perception"
+                        value="" />
+                    <div class="header">E</div>
+                    <input type="number" name="attr_endurance"
+                        value="" />
+                    <div class="header">C</div>
+                    <input type="number" name="attr_charisma"
+                        value="" />
+                    <div class="header">I</div>
+                    <input type="number" name="attr_intelligence"
+                        value="" />
+                    <div class="header">A</div>
+                    <input type="number" name="attr_agility"
+                        value="" />
+                    <div class="header">L</div>
+                    <input type="number" name="attr_luck"
+                        value="" />
+                </div>
+
                 <div class="grid col4">
                     <label class="header">Current HP</label>
                     <input type="number" name="attr_hp"
@@ -1969,7 +2003,7 @@
                     (TN <span name="attr_attacktn" />),
                     <span name="attr_attackdamage" />
                     <button type="roll" class="die" name="roll_attackdamage"
-                        value="&{template:foraw} {{name=@{character_name}}} {{dice_num=[[@{attackdamage}]]}} {{roll=[[@{attackdamage}d6]]}}" />
+                        value="&{template:foraw} {{name=@{character_name}}} {{dice_num=[[@{attackdamage}]]}} {{sides=6}} {{result=[[@{attackdamage}d6]]}}" />
                     <span name="attr_attackeffects" />
 
                     <details>
@@ -2060,6 +2094,10 @@
                     <li>Added NPC sheet w/ support for creatures and characters.
                         Toggle in settings. Click on attacks to roll. Click on
                         combat die next to damage to roll damage.</li>
+                    <li>Updated combat dice to use damage values, but with
+                        less info.</li>
+                    <li>Added generic dice at top of tabs. Single combat die and
+                        2d20 roller. (in case you still want full info on the roll)</li>
                 </ul>
                 <h3>Alpha 0.13</h3>
                 <ul>
@@ -2141,6 +2179,7 @@ const skillList = ["ATHLETICS","BARTER","BIG_GUNS",
     "PILOT","REPAIR","SCIENCE","SMALL_GUNS","SNEAK","SPEECH","SURVIVAL",
     "THROWING","UNARMED"];
 const skillTagModList = skillList.map(i => i + "_TAG_MOD");
+const settingsList = ["SETTING_NPC"];
 const originTagList = ["ORIGIN","BROTHERHOOD_TAG","SURVIVOR_CHOICE",
     "SURVIVOR_TRAIT1","SURVIVOR_TRAIT2","SURVIVOR_PERK","SURVIVOR_TAG",
     "VAULT_TAG"];
@@ -2158,7 +2197,7 @@ const triggerList =
 const valueList =
     addList.concat(attributelist).concat(totalAttributelist).concat(skillList)
     .concat(originTagList).concat(survivorAttrList).concat(tagSkillList)
-    .concat(skillTagModList);
+    .concat(skillTagModList).concat(settingsList);
 const originsDictionary = {
     "brotherhood": {"name": "Brotherhood of Steel"},
     "ghoul": {"name": "Ghoul"},
@@ -2811,7 +2850,6 @@ function rollCombatDice(count) {
 
 on("clicked:combatdice", function() {
     let results = rollCombatDice(6);
-    console.log(results);
 });
 
 on("clicked:copyspecial", function() {
@@ -2911,7 +2949,10 @@ attributelist.forEach(attribute => {
 triggerList.forEach(trigger => {
     on(`change:${trigger}`, function(eventInfo) {
         getAttrs(valueList, function(values) {
-            console.log(values);
+
+            let setting_npc = parseInt(values.SETTING_NPC)||0;
+            if (setting_npc) return
+
             let update = {};
 
             let attributes = {};
@@ -3174,12 +3215,9 @@ const npcAttrsList = ["repeating_npcattacks_attackattribute",
 npcTriggerList.forEach(trigger => {
     on(`change:repeating_npcattacks:${trigger}`, function(eventInfo) {
         getAttrs(npcAttrsList, function(values) {
-            console.log(values);
             let update = {};
             let name = values[`repeating_npcattacks_${trigger}`];
-            console.log(name);
             let value = parseInt(values[`${name}`])||0;
-            console.log(value);
             update[`repeating_npcattacks_${trigger}value`] = value;
             setAttrs(update);
         });
