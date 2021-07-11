@@ -1,3 +1,21 @@
+### Version 2.41 (2021-05):
+- fix broken styles
+
+### Version 2.40 (2021-05):
+- refactor sheet to be able to use the new Roll20 Sheet framework
+- Feature: Skills, Species, Force Powers auto-suggestions, suggest relevant names as you start typing
+- more code cleanup
+
+### Version 2.34 (2021-05):
+- Enhance Player Core info section's layout
+- Reformats Player Secondary Info section
+- Enhance Attributes & Skills section's layout
+- Enhance Weapons & Armors section's layout
+- Enhance Force section's layout
+- FIX: cleaning up HTML code
+- FIX: removes invalid CSS code
+- FIX: Resist Pain effect works as expected
+
 ### Version 2.33 (2021-04-06):
 - remove duplicated control force power name field
 - fix force power section width

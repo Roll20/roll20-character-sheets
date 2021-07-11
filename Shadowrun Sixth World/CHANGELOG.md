@@ -1,6 +1,48 @@
 Change Log
 ==============================================
-**2021-05-03**
+**2021-07-05 ** v.37 Chuz (James Culp)
+	Rolls->Misc tab added and now contains a way to do quick and dirty conversions for Standard to Metric and vice versa.  Feet <=> Meters, Pounds <=> Kilograms, and Miles <=> Kilometers.
+	PC->Arms->Range/Melee Added "Engineering" option to the skill dropdown.
+	Bugfix - PC->Arms->Range/Melee fixed the dicepool display to now reflect the actual dicepool.  To make sure this is up to date when viewing a character sheet for the first time after this version goes live just toggle settings mode off/on or on/off for each weapon, that should trigger the update and update your primary displays as well.
+	Added some behind the scenes code to try and update the weapons to have the Attribute, Attribute Rating and Dicepool Modifier attributes set correctly after loading.  Also added versioning for the character sheet data.
+	NPC Astral Initiative now auto-calculates for spirits and awakened grunts	NPC->Vehicle/Drone fixed hot sim initiative auto-calculation (now pilot * 2 + 4d6)
+	NPC->Grunt fixed sprint speed being 0 by default
+	PC Sheet -> Condition Modifiers box - added Natural Healing Physical and Stun buttons.  Currently do not update player's CM.
+**2021-06-21 ** v.36 Chuz (James Culp)
+	PC Sheet Modifiers text boxes in various places in the sheet (Qualities, Augs, Gear, Matrix Devices, Programs, and Echos) now allow the player to add/subtract from attributes on the sheet.  See roll20 forum thread for further details.
+	PC Sheet Removed Modifications from sprites.
+	PC Sheets Added functionality so when firing mode is changed on the Core tab, the DV and AR are updated appropriately.  Still doesn't split dice pools.
+	Added combat_paralysis flag that will automatically divide the PC's initiative roll in half, rounded up until there is further guidance from Catalyst.  It does not move them to the last  slot for the first round of combat however.
+**2021-06-03 ** v.35 Chuz (James Culp)
+	PC->Magic->Meta tab, added alternative Tradition attributes to the drop down.
+	Added Matrix AR and Matrix DR to Host sheet
+**2021-05-25 ** v.34 Chuz (James Culp)
+	Bugfix - Changed HTML top display the nuyen symbol instead of translations as the character was breaking the translation stuff
+**2021-05-17 ** v.33 Chuz (James Culp)
+	Bugfix - PC->Grenades launched grenades didn't work properly
+	Bugfix - Nuyen symbol keeps disappearing, another attempt to lock it in
+	Added mouseover text to Rolls->Matrix Actions to identify skill and attribute for each.
+	Updated NPC-Spells to follow the same format as PC-Spells, to include using the same roll button format.
+**2021-05-10 ** v.32 Chuz (James Culp)
+	Bugfix - Added sheetworker call on sheet load to fix incorrectly calculated soak value for the Core->Soak Damage button
+	Changed Rolls->Jack Out from text to a roll button so unfortunate deckers can escape link-lock.
+	Added Core->Direct Magic Defense button and Core->Indirect Magic Defense buttons
+	Added Arms->Grenade section to handle Grenades, also added a GM Button to roll Scatter and Distance
+	Added disclaimer to Rolls section, specialization/expertise and mods from augs/magic/etc are not included in those rolls, the way to add those dice to the pools is to use the [Modifiers] toggle at the top of the sheet.
+	Bugfix - Long weapon names threw off the display in Core->Weapons and Arms.
+	Bugfix - Delete icons were showing up on the left for Social and Vehicles covering the move icon preventing rearranging.
+**2021-05-03 ** v.31 Chuz (James Culp)
+	Bugfix - NPC->Vehicle sheet was resetting Body to 1 when the sheet was closed
+	Added Birth Name to Social Tab
+	Added New Roll Template {template:multirow} with available fields header, base, desc, desc2,...desc6, bigdesc, bigdesc2...bigdesc6 for your macro display joy
+	Added Augmentation Grades drop down to PC->Augs section
+	Updated NPC->Host->IC section to make them more useful during encounters.  Separate AR/CM/Initiative Roll Button/etc
+	Added a Notes field to all NPC sheets
+	Added Name field to all NPC sheets, tied to the actual character_name attribute
+	Added Metatype field for NPC->Grunt sheet.
+	Added Matrix Action roll buttons to the new Rolls tab.
+	Styled Rolls->Matrix Action roll buttons to indicate legal/illegal
+**2021-04-28** v.30 Chuz (James Culp)
 	Bugfix - Separated NPC->Vehicles targeting autosofts so you can activate them one at a time.
 	Bugfix - Options->Soak Modifier and Options->Defense modifiers were not working properly.
 	Bugfix - Core->DR roll button wasn't updating all of the time as it should.

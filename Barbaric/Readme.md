@@ -1,6 +1,6 @@
 # About
 
-Official Character Sheet for [Barbaric!](https://www.drivethrurpg.com/product/348272/Barbaric) by Stellagama Publishing. Sheet Created by [Andreas J.](https://wiki.roll20.net/Anduh)
+Official Character Sheet for [Barbaric!](https://www.drivethrurpg.com/product/348272/Barbaric)/[¡Bárbaro!](https://www.drivethrurpg.com/product/357031/Barbaro) by Stellagama Publishing. Sheet Created by [Andreas J.](https://wiki.roll20.net/Anduh)
 
 ## Sheet Info
 Basic character sheet for tracking your stats, with roll buttons for Skills, Attacks & Initiative.

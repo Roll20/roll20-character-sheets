@@ -1,7 +1,9 @@
 // --- ALL SHEET WORKERS START --- //
-const SheetWorker = 'sheetworker';
-const Player = 'player';
+const sheetWorker = 'sheetworker';
+const player = 'player';
 
+const squareBracketsRegex = /18\[([0-9]{1,3})]/; // Ie. 18[65]
+const parenthesisRegex = /18\(([0-9]{1,3})\)/; // Ie. 18(65)
 //Ability Score Parser function
 function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     if (abilityScoreString === '') {
@@ -14,7 +16,7 @@ function getLookupValue(abilityScoreString, defaultValue, isStrength = false) {
     }
 
     if (isStrength) {
-        let exceptionalMatch = abilityScoreString.match(/18\[([0-9]{1,3})]/) || abilityScoreString.match(/18\(([0-9]{1,3})\)/);
+        let exceptionalMatch = abilityScoreString.match(squareBracketsRegex) || abilityScoreString.match(parenthesisRegex);
         if (exceptionalMatch !== null) {
             let exceptionalStrNumber = parseInt(exceptionalMatch[1]);
             if (1 <= exceptionalStrNumber && exceptionalStrNumber <= 50) {
@@ -414,6 +416,20 @@ function isNewSpellSection(section) {
     return section.startsWith('wiz') || section.startsWith('pri');
 }
 
+function isRemoving0(eventInfo, fieldNames) {
+    return fieldNames?.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
+}
+
+function isOverwriting0(eventInfo) {
+    return !parseInt(eventInfo.newValue) && !parseInt(eventInfo.previousValue);
+}
+
+function doEarlyReturn(eventInfo, fieldNames) {
+    return eventInfo.removedInfo
+        ? isRemoving0(eventInfo, fieldNames)
+        : isOverwriting0(eventInfo);
+}
+
 // --- Start summing numbers from repeating spells for wizard and priest --- //
 function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
 
@@ -448,7 +464,7 @@ function recursiveSpellSum(tail, acc, oldField, newField, resultFieldName) {
         .execute(() => recursiveSpellSum(tail, acc, oldField, newField, resultFieldName)); // Fat arrow function to lazy load value.
 }
 
-function setupSpellSumming(sections, oldField, newField, resultFieldName) {
+function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldName) {
     sections.forEach(section => {
         let repeatingName;
         let fieldName;
@@ -461,9 +477,11 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
         }
 
         let onChange = `change:repeating_${repeatingName}:${fieldName} remove:repeating_${repeatingName}`;
-        on(onChange, function () {
-
-            console.log(`Summing started by section ${repeatingName}`);
+        on(onChange, function (eventInfo) {
+            if (doEarlyReturn(eventInfo, [fieldName]))
+                return;
+            
+            console.log(`Summing started by section ${repeatingName}. Fieldname ${fieldName}`);
             console.time('Summing time');
             let levelsCopy = [...sections];
             let accumulator = 0;
@@ -475,36 +493,37 @@ function setupSpellSumming(sections, oldField, newField, resultFieldName) {
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
 function setupAutoFillSpellInfo(section, spellsTable) {
-    if (spellsTable[section]) {
-        on(`change:repeating_spells-${section}:spell-name`, function(eventInfo){
+    if (!spellsTable[section])
+        return;
+    
+    on(`change:repeating_spells-${section}:spell-name`, function (eventInfo) {
 
-            let spell = spellsTable[section][eventInfo.newValue];
-            if (spell === undefined) 
-                return;
+        let spell = spellsTable[section][eventInfo.newValue];
+        if (spell === undefined)
+            return;
 
-            let spellInfo ={
-                [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
-                [`repeating_spells-${section}_spell-level`]        : spell['level'],
-                [`repeating_spells-${section}_spell-school`]       : spell['school'],
-                [`repeating_spells-${section}_spell-components`]   : spell['components'],
-                [`repeating_spells-${section}_spell-range`]        : spell['range'],
-                [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
-                [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
-                [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
-                [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
-                [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
-                [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
-                [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
-                [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
-                [`repeating_spells-${section}_spell-effect`]       : spell['effect']
-            }
-            if (section.startsWith('pri')) {
-                spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
-            }
+        let spellInfo = {
+            [`repeating_spells-${section}_spell-cast-time`]: spell['cast-time'],
+            [`repeating_spells-${section}_spell-level`]: spell['level'],
+            [`repeating_spells-${section}_spell-school`]: spell['school'],
+            [`repeating_spells-${section}_spell-components`]: spell['components'],
+            [`repeating_spells-${section}_spell-range`]: spell['range'],
+            [`repeating_spells-${section}_spell-aoe`]: spell['aoe'],
+            [`repeating_spells-${section}_spell-duration`]: spell['duration'],
+            [`repeating_spells-${section}_spell-damage`]: spell['damage'],
+            [`repeating_spells-${section}_spell-damage-type`]: spell['damage-type'],
+            [`repeating_spells-${section}_spell-saving-throw`]: spell['saving-throw'],
+            [`repeating_spells-${section}_spell-healing`]: spell['healing'],
+            [`repeating_spells-${section}_spell-materials`]: spell['materials'],
+            [`repeating_spells-${section}_spell-reference`]: spell['reference'],
+            [`repeating_spells-${section}_spell-effect`]: spell['effect']
+        };
+        if (section.startsWith('pri')) {
+            spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
+        }
 
-            setAttrs(spellInfo);
-        });
-    }
+        setAttrs(spellInfo);
+    });
 }
 
 function setupCalculateRemaining(totalField, sumField, remainingField) {
@@ -531,8 +550,6 @@ function setupCalculateTotal(totalField, fieldsToSum) {
                 total += parseInt(values[field]) || 0;
             });
 
-            console.log(total);
-
             setAttrs({
                 [totalField]: total
             });
@@ -545,41 +562,220 @@ function setupRepeatingRowCalculateTotal(repeatingTotalField, repeatingFieldsToS
     let allFields = [...repeatingFieldsToSum];
     allFields.push(repeatingTotalField);
     on(`${onChange} remove:repeating_${repeatingName}`, function(eventInfo){
+        if (eventInfo.removedInfo)
+            return;
+        
         TAS.repeating(repeatingName)
             .fields(allFields)
             .tap(function(rowSet) {
-                console.log(eventInfo);
                 let rowId = eventInfo.sourceAttribute.split('_')[2];
                 let row = rowSet[rowId];
-                console.log(rowId);
-                console.log(row);
                 let total = 0;
                 repeatingFieldsToSum.forEach(column => {
                     total += row.I[column];
                 });
                 row[repeatingTotalField] = total;
-                console.log(total);
             })
             .execute();
     });
 }
 
+// --- Start setup for priest spells based on spheres --- //
+const primarySphereRegex = /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather|Elemental/gi
+const noElementalRegex =   /All|Animal|Astral|Charm|Combat|Creation|Divination|Guardian|Healing|Necromantic|Plant|Protection|Summoning|Sun|Weather/gi
+const elementalRegex = /Earth|Air|Fire|Water/gi
+function capitalizeFirst(s) {
+    if (typeof s !== 'string')
+        return '';
+
+    return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function parseSpheres(spheresStrings, regex) {
+    let spheres = new Set();
+    spheresStrings.map(s => s.match(regex))
+        .flat()
+        .filter(Boolean)
+        .map(s => capitalizeFirst(s))
+        .forEach(s => spheres.add(s));
+    return spheres;
+}
+
+function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
+    let primarySpellSpheres = spellSphereString.match(noElementalRegex);
+    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
+    if (isAvailable)
+        return true;
+
+    if (!availableSpheres.has('Elemental'))
+        return false;
+
+    if (!spellSphereString.includes('Elemental'))
+        return false;
+
+    if (spellSphereString.includes('Elemental ('))
+        return spellSphereString.match(elementalRegex).some((element) => elementalSpheres.has(element))
+
+    // The player and the spell has the elemental sphere (without any sub elements)
+    return true;
+}
+
+function setupAddPriestSpell(postfix) {
+    if (!priestSpells[postfix])
+        return;
+
+    on(`clicked:add-spells-${postfix}`, function () {
+        const section = `spells-${postfix}`;
+        const field = 'spell-name';
+        let errorMessage = `add-spell-error-${postfix}`;
+        let attributes = ['sphere-major'];
+        if (postfix.match(/[123]/)) 
+            attributes.push("sphere-minor");
+            
+        TAS.repeating(section)
+            .attrs(attributes)
+            .fields(field)
+            .reduce(function(memo, row){
+                memo.add(row.S[field]);
+                return memo;
+            }, new Set(), function (knownSpells,_,a){
+                let primarySpheres = parseSpheres(attributes.map(aField => a.S[aField]), primarySphereRegex);
+                let elementalSpheres = parseSpheres(attributes.map(aField => a.S[aField]), elementalRegex);
+
+                let newValue = {};
+                newValue[errorMessage] = '';
+                if (primarySpheres.size < 1) {
+                    newValue[errorMessage] = 'No valid spheres found. Please write or select some spheres';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                let spellsToAdd = [];
+                for (const [spellName, spell] of Object.entries(priestSpells[postfix])) {
+                    let isAvailable = isSpellAvailable(spellName, spell['sphere'], primarySpheres, elementalSpheres);
+                    if (isAvailable)
+                        spellsToAdd.push(spellName);
+                }
+
+                console.log(spellsToAdd);
+                if (spellsToAdd.length < 1) {
+                    newValue[errorMessage] = 'No spells found for the selected spheres';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                spellsToAdd = spellsToAdd.filter(spell => !knownSpells.has(spell));
+                console.log(spellsToAdd);
+                if (spellsToAdd.length < 1) {
+                    newValue[errorMessage] = 'All spells already added.';
+                    setAttrs(newValue);
+                    return;
+                }
+
+                spellsToAdd.forEach(spell => {
+                    let newrowid = generateRowID();
+                    newValue[`repeating_${section}_${newrowid}_${field}`] = spell;
+                });
+
+                setAttrs(newValue);
+
+            })
+            .execute();
+    });
+}
+// --- End setup for priest spells based on spheres --- //
+
+// --- Start defining rest buttons --- //
+function resetCastSlots(row, castField, memField) {
+    row.I[castField] = 0;
+}
+
+function resetCastAndMemSlots(row, castField, memField) {
+    row.I[castField] = 0;
+    row.I[memField] = 0;
+}
+
+function resetSpentSlots(row, castField, memField) {
+    row.I[memField] = row.I[memField] - row.I[castField];
+    row.I[castField] = 0;
+}
+
+function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
+    let isPowers = !spellLevels || !tab;
+    let attributes = ['spell-slot-reset-sections', 'spell-slot-reset-function']
+    if (!isPowers)
+        attributes.push(tab);
+    
+    on(`clicked:${buttonName}`, function () {
+        
+        getAttrs(attributes, function (values) {
+            let resetSection = values['spell-slot-reset-sections'];
+            let resetFunction = values['spell-slot-reset-function'];
+
+            let sections = [];
+            if (resetSection === 'all' || isPowers)
+                sections = allSections;
+            else if (resetSection === 'level') {
+                let level = values[tab];
+                sections = spellLevels.find(sl => sl.level === level)?.sections;
+            }
+            
+            if (!sections?.length)
+                return
+            
+            let updateFunction;
+            if (resetFunction === '1' || isPowers)
+                updateFunction = resetCastSlots;
+            else if (resetFunction === '2')
+                updateFunction = resetCastAndMemSlots;
+            else if (resetFunction === '3')
+                updateFunction = resetSpentSlots;
+            
+            if (!updateFunction)
+                return;
+
+            sections.forEach(section => {
+                let repSection;
+                let castField;
+                let memField;
+                if (isNewSpellSection(section)) {
+                    repSection = `spells-${section}`;
+                    castField = 'spell-cast-value';
+                    memField = 'spell-memorized';
+                } else {
+                    repSection = `spells${section}`;
+                    castField = `cast-value${section}`;
+                    memField = `cast-max${section}`;
+                }
+
+                TAS.repeating(repSection)
+                    .fields(castField, memField)
+                    .each(function(row) {
+                        updateFunction(row, castField, memField);
+                    })
+                    .execute();
+            });
+        });
+    });
+}
+// --- End defining rest buttons --- //
+
 let wizardSpellLevelsSections = [
-    {level: 1, sections: ['', '2', '3', 'wiz1']},
-    {level: 2, sections: ['4', '5', '6', 'wiz2']},
-    {level: 3, sections: ['7', '8', '9', 'wiz3']},
-    {level: 4, sections: ['10', '11', '12', 'wiz4']},
-    {level: 5, sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
-    {level: 6, sections: ['13', '14', '15', 'wiz6']},
-    {level: 7, sections: ['16', '17', '18', 'wiz7']},
-    {level: 8, sections: ['19', '20', '21', 'wiz8']},
-    {level: 9, sections: ['22', '23', '24', 'wiz9']},
-    {level: 10, sections: ['25', '26', '27', 'wiz10']},
-    {level: 11, sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
-    {level: 12, sections: ['55', '56', '57', 'wiz12']},
-    {level: 13, sections: ['58', '59', '60', 'wiz13']},
-    {level: 14, sections: ['61', '62', '63', 'wiz14']},
-    {level: 15, sections: ['64', '65', '66', 'wiz15']},
+    {level: '1', sections: ['', '2', '3', 'wiz1']},
+    {level: '2', sections: ['4', '5', '6', 'wiz2']},
+    {level: '3', sections: ['7', '8', '9', 'wiz3']},
+    {level: '4', sections: ['10', '11', '12', 'wiz4']},
+    {level: '5', sections: ['70', '71', '72', 'wiz5']}, //... legacy naming convention
+    {level: '6', sections: ['13', '14', '15', 'wiz6']},
+    {level: '7', sections: ['16', '17', '18', 'wiz7']},
+    {level: '8', sections: ['19', '20', '21', 'wiz8']},
+    {level: '9', sections: ['22', '23', '24', 'wiz9']},
+    {level: '10', sections: ['25', '26', '27', 'wiz10']},
+    {level: '11', sections: ['52', '53', '54', 'wiz11']}, //... legacy naming convention
+    {level: '12', sections: ['55', '56', '57', 'wiz12']},
+    {level: '13', sections: ['58', '59', '60', 'wiz13']},
+    {level: '14', sections: ['61', '62', '63', 'wiz14']},
+    {level: '15', sections: ['64', '65', '66', 'wiz15']},
 ];
 
 let priestSpellLevelsSections = [
@@ -597,8 +793,8 @@ let priestSpellLevelsSections = [
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-specialist`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 
@@ -612,8 +808,8 @@ wizardSpellLevelsSections.forEach(spellLevel => {
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
     setupCalculateTotal(`${prefix}-total`, [`${prefix}-castable`, `${prefix}-wisdom`, `${prefix}-misc`]);
-    setupSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
-    setupSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-value', 'spell-cast-value', `${prefix}-cast-value-sum`);
+    setupRepeatingSpellSumming(spellLevel.sections, 'cast-max', 'spell-memorized', `${prefix}-cast-max-sum`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-max-sum`, `${prefix}-selected`);
     setupCalculateRemaining(`${prefix}-total`, `${prefix}-cast-value-sum`, `${prefix}-remaining`);
 
@@ -621,6 +817,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
         setupAutoFillSpellInfo(lastSection, priestSpells);
+        setupAddPriestSpell(lastSection);
     }
 });
 // --- End setup Spell Slots --- //
@@ -630,8 +827,8 @@ let wizardSpellPoints = 'spell-points';
 let arc = 'total-arc';
 let allWizardSpellSections = wizardSpellLevelsSections.flatMap(sl => sl.sections);
 setupCalculateTotal(`${wizardSpellPoints}-total`, [`${wizardSpellPoints}-lvl`, `${wizardSpellPoints}-spc`, `${wizardSpellPoints}-int`]);
-setupSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`);
-setupSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`);
+setupRepeatingSpellSumming(allWizardSpellSections, wizardSpellPoints, 'spell-points', `${wizardSpellPoints}-sum`, true);
+setupRepeatingSpellSumming(allWizardSpellSections, 'arc', 'spell-arc', `${arc}-sum`, true);
 setupCalculateRemaining(`${wizardSpellPoints}-total`, `${wizardSpellPoints}-sum`, `${wizardSpellPoints}-remaining`);
 setupCalculateRemaining(arc, `${arc}-sum`, `${arc}-remaining`);
 
@@ -639,18 +836,27 @@ let priestSpellPoints = 'spell-points-priest';
 let wind = 'total-wind';
 let allPriestSpellSections = priestSpellLevelsSections.flatMap(sl => sl.sections);
 setupCalculateTotal(`${priestSpellPoints}-total`, [`${priestSpellPoints}-lvl`, `${priestSpellPoints}-wis`]);
-setupSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`);
-setupSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`);
+setupRepeatingSpellSumming(allPriestSpellSections, priestSpellPoints, 'spell-points', `${priestSpellPoints}-sum`, true);
+setupRepeatingSpellSumming(allPriestSpellSections, 'wind', 'spell-wind', `${wind}-sum`, true);
 setupCalculateRemaining(`${priestSpellPoints}-total`, `${priestSpellPoints}-sum`, `${priestSpellPoints}-remaining`);
 setupCalculateRemaining(wind, `${wind}-sum`, `${wind}-remaining`);
 // --- End setup Spell Points, Arc, and Wind --- //
 
+// --- Start setup reset buttons --- //
+//tab6 = wizard levels
+//tab7 = priest levels
+setupSpellSlotsReset('reset-spent-slots-wiz', 'tab6', wizardSpellLevelsSections, allWizardSpellSections);
+let allPriestSectionsExceptQuest = priestSpellLevelsSections.slice(0, -1).flatMap(sl => sl.sections);
+setupSpellSlotsReset('reset-spent-slots-pri', 'tab7', priestSpellLevelsSections, allPriestSectionsExceptQuest);
+// --- End setup reset buttons --- //
+
 // --- Start setup Granted Powers --- //
 let powerSpellSections = ['67', '68', '69'];
 let spellPower = 'spell-power';
-setupSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
-setupSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
+setupRepeatingSpellSumming(powerSpellSections, 'cast-value', '', `${spellPower}-sum`);
+setupRepeatingSpellSumming(powerSpellSections, 'cast-max', '', `${spellPower}-available`);
 setupCalculateRemaining(`${spellPower}-available`, `${spellPower}-sum`, `${spellPower}-remaining`);
+setupSpellSlotsReset('reset-spent-slots-pow', null, null, powerSpellSections)
 // --- End setup Granted Powers --- //
 
 // --- Start setup Rogue skills total --- //
@@ -704,7 +910,7 @@ on('change:repeating_customrogue:crl remove:repeating_customrogue', function(){
 
 //Related weapons / familiarity penalty
 on('change:nonprof-penalty', function (eventInfo) {
-    if (eventInfo.sourceType === SheetWorker) {
+    if (eventInfo.sourceType === sheetWorker) {
         return;
     }
     getAttrs(['nonprof-penalty'], function(values) {
@@ -718,25 +924,27 @@ on('change:nonprof-penalty', function (eventInfo) {
 })
 
 function getWeaponWithBonus(weaponName) {
+    weaponName = weaponName?.toLowerCase();
     if (!weaponName)
         return undefined;
     
     let baseWeapon = weapons[weaponName];
-    if (baseWeapon !== undefined) {
+    if (baseWeapon) {
         return {
             ...baseWeapon,
             bonus: '0'
         };
     }
     
-    let match = weaponName.match(/\+[0-9]+$/);
+    let match = weaponName.match(/\s*\+[0-9]+\s*/);
     if (!match)
         return undefined;
-    
-    let split = weaponName.split('+');
-    baseWeapon = weapons[split[0].trim()];
-    let bonus = parseInt(split[1].trim());
-    if (split.length !== 2 || baseWeapon === undefined || isNaN(bonus))
+
+    let baseWeaponName = weaponName.replace(match[0], ' ').trim();
+    baseWeapon = weapons[baseWeaponName];
+    let bonusString = match[0].trim().replace('+', '');
+    let bonus = parseInt(bonusString)
+    if (!baseWeapon || isNaN(bonus))
         return undefined;
     
     let weaponWithBonus = {
@@ -871,13 +1079,16 @@ followerWeapons.forEach(fw => {
 });
 
 //Weapon proficiency slots
-on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(){
+on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
+    if (doEarlyReturn(eventInfo, ['weapprofnum']))
+        return;
     TAS.repeatingSimpleSum('weaponprofs', 'weapprofnum', 'weapprofslotssum');
 });
 
 //Nonweapon proficiency slots
-on('change:repeating_profs:profslots remove:repeating_profs', function(){
-
+on('change:repeating_profs:profslots remove:repeating_profs', function(eventInfo){
+    if (doEarlyReturn(eventInfo, ['profslots']))
+        return;
     TAS.repeatingSimpleSum('profs', 'profslots', 'profslotssum');
 });
 //Nonweapon proficiency autofill
@@ -894,14 +1105,18 @@ on('change:repeating_profs:profname', function (eventInfo) {
 });
 
 //Equipment Carried Section
-on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(){
+on('change:repeating_gear:gearweight change:repeating_gear:gearqty remove:repeating_gear', function(eventInfo){
+    if (doEarlyReturn(eventInfo, ['gearweight', 'gearqty']))
+        return;
     repeatingMultipleSum('gear', 'gearweight', 'gearqty', 'gearweighttotal', 2);
 });
 
 //Equipment Stored Section
 //Mount Equipment Carried Section Continued
-on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(){
-
+on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored:gear-stored-qty change:repeating_gear-stored:on-mount remove:repeating_gear-stored', function(eventInfo){
+    if (doEarlyReturn(eventInfo, ['gear-stored-weight', 'gear-stored-qty']))
+        return;
+    
     TAS.repeating('gear-stored')
         .attrs('mount-gear-weight-total','stored-gear-weight-total')
         .fields('on-mount','gear-stored-weight','gear-stored-qty')
@@ -917,10 +1132,14 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         .execute();
 })
 
-function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, repeatingSection) {
+function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, section) {
+    let repeatingSection = `repeating_${section}`;
     let onChange = `change:${valueField} change:${multiplierField} change:${repeatingSection}:${valueField} change:${repeatingSection}:${multiplierField} remove:${repeatingSection}`
-    on(onChange, function(){
-        TAS.repeating(repeatingSection)
+    on(onChange, function(eventInfo){
+        if (doEarlyReturn(eventInfo, [valueField, multiplierField]))
+            return;
+        
+        TAS.repeating(section)
             .attrs(totalField, valueField, multiplierField)
             .fields(valueField, multiplierField)
             .reduce(function(m,r){
