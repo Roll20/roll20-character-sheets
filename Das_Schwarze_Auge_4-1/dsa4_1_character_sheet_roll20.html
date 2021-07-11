@@ -16624,26 +16624,40 @@ function calculateCombatValues() {
             attrsToChange["shield_bf"] = shieldparrybf;
 
             // Set shield parry weapon TP/KK (damage modifier based on low/high strength)
-            // For now no calculations, just showing text
-            var shieldparrytpkk = "";
+            var shieldparrytpkkdefault = "13/3";
+            var shieldparrytpkk = shieldparrytpkkdefault;
             if (activeShieldRowId) {
                 shieldparrytpkk = values["repeating_shields_" + activeShieldRowId + "_shield_tpkk"];
-                if (shieldparrytpkk === undefined || shieldparrytpkk === "") {
-                    shieldparrytpkk = " ";
-                } else {
-                    // We are misusing the TP/KK function a bit ...
-                    var TPKK = new Object();
-                    TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
-                    TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
-                    shieldparrytpkk = calculateTpKKMod(
-                        {
-                            "KK": values["KK"],
-                            "NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
-                            "NKW-schild_Schwellenwert": TPKK["Schritt"]
-                        },
-                        "-schild"
-                    );
-                }
+
+				// Check for correct TP/KK
+				{
+					var setdefault = 1;
+					if (shieldparrytpkk === undefined) {
+						console.log('Error: TP/KK for shield parry is undefined. Set to default value ("' + shieldparrytpkkdefault + '").');
+					} else if (shieldparrytpkk === "") {
+						console.log('Error: TP/KK for shield parry is empty. Set to default value ("' + shieldparrytpkkdefault + '").');
+					} else if (shieldparrytpkk.match(/([^/]+)\/([^/]+)/) == null) {
+						console.log('Error: Invalid TP/KK \'' + shieldparrytpkk + '\'. Set to default value ("' + shieldparrytpkkdefault + '").');
+					} else {
+						setdefault = 0;
+					}
+					if ( setdefault === 1 ) {
+						attrsToChange["repeating_shields_" + activeShieldRowId + "_shield_tpkk"] = shieldparrytpkkdefault;
+						shieldparrytpkk = shieldparrytpkkdefault;
+					}
+				}
+                // We are misusing the TP/KK function a bit ...
+                var TPKK = new Object();
+                TPKK["Schwellenwert"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[1]);
+                TPKK["Schritt"] = parseInt(shieldparrytpkk.match(/([^/]+)\/([^/]+)/)[2]);
+                shieldparrytpkk = calculateTpKKMod(
+                    {
+                        "KK": values["KK"],
+                        "NKW-schild_SchwellenwertKK": TPKK["Schwellenwert"],
+                        "NKW-schild_Schwellenwert": TPKK["Schritt"]
+                    },
+                    "-schild"
+                );
             }
             attrsToChange["shield_tpkk"] = shieldparrytpkk;
 
