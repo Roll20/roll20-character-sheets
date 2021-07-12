@@ -5,7 +5,7 @@ const sheetVersion = '4.1.1';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
-        let cs=(attrs.character_sheet||'').match(/(.*?)\s+v(.*?)$/) || [];
+        let cs=(attrs.character_sheet||'').match(/(.*)\s+v(.*)/) || [];
         let sheet_name=cs[1] || '';
         let sheet_version=cs[2] || '0.0.0';
 
