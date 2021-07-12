@@ -73,13 +73,20 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+July 5th 2021 v1.5 
+
+- Automatic XP Spent calculation (as per core rule book) has been intergrated to the sheet as a optional feature, activate this in the XP or settings tabs. This will calculate all XP on the fly after Talents or Advances are entered in the sheet. Special Xp circumstances like free/starting XP or changing career/level need to be added manually to the "Other XP" section in the XP tab. XP calculation is capped at 50 skill advances/10 talent levels as descibed in the core rules, advances above this will not count toward the overall spent total. You can not mix Auto & Manual modes at the same time, but you can switch between them at anytime.
+- Made Armor Penalties on Perception and Stealth rolls visible on the Rolltempalte so it clear that they are being applied.
+- Fixed some advanced skill target numbers which were calculating conditions twice.
+
 June 14th 2021 v1.41 
 
 - Vastly improved performance of Target value re-calculations due to condition changes, by moving them to the sheet worker. This was particularly bad on Firefox, while MS Edge(Chromium) and Chrome were less impacted but also benefit from the changes. No actual changes in functionality just faster!
 - Corrected bug with Characteristics Modifier not reach through to skills/melee/spells
 - Deafened = Effects Initiative characteristic rolls, and any skill that would require hearing like Perception/Intuition.
 - Haggle Skill roll was broken from the last update and is now fixed.
-
+- Corruption table corrections.
+- Armor Qualities are now shown on Dodge rolls.
  
 
 June 14th 2021 v1.4 

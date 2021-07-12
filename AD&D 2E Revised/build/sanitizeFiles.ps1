@@ -20,6 +20,7 @@ Get-ChildItem $javascriptFolder | ForEach-Object {
     $content = Get-Content -Raw $_.FullName
 
     $replace = $content -replace [Regex]::Escape("\\"), "\"
+    $replace = $replace -replace [Regex]::Escape(" \n"), "\n"
     if ($replace -cne $content) {
         $replace | Set-Content -NoNewline -Path $_.FullName
     }

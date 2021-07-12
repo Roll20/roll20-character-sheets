@@ -146,6 +146,10 @@ mixin borderedContainer(divObj,sectionHeadObj,columnHeaderArray,columnHeaderObj)
 		//- End if
 		block
 //-End mixin
+mixin pseudoControl(name)
+	.pseudo-control
+		button(type='action' class='repcontrol_add' name=`act_add_${name}`)
+//- End Mixin
 mixin templateConditionalDisplay(fieldBool,fieldDisplay,invert)
 	!=`{{${invert ? '^' : '#'}${fieldBool}}}`
 	if /\^{/.test(fieldDisplay)
@@ -155,10 +159,11 @@ mixin templateConditionalDisplay(fieldBool,fieldDisplay,invert)
 			!=`${fieldDisplay}`
 	!=`{{/${fieldBool}}}`
 //- End mixin
-mixin templateBorderedContainer(divObj)
-	.bordered-container&attributes(divObj)
-		block
-//- End mixin
+mixin rollTemplateHelperFunction(helperObj)
+	!=`{{${helperObj.positive ? '#' : (helperObj.func ? '#^' : '^')}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
+	block
+	!=`{{/${(helperObj.positive || !helperObj.func) ? '' : '^'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
+//- End Mixin
 mixin templateHexagonLabelContainer(divClass,field,def,invert)
 	+trueHexagon(null,divClass)
 		block
@@ -166,11 +171,10 @@ mixin templateHexagonLabelContainer(divClass,field,def,invert)
 		if def
 			+templateConditionalDisplay(field,def,!invert)
 //- End mixin
-mixin rollTemplateHelperFunction(helperObj)
-	!=`{{${helperObj.positive ? '#' : (helperObj.func ? '#^' : '^')}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
-	block
-	!=`{{/${(helperObj.positive || !helperObj.func) ? '' : '^'}${helperObj.func ? `${helperObj.func}() `:''}${helperObj.field}${helperObj.values ? ` ${helperObj.values.join(' ')}` : ''}}}`
-//- End Mixin
+mixin templateBorderedContainer(divObj)
+	.bordered-container&attributes(divObj)
+		block
+//- End mixin
 mixin hack-header(level)
 	div(class=`hack-header pentagon-hexagon-label-container`)
 		+trueHexagon(locked)
@@ -338,11 +342,7 @@ mixin trait(pc)
 				//- End collapsed-view
 			//- End Expandable Section
 		//- End fieldset
-//- End mixin	
-mixin pseudoControl(name)
-	.pseudo-control
-		button(type='action' class='repcontrol_add' name=`act_add_${name}`)
-//- End Mixin
+//- End mixin
 mixin settingLabel(inputObj,i18n)
 	if !inputObj.type || inputObj.type!=='select'
 		label
