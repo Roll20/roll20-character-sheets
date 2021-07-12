@@ -5239,7 +5239,9 @@ on("sheet:opened", function() {
 				case '0.37':
 					_pre_v37_update();
 					console.log("Data now fits v.37");
-
+				case '0.38':
+					_v38_update();
+					console.log("Data now fits v.38");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5255,6 +5257,62 @@ on("sheet:opened", function() {
 
 
 var _v38_update = () => {
+	getAttrs(['sheet_type'], (v) => {
+		if(v.sheet_type === 'grunt') {
+			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
+			// this code just sets them to their default associated attribute which should annoy the fewest users.
+			getSectionIDs('repeating_skills', (skill) => {
+				skill.forEach((skillID) => {
+					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
+						var attribute;
+						switch(attrs[`repeating_skills_${skillID}_name`]) {
+							case 'Athletics':
+							case 'Close Combat':
+							case 'Exotic Weapons':
+							case 'Firearms':
+							case 'Stealth':
+								attribute = 'Agility';
+								break;
+							case 'Con':
+							case 'Influence':
+								attribute = 'Charisma';
+								break;
+							case 'Astral':
+							case 'Outdoors':
+							case 'Perception':
+								attribute = 'Intuition';
+								break;
+							case 'Biotech':
+							case 'Cracking':
+							case 'Electronics':
+							case 'Engineering':
+								attribute = 'Logic';
+								break;
+							case 'Conjuring':
+							case 'Enchanting':
+							case 'Sorcery':
+								attribute = 'Magic';
+								break;
+							case 'Piloting':
+								attribute = 'Reaction';
+								break;
+							case 'Tasking':
+								attribute = 'Resonance';
+								break;
+							default:
+								attribute = 'Agility';
+								break;
+						}
+
+						setAttrs({
+							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
+							[`repeating_skills_${skillID}_display_attribute`]: attribute
+						});
+					});
+				});
+			});
+		}
+	});
 
 }
 
