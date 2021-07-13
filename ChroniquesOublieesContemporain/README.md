@@ -10,9 +10,25 @@ Le jeu complet est disponible sur le site de l'éditeur [Black Book Editions](ht
 
 # Version courante
 
-3.8.1 [Screenshot](coc_v2.png)
+3.9.2 [Screenshot](coc_v2.png)
 
 # Notes de version
+
+## v3.9.2 (2021-04-27)
+
+- Correction d'un bug sur le titre de la capacité de rang 4 de la voie n°2
+- Correction du calcul du rang dans une voie : la case doit être cochée et soit le titre soit le texte de la capacité doit être renseigné
+
+## v3.9.1 (2021-04-25)
+
+- Correction d'un bug sur le titre de la capacité de rang 3 de la voie n°3 dupliquée dans la voie n°8
+
+## v3.9.0 (2021-03-30)
+
+- Ajout d'un champ titre pour chaque capacité (attributs @{voieN-tR} où N = no de voie et R = rang)
+  - Migration automatique d'une version antérieure : la première ligne de la capacité est considérée comme titre
+  - Prise en compte dans les autres fonctions (liaison d'un jet de capacité à une voie+rang, import de données de profil JSON)
+- Correction d'un bug après suppression du seul modificateur d'attaque ou de DM de la liste (le modificateur n'est plus pris en compte dans les jets d'attaque)
 
 ## v3.8.1 (2021-03-01)
 
