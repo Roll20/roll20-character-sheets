@@ -43,6 +43,13 @@ If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
 
+### 2.6.1
+
+* Add datalists to most free-fill fields with autofilling
+  * Drones, drone fittings, ship hulltypes, class
+* Update sheet to use the new Character Sheet Enhancement sanitiser.
+* Some TypeScript refactoring.
+
 ### 2.6.0
 
 * Migrate worker codebase to TypeScript. Should hopefully reduce future bugs.
