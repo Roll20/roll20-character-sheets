@@ -63,6 +63,9 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 	
 	QUICKSTART Sheet
 	Added deprecation message 
+	
+	Translation 
+	Changed fumble8 and fumble to reomve references to previous fumble.  This will translators to strange translation. 
 
 
 ## 06.06.2021 
