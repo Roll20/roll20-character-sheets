@@ -720,10 +720,14 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 sections = allSections;
             else if (resetSection === 'level') {
                 let level = values[tab];
+                if (!level)
+                    return;
+                
                 let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
-                sections = spellLevel 
-                    ? spellLevel.sections ?? []
-                    : [];
+                if (!spellLevel)
+                    return;
+                
+                sections = spellLevel.sections || [];
             }
             
             if (!sections.length)
