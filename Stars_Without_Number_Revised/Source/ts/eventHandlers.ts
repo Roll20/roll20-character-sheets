@@ -90,7 +90,7 @@ on("change:setting_super_type change:repeating_spells remove:repeating_spells " 
     "change:skill_know_magic change:skill_use_magic change:skill_fight change:skill_sunblade change:skill_magic2_name change:skill_magic2", buildMagicMenu);
 
 /* Repeating autofill */
-autofillSections.forEach(sName => {
+autofillSections.forEach((sName: AutofillSectionsKey) => {
     on(`change:generate_${sName}_source`, () => generateAutofillInfo(sName));
     on(`change:generate_${sName}_button`, () => generateAutofillRow(sName));
 });
@@ -101,7 +101,7 @@ on("change:ship_hulltype", fillShipStats);
 on("change:ship_calculate_price", calculateShipStats)
 on("change:ship_class", () => {
     setShipClass();
-    ["ship-fittings", "ship-defenses"].forEach(sName => generateAutofillInfo(sName));
+    ["ship-fittings", "ship-defenses"].forEach((sName: 'ship-fittings' | 'ship-defenses') => generateAutofillInfo(sName));
 });
 on(shipStatEvent, calculateShipStats);
 on("change:repeating_ship-weapons:weapon_name change:repeating_ship-weapons:weapon_attack_bonus " +
