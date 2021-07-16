@@ -642,6 +642,9 @@ body .charactersheet div .col2 .melee-damage[value="3"] ~ .die3 {
 .col2-csheet {
     grid-template-columns: 1fr 2fr;
 }
+.col2-weapon {
+    grid-template-columns: 1fr 5fr;
+}
 .col2-initiative {
     grid-template-columns: 3fr 1fr;
 }
@@ -1022,9 +1025,20 @@ body .charactersheet div .col3 .col6-dr input {
     padding: 0 0 0 2px;
 }
 
+body .charactersheet div .col1 .weapons-grid button.skill-btn[type=roll] {
+    background: white;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    margin: 0 0 0 2px;
+    padding: 0;
+    outline: none;
+}
 body .charactersheet .roll-dice button.cd,
 body .charactersheet div .col3 .col7-meleedmg button,
-body .charactersheet div .col1 .weapons-grid button[type=roll] {
+body .charactersheet div .col1 .weapons-grid .melee-damage ~ button[type=roll] {
     background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fallout%202d20/images/die_vaultboy.png') center no-repeat;
     background-size: contain;
     width: 20px;
@@ -1043,7 +1057,7 @@ body .charactersheet .roll-dice button.cd {
 }
 body .charactersheet .roll-dice button.cd[type=roll]::before,
 body .charactersheet div .col3 .col7-meleedmg button[type=roll]::before,
-body .charactersheet div .col1 .weapons-grid button[type=roll]::before {
+body .charactersheet div .col1 .weapons-grid .melee-damage ~ button[type=roll]::before {
     content: '';
 }
 body .charactersheet .roll-dice button.skill,
@@ -1068,7 +1082,8 @@ body .charactersheet .roll-dice button.skill {
 body .charactersheet .roll-dice button.skill:hover,
 body .charactersheet div .col3 .col7-defense button:hover,
 body .charactersheet div .col3 .col7-initiative button:hover,
-body .charactersheet div .col3 .col2-initiative button:hover {
+body .charactersheet div .col3 .col2-initiative button:hover,
+body .charactersheet div .col1 .weapons-grid button.skill-btn[type=roll]:hover {
     color: #DC8D3B;
 }
 
@@ -1126,10 +1141,16 @@ body .charactersheet .locations .location input,
 body .charactersheet .grid label.physical-dr,
 body .charactersheet .grid label.energy-dr,
 body .charactersheet .grid label.rad-dr,
-body .charactersheet .grid label.poison-dr {
-    box-shadow: 0 0 0 1px white;
+body .charactersheet .grid label.poison-dr,
+body .charactersheet .grid button.power-armor {
     text-align: left;
     text-indent: -9999px;
+}
+body .charactersheet .npc label.physical-dr,
+body .charactersheet .npc label.energy-dr,
+body .charactersheet .npc label.rad-dr,
+body .charactersheet .npc label.poison-dr {
+    box-shadow: 0 0 0 1px white;
 }
 body .charactersheet .grid label.header.physical-dr,
 body .charactersheet .grid label.header.energy-dr,
@@ -1138,6 +1159,16 @@ body .charactersheet .grid label.header.poison-dr {
     background-color: white;
     filter: invert(1);
     padding: 0;
+}
+body .charactersheet .grid button.power-armor {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    background: none;
+    outline: none;
 }
 body .charactersheet .grid label.physical-dr {
     background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fallout%202d20/images/physical.png')
@@ -1154,6 +1185,17 @@ body .charactersheet .grid label.rad-dr {
 body .charactersheet .grid label.poison-dr {
     background: url('https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Fallout%202d20/images/poison.png')
         center / contain no-repeat border-box;
+}
+body .charactersheet .grid button.power-armor {
+    background: url('https://raw.githubusercontent.com/coyotegrey/roll20-character-sheets/fallout-2d20-dev/Fallout%202d20/images/armor.png')
+        center / contain no-repeat border-box;
+    filter: drop-shadow(0 0 1px white) invert(1);
+}
+body .charactersheet .power-armor[value="1"] ~ .interface button.power-armor {
+    filter: none;
+}
+body .charactersheet .power-armor[value="2"] ~ .interface button.power-armor {
+    filter: drop-shadow(0 0 1px #DC8D3B);
 }
 body .charactersheet .locations .col8 > *:nth-child(2) {
     border-left: 1px solid black;
@@ -1246,7 +1288,7 @@ body .charactersheet div .col1 .health input[type=number] {
 .weapons-grid .rep-grid-header,
 .weapons-grid .rep-grid ~ .repcontainer .repitem {
     grid-template-rows: 20px;
-    grid-template-columns: 3fr 3fr 2fr 4fr 2fr 1fr 1fr 4fr 1fr 1fr;
+    grid-template-columns: 4fr 3fr 2fr 4fr 2fr 1fr 1fr 4fr 1fr 1fr;
 }
 .perks-grid .rep-grid-header,
 .perks-grid .rep-grid ~ .repcontainer .repitem {
@@ -1269,6 +1311,12 @@ body .charactersheet div .col1 .health input[type=number] {
     padding: 0;
     box-shadow: 0 0 0 1px black;
     line-height: 20px;
+}
+.rep-grid ~ .repcontainer .repitem details div {
+    background: black;
+}
+.rep-grid ~ .repcontainer .repitem details div {
+    margin: 0px 20px 10px 0;
 }
 .rep-grid-header div {
     font: bold 10px 'Roboto', sans-serif;
@@ -1295,9 +1343,6 @@ body .charactersheet div .col1 .health input[type=number] {
     padding: 0 2px;
     outline: none;
     margin-bottom: 0;
-}
-.rep-grid ~ .repcontainer .repitem div input.melee-damage {
-    width: 50%;
 }
 .rep-grid ~ .repcontainer .repitem div textarea {
     width: 100%;
@@ -1819,35 +1864,35 @@ body .charactersheet div.npc .switch {
 .sheet-rolltemplate-foskill .sheet-hidden {
     display: none;
 }
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=strength] ~ .sheet-container .sheet-strength,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=perception] ~ .sheet-container .sheet-perception,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=endurance] ~ .sheet-container .sheet-endurance,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=charisma] ~ .sheet-container .sheet-charisma,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=intelligence] ~ .sheet-container .sheet-intelligence,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=agility] ~ .sheet-container .sheet-agility,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=luck] ~ .sheet-container .sheet-luck,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=body] ~ .sheet-container .sheet-body,
-.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder=mind] ~ .sheet-container .sheet-mind,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=athletics] ~ .sheet-container .sheet-athletics,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=barter] ~ .sheet-container .sheet-barter,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=big_guns] ~ .sheet-container .sheet-big_guns,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=energy_weapons] ~ .sheet-container .sheet-energy_weapons,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=explosives] ~ .sheet-container .sheet-explosives,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=lockpick] ~ .sheet-container .sheet-lockpick,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=medicine] ~ .sheet-container .sheet-medicine,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=melee_weapons] ~ .sheet-container .sheet-melee_weapons,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=pilot] ~ .sheet-container .sheet-pilot,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=repair] ~ .sheet-container .sheet-repair,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=science] ~ .sheet-container .sheet-science,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=small_guns] ~ .sheet-container .sheet-small_guns,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=sneak] ~ .sheet-container .sheet-sneak,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=speech] ~ .sheet-container .sheet-speech,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=survival] ~ .sheet-container .sheet-survival,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=throwing] ~ .sheet-container .sheet-throwing,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=unarmed] ~ .sheet-container .sheet-unarmed,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=melee] ~ .sheet-container .sheet-melee,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=guns] ~ .sheet-container .sheet-guns,
-.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder=other] ~ .sheet-container .sheet-other {
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=strength] ~ .sheet-container .sheet-strength,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=perception] ~ .sheet-container .sheet-perception,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=endurance] ~ .sheet-container .sheet-endurance,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=charisma] ~ .sheet-container .sheet-charisma,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=intelligence] ~ .sheet-container .sheet-intelligence,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=agility] ~ .sheet-container .sheet-agility,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=luck] ~ .sheet-container .sheet-luck,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=body] ~ .sheet-container .sheet-body,
+.sheet-rolltemplate-foskill .sheet-hidden-attribute[data-i18n-placeholder*=mind] ~ .sheet-container .sheet-mind,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=athletics] ~ .sheet-container .sheet-athletics,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=barter] ~ .sheet-container .sheet-barter,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=big_guns] ~ .sheet-container .sheet-big_guns,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=energy_weapons] ~ .sheet-container .sheet-energy_weapons,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=explosives] ~ .sheet-container .sheet-explosives,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=lockpick] ~ .sheet-container .sheet-lockpick,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=medicine] ~ .sheet-container .sheet-medicine,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=melee_weapons] ~ .sheet-container .sheet-melee_weapons,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=pilot] ~ .sheet-container .sheet-pilot,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=repair] ~ .sheet-container .sheet-repair,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=science] ~ .sheet-container .sheet-science,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=small_guns] ~ .sheet-container .sheet-small_guns,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=sneak] ~ .sheet-container .sheet-sneak,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=speech] ~ .sheet-container .sheet-speech,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=survival] ~ .sheet-container .sheet-survival,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=throwing] ~ .sheet-container .sheet-throwing,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=unarmed] ~ .sheet-container .sheet-unarmed,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=melee]:not([data-i18n-placeholder*=melee_]) ~ .sheet-container .sheet-melee,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=guns]:not([data-i18n-placeholder*=_guns]) ~ .sheet-container .sheet-guns,
+.sheet-rolltemplate-foskill .sheet-hidden-skill[data-i18n-placeholder*=other] ~ .sheet-container .sheet-other {
     display: inline-block;
 }
 
