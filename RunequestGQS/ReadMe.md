@@ -34,6 +34,40 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+
+
+## 14.7.2021
+
+
+	Added draggable button support
+	
+	Added roll template for spirit combat damage
+	
+	Added roll template for turn order
+	
+	Support for critical and special damage for Allies and Otherworld Creatures
+	
+	Added translation for labels in skill roll template
+	
+	Fixed issue with damage for Otherworld creature 1
+	
+	Fixed formatting issue with fumble  87-89 in English translation file.
+
+	NPC Sheet
+	
+	Added support for critical and special damage
+	
+	Flipped current and maximum hp and mp
+	
+	Fixed hit location selection
+	
+	QUICKSTART Sheet
+	Added deprecation message 
+	
+	Translation 
+	Changed fumble8 and fumble to reomve references to previous fumble.  This will translators to strange translation. 
+
+
 ## 06.06.2021 
        Added translation tags for buff spells and hit point labels
        Fixed issues with a number of translation tags.
