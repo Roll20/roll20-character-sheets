@@ -3,9 +3,9 @@
 /* Ship Code */
 const fillShipStats = () => {
     getAttrs(["ship_hulltype", ...shipStats], v => {
-        const label = v.ship_hulltype && reverseHullTypes[v.ship_hulltype.toLowerCase()];
+        const label: ReverseHullTypes | "" = v.ship_hulltype && <ReverseHullTypes> reverseHullTypes[v.ship_hulltype.toLowerCase()];
         if (label && autofillData.hulltypes.hasOwnProperty(label)) {
-            const data = Object.assign({}, autofillData.hulltypes[label]);
+            const data = <{[key:string]: string}> Object.assign({}, autofillData.hulltypes[label]);
             data.ship_hp_max = data.ship_hp;
             Object.keys(data).forEach(key => {
                 //Might remove later. Unsure if desired feature.

@@ -2,12 +2,12 @@
 
 /* NPC */
 const fillNPC = () => {
-    getAttrs(["npc_stat_block"], (v) => {
-        if (v.npc_stat_block && autofillData.statblocks[v.npc_stat_block]) {
+    getAttrs(["npc_stat_block"], (v ) => {
+        if (v.npc_stat_block && Object.keys(autofillData.statblocks).includes(v.npc_stat_block)) {
             const {
                 npc_hd, npc_ac, npc_attack_bonus, npc_damage, npc_attacks, npc_move,
                 npc_morale, npc_skills, npc_saves, npc_armor_type
-            }: {[key: string]: string | false} = autofillData.statblocks[v.npc_stat_block];
+            } = autofillData.statblocks[v.npc_stat_block as keyof (typeof autofillData.statblocks)];
 
             const setting: {[key: string]: string | false} = {
                 npc_ac,
