@@ -417,7 +417,7 @@ function isNewSpellSection(section) {
 }
 
 function isRemoving0(eventInfo, fieldNames) {
-    return fieldNames?.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
+    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
 }
 
 function isOverwriting0(eventInfo) {
@@ -603,7 +603,10 @@ function parseSpheres(spheresStrings, regex) {
 
 function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
     let primarySpellSpheres = spellSphereString.match(noElementalRegex);
-    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
+    if (!primarySpellSpheres)
+        return false;
+    
+    let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
@@ -717,10 +720,17 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 sections = allSections;
             else if (resetSection === 'level') {
                 let level = values[tab];
-                sections = spellLevels.find(sl => sl.level === level)?.sections;
+                if (!level)
+                    return;
+                
+                let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
+                if (!spellLevel)
+                    return;
+                
+                sections = spellLevel.sections || [];
             }
             
-            if (!sections?.length)
+            if (!sections.length)
                 return
             
             let updateFunction;
@@ -924,10 +934,10 @@ on('change:nonprof-penalty', function (eventInfo) {
 })
 
 function getWeaponWithBonus(weaponName) {
-    weaponName = weaponName?.toLowerCase();
     if (!weaponName)
         return undefined;
     
+    weaponName = weaponName.toLowerCase();
     let baseWeapon = weapons[weaponName];
     if (baseWeapon) {
         return {
