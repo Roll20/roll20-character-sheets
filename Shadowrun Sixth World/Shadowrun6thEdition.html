@@ -806,7 +806,11 @@
 				<div class="con-track">
 					<input type="hidden" name="attr_physical_damage" value="0" />
 					<button type="action" name="act_cond_reset_physical" data-i18n="resetphysicaltrack">Reset Physical Track</button>
+<<<<<<< HEAD
 					<button type="roll" name="roll_natural_healing_physical" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.  &star; Duration is halved with the Quick Healer quality.}}"><span class="center"><span class="center" data-i18n="naturalhealingphysical">Natural Healing (Physical)</span></span></button>
+=======
+					<button type="action" name="act_natural_healing_physical" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.  &star; Duration is halved with the Quick Healer quality.}}"><span class="center"><span class="center" data-i18n="naturalhealingphysical">Natural Healing (Physical)</span></span></button>
+>>>>>>> computable-rolls
 					<div class="squares">
 						<input class="hex-hider" type="hidden" name="attr_physical_max" value="10" />
 						<input type="radio" name="attr_physical_damage" value="1" /><span></span>
@@ -5032,7 +5036,11 @@
 			{{#rollGreater() combat_paralysis 0}}<span>|</span><span data-i18n="combat_paralysis">Combat Paralysis</span><span>|</span>{{/rollGreater() combat_paralysis 0}}
 			{{#effecttype}}<br /><span>{{effecttype}}</span>{{/effecttype}}
 		</div>
-		{{#dice}}<div class="sheet-template-row">Hits: {{dice}}</div>{{/dice}}
+{{#rollGreater() computed::glitch 0}}
+{{#rollLess() computed::glitch 2}}<div class="sheet-template-row red"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch 2}}
+{{#rollGreater() computed::glitch 1}}<div class="sheet-template-row red"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch 1}}
+{{/rollGreater() computed::glitch 0}}
+		{{#dice}}<div class="sheet-template-row">Hits: {{dice}} == {{computed::dice}}</div>{{/dice}}
 		{{#rollGreater() wilddie 0}}
 			<div class="sheet-template-row">Wild Die Rolled! {{wilddie}}<br>
 			{{#rollLess() wilddie 2}}
@@ -5221,11 +5229,67 @@
 <input type="hidden" name="attr_unarmedcombat" value="0" />
 <input type="hidden" name="attr_combat_paralysis" value="0" />
 <input type="hidden" name="attr_combat_paralysis_initiative_mod" value="" />
+<input type="hidden" name="attr_bad_luck" value="1" />
 
+<<<<<<< HEAD
 <input type="hidden" name="attr_sheet_version" value="0.39">
 <input type="hidden" name="attr_data_version" value="0">
+=======
+<input type="hidden" name="attr_sheet_version" value="0.37">
+>>>>>>> computable-rolls
 <script type="text/worker">
 //Sheet workers
+on("clicked:natural_healing_physical", (eventInfo) => {
+console.log("clicked");
+console.log(eventInfo);
+	getAttrs(["bad_luck"], (v) => {
+		startRoll("@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.  &star; Duration is halved with the Quick Healer quality.}}{{wilddie=[[@{wild_die}d6]]}}{{glitch=[[0]]}}", (results) => {
+console.log(results.results);
+			var rolled = results.results.dice.dice;
+
+console.log("Wild Die: "+results.results.wilddie.result);
+			var hits_threshold = 5;
+			if(results.results.wilddie && results.results.wilddie.result < 2) {
+				hits_threshold = 6;
+			}
+			var hits = rolled.reduce((a, v) => (v >= hits_threshold ? a + 1 : a), 0);
+console.log("Hit Threshold: "+hits_threshold);
+
+			if(results.results.wilddie && results.results.wilddie.result >= 5) {
+console.log("Wild Die Rolled High!");
+				hits = hits + 3;
+			}
+
+			var glitch_threshold = 1;
+			if(parseInt(v.bad_luck) > 0) {
+				glitch_threshold = 2;
+			}
+			var glitches = rolled.reduce((a, v) => (v <= glitch_threshold ? a + 1 : a), 0);
+console.log("Glitch Threshold: "+glitch_threshold);
+
+			var glitch = 0;
+			if(glitches > rolled.length / 2) {
+				if(hits) {
+					glitch = 1;
+				} else {
+					glitch = 2;
+				}
+			}
+console.log("Hits: "+hits+" Glitches: "+glitches+" Glitch: "+glitch);
+
+
+			results.results.dice.result = 100;
+			finishRoll(
+				results.rollId, {
+					dice: hits,
+					glitch: glitch,
+				}
+			);
+		});
+
+	});
+});
+
 on("sheet:opened", function() {
 	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
 		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
