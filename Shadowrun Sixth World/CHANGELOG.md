@@ -1,6 +1,5 @@
 Change Log
 ==============================================
-<<<<<<< HEAD
 **2021-07-19 ** v.39 Chuz (James Culp)
 	Added Grunt Groups and Autocalculations based on the # of grunts
 **2021-07-12 ** v.38 Chuz (James Culp)
@@ -14,9 +13,6 @@ Change Log
 	Added some behind the scenes code to try and update the weapons to have the Attribute, Attribute Rating and Dicepool Modifier attributes set correctly after loading.  Also added versioning for the character sheet data.
 	NPC Astral Initiative now auto-calculates for spirits and awakened grunts	NPC->Vehicle/Drone fixed hot sim initiative auto-calculation (now pilot * 2 + 4d6)
 	NPC->Grunt fixed sprint speed being 0 by default
-=======
-**2021-07-05 ** v.37 Chuz (James Culp)
->>>>>>> computable-rolls
 	PC Sheet -> Condition Modifiers box - added Natural Healing Physical and Stun buttons.  Currently do not update player's CM.
 **2021-06-21 ** v.36 Chuz (James Culp)
 	PC Sheet Modifiers text boxes in various places in the sheet (Qualities, Augs, Gear, Matrix Devices, Programs, and Echos) now allow the player to add/subtract from attributes on the sheet.  See roll20 forum thread for further details.
