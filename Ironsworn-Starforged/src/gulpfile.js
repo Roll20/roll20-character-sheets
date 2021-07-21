@@ -8,7 +8,7 @@ merge = require('gulp-merge-json')
 const translation = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../translation.json')))
 
 gulp.task('data', function() {
-  return gulp.src(['data/**/*.json', '../translation.json'], {allowEmpty: true})
+  return gulp.src(['app/data/**/*.json', '../translation.json'], {allowEmpty: true})
     .pipe(merge({
       fileName: 'data.json',
       edit: (json, file) => {
