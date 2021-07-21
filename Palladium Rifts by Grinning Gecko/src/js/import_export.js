@@ -43,9 +43,7 @@
     attrs.modifiers = await getRepeatingRowsAsync("modifiers");
     // Profiles are tricky to export because IDs that they refer to won't line up
     // attrs.profiles = await getRepeatingRowsAsync("profiles");
-    // const coreAttrs = await getAttrsAsync(CORE_KEYS);
     attrs.core = await getAttrsAsync(CORE_KEYS);
-    // Object.entries(coreAttrs).forEach(([key, val]) => (attrs[key] = val));
     await setAttrsAsync({ importexport: JSON.stringify(attrs, null, 2) });
   });
 
@@ -99,23 +97,13 @@
     // return;
     await setAttrsAsync(data.core);
     await setRepeatingRowsAsync("wp", data.wp);
-    // delete data.wp;
     await setRepeatingRowsAsync("wpmodern", data.wpmodern);
-    // delete data.wpmodern;
     await setRepeatingRowsAsync("skills", data.skills);
-    // delete data.skills;
     await setRepeatingRowsAsync("magic", data.magic);
-    // delete data.magic;
     await setRepeatingRowsAsync("psionics", data.psionics);
-    // delete data.psionics;
     await setRepeatingRowsAsync("movement", data.movement);
-    // delete data.movement;
     await setRepeatingRowsAsync("powersabilities", data.powersabilities);
-    // delete data.powersabilities;
     await setRepeatingRowsAsync("modifiers", data.modifiers);
-    // delete data.modifiers;
-    // await setAttrsAsync(data);
-    // Done isn't actually true until everything is using async and no more callbacks
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",

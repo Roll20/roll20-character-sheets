@@ -712,7 +712,6 @@ const SECTIONS = {
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,
-  // combat: REPEATING_BONUS_KEYS, // deprecated
   modifiers: REPEATING_BONUS_KEYS,
   magic: MAGIC_KEYS,
   psionics: PSIONICS_KEYS,
