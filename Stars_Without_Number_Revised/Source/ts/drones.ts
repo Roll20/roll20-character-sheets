@@ -6,7 +6,7 @@ const fillDroneStats = () => {
     getAttrs(["repeating_drones_drone_model"], v => {
         const model = (v.repeating_drones_drone_model || "").toLowerCase().trim().replace(/ /g, "_");
         if (autofillData.drones.hasOwnProperty(model)) {
-            const setting = Object.entries(autofillData.drones[model]).reduce((m: {[key: string]: string}, [key, value]) => {
+            const setting = Object.entries(autofillData.drones[model as keyof typeof autofillData.drones]).reduce((m: {[key: string]: string}, [key, value]) => {
                 if (typeof value === "string") {
                     m[`repeating_drones_${key}`] = value;
                 }
@@ -21,7 +21,7 @@ const fillDroneFitting = (num: number) => {
     const prefix = `repeating_drones_drone_fitting_${num}`;
     getAttrs([`${prefix}_desc`, `${prefix}_name`], v => {
         const fittingName = (v[`${prefix}_name`] || "").toLowerCase().trim().replace(/ /g, "_");
-        if (v[`${prefix}_desc`] === "" && Object.keys(autofillData.droneFittings.default).includes(fittingName)) {
+        if (v[`${prefix}_desc`] === "" && autofillData.droneFittings.includes(fittingName)) {
             setAttrs({
                 [`${prefix}_desc`]: translate(`${fittingName.toUpperCase()}_DESC`)
             });
