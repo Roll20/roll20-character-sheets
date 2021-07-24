@@ -4459,7 +4459,7 @@
 				<input name="attr_IC" type="hidden" value=""/>
 				<input class="toggle" name="attr_powered_on_IC" type="checkbox" value='1'/>
 				<span class="pictos">Q</span>
-				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{dice}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_IC_name"></span></button>
+				<button name="roll_IC" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{ic}: @{IC_name}}}{{dice=[[(@{IC_dice}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=vs. @{IC_attribute}+@{IC_matrix}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_IC_name"></span></button>
 				<span class="center" name="attr_IC_dice"></span>
 				<span class="center" name="attr_IC_ar"></span>
 				<label data-i18n-title="cm" title="Condition Monitor">
@@ -5208,7 +5208,7 @@
 <input type="hidden" name="attr_combat_paralysis" value="0" />
 <input type="hidden" name="attr_combat_paralysis_initiative_mod" value="" />
 
-<input type="hidden" name="attr_sheet_version" value="0.37">
+<input type="hidden" name="attr_sheet_version" value="0.38">
 <input type="hidden" name="attr_data_version" value="0">
 <script type="text/worker">
 //Sheet workers
@@ -5239,7 +5239,9 @@ on("sheet:opened", function() {
 				case '0.37':
 					_pre_v37_update();
 					console.log("Data now fits v.37");
-
+				case '0.38':
+					_v38_update();
+					console.log("Data now fits v.38");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5253,6 +5255,66 @@ on("sheet:opened", function() {
 	});
 });
 
+
+var _v38_update = () => {
+	getAttrs(['sheet_type'], (v) => {
+		if(v.sheet_type === 'grunt') {
+			// Grunt skills somehow ended up thinking they were all based on agility at least for the display part and for many apparently the actual selected attribute.
+			// this code just sets them to their default associated attribute which should annoy the fewest users.
+			getSectionIDs('repeating_skills', (skill) => {
+				skill.forEach((skillID) => {
+					getAttrs([`repeating_skills_${skillID}_attribute`, `repeating_skills_${skillID}_display_attribute`, `repeating_skills_${skillID}_name`], (attrs) => {
+						var attribute;
+						switch(attrs[`repeating_skills_${skillID}_name`]) {
+							case 'Athletics':
+							case 'Close Combat':
+							case 'Exotic Weapons':
+							case 'Firearms':
+							case 'Stealth':
+								attribute = 'Agility';
+								break;
+							case 'Con':
+							case 'Influence':
+								attribute = 'Charisma';
+								break;
+							case 'Astral':
+							case 'Outdoors':
+							case 'Perception':
+								attribute = 'Intuition';
+								break;
+							case 'Biotech':
+							case 'Cracking':
+							case 'Electronics':
+							case 'Engineering':
+								attribute = 'Logic';
+								break;
+							case 'Conjuring':
+							case 'Enchanting':
+							case 'Sorcery':
+								attribute = 'Magic';
+								break;
+							case 'Piloting':
+								attribute = 'Reaction';
+								break;
+							case 'Tasking':
+								attribute = 'Resonance';
+								break;
+							default:
+								attribute = 'Agility';
+								break;
+						}
+
+						setAttrs({
+							[`repeating_skills_${skillID}_attribute`]: '@{'+attribute.toLowerCase()+'}',
+							[`repeating_skills_${skillID}_display_attribute`]: attribute
+						});
+					});
+				});
+			});
+		}
+	});
+
+}
 
 var _pre_v37_update = () => {
 	// Update trigger sheetworkers for weapons to set attribute and attr_rating values
