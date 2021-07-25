@@ -82,6 +82,8 @@ async function updateMagicPsionicsLevels() {
       await calculatePercentage(`${row}_percentage`);
       await calculateRangeDuration(`${row}_range`);
       await calculateRangeDuration(`${row}_duration`);
+      await calculateRangeDuration(`${row}_frequency`);
+      await calculateRangeDuration(`${row}_dc`);
     }
   }
 }
