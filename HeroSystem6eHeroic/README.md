@@ -36,7 +36,7 @@ Note that the total points may not update immediately. After you change some inp
 
 ![Health Status Indicator](https://github.com/Villain1nGlasses/images/blob/318bd9656887880b4fd28fddf9b1c07fd40d204f/HealthStatus.png)
 
-In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your maximums.
+In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
 ## Page 1: Characteristics
 
@@ -46,11 +46,19 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 ## Page 2: Gear
 
-Along the top is an accounting of your carried weight and DCV and movement penalties.
+The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers. Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn.
+
+![Killing Attack Chat Message](https://github.com/Villain1nGlasses/images/blob/3304081cf4f84b8bf2b3f0a8a2d41c163e275d3f/encumbrance.png)
 
 The sheet includes space for four suits or pieces of armor. Although this sheet is currently written for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. The shield line assumes attacking with a shield is a normal damage attack and that the DCV bonus for defense is an OCV penalty for attacks.
 
-The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). 
+The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made and target, and the BODY and STUN damage rolls.
+
+![Killing Attack Chat Message](https://github.com/Villain1nGlasses/images/blob/a14f2b633b99788b00227d77c6138c334494933c/RedButtonChat.png)
+
+The fifth weapon's roll button produces similar output, but assumes the weapon's damage dice are of type normal damage.
+
+![Normal Attack Chat Message](https://github.com/Villain1nGlasses/images/blob/c910ec6970abe43671e32a8907b831244ce449b7/GreenButtonChat.png)
 
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers. A third pane can be used for notes and treasures.
 
@@ -76,7 +84,7 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ## Page 5: Talents and Complications
 
-The only trick to this page is to remember that points from Complications subtract from the total shown in the Tally Bar. Talents and Perks and so forth count as Powers in the Tally Bar.  
+The only trick to this page is to remember that points from Complications subtract from the total shown in the Tally Bar. Points spent on items in the Talent section (e.g., Perks) are counted along with Powers in the Tally Bar.  
 
 ## Page 6: Options
 
