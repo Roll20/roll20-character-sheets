@@ -14,7 +14,7 @@ If you would like more flexibility in creating macros and have a Pro-level subsc
 ## Buttons
 Roll buttons are color-coded:
 
-![Orange Button](HeroSystem6eHeroic/images/OrangeButton.png) Orange buttons are for skill checks and characteristic rolls.
+![Orange Button](/HeroSystem6eHeroic/images/OrangeButton.png) Orange buttons are for skill checks and characteristic rolls.
 
 ![Blue Button](HeroSystem6eHeroic/images/BlueButton.png) Blue buttons are for armor activation rolls.
 
