@@ -805,8 +805,8 @@
 			<div class="display">
 				<div class="con-track">
 					<input type="hidden" name="attr_physical_damage" value="0" />
-					<button type="action" name="act_cond_reset_physical" data-i18n="resetphysicaltrack">Reset Physical Track</button>
-					<button type="roll" name="roll_natural_healing_physical" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.  &star; Duration is halved with the Quick Healer quality.}}"><span class="center"><span class="center" data-i18n="naturalhealingphysical">Natural Healing (Physical)</span></span></button>
+					<button name="act_cond_reset_physical" type="action" data-i18n="resetphysicaltrack">Reset Physical Track</button>
+					<button type="roll" name="roll_natural_healing_physical" value="@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.\n\n&star; Duration is halved with the Quick Healer quality.}}{{wilddie=[[@{wild_die}d6]]}}{{glitch=[[0]]}}"><span class="center"><span class="center" data-i18n="naturalhealingphysical">Natural Healing (Physical)</span></span></button>
 					<div class="squares">
 						<input class="hex-hider" type="hidden" name="attr_physical_max" value="10" />
 						<input type="radio" name="attr_physical_damage" value="1" /><span></span>
@@ -3794,6 +3794,12 @@
           <h2 data-i18n="gruntgroupmember">Grunt Group Member</h2>
         </label>
       </div>
+      <div class="rows grunt spirit">
+        <label class="settings" title="Grunt Count">
+          <h2 data-i18n="number_grunts"># Grunts</h2>
+          <input class="grunt-group-count" name="attr_grunt_group_count" title="@{grunt_group_count}" type="number" min='0' value="0"/>
+        </label>
+      </div>
       <div class="rows vehicle">
         <label class="settings" title="Drone">
           <input class="character-type" name="attr_flag_drone" title="@{flag_drone}" type="checkbox" value="drone"/>
@@ -4141,6 +4147,13 @@
 			<input name="attr_skill" type="hidden" value=""/>
 			<input class="flag-primary" name="attr_primary" type="hidden" value=""/>
 			<input class="flag-primary" name="attr_additional" type="hidden" value=""/>
+			<input name="attr_dicepool" type="hidden" value=""/>
+			<input name="attr_damage" type="hidden" value=""/>
+			<input name="attr_close" type="hidden" value=""/>
+			<input name="attr_near" type="hidden" value=""/>
+			<input name="attr_medium" type="hidden" value=""/>
+			<input name="attr_far" type="hidden" value=""/>
+			<input name="attr_extreme" type="hidden" value=""/>
 			<button name="roll_range_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon} (Dicepool: @{dicepool})}}{{dice=[[(@{dicepool}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Dicepool = @{dicepool} + Wounds @{wounds_toggle} + Modifiers @{modifiers_toggle} + Edge @{edge_toggle}, Notes @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
 			<span class="center" name="attr_dicepool"></span>
 			<span class="center" name="attr_damage"></span>
@@ -4165,33 +4178,27 @@
 					<input name="attr_weapon" placeholder="Ares Predator" title="@{repeating_range_${x}_weapon}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="pool" title="pool">
-					<input name="attr_dicepool" placeholder="" title="@{repeating_range_${x}_dicepool}" type="text" value=""/>
+					<input name="attr_dicepool_base" placeholder="" title="@{repeating_range_${x}_dicepool_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="dam" title="dam">
-					<input name="attr_damage" placeholder="9P" title="@{repeating_range_${x}_damage}" type="text" value=""/>
+					<input name="attr_damage_base" placeholder="9P" title="@{repeating_range_${x}_damage_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="c" title="Close">
-					<input name="attr_close" placeholder="-" title="@{repeating_range_${x}_close}" type="text" value=""/>
+					<input name="attr_close_base" placeholder="-" title="@{repeating_range_${x}_close_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="n" title="Near">
-					<input name="attr_near" placeholder="-" title="@{repeating_range_${x}_near}" type="text" value=""/>
+					<input name="attr_near_base" placeholder="-" title="@{repeating_range_${x}_near_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="m" title="Medium">
-					<input name="attr_medium" placeholder="-" title="@{repeating_range_${x}_medium}" type="text" value=""/>
+					<input name="attr_medium_base" placeholder="-" title="@{repeating_range_${x}_medium_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="f" title="Far">
-					<input name="attr_far" placeholder="-" title="@{repeating_range_${x}_far}" type="text" value=""/>
+					<input name="attr_far_base" placeholder="-" title="@{repeating_range_${x}_far_base}" type="text" value=""/>
 				</label>
 				<label data-i18n-title="e" title="Extreme">
-					<input name="attr_extreme" placeholder="-" title="@{repeating_range_${x}_extreme}" type="text" value=""/>
+					<input name="attr_extreme_base" placeholder="-" title="@{repeating_range_${x}_extreme_base}" type="text" value=""/>
 				</label>
-				<select name="attr_mode" title="@{mode}">
-					<option data-i18n="ss" value="SS">SS</option>
-					<option data-i18n="sa" value="SA">SA</option>
-					<option data-i18n="bf" value="BF">BF</option>
-					<option data-i18n="fa" value="FA">FA</option>
-					<option data-i18n="other" value="Other">Other</option>
-				</select>
+				<span class="center">SS</span>
 				<label data-i18n-title="ammo" title="ammo">
 					<input name="attr_ammo" placeholder="15" title="@{repeating_range_${x}_ammo}" type="number" value=""/>
 				</label>
@@ -4204,7 +4211,7 @@
 					</label>
 					<h3 data-i18n="modifier">modifier</h3>
 					<label data-i18n-title="modifier" title="modifier">
-						<input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" placeholder='0' type="number"/>
+						<input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" type="number" value="0"/>
 					</label>
 				</div>
 				<h3 data-i18n="notes">notes</h3>
@@ -4233,6 +4240,13 @@
 		  <input name="attr_skill" type="hidden" value=""/>
 		  <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
 		  <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
+			<input name="attr_dicepool" type="hidden" value=""/>
+			<input name="attr_damage" type="hidden" value=""/>
+			<input name="attr_close" type="hidden" value=""/>
+			<input name="attr_near" type="hidden" value=""/>
+			<input name="attr_medium" type="hidden" value=""/>
+			<input name="attr_far" type="hidden" value=""/>
+			<input name="attr_extreme" type="hidden" value=""/>
 		  <button name="roll_melee_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon} (Dicepool: @{dicepool})}}{{dice=[[(@{dicepool}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=DV @{damage}, Notes: @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
 		  <span class="center" name="attr_dicepool"></span>
 		  <span class="center" name="attr_damage"></span>
@@ -4249,25 +4263,25 @@
 				<input name="attr_weapon" placeholder="Katana" title="@{repeating_melee_${x}_weapon}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="pool" title="pool">
-				<input name="attr_dicepool" placeholder="0d6" title="@{repeating_melee_${x}_dicepool}" type="text" value=""/>
+				<input name="attr_dicepool_base" placeholder="0d6" title="@{repeating_melee_${x}_dicepool_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="dam" title="dam">
-				<input name="attr_damage" placeholder="5P" title="@{repeating_melee_${x}_damage}" type="text" value=""/>
+				<input name="attr_damage_base" placeholder="5P" title="@{repeating_melee_${x}_damage_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="close" title="Close 0-3">
-				<input name="attr_close" placeholder="-" title="@{repeating_melee_${x}_close}" type="text" value=""/>
+				<input name="attr_close_base" placeholder="-" title="@{repeating_melee_${x}_close_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="near" title="Near 4-50">
-				<input name="attr_near" placeholder="-" title="@{repeating_melee_${x}_near}" type="text" value=""/>
+				<input name="attr_near_base" placeholder="-" title="@{repeating_melee_${x}_near_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="medium" title="Medium 51-250">
-				<input name="attr_medium" placeholder="-" title="@{repeating_melee_${x}_medium}" type="text" value=""/>
+				<input name="attr_medium_base" placeholder="-" title="@{repeating_melee_${x}_medium_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="far" title="Far 251-500">
-				<input name="attr_far" placeholder="-" title="@{repeating_melee_${x}_far}" type="text" value=""/>
+				<input name="attr_far_base" placeholder="-" title="@{repeating_melee_${x}_far_base}" type="text" value=""/>
 			 </label>
 			 <label data-i18n-title="extreme" title="Extreme 500+">
-				<input name="attr_extreme" placeholder="-" title="@{repeating_melee_${x}_extreme}" type="text" value=""/>
+				<input name="attr_extreme_base" placeholder="-" title="@{repeating_melee_${x}_extreme_base}" type="text" value=""/>
 			 </label>
 			 <h3 data-i18n="notes">notes</h3>
 			 <label data-i18n-title="notes" title="notes">
@@ -5018,6 +5032,10 @@
 			{{#rollGreater() combat_paralysis 0}}<span>|</span><span data-i18n="combat_paralysis">Combat Paralysis</span><span>|</span>{{/rollGreater() combat_paralysis 0}}
 			{{#effecttype}}<br /><span>{{effecttype}}</span>{{/effecttype}}
 		</div>
+{{#rollGreater() computed::glitch 0}}
+{{#rollLess() computed::glitch 2}}<div class="sheet-template-row red"><span class="sheet-red">GLITCH!</span></div>{{/rollLess() computed::glitch 2}}
+{{#rollGreater() computed::glitch 1}}<div class="sheet-template-row red"><span class="sheet-red">CRITICAL GLITCH!</span></div>{{/rollGreater() computed::glitch 1}}
+{{/rollGreater() computed::glitch 0}}
 		{{#dice}}<div class="sheet-template-row">Hits: {{dice}}</div>{{/dice}}
 		{{#rollGreater() wilddie 0}}
 			<div class="sheet-template-row">Wild Die Rolled! {{wilddie}}<br>
@@ -5207,11 +5225,64 @@
 <input type="hidden" name="attr_unarmedcombat" value="0" />
 <input type="hidden" name="attr_combat_paralysis" value="0" />
 <input type="hidden" name="attr_combat_paralysis_initiative_mod" value="" />
+<input type="hidden" name="attr_bad_luck" value="1" />
 
-<input type="hidden" name="attr_sheet_version" value="0.38">
+<input type="hidden" name="attr_sheet_version" value="0.39">
 <input type="hidden" name="attr_data_version" value="0">
+
 <script type="text/worker">
 //Sheet workers
+on("clicked:natural_healing_physical", (eventInfo) => {
+console.log("clicked");
+console.log(eventInfo);
+	getAttrs(["bad_luck"], (v) => {
+		startRoll("@{gm_toggle} &{template:rolls}{{header=@{character_name}}}{{base=^{natural} ^{healing} ^{physical}\n^{body} + ^{body}}}{{dice=[[(@{body}+@{body}+?{Medical Care?|No,0|Yes,2})d6>5]]}}{{desc=Natural Healing (Physical), This test can be performed once per 24 hours of rest to recover Overflow/Physical damage.  &star; Duration is halved with the Quick Healer quality.}}{{wilddie=[[@{wild_die}d6]]}}{{glitch=[[0]]}}", (results) => {
+console.log(results.results);
+			var rolled = results.results.dice.dice;
+
+console.log("Wild Die: "+results.results.wilddie.result);
+			var hits_threshold = 5;
+			if(results.results.wilddie && results.results.wilddie.result < 2) {
+				hits_threshold = 6;
+			}
+			var hits = rolled.reduce((a, v) => (v >= hits_threshold ? a + 1 : a), 0);
+console.log("Hit Threshold: "+hits_threshold);
+
+			if(results.results.wilddie && results.results.wilddie.result >= 5) {
+console.log("Wild Die Rolled High!");
+				hits = hits + 3;
+			}
+
+			var glitch_threshold = 1;
+			if(parseInt(v.bad_luck) > 0) {
+				glitch_threshold = 2;
+			}
+			var glitches = rolled.reduce((a, v) => (v <= glitch_threshold ? a + 1 : a), 0);
+console.log("Glitch Threshold: "+glitch_threshold);
+
+			var glitch = 0;
+			if(glitches > rolled.length / 2) {
+				if(hits) {
+					glitch = 1;
+				} else {
+					glitch = 2;
+				}
+			}
+console.log("Hits: "+hits+" Glitches: "+glitches+" Glitch: "+glitch);
+
+
+			results.results.dice.result = 100;
+			finishRoll(
+				results.rollId, {
+					dice: hits,
+					glitch: glitch,
+				}
+			);
+		});
+
+	});
+});
+
 on("sheet:opened", function() {
 	getAttrs(['sheet_type', 'sheet_version', 'data_version'], (v) => {
 		console.log(`%c Shadowrun 6th World v${v['sheet_version']}`, "color: blue; font-weight:bold");
@@ -5242,6 +5313,9 @@ on("sheet:opened", function() {
 				case '0.38':
 					_v38_update();
 					console.log("Data now fits v.38");
+				case '0.39':
+					_v39_update();
+					console.log("Data now fits v.39");
 				default:
 					setAttrs({
 						'data_version': v.sheet_version
@@ -5255,6 +5329,23 @@ on("sheet:opened", function() {
 	});
 });
 
+
+var _v39_update = () => {
+	// this section updates the AR values that were set for attr_close - attr_extreme to be the value for the previously undefined attr_close_base - attr_extreme_base
+	['range', 'melee'].forEach((type) => {
+		getSectionIDs(`repeating_${type}`, (sections) => {
+			sections.forEach((section) => {
+				[`repeating_${type}_${section}_close`, `repeating_${type}_${section}_near`, `repeating_${type}_${section}_medium`, `repeating_${type}_${section}_far`, `repeating_${type}_${section}_extreme`, `repeating_${type}_${section}_dicepool`, `repeating_${type}_${section}_damage`, 'sheet_type'].forEach((attr) => {
+					getAttrs([`${attr}`], (v) => {
+						setAttrs({
+							[`${attr}_base`]: v[`${attr}`]
+						});
+					});
+				});
+			});
+		});
+	});
+};
 
 var _v38_update = () => {
 	getAttrs(['sheet_type'], (v) => {
@@ -5313,7 +5404,6 @@ var _v38_update = () => {
 			});
 		}
 	});
-
 }
 
 var _pre_v37_update = () => {
@@ -6253,8 +6343,11 @@ on("change:device_rating change:matrix_modifier", () => {
 //Convert physical into the physical damage track boxes and reverse
 ['physical', 'stun'].forEach(attr => {
 	on(`change:${attr} change:${attr}_damage`, (eventInfo) => {
-		getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`], (v) => {
-			const stat = parseInt(v[`${attr}`]) || 0, dam = parseInt(v[`${attr}_damage`]) || 0, max = parseInt(v[`${attr}_max`]) || 0, source = eventInfo.sourceAttribute;
+		getAttrs([`${attr}`, `${attr}_damage`, `${attr}_max`, 'sheet_type'], (v) => {
+			const stat = parseInt(v[`${attr}`]) || 0,
+					dam = parseInt(v[`${attr}_damage`]) || 0,
+					max = parseInt(v[`${attr}_max`]) || 0,
+					source = eventInfo.sourceAttribute;
 			const wou = (source === `${attr}`) ? max - stat : max - dam;
 
 			if (source === `${attr}`) {
@@ -6679,7 +6772,10 @@ on("change:repeating_skills:name", (eventInfo) => {
 		}
 
 		if (source.includes("rating")) {
-			getAttrs([`${field}_rating`, `${field}_rating_modifier`, `${field}_name`], (v) => {
+			getAttrs([`${field}_rating`, `${field}_rating_modifier`, `${field}_name`, 'sheet_type'], (v) => {
+				if(v.sheet_type == 'spirit') {
+					return;
+				}
 				const bas = parseInt(v[`${field}_rating`]) || 0;
 				const mod = parseInt(v[`${field}_rating_modifier`]) || 0;
 				const tot = parseInt(bas) + parseInt(mod);
@@ -6725,42 +6821,28 @@ on("change:repeating_skills:name", (eventInfo) => {
 		} else if (source.includes("logic") || source.includes("agility")) {
 			var diff = eventInfo.newValue - eventInfo.previousValue;
 
-			// Update repeating range weapon dicepool if it uses this attribute
-			getSectionIDs("range", function(ids) {
-				for(var i = 0; i < ids.length; i++) {
-					let attr = "repeating_range_" + ids[i] + "_attribute";
-					let attr_rating = "repeating_range_" + ids[i] + "_attr_rating";
-					let pool = "repeating_range_" + ids[i] + "_dicepool";
-					getAttrs([attr, pool], (v2) => {
-						if(v2[`${attr}`].toLowerCase() == source.toLowerCase()) {
-							setAttrs({
-								[`${pool}`]: parseInt(v2[`${pool}`]) + diff,
-								[`${attr_rating}`]: eventInfo.newValue
-							});
-						}
-					});
-				}
+			// Update repeating melee and range weapon dicepool if it uses this attribute
+			['range', 'melee'].forEach((type) => {
+				getSectionIDs(type, function(ids) {
+					for(var i = 0; i < ids.length; i++) {
+						let attr = `repeating_${type}_` + ids[i] + "_attribute";
+						let attr_rating = `repeating_${type}_` + ids[i] + "_attr_rating";
+						let pool = `repeating_${type}_` + ids[i] + "_dicepool";
+						getAttrs([attr, pool, 'sheet_type'], (v2) => {
+							if(v2.sheet_type == 'spirit' || v2.sheet_type == 'grunt' || v2.sheet_type == 'vehicle') {
+								return;
+							}
+
+							if(v2[`${attr}`].toLowerCase() == source.toLowerCase()) {
+								setAttrs({
+									[`${pool}`]: parseInt(v2[`${pool}`]) + diff,
+									[`${attr_rating}`]: eventInfo.newValue
+								});
+							}
+						});
+					}
+				});
 			});
-
-			// Update repeating melee weapon dicepool if it uses this attribute
-			getSectionIDs("melee", function(ids) {
-				for(var i = 0; i < ids.length; i++) {
-					let attr = "repeating_melee_" + ids[i] + "_attribute";
-					let attr_rating = "repeating_melee_" + ids[i] + "_attr_rating";
-					let pool = "repeating_melee_" + ids[i] + "_dicepool";
-					getAttrs([attr, pool], (v2) => {
-						if(v2[`${attr}`].toLowerCase() == source.toLowerCase()) {
-							setAttrs({
-								[`${pool}`]: parseInt(v2[`${pool}`]) + diff,
-								[`${attr_rating}`]: eventInfo.newValue
-							});
-						}
-					});
-				}
-			});
-
-
-
 		} else if (source.includes("attribute") && type === "player") {
 			getAttrs([`${source}`], (v) => {
 				const attribute   = v[`${source}`].slice(2, -1);
@@ -6980,6 +7062,141 @@ on("change:repeating_skills:name", (eventInfo) => {
 	});
 });
 
+
+// Grunt weapon AR change
+['range', 'melee'].forEach((type) => {
+	on(`change:repeating_${type}:close_base change:repeating_${type}:near_base change:repeating_${type}:medium_base change:repeating_${type}:far_base change:repeating_${type}:extreme_base change:repeating_${type}:dicepool_base`, (eventInfo) => {
+		if(parseInt(eventInfo.newValue) < 0 || isNaN(eventInfo.newValue)) {
+			eventInfo.newValue = 0;
+		}
+		if(parseInt(eventInfo.previousValue) < 0 || isNaN(eventInfo.previousValue)) {
+			eventInfo.previousValue = 0;
+		}
+
+		delta = parseInt(eventInfo.newValue) - parseInt(eventInfo.previousValue);
+		display = eventInfo.sourceAttribute.slice(0,-5);
+
+		getAttrs(['sheet_type', display], (v) => {
+			// this only gets applied to grunts, spirits and vehicles
+			if(v.sheet_type != 'grunt' && v.sheet_type != 'spirit' && v.sheet_type != 'vehicle') {
+				return;
+			}
+
+			var newV = parseInt(v[`${display}`]) + delta || 0;
+			if(newV < 0) {
+				newV = 0;
+			}
+
+			setAttrs({
+				[`${display}`]: newV
+			});
+		});
+	});
+});
+
+// Grunt Groups Count changes
+on("change:grunt_group_count change:grunt_group_member change:repeating_melee:mode change:repeating_range:mode change:repeating_melee:damage_base change:repeating_range:damage_base", (eventInfo) => {
+console.log(eventInfo);
+	['range', 'melee'].forEach((wtype) => {
+		getSectionIDs(`${wtype}`, (ids) => {
+			ids.forEach((id) => {
+				getAttrs([`repeating_${wtype}_${id}_dicepool_base`, `repeating_${wtype}_${id}_dicepool_modifier`, `repeating_${wtype}_${id}_close_base`, `repeating_${wtype}_${id}_near_base`, `repeating_${wtype}_${id}_medium_base`, `repeating_${wtype}_${id}_far_base`, `repeating_${wtype}_${id}_extreme_base`, `repeating_${wtype}_${id}_damage_base`, `repeating_${wtype}_${id}_mode`, 'mode', 'grunt_group_count', 'grunt_group_member', 'sheet_type'], (w) => {
+					if(w.sheet_type != 'grunt' && w.sheet_type != 'spirit' && w.sheet_type != 'vehicle') {
+						return;
+					}
+
+					var grunts = 0;
+					if(w.grunt_group_member == 0) {
+						grunts = 0;
+					} else {
+						grunts = w.grunt_group_count;
+					}
+
+					firing_mode_mods = {
+						SS: { AR: 0, DV: 0 },
+						SA: { AR: -2, DV: +1 },
+						BF: { AR: -4, DV: +2 },
+						FA: { AR: -6, DV: 0 },
+						Other: { AR: 0, DV: 0 }
+					};
+
+					var firing_mode = 'SS';
+					if(wtype == 'range') {
+						firing_mode = w[`repeating_${wtype}_${id}_mode`] || w.mode || 'SS';
+					}
+
+					var DV = adjAttrs({
+						dvMod: firing_mode_mods[firing_mode].DV,
+						arMod: firing_mode_mods[firing_mode].AR,
+						attrs: {
+							attr_damage: w[`repeating_${wtype}_${id}_damage_base`]
+						}
+					}).attr_damage;
+
+					var bonuses = {
+						AR: 0,
+						dice: 0
+					}
+
+					if(w.grunt_group_member != '0' && parseInt(w.grunt_group_count) > 1) {
+						bonuses = grunt_group_bonuses(w.grunt_group_count);
+					}
+
+					var c = parseInt(w[`repeating_${wtype}_${id}_close_base`]) || '';
+					c = (c > 0) ? c + parseInt(bonuses.AR) + parseInt(firing_mode_mods[firing_mode].AR) : '';
+					c = (c <= 0) ? '' : c;
+					var n = parseInt(w[`repeating_${wtype}_${id}_near_base`]) || '';
+					n = (n > 0) ? n + parseInt(bonuses.AR) + parseInt(firing_mode_mods[firing_mode].AR) : '';
+					n = (n <= 0) ? '' : n;
+					var m = parseInt(w[`repeating_${wtype}_${id}_medium_base`]) || '';
+					m = (m > 0) ? m + parseInt(bonuses.AR) + parseInt(firing_mode_mods[firing_mode].AR) : '';
+					m = (m <= 0) ? '' : m;
+					var f = parseInt(w[`repeating_${wtype}_${id}_far_base`]) || '';
+					f = (f > 0) ? f + parseInt(bonuses.AR) + parseInt(firing_mode_mods[firing_mode].AR) : '';
+					f = (f <= 0) ? '' : f;
+					var e = parseInt(w[`repeating_${wtype}_${id}_extreme_base`]) || '';
+					e = (e > 0) ? e + parseInt(bonuses.AR) + parseInt(firing_mode_mods[firing_mode].AR) : '';
+					e = (e <= 0) ? '' : e;
+					var dice = parseInt(w[`repeating_${wtype}_${id}_dicepool_base`]) || '';
+					var diceMod = parseInt(w[`repeating_${wtype}_${id}_dicepool_modifier`]) || 0;
+
+					if(w.grunt_group_member == 0) { // Not a grunt group member
+						var dp = parseInt(dice) + parseInt(diceMod) + parseInt(bonuses.dice) || 0;
+						setAttrs({
+							[`repeating_${wtype}_${id}_damage`]: DV,
+							[`repeating_${wtype}_${id}_dicepool`]: dp,
+							[`repeating_${wtype}_${id}_close`]: c,
+							[`repeating_${wtype}_${id}_near`]: n,
+							[`repeating_${wtype}_${id}_medium`]: m,
+							[`repeating_${wtype}_${id}_far`]: f,
+							[`repeating_${wtype}_${id}_extreme`]: e
+						});
+					} else { // they are now a grunt group member we need to adjust dicepool and ARs
+						var dp = parseInt(dice) + parseInt(diceMod) + parseInt(bonuses.dice) || 0;
+						setAttrs({
+							[`repeating_${wtype}_${id}_damage`]: DV,
+							[`repeating_${wtype}_${id}_dicepool`]: dp,
+							[`repeating_${wtype}_${id}_close`]: c,
+							[`repeating_${wtype}_${id}_near`]: n,
+							[`repeating_${wtype}_${id}_medium`]: m,
+							[`repeating_${wtype}_${id}_far`]: f,
+							[`repeating_${wtype}_${id}_extreme`]: e
+						});
+					}
+				});
+			});
+		});
+	});
+});
+
+var grunt_group_bonuses = (p) => {
+	var b = {
+		AR: p - 1,
+		dice: Math.floor((p - 1) / 2)
+	};
+
+	return b;
+};
 
 
 
@@ -7223,6 +7440,10 @@ on("change:spirit_type change:force", (eventInfo) => {
 	spirit_update();
 });
 var spirit_update = () => {
+	setAttrs({
+		grunt_group_member: 'grunt_group_member'
+	}, {}, () => { console.log("grunt group member set"); });
+
 	getAttrs(['force', 'spirit_type', 'sheet_type', 'spirit_reset_toggle'], (v) => {
 		if(v.sheet_type != 'spirit') {
 			return;
@@ -7696,6 +7917,7 @@ var spirit_update = () => {
 			'major_actions': spirit.major_actions,
 			'minor_actions': spirit.minor_actions,
 			'physical': spirit.physical,
+			'physical_max': spirit.physical,
 			'move_speed': spirit.move_speed,
 			'sprint_speed': spirit.sprint_speed,
 			'sprint_modifier': spirit.sprint_modifier,
@@ -7824,15 +8046,16 @@ var spirit_update = () => {
 					setAttrs({
 						[`repeating_range_${newId}_weapon`]: ranged.weapon,
 						[`repeating_range_${newId}_dicepool`]: ranged.pool,
-						[`repeating_range_${newId}_damage`]: ranged.dam,
-						[`repeating_range_${newId}_close`]: (ranged.c > 0) ? ranged.c : 0,
-						[`repeating_range_${newId}_near`]: (ranged.n > 0) ? ranged.n : 0,
-						[`repeating_range_${newId}_medium`]: (ranged.m > 0) ? ranged.m : 0,
-						[`repeating_range_${newId}_far`]: (ranged.f > 0) ? ranged.f : 0,
-						[`repeating_range_${newId}_extreme`]: (ranged.e > 0) ? ranged.e : 0,
+						[`repeating_range_${newId}_dicepool_base`]: ranged.pool,
+						[`repeating_range_${newId}_damage_base`]: ranged.dam,
+						[`repeating_range_${newId}_close_base`]: (ranged.c > 0) ? ranged.c : 0,
+						[`repeating_range_${newId}_near_base`]: (ranged.n > 0) ? ranged.n : 0,
+						[`repeating_range_${newId}_medium_base`]: (ranged.m > 0) ? ranged.m : 0,
+						[`repeating_range_${newId}_far_base`]: (ranged.f > 0) ? ranged.f : 0,
+						[`repeating_range_${newId}_extreme_base`]: (ranged.e > 0) ? ranged.e : 0,
 						[`repeating_range_${newId}_notes`]: ranged.notes,
 						[`repeating_range_${newId}_flag`]: 0
-					});
+					}, {silent: true});
 				}
 			});
 		}
@@ -7857,19 +8080,23 @@ var spirit_update = () => {
 					setAttrs({
 						[`repeating_melee_${newId}_weapon`]: close.weapon,
 						[`repeating_melee_${newId}_dicepool`]: close.pool,
-						[`repeating_melee_${newId}_damage`]: close.dam,
-						[`repeating_melee_${newId}_close`]: (close.c > 0) ? close.c : 0,
-						[`repeating_melee_${newId}_near`]: (close.n > 0) ? close.n : 0,
-						[`repeating_melee_${newId}_medium`]: (close.m > 0) ? close.m : 0,
-						[`repeating_melee_${newId}_far`]: (close.f > 0) ? close.f : 0,
-						[`repeating_melee_${newId}_extreme`]: (close.e > 0) ? close.e : 0,
+						[`repeating_melee_${newId}_dicepool_base`]: close.pool,
+						[`repeating_melee_${newId}_damage_base`]: close.dam,
+						[`repeating_melee_${newId}_close_base`]: (close.c > 0) ? close.c : 0,
+						[`repeating_melee_${newId}_near_base`]: (close.n > 0) ? close.n : 0,
+						[`repeating_melee_${newId}_medium_base`]: (close.m > 0) ? close.m : 0,
+						[`repeating_melee_${newId}_far_base`]: (close.f > 0) ? close.f : 0,
+						[`repeating_melee_${newId}_extreme_base`]: (close.e > 0) ? close.e : 0,
 						[`repeating_melee_${newId}_notes`]: close.notes,
 						[`repeating_melee_${newId}_flag`]: 0
-					});
+					}, {silent: true});
 				}
 			});
 		}
 
+		setAttrs({
+			grunt_group_member: 0
+		}, {}, () => { console.log("grunt group member updated"); });
 	});
 };
 
