@@ -7,5 +7,5 @@ https://github.com/kreuvf/roll20-character-sheets/issues
 
 ## Known Limitations
 ### Skill Checks: Double/Triple 1 or 20
-Skill checks do not take double 1 (automatic success with max. result), double 20 (automatic failure) and triple 20 (disastrous failure) into account. This could be implemented via API scripts, but would be available to paying accounts only.
+Skill checks do not take double 1 (automatic success with max. result), double 20 (automatic failure) and triple 20 (disastrous failure) into account. This could either be implemented via API scripts (= available to paying accounts only) or via Custom Roll Parsing (new as of 2021-07-13, available to everyone).
 
