@@ -66,13 +66,13 @@ The fifth weapon's green roll button produces similar output, but assumes the we
 
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). A third pane can be used for notes and treasures.
 
-![Martial Manuevers](/HeroSystem6eHeroic/images/martialManuevers.png)
+![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
 
 ## Page 3: Skills
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
 
-Characters in Heroic campaigns can have a lot of skills. On the left side of this page is room for 30 skills. The base skill chance is determined from the type of skill selected and the number of points spent. Skills 1, 5, 11, 15, 21, and 25 also include an additional skill type "Group" in their selection menus (indicated by ![Salmon Triangle](/HeroSystem6eHeroic/images/selectionGroup.png) instead of ![Olive Triangle](/HeroSystem6eHeroic/images/selectionStandard.png)). When this skill type is selected, every three points spent will apply a group level to the next three skills listed below the group skill. In the image below, the first skill, "Spacecraft Officer," is a regular skill of type "PS." The fifth skill, "Pilot Skill Group," is a group skill level that applies +1 to the skill rolls of Combat Pilot, Systems Operation, and Sensors Operation.
+Characters in Heroic campaigns can have a lot of skills. On the left side of this page is room for 30 skills. The base skill chance is determined from the type of skill selected and the number of points spent. Skills 1, 5, 11, 15, 21, and 25 also include an additional skill type "Group" in their selection menus (indicated by ![Salmon Triangle](/HeroSystem6eHeroic/images/selectionGroup.png) instead of ![Olive Triangle](/HeroSystem6eHeroic/images/selectionStandard.png)). When this skill type is selected, every three points spent will apply a group level to the next three skills listed below the group skill. In the image below, the first skill, "Spacecraft Officer," is a regular skill of type "PS" or "Professional Skill." The fifth skill, "Pilot Skill Group," is a group skill level that applies +1 to the skill rolls of Combat Pilot, Systems Operation, and Sensors Operation.
 
 ![Group Skill Levels](/HeroSystem6eHeroic/images/GroupSkillLevels.png)
 
