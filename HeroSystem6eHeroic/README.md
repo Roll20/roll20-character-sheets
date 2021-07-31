@@ -96,7 +96,7 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
-The Talents column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. 
+The "Perks & Talents" column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. 
 
 The only trick to the Complications column is to remember that points gained from selecting Complications *subtract* from the total points calculated in the Tally Bar. 
 
