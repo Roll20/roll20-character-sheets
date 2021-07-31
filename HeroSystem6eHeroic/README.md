@@ -44,6 +44,8 @@ The first page displays characteristics, combat abilities, and movement abilitie
 
 The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image, which is currently a feature of the Dev server. The third is a sticky note for text.
 
+![Page 1](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
+
 ## Page 2: Gear
 
 The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers. Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn.
@@ -62,6 +64,8 @@ The fifth weapon's roll button produces similar output, but assumes the weapon's
 
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers. A third pane can be used for notes and treasures.
 
+![Page 1](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
+
 ## Page 3: Skills
 
 Characters in Heroic campaigns can have a lot of skills. On the left side of this page is room for 30 skills. The base skill chance is determined from the type of skill selected and the number of points spent. Skills 1, 5, 11, 15, 21, and 25 also include an additional skill type "Group" in their selection menus (indicated by ![Salmon Triangle](/HeroSystem6eHeroic/images/selectionGroup.png) instead of ![Olive Triangle](/HeroSystem6eHeroic/images/selectionStandard.png)). When this skill type is selected points spent will be considered group levels for the next three skills listed below the group skill. In the image below, the first skill, "Spacecraft Officer," is a regular skill of type "PS." The fifth skill, "Pilot Skill Group," is a group skill level that applies +1 to the skill rolls of Combat Pilot, Systems Operation, and Sensors Operation.
@@ -71,6 +75,8 @@ Characters in Heroic campaigns can have a lot of skills. On the left side of thi
 There is space for up to nine languages. Any language skill selected with "Native" fluency costs 0 CP, except for those campaigns where literacy costs points (an option on the Options Page).
 
 Skill Enhancers reduce the cost of relevant knowledge-type skills, which are reflected in the calculated skill rolls. The Skill Enhancer "Well-Connected" is not considered in the automatic calculation of any other field. Keep this skill enhancer in mind when you calculate points spent on Perks on Page 5.
+
+![Page 1](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
 ## Page 4: Powers
 
@@ -82,9 +88,13 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
+![Page 1](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
+
 ## Page 5: Talents and Complications
 
-The only trick to this page is to remember that points from Complications subtract from the total shown in the Tally Bar. Points spent on items in the Talent section (e.g., Perks) are counted along with Powers in the Tally Bar.  
+The only trick to this page is to remember that points from Complications subtract from the total shown in the Tally Bar. Points spent on items in the Talent section (e.g., Perks) are counted along with Powers in the Tally Bar. 
+
+![Page 1](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
 ## Page 6: Options
 
