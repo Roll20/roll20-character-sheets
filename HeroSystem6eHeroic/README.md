@@ -28,7 +28,7 @@ Roll buttons are color-coded:
 
 At the bottom of the character sheet you will find the Tally Bar. The Total field represents points spent on characteristics, skills, and powers minus complications and bonus points. The latter represent free items in a campaign that shouldn't count against your starting point total, but nonetheless should be accounted for.
 
-Note that the total points may not update immediately. After you change some input field clicking any other item will force an update.
+Note that the total points may not update immediately. You may force an update by clicking on any other item on the character sheet.
 
 ## Page 1: Characteristics
 
