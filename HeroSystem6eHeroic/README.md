@@ -78,7 +78,7 @@ Characters in Heroic campaigns can have a lot of skills. On the left side of thi
 
 There is space for up to nine languages. Any language skill selected with "Native" fluency costs 0 CP, except for those campaigns where literacy costs points (an option on the Options Page).
 
-Skill Enhancers reduce the cost of relevant knowledge-type skills, which are reflected in the calculated skill rolls. The Skill Enhancer "Well-Connected" is not considered in the automatic calculation of any other field. Keep this skill enhancer in mind when you calculate points spent on Perks on Page 5.
+Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge-type skills. The benefit is reflected in the calculated skill rolls as per the number of points spent on each skill. The enhancer does not subtract character points. Note that the Skill Enhancer "Well-Connected" is not considered in the automatic calculation of any skill roll field. Keep this skill enhancer's benefit in mind when you calculate points spent on Perks on Page 5.
 
 ## Page 4: Powers
 
