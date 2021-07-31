@@ -34,7 +34,7 @@ Note that the total points may not update immediately. After you change some inp
 
 ![Page 1](/HeroSystem6eHeroic/images/screenshot-01-scaled.png)
 
-The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option, which is located on the Options Page.
+The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option on the Options Page.
 
 The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image, which is currently a feature of the Dev server. The third is a sticky note for text.
 
