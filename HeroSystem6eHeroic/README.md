@@ -66,6 +66,8 @@ The fifth weapon's green roll button produces similar output, but assumes the we
 
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers. A third pane can be used for notes and treasures.
 
+![Martial Manuevers](/HeroSystem6eHeroic/images/martialManuevers.png)
+
 ## Page 3: Skills
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
