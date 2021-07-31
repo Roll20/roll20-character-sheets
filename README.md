@@ -1,60 +1,9 @@
-Roll20 Character Sheets
-=======================
+# Roll20-CyberpunkRed-Character-Sheet
+This is a full character sheet for Cyberpunk Red VTT for Roll20
 
-This repository is the collection of all the community-contributed character sheets that are available for use on Roll20. 
+6/27/2021: sheet is stable and fully usable in game.
+6/30/2021: Mobile version is done also: errors in the mobile app are from the mobile app not the sheet.
 
-Contributing
-============
-
-Full Character Sheet documentation can be found on the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets).
-
-Pull requests are processed weekly and should be **submitted no later than 6am PST Mondays**, roughly 13:00-14:00 UTC. Earlier submissions are encouraged to allow for peer review from other contributors. On Monday, a Roll20 staff member will review the content to ensure it meets the standards documented on the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository). Comments, concerns, and changes as a result of review will need to be addressed before the pull request can be merged into the repository.
-
-## Internationalization &amp; Translations
-
-We use [Crowdin](https://crowdin.com/) to crowdsource and manage translations for various aspects of our site. 
-
-Check out the Help Center articles and Community Wiki documentation below to learn about translations and to help us make Roll20 accessible in as many languages as possible!
-
-* [How to Become a Translation Volunteer](https://roll20.zendesk.com/hc/en-us/articles/360058423993-How-to-Become-a-Translation-Volunteer)
-* [How to Translate Content on Crowdin](https://roll20.zendesk.com/hc/en-us/articles/360057432414-How-to-Translate-Content-on-Crowdin)
-* [Roll20 Community Wiki](https://wiki.roll20.net/Character_Sheet_i18n)
-
-**Sheet translations submitted outside of Crowdin will not be accepted and/or will be overwritten by Crowdin.**
-
-## Improving Existing Character Sheets
-
-If you want to help improve an existing sheet, just clone this repository. Make your changes, test them in app using the Custom accessible with a Roll20 Pro account, and submit a pull request.
-
-## Creating your own
-
-If you would like to contribute a new sheet for the community to use, just clone this repository and follow the [directions for GitHub](https://wiki.roll20.net/Beginner%27s_Guide_to_GitHub). New sheets will need to meet the minimum required standards located in the [Roll20 Wiki](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository). 
-
-**Creating a sheet.json File**
-
-When you are ready to submit your template for **public use**, create a `sheet.json` file in your sheet's folder (see the [kitchensink](https://github.com/Roll20/roll20-character-sheets/tree/master/kitchensink) folder for an example [sheet.json](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/sheet.json) file). This file is required to be named `sheet.json`. The file has the following fields:
-
-* `html`: The **exact** name, including capitzation, of the HTML file for the sheet (e.g. `kitchensink.html`).
-* `css`: The **exact** name, including capitzation, of the CSS file for the sheet (e.g. `kitchensink.css`).
-* `authors`: A simple string telling who contributed toward the sheet (e.g. `Riley Dutton` or `Riley Dutton, John Doe`)
-* `roll20userid`: A simple string telling the Roll20 User ID's of the authors (e.g. `1` or `45672,145678`). Just used so we know who to credit internally, won't be shown publicly on the site.
-* `patreon`: *(optional)* Place the URL for a Patreon campaign here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.patreon.com/<name>"`)
-* `tipeee`: *(optional)* Place the URL for a Tipeee here, and it will appear under your sheet's description when selected.  (e.g. `"https://www.tipeee.com/<name>"`)
-* `preview`: The **exact** name, including capitzation, of an image file which included in your sheet folder showing a preview/screenshot of the sheet (will be displayed in-app at 500x500 resolution) (e.g. `kitchensink.png`).
-* `instructions`: Markdown-formatted instructions for using the sheet. If there are any particular setup steps, special rolls you want to make the player aware of, etc., this is the place to put that info. Try to be succinct. If you have sheet instructions elsewhere, it can be a good idea to provide a link here (e.g. `full sheet instructions in the [Readme](https://github.com/Roll20/roll20-character-sheets/blob/master/kitchensink/README.md)` or `Sheet instuctions, Roll20 Wiki: [Example PRG](https://wiki.roll20.net/ExampleRPG)`)
-* `legacy` : set to either `true` or `false`. If the sheet code have been updated to work with the [Character Sheet Enhancement](https://wiki.roll20.net/Character_Sheet_Enhancement)-update (released [March 2021](https://app.roll20.net/forum/permalink/9883156/)), set it to `false`. Otherwise, set it to `true`.
-
-After we have reviewed your sheet if we approve it we will add it to the `approved.yaml` file in the root directory which will cause it to be available to everyone on the main Roll20 site. If we reject your sheet, we will comment on your Github commit and let you know what changes need to be made before it can be accepted. 
-
-PLEASE VERIFY YOUR SHEET.JSON IS VALID JSON at http://jsonlint.com before you submit it!
-
-Guidelines
-==========
-
-The former guidelines found here have been moved and expanded on in the [Roll20 Wiki: Building Character Sheets](https://wiki.roll20.net/Building_Character_Sheets#Roll20_Character_Sheets_Repository).
+It is a work in progress in its current state it will run. I do have a todo list.<br>
 
 
-License
-=======
-
-All of the code (HTML/CSS) of the sheets in this repository is released under the MIT license (see [LICENSE](https://github.com/Roll20/roll20-character-sheets/blob/master/LICENSE) file for details). If you contribute a new sheet or help improve an existing sheet, you agree that your contribution is released under the MIT License as well.
