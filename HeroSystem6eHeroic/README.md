@@ -30,23 +30,23 @@ At the bottom of the character sheet you will find the Tally Bar. The total fiel
 
 Note that the total points may not update immediately. After you change some input field clicking any other item will force an update.
 
+## Page 1: Characteristics
+
+![Page 1](/HeroSystem6eHeroic/images/screenshot-01-scaled.png)
+
+The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option, which is located on the Options Page.
+
+The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image, which is currently a feature of the Dev server. The third is a sticky note for text.
+
 ## Health Status Indicator
 
 ![Health Status Indicator](/HeroSystem6eHeroic/images/HealthStatus.png)
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
-![Page 1](/HeroSystem6eHeroic/images/screenshot-01-scaled.png)
-
-## Page 1: Characteristics
-
-The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option, which is located on the Options Page.
-
-The first page also includes a portrait section designed as a slideshow. The first shown is a "rule card" that is by default a welcome message. The second is the player's avatar image, which is currently a feature of the Dev server. The third is a sticky note for text.
-
-![Page 1](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
-
 ## Page 2: Gear
+
+![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
 The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers. Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn.
 
@@ -64,9 +64,9 @@ The fifth weapon's roll button produces similar output, but assumes the weapon's
 
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers. A third pane can be used for notes and treasures.
 
-![Page 1](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
-
 ## Page 3: Skills
+
+![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
 
 Characters in Heroic campaigns can have a lot of skills. On the left side of this page is room for 30 skills. The base skill chance is determined from the type of skill selected and the number of points spent. Skills 1, 5, 11, 15, 21, and 25 also include an additional skill type "Group" in their selection menus (indicated by ![Salmon Triangle](/HeroSystem6eHeroic/images/selectionGroup.png) instead of ![Olive Triangle](/HeroSystem6eHeroic/images/selectionStandard.png)). When this skill type is selected points spent will be considered group levels for the next three skills listed below the group skill. In the image below, the first skill, "Spacecraft Officer," is a regular skill of type "PS." The fifth skill, "Pilot Skill Group," is a group skill level that applies +1 to the skill rolls of Combat Pilot, Systems Operation, and Sensors Operation.
 
@@ -76,9 +76,9 @@ There is space for up to nine languages. Any language skill selected with "Nativ
 
 Skill Enhancers reduce the cost of relevant knowledge-type skills, which are reflected in the calculated skill rolls. The Skill Enhancer "Well-Connected" is not considered in the automatic calculation of any other field. Keep this skill enhancer in mind when you calculate points spent on Perks on Page 5.
 
-![Page 1](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
-
 ## Page 4: Powers
+
+![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
 The Power page can accommodate ten powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a variable slot. "AF" after Reduced Endurance refers to Autofire, which is an advantage chosen for this particular power.
 
@@ -88,15 +88,15 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
-![Page 1](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
-
 ## Page 5: Talents and Complications
+
+![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
 The only trick to this page is to remember that points from Complications subtract from the total shown in the Tally Bar. Points spent on items in the Talent section (e.g., Perks) are counted along with Powers in the Tally Bar. 
 
-![Page 1](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
-
 ## Page 6: Options
+
+![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
 Current options include:
 
