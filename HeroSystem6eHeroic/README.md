@@ -84,7 +84,7 @@ Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
-The Power page can accommodate ten powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a variable slot. "AF" after Reduced Endurance refers to Autofire, which is an advantage chosen for this particular power.
+The Power page can accommodate ten powers. The left and right sides have different color schemes for organizational purposes, but are otherwise the same. Each power's points and endurance costs are calculated from the base cost provided and advantages and limitations entered. A power framework is treated as its own entry as shown in the figure below. The second power "Ice Bolts" belongs to the Multipower as a Variable Slot. "AF" after Reduced Endurance refers to Autofire, which is an advantage chosen for this particular power that increases the cost of Reduced Endurance.
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
 
