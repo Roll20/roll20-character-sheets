@@ -36,6 +36,8 @@ Note that the total points may not update immediately. After you change some inp
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+![Page 1](/HeroSystem6eHeroic/images/screenshot-01-scaled.png)
+
 ## Page 1: Characteristics
 
 The first page displays characteristics, combat abilities, and movement abilities. Note that if your campaign does not use characteristic maximums (doubling points on abilities above these maximums) remember to uncheck this option, which is located on the Options Page.
