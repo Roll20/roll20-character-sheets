@@ -52,13 +52,15 @@ The Gear page provides space for most of a character's physical goods (weapons, 
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/encumbrance.png)
 
-The sheet includes space for four suits or pieces of armor. Although this sheet is currently written for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. The shield line assumes attacking with a shield is a normal damage attack and that the DCV bonus for defense is an OCV penalty for attacks.
+The sheet includes space for four suits or pieces of armor. Although this sheet is currently written for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. Click the "Roll" button to roll armor activation. The message like the one shown below will be sent to the chat window. The shield line assumes attacking with a shield is a normal damage attack and that the DCV bonus for defense is an OCV penalty for attacks.
+
+![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)
 
 The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made and target, and the BODY and STUN damage rolls.
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
-The fifth weapon's roll button produces similar output, but assumes the weapon's damage dice are of type normal damage.
+The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage.
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChat.png)
 
@@ -98,10 +100,10 @@ The only trick to this page is to remember that points from Complications subtra
 
 ![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
-Current options include:
+The last page of this sheet contains a number of important options:
 
 (1) Use Characteristic Maximums. If checked, character point costs are doubled above the standard Hero System maximums.
 
 (2) Super-heroic Campaign Endurance. If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
-(3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. 
+(3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
