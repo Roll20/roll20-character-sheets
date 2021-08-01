@@ -112,7 +112,7 @@ The last page of this sheet contains a number of important options:
 
 (3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
-## Suggested Token Settings
+## Token Settings
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
