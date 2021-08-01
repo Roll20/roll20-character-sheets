@@ -120,5 +120,4 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-*Villain In Glasses*
-August 1, 2021
+*Villain In Glasses, August 1, 2021*
