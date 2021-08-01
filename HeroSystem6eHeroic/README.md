@@ -116,6 +116,6 @@ The last page of this sheet contains a number of important options:
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes currentDCV, currentBODY, and currentEND coupled with their maximum values as shown in the example settings dialog below. The hidden attribute "currentDCV" is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute "currentDCV" is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
