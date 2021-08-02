@@ -67,9 +67,18 @@ async function calculateDamage(row) {
   const a = await getAttrsAsync(attrNames.concat(["character_level"]));
   console.log(a);
   const perLevel = a[`${row}_per_level`];
-  const repeats = perLevel ? `+${perLevel}`.repeat(a.character_level - 1) : "";
-  const value = `${a[`${row}_starting`]}${repeats}`;
-  await setAttrsAsync({ [row]: value });
+  const starting = a[`${row}_starting`];
+  let damage = "";
+  if (starting != "" && starting != "0") {
+    damage = starting;
+  }
+  if (perLevel != "" && perLevel != "0" && a.character_level > 1) {
+    if (!damage) {
+      damage = "0"; // Give a base of "0" so that the "+" is adding to something
+    }
+    damage += `+${perLevel}`.repeat(a.character_level - 1);
+  }
+  await setAttrsAsync({ [row]: damage });
 }
 
 async function updateMagicPsionicsLevels() {
