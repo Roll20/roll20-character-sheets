@@ -17,11 +17,41 @@ async function updateProfile(rowId) {
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
 }
 
+/**
+ * @todo this function
+ * @param {string} rowId The Profile row ID
+ * @returns boolean
+ */
+async function isDefaultProfile(rowId) {
+  return false;
+}
+
 on("clicked:repeating_profiles:copybonusids", async (e) => {
   console.log("clicked:copybonusids", e);
   const a = await getAttrsAsync(["bonus_ids_output"]);
   const attrs = {};
   attrs[`repeating_profiles_bonus_ids`] = a.bonus_ids_output;
+  await setAttrsAsync(attrs);
+});
+
+on("clicked:repeating_profiles:checkbonusids", async (e) => {
+  console.log("clicked:repeating_profiles:checkbonusids", e);
+  const a = await getAttrsAsync(["repeating_profiles_bonus_ids"]);
+  console.log(a);
+  const bonusIds = a["repeating_profiles_bonus_ids"].split(",");
+  const bonusselectionsSectionIds = await getSectionIDsAsync("bonusselections");
+  const bonusIdKeys = bonusselectionsSectionIds.map(
+    (id) => `repeating_bonusselections_${id}_bonus_id`
+  );
+  const allBonusselectionsIds = await getAttrsAsync(bonusIdKeys);
+  console.log(allBonusselectionsIds);
+  const attrs = {};
+  for (const [key, val] of Object.entries(allBonusselectionsIds)) {
+    const [r, section, rowId] = key.split("_");
+    attrs[`repeating_bonusselections_${rowId}_enabled`] = bonusIds.includes(val)
+      ? 1
+      : 0;
+  }
   await setAttrsAsync(attrs);
 });
 

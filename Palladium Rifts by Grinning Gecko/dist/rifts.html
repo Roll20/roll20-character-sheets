@@ -4385,9 +4385,17 @@
                         <span></span>
                         Apply Checked Modifiers to this Profile
                       </button>
-                      <!-- <button type="action" name="act_checkbonusids">
-                  Apply this Profile to Selected IDs
-                </button> -->
+                      <button
+                        type="action"
+                        name="act_checkbonusids"
+                        class="metal-btn btn-silver-flat"
+                      >
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        Apply this Profile to Cumulative Modifiers
+                      </button>
                       <button
                         type="action"
                         name="act_updateprofile"
@@ -7775,11 +7783,41 @@ on(
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
 }
 
+/**
+ * @todo this function
+ * @param {string} rowId The Profile row ID
+ * @returns boolean
+ */
+async function isDefaultProfile(rowId) {
+  return false;
+}
+
 on("clicked:repeating_profiles:copybonusids", async (e) => {
   console.log("clicked:copybonusids", e);
   const a = await getAttrsAsync(["bonus_ids_output"]);
   const attrs = {};
   attrs[`repeating_profiles_bonus_ids`] = a.bonus_ids_output;
+  await setAttrsAsync(attrs);
+});
+
+on("clicked:repeating_profiles:checkbonusids", async (e) => {
+  console.log("clicked:repeating_profiles:checkbonusids", e);
+  const a = await getAttrsAsync(["repeating_profiles_bonus_ids"]);
+  console.log(a);
+  const bonusIds = a["repeating_profiles_bonus_ids"].split(",");
+  const bonusselectionsSectionIds = await getSectionIDsAsync("bonusselections");
+  const bonusIdKeys = bonusselectionsSectionIds.map(
+    (id) => `repeating_bonusselections_${id}_bonus_id`
+  );
+  const allBonusselectionsIds = await getAttrsAsync(bonusIdKeys);
+  console.log(allBonusselectionsIds);
+  const attrs = {};
+  for (const [key, val] of Object.entries(allBonusselectionsIds)) {
+    const [r, section, rowId] = key.split("_");
+    attrs[`repeating_bonusselections_${rowId}_enabled`] = bonusIds.includes(val)
+      ? 1
+      : 0;
+  }
   await setAttrsAsync(attrs);
 });
 
@@ -8180,19 +8218,16 @@ on("change:spd", async (e) => {
   const defaultProfileSkillBonusKey = `repeating_profiles_${profilesIds[0]}_mod_skillbonus`;
   const row = `repeating_skills_${rowId}`;
   const skillAttrs = SKILL_KEYS.map((key) => `${row}_${key}`);
-  console.log(skillAttrs);
   const a = await getAttrsAsync(
     skillAttrs.concat([iqBonusKey, defaultProfileSkillBonusKey])
   );
-  console.log(a);
   const attrs = {};
   const total =
     +a[`${row}_base`] +
     +a[iqBonusKey] +
-    +a[defaultProfileSkillBonusKey] +
+    (+a[defaultProfileSkillBonusKey] || 0) +
     +a[`${row}_bonus`] +
     (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`];
-  console.log(total);
   attrs[`${row}_total`] = total;
   await setAttrsAsync(attrs);
 }
@@ -8592,10 +8627,10 @@ on("change:repeating_movement:ft_melee", async (e) => {
   /* endinject */
 
   /**
-   * [] Skill calculation requires a default profile or it breaks. fix this.
+   * [] Use a radio button to determine default profile
    * [] Make range/duration text instead of number ("2D6 minutes", "varies", "touch")
    * [] Profile damage should use bonus damage if it exists instead of calculating based on PS type
-   * [] Add credits field(s) - Universal, Black Market, Splugorth, Phase World
+   * [] Add credits field(s) - Universal, Black Market, Splugorth, Phase World, gems, gold, etc.
    *
    *
    * [] Changing values causes other fields to set to 0
@@ -8612,6 +8647,9 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Add a non-repeating section for Default Profile so that profile attributes can be set on the token
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
+   *
+   * [x] Re-implement "Set this profile's selections as checked"
+   * [x] Skill calculation requires a default profile or it breaks. fix this.
    * [x] Fix P.P. missing dot
    * [x] Filter +0s from combined damage fields
    * [x] Set skill check to be skill % or 98, whichever is lower
