@@ -17,6 +17,13 @@ async function updateProfile(rowId) {
   await combineBonuses(bonusIds, `repeating_profiles_${rowId}`);
 }
 
+async function setSingleAttributeFromDefaultProfile(attrName, profileAttrName) {
+  const profileMeta = await getAttrsAsync(["default_profile"]);
+  const repeatingAttribute = `repeating_profiles_${profileMeta["default_profile"]}_${profileAttrName}`;
+  const a = await getAttrsAsync([repeatingAttribute]);
+  await setAttrsAsync({ [attrName]: +a[repeatingAttribute] });
+}
+
 /**
  * Whether or not the current row is set as default
  * @param {string} rowId The Profile row ID
@@ -36,33 +43,28 @@ async function setDefaultRepeatingRowAndUnsetOthers(
 ) {
   console.log("setDefaultRepeatingRowAndUnsetOthers", section, rowId, attrName);
   const rowIds = await getSectionIDsAsync(section);
-  console.log(rowIds);
   const isDefaultKeys = rowIds.map(
     (id) => `repeating_${section}_${id}_${attrName}`
   );
-  console.log(isDefaultKeys);
   const a = await getAttrsAsync(isDefaultKeys);
-  console.log(a);
   const attrs = Object.entries(a).reduce((acc, [key, value]) => {
-    console.log("reduce", acc, key, value);
     acc[key] = "0";
     return acc;
   }, {});
-  console.log(attrs);
   attrs[`repeating_${section}_${rowId}_${attrName}`] = "1";
   attrs[attrCurrent] = rowId;
-  console.log(attrs);
-  await setAttrsAsync(attrs, { silent: true });
+  await setAttrsAsync(attrs);
 }
 
 /**
- * Checks the other rows in a repeating section to see if this one needs to be set as Default.
- * Conditions:
+ * Sets the default row
  *  - Only row
  *  - A row that was set as default was deleted
- * @param {string} section Repeating section name
- * @param {string} rowId Row ID that triggered this function
- * @param {string} attrName Attribute name to look for if different than "is_default"
+ * @param {string} section Repeating section name.
+ * @param {string} rowId Row ID that triggered this function. If a valid string, this
+ *    row is set as default.
+ * @param {string} attrName Attribute name to look for if different than "is_default".
+ * @param {string} attrCurrent The attribute that holds the value of the current default row.
  */
 async function setDefaultRepeatingRow(
   section,
@@ -88,12 +90,12 @@ async function setDefaultRepeatingRow(
   attrs[attrCurrent] = rowIds[0];
 
   if (rowIds.length < 1) {
-    await setAttrsAsync({ default_profile: "" });
+    await setAttrsAsync({ [attrCurrent]: "" });
     return;
   }
 
   if (rowIds.length === 1) {
-    await setAttrsAsync(attrs, { silent: true });
+    await setAttrsAsync(attrs);
     return;
   }
 
@@ -104,17 +106,26 @@ async function setDefaultRepeatingRow(
   const a = await getAttrsAsync(isDefaultKeys);
   const isDefaultSet = Object.values(a).some((value) => +value == 1);
   if (!isDefaultSet) {
-    await setAttrsAsync(attrs, { silent: true });
+    await setAttrsAsync(attrs);
   }
 }
 
-on("change:default_profile", (e) => {
+on("change:default_profile", async (e) => {
   console.log("change:default_profile", e);
-  // @todo update other defaults like "default_mdc"
+  if (e.newValue == "") {
+    return;
+  }
+  const prefix = `repeating_profiles_${e.newValue}`;
+  const a = await getAttrsAsync([`${prefix}_mdc`]);
+  await setAttrsAsync({ default_mdc: a[`${prefix}_mdc`] });
+  await updateSkills();
 });
 
 on("change:repeating_profiles:is_default", async (e) => {
   console.log("clicked:repeating_profiles:is_default", e);
+  if (e.newValue != "1") {
+    return;
+  }
   const [r, section, rowId, ...attrNameArray] = e.sourceAttribute.split("_");
   const attrName = attrNameArray.join("_");
   await setDefaultRepeatingRow(section, rowId, attrName, "default_profile");
@@ -143,14 +154,15 @@ on("clicked:repeating_profiles:checkbonusids", async (e) => {
   for (const [key, val] of Object.entries(allBonusselectionsIds)) {
     const [r, section, rowId] = key.split("_");
     attrs[`repeating_bonusselections_${rowId}_enabled`] = bonusIds.includes(val)
-      ? 1
-      : 0;
+      ? "1"
+      : "0";
   }
   await setAttrsAsync(attrs);
 });
 
 on(
-  "clicked:repeating_profiles:updateprofile change:repeating_profiles:bonus_ids",
+  "clicked:repeating_profiles:updateprofile \
+  change:repeating_profiles:bonus_ids",
   async (e) => {
     console.log("clicked:repeating_profiles:updateprofile", e);
     const [r, section, rowId] = e.sourceAttribute.split("_");
@@ -160,16 +172,14 @@ on(
 
 on("change:_reporder:profiles", async (e) => {
   console.log("change:_reporder:profiles", e);
-  const sectionIds = await getSectionIDsOrderedAsync("profiles");
-  const prefix = `repeating_profiles_${sectionIds[0]}`;
-  const a = await getAttrsAsync([`${prefix}_mdc`]);
-  await setAttrsAsync({ default_mdc: a[`${prefix}_mdc`] });
-  console.log(a);
 });
 
 on("change:repeating_profiles:mod_skillbonus", async (e) => {
   console.log("change:repeating_profiles:mod_skillbonus", e);
-  await updateSkills();
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  if (await isDefault(section, rowId)) {
+    await updateSkills();
+  }
 });
 
 on("remove:repeating_profiles", async (e) => {
@@ -179,6 +189,6 @@ on("remove:repeating_profiles", async (e) => {
 
 on("clicked:getdefaultprofile", async (e) => {
   console.log("clicked:getdefaultprofile", e);
-  const a = await getAttrsAsync(["default_profile"]);
+  const a = await getAttrsAsync(["default_profile", "default_mdc"]);
   console.log(a);
 });

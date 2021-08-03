@@ -6,13 +6,8 @@ on("clicked:repeating_magic:usespell", async (e) => {
 });
 
 on("clicked:resetppe", async (e) => {
-  console.log(e);
-  const sectionIds = await getSectionIDsOrderedAsync("profiles");
-  const attrs = [`repeating_profiles_${sectionIds[0]}_ppe`];
-  const a = await getAttrsAsync(attrs);
-  await setAttrsAsync({
-    currentppe: +a[`repeating_profiles_${sectionIds[0]}_ppe`],
-  });
+  console.log("clicked:resetppe", e);
+  await setSingleAttributeFromDefaultProfile("currentppe", "ppe");
 });
 
 on("clicked:repeating_psionics:usepsionic", async (e) => {
@@ -25,13 +20,8 @@ on("clicked:repeating_psionics:usepsionic", async (e) => {
 });
 
 on("clicked:resetisp", async (e) => {
-  console.log(e);
-  const sectionIds = await getSectionIDsOrderedAsync("profiles");
-  const attrs = [`repeating_profiles_${sectionIds[0]}_isp`];
-  const a = await getAttrsAsync(attrs);
-  await setAttrsAsync({
-    currentisp: +a[`repeating_profiles_${sectionIds[0]}_isp`],
-  });
+  console.log("clicked:resetisp", e);
+  await setSingleAttributeFromDefaultProfile("currentisp", "isp");
 });
 
 async function calculateRangeDuration(row) {
