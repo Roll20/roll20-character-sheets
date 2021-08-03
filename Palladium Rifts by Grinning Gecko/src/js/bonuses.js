@@ -357,6 +357,7 @@ on("change:repeating_profiles:name", async (e) => {
   await setAttrsAsync({
     repeating_profiles_rowid: `${r}_${section}_${rowId}_`,
   });
+  await setDefaultRepeatingRow(section, null, "is_default", "default_profile");
 });
 
 on("change:repeating_profiles:mod_iq", async (e) => {

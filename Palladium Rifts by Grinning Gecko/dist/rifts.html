@@ -4343,73 +4343,85 @@
             <hr />
             <div class="profiles repeating-bonuses-outer">
               <h3>Profiles</h3>
+              <!-- <button type="action" name="act_getdefaultprofile">
+                Default
+              </button> -->
               <input type="hidden" name="attr_default_mdc" />
+              <input type="hidden" name="attr_default_profile" />
+              <label>Default</label>
               <fieldset class="repeating_profiles">
-                <details class="info">
-                  <summary>
-                    <div class="bonus-thing-heading">
-                      <b class="click-expand"
-                        ><span title="Click for more info"
-                          >&nbsp;&#9432;</span
-                        ></b
-                      >
-                      <label
-                        ><span>Name</span>
-                        <input
-                          type="text"
-                          list="combat-modifiers"
-                          name="attr_name"
-                        />
-                      </label>
-                      <label
-                        ><span>Level</span>
-                        <input type="number" value="1" name="attr_level" />
-                      </label>
-                    </div>
-                  </summary>
-                  <div class="details-body">
-                    <div class="profile-management">
-                      <input type="text" class="full" name="attr_bonus_ids" />
-                      <input type="hidden" name="attr_bonus_names" />
-                      <div class="bonus-names">
-                        <span name="attr_bonus_names"></span>
+                <div class="profiles-inner">
+                  <input
+                    type="checkbox"
+                    class="is-default"
+                    name="attr_is_default"
+                    value="1"
+                  />
+                  <details class="info profile">
+                    <summary>
+                      <div class="bonus-thing-heading">
+                        <b class="click-expand"
+                          ><span title="Click for more info"
+                            >&nbsp;&#9432;</span
+                          ></b
+                        >
+                        <label
+                          ><span>Name</span>
+                          <input
+                            type="text"
+                            list="combat-modifiers"
+                            name="attr_name"
+                          />
+                        </label>
+                        <label
+                          ><span>Level</span>
+                          <input type="number" value="1" name="attr_level" />
+                        </label>
                       </div>
-                      <button
-                        type="action"
-                        name="act_copybonusids"
-                        class="metal-btn btn-silver-flat"
-                      >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        Apply Checked Modifiers to this Profile
-                      </button>
-                      <button
-                        type="action"
-                        name="act_checkbonusids"
-                        class="metal-btn btn-silver-flat"
-                      >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        Apply this Profile to Cumulative Modifiers
-                      </button>
-                      <button
-                        type="action"
-                        name="act_updateprofile"
-                        class="metal-btn btn-silver-flat"
-                      >
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        Update Profile if Attributes or Modifiers have changed
-                      </button>
-                    </div>
-                    <!-- inject:partials/repeating_modifiers_readonly.html -->
-                    <input type="hidden" name="attr_bonus_id" value="" />
+                    </summary>
+                    <div class="details-body">
+                      <div class="profile-management">
+                        <input type="text" class="full" name="attr_bonus_ids" />
+                        <input type="hidden" name="attr_bonus_names" />
+                        <div class="bonus-names">
+                          <span name="attr_bonus_names"></span>
+                        </div>
+                        <button
+                          type="action"
+                          name="act_copybonusids"
+                          class="metal-btn btn-silver-flat"
+                        >
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          Apply Checked Modifiers to this Profile
+                        </button>
+                        <button
+                          type="action"
+                          name="act_checkbonusids"
+                          class="metal-btn btn-silver-flat"
+                        >
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          Apply this Profile to Cumulative Modifiers
+                        </button>
+                        <button
+                          type="action"
+                          name="act_updateprofile"
+                          class="metal-btn btn-silver-flat"
+                        >
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                          Update Profile if Attributes or Modifiers have changed
+                        </button>
+                      </div>
+                      <!-- inject:partials/repeating_modifiers_readonly.html -->
+                      <input type="hidden" name="attr_bonus_id" value="" />
 <h3>Attributes</h3>
 <div class="bonus-type-container attributes">
   <label
@@ -5178,9 +5190,10 @@
   /></label>
 </div>
 
-                    <!-- endinject -->
-                  </div>
-                </details>
+                      <!-- endinject -->
+                    </div>
+                  </details>
+                </div>
               </fieldset>
             </div>
             <hr />
@@ -7610,6 +7623,7 @@ on("change:repeating_profiles:name", async (e) => {
   await setAttrsAsync({
     repeating_profiles_rowid: `${r}_${section}_${rowId}_`,
   });
+  await setDefaultRepeatingRow(section, null, "is_default", "default_profile");
 });
 
 on("change:repeating_profiles:mod_iq", async (e) => {
@@ -7893,13 +7907,107 @@ on(
 }
 
 /**
- * @todo this function
+ * Whether or not the current row is set as default
  * @param {string} rowId The Profile row ID
  * @returns boolean
  */
-async function isDefaultProfile(rowId) {
-  return false;
+async function isDefault(section, rowId, attrName = "is_default") {
+  const rowKey = `repeating_${section}_${rowId}_${attrName}`;
+  const a = await getAttrsAsync([rowKey]);
+  return a[rowKey] == "1";
 }
+
+async function setDefaultRepeatingRowAndUnsetOthers(
+  section,
+  rowId,
+  attrName = "is_default",
+  attrCurrent = "default_profile"
+) {
+  console.log("setDefaultRepeatingRowAndUnsetOthers", section, rowId, attrName);
+  const rowIds = await getSectionIDsAsync(section);
+  console.log(rowIds);
+  const isDefaultKeys = rowIds.map(
+    (id) => `repeating_${section}_${id}_${attrName}`
+  );
+  console.log(isDefaultKeys);
+  const a = await getAttrsAsync(isDefaultKeys);
+  console.log(a);
+  const attrs = Object.entries(a).reduce((acc, [key, value]) => {
+    console.log("reduce", acc, key, value);
+    acc[key] = "0";
+    return acc;
+  }, {});
+  console.log(attrs);
+  attrs[`repeating_${section}_${rowId}_${attrName}`] = "1";
+  attrs[attrCurrent] = rowId;
+  console.log(attrs);
+  await setAttrsAsync(attrs, { silent: true });
+}
+
+/**
+ * Checks the other rows in a repeating section to see if this one needs to be set as Default.
+ * Conditions:
+ *  - Only row
+ *  - A row that was set as default was deleted
+ * @param {string} section Repeating section name
+ * @param {string} rowId Row ID that triggered this function
+ * @param {string} attrName Attribute name to look for if different than "is_default"
+ */
+async function setDefaultRepeatingRow(
+  section,
+  rowId,
+  attrName = "is_default",
+  attrCurrent = "default_profile"
+) {
+  if (rowId) {
+    await setDefaultRepeatingRowAndUnsetOthers(
+      section,
+      rowId,
+      attrName,
+      attrCurrent
+    );
+    return;
+  }
+
+  const rowIds = await getSectionIDsOrderedAsync(section);
+  const firstRow = `repeating_${section}_${rowIds[0]}_${attrName}`;
+
+  const attrs = {};
+  attrs[firstRow] = "1";
+  attrs[attrCurrent] = rowIds[0];
+
+  if (rowIds.length < 1) {
+    await setAttrsAsync({ default_profile: "" });
+    return;
+  }
+
+  if (rowIds.length === 1) {
+    await setAttrsAsync(attrs, { silent: true });
+    return;
+  }
+
+  // Was something deleted? If there's no current default, set the top item.
+  const isDefaultKeys = rowIds.map(
+    (id) => `repeating_${section}_${id}_${attrName}`
+  );
+  const a = await getAttrsAsync(isDefaultKeys);
+  const isDefaultSet = Object.values(a).some((value) => +value == 1);
+  if (!isDefaultSet) {
+    await setAttrsAsync(attrs, { silent: true });
+  }
+}
+
+on("change:default_profile", (e) => {
+  console.log("change:default_profile", e);
+  // @todo update other defaults like "default_mdc"
+});
+
+on("change:repeating_profiles:is_default", async (e) => {
+  console.log("clicked:repeating_profiles:is_default", e);
+  const [r, section, rowId, ...attrNameArray] = e.sourceAttribute.split("_");
+  const attrName = attrNameArray.join("_");
+  await setDefaultRepeatingRow(section, rowId, attrName, "default_profile");
+});
 
 on("clicked:repeating_profiles:copybonusids", async (e) => {
   console.log("clicked:copybonusids", e);
@@ -7951,6 +8059,17 @@ on("change:_reporder:profiles", async (e) => {
 on("change:repeating_profiles:mod_skillbonus", async (e) => {
   console.log("change:repeating_profiles:mod_skillbonus", e);
   await updateSkills();
+});
+
+on("remove:repeating_profiles", async (e) => {
+  console.log("remove:repeating_profiles", e);
+  await setDefaultRepeatingRow("profiles");
+});
+
+on("clicked:getdefaultprofile", async (e) => {
+  console.log("clicked:getdefaultprofile", e);
+  const a = await getAttrsAsync(["default_profile"]);
+  console.log(a);
 });
 
   /* endinject */
@@ -8323,18 +8442,23 @@ on("change:spd", async (e) => {
 
   /* inject:js/skills.js */
   async function updateSkill(rowId, iqBonusKey = "iq_bonus") {
-  const profilesIds = await getSectionIDsOrderedAsync("profiles");
-  const defaultProfileSkillBonusKey = `repeating_profiles_${profilesIds[0]}_mod_skillbonus`;
+  const additionalModifiers = [iqBonusKey];
+
+  const profileMeta = await getAttrsAsync(["default_profile"]);
+  let profileSkillBonusKey = "";
+  if (profileMeta["default_profile"]) {
+    profileSkillBonusKey = `repeating_profiles_${profileMeta["default_profile"]}_mod_skillbonus`;
+    additionalModifiers.push(profileSkillBonusKey);
+  }
+
   const row = `repeating_skills_${rowId}`;
   const skillAttrs = SKILL_KEYS.map((key) => `${row}_${key}`);
-  const a = await getAttrsAsync(
-    skillAttrs.concat([iqBonusKey, defaultProfileSkillBonusKey])
-  );
+  const a = await getAttrsAsync(skillAttrs.concat(additionalModifiers));
   const attrs = {};
   const total =
     +a[`${row}_base`] +
     +a[iqBonusKey] +
-    (+a[defaultProfileSkillBonusKey] || 0) +
+    (+a[profileSkillBonusKey] || 0) +
     +a[`${row}_bonus`] +
     (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`];
   attrs[`${row}_total`] = total;
@@ -8739,7 +8863,6 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Use a radio button to determine default profile
    * [] Make range/duration text instead of number ("2D6 minutes", "varies", "touch")
    * [] Profile damage should use bonus damage if it exists instead of calculating based on PS type
-   * [] Add credits field(s) - Universal, Black Market, Splugorth, Phase World, gems, gold, etc.
    *
    *
    * [] Changing values causes other fields to set to 0
@@ -8757,6 +8880,7 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
    *
+   * [x] Add credits field(s) - Universal, Black Market, Splugorth, Phase World, gems, gold, etc.
    * [x] Re-implement "Set this profile's selections as checked"
    * [x] Skill calculation requires a default profile or it breaks. fix this.
    * [x] Fix P.P. missing dot
