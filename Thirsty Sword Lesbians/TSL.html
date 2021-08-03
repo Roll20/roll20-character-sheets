@@ -2,7 +2,7 @@
 
 	// data
 
-	var codeVersion = "1.001";
+	var codeVersion = "1.003";
 	var xpmax = 5;
 	
 	// For TSL, all playbooks have identical advancement options, so that's the reduced-case I'll implement here.
@@ -164,7 +164,7 @@
 		},
 		{
 			name: "Entice",
-			body: "When you appeal to someone’s physical or romantic sensibilities, roll +Heart:",
+			body: "When you appeal to someone’s physical or emotional sensibilities, roll +Heart:",
 			hit: "Gain a String on them and they choose 1",
 			mixed: "Gain a String on them, unless they decide instead to choose 1",
 			mixedbullets: [
@@ -416,6 +416,9 @@
 					alternative: "Choose two Heroic Aspects and two Tragic Aspects from the following lists. When you act in accordance with one of your Aspects, check it off and take +1 forward. If it’s a Tragic Aspect, also mark XP. When all four Aspects are checked off, describe how your Destiny grows ever nearer, then erase the check marks and begin again.",
 					end: "You may fulfill your Destiny in the course of play, or reject it so firmly that you no longer feel pressure to fulfill it. This deserves a climactic scene either way, and trying to reject your Destiny draws the full wrath of your Aspects and those pressing you to fulfill it. Afterwards, choose a new Destiny, adopt a new playbook, or live happily ever after.",
 					blanks: [
+						{
+							name: "Destiny", checkbox: "no"
+						},
 						{
 							name: "Heroic Aspect",
 							suggestions: "Portents & Prophecies, Spiritual Prowess, Heir to a Mystic Power, Prominent Suitors, Save Your World, Soother of Monsters, Help of the Masses, Chosen by a God, Legendary Skill",
@@ -3256,6 +3259,7 @@
 			log("This sheet is version "+myVersion);
 			if ( myVersion !== codeVersion ) {
 				log("This sheet is behind the current version "+codeVersion);
+
 				if ( myVersion === "1.0" ) {
 					// Then do what needs to be done for this version to move up.
 					var nextVersion = "1.001";
@@ -3281,7 +3285,94 @@
 							}
 						});
 					});
-				}
+					log("Sheet updated to 1.001");
+				} // End of 1.0 -> 1.001 bloc
+
+				if ( myVersion === "1.001" ) {
+					var nextVersion = "1.002"; 
+					myVersion = nextVersion;
+					var mname = getTranslationByKey("Destiny");
+					getSectionIDs("repeating_moves", function(mlist) {
+						var mf = [];
+						for(var i=0; i < mlist.length; i++ ) {
+							var mfpre = "repeating_moves_" + mlist[i] + "_";
+							mf[i*2] = mfpre + "name";
+							mf[i*2+1] = mfpre + "playbook"; 
+						}
+						getAttrs(mf, function(mdata) {
+							for(var i=0; i < mlist.length; i++) {
+								if ( mdata[mf[i*2]] === mname && mdata[mf[i*2+1]] === "chosen" ) { 
+									// Then we found the Chosen's Destiny move. Take action here.
+									// We want the Destiny at the top of the list of blanks
+									// That means moving all the other blanks down a row
+									// That means getting all the other blanks' values and such
+									// Fields, suffixed by a number starting with 0:
+									// blankname
+									// checkbox
+									// blankbox
+									// blank
+									// blanksuggestions
+									// These should already be populated 0 through 3; they need to be moved to 1 through 4
+									var mfpre = "repeating_moves_" + mlist[i] + "_";
+									var dblanks = {};
+									var df = [];
+									for(var j=0; j < 4; j++) {
+										df[j*5] = mfpre + "blankname" + j;
+										df[j*5+1] = mfpre + "checkbox" + j;
+										df[j*5+2] = mfpre + "blankbox" + j;
+										df[j*5+3] = mfpre + "blank" + j;
+										df[j*5+4] = mfpre + "blanksuggestions" + j;
+									}
+									getAttrs(df, function(ddata) {
+										dblanks[mfpre + "blankname0"] = mname; // Convenient; field label same as move's name
+										dblanks[mfpre + "checkbox0"] = "no";
+										dblanks[mfpre + "blankbox0"] = "";
+										dblanks[mfpre + "blank0"] = "";
+										dblanks[mfpre + "blanksuggestions0"] = "";
+										for(var j=1; j < 5; j++) {
+											dblanks[mfpre + "blankname" + j] = ddata[df[(j-1)*5]];
+											dblanks[mfpre + "checkbox" + j] = ddata[df[(j-1)*5+1]];
+											dblanks[mfpre + "blankbox" + j] = ddata[df[(j-1)*5+2]];
+											dblanks[mfpre + "blank" + j] = ddata[df[(j-1)*5+3]];
+											dblanks[mfpre + "blanksuggestions" + j] = ddata[df[(j-1)*5+4]];
+										}
+										setAttrs(dblanks);
+									});
+								}
+							}
+						});
+					});
+					log("Sheet updated to 1.002");
+				} // End of 1.001 -> 1.002 bloc
+
+				if ( myVersion === "1.002" ) {
+					// Then do what needs to be done for this version to move up.
+					var nextVersion = "1.003";
+					myVersion = nextVersion;
+					// 1.003 Change "physical or romantic" to "physical or emotional" in the Entice move
+					var oldtext = getTranslationByKey("When you appeal to someone’s physical or romantic sensibilities, roll +Heart:");
+					var newtext = getTranslationByKey("When you appeal to someone’s physical or emotional sensibilities, roll +Heart:");
+					getSectionIDs("repeating_basic", function(blist) {
+						var bf = [];
+						for(var i=0; i < blist.length; i++ ) {
+							var bfpre = "repeating_basic_" + blist[i] + "_";
+							bf[i] = bfpre + "body";
+						}
+						getAttrs(bf, function(bdata) {
+							for(var i=0; i < blist.length; i++ ) {
+								if ( bdata[bf[i]] === oldtext ) {
+									log("discovered oldtext");
+									var att = {};
+									att[bf[i]] = newtext;
+									setAttrs(att);
+									break;
+								}
+							}
+						});
+					});
+					log("Sheet updated to 1.003");
+				} // End of 1.002 -> 1.003 bloc
+
 				// Once we're comfortable that the right things are being done, 
 				// we make sure to setAttrs sheet-version => myVersion
 				setAttrs({"sheet-version": myVersion});
@@ -3389,7 +3480,7 @@
 								<span name="attr_name"></span>
 							</button>
 							<button type="roll" class="sheet-2d6-button-nofloat minimum bold" value="&{template:2d6-roll} {{character=@{character_name}}} {{title=@{name}}} {{roll=[[2d6+@{rating}+@{rollprompt}]]}}" name="roll_2d6">
-								<input type="hidden" name="attr_rating" value="" class="make-plus"><span class="make-plus"></span><span name="attr_rating" class="minimum"></span>
+								<input type="hidden" name="attr_rating" value="0" class="make-plus"><span class="make-plus"></span><span name="attr_rating" class="minimum"></span>
 							</button>
 						</div>
 						<div class="tooltip-pop">

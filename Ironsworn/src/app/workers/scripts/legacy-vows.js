@@ -25,22 +25,17 @@ function updateVow (mark, vowArray, number) {
 function chosenDifficulty (rank) {
   switch (rank) {
     case 1:
-      return 12
-      break;
+      return 12;
     case 2:
-      return 8
-      break;
+      return 8;
     case 3:
-      return 4
-      break;
+      return 4;
     case 4:
-      return 2
-      break;
+      return 2;
     case 5:
-      return 1
-      break;
+      return 1;
     default:
-      return null
+      return null;
   }
 }
 

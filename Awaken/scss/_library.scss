@@ -1,0 +1,285 @@
+@function compare($lists) {
+    $total:0;
+
+    @each $list in $lists {
+        $value:$list;
+        $result:0;
+
+        @each $r in $lists {
+            @if $r == $value {
+                $result:$result+1;
+            }
+        }
+        $result:$result;
+
+        @if $result > $total {
+            $total:$result;
+        }
+    }
+
+    @return $total;
+}
+
+@mixin col($widthMain, $widthCol) {
+    display:flex;
+    justify-content: space-between;
+    align-items:flex-start;
+    align-content:flex-start;
+    width:$widthMain;
+    
+    div.col {
+        display:flex;
+        justify-content: space-between;
+        align-items:flex-start;
+        align-content:flex-start;
+        width:$widthCol;
+        flex-wrap:wrap;
+        position:relative;
+    }
+}
+
+@mixin button($width) {
+    button[type="roll"] {
+        &::before {
+            content:"";
+            background:$diceBlack;
+            background-size:contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            width:$width;
+            height:$width;
+            border:1px solid black;
+        }
+
+        &:hover {
+            &::before {
+                background:$diceWhite;
+                background-size:contain;
+                background-position: center;
+                background-repeat: no-repeat;
+            }
+        }
+
+        display:flex;
+        justify-content: flex-start;
+        text-transform: uppercase;
+        font-size: 22px;
+        letter-spacing: 2px;
+        font-weight: bold;
+        line-height: 22px;
+
+        padding:0px;
+        margin:0px;
+        background:transparent;
+        border:0px;
+        box-shadow:none;
+
+        @content;
+
+        span,
+        h1 {
+            display:flex;
+            align-items:center;
+            margin-left:5px;
+        }
+    }
+}
+
+@mixin upRank($wh) {
+
+    input[type="hidden"][value="1"] ~ button[type="action"].evolution_1,
+    input[type="hidden"][value="2"] ~ button[type="action"].evolution_1,
+    input[type="hidden"][value="2"] ~ button[type="action"].evolution_2,
+    input[type="hidden"][value="3"] ~ button[type="action"].evolution_1,
+    input[type="hidden"][value="3"] ~ button[type="action"].evolution_2,
+    input[type="hidden"][value="3"] ~ button[type="action"].evolution_3,
+    input[type="hidden"][value="4"] ~ button[type="action"].evolution_1,
+    input[type="hidden"][value="4"] ~ button[type="action"].evolution_2,
+    input[type="hidden"][value="4"] ~ button[type="action"].evolution_3,
+    input[type="hidden"][value="4"] ~ button[type="action"].evolution_4,
+    input[type="hidden"][value="5"] ~ button[type="action"].evolution_1,
+    input[type="hidden"][value="5"] ~ button[type="action"].evolution_2,
+    input[type="hidden"][value="5"] ~ button[type="action"].evolution_3,
+    input[type="hidden"][value="5"] ~ button[type="action"].evolution_4,
+    input[type="hidden"][value="5"] ~ button[type="action"].evolution_5 {
+
+        &::before {
+            content: "X";
+            width: 100%;
+            height: 15px;
+            color: black;
+            font-size: 20px;
+            line-height: 15px;
+            display: flex;
+            justify-content: center;
+        }
+    }
+
+    button[type="action"] {
+        width: $wh;
+        height: $wh;
+        background: lightgrey;
+        border: 0px;
+        padding: 0px;
+        border:1px solid black;
+
+        @content;
+    }
+}
+
+@mixin configStats($borderColor, $classBase, $marginLeftConfig:0) {
+
+    #{$classBase} {
+        &:hover {
+            label.config {
+                span {
+                    &::before {
+                        opacity: 0.5;
+                    }
+                }
+            }
+        }
+    }
+    
+    label.config {
+        position:relative;
+        width:23px;
+        height:23px;
+
+        span {
+            width:23px;
+            height:23px;
+
+            &::before {
+                content: "y";
+                font-family: "pictos";
+                font-variant: initial;
+                font-size: 26px;
+                line-height: 23px;
+                height: 23px;
+                width: 23px;
+                display: block;
+                text-align: center;
+                opacity:0;
+            }
+        }
+
+        input[type="checkbox"] {
+            position:absolute;
+            width:23px;
+            height:23px;
+            opacity: 0;
+            z-index:999;
+            
+            &:checked ~ span::before {
+                opacity: 1;
+            }
+        }
+    }
+
+    input[type="hidden"][value="1"].config ~ div.config {
+        display:flex;
+    }
+
+    div.config {
+        display:none;
+        width:100%;
+        flex-wrap: wrap;
+        margin-left:$marginLeftConfig;
+
+        label {
+            display:flex;
+            width:100%;
+            justify-content: space-between;
+            align-items:flex-end;
+
+            span {
+                width: 40px;
+                white-space: nowrap;
+                margin-right: 5px;
+                color: RGB(118, 150, 166);
+                font-variant: small-caps;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            input[type="number"] {
+                width:calc(100% - 40px);
+                text-align: center;
+                background:transparent;
+
+                border-top:0px;
+                border-right:0px;
+                border-left:0px;
+                border-bottom:1px dashed $borderColor;
+                
+                border-radius: 0px;
+                padding:0px;
+            }
+        }
+    }
+}
+
+@mixin options($color, $background) {
+
+    label.config {
+        position:absolute;
+        width:23px;
+        height:23px;
+        right:0;
+
+        span {
+            width:23px;
+            height:23px;
+
+            &::before {
+                content: "y";
+                color:$color;
+                font-family: "pictos";
+                font-variant: initial;
+                font-size: 26px;
+                line-height: 23px;
+                height: 23px;
+                width: 23px;
+                display: block;
+                text-align: center;
+                opacity:0.5;
+            }
+        }
+
+        input[type="checkbox"] {
+            position:absolute;
+            width:23px;
+            height:23px;
+            opacity: 0;
+            z-index:999;
+            
+            &:checked ~ span::before {
+                opacity: 1;
+            }
+        }
+    }
+
+    input[type="hidden"][value="1"] ~ div.config {
+        display:flex;
+    }
+
+    div.config {
+        display:none;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 100px;
+        padding: 25px;
+        background: white;
+        border: 1px solid black;
+        border-radius: 30px;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        z-index:9999;
+
+        *{
+            width:100%;
+        }
+    }
+}
