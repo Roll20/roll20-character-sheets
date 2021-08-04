@@ -124,6 +124,10 @@ on("change:default_profile", async (e) => {
 on("change:repeating_profiles:is_default", async (e) => {
   console.log("clicked:repeating_profiles:is_default", e);
   if (e.newValue != "1") {
+    if (e.sourceType == "player") {
+      // check it - don't allow unchecking
+      await setAttrsAsync({ [e.sourceAttribute]: "1" });
+    }
     return;
   }
   const [r, section, rowId, ...attrNameArray] = e.sourceAttribute.split("_");
