@@ -1,65 +1,71 @@
-include ../../data/oracles
-include ./raw-oracles
+//- include ../../data/oracles
+//- include ./raw-oracles
 
-mixin oracleGroupTemplate(opts, name)
-  - var id = `${name}${opts.roll_id}`
-  |
-  | {{##{id}}}
-  .sheet-result-row
-    .sheet-oracle-double-dice
-      each subOracle in opts.sub_oracles
-        -var subId = `${name}${subOracle.roll_id}`
-        span {{#{subId}}}
-    .sheet-oracle-table-text
-      each subOracle in opts.sub_oracles
-        -var subId = `${name}${subOracle.roll_id}`
-        each row in subOracle.rows
-          - var rollValues = row.roll.match(/(\d+-\d*)|(\d+)/gm)[0].replace('-', ' ')
-          | 
-          | {{#roll#{row.type}() #{subId} #{rollValues}}}
-          | 
-          span!=row.result
-          | 
-          | {{/roll#{row.type}() #{subId} #{rollValues}}}
-  |
-  | {{/#{id}}}
+//- mixin oracleGroupTemplate(opts, name)
+//-   - var id = `${name}${opts.roll_id}`
+//-   |
+//-   | {{##{id}}}
+//-   .sheet-result-row
+//-     .sheet-oracle-double-dice
+//-       each subOracle in opts.sub_oracles
+//-         -var subId = `${name}${subOracle.roll_id}`
+//-         span {{#{subId}}}
+//-     .sheet-oracle-table-text
+//-       each subOracle in opts.sub_oracles
+//-         -var subId = `${name}${subOracle.roll_id}`
+//-         each row in subOracle.rows
+//-           - var rollValues = row.roll.match(/(\d+-\d*)|(\d+)/gm)[0].replace('-', ' ')
+//-           | 
+//-           | {{#roll#{row.type}() #{subId} #{rollValues}}}
+//-           | 
+//-           span!=row.result
+//-           | 
+//-           | {{/roll#{row.type}() #{subId} #{rollValues}}}
+//-   |
+//-   | {{/#{id}}}
 
-mixin oracleTemplate(opts, name)
-  - var id = `${name}${opts.roll_id}`
+mixin oracleTemplate(oracle)
+  - var id = oracle.Name.toLowerCase().replace(/\s/g, '-')
   |
   | {{##{id}}}
   .sheet-result-row
     .sheet-oracle-dice
       span {{#{id}}}
     .sheet-oracle-table-text
-      each row in opts.rows
-        - var rollValues = row.roll.match(/(\d+-\d*)|(\d+)/gm)[0].replace('-', ' ')
-        | 
-        | {{#roll#{row.type}() #{id} #{rollValues}}}
-        | 
-        span!=row.result
-        | 
-        | {{/roll#{row.type}() #{id} #{rollValues}}}
+      if oracle.Table
+        each row, index in oracle.Table
+          - var initChance
+          if index === 0
+            - initChance = row.Chance - (row.Chance - 1)
+          else
+            - initChance = oracle.Table[index - 1].Chance + 1
+          - var finalChance = row.Chance
+          - var result = row.Description.charAt(0).toUpperCase() + row.Description.slice(1)
+          if initChance === finalChance
+            | 
+            | {{#rollTotal() #{id} #{finalChance}}}
+            | 
+            span=result
+            | 
+            | {{/rollTotal() #{id} #{finalChance}}}
+          else
+            | 
+            | {{#rollBetween() #{id} #{initChance} #{finalChance}}}
+            | 
+            span=result
+            | 
+            | {{/rollBetween() #{id} #{initChance} #{finalChance}}}
   |
   | {{/#{id}}}
 
-each system, key in oracles
-  rolltemplate(class=`sheet-rolltemplate-${key}_oracles`)
-    .sheet-roll-container
-      .sheet-subheader {{header}}
-      | {{#custom-oracle}}
-      .sheet-result-row
-        .sheet-oracle-table-text {{custom-oracle}}
-      | {{/custom-oracle}}
-
-      if key === 'ironsworn'
-        +rawOracles
-      
-      each group, name in system
-        each oracle in group.oracles
-          if oracle.oracle_move
-            |
-          else if oracle.oracle_group
-            +oracleGroupTemplate(oracle, name)
-          else
-            +oracleTemplate(oracle, name)
+rolltemplate(class=`sheet-rolltemplate-starforged_oracles`)
+  .sheet-roll-container
+    .sheet-subheader {{header}}
+    | {{#custom-oracle}}
+    .sheet-result-row
+      .sheet-oracle-table-text {{custom-oracle}}
+    | {{/custom-oracle}}
+    
+    each category, index in oraclesdata
+      each oracle in category.Oracles
+        +oracleTemplate(oracle)

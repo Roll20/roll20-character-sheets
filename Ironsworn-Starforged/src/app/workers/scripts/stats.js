@@ -1,8 +1,8 @@
 //Cannot increase Health while Wounded
 //Health reaching 0 marks Wounded
 on('change:health', function(eventinfo) {
-    getAttrs(["debilWounded"], function(values) {
-        if(values.debilWounded == "on") {
+    getAttrs(["impactWounded"], function(values) {
+        if(values.impactWounded == "on") {
             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
                 setAttrs({health: eventinfo.previousValue});
             }
@@ -13,8 +13,8 @@ on('change:health', function(eventinfo) {
 //Cannot increase Spirit while Shaken
 //Spirit reaching 0 marks Shaken
 on('change:spirit', function(eventinfo) {
-    getAttrs(["debilShaken"], function(values) {
-        if(values.debilShaken == "on") {
+    getAttrs(["impactShaken"], function(values) {
+        if(values.impactShaken == "on") {
             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
                 setAttrs({spirit: eventinfo.previousValue});
             }
@@ -25,12 +25,12 @@ on('change:spirit', function(eventinfo) {
 //Cannot increase Supply while Unprepared
 //Supply reaching 0 marks Unprepared
 on('change:supply', function(eventinfo) {
-    getAttrs(["debilUnprepared"], function(values) {
+    getAttrs(["impactUnprepared"], function(values) {
         if(values.unprepared == "on") {
             if (parseInt(eventinfo.newValue) > parseInt(eventinfo.previousValue)) {
                 setAttrs({supply: eventinfo.previousValue});
             }
         }
     });
-    if (parseInt(eventinfo.newValue) === 0) setAttrs({debilUnprepared: "on"});
+    if (parseInt(eventinfo.newValue) === 0) setAttrs({impactUnprepared: "on"});
 });

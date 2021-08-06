@@ -102,22 +102,6 @@ on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress
   });
 });
 
-on('change:clear_misses', function() {
-  setAttrs({ 
-    'miss_0': '0',
-    'miss_1': '0',
-    'miss_2': '0',
-    'miss_3': '0',
-    'miss_4': '0',
-    'miss_5': '0',
-    'miss_6': '0',
-    'miss_7': '0',
-    'miss_8': '0',
-    'miss_9': '0',
-    'clear_misses': 'off'
-  });
-});
-
 on('change:repeating_progress:challenge-show-button', function(eventinfo) {
   setAttrs({
     'repeating_progress_challenge-show': eventinfo.newValue  
