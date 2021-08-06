@@ -702,6 +702,15 @@ const CORE_KEYS = [
   "leapup",
   "leapout",
   "equipment",
+  "psionic_ability",
+  "credits_universal_bearer",
+  "credits_universal_marked",
+  "credits_blackmarket",
+  "credits_ngmi",
+  "credits_phaseworld",
+  "credits_splugorth",
+  "credits_gems",
+  "credits_blackmarketmerchandise",
 ];
 
 const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
