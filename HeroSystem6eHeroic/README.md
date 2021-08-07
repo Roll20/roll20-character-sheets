@@ -64,7 +64,7 @@ The first four weapons have buttons for killing damage attacks. The fifth weapon
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
-When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made and target, and the BODY and STUN damage rolls.
+When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results.
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
@@ -125,6 +125,8 @@ The last page of this sheet contains a number of important options:
 (2) Super-heroic Campaign Endurance. If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
 
 (3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+
+(4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
 ## Token Settings
 
