@@ -60,7 +60,7 @@ Click the "Roll" button to roll armor activation. The message like the one shown
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)
 
-The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon.
+The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon. The "AoE" checkbox indicates an Area of Effect weapon.
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
@@ -78,7 +78,7 @@ The basic maneuvers list is contained in a slideshow so that it can be hidden by
 
 *Hit location system (Optional)*
 
-To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically caculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers.
+To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically caculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers. An attack using a weapon marked as "AoE" will not use the hit location system (this allows the hit location system to be applied on a case by case basis).
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocations.png)
 
