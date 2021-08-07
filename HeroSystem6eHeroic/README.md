@@ -76,9 +76,9 @@ The basic maneuvers list is contained in a slideshow so that it can be hidden by
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
 
-*Hit location system*
+*Hit location system (Optional)*
 
-To make a targeted attack select the radio button corresponding to the desired region on the target's body. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically caculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers.
+To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically caculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers.
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocations.png)
 
