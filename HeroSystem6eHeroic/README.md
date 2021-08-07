@@ -72,9 +72,15 @@ The fifth weapon's green roll button produces similar output, but assumes the we
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChat.png)
 
-The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). A third pane can be used for notes and treasures.
+The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
+
+*Hit location system*
+
+To make a targeted attack select the radio button corresponding to the desired region on the target's body. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically caculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers.
+
+![Hit Locations](/HeroSystem6eHeroic/images/HitLocations.png)
 
 ## Page 3: Skills
 
