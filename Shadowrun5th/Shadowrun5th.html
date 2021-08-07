@@ -11069,36 +11069,7 @@ on("change:chummercheckbox", function(){
                     if(chummerfile.characters.character.armors.armor.length>1){
                         for(var i=0;i<chummerfile.characters.character.armors.armor.length;i++){
                             try{
-                                var newrowid=generateRowID()
-                                attributes["repeating_armors_"+newrowid+"_armorname"]=chummerfile.characters.character.armors.armor[i].name;
-                                attributes["repeating_armors_"+newrowid+"_armorrating"]=chummerfile.characters.character.armors.armor[i].armor;
-                                attributes["repeating_armors_"+newrowid+"_armornotes"]="";
-                                if(chummerfile.characters.character.armors.armor[i].armormods!=null){
-                                    if(chummerfile.characters.character.armors.armor[i].armormods.armormod.length>1){
-                                        for(var j=0;j<chummerfile.characters.character.armors.armor[i].armormods.armormod.length;j++){
-                                            if(Number(chummerfile.characters.character.armors.armor[i].armormods.armormod[j].rating)>0){
-                                                attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].armormods.armormod[j].name+" "+chummerfile.characters.character.armors.armor[i].armormods.armormod[j].rating+"\n";
-                                            }else{
-                                                attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].armormods.armormod[j].name+"\n";
-                                            }
-                                        }
-                                    }else{
-                                        if(Number(chummerfile.characters.character.armors.armor[i].armormods.armormod.rating)>0){
-                                            attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].armormods.armormod.name+" "+chummerfile.characters.character.armors.armor[i].armormods.armormod.rating+"\n";
-                                        }else{
-                                            attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].armormods.armormod.name+"\n";
-                                        }
-                                    }
-                                }
-                                if(chummerfile.characters.character.armors.armor[i].gears!=null){
-                                    if(chummerfile.characters.character.armors.armor[i].gears.gear.length>1){
-                                        for(var j=0;j<chummerfile.characters.character.armors.armor[i].gears.gear.length;j++){
-                                            attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].gears.gear[j].name+"\n";
-                                        }
-                                    }else{
-                                        attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor[i].gears.gear.name+"\n";
-                                    }
-                                }
+                                importSingleArmor(chummerfile.characters.character.armors.armor[i], attributes);
                             }catch(err){
                                 goodcode=false;
                                 error= error + "\n" + "Error with Armor " + chummerfile.characters.character.armors.armor[i].name + ": " + err
@@ -11106,37 +11077,7 @@ on("change:chummercheckbox", function(){
                         }
                     }else{
                         try{
-                            var newrowid=generateRowID()
-                            attributes["repeating_armors_"+newrowid+"_armorname"]=chummerfile.characters.character.armors.armor.name;
-                            attributes["repeating_armors_"+newrowid+"_armorrating"]=chummerfile.characters.character.armors.armor.armor;
-                            attributes["repeating_armors_"+newrowid+"_armornotes"]="";
-                            if(chummerfile.characters.character.armors.armor.armormods!=null){
-                                if(chummerfile.characters.character.armors.armor.armormods.armormod.length>1){
-                                    for(var j=0;j<chummerfile.characters.character.armors.armor.armormods.armormod.length;j++){
-                                        if(Number(chummerfile.characters.character.armors.armor.armormods.armormod[j].rating)>0){
-                                            attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.armormods.armormod[j].name+" "+chummerfile.characters.character.armors.armor.armormods.armormod[j].rating+"\n";
-                                        }else{
-                                            attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.armormods.armormod[j].name+"\n";
-                                        }
-                                    }
-                                }else{
-                                    if(Number(chummerfile.characters.character.armors.armor.armormods.armormod.rating)>0){
-                                        attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.armormods.armormod.name+" "+chummerfile.characters.character.armors.armor.armormods.armormod.rating+"\n";
-                                    }else{
-                                        attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.armormods.armormod.name+"\n";
-                                    }
-                                }
-                            }
-                            if(chummerfile.characters.character.armors.armor.gears!=null){
-                                if(chummerfile.characters.character.armors.armor.gears.gear.length>1){
-                                    for(var j=0;j<chummerfile.characters.character.armors.armor.gears.gear.length;j++){
-                                        attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.gears.gear[j].name+"\n";
-                                    }
-                                }else{
-                                    attributes["repeating_armors_"+newrowid+"_armornotes"]+=chummerfile.characters.character.armors.armor.gears.gear.name+"\n";
-
-                                }
-                            }
+                            importSingleArmor(chummerfile.characters.character.armors.armor, attributes);
                         }catch(err){
                             goodcode=false;
                             error= error + "\n" + "Error with Armor " + chummerfile.characters.character.armors.armor.name + ": " + err
@@ -12061,6 +12002,50 @@ on("change:chummercheckbox", function(){
         }
     });
 });
+
+function importSingleArmor(armor, attributes) {
+
+    if(armor.armor.includes("/")) {
+        var armorValueArray = armor.armor.toString().split("/");
+
+        var splitArmor = armor;
+        splitArmor.armor = armorValueArray[0];
+        importSingleArmor(splitArmor, attributes);
+
+        armor.armor = armorValueArray[1];
+    }
+
+    var newrowid = generateRowID()
+    attributes["repeating_armors_"+newrowid+"_armorname"] = armor.name;
+    attributes["repeating_armors_"+newrowid+"_armorrating"] = armor.armor;
+    attributes["repeating_armors_"+newrowid+"_armornotes"] = "";
+    if(armor.armormods!=null){
+        if(armor.armormods.armormod.length > 1){
+            for(var j=0; j < armor.armormods.armormod.length; j++){
+                if(Number(armor.armormods.armormod[j].rating) > 0){
+                    attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.armormods.armormod[j].name + " " + armor.armormods.armormod[j].rating + "\n";
+                }else{
+                    attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.armormods.armormod[j].name + "\n";
+                }
+            }
+        }else{
+            if(Number(armor.armormods.armormod.rating)>0){
+                attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.armormods.armormod.name + " " + armor.armormods.armormod.rating + "\n";
+            }else{
+                attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.armormods.armormod.name + "\n";
+            }
+        }
+    }
+    if(armor.gears!=null){
+        if(armor.gears.gear.length > 1){
+            for(var j=0; j < armor.gears.gear.length; j++){
+                attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.gears.gear[j].name + "\n";
+            }
+        }else{
+            attributes["repeating_armors_"+newrowid+"_armornotes"] += armor.gears.gear.name + "\n";
+        }
+    }
+}
 
 on("change:wil_base change:wil_aug", function() {
     getAttrs(["wil_base", "wil_aug"], function(value){
