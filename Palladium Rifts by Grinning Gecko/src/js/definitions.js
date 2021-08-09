@@ -566,7 +566,15 @@ const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
   []
 );
 const REPEATING_BONUS_KEYS = COMBAT_KEYS.concat(SAVE_KEYS, ATTRIBUTE_KEYS);
-const SKILL_KEYS = ["name", "base", "bonus", "perlevel", "level", "total"];
+const SKILL_KEYS = [
+  "name",
+  "category",
+  "base",
+  "bonus",
+  "perlevel",
+  "level",
+  "total",
+];
 
 const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
 
