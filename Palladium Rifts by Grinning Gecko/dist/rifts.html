@@ -8747,6 +8747,7 @@ async function calculateDamage(row) {
   console.log(a);
   const perLevel = a[`${row}_per_level`];
   const starting = a[`${row}_starting`];
+  const unit = a[`${row}_unit`];
   let damage = "";
   if (starting != "" && starting != "0") {
     damage = starting;
@@ -8757,6 +8758,7 @@ async function calculateDamage(row) {
     }
     damage += `+${perLevel}`.repeat(a.character_level - 1);
   }
+  damage += ` ${unit}`;
   await setAttrsAsync({ [row]: damage });
 }
 
@@ -8806,7 +8808,7 @@ const rangeDurationFrequencyDcListeners = ABILITIES_REPEATERS.reduce(
 ).join(" ");
 
 on(damageListeners, async (e) => {
-  console.log(e);
+  console.log("damageListeners", e);
   const [r, section, rowId] = e.sourceAttribute.split("_");
   const row = `${r}_${section}_${rowId}_damage`;
   await calculateDamage(row);
@@ -9027,8 +9029,6 @@ on("change:repeating_movement:ft_melee", async (e) => {
   /* endinject */
 
   /**
-   * [] Make headings sticky
-   * [] Independent scroll on Profiles
    * [] Damage unit isn't getting added on spells
    * [] Skill Category not being exported or imported
    * [] Lock heading row on scroll (so that it's always visible)
@@ -9065,6 +9065,8 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
    *
+   * [x] Make headings sticky
+   * [x] Independent scroll on Profiles
    * [x] Add overflow:scroll to tabs for narrow sheet
    * [x] Restructure
    * - "Toolbar" cumulative modifiers on the right

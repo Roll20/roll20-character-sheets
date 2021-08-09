@@ -58,6 +58,7 @@ async function calculateDamage(row) {
   console.log(a);
   const perLevel = a[`${row}_per_level`];
   const starting = a[`${row}_starting`];
+  const unit = a[`${row}_unit`];
   let damage = "";
   if (starting != "" && starting != "0") {
     damage = starting;
@@ -68,6 +69,7 @@ async function calculateDamage(row) {
     }
     damage += `+${perLevel}`.repeat(a.character_level - 1);
   }
+  damage += ` ${unit}`;
   await setAttrsAsync({ [row]: damage });
 }
 
@@ -117,7 +119,7 @@ const rangeDurationFrequencyDcListeners = ABILITIES_REPEATERS.reduce(
 ).join(" ");
 
 on(damageListeners, async (e) => {
-  console.log(e);
+  console.log("damageListeners", e);
   const [r, section, rowId] = e.sourceAttribute.split("_");
   const row = `${r}_${section}_${rowId}_damage`;
   await calculateDamage(row);
