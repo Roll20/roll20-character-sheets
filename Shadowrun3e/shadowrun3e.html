@@ -1301,7 +1301,7 @@
 		Parry<button type="action" name="act_matrixmaneuvers" class="d6-button" title="Parry Attack" id="matrixparry">L</button>
 		<div></div>
 		Posistion<button type="action" name="act_matrixmaneuvers" class="d6-button" title="Position Attack" id="matrixposition">L</button>
-                <div>Combat TN<span class="numberspan" name="attr_deck-tn"></span></div>
+                <div class="numberspan">Combat TN<span name="attr_deck-tn"></span></div>
 		Resist<button type="action" name="act_matrixresist" class="d6-button" title="Damage Resistance Test" id="matrixresist">L</button>
 		<div></div>
 		Medic<button type="action" name="act_matrixmedic" class="d6-button" title="Medic Utility" id="matrixmedic">L</button>
@@ -1360,7 +1360,7 @@
             </div>
             <div class="deck-combat-modifiers">
                 <input type='hidden' name='attr_matrix-penalty' value=0 />
-                <div>Penalties<span class="matrix-pens" name="attr_matrix-penalty"></span></div>
+                <div>Penalties: <span class="matrix-pens" name="attr_matrix-penalty"></span></div>
             </div>
         </div>
 
@@ -1697,7 +1697,7 @@
                     </div>
                 </fieldset>
             </div>
-            <div>
+	    <div class="deck-util-background">
                 <div class="SRH4">Additional Utilities</div>
                 <div class="deck-utilities-additional">
                     <header class="table-top-left">Utility</header>
@@ -1710,29 +1710,27 @@
                     <header class="table-top-mid">Test</header>
                     <header class="table-top-right">Notes</header>
                 </div>
-                <div>
                     <fieldset class="repeating_deck-utilities">
-                        <div class="deck-utilities-additional">
-                            <div class="table-item-left"><input type="text" name="attr_utility" style="width: 100px;"></div>
-                            <div class="table-item"><input type="number" name="attr_rating" value=0></div>
-                            <div class="table-item"><select name="attr_target" style="width: 80px;">
+                        <div class="deck-utilities-addrow">
+                            <input type="text" name="attr_utility" class="myweapontxt">
+                            <input type="number" name="attr_rating" value=0>
+                            <select name="attr_target" class="mediumselect2">
                                     <option value="@{target|Target|matrixaccessrating}">control</option>
                                     <option value="@{target|Target|matrixcontrolrating}">access</option>
                                     <option value="@{target|Target|matrixindexrating}">index</option>
                                     <option value="@{target|Target|matrixfilesrating}">files</option>
                                     <option value="@{target|Target|matrixslaverating}">slave</option>
                                 </select>
-                            </div>
-                            <div class="table-item"><input type="number" name="attr_multiplier" value=0></div>
-                            <div class="table-item"><input type="number" name="attr_size" value=0></div>
-                            <div class="table-item" style="text-align: center;"><input type="checkbox" name="attr_loaded" value=1>
-                            </div>
-                            <div class="table-item"><button type="action" name="act_matrixrepeatingtest" class="d6-button" title="System Operation with Utility" id="matrixrepeatingexec">L</button></div>
-                            <div class="table-item"><button type="action" name="act_matrixrepeatingtest" class="d6-button" title="Utility Test - use vs. Tar programs" id="matrixrepeatingtest">L</button></div>
-                            <div class="table-item"><input type="text" name="attr_utilitynotes"></div>
+                            <input type="number" name="attr_multiplier" value=0>
+                            <input type="number" name="attr_size" value=0>
+                            <div class="text-mid-center"><input type="checkbox" name="attr_loaded" value=1></div>
+                            <div><button type="action" name="act_matrixrepeatingtest" class="d6-button" title="System Operation with Utility" id="matrixrepeatingexec">L</button></div>
+                            <div><button type="action" name="act_matrixrepeatingtest" class="d6-button" title="Utility Test - use vs. Tar programs" id="matrixrepeatingtest">L</button></div>
+			    <input type="text" name="attr_notes" class="myweapontxt">
                         </div>
+                        <div class="table-bottom" />
+			</div>
                     </fieldset>
-                </div>
             </div>
         </div>
     </div>
@@ -5676,10 +5674,20 @@ on("clicked:matrixsystemset", function(){
 });
 
 var setmatrixsystem = function (rating) {
-	const [mycode, myrating]  = myval.matrixsystemset.split("-")
+	console.log(rating);
+	atts=[];
+	const [mycode, myrating]  = rating.split("-")
+	console.log('mycode:' + mycode + ' myrating ' + myrating);
         let finalcode = mycode.toUpperCase()
         const [system, access, control, index, files, slave ] = myrating.split("/")
-        setAttrs({matrixcode:finalcode, matrixsecurityrating:system, matrixaccessrating:access, matrixcontrollrating:control, matrixindexrating: index, matrixfilesrating:files, matrixslaverating:slave });
+	atts["matrixcode"]=finalcode;
+	atts["matrixsecurityrating"]=system;
+	atts["matrixcontrollrating"]=control;
+	atts["matrixindexrating"]=index;
+	atts["matrixfilesrating"]=files;
+	atts["matrixslaverating"]=slave;
+	console.log(atts);
+        setAttrs(atts);
 };
 
     on("sheet:opened", function(){
