@@ -2,15 +2,16 @@
 <!-- by PantsWorth -->
 <!-- I borrowed liberally from Diana P.  -->
 <!-- Who in turn borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 1.0.00 dated 06/23/2020 -->
+<!-- Version 1.1.00 dated 08/10/2021 -->
+<!-- Trying the new calculated roll functionality in this version-->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
 <input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="4.25" />
-<p style="font-size: 0.6em;">V2.<span name="attr_sheetversion" title="sheetversion" ></span> 02/04/2021 by PantsWorth</p>
+<p style="font-size: 0.6em;">V1.1<span name="attr_sheetversion" title="sheetversion" ></span> 08/10/2021 by PantsWorth</p>
 <input type="checkbox" class="announcement-show cbox" title="announcement-show" name="attr_announcement-show" value="1" checked />
 <div class="announcement">
 	<div class="table-style">
 		<div class="table-row">
-			<span class="table-data-center" style="color: blue;"><b>This character has been upgraded to the new character sheet!  Everything should have copied over.  <br>Movement calculations for centimeters/meters are not in; if you know what the formula looks like, please let me know.  <br>See the Setup tab for automating calculations.  The Recalculate skill totals button will be needed to set the stat bonuses and add up the skill totals even if you do not wish to use auto calculated skill rank bonuses.  <br>Double check the Combat tab to set your Armor Type and verify your attacks are set to the correct attack type and to customize the on-sheet attack macros. <br>The Equipment tab has new columns for amount and location category; filling those out will enable weight and encumbrance calculations. </b></span>
+			<span class="table-data-center" style="color: blue;"><b>This character has been upgraded to the new character sheet!  It is using the new calculated rolls to perform downrolls properly. </b></span>
 		</div>
 		<div class="table-row">
 			<span class="table-data-center">
@@ -377,24 +378,7 @@
 							<span class="table-data-center-bold"> &nbsp; &nbsp; <span data-i18n="power-points-per-3-hours-active">Power Points / 3 hrs active</span>: </span>
 							<span class="table-data"><input type="text" class="table-data-recoverytraits" name="attr_ppp3hactive" title="ppp3hactive" value="1" disabled="true" /></span>
 						</div>
-					</div>
-					<hr/>
-					<div class="table-style">
-						<div class="table-data">
-							<div class="table-row"> 
-								<span class="table-data-center-bold"><span data-i18n="exhaustion-points-per-minute-resting">Exhaustion Points / min resting</span>: </span>
-								<span class="table-data"><input type="text" class="table-data-recoverytraits" name="attr_eppmrest" title="eppmrest" value="(((ceil((@{cobonus}+0.5)/2) + 1) + abs(ceil((@{cobonus}+0.5)/2) - 1)) / 2)" disabled="true" /></span>
-							</div>
-							<div class="table-row"> 
-								<span class="table-data-center-bold"><span data-i18n="exhaustion-points-per-half-hour-sleeping">Exhaustion Points / .5 hrs sleep</span>: </span>
-								<span class="table-data"><input type="text" class="table-data-recoverytraits" name="attr_epphhsleep" title="epphhsleep" value="(@{exhaustionpoints|max})" disabled="true" /></span>
-							</div>
-							<div class="table-row"> 
-								<span class="table-data-center-bold"><span data-i18n="exhaustion-points-per-3-minutes-active">Exhaustion Points / 3 mins active</span>: </span>
-								<span class="table-data"><input type="text" class="table-data-recoverytraits" name="attr_epp3mactive" title="epp3mactive" value="1" disabled="true" /></span>
-							</div>
-						</div>
-					</div>
+					</div>					
 				</div>
 			</div>
 	  
@@ -1285,12 +1269,13 @@
 				<span class="table-data-skills-stats"><b><span data-i18n="agility-a">Ag</span></b></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_perceptionstat" title="perceptionstat (Stat Bonus)" value="0"  /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_perceptionknackbonus" title="perceptionknackbonus (Knack Bonus)" value="0"  /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_perceptionprofbonus" title="perceptionprofbonus (Profession Bonus)" value="0" /></span>
+				<input type="checkbox" name="attr_perceptionisprofskill" value="0" >
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_perceptionspecialmod" title="perceptionspecialmod (Any Special bonuses)" value="0"/></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_perceptionitemmod" title="perceptionitemmod (Item Bonus)" value="0"/></span>
 				<span class="table-data"><textarea rows="1" cols="50" class="table-data-skills-notes" name="attr_perceptionnotes" title="perceptionnotes"></textarea></span>
 				<span class="table-data"><textarea rows="1" cols="50" class="table-data-skills-macrobox" name="attr_perceptionmacro" title="perceptionmacro">/w gm &{template:RmuStdRoll} {{skillflag=true}} {{name=@{character_name}'s Perception-@{perceptionname}}} {{subtags=Category: Artistic, Active}} {{check= Perception  (@{perceptionranks} ranks): }}  {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll}cs=100 +[[@{perception}]] +?{Other bonus/penalty?|0} ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}} {{critroll= **Check for Nat 100!!!!**}} {{highlight66= [[66 +?{Other bonus/penalty?|0} +@{perception} ]]}} {{highlight66roll=**Natural 66.** }} {{notes=@{perceptionnotes} }} </textarea></span>
-				<span class="table-data-skills-sm"><button type="roll" class="button-roll" name="roll_perceptioncheck" title="perceptioncheck" value="@{perceptionmacro}"></button></span>
+				<span class="table-data"><button type="action" name="act_test" class="button-roll">Percep</button></span> <!--title="perceptioncheck" value="perception">Percep</button></span-->
+				<span class="table-data-skills-sm"><button type="roll" class="button-roll" name="roll_test" title="perceptioncheck" value="@{perceptionmacro}"></button></span>
 			</div>
 			<div class="table-row">
 				<span class="table-data-skills-name"><span data-i18n="tracking">Tracking</span></span>
@@ -3983,7 +3968,7 @@
 				<div class="table-style" style="width: 800px;" class="table-row">
 					<div class="table-row">
 						<span class="table-data-center-bottom"><input type="text" style="width: 125px;" name="attr_skillname" title="repeating_skills_#_skillname"/></span>
-						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skill" title="repeating_skills_#_skill" value="@{skillrankbonus}+@{skillstat1}+@{skillstat2}+@{skillstat3}+(@{skillcatbonus})+@{skillspecialmod}+@{skillitemmod}" disabled="true"/></span>
+						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skill" title="repeating_skills_#_skill" value="@{skillrankbonus}+@{skillstat1}+@{skillstat2}+@{skillstat3}+(@{skillknackbonus})+@{skillspecialmod}+@{skillitemmod}" disabled="true"/></span>
 						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillranks" title="repeating_skills_#_skillranks (Number of Ranks)" value="0"/></span>
 						<span class="table-data-center-bottom-dropdown"><select style="width: 55px; margin-bottom: 0;" name="attr_skillprog" title="repeating_skills_#_skillprog(Skill Progression Type)">
 						  <option value="1" data-i18n="combined">Combined</option>
@@ -4038,7 +4023,7 @@
 						</select></span>
 						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillstat" title="repeating_skills_#_skillstat" value="@{skillstat1}+@{skillstat2}+@{skillstat3}" disabled="true" /></span>
 						<span class="table-data-center-bottom"><input type="text" style="width: 100px; margin-bottom: 0;" name="attr_skillcategory" title="repeating_skills_#_skillcategory"></span>
-						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillcatbonus" title="repeating_skills_#_skillcatbonus (Category Bonus)" value="0" /></span>
+						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillknackbonus" title="repeating_skills_#_skillknackbonus (Category Bonus)" value="0" /></span>
 						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillspecialmod" title="repeating_skills_#_skillspecialmod (Any Special bonuses)" value="0"/></span>
 						<span class="table-data-center-bottom"><input type="text" style="width: 30px;" name="attr_skillitemmod" title="repeating_skills_#_skillitemmod (Bonus modification from Item)" value="0"/></span>
 						<span class="table-data-skills-sm"><textarea rows="1" cols="50" style="width: 50px; height: 19px; margin-bottom: 0;" name="attr_skill-notes" title="repeating_skills_#_skill-notes"></textarea></span>
@@ -4077,7 +4062,7 @@
 				<input type="hidden" name="attr_srob-list1prog" title="srob-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1ranks" title="srob-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1rankbonus" title="srob-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1catbonus" title="srob-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1knackbonus" title="srob-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1profbonus" title="srob-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1specialbonus" title="srob-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list1itembonus" title="srob-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4091,7 +4076,7 @@
 				<input type="hidden" name="attr_srob-list2prog" title="srob-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2ranks" title="srob-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2rankbonus" title="srob-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2catbonus" title="srob-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2knackbonus" title="srob-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2profbonus" title="srob-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2specialbonus" title="srob-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list2itembonus" title="srob-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4105,7 +4090,7 @@
 				<input type="hidden" name="attr_srob-list3prog" title="srob-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3ranks" title="srob-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3rankbonus" title="srob-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3catbonus" title="srob-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3knackbonus" title="srob-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3profbonus" title="srob-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3specialbonus" title="srob-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list3itembonus" title="srob-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4119,7 +4104,7 @@
 				<input type="hidden" name="attr_srob-list4prog" title="srob-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4ranks" title="srob-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4rankbonus" title="srob-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4catbonus" title="srob-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4knackbonus" title="srob-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4profbonus" title="srob-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4specialbonus" title="srob-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list4itembonus" title="srob-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4133,7 +4118,7 @@
 				<input type="hidden" name="attr_srob-list5prog" title="srob-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5ranks" title="srob-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5rankbonus" title="srob-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5catbonus" title="srob-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5knackbonus" title="srob-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5profbonus" title="srob-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5specialbonus" title="srob-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list5itembonus" title="srob-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4147,7 +4132,7 @@
 				<input type="hidden" name="attr_srob-list6prog" title="srob-list6prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6ranks" title="srob-list6ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6rankbonus" title="srob-list6rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6catbonus" title="srob-list6catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6knackbonus" title="srob-list6knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6profbonus" title="srob-list6profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6specialbonus" title="srob-list6specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list6itembonus" title="srob-list6itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4161,7 +4146,7 @@
 				<input type="hidden" name="attr_srob-list7prog" title="srob-list7prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7ranks" title="srob-list7ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7rankbonus" title="srob-list7rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7catbonus" title="srob-list7catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7knackbonus" title="srob-list7knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7profbonus" title="srob-list7profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7specialbonus" title="srob-list7specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list7itembonus" title="srob-list7itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4175,7 +4160,7 @@
 				<input type="hidden" name="attr_srob-list8prog" title="srob-list8prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8ranks" title="srob-list8ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8rankbonus" title="srob-list8rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8catbonus" title="srob-list8catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8knackbonus" title="srob-list8knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8profbonus" title="srob-list8profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8specialbonus" title="srob-list8specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list8itembonus" title="srob-list8itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4189,7 +4174,7 @@
 				<input type="hidden" name="attr_srob-list9prog" title="srob-list9prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9ranks" title="srob-list9ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9rankbonus" title="srob-list9rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9catbonus" title="srob-list9catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9knackbonus" title="srob-list9knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9profbonus" title="srob-list9profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9specialbonus" title="srob-list9specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list9itembonus" title="srob-list9itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4203,7 +4188,7 @@
 				<input type="hidden" name="attr_srob-list10prog" title="srob-list10prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10ranks" title="srob-list10ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10rankbonus" title="srob-list10rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10catbonus" title="srob-list10catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10knackbonus" title="srob-list10knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10profbonus" title="srob-list10profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10specialbonus" title="srob-list10specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srob-list10itembonus" title="srob-list10itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4235,7 +4220,7 @@
 				<input type="hidden" name="attr_sropen-list1prog" title="sropen-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1ranks" title="sropen-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1rankbonus" title="sropen-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1catbonus" title="sropen-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1knackbonus" title="sropen-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1profbonus" title="sropen-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1specialbonus" title="sropen-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list1itembonus" title="sropen-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4249,7 +4234,7 @@
 				<input type="hidden" name="attr_sropen-list2prog" title="sropen-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2ranks" title="sropen-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2rankbonus" title="sropen-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2catbonus" title="sropen-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2knackbonus" title="sropen-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2profbonus" title="sropen-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2specialbonus" title="sropen-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list2itembonus" title="sropen-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4263,7 +4248,7 @@
 				<input type="hidden" name="attr_sropen-list3prog" title="sropen-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3ranks" title="sropen-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3rankbonus" title="sropen-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3catbonus" title="sropen-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3knackbonus" title="sropen-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3profbonus" title="sropen-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3specialbonus" title="sropen-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list3itembonus" title="sropen-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4277,7 +4262,7 @@
 				<input type="hidden" name="attr_sropen-list4prog" title="sropen-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4ranks" title="sropen-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4rankbonus" title="sropen-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4catbonus" title="sropen-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4knackbonus" title="sropen-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4profbonus" title="sropen-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4specialbonus" title="sropen-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list4itembonus" title="sropen-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4291,7 +4276,7 @@
 				<input type="hidden" name="attr_sropen-list5prog" title="sropen-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5ranks" title="sropen-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5rankbonus" title="sropen-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5catbonus" title="sropen-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5knackbonus" title="sropen-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5profbonus" title="sropen-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5specialbonus" title="sropen-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list5itembonus" title="sropen-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4305,7 +4290,7 @@
 				<input type="hidden" name="attr_sropen-list6prog" title="sropen-list6prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6ranks" title="sropen-list6ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6rankbonus" title="sropen-list6rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6catbonus" title="sropen-list6catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6knackbonus" title="sropen-list6knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6profbonus" title="sropen-list6profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6specialbonus" title="sropen-list6specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list6itembonus" title="sropen-list6itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4319,7 +4304,7 @@
 				<input type="hidden" name="attr_sropen-list7prog" title="sropen-list7prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7ranks" title="sropen-list7ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7rankbonus" title="sropen-list7rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7catbonus" title="sropen-list7catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7knackbonus" title="sropen-list7knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7profbonus" title="sropen-list7profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7specialbonus" title="sropen-list7specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list7itembonus" title="sropen-list7itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4333,7 +4318,7 @@
 				<input type="hidden" name="attr_sropen-list8prog" title="sropen-list8prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8ranks" title="sropen-list8ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8rankbonus" title="sropen-list8rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8catbonus" title="sropen-list8catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8knackbonus" title="sropen-list8knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8profbonus" title="sropen-list8profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8specialbonus" title="sropen-list8specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list8itembonus" title="sropen-list8itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4347,7 +4332,7 @@
 				<input type="hidden" name="attr_sropen-list9prog" title="sropen-list9prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9ranks" title="sropen-list9ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9rankbonus" title="sropen-list9rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9catbonus" title="sropen-list9catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9knackbonus" title="sropen-list9knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9profbonus" title="sropen-list9profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9specialbonus" title="sropen-list9specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list9itembonus" title="sropen-list9itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4361,7 +4346,7 @@
 				<input type="hidden" name="attr_sropen-list10prog" title="sropen-list10prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10ranks" title="sropen-list10ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10rankbonus" title="sropen-list10rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10catbonus" title="sropen-list10catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10knackbonus" title="sropen-list10knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10profbonus" title="sropen-list10profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10specialbonus" title="sropen-list10specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_sropen-list10itembonus" title="sropen-list10itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4393,7 +4378,7 @@
 				<input type="hidden" name="attr_srclosed-list1prog" title="srclosed-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1ranks" title="srclosed-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1rankbonus" title="srclosed-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1catbonus" title="srclosed-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1knackbonus" title="srclosed-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1profbonus" title="srclosed-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1specialbonus" title="srclosed-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list1itembonus" title="srclosed-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4407,7 +4392,7 @@
 				<input type="hidden" name="attr_srclosed-list2prog" title="srclosed-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2ranks" title="srclosed-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2rankbonus" title="srclosed-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2catbonus" title="srclosed-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2knackbonus" title="srclosed-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2profbonus" title="srclosed-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2specialbonus" title="srclosed-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list2itembonus" title="srclosed-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4421,7 +4406,7 @@
 				<input type="hidden" name="attr_srclosed-list3prog" title="srclosed-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3ranks" title="srclosed-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3rankbonus" title="srclosed-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3catbonus" title="srclosed-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3knackbonus" title="srclosed-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3profbonus" title="srclosed-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3specialbonus" title="srclosed-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list3itembonus" title="srclosed-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4435,7 +4420,7 @@
 				<input type="hidden" name="attr_srclosed-list4prog" title="srclosed-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4ranks" title="srclosed-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4rankbonus" title="srclosed-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4catbonus" title="srclosed-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4knackbonus" title="srclosed-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4profbonus" title="srclosed-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4specialbonus" title="srclosed-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list4itembonus" title="srclosed-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4449,7 +4434,7 @@
 				<input type="hidden" name="attr_srclosed-list5prog" title="srclosed-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5ranks" title="srclosed-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5rankbonus" title="srclosed-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5catbonus" title="srclosed-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5knackbonus" title="srclosed-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5profbonus" title="srclosed-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5specialbonus" title="srclosed-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list5itembonus" title="srclosed-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4463,7 +4448,7 @@
 				<input type="hidden" name="attr_srclosed-list6prog" title="srclosed-list6prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6ranks" title="srclosed-list6ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6rankbonus" title="srclosed-list6rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6catbonus" title="srclosed-list6catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6knackbonus" title="srclosed-list6knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6profbonus" title="srclosed-list6profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6specialbonus" title="srclosed-list6specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list6itembonus" title="srclosed-list6itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4477,7 +4462,7 @@
 				<input type="hidden" name="attr_srclosed-list7prog" title="srclosed-list7prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7ranks" title="srclosed-list7ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7rankbonus" title="srclosed-list7rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7catbonus" title="srclosed-list7catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7knackbonus" title="srclosed-list7knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7profbonus" title="srclosed-list7profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7specialbonus" title="srclosed-list7specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list7itembonus" title="srclosed-list7itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4491,7 +4476,7 @@
 				<input type="hidden" name="attr_srclosed-list8prog" title="srclosed-list8prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8ranks" title="srclosed-list8ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8rankbonus" title="srclosed-list8rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8catbonus" title="srclosed-list8catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8knackbonus" title="srclosed-list8knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8profbonus" title="srclosed-list8profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8specialbonus" title="srclosed-list8specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list8itembonus" title="srclosed-list8itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4505,7 +4490,7 @@
 				<input type="hidden" name="attr_srclosed-list9prog" title="srclosed-list9prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9ranks" title="srclosed-list9ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9rankbonus" title="srclosed-list9rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9catbonus" title="srclosed-list9catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9knackbonus" title="srclosed-list9knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9profbonus" title="srclosed-list9profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9specialbonus" title="srclosed-list9specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list9itembonus" title="srclosed-list9itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4519,7 +4504,7 @@
 				<input type="hidden" name="attr_srclosed-list10prog" title="srclosed-list10prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10ranks" title="srclosed-list10ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10rankbonus" title="srclosed-list10rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10catbonus" title="srclosed-list10catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10knackbonus" title="srclosed-list10knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10profbonus" title="srclosed-list10profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10specialbonus" title="srclosed-list10specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srclosed-list10itembonus" title="srclosed-list10itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4551,7 +4536,7 @@
 				<input type="hidden" name="attr_srotherb-list1prog" title="srotherb-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1ranks" title="srotherb-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1rankbonus" title="srotherb-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1catbonus" title="srotherb-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1knackbonus" title="srotherb-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1profbonus" title="srotherb-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1specialbonus" title="srotherb-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list1itembonus" title="srotherb-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4565,7 +4550,7 @@
 				<input type="hidden" name="attr_srotherb-list2prog" title="srotherb-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2ranks" title="srotherb-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2rankbonus" title="srotherb-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2catbonus" title="srotherb-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2knackbonus" title="srotherb-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2profbonus" title="srotherb-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2specialbonus" title="srotherb-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list2itembonus" title="srotherb-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4579,7 +4564,7 @@
 				<input type="hidden" name="attr_srotherb-list3prog" title="srotherb-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3ranks" title="srotherb-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3rankbonus" title="srotherb-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3catbonus" title="srotherb-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3knackbonus" title="srotherb-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3profbonus" title="srotherb-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3specialbonus" title="srotherb-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list3itembonus" title="srotherb-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4593,7 +4578,7 @@
 				<input type="hidden" name="attr_srotherb-list4prog" title="srotherb-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4ranks" title="srotherb-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4rankbonus" title="srotherb-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4catbonus" title="srotherb-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4knackbonus" title="srotherb-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4profbonus" title="srotherb-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4specialbonus" title="srotherb-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list4itembonus" title="srotherb-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4607,7 +4592,7 @@
 				<input type="hidden" name="attr_srotherb-list5prog" title="srotherb-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5ranks" title="srotherb-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5rankbonus" title="srotherb-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5catbonus" title="srotherb-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5knackbonus" title="srotherb-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5profbonus" title="srotherb-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5specialbonus" title="srotherb-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list5itembonus" title="srotherb-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4621,7 +4606,7 @@
 				<input type="hidden" name="attr_srotherb-list6prog" title="srotherb-list6prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6ranks" title="srotherb-list6ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6rankbonus" title="srotherb-list6rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6catbonus" title="srotherb-list6catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6knackbonus" title="srotherb-list6knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6profbonus" title="srotherb-list6profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6specialbonus" title="srotherb-list6specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_srotherb-list6itembonus" title="srotherb-list6itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4653,7 +4638,7 @@
 				<input type="hidden" name="attr_oropen-list1prog" title="oropen-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1ranks" title="oropen-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1rankbonus" title="oropen-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1catbonus" title="oropen-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1knackbonus" title="oropen-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1profbonus" title="oropen-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1specialbonus" title="oropen-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list1itembonus" title="oropen-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4667,7 +4652,7 @@
 				<input type="hidden" name="attr_oropen-list2prog" title="oropen-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2ranks" title="oropen-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2rankbonus" title="oropen-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2catbonus" title="oropen-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2knackbonus" title="oropen-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2profbonus" title="oropen-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2specialbonus" title="oropen-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list2itembonus" title="oropen-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4681,7 +4666,7 @@
 				<input type="hidden" name="attr_oropen-list3prog" title="oropen-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3ranks" title="oropen-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3rankbonus" title="oropen-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3catbonus" title="oropen-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3knackbonus" title="oropen-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3profbonus" title="oropen-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3specialbonus" title="oropen-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list3itembonus" title="oropen-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4695,7 +4680,7 @@
 				<input type="hidden" name="attr_oropen-list4prog" title="oropen-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4ranks" title="oropen-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4rankbonus" title="oropen-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4catbonus" title="oropen-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4knackbonus" title="oropen-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4profbonus" title="oropen-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4specialbonus" title="oropen-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list4itembonus" title="oropen-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4709,7 +4694,7 @@
 				<input type="hidden" name="attr_oropen-list5prog" title="oropen-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5ranks" title="oropen-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5rankbonus" title="oropen-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5catbonus" title="oropen-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5knackbonus" title="oropen-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5profbonus" title="oropen-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5specialbonus" title="oropen-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_oropen-list5itembonus" title="oropen-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4741,7 +4726,7 @@
 				<input type="hidden" name="attr_orclosed-list1prog" title="orclosed-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1ranks" title="orclosed-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1rankbonus" title="orclosed-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1catbonus" title="orclosed-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1knackbonus" title="orclosed-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1profbonus" title="orclosed-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1specialbonus" title="orclosed-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list1itembonus" title="orclosed-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4755,7 +4740,7 @@
 				<input type="hidden" name="attr_orclosed-list2prog" title="orclosed-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2ranks" title="orclosed-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2rankbonus" title="orclosed-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2catbonus" title="orclosed-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2knackbonus" title="orclosed-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2profbonus" title="orclosed-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2specialbonus" title="orclosed-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list2itembonus" title="orclosed-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4769,7 +4754,7 @@
 				<input type="hidden" name="attr_orclosed-list3prog" title="orclosed-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3ranks" title="orclosed-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3rankbonus" title="orclosed-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3catbonus" title="orclosed-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3knackbonus" title="orclosed-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3profbonus" title="orclosed-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3specialbonus" title="orclosed-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list3itembonus" title="orclosed-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4783,7 +4768,7 @@
 				<input type="hidden" name="attr_orclosed-list4prog" title="orclosed-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4ranks" title="orclosed-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4rankbonus" title="orclosed-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4catbonus" title="orclosed-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4knackbonus" title="orclosed-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4profbonus" title="orclosed-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4specialbonus" title="orclosed-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list4itembonus" title="orclosed-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4797,7 +4782,7 @@
 				<input type="hidden" name="attr_orclosed-list5prog" title="orclosed-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5ranks" title="orclosed-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5rankbonus" title="orclosed-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5catbonus" title="orclosed-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5knackbonus" title="orclosed-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5profbonus" title="orclosed-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5specialbonus" title="orclosed-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orclosed-list5itembonus" title="orclosed-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4829,7 +4814,7 @@
 				<input type="hidden" name="attr_orbase-list1prog" title="orbase-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1ranks" title="orbase-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1rankbonus" title="orbase-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1catbonus" title="orbase-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1knackbonus" title="orbase-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1profbonus" title="orbase-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1specialbonus" title="orbase-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list1itembonus" title="orbase-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4843,7 +4828,7 @@
 				<input type="hidden" name="attr_orbase-list2prog" title="orbase-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2ranks" title="orbase-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2rankbonus" title="orbase-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2catbonus" title="orbase-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2knackbonus" title="orbase-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2profbonus" title="orbase-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2specialbonus" title="orbase-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list2itembonus" title="orbase-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4857,7 +4842,7 @@
 				<input type="hidden" name="attr_orbase-list3prog" title="orbase-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3ranks" title="orbase-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3rankbonus" title="orbase-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3catbonus" title="orbase-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3knackbonus" title="orbase-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3profbonus" title="orbase-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3specialbonus" title="orbase-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list3itembonus" title="orbase-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4871,7 +4856,7 @@
 				<input type="hidden" name="attr_orbase-list4prog" title="orbase-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4ranks" title="orbase-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4rankbonus" title="orbase-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4catbonus" title="orbase-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4knackbonus" title="orbase-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4profbonus" title="orbase-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4specialbonus" title="orbase-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list4itembonus" title="orbase-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4885,7 +4870,7 @@
 				<input type="hidden" name="attr_orbase-list5prog" title="orbase-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5ranks" title="orbase-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5rankbonus" title="orbase-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5catbonus" title="orbase-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5knackbonus" title="orbase-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5profbonus" title="orbase-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5specialbonus" title="orbase-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_orbase-list5itembonus" title="orbase-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4917,7 +4902,7 @@
 				<input type="hidden" name="attr_arcopen-list1prog" title="arcopen-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1ranks" title="arcopen-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1rankbonus" title="arcopen-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1catbonus" title="arcopen-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1knackbonus" title="arcopen-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1profbonus" title="arcopen-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1specialbonus" title="arcopen-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list1itembonus" title="arcopen-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4931,7 +4916,7 @@
 				<input type="hidden" name="attr_arcopen-list2prog" title="arcopen-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2ranks" title="arcopen-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2rankbonus" title="arcopen-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2catbonus" title="arcopen-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2knackbonus" title="arcopen-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2profbonus" title="arcopen-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2specialbonus" title="arcopen-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list2itembonus" title="arcopen-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4945,7 +4930,7 @@
 				<input type="hidden" name="attr_arcopen-list3prog" title="arcopen-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3ranks" title="arcopen-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3rankbonus" title="arcopen-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3catbonus" title="arcopen-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3knackbonus" title="arcopen-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3profbonus" title="arcopen-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3specialbonus" title="arcopen-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list3itembonus" title="arcopen-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4959,7 +4944,7 @@
 				<input type="hidden" name="attr_arcopen-list4prog" title="arcopen-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4ranks" title="arcopen-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4rankbonus" title="arcopen-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4catbonus" title="arcopen-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4knackbonus" title="arcopen-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4profbonus" title="arcopen-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4specialbonus" title="arcopen-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list4itembonus" title="arcopen-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -4973,7 +4958,7 @@
 				<input type="hidden" name="attr_arcopen-list5prog" title="arcopen-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5ranks" title="arcopen-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5rankbonus" title="arcopen-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5catbonus" title="arcopen-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5knackbonus" title="arcopen-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5profbonus" title="arcopen-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5specialbonus" title="arcopen-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcopen-list5itembonus" title="arcopen-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5005,7 +4990,7 @@
 				<input type="hidden" name="attr_arcclosed-list1prog" title="arcclosed-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1ranks" title="arcclosed-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1rankbonus" title="arcclosed-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1catbonus" title="arcclosed-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1knackbonus" title="arcclosed-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1profbonus" title="arcclosed-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1specialbonus" title="arcclosed-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list1itembonus" title="arcclosed-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5019,7 +5004,7 @@
 				<input type="hidden" name="attr_arcclosed-list2prog" title="arcclosed-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2ranks" title="arcclosed-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2rankbonus" title="arcclosed-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2catbonus" title="arcclosed-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2knackbonus" title="arcclosed-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2profbonus" title="arcclosed-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2specialbonus" title="arcclosed-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list2itembonus" title="arcclosed-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5033,7 +5018,7 @@
 				<input type="hidden" name="attr_arcclosed-list3prog" title="arcclosed-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3ranks" title="arcclosed-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3rankbonus" title="arcclosed-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3catbonus" title="arcclosed-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3knackbonus" title="arcclosed-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3profbonus" title="arcclosed-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3specialbonus" title="arcclosed-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list3itembonus" title="arcclosed-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5047,7 +5032,7 @@
 				<input type="hidden" name="attr_arcclosed-list4prog" title="arcclosed-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4ranks" title="arcclosed-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4rankbonus" title="arcclosed-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4catbonus" title="arcclosed-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4knackbonus" title="arcclosed-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4profbonus" title="arcclosed-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4specialbonus" title="arcclosed-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list4itembonus" title="arcclosed-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5061,7 +5046,7 @@
 				<input type="hidden" name="attr_arcclosed-list5prog" title="arcclosed-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5ranks" title="arcclosed-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5rankbonus" title="arcclosed-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5catbonus" title="arcclosed-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5knackbonus" title="arcclosed-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5profbonus" title="arcclosed-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5specialbonus" title="arcclosed-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcclosed-list5itembonus" title="arcclosed-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5093,7 +5078,7 @@
 				<input type="hidden" name="attr_arcbase-list1prog" title="arcbase-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1ranks" title="arcbase-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1rankbonus" title="arcbase-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1catbonus" title="arcbase-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1knackbonus" title="arcbase-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1profbonus" title="arcbase-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1specialbonus" title="arcbase-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list1itembonus" title="arcbase-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5107,7 +5092,7 @@
 				<input type="hidden" name="attr_arcbase-list2prog" title="arcbase-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2ranks" title="arcbase-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2rankbonus" title="arcbase-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2catbonus" title="arcbase-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2knackbonus" title="arcbase-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2profbonus" title="arcbase-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2specialbonus" title="arcbase-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list2itembonus" title="arcbase-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5121,7 +5106,7 @@
 				<input type="hidden" name="attr_arcbase-list3prog" title="arcbase-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3ranks" title="arcbase-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3rankbonus" title="arcbase-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3catbonus" title="arcbase-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3knackbonus" title="arcbase-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3profbonus" title="arcbase-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3specialbonus" title="arcbase-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list3itembonus" title="arcbase-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5135,7 +5120,7 @@
 				<input type="hidden" name="attr_arcbase-list4prog" title="arcbase-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4ranks" title="arcbase-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4rankbonus" title="arcbase-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4catbonus" title="arcbase-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4knackbonus" title="arcbase-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4profbonus" title="arcbase-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4specialbonus" title="arcbase-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list4itembonus" title="arcbase-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5149,7 +5134,7 @@
 				<input type="hidden" name="attr_arcbase-list5prog" title="arcbase-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5ranks" title="arcbase-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5rankbonus" title="arcbase-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5catbonus" title="arcbase-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5knackbonus" title="arcbase-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5profbonus" title="arcbase-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5specialbonus" title="arcbase-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcbase-list5itembonus" title="arcbase-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5181,7 +5166,7 @@
 				<input type="hidden" name="attr_arcotherbase-list1prog" title="arcotherbase-list1prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1ranks" title="arcotherbase-list1ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1rankbonus" title="arcotherbase-list1rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1catbonus" title="arcotherbase-list1catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1knackbonus" title="arcotherbase-list1knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1profbonus" title="arcotherbase-list1profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1specialbonus" title="arcotherbase-list1specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list1itembonus" title="arcotherbase-list1itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5195,7 +5180,7 @@
 				<input type="hidden" name="attr_arcotherbase-list2prog" title="arcotherbase-list2prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2ranks" title="arcotherbase-list2ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2rankbonus" title="arcotherbase-list2rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2catbonus" title="arcotherbase-list2catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2knackbonus" title="arcotherbase-list2knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2profbonus" title="arcotherbase-list2profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2specialbonus" title="arcotherbase-list2specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list2itembonus" title="arcotherbase-list2itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5209,7 +5194,7 @@
 				<input type="hidden" name="attr_arcotherbase-list3prog" title="arcotherbase-list3prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3ranks" title="arcotherbase-list3ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3rankbonus" title="arcotherbase-list3rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3catbonus" title="arcotherbase-list3catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3knackbonus" title="arcotherbase-list3knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3profbonus" title="arcotherbase-list3profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3specialbonus" title="arcotherbase-list3specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list3itembonus" title="arcotherbase-list3itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5223,7 +5208,7 @@
 				<input type="hidden" name="attr_arcotherbase-list4prog" title="arcotherbase-list4prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4ranks" title="arcotherbase-list4ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4rankbonus" title="arcotherbase-list4rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4catbonus" title="arcotherbase-list4catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4knackbonus" title="arcotherbase-list4knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4profbonus" title="arcotherbase-list4profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4specialbonus" title="arcotherbase-list4specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list4itembonus" title="arcotherbase-list4itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5237,7 +5222,7 @@
 				<input type="hidden" name="attr_arcotherbase-list5prog" title="arcotherbase-list5prog (progression)" value="4" />
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5ranks" title="arcotherbase-list5ranks (Number of Ranks)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5rankbonus" title="arcotherbase-list5rankbonus (Rank Bonus)" value="0" /></span>
-				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5catbonus" title="arcotherbase-list5catbonus (Category Bonus)" value="0" readonly /></span>
+				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5knackbonus" title="arcotherbase-list5knackbonus (Category Bonus)" value="0" readonly /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5profbonus" title="arcotherbase-list5profbonus (Profession bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5specialbonus" title="arcotherbase-list5specialbonus (Special bonus if applicable.)" value="0" /></span>
 				<span class="table-data"><input type="text" class="table-data-skills" name="attr_arcotherbase-list5itembonus" title="arcotherbase-list5itembonus (Item bonus if applicable.)" value="0" /></span>
@@ -5739,69 +5724,6 @@
 					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_stdprog31" title="stdprog31" value="1" readonly /> </span>
 					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-standard-progression-skills">Progression for Standard-Progression Skills</span> </span>
 				</div>
-				<!--div class="table-row">
-					<span class="table-data-header" ><span data-i18n="category-progression">Category Progression</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_catprog0" title="catprog0" value="-15" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_catprog10" title="catprog10" value="2" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_catprog20" title="catprog20" value="1" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_catprog30" title="catprog30" value="0.5" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_catprog31" title="catprog31" value="0" readonly /> </span>
-					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-standard-progression-skill-categories">Progression for Standard-Progression Skill Categories</span> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="combined-progression">Combined Progression</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_combprog0" title="combprog0" value="-30" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_combprog10" title="combprog10" value="5" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_combprog20" title="combprog20" value="3" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_combprog30" title="combprog30" value="1.5" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_combprog31" title="combprog31" value="0.5" readonly /> </span>
-					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-combined-progression-skills">Progression for Combined-Progression Skills</span> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="special-progression">Special Progression</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_spellprog0" title="spellprog0" value="0" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_spellprog10" title="spellprog10" value="1" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_spellprog20" title="spellprog20" value="1" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_spellprog30" title="spellprog30" value="0.5" readonly /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_spellprog31" title="spellprog31" value="0" readonly /> </span>
-					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-spells-and-skills-with-special-progression">Progression for Spells and Skills with Special-Progression</span> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="body-development-progression">Body Development Progression</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_bodydevprog0" title="bodydevprog0" value="0" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_bodydevprog10" title="bodydevprog10" value="6" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_bodydevprog20" title="bodydevprog20" value="5" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_bodydevprog30" title="bodydevprog30" value="4" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_bodydevprog31" title="bodydevprog31" value="3" /> </span>
-					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-body-development-for">Progression for Body Development for</span> <span name="attr_race" title="race"><span> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="power-point-progression">Power Point Progression</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_ppdevprog0" title="ppdevprog0" value="0" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_ppdevprog10" title="ppdevprog10" value="6" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_ppdevprog20" title="ppdevprog20" value="5" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_ppdevprog30" title="ppdevprog30" value="4" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_ppdevprog31" title="ppdevprog31" value="3" /> </span>
-					<span class="table-data-left-bottom" > &nbsp; <span data-i18n="progression-for-power-point-development-for">Progression for Power Point Development for</span> <span name="attr_race" title="race"><span> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="custom-progression1">Custom Progression1</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust1prog0" title="cust1prog0" value="0" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust1prog10" title="cust1prog10" value="6" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust1prog20" title="cust1prog20" value="5" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust1prog30" title="cust1prog30" value="4" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust1prog31" title="cust1prog31" value="3" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-customprogression" name="attr_cust1progname" title="cust1progname" data-i18n-placeholder="custom-skill-progression1-for-custom-skills" placeholder="Custom Skill Progression1 (for custom skills)" /> </span>
-				</div>
-				<div class="table-row">
-					<span class="table-data-header" ><span data-i18n="custom-progression2">Custom Progression2</span>: </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust2prog0" title="cust2prog0" value="0" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust2prog10" title="cust2prog10" value="6" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust2prog20" title="cust2prog20" value="5" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust2prog30" title="cust2prog30" value="4" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-stats" name="attr_cust2prog31" title="cust2prog31" value="3" /> </span>
-					<span class="table-data" ><input type="text" class="table-data-customprogression" name="attr_cust2progname" title="cust2progname" data-i18n-placeholder="custom-skill-progression2-for-custom-skills" placeholder="Custom Skill Progression2 (for custom skills)" /> </span>
-				</div-->
 			</div>
 		</div>
 	<!-- End Tab8 -->
@@ -7871,6 +7793,19 @@ A8:@{npcattack8notes} }} </textarea>
 	</table>
 </rolltemplate>
 
+
+<rolltemplate class="sheet-rolltemplate-test">
+	<table>
+		{{#^rollTotal() computed::downroll 0}}
+		<div class="sheet-roll1mod sheet-result">
+			{{computed::roll1mod}}
+		</div>
+		<div class="sheet-roll1final sheet-result">
+			{{computed::roll1mod}}
+		</div>
+	{{/^rollTotal() computed::downroll 0}}
+	</table>
+</rolltemplate>
 	</div>
 
 <!-- end Roll Template section -->
@@ -7882,6 +7817,32 @@ A8:@{npcattack8notes} }} </textarea>
 // A Big thanks to GiGs for lots of help on streamlining the Sheetworkers!!!!
 const int = (value, error = 0) => parseInt(value) || 0;
 const float = (value, error = 0) => parseFloat(value) || 0;
+
+on('clicked:test', (event) => { 
+	console.log("In Clicked Test");
+	console.log(event);
+	testRoll();
+});
+
+const testRoll = () => {
+	let rollExpression = '1d100!>95'; //+ @{perception} +?{Other bonus/penalty?|0} // + @{skill_bonus}[Bonus] + @{skill_mod}[Mod]'; // Wrap the two @{attributes} in a [[subroll]] if they're taking up too much space
+	let rollBase = '&{template:test} {{name=Test}} {{roll1=[[${rollExpression}]]}} {{downroll=[[0]]}} {{roll1name=${rollExpression}}} {{roll1mod=- [[1d100!>95]]}} {{roll1final=[[0]]}}';
+
+	startRoll(rollbase, (results) => {
+
+		let downRoll = results.roll1mod.result;
+		let origRoll = results.roll1.result;
+		let dieRoll = results.roll1.dice[0];
+		let rollData = {}; // Holding the computed data in an object is a bit cleaner if your rolls get more complex
+
+		if (dieRoll < 6) {
+			rollData.downroll = 1; // This tells the roll template to display the mod & final sections
+			rollData.roll1final = origRoll - downRoll
+		}
+
+	finishRoll(results.rollId, rollData);
+	});
+}
 
 /* eslint-disable no-console */
 
@@ -8036,25 +7997,6 @@ function SetRealm(rselect, intmod, empmod, premod) {
     return mod;  
 }
 
-//  <!---- update ppdev progression when realm or race change---->
-// and <!---- update realm stat when realm or realm stat changes---->   
-on('change:realmselect change:race change:racialcalc change:inbonus change:embonus change:prbonus', function () {
-    //   console.log('/* ---------- entering ppsetup and realm call------------ */');
-	getAttrs(['realmselect', 'racialcalc', 'race', 'inbonus', 'embonus', 'prbonus'], function (values) {		
-    	if (int(values.racialcalc) == 1) {
-			const realmindex = int(values.realmselect);
-			// create an empty data object to hold the stat values, that iwll later be sent to setAttrs
-			let output = PPDevProgMod(realmindex, values.race);
-			// if the race is custom this will be empty. But probably should not be - if changing TO custom, should probably erase existing values.
-			// then again thats only true if changing race - changing any other value wouldnt change things
-			
-			// add the realm attribute to output
-			output.realm = SetRealm(realmindex, int(values.inbonus), int(values.embonus), int(values.prbonus));
-			setAttrs(output);
-		}
-	});
-    //   console.log('/* ---------- exiting ppdev and realm setup call------------ */');
-});
   
 //	<!---- Calc skill bonus from ranks/progression (use GenSkillMod to calc the actual value) ---->	
 function SkillChange(name) {
@@ -8151,40 +8093,40 @@ function FixDropdownStats(name) {
 
 //	<!---- Calc total skill bonus ------->	
 function CalcTotalBonus(name) {
-//    console.log('/* ----------entering CalcTotalBonus  ------------ */'); 
+    console.log('/* ----------entering CalcTotalBonus  ------------ */'); 
 //	let temp = name+"z";
     let skill = name.replace(/-$/g,'');   //need to remove the last - but not the previous ones....
     let rankbonus = name+'rankbonus';
     let stat = name+'stat';
-    let catbonus = name+'catbonus';
+    let knackbonus = name+'knackbonus';
     let specialmod = name+'specialmod';
     let itemmod = name+'itemmod';
     let specialbonus = name+'specialbonus';
     let itembonus = name+'itembonus';
     let statbonus = name+'statbonus';
     let profbonus = name+'profbonus';
-    //console.log('/* ----------CalcTotalBonus: name value:'+skill+'; rankbonus value:'+rankbonus+'; stat value:'+stat+'; catbonus value:'+catbonus+'; specialmod value:'+specialmod+'; itemmod value:'+itemmod+'; statbonus value:'+statbonus+'; profbonus value:'+profbonus+'; specialbonus value:'+specialbonus+'; itemmod value:'+itembonus+' ------------ */'); // debug 
-    getAttrs([skill, stat, rankbonus, catbonus, specialmod, specialmod, itemmod, statbonus, profbonus, specialbonus, itembonus], function(values) {
+    console.log('/* ----------CalcTotalBonus: name value:'+skill+'; rankbonus value:'+rankbonus+'; stat value:'+stat+'; knackbonus value:'+knackbonus+'; specialmod value:'+specialmod+'; itemmod value:'+itemmod+'; statbonus value:'+statbonus+'; profbonus value:'+profbonus+'; specialbonus value:'+specialbonus+'; itemmod value:'+itembonus+' ------------ */'); // debug 
+    getAttrs([skill, stat, rankbonus, knackbonus, specialmod, specialmod, itemmod, statbonus, profbonus, specialbonus, itembonus], function(values) {
         let update = {};
         let rbon = parseInt(values[rankbonus],10)||0;
         let statv = parseInt(values[stat],10)||0;
-        let catbon = parseInt(values[catbonus],10)||0;
+        let knackbon = parseInt(values[knackbonus],10)||0;
         let spmod = parseInt(values[specialmod],10)||0;
         let imod = parseInt(values[itemmod],10)||0;
         let stbon = parseInt(values[statbonus],10)||0;
         let profbon = parseInt(values[profbonus],10)||0;
         let spbon = parseInt(values[specialbonus],10)||0;
         let ibon = parseInt(values[itembonus],10)||0;
-        //console.log('/* ----------CalcTotalBonus: rankbonus value:'+rbon+'; stat value:'+statv+'; catbonus value:'+catbon+'; specialmod value:'+spmod+'; itemmod value:'+imod+'; statbonus value:'+stbon+'; profbonus value:'+profbon+'; specialbonus value:'+spbon+'; itemmod value:'+ibon+' ------------ */'); // debug 
+        console.log('/* ----------CalcTotalBonus: rankbonus value:'+rbon+'; stat value:'+statv+'; knackbonus value:'+knackbon+'; specialmod value:'+spmod+'; itemmod value:'+imod+'; statbonus value:'+stbon+'; profbonus value:'+profbon+'; specialbonus value:'+spbon+'; itemmod value:'+ibon+' ------------ */'); // debug 
         if (name == 'bodydev') {
-            update[skill]=rbon + statv + catbon + spmod + imod + stbon + profbon + spbon + ibon + 10.0;
+            update[skill]=rbon + statv + knackbon + spmod + imod + stbon + profbon + spbon + ibon + 10.0;
         } else {
-            update[skill]=rbon + statv + catbon + spmod + imod + stbon + profbon + spbon + ibon;
+            update[skill]=rbon + statv + knackbon + spmod + imod + stbon + profbon + spbon + ibon;
         }
         //console.log('/* ----------CalcTotalBonus:'+skill+' value:'+values[skill]+' ------------ */'); // debug
         setAttrs(update);
     });
-//console.log('/* ----------exiting CalcTotalBonus ------------ */');
+console.log('/* ----------exiting CalcTotalBonus ------------ */');
 }
 
 // <!-- change the skill stat when the skill dropdown changes -->
@@ -8766,15 +8708,15 @@ on('change:skillrecalc', function(){
 });
 
 // <!-- if powerpoint development total changes, update powerpoints-->
-on('change:ppdev change:ppmult', function() {
-    getAttrs(['ppdev', 'ppmult'], function(values) {
-        let powerpts = parseInt(values.ppdev,10)||0;
-        let mult = parseFloat(values.ppmult,10)||0;
-        setAttrs({
-            'powerpoints_max': Math.round(powerpts*mult)
-        });
-    });
-});
+//on('change:ppdev change:ppmult', function() {
+    //getAttrs(['ppdev', 'ppmult'], function(values) {
+        //let powerpts = parseInt(values.ppdev,10)||0;
+        //let mult = parseFloat(values.ppmult,10)||0;
+        //setAttrs({
+            //'powerpoints_max': Math.round(powerpts*mult)
+        //});
+    //});
+//});
 
 //	<!---- Update bonus on current stat change.  Do this for each stat ---->	
 // Calculate Base Bonus
@@ -8990,7 +8932,7 @@ on('change:levelexpcalc change:level', function() {
 //	<!---- Do this for each skill to set up OnChange events ---->	
 on('sheet:opened', function() {
 //  console.log('/* ----------entering Setup OnChange ------------ */');
-    //var skills=['cat-srob', 'srob-list1', 'srob-list2', 'srob-list3', 'srob-list4', 'srob-list5', 'srob-list6', 'srob-list7', 'srob-list8', 'srob-list9', 'srob-list10', 'cat-sropen', 'sropen-list1', 'sropen-list2', 'sropen-list3', 'sropen-list4', 'sropen-list5', 'sropen-list6', 'sropen-list7', 'sropen-list8', 'sropen-list9', 'sropen-list10', 'cat-srclosed', 'srclosed-list1', 'srclosed-list2', 'srclosed-list3', 'srclosed-list4', 'srclosed-list5', 'srclosed-list6', 'srclosed-list7', 'srclosed-list8', 'srclosed-list9', 'srclosed-list10', 'cat-srotherb', 'srotherb-list1', 'srotherb-list2', 'srotherb-list3', 'srotherb-list4', 'srotherb-list5', 'srotherb-list6', 'cat-oropen', 'oropen-list1', 'oropen-list2', 'oropen-list3', 'oropen-list4', 'oropen-list5', 'cat-orclosed', 'orclosed-list1', 'orclosed-list2', 'orclosed-list3', 'orclosed-list4', 'orclosed-list5', 'cat-orbase', 'orbase-list1', 'orbase-list2', 'orbase-list3', 'orbase-list4', 'orbase-list5', 'cat-arcopen', 'arcopen-list1', 'arcopen-list2', 'arcopen-list3', 'arcopen-list4', 'arcopen-list5', 'cat-arcclosed', 'arcclosed-list1', 'arcclosed-list2', 'arcclosed-list3', 'arcclosed-list4', 'arcclosed-list5', 'cat-arcbase', 'arcbase-list1', 'arcbase-list2', 'arcbase-list3', 'arcbase-list4', 'arcbase-list5', 'cat-arcotherbase', 'arcotherbase-list1', 'arcotherbase-list2', 'arcotherbase-list3', 'arcotherbase-list4', 'arcotherbase-list5', 'cat-armor-heavy-', 'plate', 'cat-armor-light-', 'softleather', 'rigidleather', 'cat-armor-med-', 'chain', 'cat-artistic-active-', 'acting', 'dancing', 'mimery', 'mimicry', 'animalhandling1', 'animalhandling2', 'animalhandling3', 'riding1', 'riding2', 'riding3', 'poeticimprov', 'singing', 'taletelling', 'ventriloquism', 'cat-artistic-passive-', 'music', 'painting', 'poetry', 'sculpting', 'cat-athletic-brawn-', 'athleticgamesbrawn1', 'athleticgamesbrawn2', 'athleticgamesbrawn3', 'jumping', 'powerstriking', 'powerthrowing', 'weightlifting', 'cat-athletic-endur-', 'athleticgamesendur1', 'athleticgamesendur2', 'athleticgamesendur3', 'distancerunning', 'rowing', 'scaling', 'sprinting', 'swimming', 'cat-athletic-gym-', 'acrobatics', 'athleticgamesgym1', 'athleticgamesgym2', 'athleticgamesgym3', 'climbing', 'contortions', 'diving', 'flyglide', 'juggling', 'polevaulting', 'rappelling', 'skating', 'skiing', 'stiltwalking', 'surfing', 'tightrope', 'tumbling',  'perception', 'tracking', 'bodydev', 'adrenaldeflecting', 'mountedcombat', 'quickdraw', 'reversestroke1', 'subdual', 'swashbuckling', 'tumbleevade', 'twoweaponfighting1', 'combatmaneuvers1', 'combatmaneuvers2', 'combatmaneuvers3', 'cat-communications-', 'blindfighting', 'signaling', 'cooking', 'drafting', 'fletching', 'horticulture', 'leathercrafts', 'metalcrafts', 'ropemastery', 'scribing', 'service', 'sewing', 'skinning', 'stonecrafts', 'trapping', 'woodcrafts', 'craft15', 'craft16', 'cat-directed-spells-', 'firebolt', 'icebolt', 'lightningbolt', 'shockbolt', 'waterbolt', 'boltattack6', 'cat-influence-', 'drawpaint', 'runes', 'leathercraft', 'metalcraft', 'stonecraft', 'woodcraft', 'publicspeaking', 'seduction', 'trading', 'cat-lore-general-', 'culturelore1', 'faunalore', 'floralore', 'heraldry', 'history', 'philosophy', 'regionlore1', 'religion', 'loregeneral1', 'loregeneral2', 'loregeneral3', 'cat-lore-magical-', 'artifactlore', 'circlelore', 'planarlore', 'spelllore', 'symbollore', 'undeadlore', 'wardinglore', 'cat-lore-obscure-', 'demondevillore', 'dragonlore', 'faerielore', 'xenolore1', 'xenolore2', 'xenolore3', 'cat-lore-technical-', 'herblore', 'locklore', 'metallore', 'poisonlore', 'stonelore', 'tradinglore', 'cat-ma-striking-', 'boxing', 'striking1', 'striking2', 'striking3', 'striking4', 'tackling', 'cat-ma-sweeps-', 'blocking', 'sweeps1', 'sweeps2', 'sweeps3', 'sweeps4', 'wrestling', 'cat-outdoor-animal-', 'animalhandling1', 'animalhealing1', 'animalmastery', 'animaltraining1', 'driving1', 'herding1', 'riding1', 'outdooranimal1', 'outdooranimal2', 'outdooranimal3', 'cat-outdoor-environ-', 'caving', 'foraging', 'hunting', 'stargazing', 'survival1', 'survival2', 'survival3', 'weatherwatching', 'cat-power-awareness-', 'attunement', 'divination1', 'divination2', 'divination3', 'powerperception', 'readrunes', 'channeling', 'magicritual', 'spellmastery1', 'spellmastery2', 'spellmastery3', 'transcendarmor', 'ppdev', 'cat-science-basic-', 'basicmath', 'research', 'advancedmath', 'anthropology1', 'alchemy', 'astronomy', 'biochemistry', 'psychology', 'specscience1', 'specscience2', 'cat-self-control-', 'adrenalbalance', 'adrenalconcentration', 'adrenallanding', 'adrenalleaping', 'adrenalquickdraw', 'adrenalspeed', 'adrenalstabilization', 'adrenalstrength', 'cleansingtrance', 'controllycanthropy', 'deathtrance', 'frenzy', 'healingtrance', 'meditation', 'mnemonics', 'sleeptrance', 'stunnedmaneuvering', 'brawling', 'disarmarmedvs1h', 'disarmarmedvs2h', 'disarmarmedvspolearm', 'disarmarmedvs2wcombo', 'disarmunarmedvs1hedged', 'disarmunarmedvs2h', 'disarmunarmedvspolearm', 'disarmunarmedvs1hconcussion', 'jousting', 'adrenaldefense', 'adrenaltoughness', 'cat-subterfuge-attack-', 'ambush', 'silentkill', 'cat-subterfuge-mechanics-', 'camouflage', 'disarmingtraps', 'disguise', 'counterfeiting', 'forgery1', 'hidingitems', 'picklocks', 'settraps', 'trapbuilding', 'usepoison', 'subtermech1', 'subtermech2', 'cat-subterfuge-stealth-', 'hiding', 'pickpockets', 'stalking', 'trickery', 'cat-tech-general-', 'begging', 'firstaid', 'gambling', 'mapping', 'operatingequipment', 'orienteering', 'sailing', 'tacticalgames', 'useprepherbs', 'advertising', 'architecture', 'diagnostics1', 'dowsing', 'engineering1', 'mechanition1', 'militaryorg1', 'mining1', 'secondaid', 'surgery', 'techprof1', 'techprof2', 'techprof3', 'administration', 'appraisal', 'boatpilot1', 'cartography', 'evalarmor', 'evalmetal', 'evalstone', 'evalweapon', 'gimmickry', 'hypnosis', 'midwifery', 'navigation', 'prepareherbs', 'preparepoisons', 'siegeengineering', 'tactics', 'techvoc1', 'techvoc2', 'cat-urban-', 'contacting', 'mingling', 'scrounging', 'streetwise', 'cat-weapon-1hconcussion-', 'weapon1hc1', 'weapon1hc2', 'weapon1hc3', 'cat-weapon-1hedged-', 'weapon1he1', 'weapon1he2', 'weapon1he3', 'cat-weapon-2handed-', 'weapon2hand1', 'weapon2hand2', 'weapon2hand3', 'cat-weapon-missile-', 'weaponmissile1', 'weaponmissile2', 'weaponmissile3', 'cat-weapon-missileartillery-', 'weaponmissileart1', 'weaponmissileart2', 'weaponmissileart3', 'cat-weapon-thrown-', 'weaponthrown1', 'weaponthrown2', 'weaponthrown3', 'cat-weapon-polearms-', 'weaponpolearm1', 'weaponpolearm2', 'weaponpolearm3', 'cat-aware-percept-', 'cat-combat-maneuvers-', 'cat-crafts-', 'cat-power-manipulation-', 'cat-science-specialized-', 'cat-special-attacks-', 'cat-tech-professional-', 'cat-tech-vocational-'];   // list of skills from previous sheet included here incase we need to reference this
+    //var skills=['cat-srob', 'srob-list1', 'srob-list2', 'srob-list3', 'srob-list4', 'srob-list5', 'srob-list6', 'srob-list7', 'srob-list8', 'srob-list9', 'srob-list10', 'cat-sropen', 'sropen-list1', 'sropen-list2', 'sropen-list3', 'sropen-list4', 'sropen-list5', 'sropen-list6', 'sropen-list7', 'sropen-list8', 'sropen-list9', 'sropen-list10', 'cat-srclosed', 'srclosed-list1', 'srclosed-list2', 'srclosed-list3', 'srclosed-list4', 'srclosed-list5', 'srclosed-list6', 'srclosed-list7', 'srclosed-list8', 'srclosed-list9', 'srclosed-list10', 'cat-srotherb', 'srotherb-list1', 'srotherb-list2', 'srotherb-list3', 'srotherb-list4', 'srotherb-list5', 'srotherb-list6', 'cat-oropen', 'oropen-list1', 'oropen-list2', 'oropen-list3', 'oropen-list4', 'oropen-list5', 'cat-orclosed', 'orclosed-list1', 'orclosed-list2', 'orclosed-list3', 'orclosed-list4', 'orclosed-list5', 'cat-orbase', 'orbase-list1', 'orbase-list2', 'orbase-list3', 'orbase-list4', 'orbase-list5', 'cat-arcopen', 'arcopen-list1', 'arcopen-list2', 'arcopen-list3', 'arcopen-list4', 'arcopen-list5', 'cat-arcclosed', 'arcclosed-list1', 'arcclosed-list2', 'arcclosed-list3', 'arcclosed-list4', 'arcclosed-list5', 'cat-arcbase', 'arcbase-list1', 'arcbase-list2', 'arcbase-list3', 'arcbase-list4', 'arcbase-list5', 'cat-arcotherbase', 'arcotherbase-list1', 'arcotherbase-list2', 'arcotherbase-list3', 'arcotherbase-list4', 'arcotherbase-list5', 'cat-armor-heavy-', 'plate', 'cat-armor-light-', 'softleather', 'rigidleather', 'cat-armor-med-', 'chain', 'cat-artistic-active-', 'acting', 'dancing', 'mimery', 'mimicry', 'animalhandling1', 'animalhandling2', 'animalhandling3', 'riding1', 'riding2', 'riding3', 'poeticimprov', 'singing', 'taletelling', 'ventriloquism', 'cat-artistic-passive-', 'music', 'painting', 'poetry', 'sculpting', 'cat-athletic-brawn-', 'athleticgamesbrawn1', 'athleticgamesbrawn2', 'athleticgamesbrawn3', 'jumping', 'powerstriking', 'powerthrowing', 'weightlifting', 'cat-athletic-endur-', 'athleticgamesendur1', 'athleticgamesendur2', 'athleticgamesendur3', 'distancerunning', 'rowing', 'scaling', 'sprinting', 'swimming', 'cat-athletic-gym-', 'acrobatics', 'athleticgamesgym1', 'athleticgamesgym2', 'athleticgamesgym3', 'climbing', 'contortions', 'diving', 'flyglide', 'juggling', 'polevaulting', 'rappelling', 'skating', 'skiing', 'stiltwalking', 'surfing', 'tightrope', 'tumbling',  'perception', 'tracking', 'bodydev', 'adrenaldeflecting', 'mountedcombat', 'quickdraw', 'reversestroke1', 'subdual', 'swashbuckling', 'tumbleevade', 'twoweaponfighting1', 'combatmaneuvers1', 'combatmaneuvers2', 'combatmaneuvers3', 'cat-communications-', 'blindfighting', 'signaling', 'cooking', 'drafting', 'fletching', 'horticulture', 'leathercrafts', 'metalcrafts', 'ropemastery', 'scribing', 'service', 'sewing', 'skinning', 'stonecrafts', 'trapping', 'woodcrafts', 'craft15', 'craft16', 'cat-directed-spells-', 'firebolt', 'icebolt', 'lightningbolt', 'shockbolt', 'waterbolt', 'boltattack6', 'cat-influence-', 'drawpaint', 'runes', 'leathercraft', 'metalcraft', 'stonecraft', 'woodcraft', 'publicspeaking', 'seduction', 'trading', 'cat-lore-general-', 'culturelore1', 'faunalore', 'floralore', 'heraldry', 'history', 'philosophy', 'regionlore1', 'religion', 'loregeneral1', 'loregeneral2', 'loregeneral3', 'cat-lore-magical-', 'artifactlore', 'circlelore', 'planarlore', 'spelllore', 'symbollore', 'undeadlore', 'wardinglore', 'cat-lore-obscure-', 'demondevillore', 'dragonlore', 'faerielore', 'xenolore1', 'xenolore2', 'xenolore3', 'cat-lore-technical-', 'herblore', 'locklore', 'metallore', 'poisonlore', 'stonelore', 'tradinglore', 'cat-ma-striking-', 'boxing', 'striking1', 'striking2', 'striking3', 'striking4', 'tackling', 'cat-ma-sweeps-', 'blocking', 'sweeps1', 'sweeps2', 'sweeps3', 'sweeps4', 'wrestling', 'cat-outdoor-animal-', 'animalhandling1', 'animalhealing1', 'animalmastery', 'animaltraining1', 'driving1', 'herding1', 'riding1', 'outdooranimal1', 'outdooranimal2', 'outdooranimal3', 'cat-outdoor-environ-', 'caving', 'foraging', 'hunting', 'stargazing', 'survival1', 'survival2', 'survival3', 'weatherwatching', 'cat-power-awareness-', 'attunement', 'divination1', 'divination2', 'divination3', 'powerperception', 'readrunes', 'channeling', 'magicritual', 'spellmastery1', 'spellmastery2', 'spellmastery3', 'transcendarmor', 'cat-science-basic-', 'basicmath', 'research', 'advancedmath', 'anthropology1', 'alchemy', 'astronomy', 'biochemistry', 'psychology', 'specscience1', 'specscience2', 'cat-self-control-', 'adrenalbalance', 'adrenalconcentration', 'adrenallanding', 'adrenalleaping', 'adrenalquickdraw', 'adrenalspeed', 'adrenalstabilization', 'adrenalstrength', 'cleansingtrance', 'controllycanthropy', 'deathtrance', 'frenzy', 'healingtrance', 'meditation', 'mnemonics', 'sleeptrance', 'stunnedmaneuvering', 'brawling', 'disarmarmedvs1h', 'disarmarmedvs2h', 'disarmarmedvspolearm', 'disarmarmedvs2wcombo', 'disarmunarmedvs1hedged', 'disarmunarmedvs2h', 'disarmunarmedvspolearm', 'disarmunarmedvs1hconcussion', 'jousting', 'adrenaldefense', 'adrenaltoughness', 'cat-subterfuge-attack-', 'ambush', 'silentkill', 'cat-subterfuge-mechanics-', 'camouflage', 'disarmingtraps', 'disguise', 'counterfeiting', 'forgery1', 'hidingitems', 'picklocks', 'settraps', 'trapbuilding', 'usepoison', 'subtermech1', 'subtermech2', 'cat-subterfuge-stealth-', 'hiding', 'pickpockets', 'stalking', 'trickery', 'cat-tech-general-', 'begging', 'firstaid', 'gambling', 'mapping', 'operatingequipment', 'orienteering', 'sailing', 'tacticalgames', 'useprepherbs', 'advertising', 'architecture', 'diagnostics1', 'dowsing', 'engineering1', 'mechanition1', 'militaryorg1', 'mining1', 'secondaid', 'surgery', 'techprof1', 'techprof2', 'techprof3', 'administration', 'appraisal', 'boatpilot1', 'cartography', 'evalarmor', 'evalmetal', 'evalstone', 'evalweapon', 'gimmickry', 'hypnosis', 'midwifery', 'navigation', 'prepareherbs', 'preparepoisons', 'siegeengineering', 'tactics', 'techvoc1', 'techvoc2', 'cat-urban-', 'contacting', 'mingling', 'scrounging', 'streetwise', 'cat-weapon-1hconcussion-', 'weapon1hc1', 'weapon1hc2', 'weapon1hc3', 'cat-weapon-1hedged-', 'weapon1he1', 'weapon1he2', 'weapon1he3', 'cat-weapon-2handed-', 'weapon2hand1', 'weapon2hand2', 'weapon2hand3', 'cat-weapon-missile-', 'weaponmissile1', 'weaponmissile2', 'weaponmissile3', 'cat-weapon-missileartillery-', 'weaponmissileart1', 'weaponmissileart2', 'weaponmissileart3', 'cat-weapon-thrown-', 'weaponthrown1', 'weaponthrown2', 'weaponthrown3', 'cat-weapon-polearms-', 'weaponpolearm1', 'weaponpolearm2', 'weaponpolearm3', 'cat-aware-percept-', 'cat-combat-maneuvers-', 'cat-crafts-', 'cat-power-manipulation-', 'cat-science-specialized-', 'cat-special-attacks-', 'cat-tech-professional-', 'cat-tech-vocational-'];   // list of skills from previous sheet included here incase we need to reference this
     var skills=['animalhandling1', 'animalhandling2', 'animalhandling3', 'riding1', 'riding2', 'riding3', 'perception', 'tracking', 'maneuveringarmor', 'mountedcombat', 'protect', 'restrictedquarters', 'subduing', 'adrenaldefense', 'adrenalfocus', 'adrenalspeed', 'adrenalstrength', 'bodydev', 'fortitude', 'weighttraining', 'blindfighting', 'disarm', 'footwork', 'multipleattacks', 'reversestrike', 'melee1', 'melee2', 'melee3', 'ranged1', 'ranged2', 'ranged3', 'shield', 'sweeps1', 'sweeps2', 'sweeps3', 'throws1', 'throws2', 'throws3', 'illusioncrafting', 'musicalcomposition', 'writing1', 'writing2', 'writing3', 'culinary', 'drawingpainting', 'fabriccraft', 'leathercraft', 'metalcraft', 'stonecraft', 'woodcraft', 'attunrment', 'runes', 'navigation', 'piloting1', 'piloting2', 'piloting3', 'survival1', 'survival2', 'survival3', 'acrobatics', 'contortions', 'jumping', 'creaturelore1', 'creaturelore2', 'creaturelore3', 'historiclore1', 'historiclore2', 'historiclore3', 'language1', 'language2', 'language3', 'materialslore1', 'materialslore2', 'materialslore3', 'raciallore1', 'raciallore2', 'raciallore3', 'regionlore1', 'regionlore2', 'regionlore3', 'religion1', 'religion2', 'religion3', 'spelllore', 'grace1', 'grace2', 'grace3', 'spelltrickery1', 'spelltrickery2', 'spelltrickery3', 'transcendence', 'herbalism', 'medicine', 'poisonmastery', 'controllycanthropy', 'meditation', 'mentalfocus', 'climbing', 'flying', 'running', 'swimming', 'acting', 'music1', 'music2', 'music3', 'stagemagic', 'channeling', 'bolts', 'illusions', 'hurling', 'powerdevelopment', 'powerprojection', 'architecture', 'astronomy', 'engineering', 'mathematics', 'influence1', 'influence2', 'influence3', 'leadership', 'socialawareness', 'trading', 'magicalritual1', 'magicalritual2', 'magicalritual3', 'open1', 'open2', 'open3', 'open4', 'open5', 'open6', 'open7', 'open8', 'open9', 'open10', 'open11', 'closed1', 'closed2', 'closed3', 'closed4', 'closed5', 'closed6', 'closed7', 'closed8', 'closed9', 'closed10', 'closed11', 'base1', 'base2', 'base3', 'base4', 'base5', 'base6', 'base7', 'base8', 'arcane1', 'arcane2', 'arcane3', 'restricted1', 'restricted2', 'restricted3', 'ambush1', 'ambush2', 'ambush3', 'concealment', 'stalking', 'trickery', 'locks', 'mechanics1', 'mechanics2', 'mechanics3', 'traps', 'administration1', 'administration2', 'administration3', 'service1', 'service2', 'service3', 'trade1', 'trade2', 'trade3'];   // list of skills
     _.each(skills, function(skill) {
         var event;
@@ -8998,7 +8940,7 @@ on('sheet:opened', function() {
         event = 'change:'+skill+'ranks'; 
         on ( event, _.bind(SkillChange,{},skill+'ranks'));
         //	calc skill
-        event = 'change:'+skill+'rankbonus change:'+skill+'stat change:'+skill+'catbonus change:'+skill+'specialmod change:'+skill+'itemmod change:'+skill+'statbonus change:'+skill+'profbonus change:'+skill+'specialbonus change:'+skill+'itembonus';
+        event = 'change:'+skill+'rankbonus change:'+skill+'stat change:'+skill+'knackbonus change:'+skill+'specialmod change:'+skill+'itemmod change:'+skill+'statbonus change:'+skill+'profbonus change:'+skill+'specialbonus change:'+skill+'itembonus';
         //	console.log('/* ---------- event: '+event+' ------------ */'); 
         on ( event, _.bind(CalcTotalBonus,{},skill));
     });
@@ -9022,8 +8964,8 @@ on('change:repeating_langs', function() {
 on('change:repeating_langs change:embonus change:mebonus change:rebonus change:cat-communications remove:repeating_langs', function () {
     //console.log('/*----------- create rep-languages summary------*/');
     getAttrs(['cat-communications-rankbonus', 'rebonus', 'mebonus', 'embonus', 'cat-communications-profbonus', 'cat-communications-specialbonus', 'cat-communications-itembonus'], function (values) {
-        let catbonus = parseInt(values['cat-communications-rankbonus'], 10) + parseInt(values.rebonus, 10) + parseInt(values.mebonus, 10) + parseInt(values['cat-communications-profbonus'], 10) + parseInt(values['cat-communications-specialbonus'], 10) + parseInt(values['cat-communications-itembonus'], 10);
-        //console.log("catbonus: "+catbonus);
+        let knackbonus = parseInt(values['cat-communications-rankbonus'], 10) + parseInt(values.rebonus, 10) + parseInt(values.mebonus, 10) + parseInt(values['cat-communications-profbonus'], 10) + parseInt(values['cat-communications-specialbonus'], 10) + parseInt(values['cat-communications-itembonus'], 10);
+        //console.log("knackbonus: "+knackbonus);
         getSectionIDs('repeating_langs', function (idarray) {
             let attrArray = _.chain(idarray)
                 .map(function (id) {
@@ -9058,14 +9000,14 @@ on('change:repeating_langs change:embonus change:mebonus change:rebonus change:c
                     //console.log("langwrittenspecial: "+langwrittenspecial);
                     let langwrittenitem = parseInt(x['repeating_langs_' + currentID + '_languagewrittenitemmod'], 10) || 0;
                     //console.log("langwrittenitem: "+langwrittenitem);
-                    let langspoken = parseInt(x['repeating_langs_' + currentID + '_languagespokenrankbonus'], 10) + parseInt(values.embonus, 10) + catbonus + langspokenspecial + langspokenitem;
+                    let langspoken = parseInt(x['repeating_langs_' + currentID + '_languagespokenrankbonus'], 10) + parseInt(values.embonus, 10) + knackbonus + langspokenspecial + langspokenitem;
                     //console.log("langspoken: "+langspoken);
-                    let langwritten = parseInt(x['repeating_langs_' + currentID + '_languagewrittenrankbonus'], 10) + parseInt(values.embonus, 10) + catbonus + langwrittenspecial + langwrittenitem;
+                    let langwritten = parseInt(x['repeating_langs_' + currentID + '_languagewrittenrankbonus'], 10) + parseInt(values.embonus, 10) + knackbonus + langwrittenspecial + langwrittenitem;
                     //console.log("langwritten: "+langwritten);
                     // setAttrs here to spit out the values to the skill tab; these aren't read in directly so should not interfere with building the summary and no point in calculating them again elsewhere.                
                      //optimise next 4 lines by replacing setAttrs with output[]
                     output['repeating_langs_' + currentID + '_languagespoken'] = langspoken;
-                    output['repeating_langs_' + currentID + '_languagespokencatbonus'] = catbonus;
+                    output['repeating_langs_' + currentID + '_languagespokenknackbonus'] = knackbonus;
                     output['repeating_langs_' + currentID + '_languagespokenstat'] = parseInt(values.embonus, 10);
                     output['repeating_langs_' + currentID + '_languagewritten'] = langwritten;
 
