@@ -1,8 +1,12 @@
 ## Stargate RPG
-Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming (Quickstart/Beta Sheet: February 2020, GenCon Release: Aug 2020) created by Andreas J. [@anduh_](https://twitter.com/anduh_)
+Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming, sheet created by Andreas J. [@anduh_](https://twitter.com/anduh_)
 
+- [Stargate Core Rulebook](https://stargatetherpg.com/files/file/74-stargate-sg-1-roleplaying-game-core-rulebook/)
 
 ### Changelog
+
+**v.1.73 (2021-08-09)**
+* Remove History Skill (was skill in old beta rules)
 
 **v.1.72(2021-06)**
 * update in-sheet changelog
