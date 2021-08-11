@@ -1,5 +1,12 @@
 Change Log
 ==============================================
+**2021-07-19 ** v.39 Chuz (James Culp)
+	Added Grunt Groups and Autocalculations based on the # of grunts
+	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
+**2021-07-12 ** v.38 Chuz (James Culp)
+	Bugfix - NPC->Grunt fixed a bug or oversight on grunt repeating skills.   They were all showing Agility on the roll template as their ability.  Upon first opening a grunt sheet all repeating skills for the grunt will be re-set to use their default associated attribute and the display attribute will also be fixed.
+	Bugfix - NPC->Host IC dice roll buttons weren't working.
+	Bugfix - PC->Rolls->Misc fixed width on conversions
 **2021-07-05 ** v.37 Chuz (James Culp)
 	Rolls->Misc tab added and now contains a way to do quick and dirty conversions for Standard to Metric and vice versa.  Feet <=> Meters, Pounds <=> Kilograms, and Miles <=> Kilometers.
 	PC->Arms->Range/Melee Added "Engineering" option to the skill dropdown.
