@@ -30,13 +30,24 @@ mixin oracleRollGroup(group)
   
       .oracle
         .button-container
-          button(
-            type='roll'
-            class='oracle-roll'
-            title=`@{roll_${id}_oracle}`
-            name=`roll_${id}_oracle`
-            value=`&{template:starforged_oracles} {{header=${header}}} {{${id}=[[d100]]}}`
+          if oracle.Tables 
+            - const options = oracle.Tables.map((obj, index) => { return `${obj['Display name']},${index}` })
+            - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
+            button(
+              type='roll'
+              class='oracle-roll'
+              title=`@{roll_${id}_oracle}`
+              name=`roll_${id}_oracle`
+              value=`&{template:starforged_oracles} ${rollQuery} {{header=${oracle.Name}}} {{${id}=[[d100]]}}`
             )
+          else
+            button(
+              type='roll'
+              class='oracle-roll'
+              title=`@{roll_${id}_oracle}`
+              name=`roll_${id}_oracle`
+              value=`&{template:starforged_oracles} {{header=${header}}} {{${id}=[[d100]]}}`
+              )
         label.toggle-btn.oracle-btn
           input.hide-element.btn-input(
             type='radio'
