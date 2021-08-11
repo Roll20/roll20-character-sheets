@@ -8,84 +8,60 @@ mixin oracleLabel(type, name, id)
       name=`attr_oracle_${type}_button`
       value=id
     )
-    .btn-content.oracle-name=name
+    .btn-content.oracle-name=header
 
-mixin oracleRollGroup(group, type, key)
+mixin oracleRowBuilder(table, row, index)
+  - const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1
+  - const finalChance = row.Chance
+  - const range = (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`
+  - const result = row.Description.charAt(0).toUpperCase() + row.Description.slice(1)
+  .oracle-row
+    span.oracle-roll=range
+    span.oracle-result=result 
+
+mixin oracleRollGroup(group)
   .oracle-box
-    .oracle-title=key.replace(/_/g, ' ')
-    each oracle in group.oracles
-      - var header = oracle.name.replace(/_/g, ' ')
-      - var id = `${key}${oracle.roll_id}`
-      if key === 'moves'
-        .oracle
-          +oracleLabel(type, header, id)
-      else if oracle.oracle_group === '2'
-        .oracle
-          .button-container
-            - var sub_one = oracle.sub_oracles[0]
-            - var sub_two = oracle.sub_oracles[1]
-            button(
-              type='roll'
-              class='oracle-roll'
-              title=`@{roll_${id}_oracle}`
-              name=`roll_${id}_oracle`
-              value=`&{template:${type}_oracles} {{header=${header}}} {{${key}${oracle.roll_id}=[[${oracle.dice}]]}} {{${key}${sub_one.roll_id}=[[${sub_one.dice}]]}} {{${key}${sub_two.roll_id}=[[${sub_two.dice}]]}}`
-              )
-          +oracleLabel(type, header, id)
-      else
-        .oracle
-          .button-container
-            button(
-              type='roll'
-              class='oracle-roll'
-              title=`@{roll_${id}_oracle}`
-              name=`roll_${id}_oracle`
-              value=`&{template:${type}_oracles} {{header=${header}}} {{${key}${oracle.roll_id}=[[${oracle.dice}]]}}`
-              )
-          +oracleLabel(type, header, id)
+    .oracle-title=group.Name
+    each oracle in group.Oracles
+      - const header = `${group.Name} - ${oracle.Name}`
+      - const groupFormattedName = group.Name.toLowerCase().replace(/\s/g, '-')
+      - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+      - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
+  
+      .oracle
+        .button-container
+          button(
+            type='roll'
+            class='oracle-roll'
+            title=`@{roll_${id}_oracle}`
+            name=`roll_${id}_oracle`
+            value=`&{template:starforged_oracles} {{header=${header}}} {{${id}=[[d100]]}}`
+            )
+        label.toggle-btn.oracle-btn
+          input.hide-element.btn-input(
+            type='radio'
+            title=`@{oracle_starforged_button}`
+            name=`attr_oracle_starforged_button`
+            value=id
+          )
+          .btn-content.oracle-name=oracle.Name
 
-mixin oracleBuilder(opts, type, key)
-  - var id = opts.roll_id
-  - var oracleName = `${key}-${opts.name}`
-  - var oracleClass = oracleName.replace(/_/g, '-')
-  input(class=`${oracleClass} hide-element` type='radio' name=`attr_oracle_${type}` value=`${key}${id}`)
-  div(class=`${oracleClass} showhide`)
-    .oracle-title.oracle-table-preview=opts.name.replace(/_/g, ' ')
-    if opts.oracle_move
-      //- +movePreviewFactory(moveList[opts.name], { visibility: true, no_title: true })
-    else if opts.oracle_group === '2'
-      .oracle-table.flex-table
-        each sub_oracle in opts.sub_oracles
-          .oracle-sub-column
-            each row in sub_oracle.rows
-              .oracle-row
-                span.oracle-roll=row.roll
-                span.oracle-result!=row.result
-    else
-      if opts.columns === '2'
-        .oracle-table.oracle-table-2-column
-          each row in opts.rows
-            .oracle-row.oracle-row-2
-              span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+mixin oracleBuilder(oracle, groupName)
+  - const groupFormattedName = groupName.toLowerCase().replace(/\s/g, '-')
+  - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+  - const id = `${groupFormattedName}-${oracleFormattedName}`
+  //- Stupid way for me to generate orcale ccs
+  //- - console.log(`input[type=radio].${id}:checked ~ div.${id},`)
 
-      else if opts.columns === '3'
-        .oracle-table.oracle-table-3-column
-          each row in opts.rows
-            .oracle-row.oracle-row-3
-              span.oracle-roll=row.roll
-              span.oracle-result!=row.result
-      
-      else if opts.columns === '4'
-        .oracle-table.oracle-table-4-column
-          each row in opts.rows
-            .oracle-row.oracle-row-4
-              span.oracle-roll=row.roll
-              span.oracle-result!=row.result
-
-      else
-        .oracle-table
-          each row in opts.rows
-            .oracle-row
-              span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+  input(class=`${id} hide-element` type='radio' name=`attr_oracle_starforged` value=id)
+  div(class=`${id} showhide`)
+    .oracle-title.oracle-table-preview=`${groupName} - ${oracle.Name}`
+    .oracle-table
+      if oracle.Table
+        each row, index in oracle.Table
+          +oracleRowBuilder(oracle.Table, row, index)
+      else if oracle.Tables
+        each table, index in oracle.Tables
+          .oracle-subtitle=table['Display name']
+          each row, index in table.Table
+            +oracleRowBuilder(table.Table, row, index)

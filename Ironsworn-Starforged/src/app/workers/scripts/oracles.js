@@ -1,6 +1,6 @@
-on('change:oracle_ironsworn_button', function(eventinfo) {
+on('change:oracle_starforged_button', function(eventinfo) {
   setAttrs({
-    oracle_ironsworn: eventinfo.newValue,
+    oracle_starforged: eventinfo.newValue,
   });
 });
 
