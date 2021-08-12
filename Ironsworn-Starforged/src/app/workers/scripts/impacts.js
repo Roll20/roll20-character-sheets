@@ -10,7 +10,9 @@ const impactsAttrs = [
   'impactTormented',
   'impactIndebted',
   'impactBattered',
-  'impactCursed'
+  'impactCursed',
+  'impactOther1',
+  'impactOther2'
 ]
 
 const momentumAttrs = [
