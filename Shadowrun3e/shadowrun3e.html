@@ -96,6 +96,12 @@
     <input type='hidden' name='attr_ask-spell' value="?{Magic Pool Dice|0}" />
     <input type='hidden' name='attr_get-spell' value="?{Magic Pool Dice}" />
     <input type='hidden' name='attr_ask-range' value="?{Range|Short,4|Medium,5|Long,6|Extreme,9}" />
+    <button type="action" name="act_init-aug" class="d6-button" title="Augmented Initiative">L</button>
+    <button type="action" name="act_endturn" class="d6-button" title="End Combat Turn">L</button>
+    <button type="action" name="act_resist-ballistic" class="d6-button" title="Resist with Ballistic Armor">L</button>
+    <button type="action" name="act_resist-impact" class="d6-button" title="Resist with Impact Armor">L</button>
+    <button type="action" name="act_rangedattack-primary" class="d6-button" title="Attack with primary equipped ranged weapons">L</button>
+    <button type="action" name="act_meleeattack-primary" class="d6-button" title="Attack with primary equipped melee weapons">L</button>
 
 </div>
 <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
@@ -203,6 +209,17 @@
 
             </div>
             <div><br></div>
+        </div>
+        <div>
+            <div class="SRH3">Dice Pools</div>
+            <div> Combat Pool:<span class="dicepool" name="attr_combatpool"> </span> </div>
+            <div> Spell Pool:<span class="dicepool" type="number" name="attr_magicpool"></span> </div>
+            <div> Hacking Pool:<span class="dicepool" type="number" name="attr_hackingpool-max"></span> </div>
+            <div> Control Pool:<span class="dicepool" type="number" name="attr_controlpool"></span> </div>
+            <div> Astral Pool:<span class="dicepool" type="number" name="attr_astralpool"></span> </div>
+
+        </div>
+    </div>
             <div class="conditionstatus2">
                 <div>Physical Damage Overflow:</div><div><input type="number" name="attr_overflow" value=0 min=0 /></div>
                 <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
@@ -215,6 +232,8 @@
 		<div class="spirits-only"><button type="action" name="act_init" class="d6-button" title="Physical Initiative" id="spiritinit">L</button></div>
                 <div class="spirits-only text-mid-center">Init. Astr. </div>
 		<div class="spirits-only"><button type="action" name="act_init" class="d6-button" title="Astral Initiative" id="astralinit">L</button></div>
+                <div class="text-mid-center">End Turn</div>
+		<div><button type="action" name="act_endturn" class="d6-button" title="End Combat Turn" id="endturn">L</button></div>
                 <div class="conditionstatus2_attrs">
                     <div class="text-mid-center">B: <span name="attr_body_max"></span></div>
                     <div class="text-mid-center">Q: <span name="attr_quickness_max"></span></div>
@@ -225,27 +244,6 @@
                     <div class="text-mid-center">R: <span name="attr_reaction_max"></span></div>
                 </div>
             </div>
-        </div>
-        <div>
-            <div class="SRH3">Dice Pools</div>
-            <div>
-                Combat Pool:<span class="dicepool" name="attr_combatpool"> </span>
-            </div>
-            <div>
-                Spell Pool:<span class="dicepool" type="number" name="attr_magicpool"></span>
-            </div>
-            <div>
-                Hacking Pool:<span class="dicepool" type="number" name="attr_hackingpool-max"></span>
-            </div>
-            <div>
-                Control Pool:<span class="dicepool" type="number" name="attr_controlpool"></span>
-            </div>
-            <div>
-                Astral Pool:<span class="dicepool" type="number" name="attr_astralpool"></span>
-            </div>
-
-        </div>
-    </div>
     <div class="combat_always_visible">
         <div class="SRH3">Combat conditions</div>
         <div class="combat_modifiers_total">
@@ -680,7 +678,6 @@
             <button class="switch-button-hide" type="action" name="act_astralattributesswitch">Hide</button>
         </div>
     </div>
-    <br>
     <input type="number" hidden=true name="attr_astralreaction" value=0>
     <div class="astralattributes">
         <div class="astralspace">
@@ -858,7 +855,6 @@
             </div>
         </div>
 	<div>
-	<br>	
         <div class="magic-skills-table table-top">
             <header class="text-mid-center">Magic:</header>
             <div class="sidebyside"><span name="attr_magic"></span><button class="d6-button" type="action" name="act_skilltest" id="magic spell" title="Magic Test" >L</button></div>
@@ -879,10 +875,8 @@
             <header class="text-mid-center">Creative Skill:</header>
             <div><input type="text" name="attr_centeringskillname" style="width:130px"></div>
         </div>
-        <br>
 	</div>
     </div>
-
     <input type='hidden' class='spells-switch' name='attr_spellsswitch' value="show" />
     <div class="spells-show">
         <div class="SRH3">Spells
@@ -894,8 +888,7 @@
             <button class="switch-button-hide" type="action" name="act_spellsswitch">Hide</button>
         </div>
     </div>
-    <br>
-    <div>
+    <div class="spells-section">
         <div class="spells-status table-full">
         <div>Spells Stacked: <input type="number" name='attr_spellstack' class="smallnumber" min=0 value=0></div>
 	<div>Spells Sustained: <input type="number" name='attr_spellsus' min=0 value=0></div> 
@@ -956,12 +949,16 @@
                             <option value="6">6</option>
                         </select>
                         <select name="attr_damage" class="mediumselect2">
-                            <option SELECTED title="Choose for non combat spell">N/A</option>
-                            <option value="?{Damage Level|M|S|L|D}" title="Choose Damage at time of roll, default for combat spells">Choose</option>
-                            <option value="L">Light</option>
-                            <option value="M">Medium</option>
-                            <option value="S">Serious</option>
-                            <option value="D">Deadly</option>
+                            <option value=0 SELECTED title="Choose for non combat spell">N/A</option>
+                            <option value="?{Damage Level|M,2|S,3|L,1|D,4}" title="Choose Damage at time of roll, default for combat spells">Choose</option>
+                            <option value=1>Light</option>
+                            <option value=2>Medium</option>
+                            <option value=3>Serious</option>
+                            <option value=4>Deadly</option>
+                            <option value=10>Light(s)</option>
+                            <option value=11>Medium(s)</option>
+                            <option value=12>Serious(s)</option>
+                            <option value=13>Deadly(s)</option>
                         </select>
                         <select name="attr_duration" class="mediumselect2">
                             <option SELECTED>I</option>
@@ -970,19 +967,21 @@
                         </select>
                     <input type="number" title="modifier to force/2 for drain resistance test" name="attr_drain" value=0>
                         <select name="attr_drainlvl" class="mediumselect2">
-                            <option value="L">Light</option>
-			    <option SELECTED>Damage Level</option>
-                            <option value="L">Medium</option>
-                            <option value="L">Serious</option>
-                            <option value="L">Deadly</option>
-			    <option>Damage Level +1</option>
-			    <option>Damage Level +2</option>
+                            <option value=1>Light</option>
+			    <option value="dmglvl" SELECTED>Damage Level</option>
+                            <option value=2>Medium</option>
+                            <option value=3>Serious</option>
+                            <option value=4>Deadly</option>
+			    <option title="stages drain damage up 1 level from damage level of spell" value="dmglvl + 1">Damage Level +1</option>
+			    <option title="stages drain damage up 2levels from damage level of spell" value="dmglvl + 2">Damage Level +2</option>
+			    <option title="stages drain damage down 1 level from damage level of spell" value="dmglvl - 1">Damage Level -1</option>
+			    <option title="stages drain damage down 2 levels from damage level of spell" value="dmglvl - 2">Damage Level -2</option>
                         </select>
 	            <button class="d6-button" type="action" name="act_cast" id="spell" title="Cast Spell" >L</button>
                     <input type="text" name="attr_description" class="myweapontxt2">
                 </div>
             </fieldset>
-        </div><br>
+        </div>
     </div>
     <input type='hidden' class='buttontoggle' name='attr_sheettype' />
     <div class="hide-spirit-critter">
@@ -997,7 +996,6 @@
             <button class="switch-button-hide" type="action" name="act_adeptpowersswitch">Hide</button>
         </div>
     </div>
-    <br>
     <div class="adept-powers">
         <div class="adept-skills-table">
             <header class="table-top-left">Power</header>
@@ -1049,7 +1047,7 @@
                 <div class="table-item"><input type="checkbox" name="attr_poweractivated"></div>
                 <div class="table-item"><input type="text" name="attr_powernotes"></div>
             </div>
-        </fieldset><br>
+        </fieldset>
     </div>
     <input type='hidden' class='foci-switch' name='attr_fociswitch' value="show" />
     <div class="foci-show">
@@ -1062,7 +1060,6 @@
             <button class="switch-button-hide" type="action" name="act_fociswitch">Hide</button>
         </div>
     </div>
-    <br>
     <div class="fetish-foci">
         <div class="foci-table">
             <header class="table-top-left">Name</header>
@@ -1073,7 +1070,7 @@
         </div>
         <fieldset class="repeating_foci">
             <div class="foci-table">
-                <div class="table-item-left"><input type="text" name="attr_fociname" style="width: 160px;"></div>
+                <div class="table-item-left"><input type="text" name="attr_fociname" class="myweapontxt"></div>
                 <div class="table-item"><select name="attr_type" clas="mediumselect3">
                         <option SELECTED>Expendable</option>
                         <option>Spell</option>
@@ -1094,7 +1091,6 @@
 
             </div>
         </fieldset>
-        <br>
     </div>
     <input type='hidden' class='magicinitiate-switch' name='attr_magicinitiateswitch' value="show" />
     <div class="magicinitiate-show">
@@ -1107,9 +1103,8 @@
             <button class="switch-button-hide" type="action" name="act_magicinitiateswitch">Hide</button>
         </div>
     </div>
-    <br>
     <div class="magicinitiate">
-        <div class="SRH4">Initiate Grade:</div><div class="smallnumber"><input type="number" name="attr_initiategrade" value=0></div>
+        <div class="SRH4">Initiate Grade:<input type="number" name="attr_initiategrade" value=0></div>
         <div class="metamagic-table">
             <header class="table-top-left">Metamagic</header>
             <header class="table-top-right">Notes</header>
@@ -1120,7 +1115,6 @@
                 <div class="table-item"><input type="text" name="attr_metamagicnotes"/></div>
             </div>
         </fieldset>
-        <br>
     </div>
     <input type='hidden' class='geas-switch' name='attr_geasswitch' value="show" />
     <div class="geas-show">
@@ -1133,7 +1127,6 @@
             <button class="switch-button-hide" type="action" name="act_geasswitch">Hide</button>
         </div>
     </div>
-    <br>
     <div class="geas">
         <div class="geas-table">
             <header class="table-top-left">Geas Type</header>
@@ -1145,7 +1138,6 @@
                 <div class="table-item"><input type="text" name="attr_geasnotes"></div>
             </div>
         </fieldset>
-        <br>
     </div>
     <input type='hidden' class='totem-switch' name='attr_totemswitch' value="show" />
     <div class="totem-show">
@@ -1158,17 +1150,16 @@
             <button class="switch-button-hide" type="action" name="act_totemswitch">Hide</button>
         </div>
     </div>
-    <br>
     <div class="totem">
         <div class="totem-table">
             <header class="table-top-left">Totem</header>
             <header class="table-top-mid">Environment</header>
             <header class="table-top-mid">Advantages</header>
             <header class="table-top-right">Disadvantages</header>
-            <div class="table-item-left"><input type='text' name="attr_totem" style="width: 90px;"></div>
-            <div class="table-item"><input type='text' name="attr_totemenv"></div>
-            <div class="table-item"><input type="text" name="attr_totemadv" style="width: 250px;"></div>
-            <div class="table-item"><input type="text" name="attr_totemdisadv" style="width: 250px;"></div>
+            <div class="table-item-left"><input type='text' name="attr_totem" class="myweapontxt2"></div>
+            <div class="table-item"><input type='text' name="attr_totemenv" class="myweapontxt2"></div>
+            <div class="table-item"><input type="text" name="attr_totemadv" class="myweapontxt2"></div>
+            <div class="table-item"><input type="text" name="attr_totemdisadv" class="myweapontxt2"></div>
         </div>
     </div>
     </div>
@@ -3822,10 +3813,12 @@ buttonlist.forEach(button => {
 
 <script type="text/worker">
       const damagetable = {
+   		"N/A": 0,
    		"L": 1,
    		"M": 2,
    		"S": 3,
    		"D": 4,
+		0: "N/A",
 		1: "L",
 		2: "M",
 		3: "S",
@@ -4091,7 +4084,7 @@ buttonlist.forEach(button => {
 
 	});
 	on('clicked:repeating_spells:cast', (info) => {
-		var atts=[];
+		var atts=["magic"];
 		var source=info['sourceAttribute'].split('_');
 		const myid=info["htmlAttributes"]["id"]
 		var sourceattr=source.pop();
@@ -4105,10 +4098,11 @@ buttonlist.forEach(button => {
 		getAttrs(atts, function(myval) {
 			console.log('vals');
 			console.log(myval);
+			const magic=myval["magic"];
 			const force=myval[myrepeat + "force"];
 			const target=myval[myrepeat + "target"];
 			const drain=myval[myrepeat + "drain"];
-			const drainlvl=myval[myrepeat + "drainlvl"];
+			var drainlvl=myval[myrepeat + "drainlvl"];
 			const name=myval[myrepeat + "name"];
 			const description=myval[myrepeat + "description"];
 			const damage=myval[myrepeat + "damage"];
@@ -4117,15 +4111,16 @@ buttonlist.forEach(button => {
 
 			var calcDice="@{spellcasting} + ?{Magic Pool Dice}";
 			var calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen}";
-			var calcDrainTN="floor(" + force + "/2) + " + drain;
+			var calcDrainTN="floor(" + force + "/2) + " + drain + " + ( 2 * @{spellsus} )";
 			var calcDrainDice="@{willpower|max} + ?{Drain Pool Dice}";
-
 			var myroll="&{template:spell}{{myname=@{character_name}}}";
-			myroll+="{{draindamage=" + drainlvl + "}}";
+
+
+			myroll+="{{draindamage=[[0]]}}"
 			myroll+="{{spellname=" + name + "}}";
 			myroll+="{{description=" + description +"}}";
 			myroll+="{{MagicPool=[[?{Magic Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
-			myroll+="{{spelldamage=" + damage + "}}"
+			myroll+="{{spelldamage=[[" + damage + "]]}}"
 			myroll+="{{castforce=?{Force?|" + force + "}}}"
 			myroll+="{{targetofspell=" + targetofspell + "}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
@@ -4134,9 +4129,75 @@ buttonlist.forEach(button => {
 			myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
-				finishRoll( results.rollId);
+				console.log('tst');
+				console.log(results.results.spelldamage.result);
+				const finaldmg=damagetable[results.results.spelldamage.result];
+				var draindmg;
+				if (drainlvl.includes("dmglvl")) {
+					let dmglvl=parseInt(results.results.spelldamage.result);
+					draindmg=eval(drainlvl);
+					console.log('drdmg calc: ' + draindmg);
+					var dmgmax=4;
+					var dmgmin=1;
+					if (draindmg >= 10) dmgmax=13;
+					if (draindmg >= 10) dmgmin=10;
+					if (draindmg > dmgmax) draindmg=dmgmax;
+					if (draindmg < dmgmin) draindmg=dmgmin;
+
+				} else {
+					draindmg = parseInt(drainlvl);
+					console.log('drdmg stright: ' + damagetable[draindmg]);
+				}
+				/* set drain damage to stun damage if force of spell is less than magic rating*/
+				if ( (draindmg < 10 ) && ( force <= magic  )) draindmg = draindmg + 9;
+				/* set drain damage to physical damage if force of spell is greater than magic rating*/
+				if ( (draindmg >= 10 ) && ( force > magic  )) draindmg = draindmg - 9;
+				draindmg=damagetable[draindmg];
+				console.log('drdmg : ' + draindmg);
+				finishRoll( results.rollId,
+                		{
+                    			spelldamage: finaldmg, 
+                    			draindamage: draindmg, 
+                		});
 			});
 		});
+	});
+
+   var initiative = function (init, reaction, dmgpen, mytitle) {
+        penatts=["stun_pen", "wound_pen", "matrix-penalty", "vehicle-penalty", "rccommand-penalty", "rcsimsense-penalty", "rcsystem-penalty"];
+        getAttrs(penatts, function (myval) { 
+        	console.log('test');
+		console.log(init, reaction)
+        	var myroll="&{template:init} {{character=@{character_name}}}{{type=" + mytitle + "}}"
+		myroll += "{{roll=[[" + init + "d6+" + reaction + dmgpen + " &{tracker}]]}}"
+		if (myval["wound_pen"] >= 10) {
+			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name} is unconcious or dead}}";
+		}
+		if (myval["stun_pen"] >= 10) {
+			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name} is unconcious}}";
+		}
+		if (myval["matrix-penalty"] >= 10) {
+			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name}'s icon has crashed}}";
+		}
+		if (myval["vehicle-penalty"] >= 10) {
+			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name} is destroyed }}";
+		}
+		if  ( (myval["rccommand-penalty"] >= 10) || (myval["rcsimsense-penalty"] >= 10)   || (myval["rcsystem-penalty"] >= 10) ) {
+			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name} is disengaged }}";
+		}
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+		finishRoll( results.rollId);
+	    });
+	});
+   };
+	on('clicked:init-aug', (info) => {
+		let init="@{initiative|max}";
+		let reaction="@{reaction|max}";
+		let dmgpen=" -@{wp-char}";
+		let mytitle="Augmented Initiative Roll";
+		initiative(init, reaction, dmgpen, mytitle);	
+
 	});
 
     	on('clicked:init', (info) => {
@@ -4145,8 +4206,8 @@ buttonlist.forEach(button => {
 		const myid=info["htmlAttributes"]["id"]
 		var dmgpen=" -@{wp-char}";
 		if ( myid == "augmentedinit" )  {
-			init="@{initiative_max}";
-			reaction="@{reaction_max}";
+			init="@{initiative|max}";
+			reaction="@{reaction|max}";
 		} else if ( myid == "astralinit" )  {
 			init=1;
 			reaction="@{astralreaction}";
@@ -4169,12 +4230,7 @@ buttonlist.forEach(button => {
 			init="@{initiative}";
 			reaction="@{reaction}";
 		}
-                var myroll="&{template:init} {{character=@{character_name}}}{{type=" + mytitle + "}}"
-		myroll += "{{roll=[[" + init + "d6+" + reaction + dmgpen + " &{tracker}]]}}"
-		console.log(myroll);
-                startRoll(myroll, (results) => {
-			finishRoll( results.rollId);
-		});
+		initiative(init, reaction, dmgpen, mytitle);	
  	});
 
 	
@@ -6614,13 +6670,13 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 
 <rolltemplate class="sheet-rolltemplate-spell">
     <div class="sheet-rtcontainer">
-        <div class="sheet-rtheader">{{myname}}: {{spellname}} {{castforce}}{{spelldamage}} vs. {{targetofspell}}
-        </div>
-        {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
+        <div class="sheet-rtheader">{{myname}}: {{spellname}} {{castforce}} vs. {{targetofspell}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
-        <div class="sheet-rtrow"><span>Magic Pool Used: </span>{{MagicPool}}</div>
-        <div class="sheet-rtrow"><span>Casting Test: </span>{{casttest}}</div>
-        <div class="sheet-rtrow"><span>Drain Test: </span>{{draintest}} vs. {{draindamage}}</div>
+        <div class="sheet-rtrow"><b>Damage:</b> {{computed::spelldamage}} </div>
+        <div class="sheet-rtrow"><b>Magic Pool Used:</b> {{MagicPool}}</div>
+        <div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>
+        <div class="sheet-rtrow"><b>Drain Test:</b> {{draintest}} vs. {{computed::draindamage}}</div>
+        {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
