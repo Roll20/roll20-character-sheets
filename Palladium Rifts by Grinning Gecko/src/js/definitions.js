@@ -559,7 +559,14 @@ const SAVE_KEYS_ATTRIBUTE_BONUSES = {
   ],
   pe_coma_bonus: ["comadeath"],
   perception_bonus: ["perceptioncheck"],
-  none: ["horrorfactor", "mindcontrol", "illusions", "possession", "curses"],
+  none: [
+    "horrorfactor",
+    "mindcontrol",
+    "illusions",
+    "possession",
+    "curses",
+    "maintainbalance",
+  ],
 };
 const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
   (acc, cur) => acc.concat(cur),
