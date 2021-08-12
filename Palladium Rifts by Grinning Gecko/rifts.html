@@ -573,7 +573,7 @@
           <span class="readonly" name="attr_total"></span>
           <button
             type="roll"
-            value="@{character_name} @{name} check: [[1d100<[[{@{total},98}kl1]]]]"
+            value="&{template:skill} {{name=@{character_name}}} {{skill=@{name}}} {{target=[[@{total}]]}} {{roll=[[d100]]}}"
             name="roll_skill"
           ></button>
         </div>
@@ -9332,9 +9332,9 @@ on("change:repeating_movement:ft_melee", async (e) => {
    *  - [] Add IQ to Perception
    *  - [] Apply PS damage to each hand or total in Paired attack
    * [] Two hands worth of damage
-   *  - Separate Left, Right, and Combined damage
+   *  - Separate Main Hand, Off Hand, and Combined damage
    *  - Each damage should include a checkbox for "stacks" vs. "overrides". Overrides uses greatest of.
-   *  - If Combined is empty on the Profile, it should use the combined left+right.
+   *  - If Combined is empty on the Profile, it should use the combined main+off.
    * [] Separate Left, Right, and Combined damage. On modifiers,
    * [] Make range/duration text instead of number ("2D6 minutes", "varies", "touch")
    * [] Profile damage should use bonus damage if it exists instead of calculating based on PS type
@@ -9456,3 +9456,19 @@ on("change:repeating_movement:ft_melee", async (e) => {
     await updateMagicPsionicsLevels();
   });
 </script>
+<!-- inject:partials/roll-templates.html -->
+<rolltemplate class="sheet-rolltemplate-skill">
+  <div class="sheet-template-container">
+    <div class="sheet-template-header">{{name}} uses {{skill}}</div>
+    <div class="sheet-template-row">Skill Check: {{roll}} / {{target}}</div>
+    {{#rollGreater() roll target }}
+    <div class="sheet-template-row">Failure!</div>
+    {{/rollGreater() roll target }}
+    <!-- -->
+    {{#^rollGreater() roll target }}
+    <div class="sheet-template-row">Success!</div>
+    {{/^rollGreater() roll target }}
+  </div>
+</rolltemplate>
+
+<!-- endinject -->
