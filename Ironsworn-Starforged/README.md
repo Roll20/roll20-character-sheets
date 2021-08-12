@@ -6,12 +6,12 @@ To build finished sheet run the following commands from command line or terminal
 cd src
 npm install
 
-// Mac or Linux
-npm run build:pug 
-// Windows
-npm run build:pug:win
+# Build the sheet
+npm run gulp:build
 
-npm run build:css
+# Watch for changes made and build the sheet
+npm run gulp:watch
+
 ```
 These will then generate a dist folder that will have the finished code. From their you can upload them into the custom sheet sandbox for testing.
 ## Pushing Changes
