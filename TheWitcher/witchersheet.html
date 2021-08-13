@@ -3982,35 +3982,39 @@ function repeatingSum (destination, section, fieldsum, fieldmult, totalmult){
 }
 
 on('clicked:roll', (event) => {
-  	startRoll(event.htmlAttributes.value + "{{fumble=[[1d10!]]}} {{fumble2=[[1d10!]]}}", (results) => {
+  	startRoll(event.htmlAttributes.value + "{{fumble=[[1d10!+1]]}} {{fumble2=[[1d10!+1]]}}", (results) => {
   	    	var rollComputed = results.results.roll.result;
   	    	var roll2Computed = 0;
 
-  	      if(results.results.roll.dice[0] == 1) // We check if the first die is a fumble.
-  	      {
-  	        	rollComputed = results.results.roll.result - 1 - results.results.fumble.result;
-  	      }
+  	    	console.log(results.results);
 
-			if(results.results.roll2 != null) {
-				roll2Computed = results.results.roll2.result;
-			 	if( results.results.roll2.dice[0] == 1) // We check if the first die is a fumble.
-  	      	{
-  	        		roll2Computed = results.results.roll2.result - 1 - results.results.fumble2.result;
-  	      	}
-			 }
+		if(results.results.roll.dice[0] == 1) // We check if the first die is a fumble.
+		{
+			rollComputed = results.results.roll.result - results.results.fumble.result;
+		}
 
-  	      finishRoll(
-  	          results.rollId,
-  	          {
-  	              roll: rollComputed,
-  	              roll2: roll2Computed
+		if(results.results.roll2 != null) {
 
-  	          }
-  	      );
+			roll2Computed = results.results.roll2.result;
+
+			if( results.results.roll2.dice[0] == 1) // We check if the first die is a fumble.
+			{
+				roll2Computed = results.results.roll2.result - results.results.fumble2.result;
+			}
+		}
+
+	  	finishRoll(
+		  	results.rollId,
+		  	{
+			  	roll: rollComputed,
+			  	roll2: roll2Computed,
+
+		  	}
+	  	);
   	  });
 });
 
-on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) => {
+on('clicked:repeating_finearts:roll clicked:repeating_performance:roll clicked:repeating_npcskill:roll', (event) => {
 
 	// prefix gets an empty string for normal attributes, and repeating_section_ID_ for repeating attributes
 	var trigger = event.triggerName.slice(8); // this always starts with 'clicked:'
@@ -4018,20 +4022,20 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
 
 	let rollPart = event.htmlAttributes.value.replaceAll('prefix-', `${prefix}`);
 
-  	startRoll(rollPart + "{{fumble=[[1d10!]]}}", (results) => {
+  	startRoll(rollPart + "{{fumble=[[1d10!+1]]}}", (results) => {
         var rollComputed = results.results.roll.result;
 
         if(results.results.roll.dice[0] == 1) // We check if the first die is a fumble.
         {
-            rollComputed = results.results.roll.result - 1 - results.results.fumble.result;
+            rollComputed = results.results.roll.result - results.results.fumble.result;
         }
 
         finishRoll(
-        results.rollId,
-        {
-            roll: rollComputed,
-        }
-        );
+        	results.rollId,
+        	{
+        	    roll: rollComputed,
+        	}
+		);
   	  });
 });
 </script>
@@ -4052,12 +4056,11 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr><th  style='text-transform: uppercase;'>{{title}}</th></tr>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
-        {{#rollWasCrit() roll}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
         {{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
 		<tr style='text-align: justify; font-size: 12px;'>
 			<td>
-				<strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}.
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
 			</td>
 		</tr>
 		{{/^rollWasCrit() roll}}
@@ -4070,24 +4073,22 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
 		<tr><th  style='text-transform: uppercase;'>{{title}}</th></tr>
 		<tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
 		<tr><td><strong class="template-title">1ST ATTACK: </strong> {{computed::roll}}</td></tr>
-		{{#rollWasCrit() roll}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
 		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
 		<tr style='text-align: justify; font-size: 12px;'>
 			<td>
-				<strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}.
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
 			</td>
 		</tr>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
 
 		<tr><td><strong class="template-title">2ND ATTACK: </strong> {{computed::roll2}}</td></tr>
-		{{#rollWasCrit() roll2}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll2}}
 		{{#rollWasFumble() roll2}}
 		{{#^rollWasCrit() roll2}}
 		<tr style='text-align: justify; font-size: 12px;'>
 			<td>
-				<strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble2}}.
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble2}}
 			</td>
 		</tr>
 		{{/^rollWasCrit() roll2}}
@@ -4164,10 +4165,11 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong>{{description}}</td></tr>
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
-        {{#rollWasCrit() roll}}<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
-        {{#rollWasFumble() roll}}
+		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
-		<tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}</td></tr>
+		<td>
+			<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+		</td>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
     </table>
@@ -4179,10 +4181,13 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
-        {{#rollWasCrit() roll}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
-        {{#rollWasFumble() roll}}
+		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
-		<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}</td></tr>
+		<tr style='text-align: justify; font-size: 12px;'>
+			<td>
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+			</td>
+		</tr>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
     </table>
@@ -4194,10 +4199,13 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
-        {{#rollWasCrit() roll}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
-        {{#rollWasFumble() roll}}
+		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
-		<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}</td></tr>
+		<tr style='text-align: justify; font-size: 12px;'>
+			<td>
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+			</td>
+		</tr>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
     </table>
@@ -4209,10 +4217,13 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr><td><strong class="template-title">NAME: </strong> {{name}}</td></tr>
         <tr><td style='text-align: justify; font-size: 12px;'><strong class="template-title">DESCRIPTION: </strong> {{description}}</td></tr>
         <tr><td><strong class="template-title">SKILL ROLL: </strong> {{computed::roll}}</td></tr>
-        {{#rollWasCrit() roll}}<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td></tr>{{/rollWasCrit() roll}}
-        {{#rollWasFumble() roll}}
+		{{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
-		<tr style='text-align: justify; font-size: 12px;'><td><strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}</td></tr>
+		<tr style='text-align: justify; font-size: 12px;'>
+			<td>
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
+			</td>
+		</tr>
 		{{/^rollWasCrit() roll}}
 		{{/rollWasFumble() roll}}
     </table>
@@ -4304,16 +4315,11 @@ on('clicked:repeating_finearts:roll clicked:repeating_npcskill:roll', (event) =>
         <tr>
 			<td><strong class="template-title">REP ROLL: </strong> {{computed::roll}}</td>
 		</tr>
-        {{#rollWasCrit() roll}}
-		<tr style='text-align: justify; font-size: 12px;'>
-			<td><strong class="template-title" style='color: #66c600; text-shadow: 1px 1px #000;'>CRITICAL:</strong> Criticals are already calculated into the roll</td>
-		</tr>
-		{{/rollWasCrit() roll}}
         {{#rollWasFumble() roll}}
 		{{#^rollWasCrit() roll}}
 		<tr style='text-align: justify; font-size: 12px;'>
 			<td>
-				<strong class="template-title" style='color: #c60000; text-shadow: 1px 1px #000;'>FUMBLE:</strong> Fumbles are already calculated into the roll. Your fumble roll was {{fumble}}.
+				<strong class="template-title">FUMBLED BY:</strong> {{fumble}}
 			</td>
 		</tr>
 		{{/^rollWasCrit() roll}}
