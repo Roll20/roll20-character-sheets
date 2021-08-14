@@ -54,10 +54,8 @@
   <input type="number" name="attr_miscCriticalThreshold" value=0 hidden />
   <input type="number" name="attr_death_threshold" value=0 hidden />
   <input type="number" name="attr_death_threshold_max" value=3 hidden />
-  <input type="number" name="attr_ap_max" value=6 hidden />
   <input type="number" name="attr_damageBonus1" value=0 hidden />
   <input type="number" name="attr_damageBonus2" value=0 hidden />
-  <input type="number" name="attr_ap_max" value=6 hidden />
   <input type="number" name="attr_ar" value=0 hidden />
   <input type="number" name="attr_attP" value=0 hidden />
   <input type="number" name="attr_attP_max" value=18 hidden />
@@ -71,9 +69,10 @@
   <input type="number" name="attr_tiredThreshold" value=2 hidden />
   <input type="number" name="attr_drainedThreshold" value=4 hidden />
   <input type="number" name="attr_armorAR" value=0 hidden />
-  <input type="number" name="attr_cs_max" value=5 hidden />
+  <input type="number" name="attr_miscAP" value=0 hidden />
   <input type="number" name="attr_baseCS" value=5 hidden />
   <input type="number" name="attr_staminaCS" value=0 hidden />
+  <input type="number" name="attr_conditionCS" value=0 hidden />
   <input type="number" name="attr_miscCS" value=0 hidden />
   <input type="number" name="attr_touch_max" value=5 hidden />
   <input type="number" name="attr_baseTouch" value=5 hidden />
@@ -1091,6 +1090,7 @@
                 <option value="1 Round">1 Round</option>
                 <option value="Short Rest">Short Rest</option>
                 <option value="Long Rest">Long Rest</option>
+                <option value="Other">Other</option>
               </select>
               <input type="checkbox" name="attr_techniqueCooldown">
             </div>
@@ -1109,7 +1109,7 @@
         <div class="mookTPSection">
           <input type="checkbox" class="itemToggleNotes float-left" name="attr_mookTP" value="true" />
           <div class="mookTPText">
-            Use Mook TP
+            Remove Attribute Bonus
           </div>
         </div>
       </div>
@@ -1205,6 +1205,7 @@
                 <option value="Long Rest">Long Rest</option>
                 <option value="Week">Week</option>
                 <option value="Month">Month</option>
+                <option value="Other">Other</option>
               </select>
               <input type="checkbox" name="attr_techniqueCooldown">
             </div>
@@ -6270,6 +6271,16 @@
       </div>
 
       <div class="modifiersContainer">
+        <div class="modifiersTitle">Action Point Modifier</div>
+        <input class="modifiersInput" type="number" name="attr_miscAP" title="Misc Action Points" value=0 />
+      </div>
+
+      <div class="modifiersContainer">
+        <div class="modifiersTitle stamina-color">Combat Stamina Modifier</div>
+        <input class="modifiersInput" type="number" name="attr_miscCS" title="Misc Combat Stamina" value=0 />
+      </div>
+
+      <div class="modifiersContainer">
         <div class="modifiersTitle connection-color">Touch Modifier</div>
         <input class="modifiersInput" type="number" name="attr_miscTouch" title="Misc Touch" value=0 />
       </div>
@@ -6539,9 +6550,9 @@
         case 2:
         case 3:
         case 4:
+        case 5:
           bonus = 1;
           break;
-        case 5:
         case 6:
         case 7:
         case 8:
@@ -6592,7 +6603,8 @@
       let tp = 12;
       if (stats.mookTP === "0") {
       for (stat in stats) {
-        if (stat !== "character_level" || stat !== "mookTP" || stat !== "miscTP" || stat !== "miscAttrP") {
+        if (stat !== "character_level" && stat !== "mookTP" && stat !== "miscTP" && stat !== "miscAttrP") {
+          console.log(stat);
           tp = tp + calculateTpBonus(stats[stat]);
         }
       }
@@ -6677,9 +6689,9 @@
       });
     });
     
-    on("change:character_level change:conditionActionPoints", function () {
-      getAttrs(["character_level", "conditionActionPoints"], function (values) {
-        let apMax = 6 + (calculateLevelBonus(values.character_level)) + Number(values.conditionActionPoints);
+    on("change:character_level change:conditionActionPoints change:miscAP", function () {
+      getAttrs(["character_level", "conditionActionPoints", "miscAP"], function (values) {
+        let apMax = 6 + (calculateLevelBonus(values.character_level)) + Number(values.conditionActionPoints) + Number(values.miscAP);
         setAttrs({
           ap_max: apMax,
         });
@@ -7143,9 +7155,9 @@
     
     
     
-    on("change:staminaCS change:miscCS", function () {
-      getAttrs(["cs", "baseCS", "staminaCS", "miscCS"], function (values) {
-        let cs = Number(values.baseCS) + Number(values.staminaCS) + Number(values.miscCS);
+    on("change:staminaCS change:conditionCS change:miscCS", function () {
+      getAttrs(["cs", "baseCS", "staminaCS", "conditionCS", "miscCS"], function (values) {
+        let cs = Number(values.baseCS) + Number(values.staminaCS) + Number(values.conditionCS) + Number(values.miscCS);
         setAttrs({
           cs_max: cs,
         });
@@ -9532,42 +9544,42 @@
     });
 
     on("change:chestModerate", function (eventInfo) {
-      getAttrs(["chestModerate", "conditionCombatStaminaBonus", "conditionStaminaBonus"], function (values) {
+      getAttrs(["chestModerate", "conditionCS", "conditionStaminaBonus"], function (values) {
         if (values.chestModerate === "on") {
           let conditionStaminaBonus = Number(values.conditionStaminaBonus) - 1;
-          let conditionCombatStaminaBonus = Number(values.conditionCombatStaminaBonus) - 2;
+          let conditionCS = Number(values.conditionCS) - 2;
           setAttrs({
             conditionStaminaBonus: conditionStaminaBonus,
-            conditionCombatStaminaBonus: conditionCombatStaminaBonus
+            conditionCS: conditionCS
           });
         }
         else {
           let conditionStaminaBonus = Number(values.conditionStaminaBonus) + 1;
-          let conditionCombatStaminaBonus = Number(values.conditionCombatStaminaBonus) + 2;
+          let conditionCS = Number(values.conditionCS) + 2;
           setAttrs({
             conditionStaminaBonus: conditionStaminaBonus,
-            conditionCombatStaminaBonus: conditionCombatStaminaBonus
+            conditionCS: conditionCS
           });
         }
       });
     });
 
     on("change:chestMajor", function (eventInfo) {
-      getAttrs(["chestMajor", "conditionCombatStaminaBonus", "conditionStaminaBonus"], function (values) {
+      getAttrs(["chestMajor", "conditionCS", "conditionStaminaBonus"], function (values) {
         if (values.chestMajor === "on") {
           let conditionStaminaBonus = Number(values.conditionStaminaBonus) - 2;
-          let conditionCombatStaminaBonus = Number(values.conditionCombatStaminaBonus) - 4;
+          let conditionCS = Number(values.conditionCS) - 4;
           setAttrs({
             conditionStaminaBonus: conditionStaminaBonus,
-            conditionCombatStaminaBonus: conditionCombatStaminaBonus
+            conditionCS: conditionCS
           });
         }
         else {
           let conditionStaminaBonus = Number(values.conditionStaminaBonus) + 2;
-          let conditionCombatStaminaBonus = Number(values.conditionCombatStaminaBonus) + 4;
+          let conditionCS = Number(values.conditionCS) + 4;
           setAttrs({
             conditionStaminaBonus: conditionStaminaBonus,
-            conditionCombatStaminaBonus: conditionCombatStaminaBonus
+            conditionCS: conditionCS
           });
         }
       });
