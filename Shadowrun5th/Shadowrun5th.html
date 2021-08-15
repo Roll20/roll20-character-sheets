@@ -11995,7 +11995,7 @@ on("change:chummercheckbox", function(){
                                             attributes["skillrating"+j]="-1";
                                             attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
                                         }
-                                        if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                                        if(chummerfile.characters.character.skills.skill[i].skillspecializations != null && chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name != null)
                                             attributes["skillspec"+j]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
                                         else
                                             attributes["skillspec"+j]="none";
@@ -12078,7 +12078,7 @@ on("change:chummercheckbox", function(){
                                         attributes["skillrating"+j]="-1";
                                         attributes["skillbonus"+j]=chummerfile.characters.character.skills.skill[i].total-chummerfile.characters.character.skills.skill[i].rating-chummerfile.characters.character.skills.skill[i].attributemod+1;
                                     }
-                                    if(chummerfile.characters.character.skills.skill[i].skillspecializations!=null)
+                                    if(chummerfile.characters.character.skills.skill[i].skillspecializations != null && chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name != null)
                                         attributes["skillspec"+j]=chummerfile.characters.character.skills.skill[i].skillspecializations.skillspecialization.name;
                                     else
                                         attributes["skillspec"+j]="none";
@@ -12321,25 +12321,30 @@ function importSingleSpell(spell, attributes, spellcasting, ritual, alchemy) {
     if(spell.category_english == "Rituals") {
         category = "rituals"
     }
-    if(spell.alchemy == "True"){
+    else if(spell.alchemy == "True"){
         category = "alchemy"
     }
 
     var row = "repeating_" + category + "_" + generateRowID();
+    console.log(row);
 
     attributes[row + "_spellname"] = spell.name;
     attributes[row + "_spelltype"] = spell.type;
     attributes[row + "_spellcategory"] = spell.category;
+
+    attributes[row + "_spellrange"] = spell.range;
+    attributes[row + "_spellduration"] = spell.duration;
+
     if(spell.notes != null){
         attributes[row + "_spelldescription"] = spell.notes;
     }
+
     if(spell.dv.match(/(\-|\+)\d/) != null) {
         attributes[row + "_spelldrain"] = spell.dv.match(/(\-|\+)\d/)[0];
     }
     else {
         attributes[row + "_spelldrain"] = "-0";
     }
-
 
     if(spell.category_english == "Rituals"){
         attributes[row + "_spellschool"] = "@{skilldicepool67}";
@@ -12352,9 +12357,6 @@ function importSingleSpell(spell, attributes, spellcasting, ritual, alchemy) {
             attributes[row + "_spellbonus"] = spell.dicepool - alchemy;
         }
     }
-
-    attributes[row + "_spellrange"] = spell.range;
-    attributes[row + "_spellduration"] = spell.duration;
 }
 
 on("change:wil_base change:wil_aug", function() {
@@ -12676,6 +12678,26 @@ on("change:repeating_spells:spellschool", function() {
         var name='@{skillname'+numb[1]+'}';
         setAttrs({
             repeating_spells_spellschool_name: name
+        });
+    });
+});
+
+on("change:repeating_rituals:spellschool", function() {
+    getAttrs(["repeating_rituals_spellschool"], function(value) {
+        var numb=value.repeating_rituals_spellschool.match(/(\d*)}$/);
+        var name='@{skillname'+numb[1]+'}';
+        setAttrs({
+            repeating_rituals_spellschool_name: name
+        });
+    });
+});
+
+on("change:repeating_alchemy:spellschool", function() {
+    getAttrs(["repeating_alchemy_spellschool"], function(value) {
+        var numb=value.repeating_alchemy_spellschool.match(/(\d*)}$/);
+        var name='@{skillname'+numb[1]+'}';
+        setAttrs({
+            repeating_alchemy_spellschool_name: name
         });
     });
 });
