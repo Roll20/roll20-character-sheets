@@ -7155,26 +7155,41 @@
 	});
 	
 	on('clicked:standardAttackRoll', (info) => {
-		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[(@{strength}/5)d6]]}}", (results) => {
-			let computed =0;
-			const theDice = results.results.STUN.dice;
-			for (let element of theDice) {
-				  if (element === 1) {
-					computed = computed+0;
-				  } else if (element === 6) {
-					  computed = computed+2;
-				  } else {
-					  computed = computed+1;
-				  }
-			}
-
-			// Get hit location message if system used.
-			getAttrs(["optionHitLocationSystem", "targetSelection"], function(values) {
+		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[((@{strength}-(@{strength}%5))/5)d6+((@{strength}%5)/5)d3]]}}", (results) => {
+			// A standard strength-based attack is complicated by the need to use a 1d3 for strength%5 == 3 or 4, such as 4, 8, 13, 19, etc.
+			
+			getAttrs(["optionHitLocationSystem", "targetSelection","strength"], function(values) {
 				let useHitLocations = values.optionHitLocationSystem;
 				let targetSelectionType = parseInt(values.targetSelection)||1;
 				let theMessage = " ";
-									 
-			
+				
+				let computed =0;
+				const theDiceD6 = results.results.STUN.dice;
+				
+				if (parseInt(values.strength)%5>2) {
+					// Get the last die value, which was rolled with a d3.
+					let theDiceD3 = theDiceD6.pop();
+					
+					if (theDiceD3 == 3) {
+						computed = computed +1;
+					} else if (theDiceD3 == 2) {
+						computed = computed + Math.floor(Math.random()*2); // Flip a coin. 0 or 1 BODY corresponding to a '3' or '4' on a d6.
+					} else {
+						computed = computed; // Do nothing.
+					}
+				} 
+				
+				for (let element of theDiceD6) {
+					if (element === 1) {
+						computed = computed+0;
+					} else if (element === 6) {
+						computed = computed+2;
+					} else {
+						computed = computed+1;
+					}
+				}
+				
+				// Get hit location message if system used.
 				if (useHitLocations != 0) {
 					var theHitLocation = new normalHitLocation(targetSelectionType);
 					theMessage = theHitLocation.message;
