@@ -68,7 +68,7 @@ When a red killing attack roll button is pressed, a dialog box will first ask fo
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
-The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage. Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the case below, the d3 contributed 0 BODY.
+The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage. Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)
 
