@@ -45,6 +45,8 @@ STR and DEX minimums are not currently supported this maybe added in a future re
 	Added magic tab with expanded areas for spells including a new area to include a description  of spell effects and turn order buttons
 
 	Added self to range options for spells
+	
+	Added Spcl  (Special) to duration
 
 	Added parry button and parry modifiers to cover different modifiers for attack and parry
 
