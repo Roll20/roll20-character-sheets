@@ -12,6 +12,34 @@ on('change:repeating_assets:asset', function(values) {
   });
 });
 
+on('change:repeating_module-assets:assettype', function(values) {
+  setAttrs({
+      ['repeating_module-assets_Asset' + values.previousValue]: 'off',
+      ['repeating_module-assets_Asset' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_module-assets:asset', function(values) {
+  setAttrs({
+      ['repeating_module-assets_' + values.previousValue]: 'off',
+      ['repeating_module-assets_' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:assettype', function(values) {
+  setAttrs({
+      ['repeating_support-vehicle-assets_Asset' + values.previousValue]: 'off',
+      ['repeating_support-vehicle-assets_Asset' + values.newValue]: 'on'
+  });
+});
+
+on('change:repeating_support-vehicle-assets:asset', function(values) {
+  setAttrs({
+      ['repeating_support-vehicle-assets_' + values.previousValue]: 'off',
+      ['repeating_support-vehicle-assets_' + values.newValue]: 'on'
+  });
+});
+
 on('change:repeating_assets:builder-titles', function(values) {
   setAttrs({
       ['repeating_assets_builder-titles-' + values.previousValue]: 'off',

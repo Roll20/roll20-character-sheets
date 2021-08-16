@@ -45,35 +45,38 @@ mixin track(track, assetName)
         input(type='radio' name=`attr_assettrack_${assetName}` value=`${currentTrack}`)
         - currentTrack++
 
-mixin genericBuilder 
+mixin assetTemplate(asset, options)
+  - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
+  - var category = asset.Category.toLowerCase().replace(/\s/g, '-')
+  if options.visiblityToggle === true
+    input(class=`${options.classes} ${name}` type='checkbox' name=`attr_${name}`)
+  div(class=`${options.classes} ${name} category-${category}`)
+    .asset-content-header
+      .asset-details
+        .category=asset.Category
+        span.asset-name=asset.Name
+      .background-svg
+    if asset.Description
+      +description(asset, name)
+    if asset.Fields
+      each field in asset.Fields
+        +field(field, name)
+    .flex-wrapper
+      each ability, index in asset.Abilities
+        - var abilityNumber = index + 1
+        +ability(asset, ability, abilityNumber, name)
+    if asset.Track && options.standalone === false
+      +track(asset.Track, name)
+
+mixin genericBuilder(assetsArray, listId)
   //- Asset Datalist
-  input.asset-options-header(type='text' list='assetList' name='attr_asset' placeholder='Type Asset Name')
-  datalist(id='assetList')
-    each asset in assets.Assets
+  input.asset-options-header(type='text' list=listId name='attr_asset' placeholder='Type Asset Name')
+  datalist(id=listId)
+    each asset in assetsArray
       - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
       option(data-i18n=`asset-name-${name}` value=name)=translation[`asset-name-${name}`]
     option(data-i18n=`asset-name-custom` value='custom')=translation[`asset-name-custom`]
 
   //- Asset Content
-  each asset in assets.Assets
-    //- build data list
-    - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
-    - var category = asset.Category.toLowerCase().replace(/\s/g, '-')
-    input(class=`hide-element ${name}` type='checkbox' name=`attr_${name}`)
-    div(class=`hide-element ${name} category-${category}`)
-      .asset-content-header
-        .asset-details
-          .category=asset.Category
-          span.asset-name=asset.Name
-        .background-svg
-      if asset.Description
-        +description(asset, name)
-      if asset.Fields
-        each field in asset.Fields
-          +field(field, name)
-      .flex-wrapper
-        each ability, index in asset.Abilities
-          - var abilityNumber = index + 1
-          +ability(asset, ability, abilityNumber, name)
-      if asset.Track
-        +track(asset.Track, name)
+  each asset in assetsArray
+    +assetTemplate(asset, { classes: 'hide-element', visiblityToggle: true })
