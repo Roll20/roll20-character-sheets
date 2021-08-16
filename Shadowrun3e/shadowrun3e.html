@@ -697,8 +697,6 @@
     	<div>Dispell: </div><button title="Cancel an existing spell" type="action" class="d6-button" name='act_dispell' id="dispelling">L</button>
     	<div>Resist Banish: </div><button title="Resist a Banishing action by a Mage/Shaman " type="action" class="d6-button" name='act_resistbanish' id="resistbanish">L</button>
     </div>
-    <br>
-    <br>
     <div class="astralattributes-show">
         <div class="SRH3">Astral Space
             <button class="switch-button-show" type="action" name="act_astralattributesswitch">Show</button>
@@ -814,7 +812,7 @@
             <div class="sorcery-row table-top">
                 <header>Conjuring:</header>
                 <div><input type="number" name="attr_conjuring" value=0 /></div>
-	        <div><button class="d6-dice" type="action" name="act_skilltest" id="conjuring spell" title="Spirit Conjuring/Control/Banishing Test"></button></div>
+	        <div><button class="d6-button" type="action" name="act_skilltest" id="conjuring spell" title="Spirit Conjuring/Control/Banishing Test">L</button></div>
                 <div class="skillspec">Specialize</div>
                 <div class="text-center"><input type="checkbox" class="conjuring-spec-switch" name="attr_conjuring-spec-switch" value="1" /></div>
             </div>
@@ -4270,12 +4268,13 @@ buttonlist.forEach(button => {
 			var targetofspell=target;
 			if (target.includes("@{target")) targetofspell="@{target|Target|token_name}"
 
-			var calcDice="@{spellcasting} + ?{Magic Pool Dice}";
+			var calcDice="?{Sorcery Dice?} + ?{Magic Pool Dice}";
 			var calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen}";
 			var calcDrainTN="floor(" + force + "/2) + " + drain + " + ( 2 * @{spellsus} )";
 			var calcDrainDice="@{willpower|max} + ?{Drain Pool Dice}";
 			var myroll="&{template:spell}{{myname=@{character_name}}}";
 			myroll+="{{draindamage=[[0]]}}"
+			myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}}]]}}"
 			myroll+="{{spellname=" + name + "}}";
 			myroll+="{{description=" + description +"}}";
 			myroll+="{{MagicPool=[[?{Magic Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
@@ -7017,6 +7016,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtheader">{{myname}}: {{spellname}} {{castforce}} vs. {{targetofspell}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#spelldamage}}<div class="sheet-rtrow"><b>Damage:</b> {{computed::spelldamage}} </div>{{/spelldamage}}
+        {{#sorcerydice}}<div class="sheet-rtrow"><b>Sorcery Dice Used:</b> {{sorcerydice}}</div>{{/sorcerydice}}
         {{#MagicPool}}<div class="sheet-rtrow"><b>Magic Pool Used:</b> {{MagicPool}}</div>{{/MagicPool}}
         <div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>
         {{#draintest}}<div class="sheet-rtrow"><b>Drain Test:</b> {{draintest}} vs. {{computed::draindamage}}</div>{{/draintest}}
