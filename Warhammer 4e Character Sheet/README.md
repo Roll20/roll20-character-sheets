@@ -76,7 +76,7 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 July 12th 2021 v1.51 
 
 - XP tab: clean up, added styling and some text. 
-- Spellbook: Petty & Arcane spell tabs have been cleaned up a bit to allow adding Willpower Bouns to the spell damage. This is similar the way the ranged weapons work. Wehn ticked this will now automatically add WPB to the cast roll damage. WPB? and Dmg input fields will now be invisible if the Dmg? checkbox is not ticked.
+- Spellbook: Petty & Arcane spell tabs have been cleaned up a bit to allow adding Willpower Bouns to the spell damage. This is similar the way the ranged weapons work. Wehn ticked this will now automatically add WPB to the cast roll damage. WPB? and Dmg input fields will now be invisible if the Dmg? checkbox is not ticked. Miracle Damage also adapted to match, but without the WPB modifier.
 - Houserules are no longer seperated main PC and NPCs on the same sheet. The settings options now configures both.
 - Default settings added to Game Settings page on Roll20 when this sheet is selected (Roll20 website, out side of the game). This is handy for GM's to set defaults before char sheets are created and less fiddling about each time you create a new one.
 - PC crit roll now shows modifer in the roll template. NPC crit roll had 2 pop up boxes for modifier, fixed
