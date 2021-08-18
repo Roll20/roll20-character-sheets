@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2021-08-24 ** v.40 Chuz (James Culp)
+	
 **2021-07-19 ** v.39 Chuz (James Culp)
 	Added Grunt Groups and Autocalculations based on the # of grunts
 	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
