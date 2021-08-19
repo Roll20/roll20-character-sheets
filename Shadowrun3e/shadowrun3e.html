@@ -85,16 +85,7 @@
 <div class="hidden-constants">
     <input type='hidden' name='attr_wp-char' value="(@{stun_pen} + @{wound_pen})" />
     <input type='hidden' name='attr_wp-matrix' value="(@{stun_pen} + @{wound_pen} + @{matrix-penalty})" />
-    <input type='hidden' name='attr_wp-vehicle'
-        value="(@{vehicle-penalty} +@{rccommand-penalty} + @{rcsimsense-penalty} +@{rcsystem-penalty})" />
-    <input type='hidden' name='attr_ask-control' value="?{Control Pool Dice|0}" />
-    <input type='hidden' name='attr_get-control' value="?{Control Pool Dice}" />
-    <input type='hidden' name='attr_ask-combat' value="?{Combat Pool Dice|0}" />
-    <input type='hidden' name='attr_get-combat' value="?{Combat Pool Dice}" />
-    <input type='hidden' name='attr_ask-hack' value="?{Hacking Pool Dice|0}" />
-    <input type='hidden' name='attr_get-hack' value="?{Hacking Pool Dice}" />
-    <input type='hidden' name='attr_ask-spell' value="?{Magic Pool Dice|0}" />
-    <input type='hidden' name='attr_get-spell' value="?{Magic Pool Dice}" />
+    <input type='hidden' name='attr_wp-vehicle' value="(@{vehicle-penalty} +@{rccommand-penalty} + @{rcsimsense-penalty} +@{rcsystem-penalty})" />
     <input type='hidden' name='attr_ask-range' value="?{Range|Short,4|Medium,5|Long,6|Extreme,9}" />
     <button type="action" name="act_init-aug" class="d6-button" title="Augmented Initiative">L</button>
     <button type="action" name="act_endturn" class="d6-button" title="End Combat Turn">L</button>
@@ -685,6 +676,7 @@
     	<div>Spells Stacked: <input type="number" name='attr_spellstack' class="smallnumber" min=0 value=0></div>
     	<div>Spells Sustained: <input type="number" name='attr_spellsus' min=0 value=0></div> 
     	<div title="Miscelaneous Modifiers for Spell Casting and Conjuring">Misc. Modifiers: <input type="number" name='attr_spellmisc' min=0 value=0></div>
+    	<div>Defend: </div><button title="Spell Defense" type="action" class="d6-button" name='act_spelldefense' id="spelldefense">L</button>
     	<div>Dispell: </div><button title="Cancel an existing spell" type="action" class="d6-button" name='act_dispell' id="dispelling">L</button>
     	<div>Summon: </div><button title="Summon a Spirit or Element" type="action" class="d6-button" name='act_conjure' id="summoning">L</button>
     	<div>Banish: </div><button title="Banish a Spirit or Element" type="action" class="d6-button" name='act_conjure' id="banishing">L</button>
@@ -4267,17 +4259,16 @@ buttonlist.forEach(button => {
 			const damage=myval[myrepeat + "damage"];
 			var targetofspell=target;
 			if (target.includes("@{target")) targetofspell="@{target|Target|token_name}"
-
-			var calcDice="?{Sorcery Dice?} + ?{Magic Pool Dice}";
+			var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
 			var calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen}";
 			var calcDrainTN="floor(" + force + "/2) + " + drain + " + ( 2 * @{spellsus} )";
-			var calcDrainDice="@{willpower|max} + ?{Drain Pool Dice}";
+			var calcDrainDice="@{willpower|max} + ?{Sorcery Dice for Drain?} + ?{Spell Pool Dice for Drain?}";
 			var myroll="&{template:spell}{{myname=@{character_name}}}";
-			myroll+="{{draindamage=[[0]]}}"
-			myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}}]]}}"
+			myroll+="{{draindamage=[[0]]}}";
+			myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}} + ?{Sorcery Dice for Drain?|0}]]}}";
+			myroll+="{{spellpool=[[?{Spell Pool Dice?|0} + ?{Spell Pool Dice for Drain?|0}]]}}";
 			myroll+="{{spellname=" + name + "}}";
 			myroll+="{{description=" + description +"}}";
-			myroll+="{{MagicPool=[[?{Magic Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
 			myroll+="{{spelldamage=[[" + damage + "]]}}"
 			myroll+="{{castforce=?{Force?|" + force + "}}}"
 			myroll+="{{targetofspell=" + targetofspell + "}}";
@@ -4288,9 +4279,10 @@ buttonlist.forEach(button => {
 			if (target.includes("@{target"))  {
 				resistattr=target.split("|")[2];
 				console.log('attr split: ' + resistattr);
+				myroll += "{{spelldefense=[Spell Defense](~|spelldefense)}}"
 				if ( resistattr == "force" ) myroll += "{{resistspell=[Resist Spell with force](~@{target|Target|character_name}|attrib-force)}}"
 				if ( resistattr == "targetMove" ) myroll += "{{resistspell=[Resist Spell with 1/2 Impact ](~@{target|Target|character_name}|resist-impact-half)}}"
-				else myroll += "{{resistspell=[Resist Spell with " + resistattr + " max](~@{target|Target|character_name}|attrib-" + resistattr  +"-max)}}"
+				else  myroll += "{{resistspell=[Resist Spell](~@{target|Target|character_name}|attrib-" + resistattr  +"-max)}}"
 			}
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
@@ -4319,6 +4311,8 @@ buttonlist.forEach(button => {
 				if ( (draindmg >= 10 ) && ( force > magic  )) draindmg = draindmg - 9;
 				draindmg=damagetable[draindmg];
 				console.log('drdmg : ' + draindmg);
+				console.log('sorcery dice : ' + results.results.sorcerydice.result);
+				console.log('spell pool : ' + results.results.spellpool.result);
 				finishRoll( results.rollId,
                 		{
                     			spelldamage: finaldmg, 
@@ -4477,6 +4471,7 @@ buttonlist.forEach(button => {
 			var action;
 			if (myid == "summoning" ) {
 				calcTN="?{Force?}";
+				var calcDice="?{Conjuring Dice?|" +  parseInt(myval[myid]) + "} + ?{Spirit Focus Dice}";
 				calcDrainTN="?{Force?}";
 				action="Conjure Force ?{Force?} Spirit";
 
@@ -4485,7 +4480,7 @@ buttonlist.forEach(button => {
 		    		let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
 				action= actionname + " Force @{target|Target|force} Spirit";
 			}
-			var calcDrainDice=mycharisma + " + ?{Drain Pool Dice} + ?{Spirit Focus Dice}";
+			var calcDrainDice=mycharisma + " + ?{Conjuring Dice for Drain?|0} + ?{Spirit Focus Dice}";
 			var myroll="&{template:spell}{{myname=" + myval["character_name"] + "}}";
 			myroll+="{{draindamage=[[0]]}}"
 			if (myid == "summoning" ) myroll+="{{spiritforce=[[?{Force?|1}]]}}"
@@ -4535,6 +4530,48 @@ buttonlist.forEach(button => {
 		conjuring(myid);
 	});
 
+	on('clicked:dispell', (info) => {
+		console.log("clicked dispell");
+		var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
+		var calcTN="?{Force of Spell?}";
+		var calcDrainTN="floor( ?{Force of Spell?}/2) + ( 2 * @{spellsus} )";
+		var calcDrainDice="@{willpower|max} + ?{Sorcery Dice for Drain?} + ?{Spell Pool Dice for Drain?} +?{Drain Modifier?|0}";
+		var myroll="&{template:spell}{{myname=@{character_name}}}";
+		myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}} + ?{Sorcery Dice for Drain?|0}]]}}";
+		myroll+="{{spellpool=[[?{Spell Pool Dice?|0} + ?{Spell Pool Dice for Drain?|0}]]}}";
+		myroll+="{{spellname="DISPELL"}}";
+		myroll+="{{castforce=?{Force of Spell?}}}"
+		myroll+="{{rolldice=[[" + calcDice + "]]}}";
+		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
+		myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
+		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+		finishRoll( results.rollId);
+		});
+	});
+        
+	on('clicked:spelldefense', (info) => {
+		console.log("clicked spelldefense");
+		var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
+		var calcTN="?{Force of Spell?}";
+		var myroll="&{template:spell}{{myname=@{character_name}}}";
+		myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spelldefense}}}}";
+		myroll+="{{spellpool=[[?{Spell Pool Dice?|0}}}":
+		myroll+="{{castforce=?{Force of Spell?}}}"
+		myroll+="{{spellname="SPELL DEFENSE"}}";
+		myroll+="{{targetofspell=@{target|Ally|token_name}}}";
+		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+		finishRoll( results.rollId);
+		});
+	});
+
+   	var spelld = function (myid) {
+		
+
+	};
 	
 	on('clicked:vehicleposition', (info) => {
 		    calcTN="[[{2,(@{handling} + @{speed-exceeding} +  @{driving-position-terrain} - @{vehicle-actionbonus} + (@{vehicle-autonav} * @{autonav}) + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} )}kh1]]"
@@ -7017,14 +7054,15 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#spelldamage}}<div class="sheet-rtrow"><b>Damage:</b> {{computed::spelldamage}} </div>{{/spelldamage}}
         {{#sorcerydice}}<div class="sheet-rtrow"><b>Sorcery Dice Used:</b> {{sorcerydice}}</div>{{/sorcerydice}}
-        {{#MagicPool}}<div class="sheet-rtrow"><b>Magic Pool Used:</b> {{MagicPool}}</div>{{/MagicPool}}
+        {{#spellpool}}<div class="sheet-rtrow"><b>Spell Pool Used:</b> {{spellpool}}</div>{{/spellpool}}
         <div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>
         {{#draintest}}<div class="sheet-rtrow"><b>Drain Test:</b> {{draintest}} vs. {{computed::draindamage}}</div>{{/draintest}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
         {{#resist}}<div class="sheet-rtrow"><b>{{targetofspell}}:</b> {{resist}}</div>{{/resist}}
-        {{#resistspell}}<div class="sheet-rtrow"><b>{{targetofspell}}:</b> {{resistspell}} Target of {{castforce}}</div>{{/resistspell}}
+        {{#spelldefense}}<div class="sheet-rtrow">{{spelldefense}} Target of {{castforce}} </div>{{/spelldefense}}
+        {{#resistspell}}<div class="sheet-rtrow">{{resistspell}} Target of {{castforce}}</div>{{/resistspell}}
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-adept">
