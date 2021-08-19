@@ -258,6 +258,7 @@
             <div class="text-mid-center">Ranged Modifiers: <span name="attr_rangedTN"></span></div>
             <div class="text-mid-center">Melee Modifiers: <span name="attr_meleeTN"></span></div>
             <div class="text-mid-center">Misc. Modifiers: <span name="attr_misccombatmods" value=0></span></div>
+            <div>Dodge<button type="action" name="act_dodge" class="d6-button" title="Dodge Attack" id="dodge">L</button></div>
             <div>Ballistic: <span name="attr_ballistic" value=0></span><button type="action" name="act_resistdmg" class="d6-button" title="Resist Damage with Ballistic Armor" id="ballistic">L</button>
             </div>
             <div>Impact: <span name="attr_impact" value=0></span><button type="action" name="act_resistdmg" class="d6-button" title="Resist Damage with Impact Armor" id="impact">L</button>
@@ -269,12 +270,12 @@
                 <div class="manual-gunnery-show">
                     <input type="hidden" class="manual-gunnery-tn" name="attr_manualgunneryTN" value=0>
                     <button class="gunneryswitch" type="action" name="act_gunneryswitch">Show Manual
-                        Gunnery</button>:<span name="attr_manualgunneryTN"></span>
+                        Gunnery</button><span name="attr_manualgunneryTN"></span>
                 </div>
                 <div class="manual-gunnery-hide">
                     <input type="hidden" class="manual-gunnery-tn" name="attr_manualgunneryTN" value=0>
                     <button class="gunneryswitch" type="action" name="act_gunneryswitch">Hide Manual
-                        Gunnery</button>:<span name="attr_manualgunneryTN"></span>
+                        Gunnery</button><span name="attr_manualgunneryTN"></span>
                 </div>
             </div>
         </div>
@@ -4317,7 +4318,7 @@ buttonlist.forEach(button => {
 		const myid=info["htmlAttributes"]["id"]
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_'); 
-		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage"];
+		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage", "range", "spellcategory"];
 		attlist.forEach(attr=>{
 			let myname=myrepeat + attr;
 			atts.push(myname);
@@ -4327,6 +4328,8 @@ buttonlist.forEach(button => {
 			console.log('vals');
 			console.log(myval);
 			const magic=myval["magic"];
+			const range=myval[myrepeat + "range"];
+			const spellcat=myval[myrepeat + "spellcategory"];
 			const force=myval[myrepeat + "force"];
 			const target=myval[myrepeat + "target"];
 			const drain=myval[myrepeat + "drain"];
@@ -4511,6 +4514,7 @@ buttonlist.forEach(button => {
          	myroll="&{template:resistance}";
 	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{CombatPool=[[?{Combat Dice|0}]]}}";
 	 	myroll +="{{Power=?{Attack Power|4}}}";
+	 	myroll +="{{action=Resistance Test}}";
 		myroll +="{{rolldice=[[" + calcDice + "]]}}";
 		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
 	 	myroll +="{{AttackType=" + mods  + "}}";
@@ -4541,6 +4545,31 @@ buttonlist.forEach(button => {
     		on(`clicked:${myimpact}`, (info) => {
 			resistdmg("impact", mod); 
 		});
+	});
+
+   	var dodge = function (myid, mods) {
+	        var calcDice= "?{Combat Dice}";
+		calcTN="4 + " + mods;
+         	myroll="&{template:resistance}";
+	 	myroll +="{{name=Dodge}}{{character=@{character_name}}}"
+		myroll +="{{CombatPool=[[?{Combat Dice|0}]]}}";
+	 	myroll +="{{action=Dodge Test}}";
+		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
+		myroll +="{{rolldice=[[" + calcDice + "]]}}";
+	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+		finishRoll( results.rollId);
+		});
+
+	};
+
+	on('clicked:dodge', (info) => {
+		console.log(info);
+		const mytitle=info["htmlAttributes"]["title"]
+		const myid=info["htmlAttributes"]["id"]
+		mods="?{Modifiers?|0}";
+		dodge(myid, mods); 
 	});
 
    	var conjuring = function (myid) {
@@ -4960,7 +4989,8 @@ buttonlist.forEach(button => {
 			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=" + wdmg  + "}}{{weaponpower=[[" + wpower + "]]}}"
 			roll += "{{combatpool=[[?{Combat Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}"
 			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}"
-			roll += "{{resist=[Resist](~@{target|Target|token_name}|resist_ballistic)}}"
+			roll += "{{dodge=[Dodge](~@{target|Target|token_name}|dodge)}}";
+			roll += "{{resist=[Resist](~@{target|Target|token_name}|resist-ballistic-normal)}}"
 			console.log(roll);
                 	startRoll(roll, (results) => {
 				const myrounds=results.results.rounds.result;
@@ -4968,7 +4998,6 @@ buttonlist.forEach(button => {
 				if ( myrounds > ammoleft ) { 
 					finalrounds=parseInt(ammoleft);
 				}
-				
 				if ((bf==1) || (fa==1))  wpower=parseInt(wpower) + finalrounds;
 			finishRoll( results.rollId,
                 	{
@@ -7262,7 +7291,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 	{{#default}}<div class="sheet-rtrow">{{default}}</div>{{/default}}
 	{{#reachmod}}<div class="sheet-rtrow">{{reachbonus}} {{computed::reachmod}}</div>{{/reachmod}}
         {{#recoil}}<div class="sheet-rtrow"><b>Uncompensated Recoil:</b> {{recoil}} </div>{{/recoil}}
-        {{#resist}}<div class="sheet-rtrow"><b>{{target}}:</b> {{resist}}</div>{{/resist}}
+        {{#resist}}<div class="sheet-rtrow"><b>{{target}}:</b>{{dodge}} {{resist}}</div>{{/resist}}
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-explosive">
@@ -7324,8 +7353,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="rtrow">Attack {{Power}} vs {{name}} {{armorvalue}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
-        <div class="sheet-rtrow"><span>Resistance Test: </span>{{roll}}</div>
-        <div class="sheet-rtrow"><span>Combat Pool Used: </span>{{CombatPool}}</div>
+        <div class="sheet-rtrow">{{action}}: {{roll}}</div>
+        <div class="sheet-rtrow">Combat Pool Used: {{CombatPool}}</div>
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
