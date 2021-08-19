@@ -3865,12 +3865,24 @@
             <hr />
             <div class="armor">
               <h3>Armor</h3>
+              <div class="armor-active">
+                <label
+                  >Damage
+                  <input
+                    type="number"
+                    placeholder="Damage"
+                    name="attr_armordamage"
+                  />
+                </label>
+                <button type="action" name="act_armorapplydamage">
+                  Apply Damage
+                </button>
+              </div>
               <div class="armor-labels">
                 <label>Active</label>
                 <label>Name</label>
                 <label>Base MDC</label>
                 <label>Current MDC</label>
-                <label>Damage</label>
               </div>
               <fieldset class="repeating_armor">
                 <div class="repeating_armor-inner">
@@ -3884,8 +3896,6 @@
   name="attr_currentmdc"
   value="0"
 />
-<input type="number" placeholder="Damage" name="attr_damage" />
-<button type="action" name="act_applydamage">Apply Damage</button>
 <button type="action" name="act_resetmdc">Reset MDC</button>
 
                   <!-- endinject -->
@@ -7501,61 +7511,44 @@ on(
   /* endinject */
 
   /* inject:js/armor.js */
-  async function applyDamageToNextActiveArmor(section, currentRowId, damage) {
-  console.log("applyDamageToNextActiveArmor", section, currentRowId, damage);
+  async function applyDamageToNextActiveArmor(section, damage) {
+  console.log("applyDamageToNextActiveArmor", section, damage);
   const ids = await getSectionIDsOrderedAsync(section);
   const attrKeys = ids.flatMap((id) => [
     `repeating_${section}_${id}_is_active`,
     `repeating_${section}_${id}_currentmdc`,
   ]);
   const attrs = {};
-  attrs[`repeating_${section}_${currentRowId}_currentmdc`] = 0;
   const a = await getAttrsAsync(attrKeys);
-  let next = false;
-  let nextCurrentMdc = false;
-  for (const id of ids) {
-    if (id == currentRowId) {
-      next = true;
-      continue;
+  let damageCarry = damage;
+  // let nextCurrentMdc = false;
+  let currentMdc = false;
+
+  const activeIds = ids.reduce((acc, cur) => {
+    if (Boolean(Number(a[`repeating_${section}_${cur}_is_active`]))) {
+      acc.push(cur);
     }
-    if (next && Boolean(Number(a[`repeating_${section}_${id}_is_active`]))) {
-      nextCurrentMdc = +a[`repeating_${section}_${id}_currentmdc`] - damage;
-      attrs[`repeating_${section}_${id}_currentmdc`] = nextCurrentMdc;
+    return acc;
+  }, []);
+
+  let i = 0;
+  for (const id of activeIds) {
+    currentMdc = +a[`repeating_${section}_${id}_currentmdc`] - damageCarry;
+    if (currentMdc < 0 && ++i < activeIds.length) {
+      attrs[`repeating_${section}_${id}_currentmdc`] = 0;
+      damageCarry = Math.abs(currentMdc);
+    } else {
+      attrs[`repeating_${section}_${id}_currentmdc`] = currentMdc;
       break;
     }
-  }
-  if (nextCurrentMdc === false) {
-    nextCurrentMdc =
-      +a[`repeating_${section}_${currentRowId}_currentmdc`] - damage;
-    attrs[`repeating_${section}_${currentRowId}_currentmdc`] = nextCurrentMdc;
   }
   await setAttrsAsync(attrs);
 }
 
-on("clicked:repeating_armor:applydamage", async (e) => {
-  console.log("clicked:repeating_armor:applydamage", e);
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  const a = await getAttrsAsync([
-    `repeating_armor_${rowId}_currentmdc`,
-    `repeating_armor_${rowId}_damage`,
-  ]);
-  let currentMdc =
-    +a[`repeating_armor_${rowId}_currentmdc`] -
-    +a[`repeating_armor_${rowId}_damage`];
-  if (currentMdc < 0) {
-    const [r, section, rowId] = e.sourceAttribute.split("_");
-    // apply to next active in line
-    // if there is no next in line, show as negative
-    await applyDamageToNextActiveArmor(
-      section,
-      rowId.toLowerCase(),
-      Math.abs(currentMdc)
-    );
-  } else {
-    await setAttrsAsync({
-      [`repeating_armor_${rowId}_currentmdc`]: currentMdc,
-    });
-  }
+on("clicked:armorapplydamage", async (e) => {
+  console.log("clicked:armorapplydamage", e);
+  const a = await getAttrsAsync([`armordamage`]);
+  await applyDamageToNextActiveArmor("armor", +a[`armordamage`]);
 });
 
 on("clicked:repeating_armor:resetmdc", async (e) => {
@@ -8550,6 +8543,13 @@ on("change:repeating_movement:ft_melee", async (e) => {
   /* endinject */
 
   /**
+   * [] Armor tab / repeater; Armor checkboxes in Aggregate Bonuses, and Armor list (name, MDC) underneath
+   *  - [] Move Damage/Apply Damage outside repeater
+   *    Aggregate Bonuses checkboxes that show and hide based on the check
+   *    - Magic and Psionics also provide armor. so you have to add the spell and then have a button to add it to the Armor tab
+   *      Hitting "cast" should use up the PPE and check the checkbox. This should also apply to spell which have a duration and provide bonuses.
+   *      Buttons: Cast | Cast and add to modifiers | Cast and add to armor
+   *    - consider different MDC for different body parts
    * [] Add Range, Ammo to Modifiers
    * [] Carry PS damage rolls through to profile (ex. kick: 2d4 sdc)
    * [] Add details/summary to some Core background fields like Insanity, Environment, Family Origin, Disposition
@@ -8650,12 +8650,6 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [x] Have abilities/magic/psionics auto-calculate/populate MDC/SDC/HP/...
    * [x] Make things async
    *
-   * @todo Armor tab / repeater; Armor checkboxes in Aggregate Bonuses, and Armor list (name, MDC) underneath
-   *    Aggregate Bonuses checkboxes that show and hide based on the check
-   *    - Magic and Psionics also provide armor. so you have to add the spell and then have a button to add it to the Armor tab
-   *      Hitting "cast" should use up the PPE and check the checkbox. This should also apply to spell which have a duration and provide bonuses.
-   *      Buttons: Cast | Cast and add to modifiers | Cast and add to armor
-   *    - consider different MDC for different body parts
    * @todo add Ammo/Uses to Combat, Magic
    * @todo add import status - add an attribute and update count on each callback, or just once at the end indicating completion
    *
