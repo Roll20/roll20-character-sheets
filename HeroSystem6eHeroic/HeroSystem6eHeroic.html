@@ -3364,6 +3364,16 @@
 <input type="hidden" name="attr_hiddenEnhancerSkillsCost"  value="0"/>
 <input type="hidden" name="attr_hiddenMartialSkillsCost"  value="0"/>
 
+<!-- Hidden variables for clean weapon damage strings -->
+<input type="hidden" name="attr_hiddenShieldDamage01"  value="0"/>
+<input type="hidden" name="attr_hiddenWeaponDamage01"  value="0"/>
+<input type="hidden" name="attr_hiddenWeaponDamage02"  value="0"/>
+<input type="hidden" name="attr_hiddenWeaponDamage03"  value="0"/>
+<input type="hidden" name="attr_hiddenWeaponDamage04"  value="0"/>
+<input type="hidden" name="attr_hiddenWeaponDamage05"  value="0"/>
+<input type="hidden" name="attr_hiddenManeuverDamage01"  value="0"/>
+
+<!-- Hidden variable for token display -->
 <input type="hidden" name="attr_currentDCV" value="0"/>
 
 <!-- Jackob's Roll Template -->
@@ -6826,9 +6836,57 @@
 	/* --- Weapon Attacks   --- */
 	/* ------------------------ */
 	
+	on("change:shieldDamage change:weaponDamage01 change:weaponDamage02 change:weaponDamage03 change:weaponDamage04 change:weaponDamage05 change:strength", function () {
+		// This function attempts to clean damage text input into text more likely to be rollable dice.
+		// Only characters 0-9, d, D, +, and - are passed to attack rolls.
+		
+		getAttrs(["shieldDamage","weaponDamage01","weaponDamage02","weaponDamage03","weaponDamage04","weaponDamage05","strength"], function(values) {
+		
+			var theShieldDamage=values.shieldDamage;
+			theShieldDamage=theShieldDamage.replace(/[^\ddD\\+\\-]/g,"");
+			
+			var theWeaponDamage01=values.weaponDamage01;
+			theWeaponDamage01=theWeaponDamage01.replace(/[^\ddD\\+\\-]/g,"");
+			
+			var theWeaponDamage02=values.weaponDamage02;
+			theWeaponDamage02=theWeaponDamage02.replace(/[^\ddD\\+\\-]/g,"");
+			
+			var theWeaponDamage03=values.weaponDamage03;
+			theWeaponDamage03=theWeaponDamage03.replace(/[^\ddD\\+\\-]/g,"");
+			
+			var theWeaponDamage04=values.weaponDamage04;
+			theWeaponDamage04=theWeaponDamage04.replace(/[^\ddD\\+\\-]/g,"");
+			
+			var theWeaponDamage05=values.weaponDamage05;
+			theWeaponDamage05=theWeaponDamage05.replace(/[^\ddD\\+\\-]/g,"");
+			
+			
+			// Calculate basic strength damage dice and create a roll20 dice string of d6s and d3s.
+			let theStrength=parseInt(values.strength)||0;
+			let theNumberOfD6=(parseInt((theStrength-(theStrength%5))/5)||0).toString();
+			
+			let theNumberOfD3=0;
+			if (theStrength%5>2) {
+				theNumberOfD3=1;
+			}
+			
+			var theStrengthDamage=theNumberOfD6.concat("d6+",theNumberOfD3.toString(),"d3");
+			
+			setAttrs({
+				hiddenShieldDamage01:theShieldDamage,
+				hiddenWeaponDamage01:theWeaponDamage01,
+				hiddenWeaponDamage02:theWeaponDamage02,
+				hiddenWeaponDamage03:theWeaponDamage03,
+				hiddenWeaponDamage04:theWeaponDamage04,
+				hiddenWeaponDamage05:theWeaponDamage05,
+				hiddenManeuverDamage01:theStrengthDamage
+			});
+		});
+	});
+	
 	
 	on('clicked:attackWeapon01', (info) => {
-		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName01}}} {{OCV=[[?{Modifier|0}+@{weaponOCV01}+@{weaponOCVPenalty01}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{weaponDamage01}]]}}", (results) => {
+		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName01}}} {{OCV=[[?{Modifier|0}+@{weaponOCV01}+@{weaponOCVPenalty01}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage01}]]}}", (results) => {
 			
 			let computed = parseInt(results.results.BODY.result)||0;
 			
@@ -6885,7 +6943,7 @@
 	});
 	
 	on('clicked:attackWeapon02', (info) => {
-		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName02}}} {{OCV=[[?{Modifier|0}+@{weaponOCV02}+@{weaponOCVPenalty02}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{weaponDamage02}]]}}", (results) => {
+		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName02}}} {{OCV=[[?{Modifier|0}+@{weaponOCV02}+@{weaponOCVPenalty02}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage02}]]}}", (results) => {
 			
 			let computed = parseInt(results.results.BODY.result)||0;
 			
@@ -6942,7 +7000,7 @@
 	});
 	
 	on('clicked:attackWeapon03', (info) => {
-		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName03}}} {{OCV=[[?{Modifier|0}+@{weaponOCV03}+@{weaponOCVPenalty03}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{weaponDamage03}]]}}", (results) => {
+		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName03}}} {{OCV=[[?{Modifier|0}+@{weaponOCV03}+@{weaponOCVPenalty03}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage03}]]}}", (results) => {
 			
 			let computed = parseInt(results.results.BODY.result)||0;
 			
@@ -6999,7 +7057,7 @@
 	});
 	
 	on('clicked:attackWeapon04', (info) => {
-		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName04}}} {{OCV=[[?{Modifier|0}+@{weaponOCV04}+@{weaponOCVPenalty04}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{weaponDamage04}]]}}", (results) => {
+		startRoll("&{template:custom-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{weaponName04}}} {{OCV=[[?{Modifier|0}+@{weaponOCV04}+@{weaponOCVPenalty04}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{BODY=[[@{hiddenWeaponDamage04}]]}}", (results) => {
 			
 			let computed = parseInt(results.results.BODY.result)||0;
 			
@@ -7058,13 +7116,13 @@
 	on('clicked:attackWeapon05', (info) => {
 		// Weapon05 does normal damage.
 		
-		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName05}}} {{OCV=[[?{Modifier|0}+@{weaponOCV05}+@{weaponOCVPenalty05}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{weaponDamage05}]]}}", (results) => {
+		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle=Attacks with @{weaponName05}}} {{OCV=[[?{Modifier|0}+@{weaponOCV05}+@{weaponOCVPenalty05}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenWeaponDamage05}]]}}", (results) => {
 			
 			// Convert dice roll to equivalent BODY damage.
 			
 			let computed =0;
 			const theDice = results.results.STUN.rolls;
-
+			
 			// For each type of dice (d3 or d6) calculate BODY:
 			for(let groupOfDice of theDice) {
 				if (groupOfDice.sides == 3) {
@@ -7127,7 +7185,7 @@
 	on('clicked:attackShield', (info) => {
 		// The shield does normal damage.
 		
-		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{shieldName}}} {{OCV=[[?{Modifiers|0}-@{shieldDCV}+@{targetOCVpenalty}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{shieldDamage}]]}}", (results) => {
+		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with @{shieldName}}} {{OCV=[[?{Modifiers|0}-@{shieldDCV}+@{targetOCVpenalty}+@{ocv}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenShieldDamage01}]]}}", (results) => {
 			
 			// Convert dice roll to equivalent BODY damage.
 			
@@ -7191,7 +7249,7 @@
 	});
 	
 	on('clicked:standardAttackRoll', (info) => {
-		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[((@{strength}-(@{strength}%5))/5)d6+((@{strength}%5)/5)d3]]}}", (results) => {
+		startRoll("&{template:custom-normal-attack} {{title=@{character_name} - @{character_title}}} {{subtitle= Attacks with Strength @{strength}}} {{OCV=[[?{Modifiers|0}+@{ocv}+@{targetOCVpenalty}]]}} {{Result=[[3d6cf<0cs>0]]}} {{STUN=[[@{hiddenManeuverDamage01}]]}}", (results) => {
 			// A standard strength-based attack is complicated by the need to use a 1d3 for strength%5 == 3 or 4, such as 4, 8, 13, 19, etc.
 			
 			getAttrs(["optionHitLocationSystem", "targetSelection","strength"], function(values) {
