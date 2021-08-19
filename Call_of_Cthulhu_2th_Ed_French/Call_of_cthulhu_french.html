@@ -1,38 +1,40 @@
 <script type="text/worker">
-var version = "1.0";
-
 on("sheet:opened", function() {  
-    if(version != "1.1") {
-		console.log("test");
-        getAttrs(["Kick_Empalement"], function(values) {
-            let attrs = {};
-            let kick = values["Kick_Empalement"];
+	getAttrs(["Kick_Empalement", "version"], function(values) {
+		let version = values["version"];
+		console.log(version);
+		if(version != "1.1") {
+			let attrs = {};
+			console.log("Test");
+			let kick = values["Kick_Empalement"];
 
-            if(kick == "{{empalement=[[floor(@{Kick}/5)]]}}")
-                attrs["Kick_Empalement"] == "floor(@{Kick}/5)";
+			if(kick == "{{empalement=[[floor(@{Kick}/5)]]}}")
+				attrs["Kick_Empalement"] = "floor(@{Kick}/5)";
+				
+			attrs["version"] = "1.1";
 
-            setAttrs(attrs);
+			setAttrs(attrs);
 
-            getSectionIDs("repeating_armes", function(idarray) 
-            {
-                _.each(idarray,function(id) {
-                    getAttrs(["repeating_armes_"+id+"_Empalement"], function(value) {
-                        let empalement = value["repeating_armes_"+id+"_Empalement"];
+			getSectionIDs("repeating_armes", function(idarray) 
+			{
+				_.each(idarray,function(id) {
+					getAttrs(["repeating_armes_"+id+"_Empalement"], function(value) {
+						let empalement = value["repeating_armes_"+id+"_Empalement"];
 
-                        if(empalement == "{{empalement=[[floor(@{Score}/5)]]}}") {
-                            setAttrs({
-                                ["repeating_armes_"+id+"_Empalement"]: "floor(@{Score}/5)"
-                            });
-                        }
-                    });
-                });
-            });
-        });
-		
-		version = "1.1";
-    }	
+						if(empalement == "{{empalement=[[floor(@{Score}/5)]]}}") {
+							setAttrs({
+								["repeating_armes_"+id+"_Empalement"]: "floor(@{Score}/5)"
+							});
+						}
+					});
+				});
+			});
+		}
+	});
 });
 </script>
+
+<input type="hidden" name="attr_version" value="1.0"/>
 
 <div class='first'>
 	<div class='col'>
