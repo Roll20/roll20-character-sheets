@@ -3863,6 +3863,36 @@
             </details>
             <p>Click <b>Instructions</b> for detailed instructions.</p>
             <hr />
+            <div class="armor">
+              <h3>Armor</h3>
+              <div class="armor-labels">
+                <label>Active</label>
+                <label>Name</label>
+                <label>Base MDC</label>
+                <label>Current MDC</label>
+                <label>Damage</label>
+              </div>
+              <fieldset class="repeating_armor">
+                <div class="repeating_armor-inner">
+                  <!-- inject:partials/armor.html -->
+                  <input type="checkbox" class="is-active" name="attr_is_active" value="1" />
+<input type="text" placeholder="Armor Name" name="attr_name" />
+<input type="number" placeholder="Base MDC" name="attr_basemdc" value="0" />
+<input
+  type="number"
+  placeholder="Current MDC"
+  name="attr_currentmdc"
+  value="0"
+/>
+<input type="number" placeholder="Damage" name="attr_damage" />
+<button type="action" name="act_applydamage">Apply Damage</button>
+<button type="action" name="act_resetmdc">Reset MDC</button>
+
+                  <!-- endinject -->
+                </div>
+              </fieldset>
+            </div>
+            <hr />
             <div class="profile-builder">
               <div class="profiles repeating-bonuses-outer">
                 <div class="profiles-inner">
@@ -7470,6 +7500,84 @@ on(
 
   /* endinject */
 
+  /* inject:js/armor.js */
+  async function applyDamageToNextActiveArmor(section, currentRowId, damage) {
+  console.log("applyDamageToNextActiveArmor", section, currentRowId, damage);
+  const ids = await getSectionIDsOrderedAsync(section);
+  const attrKeys = ids.flatMap((id) => [
+    `repeating_${section}_${id}_is_active`,
+    `repeating_${section}_${id}_currentmdc`,
+  ]);
+  console.log(attrKeys);
+  const attrs = {};
+  attrs[`repeating_${section}_${currentRowId}_currentmdc`] = 0;
+  const a = await getAttrsAsync(attrKeys);
+  console.log(a);
+  let next = false;
+  let nextCurrentMdc = false;
+  console.log(ids);
+  for (const id of ids) {
+    console.log(id);
+    if (id == currentRowId) {
+      next = true;
+      continue;
+    }
+    if (next && Boolean(Number(a[`repeating_${section}_${id}_is_active`]))) {
+      console.log("here");
+      nextCurrentMdc = +a[`repeating_${section}_${id}_currentmdc`] - damage;
+      attrs[`repeating_${section}_${id}_currentmdc`] = nextCurrentMdc;
+      break;
+    }
+  }
+  console.log("done for", nextCurrentMdc);
+  if (nextCurrentMdc === false) {
+    nextCurrentMdc =
+      +a[`repeating_${section}_${currentRowId}_currentmdc`] - damage;
+    attrs[`repeating_${section}_${currentRowId}_currentmdc`] = nextCurrentMdc;
+  }
+  console.log(attrs);
+  await setAttrsAsync(attrs);
+}
+
+on("clicked:repeating_armor:applydamage", async (e) => {
+  console.log("clicked:repeating_armor:applydamage", e);
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const a = await getAttrsAsync([
+    `repeating_armor_${rowId}_currentmdc`,
+    `repeating_armor_${rowId}_damage`,
+  ]);
+  let currentMdc =
+    +a[`repeating_armor_${rowId}_currentmdc`] -
+    +a[`repeating_armor_${rowId}_damage`];
+  if (currentMdc < 0) {
+    const [r, section, rowId] = e.sourceAttribute.split("_");
+    await applyDamageToNextActiveArmor(
+      section,
+      rowId.toLowerCase(),
+      Math.abs(currentMdc)
+    );
+    // apply to next active in line
+    // if there is no next in line, show as negative
+  } else {
+    await setAttrsAsync({
+      [`repeating_armor_${rowId}_currentmdc`]: currentMdc,
+    });
+  }
+});
+
+on("clicked:repeating_armor:resetmdc", async (e) => {
+  console.log("clicked:repeating_armor:resetmdc", e);
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const a = await getAttrsAsync([`repeating_armor_${rowId}_basemdc`]);
+  console.log(a);
+  await setAttrsAsync({
+    [`repeating_armor_${rowId}_currentmdc`]:
+      a[`repeating_armor_${rowId}_basemdc`],
+  });
+});
+
+  /* endinject */
+
   /* inject:js/profiles.js */
   async function updateProfile(rowId) {
   const bonusIds = (
@@ -8555,6 +8663,7 @@ on("change:repeating_movement:ft_melee", async (e) => {
    *    - Magic and Psionics also provide armor. so you have to add the spell and then have a button to add it to the Armor tab
    *      Hitting "cast" should use up the PPE and check the checkbox. This should also apply to spell which have a duration and provide bonuses.
    *      Buttons: Cast | Cast and add to modifiers | Cast and add to armor
+   *    - consider different MDC for different body parts
    * @todo add Ammo/Uses to Combat, Magic
    * @todo add import status - add an attribute and update count on each callback, or just once at the end indicating completion
    *
