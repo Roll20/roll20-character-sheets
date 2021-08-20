@@ -472,6 +472,8 @@ const ATTRIBUTE_KEYS = [
   "pb_abs",
   "mod_spd",
   "spd_abs",
+  "mod_spdfly",
+  "spdfly_abs",
   "mod_character_ps_type",
   "mod_restrained_punch",
   "mod_restrained_punch_unit",
@@ -566,6 +568,7 @@ const SAVE_KEYS_ATTRIBUTE_BONUSES = {
     "possession",
     "curses",
     "maintainbalance",
+    "fatigue",
   ],
 };
 const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
@@ -698,6 +701,7 @@ const CORE_KEYS = [
   "pb",
   "pb_bonus",
   "spd",
+  "spdfly",
   "trustintimidate",
   "charmimpress",
   "character_hp",

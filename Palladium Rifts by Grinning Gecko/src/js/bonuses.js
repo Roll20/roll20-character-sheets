@@ -71,6 +71,7 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     "pe",
     "pb",
     "spd",
+    "spdfly",
     "hf",
     "spellstrength",
     "trustintimidate",
