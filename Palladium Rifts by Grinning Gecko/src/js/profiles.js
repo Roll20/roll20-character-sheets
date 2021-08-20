@@ -174,6 +174,16 @@ on(
   }
 );
 
+on("change:repeating_profiles", async (e) => {
+  console.log("change:repeating_profiles", e);
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const a = await getAttrsAsync(["psionic_ability"]);
+  const attrs = {};
+  attrs[`repeating_${section}_${rowId}_global_psionic_ability`] =
+    a["psionic_ability"];
+  await setAttrsAsync(attrs);
+});
+
 on("change:_reporder:profiles", async (e) => {
   console.log("change:_reporder:profiles", e);
 });
