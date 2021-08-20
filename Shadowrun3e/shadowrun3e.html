@@ -218,13 +218,28 @@
             </div>
             <div><br></div>
         </div>
-        <div>
-            <div class="SRH3">Dice Pools</div>
-            <div> Combat Pool:<span class="dicepool" name="attr_combatpool"> </span> </div>
-            <div> Spell Pool:<span class="dicepool" type="number" name="attr_magicpool"></span> </div>
-            <div> Hacking Pool:<span class="dicepool" type="number" name="attr_hackingpool-max"></span> </div>
-            <div> Control Pool:<span class="dicepool" type="number" name="attr_controlpool"></span> </div>
-            <div> Astral Pool:<span class="dicepool" type="number" name="attr_astralpool"></span> </div>
+        <div class="dicepool">
+            <input type="hidden" name="attr_combatpool-used" value=0 />
+            <input type="hidden" name="attr_spellpool-used" value=0 />
+            <input type="hidden" name="attr_hackingpool-used" value=0 />
+            <input type="hidden" name="attr_controlpool-used" value=0 />
+            <input type="hidden" name="attr_astralpool-used" value=0 />
+            <div class="SRH3">Dice Pools</div><div>Max</div><div>Used</div>
+            <div> Combat Pool:</div>
+	    <div><span name="attr_combatpool"></span></div>
+	    <div><input type='hidden' class='combatpool-over' name='attr_combatpool-over' /><span name="attr_combatpool-used"></span></div>
+            <div> Spell Pool:</div>
+	    <div><span type="number" name="attr_spellpool"></span> </div>
+	    <div><input type='hidden' class='spellpool-over' name='attr_spellpool-over' /><span class="spellpool-over" name="attr_spellpool-used-total"></span></div>
+            <div> Hacking Pool:</div>
+	    <div><span type="number" name="attr_hackingpool-max"></span> </div>
+	    <div><input type='hidden' class='hackingpool-over' name='attr_hackingpool-over' /><span name="attr_hackingpool-used"></span></div>
+            <div> Control Pool:</div>
+	    <div><span type="number" name="attr_controlpool"></span> </div>
+	    <div><input type='hidden' class='controlpool-over' name='attr_controlpool-over' /><span name="attr_controlpool-used"></span></div>
+            <div> Astral Pool:</div>
+	    <div><span type="number" name="attr_astralpool"></span> </div>
+	    <div><input type='hidden' class='astralpool-over' name='attr_astralpool-over' /><span name="attr_astralpool-used"></span></div>
 
         </div>
     </div>
@@ -282,7 +297,7 @@
         <div class="combat-conditions">
             <div class="text-mid">Visibility</div>
             <div class="text-mid">Vision Enhacement</div>
-            <div class="text-mid">Cover</div>
+            <div class="text-mid">Target Cover</div>
             <div class="text-mid">Movement</div>
             <div>Dual Wield</div>
             <div>Called Shot</div>
@@ -675,8 +690,8 @@
     <input type='hidden' name='attr_sorcery-used-total' value=0 />
     <input type='hidden' name='attr_conjuring-used' value=0 />
     <input type='hidden' name='attr_conjuring-used' value=0 />
-    <input type='hidden' name='attr_magicpool-used' value=0 />
-    <input type='hidden' name='attr_magicpool-used-total' value=0 />
+    <input type='hidden' name='attr_spellpool-used' value=0 />
+    <input type='hidden' name='attr_spellpool-used-total' value=0 />
     <input type='hidden' name='attr_spelldefensedice-used' value=0 />
     <input type='hidden' class='astralattributes-switch' name='attr_astralattributesswitch' value="show" />
     <input type='hidden' class='buttontoggle' name='attr_sheettype' />
@@ -717,11 +732,11 @@
 	  <span class="sorcery-over" name="attr_sorcery-used-total"></span>
 	</div>
     	<div>Spell Pool</div>
-	<div><span name="attr_magicpool"></span></div>
-	<div><input type="number" name="attr_magicpool-defense" min=0 value=0></input></div>
+	<div><span name="attr_spellpool"></span></div>
+	<div><input type="number" name="attr_spellpool-defense" min=0 value=0></input></div>
     	<div>
           <input type='hidden' class='spellpool-over' name='attr_spellpool-over' />
-	  <span class="spellpool-over" name="attr_magicpool-used-total"></span>
+	  <span class="spellpool-over" name="attr_spellpool-used-total"></span>
 	</div>
     	<div>Conjuring</div>
 	<div><span name="attr_conjuring"></span></div>
@@ -1067,9 +1082,10 @@
                     <select class="mediumselect2" name="attr_spellcategory">
                             <option SELECTED>Combat</option>
                             <option>Health</option>
+                            <option>Detection</option>
                             <option>Illusion</option>
                             <option>Elemental</option>
-                            <option>Controll</option>
+                            <option>Control</option>
                             <option>Telekinetic</option>
                             <option>Transformation</option>
                     </select>
@@ -1088,11 +1104,9 @@
                             <option value="@{target|Target|body|max}">Body</option>
                             <option value="@{target|Target|willpower|max}">Willpower</option>
                             <option value="@{target|Target|intelligence|max}">Intelligence</option>
-                            <option value="@{target|Target|targetMove} + 4 + @{rangedTN} + @{move})">Elemental (single target)</option>
-                            <option value="4 + @{rangedTN})">AOE Elemental</option>
+                            <option value="@{target|Target|targetMove}">Elemental</option>
                             <option value="?{Target Number|4}">Target Number</option>
                             <option value="@{target|Target|force}">Force</option>
-                            <option value="4">AOE</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
                             <option value="4">4</option>
@@ -1171,9 +1185,10 @@
                             		<option value="none"></option>
                             		<option value="combat" >Combat</option>
                             		<option value="health" >Health</option>
+                            		<option value="detection" >Detection</option>
                             		<option value="illusion" >Illusion</option>
                             		<option value="elemental" >Elemental</option>
-                            		<option value="controll" >Controll</option>
+                            		<option value="control" >Control</option>
                             		<option value="telekinetic" >Telekinetic</option>
                             		<option value="transformation" >Transformation</option>
 		        	</select>
@@ -1953,12 +1968,12 @@
 
     <input type='hidden' class='rc-deck-switch' name='attr_rc-deck-switch' value="show" />
     <div class="rc-deck-show">
-        <div class="SRH3">Remote Controll Deck
+        <div class="SRH3">Remote Control Deck
             <button class="switch-button-show" type="action" name="act_rc-deck-switch">Show</button>
         </div>
     </div>
     <div class="rc-deck-hide">
-        <div class="SRH3">Remote Controll Deck
+        <div class="SRH3">Remote Control Deck
             <button class="switch-button-hide" type="action" name="act_rc-deck-switch">Hide</button>
         </div>
     </div>
@@ -2760,7 +2775,7 @@
                 <div>/</div>
                 <div class="header"> Acesss</div>
                 <div>/</div>
-                <div class="header"> Controll</div>
+                <div class="header"> Control</div>
                 <div>/</div>
                 <div class="header"> Index</div>
                 <div>/</div>
@@ -2786,7 +2801,7 @@
                 <div>/</div>
                 <div><input type="number" name="attr_matrixaccessrating"></div>
                 <div>/</div>
-                <div><input type="number" name="attr_matrixcontrollrating"></div>
+                <div><input type="number" name="attr_matrixcontrolrating"></div>
                 <div>/</div>
                 <div><input type="number" name="attr_matrixindexrating"></div>
                 <div>/</div>
@@ -2801,7 +2816,7 @@
                 <div><span name="attr_matrixcode"></span> -
                     <span name="attr_matrixsecurityrating"></span> /
                     <span name="attr_matrixaccessrating"></span> /
-                    <span name="attr_matrixcontrollrating"></span> /
+                    <span name="attr_matrixcontrolrating"></span> /
                     <span name="attr_matrixindexrating"></span> /
                     <span name="attr_matrixfilesrating"></span> /
                     <span name="attr_matrixslaverating"></span>
@@ -2893,13 +2908,9 @@
         <fieldset class="repeating_ic">
             <input type="hidden" name="attr_matrix-penalty">
             <div class="ic-attributes-table">
-                <div><input type="text" name="attr_ic_name" style="width: 110px;"></div>
+                <div><input type="text" name="attr_icname" style="width: 110px;"></div>
                 <div><input type="number" name="attr_icrating"></div>
-                <div><span name="attr_matrixsecuritynumber"></span><span>d6 +</span><span
-                        name="attr_icrating"></span><button type="roll" class="d6-dice" name="roll_initiative"
-                        title="IC Initiative Roll"
-                        value="&{template:default} {{character=@{character_name}}} {{type=IC Initiative Roll}} {{character=@{character_name}}} {{roll=[[@{matrixsecuritynumber}d6+@{icrating}-@{wound_pen} &{tracker}]]}}"></button>
-                </div>
+                <div><span name="attr_matrixsecuritynumber"></span>d6 +<span name="attr_icrating"></span><button type="action" name="act_init" class="d6-button" title="IC Initiative Roll">L</button></div>
                 <div><input type="number" name="attr_matrix-damage" sytle="width: 60px;" min=0 max=10></div>
                 <div><select name="attr_ictype" style="width: 80px;">
                         <option>Crippler</option>
@@ -4275,13 +4286,13 @@ buttonlist.forEach(button => {
 			console.log('2x: ' + my2x);
 			console.log('Drain: ' + drainlvl);
 		
-			var calcDice="@{magic} + ?{Magic Pool Dice}";
+			var calcDice="@{magic} + ?{Spell Pool Dice}";
 			var calcTN="ceil(@{" + myid + "}/2 )";
 			var calcDrainTN="ceil((@{" + myid + "} + @{adept" + myid + "boost} ) /2 )";
 			var calcDrainDice="@{willpower|max} + ?{Drain Pool Dice}";
 
 			var myroll="&{template:adept}{{myname=@{character_name}}}";
-			myroll+="{{MagicPool=[[?{Magic Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
+			myroll+="{{spellpool=[[?{Spell Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{targetofspell=@{" + uppermyid + "}}}";
@@ -4300,20 +4311,20 @@ buttonlist.forEach(button => {
 
 	});
 
-   	var resetpool = function () {
+   	var refreshpools = function () {
 		atts=[];
-		/* atts["controllpool-used"]=0;
+		atts["controlpool-used"]=0;
 		atts["hackingppool-used"]=0;
-		atts["astralpool-used"]=0;
-		atts["combatpool-used"]=0; */
-		atts["magicpool-used"]=0;
+		atts["astralpool-used"]=0; 
+		atts["combatpool-used"]=0; 
+		atts["spellpool-used"]=0;
 		atts["sorcery-used"]=0;
 		atts["spelldefense-used"]=0;
 		setAttrs(atts);
 	};
 
 	on('clicked:repeating_spells:cast', (info) => {
-		var atts=["magic", "magicpool-used", "sorcery-used"];
+		var atts=["magic", "spellpool-used", "sorcery-used"];
 		var source=info['sourceAttribute'].split('_');
 		const myid=info["htmlAttributes"]["id"]
 		var sourceattr=source.pop();
@@ -4333,46 +4344,85 @@ buttonlist.forEach(button => {
 			const force=myval[myrepeat + "force"];
 			const target=myval[myrepeat + "target"];
 			const drain=myval[myrepeat + "drain"];
-			const spused=parseInt(myval["magicpool-used"]);
+			const spused=parseInt(myval["spellpool-used"]);
 			const sorceryused=parseInt(myval["sorcery-used"]);
 			var drainlvl=myval[myrepeat + "drainlvl"];
 			const name=myval[myrepeat + "name"];
 			const description=myval[myrepeat + "description"];
 			const damage=myval[myrepeat + "damage"];
+			var resistattr;
 			var targetofspell=target;
-			if (target.includes("@{target")) targetofspell="@{target|Target|token_name}"
-			var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
-			var calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen} + @{cover}";
-			var calcDrainTN="floor(" + force + "/2) + " + drain + " + ( 2 * @{spellsus} )";
-			var calcDrainDice="@{willpower|max} + ?{Sorcery Dice for Drain?} + ?{Spell Pool Dice for Drain?}";
+			if  (target.includes("@{target")) { 
+				targetofspell="@{target|Target|token_name}";
+				resistattr=target.split("|")[2];
+			}
 			var myroll="&{template:spell}{{myname=@{character_name}}}";
+			if ( range == "AoE" ) {
+				targetofspell="AoE";
+				if ( spellcat == "Elemental" ) {
+					calcTN = "4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc} + @{move}";
+					myroll+="{{targetnumber=[[" + calcTN + "]] + Cover & Target Movement}}";
+				} else {
+					if ( resistattr != null )  {
+						calcTN= " (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen} + @{rangedvizTN}";
+						myroll+="{{targetnumber=[[" + calcTN + "]] + Cover & " + resistattr + "}}";
+					} else {
+						calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen} + @{rangedvizTN}";
+						myroll+="{{targetnumber=[[" + calcTN + "]] + Cover}}";
+					}
+				}
+
+			} else {
+				if ( spellcat == "Elemental" ) {
+					calcTN = target + " + 4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc} + @{move}";
+					myroll+="{{targetnumber=[[" + calcTN + "]]}}";
+				} else {
+					calcTN= target + " + (2*(@{spellstack}+@{spellsus})) + @{spellmisc} + @{stun_pen} + @{wound_pen} + @{rangedvizTN} + @{cover}";
+					myroll+="{{targetnumber=[[" + calcTN + "]]}}";
+				}
+
+			}
+			var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
+			var calcDrainTN="floor(?{Force?}/2) + " + drain + " + ( 2 * @{spellsus} )";
+			var calcDrainDice="@{willpower|max} + ?{Sorcery Dice for Drain?} + ?{Spell Pool Dice for Drain?}";
 			myroll+="{{draindamage=[[0]]}}";
 			myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}} + ?{Sorcery Dice for Drain?|0}]]}}";
 			myroll+="{{spellpool=[[?{Spell Pool Dice?|0} + ?{Spell Pool Dice for Drain?|0}]]}}";
 			myroll+="{{spellname=" + name + "}}";
 			myroll+="{{description=" + description +"}}";
 			myroll+="{{spelldamage=[[" + damage + "]]}}"
-			myroll+="{{castforce=?{Force?|" + force + "}}}"
+			myroll+="{{castforce=?{Force?|" + force + "}}}";
 			myroll+="{{targetofspell=" + targetofspell + "}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
-			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
-			myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+			if ( range == "AoE" ) {
+				myroll+="{{cast=[[0]]}}";
+				myroll+="{{roll=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+			} else {
+				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+			}
 			if (target.includes("@{target"))  {
-				resistattr=target.split("|")[2];
 				console.log('attr split: ' + resistattr);
-				myroll += "{{spelldefense=[Spell Defense](~|spelldefense)}}"
-				if ( resistattr == "force" ) myroll += "{{resistspell=[Resist Spell with force](~@{target|Target|character_name}|attrib-force)}}"
-				if ( resistattr == "targetMove" ) myroll += "{{resistspell=[Resist Spell with 1/2 Impact ](~@{target|Target|character_name}|resist-impact-half)}}"
-				else  myroll += "{{resistspell=[Resist Spell](~@{target|Target|character_name}|attrib-" + resistattr  +"-max)}}"
+				myroll += "{{spelldefense=[Spell Defense](~selected|spelldefense)}}";
+				if ( range != "AoE" ) {
+					if (spellcat == "Elemental" ) myroll += "{{resistspell=[Resist Spell with 1/2 Impact ](~@{target|Target|character_name}|resist-impact-half)}}";
+					else if ( resistattr == "force" ) myroll += "{{resistspell=[Resist Spell with force](~@{target|Target|character_name}|attrib-force)}}";
+					else myroll += "{{resistspell=[Resist Spell](~@{target|Target|character_name}|attrib-" + resistattr  +"-max)}}";
+
+				} else {
+					if ( spellcat == "Elemental" ) myroll += "{{resistspell=[Resist Spell with 1/2 Impact ](~selected|resist-impact-half)}}"
+					else if ( resistattr == "force" ) myroll += "{{resistspell=[Resist Spell with force](~selected|attrib-force)}}"
+					else  myroll += "{{resistspell=[Resist Spell](~selected|attrib-" + resistattr  +"-max)}}"
+
+				}
 			}
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
 				atts=[];
-				console.log('tst');
 				console.log(results.results.spelldamage.result);
 				const finaldmg=damagetable[results.results.spelldamage.result];
 				var draindmg;
+				var finalcast;
 				if (drainlvl.includes("dmglvl")) {
 					let dmglvl=parseInt(results.results.spelldamage.result);
 					draindmg=eval(drainlvl);
@@ -4395,24 +4445,36 @@ buttonlist.forEach(button => {
 				draindmg=damagetable[draindmg];
 				console.log('drdmg : ' + draindmg);
 				atts["sorcery-used"]= sorceryused + parseInt(results.results.sorcerydice.result);
-				atts["magicpool-used"]= spused + parseInt(results.results.spellpool.result);
-				finishRoll( results.rollId,
-                		{
-                    			spelldamage: finaldmg, 
-                    			draindamage: draindmg, 
-                		});
+				atts["spellpool-used"]= spused + parseInt(results.results.spellpool.result);
+				console.log('finalcast: ' + finalcast);
+				if ( range == "AoE" )  { 
+					finalcast=results.results.roll.dice;
+					finishRoll( results.rollId,
+                				{
+                    				spelldamage: finaldmg,
+                    				draindamage: draindmg,
+                    				cast: finalcast,
+                			});
+				} else  { 
+					finishRoll( results.rollId,
+                				{
+                    				spelldamage: finaldmg,
+                    				draindamage: draindmg,
+                			});
+
+				}
 				console.log(atts);
 				setAttrs(atts);
 			});
 		});
 	});
 
-   var initiative = function (init, reaction, dmgpen, mytitle) {
+   var initiative = function (init, reaction, dmgpen, mytitle, character) {
         penatts=["stun_pen", "wound_pen", "matrix-penalty", "vehicle-penalty", "rccommand-penalty", "rcsimsense-penalty", "rcsystem-penalty"];
         getAttrs(penatts, function (myval) { 
         	console.log('test');
 		console.log(init, reaction)
-        	var myroll="&{template:init} {{character=@{character_name}}}{{type=" + mytitle + "}}"
+        	var myroll="&{template:init} {{character=" + character + "}}{{type=" + mytitle + "}}"
 		myroll += "{{roll=[[" + init + "d6+" + reaction + dmgpen + " &{tracker}]]}}"
 		if (myval["wound_pen"] >= 10) {
 			myroll="&{template:info}{{character=@{character_name}}}{{action=Initiative}}{{type=" + mytitle + " }}{{info1=@{character_name} is unconcious or dead}}";
@@ -4432,7 +4494,6 @@ buttonlist.forEach(button => {
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 		finishRoll( results.rollId);
-		resetpool();
 	    });
 	});
    };
@@ -4440,8 +4501,35 @@ buttonlist.forEach(button => {
 		let init="@{initiative|max}";
 		let reaction="@{reaction|max}";
 		let dmgpen=" -@{wp-char}";
+		let character="@{character_name}";
 		let mytitle="Augmented Initiative Roll";
-		initiative(init, reaction, dmgpen, mytitle);	
+		initiative(init, reaction, dmgpen, mytitle, character);	
+
+	});
+
+	on('clicked:repeating_ic:init', (info) => {
+        value="&{template:default} {{character=@{character_name}}} {{type=IC Initiative Roll}} {{character=@{character_name}}} {{roll=[[@{matrixsecuritynumber}d6+@{icrating}-@{wound_pen} &{tracker}]]}}"
+		gets=[];
+		var source=info['sourceAttribute'].split('_');
+		var sourceattr=source.pop();
+		var myrepeat=source.join('_').concat('_');
+		const mytitle=info["htmlAttributes"]["title"]
+		gets.push(myrepeat.concat("icrating"));
+		gets.push(myrepeat.concat("icname"));
+		gets.push(myrepeat.concat("matrix-damage"));
+		getAttrs(gets, function (myval) {
+			console.log(myval);
+			const init = "@{matrixsecuritynumber}";
+			const reaction = parseInt(myval[myrepeat.concat("icrating")]);
+			const character = myval[myrepeat.concat("icname")];
+			const dmg = parseInt(myval[myrepeat.concat("matrix-damage")]);
+			var penalty = " - 0";
+			if ( dmg > 10) penalty = " - 100";
+			else if (dmg > 5) penalty = " - 3";
+			else if (dmg > 2) penalty = " - 2";
+			else if (dmg > 0) penalty = " - 1";
+			initiative(init, reaction, penalty, mytitle, character);	
+		});
 
 	});
 
@@ -4450,6 +4538,7 @@ buttonlist.forEach(button => {
 		const mytitle=info["htmlAttributes"]["title"]
 		const myid=info["htmlAttributes"]["id"]
 		var dmgpen=" -@{wp-char}";
+		character="@{character_name}";
 		if ( myid == "augmentedinit" )  {
 			init="@{initiative|max}";
 			reaction="@{reaction|max}";
@@ -4475,7 +4564,8 @@ buttonlist.forEach(button => {
 			init="@{initiative}";
 			reaction="@{reaction}";
 		}
-		initiative(init, reaction, dmgpen, mytitle);	
+		initiative(init, reaction, dmgpen, mytitle, character);	
+		refreshpools();
  	});
 
 	on('clicked:endturn', (info) => {
@@ -4484,6 +4574,7 @@ buttonlist.forEach(button => {
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 		finishRoll( results.rollId);
+		refreshpools();
 		});
 	});
 
@@ -4505,23 +4596,29 @@ buttonlist.forEach(button => {
 	});
 
    	var resistdmg = function (myid, mods) {
-		if ( mods=="normal" ) mods=1;	
-		if ( mods=="double" ) mods=2;	
-		if ( mods=="half" ) mods=0.5;	
-	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-	        var calcDice= "@{body|max} + @{dermalarmour} + ?{Combat Dice}";
-		calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
-         	myroll="&{template:resistance}";
-	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{CombatPool=[[?{Combat Dice|0}]]}}";
-	 	myroll +="{{Power=?{Attack Power|4}}}";
-	 	myroll +="{{action=Resistance Test}}";
-		myroll +="{{rolldice=[[" + calcDice + "]]}}";
-		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
-	 	myroll +="{{AttackType=" + mods  + "}}";
-	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
-		console.log(myroll);
-        	startRoll(myroll, (results) => {
-		finishRoll( results.rollId);
+		getAttrs(["combatpool-used"], function(myval) {
+			const combatused=parseInt(myval["combatpool-used"]);
+			atts=[];
+			if ( mods=="normal" ) mods=1;	
+			if ( mods=="double" ) mods=2;	
+			if ( mods=="half" ) mods=0.5;	
+	 		let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
+	        	var calcDice= "@{body|max} + @{dermalarmour} + ?{Combat Pool Dice}";
+			calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
+         		myroll="&{template:resistance}";
+	 		myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{combatpool=[[?{Combat Pool Dice|0}]]}}";
+	 		myroll +="{{Power=?{Attack Power|4}}}";
+	 		myroll +="{{action=Resistance Test}}";
+			myroll +="{{rolldice=[[" + calcDice + "]]}}";
+			myroll +="{{targetnumber=[[" + calcTN + "]]}}";
+	 		myroll +="{{AttackType=" + mods  + "}}";
+	 		myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
+			console.log(myroll);
+        		startRoll(myroll, (results) => {
+				finishRoll( results.rollId);
+				atts["combatpool-used"] = results.results.combatpool.result + combatused;
+				setAttrs(atts);
+			});
 		});
 
 	};
@@ -4548,20 +4645,26 @@ buttonlist.forEach(button => {
 	});
 
    	var dodge = function (myid, mods) {
-	        var calcDice= "?{Combat Dice}";
-		calcTN="4 + " + mods;
-         	myroll="&{template:resistance}";
-	 	myroll +="{{name=Dodge}}{{character=@{character_name}}}"
-		myroll +="{{CombatPool=[[?{Combat Dice|0}]]}}";
-	 	myroll +="{{action=Dodge Test}}";
-		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
-		myroll +="{{rolldice=[[" + calcDice + "]]}}";
-	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
-		console.log(myroll);
-        	startRoll(myroll, (results) => {
-		finishRoll( results.rollId);
-		});
+		getAttrs(["combatpool-used"], function(myval) {
+			atts=[];
+			const combatused=parseInt(myval["combatpool-used"]);
+	        	var calcDice= "?{Combat Pool Dice}";
+			calcTN="4 + " + mods;
+         		myroll="&{template:resistance}";
+	 		myroll +="{{name=Dodge}}{{character=@{character_name}}}"
+			myroll +="{{combatpool=[[?{Combat Pool Dice|0}]]}}";
+	 		myroll +="{{action=Dodge Test}}";
+			myroll +="{{targetnumber=[[" + calcTN + "]]}}";
+			myroll +="{{rolldice=[[" + calcDice + "]]}}";
+	 		myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
+			console.log(myroll);
+        		startRoll(myroll, (results) => {
+				finishRoll( results.rollId);
+				atts["combatpool-used"] = results.results.combatpool.result + combatused;
+				setAttrs(atts);
+				});
 
+		});
 	};
 
 	on('clicked:dodge', (info) => {
@@ -4578,7 +4681,7 @@ buttonlist.forEach(button => {
 			const mycharisma=myval["charisma_max"];
 		 	var calcTN;
 		 	var calcDrainTN;
-			var calcDice= parseInt(myval[myid]) + " + ?{Magic Pool Dice} + ?{Spirit Focus Dice}";
+			var calcDice= parseInt(myval[myid]) + " + ?{Spell Pool Dice} + ?{Spirit Focus Dice}";
 			if (myid != "summoning") calcDice+= " + ?{Are you the summoner of the spirit?|Yes," + mycharisma + "|No,0}"
 			var action;
 			if (myid == "summoning" ) {
@@ -4597,7 +4700,7 @@ buttonlist.forEach(button => {
 			myroll+="{{draindamage=[[0]]}}"
 			if (myid == "summoning" ) myroll+="{{spiritforce=[[?{Force?|1}]]}}"
 			else  myroll+="{{spiritforce=[[  @{target|Target|force} ]]}}"
-			myroll+="{{MagicPool=[[?{Magic Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
+			myroll+="{{spellpool=[[?{Spell Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
 			myroll+="{{spellname=" + action + "}}";
 			myroll+="{{spiritdice=[[?{Spirit Focus Dice|0}]]}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
@@ -4923,7 +5026,7 @@ buttonlist.forEach(button => {
 	});
     	on('clicked:repeating_rangedweapons:rangedattack', (info) => {
 		var setatts={};
-		var atts=["sensors-rating"];
+		var atts=["sensors-rating", "combatpool-used"];
 	    	var recoilx=1;
 		var rounds=1;
 		var source=info['sourceAttribute'].split('_');
@@ -4939,6 +5042,7 @@ buttonlist.forEach(button => {
 			var vehiclesensors=0;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
 			const myweapon= myval[myrepeat.concat("name")];
+			const combatused=parseInt(myval["combatpool-used"]);
 			const wdmg= myval[myrepeat.concat("damage")];
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
 			const ammotype= myval[myrepeat.concat("ammotype")];
@@ -4994,17 +5098,19 @@ buttonlist.forEach(button => {
 			console.log(roll);
                 	startRoll(roll, (results) => {
 				const myrounds=results.results.rounds.result;
+				const combatpool=results.results.combatpool.result + combatused;
 				finalrounds=myrounds;
 				if ( myrounds > ammoleft ) { 
 					finalrounds=parseInt(ammoleft);
 				}
-				if ((bf==1) || (fa==1))  wpower=parseInt(wpower) + finalrounds;
+				if ( finalrounds > 1  )  wpower=parseInt(wpower) + finalrounds;
 			finishRoll( results.rollId,
                 	{
                     		weaponpower: wpower, 
                     		rounds: finalrounds, 
                 	})
 			setatts[myrepeat.concat("ammoremain")]=ammoremain - finalrounds;
+			setatts["combatpool-used"]=combatpool;
 			setAttrs(setatts);
 			});
 			}
@@ -5022,13 +5128,16 @@ buttonlist.forEach(button => {
 		var myskill;
 		var myweapon;
 		var mypower;
-		var combatpool="true";
+		var pool="combat";
 		var defaultmsg="";
 		var defaultpen=0;
 		var myspec=0;
-		const meleeattrs=["unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage"];
+		const meleeattrs=["combatpool-used", "astralpool-used", "unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage"];
 		getAttrs(meleeattrs, function(myval) {
+			const astralused=parseInt(myval["astralpool-used"]);
+			const combatused=parseInt(myval["combatpool-used"]);
 			if ( mymode == "astralattack" ) {
+				pool="astral";
 				myweapon="Astral Attack";
 				var myskill="@{astralcombat}";
 				myskill="@{astralcombat} + @{weaponfocus-force}"
@@ -5048,10 +5157,11 @@ buttonlist.forEach(button => {
 			   myweapon="@{martialarts}";
 			   mypower="@{strength|max}";
 			   if ( myval["unarmed"] == 0 ) {
+			   	console.log('unarmed is 0');
 				if (myval["cyberimplant"] == 0) { 
 					myskill="@{strength|max}";
 					defaultpen=4;
-					combatpool="false";
+					pool="false";
 					var defaultmsg="{{default=Skill Defaulted to Strength Attribute with +" + defaultpen + " to hit}}";
 				} else {
 					myskill=myval["cyberimplant"];
@@ -5070,11 +5180,20 @@ buttonlist.forEach(button => {
 			}
 			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?} ) + " + defaultpen;
 			var calcDice=myskill + " + " + myspec ;
-			if ( combatpool == "true" ) calcDice += " + ?{Combat Pool Dice}"
                         var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}{{weapondamage="
+			console.log('pool name is ' + pool);
 			myroll+= mydamage + "}}{{weaponpower=[[" + mypower + "]]}}"
-			if ( combatpool == "true" ) myroll += "{{combatpool=[[?{Combat Pool Dice|0}]]}}"
-			else  myroll += "{{combatpool=[[0]]}}"
+			if ( pool == "combat" ) {
+				calcDice += " + ?{Combat Pool Dice}"
+				myroll += "{{pooldice=[[?{Combat Pool Dice|0}]]}}"
+				myroll += "{{pooltype=Combat}}";
+			} else if ( pool == "astral" ) {
+				calcDice += " + ?{Astral Pool Dice}"
+				myroll += "{{pooldice=[[?{Astral Pool Dice|0}]]}}"
+				myroll += "{{pooltype=Astral}}";
+			} else  {
+				myroll += "{{pooldice=[[0]]}}"
+			}
 			myroll+= "{{charreach=[[@{meleereach|max}]]}}{{targetreach=[[@{target|Target|meleereach|max}]]}}"
 			myroll+="{{weaponname=" + myweapon + "}}{{reachmod=[[?{Use Reach Modifier?|Yes,1|No,0}]]}}"
 			myroll+="{{reachbonus=[[(@{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?}]]}}"
@@ -5085,16 +5204,20 @@ buttonlist.forEach(button => {
                 	startRoll(myroll, (results) => {
 				var reachmodtxt="Reach Bonus Applied" ;
 				if ( results.results.reachmod.result == 0 ) reachmodtxt="Reach Bonus Not Applied";
+				if ( pool == "combat" ) atts["combatpool-used"] = results.results.pooldice.result + combatused;
+				if ( pool == "astral" ) atts["astralpool-used"] = results.results.pooldice.result + astralused;
 				finishRoll( results.rollId, {
 					reachmod: reachmodtxt,
 				});
+				if ( Object.keys(atts).length > 0 ) setAttrs(atts);
+
 			});
 		});
 
 	});
     	on('clicked:repeating_meleeweapons:attack', (info) => {
 		console.log(info);
-		var atts=[];
+		var atts=["combatpool-used"];
 		var rounds=1;
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
@@ -5105,6 +5228,7 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
+			const combatused= parseInt(myval["combatpool-used"]);
 			const myweapon= myval[myrepeat.concat("name")];
 			const myreach= myval[myrepeat.concat("reach")];
 			const mydamage= myval[myrepeat.concat("damage")];
@@ -5128,6 +5252,8 @@ buttonlist.forEach(button => {
 			finishRoll( results.rollId, {
 				reachmod: reachmodtxt,
 			});
+			atts["combatpool-used"] = results.results.combatpool.result + combatused;
+			setAttrs(atts);
 			});
 		});
 	});
@@ -5135,7 +5261,7 @@ buttonlist.forEach(button => {
     	on('clicked:repeating_explosives:rangedattack', (info) => {
 		var setatts={};
 		var scatter="";
-		var atts=[];
+		var atts=["combatpool-used"];
 		var rounds=1;
 		var expint=0;
 		var source=info['sourceAttribute'].split('_');
@@ -5148,6 +5274,7 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
+			const combatused= parseInt(myval["combatpool-used"]);
 			const myweapon= myval[myrepeat.concat("name")];
 			const wdmg= myval[myrepeat.concat("damage")];
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
@@ -5187,6 +5314,7 @@ buttonlist.forEach(button => {
 			   roll += "{{scatdir=[[1d6]]}}{{scatter=[[" + myscat + "d6]]}}{{blastradius=" + myblast 
 			   roll += "}}{{scatterredux=" + myredux + "}}{{scatdirnumber=[[" + direction  
 			   roll += "]]}}{{scatdir=" + scatimg + direction  + ".png}}"
+			   roll += "{{resist=[Resist Explosive](~selected|resist-impact-normal)}}";
 			   console.log(roll);
                 	   startRoll(roll, (results) => {
 			   	var myscatter = results.results.scatter.result;
@@ -5200,6 +5328,7 @@ buttonlist.forEach(button => {
                     			scatter: myscatter, 
                 		}
 				);
+				setatts["combatpool-used"] = results.results.combatpool.result + combatused;
 			   	setatts[myrepeat.concat("ammoremain")]=ammoremain - 1;
 			   	setAttrs(setatts);
 			   });
@@ -6214,7 +6343,7 @@ var setmatrixsystem = function (rating) {
         const [system, access, control, index, files, slave ] = myrating.split("/")
 	atts["matrixcode"]=finalcode;
 	atts["matrixsecurityrating"]=system;
-	atts["matrixcontrollrating"]=control;
+	atts["matrixcontrolrating"]=control;
 	atts["matrixindexrating"]=index;
 	atts["matrixfilesrating"]=files;
 	atts["matrixslaverating"]=slave;
@@ -6592,7 +6721,6 @@ on("change:metatype change:quickness change:acceleration change:handling-street 
 });
 
 
-
 on("change:matrixcode", function() {
     console.log('matrixsecuritynumber')
     getAttrs(["matrixcode"], function (myvar) {
@@ -6639,17 +6767,17 @@ on("change:deck-dni change:intelligence_max change:reaction change:deck-asist ch
     });
 });
 
-on("change:sorcery-defense change:magicpool-defense change:sorcery-used change:magicpool-used", function() {
-	getAttrs(["sorcery-defense", "magicpool", "sorcery", "magicpool-defense", "magicpool-used", "sorcery-used"], function (myval) {
+on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:spellpool-used", function() {
+	getAttrs(["sorcery-defense", "spellpool", "sorcery", "spellpool-defense", "spellpool-used", "sorcery-used"], function (myval) {
 		atts=[];
 	        console.log('updating defense dice');
 		var poolover=0;
 		var sorceryover=0;
 		let sorcery=parseInt(myval["sorcery"]);
-		let pool=parseInt(myval["magicpool"]);
-		let md=parseInt(myval["magicpool-defense"]);
+		let pool=parseInt(myval["spellpool"]);
+		let md=parseInt(myval["spellpool-defense"]);
 		let sd=parseInt(myval["sorcery-defense"]);
-		let mpu=parseInt(myval["magicpool-used"]);
+		let mpu=parseInt(myval["spellpool-used"]);
 		let su=parseInt(myval["sorcery-used"]);
 		let sorcerytotal= sd + su;
 		let pooltotal= md + mpu;
@@ -6659,7 +6787,7 @@ on("change:sorcery-defense change:magicpool-defense change:sorcery-used change:m
 		atts["spellpool-over"]=poolover;
 		atts["spelldefensedice"]=md + sd;
 		atts["sorcery-used-total"]=sd + su;
-		atts["magicpool-used-total"]=md + mpu;
+		atts["spellpool-used-total"]=md + mpu;
 		console.log(atts);
 		setAttrs(atts);
 	});
@@ -6767,14 +6895,14 @@ var updatepools = function() {
         if (myval.sheettype != "Spirit" ) myatts["reaction"] = Math.floor((myagil + myint)/2);
         if (mymagic > 0 ) {
             console.log("magic is not 0");
-	    myatts["magicpool"] = Math.floor((mymagic + myint + mywill)/3);
+	    myatts["spellpool"] = Math.floor((mymagic + myint + mywill)/3);
 	    myatts["astralpool"] = Math.floor( (mychar + mywill + myint) /2 );
 	    myatts["astralreaction"]= ( 20 + myval.intelligence_max);
         } else if (myval.sheettype == "Spirit" ) {
-	    myatts["magicpool"] = 0;
+	    myatts["spellpool"] = 0;
 	    myatts["astralpool"] = 0;
         } else {
-	    myatts["magicpool"] = 0;
+	    myatts["spellpool"] = 0;
 	    myatts["astralpool"] = 0;
 	    myatts["astralreaction"] = 0;
         }
@@ -7243,6 +7371,21 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 
 	});
 
+	on("change:repeating_spells:range change:repeating_spells:spellcategory", function(myval) {
+		getAttrs(["repeating_spells_spellcategory", "repeating_spells_range"], function(myval) {
+		const spellcategory=myval["repeating_spells_spellcategory"];
+		const range=myval["repeating_spells_range"];
+		console.log(spellcategory)
+		console.log(range)
+		atts=[];
+		if ( spellcategory == "Elemental" ) {
+			atts["repeating_spells_target"]="@{target|Target|targetMove}";
+			console.log(atts);
+			setAttrs(atts);
+		}
+		});
+	});
+
 
 
     
@@ -7251,17 +7394,18 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 <rolltemplate class="sheet-rolltemplate-spell">
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader">{{myname}}: {{spellname}} {{castforce}} vs. {{targetofspell}}</div>
-        <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
+        <div class="sheet-rtrow"><b>Rolling:</b> {{computed::rolldice}}d6 vs. {{targetnumber}} </div>
         {{#spelldamage}}<div class="sheet-rtrow"><b>Damage:</b> {{computed::spelldamage}} </div>{{/spelldamage}}
         {{#sorcerydice}}<div class="sheet-rtrow"><b>Sorcery Dice Used:</b> {{sorcerydice}}</div>{{/sorcerydice}}
         {{#spellpool}}<div class="sheet-rtrow"><b>Spell Pool Used:</b> {{spellpool}}</div>{{/spellpool}}
-        <div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>
+        {{#cast}}<div class="sheet-rtrow"><b>Casting Test:</b> {{computed::cast}}</div>{{/cast}}
+        {{#casttest}}<div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>{{/casttest}}
         {{#draintest}}<div class="sheet-rtrow"><b>Drain Test:</b> {{draintest}} vs. {{computed::draindamage}}</div>{{/draintest}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
         {{#resist}}<div class="sheet-rtrow"><b>{{targetofspell}}:</b> {{resist}}</div>{{/resist}}
-        {{#spelldefense}}<div class="sheet-rtrow">{{spelldefense}} Target of {{castforce}} </div>{{/spelldefense}}
+        {{#spelldefense}}<div class="sheet-rtrow">{{spelldefense}} Target of <b>{{castforce}}</b> </div>{{/spelldefense}}
         {{#resistspell}}<div class="sheet-rtrow">{{resistspell}} Target of {{castforce}}</div>{{/resistspell}}
     </div>
 </rolltemplate>
@@ -7270,7 +7414,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtheader">{{myname}}: {{spellname}} {{powerlevel}} vs. {{targetofspell}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
-        <div class="sheet-rtrow"><span>Magic Pool Used: </span>{{MagicPool}}</div>
+        <div class="sheet-rtrow"><span>Spell Pool Used: </span>{{spellpool}}</div>
         <div class="sheet-rtrow"><span>Casting Test: </span>{{casttest}}</div>
         <div class="sheet-rtrow"><span>Drain Test: </span>{{draintest}} vs. {{computed::draindamage}}</div>
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
@@ -7354,7 +7498,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         <div class="sheet-rtrow">{{action}}: {{roll}}</div>
-        <div class="sheet-rtrow">Combat Pool Used: {{CombatPool}}</div>
+        <div class="sheet-rtrow">Combat Pool Used: {{combatpool}}</div>
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
