@@ -9480,6 +9480,12 @@
               </div>
           </div>
           <div class="ship-category-info">
+            <div class="boarded"> 
+                <label class="toggle-btn ship-onboard">
+                  <input class="btn-input hide-element" type="checkbox" name="attr_onboard_check_ship_button"/>
+                  <div class="btn-content" data-i18n="ship-onboard"></div>
+                </label>
+            </div>
             <h3>Integrity </h3>
             <div class="info">
                 <div class="asset-track-wrapper">
@@ -9515,11 +9521,11 @@
                   <div class="impact-group">
                     <div class="impact-list">
                         <label class="toggle-btn impact-btn">
-                          <input class="btn-input hide-element" type="checkbox" name="attr_impactBattered"/>
+                          <input class="btn-input hide-element" type="checkbox" name="attr_impactShipBattered"/>
                           <div class="btn-content" data-i18n="impact-battered"></div>
                         </label>
                         <label class="toggle-btn impact-btn">
-                          <input class="btn-input hide-element" type="checkbox" name="attr_impactCursed"/>
+                          <input class="btn-input hide-element" type="checkbox" name="attr_impactShipCursed"/>
                           <div class="btn-content" data-i18n="impact-cursed"></div>
                         </label>
                     </div>
@@ -11114,11 +11120,11 @@
                   <div class="impact-group">
                     <div class="impact-list">
                         <label class="toggle-btn impact-btn">
-                          <input class="btn-input hide-element" type="checkbox" name="attr_impactBattered"/>
+                          <input class="btn-input hide-element" type="checkbox" name="attr_impactShipBattered"/>
                           <div class="btn-content" data-i18n="impact-battered"></div>
                         </label>
                         <label class="toggle-btn impact-btn">
-                          <input class="btn-input hide-element" type="checkbox" name="attr_impactCursed"/>
+                          <input class="btn-input hide-element" type="checkbox" name="attr_impactShipCursed"/>
                           <div class="btn-content" data-i18n="impact-cursed"></div>
                         </label>
                     </div>
@@ -21531,19 +21537,35 @@ const impactsAttrs = [
   'impactOther2'
 ]
 
-const momentumAttrs = [
-  'momentum_max',
-  'momentum_reset'
+const shipImpactAttrs = [
+  'impactShipBattered',
+  'impactShipCursed'
 ]
 
-on(impactsAttrs.map(impact => `change:${impact}`).join(" "),
+const momentumAttrs = [
+  'momentum_max',
+  'momentum_reset',
+  'onboard_check_ship_button'
+]
+
+function buildImpactEvents (impacts) {
+  return impacts.map(impact => `change:${impact}`).join(' ')
+}
+
+on(`${buildImpactEvents(impactsAttrs)} ${buildImpactEvents(shipImpactAttrs)} change:onboard_check_ship_button`,
   function() {
     var numImpacts = 0;
     getAttrs(
-      impactsAttrs.concat(momentumAttrs),
+      impactsAttrs.concat(momentumAttrs).concat(shipImpactAttrs),
       function(values) {
         for (var attr in impactsAttrs) {
-          if (values[impactsAttrs[attr]] === "on") {
+          if (values[impactsAttrs[attr]] === 'on') {
+            numImpacts += 1;
+          }
+        }
+        for (var attr in shipImpactAttrs) {
+          console.log(values)
+          if (values[shipImpactAttrs[attr]] === 'on' && values['onboard_check_ship_button'] === 'on') {
             numImpacts += 1;
           }
         }
