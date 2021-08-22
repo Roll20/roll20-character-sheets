@@ -241,7 +241,7 @@
             <div><input type='hidden' class='spellpool-over' name='attr_spellpool-over' /><span class="spellpool-over"
                     name="attr_spellpool-used-total"></span></div>
             <div> Hacking Pool:</div>
-            <div><span type="number" name="attr_hackingpool-max"></span> </div>
+            <div><span type="number" name="attr_hackingpool"></span> </div>
             <div><input type='hidden' class='hackingpool-over' name='attr_hackingpool-over' /><span
                     class="hackingpool-over" name="attr_hackingpool-final"></span></div>
             <div> Control Pool:</div>
@@ -4305,6 +4305,7 @@ buttonlist.forEach(button => {
 			const rollq="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}{{poolname=Combat Pool}}{{pooldice=?{Pool Dice?|0}}}{{result=[[ {[[" + rating + " + ?{Pool Dice?}]]d6>[[?{What is the Target Number?|4} + @{stun_pen} + @{wound_pen}]]!!} ]]}}";
                 	startRoll(rollq, (results) => {
 				console.log('R: ' + results);
+				updatepoolused("combatpool", results.results.pooldice.result);	
 				 finishRoll( results.rollId);
 			});
 		});
@@ -4321,8 +4322,7 @@ buttonlist.forEach(button => {
 		    myroll+="{{result= [[ [[" + calcDice + "]]d6>[[{2,(" + calcTN +")}kh1]]!! ]] }}";
 		    console.log(myroll);
                 	startRoll(myroll, (results) => {
-				if ( pool == "hackingpool-max" ) updatepoolused("hacking", results.results.pooldice.result);	
-				else updatepoolused(pool, results.results.pooldice.result);	
+				updatepoolused(mypool.concat("pool"), results.results.pooldice.result);	
 				finishRoll( results.rollId);
 			});
 	});
@@ -4839,29 +4839,24 @@ buttonlist.forEach(button => {
 	});
 
    	var resistdmg = function (myid, mods) {
-		getAttrs(["combatpool-used"], function(myval) {
-			const combatused=parseInt(myval["combatpool-used"]);
-			atts=[];
-			if ( mods=="normal" ) mods=1;	
-			if ( mods=="double" ) mods=2;	
-			if ( mods=="half" ) mods=0.5;	
-	 		let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-	        	var calcDice= "@{body|max} + @{dermalarmour} + ?{Combat Pool Dice}";
-			calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
-         		myroll="&{template:resistance}";
-	 		myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{combatpool=[[?{Combat Pool Dice|0}]]}}";
-	 		myroll +="{{Power=?{Attack Power|4}}}";
-	 		myroll +="{{action=Resistance Test}}";
-			myroll +="{{rolldice=[[" + calcDice + "]]}}";
-			myroll +="{{targetnumber=[[" + calcTN + "]]}}";
-	 		myroll +="{{AttackType=" + mods  + "}}";
-	 		myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
-			console.log(myroll);
-        		startRoll(myroll, (results) => {
-				finishRoll( results.rollId);
-				atts["combatpool-used"] = results.results.combatpool.result + combatused;
-				setAttrs(atts);
-			});
+		if ( mods=="normal" ) mods=1;	
+		if ( mods=="double" ) mods=2;	
+		if ( mods=="half" ) mods=0.5;	
+	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
+	        var calcDice= "@{body|max} + @{dermalarmour} + ?{Combat Pool Dice}";
+		calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
+         	myroll="&{template:resistance}";
+	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{combatpool=[[?{Combat Pool Dice|0}]]}}";
+	 	myroll +="{{Power=?{Attack Power|4}}}";
+	 	myroll +="{{action=Resistance Test}}";
+		myroll +="{{rolldice=[[" + calcDice + "]]}}";
+		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
+	 	myroll +="{{AttackType=" + mods  + "}}";
+	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+			updatepoolused("combatpool", results.results.combatpool.result);	
+			finishRoll( results.rollId);
 		});
 
 	};
@@ -4888,26 +4883,21 @@ buttonlist.forEach(button => {
 	});
 
    	var dodge = function (myid, mods) {
-		getAttrs(["combatpool-used"], function(myval) {
-			atts=[];
-			const combatused=parseInt(myval["combatpool-used"]);
-	        	var calcDice= "?{Combat Pool Dice}";
-			calcTN="4 + " + mods;
-         		myroll="&{template:resistance}";
-	 		myroll +="{{name=Dodge}}{{character=@{character_name}}}"
-			myroll +="{{combatpool=[[?{Combat Pool Dice|0}]]}}";
-	 		myroll +="{{action=Dodge Test}}";
-			myroll +="{{targetnumber=[[" + calcTN + "]]}}";
-			myroll +="{{rolldice=[[" + calcDice + "]]}}";
-	 		myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
-			console.log(myroll);
-        		startRoll(myroll, (results) => {
-				finishRoll( results.rollId);
-				atts["combatpool-used"] = results.results.combatpool.result + combatused;
-				setAttrs(atts);
-				});
-
+	       	var calcDice= "?{Combat Pool Dice}";
+		calcTN="4 + " + mods;
+         	myroll="&{template:resistance}";
+	 	myroll +="{{name=Dodge}}{{character=@{character_name}}}"
+		myroll +="{{combatpool=[[?{Combat Pool Dice|0}]]}}";
+	 	myroll +="{{action=Dodge Test}}";
+		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
+		myroll +="{{rolldice=[[" + calcDice + "]]}}";
+	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
+		console.log(myroll);
+        	startRoll(myroll, (results) => {
+			updatepoolused("combatpool", results.results.combatpool.result);	
+			finishRoll( results.rollId);
 		});
+
 	};
 
 	on('clicked:dodge', (info) => {
@@ -5042,7 +5032,7 @@ buttonlist.forEach(button => {
 				const newscore = parseInt(myval["maneuver-score"]) + results.results.roll.result ;
 				atts["maneuver-score"] = newscore;
 				console.log('new man score: ' + atts["maneuver-score"]);
-				updatepoolused("Control", results.results.controlpool.result);	
+				updatepoolused("controlpool", results.results.controlpool.result);	
 				finishRoll( results.rollId, {
 					position: newscore,
 				})
@@ -5072,7 +5062,7 @@ buttonlist.forEach(button => {
 				var finaltn = results.results.targetnumber.result + speedmod;
 				if ( finaltn < 2 ) finaltn = 2;
 				const finaldice = (results.results.roll.dice.filter(mydice=> mydice >= finaltn )).length;
-				updatepoolused("Control", results.results.controlpool.result);	
+				updatepoolused("controlpool", results.results.controlpool.result);	
 				finishRoll( results.rollId,
                 		{
                     			targetnumber: finaltn, 
@@ -5136,7 +5126,7 @@ buttonlist.forEach(button => {
 			if (finaltn < 2) finaltn=2;
 			console.log(results.results.roll.dice);
 			const finaldice = (results.results.roll.dice.filter(mydice=> mydice >= finaltn )).length;
-			updatepoolused("Control", results.results.controlpool.result);	
+			updatepoolused("controlpool", results.results.controlpool.result);	
 			finishRoll( results.rollId,
                 	{
                     		targetnumber: finaltn, 
@@ -5192,7 +5182,7 @@ buttonlist.forEach(button => {
                  	var manroll="&{template:vehicle} {{type=Compare Maneuver Score}} {{character=@{character_name}}} {{target=@{target|Target|character_name}}} {{charscore=[[@{maneuver-score}]]}} {{targetscore=[[@{target|Target|maneuver-score}]]}} {{roll=[[@{maneuver-score} - @{target|Target|maneuver-score} ]]}} "
 		}
                 startRoll(manroll, (results) => {
-			updatepoolused("Control", results.results.controlpool.result);	
+			updatepoolused("controlpool", results.results.controlpool.result);	
 			console.log('results: ' + results.results.roll.result)			
 			finishRoll( results.rollId);
 			setAttrs({"maneuver-score": results.results.roll.result});
@@ -5977,7 +5967,7 @@ buttonlist.forEach(button => {
 		sets={};
 	        console.log(myval);
 	        console.log(myval["deck-realityfilter"]);
-		var hp =  parseInt(myval["hackingpool-max"]);
+		var hp =  parseInt(myval["hackingpool"]);
 		var hackpool= hp || 0;
 		var mysuppress=parseInt(myval["deck-icsuppressed"]);
 		var mympcp = parseInt(myval["deck-mpcp-max"]) + parseInt(myval["deck-mpcp-mods"]) - parseInt(myval["deck-realityfilter"]);
@@ -5997,7 +5987,6 @@ buttonlist.forEach(button => {
 		sets["deck-sensors-final"] = mysensors;	
 		sets["deck-evasion-final"] = myevasion;	
 		sets["deck-masking-final"] = mymasking;	
-		sets["hackingpool-final"] = poolused;
 		sets["deck-detection-final"] = mydetection;	
 		console.log(sets);
 		setAttrs(sets);
@@ -6898,7 +6887,7 @@ on("change:gunnerymotion change:gunneryspeed change:gunnerymaneuver change:gunne
     updateManualGunneryTNs();
 });
 
-on("sheet:opened change:perception change:strength change:magic change:deck-mpcp-max change:willpower change:intelligence change:quickness change:charisma change:body change:frametype change:reaction change:vcr", function() {
+on("sheet:opened change:perception change:strength change:magic change:deck-mpcp-final change:willpower change:intelligence change:quickness change:charisma change:body change:frametype change:reaction change:vcr", function() {
     updatepools();
 });
 
@@ -7086,10 +7075,10 @@ on("change:strength_max", function() {
 });
 
 on("change:hackingpool-final change:hackingpool change:controlpool change:controlpool-used change:combatpool change:combatpool-used", function() {
-	getAttrs(["hackingpool-final", "hackingpool-max", "controlpool", "controlpool-used", "combatpool", "combatpool-used"], function(myval) {
+	getAttrs(["hackingpool-final", "hackingpool", "controlpool", "controlpool-used", "combatpool", "combatpool-used"], function(myval) {
 		sets={"hackingpool-over": 0, "controlpool-over": 0, "combatpool-over": 0};
 		hackused=parseInt(myval["hackingpool-final"]);
-		hackpool=parseInt(myval["hackingpool-max"]);
+		hackpool=parseInt(myval["hackingpool"]);
 		controlused=parseInt(myval["controlpool-used"]);
 		controlpool=parseInt(myval["controlpool"]);
 		combatused=parseInt(myval["combatpool-used"]);
@@ -7147,13 +7136,13 @@ on("change:repeating_explosives:exptype", function(eventinfo){
 
 
 var updatepools = function() {
-    getAttrs(["strength_max","magic","deck-mpcp-max","perception", "willpower_max","intelligence_max", "quickness_max", "charisma_max", "body_max", "frametype", "reaction", "vcr", "sheettype"], function(myval) {
+    getAttrs(["strength_max","magic","deck-mpcp-final","perception", "willpower_max","intelligence_max", "quickness_max", "charisma_max", "body_max", "frametype", "reaction", "vcr", "sheettype"], function(myval) {
         var myatts={}
         var myvcr = parseInt(myval.vcr);
         var myperception = parseInt(myval.perception) || 0;
         var myreact = parseInt(myval.reaction);
         var mymagic = parseInt(myval.magic);
-        var mympcp = parseInt(myval["deck-mpcp-max"]);
+        var mympcp = parseInt(myval["deck-mpcp-final"]);
         var myagil = parseInt(myval.quickness_max);
         var mystr = parseInt(myval.strength_max);
         var mywill = parseInt(myval.willpower_max);
@@ -7176,12 +7165,12 @@ var updatepools = function() {
 	    myatts["astralreaction"] = 0;
         }
         if ( mympcp > 0 ) {
-	    myatts["hackingpool-max"] = Math.floor( (mympcp + myint) /3 );
+	    myatts["hackingpool"] = Math.floor( (mympcp + myint) /3 );
 	} else { 
-	    myatts["hackingpool-max"] = 0;
+	    myatts["hackingpool"] = 0;
         }
 	if (myval.frametype == "Smart Frame") {
-	    	myatts["hackingpool-max"] = 0;
+	    	myatts["hackingpool"] = 0;
         }
 	if (myvcr > 0) {
 	    	myatts["controlpool"] = myreact + ( 2 * myvcr);
