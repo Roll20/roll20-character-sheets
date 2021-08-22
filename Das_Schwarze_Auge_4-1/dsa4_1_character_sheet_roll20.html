@@ -14421,23 +14421,6 @@ function FKWgetType(typeRaw)
 	return FKWtype;
 }
 
-function prettifyMod(uglyModifier) {
-	var prettyModifier;
-	if(isNaN(parseInt(uglyModifier)))
-	{
-		return uglyModifier;
-	}
-	if(uglyModifier < 0)
-	{
-		prettyModifier = "−" + String(Math.abs(uglyModifier));
-	} else if(uglyModifier === 0){
-		prettyModifier = "±" + String(uglyModifier);
-	} else {
-		prettyModifier = "+" + String(uglyModifier);
-	}
-	return prettyModifier;
-}
-
 function getTargetZoneMod(targetZone, legs) {
 	var zoneMod = 0;
 	switch(targetZone)
@@ -17065,124 +17048,6 @@ function calculateRuestungBE(values, eventInfo) {
 
     return attrsToChange;
 }
-/*
-	x.5 values are always rounded up in this system, so let's have a function for this.
-*/
-function DSAround (num) {
-	num = parseFloat(num);
-
-	if (isNaN(num)) {
-		console.log("DSAround: NaN encountered.", "num is \"" + num + "\".");
-		return NaN;
-	}
-
-	num = roundDecimals(num, 1);
-	// Round down if fraction is less than 0.5; abs() to handle negative values correctly as well
-	if (Math.abs(num) % 1 < 0.5) {
-		num = Math.floor(num);
-	} else {
-		num = Math.ceil(num);
-	}
-
-	return num;
-}
-
-/*
-	JavaScript's Math.round() only rounds to 0 decimal places.
-	Using the toFixed() + parseFloat() method is cumbersome, so here we are with a new function.
-*/
-function roundDecimals (num, digits) {
-	num = parseFloat(num);
-	digits = parseInt(digits);
-
-	if (isNaN(num) || isNaN(digits)) {
-		console.log("roundDecimals: NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
-		return NaN;
-	}
-
-	num = parseFloat(num.toFixed(digits));
-	return num;
-}
-
-/*
-	General Sanity Check Function
-*/
-function DSAsane (value, type) {
-	var func = "DSAsane";
-	var errors = false;
-
-	function limitedIntValid(value, minimum, maximum) {
-		if (isNaN(value)
-		|| isNaN(parseInt(value))
-		|| parseInt(value) < minimum
-		|| parseInt(value) > maximum) {
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	switch(type) {
-		case "stat":
-			// MU, KL, IN, ...
-			// Must be number or parseInt()-able number
-			// Must be integer in range [0, 99]
-			if (!limitedIntValid(value, 0, 99)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
-			}
-			break;
-		case "wound-box":
-			// Checkbox with wound value (active: 1, inactive: 0)
-			// Must be number or parseInt()-able number
-			// Must be integer in range [0, 1]
-			if (!limitedIntValid(value, 0, 1)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
-			}
-			break;
-		case "ini-mod-weapon":
-			// INI modifiers of weapons
-			// Must be number or parseInt()-able number
-			// Must be integer in range [-9, 9]
-			if (!limitedIntValid(value, -9, 9)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
-			}
-			break;
-		case "encumbrance":
-			// Encumbrance from excessive equipment weight or armour
-			// Must be number or parseInt()-able number
-			// Must be integer in range [0, 99]
-			if (!limitedIntValid(value, 0, 99)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
-				errors = true;
-			}
-			break;
-		default:
-			console.log(func + ": type '", type, "' not understood.");
-	}
-	return !errors;
-}
-
-/*
-	Property Checker
-	Checks whether properties (given in an array of strings) are available in an object.
-	Does not check whether the array contains strings only.
-	Returns an object with the error count (missing properties) and a string array of missing properties.
-*/
-function checkRequiredProperties(properties, values) {
-	var errors = 0;
-	var missing = [];
-
-	for (req of properties) {
-		if (!values.hasOwnProperty(req)) {
-			errors += 1;
-			missing.push(req);
-		}
-	}
-	return { "errors": errors, "missing": missing.toString() };
-}
 
 // Astral Energy: Base value
 function calculateAEBase(values) {
@@ -17757,5 +17622,147 @@ function calculateShieldAttack(values, activeShieldRowId) {
 		"shieldAtMod": shieldAtMod,
 		"shieldAtAvailable": shieldAtAvailable
     };
+}
+
+/* 
+	UTILITY FUNCTIONS
+*/
+/*
+	General Sanity Check Function
+*/
+function DSAsane (value, type) {
+	var func = "DSAsane";
+	var errors = false;
+
+	function limitedIntValid(value, minimum, maximum) {
+		if (isNaN(value)
+		|| isNaN(parseInt(value))
+		|| parseInt(value) < minimum
+		|| parseInt(value) > maximum) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	switch(type) {
+		case "stat":
+			// MU, KL, IN, ...
+			// Must be number or parseInt()-able number
+			// Must be integer in range [0, 99]
+			if (!limitedIntValid(value, 0, 99)) {
+				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				errors = true;
+			}
+			break;
+		case "wound-box":
+			// Checkbox with wound value (active: 1, inactive: 0)
+			// Must be number or parseInt()-able number
+			// Must be integer in range [0, 1]
+			if (!limitedIntValid(value, 0, 1)) {
+				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				errors = true;
+			}
+			break;
+		case "ini-mod-weapon":
+			// INI modifiers of weapons
+			// Must be number or parseInt()-able number
+			// Must be integer in range [-9, 9]
+			if (!limitedIntValid(value, -9, 9)) {
+				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				errors = true;
+			}
+			break;
+		case "encumbrance":
+			// Encumbrance from excessive equipment weight or armour
+			// Must be number or parseInt()-able number
+			// Must be integer in range [0, 99]
+			if (!limitedIntValid(value, 0, 99)) {
+				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				errors = true;
+			}
+			break;
+		default:
+			console.log(func + ": type '", type, "' not understood.");
+	}
+	return !errors;
+}
+
+/*
+	Property Checker
+	Checks whether properties (given in an array of strings) are available in an object.
+	Does not check whether the array contains strings only.
+	Returns an object with the error count (missing properties) and a string array of missing properties.
+*/
+function checkRequiredProperties(properties, values) {
+	var errors = 0;
+	var missing = [];
+
+	for (req of properties) {
+		if (!values.hasOwnProperty(req)) {
+			errors += 1;
+			missing.push(req);
+		}
+	}
+	return { "errors": errors, "missing": missing.toString() };
+}
+
+/*
+	x.5 values are always rounded up in this system, so let's have a function for this.
+*/
+function DSAround (num) {
+	num = parseFloat(num);
+
+	if (isNaN(num)) {
+		console.log("DSAround: NaN encountered.", "num is \"" + num + "\".");
+		return NaN;
+	}
+
+	num = roundDecimals(num, 1);
+	// Round down if fraction is less than 0.5; abs() to handle negative values correctly as well
+	if (Math.abs(num) % 1 < 0.5) {
+		num = Math.floor(num);
+	} else {
+		num = Math.ceil(num);
+	}
+
+	return num;
+}
+
+/*
+	JavaScript's Math.round() only rounds to 0 decimal places.
+	Using the toFixed() + parseFloat() method is cumbersome, so here we are with a new function.
+*/
+function roundDecimals (num, digits) {
+	num = parseFloat(num);
+	digits = parseInt(digits);
+
+	if (isNaN(num) || isNaN(digits)) {
+		console.log("roundDecimals: NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
+		return NaN;
+	}
+
+	num = parseFloat(num.toFixed(digits));
+	return num;
+}
+
+/*
+	When displaying modifiers, make use of real minus sign (U+2212) or ± (U+00B1).
+*/
+function prettifyMod(uglyModifier) {
+	var prettyModifier;
+	if(isNaN(parseInt(uglyModifier)))
+	{
+		return uglyModifier;
+	}
+	if(uglyModifier < 0)
+	{
+		prettyModifier = "−" + String(Math.abs(uglyModifier));
+	} else if(uglyModifier === 0){
+		prettyModifier = "±" + String(uglyModifier);
+	} else {
+		prettyModifier = "+" + String(uglyModifier);
+	}
+	return prettyModifier;
 }
 </script>
