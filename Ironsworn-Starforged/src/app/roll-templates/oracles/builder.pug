@@ -1,0 +1,57 @@
+mixin oracleRoll(id, table, row, index)
+  - var initChance
+  if index === 0
+    - initChance = row.Chance - (row.Chance - 1)
+  else
+    - initChance = table[index - 1].Chance + 1
+  - var finalChance = row.Chance
+  - var result = row.Description.charAt(0).toUpperCase() + row.Description.slice(1)
+  if initChance === finalChance
+    | {{#rollTotal() #{id} #{finalChance}}}
+    | 
+    span=result
+    | 
+    | {{/rollTotal() #{id} #{finalChance}}}
+  else
+    | 
+    | {{#rollBetween() #{id} #{initChance} #{finalChance}}}
+    | 
+    span=result
+    | 
+    | {{/rollBetween() #{id} #{initChance} #{finalChance}}}
+
+mixin oracleTemplate(oracle, category)
+  - const categoryName = category.toLowerCase().replace(/\s/g, '-')
+  - const oracleName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+  - const id = `${categoryName}-${oracleName}`
+  |
+  | {{##{id}}}
+  .sheet-result-row
+    .sheet-oracle-dice
+      span {{#{id}}}
+    .sheet-oracle-table-text
+      if oracle.Table
+        each row, index in oracle.Table
+          +oracleRoll(id, oracle.Table, row, index)
+      else if oracle.Tables
+        each table, index in oracle.Tables
+          |
+          | {{#rollTotal() tableChoice #{index}}}
+          each row, index in table.Table
+            +oracleRoll(id, table.Table, row, index)
+          |
+          | {{/rollTotal() tableChoice #{index}}}
+  |
+  | {{/#{id}}}
+
+rolltemplate(class=`sheet-rolltemplate-starforged_oracles`)
+  .sheet-roll-container
+    .sheet-subheader {{header}}
+    | {{#custom-oracle}}
+    .sheet-result-row
+      .sheet-oracle-table-text {{custom-oracle}}
+    | {{/custom-oracle}}
+    
+    each category, index in oracles
+      each oracle in category.Oracles
+        +oracleTemplate(oracle, category.Name)
