@@ -1,0 +1,36 @@
+include ./container
+include ./oracle-table
+
+mixin movePreviewFactory(move, options)
+  +container(move, options)
+    p!=move.Text
+    if move.Table
+      - var moveOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
+      +oracleTable(moveOracle)
+
+mixin preview(move, options)
+  if options.no_title
+    div
+  else
+    div.move-title.move-preview=move.Name
+  if move.Stats
+    +rollLabel
+      +movesRoll(move, 'hide-element')
+  else if move['Progress Move']
+    +rollLabel
+      +progressRoll(move, 'hide-element')
+  .move-description
+    block
+  .oracle-footer.move-page-footer=move.page
+
+mixin container(move, options = false)
+  - var formattedName = move.Name.replace(/\s/g, '-').toLowerCase()
+  if options.visibility
+    div.move-visible
+      +preview(move, options)
+        block
+  else
+    input(type='radio' name='attr_move_preview' class=`${formattedName} hide-element` value=move.Name)
+    div(class=`${formattedName} showhide`)
+      +preview(move, options)
+        block
