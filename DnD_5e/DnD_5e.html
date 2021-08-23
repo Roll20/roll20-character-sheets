@@ -11846,6 +11846,39 @@
 						</div>
 					</div>
 					<div class="sheet-row">
+						<div class="sheet-col-1-6 sheet-margin-top sheet-center">Prepared</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_arcane_trickster" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_bard" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_cleric" value="(@{spells_prepared_count})" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_druid" value="(@{spells_prepared_count})" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_eldritch_knight" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_paladin" value="(@{spells_prepared_count})" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_ranger" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_sorcerer" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_warlock" value="0" disabled="disabled" />
+						</div>
+						<div class="sheet-col-1-12">
+							<input type="number" name="attr_spells_prepared_count_wizard" value="(@{spells_prepared_count})" disabled="disabled" />
+						</div>
+					</div>
+					<div class="sheet-row">
 						<div class="sheet-col-1-6 sheet-margin-top sheet-center">Save DC</div>
 						<div class="sheet-col-1-12">
 							<input type="number" name="attr_arcane_trickster_spell_dc" value="(@{base_spell_dc}+@{arcane_trickster_spell_bonus})" disabled="disabled" />
@@ -18262,10 +18295,109 @@
 	</div>
   <script type="text/worker">
 
+    const countPreparedSpells = () => {
+      const doCalc = (level1IDs, level2IDs, level3IDs, level4IDs, level5IDs, level6IDs, level7IDs, level8IDs, level9IDs) => {
+        const attrs = [
+          ...level1IDs.map(id => `repeating_spellbooklevel1_${id}_spellisprepared`),
+          ...level2IDs.map(id => `repeating_spellbooklevel2_${id}_spellisprepared`),
+          ...level3IDs.map(id => `repeating_spellbooklevel3_${id}_spellisprepared`),
+          ...level4IDs.map(id => `repeating_spellbooklevel4_${id}_spellisprepared`),
+          ...level5IDs.map(id => `repeating_spellbooklevel5_${id}_spellisprepared`),
+          ...level6IDs.map(id => `repeating_spellbooklevel6_${id}_spellisprepared`),
+          ...level7IDs.map(id => `repeating_spellbooklevel7_${id}_spellisprepared`),
+          ...level8IDs.map(id => `repeating_spellbooklevel8_${id}_spellisprepared`),
+          ...level9IDs.map(id => `repeating_spellbooklevel9_${id}_spellisprepared`)
+        ];
+        getAttrs(attrs, v => {
+          values = Object.values(v).map(a=>(parseInt(a)));
+          const total = values.reduce((a,b) => a + b, 0);
+          setAttrs({
+            spells_prepared_count: total
+          });
+        });
+      };
+
+      getSectionIDs("repeating_spellbooklevel1", level1IDs => {
+        getSectionIDs("repeating_spellbooklevel2", level2IDs => {
+          getSectionIDs("repeating_spellbooklevel3", level3IDs => {
+            getSectionIDs("repeating_spellbooklevel4", level4IDs => {
+              getSectionIDs("repeating_spellbooklevel5", level5IDs => {
+                getSectionIDs("repeating_spellbooklevel6", level6IDs => {
+                  getSectionIDs("repeating_spellbooklevel7", level7IDs => {
+                    getSectionIDs("repeating_spellbooklevel8", level8IDs => {
+                      getSectionIDs("repeating_spellbooklevel9", level9IDs => doCalc(level1IDs, level2IDs, level3IDs, level4IDs, level5IDs, level6IDs, level7IDs, level8IDs, level9IDs));
+                    });
+                  });
+                });
+              });
+            });
+          });
+        });
+      });
+    };
+
+    on('sheet:opened',function(){
+      countPreparedSpells();
+    });
+
+    on("change:repeating_spellbooklevel1", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel2", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel3", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel4", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel5", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel6", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel7", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel8", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
+    on("change:repeating_spellbooklevel9", function(eventInfo) {
+      if(eventInfo.sourceAttribute.match(/spellisprepared/)) {
+        countPreparedSpells();
+      }
+   });
+
     on("change:drop_category", function(eventinfo) {
-        if(eventinfo.newValue === "Monsters") {
-            handle_drop_monster(eventinfo.newValue);
-        }
+      if(eventinfo.newValue === "Monsters") {
+        handle_drop_monster(eventinfo.newValue);
+      }
     });
 
     var handle_drop_monster = function(category, eventinfo) {

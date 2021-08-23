@@ -5,7 +5,7 @@ This an alternate Hero System character sheet designed for use in heroic-level H
 
 The number of skills (30 general, 7 combat, 6 maneuvers, and 9 languages) and powers (10) is hard-coded to handle the background math and for aesthetics, but should be sufficient for general use.
 
-To keep the game on the simple side, this sheet is built for the combat that uses armor activation rolls rather than hit locations. There are input fields for the recording of armor locations, but otherwise the more advanced hit location rules are not supported at this time.
+This sheet has support for either armor activation rolls or the optional hit location system (see Options). The choice to use one or the other system is a GM campaign-level decision.
 
 If you would like more flexibility in creating macros and have a Pro-level subscription you might consider adding Hero Roller https://wiki.roll20.net/Script:HeroRoller to your game API settings. This is an optional addition and is not necessary to play the game. 
 
@@ -60,21 +60,27 @@ Click the "Roll" button to roll armor activation. The message like the one shown
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)
 
-The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon.
+The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon. The "AoE" checkbox indicates an Area of Effect weapon.
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
-When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made and target, and the BODY and STUN damage rolls.
+When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results.
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
-The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage.
+The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage. Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
 
-![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChat.png)
+![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)
 
-The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). A third pane can be used for notes and treasures.
+The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
+
+*Hit location system (Optional)*
+
+To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically calculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers. An attack using a weapon marked as "AoE" will not use the hit location system (this allows the hit location system to be applied on a case by case basis).
+
+![Hit Locations](/HeroSystem6eHeroic/images/HitLocations.png)
 
 ## Page 3: Skills
 
@@ -120,6 +126,8 @@ The last page of this sheet contains a number of important options:
 
 (3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
+(4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+
 ## Token Settings
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
@@ -128,4 +136,6 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-*Villain In Glasses, August 1, 2021*
+*Villain In Glasses, August 1, 2021.*
+
+*Updated August 7, 2021 to include Hit Location support.*
