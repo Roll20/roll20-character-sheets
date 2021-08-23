@@ -1,3 +1,41 @@
+<script type="text/worker">
+on("sheet:opened", function() {  
+	getAttrs(["Kick_Empalement", "version"], function(values) {
+		let version = values["version"];
+		console.log(version);
+		if(version != "1.1") {
+			let attrs = {};
+			console.log("Test");
+			let kick = values["Kick_Empalement"];
+
+			if(kick == "{{empalement=[[floor(@{Kick}/5)]]}}")
+				attrs["Kick_Empalement"] = "floor(@{Kick}/5)";
+				
+			attrs["version"] = "1.1";
+
+			setAttrs(attrs);
+
+			getSectionIDs("repeating_armes", function(idarray) 
+			{
+				_.each(idarray,function(id) {
+					getAttrs(["repeating_armes_"+id+"_Empalement"], function(value) {
+						let empalement = value["repeating_armes_"+id+"_Empalement"];
+
+						if(empalement == "{{empalement=[[floor(@{Score}/5)]]}}") {
+							setAttrs({
+								["repeating_armes_"+id+"_Empalement"]: "floor(@{Score}/5)"
+							});
+						}
+					});
+				});
+			});
+		}
+	});
+});
+</script>
+
+<input type="hidden" name="attr_version" value="1.0"/>
+
 <div class='first'>
 	<div class='col'>
         <div class="options">
@@ -846,7 +884,7 @@
             <input type="checkbox" name="attr_Kick_BD" value="@{Damage-Bonus}" checked />
         </div>
         <div>
-            <input type="checkbox" name="attr_Kick_Empalement" value="{{empalement=[[floor(@{Kick}/5)]]}}" />
+            <input type="checkbox" name="attr_Kick_Empalement" value="floor(@{Kick}/5)" />
         </div>
         
         <button type="roll" name="roll_Kick" value="@{jetGM} &{template:jets} {{name=Coup de pied}} {{result=[[1d100]]}} {{objective=[[@{Kick}]]}} {{Dégâts=[[@{Kick-Damage}+@{Kick_BD}]]}} {{DégâtsP=[[@{Kick-Damage}+@{Kick-Damage}+@{Kick_BD}]]}} {{empalement=[[@{Kick_Empalement}]]}}" />
@@ -882,7 +920,7 @@
             <input type="text" name="attr_Attack-Weapon" />
         </div>
         <div>
-            <input type="number" name="attr_Score" />
+            <input type="number" name="attr_Score" value="0" />
         </div>
         <div>
             <input type="text" name="attr_Damage" />
@@ -894,7 +932,7 @@
             <input type="checkbox" name="attr_BD" value="@{Damage-Bonus}" />
         </div>
         <div>
-            <input type="checkbox" name="attr_Empalement" value="{{empalement=[[floor(@{Score}/5)]]}}" />
+            <input type="checkbox" name="attr_Empalement" value="floor(@{Score}/5)" />
         </div>
 
         <button type="roll" name="roll_Attack-Weapon" value="@{jetGM} &{template:jets} {{name=@{Attack-Weapon}}} {{result=[[1d100]]}} {{objective=[[@{Score}]]}} {{Dégâts=[[@{Damage}+@{BD}]]}} {{DégâtsP=[[@{Damage}+@{Damage}+@{BD}]]}} {{empalement=[[@{Empalement}]]}}" />
