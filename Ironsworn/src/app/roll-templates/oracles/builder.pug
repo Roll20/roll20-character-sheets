@@ -12,15 +12,19 @@ mixin oracleGroupTemplate(opts, name)
         span {{#{subId}}}
     .sheet-oracle-table-text
       each subOracle in opts.sub_oracles
-        -var subId = `${name}${subOracle.roll_id}`
-        each row in subOracle.rows
+        - var subId = `${name}${subOracle.roll_id}`
+        //- - var subTranslationObj = {}
+        each row, index in subOracle.rows
           - var rollValues = row.roll.match(/(\d+-\d*)|(\d+)/gm)[0].replace('-', ' ')
           | 
           | {{#roll#{row.type}() #{subId} #{rollValues}}}
           | 
-          span!=row.result
+          span(data-i18n=`${subId}-${index}`)!=row.result
+          //- - subTranslationObj[`${subId}-${index}`] = row.result
           | 
           | {{/roll#{row.type}() #{subId} #{rollValues}}}
+        //- - var subJson = JSON.stringify(subTranslationObj);
+        //- - fs.writeFileSync(`data/${subId}.json`, subJson);
   |
   | {{/#{id}}}
 
@@ -32,14 +36,21 @@ mixin oracleTemplate(opts, name)
     .sheet-oracle-dice
       span {{#{id}}}
     .sheet-oracle-table-text
-      each row in opts.rows
+      //- - var translationObj = {}
+      each row, index in opts.rows
         - var rollValues = row.roll.match(/(\d+-\d*)|(\d+)/gm)[0].replace('-', ' ')
         | 
         | {{#roll#{row.type}() #{id} #{rollValues}}}
-        | 
-        span!=row.result
+        |
+        if name === 'names' || id === 'site_nameNamesake'
+          span!=row.result
+        else
+          span(data-i18n=`${id}-${index}`)!=row.result
+          //- - translationObj[`${id}-${index}`] = row.result
         | 
         | {{/roll#{row.type}() #{id} #{rollValues}}}
+      //- - var json = JSON.stringify(translationObj); 
+      //- - fs.writeFileSync(`data/${id}.json`, json);
   |
   | {{/#{id}}}
 
