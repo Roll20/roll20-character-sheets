@@ -2,7 +2,7 @@
 /**
  * ================
  * CONTENTS:
- * 
+ *
  * 1. GAME SYSTEM DATA - game system data for character creation & rolls
  * 2. CONSTANTS & VERSION CONTROL - common constants for character sheet
  * 3. ASYNC CORE - promisified sheetworkers for delicious async goodness
@@ -11,10 +11,9 @@
  * 6. REPEATING SECTION FUNCTIONS - go on, have a guess
  * 7. DICE ROLL FUNCTIONS - includes experimental Reactive Rolls
  * 8. EVENT LISTENERS - ooooh, another mysterious title
- * 
+ *
  * ================
  */
-
 
 /**
  * 1. GAME SYSTEM DATA
@@ -849,7 +848,7 @@ const warRepeating = (() => {
 		// Process the item mods/value changes
 		let weaponData = {};
 		if (/possess/i.test(trigger.type)) {
-			weaponData = {damage: warlockData.weaponTypes.club.damage, attack_skill: 'blunt', damage_type: 'crushing', ranged: '0'};
+			weaponData = {damage: warlockData.weaponTypes.club.damage, attack_skill: 'blunt', damage_type: 'crushing', ranged: '0', attack_mod: '0'};
 			if (linkData) h.mergeObj(weaponData, {name: linkData.possessionName, possession_link: linkData.possessionRowId});
 			// If mod list contains a base weapon type, put it first so it can be overwritten
 			itemMods.sort((a,b) => {
@@ -1049,7 +1048,7 @@ const roll = (() => {
 			let spAttrs = await as.getAttrs(nonRepAttrs.concat(spellAttributes.map(a=>`${defSpRow}_${a}`)));
 			let output = {
 				name: spAttrs[`${defSpRow}_name`]||'Spell',
-				type: spAttrs[`${defSpRow}_type`].toLowerCase()||'spellcard',
+				type: (spAttrs[`${defSpRow}_type`]||'').toLowerCase()||'spellcard',
 				desc: spAttrs[`${defSpRow}_description`]||'',
 				effect: spAttrs[`${defSpRow}_mods`]||'',
 				cost: spAttrs[`${defSpRow}_cost`]||0,
@@ -1065,6 +1064,7 @@ const roll = (() => {
 				npc: spAttrs.npc == 1 ? true : false,
 				globalAttack: spAttrs.global_attack_bonus||null,
 				globalDamage: spAttrs.global_damage_bonus||null,
+				weaponId: rowId,
 				attrs: spAttrs,
 			}
 			return output;
@@ -1221,7 +1221,7 @@ const roll = (() => {
 			finishRoll(abort.rollId);
 		} else {
 			let acId = getActiveCharacterId(),
-				spellExpression = h.combineRollParts(sp.incantation||0, sp.incantation_bonus||0, null);
+				spellExpression = h.combineRollParts(sp.attrs.incantation||0, sp.attrs.incantation_bonus||0, null);
 			let spellBase = `${t.roll}${color.spell}${prop.name}${sp.react} {{title=${sp.name} Casting Check}} {{success=[[0]]}} {{reactdata=[[0]]}} {{reactbutton1name=[[1]]}} {{reactbutton2name=[[2]]}} {{outcome=[[0]]}} {{reactsubheader=Incantation}} {{reactroll1name=+${spellExpression}}} {{reactroll1=[[${sp.react ? `${prop.coreDie} + ${spellExpression}` : `0`}]]}} {{subheader=Incantation}} {{roll1name=+${spellExpression}}} {{roll1=[[${sp.react ? `0` : `${prop.coreDie}`} +${spellExpression}]]}} {{reactbutton3name=[[3]]}} {{linksuccess=[Cast](~repeating_spell_${rowId}_rollcast)}} {{linkfailure=On a [[1cf1cs0]] - [Miscast](~rollmiscast)}}  ${sp.cost ? `{{notes=@{character_name}'s Stamina reduced by ${sp.cost}}}` : ``} {{reactbutton1label=[0](~${acId}|react-cast}} {{reactbutton2label=[0](~${acId}|react-miscast}}`;
 			let spellRoll = await startRoll(spellBase);
 			let rollResult = (sp.react) ? spellRoll.results.reactroll1.result : spellRoll.results.roll1.result;
@@ -1488,23 +1488,20 @@ const roll = (() => {
 			loser = attackResult[attackResult.result.loser];
 		if (!winner || !loser) return h.log(attackResult, 'error', `react-damage: Couldn't determine winner from attack`);
 		if (!await checkSheetPermission(winner.charname)) return h.log(`Failed action button permission check`, 'error', `react-apply-damage`);
-		let rowId = winner.weaponId;
 		let mightyBlow = attackResult.result.mighty ? `{{mighty=1}}` : '';
-		let spellAttack = (winner.spellAttack) ? true : false;
 		as.setActiveCharacterId(winner.id);
-		let att = spellAttack ? await prop.getSpellAttrs(rowId) : await prop.getWeaponAttrs(rowId);
 		as.setActiveCharacterId(loser.id);
-		let d = await as.getAttrs(['armour_value', 'armour_items', 'stamina']);
+		let def = await as.getAttrs(['armour_value', 'armour_items', 'stamina']);
 		//h.log(d, 'info', `loser defence`);
-		let hasArmour = (!/\w+/.test(d.armour_items)) ? false : true;
-		let damageBase = `${t.damage}${color.damage}${prop.reactInit}{{charname=${winner.charname}}} {{title=Damage Roll}}{{subheader=${att.name}}} {{damagetype= ${h.emproper(att.damageType)}}}  {{damageroll1name=${att.damage}}} {{reactdata=[[0]]}} {{reactbutton1name=[[1]]}} {{reactbutton2name=[[2]]}} {{damageroll1=[[${att.damage}]]}} {{defencename=${loser.charname}'s defence-\n ${hasArmour ? `${d.armour_items}`.replace(/\s*,\s*/g, '\\n') : 'none'}}} {{defenceroll=[[${d.armour_value||0}]] DR}} {{outcome=${loser.charname} takes [[4]] damage.}} {{reactbutton1label=[3](~${loser.id}|react-apply-damage}} {{reactbutton2label=[0](~${winner.id}|react-roll-crit}} ${mightyBlow}`;
+		let hasArmour = (!/\w+/.test(def.armour_items)) ? false : true;
+		let damageBase = `${t.damage}${color.damage}${prop.reactInit}{{charname=${winner.charname}}} {{title=Damage Roll}}{{subheader=${winner.name}}} {{damagetype= ${h.emproper(winner.damageType)}}}  {{damageroll1name=${winner.damage}}} {{reactdata=[[0]]}} {{reactbutton1name=[[1]]}} {{reactbutton2name=[[2]]}} {{damageroll1=[[${winner.damage}]]}} {{defencename=${loser.charname}'s defence-\n ${hasArmour ? `${def.armour_items}`.replace(/\s*,\s*/g, '\\n') : 'none'}}} {{defenceroll=[[${def.armour_value||0}]] DR}} {{outcome=${loser.charname} takes [[4]] damage.}} {{reactbutton1label=[3](~${loser.id}|react-apply-damage}} {{reactbutton2label=[0](~${winner.id}|react-roll-crit}} ${mightyBlow}`;
 		h.log(damageBase, 'info', `Debug`);
 		let damageRoll = await startRoll(damageBase);
 		let damageTotal = parseInt(damageRoll.results.damageroll1.result)||0,
 			damageReduction = parseInt(damageRoll.results.defenceroll.result)||0,
 			damageNet = damageTotal - damageReduction,
 			damageFinal = attackResult.result.mighty ? Math.max(damageNet*2, 1) : Math.max(damageNet, 1),
-			loserStamina = parseInt(d.stamina) - damageFinal;
+			loserStamina = parseInt(def.stamina) - damageFinal;
 		let rollData = {
 			outcome: damageFinal,
 			reactbutton1name: `${loser.charname} takes ${damageFinal} damage.`,
