@@ -2733,7 +2733,7 @@
                 <input type="number" name="attr_ammoremain" value=0>
                 <div><button class="pictos-button" id="reloadbutton" type="action" name="act_reload"
                         title="Reload Weapon">0</button></div>
-                <div><button class="attack-dice" type="action" name="act_rangedattack" title="Fire Weapon"></button>
+                <div><button class="attack-dice" type="action" id="rangedattack" name="act_rangedattack" title="Fire Weapon"></button>
                 </div>
                 <div>
                     <input type="hidden" class="show-weaponmods" name="attr_showmore" value="show">
@@ -3280,7 +3280,7 @@
                         value="&{template:matrix}{{myname=@{character_name}}}{{target=@{target|decker|character_name}}}{{action=Position Attack}}{{roll= [[@{matrixsecurityrating}d6>[[ {2,(@{target|decker|deck-evasion-final} + @{matrix-penalty} +?{Miscellaneous Modifiers|0} )}kh1]]!! ]] }}"></button>
                 </div>
                 <div><button type="roll" class="d6-dice" name="roll_icattack" title="IC Attack Roll"
-                        value="&{template:matrix} {{target=@{target|decker|character_name}}} {{character=@{character_name}}} {{action=IC Attack}} {{roll=[[@{matrixsecurityrating}d6>[[@{deck-tn}+@{matrix-penalty} +?{Miscellaneous Modifiers|0}]] ]]}}">
+                        value="&{template:matrix} {{target=@{target|decker|character_name}}} {{character=@{character_name}}} {{action=IC Attack}} {{roll=[[@{matrixsecurityrating}d6>[[ {2,(@{deck-tn}+@{matrix-penalty} +?{Miscellaneous Modifiers|0})}kh1]]!! ]]}}">
                     </button></div>
                 <div><button type="roll" class="d6-dice" name="roll_icresist" title="IC Resist Roll"
                         value="&{template:matrix}{{myname=@{character_name}}}{{target=?{Power of Attack?}}}{{action=Damage Resistance Test}}{{roll= [[ @{matrixsecurityrating}d6>[[{2,(?{Power of Attack?|2} + ?{Miscellaneous Modifiers|0} )}kh1]]!! ]] }}"></button>
@@ -4144,10 +4144,10 @@
                     <input type="number" name="attr_blast" value=0 step=0.05>
                     <input type="number" name="attr_scatter" value=1>
                     <input type="number" name="attr_ammoremain" value=0>
-                    <div><button class="explosive-dice" type="action" name="act_rangedattack" id="explosive"
+                    <div><button class="explosive-dice" type="action" name="act_rangedattack" id="vehicle-explosive"
                             title="Explosives Attack"></button></div>
-                    <div><button type="action" name="act_rangedattack" id="sensorexp"
-                            title="Sensor Assisted Attack">f</button></div>
+                    <div><button type="action" name="act_rangedattack" id="vehicle-sensorexp"
+                            title="Sensor Assisted Attack" class="pictos-button">f</button></div>
                     <div>
                         <input type="hidden" class="show-weaponmods" name="attr_showmore" value="show">
                         <button class="pictos-button" type="action" name="act_showmore" title="Show More">y</button>
@@ -4440,7 +4440,7 @@ buttonlist.forEach(button => {
 			let skill=myval[myrepeat.concat("skillname")];
 			let rating=myval[myrepeat.concat("skillrating")];
 			console.log('start roll for ' + skill);
-			const rollq="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}{{poolname=Combat Pool}}{{pooldice=?{Pool Dice?|0}}}{{result=[[ {[[" + rating + " + ?{Pool Dice?}]]d6>[[?{What is the Target Number?|4} + @{stun_pen} + @{wound_pen}]]!!} ]]}}";
+			const rollq="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}{{poolname=Combat Pool}}{{pooldice=?{Pool Dice?|0}}}{{result=[[ {[[ {2,(" + rating + " + ?{Pool Dice?}]]d6>[[?{What is the Target Number?|4} + @{stun_pen} + @{wound_pen})}kh1]]!!} ]]}}";
                 	startRoll(rollq, (results) => {
 				console.log('R: ' + results);
 				updatepoolused("combatpool", results.results.pooldice.result);	
@@ -4563,7 +4563,7 @@ buttonlist.forEach(button => {
         			var myroll="&{template:matrix}{{target=@{target|Target|character_name}}}{{myname=@{character_name}}}{{action=Detection Roll}}" ;
 				myroll+="{{targetnumber=@{target|Target|deck-detection-final}}}";
 				myroll+="{{rolldice=[[@{matrixsecurityrating}]]}}";
-				myroll+="{{roll=[[@{matrixsecurityrating}d6>[[{2,(@{target|Target|deck-detection-final})}kh1]] ]]}}";
+				myroll+="{{roll=[[@{matrixsecurityrating}d6>[[{2,(@{target|Target|deck-detection-final})}kh1]]!! ]]}}";
 				console.log(myroll);
                 		startRoll(myroll, (results) => {
 					mytally += results.results.roll.result;
@@ -4596,7 +4596,7 @@ buttonlist.forEach(button => {
         			var myroll="&{template:matrix}{{target=@{" + intruder + "}character_name}}}{{myname=@{character_name}}}{{action=Detection Roll}}" ;
 				myroll+="{{targetnumber=@{" + intruder + "}deck-detection-final}}}";
 				myroll+="{{rolldice=[[@{matrixsecurityrating}]]}}";
-				myroll+="{{roll=[[@{matrixsecurityrating}d6>[[{2,(@{" + intruder + "}deck-detection-final})}kh1]] ]]}}";
+				myroll+="{{roll=[[@{matrixsecurityrating}d6>[[{2,(@{" + intruder + "}deck-detection-final})}kh1]]!! ]]}}";
 				console.log(myroll);
                 		startRoll(myroll, (results) => {
 					mytally += results.results.roll.result;
@@ -4724,7 +4724,7 @@ buttonlist.forEach(button => {
 		var calcDice="@{" + myid + "} + ?{Hacking Pool Dice}"
                 var myroll="&{template:matrix}{{myname=@{character_name}}}{{target=?{Target Number?|4}}}{{hackingpool=[[?{Hacking Pool Dice|0}]]}}"
 		myroll+= "{{action=" + mytitle + "}}{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+= "{{roll= [[ [[ " + calcDice + "]]d6>[[" + calcTN + "]]!!]] }}"
+		myroll+= "{{roll= [[ [[ " + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!!]] }}"
                 startRoll(myroll, (results) => {
 			updatepoolused("hackingpool", results.results.hackingpool.result);	
 			finishRoll( results.rollId);
@@ -4885,7 +4885,7 @@ buttonlist.forEach(button => {
 				myroll+="{{cast=[[0]]}}";
 				myroll+="{{roll=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
 			} else {
-				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			}
 			if (target.includes("@{target"))  {
 				console.log('attr split: ' + resistattr);
@@ -5067,7 +5067,7 @@ buttonlist.forEach(button => {
 		myroll+="{{spellname=Resist Banish}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 		finishRoll( results.rollId);
@@ -5199,7 +5199,7 @@ buttonlist.forEach(button => {
 			 	myroll+="{{draindice=[[" + calcDrainDice + "]]}}";
 				myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
 			}
-			myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+			myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			if (myid == "banishing" ) myroll += "{{resist=[Resist Banish](~@{target|Target|character_name}|resistbanish)}}"
 			console.log(myroll);
         		startRoll(myroll, (results) => {
@@ -5248,7 +5248,7 @@ buttonlist.forEach(button => {
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
-		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 		finishRoll( results.rollId);
@@ -5267,7 +5267,7 @@ buttonlist.forEach(button => {
 		myroll+="{{spellname=SPELL DEFENSE}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetofspell=@{target|Ally|token_name}}}";
-		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
+		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 		finishRoll( results.rollId);
@@ -5401,7 +5401,7 @@ buttonlist.forEach(button => {
 			mybase=attrib.split("|")[0].toUpperCase();
 		} 
 		console.log(attrib);
-                const attroll="&{template:attribute} {{character=@{character_name}}}{{Attribute=" + mybase + " " + mymode + "}} {{targetnumber=[[?{Target Number?|4}]]}}{{combatpool= [[?{Combat Dice Pool?|0}]]}}{{result= [[ [[@{" + attrib +"} + ?{Combat Dice Pool?}]]d6>[[?{Target Number?} + @{stun_pen} + @{wound_pen}]]!! ]] }}"
+                const attroll="&{template:attribute} {{character=@{character_name}}}{{Attribute=" + mybase + " " + mymode + "}} {{targetnumber=[[?{Target Number?|4}]]}}{{combatpool= [[?{Combat Dice Pool?|0}]]}}{{result= [[ [[@{" + attrib +"} + ?{Combat Dice Pool?}]]d6>[[{2,(?{Target Number?} + @{stun_pen} + @{wound_pen})}kh1]]!! ]] }}"
                 startRoll(attroll, (results) => {
 			console.log(results.results.combatpool.result)
 			finishRoll( results.rollId);
@@ -5519,7 +5519,7 @@ buttonlist.forEach(button => {
 	});
     	on('clicked:repeating_rangedweapons:rangedattack', (info) => {
 		var setatts={};
-		var atts=["sensors-rating", "combatpool-used"];
+		var atts=["sensors-rating", "combatpool-used", "controlpool-used"];
 	    	var recoilx=1;
 		var rounds=1;
 		var source=info['sourceAttribute'].split('_');
@@ -5531,11 +5531,12 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
-			if (myval[myrepeat.concat("wfamily")] == "Heavy" ) recoilx=2; 
+			if ((myval[myrepeat.concat("wfamily")] == "Heavy" ) &&  ( mymode == "rangedattack" ))  recoilx=2; 
 			var vehiclesensors=0;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
 			const myweapon= myval[myrepeat.concat("name")];
 			const combatused=parseInt(myval["combatpool-used"]);
+			const controlused=parseInt(myval["controlpool-used"]);
 			const wdmg= myval[myrepeat.concat("damage")];
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
 			const ammotype= myval[myrepeat.concat("ammotype")];
@@ -5545,6 +5546,8 @@ buttonlist.forEach(button => {
 			const sa= myval[myrepeat.concat("sa")];
 			const bf= myval[myrepeat.concat("bf")];
 			const fa= myval[myrepeat.concat("fa")];
+			var pool;
+			var poolname;
 			var dmgnumber= damagetable[wdmg];
 			console.log('dmgnumber ' + dmgnumber);
 			var dmgmax=4;
@@ -5569,14 +5572,24 @@ buttonlist.forEach(button => {
 			specialized=myval[myrepeat.concat("specialized")] || 0
 			var calcTN = "[[ " 
 			if ( mymode == "vehiclesensor" )  {
-			   calcTN += "@{sensor-gunnery-tn}  + @{vehicle-driver}wp-char}"
-			} else { 
-			   calcTN += " ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim 
+			   calcTN += "@{sensor-gunnery-tn}  + @{vehicle-driver}wp-char} + @{wp-vehicle}"
+			   poolname="Control";
+			   pool="controlpool";
+
+			} else if ( mymode == "vehicleranged" ) { 
+			   calcTN += " ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-vehicle}";
+			   poolname="Control";
+			   pool="controlpool";
+			} else {
+			   calcTN += " ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-char}";
+			   poolname="Combat";
+			   pool="combatpool";
 			}
-			calcTN += " + ?{Additional Modifiers|0} + " + recoil + " + @{wp-vehicle}"
+
+			calcTN += " + ?{Additional Modifiers|0} + " + recoil;
 			calcTN += " ]]"
 
-			var calcDice = "[[ " + myval[myrepeat.concat("skill")] + " + " + specialized + " + ?{Combat Pool Dice|0}"
+			var calcDice = "[[ " + myval[myrepeat.concat("skill")] + " + " + specialized + " + ?{" + poolname + " Pool Dice|0}"
 			if ( mymode == "vehiclesensor" ) calcDice += " + " + Math.floor(vehiclesensors / 2 )
 			calcDice += " ]]"
 
@@ -5584,14 +5597,18 @@ buttonlist.forEach(button => {
 			roll += "{{rounds=[[" + rounds + "]]}}{{range=@{ask-range}}}" + uncomprecoil 
 			roll += "{{targetnumber=" + calcTN + " }}{{rolldice=" + calcDice + "}}"
 			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=" + wdmg  + "}}{{weaponpower=[[" + wpower + "]]}}"
-			roll += "{{combatpool=[[?{Combat Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}"
+			roll += "{{" + pool + "=[[?{" + poolname + " Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}"
 			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}"
-			roll += "{{dodge=[Dodge](~@{target|Target|token_name}|dodge)}}";
-			roll += "{{resist=[Resist](~@{target|Target|token_name}|resist-ballistic-normal)}}"
+			if ( mymode == "rangedattack" )  {
+				roll += "{{dodge=[Dodge](~@{target|Target|token_name}|dodge)}}";
+				roll += "{{resist=[Resist](~@{target|Target|token_name}|resist-ballistic-normal)}}"
+			}
 			console.log(roll);
                 	startRoll(roll, (results) => {
+				var poolresults;
 				const myrounds=results.results.rounds.result;
-				const combatpool=results.results.combatpool.result + combatused;
+				if ( mymode == "rangedattack" ) poolresults=results.results.combatpool.result + combatused;
+				else poolresults=results.results.controlpool.result + controlused;
 				finalrounds=myrounds;
 				if ( myrounds > ammoleft ) { 
 					finalrounds=parseInt(ammoleft);
@@ -5603,7 +5620,7 @@ buttonlist.forEach(button => {
                     		rounds: finalrounds, 
                 	})
 			setatts[myrepeat.concat("ammoremain")]=ammoremain - finalrounds;
-			setatts["combatpool-used"]=combatpool;
+			setatts[pool.concat("-used")]=poolresults;
 			setAttrs(setatts);
 			});
 			}
@@ -5750,7 +5767,7 @@ buttonlist.forEach(button => {
     	on('clicked:repeating_explosives:rangedattack', (info) => {
 		var setatts={};
 		var scatter="";
-		var atts=["combatpool-used"];
+		var atts=["combatpool-used", "controlpool-used"];
 		var rounds=1;
 		var expint=0;
 		var source=info['sourceAttribute'].split('_');
@@ -5764,20 +5781,38 @@ buttonlist.forEach(button => {
 		});
    		getAttrs(atts, function(myval) {
 			const combatused= parseInt(myval["combatpool-used"]);
+			const controlused= parseInt(myval["controlpool-used"]);
 			const myweapon= myval[myrepeat.concat("name")];
 			const wdmg= myval[myrepeat.concat("damage")];
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
 			const gyro= myval[myrepeat.concat("gyro")];
+			const targetaim= myval[myrepeat.concat("targeting")];
 			var dmgnumber= damagetable[wdmg];
-			var range="{{range=@{ask-range}}}";
+			var range="{{range=?{Range|Short,4|Medium,5|Long,6|Extreme,9}}}";
 			var missleintel=0;
-			var targetnumber=" ?{Range} + @{target|Target|targetMove}";
+			var calcTN;
 			if ( mymode=="sensorexp") { 
-				console.log('got a missle');
 				range="";
 				missleintel=myval[myrepeat.concat("missleint")] || 0;
 				expint="{{expint=[[" + missleintel + "]]}}"
-				var targetnumber="  @{target|Target|signature} + ?{Urban Environment?|Yes,2|No,0}";
+				calcTN="[[ @{target|Target|signature} + ?{Urban Environment?|Yes,2|No,0} + @{wp-char}";
+				poolname="Combat";
+				pool="combatpool";
+			} else if ( mymode=="vehicle-sensorexp" )  {
+				range="";
+				missleintel=myval[myrepeat.concat("missleint")] || 0;
+				expint="{{expint=[[" + missleintel + "]]}}"
+				calcTN="[[ @{target|Target|signature} + ?{Urban Environment?|Yes,2|No,0} + @{wp-vehicle} + @{gunnery-test-los}";
+				poolname="Control";
+				pool="controlpool";
+			} else if ( mymode=="vehicle-explosive" ) {
+			   	calcTN = "[[ ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-vehicle}";
+			   	poolname="Control";
+			   	pool="controlpool";
+			} else {
+				poolname="Combat";
+				pool="combatpool";
+			   	calcTN = "[[ ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-char}";
 			}
 			let direction=getRandomInt(1, 7);
 			const myskill=myval[myrepeat.concat("skill")];
@@ -5791,18 +5826,19 @@ buttonlist.forEach(button => {
 					finishRoll( results.rollId,{});
 				});
 			} else {
-			   var calcDice = "[[ " + myskill + " + " + specialized + " + ?{Combat Pool Dice|0} + " + missleintel + " ]]"
-			   var calcTN = "[[" + targetnumber  + " + @{wp-vehicle} + " + myval[myrepeat.concat("targeting")]
-			   calcTN += " + ?{Additional Modifiers|0} + @{rangedTN} + {0,( @{move} - " + gyro + ") }kh1 ]]" 
+			   var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + poolname + " Pool Dice|0} + " + missleintel + " ]]"
+			   calcTN += " + ?{Additional Modifiers|0} ]]"
                 	   var roll="&{template:explosive}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}" + range
-			   roll += "{{rolldice=" + calcDice + "}}{{targetnumber=" + calcTN + "}}"
-			   roll += "{{weapondamage=" + myval[myrepeat.concat("damage")] + "}}"
-			   roll += "{{weaponpower=" + myval[myrepeat.concat("power")]  + "}}" + expint
-			   roll += "{{combatpool=[[?{Combat Pool Dice|0}]]}}{{weaponname=" + myval[myrepeat.concat("name")] + "}}"
-			   roll += "{{attacktest=[[" + calcDice + "d6>" + calcTN + "]]}}"
-			   roll += "{{scatdir=[[1d6]]}}{{scatter=[[" + myscat + "d6]]}}{{blastradius=" + myblast 
-			   roll += "}}{{scatterredux=" + myredux + "}}{{scatdirnumber=[[" + direction  
-			   roll += "]]}}{{scatdir=" + scatimg + direction  + ".png}}"
+			   roll += "{{rolldice=" + calcDice + "}}{{targetnumber=[[{2,( " + calcTN + ")}kh1]]}}";
+			   roll += "{{weapondamage=" + myval[myrepeat.concat("damage")] + "}}";
+			   roll += "{{weaponpower=" + myval[myrepeat.concat("power")]  + "}}" + expint;
+			   if (  ( mymode=="vehicle-explosive" ) || ( mymode=="vehicle-sensorexp") ) roll += "{{controlpool=[[?{Control Pool Dice|0}]]}}";
+			   else roll += "{{combatpool=[[?{Combat Pool Dice|0}]]}}";
+			   roll += "{{weaponname=" + myval[myrepeat.concat("name")] + "}}";
+			   roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, ( " + calcTN + ")}kh1 ]]!! ]] }}";
+			   roll += "{{scatdir=[[1d6]]}}{{scatter=[[" + myscat + "d6]]}}{{blastradius=" + myblast ;
+			   roll += "}}{{scatterredux=" + myredux + "}}{{scatdirnumber=[[" + direction ; 
+			   roll += "]]}}{{scatdir=" + scatimg + direction  + ".png}}";
 			   roll += "{{resist=[Resist Explosive](~selected|resist-impact-normal)}}";
 			   console.log(roll);
                 	   startRoll(roll, (results) => {
@@ -5817,7 +5853,8 @@ buttonlist.forEach(button => {
                     			scatter: myscatter, 
                 		}
 				);
-				setatts["combatpool-used"] = results.results.combatpool.result + combatused;
+			   	if (( mymode=="vehicle-explosive" ) || ( mymode=="vehicle-sensorexp")) setatts["controlpool-used"] = results.results.controlpool.result + controlused;
+			   	else setatts["combatpool-used"] = results.results.combatpool.result + combatused;
 			   	setatts[myrepeat.concat("ammoremain")]=ammoremain - 1;
 			   	setAttrs(setatts);
 			   });
@@ -7961,7 +7998,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         <div class="sheet-rtrow"><b>Attack Test:</b> {{attacktest}}</div>
-        <div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>
+        {{#combatpool}}<div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>{{/combatpool}}
+        {{#controlpool}}<div class="sheet-rtrow"><b>Control Pool Used:</b> {{controlpool}} </div>{{/controlpool}}
         <div class="sheet-rtrow"><b>Weapon Damage:</b> {{computed::weaponpower}} <b>{{weapondamage}}</div>
         {{#rounds}}<div class="sheet-rtrow">{{ammotype}} <b>Rounds:</b> {{computed::rounds}}</div>{{/rounds}}
         {{#weaponfocus}}<div class="sheet-rtrow"><b>Weapon Focus:</b> {{weaponfocus}} {{focusforce}}</div>
@@ -7979,7 +8017,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         <div class="sheet-rtrow"><b>Attack Test:</b> {{attacktest}}</div>
-        <div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}}</div>
+        {{#combatpool}}<div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>{{/combatpool}}
+        {{#controlpool}}<div class="sheet-rtrow"><b>Control Pool Used:</b> {{controlpool}} </div>{{/controlpool}}
         <div class="sheet-rtrow"><b>Weapon Damage:</b> {{weaponpower}}{{weapondamage}}</div>
         <div class="sheet-rtrow"><b>Scatter:</b> {{computed::scatter}}m in {{scatdirnumber}} Direction</div>
         {{#scatdir}}[img]({{scatdir}}){{/scatdir}}
