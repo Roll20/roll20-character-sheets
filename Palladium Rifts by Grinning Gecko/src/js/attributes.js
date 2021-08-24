@@ -321,26 +321,18 @@ async function pbBonus(value, prefix = "") {
   });
 }
 
+// DEPRECATED
 async function spdBonus(value) {
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
-  const attacksAttrName = `repeating_profiles_${orderedSectionIds[0]}_attacks`
-  const { [attacksAttrName]: attacksPerMelee, repeating_armor } = await getAttrsAsync([
-    attacksAttrName,
-    `repeating_armor`,
+  const a = await getAttrsAsync([
+    `repeating_profiles_${orderedSectionIds[0]}_attacks`,
   ]);
-  
-  const mvmtpenalty = repeating_armor.reduce((penalty, item) => {
-    const { mvmtpenalty } = item;
-    const newPenalty = penalty - +mvmtpenalty;
-    return newPenalty;
-  }, 1)
-  let feetPerMelee = value * 15;
-  feetPerMelee = feetPerMelee - (feetPerMelee - mvmtpenalty);
+  const feetPerMelee = value * 15;
   const attrs = {
     run_mph: ((feetPerMelee * 4 * 60) / 5280).toFixed(1),
     run_ft_melee: feetPerMelee,
     run_ft_attack: Math.round(
-      feetPerMelee / attacksPerMelee
+      feetPerMelee / a[`repeating_profiles_${orderedSectionIds[0]}_attacks`]
     ),
   };
   await setAttrsAsync(attrs);
@@ -367,5 +359,5 @@ on("change:pb", async (e) => {
 });
 
 on("change:spd", async (e) => {
-  await spdBonus(e.newValue);
+  recalculateMovement();
 });

@@ -32,14 +32,8 @@ async function applyDamageToNextActiveArmor(section, damage) {
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_armor:mvmtpenalty", async (e) => {
-  console.log("change:repeating_armor:mvmtpenalty", e);
-  const penalty = +e.newValue;
-  const { repeating_movement_mph: mph } = await getAttrsAsync(["repeating_movement_mph"]);
-  const newMvmt = +mph - (+mph * penalty);
-  await setAttrsAsync({
-    "repeating_movement_mph": newMvmt,
-  })
+on("change:repeating_armor:movementpenalty", async (e) => {
+  recalculateMovement();
 })
 
 on("clicked:armorapplydamage", async (e) => {
@@ -57,3 +51,5 @@ on("clicked:repeating_armor:resetmdc", async (e) => {
       a[`repeating_armor_${rowId}_basemdc`],
   });
 });
+
+on("change:repeating_armor:is_active", e => recalculateMovement());
