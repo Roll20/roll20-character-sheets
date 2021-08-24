@@ -49,26 +49,26 @@ This is a slight departure from the official sheet, to account for the Item/Effe
 	- _Item/Effect bonus_ (locked) - the total +Stamina you are receiving from Items, Spells or other Effects.  
 	- **Rest**: the heart icon is a shortcut for a short rest or full rest, recovering 50% / 100% Stamina respectively.  
 	
-###Luck:
+### Luck:
 Luck functions similarly to Stamina above, except it does not have a Career Leveling increase. The value can be manually changed via the Base, or calculated changes via the Item/Effect system.  
 	**Luck Roll**: the four-leaved clover icon will roll your luck, and subtract a luck point.  
 
-###Background/Traits:
+### Background/Traits:
 A short section to add some flavour to your character. Bear in mind that Roll20 does not allow other players to view sheets they don't have control of - if you want other characters to be able to see your Bio, use the Bio tab in the top-left of the frame.  
 This section is best used as a quick summary for the benefit of the controlling player or GM.  
 
-###Adventuring Skills:
+### Adventuring Skills:
 This section is largely automated unless the sheet is Unlocked. Use the number input to level your Skills, and click the Skill name to roll.  
 A _green flag on the left _indicates a current Career Skill proficiency.  
 A _blue number to the right_ of the input indicates that an Item or Effect is currently modifying the Skill. If your Item Mods include dice rolls, the number quoted here is an average representation. For example, if you have two items boosting your Dodge skill by (+1d6) and (+5), the bonus displayed will be the average of 1d6 plus 5, or (+8.5). This is only for display purposes - the dice will be rolled as normal when a skill check is made.  
 A _red input box & red Max value_ indicates you have exceeded the Max value for the Skill.  
 A _green up arrow on the far right _indicates that a Skill was increased via a Past Career - this mostly provides feedback for the player or GM as to why a Skill Max might be higher for a Skill which is not active under the current Active Career.   
 
-###Possessions:                  
+### Possessions:                  
 Items can be added, removed & edited here. It's largely self-explanatory, except for the Item Mods system. This system can be used to create Items which provide actual Effects on a character and will be automatically applied to rolls.  
 The following is a big section! It covers functionality which applies to Possessions, Weapons, Spells and Active Effects - all of these sections can apply bonuses to a character's other stats.  
     
-##Item Mods System:
+## Item Mods System:
 Item Mods are divided into four Categories. You can supply one or more Categories on an item, but the syntax is quite precise and must be followed for the mods to be picked up     by the sheet.  
 A Mod Category *must* be supplied in the following format - do not forget the colon! If supplying more than one Category, they *must* be separated by a semi-colon.  
 
@@ -76,7 +76,7 @@ A Mod Category *must* be supplied in the following format - do not forget the co
 
 The following four Categories are supported:  
 
-###Weapon:
+### Weapon:
 The weapon Category, if entered correctly, will create an entry in the Weapons section corresponding to the item. You can supply a base weapon type here (e.g. dagger) to have     the Weapon entry auto-populate with the base stats for that weapon.  
 These can be modified in the Attack section later, but be aware that if you change the Item Mods field again, it may overwrite your changes in the Attack section!
 Weapons can be entered directly into the Weapon section (this is simpler), but using the Possessions Item Mods section has a couple of advantages:  
@@ -91,36 +91,36 @@ The following mods are supported in the Weapon Category:
 - **ranged** - this setting flags whether the weapon is ranged or not. If 'ranged' is supplied as a mod, it will be processed as 'true', unless either '0' or 'false' are included. This affects Reactive Rolls - a ranged weapon will force a Dodge roll from the defender, while a non-ranged weapon will allow the defender to use a weapon to defend themselves.  
 - **damagetype** - the damage type this weapon inflicts. Can be slashing/piercing/crushing/blast. This dictates the roll table used for Critcial Strike effects.  
 
-####Examples:
+#### Examples:
 A giant, blunt, wooden sword which fires bullets from the end -  
 `weapon: base 2h sword, skill blunt, ranged;`  
 Knuckledusters which use the damage of a Pole Arm:  
 `weapon: base pole arm, skill unarmed;`  
 
-###Armour:
+### Armour:
 This Category covers Damage Reduction items, but not blocking items (e.g. Shield). There are only a few preset values: light, medium/modest and heavy. The Official designation for medium armour is 'modest', but I've included 'medium' as an alternative, as modest is less commonly used. These correspond to the Damage Reduction values in the core rules. You can also define your own roll expression instead: '2d4 + 5' or '5' or '-10' (cursed armour???).  
 Also note the English spelling of 'armour' - I've used this for the sake of consistency with the Official rules. However, 'armor' will work in all cases on the character sheet, so don't stress about remembering the spelling if you're used to the US version.  	
 
-###Examples:                               
+### Examples:                               
 Plate armour -  
 `armour: heavy;`  
 American leather armor with the codpiece missing -  
 `armor: 1d3 - 1;`  
 
-###Shield:
+### Shield:
 Shield items provide a bonus to defence for a defending character. They *do not* provide damage reduction - use the Armour Category for that. Shield items will always be included in the defence roll, unless they are unequipped - so, if your character is suprised, you will need to unequip the shield before you make your defence roll to stop the sheet from including it in the defence roll.  
 Valid modifiers for a Shield item are: small, large, or a custom expression. A custom expression can be a number, or a die roll.  
 
-####Examples:
+#### Examples:
 Large Shield -  
 `shield: large;`  
 Medium Shield -  
 `shield: +4;`  
 
-###Stats:
+### Stats:
 This Category covers almost everything else - you can boost skills, stamina, luck, luck rolls or provide global attack/damage modifiers. Legal values are: any skill in the Adventuring Skills (e.g. crossbow, dodge, appraise), stamina, luck (modifies luck_max), luckroll (provies a bonus to luck rolls without modifying luck points), attack, damage (these two are global - they will add a bonus to *all* attack and damage rolls).  
 
-####Examples:
+#### Examples:
 Ring of Brute Force:  
 `stats: brawling +5, athletics +3, diplomacy -3, intimidate +2;`  
 Warm Cloak of True North:  
@@ -128,32 +128,32 @@ Warm Cloak of True North:
 
 **These Categories can all be combined on an item!**			
 
-####Examples:
+#### Examples:
 Giant Sword of Concrete -  
 `weapon: base 2h sword, skill club, damage custom 5d6; stats: dodge -10;`  
 Blessed Mail -  
 `armour: 1d3+2; shield: +1; stats: dodge +3, incantation +3;`  
         
         
-###Current Effects:
+### Current Effects:
 The top half of the effects section lists the current offensive and defensive bonuses present on the player. Clicking the name will post the active buffs to chat.
 The bottom half is for adding temporary effects from non-items - Spells or Injuries for example. Again, clicking the Name will post the buff to chat.
 The Effects mods function almost identically to the Possessions Item Mods, except that the Weapons Category does not function in the Effects section.
 
-###Career Skills:
+### Career Skills:
 Unless the sheet is Unlocked for custom use, this section is automated. The top entry is your Active Career Skill, and is the average (rounded up) of your Proficient Skills. When a Career is retired, it will snapshot the current value, and add it to the following rows as a Past Career Skill.  
 
-###Weapons:
+### Weapons:
 This section is fairly straight-forward. An attack bonus can be added for a Weapon in the Attack Skill row - this would allow you to use, for example, a Bow which provides +5 to hit without modifying the actual Bow skill.  
 The Custom Damage field is only active when the Damage Base is set to "Custom".  
 Currently there's no way to post the Item Description to chat - this will be added.  
 
-###Spells:
+### Spells:
 Spells are divided into two types - Attack and Spellcard. In either case, clicking the spell will initiate an Incantation skill check, to see if the Spell was cast successfully.
 If Reactive Rolls are active, the rest of the process just involves following the prompt buttons on the roll templates. An Attack Spell will resolve to a ranged combat Attack, while a Spellcard spell will give an option to apply the listed Spell Effects to a selected token.  
 Spell Effects function exactly like Item Mods & Active Effects - see the Item Mods section for the required syntax. By filling in the Spell Effects section and using Reactive Rolls, temporary effects can quickly be applied in combat.  
 	
-  ####Examples:
+  #### Examples:
   Fix (spell) -  
   `stats: attack -5;`  
   Enchant (spell) -  
