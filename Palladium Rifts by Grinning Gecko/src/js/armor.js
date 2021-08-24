@@ -1,5 +1,3 @@
-const { on } = require("gulp");
-
 async function applyDamageToNextActiveArmor(section, damage) {
   console.log("applyDamageToNextActiveArmor", section, damage);
   const ids = await getSectionIDsOrderedAsync(section);
@@ -34,11 +32,11 @@ async function applyDamageToNextActiveArmor(section, damage) {
   await setAttrsAsync(attrs);
 }
 
-on("change:repeating_armor:mvmt", async (e) => {
-  console.log("change:repeating_armor:mvmt", e);
-  const penalty = e.target.value;
-  const a = await getAttrsAsync(["repeating_movement_mph"]);
-  const newMvmt = a - (a * penalty);
+on("change:repeating_armor:mvmtpenalty", async (e) => {
+  console.log("change:repeating_armor:mvmtpenalty", e);
+  const penalty = +e.newValue;
+  const { repeating_movement_mph: mph } = await getAttrsAsync(["repeating_movement_mph"]);
+  const newMvmt = +mph - (+mph * penalty);
   await setAttrsAsync({
     "repeating_movement_mph": newMvmt,
   })

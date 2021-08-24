@@ -323,15 +323,24 @@ async function pbBonus(value, prefix = "") {
 
 async function spdBonus(value) {
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
-  const a = await getAttrsAsync([
-    `repeating_profiles_${orderedSectionIds[0]}_attacks`,
+  const attacksAttrName = `repeating_profiles_${orderedSectionIds[0]}_attacks`
+  const { [attacksAttrName]: attacksPerMelee, repeating_armor } = await getAttrsAsync([
+    attacksAttrName,
+    `repeating_armor`,
   ]);
-  const feetPerMelee = value * 15;
+  
+  const mvmtpenalty = repeating_armor.reduce((penalty, item) => {
+    const { mvmtpenalty } = item;
+    const newPenalty = penalty - +mvmtpenalty;
+    return newPenalty;
+  }, 1)
+  let feetPerMelee = value * 15;
+  feetPerMelee = feetPerMelee - (feetPerMelee - mvmtpenalty);
   const attrs = {
     run_mph: ((feetPerMelee * 4 * 60) / 5280).toFixed(1),
     run_ft_melee: feetPerMelee,
     run_ft_attack: Math.round(
-      feetPerMelee / a[`repeating_profiles_${orderedSectionIds[0]}_attacks`]
+      feetPerMelee / attacksPerMelee
     ),
   };
   await setAttrsAsync(attrs);
