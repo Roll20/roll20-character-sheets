@@ -321,6 +321,7 @@ async function pbBonus(value, prefix = "") {
   });
 }
 
+// DEPRECATED
 async function spdBonus(value) {
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
   const a = await getAttrsAsync([
@@ -358,5 +359,5 @@ on("change:pb", async (e) => {
 });
 
 on("change:spd", async (e) => {
-  await spdBonus(e.newValue);
+  recalculateMovement();
 });
