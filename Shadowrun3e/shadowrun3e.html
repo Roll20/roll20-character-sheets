@@ -5536,6 +5536,7 @@ buttonlist.forEach(button => {
 		var atts=["sensors-rating", "combatpool-used", "controlpool-used"];
 	    	var recoilx=1;
 		var rounds=1;
+		var recoilmod=1;
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_');
@@ -5545,9 +5546,10 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
-			if ((myval[myrepeat.concat("wfamily")] == "Heavy" ) &&  ( mymode == "rangedattack" ))  recoilx=2; 
+			if (myval[myrepeat.concat("wfamily")] == "Heavy" )  recoilx=2; 
 			var vehiclesensors=0;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
+			if (( mymode == "vehiclesensor" )  || ( mymode == "vehicleranged" )) recoilmod=2;
 			const myweapon= myval[myrepeat.concat("name")];
 			const combatused=parseInt(myval["combatpool-used"]);
 			const controlused=parseInt(myval["controlpool-used"]);
@@ -5574,7 +5576,7 @@ buttonlist.forEach(button => {
 			var uncomprecoil="{{recoil=[[{0,( ?{Recoil Penalty|0} +1 - ( " + recoilcomp + " + " + gyro + " ) )}kh1]]}}"
 			if ((bf==1) || (fa==1)) {
 				rounds="?{Rounds|3}"
-				recoil="{0,(  ?{Recoil Penalty|0} + (" + recoilx + " * (?{Rounds} - ( " + recoilcomp + " + " + gyro + " ) )))}kh1";
+				recoil="{0,(  ?{Recoil Penalty|0} + ((" + recoilx + " * (?{Rounds} - ( " + recoilcomp + " + " + gyro + " ) )) / " + recoilmod  + " ))}kh1";
 				uncomprecoil="{{recoil=[[" + recoil + "]]}}"
 			}
 			if (ammoleft <= 0 ) {
