@@ -10,7 +10,7 @@
  * 5. MAIN SHEET FUNCTIONS - non-repeating section functions
  * 6. REPEATING SECTION FUNCTIONS - go on, have a guess
  * 7. DICE ROLL FUNCTIONS - includes experimental Reactive Rolls
- * 8. EVENT LISTENERS - ooooh, another mysterious title
+ * 8. EVENT LISTENERS - oooh, another mysterious title
  *
  * ================
  */
