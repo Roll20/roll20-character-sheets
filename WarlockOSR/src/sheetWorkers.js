@@ -21,8 +21,8 @@
  **/
 const version = {
 	M: 0,
-	m: 3,
-	p: 0,
+	m: 4,
+	p: 2,
 	current() {return `${this.M}.${this.m}.${this.p}`},
 	integer() {return parseInt(`${this.M}${this.m}${this.p}`)}
 };
@@ -239,10 +239,7 @@ const versionControl = async (gotVersion) => {
 	if (latestVersion === gotVersion) return h.log(`Sheet is up to date`, 'info', `versionControl`);
 	let currentVersion = /\d+\.\d+\.\d+/.test(gotVersion) ? parseInt(gotVersion.replace(/\D/g, '')) : 0;
 
-	if (currentVersion < 20) {
-		// NO ATTR CHANGES
-	}
-	if (currentVersion < 30) {
+	if (currentVersion < 42) {
 		//NO ATTR CHANGES
 	}
 
@@ -504,10 +501,12 @@ const warSheet = (() => {
 			h.log(`${sk}: ${attrs[sk]}, parse ${parseInt(attrs[sk])}`)
 			let nonBoostedMax = Math.min(parseInt(attrs[sk])??0, 6),
 				careerMax = parseInt(careerSkills[sk])||0,
+				current = parseInt(attrs[sk]),
 				currentMax = parseInt(attrs[`${sk}_max`])||0,
 				isProf = (careerSkillNames.includes(sk)) ? true : false;
-			output[`${sk}_max`] = (attrs[`${sk}_boosted`] == 1) ? Math.max(currentMax, careerMax) : (isProf) ? careerMax : nonBoostedMax;
+			output[`${sk}_max`] = isProf ? careerMax : (attrs[`${sk}_boosted`] == 1) ? Math.min(currentMax, current) : nonBoostedMax;
 			output[`${sk}_prof`] = (isProf) ? 1 : 0;
+			if (output[`${sk}_max`] < current) output[`${sk}_overmax`] = 1;
 			h.log(`${sk} max set to: ${output[`${sk}_max`]}, nbm: ${nonBoostedMax}`);
 		});
 		h.log(output, 'info', `Career switch completed`);
@@ -1177,8 +1176,8 @@ const roll = (() => {
 	// Standard Defence roll
 	const defendRoll = async (rowId) => {
 		let wp = await prop.getWeaponAttrs(rowId),
-			rollExpression = h.combineRollParts(wp.damage, null, wp.globalDamage);
-		let rollBase = `${t.roll}${prop.name}${color.defend}{{title=Defend Roll}}{{subheader=${h.emproper(wp.name)}}} {{roll1name=+${rollExpression}}} {{roll1=[[${rollExpression}]]}}`;
+			rollExpression = h.combineRollParts(wp.skill, wp.skillBonus, null, {base: h.emproper(wp.skillName)||'Skill'});
+		let rollBase = `${t.roll}${prop.name}${color.defend}{{title=Defend Roll}}{{subheader=${h.emproper(wp.name)}}} {{roll1name=+${rollExpression}}} {{roll1=[[${prop.coreDie} + ${rollExpression}]]}}`;
 		let defendRoll = await startRoll(rollBase);
 		finishRoll(defendRoll.rollId);
 	}
@@ -1204,7 +1203,7 @@ const roll = (() => {
 			let critRollTop = await startRoll(critTop);
 			let critResult = Math.min(10, Math.max(critRollTop.results.subtitle.result, 2));
 			let critString = warlockData.critTables[damageType][critResult];
-			let critBottom = `${t.desc}${prop.name}{{description=${critString}}}`;
+			let critBottom = `${t.desc}${prop.name}{{class=bottom}}{{description=${critString}}}`;
 			let critRollBottom = await startRoll(critBottom);
 			await finishRoll(critRollTop.rollId);
 			finishRoll(critRollBottom.rollId);
