@@ -2,11 +2,11 @@
 <!-- by PantsWorth -->
 <!-- I borrowed liberally from Diana P.  -->
 <!-- Who in turn borrowed some code/equations from Brian. And Sam. And Aaron I. And others -->
-<!-- Version 1.2.00 dated 08/25/2021 -->
+<!-- Version 1.3.00 dated 08/27/2021 -->
 <!-- Trying the new calculated roll functionality in this version-->
 <input type="hidden" name="attr_character_sheet" title="character-sheet" value="RMSS-FullCalcs"/>
-<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="1.5" />
-<p style="font-size: 0.6em;">V1.2.00<span name="attr_sheetversion" title="sheetversion" ></span> 08/25/2021 by PantsWorth</p>
+<input type="hidden" name="attr_currentsheetversion" title="currentsheetversion" value="1.3" />
+<p style="font-size: 0.6em;">V1.3.00<span name="attr_sheetversion" title="sheetversion" ></span> 08/27/2021 by PantsWorth</p>
 <input type="checkbox" class="announcement-show cbox" title="announcement-show" name="attr_announcement-show" value="1" checked />
 <div class="announcement">
 	<div class="table-style">
@@ -94,7 +94,7 @@
 				<span class="table-data-center-bold"><span data-i18n="deity">Deity</span>:</span><span class="table-data-left"><input type="text" name="attr_deity" title="deity" /></span> 
 			</div>
 			<div class="table-row"> 
-				<span class="table-data-center-bold"><span data-i18n="level">Level</span>:</span><span class="table-data"><input type="text" class="table-data-center" name="attr_level" title="level" /></span> 
+				<span class="table-data-center-bold"><span data-i18n="pc-level">Level</span>:</span><span class="table-data"><input type="text" class="table-data-center" name="attr_pclevel" title="pclevel" /></span> 
 				<span class="table-data-center-bold"><span data-i18n="experience-t">Exp</span>:</span>
 				<span class="table-data-left"><input type="text" name="attr_expcurrent" title="expcurrent" style="width: 150px; text-align: right;" />/<input type="text" name="attr_expcurrent_max" title="expcurrent|max" style="width: 150px;" /></span> 
 			</div>
@@ -824,7 +824,7 @@
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chansavestat" title="chansavestat (Stat Bonus)" value="@{inbonus}" disabled="true" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chansaverace" title="chansaverace" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chanownrealm" title="chanownrealm" value="0" /></span>
-							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chantargetlevel" title="chantargetlevel" value="@{level}*2" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chantargetlevel" title="chantargetlevel" value="@{pclevel}*2" disabled="true" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chanattacklevel" title="chanattacklevel" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chanitem" title="chanitem" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_chansavespec" title="chansavespec" value="0" /></span>
@@ -837,37 +837,57 @@
 							<span class="table-header-saves"><span data-i18n="essence">Essence</span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_esssavestat" title="esssavestat (Stat Bonus)" value="@{embonus}" disabled="true" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_esssaverace" title="esssaverace" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_essownrealm" title="essownrealm" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_esstargetlevel" title="esstargetlevel" value="@{pclevel}*2" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_essattacklevel" title="essattacklevel" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_essitem" title="essitem" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_esssavespec" title="esssavespec" value="0" /></span>
-							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_esssave" title="esssave" value="(@{esssavestat}+@{esssaverace}+@{esssavespec})" disabled="true" /></span>
-							<span><textarea rows="1" class="table-data-savestextbox" name="attr_essence-save" title="essence-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Essence}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{esssave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span>
-							<span><button type="roll" class="button-roll" name="roll_esssaveroll" title="esssaveroll" value="@{essence-save}" </span>
+							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_esssave" title="esssave" value="(@{esssavestat}+@{esssaverace}+@{essownrealm}+@{esstargetlevel}+@{essattacklevel}+@{essitem}+@{esssavespec})" disabled="true" /></span>
+							<!-- <span><textarea rows="1" class="table-data-savestextbox" name="attr_essence-save" title="essence-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Essence}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{esssave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span> -->
+							<!-- <span><button type="roll" class="button-roll" name="roll_esssaveroll" title="esssaveroll" value="@{essence-save}" </span> -->
+							<span class="table-data"><button type="action" name="act_rr" class="button-roll" title="rressence">Essence RR</button></span>
 						</div>
 						<div class="table-row">
 							<span class="table-header-saves"><span data-i18n="mentalism">Mentalism</span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentsavestat" title="mentsavestat (Stat Bonus)" value="@{prbonus}" disabled="true" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentsaverace" title="mentsaverace" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentownrealm" title="mentownrealm" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_menttargetlevel" title="menttargetlevel" value="@{pclevel}*2" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentattacklevel" title="mentattacklevel" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentitem" title="mentitem" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_mentsavespec" title="mentsavespec" value="0" /></span>
-							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_mentsave" title="mentsave" value="(@{mentsavestat}+@{mentsaverace}+@{mentsavespec})" disabled="true" /></span>
-							<span><textarea rows="1" class="table-data-savestextbox" name="attr_mentalism-save" title="mentalism-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Mentalism}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{mentsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span>
-							<span><button type="roll" class="button-roll" name="roll_mentsaveroll" title="mentsaveroll" value="@{mentalism-save}" </span>
+							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_mentsave" title="mentsave" value="(@{mentsavestat}+@{mentsaverace}+@{mentownrealm}+@{menttargetlevel}+@{mentattacklevel}+@{mentitem}+@{mentsavespec})" disabled="true" /></span>
+							<!-- <span><textarea rows="1" class="table-data-savestextbox" name="attr_mentalism-save" title="mentalism-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Mentalism}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{mentsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span> -->
+							<!-- <span><button type="roll" class="button-roll" name="roll_mentsaveroll" title="mentsaveroll" value="@{mentalism-save}" </span> -->
+							<span class="table-data"><button type="action" name="act_rr" class="button-roll" title="rrmentalism">Mentalism RR</button></span>
 						</div>
 						<div class="table-row">
 							<span class="table-header-saves"><span data-i18n="physical">Physical</span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalsavestat" title="physicalsavestat (Stat Bonus)" value="@{cobonus}" disabled="true" /></span>
-							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalsaverace" title="physicalsaverace" value="(@{chansaverace}+@{esssaverace})" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalsaverace" title="physicalsaverace" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalownrealm" title="physicalownrealm" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicaltargetlevel" title="physicaltargetlevel" value="@{pclevel}*2" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalattacklevel" title="physicalattacklevel" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalitem" title="physicalitem" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_physicalsavespec" title="physicalsavespec" value="0" /></span>
-							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_physicalsave" title="physicalsave" value="(@{physicalsavestat}+@{physicalsaverace}+@{physicalsavespec})" disabled="true" /></span>
-							<span><textarea rows="1" class="table-data-savestextbox" name="attr_chan-ess-save" title="chan-ess-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Chan/Ess}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{physicalsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span>
-							<span><button type="roll" class="button-roll" name="roll_physicalsaveroll" title="physicalsaveroll" value="@{chan-ess-save}" </span>
+							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_physicalsave" title="physicalsave" value="(@{physicalsavestat}+@{physicalsaverace}+@{physicaltargetlevel}+@{physicalattacklevel}+@{physicalitem}+@{physicalsavespec})" disabled="true" /></span>
+							<!-- <span><textarea rows="1" class="table-data-savestextbox" name="attr_chan-ess-save" title="chan-ess-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Chan/Ess}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{physicalsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span> -->
+							<!-- <span><button type="roll" class="button-roll" name="roll_physicalsaveroll" title="physicalsaveroll" value="@{chan-ess-save}" </span> -->
+							<span class="table-data"><button type="action" name="act_rr" class="button-roll" title="rrphysical">Physical RR</button></span>
 						</div>
 						<div class="table-row">
 							<span class="table-header-saves"><span data-i18n="fear">Fear</span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearsavestat" title="fearsavestat (Stat Bonus)" value="@{sdbonus}" disabled="true" /></span>
-							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearsaverace" title="fearsaverace" value="0"  /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearsaverace" title="fearsaverace" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearownrealm" title="fearownrealm" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_feartargetlevel" title="feartargetlevel" value="@{pclevel}*2" disabled="true" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearattacklevel" title="fearattacklevel" value="0" /></span>
+							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearitem" title="fearitem" value="0" /></span>
 							<span class="table-data"><input type="text" class="table-data-saves" name="attr_fearsavespec" title="fearsavespec" value="0" /></span>
-							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_fearsave" title="fearsave" value="(@{fearsavestat}+@{fearsaverace}+@{fearsavespec})" disabled="true" /></span>
-							<span><textarea rows="1" class="table-data-savestextbox" name="attr_chan-ment-save" title="chan-ment-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Chan/Ment}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{fearsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span>
-							<span><button type="roll" class="button-roll" name="roll_fearsaveroll" title="fearsaveroll" value="@{chan-ment-save}" </span>
+							<span class="table-data">=<input type="text" class="table-data-savestotal" name="attr_fearsave" title="fearsave" value="(@{fearsavestat}+@{fearsaverace}+@{feartargetlevel}+@{fearattacklevel}+@{fearitem}+@{fearsavespec})" disabled="true" /></span>
+							<!-- <span><textarea rows="1" class="table-data-savestextbox" name="attr_chan-ment-save" title="chan-ment-save">/w gm &{template:RmuStdRoll} {{saveflag=true}} {{name=@{character_name} vs Chan/Ment}} {{check=Resistance roll: }} {{checkroll=[[1d100!>@{oeuproll}cf<@{oedownroll} +[[@{fearsave}]] ]]}} {{oedownroll= -[[1d100!>@{oeuproll}[open ended down roll; subtract from previous roll] ]]}}  </textarea></span> -->
+							<!-- <span><button type="roll" class="button-roll" name="roll_fearsaveroll" title="fearsaveroll" value="@{chan-ment-save}" </span> -->
+							<span class="table-data"><button type="action" name="act_rr" class="button-roll" title="rrfear">Fear RR</button></span>
 						</div>
 					</div>
 					<hr/>
@@ -4912,7 +4932,7 @@
 					</span>
 				</div>
 				<div class="table-row">
-					<span class="table-data-center-bottom" data-i18n="directions-for-other-mods-section">A place to enter penalties that apply when a spell is cast.  These reset to 0 after an scr roll.  Select these any time they apply.</span>
+					<span class="table-data-center-bottom" data-i18n="directions-for-other-mods-section">A place to enter penalties that apply the moment the spell is cast.  These reset to 0 after an scr roll.  Select these any time they apply.</span>
 					</span>
 				</div>
 			</div>
@@ -4981,7 +5001,7 @@
 						<span class="table-data"><input type="text" class="table-data-data-skills-cat-wide" name="attr_baselist01level01type" title="baselist01level01type (Spell Type)" data-i18n-placeholder="spell-type" placeholder="Spell Type" ></span>
 						<span class="table-data"><input type="text" class="table-data-spells" name="attr_baselist01level01overcast" title="baselist01level01overcast (Overcast Penalty)" value="0" /></span>
 						<span class="table-data"><input type="text" class="table-data-spells" name="attr_baselist01level01gracemod" title="baselist01level01gracemod (Grace Offset)" value="0" /></span>
-						<span class="table-data"><input type="text" class="table-data-spells" name="attr_baselist01level01overcast" title="baselist01level01overcast (Overcast Penalty)" value="0" /></span>
+						<span class="table-data"><input type="text" class="table-data-spells" name="attr_baselist01level01overcast" title="baselist01level01overcast (Overcast Penalty)" value="-20*(((@{baselist01ranks}-@{level})-abs((@{baselist01ranks}-@{level})))/2)" /></span>
 						<span class="table-data"><input type="text" class="table-data-spells" name="attr_baselist01level01grace" title="baselist01level01grace (Grace Offset)" value="0" /></span>
 						<span class="table-data-skills-sm"><button type="action" name="act_scr" class="button-roll" title="baselist01level01scr">SCR - <span name="attr_baselist01level01name"></span></button></span>
 						<!-- <span class="table-data-skills-sm"><button type="action" name="act_skill" class="button-roll" title="perception">SCR and Directed Spell</button></span>
@@ -7964,128 +7984,6 @@ const skilllist = ['animalhandling1', 'animalhandling2', 'animalhandling3', 'rid
 const skillbonuslist = ['animalhandling1ranks', 'animalhandling2ranks', 'animalhandling3ranks', 'riding1ranks', 'riding2ranks', 'riding3ranks', 'ranks', 'perceptionranks', 'trackingranks', 'ranks', 'maneuveringarmorranks', 'mountedcombatranks', 'protectranks', 'restrictedquartersranks', 'subduingranks', 'ranks', 'adrenaldefenseranks', 'adrenalfocusranks', 'adrenalspeedranks', 'adrenalstrengthranks', 'ranks', 'bodydevranks', 'fortituderanks', 'weighttrainingranks', 'ranks', 'blindfightingranks', 'disarmranks', 'footworkranks', 'multipleattacksranks', 'reversestrikeranks', 'ranks', 'melee1ranks', 'melee2ranks', 'melee3ranks', 'ranged1ranks', 'ranged2ranks', 'ranged3ranks', 'shieldranks', 'sweeps1ranks', 'sweeps2ranks', 'sweeps3ranks', 'throws1ranks', 'throws2ranks', 'throws3ranks', 'ranks', 'illusioncraftingranks', 'musicalcompositionranks', 'writing1ranks', 'writing2ranks', 'writing3ranks', 'ranks', 'culinaryranks', 'drawingpaintingranks', 'fabriccraftranks', 'leathercraftranks', 'metalcraftranks', 'stonecraftranks', 'woodcraftranks', 'ranks', 'attunrmentranks', 'runesranks', 'ranks', 'navigationranks', 'piloting1ranks', 'piloting2ranks', 'piloting3ranks', 'survival1ranks', 'survival2ranks', 'survival3ranks', 'ranks', 'acrobaticsranks', 'contortionsranks', 'jumpingranks', 'ranks', 'creaturelore1ranks', 'creaturelore2ranks', 'creaturelore3ranks', 'historiclore1ranks', 'historiclore2ranks', 'historiclore3ranks', 'language1ranks', 'language2ranks', 'language3ranks', 'materialslore1ranks', 'materialslore2ranks', 'materialslore3ranks', 'raciallore1ranks', 'raciallore2ranks', 'raciallore3ranks', 'regionlore1ranks', 'regionlore2ranks', 'regionlore3ranks', 'religion1ranks', 'religion2ranks', 'religion3ranks', 'spellloreranks', 'ranks', 'grace1ranks', 'grace2ranks', 'grace3ranks', 'spelltrickery1ranks', 'spelltrickery2ranks', 'spelltrickery3ranks', 'transcendenceranks', 'ranks', 'herbalismranks', 'medicineranks', 'poisonmasteryranks', 'ranks', 'controllycanthropyranks', 'meditationranks', 'mentalfocusranks', 'ranks', 'climbingranks', 'flyingranks', 'runningranks', 'swimmingranks', 'ranks', 'actingranks', 'music1ranks', 'music2ranks', 'music3ranks', 'stagemagicranks', 'ranks', 'channelingranks', 'boltsranks', 'illusionsranks', 'hurlingranks', 'powerdevelopmentranks', 'powerprojectionranks', 'ranks', 'architectureranks', 'astronomyranks', 'engineeringranks', 'mathematicsranks', 'ranks', 'influence1ranks', 'influence2ranks', 'influence3ranks', 'leadershipranks', 'socialawarenessranks', 'tradingranks', 'ranks', 'magicalritual1ranks', 'magicalritual2ranks', 'magicalritual3ranks', 'open1ranks', 'open2ranks', 'open3ranks', 'open4ranks', 'open5ranks', 'open6ranks', 'open7ranks', 'closed1ranks', 'closed2ranks', 'closed3ranks', 'base1ranks', 'base2ranks', 'base3ranks', 'arcane1ranks', 'arcane2ranks', 'arcane3ranks', 'restricted1ranks', 'restricted2ranks', 'restricted3ranks', 'ranks', 'ambush1ranks', 'ambush2ranks', 'ambush3ranks', 'concealmentranks', 'stalkingranks', 'trickeryranks', 'ranks', 'locksranks', 'mechanics1ranks', 'mechanics2ranks', 'mechanics3ranks', 'trapsranks', 'ranks', 'administration1ranks', 'administration2ranks', 'administration3ranks', 'service1ranks', 'service2ranks', 'service3ranks', 'trade1ranks', 'trade2ranks', 'trade3ranks', 'animalhandling1isprof', 'animalhandling2isprof', 'animalhandling3isprof', 'riding1isprof', 'riding2isprof', 'riding3isprof', 'isprof', 'perceptionisprof', 'trackingisprof', 'isprof', 'maneuveringarmorisprof', 'mountedcombatisprof', 'protectisprof', 'restrictedquartersisprof', 'subduingisprof', 'isprof', 'adrenaldefenseisprof', 'adrenalfocusisprof', 'adrenalspeedisprof', 'adrenalstrengthisprof', 'isprof', 'bodydevisprof', 'fortitudeisprof', 'weighttrainingisprof', 'isprof', 'blindfightingisprof', 'disarmisprof', 'footworkisprof', 'multipleattacksisprof', 'reversestrikeisprof', 'isprof', 'melee1isprof', 'melee2isprof', 'melee3isprof', 'ranged1isprof', 'ranged2isprof', 'ranged3isprof', 'shieldisprof', 'sweeps1isprof', 'sweeps2isprof', 'sweeps3isprof', 'throws1isprof', 'throws2isprof', 'throws3isprof', 'isprof', 'illusioncraftingisprof', 'musicalcompositionisprof', 'writing1isprof', 'writing2isprof', 'writing3isprof', 'isprof', 'culinaryisprof', 'drawingpaintingisprof', 'fabriccraftisprof', 'leathercraftisprof', 'metalcraftisprof', 'stonecraftisprof', 'woodcraftisprof', 'isprof', 'attunrmentisprof', 'runesisprof', 'isprof', 'navigationisprof', 'piloting1isprof', 'piloting2isprof', 'piloting3isprof', 'survival1isprof', 'survival2isprof', 'survival3isprof', 'isprof', 'acrobaticsisprof', 'contortionsisprof', 'jumpingisprof', 'isprof', 'creaturelore1isprof', 'creaturelore2isprof', 'creaturelore3isprof', 'historiclore1isprof', 'historiclore2isprof', 'historiclore3isprof', 'language1isprof', 'language2isprof', 'language3isprof', 'materialslore1isprof', 'materialslore2isprof', 'materialslore3isprof', 'raciallore1isprof', 'raciallore2isprof', 'raciallore3isprof', 'regionlore1isprof', 'regionlore2isprof', 'regionlore3isprof', 'religion1isprof', 'religion2isprof', 'religion3isprof', 'spellloreisprof', 'isprof', 'grace1isprof', 'grace2isprof', 'grace3isprof', 'spelltrickery1isprof', 'spelltrickery2isprof', 'spelltrickery3isprof', 'transcendenceisprof', 'isprof', 'herbalismisprof', 'medicineisprof', 'poisonmasteryisprof', 'isprof', 'controllycanthropyisprof', 'meditationisprof', 'mentalfocusisprof', 'isprof', 'climbingisprof', 'flyingisprof', 'runningisprof', 'swimmingisprof', 'isprof', 'actingisprof', 'music1isprof', 'music2isprof', 'music3isprof', 'stagemagicisprof', 'isprof', 'channelingisprof', 'boltsisprof', 'illusionsisprof', 'hurlingisprof', 'powerdevelopmentisprof', 'powerprojectionisprof', 'isprof', 'architectureisprof', 'astronomyisprof', 'engineeringisprof', 'mathematicsisprof', 'isprof', 'influence1isprof', 'influence2isprof', 'influence3isprof', 'leadershipisprof', 'socialawarenessisprof', 'tradingisprof', 'isprof', 'magicalritual1isprof', 'magicalritual2isprof', 'magicalritual3isprof', 'open1isprof', 'open2isprof', 'open3isprof', 'open4isprof', 'open5isprof', 'open6isprof', 'open7isprof', 'closed1isprof', 'closed2isprof', 'closed3isprof', 'base1isprof', 'base2isprof', 'base3isprof', 'arcane1isprof', 'arcane2isprof', 'arcane3isprof', 'restricted1isprof', 'restricted2isprof', 'restricted3isprof', 'isprof', 'ambush1isprof', 'ambush2isprof', 'ambush3isprof', 'concealmentisprof', 'stalkingisprof', 'trickeryisprof', 'isprof', 'locksisprof', 'mechanics1isprof', 'mechanics2isprof', 'mechanics3isprof', 'trapsisprof', 'isprof', 'administration1isprof', 'administration2isprof', 'administration3isprof', 'service1isprof', 'service2isprof', 'service3isprof', 'trade1isprof', 'trade2isprof', 'trade3isprof'];
 const statsabbrv = ['ag', 'co', 'em', 'in', 'me', 'pr', 'qu', 're'];
 
-//<!-- /*------------ Start of javascript roll buttons ------------ */ -->
-
-const skillRoll = (skillname, displayname, isnamed) => {
-        
-        let rollExpression = '1d100!>96cf<5cs>96'; 
-        //let rollmodifiers = '@{skillnamerankbonus}[Rank Bonus] + @{skillnamerankbonus}[Rank Bonus] + ';
-        let rollmodifiers = '@{skillnametotal}[Total Bonus] + @{skillnamesituationbonus}[Misc Roll Mods] + @{fatiguepenalty}[Fatigue Penalty] ';
-        rollExpression = rollExpression + ' + ' + rollmodifiers //+ '[TotalBonus]';
-        //console.log(rollmodifiers);
-        // Wrap the two @{attributes} in a [[subroll]] if they're taking up too much space
-        let rollBase = '&{template:RmuStdRolltest} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name}\'s displayname - @{skillnamename} }} {{spellflag=true}} {{check= displayname - @{skillnamename} (@{skillnameranks} ranks): }}  {{roll1name=${rollExpression}}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
-
-		if (isnamed = 0) {
-			rollBase = rollBase.replace(/ - @{skillnamename}/g, "");
-		}
-
-		rollBase = rollBase.replace(/skillname/g, skillname);
-		rollBase = rollBase.replace(/displayname/g, displayname);
-
-		d100oeRoll(rollBase);
-	
-}
-
-const resistanceRoll = () => {
-	 
-	let rollExpression = '1d100!>96cf<5cs>96'; 
-	let rrtype = "";
-	spelllevel = 0;
-	let listranks = 0;
-	let spellleveltag = "";
-
-	//'baselist01level01'
-
-	//Get spell type
-	//spellname = spellname.replace("scr", "");
-	//console.log('spellname: ' + spellname);
-	//spelllisttype = spellname.substr(0,8);
-	//spelllistnumber = spellname.substr(0,10);
-	//spelllevel = parseInt(spellname.substr(15,2));
-
-	let rollBase = '&{template:RmuResistanceRoll} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name} resists @{spellnamename} check:}} {{rrflag=true}} {{check= @{spelllistnumbername} (@{spelllistnumberranks} ranks): }}  {{roll1name=${rollExpression}}} {{spellfailureroll=[[(1d100!>95cf<5001cs=0)]]}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
-
-	//rollBase = rollBase.replace(/spellname/g, spellname);
-	//rollBase = rollBase.replace(/spelllistnumber/g, spelllistnumber);
-	//rollBase = rollBase.replace(/spelllisttype/g, spelllisttype);
-
-	console.log('rollBase: ' + rollBase);
-	
-	//d100oeRoll(rollBase);
-}
-
-const initRoll = () => {
-	let rollBase = '&{template:RmuInitiative} {{name=@{selected|token_name} : }} {{check=Initiative roll: }} {{checkroll=[[2d10 + [[@{initbonus} + (@{apperround}/10)]] &{tracker} ]] }}';
-
-	console.log('rollBase: ' + rollBase);
-	
-	startRoll(rollBase, (results) => {
-		finishRoll(results.rollId);
-	});
-}
-
-const scrRoll = (spellname) => {
-        
-	let rollExpression = '1d100!>96cf<5cs>96'; 
-	let spelllisttype = "";
-	spelllevel = 0;
-	let listranks = 0;
-	let spellleveltag = "";
-
-	//'baselist01level01'
-
-	//Get spell type
-	spellname = spellname.replace("scr", "");
-	console.log('spellname: ' + spellname);
-	spelllisttype = spellname.substr(0,8);
-	spelllistnumber = spellname.substr(0,10);
-	spelllevel = parseInt(spellname.substr(15,2));
-	//spelllevel = spellname.substr(15,2);
-
-	console.log('spelllisttype: ' + spelllisttype);
-	console.log('spelllistnumber: ' + spelllistnumber);
-	console.log('spelllevel: ' + spelllevel);
-	
-	//Get list ranks 
-	let rollmodifiers = '@{spelllistnumberranks}[Spell List Ranks] + @{scrstatmod}[Realm Stat] + @{spelllisttypemod}[List Type Modifier]';
-	console.log('rollmodifiers: ' + rollmodifiers);
-	rollExpression = rollExpression + ' + ' + rollmodifiers;
-	let rollBase = '&{template:RmuScrRolltest} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name} casts @{spellnamename} check}} {{scrflag=true}} {{check= @{spelllistnumbername} (@{spelllistnumberranks} ranks): }}  {{roll1name=${rollExpression}}} {{spellfailureroll=[[(1d100!>95cf<5001cs=0)]]}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
-	
-	rollBase = rollBase.replace(/spellname/g, spellname);
-	rollBase = rollBase.replace(/spelllistnumber/g, spelllistnumber);
-	rollBase = rollBase.replace(/spelllisttype/g, spelllisttype);
-
-	console.log('rollBase: ' + rollBase);
-	d100oeRoll(rollBase);
-
-}
-
-const d100oeRoll = (rollBase) => {
-
-	console.log(rollBase);
-
-	startRoll(rollBase, (results) => {
-
-			let downRoll = results.results.roll1mod.result;
-			let origRoll = results.results.roll1.result;
-			let dieRoll = results.results.roll1.dice[0];
-			console.log(dieRoll);
-			let rollData = results.results; // Holding the computed data in an object is a bit cleaner if your rolls get more complex
-			rollData = Object.assign(results);
-
-			if (dieRoll < 6) {
-					rollData.isdownroll = 1; // This tells the roll template to display the mod & final sections
-					rollData.roll1final = origRoll - downRoll;
-					console.log('Roll Final With Downroll: ' + rollData.roll1final);
-			} 
-			
-	finishRoll(results.rollId, rollData);
-	});
-
-}
-
 
 //<!-- /*------------ Start of javascript event capture ------------ */ -->
 
@@ -8299,6 +8197,160 @@ on('change:activearmorfull change:activearmormagic change:activearmortorso chang
 	console.log('callingevent: ' + callingevent);
 
 });
+
+//	<!---- capture armor type change for each stat ---->
+on('change:baselist01ranks', function(info) {
+	let newranks = 0;
+
+	//for (1 = 1, i<5; i++) {
+
+	//}
+	
+	console.log('info.sourceAttribute: ' + info.sourceAttribute);
+	//callingevent = info.sourceAttribute; 
+	//console.log('callingevent: ' + callingevent);
+	SetGracePenalty();
+
+});
+
+//	<!---- capture armor type change for each stat ---->
+on('change:level', function(info) {
+	let newlevel = 0;
+
+	//for (1 = 1, i<5; i++) {
+
+	//}
+	
+	console.log('info.sourceAttribute: ' + info.sourceAttribute);
+	//callingevent = info.sourceAttribute; 
+	//console.log('callingevent: ' + callingevent);
+	SetGracePenalty();
+
+});
+
+
+//<!-- /*------------ Start of javascript roll buttons ------------ */ -->
+
+const skillRoll = (skillname, displayname, isnamed) => {
+        
+        let rollExpression = '1d100!>96cf<5cs>96'; 
+        //let rollmodifiers = '@{skillnamerankbonus}[Rank Bonus] + @{skillnamerankbonus}[Rank Bonus] + ';
+        let rollmodifiers = '@{skillnametotal}[Total Bonus] + @{skillnamesituationbonus}[Misc Roll Mods] + @{fatiguepenalty}[Fatigue Penalty] ';
+        rollExpression = rollExpression + ' + ' + rollmodifiers //+ '[TotalBonus]';
+        //console.log(rollmodifiers);
+        // Wrap the two @{attributes} in a [[subroll]] if they're taking up too much space
+        let rollBase = '&{template:RmuStdRolltest} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name}\'s displayname - @{skillnamename} }} {{spellflag=true}} {{check= displayname - @{skillnamename} (@{skillnameranks} ranks): }}  {{roll1name=${rollExpression}}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
+
+		if (isnamed = 0) {
+			rollBase = rollBase.replace(/ - @{skillnamename}/g, "");
+		}
+
+		rollBase = rollBase.replace(/skillname/g, skillname);
+		rollBase = rollBase.replace(/displayname/g, displayname);
+
+		d100oeRoll(rollBase);
+	
+}
+
+const resistanceRoll = () => {
+	 
+	let rollExpression = '1d100!>96cf<5cs>96'; 
+	let rrtype = "";
+	spelllevel = 0;
+	let listranks = 0;
+	let spellleveltag = "";
+
+	//'baselist01level01'
+
+	//Get spell type
+	//spellname = spellname.replace("scr", "");
+	//console.log('spellname: ' + spellname);
+	//spelllisttype = spellname.substr(0,8);
+	//spelllistnumber = spellname.substr(0,10);
+	//spelllevel = parseInt(spellname.substr(15,2));
+
+	let rollBase = '&{template:RmuResistanceRoll} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name} resists @{spellnamename} check:}} {{rrflag=true}} {{check= @{spelllistnumbername} (@{spelllistnumberranks} ranks): }}  {{roll1name=${rollExpression}}} {{spellfailureroll=[[(1d100!>95cf<5001cs=0)]]}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
+
+	//rollBase = rollBase.replace(/spellname/g, spellname);
+	//rollBase = rollBase.replace(/spelllistnumber/g, spelllistnumber);
+	//rollBase = rollBase.replace(/spelllisttype/g, spelllisttype);
+
+	console.log('rollBase: ' + rollBase);
+	
+	//d100oeRoll(rollBase);
+}
+
+const initRoll = () => {
+	let rollBase = '&{template:RmuInitiative} {{name=@{selected|token_name} : }} {{check=Initiative roll: }} {{checkroll=[[2d10 + [[@{initbonus} + (@{apperround}/10)]] &{tracker} ]] }}';
+
+	console.log('rollBase: ' + rollBase);
+	
+	startRoll(rollBase, (results) => {
+		finishRoll(results.rollId);
+	});
+}
+
+const scrRoll = (spellname) => {
+        
+	let rollExpression = '1d100!>96cf<5cs>96'; 
+	let spelllisttype = "";
+	spelllevel = 0;
+	let listranks = 0;
+	let spellleveltag = "";
+
+	//'baselist01level01'
+
+	//Get spell type
+	spellname = spellname.replace("scr", "");
+	console.log('spellname: ' + spellname);
+	spelllisttype = spellname.substr(0,8);
+	spelllistnumber = spellname.substr(0,10);
+	spelllevel = parseInt(spellname.substr(15,2));
+	//spelllevel = spellname.substr(15,2);
+
+	console.log('spelllisttype: ' + spelllisttype);
+	console.log('spelllistnumber: ' + spelllistnumber);
+	console.log('spelllevel: ' + spelllevel);
+	
+	//Get list ranks 
+	let rollmodifiers = '@{spelllistnumberranks}[Spell List Ranks] + @{scrstatmod}[Realm Stat] + @{spelllisttypemod}[List Type Modifier]';
+	console.log('rollmodifiers: ' + rollmodifiers);
+	rollExpression = rollExpression + ' + ' + rollmodifiers;
+	let rollBase = '&{template:RmuScrRolltest} {{roll1=[['+ rollExpression +']]}} {{isdownroll=[[0]]}} {{name=@{character_name} casts @{spellnamename} check}} {{scrflag=true}} {{check= @{spelllistnumbername} (@{spelllistnumberranks} ranks): }}  {{roll1name=${rollExpression}}} {{spellfailureroll=[[(1d100!>95cf<5001cs=0)]]}} {{roll1mod=[[(1d100!>95cf<101cs=0)]]}} {{roll1final=[[0]]}}';
+	
+	rollBase = rollBase.replace(/spellname/g, spellname);
+	rollBase = rollBase.replace(/spelllistnumber/g, spelllistnumber);
+	rollBase = rollBase.replace(/spelllisttype/g, spelllisttype);
+
+	console.log('rollBase: ' + rollBase);
+	d100oeRoll(rollBase);
+
+}
+
+const d100oeRoll = (rollBase) => {
+
+	console.log(rollBase);
+
+	startRoll(rollBase, (results) => {
+
+			let downRoll = results.results.roll1mod.result;
+			let origRoll = results.results.roll1.result;
+			let dieRoll = results.results.roll1.dice[0];
+			console.log(dieRoll);
+			let rollData = results.results; // Holding the computed data in an object is a bit cleaner if your rolls get more complex
+			rollData = Object.assign(results);
+
+			if (dieRoll < 6) {
+					rollData.isdownroll = 1; // This tells the roll template to display the mod & final sections
+					rollData.roll1final = origRoll - downRoll;
+					console.log('Roll Final With Downroll: ' + rollData.roll1final);
+			} 
+			
+	finishRoll(results.rollId, rollData);
+	});
+
+}
+
 
 //<!-- /* ----------Start of javascript functions ------------ */ -->
 
