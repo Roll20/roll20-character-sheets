@@ -38,18 +38,26 @@ async function recalculateMovement(manualFeetPerMelee) {
   let attacksPerMelee = 2;
 
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
+  /**
+   * @todo short-term - this should use Default profile
+   * @todo long-term - movement section should be incorporated into each profile
+   */
   const attacksAttrName = `repeating_profiles_${orderedSectionIds[0]}_attacks`;
 
   if (!manualFeetPerMelee) {
     const ids = await getSectionIDsOrderedAsync("armor");
-    const { spd, [attacksAttrName]: perMelee, ...penalties} = await getAttrsAsync([
+    const {
+      spd,
+      [attacksAttrName]: perMelee,
+      ...penalties
+    } = await getAttrsAsync([
       "spd",
       attacksAttrName,
-      ...ids.map(id => `repeating_armor_${id}_is_active`),
-      ...ids.map(id => `repeating_armor_${id}_movementpenalty`),
+      ...ids.map((id) => `repeating_armor_${id}_is_active`),
+      ...ids.map((id) => `repeating_armor_${id}_movementpenalty`),
     ]);
     attacksPerMelee = perMelee;
-    
+
     const activeArmorIds = ids.reduce((acc, id) => {
       if (!!Number(penalties[`repeating_armor_${id}_is_active`])) {
         acc.push(id);
@@ -60,23 +68,23 @@ async function recalculateMovement(manualFeetPerMelee) {
     const speedPenalty = activeArmorIds.reduce((penalty, id) => {
       const p = +penalties[`repeating_armor_${id}_movementpenalty`];
       return penalty + p;
-    }, 0)
-  
+    }, 0);
+
     feetPerMelee = spd * 15;
     feetPerMelee = Math.round(
-      feetPerMelee + (feetPerMelee * (speedPenalty / 100.0))
+      feetPerMelee + feetPerMelee * (speedPenalty / 100.0)
     );
   } else {
     // To save a network call, pull only attacks on a manual override
-    const { [attacksAttrName]: perMelee } = await getAttrsAsync([attacksAttrName]);
+    const { [attacksAttrName]: perMelee } = await getAttrsAsync([
+      attacksAttrName,
+    ]);
     attacksPerMelee = perMelee;
   }
   const attrs = {
     run_mph: ((feetPerMelee * 4 * 60) / 5280).toFixed(1),
     run_ft_melee: feetPerMelee,
-    run_ft_attack: Math.round(
-      feetPerMelee / attacksPerMelee
-    ),
+    run_ft_attack: Math.round(feetPerMelee / attacksPerMelee),
   };
   await setAttrsAsync(attrs);
-};
+}
