@@ -2155,7 +2155,7 @@
 	    </div>		  
     	    <div class="table-item">
                 <select name="attr_id" class="mediumselect2">
-                    <option SELECTED>Legit</option>
+                    <option SELECTED>Legitmate</option>
                     <option SELECTED>Forged</option>
 		</select>
 	    </div>
@@ -3006,16 +3006,21 @@
     <br>
 
     <div class="SRH3">Armor</div>
+    <input type="hidden" name="attr_armor-combatpool-pen" value=0>
+    <input type="hidden" name="attr_armor-quickness-pen" value=0>
     <div class="armor">
-        <div class="SRH4">Dermal <input type="number" name='attr_dermalarmour' value="0" min="0"></div>
-        <div class="SRH4">Pain Resistance <input type='number' name='attr_adeptpainres' value="0" min="0" max=9></div>
-        <div class="SRH4">Ballistic<input type='number' name='attr_ballistic' value="0" min="0" max=9></div>
-        <div class="SRH4">Impact<input type='number' name='attr_impact' value="0" min="0" max=9></div>
+        <header>Dermal <input type="number" name='attr_dermalarmour' value="0" min="0"></header>
+        <header>Pain Resistance <input type='number' name='attr_adeptpainres' value="0" min="0"></header>
+        <header>Ballistic<input type='number' name='attr_ballistic' value="0" min="0"></header>
+        <header>Impact<input type='number' name='attr_impact' value="0" min="0" ></header>
+        <header>Quickness Penalty: <span name="attr_armor-quickness-pen" value=0></span></header>
+        <header>Combat Pool Penalty: <span name="attr_armor-combatpool-pen" value=0></span></header>
     </div>
     <div class="SRH3">Armor Sets</div>
     <div class="armorsets-table-header">
         <div class="table-top-left">Equip</div>
         <div class="table-top-mid">Name</div>
+        <div class="table-top-mid">Slot</div>
         <div class="table-top-mid">Ballistic Rating</div>
         <div class="table-top-mid">Impact Rating</div>
         <div class="table-top-right">Notes</div>
@@ -3024,9 +3029,18 @@
         <div class="armorsets-table-row">
             <div style="text-align: center; padding-top: 8px;"><input type="checkbox" name="attr_equipped">
             </div>
-            <div><input type=text name="attr_armorname" style="width: 150px;"></div>
-            <div><input type="number" value=0 name="attr_ballistic" style="width: 80px;"></div>
-            <div><input type="number" value=0 name="attr_impact" style="width: 80px;"></div>
+            <input type=text name="attr_armorname" class="myweapontxt">
+	    <div><select name="attr_slot" class="mediumselect2">
+                    <option SELECTED>body</option>
+                    <option >helmet</option>
+                    <option>shield</option>
+                    <option value="ware">cyberware</option>
+                    <option value="ware">bioware</option>
+                    <option value="ware">nanoware</option>
+                </select>
+	    </div>
+            <input type="number" value=0 name="attr_ballistic">
+            <input type="number" value=0 name="attr_impact">
             <textarea name="attr_armornotes" style='width:300px;height:18px;'></textarea>
         </div>
         <div class="table-bottom" />
@@ -6867,6 +6881,7 @@ var setmatrixsystem = function (rating) {
 	console.log('mycode:' + mycode + ' myrating ' + myrating);
         let finalcode = mycode.toUpperCase()
         const [system, access, control, index, files, slave ] = myrating.split("/")
+	atts["character_name"]=rating;
 	atts["matrixcode"]=finalcode;
 	atts["matrixsecurityrating"]=system;
 	atts["matrixcontrolrating"]=control;
@@ -7146,23 +7161,46 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 	var sets={};
 	var ballistic=0;
 	var impact=0;
-	fields=["equipped", "ballistic", "impact"];
+	var armorval={"body-bal": [0], "body-im": [0], "helmet-bal": [0], "helmet-im": [0], "shield-bal": [0], "shield-im": [0], "ware-bal": [0], "ware-im": [0]};
+	fields=["equipped", "ballistic", "impact", "slot"];
 	getSectionIDs("repeating_armor", idArray => {
 		var attrArray = idArray.reduce((m, id) => [ ...m, ...(fields.map(field => `repeating_armor_${id}_${field}`))], []); 
+		attrArray.push("quickness_max");
 		getAttrs(attrArray, function(myval) {
 			console.log('myval');
 			console.log(myval);
 			console.log(idArray);
+			const myquick=parseInt(myval["quickness_max"]);
 			idArray.forEach(m => {
 				if (myval["repeating_armor_" + m + "_equipped"] == "on" ) {
-					ballistic += parseInt(myval["repeating_armor_" + m + "_ballistic"]);
-					impact += parseInt(myval["repeating_armor_" + m + "_impact"]);
+					let bal=myval["repeating_armor_" + m + "_slot"] + "-bal";
+					let imp=myval["repeating_armor_" + m + "_slot"] + "-im";
+					armorval[bal].push(parseInt(myval["repeating_armor_" + m + "_ballistic"]));
+					armorval[imp].push(parseInt(myval["repeating_armor_" + m + "_impact"]));
 				}
 			});
-			console.log('myball ' + ballistic);
-			console.log('impact ' + impact);
-			sets["ballistic"]=ballistic;
-			sets["impact"]=impact;
+			console.log(armorval);
+			let shield_bal=Math.max(...armorval["shield-bal"]);
+			let shield_im=Math.max(...armorval["shield-im"]);
+			let helmet_bal=Math.max(...armorval["helmet-bal"]);
+			let helmet_im=Math.max(...armorval["helmet-im"]);
+			let ware_bal= armorval["ware-bal"].reduce((a, b) => a + b, 0);
+			let ware_im= armorval["ware-im"].reduce((a, b) => a + b, 0);
+			armorval["body-bal"].sort();
+			armorval["body-im"].sort();
+			let body_bal = armorval["body-bal"].pop() + Math.floor( armorval["body-bal"].pop() / 2 );
+			let body_im = armorval["body-im"].pop() + Math.floor( armorval["body-im"].pop() / 2 );
+			ballistic= body_bal + shield_bal + helmet_bal;
+			impact= body_im + shield_im + helmet_im;
+			let ballover = ballistic - myquick;
+			let impactover = impact - myquick;
+			if ( ballover < 0 ) ballover=0;
+			if ( impactover < 0 ) impactover=0;
+			let combatpen= -1 * (Math.floor((ballover + impactover) / 2 ));
+			sets["ballistic"]=ballistic + ware_bal;
+			sets["impact"]=impact + ware_im;;
+			sets["armor-quickness-pen"]=ballover;
+			sets["armor-combatpool-pen"]=combatpen;
 			setAttrs(sets);
 
 		});
@@ -7429,11 +7467,11 @@ on("change:repeating_explosives:exptype", function(eventinfo){
     });
 };
 
-on("change:combatpool-mods change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base", function () {
+on("change:combatpool-mods change:armor-combatpool-pen change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base", function () {
 	sets={};
-	atts=["combatpool-mods", "combatpool-base", "spellpool-mods", "spellpool-base", "hackingpool-mods", "hackingpool-base", "controlpool-mods", "controlpool-base", "astralpool-mods", "astralpool-base"]
+	atts=["combatpool-mods", "combatpool-base", "armor-combatpool-pen","spellpool-mods", "spellpool-base", "hackingpool-mods", "hackingpool-base", "controlpool-mods", "controlpool-base", "astralpool-mods", "astralpool-base"]
 	getAttrs(atts, function (myval) {
-		sets["combatpool"] = parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]);
+		sets["combatpool"] = parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]);
 		sets["spellpool"] = parseInt(myval["spellpool-mods"]) + parseInt(myval["spellpool-base"]);
 		sets["hackingpool"] = parseInt(myval["hackingpool-mods"]) + parseInt(myval["hackingpool-base"]);
 		sets["controlpool"] = parseInt(myval["controlpool-mods"]) + parseInt(myval["controlpool-base"]);
@@ -8083,7 +8121,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader"><b>{{myname}} vs. {{target}}</b></div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
-        {{#HackingPool}}<div class="rtrow"><b>Hacking Pool Dice:</b> {{HackingPool}}</div>{{/HackingPool}}
+        {{#hackingpool}}<div class="rtrow"><b>Hacking Pool Dice:</b> {{hackingpool}}</div>{{/hackingpool}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         <div class="sheet-rtrow"><b>{{action}}:</b> {{roll}}</div>
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
