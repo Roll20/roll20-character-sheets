@@ -73,6 +73,11 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+August 25th 2021 v1.52
+
+- Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
+
+
 July 12th 2021 v1.51 
 
 - XP tab: clean up, added styling and some text. 
