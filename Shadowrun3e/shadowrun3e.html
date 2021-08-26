@@ -732,12 +732,22 @@
             <div class="skills-table">
                 <header class="table-top-left">Name</header>
                 <header class="table-top-mid">Rating</header>
-                <header class="table-top-right"></header>
+                <header class="table-top-mid">Pool</header>
+                <header class="table-top-right">Roll</header>
             </div>
             <fieldset class="repeating_skills">
                 <div class="skills-table">
-                    <div class="table-item-left"><input type="text" name="attr_skillname"></div>
+                    <div class="table-item-left"><input type="text" name="attr_skillname" class="myweapontxt"></div>
                     <div class="table-item"><input type="number" name="attr_skillrating" min=1 value=1></div>
+                    <div class="table-item"><select name="attr_pool" class="mediumselect2">
+		    	<option SELECTED value="none">None</option>
+		    	<option value="combat">Combat</option>
+		    	<option value="task">Task</option>
+		    	<option value="hacking">Hacking</option>
+		    	<option value="control">Control</option>
+		    	<option value="spell">Spell</option>
+		    	<option value="astral">Astral</option>
+		      </select></div>
                     <div class="table-item"><button class="d6-button" type="action" name="act_skills">L</button></div>
                 </div>
             </fieldset>
@@ -3446,10 +3456,7 @@
                         <div><input type="radio" name="attr_sensor-los" value="interupted"></div>
                     </div>
                     <div class="table-close-nc">Sensor Test</div>
-                    <div>
-                        <button type="roll" class="d6-dice" name="roll_skill" title="Sensor Test"
-                            value="&{template:vehicle} {{type=Sensor Test}} {{character=@{character_name}}} {{target=@{target|Target|token_name}}} {{roll=[[ [[@{sensors-rating}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }} {{ecd=[[ [[@{ecd-rating} * @{ecd-enabled}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }}"></button>
-                    </div>
+                    <div><button type="action" class="pictos-button" title="Sensor Test" name="act_vehiclesensor" id="vehiclesensor">f</button></div>
                 </div>
             </div>
             <input type='hidden' class='buttontoggle' name='attr_sheettype' />
@@ -3570,7 +3577,7 @@
 		<div>Used</div>
                 <div>Control Pool:</div>
                 <input type="number" name="attr_control-pool" min=0 value=0>
-		<div><span name="attr_controlpool-used"></span></div>
+                <div><input type='hidden' class='controlpool-over' name='attr_controlpool-over' /><span class="controlpool-over" name="attr_controlpool-used"></span></div>
 	     </div>
 	     <br>
              <div class="table-top-nc"><b>Skills</div>
@@ -3756,10 +3763,7 @@
             <div class="table-item"><span name="attr_sensors-flux"></div>
             <div class="table-item"><input type="number" name="attr_sensors-fluxmod" min=0 value=0></div>
             <div class="table-item"><span name="attr_sensors-fluxmax"></div>
-            <div class="table-item">
-                <button type="roll" class="d6-dice" name="roll_skill" title="Sensor Test"
-                    value="&{template:vehicle} {{type=Sensor Test}} {{character=@{character_name}}} {{target=@{target|Target|token_name}}} {{roll=[[ [[@{sensors-rating}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }} {{ecd=[[ [[@{ecd-rating} * @{ecd-enabled}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }}"></button>
-            </div>
+            <div class="table-item"><button type="action" class="pictos-button" title="Sensor Test" name="act_vehiclesensor" id="vehiclesensor">f</button></div>
             <div class="table-item"></div>
             <div class="table-item-left">Sonar:</div>
             <div class="table-item"><input type="number" name="attr_sonar-rating" min=0 value=0></div>
@@ -3816,10 +3820,7 @@
             <div class="text-mid">End Turn:</div>
             <div class="center-checkbox"><button type="action" name="act_endturn" class="d6-button" title="End Combat Turn" id="endturn">L</button></div>
             <div class="text-mid">Hand</div>
-            <div class="text-mid"><span name="attr_handling"></span>
-                <button type="roll" class="d6-dice" name="roll_skill" title="Driving Test"
-                    value="&{template:vehicle} {{type=Driving Test}} {{character=@{character_name}}} {{controlpool=?{Control Pool Dice?|0}}} {{roll=[[ [[  @{vehicle-skill-final} + @{driving-test-autonav} + ?{Control Pool Dice?}]]d6>[[{2,(@{handling} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} - @{driving-test-interface} +@{driving-test-weather} +@{driving-test-terrain} +@{driving-test-size} +?{Additional Modifiers|0})}kh1]]!!]]  }}"></button>
-            </div>
+            <div class="text-mid"><span name="attr_handling"></span><button type="action" class="d6-button" title="Driving Test" name="act_vehicledriving" id="driving">L</button></div>
             <div class="text-mid">Accel:</div>
             <div class="text-mid"><span name="attr_acceleration"></span>
             <button type="action" class="d6-button" title="Vehicle Acceleration Test" name="act_vehicleaction" id="accelerating">L</button></div>
@@ -3832,9 +3833,7 @@
             <div class="text-mid">Auto:</div>
             <div class="text-mid"><span name="attr_autonav"></span></div>
             <div class="text-mid">Sensor:</div>
-            <div class="text-mid"><span name="attr_sensors-rating"></span>
-                <button type="roll" class="d6-dice" name="roll_skill" title="Sensor Test"
-                    value="&{template:vehicle} {{type=Sensor Test}} {{character=@{character_name}}} {{target=@{target|Target|token_name}}} {{roll=[[ [[@{sensors-rating}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }} {{ecd=[[ [[@{ecd-rating} * @{ecd-enabled}]]d6>[[{2,( @{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]!!]]  }}"></button></div>
+            <div class="text-mid"><span name="attr_sensors-rating"></span><button type="action" class="pictos-button" title="Sensor Test" name="act_vehiclesensor" id="vehiclesensor">f</button></div>
         </div>
 
         <div class="vehicle-actions">
@@ -4446,6 +4445,7 @@ buttonlist.forEach(button => {
 	});
 
    });
+
 	on('clicked:repeating_credsticks:checkcredstick', (info) => {
 		var atts=[];
 		var source=info['sourceAttribute'].split('_');
@@ -4469,8 +4469,8 @@ buttonlist.forEach(button => {
 	});
 
     	on('clicked:repeating_skills:skills', (info) => {
-		const attrlist=["skillname", "skillrating"];
-		var atts=[];
+		const attrlist=["skillname", "skillrating", "pool"];
+		var atts=["character_name"];
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_');
@@ -4478,17 +4478,22 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
-			let skill=myval[myrepeat.concat("skillname")];
-			let rating=parseInt(myval[myrepeat.concat("skillrating")]);
+			const skill=myval[myrepeat.concat("skillname")];
+			const rating=parseInt(myval[myrepeat.concat("skillrating")]);
+			const mypool=myval[myrepeat.concat("pool")];
+		     	const poolname = mypool.charAt(0).toUpperCase() + mypool.slice(1);
+			const pool=mypool + "pool";
 			console.log('start roll for ' + skill);
-			const calcDice= rating + " + ?{Pool Dice?}";
+			var calcDice= rating;
+			if ( mypool != "none" ) calcDice += " + ?{" + poolname + " Pool Dice?}";
 			const calcTN="?{What is the Target Number?|4} + @{stun_pen} + @{wound_pen}";
-			var myroll="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}{{poolname=Combat Pool}}{{pooldice=[[?{Pool Dice?|0}]]}}";
+			var myroll="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}";
+			if ( mypool != "none" ) myroll += "{{pooldice=[[?{" + poolname + " Pool Dice?|0}]]}}{{poolname=" + poolname + " Pool}}";
 			myroll +="{{targetnumber=[[ " + calcTN + " ]]}}{{rolldice=[[ " + calcDice + " ]]}}";
 			myroll += "{{result=[[ [[ " + calcDice + " ]]d6>[[{2,( " + calcTN + " )}kh1]]!!} ]]}}";
                 	startRoll(myroll, (results) => {
 				console.log('R: ' + results);
-				updatepoolused("combatpool", results.results.pooldice.result);	
+				if ( mypool != "none" ) updatepoolused(pool, results.results.pooldice.result);	
 				 finishRoll( results.rollId);
 			});
 		});
@@ -5321,8 +5326,37 @@ buttonlist.forEach(button => {
 	});
 
 	
+	on('clicked:vehicledriving', (info) => {
+		    calcTN="@{handling} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} - @{driving-test-interface} +@{driving-test-weather} +@{driving-test-terrain} +@{driving-test-size} +?{Additional Modifiers|0}";
+		    calcDice="[[@{vehicle-skill-final} + @{driving-test-autonav} + ?{Control Pool Dice?}]]"
+		    var myroll="&{template:vehicle}{{type=Driving Test}}{{controlpool=[[?{Control Pool Dice?|0}]]}}{{character=@{character_name}}}"
+		    myroll += "{{targetnumber=[[" + calcTN + "]]}}"
+		    myroll += "{{roll=[[ " + calcDice + "d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}"
+		    console.log(myroll);
+		    var atts=[];
+                    startRoll(myroll, (results) => {
+			updatepoolused("controlpool", results.results.controlpool.result);	
+			finishRoll( results.rollId, { })
+		    });
+	});
+
+	on('clicked:vehiclesensor', (info) => {
+		    calcTN="[[{2,(@{target|Target|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]";
+		    calcDice="[[@{sensors-rating}]]";
+		    calcDiceECD="[[@{ecd-rating} * @{ecd-enabled} ]]";
+		    var myroll="&{template:vehicle}{{type=Sensor Test}}{{character=@{character_name}}}";
+		    myroll += "{{targetnumber=" + calcTN + "}}"
+		    myroll += "{{roll=[[ " + calcDice + "d6>" + calcTN + "!! ]] }}"
+		    myroll += "{{ecd=[[ " + calcDiceECD + "d6>" + calcTN + "!! ]] }}"
+		    console.log(myroll);
+		    var atts=[];
+                    startRoll(myroll, (results) => {
+			finishRoll( results.rollId, { })
+		    });
+	});
+
 	on('clicked:vehicleposition', (info) => {
-		    calcTN="[[{2,(@{handling} + @{speed-exceeding} +  @{driving-position-terrain} - @{vehicle-actionbonus} + (@{vehicle-autonav} * @{autonav}) + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} )}kh1]]"
+		    calcTN="[[{2,(@{handling} + @{speed-exceeding} +  @{driving-position-terrain} - @{vehicle-actionbonus} + (@{vehicle-autonav} * @{autonav}) + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} )}kh1]]";
 		    calcDice="[[@{vehicle-skill-final} + ?{Control Pool Dice?}]]"
 		    var myroll="&{template:vehicle}{{type=Position Maneuever}}{{controlpool=[[?{Control Pool Dice?|0}]]}}{{character=@{character_name}}}"
 		    myroll += "{{targetnumber=" + calcTN + "}}{{position=[[0]]}}"
@@ -7491,8 +7525,8 @@ on("change:strength_max", function() {
 	
 });
 
-on("change:hackingpool-icsuppress change:hackingpool-used change:hackingpool change:controlpool change:controlpool-used change:combatpool change:combatpool-used", function() {
-	getAttrs(["hackingpool-used", "hackingpool-icsuppress", "hackingpool", "controlpool", "controlpool-used", "combatpool", "combatpool-used"], function(myval) {
+on("change:hackingpool-icsuppress change:hackingpool-used change:hackingpool change:controlpool change:controlpool-used change:combatpool change:combatpool-used change:taskpool change:taskpool-used change:astralpool change:astralpool-used", function() {
+	getAttrs(["hackingpool-used", "hackingpool-icsuppress", "hackingpool", "controlpool", "controlpool-used", "combatpool", "combatpool-used", "taskpool", "taskpool-used", "astralpool", "astralpool-used"], function(myval) {
 		sets={"hackingpool-over": 0, "controlpool-over": 0, "combatpool-over": 0};
 		hackusedic=parseInt(myval["hackingpool-icsuppress"]);
 		hackused=parseInt(myval["hackingpool-used"]);
@@ -7503,9 +7537,15 @@ on("change:hackingpool-icsuppress change:hackingpool-used change:hackingpool cha
 		controlpool=parseInt(myval["controlpool"]);
 		combatused=parseInt(myval["combatpool-used"]);
 		combatpool=parseInt(myval["combatpool"]);
+		taskused=parseInt(myval["taskpool-used"]);
+		taskpool=parseInt(myval["taskpool"]);
+		astralused=parseInt(myval["astralpool-used"]);
+		astralpool=parseInt(myval["astralpool"]);
 		console.log(myval);
 		console.log('cu: ' + combatused);
 		console.log('cp: ' + combatpool);
+		if ( taskused > taskpool ) sets["taskpool-over"]=1;
+		if ( astralused > astralpool ) sets["astralpool-over"]=1;
 		if ( combatused > combatpool ) sets["combatpool-over"]=1;
 		if ( controlused > controlpool ) sets["controlpool-over"]=1;
 		if ( hackpoolfinal > hackpool ) sets["hackingpool-over"]=1;
@@ -8169,7 +8209,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         <div class="sheet-rtrow"><span>Skill Test: </span>{{result}}</div>
-        <div class="sheet-rtrow">{{poolname}}: {{pooldice}}</div>
+        {{#poolname}}<div class="sheet-rtrow">{{poolname}}: {{pooldice}}</div>{{/poolname}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#dicepool}}<div class="sheet-rtrow">Dice Pool Used: {{dicepool}}</div>{{/dicepool}}
     </div>
