@@ -530,6 +530,7 @@ const COMBAT_KEYS = [
   "dodge_auto",
   "dodge_teleport",
   "dodge_motion",
+  "dodge_underwater",
   "strike_range",
   "strike_range_single",
   "strike_range_burst",
