@@ -83,6 +83,7 @@
 
 
 <div class="hidden-constants">
+    <input type='hidden' name='attr_gyro-on' value=0 />
     <input type='hidden' name='attr_wp-char' value="(@{stun_pen} + @{wound_pen})" />
     <input type='hidden' name='attr_wp-matrix' value="(@{stun_pen} + @{wound_pen} + @{matrix-penalty})" />
     <input type='hidden' name='attr_wp-vehicle'
@@ -2575,15 +2576,14 @@
                 <div class="combat-skills-items">Bracer:</b><input type="number" name="attr_bracer" value=0> </div>
                 <div class="combat-skills-items">Gun Cane:</b><input type="number" name="attr_guncane" value=0> </div>
                 <div class="combat-skills-items">Oral Gun:</b><input type="number" name="attr_oralgun" value=0> </div>
-                <div class="combat-skills-items">Oral Strike:</b><input type="number" name="attr_oralstrike" value=0>
-                </div>
+                <div class="combat-skills-items">Oral Strike:</b><input type="number" name="attr_oralstrike" value=0></div>
                 <div class="combat-skills-items">Eye Gun:</b><input type="number" name="attr_eyegun" value=0> </div>
             </div>
             <div></div>
             <div class="combat-unarmed">
                 <div class="combat-skills-items">Unarmed:<input type="number" name="attr_unarmed" value=0></div>
                 <div class="combat-skills-items">Martial Arts:</div>
-                <div><input type="text" list="martialarts" value="Regular" style="width=80px;" name="attr_martialarts">
+                <div><input type="text" list="martialarts" value="Unarmed" style="width=80px;" name="attr_martialarts">
                     <datalist class="mediumselect3" id="martialarts">
                         <option selected>Unarmed</option>
                         <option>Brawling</option>
@@ -3009,7 +3009,6 @@
     <input type="hidden" name="attr_armor-combatpool-pen" value=0>
     <input type="hidden" name="attr_armor-quickness-pen" value=0>
     <div class="armor">
-        <header>Dermal <input type="number" name='attr_dermalarmour' value="0" min="0"></header>
         <header>Pain Resistance <input type='number' name='attr_adeptpainres' value="0" min="0"></header>
         <header>Ballistic<input type='number' name='attr_ballistic' value="0" min="0"></header>
         <header>Impact<input type='number' name='attr_impact' value="0" min="0" ></header>
@@ -3037,6 +3036,7 @@
                     <option value="ware">cyberware</option>
                     <option value="ware">bioware</option>
                     <option value="ware">nanoware</option>
+                    <option value="gyro">gyro harness</option>
                 </select>
 	    </div>
             <input type="number" value=0 name="attr_ballistic">
@@ -4380,6 +4380,7 @@ buttonlist.forEach(button => {
 
 <script type="text/worker">
       const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "force" ];
+      const quicknesslinked=["@{blowgun}", "@{bracer}", "@{guncane}", "@{gyrojet}", "@{eyegun}", "@{oralgun}", "@{oralstrike}", "@{pistols}", "@{smgs}", "@{rifles}", "@{assaultrifles}", "@{lasers}", "@{whips}", "@{stealth}", "@{shotguns}"]
       const damagetable = {
    		"N/A": 0,
    		"L": 1,
@@ -5093,7 +5094,7 @@ buttonlist.forEach(button => {
 		if ( mods=="double" ) mods=2;	
 		if ( mods=="half" ) mods=0.5;	
 	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-	        var calcDice= "@{body|max} + @{dermalarmour} + ?{Combat Pool Dice}";
+	        var calcDice= "@{body|max} + ?{Combat Pool Dice}";
 		calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
          	myroll="&{template:resistance}";
 	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{combatpool=[[?{Combat Pool Dice|0}]]}}";
@@ -5533,7 +5534,7 @@ buttonlist.forEach(button => {
 	});
     	on('clicked:repeating_rangedweapons:rangedattack', (info) => {
 		var setatts={};
-		var atts=["sensors-rating", "combatpool-used", "controlpool-used"];
+		var atts=["sensors-rating", "combatpool-used", "controlpool-used", "gyro-on", "armor-quickness-pen"];
 	    	var recoilx=1;
 		var rounds=1;
 		var recoilmod=1;
@@ -5557,11 +5558,15 @@ buttonlist.forEach(button => {
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
 			const ammotype= myval[myrepeat.concat("ammotype")];
 			const targetaim= myval[myrepeat.concat("targeting")];
-			const gyro= myval[myrepeat.concat("gyro")];
+			const myskill=myval[myrepeat.concat("skill")];
+			var gyro= myval[myrepeat.concat("gyro")];
+			if ( myval["gyro-on"]  == 0 ) gyro=0;
 			const ss= myval[myrepeat.concat("ss")];
 			const sa= myval[myrepeat.concat("sa")];
 			const bf= myval[myrepeat.concat("bf")];
 			const fa= myval[myrepeat.concat("fa")];
+			var armorpen=0;
+			var armorpenroll="";
 			var pool;
 			var poolname;
 			var dmgnumber= damagetable[wdmg];
@@ -5586,6 +5591,10 @@ buttonlist.forEach(button => {
 				});
 			} else {
 			specialized=myval[myrepeat.concat("specialized")] || 0
+			if ( quicknesslinked.includes(myskill) ) {
+				armorpen=myval["armor-quickness-pen"];
+				armorpenroll= "{{armorpen=@{armor-quickness-pen}}}";
+			}
 			var calcTN = "[[ " 
 			if ( mymode == "vehiclesensor" )  {
 			   calcTN += "@{sensor-gunnery-tn}  + @{vehicle-driver}wp-char} + @{wp-vehicle}"
@@ -5597,7 +5606,7 @@ buttonlist.forEach(button => {
 			   poolname="Control";
 			   pool="controlpool";
 			} else {
-			   calcTN += " ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-char}";
+			   calcTN += " ?{Range} + @{rangedTN} + @{target|Target|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + " + armorpen;
 			   poolname="Combat";
 			   pool="combatpool";
 			}
@@ -5605,9 +5614,10 @@ buttonlist.forEach(button => {
 			calcTN += " + ?{Additional Modifiers|0} + " + recoil;
 			calcTN += " ]]"
 
-			var calcDice = "[[ " + myval[myrepeat.concat("skill")] + " + " + specialized + " + ?{" + poolname + " Pool Dice|0}"
+			var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + poolname + " Pool Dice|0}"
 			if ( mymode == "vehiclesensor" ) calcDice += " + " + Math.floor(vehiclesensors / 2 )
 			calcDice += " ]]"
+
 
                 	var roll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}"
 			roll += "{{rounds=[[" + rounds + "]]}}{{range=@{ask-range}}}" + uncomprecoil 
@@ -5619,6 +5629,10 @@ buttonlist.forEach(button => {
 				roll += "{{dodge=[Dodge](~@{target|Target|token_name}|dodge)}}";
 				roll += "{{resist=[Resist](~@{target|Target|token_name}|resist-ballistic-normal)}}"
 			}
+			roll += armorpenroll;
+			roll += "{{rangedmods=@{rangedTN}}}";
+			roll += "{{movemods=[[{0,( @{move} - " + gyro + ") }kh1]]}}";
+			roll += "{{targetmods=" + targetaim + "}}";
 			console.log(roll);
                 	startRoll(roll, (results) => {
 				var poolresults;
@@ -5658,7 +5672,7 @@ buttonlist.forEach(button => {
 		var defaultmsg="";
 		var defaultpen=0;
 		var myspec=0;
-		const meleeattrs=["unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage"];
+		const meleeattrs=["unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage", "gyro-on"];
 		getAttrs(meleeattrs, function(myval) {
 			if ( mymode == "astralattack" ) {
 				pool="astralpool";
@@ -5675,6 +5689,12 @@ buttonlist.forEach(button => {
 				force="{{focusforce=@{weaponfocus-force}}}"
 			}
 			else if ( mymode == "unarmedattack" ) {
+			   var gyropen=0;
+			   var gyropenroll="";
+			   if ( myval["gyro-on"] == 1 ) {
+			   	gyropen=4;
+				gyropenroll = "{{gyropen=" + gyropen + "}}";
+			   }
 			   mydamage=myval["@{attackdamage}"];
 			   myskill=myval["unarmed"];
 			   myspec=myval["unarmed-specialized"];
@@ -5702,7 +5722,7 @@ buttonlist.forEach(button => {
 			} else {
 				console.log(' id ' + mymode + ' does not match');
 			}
-			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?} ) + " + defaultpen;
+			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?} ) + " + defaultpen + " + " + gyropen;
 			var calcDice=myskill + " + " + myspec ;
                         var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}{{weapondamage="
 			console.log('pool name is ' + pool);
@@ -5724,6 +5744,7 @@ buttonlist.forEach(button => {
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}"
 			myroll+="{{attacktest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}" 
 			myroll+=defaultmsg;
+			myroll+=gyropenroll;
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
 				var reachmodtxt="Reach Bonus Applied" ;
@@ -5739,7 +5760,7 @@ buttonlist.forEach(button => {
 	});
     	on('clicked:repeating_meleeweapons:attack', (info) => {
 		console.log(info);
-		var atts=["combatpool-used"];
+		var atts=["combatpool-used", "gyro-on", "armor-quickness-pen"];
 		var rounds=1;
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
@@ -5750,6 +5771,12 @@ buttonlist.forEach(button => {
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
+			var gyropenroll="";
+			var gyropen=0;
+			if ( myval["gyro-on"] == 1 ) {
+				gyropen=4;
+				gyropenroll = "{{gyropen=" + gyropen + "}}";
+			}
 			const combatused= parseInt(myval["combatpool-used"]);
 			const myweapon= myval[myrepeat.concat("name")];
 			const myreach= myval[myrepeat.concat("reach")];
@@ -5758,15 +5785,24 @@ buttonlist.forEach(button => {
 			const myskill= myval[myrepeat.concat("skill")];
 			const myspec= myval[myrepeat.concat("specialized")];
 			const mynotes= myval[myrepeat.concat("notes")];
+			var armorpen=0;
+                        var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}{{weapondamage=" + mydamage + "}}";
+			if ( quicknesslinked.includes(myskill) ) {
+				console.log('quick pen');
+				armorpen=myval["armor-quickness-pen"];
+				console.log(armorpen);
+				myroll+= "{{armorpen=@{armor-quickness-pen}}}";
+			}
 			calcDice="[[ " + myskill + " + " + myspec + " + ?{Combat Pool Dice}]]";
-			calcTN="[[ {2,(4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - " + myreach + ") * ?{Use Reach Modifier?} ))}kh1 ]]";
-                        var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}{{weapondamage="
-			myroll+= mydamage + "}}{{weaponpower=[[" + mypower + "]]}}{{combatpool=[[?{Combat Pool Dice|0}]]}}"
+			calcTN="[[ {2,(4 + @{meleeTN} + " + gyropen + " +  ( ( @{target|Target|meleereach|max} - " + myreach + ") * ?{Use Reach Modifier?} ) + " + armorpen + ")}kh1 ]]";
+			myroll+= "{{weaponpower=[[" + mypower + "]]}}{{combatpool=[[?{Combat Pool Dice|0}]]}}"
 			myroll+= "{{charreach=[[@{meleereach|max}]]}}{{targetreach=[[@{target|Target|meleereach|max}]]}}"
 			myroll+="{{weaponname=" + myweapon + "}}{{reachmod=[[?{Use Reach Modifier?|Yes,1|No,0}]]}}"
 			myroll+="{{reachbonus=[[(@{target|Target|meleereach|max} - " + myreach + ") * ?{Use Reach Modifier?}]]}}"
 			myroll+="{{rolldice=" + calcDice + "}}{{targetnumber=" + calcTN + "}}"
 			myroll+="{{attacktest=[[" + calcDice + "d6>" + calcTN + "!!  ]] }}" 
+			myroll += "{{meleemods=@{meleeTN}}}";
+			myroll += gyropenroll;
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
 			var reachmodtxt="Reach Bonus Applied" ;
@@ -7163,7 +7199,7 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 	var sets={};
 	var ballistic=0;
 	var impact=0;
-	var armorval={"body-bal": [0], "body-im": [0], "helmet-bal": [0], "helmet-im": [0], "shield-bal": [0], "shield-im": [0], "ware-bal": [0], "ware-im": [0]};
+	var armorval={"body-bal": [0], "body-im": [0], "helmet-bal": [0], "helmet-im": [0], "shield-bal": [0], "shield-im": [0], "ware-bal": [0], "ware-im": [0], "gyro-bal": [0], "gyro-im": [0]};
 	fields=["equipped", "ballistic", "impact", "slot"];
 	getSectionIDs("repeating_armor", idArray => {
 		var attrArray = idArray.reduce((m, id) => [ ...m, ...(fields.map(field => `repeating_armor_${id}_${field}`))], []); 
@@ -7184,6 +7220,8 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 			console.log(armorval);
 			let shield_bal=Math.max(...armorval["shield-bal"]);
 			let shield_im=Math.max(...armorval["shield-im"]);
+			let gyro_bal=Math.max(...armorval["gyro-bal"]);
+			let gyro_im=Math.max(...armorval["gyro-im"]);
 			let helmet_bal=Math.max(...armorval["helmet-bal"]);
 			let helmet_im=Math.max(...armorval["helmet-im"]);
 			let ware_bal= armorval["ware-bal"].reduce((a, b) => a + b, 0);
@@ -7199,8 +7237,10 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 			if ( ballover < 0 ) ballover=0;
 			if ( impactover < 0 ) impactover=0;
 			let combatpen= -1 * (Math.floor((ballover + impactover) / 2 ));
-			sets["ballistic"]=ballistic + ware_bal;
-			sets["impact"]=impact + ware_im;;
+			if ( gyro_bal > 0 ) sets["gyro-on"]=1;
+			else sets["gyro-on"]=0;
+			sets["ballistic"]=ballistic + ware_bal + gyro_bal;
+			sets["impact"]=impact + ware_im + gyro_bal;;
 			sets["armor-quickness-pen"]=ballover;
 			sets["armor-combatpool-pen"]=combatpen;
 			setAttrs(sets);
@@ -7469,11 +7509,12 @@ on("change:repeating_explosives:exptype", function(eventinfo){
     });
 };
 
-on("change:combatpool-mods change:armor-combatpool-pen change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base", function () {
+on("change:combatpool-mods change:armor-combatpool-pen change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base change:gyro-on", function () {
 	sets={};
-	atts=["combatpool-mods", "combatpool-base", "armor-combatpool-pen","spellpool-mods", "spellpool-base", "hackingpool-mods", "hackingpool-base", "controlpool-mods", "controlpool-base", "astralpool-mods", "astralpool-base"]
+	atts=["combatpool-mods", "combatpool-base", "armor-combatpool-pen","spellpool-mods", "spellpool-base", "hackingpool-mods", "hackingpool-base", "controlpool-mods", "controlpool-base", "astralpool-mods", "astralpool-base", "gyro-on"]
 	getAttrs(atts, function (myval) {
-		sets["combatpool"] = parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]);
+		if ( myval["gyro-on"] == 1 ) sets["combatpool"] = Math.floor(( parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]) ) / 2);
+		else sets["combatpool"] = parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]);
 		sets["spellpool"] = parseInt(myval["spellpool-mods"]) + parseInt(myval["spellpool-base"]);
 		sets["hackingpool"] = parseInt(myval["hackingpool-mods"]) + parseInt(myval["hackingpool-base"]);
 		sets["controlpool"] = parseInt(myval["controlpool-mods"]) + parseInt(myval["controlpool-base"]);
@@ -8047,9 +8088,16 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#charreach}}<div class="sheet-rtrow"><b>{{myname}} Reach:</b> {{charreach}}</div>{{/charreach}}
         {{#targetreach}}<div class="sheet-rtrow"><b>{{target}} Reach:</b> {{targetreach}}</div>{{/targetreach}}
         {{#default}}<div class="sheet-rtrow">{{default}}</div>{{/default}}
-        {{#reachmod}}<div class="sheet-rtrow">{{reachbonus}} {{computed::reachmod}}</div>{{/reachmod}}
         {{#recoil}}<div class="sheet-rtrow"><b>Uncompensated Recoil:</b> {{recoil}} </div>{{/recoil}}
         {{#resist}}<div class="sheet-rtrow"><b>{{target}}:</b>{{dodge}} {{resist}}</div>{{/resist}}
+	<div class="sheet-rtrow"><b>Mods:</b>{{#rangedmods}}Ranged: {{rangedmods}}
+	{{/rangedmods}}{{#meleemods}} Melee: {{meleemods}}
+	{{/meleemods}}{{#armorpen}} Armor Penalty: {{armorpen}}{{/armorpen}}
+	{{#gyropen}} Gyro Penalty: {{gyropen}}
+	{{/gyropen}} {{#movemods}} Move Penalty: {{movemods}}{{/movemods}}
+	{{#targetmods}}{{targetmods}}{{/targetmods}}
+	{{#reachmod}}{{computed::reachmod}}{{/reachmod}}
+	</div>
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-explosive">
