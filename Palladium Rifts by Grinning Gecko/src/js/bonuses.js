@@ -246,6 +246,7 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "dodge_auto",
     "dodge_teleport",
     "dodge_motion",
+    "dodge_underwater",
     "flipthrow",
   ];
   await repeatingSumAsync(
