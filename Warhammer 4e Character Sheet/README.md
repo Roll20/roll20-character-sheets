@@ -12,7 +12,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is some additional integration like TEW companion rules, and options for certain custom house rules.
 
 
-My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip 
+My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. Follow Roll20 Token marker update instructions for your server.
 The sheet should work on latest version of Firefox, MS Egde & Chrome.
 
   
@@ -72,6 +72,12 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
  
 ///// ============ Change Log ============ /////  
+
+August 25th 2021 v1.52
+
+- Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
+- WFRP4e marker 3.1 update, added Lamp and Distrated markers, and Torn Muscle/Broken Bone markers with Minor/Major (M/m) and Loction (A/B/H/L = Arm/Body/Head/Leg) identifers. This greatly helps the flow and tracking of battle on roll20, particularly for the GM. File available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. This is Optional. Follow Roll20 Token marker update instructions for your server.
+
 
 July 12th 2021 v1.51 
 
