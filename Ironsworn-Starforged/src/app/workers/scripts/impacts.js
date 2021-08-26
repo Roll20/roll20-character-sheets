@@ -42,7 +42,6 @@ on(`${buildImpactEvents(impactsAttrs)} ${buildImpactEvents(shipImpactAttrs)} cha
           }
         }
         for (var attr in shipImpactAttrs) {
-          console.log(values)
           if (values[shipImpactAttrs[attr]] === 'on' && values['onboard_check_ship_button'] === 'on') {
             numImpacts += 1;
           }
