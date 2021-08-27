@@ -77,7 +77,7 @@ August 25th 2021 v1.52
 
 - Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
 - WFRP4e marker 3.1 update, added Lamp and Distrated markers, and Torn Muscle/Broken Bone markers with Minor/Major (M/m) and Loction (A/B/H/L = Arm/Body/Head/Leg) identifers. This greatly helps the flow and tracking of battle on roll20, particularly for the GM. File available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. This is Optional. Follow Roll20 Token marker update instructions for your server.
-- Added Torn Muscle and Broken Bone effect information to the Critical outcome text. E.g. Torn Muscle (Minor) injury (Suffer a penalty of –10 to all Tests involving the location).
+
 
 July 12th 2021 v1.51 
 
