@@ -5,11 +5,11 @@ const gulp = require('gulp')
 const fs = require('fs')
 const path = require('path')
 const axios = require('axios')
-merge = require('gulp-merge-json')
+const merge = require('gulp-merge-json')
 
 axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
 
-gulp.task('data', async function() {
+gulp.task('dataforge', async function() {
   const rawData = {
     oracles: await axios.get('/oracles.json'),
     assets: await axios.get('/assets.json'),
@@ -21,7 +21,9 @@ gulp.task('data', async function() {
     const fileName = path.join(__dirname, `./app/data/${key}.json`)
     fs.writeFileSync(fileName, JSON.stringify(data, null, 2))
   }
+})
 
+gulp.task('data', function() {
   return gulp.src(['app/data/**/*.json', '../translation.json'], {allowEmpty: true})
     .pipe(merge({
       fileName: 'data.json',
@@ -57,9 +59,9 @@ gulp.task('html', () => {
     .pipe(gulp.dest('../'))
 })
 
-gulp.task('watch', gulp.series(['css', 'data', 'html'], () => {
+gulp.task('watch', gulp.series(['dataforge', 'css', 'data', 'html'], () => {
   gulp.watch('./app/**/*.styl', gulp.series(['css']))
   gulp.watch(['./app/**/*.pug','./app/**/*.js'], gulp.series(['html']))
 }))
 
-gulp.task('build',  gulp.series(['css', 'data', 'html']))
+gulp.task('build',  gulp.series(['dataforge', 'data', 'css', 'html']))
