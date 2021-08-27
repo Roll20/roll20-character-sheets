@@ -8,6 +8,10 @@
   <input type="hidden" name="attr_pnj_default_jets_caches" value="false" />
   <input type="hidden" name="attr_max_attack_label" value=0 />
   <input type="hidden" name="attr_maxrangaction" value=0 />
+  <input type="hidden" name="attr_maxrangaction1" value=0 />
+  <input type="hidden" name="attr_maxrangaction2" value=0 />
+  <input type="hidden" name="attr_maxrangaction3" value=0 />
+  <input type="hidden" name="attr_maxrangaction4" value=0 />
   <input type="hidden" name="attr_titrevoie4" value="Voie 4" />
   <input type="hidden" name="attr_titrevoie5" value="Voie 5" />
   <input type="hidden" name="attr_titrecapaciteraciale" value="Capacité raciale" />
@@ -2390,7 +2394,7 @@
           <div class="sheet-col">
             <table>
               <tr><td class="boxtitre">Prédicats</td></tr>
-              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" title="Predicats"></textarea></td></tr>
+              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" spellcheck="false" title="Predicats"></textarea></td></tr>
             </table>
           </div>
         </div>
@@ -2874,7 +2878,7 @@
           <div class="sheet-col">
             <table>
               <tr><td class="boxtitre">Prédicats</td></tr>
-              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" title="Predicats"></textarea></td></tr>
+              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" spellcheck="false" title="Predicats"></textarea></td></tr>
             </table>
           </div>
         </div>
@@ -2986,7 +2990,7 @@
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-  on('sheet:opened', function() {
+ on('sheet:opened', function() {
     // **** Gestion transition de version
     getAttrs(["version", "option_setting"], function(v) {
       var verfdp = parseFloat(v.version) || 0;
@@ -4872,14 +4876,19 @@
     if (eventinfo.newValue != 'Script' && eventinfo.newValue != 'script pnj') return;
     getAttrs(['show_script', 'scriptVersion', 'scriptVersion_max'], function(values) {
       if (values.scriptVersion) {
-        if (values.show_script == 1) return;
-        var sa = {
-          show_script: 1
+        let sa = {
+          message_version: ''
         };
-        var version = parseFloat(values.scriptVersion_max);
+        const version = parseFloat(values.scriptVersion_max);
         if (!isNaN(version) && version >= 3)
           sa.message_version = "COFantasy version " + version;
-        setAttrs(sa);
+        if (values.show_script === '0')
+          sa = {
+            show_script: 1
+          };
+        setAttrs(sa, {
+          silent: true
+        });
       } else {
         if (values.show_script == 0) return;
         setAttrs({
