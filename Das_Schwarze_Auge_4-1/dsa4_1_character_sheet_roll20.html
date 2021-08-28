@@ -17625,8 +17625,83 @@ function calculateShieldAttack(values, activeShieldRowId) {
 }
 
 /* 
-	UTILITY FUNCTIONS
+	UTILITY FUNCTIONS AND CONSTANTS
 */
+/*
+	Default Values for Known Attributes
+
+Using safe get/setAttrs the default value 0 is assumed, if nothing is in this object.
+Currently, does not handle repeating sections.
+*/
+const defaultValues = {};
+
+/*
+	Safe getAttrs()
+
+This function calls getAttrs(), but checks whether all attributes returned are actually there and are not NaN or undefined. Non-existing attributes are filled with the stored default value or 0.
+*/
+function safeGetAttrs( attrsToGet, callback ) {
+	getAttrs(
+		attrsToGet, function(attrs) {
+			var missing = [];
+			var badDef = [];
+			var errors = [0, 0];
+
+			for (req of attrsToGet) {
+			// Check for missing attributes and try setting a default value
+				if (!attrs.hasOwnProperty(req)) {
+					errors[0] += 1;
+					missing.push(req);
+					attrs[req] = defaultValues[req] || 0;
+				}
+			// Check existing attributes for undefined or NaN
+				if (
+					typeof attrs[req] === 'undefined' ||
+					isNaN(attrs[req])
+				) {
+					errors[1] += 1;
+					badDef.push(req);
+					attrs[req] = defaultValues[req] || 0;
+				}
+			}
+			if ( errors[0] > 0 ) {
+				console.log("Non-existing attributes gotten and set to default value:", missing.join(", "));
+			}
+			if ( errors[1] > 0 ) {
+				console.log("Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+			}
+			callback(attrs);
+		}
+	);
+}
+
+/*
+	Safe setAttrs()
+
+This function ultimately calls setAttrs(), but beforehand checks whether all attributes are are not NaN or undefined. Bad attributes are filled with the stored default value or 0.
+*/
+function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
+	var badDef = [];
+	var errors = 0;
+
+	for (req in attrsToSet) {
+	// Check existing attributes for undefined or NaN
+		if (
+			typeof attrsToSet[req] === 'undefined' ||
+			isNaN(attrsToSet[req])
+		) {
+			errors += 1;
+			badDef.push(req);
+			attrsToSet[req] = defaultValues[req] || 0;
+		}
+	}
+	if ( errors > 0 ) {
+		console.log("Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+	}
+
+	setAttrs( attrsToSet, options, callback );
+}
+
 /*
 	General Sanity Check Function
 */
