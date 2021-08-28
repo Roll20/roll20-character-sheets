@@ -1542,7 +1542,7 @@
                     <div>Hot ASIST</div>
                     <div>Reality Filter</div>
                     <div>IC Suppressed</div>
-                    <div class="text-mid">Icon Status</div>
+                    <div class="text-mid">Target Status</div>
                     <div class="text-mid">Host/Grid Rating</div>
                     <div class="text-mid">Alert Status</div>
                     <div><input checked="checked" type="checkbox" name="attr_deck-dni" value=1></div>
@@ -1611,6 +1611,8 @@
                     <button type="action" name="act_init" class="d6-button" title="Matrix Initiative"
                         id="matrixinit">L</button>
                 </div>
+        	End Turn<button type="action" name="act_endturn" class="d6-button" title="End Combat Turn" id="endturn">L</button>
+                <div></div>
                 Sensor<button type="action" name="act_matrixmaneuvers" class="d6-button" title="Sensor Test"
                     id="matrixsensor">L</button>
                 <div></div>
@@ -1780,6 +1782,7 @@
         <input type='hidden' class='buttontoggle' name='attr_sheettype' />
         <div class="matrix-show-deck">
             <div class="deck-attributes">
+	        <div>Deck Name<div><input type=text name="attr_deck-name">
                 <div class="deck-persona">
                     <div>MPCP</div>
                     <input type="number" name="attr_deck-mpcp-max" value=0 min=0>
@@ -2024,7 +2027,6 @@
                     <div class="table-item"><button type="action" name="act_matrixtest" class="d6-button" title="Slow Utility Test" id="deckslow-rating-final">L</button></div>
                     <div class="table-item"><button type="action" name="act_swapmemory" class="pictos-button" title="Reload Slow Utility from Disk" id="deckslow-rating">0</button></div>
                     <div class="table-item"><input type="text" name="attr_deckslow-notes"></div>
-
 
                 </div>
                 <fieldset class="repeating_offensiveutils">
@@ -3188,7 +3190,8 @@
             </div>
 	    <div></div>
             <div>Detection Roll</div><div><button type="action" class="d6-button" name="act_matrixdetect" title="Detection Roll" id="systemdetect">L</button></div>
-            <div>Security Tally <input title="Security Tally for all intruding icons in the system"type="number" name="attr_matrixsecuritytally"></div>
+            <div>Security Tally</div><input title="Security Tally for all intruding icons in the system"type="number" name="attr_matrixsecuritytally">
+	    <div></div>
             <div title="Reset Security Tally for all icons in the system">Reset Tally</div><div><button type="action" class="pictos-button" name="act_matrixdetect" title="Detection Roll" id="resettally">0</button></div>
             <div>Alert Status</div>
                 <select name="attr_matrixalert" class="mediumselect2">
@@ -3267,7 +3270,7 @@
             <header class="table-top-mid">Evade</header>
             <header class="table-top-mid">Parry</header>
             <header class="table-top-mid">Position</header>
-            <header class="table-top-mid">Attack</header>
+            <header class="table-top-mid">Execute</header>
             <header class="table-top-right">Resist</header>
         </div>
         <fieldset class="repeating_ic">
@@ -3299,22 +3302,21 @@
                         <option>Legitimate</option>
                     </select></div>
                 <div><select name="attr_ictargettest" class="mediumselect2">
-                        <option value=@{target|decker|bod}>Bod</option>
-                        <option value=@{target|decker|evasion}>Evasion</option>
-                        <option value=@{target|decker|sensor}>Sensor</option>
-                        <option value=@{target|decker|masking}>Masking</option>
-                        <option value=@{target|decker|detectionFactor}>DetectionFactor</option>
+                        <option value="@{target|decker|deck-bod-final}">Bod</option>
+                        <option value="@{target|decker|deck-evasion-final}">Evasion</option>
+                        <option value="@{target|decker|deck-sensors-final}">Sensor</option>
+                        <option value="@{target|decker|deck-masking-final}">Masking</option>
+                        <option value="@{target|decker|deck-detection-final}">DetectionFactor</option>
                         <option>Attack</option>
-                        <option>Computer Skill</option>
-                        <option>Utility TN</option>
-                        <option>MPCP</option>
-                        <option>Jammer</option>
+                        <option value="@{target|decker|computer}">Computer Skill</option>
+                        <option value="?{Utility Rating?|4}">Utility TN</option>
+                        <option value="@{target|decker|deck-mpcp-final}">MPCP</option>
                     </select></div>
 		    <div><button type="action" class="d6-button" name="act_combat" title="Sensor Test" id="icsensortest">L</button></div>
 		    <div><button type="action" class="d6-button" name="act_combat" title="Evade Detection" id="icevade">L</button></div>
 		    <div><button type="action" class="d6-button" name="act_combat" title="Parry Attack" id="icparry">L</button></div>
 		    <div><button type="action" class="d6-button" name="act_combat" title="Position Attack" id="icposition">L</button></div>
-		    <div><button type="action" class="d6-button" name="act_combat" title="IC Attack" id="icattack">L</button></div>
+		    <div><button type="action" class="d6-button" name="act_combat" title="IC Execute" id="icattack">L</button></div>
 		    <div><button type="action" class="pictos3-button" name="act_combat" title="IC Resist" id="icresist">b</button></div>
             <div><textarea name="attr_icnotes" style='width:275px;height:25px;'></textarea>
             </div>
@@ -6419,7 +6421,7 @@ buttonlist.forEach(button => {
     let onsuffix="-rating";
     utilitylist.forEach(util => {
         let myonchange = onprefix.concat(util);
-	myonchange = myonchange.concat(onsuffix);
+	myonchange = myonchange.concat("-rating");
         changelist += myonchange;
     });
     on(changelist, function(eventinfo) {
@@ -6484,17 +6486,19 @@ on("change:frame-initiative change:frame-core", function () {
  var utilsizechange; 
    const cprefix=" change:repeating_";
    deckutilrepeat.forEach(p => {
+	utilsizechange += cprefix.concat(p.concat(":multiplier"));
 	utilsizechange += cprefix.concat(p.concat(":size"));
 	utilsizechange += cprefix.concat(p.concat(":rating"));
    });
 on(utilsizechange, function(info) {   
+ 	console.log(info);
 	getAttrs(["repeating_deck-utilities_rating", "repeating_deck-utilities_multiplier"], function(myval) {
 	let r = parseInt(myval["repeating_deck-utilities_rating"]);
 	let m = parseInt(myval["repeating_deck-utilities_multiplier"]);
 	let s = (r * r) * m;
 	let myattr = "repeating_deck-utilities_size";
 	setAttrs({[myattr]: s});
-});
+	});
 });
 
 
@@ -6655,6 +6659,7 @@ on("change:deckattacklevel", function() {
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_');
 		gets.push(myrepeat.concat("icrating"));
+		gets.push(myrepeat.concat("ictargettest"));
 		gets.push(myrepeat.concat("icname"));
 		gets.push(myrepeat.concat("ic-penalty"));
 		gets.push(myrepeat.concat("matrix-iconstatus"));
@@ -6662,15 +6667,22 @@ on("change:deckattacklevel", function() {
 			var myatt="@{target|Target|deck-evasion-final}";
 	        	const code=myval["matrixcode"].toUpperCase();
 			const rating=parseInt(myval[myrepeat.concat("icrating")]);
+			var ictest=myval[myrepeat.concat("ictargettest")];
+			console.log('test ' + ictest);
 			const name=myval[myrepeat.concat("icname")];
 			const penalty=parseInt(myval[myrepeat.concat("ic-penalty")]);
 			const targeticon=myval[myrepeat.concat("matrix-iconstatus")];
 			const attacktn =matrixtn[code][targeticon];
+			console.log('test2 ' + attacktn);
+			if ( ictest=="Attack" ) ictest=attacktn;
 			var target="{{target=@{target|Target|token_name}}}";
 			if ( mytitle == "Evade Detection" ) myatt = "@{target|Target|deck-sensors-final}";
-			if ( mytitle == "IC Attack" ) myatt = attacktn;
 			if ( mytitle == "IC Resist" ) myatt = "?{Power of Attack?|2}";
 			if ( mytitle == "IC Resist" ) target = "{{target=" + name + "}}";
+			if ( mytitle == "IC Execute" ) { 
+				myatt = ictest;
+				target="{{target=@{target|decker|token_name}}}";
+			}
 			var calcTN= myatt + " +?{Miscellaneous Modifiers|0} + " + penalty;
 			var calcDice="@{matrixsecurityrating}"
                 	var myroll="&{template:matrix}{{myname=" + name + "}}";
