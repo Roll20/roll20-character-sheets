@@ -14722,7 +14722,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 			],
 			function(v) {
 				var caller = "???";
-				debugLog(JSON.stringify(v));
+				debugLog(caller, JSON.stringify(v));
 				debugLog(caller, 'FKW_aktiv1: ', v.fkw_aktiv1, 
 					'; FKW_aktiv2: ', v.fkw_aktiv2, 
 					'; FKW_aktiv3: ', v.fkw_aktiv3, 
@@ -14731,7 +14731,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 				var activeCount = parseInt(v.fkw_aktiv1) + parseInt(v.fkw_aktiv2) + parseInt(v.fkw_aktiv3) + parseInt(v.fkw_aktiv4);
 				if(activeCount === 0)
 				{
-					debugLog('Keine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
+					debugLog(caller, 'Keine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
 					deactivateRCC();
 
 				} else if (activeCount === 1) {
@@ -14789,7 +14789,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					FKR.misc_ansage = v.fkr_sonstiges_ansage_raw;
 
 					// Zeige FK-Rechner an
-					debugLog('Genau eine aktive Fernkampfwaffe gewählt. Fernkampfrechneraktivierung im Gange ...');
+					debugLog(caller, 'Genau eine aktive Fernkampfwaffe gewählt. Fernkampfrechneraktivierung im Gange ...');
 					safeSetAttrs({fkr_aktiv: "off"});
 
 					// Finde die aktive Waffe heraus
@@ -14802,7 +14802,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					switch(FKW.aktiv)
 					{
 						case 0:
-							debugLog('Keine aktive Fernkampfwaffe gefunden?! o.O Fernkampfrechneraktivierung eingestellt.');
+							debugLog(caller, 'Keine aktive Fernkampfwaffe gefunden?! o.O Fernkampfrechneraktivierung eingestellt.');
 							break;
 						case 1:
 							FKW.spez = parseInt(v.fkw1_spez);
@@ -14918,7 +14918,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 							FKW.schuetze = -1;
 							break;
 					}
-					debugLog(JSON.stringify(FKW));
+					debugLog(caller, JSON.stringify(FKW));
 
 					// Rückmeldung an den Benutzer
 					switch(FKW.schuetze)
@@ -14965,21 +14965,21 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 						|| typeof(FKW.TPRW3) != "number" || typeof(FKW.TPRW4) != "number"
 						|| typeof(FKW.TPRW5) != "number")
 					{
-						debugLog("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe sind keine gültigen Zahlen. Berechnungen abgebrochen.");
+						debugLog(caller, "Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe sind keine gültigen Zahlen. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
 					if(FKR.abstand < 0 || FKW.RW1 < 0 || FKW.RW2 < 0
 						|| FKW.RW3 < 0 || FKW.RW4 < 0 || FKW.RW5 < 0)
 					{
-						debugLog("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe negativ. Berechnungen abgebrochen.");
+						debugLog(caller, "Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe negativ. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
 					if(FKW.RW1 >= FKW.RW2 || FKW.RW2 >= FKW.RW3
 						|| FKW.RW3 >= FKW.RW4 | FKW.RW4 >= FKW.RW5)
 					{
-						debugLog("Mindestens eine Reichweite einer Entfernungsklasse ist größer als oder gleich groß wie die Reichweite einer höheren Entfernungsklasse. Berechnungen abgebrochen.");
+						debugLog(caller, "Mindestens eine Reichweite einer Entfernungsklasse ist größer als oder gleich groß wie die Reichweite einer höheren Entfernungsklasse. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
@@ -15040,7 +15040,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW5)
 						});
 					} else {
-						debugLog("Ziel außerhalb der Reichweite. Berechnungen abgebrochen.");
+						debugLog(caller, "Ziel außerhalb der Reichweite. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
@@ -15162,7 +15162,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 								GUIansage = "off";
 								if(isNaN(parseInt(FKR.schuss.ansage)))
 								{
-									debugLog("Ansage keine Zahl. Berechnungen abgebrochen.");
+									debugLog(caller, "Ansage keine Zahl. Berechnungen abgebrochen.");
 									safeSetAttrs({
 										fkr_schussart_schussmitansage: GUIansage,
 										fkr_schussart_final: "!",
@@ -15173,7 +15173,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 								}
 								if(parseInt(FKR.schuss.ansage) < 1)
 								{
-									debugLog("Ansage kleiner eins. Berechnungen abgebrochen.");
+									debugLog(caller, "Ansage kleiner eins. Berechnungen abgebrochen.");
 									safeSetAttrs({
 										fkr_schussart_schussmitansage: GUIansage,
 										fkr_schussart_final: "!",
@@ -15233,7 +15233,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 										safeSetAttrs({fkr_schussart_gezielter_schuss_vierbeiner_variabel: GUIgezielt4bvar});
 										if(isNaN(parseInt(FKR.schuss.gezielt4bvar)))
 										{
-											debugLog("Angabe für Sinnesorgan/Schwanz keine Zahl. Berechnungen abgebrochen.");
+											debugLog(caller, "Angabe für Sinnesorgan/Schwanz keine Zahl. Berechnungen abgebrochen.");
 											safeSetAttrs({
 												fkr_schussart_final: "!",
 												fkr_schussart_final_dauer: "!",
@@ -15243,7 +15243,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 										}
 										if(parseInt(FKR.schuss.gezielt4bvar) < 1)
 										{
-											debugLog("Angabe für Sinnesorgan/Schwanz kleiner eins. Berechnungen abgebrochen.");
+											debugLog(caller, "Angabe für Sinnesorgan/Schwanz kleiner eins. Berechnungen abgebrochen.");
 											safeSetAttrs({
 												fkr_schussart_final: "!",
 												fkr_schussart_final_dauer: "!",
@@ -15501,25 +15501,25 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					{
 						if(isNaN(parseInt(FKR.getuemmel.ziele_h)))
 						{
-							debugLog("Anzahl Ziele auf DK H keine gültige Zahl. Berechnungen abgebrochen.");
+							debugLog(caller, "Anzahl Ziele auf DK H keine gültige Zahl. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(isNaN(parseInt(FKR.getuemmel.ziele_ns)))
 						{
-							debugLog("Anzahl Ziele auf DK NS keine gültige Zahl. Berechnungen abgebrochen.");
+							debugLog(caller, "Anzahl Ziele auf DK NS keine gültige Zahl. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_h) < 0)
 						{
-							debugLog("Anzahl Ziele auf DK H kleiner null. Berechnungen abgebrochen.");
+							debugLog(caller, "Anzahl Ziele auf DK H kleiner null. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_ns) < 0)
 						{
-							debugLog("Anzahl Ziele auf DK NS kleiner null. Berechnungen abgebrochen.");
+							debugLog(caller, "Anzahl Ziele auf DK NS kleiner null. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
@@ -15527,13 +15527,13 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 						var dk_ns = parseInt(FKR.getuemmel.ziele_ns);
 						if((dk_ns + dk_h) < 2)
 						{
-							debugLog("Kampfgetümmel setzt mindestens zwei Beteiligte voraus. Berechnungen abgebrochen.");
+							debugLog(caller, "Kampfgetümmel setzt mindestens zwei Beteiligte voraus. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(dk_ns < 2 && dk_h < 2)
 						{
-							debugLog("Mindestens zwei Beteiligte eines Kampfgetümmels müssen in derselben Distanzklasse kämpfen. Berechnungen abgebrochen.");
+							debugLog(caller, "Mindestens zwei Beteiligte eines Kampfgetümmels müssen in derselben Distanzklasse kämpfen. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
@@ -15549,20 +15549,20 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					// Freier/Sonstiger Modifikator
 					if(isNaN(parseInt(FKR.misc)))
 					{
-						debugLog("Sonstiger Modifikator keine gültige Zahl. Berechnungen abgebrochen.");
+						debugLog(caller, "Sonstiger Modifikator keine gültige Zahl. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
 					mod_gesamt.misc = parseInt(FKR.misc);
 					if(isNaN(parseInt(FKR.misc_ansage)))
 					{
-						debugLog("Sonstige Ansage keine gültige Zahl. Berechnungen abgebrochen.");
+						debugLog(caller, "Sonstige Ansage keine gültige Zahl. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
 					if(parseInt(FKR.misc_ansage) < 0)
 					{
-						debugLog("Sonstige Ansage kleiner null. Berechnungen abgebrochen.");
+						debugLog(caller, "Sonstige Ansage kleiner null. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
@@ -16516,6 +16516,7 @@ There are two possible results: one and only one active shield; no active shield
 We need to make sure that the right thing™ is done
 */
 on("change:repeating_shields:shield_active", function(eventInfo) {
+	var caller = "???";
     // Get the source shield, its row ID and whether it was turned on or off
     var sourceShield = eventInfo.sourceAttribute;
     var sourceShieldId = extractRowId(sourceShield);
@@ -16547,7 +16548,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
             // 0 active shields? Deactivate shields, nothing to do.
             if (activeShields.length === 0) {
                 // do something for deactivation
-                debugLog("Deactivating shields/parry weapons ...");
+                debugLog(caller, "Deactivating shields/parry weapons ...");
                 activeShieldRowId = "";
             } else if (activeShields.length === 1) {
                 // this is the active shield
@@ -16566,7 +16567,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
                     }
                 } else {
                 // If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
-                    debugLog("Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
+                    debugLog(caller, "Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
                     activeShieldRowId = extractRowId(activeShields[0]);
                     for (var i = 1; i < activeShields.length; i++) {
                         attrsToChange[ activeShields[i] ] = 0;
@@ -17361,12 +17362,13 @@ function calculateWoundModifiers(values) {
 
 on("change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:sf_schildkampfI change:sf_schildkampfII", function(eventInfo) {
     safeGetAttrs(["sf_linkhand", "sf_parierwaffenI", "sf_parierwaffenII", "sf_schildkampfI", "sf_schildkampfII"], function(values) {
+        var caller = "???";
         var attrsToChange = {};
 
 		// Caution: This might cause trouble if some function other than this one changed these attributes.
 		if (eventInfo.sourceType === "sheetworker")
 		{
-			debugLog("Suppressing setting LH/PW/SK (again) ...");
+			debugLog(caller, "Suppressing setting LH/PW/SK (again) ...");
 			return;
 		}
 		switch(eventInfo.sourceAttribute) {
@@ -17574,6 +17576,7 @@ function calculateTpKKMod(values, weapon) {
 // calculate shield attack modifier
 on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII change:sf_knaufschlag change:sf_schmutzigetricks change:AT_raufen change:AT_mod_wounds", function(eventInfos) {
     safeGetAttrs(["activeShieldRowId"], function(rowIdValues) {
+        var caller = "???";
         var activeShieldRowId = rowIdValues["activeShieldRowId"];
         if (eventInfos.sourceAttribute && eventInfos.sourceAttribute.endsWith("_shield_active")) {
             if (eventInfos.newValue === "on") {
@@ -17591,7 +17594,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         } else {
-            debugLog("no active shield found");
+            debugLog(caller, "no active shield found");
             safeSetAttrs({
 				"shield_at": 0,
 				"shield_at_available": "0",
@@ -17602,8 +17605,8 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
 
         safeGetAttrs(variablesToGet, function(values) {
             let result = calculateShieldAttack(values, activeShieldRowId);
-            debugLog('calculated shield attack');
-            debugLog(result);
+            debugLog(caller, 'calculated shield attack');
+            debugLog(caller, result);
             safeSetAttrs({
 				"shield_at": result["shield_at"],
 				"shield_at_mod": result["shieldAtMod"],
@@ -17682,29 +17685,19 @@ const defaultValues = {
 
 Instead of spamming the console unnecessarily all the time, only show messages in debug mode.
 */
-function debugLog(caller = "???", ...args) {
-	var msg = args;
-
-	// Make sure that the caller is really optional by
-	// checking the argument count and in the case of one and only one
-	// argument, use this as debug message.
-	// If you know a better solution, please tell me.
-	if (arguments.length === 0)
+function debugLog(caller, ...args) {
+	// Caller not optional, because of complicated handling of different amounts of parameters with console.log()
+	if (arguments.length <= 1)
 	{
-		console.log("debugLog() Call without arguments detected. Nothing done.");
+		console.log("debugLog() call with insufficient arguments detected. Nothing done.");
 		return;
-	}
-	if (arguments.length === 1)
-	{
-		caller = "???";
-		msg[0] = arguments[0];
 	}
 
 	safeGetAttrs(
 		['debug-mode'],
 		function(debugMode) {
 			if (debugMode['debug-mode'] === "on") {
-				console.log(caller + ":", ...msg);
+				console.log(caller + ":", ...args);
 			}
 		}
 	);
