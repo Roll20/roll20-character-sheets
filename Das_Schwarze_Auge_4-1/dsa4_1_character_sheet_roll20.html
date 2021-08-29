@@ -12689,7 +12689,12 @@
             <label class="sheet-lone-input-label">
                 <input type="checkbox" name="attr_fkr_helligkeitssystem"> Fernkampfrechner: Dunkelheitsstufen aus Wege des Entdeckers (0 bis 16) statt aus Wege des Schwerts (0 bis 8) benutzen
             </label>
-            <br>
+        </div>
+        <input class="sheet-default-hide sheet-developer" type="checkbox" name="attr_show-developer" value="1">
+        <div class="sheet-section sheet-section-config1 sheet-section-developer">
+            <label class="sheet-lone-input-label">
+                <input type="checkbox" name="attr_debug-mode"> Debug-Modus aktivieren
+            </label>
         </div>
 		<div class="sheet-hide">
 			<!-- Comfort Attributes (= to shorten rolls) -->
@@ -14378,6 +14383,7 @@ ID      0           1          2         3         4
 <script type="text/worker">
 function FKWgetType(typeRaw)
 {
+	var caller = "FKWgetType";
 	var FKWtype = 0;
 	switch(typeRaw)
 	{
@@ -14404,24 +14410,25 @@ function FKWgetType(typeRaw)
 			break;
 		case 0:
 		case "0":
-			console.log('Kein FKW-Typ gewählt.');
+			debugLog(caller, 'Kein FKW-Typ gewählt.');
 			FKWtype = -1;
 			break;
 		case '@{AT_Belagerungswaffen}':
-			console.log('Gewählter FKW-Typ kennt keine Scharf- und Meisterschützen.');
+			debugLog(caller, 'Gewählter FKW-Typ kennt keine Scharf- und Meisterschützen.');
 			FKWtype = 'Belagerungswaffen';
 			break;
 		case '@{AT_Diskus}':
-			console.log('Gewählter FKW-Typ kennt keine Scharf- und Meisterschützen.');
+			debugLog(caller, 'Gewählter FKW-Typ kennt keine Scharf- und Meisterschützen.');
 			FKWtype = 'Diskus';
 			break;
 		default:
-			console.log('Ungültiger FKW-Typ: "', typeRaw, '"');
+			debugLog(caller, 'Ungültiger FKW-Typ: "', typeRaw, '"');
 	}
 	return FKWtype;
 }
 
 function getTargetZoneMod(targetZone, legs) {
+	var caller = "getTargetZoneMod";
 	var zoneMod = 0;
 	switch(targetZone)
 	{
@@ -14446,20 +14453,21 @@ function getTargetZoneMod(targetZone, legs) {
 		case "bein":
 			if(isNaN(parseInt(legs)) || (parseInt(legs) != 2 && parseInt(legs) != 4))
 			{
-				console.log("Beinanzahl für getTargetZoneMod() nicht 2 oder 4.");
+				debugLog(caller, "Beinanzahl für getTargetZoneMod() nicht 2 oder 4.");
 				return "!";
 			}
 			parseInt(legs) == 2 ? zoneMod = 8 : zoneMod = 10; break;
 		case "variabel":
 			zoneMod = "variabel"; break;
 		default:
-			console.log("Zielzone unbekannt. getTargetZoneMod() veraltet?!");
+			debugLog(caller, "Zielzone unbekannt. getTargetZoneMod() veraltet?!");
 			return "!";
 	}
 	return zoneMod;
 }
 
 function getTargetZoneName(targetZone) {
+	var caller = "getTargetZoneName";
 	var zoneName = 0;
 	switch(targetZone)
 	{
@@ -14490,7 +14498,7 @@ function getTargetZoneName(targetZone) {
 		case "nd":
 			zoneName = "nd"; break;
 		default:
-			console.log("Zielzone unbekannt. getTargetZoneName() veraltet?!");
+			debugLog(caller, "Zielzone unbekannt. getTargetZoneName() veraltet?!");
 			return "!";
 	}
 	return zoneName;
@@ -14533,6 +14541,25 @@ on("change:vorteil_daemmerungssicht change:vorteil_nachtsicht",
 				}
 		});
 });
+
+on(
+	"change:stand",
+	function() {
+		safeGetAttrs(
+			['stand', 'show-developer'],
+			function(v) {
+				var results = {};
+				if (v['stand'] === 'Entwickler-Isu')
+				{
+					results['show-developer'] = "1";
+				} else {
+					results['show-developer'] = "0";
+				}
+				safeSetAttrs(results);
+			}
+		);
+	}
+);
 
 on(
 	"change:safe-sheet-open " +
