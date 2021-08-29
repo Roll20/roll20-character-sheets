@@ -17641,6 +17641,40 @@ const defaultValues = {
 	};
 
 /*
+	Debug Log
+
+Instead of spamming the console unnecessarily all the time, only show messages in debug mode.
+*/
+function debugLog(caller = "???", ...args) {
+	var msg = args;
+
+	// Make sure that the caller is really optional by
+	// checking the argument count and in the case of one and only one
+	// argument, use this as debug message.
+	// If you know a better solution, please tell me.
+	if (arguments.length === 0)
+	{
+		console.log("debugLog() Call without arguments detected. Nothing done.");
+		return;
+	}
+	if (arguments.length === 1)
+	{
+		caller = "???";
+		msg[0] = arguments[0];
+	}
+
+	safeGetAttrs(
+		['debug-mode'],
+		function(debugMode) {
+			if (debugMode['debug-mode'] === "on") {
+				console.log(caller + ":", ...msg);
+			}
+		}
+	);
+	return;
+}
+
+/*
 	Safe getAttrs()
 
 This function calls getAttrs(), but checks whether all attributes returned are actually there and are not NaN or undefined. Non-existing attributes are filled with the stored default value or 0.
