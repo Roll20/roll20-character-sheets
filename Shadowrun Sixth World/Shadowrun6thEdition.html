@@ -1542,8 +1542,7 @@
                     <option data-i18n="los" value="LOS" selected="selected">los</option>
                     <option data-i18n="los (a)" value="LOS (A)">los (a)</option>
                     <option data-i18n="special" value="Special">special</option>
-                    <option data-i18n="t" value="T">t</option>
-                    <option data-i18n="t (a)" value="T (A)">t (a)</option>
+                    <option data-i18n="touch" value="T">touch</option>
                   </select>
                   <select name="attr_duration" title="@{repeating_spell_${x}_duration}">
                     <option data-i18n="instant" value="Instant" selected="selected">Instant</option>
@@ -1567,9 +1566,9 @@
                     <select name="attr_effect_type" title="@{repeating_spell_${x}_effect_type}">
                       <option data-i18n="none" value="" selected="selected">None</option>
                       <option data-i18n="directcombat" value="Direct Combat">Direct Combat</option>
-                      <option data-i18n="directcombatarea" value="Direct Combat">Direct Combat, Area</option>
+                      <option data-i18n="directcombatarea" value="Direct Combat, Area">Direct Combat, Area</option>
                       <option data-i18n="indirectcombat" value="Indirect Combat">Indirect Combat</option>
-                      <option data-i18n="indirectcombatarea" value="Indirect Combat">Indirect Combat, Area</option>
+                      <option data-i18n="indirectcombatarea" value="Indirect Combat, Area">Indirect Combat, Area</option>
                       <option data-i18n="singlesense" value="Single-Sense">Single-Sense</option>
                       <option data-i18n="multisense" value="Multi-Sense">Multi-Sense</option>
                     </select>
@@ -4365,8 +4364,7 @@
 						<option data-i18n="los" value="LOS">los</option>
 						<option data-i18n="los (a)" value="LOS (A)">los (a)</option>
 						<option data-i18n="special" value="Special">special</option>
-						<option data-i18n="t" value="T">t</option>
-						<option data-i18n="t (a)" value="T (A)">t (a)</option>
+						<option data-i18n="touch" value="T">Touch</option>
 					</select>
 					<select name="attr_duration" title="@{repeating_NPCspell_${x}_duration}">
 						<option data-i18n="instant" value="Instant">instant</option>
@@ -4391,12 +4389,12 @@
 						<option data-i18n="manipulation" value="Manipulation">manipulation</option>
 					</select>
 					<h3 class="right" data-i18n="effecttype">Effect Type</h3>
-               <select name="attr_effect_type" title="@{repeating_spell_${x}_effect_type}">
+               <select name="attr_effect_type" title="@{repeating_NPCspell_${x}_effect_type}">
                  <option data-i18n="none" value="" selected="selected">None</option>
                  <option data-i18n="directcombat" value="Direct Combat">Direct Combat</option>
-                 <option data-i18n="directcombatarea" value="Direct Combat">Direct Combat, Area</option>
+                 <option data-i18n="directcombatarea" value="Direct Combat, Area">Direct Combat, Area</option>
                  <option data-i18n="indirectcombat" value="Indirect Combat">Indirect Combat</option>
-                 <option data-i18n="indirectcombatarea" value="Indirect Combat">Indirect Combat, Area</option>
+                 <option data-i18n="indirectcombatarea" value="Indirect Combat, Area">Indirect Combat, Area</option>
                  <option data-i18n="singlesense" value="Single-Sense">Single-Sense</option>
                  <option data-i18n="multisense" value="Multi-Sense">Multi-Sense</option>
                </select>
@@ -5232,6 +5230,32 @@
 
 <script type="text/worker">
 //Sheet workers
+
+
+on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes", (eventInfo) => {
+	if(eventInfo.sourceType != 'player') {
+		return;
+	}
+
+	var rep_row = eventInfo.sourceAttribute.match(/(repeating_[^_]+?)_([^_]+?)_(.+)/);
+	var note = eventInfo.newValue;
+	var dat = {};
+
+	if(note.search("JSON=") == 0) {
+		note = note.slice(5);
+		dat = JSON.parse(note);
+
+		toSave = {};
+		Object.keys(dat).forEach(k => {
+			toSave[`${rep_row[1]}_${rep_row[2]}_${k}`] = dat[k];
+		});
+
+		setAttrs(toSave);
+	}
+});
+
+
+
 on("clicked:natural_healing_physical", (eventInfo) => {
 console.log("clicked");
 console.log(eventInfo);
@@ -5552,6 +5576,7 @@ console.log("Program not active");
 
 	});
 });
+
 
 
 
