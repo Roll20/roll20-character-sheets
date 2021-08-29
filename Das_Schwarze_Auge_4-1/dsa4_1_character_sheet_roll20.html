@@ -14721,8 +14721,9 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 				'fkr_sonstiges_ansage_raw'
 			],
 			function(v) {
-				console.log(JSON.stringify(v));
-				console.log('FKW_aktiv1: ', v.fkw_aktiv1, 
+				var caller = "???";
+				debugLog(JSON.stringify(v));
+				debugLog(caller, 'FKW_aktiv1: ', v.fkw_aktiv1, 
 					'; FKW_aktiv2: ', v.fkw_aktiv2, 
 					'; FKW_aktiv3: ', v.fkw_aktiv3, 
 					'; FKW_aktiv4: ', v.fkw_aktiv4
@@ -14730,7 +14731,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 				var activeCount = parseInt(v.fkw_aktiv1) + parseInt(v.fkw_aktiv2) + parseInt(v.fkw_aktiv3) + parseInt(v.fkw_aktiv4);
 				if(activeCount === 0)
 				{
-					console.log('Keine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
+					debugLog('Keine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
 					deactivateRCC();
 
 				} else if (activeCount === 1) {
@@ -14788,7 +14789,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					FKR.misc_ansage = v.fkr_sonstiges_ansage_raw;
 
 					// Zeige FK-Rechner an
-					console.log('Genau eine aktive Fernkampfwaffe gewählt. Fernkampfrechneraktivierung im Gange ...');
+					debugLog('Genau eine aktive Fernkampfwaffe gewählt. Fernkampfrechneraktivierung im Gange ...');
 					safeSetAttrs({fkr_aktiv: "off"});
 
 					// Finde die aktive Waffe heraus
@@ -14801,7 +14802,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					switch(FKW.aktiv)
 					{
 						case 0:
-							console.log('Keine aktive Fernkampfwaffe gefunden?! o.O Fernkampfrechneraktivierung eingestellt.');
+							debugLog('Keine aktive Fernkampfwaffe gefunden?! o.O Fernkampfrechneraktivierung eingestellt.');
 							break;
 						case 1:
 							FKW.spez = parseInt(v.fkw1_spez);
@@ -14913,11 +14914,11 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 							break;
 						case -1:
 						default:
-							console.log('FKW-Typ unbekannt: ', FKW.typ);
+							debugLog(caller, 'FKW-Typ unbekannt: ', FKW.typ);
 							FKW.schuetze = -1;
 							break;
 					}
-					console.log(JSON.stringify(FKW));
+					debugLog(JSON.stringify(FKW));
 
 					// Rückmeldung an den Benutzer
 					switch(FKW.schuetze)
@@ -14964,21 +14965,21 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 						|| typeof(FKW.TPRW3) != "number" || typeof(FKW.TPRW4) != "number"
 						|| typeof(FKW.TPRW5) != "number")
 					{
-						console.log("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe sind keine gültigen Zahlen. Berechnungen abgebrochen.");
+						debugLog("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe sind keine gültigen Zahlen. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
 					if(FKR.abstand < 0 || FKW.RW1 < 0 || FKW.RW2 < 0
 						|| FKW.RW3 < 0 || FKW.RW4 < 0 || FKW.RW5 < 0)
 					{
-						console.log("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe negativ. Berechnungen abgebrochen.");
+						debugLog("Entfernung zum Ziel oder mindestens eine Reichweite der aktiven Fernkampfwaffe negativ. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
 					if(FKW.RW1 >= FKW.RW2 || FKW.RW2 >= FKW.RW3
 						|| FKW.RW3 >= FKW.RW4 | FKW.RW4 >= FKW.RW5)
 					{
-						console.log("Mindestens eine Reichweite einer Entfernungsklasse ist größer als oder gleich groß wie die Reichweite einer höheren Entfernungsklasse. Berechnungen abgebrochen.");
+						debugLog("Mindestens eine Reichweite einer Entfernungsklasse ist größer als oder gleich groß wie die Reichweite einer höheren Entfernungsklasse. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
@@ -15039,7 +15040,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 							fkr_entfernung_final_TP: prettifyMod(FKW.TPRW5)
 						});
 					} else {
-						console.log("Ziel außerhalb der Reichweite. Berechnungen abgebrochen.");
+						debugLog("Ziel außerhalb der Reichweite. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_entfernung_final: "!", fkr_entfernung_final_TP: "!"});
 						return;
 					}
@@ -15060,7 +15061,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					if(FKR.licht != "nd")
 					{
 						var finsternis = 8;
-						console.log("FKR.lichtsys: ", FKR.lichtsys);
+						debugLog(caller, "FKR.lichtsys: ", FKR.lichtsys);
 						if(FKR.lichtsys == "on") { finsternis = 16; }
 
 						if(FKR.DS == "0" && FKR.NS == "0")
@@ -15161,7 +15162,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 								GUIansage = "off";
 								if(isNaN(parseInt(FKR.schuss.ansage)))
 								{
-									console.log("Ansage keine Zahl. Berechnungen abgebrochen.");
+									debugLog("Ansage keine Zahl. Berechnungen abgebrochen.");
 									safeSetAttrs({
 										fkr_schussart_schussmitansage: GUIansage,
 										fkr_schussart_final: "!",
@@ -15172,7 +15173,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 								}
 								if(parseInt(FKR.schuss.ansage) < 1)
 								{
-									console.log("Ansage kleiner eins. Berechnungen abgebrochen.");
+									debugLog("Ansage kleiner eins. Berechnungen abgebrochen.");
 									safeSetAttrs({
 										fkr_schussart_schussmitansage: GUIansage,
 										fkr_schussart_final: "!",
@@ -15232,7 +15233,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 										safeSetAttrs({fkr_schussart_gezielter_schuss_vierbeiner_variabel: GUIgezielt4bvar});
 										if(isNaN(parseInt(FKR.schuss.gezielt4bvar)))
 										{
-											console.log("Angabe für Sinnesorgan/Schwanz keine Zahl. Berechnungen abgebrochen.");
+											debugLog("Angabe für Sinnesorgan/Schwanz keine Zahl. Berechnungen abgebrochen.");
 											safeSetAttrs({
 												fkr_schussart_final: "!",
 												fkr_schussart_final_dauer: "!",
@@ -15242,7 +15243,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 										}
 										if(parseInt(FKR.schuss.gezielt4bvar) < 1)
 										{
-											console.log("Angabe für Sinnesorgan/Schwanz kleiner eins. Berechnungen abgebrochen.");
+											debugLog("Angabe für Sinnesorgan/Schwanz kleiner eins. Berechnungen abgebrochen.");
 											safeSetAttrs({
 												fkr_schussart_final: "!",
 												fkr_schussart_final_dauer: "!",
@@ -15500,25 +15501,25 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					{
 						if(isNaN(parseInt(FKR.getuemmel.ziele_h)))
 						{
-							console.log("Anzahl Ziele auf DK H keine gültige Zahl. Berechnungen abgebrochen.");
+							debugLog("Anzahl Ziele auf DK H keine gültige Zahl. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(isNaN(parseInt(FKR.getuemmel.ziele_ns)))
 						{
-							console.log("Anzahl Ziele auf DK NS keine gültige Zahl. Berechnungen abgebrochen.");
+							debugLog("Anzahl Ziele auf DK NS keine gültige Zahl. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_h) < 0)
 						{
-							console.log("Anzahl Ziele auf DK H kleiner null. Berechnungen abgebrochen.");
+							debugLog("Anzahl Ziele auf DK H kleiner null. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(parseInt(FKR.getuemmel.ziele_ns) < 0)
 						{
-							console.log("Anzahl Ziele auf DK NS kleiner null. Berechnungen abgebrochen.");
+							debugLog("Anzahl Ziele auf DK NS kleiner null. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
@@ -15526,13 +15527,13 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 						var dk_ns = parseInt(FKR.getuemmel.ziele_ns);
 						if((dk_ns + dk_h) < 2)
 						{
-							console.log("Kampfgetümmel setzt mindestens zwei Beteiligte voraus. Berechnungen abgebrochen.");
+							debugLog("Kampfgetümmel setzt mindestens zwei Beteiligte voraus. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
 						if(dk_ns < 2 && dk_h < 2)
 						{
-							console.log("Mindestens zwei Beteiligte eines Kampfgetümmels müssen in derselben Distanzklasse kämpfen. Berechnungen abgebrochen.");
+							debugLog("Mindestens zwei Beteiligte eines Kampfgetümmels müssen in derselben Distanzklasse kämpfen. Berechnungen abgebrochen.");
 							safeSetAttrs({fkr_kampfgetuemmel_final: "!"});
 							return;
 						}
@@ -15548,20 +15549,20 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					// Freier/Sonstiger Modifikator
 					if(isNaN(parseInt(FKR.misc)))
 					{
-						console.log("Sonstiger Modifikator keine gültige Zahl. Berechnungen abgebrochen.");
+						debugLog("Sonstiger Modifikator keine gültige Zahl. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
 					mod_gesamt.misc = parseInt(FKR.misc);
 					if(isNaN(parseInt(FKR.misc_ansage)))
 					{
-						console.log("Sonstige Ansage keine gültige Zahl. Berechnungen abgebrochen.");
+						debugLog("Sonstige Ansage keine gültige Zahl. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
 					if(parseInt(FKR.misc_ansage) < 0)
 					{
-						console.log("Sonstige Ansage kleiner null. Berechnungen abgebrochen.");
+						debugLog("Sonstige Ansage kleiner null. Berechnungen abgebrochen.");
 						safeSetAttrs({fkr_sonstiges_final: "!"});
 						return;
 					}
@@ -15569,9 +15570,9 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					safeSetAttrs({fkr_sonstiges_final: prettifyMod(parseInt(FKR.misc) + parseInt(FKR.misc_ansage))});
 
 					// Ergebnisse anzeigen
-					console.log("mod_gesamt: ", JSON.stringify(mod_gesamt));
-					console.log("dauer_gesamt: ", JSON.stringify(dauer_gesamt));
-					console.log("TP_gesamt: ", JSON.stringify(TP_gesamt));
+					debugLog(caller, "mod_gesamt: ", JSON.stringify(mod_gesamt));
+					debugLog(caller, "dauer_gesamt: ", JSON.stringify(dauer_gesamt));
+					debugLog(caller, "TP_gesamt: ", JSON.stringify(TP_gesamt));
 					var ergebnis = {};
 					ergebnis.mod = 0;
 					if(mod_gesamt.groesse != "-") ergebnis.mod += mod_gesamt.groesse;
@@ -15631,7 +15632,7 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 						ergebnis.tp.roll = "&{template:DSA-Kampf-Treffer} {{name=Fernkampf}} {{target=[[?{Tabelle für zufällige Trefferzone auswählen|Zweibeiner gegen unbeschwänzten Zweibeiner,0|Zweibeiner gegen beschwänzten Zweibeiner,1|Zweibeiner gegen Vierbeiner,3|Zweibeiner gegen Reiter,4|Reiter gegen Zweibeiner,2}]]}} {{TPArt=[[0]]}} {{zone=[[1d20]]}} {{damage=[[[[(@{FTP_W_Aktiv})]]d6 + (@{FTP_Bonus_Aktiv})]]}}";
 					}
 
-					console.log("ergebnis.mod: ", ergebnis.mod,
+					debugLog(caller, "ergebnis.mod: ", ergebnis.mod,
 						"; ergebnis.mod_ohne_getuemmel: ", ergebnis.mod_ohne_getuemmel,
 						"; ergebnis.dauer: ", ergebnis.dauer,
 						"; ergebnis.tp.w6: ", ergebnis.tp.w6,
@@ -15654,10 +15655,10 @@ on("change:safe-sheet-open change:fkw_aktiv1 change:fkw_aktiv2 change:fkw_aktiv3
 					});
 
 				} else if (activeCount > 1) {
-					console.log('Mehr als eine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
+					debugLog(caller, 'Mehr als eine aktive Fernkampfwaffe gewählt. Fernkampfrechner deaktiviert.');
 					deactivateRCC();
 				} else {
-					console.log('Dieser Fall sollte niemals eintreten. Weniger als keine oder mehr als vier aktive Fernkampfwaffen gewählt. Fernkampfrechner deaktiviert.');
+					debugLog(caller, 'Dieser Fall sollte niemals eintreten. Weniger als keine oder mehr als vier aktive Fernkampfwaffen gewählt. Fernkampfrechner deaktiviert.');
 					deactivateRCC();
 				}
 			}
@@ -15951,7 +15952,8 @@ Relevant character sheet versions
 */
 function migrationCheck() {
     safeGetAttrs(["character_sheet_version", "data_version"], function(v) {
-        console.log("Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
+    	var caller = "migrationCheck";
+        debugLog(caller, "Checking versions before attempting data migration: Character sheet version is", v["character_sheet_version"], "and data version is", v["data_version"]);
 
         let dataVersion = parseInt(v["data_version"]);
         let sheetVersion = parseInt(v["character_sheet_version"]);
@@ -15983,7 +15985,7 @@ function migrationCheck() {
         for (var i = 0; i < versionsWithMigrations.length; i++) {
             if (dataVersion < versionsWithMigrations[i]) {
                 var functionName = "migrateTo" + versionsWithMigrations[i];
-                console.log("dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
+                debugLog(caller, "dataVersion " + dataVersion + " is older than version " + versionsWithMigrations[i] + " which needs a migration. Invoking migration function: " + functionName);
                 if (firstFunction) {
                     functionsToCall.push(functionName);
                 } else {
@@ -16028,7 +16030,8 @@ var versionsWithMigrations = [
 * Gifts and meta-talents were changed
 */
 function migrateTo20190427 (migrationChain) {
-    console.log("migrateTo20190427 invoked");
+	var caller = "migrateTo20190427";
+    debugLog(caller, "migrateTo20190427 invoked");
 
     getSectionIDs("GabenTalente", function(gabenIDs) {
         getSectionIDs("MetaTalente", function(metatalenteIDs) {
@@ -16100,9 +16103,9 @@ function migrateTo20190427 (migrationChain) {
             let attrsToGet = ["mu", "kl", "in", "ch", "ff", "ge", "ko", "kk"];
             // GIFTS MIGRATION
             if(gabenIDs.length == 0) {
-                console.log("Migration: No gifts found, nothing to migrate.");
+                debugLog(caller, "Migration: No gifts found, nothing to migrate.");
             } else {
-                console.log("Migration: Found old gifts, continuing ...");
+                debugLog(caller, "Migration: Found old gifts, continuing ...");
                 for(var i=0; i < gabenIDs.length; i++) {
                     attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_TalentName");
                     attrsToGet.push("repeating_GabenTalente_" + gabenIDs[i] + "_Eigenschaft1");
@@ -16115,9 +16118,9 @@ function migrateTo20190427 (migrationChain) {
 
             // META-TALENTS MIGRATION
             if(metatalenteIDs.length == 0) {
-                console.log("Migration: No meta-talents found, nothing to migrate.");
+                debugLog(caller, "Migration: No meta-talents found, nothing to migrate.");
             } else {
-                console.log("Migration: Found old meta-talents, continuing ...");
+                debugLog(caller, "Migration: Found old meta-talents, continuing ...");
                 for(var i=0; i < metatalenteIDs.length; i++) {
                     attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_TalentName");
                     attrsToGet.push("repeating_MetaTalente_" + metatalenteIDs[i] + "_Eigenschaft1");
@@ -16131,7 +16134,7 @@ function migrateTo20190427 (migrationChain) {
             // Gaben
             safeGetAttrs(
                 attrsToGet, function(v) {
-                    console.log(v);
+                    debugLog(caller, v);
                     let defaultGiftTaW = 3;
                     let defaultMetaTaW = 0;
                     let update = {};
@@ -16153,11 +16156,11 @@ function migrateTo20190427 (migrationChain) {
                             update[prefixNew + "_Name_Gabe_Zusatz"] = "";
                         } else {
                             update[prefixNew + "_Name_Gabe_Zusatz"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
+                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined gift set. Old data preserved.");
                         }
                         if(v[prefixOld + "_SE"] == "on") {
                             update[prefixNew + "_Name_Gabe_Zusatz"] += "[x] SE";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
+                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as it is only relevant for character advancement. Old data preserved. Please move to notes.");
                         } else {
                             update[prefixNew + "_Name_Gabe_Zusatz"] += "[ ] SE";
                         }
@@ -16174,7 +16177,7 @@ function migrateTo20190427 (migrationChain) {
                             update[prefixNew + "_TaW"] = parseInt(v[prefixOld + "_TaW"]);
                         }
                     }
-                    console.log(update);
+                    debugLog(caller, update);
 
                     for(var i=0; i < metatalenteIDs.length; i++) {
                         let newrow = generateRowID();
@@ -16194,11 +16197,11 @@ function migrateTo20190427 (migrationChain) {
                             update[prefixNew + "_Name_Metatalent_Eigen"] = "";
                         } else {
                             update[prefixNew + "_Name_Metatalent_Eigen"] = "urspr. " + v[prefixOld + "_TalentName"] + "; Eigenschaften für Probe aber nicht Standard. ";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
+                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " containing non-standard stats. No predefined meta-talent set. Old data preserved.");
                         }
                         if(v[prefixOld + "_SE"] == "on") {
                             update[prefixNew + "_Name_Metatalent_Eigen"] += "[x] SE";
-                            console.log("Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
+                            debugLog(caller, "Migration: Found old " + v[prefixOld + "_TalentName"] + " marked as having a special experience (SE). This data will no longer be kept in the character sheet as SEs for metatalents are not RAW and they are only relevant for character advancement. Old data preserved. Please move to notes.");
                         } else {
                             update[prefixNew + "_Name_Metatalent_Eigen"] += "[ ] SE";
                         }
@@ -16238,7 +16241,8 @@ function migrateTo20190427 (migrationChain) {
     - calculate BE modifications for weapons
 */
 function migrateTo20200809(migrationChain) {
-    console.log("migrateTo20200809 invoked");
+	var caller = "migrateTo20200809";
+    debugLog(caller, "migrateTo20200809 invoked");
 
     safeGetAttrs([
             "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4", "TaW_peitsche", "ATbasis", 
@@ -16307,7 +16311,8 @@ function migrateTo20200809(migrationChain) {
     - Calculate initiative base and initiative dice based on three special skills (Kampfgespür, Kampfreflexe, Klingentänzer)
 */
 function migrateTo20210413(migrationChain) {
-    console.log("migrateTo20210413 invoked");
+	var caller = "migrateTo20210413";
+    debugLog(caller, "migrateTo20210413 invoked");
 
     safeGetAttrs(["activeShieldRowId"], function(values) {
 		var variablesToGet = [
@@ -16385,7 +16390,7 @@ function migrateTo20210413(migrationChain) {
 			var weaponini = 0;
 			for (weapon = 1; weapon <= 4; weapon++) {
 				if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
-					console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
+					debugLog(caller, "INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
 					weaponini = parseInt(values["INIModNKW" + weapon]);
 				}
 			}
@@ -16449,7 +16454,8 @@ Encumbrance from armour for initiative calculation
 Dummy attribute for display of value is not used anymore, BE used instead
 */
 function migrateTo20210718 (migrationChain) {
-	console.log("migrateTo20210718 invoked");
+	var caller = "migrateTo20210718";
+	debugLog(caller, "migrateTo20210718 invoked");
 	var func = "migrateTo20210718";
 
 	var requirements = [
@@ -16470,7 +16476,7 @@ function migrateTo20210718 (migrationChain) {
 	safeGetAttrs(requirements, function(values) {
 		results = checkRequiredProperties(requirements, values);
 		if (results["errors"] >= 1) {
-			console.log(func + ": Missing properties: '" + results["missing"] + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
+			debugLog(caller, "Missing properties: '" + results["missing"] + "'. Using default values. 0 for 'Ges_BE', 'BE_Last', 'BE_TaW' and 'sf_rustungsgewohnungIII'.");
 			for (req of requirements) {
 				if (!values.hasOwnProperty(req)) {
 					values[req] = defaultValue;
@@ -16481,7 +16487,7 @@ function migrateTo20210718 (migrationChain) {
 		var reqsToCheck = requirements.slice(0,3);
 		for (req of reqsToCheck) {
 			if (!DSAsane(values[req], "encumbrance")) {
-				console.log(func + ": '" + req + "' not sane, set to default value (" + defaultValue + ").");
+				debugLog(caller, "'" + req + "' not sane, set to default value (" + defaultValue + ").");
 				values[req] = defaultValue;
 			}
 		}
@@ -16490,7 +16496,7 @@ function migrateTo20210718 (migrationChain) {
 		update["BE_Last"] = parseInt(values["BE_Last"]);
 		update["BE"] = parseInt(values["Ges_BE"]) + parseInt(values["BE_Last"]);
 		update["BE_RG_INI"] = calculateRuestungBE(values, {"sourceType": "migration"})["BE_RG_INI"];
-		console.log(func + ": Gathering new values complete:", update);
+		debugLog(caller, "Gathering new values complete:", update);
 		safeSetAttrs(update, {}, function() {
 			callNextMigration(migrationChain);
 		});
@@ -16541,18 +16547,18 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
             // 0 active shields? Deactivate shields, nothing to do.
             if (activeShields.length === 0) {
                 // do something for deactivation
-                console.log("Deactivating shields/parry weapons ...");
+                debugLog("Deactivating shields/parry weapons ...");
                 activeShieldRowId = "";
             } else if (activeShields.length === 1) {
                 // this is the active shield
                 var activeShield = activeShields[0];
-                console.log("Setting active shields/parry weapons to \"" + activeShield + "\"");
+                debugLog(caller, "Setting active shields/parry weapons to \"" + activeShield + "\"");
                 activeShieldRowId = extractRowId(activeShield);
             } else {
                 // If one shield got activated, deactivate all others.
                 if (mode === "on") {
                     activeShieldRowId = sourceShieldId;
-                    console.log("Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
+                    debugLog(caller, "Setting active shields/parry weapons to \"" + sourceShield + "\" and deactivating all others ...");
                     for (activeShield of activeShields) {
                         if (activeShield !== sourceShield) {
                             attrsToChange[ activeShield ] = 0;
@@ -16560,7 +16566,7 @@ on("change:repeating_shields:shield_active", function(eventInfo) {
                     }
                 } else {
                 // If one shield got deactivated and there is another active shield, keep one and only one shield. (This case should not happen.)
-                    console.log("Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
+                    debugLog("Impossible case triggered: One shield deactivated and more than one active shield remaining. Deactivating all but the first active shield.");
                     activeShieldRowId = extractRowId(activeShields[0]);
                     for (var i = 1; i < activeShields.length; i++) {
                         attrsToChange[ activeShields[i] ] = 0;
@@ -16588,7 +16594,8 @@ function(eventInfos) {
 });
 
 function calculateCombatValues() {
-    console.log("calculating combat values");
+	var caller = "calculateCombatValues";
+    debugLog(caller, "calculating combat values");
     // Zunächst sammeln wir Infos über die aktiven Waffen und Schilde
     // "activeShieldRowId" can be the id of either a shield or a parry weapon
     safeGetAttrs([ "activeShieldRowId", "NKW_Aktiv1", "NKW_Aktiv2", "NKW_Aktiv3", "NKW_Aktiv4" ], function(rowIdValues) {
@@ -16791,7 +16798,7 @@ function calculateCombatValues() {
 			// Set INI modifier from (main) weapon
 			var weaponini = 0;
 			if (DSAsane(values["INIModNKW" + weapon], "ini-mod-weapon")) {
-				console.log("INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
+				debugLog(caller, "INIModNKW" + weapon, "is", values["INIModNKW" + weapon]);
 				weaponini = parseInt(values["INIModNKW" + weapon]);
 			}
 			attrsToChange["INI_mod_hauptwaffe"] = weaponini;
@@ -16823,11 +16830,11 @@ function calculateCombatValues() {
 				{
 					var setdefault = 1;
 					if (shieldparrytpkk === undefined) {
-						console.log('Error: TP/KK for shield parry is undefined. Set to default value ("' + shieldparrytpkkdefault + '").');
+						debugLog(caller, 'Error: TP/KK for shield parry is undefined. Set to default value ("' + shieldparrytpkkdefault + '").');
 					} else if (shieldparrytpkk === "") {
-						console.log('Error: TP/KK for shield parry is empty. Set to default value ("' + shieldparrytpkkdefault + '").');
+						debugLog(caller, 'Error: TP/KK for shield parry is empty. Set to default value ("' + shieldparrytpkkdefault + '").');
 					} else if (shieldparrytpkk.match(/([^/]+)\/([^/]+)/) == null) {
-						console.log('Error: Invalid TP/KK \'' + shieldparrytpkk + '\'. Set to default value ("' + shieldparrytpkkdefault + '").');
+						debugLog(caller, 'Error: Invalid TP/KK \'' + shieldparrytpkk + '\'. Set to default value ("' + shieldparrytpkkdefault + '").');
 					} else {
 						setdefault = 0;
 					}
@@ -16927,6 +16934,7 @@ on("change:RSName1 change:RS_gBE1 change:RSAktiv1 change:RSName2 change:RS_gBE2 
 // wenn bei dem übergebenen Event die aktive Rüstungsgewöhnung 1 geändert wurde, wird auch das übergeben
 // Enthält auch die Berechnung der auf die Initiative wirksamen BE aus Rüstung (BE_RG_INI)
 function calculateRuestungBE(values, eventInfo) {
+	var caller = "calculateRuestungBE";
     var attrsToChange = {};
 
 	// Determine old/previous degree of armour adaptation
@@ -17016,11 +17024,11 @@ function calculateRuestungBE(values, eventInfo) {
 		}
 		oldLen = armours.length;
 		armours = armours.filter(Boolean);
-		if (oldLen > armours.length) console.log("Warnung: Mindestens ein Rüstungsname ist ungültig, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
+		if (oldLen > armours.length) debugLog(caller, "Warnung: Mindestens ein Rüstungsname ist ungültig, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
 
 		// Get names of armour with armour adaptation
 		var RGarmours = values["rustungsgewohnungI_rustungen"]
-		if (typeof(RGarmours) === 'undefined' || RGarmours === "") console.log("Warnung: Keine Rüstungsnamen für Rüstungsgewöhnung I definiert.");
+		if (typeof(RGarmours) === 'undefined' || RGarmours === "") debugLog(caller, "Warnung: Keine Rüstungsnamen für Rüstungsgewöhnung I definiert.");
 		RGarmours = RGarmours
 			.replace(/\|/g, "")
 			.replace(/[,;\r\n]/gm, "|")
@@ -17028,18 +17036,18 @@ function calculateRuestungBE(values, eventInfo) {
 			.toLowerCase()
 			.split("|")
 			.filter(Boolean);
-		if (RGarmours.length === 0) console.log("Warnung: Kein gültiger Rüstungsnamen für Rüstungsgewöhnung I gefunden, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
+		if (RGarmours.length === 0) debugLog(caller, "Warnung: Kein gültiger Rüstungsnamen für Rüstungsgewöhnung I gefunden, da kein Zeichen aus dem folgenden Zeichenvorrat stammt: a-z, A-Z, ä, ö, ü, Ä, Ö, Ü, ß.");
 
 		// Find the first match and stop
 		for (armour of armours) {
 			if (RGarmours.indexOf(armour) > -1) {
 				RGBonus = 1;
-				console.log("Rüstungsgewöhnung I: \"" + armour + "\" erhält den Bonus.");
+				debugLog(caller, "Rüstungsgewöhnung I: \"" + armour + "\" erhält den Bonus.");
 				break;
 			}
 		}
 
-		if(RGBonus === 0) console.log("Hinweis: Entweder ist keine Rüstung aktiv, für die eine Rüstungsgewöhnung I vorhanden ist, oder der Rüstungsname ist falsch geschrieben.");
+		if(RGBonus === 0) debugLog(caller, "Hinweis: Entweder ist keine Rüstung aktiv, für die eine Rüstungsgewöhnung I vorhanden ist, oder der Rüstungsname ist falsch geschrieben.");
 	} else if (RG === 2) {
 		RGBonus = 1;
 	} else if (RG === 3) {
@@ -17086,7 +17094,7 @@ function calculateAEBase(values) {
 	var reqCheck = checkRequiredProperties(requiredProperties, values);
 
 	if (reqCheck["errors"] > 0) {
-		console.log("Error:", func, "stopped due to missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"]);
+		debugLog(func, "Error:", func, "stopped due to missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"]);
 		return;
 	}
 
@@ -17096,7 +17104,7 @@ function calculateAEBase(values) {
 	|| !DSAsane(values["IN"], "stat")
 	|| !DSAsane(values["CH"], "stat")
 	) {
-		console.log(func + ": One or more stats are not sane. Stopping.");
+		debugLog(func, "One or more stats are not sane. Stopping.");
 		return;
 	}
 
@@ -17190,19 +17198,20 @@ Output: Object with properties "be_at" and "be_pa"
 This function takes into account the effective encumbrance (eBE) and returns the corresponding modifiers for the AT/PA values.
 */
 function calculateWeaponBEModifiers(combatTechnique, BE) {
+	var caller = "calculateWeaponBEModifiers";
 	var eBE = 0;
 	var BEModifiers = { "be_at": 0, "be_pa": 0 };
 	combatTechnique = String(combatTechnique);
 
 	// This should never happen, but in case the code gets edited in the wrong place ...
 	if ( !combatTechniques.hasOwnProperty(combatTechnique) ) {
-		console.log("Warnung: Kampftechnik \"" + combatTechnique + "\" unbekannt. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
+		debugLog(caller, "Warnung: Kampftechnik \"" + combatTechnique + "\" unbekannt. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
 		return BEModifiers;
 	}
 
 	// Checking BE ...
 	if ( isNaN(parseInt(BE)) ) {
-		console.log("Warnung: Bei der BE \"" + String(BE) + "\" handelt es sich nicht um eine Ganzzahl. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
+		debugLog(caller, "Warnung: Bei der BE \"" + String(BE) + "\" handelt es sich nicht um eine Ganzzahl. Berechnung der AT/PA-Modifikatoren aus BE nicht möglich. Standardwert \"0\" benutzt.");
 		return BEModifiers;
 	}
 
@@ -17294,7 +17303,7 @@ function calculateWoundModifiers(values) {
 
 	var reqCheck = checkRequiredProperties(requiredProperties, values);
 	if (reqCheck["errors"] > 0) {
-		console.log("Error:", func, "stopped due to", reqCheck["errors"], "missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"]);
+		debugLog(func, "Error:", func, "stopped due to", reqCheck["errors"], "missing properties in input. Nothing returned. Missing properties:", reqCheck["missing"]);
 		return;
 	}
 
@@ -17308,7 +17317,7 @@ function calculateWoundModifiers(values) {
 	}
 
 	if (errors > 0) {
-		console.log(func + ": One or more wounds are not sane. Stopping.");
+		debugLog(func, "One or more wounds are not sane. Stopping.");
 		return;
 	}
 
@@ -17357,7 +17366,7 @@ on("change:sf_linkhand change:sf_parierwaffenI change:sf_parierwaffenII change:s
 		// Caution: This might cause trouble if some function other than this one changed these attributes.
 		if (eventInfo.sourceType === "sheetworker")
 		{
-			console.log("Suppressing setting LH/PW/SK (again) ...");
+			debugLog("Suppressing setting LH/PW/SK (again) ...");
 			return;
 		}
 		switch(eventInfo.sourceAttribute) {
@@ -17582,7 +17591,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_pa_mod");
             variablesToGet.push("repeating_shields_" + activeShieldRowId + "_shield_type");
         } else {
-            console.log("no active shield found");
+            debugLog("no active shield found");
             safeSetAttrs({
 				"shield_at": 0,
 				"shield_at_available": "0",
@@ -17593,8 +17602,8 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
 
         safeGetAttrs(variablesToGet, function(values) {
             let result = calculateShieldAttack(values, activeShieldRowId);
-            console.log('calculated shield attack');
-            console.log(result);
+            debugLog('calculated shield attack');
+            debugLog(result);
             safeSetAttrs({
 				"shield_at": result["shield_at"],
 				"shield_at_mod": result["shieldAtMod"],
@@ -17606,6 +17615,7 @@ on("change:repeating_shields change:sf_schildkampfI change:sf_schildkampfII chan
 });
 
 function calculateShieldAttack(values, activeShieldRowId) {
+	var caller = "calculateShieldAttack";
     var shieldAtAvailable = "on";
 
 	// Default Value: +3
@@ -17624,18 +17634,18 @@ function calculateShieldAttack(values, activeShieldRowId) {
 	if (shieldType !== "shield" || !activeShieldRowId) {
 		shieldAtAvailable = "0";
 		shieldAt = 0;
-		console.log("ping");
+		debugLog(caller, "ping");
 
     // Without Shield Combat I, no Shield Attacks
 	} else if (schildkampfI !== "1") {
-    	console.log("schildkampfI:", schildkampfI);
+    	debugLog(caller, "schildkampfI:", schildkampfI);
 		shieldAtAvailable = "0";
 		shieldAt = 0;
-		console.log("pong");
+		debugLog(caller, "pong");
 
 	// Good to go, check for modifier reduction
     } else if (schildkampfII === "1" || knaufschlag === "1" || schmutzigeTricks === "1") {
-    	console.log("schildkampfII:", schildkampfII, "knaufschlag:", knaufschlag, "schmutzigeTricks:", schmutzigeTricks);
+    	debugLog(caller, "schildkampfII:", schildkampfII, "knaufschlag:", knaufschlag, "schmutzigeTricks:", schmutzigeTricks);
     	shieldAtMod = 0;
     }
 
@@ -17707,6 +17717,7 @@ function debugLog(caller = "???", ...args) {
 This function calls getAttrs(), but checks whether all attributes returned are actually there and are not NaN or undefined. Non-existing attributes are filled with the stored default value or 0.
 */
 function safeGetAttrs( attrsToGet, callback ) {
+	var caller = "safeGetAttrs";
 	getAttrs(
 		attrsToGet, function(attrs) {
 			var missing = [];
@@ -17731,10 +17742,10 @@ function safeGetAttrs( attrsToGet, callback ) {
 				}
 			}
 			if ( errors[0] > 0 ) {
-				console.log("Non-existing attributes gotten and set to default value:", missing.join(", "));
+				debugLog(caller, "Non-existing attributes gotten and set to default value:", missing.join(", "));
 			}
 			if ( errors[1] > 0 ) {
-				console.log("Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+				debugLog(caller, "Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
 			}
 			callback(attrs);
 		}
@@ -17747,6 +17758,7 @@ function safeGetAttrs( attrsToGet, callback ) {
 This function ultimately calls setAttrs(), but beforehand checks whether all attributes are are not NaN or undefined. Bad attributes are filled with the stored default value or 0.
 */
 function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
+	var caller = "safeSetAttrs";
 	var badDef = [];
 	var errors = 0;
 
@@ -17762,7 +17774,7 @@ function safeSetAttrs( attrsToSet, options = "", callback = function() {}) {
 		}
 	}
 	if ( errors > 0 ) {
-		console.log("Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
+		debugLog(caller, "Attributes with values 'NaN' or 'undefined' gotten and set to default value:", badDef.join(", "));
 	}
 
 	setAttrs( attrsToSet, options, callback );
@@ -17792,7 +17804,7 @@ function DSAsane (value, type) {
 			// Must be number or parseInt()-able number
 			// Must be integer in range [0, 99]
 			if (!limitedIntValid(value, 0, 99)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
 			break;
@@ -17801,7 +17813,7 @@ function DSAsane (value, type) {
 			// Must be number or parseInt()-able number
 			// Must be integer in range [0, 1]
 			if (!limitedIntValid(value, 0, 1)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
 			break;
@@ -17810,7 +17822,7 @@ function DSAsane (value, type) {
 			// Must be number or parseInt()-able number
 			// Must be integer in range [-9, 9]
 			if (!limitedIntValid(value, -9, 9)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
 			break;
@@ -17819,12 +17831,12 @@ function DSAsane (value, type) {
 			// Must be number or parseInt()-able number
 			// Must be integer in range [0, 99]
 			if (!limitedIntValid(value, 0, 99)) {
-				console.log(func + ": Value '" + value + "' check against type '" + type + "' failed.");
+				debugLog(func, "Value '" + value + "' check against type '" + type + "' failed.");
 				errors = true;
 			}
 			break;
 		default:
-			console.log(func + ": type '", type, "' not understood.");
+			debugLog(func, "type '", type, "' not understood.");
 	}
 	return !errors;
 }
@@ -17852,10 +17864,11 @@ function checkRequiredProperties(properties, values) {
 	x.5 values are always rounded up in this system, so let's have a function for this.
 */
 function DSAround (num) {
+	var caller = "DSAround";
 	num = parseFloat(num);
 
 	if (isNaN(num)) {
-		console.log("DSAround: NaN encountered.", "num is \"" + num + "\".");
+		debugLog(caller, "NaN encountered.", "num is \"" + num + "\".");
 		return NaN;
 	}
 
@@ -17875,11 +17888,12 @@ function DSAround (num) {
 	Using the toFixed() + parseFloat() method is cumbersome, so here we are with a new function.
 */
 function roundDecimals (num, digits) {
+	var caller = "roundDecimals";
 	num = parseFloat(num);
 	digits = parseInt(digits);
 
 	if (isNaN(num) || isNaN(digits)) {
-		console.log("roundDecimals: NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
+		debugLog(caller, "NaN encountered.", "num is \"" + num + "\" and digits is \"" + digits + "\".");
 		return NaN;
 	}
 
