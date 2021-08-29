@@ -85,6 +85,7 @@
 
 
 <div class="hidden-constants">
+    <input type="hidden" name="attr_iconstatuscode" value=0>
     <input type='hidden' name='attr_recoilpen' value=0 />
     <input type='hidden' name='attr_gyro-on' value=0 />
     <input type='hidden' name='attr_wp-char' value="(@{stun_pen} + @{wound_pen})" />
@@ -1549,25 +1550,22 @@
                     <div><input type="checkbox" name="attr_deck-asist" value=1> </div>
                     <div><input type="checkbox" name="attr_deck-realityfilter" value=1></div>
                     <div><input type="number" name="attr_deck-icsuppressed" value=0></div>
-                    <div><select name="attr_matrix-iconstatus" class="mediumselect2">
+                    <select name="attr_matrix-iconstatus" class="mediumselect2">
                             <option SELECTED>Intruder</option>
                             <option>Legitimate</option>
-                        </select></div>
-                    <div>
-                        <select name="attr_deck-systemrating" style="class: mediumselect2">
+                    </select>
+                    <select name="attr_deck-systemrating" class= "mediumselect2">
                             <option SELECTED>Unknown</option>
                             <option>Blue</option>
                             <option>Green</option>
                             <option>Orange</option>
                             <option>Red</option>
-                        </select>
-                    </div>
-                    <div><select name="attr_deck-alertstatus" style="class: mediumselect2">
+                    </select>
+                    <select name="attr_deck-alertstatus" class= "mediumselect2">
                             <option value=0 SELECTED>None</option>
                             <option value=4>Passive</option>
                             <option value=5>Active</option>
-                        </select>
-                    </div>
+                    </select>
                 </div>
             </div>
             <div class="matrix-show-frame">
@@ -1581,25 +1579,22 @@
                     <div><input type="number" name="attr_decking" min=0 value=0> </div>
                     <div><input type="number" name="attr_deck-utilitypayload" min=0 value=0></div>
                     <div><input type="number" name="attr_deck-icsuppressed" min=0 value=0></div>
-                    <div><select name="attr_matrix-iconstatus" style="width: 85px;">
+                    <select name="attr_matrix-iconstatus" style="width: 85px;">
                             <option SELECTED>Intruder</option>
                             <option>Legitimate</option>
-                        </select></div>
-                    <div>
-                        <select name="attr_deck-systemrating" style="class: mediumselect2">
+                    </select>
+                    <select name="attr_deck-systemrating" class= "mediumselect2">
                             <option SELECTED>Unknown</option>
                             <option>Blue</option>
                             <option>Green</option>
                             <option>Orange</option>
                             <option>Red</option>
-                        </select>
-                    </div>
-                    <div><select name="attr_deck-alertstatus" style="class: mediumselect2">
+                    </select>
+                    <select name="attr_deck-alertstatus" class= "mediumselect2">
                             <option value=0 SELECTED>None</option>
                             <option value=4>Passive</option>
                             <option value=5>Active</option>
-                        </select>
-                    </div>
+                    </select>
                 </div>
             </div>
 
@@ -4429,9 +4424,8 @@ buttonlist.forEach(button => {
 	});
    });
 
-</script>
-
-<script type="text/worker">
+      const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4}};
+      const matrixsecnumber={1: "BLUE", 2: "GREEN", 3: "ORANGE",4: "RED"};
       const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "force" ];
       const quicknesslinked=["@{blowgun}", "@{bracer}", "@{guncane}", "@{gyrojet}", "@{eyegun}", "@{oralgun}", "@{oralstrike}", "@{pistols}", "@{smgs}", "@{rifles}", "@{assaultrifles}", "@{lasers}", "@{whips}", "@{stealth}", "@{shotguns}"]
       const damagetable = {
@@ -4745,6 +4739,48 @@ buttonlist.forEach(button => {
 		});
 	});
 
+
+on('clicked:matrixattack', (info) => {
+		const myid=info["htmlAttributes"]["id"]
+		const mytitle=info["htmlAttributes"]["title"]
+		console.log(info);
+		getAttrs(["deck-systemrating"], function (myval) {
+			var calcTN="0 + @{wound_pen} + @{stun_pen} + @{matrix-penalty} + ?{Miscellaneous Modifiers|0}";
+			const systemrating=myval["deck-systemrating"].toUpperCase();
+			var calcDice="@{decking} + ?{Hacking Pool Dice|0}"
+			var myaction="{{action=" + mytitle + "}}";
+			if (myid == "deckattack") myaction="{{action=Attack @{deckattacklevel}}}" 
+        		var myroll="&{template:matrix}"
+			myroll+= myaction;
+			myroll+="{{rolldice=[[" + calcDice + "]]}}"
+			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
+			myroll+="{{utilitylevel=@{" + myid  + "-rating-final}}}" 
+			myroll+="{{iconstatus=[[@{target|Target|iconstatuscode}]]}}";
+			if  ( systemrating == "UNKNOWN" )  myroll+="{{systemrating=[[@{target|Host|matrixsecuritynumber}]]}}";
+			else  myroll+="{{systemrating=[[" + matrixtn[systemrating]["secrating"]  + "]]}}";
+			myroll+="{{myname=@{character_name}}} {{target=@{target|Target|token_name}}}{{hackingpool=[[?{Hacking Pool Dice|0}]]}}";
+			myroll+="{{utilitylevel=@{deckattack-rating-final}}}"; 
+			myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}";
+			console.log(myroll);
+                	startRoll(myroll, (results) => {
+				if ( results.results.iconstatus.result == 0)  myicon="Legitimate";
+				else myicon="Intruder";
+				var finaltn=results.results.targetnumber.result
+				const mysystem=matrixsecnumber[results.results.systemrating.result];
+				const myhosttn=matrixtn[mysystem][myicon];
+				finaltn += myhosttn;
+				const finaldice = (results.results.roll.dice.filter(mydice=> mydice >= finaltn )).length;
+				updatepoolused("hackingpool", results.results.hackingpool.result);	
+				console.log('final tn ' + finaltn);
+				console.log('final foll ' + finaldice);
+			   	finishRoll( results.rollId,
+                		{
+                    			targetnumber: finaltn,
+					roll: finaldice,
+                		});
+			});
+	        });
+	});
         on('clicked:matrixmedic', (info) => {
 		console.log(info);
 		const myid=info["htmlAttributes"]["id"]
@@ -4760,29 +4796,6 @@ buttonlist.forEach(button => {
 		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}"
 		console.log(myroll);
                 startRoll(myroll, (results) => {
-			finishRoll( results.rollId);
-		});
-	});
-
-        on('clicked:matrixattack', (info) => {
-		console.log(info);
-		const myid=info["htmlAttributes"]["id"]
-		const mytitle=info["htmlAttributes"]["title"]
-		var calcTN="@{deck-tn} + @{wound_pen} + @{stun_pen} + @{matrix-penalty} + ?{Miscellaneous Modifiers|0}";
-		var calcDice="@{decking} + ?{Hacking Pool Dice|0}"
-		var myaction="{{action=" + mytitle + "}}";
-		if (myid == "deckattack") myaction="{{action=Attack @{deckattacklevel}}}" 
-        	var myroll="&{template:matrix}"
-		myroll+= myaction;
-		myroll+="{{rolldice=[[" + calcDice + "]]}}"
-		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+="{{utilitylevel=@{" + myid  + "-rating-final}}}" 
-		myroll+="{{myname=@{character_name}}} {{target=@{target|Target|token_name}}}{{hackingpool=[[?{Hacking Pool Dice|0}]]}}"
-		myroll+="{{utilitylevel=@{deckattack-rating-final}}}" 
-		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}"
-		console.log(myroll);
-                startRoll(myroll, (results) => {
-			updatepoolused("hackingpool", results.results.hackingpool.result);	
 			finishRoll( results.rollId);
 		});
 	});
@@ -6046,11 +6059,9 @@ buttonlist.forEach(button => {
 			}
 		});
        });
-</script>
 
 
-<script type="text/worker">
-   const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "perception", "reaction", "initiative"];
+   const loadattributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "perception", "reaction", "initiative"];
    const critteratts=[ "perception", "attacks", "force", "reach"];
    const weaponskills=[ "clubs", "assaultrifles", "cyberimplant", "edged", "gunnery", "heavyweapons", "lasers", "launchers", "pistols", "poles", "projectiles", "rifles", "shotguns", "smgs", "whips", "throwing", "demolitions", "underwatercombat", "unarmed" ]
    const magicskills=["sorcery", "spellcasting", "spelldefense","dispelling","astralcombat", "ritualsorcery", "conjuring", "summoning", "banishing", "spiritcontrol","aurareading", "areadauras", "areadsignatures","areadsorcery"]
@@ -6109,7 +6120,7 @@ buttonlist.forEach(button => {
 		if ( npc["essense"] ) { atts["essense"]=npc["essense"]; } else { atts["essense"]=6;}
 	
 	        console.log('loading attributes');
-		attributes.forEach(myatt=>{
+		loadattributes.forEach(myatt=>{
 		        let max=myatt.concat("_max");
 		        let mod=myatt.concat("-mods");
 			if(npc[myatt]) atts[myatt]=npc[myatt];
@@ -6357,9 +6368,6 @@ buttonlist.forEach(button => {
    };
 
 
-</script>
-
-<script type="text/worker">
     const switchbuttons1 = ["securitysheaf", "astralattributes", "sorceryskills", "spells", "adeptpowers", "magicinitiate", "foci", "geas", "totem", "combatskills", "cyberware", "deckingskills", "bioware", "gear", "contacts"];
     const switchbuttons2 = ["gunnery","deck-utilities-","deck-skills-", "deck-cyberdeck-", "drones-skills-", "drones-models-", "vehicle-skills-", "drone-list-", "ic-", "rc-deck-"  ];
     const switchbuttons = switchbuttons1.concat(switchbuttons2)
@@ -6387,9 +6395,6 @@ buttonlist.forEach(button => {
 	});
     });
 
-</script>
-
-<script type="text/worker">
     const vehicleskills=["bike","car","hovercraft", "motorboat", "sailboat", "submarine", "wingedaircraft", "tracks", "semiballistic", "lta", "rotor", "ship", "vectoredthrust", "mecharm", "suborbital", "walkers"];
     let vchangelist="";
     let vonprefix=" change:";
@@ -6414,9 +6419,6 @@ buttonlist.forEach(button => {
 		});
     });
 
-</script>
-
-<script type="text/worker">
     const deckutilrepeat=["deck-utilities", "offensiveutils", "defensiveutils"]
     const utilitylist=["decksleaze", "decktrack", "deckarmor", "deckcloak", "deckmedic", "decklockon", "deckattack", "deckblackhammer", "deckkilljoy", "deckslow"];
     let changelist="change:deckattack-multiplier";
@@ -6619,14 +6621,16 @@ on("change:deck-systemrating change:matrix-iconstatus change:deck-activemem chan
 		setAttrs({"deck-mem-overloaded": myoverloaded, "deck-util-overloaded": myratingoload});
 	});
 });
-const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4}};
-on("change:deck-systemrating change:matrix-iconstatus", function() {
+
+on("sheet:opened change:deck-systemrating change:matrix-iconstatus", function() {
 	getAttrs(["deck-systemrating","matrix-iconstatus"], function(myval) {
 		sets={};
 		var mytn=0;
 		const rating=myval["deck-systemrating"].toUpperCase();
 		const icon=myval["matrix-iconstatus"];
-		sets["deck-tn"]=matrixtn[rating][icon];
+		if ( rating != "UNKNOWN") sets["deck-tn"]=matrixtn[rating][icon];
+		if ( icon  == "Legitimate") sets["iconstatuscode"]=0;
+		else sets["iconstatuscode"]=1;
 		console.log(sets)
 		setAttrs(sets);
 	});
@@ -6737,9 +6741,6 @@ on("clicked:deck-utilities-unloadall", function() {
 
 });
 
-</script>
-
-<script type="text/worker">
 
 on("sheet:opened change:eccm-fluxmod change:rcdeck-fluxmod", function() {
 	getAttrs(["eccm-fluxmod", "rcdeck-fluxmod"], function (myval) {
@@ -7084,10 +7085,6 @@ on("change:speed-current change:speed-rating change:vehicle-penalty", function()
 
     });
 
-</script>
-
-
-<script type="text/worker">
 
 on("clicked:matrixsystemset", function(){
         getAttrs(["matrixsystemset"], function (myval) {
@@ -7475,16 +7472,15 @@ on("change:matrix-damage change:rccommand-damage change:rcsimsense-damage change
 on("change:sheettype", function(){
 	getAttrs(["sheettype"], function (myval) {
 		var myatts={};
-		if ((myval["sheettype"] == "Vehicle") || (myval["sheettype"] == "Drone")) {
-			myatts
+		const mysheet=myval["sheettype"];
+		if ((mysheet == "Vehicle") || (mysheet == "Drone")) {
 			myatts["sheettab"]="vehicle-attr-tab";
 		} else { 
 			myatts["sheettab"]="character";
 		}
-		if ((myval["sheettype"] == "Critter") || (myval["sheettype"] == "Spirit")) {
-			myatts["gunneryswitch"]="hide";
-		} else {
-		}
+		if ((mysheet == "Critter") || (mysheet == "Spirit")) myatts["gunneryswitch"]="hide";
+		if (mysheet == "Matrix") myatts["iconstatuscode"]=0;
+		
 		setAttrs(myatts);
 	});
 });
@@ -8355,10 +8351,10 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 <rolltemplate class="sheet-rolltemplate-matrix">
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader"><b>{{myname}} vs. {{target}}</b></div>
-        <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
+        <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{computed::targetnumber}} </div>
         {{#hackingpool}}<div class="rtrow"><b>Hacking Pool Dice:</b> {{hackingpool}}</div>{{/hackingpool}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
-        <div class="sheet-rtrow"><b>{{action}}:</b> {{roll}}</div>
+        <div class="sheet-rtrow"><b>{{action}}:</b> {{computed::roll}}</div>
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
         {{#detect}}<div class="sheet-rtrow"><b>{{target}}:</b> {{detect}}</div>{{/detect}}
