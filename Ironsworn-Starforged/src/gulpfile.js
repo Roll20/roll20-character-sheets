@@ -3,11 +3,25 @@ const data = require('gulp-data')
 const stylus = require('gulp-stylus')
 const gulp = require('gulp')
 const fs = require('fs')
-const path = require('path'),
+const path = require('path')
+const axios = require('axios')
 merge = require('gulp-merge-json')
-const translation = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../translation.json')))
 
-gulp.task('data', function() {
+axios.defaults.baseURL = 'https://raw.githubusercontent.com/rsek/dataforged/main/roll20';
+
+gulp.task('data', async function() {
+  const rawData = {
+    oracles: await axios.get('/oracles.json'),
+    assets: await axios.get('/assets.json'),
+    moves: await axios.get('/moves.json')
+  }
+
+  for (let key in rawData) {
+    const data = rawData[key].data
+    const fileName = path.join(__dirname, `./app/data/${key}.json`)
+    fs.writeFileSync(fileName, JSON.stringify(data, null, 2))
+  }
+
   return gulp.src(['app/data/**/*.json', '../translation.json'], {allowEmpty: true})
     .pipe(merge({
       fileName: 'data.json',
