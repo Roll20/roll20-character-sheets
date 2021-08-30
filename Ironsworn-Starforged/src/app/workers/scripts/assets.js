@@ -1,5 +1,3 @@
-const { on } = require("events");
-
 on('change:repeating_assets:assettype', function(values) {
   setAttrs({
     ['repeating_assets_Asset' + values.previousValue]: 'off',
