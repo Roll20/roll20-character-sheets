@@ -20,7 +20,6 @@
                 </select>
 	    <div></div>
             <div class="box text-mid"><a class="button" href="#popup1">Import</a></div>
-
         </div>
         <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
         <div class="metatype-info">
@@ -86,7 +85,6 @@
 
 <div class="hidden-constants">
     <input type="hidden" name="attr_iconstatuscode" value=0>
-    <input type='hidden' name='attr_recoilpen' value=0 />
     <input type='hidden' name='attr_gyro-on' value=0 />
     <input type='hidden' name='attr_wp-char' value="(@{stun_pen} + @{wound_pen})" />
     <input type='hidden' name='attr_wp-matrix' value="(@{stun_pen} + @{wound_pen} + @{matrix-penalty})" />
@@ -95,6 +93,7 @@
     <input type='hidden' name='attr_ask-range' value="?{Range|Short,4|Medium,5|Long,6|Extreme,9}" />
     <button type="action" name="act_init-aug" class="d6-button" title="Augmented Initiative">L</button>
     <button type="action" name="act_endturn" class="d6-button" title="End Combat Turn">L</button>
+    <button type="action" name="act_resistroll" class="d6-button" title="Resist Roll">L</button>
     <button type="action" name="act_resist-ballistic-normal" class="d6-button"
         title="Resist with Ballistic Armor">L</button>
     <button type="action" name="act_resist-ballistic-half" class="d6-button"
@@ -289,15 +288,11 @@
         <div class="combat-modifiers-total">
             <div class="text-mid">Ranged Modifiers: <span name="attr_rangedTN"></span></div>
             <div class="text-mid">Melee Modifiers: <span name="attr_meleeTN"></span></div>
-            <div class="text-mid">Recoil Penalty: <span name="attr_recoilpen" value=0></span></div>
+            <div class="text-mid">Rounds Fired: <span name="attr_rounds-phase" value=0></span></div>
             <div>Dodge<button type="action" name="act_dodge" class="d6-button" title="Dodge Attack"
                     id="dodge">L</button></div>
-            <div>Ballistic: <span name="attr_ballistic" value=0></span><button type="action" name="act_resistdmg"
-                    class="d6-button" title="Resist Damage with Ballistic Armor" id="ballistic">L</button>
-            </div>
-            <div>Impact: <span name="attr_impact" value=0></span><button type="action" name="act_resistdmg"
-                    class="d6-button" title="Resist Damage with Impact Armor" id="impact">L</button>
-            </div>
+            <div>Ballistic: <span name="attr_ballistic" value=0></span><button type="action" name="act_resistdmg" class="d6-button" title="Resist Damage with Ballistic Armor" id="ballistic">L</button> </div>
+            <div>Impact: <span name="attr_impact" value=0></span><button type="action" name="act_resistdmg" class="d6-button" title="Resist Damage with Impact Armor" id="impact">L</button> </div>
             <input type='hidden' class='buttontoggle' name='attr_sheettype' />
             <div class="manual-gunnery">
                 <input type='hidden' class='gunnery-switch' name='attr_gunneryswitch' value="show" />
@@ -2710,11 +2705,11 @@
                 <input type="number" name="attr_short">
                 <input type="number" name="attr_medium">
                 <input type="number" name="attr_long">
-                <input type="number" name="attr_extreme" style='width:50px;'>
-                <div class="text-mid"><input type="checkbox" name="attr_ss" value=1 /></div>
-                <div class="text-mid"><input type="checkbox" name="attr_sa" value=1 /></div>
-                <div class="text-mid"><input type="checkbox" value=1 name="attr_bf" /></div>
-                <div class="text-mid"><input type="checkbox" value=1 name="attr_fa" /></div>
+                <input type="number" name="attr_extreme">
+                <div class="text-mid"><input type="radio" name="attr_firemode" value="ss" /></div>
+                <div class="text-mid"><input type="radio" name="attr_firemode" value="sa" /></div>
+                <div class="text-mid"><input type="radio" name="attr_firemode" value="bf" /></div>
+                <div class="text-mid"><input type="radio" name="attr_firemode" value="fa" /></div>
                 <input type="number" name="attr_power">
                 <select name="attr_damage" title="Weapon Damage" class="mediumselect2">
                     <option title="Light Damage" SELECTED>L</option>
@@ -4018,10 +4013,10 @@
                     <input type="number" name="attr_medium">
                     <input type="number" name="attr_long">
                     <input type="number" name="attr_extreme"> 
-                    <div class="text-mid"><input type="checkbox" name="attr_ss" value=1 /></div>
-                    <div class="text-mid"><input type="checkbox" name="attr_sa" value=1 /></div>
-                    <div class="text-mid"><input type="checkbox" value=1 name="attr_bf" /></div>
-                    <div class="text-mid"><input type="checkbox" value=1 name="attr_fa" /></div>
+                    <div class="text-mid"><input type="checkbox" name="attr_firemode" value="ss"/></div>
+                    <div class="text-mid"><input type="checkbox" name="attr_firemode" value="sa"1 /></div>
+                    <div class="text-mid"><input type="checkbox" name="attr_firemode" value="bf"/></div>
+                    <div class="text-mid"><input type="checkbox" name="attr_firemode" value="fa"/></div>
                     <input type="number" name="attr_power">
                     <select name="attr_damage" class="mediumselect2">
                         <option SELECTED>L</option>
@@ -4406,6 +4401,25 @@ buttonlist.forEach(button => {
    "Other": { short: 0, medium: 0, long: 0, extreme: 0,  skill: 0, wfamily: "Other" }
    }
 
+   const rollEscape = {
+	chars: {
+		'"': '%quot;',
+		',': '%comma;',
+		':': '%colon;',
+		'}': '%rcub;',
+		'{': '%lcub;',
+	},
+	escape(str) {
+		str = (typeof(str) === 'object') ? JSON.stringify(str) : (typeof(str) === 'string') ? str : null;
+		return (str) ? `${str}`.replace(new RegExp(`[${Object.keys(this.chars)}]`, 'g'), (r) => this.chars[r]) : null;
+	},
+	unescape(str) {
+		str = `${str}`.replace(new RegExp(`(${Object.values(this.chars).join('|')})`, 'g'), (r) => Object.entries(this.chars).find(e=>e[1]===r)[0]);
+		return JSON.parse(str);
+	}
+    };
+
+
    on("change:repeating_rangedweapons:type", function() {
    	console.log('updating range based on weapon type');
 	getAttrs(["repeating_rangedweapons_type", "strength_max"], function(myval) {
@@ -4667,7 +4681,7 @@ buttonlist.forEach(button => {
 		getAttrs(["matrixsecuritytally"], function (myval) {
 			var mytally=parseInt(myval["matrixsecuritytally"]); 
 			if ( myid == "systemdetect" ) {
-        			var myroll="&{template:matrix}{{target=@{target|Target|character_name}}}{{myname=@{character_name}}}{{action=Detection Roll}}" ;
+        			var myroll="&{template:matrix}{{target=@{target|Target|token_name}}}{{myname=@{character_name}}}{{action=Detection Roll}}" ;
 				myroll+="{{targetnumber=@{target|Target|deck-detection-final}}}";
 				myroll+="{{rolldice=[[@{matrixsecurityrating}]]}}";
 				myroll+="{{roll=[[@{matrixsecurityrating}d6>[[{2,(@{target|Target|deck-detection-final})}kh1]]!! ]]}}";
@@ -4872,7 +4886,7 @@ on('clicked:matrixattack', (info) => {
 		myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{action=" + mytitle + "}}"
 		myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
-		myroll+="{{detect=[Detect](~@{target|Target|character_name}|detection)}}"
+		myroll+="{{detect=[Detect](~@{target|Target|token_name}|detection)}}"
                 startRoll(myroll, (results) => {
 			updatepoolused("hackingpool", results.results.hackingpool.result);	
 			finishRoll( results.rollId);
@@ -4925,7 +4939,7 @@ on('clicked:matrixattack', (info) => {
 
    	var refreshpools = function () {
 		atts=[];
-		atts["recoilpen"]=0;
+		atts["rounds-phase"]=0;
 		atts["controlpool-used"]=0;
 		atts["hackingpool-used"]=0;
 		atts["astralpool-used"]=0; 
@@ -5201,28 +5215,92 @@ on('clicked:matrixattack', (info) => {
 		finishRoll( results.rollId);
 		});
 	});
+	const floor = function(v) {
+	    return (v >= 0 || -1) * Math.floor(Math.abs(v));
+	}
 
-   	var resistdmg = function (myid, mods) {
+	const ammomods = { 
+		regular: { armor: "ballistic", av: 0, power: 0, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		adps: { armor: "ballistic * 0.5", av: 0, power: 0, dmg: 0, recoil: 1, barrier: 0.5, knockdown: 1 },
+		explosive: { armor: "ballistic", av: 0, power: 1, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		explosive2: { armor: "ballistic", av: 0, power: 2, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		flechette: { armor: "return (Math.max(ballistic, (impact * 2)))", av: -0.5, power: 0, dmg: "if ( ballistic + impact ==0 ) return 1; else return 0;", recoil: 1, barrier: 2, knockdown: 1 },
+		gel: { armor: "impact", av: 0, power: -2, dmg: "stun", recoil: 1, barrier: 1, knockdown: 2 },
+		tracer: { armor: "ballistic", av: 0, power: "-(Math.floor(rounds/3))", dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		av: { armor: "ballistic * 0.5", av: 1, power: 0, dmg: 0, recoil: 1, barrier: 0.5, knockdown: 1 },
+		capsule: { armor: "impact", av: 0, power: -2, dmg: "stun", recoil: 1, barrier: 1, knockdown: 1 },
+		glazer: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 2, dmg: "if(ballistic + impact)==0 return 1 else return 0", recoil: 1, barrier: 2, knockdown: 1 },
+		hic: { armor: "Math.max(ballistic,impact)", av: 0, power: "if ((range=='extreme')||(range=='long')) return -1 else return 0", dmg: 0, recoil: 2, barrier: 1, knockdown: 1 },
+		hp: { armor: "ballistic + impact", av: 0, power: "if(ballistic + impact)==0 return 3 else return 1", dmg: 0, recoil: 2, barrier: 1, knockdown: 1 },
+		incendiary: { armor: "ballistic", av: 0, power: 0, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		mercury: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 0, dmg: "if(ballistic + impact)==0 return 1 else return 0", recoil: 1, barrier: 2, knockdown: 1 },
+		tracker: { armor: "ballistic", av: 0, power: 0, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 }
+	}
+   	const resistdmg = function (myid, mods) {
+	   atts=["ballistic", "impact", "dermal-armor"];
+	   getAttrs(atts, function (myval) {
+	   	const ballistic=myval["ballistic"];
+	   	const impact=myval["impact"];
+	   	const dermalarmor=myval["dermal-armor"];
+		var wdmg;
+		var dmgcode=0;
+		var weapondmg="none";
+		var dodge=0;
+         	myroll="&{template:resistance}";
+		if ( mods=="regular" ) mods=1;	
 		if ( mods=="normal" ) mods=1;	
 		if ( mods=="double" ) mods=2;	
 		if ( mods=="half" ) mods=0.5;	
+		if ( typeof mods === 'object' && mods !== null ) {
+			const ammo=mods["ammotype"].toLowerCase();
+	   		weapondmg = mods["wdmg"];
+	   		dodge = mods["dodge"];
+			var armorval = eval(ammomods[ammo]["armor"]);
+			const powermod = eval(ammomods[ammo]["power"]);
+			dmgcode = damagetable[weapondmg] + eval(ammomods[ammo]["dmg"]);
+			myroll +="{{Power=?{Attack Power|" + mods.power + "}}}";
+			myroll+="{{wpndmg=" + weapondmg + "}}";
+			myroll +="{{attacktest=[[" + mods["attacktest"] + "]]}}";
+			myroll+="{{dodge=[[" + mods["dodge"] + "]]}}";
+	 		myroll +="{{AttackType=" + ammo  + "}}";
+			calcTN="?{Attack Power} + " +  powermod + " - " + armorval;
+		} else { 
+			myroll +="{{Power=?{Attack Power|4}}}"; 
+	 		myroll +="{{AttackType=" + mods  + "}}";
+			calcTN="?{Attack Power} - (floor(@{" + myid + "} * " + mods + "))";
+		}
 	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
 	        var calcDice= "@{body|max} + ?{Combat Pool Dice}";
-		calcTN="?{Attack Power} - (floor(@{ballistic} * " + mods + "))";
-         	myroll="&{template:resistance}";
 	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{armorvalue=@{" + myid + "}}}{{combatpool=[[?{Combat Pool Dice|0}]]}}";
-	 	myroll +="{{Power=?{Attack Power|4}}}";
 	 	myroll +="{{action=Resistance Test}}";
+	 	myroll +="{{finaldmg=[[0]]}}{{netresult=[[0]]}}";
 		myroll +="{{rolldice=[[" + calcDice + "]]}}";
 		myroll +="{{targetnumber=[[" + calcTN + "]]}}";
-	 	myroll +="{{AttackType=" + mods  + "}}";
 	 	myroll +="{{roll= [[ [[" + calcDice  + " ]]d6>[[ {2,(" + calcTN  + ")}kh1 ]]!! ]]}}";
 		console.log(myroll);
+		console.log(' unmod weapons code ' + dmgcode);
         	startRoll(myroll, (results) => {
+			console.log('dmgcode ' + dmgcode);
+			const netresult=results.results.attacktest.result - ( results.results.roll.result + dodge );
+			console.log('netresult ' + netresult);
+			const stage=floor(netresult/2);
+			var finaldmg=dmgcode + stage;
+			console.log('finaldmg ' + finaldmg);
+			var dmgmax=4;
+			var dmgmin=1;
+			if (dmgcode >= 10) dmgmax=13;
+			if (dmgcode >= 10) dmgmin=10;
+			if (finaldmg > dmgmax) finaldmg=dmgmax;
+			if (finaldmg < dmgmin) finaldmg=dmgmin;
 			updatepoolused("combatpool", results.results.combatpool.result);	
-			finishRoll( results.rollId);
+			if (weapondmg != "none") { 
+				finishRoll( results.rollId, {
+					finaldmg: damagetable[finaldmg],
+					netresult: netresult,
+				});
+			} else { finishRoll( results.rollId); }
 		});
-
+	   });
 	};
 
 	on('clicked:resistdmg', (info) => {
@@ -5233,15 +5311,24 @@ on('clicked:matrixattack', (info) => {
 		resistdmg(myid, mods); 
 	});
 
+        on('clicked:resistroll', (info) => {
+		const payload=rollEscape.unescape(info.originalRollId);
+		console.log(payload);
+		resistdmg(payload["armortype"], payload);
+	});
+
 	const resistmods=["half", "normal", "double"];
 	resistmods.forEach(mod => {
 		var myball="resist-ballistic-" + mod;
 		var myimpact="resist-impact-" + mod;
     		on(`clicked:${myball}`, (info) => {
+			
+			console.log(rollEscape.unescape(info.originalRollId));
 			resistdmg("ballistic", mod); 
 		});
 
     		on(`clicked:${myimpact}`, (info) => {
+			console.log(rollEscape.unescape(info.originalRollId));
 			resistdmg("impact", mod); 
 		});
 	});
@@ -5266,10 +5353,17 @@ on('clicked:matrixattack', (info) => {
 	});
 
 
-   	var dodge = function (myid, mods) {
+   	var dodge = function (mods) {
+         	myroll="&{template:resistance}";
+		if ( typeof mods === 'object' && mods !== null ) {
+			payload=mods;
+			console.log(payload);
+			mods="?{Modifiers?|" + Math.floor(payload["rounds"] / 3 ) + "}";
+			myroll +="{{senddata=[[0]]}}";
+		}
+		console.log('mods: ' + mods);
 	       	var calcDice= "?{Combat Pool Dice}";
 		calcTN="4 + " + mods;
-         	myroll="&{template:resistance}";
 	 	myroll +="{{name=Dodge}}{{character=@{character_name}}}"
 		myroll +="{{combatpool=[[?{Combat Pool Dice|0}]]}}";
 	 	myroll +="{{action=Dodge Test}}";
@@ -5279,17 +5373,26 @@ on('clicked:matrixattack', (info) => {
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 			updatepoolused("combatpool", results.results.combatpool.result);	
-			finishRoll( results.rollId);
+			console.log(payload);
+			if ( payload ) { 
+				payload["dodge"]=results.results.roll.result;
+				finishRoll( results.rollId, { senddata: rollEscape.escape(payload), });
+			} else {
+				finishRoll( results.rollId);
+			}
 		});
 
 	};
 
 	on('clicked:dodge', (info) => {
 		console.log(info);
-		const mytitle=info["htmlAttributes"]["title"]
-		const myid=info["htmlAttributes"]["id"]
-		mods="?{Modifiers?|0}";
-		dodge(myid, mods); 
+		if ( info["htmlAttributes"]["id"] != undefined)  { 
+			mods="?{Modifiers?|0}";
+		}
+		else if ( info["originalRollId"] != undefined ) {
+			mods=rollEscape.unescape(info["originalRollId"]);
+		}
+		dodge(mods); 
 	});
 
    	var conjuring = function (myid) {
@@ -5676,25 +5779,23 @@ on('clicked:matrixattack', (info) => {
 	});
     	on('clicked:repeating_rangedweapons:rangedattack', (info) => {
 		var setatts={};
-		var atts=["sensors-rating", "combatpool-used", "controlpool-used", "gyro-on", "armor-quickness-pen", "recoilpen"];
+		var atts=["sensors-rating", "combatpool-used", "controlpool-used", "gyro-on", "armor-quickness-pen", "rounds-phase", "character_name"];
 	    	var recoilx=1;
 		var rounds=1;
-		var recoilmod=1;
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_');
 		var mymode=info["htmlAttributes"]["id"]
-		const weaponattrs=["damage", "power", "name", "skill", "wfamily", "specialized", "targeting", "recoilcomp", "gyro", "ammotype", "ammoremain", "sa", "ss","bf", "fa", "tnmods"] ;
+		const weaponattrs=["damage", "power", "name", "skill", "wfamily", "specialized", "targeting", "recoilcomp", "gyro", "ammotype", "ammoremain", "sa", "ss","bf", "fa", "tnmods", "firemode"] ;
 		weaponattrs.forEach(myatt=>{
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
-			if (myval[myrepeat.concat("wfamily")] == "Heavy" )  recoilx=2; 
-			var vehiclesensors=0;
+			if ( (myval[myrepeat.concat("wfamily")] == "Heavy" )  && ( ( mymode != "vehiclesensor" )  || ( mymode != "vehicleranged" )) ) recoilx=2;
+			var vehiclesensors=0, armorpen=0, armorpenroll="", pool, poolname, dmgmax=4, finalrounds;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
-			if (( mymode == "vehiclesensor" )  || ( mymode == "vehicleranged" )) recoilmod=2;
 			const tnmods= myval[myrepeat.concat("tnmods")];
-			const recoilpen= myval["recoilpen"];
+			const myname= myval["character_name"];
 			const myweapon= myval[myrepeat.concat("name")];
 			const combatused=parseInt(myval["combatpool-used"]);
 			const controlused=parseInt(myval["controlpool-used"]);
@@ -5705,28 +5806,22 @@ on('clicked:matrixattack', (info) => {
 			const myskill=myval[myrepeat.concat("skill")];
 			var gyro= myval[myrepeat.concat("gyro")];
 			if ( myval["gyro-on"]  == 0 ) gyro=0;
-			const ss= myval[myrepeat.concat("ss")];
-			const sa= myval[myrepeat.concat("sa")];
-			const bf= myval[myrepeat.concat("bf")];
-			const fa= myval[myrepeat.concat("fa")];
-			var armorpen=0;
-			var armorpenroll="";
-			var pool;
-			var poolname;
+			const firemode= myval[myrepeat.concat("firemode")];
 			var dmgnumber= damagetable[wdmg];
-			console.log('dmgnumber ' + dmgnumber);
-			var dmgmax=4;
 			if (dmgnumber >= 10) dmgmax=13;
 			var wpower= myval[myrepeat.concat("power")];
 			var ammoleft=myval[myrepeat.concat("ammoremain")];
-			var finalrounds;
+			const prevrounds=myval["rounds-phase"];
 			var recoilcomp= myval[myrepeat.concat("recoilcomp")];
-			var recoil="{0,( ?{Recoil Penalty} - ( " + recoilcomp + " + " + gyro + " ) )}kh1"
-			var uncomprecoil="{{recoil=[[{0,( ?{Recoil Penalty|" + recoilpen +"} +1 - ( " + recoilcomp + " + " + gyro + " ) )}kh1]]}}"
-			if ((bf==1) || (fa==1)) {
-				rounds="?{Rounds|3}"
-				recoil="{0,(  ?{Recoil Penalty|" + recoilpen + "} + ((" + recoilx + " * (?{Rounds} - (" + recoilcomp + " + " + gyro + "))) / " + recoilmod  + " ))}kh1";
-				uncomprecoil="{{recoil=[[" + recoil + "]]}}"
+			if (( firemode == "bf") && ( ammoleft <= 3))  rounds ="?{Rounds|" + ammoleft + "}";
+			else if (( firemode == "bf") && ( ammoleft > 3)) rounds ="?{Rounds|3}";
+			else if (( firemode == "fa") && ( ammoleft <= 10)) rounds ="?{Rounds|" + ammoleft + "}";
+			else if (( firemode == "fa") && ( ammoleft > 10)) rounds ="?{Rounds|" + ( 10 - prevrounds ) +"}";
+			var recoil="";
+			if (( firemode == "bf") || (firemode == "fa")) {
+				recoil="{0,(" + recoilx + " * (( ?{Rounds Already Fired in Combat Phase|" + prevrounds + "} +  ?{Rounds} ) - (" + recoilcomp + " + " + gyro + ")))}kh1";
+			} else if (firemode == "sa" ) {
+				recoil="{0,(" + recoilx + " * ( ?{Rounds Already Fired in Combat Phase|" + prevrounds + "}  - (" + recoilcomp + " + " + gyro + ")))}kh1";
 			}
 			if (ammoleft <= 0 ) {
 				roll="&{template:info}{{character=@{character_name}}}{{action=Attack: " + myweapon + "}}{{type=Simple}}{{info1=Out of Ammo }}";
@@ -5763,15 +5858,15 @@ on('clicked:matrixattack', (info) => {
 			calcDice += " ]]"
 
 
-                	var roll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}"
-			roll += "{{rounds=[[" + rounds + "]]}}{{range=@{ask-range}}}" + uncomprecoil 
-			roll += "{{targetnumber=" + calcTN + " }}{{rolldice=" + calcDice + "}}"
-			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=" + wdmg  + "}}{{weaponpower=[[" + wpower + "]]}}"
-			roll += "{{" + pool + "=[[?{" + poolname + " Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}"
-			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}"
+                	var roll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}";
+			roll += "{{rounds=[[" + rounds + "]]}}{{range=@{ask-range}}}"; 
+			roll += "{{targetnumber=" + calcTN + " }}{{rolldice=" + calcDice + "}}";
+			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=" + wdmg  + "}}{{weaponpower=[[" + wpower + "]]}}";
+			roll += "{{" + pool + "=[[?{" + poolname + " Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}";
+			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}";
 			if ( mymode == "rangedattack" )  {
 				roll += "{{dodge=[Dodge](~@{target|Target|token_name}|dodge)}}";
-				roll += "{{resist=[Resist](~@{target|Target|token_name}|resist-ballistic-normal)}}"
+				roll += "{{senddata=[[0]]}}"
 			}
 			roll += armorpenroll;
 			roll += "{{rangedmods=@{rangedTN}}}";
@@ -5780,7 +5875,7 @@ on('clicked:matrixattack', (info) => {
 			console.log(roll);
                 	startRoll(roll, (results) => {
 				var poolresults;
-				setatts["recoilpen"]=results.results.recoil.result;
+				setatts["rounds-phase"]=results.results.rounds.result + prevrounds;
 				const myrounds=results.results.rounds.result;
 				if ( mymode == "rangedattack" ) poolresults=results.results.combatpool.result + combatused;
 				else poolresults=results.results.controlpool.result + controlused;
@@ -5789,10 +5884,22 @@ on('clicked:matrixattack', (info) => {
 					finalrounds=parseInt(ammoleft);
 				}
 				if ( finalrounds > 1  )  wpower=parseInt(wpower) + finalrounds;
+				let payload= {
+					attacker: myname,
+					armortype: "ballistic",
+					wdmg: wdmg,
+					rounds: results.results.rounds.result,
+					dodge: 0,
+					attacktest: results.results.attacktest.result,
+					power:  wpower,
+					ammotype: ammotype.toLowerCase(),
+				}
 			finishRoll( results.rollId,
                 	{
                     		weaponpower: wpower, 
                     		rounds: finalrounds, 
+				senddata: rollEscape.escape(payload),
+
                 	})
 			setatts[myrepeat.concat("ammoremain")]=ammoremain - finalrounds;
 			setatts[pool.concat("-used")]=poolresults;
@@ -7225,6 +7332,19 @@ on("change:meleereach change:metatype", function () {
    });
 });
 
+on("change:repeating_rangedweapons:firemode", function(eventinfo){
+	getAttrs(["repeating_rangedweapons_firemode", "repeating_rangedweapons_name", "repeating_rangedweapons_targeting"], function(myval) {
+		const firemode=myval["repeating_rangedweapons_firemode"];
+		const weapon=myval["repeating_rangedweapons_name"];
+		const targeting=myval["repeating_rangedweapons_targeting"];
+		var myroll="/w gm &{template:info}{{character=@{character_name}}}{{type=Switched Weapon " + weapon + " to " + firemode + " firing mode }}";
+		if ( targeting == -2 ) myroll += "{{action=Free}}";
+		else myroll += "{{action=Simple}}";
+                startRoll(myroll, (results) => {
+			finishRoll( results.rollId);
+		});
+	});
+});
 on("change:repeating_rangedweapons:primary-ranged-equipped change:repeating_rangedweapons:secondary-ranged-equipped", function(eventinfo){
     	const myweapon=eventinfo.sourceAttribute
     	console.log(myweapon);
@@ -8257,14 +8377,13 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#charreach}}<div class="sheet-rtrow"><b>{{myname}} Reach:</b> {{charreach}}</div>{{/charreach}}
         {{#targetreach}}<div class="sheet-rtrow"><b>{{target}} Reach:</b> {{targetreach}}</div>{{/targetreach}}
         {{#default}}<div class="sheet-rtrow">{{default}}</div>{{/default}}
-        {{#recoil}}<div class="sheet-rtrow"><b>Uncompensated Recoil:</b> {{recoil}} </div>{{/recoil}}
-        {{#resist}}<div class="sheet-rtrow"><b>{{target}}:</b>{{dodge}} {{resist}}</div>{{/resist}}
+        {{#senddata}}<div class="sheet-rtrow"><b>{{target}}:</b> [Dodge](~selected|dodge||{{computed::senddata}}) [Resist](~selected|resistroll||{{computed::senddata}})</div>{{/senddata}}
 	<div class="sheet-rtrow"><b>Mods:</b>{{#rangedmods}}Ranged: {{rangedmods}}
 	{{/rangedmods}}{{#meleemods}} Melee: {{meleemods}}
 	{{/meleemods}}{{#armorpen}} Armor Penalty: {{armorpen}}{{/armorpen}}
 	{{#gyropen}} Gyro Penalty: {{gyropen}}
 	{{/gyropen}} {{#movemods}} Move Penalty: {{movemods}}{{/movemods}}
-	{{#targetmods}}{{targetmods}}{{/targetmods}}
+	{{#targetmods}} aim assit {{targetmods}}{{/targetmods}}
 	{{#reachmod}}{{computed::reachmod}}{{/reachmod}}
 	</div>
     </div>
@@ -8337,12 +8456,14 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 
 <rolltemplate class="sheet-rolltemplate-resistance">
     <div class="sheet-rtcontainer">
-        <div class="sheet-rtheader">{{character}}: {{type}}</div>
-        <div class="rtrow">Attack {{Power}} vs {{name}} {{armorvalue}}</div>
+        <div class="sheet-rtheader">{{character}}: {{Power}}{{wpndmg}} vs {{name}} {{armorvalue}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div>
+        <div class="sheet-rtrow"><b>Result:</b> {{roll}} </div>
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
-        <div class="sheet-rtrow">{{action}}: {{roll}}</div>
+	{{#finaldmg}}<div class="rtrow-small">Attack:{{attacktest}} - (resist:{{roll}} + dodge:{{dodge}})</div>
+	<div class="rtrow"><b>Final Damage:</b> staged to <b>{{computed::finaldmg}}</b></div>{{/finaldmg}}
         <div class="sheet-rtrow">Combat Pool Used: {{combatpool}}</div>
+        {{#senddata}}<div class="sheet-rtrow"><b>{{character}}:</b> [Resist](~selected|resistroll||{{computed::senddata}})</div>{{/senddata}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
