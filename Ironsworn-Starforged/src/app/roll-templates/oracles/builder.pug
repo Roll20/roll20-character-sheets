@@ -5,7 +5,26 @@ mixin oracleRoll(id, table, row, index)
   else
     - initChance = table[index - 1].Chance + 1
   - var finalChance = row.Chance
-  - var result = row.Description
+  -
+    let detailsKeys = ["Assets", "Details"];
+    let detailsStrings = [];
+    detailsKeys.forEach(key => {
+      if (row[key]) {
+        if (key === "Assets") {
+          row[key] = row[key].map(item => item.toUpperCase());
+        }
+        detailsStrings.push(row[key])
+      };
+    });
+    let detailString;
+    if (detailsStrings.length > 0) {
+      detailsStrings = detailsStrings.flat(2);
+      detailString = `(${detailsStrings.join(", ")})`;
+    }
+
+  - const result = `${row.Description}${detailString ? " " + detailString : ""}`
+
+  //- - var result = row.Description
   if initChance === finalChance
     | {{#rollTotal() #{id} #{finalChance}}}
     |
