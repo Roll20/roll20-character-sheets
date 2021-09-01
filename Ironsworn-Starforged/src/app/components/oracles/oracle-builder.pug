@@ -14,8 +14,24 @@ mixin oracleRowBuilder(table, row, index)
   - const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1
   - const finalChance = row.Chance
   - const range = (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`
-  - const result = row.Description
-  // TODO: consider whether to display row.Details here
+  -
+    let detailsKeys = ["Assets", "Details"];
+    let detailsStrings = [];
+    detailsKeys.forEach(key => {
+      if (row[key]) {
+        if (key === "Assets") {
+          row[key] = row[key].map(item => item.toUpperCase());
+        }
+        detailsStrings.push(row[key])
+      };
+    });
+    let detailString;
+    if (detailsStrings.length > 0) {
+      detailsStrings = detailsStrings.flat(2);
+      detailString = `(${detailsStrings.join(", ")})`;
+    }
+
+  - const result = `${row.Description}${detailString ? " " + detailString : ""}`
   .oracle-row
     span.oracle-roll=range
     span.oracle-result=result
