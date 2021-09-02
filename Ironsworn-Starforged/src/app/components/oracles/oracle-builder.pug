@@ -21,46 +21,75 @@ mixin oracleRowBuilder(table, row, index)
     span.oracle-result=result
 
 mixin oracleRollGroup(group)
-  .oracle-box
-    .oracle-title=group.Name
+  //- lazy collapsibles TODO: style it so it sits more nicely in group container
+  //- also there's some weird corners poking out, so change the CSS here too.
+  //- TODO: turn off "display: block", which r20 adds
+  //- i wish <details> was easier to style :( TODO: find something to replace it, or figure out how to style it nicely
+  //- this looks promising, js required for the one in the article but there's some decent CSS-only ones in the comments: https://css-tricks.com/how-to-animate-the-details-element/
+  details.oracle-box
+    summary.oracle-title=group.Name
     each oracle in group.Oracles
+      //- - console.log("oracleRollGroup processing", group.Name, ":", oracle.Name)
       - const header = `${group.Name} - ${oracle.Name}`
-      - const groupFormattedName = group.Name.toLowerCase().replace(/\s/g, '-')
-      - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+      - const groupFormattedName = kebabCase(group.Name)
+      - const oracleFormattedName = kebabCase(oracle.Name)
       - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
-
       .oracle
-        .button-container
-          if oracle.Tables
-            - const options = oracle.Tables.map((obj, index) => { return `${obj['Display name']},${index}` })
-            - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
-            button(
-              type='roll'
-              class='oracle-roll'
-              title=`@{roll_${id}_oracle}`
-              name=`roll_${id}_oracle`
-              value=`&{template:starforged_oracles} ${rollQuery} {{header=${oracle.Name}}} {{${id}=[[d100]]}}`
-            )
-          else
-            button(
-              type='roll'
-              class='oracle-roll'
-              title=`@{roll_${id}_oracle}`
-              name=`roll_${id}_oracle`
-              value=`&{template:starforged_oracles} {{header=${header}}} {{${id}=[[d100]]}}`
-              )
-        label.toggle-btn.oracle-btn
-          input.hide-element.btn-input(
-            type='radio'
-            title=`@{selected_oracle}`
-            name=`attr_selected_oracle`
-            value=id
-          )
-          .btn-content.oracle-name=oracle.Name
+        if (oracle.Tables)
+          +oracleButtonMultiTables(id, oracle.Name, oracle.Tables)
+        else
+          +oracleButton(id, oracle.Name)
+    if group.Subcategories
+      each subCategory in group.Subcategories
+        //- - console.log("oracleRollGroup processing subcategory:", subCategory.Name)
+        //- - const label = `&blacktriangleright;${subCategory.Name.match(/ /g) ? subCategory.Name : subCategory.Category ?  subCategory.Category+": "+subCategory.Name : subCategory.Name}`
+        - const label = `&blacktriangleright;${subCategory.Name}`
+        - const id = kebabCase(subCategory.Name)
+        .oracle
+          +oracleButtonMultiTables(id, label, subCategory.Oracles)
+        //- - const subCategoryFormattedName = (group.Name+" "+subCategory.Name).toLowerCase().replace(/\s/g, '-')
+        //- - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+        //- .oracle
+        //-   .button-container
+        //-     if (oracle.Tables)
+        //-       //- +oracleButtonMultiTables(id, oracle.Name, oracle.Tables)
+        //-     else
+        //-       +oracleButton(id, oracle.Name)
+
+mixin oracleButtonSingleTable(id, label)
+  +oracleButton(id, label)
+
+mixin oracleButtonMultiTables(id, label, tables)
+  - const options = tables.map((obj, index) => { return `${obj['Display name']||obj['Name']},${index}` })
+  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
+  //- TODO: handle subtables somehow, idk. might mean splitting them into individual subtables
+  +oracleButton(id, label, rollQuery)
+
+mixin oracleButton(id, label, rollQuery="")
+  - console.log(`input[type=radio].${id}:checked ~ div.${id},`)
+  .button-container
+    button(
+      type='roll'
+      class='oracle-roll'
+      title=`@{roll_${id}_oracle}`
+      name=`roll_${id}_oracle`
+      value=`&{template:starforged_oracles} ${rollQuery} {{header=${label}}} {{${id}=[[d100]]}}`
+    )
+  label.toggle-btn.oracle-btn
+    input.hide-element.btn-input(
+      type='radio'
+      title=`@{selected_oracle}`
+      name=`attr_selected_oracle`
+      value=id
+    )
+    .btn-content.oracle-name=label
+
+
+
 
 mixin oracleBuilder(oracle, groupName)
-  - const groupFormattedName = groupName.toLowerCase().replace(/\s/g, '-')
-  - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
+  - const groupFormattedName = kebabCase(groupName)
+  - const oracleFormattedName = kebabCase(oracle.Name)
   - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
   //- Stupid way for me to generate orcale ccs
   //- - console.log(`input[type=radio].${id}:checked ~ div.${id},`)
@@ -70,10 +99,27 @@ mixin oracleBuilder(oracle, groupName)
     .oracle-title.oracle-table-preview=`${groupName} - ${oracle.Name}`
     .oracle-table
       if oracle.Table
+        - console.log("oracleBuilder: table", oracle.Name)
         each row, index in oracle.Table
           +oracleRowBuilder(oracle.Table, row, index)
       else if oracle.Tables
+        - console.log("oracleBuilder: tables", oracle.Name)
         each table, index in oracle.Tables
           .oracle-subtitle=table['Display name']
           each row, index in table.Table
             +oracleRowBuilder(table.Table, row, index)
+      else if oracle.Oracles
+        - console.log("oracleBuilder: subcategory as tables", oracle.Name)
+        each subCatOracle, index in oracle.Oracles
+          if subCatOracle.Table
+            .oracle-subtitle=subCatOracle['Display name']||subCatOracle['Name']
+            each row, index in subCatOracle.Table
+              //- - console.log(row);
+              +oracleRowBuilder(subCatOracle.Table, row, index)
+          else if subCatOracle.Tables
+            each table, index in subCatOracle.Tables
+              .oracle-subtitle=subCatOracle['Display name']||subCatOracle['Name']
+              each row, index in table.Table
+                +oracleRowBuilder(table.Table, row, index)
+
+        //- - console.log("NYI: found subcategories", oracle.Oracles.map(str => str.Name).join(", ") )

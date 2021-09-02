@@ -12,11 +12,11 @@ axios.defaults.baseURL =
 
 gulp.task('dataforge', async function() {
   const rawData = {
-    oracles: await axios.get('/oracles.json'),
+    // oracles: await axios.get('/oracles.json'),
     assets: await axios.get('/assets.json'),
     moves: await axios.get('/moves.json'),
-    movegroups: await axios.get('/movegroups.json'),
-    rolls: await axios.get('/rolls.json'),
+    // movegroups: await axios.get('/movegroups.json'),
+    // rolls: await axios.get('/rolls.json'),
   };
   const translationData = {
     'translation-assets': await axios.get('/translation-assets.json'),
@@ -80,7 +80,8 @@ gulp.task('html', () => {
     )
     .pipe(
       pug({
-        pretty: true,
+        // pretty: true,
+        ...require('./app/pug.config'),
       })
     )
     .pipe(gulp.dest('../'));
