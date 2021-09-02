@@ -485,6 +485,8 @@ const ATTRIBUTE_KEYS = [
   "mod_kick_unit",
   "mod_leap_kick",
   "mod_leap_kick_unit",
+  "mod_liftcarry_weight_multiplier",
+  "mod_liftcarry_duration_multiplier",
   "mod_lift",
   "mod_carry",
   "mod_throw_distance",

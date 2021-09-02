@@ -66,10 +66,16 @@ async function psBonusComplete(prefix = "") {
     `${prefix}ps`,
     `${prefix}character_ps_type`,
     `${prefix}pe`,
+    `${prefix}liftcarry_weight_multiplier`,
+    `${prefix}liftcarry_duration_multiplier`,
   ]);
   const ps = +a[`${prefix}ps`];
   const pe = +a[`${prefix}pe`];
   const ps_type = a[`${prefix}character_ps_type`];
+  const liftcarry_weight_multiplier =
+    +a[`${prefix}liftcarry_weight_multiplier`];
+  const liftcarry_duration_multiplier =
+    +a[`${prefix}liftcarry_duration_multiplier`];
   const ps_bonus = ps > 15 ? ps - 15 : 0;
 
   let restrained_punch = (punch = power_punch = kick = leap_kick = "");
@@ -281,6 +287,14 @@ async function psBonusComplete(prefix = "") {
         restrained_punch_unit = punch_unit = power_punch_unit = "mdc";
       }
       break;
+  }
+  if (liftcarry_weight_multiplier > 0) {
+    lift *= liftcarry_weight_multiplier;
+    carry *= liftcarry_weight_multiplier;
+    throw_distance *= liftcarry_weight_multiplier;
+  }
+  if (liftcarry_duration_multiplier > 0) {
+    hold_max *= liftcarry_duration_multiplier;
   }
   const attrs = {
     [`${prefix}character_ps_type_name`]: name,

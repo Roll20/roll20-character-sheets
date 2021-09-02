@@ -159,6 +159,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "knockout",
     "deathblow",
     "mod_character_ps_type",
+    "mod_liftcarry_weight_multiplier",
+    "mod_liftcarry_duration_multiplier",
   ];
   const pickBestDestinations = pickBestFieldsBase.map(
     (field) => `${destinationPrefix}_${field}`
@@ -169,8 +171,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
     destinations: pickBestDestinations,
     section: "bonuses",
     fields: pickBestFields,
-    defaultValues: [0, 20, 0, 0, core.character_ps_type],
-    ranks: ["high", "low", "low", "low", "high", "high"],
+    defaultValues: [0, 20, 0, 0, core.character_ps_type, 1, 1],
+    ranks: ["high", "low", "low", "low", "high", "high", "high", "high"],
     filter: rowIds,
   });
 
@@ -392,7 +394,9 @@ on("change:repeating_profiles:mod_ma", async (e) => {
 
 on(
   "change:repeating_profiles:mod_ps \
-  change:repeating_profiles:mod_character_ps_type",
+  change:repeating_profiles:mod_character_ps_type \
+  change:repeating_profiles:mod_liftcarry_weight_multiplier \
+  change:repeating_profiles:mod_liftcarry_duration_multiplier",
   async (e) => {
     console.log("change:repeating_profiles:mod_ps", e);
     const [r, section, rowId] = e.sourceAttribute.split("_");
