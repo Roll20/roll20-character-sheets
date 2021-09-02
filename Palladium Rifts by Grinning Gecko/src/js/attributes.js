@@ -49,7 +49,8 @@ async function maBonus(value, prefix = "") {
       : 0;
   setAttrs({
     [`${prefix}ma_bonus`]: ma_bonus,
-    [`${prefix}trustintimidate`]: ma_bonus,
+    [`${prefix}trust`]: ma_bonus,
+    [`${prefix}intimidate`]: ma_bonus,
   });
 }
 

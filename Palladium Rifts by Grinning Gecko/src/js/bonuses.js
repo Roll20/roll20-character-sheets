@@ -74,7 +74,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     "spdfly",
     "hf",
     "spellstrength",
-    "trustintimidate",
+    "trust",
+    "intimidate",
     "charmimpress",
   ];
   const fieldNames = rowIds.reduce((acc, rowId) => {
@@ -111,7 +112,7 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
       const rsaDestinations = [`${destinationPrefix}_mod_${field}`];
       const rsaFields = [`mod_${field}`];
       let base = field;
-      if (field == "trustintimidate") {
+      if (field == "trust" || field == "intimidate") {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
