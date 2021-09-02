@@ -1,5 +1,5 @@
 //- SHEET VERSION
-- var version = "1.73"; 
+- var version = "1.74"; 
 input(type="hidden" name="attr_version" value=`${version}`)
 //- variables & mixin
 - var url = "https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Stargate-RPG/images/";
@@ -12,8 +12,8 @@ input(type="hidden" name="attr_version" value=`${version}`)
 //- var skill-at = [];
 //- var skill-name = [];
 - var dice = ["d4", "d6", "d8", "d10", "d12"];
-//- capitalize
-//- word.charAt(0).toUpperCase() + word.slice(1);
+- var N = number => [...Array(number+1).keys()].slice(1)
+- var cap = word => word.charAt(0).toUpperCase() + word.slice(1)
 
 //- sheet start
 .tab-buttons.middle.center
@@ -115,10 +115,10 @@ main.character
       label.wide(title="Proficiency Bonus") Prof Bonus
       input.stat.w40(name="attr_prof" type="number" value="2" title="Proficiency Bonus: @{prof}")
     .section.columnflex.nowrap.middle.center.init
-      button.txt-btn(name="roll_init" type="roll" value="@{whisper}&{template:stargate} {{title=Initiative}} @{show_name} {{ Roll =[[d20+(@{init}) &{tracker}]]}}" title="%{init}") Initiative
+      button.txt-btn(name="roll_init" type="roll" value="@{whisper}&{template:stargate} {{title=Initiative}} @{show_name} {{ Roll =[[@{init_dice}+(@{init}) &{tracker}]]}}" title="%{init}") Initiative
       input.stat.w40(name="attr_init" type="number" value="0" title="@{init}")
     .section.columnflex.nowrap.middle.center.moxie
-      button.txt-btn(name="roll_moxie" type="roll" value="@{whisper}&{template:stargate} {{title=Moxie}} @{show_name} {{ Roll =[[d20+(@{moxie}) &{tracker}]]}}" title="Social Initiative: %{moxie}") Moxie
+      button.txt-btn(name="roll_moxie" type="roll" value="@{whisper}&{template:stargate} {{title=Moxie}} @{show_name} {{ Roll =[[@{moxie_dice}+(@{moxie}) &{tracker}]]}}" title="Social Initiative: %{moxie}") Moxie
       input.stat.w40(name="attr_moxie" type="number" value="0" title="Social Initiative: @{moxie}")
   //- ac
   .ac.rowflex.nowrap
@@ -139,11 +139,11 @@ main.character
     .section.death.columnflex.nowrap.middle.center
       button.txt-btn.large(name="roll_deathsave" type="roll" value="@{whisper}&{template:stargate} {{color=black}} {{title=Death Save}} @{show_name} {{Result=[[d20]]}}" title="%{deathsave}") Death Save
       .rowflex.nowrap
-        each num in [1,2,3]
+        each num in N(3)
           input(name=`attr_death_success${num}` type="checkbox" value="1")
         span Sucesses
       .rowflex.nowrap
-        each num in [1,2,3]
+        each num in N(3)
           input(name=`attr_death_failure${num}` type="checkbox" value="1")
         span Failures
   //- saves
@@ -156,7 +156,7 @@ main.character
         button.txt-btn(name=`roll_${val}_save` title=`%{${val}_save}` type="roll" value=`@{whisper}&{template:stargate} {{title=${key.charAt(0).toUpperCase()}${key.slice(1)} Save}} @{show_name} {{[[d20+(@{${val}_save})]]=[[d20+(@{${val}_save})]]}}`)= key.charAt(0).toUpperCase() + key.slice(1)
   //- bulk
   section.bulk.columnflex.nowrap.middle.center
-    h3 Tactical Vest Bulk
+    h3 Tactical Bulk
     input.stat.w40(name="attr_bulk" type="number" value="8")
   //- inventory mini
   section.inventory.columnflex.nowrap.center
@@ -171,8 +171,8 @@ main.character
     span.bold range
     span.bold Cap/Reload
     span.bold.pl20 special
-    //- attacks 1 - 5
-    each num in [1, 2, 3, 4, 5]
+    //- attacks 1 - 7
+    each num in N(7)
       .rowflex.nowrap
         button(name=`roll_attack${num}` type="roll" title=`%{attack${num}}` value=`@{whisper}&{template:stargate} {{title=@{attack${num}}}} @{show_name} {{[[d20+(@{attack${num}_to_hit})]]=[[d20+(@{attack${num}_to_hit})]]}} {{Damage=[[@{attack${num}_dmg}+0]] @{attack${num}_dmgtype} }} {{desc=@{attack${num}_special} }}`)
         input.ml15(name=`attr_attack${num}` type="text" placeholder="Sidearm(Beretta M9)")
@@ -231,21 +231,35 @@ main.npc.gap
 //- ---------------------------------------------------------------------------------
 main.settings
   section.settings.columnflex.nowrap.center
-    label Settings
+    h2 Settings
     .rowflex.nowrap
       span(title="@{whisper}") Whisper rolls?
       input(name="attr_whisper" title="@{whisper}" type="checkbox" value="/w gm")
     .rowflex.nowrap
       span(title="@{show_name}") Show name in rolls?
-      select(name="attr_show_name" title="@{show_name}")
+      select(name="attr_show_name" title="@{show_name}").w60
         option(value="{{subtitle=@{character_name} }}") Yes
         option(value=" ") No
+    .rowflex.nowrap
+      h3 Advantage/disadvantage on rolls
+    .rowflex.nowrap
+      span(title="@{init_dice}") Initiative
+      select(name="attr_init_dice" title="@{init_dice}")
+        option(value="d20" selected) Normal
+        option(value="2d20kh1") Advantage
+        option(value="2d20kl1") Disadvantage
+    .rowflex.nowrap
+      span(title="@{moxie_dice}") Moxie
+      select(name="attr_moxie_dice" title="@{moxie_dice}")
+        option(value="d20" selected) Normal
+        option(value="2d20kh1") Advantage
+        option(value="2d20kl1") Disadvantage
     .rowflex.nowrap
       button(name="roll_hd" type="roll" title="%{hd}" value="@{whisper}&{template:stargate} {{color=green}} {{title=Short Rest}} @{show_name} !modbattr --silent --name @{character_name} --hp|{{Healing=[[@{hd}]]}}!!! {{desc=One roll of the Hit Dice.}}") Short Rest
       button(name="roll_longrest" type="roll" title="%{longrest}" value="@{whisper}&{template:stargate} {{color=green}} {{title=Long Rest}} @{show_name}  !modbattr --silent --name @{character_name} --hp|{{Healing=[[@{rank}@{hd}]]}}!!! {{desc=Rolls a number of Hit Dice equal to the characters level, and recovers that amount of health. }}") Long Rest
       button(name="roll_td" type="roll" title="%{td}" value="@{whisper}&{template:stargate} {{title=Tension Die (@{td})}} @{show_name}  {{Roll=[[@{td}]]}} {{desc=Rolls the current tension die for the episode. }}") Tension Dice
     .rowflex.nowrap
-      label Custom roll
+      h3 Custom roll
     .rowflex.nowrap
       button(name="roll_custom1" type="roll" value="@{whisper}@{custom1}")
       input(type="text" name="attr_custom1" value="&{template:stargate} {{color=green}} {{title=Med Kit}} @{show_name}  {{Healing=[[1d4]]}} {{desc=Heals someone with a medic kit. }}")
@@ -259,7 +273,7 @@ main.settings
       button(name="roll_custom4" type="roll" value="@{whisper}@{custom4}")
       input(type="text" name="attr_custom4" value="&{template:stargate} {{title=Tension Die (@{td})}} @{show_name}  {{Roll=[[@{td}]]}} {{desc=Rolls the current tension die for the episode. }}")
   section.other.columnflex.nowrap.center
-    label Other stats
+    h2 Other stats
     .rowflex.nowrap
       span Mission Points(MP):
       input.w40(name="attr_mp" type="number" placeholder="" title="Mission Points @{mp}")
@@ -277,35 +291,27 @@ main.settings
     button.txt-btn(name="roll_help" type="roll" value="@{whisper}&{template:stargate} {{title=[(Link)Sheet Userguide](https://wiki.roll20.net/Stargate) }} {{subtitle=Roll20 Wiki}} {{desc=  (Right-click to open in a new tab)\n**Official Stargate RPG**\n**Roll20 Character Sheet**\n created by **Andreas J.**([@anduh_](https://twitter.com/anduh_)) }}") Sheet Documentation
     br
     h1 Changelog
+    label "v.1.74 (Aug 30th)""
+    span
+      |"• Add adv./disadv. options to Init & moxie rolls"
+      |"• Add 6th & 7th weapon slot"
     label "v.1.73 (Aug 9th)"
     span
-      |* Remove History Skill (was skill in old beta rules)
+      |• Remove History Skill (was skill in old beta rules)
     label "v.1.72 (June)"
     span
-      |* code refactor
+      |• code refactor
       br
-      |       * page navigation made always visible
+      |       • page navigation made always visible
     label "v.1.70 (May)"
     span
-      | * replace page buttons
+      | • replace page buttons
       br
-      |       * add datalists for race, origin, class
+      |       • add datalists for race, origin, class
       br
-      |       * refactor sheet in PUG &amp; SCSS
+      |       • refactor sheet in PUG &amp; SCSS
       br
-      |       * update the sheet to work with CSE
-    label "v.1.55(Nov. 3rd)"
-    span
-      | * more stats to track on Settings page
-    label "v.1.50(Oct. 20th)"
-    span
-      | * add Stargate Phoenix image to roll template
-      br
-      |       * integrate ChatSetAttr commands to Short/Long Rest buttons
-      br
-      |       * added whisper toggle to Saves
-      br
-      |       * Link to sheet wiki page (button on settings page)
+      |       • update the sheet to work with CSE
   .ammo
     .section.columnflex.nowrap
       label.other Living Series
@@ -318,7 +324,7 @@ main.settings
         span Stargaterpg.com character link
         input.w40(name="attr_cahracter_link" type="text" style="width:350px" placeholder="The url to your character sheet" value="")
     .ammo.grid
-      each num in ["1", "2", "3", "4"]
+      each num in N(4)
         .section.columnflex.nowrap.middle.center
           label="Ammo Weapon " + num
           input(name=`attr_ammo${num}` type="number" value="0")
