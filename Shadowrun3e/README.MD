@@ -1,5 +1,21 @@
 # Shadowrun 3rd Edition
 
+## Release Notes 9/1/2021
+
+### changes/bug fixes
+1. enhanced resist and dodge roll buttons for rangedweapons
+2. resist button added for matrix sheet-rolls
+3. fixed calculation of deck attributes for host/grid/ic
+4. fixed rolls for IC combat
+5. added support for calculating damage for different ammo type
+6. For tar pit and tar baby will now ask for "ic rating" instead of power of attack when using he built in resist button.  They are also now using the IC rating correclty for roll dice.
+7. Probe IC now works correctly with "execute" button.
+8. Added sheet workers to make the setup of IC easier.  It will set "Test Target" to Attack for most proactive IC ( except for Ripper and Crippler as those you need to choose an attribute to damage on the deck ).  Probe will set Test Target to "detection factor" and Tar Baby/Pit will set Test Target to "Utility TN". 
+9. fixed calculation of "deck" attributes for the MATRIX sheet types.
+
+### Impact on existing characters.
+For Matrix sheets - please change the setting of the security value so that it calculates the deck attributes correctly.  You can set the value back to the previous value right away.
+
 ## Release Notes 8/30/2021
 
 ### changes/bug fixes

@@ -3217,7 +3217,8 @@
                 <header class="table-top-left">Intruder</header>
                 <header class="table-top-mid">Detection</header>
                 <header class="table-top-mid">Security Tally</header>
-                <header class="table-top-right">Reset Tally</header>
+                <header class="table-top-mid">Reset Tally</header>
+		<header class="table-top-right">Select Token</header>
             </div>
             <fieldset class="repeating_intruders">
                 <div class="matrix-intruder-tally">
@@ -3225,6 +3226,7 @@
                     <div class="table-item"><button type="action" class="d6-button" name="act_detect" id="systemdetect" title="Detection Roll for intruding icon">L</button></div>
                     <div class="table-item"><input type="number" name="attr_securitytally" value=0></div>
                     <div class="table-item"><button type="action" class="pictos-button" name="act_detect" id="resetsecuritytally" title="Reset Security Tally">0</button></div>
+                    <div class="table-item"><button type="action" class="pictos-custom-button" name="act_settokenname" id="ic" title="Set Token Name by Selecting Token">w</button></div>
                 </div>
             </fieldset>
 
@@ -4667,6 +4669,22 @@ buttonlist.forEach(button => {
 		console.log(info);
 
 	};
+	on("clicked:repeating_intruders:settokenname", function(info) {
+		console.log(info);
+		const source=info['sourceAttribute'].split('_');
+		const sourceattr=source.pop();
+		const myrepeat=source.join('_').concat('_');
+		const intrudername=myrepeat + "intrudername";
+		var sets={};
+		const myroll="/w gm &{template:info}{{character=@{character_name}}}{{action=Set Decker for Security Tally}}{{target=[[0[@{target|Icon|token_name}]]]}}";
+                startRoll(myroll, (results) => {
+			sets[intrudername]=(results.results.target.expression.split("[")[1]).split("]")[0];
+			console.log(sets);
+			finishRoll( results.rollId);
+			setAttrs(sets);
+		});
+	});
+
      	on("change:repeating_intruders:intrudername", function(){
 		getAttrs(["repeating_intruders_intrudername"], function (myval) {
 			var mydecker="@{";
@@ -4750,21 +4768,28 @@ buttonlist.forEach(button => {
 		if ( payload ) {
 			console.log(payload);
 			power=payload["power"];
+			basetn=payload["basetn"];
 			attribute=payload["attribute"];
 			attacktype=payload["attacktype"];
-			console.log ('power ' + power + ' att ' + attribute + ' attacktype ' + attacktype);
-			calcDice="@{" + attribute  + "} + ?{Hacking Pool Dice|0}";
-			calcTN="?{Power of Attack?|" + power + "}"; 
-			if ( attacktype == "cybercombat" ) calcTN+= " - @{deckarmor-rating-final}";
+			attacker=payload["attacker"];
+			if (( attacktype == "Tar Baby") || (attacktype == "Tar pit" )) {
+				calcDice="?{Utility Rating?|" + basetn  + "} + ?{Hacking Pool Dice|0}";
+				calcTN= "?{IC Rating?|" + power + "}";
+			} else {
+				calcDice="@{deck-bod-final} + ?{Hacking Pool Dice|0}";
+				calcTN= "?{Power of Attack?|" + power + "} - @{deckarmor-rating-final}";
+			}
+			myroll+="{{target=" + attacker + "}}";
 		} else {
 			calcTN="?{Power of Attack?|0} - @{deckarmor-rating-final}";
 			calcDice="@{deck-bod-final} + ?{Hacking Pool Dice|0}";
+			myroll+="{{target=?{Power of Attack?}}}";
 		}
 		myroll+="{{action=Damage Resistance Test}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{utilitylevel=Armor Rating @{deckarmor-rating-final}}}"; 
-		myroll+="{{myname=@{character_name}}}{{target=?{Power of Attack?}}}{{hackingpool=[[?{Hacking Pool Dice|0}]]}}";
+		myroll+="{{myname=@{character_name}}}{{hackingpool=[[?{Hacking Pool Dice|0}]]}}";
 		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}";
 		console.log(myroll);
                 startRoll(myroll, (results) => {
@@ -4782,7 +4807,7 @@ on('clicked:matrixattack', (info) => {
 		const myid=info["htmlAttributes"]["id"]
 		const mytitle=info["htmlAttributes"]["title"]
 		console.log(info);
-		getAttrs(["deck-systemrating"], function (myval) {
+		getAttrs(["deck-systemrating", "character_name"], function (myval) {
 			var calcTN="0 + @{wound_pen} + @{stun_pen} + @{matrix-penalty} + ?{Miscellaneous Modifiers|0}";
 			const systemrating=myval["deck-systemrating"].toUpperCase();
 			var calcDice="@{decking} + ?{Hacking Pool Dice|0}"
@@ -4811,6 +4836,7 @@ on('clicked:matrixattack', (info) => {
 				const finaldice = (results.results.roll.dice.filter(mydice=> mydice >= finaltn )).length;
 				updatepoolused("hackingpool", results.results.hackingpool.result);	
 				let payload= {
+					attacker: myval["character_name"],
 					power: results.results.utilitylevel.result,
 					attacktype: "cybercombat",
 					attribute: "deck-bod-final"
@@ -5255,7 +5281,7 @@ on('clicked:matrixattack', (info) => {
 		explosive2: { armor: "ballistic", av: 0, power: 2, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
 		flechette: { armor: "(Math.max(ballistic, (impact * 2)))", av: -0.5, power: 0, dmg: "((ballistic + impact) ==0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1 },
 		gel: { armor: "impact", av: 0, power: -2, dmg: 0, recoil: 1, barrier: 1, knockdown: 2 },
-		tracer: { armor: "ballistic", av: 0, power: "-(Math.floor(rounds/3))", dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
+		tracer: { armor: "ballistic", av: 0, power: 0, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
 		av: { armor: "Math.floor(ballistic * 0.5)", av: 1, power: 0, dmg: 0, recoil: 1, barrier: 0.5, knockdown: 1 },
 		capsule: { armor: "impact", av: 0, power: -2, dmg: 0, recoil: 1, barrier: 1, knockdown: 1 },
 		glazer: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 2, dmg: "((ballistic + impact) ==0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1 },
@@ -5825,7 +5851,7 @@ on('clicked:matrixattack', (info) => {
 		});
    		getAttrs(atts, function(myval) {
 			if ( (myval[myrepeat.concat("wfamily")] == "Heavy" )  && ( ( mymode != "vehiclesensor" )  || ( mymode != "vehicleranged" )) ) recoilx=2;
-			var vehiclesensors=0, armorpen=0, armorpenroll="", pool, poolname, dmgmax=4, finalrounds;
+			var vehiclesensors=0, armorpen=0, armorpenroll="", pool, poolname, dmgmin=0, dmgmax=4, finalrounds;
 			if ( myval["sensors-rating"] ) vehiclesensors=myval["sensors-rating"] ;
 			const tnmods= myval[myrepeat.concat("tnmods")];
 			const myname= myval["character_name"];
@@ -5845,7 +5871,7 @@ on('clicked:matrixattack', (info) => {
 				dmgnumber += 9;
 				wdmg=damagetable[dmgnumber];
 			}
-			if (dmgnumber >= 10) dmgmax=13;
+			if (dmgnumber >= 10) dmgmax=13, dmgmin=10; 
 			var wpower= myval[myrepeat.concat("power")];
 			var ammoleft=myval[myrepeat.concat("ammoremain")];
 			const prevrounds=myval["rounds-phase"];
@@ -5898,7 +5924,7 @@ on('clicked:matrixattack', (info) => {
                 	var roll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}";
 			roll += "{{rounds=[[" + rounds + "]]}}{{range=[[@{ask-range}]]}}"; 
 			roll += "{{targetnumber=" + calcTN + " }}{{rolldice=" + calcDice + "}}";
-			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=" + wdmg  + "}}{{weaponpower=[[" + wpower + "]]}}";
+			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=[[" + dmgnumber  + "]]}}{{weaponpower=[[" + wpower + "]]}}";
 			roll += "{{" + pool + "=[[?{" + poolname + " Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}";
 			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}";
 			if ( mymode == "rangedattack" )  {
@@ -5912,6 +5938,7 @@ on('clicked:matrixattack', (info) => {
 			console.log(roll);
                 	startRoll(roll, (results) => {
 				var poolresults;
+				var finaldamage;
 				setatts["rounds-phase"]=results.results.rounds.result + prevrounds;
 				const myrounds=results.results.rounds.result;
 				if ( mymode == "rangedattack" ) poolresults=results.results.combatpool.result + combatused;
@@ -5920,12 +5947,21 @@ on('clicked:matrixattack', (info) => {
 				if ( myrounds > ammoleft ) { 
 					finalrounds=parseInt(ammoleft);
 				}
-				if ( finalrounds > 1  )  wpower=parseInt(wpower) + finalrounds;
+				if ( finalrounds > 1  ) { 
+					mythird=Math.floor(finalrounds/3);
+					wpower=(ammotype=="tracer")? parseInt(wpower) + (finalrounds - mythird) : parseInt(wpower) + finalrounds;
+					dmgnumber=dmgnumber + mythird;
+					if (dmgnumber > dmgmax) dmgnumber=dmgmax;
+					if (dmgnumber < dmgmin) dmgnumber=dmgmin;
+					console.log('dmgnumber' + dmgnumber);
+					finaldamage=damagetable[dmgnumber];
+					console.log('finaldamage' + finaldamage);
+				}
 				let payload= {
 					attacker: myname,
 					armortype: "ballistic",
 					range: results.results.range.result,
-					wdmg: wdmg,
+					wdmg: finaldamage,
 					rounds: results.results.rounds.result,
 					dodge: 0,
 					attacktest: results.results.attacktest.result,
@@ -5934,6 +5970,7 @@ on('clicked:matrixattack', (info) => {
 				}
 			finishRoll( results.rollId,
                 	{
+                    		weapondamage: finaldamage, 
                     		weaponpower: wpower, 
                     		rounds: finalrounds, 
 				senddata: rollEscape.escape(payload),
@@ -6821,25 +6858,28 @@ on("change:deckattacklevel", function() {
 			var myatt="@{target|Target|deck-evasion-final}";
 			const name=myval[myrepeat.concat("icname")];
 			const ictype=myval[myrepeat.concat("ictype")];
-			console.log('ictype ' + ictype);
 			const penalty=parseInt(myval[myrepeat.concat("ic-penalty")]);
 			const targeticon=myval[myrepeat.concat("matrix-iconstatus")];
-			var icmode="proactive";
-			if ( iclist["reactive"].includes(ictype)) {
-				icmode="reactive";
-			}
+			var icmode = "proactive";
+			if ( iclist["reactive"].includes(ictype)) icmode="reactive";
 	        	const code=myval["matrixcode"].toUpperCase();
 			const rating=parseInt(myval[myrepeat.concat("icrating")]);
 			var ictest=myval[myrepeat.concat("ictargettest")];
 			var targetatt="bod";
-			if ( (icmode="proactive") && (ictest.includes("target")) ) targetatt=ictest.split("-")[1];
+			if ( (icmode=="proactive") && (ictest.includes("target")) ) targetatt=ictest.split("-")[1];
 			const attacktn =matrixtn[code][targeticon];
-			if ( icmode=="proactive" ) ictest=attacktn;
-			if ( ictype == "Probe" ) {
-				console.log('probe!');
+			var senddata="{{senddata=[[0]]}}";
+                	var myroll="&{template:matrix}{{myname=" + name + "}}";
+			if ( icmode=="proactive" ) {
+				ictest=attacktn;
+			} else if ( ictype == "Probe" ) {
 				ictest="@{target|decker|deck-detection-final}";
+				senddata="";
+			} else {
+				ictest="?{Utility Rating?|6}";
 			}
 			const payload = {
+				attacker: name,
 				power: rating,
 				attribute: "deck-" + targetatt + "-final",
 				attacktype: ictype
@@ -6850,21 +6890,22 @@ on("change:deckattacklevel", function() {
 			if ( mytitle == "IC Resist" ) target = "{{target=" + name + "}}";
 			if ( mytitle == "IC Execute" ) { 
 				myatt = ictest;
-				console.log('myatt ' + myatt);
 				target="{{target=@{target|decker|token_name}}}";
 			}
 			var calcTN= myatt + " +?{Miscellaneous Modifiers|0} + " + penalty;
 			var calcDice="@{matrixsecurityrating}"
 			if (( ictype == "Probe") || (ictype == "Scramble"))  calcDice=rating;
 			if (( ictype == "Tar Baby") || (ictype == "Tar pit"))  calcDice=rating;
-                	var myroll="&{template:matrix}{{myname=" + name + "}}";
+			if (( ictype == "Tar Baby") || (ictype == "Tar pit"))  calcDice=rating;
 			myroll+=target;
-			myroll+="{{senddata=[[0]]}}";
+			myroll+=senddata;
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
+			myroll+="{{basetn=[[" + myatt + "]]}}";
 			myroll+="{{action=" + mytitle + "}}"
 			myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
+				payload["basetn"]=results.results.basetn.result;
 			   	finishRoll( results.rollId,
                 		{
 					senddata: rollEscape.escape(payload),
@@ -7632,6 +7673,29 @@ on("change:wounds change:adeptpainres", function() {
 
 on("change:visionprofile change:visibility", function() {
     updateVisionTNs();
+});
+
+on("change:repeating_ic:ictype", function(eventinfo) {
+	console.log(eventinfo);
+	var mybase=eventinfo["sourceAttribute"].split("_");
+	var myattr=mybase.pop();
+	const myrepeat=mybase.join('_'); 
+	sets={};
+	const ictype=myrepeat + "_ictype"
+	const ictarget=myrepeat + "_ictargettest"
+	gets=[ictype];
+	console.log(gets);
+	attackic=["Killer", "Blaster", "Sparky", "Black Ic", "Scout", "Cerebropathic", "Psychotropic"]
+	getAttrs(gets, function(myval) {
+		console.log(gets);
+		const mytype=myval[ictype];	
+		console.log(mytype);
+		if (mytype=="Probe") sets[ictarget]="@{target|decker|deck-detection-final}";
+		else if (attackic.includes(mytype)) sets[ictarget]="Attack"; 
+		else if ((mytype=="Tar Baby") || (mytype=="Tar pit")) sets[ictarget]="?{Utility Rating?|4}";
+		console.log(sets);
+		setAttrs(sets);
+	});
 });
 
 on("change:matrix-damage change:rccommand-damage change:rcsimsense-damage change:rcsystem-damage change:vehicle-damage change:repeating_ic:ic-damage", function(eventinfo) {
@@ -8429,7 +8493,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtrow"><b>Attack Test:</b> {{attacktest}}</div>
         {{#combatpool}}<div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>{{/combatpool}}
         {{#controlpool}}<div class="sheet-rtrow"><b>Control Pool Used:</b> {{controlpool}} </div>{{/controlpool}}
-        <div class="sheet-rtrow"><b>Weapon Damage:</b> {{computed::weaponpower}} <b>{{weapondamage}}</div>
+        <div class="sheet-rtrow"><b>Weapon Damage:</b> {{computed::weaponpower}} <b>{{computed::weapondamage}}</div>
         {{#rounds}}<div class="sheet-rtrow">{{ammotype}} <b>Rounds:</b> {{computed::rounds}}</div>{{/rounds}}
         {{#weaponfocus}}<div class="sheet-rtrow"><b>Weapon Focus:</b> {{weaponfocus}} {{focusforce}}</div>
         {{/weaponfocus}}
