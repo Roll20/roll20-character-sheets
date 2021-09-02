@@ -43,6 +43,14 @@ If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
 
+### 2.6.3
+
+* Fix quick menus giving "unrecognised command /w".
+
+### 2.6.2
+
+* Fix rolltemplates not being migrated properly to CSE.
+
 ### 2.6.1
 
 * Add datalists to most free-fill fields with autofilling

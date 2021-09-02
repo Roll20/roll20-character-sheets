@@ -12,7 +12,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is some additional integration like TEW companion rules, and options for certain custom house rules.
 
 
-My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip 
+My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. Follow Roll20 Token marker update instructions for your server.
 The sheet should work on latest version of Firefox, MS Egde & Chrome.
 
   
@@ -31,7 +31,7 @@ The sheet should work on latest version of Firefox, MS Egde & Chrome.
 
 - Armor and Damage absorption system with Enc, AP, Durable, Damage, Damage point & Robust Talent tracking. 
 
-- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ http://www.lahiette.com/leratierbretonnien/wp-content/uploads/2021/04/WFRP4-Grimoire-Non-Officiel-VF-2.03-PDF.pdf).
+- Magic system with separate Magic/Channeling types, all 8 colors, Witch, Dark, Chaos and a Misc for custom spell Lores. includes Spell book system, with core book spell/blessing/miracle name list, plus optional custom spell names. Intgrated core spell talent modifiers (like, atheryic attunement and instinctive diction) and including miscast management and clickies in the roll template output. Additionally, advantage can be disabled for spells in the settings tab, allowing for seamless integration the Unofficial Grimoire rules (@ https://pdfcoffee.com/unofficial-grimoire-12-pdf-pdf-free.html).
 
 - Full combat Advantage & Condition Tracking, per core rules. Tracked by sheet attribute and integrated to automatically modify roll tamplate output and all Roll Target displays across all core / skill / weapons and magic tabs.
 
@@ -73,11 +73,21 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+August 25th 2021 v1.52
+
+- Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
+- WFRP4e marker 3.1 update, added Lamp and Distrated markers, and Torn Muscle/Broken Bone markers with Minor/Major (M/m) and Loction (A/B/H/L = Arm/Body/Head/Leg) identifers. This greatly helps the flow and tracking of battle on roll20, particularly for the GM. File available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. This is Optional. Follow Roll20 Token marker update instructions for your server.
+- Added Torn Muscle and Broken Bone effect information to the Critical outcome text. E.g. Torn Muscle (Minor) injury (Suffer a penalty of –10 to all Tests involving the location).
+- Melee Opposed Attacks can now show hitloc/dmg if check box is selected in the weapon config section (cog). Handy for Riposte talent.
+
+
 July 12th 2021 v1.51 
 
 - XP tab: clean up, added styling and some text. 
-- Spellbook: Petty & Arcane spell tabs have been changed to display the PCs Willpower Bonus (WPB) next the spell damage field. This mirrors the way the weapon tab works. Spell dmg will now automatically add WPB to the cast roll damage. Dmg input field will now be invisible if Damage spell checkbox is not ticked.
-
+- Spellbook: Petty & Arcane spell tabs have been cleaned up a bit to allow adding Willpower Bouns to the spell damage. This is similar the way the ranged weapons work. Wehn ticked this will now automatically add WPB to the cast roll damage. WPB? and Dmg input fields will now be invisible if the Dmg? checkbox is not ticked. Miracle Damage also adapted to match, but without the WPB modifier.
+- Houserules are no longer seperated main PC and NPCs on the same sheet. The settings options now configures both.
+- Default settings added to Game Settings page on Roll20 when this sheet is selected (Roll20 website, out side of the game). This is handy for GM's to set defaults before char sheets are created and less fiddling about each time you create a new one.
+- PC crit roll now shows modifer in the roll template. NPC crit roll had 2 pop up boxes for modifier, fixed
 
 
 July 5th 2021 v1.5 
