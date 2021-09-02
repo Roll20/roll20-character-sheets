@@ -576,6 +576,8 @@ const SAVE_KEYS_ATTRIBUTE_BONUSES = {
     "curses",
     "maintainbalance",
     "fatigue",
+    "despair",
+    "telepathicprobes",
   ],
 };
 const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
