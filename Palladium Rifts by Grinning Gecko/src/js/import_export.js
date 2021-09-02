@@ -114,3 +114,8 @@
     });
   });
 })();
+
+on("sheet:opened", async (e) => {
+  console.log("sheet:opened", e);
+  await setAttrsAsync({ debug: "0" });
+});
