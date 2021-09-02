@@ -5,6 +5,10 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming, sheet create
 
 ### Changelog
 
+**v.1.74 (2021-08-31)**
+* Add adv./disadv. options to Init & moxie rolls
+* Add 6th & 7th weapon slot
+
 **v.1.73 (2021-08-09)**
 * Remove History Skill (was skill in old beta rules)
 

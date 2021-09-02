@@ -4,21 +4,28 @@ include ./oracle-table
 mixin movePreviewFactory(move, options)
   +container(move, options)
     p!=move.Text
-    if move.Table
-      - var moveOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
-      +oracleTable(moveOracle)
+    if move.Oracle
+      .move-oracle-container
+        if move.Name === 'Ask the Oracle'
+          - var multiOracles = oracles.find(group => { return group.Name === move.Name }).Oracles
+          each oracle in multiOracles
+            +oracleTable(oracle, 'ask-the-oracle')
+        else
+          - var singleOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
+          +oracleTable(singleOracle)
 
 mixin preview(move, options)
   if options.no_title
     div
   else
     div.move-title.move-preview=move.Name
-  if move.Stats
-    +rollLabel
-      +movesRoll(move, 'hide-element')
-  else if move['Progress Move']
+  - const statCheck = move.Triggers.find(trigger => { return trigger.Stat })
+  if move['Progress Move']
     +rollLabel
       +progressRoll(move, 'hide-element')
+  else if statCheck
+    +rollLabel
+      +movesRoll(move, 'hide-element')
   .move-description
     block
   .oracle-footer.move-page-footer=move.page
