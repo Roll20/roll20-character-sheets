@@ -6895,14 +6895,23 @@ on("change:deckattacklevel", function() {
 			var calcTN= myatt + " +?{Miscellaneous Modifiers|0} + " + penalty;
 			var calcDice="@{matrixsecurityrating}"
 			if (( ictype == "Probe") || (ictype == "Scramble"))  calcDice=rating;
-			if (( ictype == "Tar Baby") || (ictype == "Tar pit"))  calcDice=rating;
-			if (( ictype == "Tar Baby") || (ictype == "Tar pit"))  calcDice=rating;
 			myroll+=target;
 			myroll+=senddata;
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{basetn=[[" + myatt + "]]}}";
 			myroll+="{{action=" + mytitle + "}}"
 			myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
+			if (( ictype == "Tar Baby") || (ictype == "Tar pit")) {
+                		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
+				myroll += "{{target=@{target|decker|token_name}}}";
+				myroll += "{{targetnumber=[[?{Utility Rating?|4}]]}}";
+				myroll += "{{action=" + name + " Test}}";
+				myroll += "{{basetn=[[0]]}}";
+				myroll += "{{rolldice=[[ " + rating + "]]}}";
+				myroll += "{{roll=[[[[" + rating +" ]]d6>[[?{Utility Rating?} + " + penalty +"]]!!]]}}";
+				myroll += "{{oppose=[[[[?{Utility Rating?}]]d6>[[" + rating + " @{target|decker|matrix-penalty}]]!!]]}}";
+				myroll += "{{sensor=[[[[@{target|decker|deck-sensors-final}]]d6>[[" + rating + " + @{target|decker|matrix-penalty} ]]!!]]}}";
+			}
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
 				payload["basetn"]=results.results.basetn.result;
@@ -8600,6 +8609,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         <div class="sheet-rtrow"><b>{{action}}:</b> {{computed::roll}}</div>
         {{#senddata}}<div class="sheet-rtrow"><b>{{target}}:</b> [Resist](~selected|matrixresist||{{computed::senddata}})</div>{{/senddata}}
+	{{#oppose}}<div class="sheet-rtrow"><b>Utility Test</b> {{oppose}}</div>{{/oppose}}
+	{{#sensor}}<div class="sheet-rtrow"><b>Sensor Test</b> {{sensor}}</div>{{/sensor}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
         {{#detect}}<div class="sheet-rtrow"><b>{{target}}:</b> {{detect}}</div>{{/detect}}
