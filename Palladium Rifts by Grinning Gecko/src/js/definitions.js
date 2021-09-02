@@ -544,6 +544,8 @@ const COMBAT_KEYS = [
   "strike_range_aimed_called_pulse",
   "disarm_range",
   "damage_range",
+  "damage_range_single",
+  "damage_range_burst",
   "critical",
   "knockout",
   "deathblow",
