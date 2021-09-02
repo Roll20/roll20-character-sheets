@@ -740,6 +740,14 @@ const CORE_KEYS = [
   "credits_blackmarketmerchandise",
 ];
 
+const ARMOR_KEYS = [
+  "is_active",
+  "name",
+  "movementpenalty",
+  "basemdc",
+  "currentmdc",
+];
+
 const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 
 const EQUIPMENT_KEYS = ["equipment"];
@@ -753,6 +761,7 @@ const SECTIONS = {
   psionics: PSIONICS_KEYS,
   movement: MOVEMENT_KEYS,
   powersabilities: ABILITIES_KEYS,
+  armor: ARMOR_KEYS,
   // profiles: PROFILES_KEYS, // Tricky to export because IDs that they refer to won't line up
-  // equipment: EQUIPMENT_KEYS,
+  equipment: EQUIPMENT_KEYS,
 };

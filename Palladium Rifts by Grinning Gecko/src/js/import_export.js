@@ -41,6 +41,8 @@
     attrs.movement = await getRepeatingRowsAsync("movement");
     attrs.powersabilities = await getRepeatingRowsAsync("powersabilities");
     attrs.modifiers = await getRepeatingRowsAsync("modifiers");
+    attrs.armor = await getRepeatingRowsAsync("armor");
+    attrs.equipment = await getRepeatingRowsAsync("equipment");
     // Profiles are tricky to export because IDs that they refer to won't line up
     // attrs.profiles = await getRepeatingRowsAsync("profiles");
     attrs.core = await getAttrsAsync(CORE_KEYS);
@@ -104,6 +106,8 @@
     await setRepeatingRowsAsync("movement", data.movement);
     await setRepeatingRowsAsync("powersabilities", data.powersabilities);
     await setRepeatingRowsAsync("modifiers", data.modifiers);
+    await setRepeatingRowsAsync("armor", data.armor);
+    await setRepeatingRowsAsync("equipment", data.equipment);
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
