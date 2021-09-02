@@ -15,7 +15,7 @@
   }
 
   async function getRepeatingRowsAsync(section) {
-    const ids = await getSectionIDsAsync(section);
+    const ids = await getSectionIDsOrderedAsync(section);
     const attrNames = ids.reduce((acc, id) => {
       SECTIONS[section].forEach((key) => {
         acc.push(`repeating_${section}_${id}_${key}`);
