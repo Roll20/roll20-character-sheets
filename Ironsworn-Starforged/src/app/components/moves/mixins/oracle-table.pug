@@ -1,38 +1,40 @@
 mixin table(table)
-  .oracle-table 
+  table.oracle-table
     each row, index in table.Table
-      .oracle-row
+      tr.oracle-row
         - const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table.Table[index - 1].Chance + 1
         - const finalChance = row.Chance
         - const chance = `${initChance}-${finalChance}`
-        span.oracle-roll=chance
-        span.oracle-result=row.Description
+        td.oracle-roll=chance
+        td.oracle-result=row.Description
 
-mixin oracleMultipleTableFactory(oracle, group)
-  - const id = `${group}-${oracle.Name.toLowerCase().replace(/\s/g, '-')}`
-  - const options = oracle.Tables.map((obj, index) => { return `${obj['Display name']},${index}` })
+mixin oracleMultipleTableFactory(oracle, indexOffset=0)
+  //- indexOffset is there to handle subcategories that have oracles with
+  - const labelText = oracle['Display name']||oracle['Name']
+  - const options = oracle.Tables.map((table, index) => { return `${table['Display name']||table['Name']},${index+indexOffset}` })
   - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
+  - const id = oracle.id
   div(class=`${id}`)
-    label.roll-label.embedded-btn=oracle.Name
+    label.roll-label.embedded-btn=labelText
       button.hide-element(
         type='roll'
-        title=`@{roll_${id}_oracle}`
-        name=`roll_${id}_oracle`
-        value=`&{template:starforged_oracles} ${rollQuery} {{header=${oracle.Name}}} {{${id}=[[d100]]}}`
+        title=`@{roll_${id}}`
+        name=`roll_${id}`
+        value=`&{template:starforged_oracles} ${rollQuery} {{header=${labelText}}} {{${id}=[[d100]]}}`
       )
     each table in oracle.Tables
-      .oracle-subtitle=table['Display name']
+      .oracle-subtitle=table['Display name']||table['Name']
       +table(table)
 
-mixin oracleTableFactory(oracle, group)
-  - const id = `${group}-${oracle.Name.toLowerCase().replace(/\s/g, '-')}`
+mixin oracleTableFactory(oracle, indexOffset=0)
+  - const id = oracle.id
   div(class=`${id}`)
     label.roll-label.embedded-btn=`${oracle.Name} Oracle`
       button.hide-element(
         type='roll'
-        title=`@{roll_${id}_oracle}`
-        name=`roll_${id}_oracle`
-        value=`&{template:starforged_oracles} {{header=${oracle.Name}}} {{${id}=[[d100]]}}`
+        title=`@{roll_${id}}`
+        name=`roll_${id}`
+        value=`&{template:starforged_oracles} {{header=${oracle.Name||oracle['Display name']}}} {{${id}=[[d100]]}}`
       )
     +table(oracle)
 

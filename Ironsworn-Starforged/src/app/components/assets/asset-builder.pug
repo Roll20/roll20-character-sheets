@@ -18,7 +18,7 @@ mixin ability(asset, ability, number, name)
       div(data-i18n=translationAbility)!=assetBodyPlaceholder
       if ability.Input
         each field in ability.Input
-          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${field.toLowerCase().replace(/\s/g, '-')}`
+          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
           .asset-ability-write-in(data-i18n=translationAbilityField)=translation[translationAbilityField]
           input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
 
@@ -30,8 +30,8 @@ mixin description(asset, key)
 mixin field(field, assetName)
   .write-in-container
     .asset-write-in.asset-name(
-      data-i18n=`asset-${assetName}-textinput-${field.toLowerCase()}`
-    )=translation[`asset-${assetName}-textinput-${field.toLowerCase()}`]
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field)}`]
     input.border-bottom.no-border(type='text' name=`attr_field-${field}` value='')
 
 mixin track(track, assetName)
@@ -47,8 +47,8 @@ mixin track(track, assetName)
         - currentTrack++
 
 mixin assetTemplate(asset, options)
-  - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
-  - var category = asset.Category.toLowerCase().replace(/\s/g, '-')
+  - var name = _.kebabCase(asset.Name)
+  - var category = _.kebabCase(asset.Category)
   if options.visiblityToggle === true
     input(class=`${options.classes} ${name}` type='checkbox' name=`attr_${name}`)
   div(class=`${options.classes} ${name} category-${category}`)
@@ -74,10 +74,9 @@ mixin genericBuilder(assetsArray, listId)
   input.asset-options-header(type='text' list=listId name='attr_asset' placeholder=translation["type-asset-name"])
   datalist(id=listId)
     each asset in assetsArray
-      - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
-      //- - console.log(`input[type=checkbox].${name}:checked ~ div.${name},`)
-      //- TODO: figure out a way to do this with stylus - output to json, then import as variable?
-      option(data-i18n=`asset-${name}-name` value=name)=translation[`asset-${name}-name`]
+      //- generates classes and outputs to stdout
+      //- - console.log(`input[type=checkbox].${asset.id}:checked ~ div.${asset.id},`)
+      option(data-i18n=`${asset.id}-name` value=name)=translation[`${asset.id}-name`]
     option(data-i18n=`asset-custom-name` value='custom')=translation[`asset-custom-name`]
 
   //- Asset Content
