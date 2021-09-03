@@ -11,7 +11,7 @@ mixin table(table)
 mixin oracleMultipleTableFactory(oracle)
   - const labelText = oracle['Display name']||oracle['Name']
   - const options = oracle.Tables.map((table, index) => { return `${table['Display name']||table['Name']},${index+indexOffset}` })
-  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
+  - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]] header=[[(?{Choose Table})]]}}`
   - const id = oracle.id
   div(class=`${id}`)
     label.roll-label.embedded-btn=labelText
@@ -19,13 +19,14 @@ mixin oracleMultipleTableFactory(oracle)
         type='roll'
         title=`@{roll_${id}}`
         name=`roll_${id}`
-        value=`&{template:starforged_oracles} ${rollQuery} {{header=${labelText}}} {{${id}=[[d100]]}}`
+        value=`&{template:starforged_oracles} ${rollQuery}  {{${id}=[[d100]]}}`
       )
     each table in oracle.Tables
       .oracle-subtitle=table['Display name']||table['Name']
         +table(table)
 
 mixin oracleTableFactory(oracle, indexOffset=0)
+  //- indexOffset is used in generating subtables of subcategory tables, e.g. planet settlement
   - const id = oracle.id
   div(class=`${id}`)
     label.roll-label.embedded-btn=`${oracle.Name} Oracle`
