@@ -20,6 +20,7 @@
                 </select>
 	    <div></div>
             <div class="box text-mid"><a class="button" href="#popup1">Import</a></div>
+            <div class="box text-mid"><a class="button" href="#popup2">Export</a></div>
         </div>
         <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
         <div class="metatype-info">
@@ -4344,7 +4345,16 @@
         <div class="content">
             <textarea name="attr_jsonnpc" style='width:500px;height:400px;resize:none; overlfow-y: scroll;'></textarea>
             <button type="action" name="act_jsonimport-char" href="#">JSON Import</button>
-
+        </div>
+    </div>
+</div>
+<div id="popup2" class="overlay">
+    <div class="popup">
+        <h2>JSON Export</h2>
+        <a class="close" href="#">×</a>
+        <div class="content">
+            <textarea name="attr_jsonout" style='width:500px;height:400px;resize:none; overlfow-y: scroll;'></textarea>
+            <button type="action" name="act_jsonexport-char" href="#">JSON Export</button>
         </div>
     </div>
 </div>
@@ -4678,8 +4688,9 @@ buttonlist.forEach(button => {
 		const intrudername=myrepeat + "intrudername";
 		var sets={};
 		const myroll="/w gm &{template:info}{{character=@{character_name}}}{{action=Set Decker for Security Tally}}{{target=[[0[@{target|Icon|token_name}]]]}}";
+
                 startRoll(myroll, (results) => {
-			sets[intrudername]=(results.results.target.expression.split("[")[1]).split("]")[0];
+			sets[intrudername]=results.results.target.expression.match(/\[(.*)\]/)[1];
 			console.log(sets);
 			finishRoll( results.rollId);
 			setAttrs(sets);
@@ -6268,6 +6279,7 @@ on('clicked:matrixattack', (info) => {
    const cyberatts=["name", "rating", "essence", "notes"];
    const bioatts=["name", "rating", "index", "notes"];
    const critterpoweratts=["name", "description"];
+   const poollist=["combatpool-mods","spellpool-mods","spellpool-mods","hackingpool-mods","controlpool-mods","astralpool-mods","taskpool"];
 
    on("clicked:jsonimport-char", function(){
    	getAttrs(["jsonnpc"], function(myval) {
@@ -6276,14 +6288,39 @@ on('clicked:matrixattack', (info) => {
 		loadCharacter(npc);
 	});
  });
+   on("clicked:jsonexport-char", function(){
+   	getAttrs(["sheet-type"], function(myval) {
+		exportCharacter(myval["sheet-type"]);
+	});
+ });
+   const exportCharacter = function(sheet) {
+	console.log('loading attributes');
+	longlist=[];
+	longlist=longlist.concat(loadattributes);
+	longlist=longlist.concat(poollist);
+	atts=[];
+	longlist.forEach(myatt=>{
+		atts.push(myatt);
+		atts.push(myatt + "-mods");
+	});
+	getAttrs(atts, function(myval) {
+		myout=JSON.stringify(myval);
+		console.log(myval);
+		console.log(myout);
+		setAttrs({jsonout: myout});
+	});
+	
+	
+   };
   
-   var loadCharacter = function (npc) {
+   const loadCharacter = function (npc) {
    	getAttrs(["jsonnpc"], function(myval) {
 		var atts={};
 		repeatskills=[];
 		npc=JSON.parse(myval["jsonnpc"]);
 		console.log(npc);
 		if ( npc["skills"] ) { var skills = npc["skills"]; } else { var skills = [];}
+		if ( npc["pools"] ) { var skills = npc["pools"]; } else { var pools = [];}
 		if ( npc["vehicles"] ) { var vehicles = npc["vehicles"]; } else { var vehicles = [];}
 		if ( npc["spells"] ) { var spells = npc["spells"]; } else { var spells = [];}
 		if ( npc["cyberware"] ) { var cyberware = npc["cyberware"]; } else { var cyberware = [];}
@@ -6313,6 +6350,10 @@ on('clicked:matrixattack', (info) => {
 			if(npc[mod]) atts[mod]=npc[mod];
 			if(npc[max]) atts[mod]=npc[max] - npc[myatt];
 			if(npc[max] == 'initiative_max') console.log('initme' + npc[max]);
+		});
+		console.log('loading pools');
+		poollist.forEach(myatt=>{
+			if (npc[myatt]) atts[myatt]=npc[myatt];
 		});
 		console.log('loading critter attributes');
 			critteratts.forEach(myatt=>{
