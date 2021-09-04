@@ -19,7 +19,8 @@
                     <option>Frame</option>
                 </select>
 	    <div></div>
-            <div class="box text-mid"><a class="button" href="#popup1">Import</a><a class="button" href="#popup2">Export</a></div>
+	    <div class="box text-mid"><a class="button" href="#popup1">Import</a><a class="button" href="#popup2">Export</a></div>
+
         </div>
         <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
         <div class="metatype-info">
@@ -86,6 +87,7 @@
 <div class="hidden-constants">
     <input type="hidden" name="attr_iconstatuscode" value=0>
     <input type='hidden' name='attr_gyro-on' value=0 />
+    <input type='hidden' name='attr_armor-on' value=0 />
     <input type='hidden' name='attr_wp-char' value="(@{stun_pen} + @{wound_pen})" />
     <input type='hidden' name='attr_wp-matrix' value="(@{stun_pen} + @{wound_pen} + @{matrix-penalty})" />
     <input type='hidden' name='attr_wp-vehicle'
@@ -2808,13 +2810,12 @@
         </div>
         <br>
 	<div class="meleeweapons-show">
-        <input name="attr_meleeselected" type="hidden" \>
         <input name="attr_armorselected" type="hidden" \>
         <input name="attr_impact" type="hidden" value=0 \>
         <input name="attr_ballistic" type="hidden" value=0 \>
         <input name="attr_meleereach" value=0 type="hidden" \>
         <input name="attr_meleereach_max" value=0 type="hidden" \>
-        <input name="attr_meleeselected" value=0 type="hidden" \>
+        <input name="attr_meleeselected" value="unarmed-equipped" type="hidden" \>
         <div class="melee-table-header">
             <div class="table-top-left">Equip</div>
             <div class="table-top-mid">Name</div>
@@ -2875,7 +2876,7 @@
             <input type="number" name="attr_specialized" value=0 \>
             <input type="number" name="attr_tnmods" value=0 \>
             <input name="attr_miscnotes" type="text" hidden=true value="Reach Bonus: ">
-            <div><button class="attack-dice" type="action" name="act_attack" title="Melee Attack"></button></div>
+            <div><button class="attack-dice" type="action" name="act_attack" id="repeatingmelee" title="Melee Attack"></button></div>
             <div><input name="attr_notes" type="text"></input></div>
         </div>
         <div class="table-bottom" />
@@ -4431,7 +4432,6 @@ buttonlist.forEach(button => {
 	}
     };
 
-
    on("change:repeating_rangedweapons:type", function() {
    	console.log('updating range based on weapon type');
 	getAttrs(["repeating_rangedweapons_type", "strength_max"], function(myval) {
@@ -5290,25 +5290,25 @@ on('clicked:matrixattack', (info) => {
 		adps: { armor: "Math.floor(ballistic * 0.5)", av: 0, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 0.5, knockdown: 1, amsg: "" },
 		explosive: { armor: "ballistic", av: 0, power: 1, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
 		explosive2: { armor: "ballistic", av: 0, power: 2, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
-		flechette: { armor: "(Math.max(ballistic, (impact * 2)))", av: -0.5, power: 0, rpower:0, dmg:0, rdmg: "(dermalarmor==1)? 0 :((ballistic + impact) ==0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
+		flechette: { armor: "(Math.max(ballistic, (impact * 2)))", av: -0.5, power: 0, rpower:0, dmg:0, rdmg: "(armoron == 0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
 		gel: { armor: "impact", av: 0, power: -2, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 2, amsg: "" },
 		tracer: { armor: "ballistic", av: 0, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
 		av: { armor: "Math.floor(ballistic * 0.5)", av: 1, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 0.5, knockdown: 1, amsg: "" },
 		capsule: { armor: "impact", av: 0, power: -2, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
-		glazer: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 2, rpower:0, dmg:0, rdmg: "((ballistic + impact) ==0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
+		glazer: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 2, rpower:0, dmg:0, rdmg: "( armoron == 0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
 		hic: { armor: "Math.max(ballistic,impact)", av: 0, power: "(range==6)? -1 : (range==9)? -1", rpower:0, dmg: 0, rdmg:0, recoil: 2, barrier: 1, knockdown: 1, amsg: "" },
 		hpoint: { armor: "ballistic + impact", av: 0, power:0, rpower: "((ballistic + impact ==0)? 3 : 1", dmg: 0, rdmg:0, recoil: 2, barrier: 1, knockdown: 1, amsg: "Final Power Rating depends on Armor" },
 		incendiary: { armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
-		mercury: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 0, rpower: 0, dmg: 0, rdmg: "((ballistic + impact) ==0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
+		mercury: { armor: "Math.max((ballistic * 2), (impact * 2))", av: -0.5, power: 0, rpower: 0, dmg: 0, rdmg: "( armoron == 0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" },
 		tracker: { armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg: 0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" }
 	}
 	
    	const resistdmg = function (myid, mods) {
-	   atts=["ballistic", "impact", "dermal-armor"];
+	   atts=["ballistic", "impact", "armor-on"];
 	   getAttrs(atts, function (myval) {
 	   	const ballistic=myval["ballistic"];
 	   	const impact=myval["impact"];
-	   	const dermalarmor=myval["dermal-armor"];
+	   	const armoron=myval["armor-on"];
 		var wdmg;
 		var dmgcode=0;
 		var weapondmg="none";
@@ -5997,10 +5997,29 @@ on('clicked:matrixattack', (info) => {
 			}
 		});
        });
-    	on('clicked:melee', (info) => {
+        on('clicked:meleedefend', (info) => {
+		payload=rollEscape.unescape(info["originalRollId"]);
+		meleecombat("defend", payload);
+	});
+        on('clicked:meleedefendfull', (info) => {
+		payload=rollEscape.unescape(info["originalRollId"]);
+		meleecombat("defend-full", payload);
+	});
+        on('clicked:melee2', (info) => {
+		payload="none";
+		const mymode=info["htmlAttributes"]["id"];
+		meleecombat(mymode, payload);
+	});
+
+    	on('clicked:melee', (info, attacktype="attack") => {
 		console.log(info);
 		var atts=[];
 		const mymode=info["htmlAttributes"]["id"];
+		var payload;
+		if ( info["originalRollId"] != undefined )  {
+			payload=rollEscape.unescape(info["originalRollId"]);
+			attacktype="defend";
+		}
 		console.log(mymode);
 		var myfocus = 0;
 		var focus="";
@@ -6013,38 +6032,56 @@ on('clicked:matrixattack', (info) => {
 		var defaultmsg="";
 		var defaultpen=0;
 		var myspec=0;
-		const meleeattrs=["unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage", "gyro-on"];
+		var meleeattrs=["sheettype", "character_name","strength_max", "martialarts", "attackdamage", "attackpower", "reaction_max", "charisma_max", "unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage", "gyro-on", "armor-quickness-pen", "unarmed-specialized", "unarmed-miscmod", "weaponfocus-specialized", "metatype", "meleeselected"];
+		if ( mymode == "repeatingmelee" ) {
+			var source=info['sourceAttribute'].split('_');
+			var sourceattr=source.pop();
+			var myrepeat=source.join('_').concat('_');
+			const repeatatts=["damage", "power", "name", "skill", "reach", "specialized", "notes", "tnmods"] ;
+			repeatatts.forEach(myatt=>{
+				meleeattrs.push(myrepeat.concat(myatt));
+			});
+		};
 		getAttrs(meleeattrs, function(myval) {
-			if ( mymode == "astralattack" ) {
+			const strmax=myval["strength_max"];
+			const attackdamage=myval["attackdamage"];
+			const attackpower=myval["attackpower"];
+			const myname=myval["character_name"];
+			const sheettype=myval["sheettype"];
+			var mynotes="";
+			var myspec=0;
+			var mytnmod=0;
+			var myreach="@{meleereach|max}";
+			var gyropenroll="";
+			var gyropen=0;
+			if (( myval["gyro-on"] == 1 ) && ( mymode != "astralattack" )) {
+			   	gyropen=4;
+				gyropenroll = "{{gyropen=" + gyropen + "}}";
+			}
+			if (( mymode == "astralattack" ) || ( (payload != null) && (payload["plane"]=="astral"))) {
 				pool="astralpool";
 				myweapon="Astral Attack";
 				var myskill="@{astralcombat}";
-				myskill="@{astralcombat} + @{weaponfocus-force}"
 				var mydamage="M"
 				if ( myval["weaponfocus-equipped"]=="on" ) { 
-					myskill += "( " + myskill + " +  @{weaponfocus-force} )"
+					myskill = "( " + myskill + " +  @{weaponfocus-force} )"
+					myspec=myval["weaponfocus-specialized"];
 					mydamage=myval["weaponfocus-damage"];
 				}
-				mypower="@{charisma|max}";
+				mypower=myval["charisma_max"];
 				focus="{{weaponfocus=@{weaponfocus-name}}}"
 				force="{{focusforce=@{weaponfocus-force}}}"
-			}
-			else if ( mymode == "unarmedattack" ) {
-			   var gyropen=0;
-			   var gyropenroll="";
-			   if ( myval["gyro-on"] == 1 ) {
-			   	gyropen=4;
-				gyropenroll = "{{gyropen=" + gyropen + "}}";
-			   }
-			   mydamage=myval["@{attackdamage}"];
+			} else if (( mymode == "unarmedattack" ) || (( attacktype.includes("defend") ) && (myval["meleeselected"] == "unarmed-equipped"))) {
+			   mydamage=attackdamage;
 			   myskill=myval["unarmed"];
 			   myspec=myval["unarmed-specialized"];
-			   myweapon="@{martialarts}";
-			   mypower="@{strength|max}";
+			   mytnmod=myval["unarmed-miscmods"];
+			   myweapon=myval["martialarts"];
+			   mypower=strmax;
 			   if ( myval["unarmed"] == 0 ) {
 			   	console.log('unarmed is 0');
 				if (myval["cyberimplant"] == 0) { 
-					myskill="@{strength|max}";
+					myskill=strmax;
 					defaultpen=4;
 					pool="false";
 					var defaultmsg="{{default=Skill Defaulted to Strength Attribute with +" + defaultpen + " to hit}}";
@@ -6054,20 +6091,51 @@ on('clicked:matrixattack', (info) => {
 					var defaultmsg="{{default=Skill Defaulted to Cyber Implant skill with +" + defaultpen + " to hit}}";
 				}
 			   }
+			} else if (( sheettype == "Critter" ) || (sheettype=="Spirit")) {
+				myskill=myval["reaction_max"];
+				mydamage=myval["attackdamage"];
+				mypower=myval["attackpower"];
+				myweapon=sheettype + " Attack";
+			} else if (mymode == "repeatingmelee" ) {
+				console.log('repeating melee');
+				mynotes=myval[myrepeat.concat("mynotes")];
+				myweapon=myval[myrepeat.concat("name")];
+				mydamage=myval[myrepeat.concat("damage")];
+				mypower=myval[myrepeat.concat("power")];
+				myskill=myval[myrepeat.concat("skill")];
+				myspec=myval[myrepeat.concat("specialized")];
+				mytnmod=myval[myrepeat.concat("tnmods")];
+				if ( myval["metatype"] == "Troll" )  myreach=myval[myrepeat.concat("reach")] + 1;
+				else myreach=myval[myrepeat.concat("reach")];
+			} else if ((attacktype.includes("defend")) && (myval["meleeselected"] != "unarmed-equipped")) {
+				myrepeat=myval["meleeselected"].slice(0, -12);
+				newgets=[];
+				repeatatts.forEach(myatt=>{ newgets.push(myrepeat.concat(myatt)); });
+				getAttrs(newgets, function(rval) {
+					console.log('repeating melee');
+					mynotes=rval[myrepeat.concat("mynotes")];
+					myweapon=rval[myrepeat.concat("name")];
+					mydamage=rval[myrepeat.concat("damage")];
+					mypower=rval[myrepeat.concat("power")];
+					myskill=rval[myrepeat.concat("skill")];
+					myspec=rval[myrepeat.concat("specialized")];
+					mytnmod=rval[myrepeat.concat("tnmods")];
+					if ( myval["metatype"] == "Troll" )  myreach=rval[myrepeat.concat("reach")] + 1;
+					else myreach=rval[myrepeat.concat("reach")];
+				});
+			} else { 
+				console.log(' id ' + mymode + ' does not match'); 
 			}
-			else if ( mymode == "critterattack" ) {
-				myskill="@{reaction|max}";
-				mydamage="@{attackdamage}";
-				mypower="@{attackpower}";
-				myweapon="Attack";
-			} else {
-				console.log(' id ' + mymode + ' does not match');
-			}
-			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?} ) + " + defaultpen + " + " + gyropen;
+			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - " + myreach + " ) * ?{Use Reach Modifier?} ) + " + mytnmod + " + " + defaultpen + " + " + gyropen;
 			var calcDice=myskill + " + " + myspec ;
-                        var myroll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}{{weapondamage="
+                        var myroll="&{template:attack}{{myname=" + myname + "}}{{target=@{target|Target|token_name}}}{{weapondamage=[[0]]}}{{weaponpower=[[" + mypower + "]]}}"
+			if ( quicknesslinked.includes(myskill) ) {
+				console.log('quick pen');
+				armorpen=myval["armor-quickness-pen"];
+				console.log(armorpen);
+				myroll+= "{{armorpen=@{armor-quickness-pen}}}";
+			}
 			console.log('pool name is ' + pool);
-			myroll+= mydamage + "}}{{weaponpower=[[" + mypower + "]]}}"
 			if ( pool == "combatpool" ) {
 				calcDice += " + ?{Combat Pool Dice}"
 				myroll += "{{pooldice=[[?{Combat Pool Dice|0}]]}}"
@@ -6079,20 +6147,40 @@ on('clicked:matrixattack', (info) => {
 			} else  {
 				myroll += "{{pooldice=[[0]]}}"
 			}
-			myroll+= "{{charreach=[[@{meleereach|max}]]}}{{targetreach=[[@{target|Target|meleereach|max}]]}}"
+			myroll+= "{{charreach=[[" + myreach + "]]}}{{targetreach=[[@{target|Target|meleereach|max}]]}}"
 			myroll+="{{weaponname=" + myweapon + "}}{{reachmod=[[?{Use Reach Modifier?|Yes,1|No,0}]]}}"
 			myroll+="{{reachbonus=[[(@{target|Target|meleereach|max} - @{meleereach|max} ) * ?{Use Reach Modifier?}]]}}"
 			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}"
-			myroll+="{{attacktest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}" 
+			myroll+="{{senddata=[[0]]}}";
 			myroll+=defaultmsg;
 			myroll+=gyropenroll;
+			if ( payload == null ) { 
+				myroll+="{{attacktest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}" 
+		 		payload={		
+					attacker: myname,
+					strength: strmax,
+					power: mypower,
+					wdmg: mydamage
+				};
+				payload["plane"]=(pool=="astralpool")? "astral" : "physical";
+			} else { 
+				myroll+="{{defensetest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}"
+		 		payload["defender"]=myname,
+		 		payload["dstrength"]=strmax,
+		 		payload["dpower"]=mypower,
+		 		payload["dwdmg"]=mydamage
+			}
 			console.log(myroll);
                 	startRoll(myroll, (results) => {
 				var reachmodtxt="Reach Bonus Applied" ;
 				if ( results.results.reachmod.result == 0 ) reachmodtxt="Reach Bonus Not Applied";
 				if ( pool != "none" ) updatepoolused(pool, results.results.pooldice.result );
+				payload["reachmode"]=results.results.reachmod.result;
+				payload["attacktest"]=results.results.attacktest.result;
 				finishRoll( results.rollId, {
 					reachmod: reachmodtxt,
+					weapondamage: mydamage,
+					senddata: rollEscape.escape(payload),
 				});
 
 			});
@@ -7648,7 +7736,7 @@ on("change: change:repeating_meleeweapons:reach", function(eventinfo){
     });
 });
 
-on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repeating_armor:impact", function(eventinfo){
+on("change:dermal-armor change:repeating_armor:equipped change:repeating_armor:ballistic change:repeating_armor:impact", function(eventinfo){
 	var sets={};
 	var ballistic=0;
 	var impact=0;
@@ -7656,12 +7744,13 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 	fields=["equipped", "ballistic", "impact", "slot"];
 	getSectionIDs("repeating_armor", idArray => {
 		var attrArray = idArray.reduce((m, id) => [ ...m, ...(fields.map(field => `repeating_armor_${id}_${field}`))], []); 
-		attrArray.push("quickness_max");
+		attrArray.push("quickness_max","dermal-armor");
 		getAttrs(attrArray, function(myval) {
 			console.log('myval');
 			console.log(myval);
 			console.log(idArray);
 			const myquick=parseInt(myval["quickness_max"]);
+			const mydermal=parseInt(myval["dermal-armor"]);
 			idArray.forEach(m => {
 				if (myval["repeating_armor_" + m + "_equipped"] == "on" ) {
 					let bal=myval["repeating_armor_" + m + "_slot"] + "-bal";
@@ -7692,6 +7781,8 @@ on("change:repeating_armor:equipped change:repeating_armor:ballistic change:repe
 			let combatpen= -1 * (Math.floor((ballover + impactover) / 2 ));
 			if ( gyro_bal > 0 ) sets["gyro-on"]=1;
 			else sets["gyro-on"]=0;
+			if (((ballistic + impact) >= 1 ) || (mydermal == 1)) sets["armor-on"]=1;
+			else sets["armor-on"]=0;
 			sets["ballistic"]=ballistic + ware_bal + gyro_bal;
 			sets["impact"]=impact + ware_im + gyro_bal;;
 			sets["armor-quickness-pen"]=ballover;
