@@ -11,30 +11,50 @@ mixin oracleLabel(type, name, id)
     .btn-content.oracle-name=header
 
 mixin oracleRowBuilder(table, row, index)
-  - const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1
-  - const finalChance = row.Chance
-  - const range = (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`
   -
-    let detailsKeys = ["Assets", "Details"];
-    let detailsStrings = [];
-    detailsKeys.forEach(key => {
-      if (row[key]) {
-        if (key === "Assets") {
-          row[key] = row[key].map(item => item.toUpperCase());
-        }
-        detailsStrings.push(row[key])
+    function rangeString(initChance, finalChance) {
+      return (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`;
+    };
+    function resultString(row) {
+      let detailsKeys = ["Assets", "Details"];
+      let detailsStrings = [];
+      detailsKeys.forEach(key => {
+        if (row[key]) {
+          if (key === "Assets") {
+            row[key] = row[key].map(item => item.toUpperCase());
+          }
+          detailsStrings.push(row[key])
+        };
+      });
+      let detailString;
+      if (detailsStrings.length > 0) {
+        detailsStrings = detailsStrings.flat(2);
+        detailString = `(${detailsStrings.join(", ")})`;
       };
-    });
-    let detailString;
-    if (detailsStrings.length > 0) {
-      detailsStrings = detailsStrings.flat(2);
-      detailString = `(${detailsStrings.join(", ")})`;
+      const result = `${row.Description}${detailString ? " " + detailString : ""}`;
+      return result;
     }
-
-  - const result = `${row.Description}${detailString ? " " + detailString : ""}`
+      let ranges = [];
+    if (Array.isArray(row.Chance)) {
+      row.Chance.forEach((chance, chanceIndex) => {
+        if (chance === 0) {
+          ranges.push(`&mdash;`)
+        }
+        else
+        {const initChance = (index === 0) ? chance - (chance - 1) : table[index - 1].Chance[chanceIndex] + 1;
+        const finalChance = chance;
+        ranges.push(rangeString(initChance, finalChance));}
+      })
+    }
+    else {
+      const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1;
+      const finalChance = row.Chance;
+      ranges.push(rangeString(initChance, finalChance));
+    }
   tr.oracle-row
-    td.oracle-roll=range
-    td.oracle-result=result
+    each range in ranges
+      td.oracle-roll=range
+    td.oracle-result=resultString(row)
 
 mixin oracleRollGroup(group)
   //- TODO: implement as details/summary?
@@ -51,7 +71,6 @@ mixin oracleRollGroup(group)
     if group.Subcategories
       each subCategory in group.Subcategories
         - const buttonLabel = subCategory.Name||subCategory['Display name']
-        //- TODO: add &blacktriangleright; in styling rather than raw text
         .oracle.oracle-subcategory
           +oracleButtonMultiTables(subCategory.id, buttonLabel, subCategory.Oracles)
 
@@ -106,7 +125,7 @@ mixin oracleButton(id, buttonLabel, rollQuery="")
     .btn-content.oracle-name=buttonLabel
 
 mixin oracleTableBuilder(oracle, titleText)
-  table.oracle-table.oracle-table-preview
+  table.oracle-table.oracle-table-preview(id=oracle.id)
     thead
       th.oracle-title.oracle-table-preview(colspan=2)=titleText
     each row, index in oracle.Table
@@ -119,6 +138,61 @@ mixin oracleSubTableBuilder(subtable, subtitleText)
     each row, index in subtable.Table
       +oracleRowBuilder(subtable.Table, row, index)
 
+mixin oracleSubTableMultiBuilder(oracle, titleText)
+  //-  builds tables with multiple Roll columns, e.g. regional tables
+  -
+    let mergedRows = [];
+    //- if all subtables have the same number of rows
+    if (oracle.Tables.every(subtable =>
+      subtable.Table.length == oracle.Tables[0].Table.length
+      //- && subtable.Table.map(row => row.Description) == oracle.Tables[0].Table.map(row => row.Description)
+    )) {
+      console.log("oracleSubTableMultiBuilder: all tables of", oracle.Name, "have the same length.");
+      oracle.Tables[0].Table.forEach((row, index) => {
+        let newRow = _.clone(row);
+        newRow.Chance = [];
+        oracle.Tables.forEach(subOracle => newRow.Chance.push(subOracle.Table[index].Chance));
+        mergedRows.push(newRow);
+      })
+    } else {
+      let tables = oracle.Tables.map(subtable => subtable.Table);
+      console.log("oracleSubTableMultiBuilder: tables of", oracle.Name, "have different lengths -",  tables.map(item => item.length).join(", "));
+      let baseTable = _.clone(tables.reduce((a, b) => a.length > b.length ? a : b));
+      //- console.log("longest table will act as base:", baseTable);
+      // selects longest table as starting point
+      baseTable.forEach((row) => {
+        let newRow = _.clone(row);
+        newRow.Chance = [];
+        tables.forEach(tbl => {
+          if (!_.isUndefined(tbl.find(tblRow => tblRow.Description === row.Description)))
+          {
+            matchingRow = _.clone(tbl.find(
+                tblRow => tblRow.Description === row.Description
+              ));
+
+            newRow.Chance.push(matchingRow.Chance);
+          }
+          else {
+            newRow.Chance.push(0);
+          }
+        })
+        mergedRows.push(newRow);
+      })
+    }
+  if oracle.Description
+    p.oracle-description=oracle.Description
+  table.oracle-table.oracle-subtable.oracle-subtable-multi
+    thead
+      tr
+        th.oracle-subtitle(colspan=(oracle.Tables.length+1))=titleText
+      tr
+        each subOracle in oracle.Tables
+          th.oracle-column-head=subOracle.Name
+        th.oracle-column-head=`Result`
+    each row, index in mergedRows
+      +oracleRowBuilder(mergedRows, row, index)
+
+
 mixin oracleBuilder(oracle, groupName)
   //- - console.log("oraclebuilder in", groupName)
   input(class=`${oracle.id} hide-element` type='radio' name=`attr_oracle_preview` value=oracle.id)
@@ -127,15 +201,17 @@ mixin oracleBuilder(oracle, groupName)
       +oracleTableBuilder(oracle, `${groupName} - ${oracle.Name}`)
     else if oracle.Tables
       .oracle-title.oracle-table-preview=`${groupName} - ${oracle.Name}`
-      each subtable, index in oracle.Tables
-        +oracleSubTableBuilder(subtable, subtable['Display name'])
+      +oracleSubTableMultiBuilder(oracle)
+      //- each subtable, index in oracle.Tables
+        //- +oracleSubTableBuilder(subtable, subtable['Display name']||subtable['Name'])
     else if oracle.Oracles
       .oracle-title.oracle-table-preview=`${groupName} - ${oracle.Name}`
       each subCatOracle, index in oracle.Oracles
         if subCatOracle.Table
           +oracleSubTableBuilder(subCatOracle, subCatOracle['Display name']||subCatOracle['Name'])
         else if subCatOracle.Tables
-          each subtable, index in subCatOracle.Tables
-            +oracleSubTableBuilder(subtable, subtable['Display name']||subtable['Name'])
+          +oracleSubTableMultiBuilder(subCatOracle, subCatOracle.Name)
+          //- each subtable, index in subCatOracle.Tables
+            //- +oracleSubTableBuilder(subtable, subtable['Display name']||subtable['Name'])
 
         //- - console.log("NYI: found subcategories", oracle.Oracles.map(str => str.Name).join(", ") )
