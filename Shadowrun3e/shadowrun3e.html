@@ -111,6 +111,8 @@
         title="Attack with primary equipped ranged weapons">L</button>
     <button type="action" name="act_meleeattack-primary" class="d6-button"
         title="Attack with primary equipped melee weapons">L</button>
+    <button type="action" name="act_meleedefend" class="d6-button" title="melee defense test">L</button>
+    <button type="action" name="act_meleedefendfull" class="d6-button" title="melee full-defense test">L</button>
     <button type="action" name="act_spiritcontrol" class="d6-button" title="spirit control test">L</button>
     <button type="action" name="act_banishing" class="d6-button" title="banishing test">L</button>
     <button type="action" name="act_summoning" class="d6-button" title="summoning test">L</button>
@@ -5997,28 +5999,11 @@ on('clicked:matrixattack', (info) => {
 			}
 		});
        });
-        on('clicked:meleedefend', (info) => {
-		payload=rollEscape.unescape(info["originalRollId"]);
-		meleecombat("defend", payload);
-	});
-        on('clicked:meleedefendfull', (info) => {
-		payload=rollEscape.unescape(info["originalRollId"]);
-		meleecombat("defend-full", payload);
-	});
-        on('clicked:melee2', (info) => {
-		payload="none";
-		const mymode=info["htmlAttributes"]["id"];
-		meleecombat(mymode, payload);
-	});
 
-    	on('clicked:melee', (info, attacktype="attack") => {
-		console.log(info);
+   	const meleecombat = function (mymode, payload) {
 		var atts=[];
-		const mymode=info["htmlAttributes"]["id"];
-		var payload;
-		if ( info["originalRollId"] != undefined )  {
+		if ( payload != "none" )  {
 			payload=rollEscape.unescape(info["originalRollId"]);
-			attacktype="defend";
 		}
 		console.log(mymode);
 		var myfocus = 0;
@@ -6029,10 +6014,10 @@ on('clicked:matrixattack', (info) => {
 		var myweapon;
 		var mypower;
 		var pool="combatpool";
-		var defaultmsg="";
+		var defaultmsg=" ";
 		var defaultpen=0;
 		var myspec=0;
-		var meleeattrs=["sheettype", "character_name","strength_max", "martialarts", "attackdamage", "attackpower", "reaction_max", "charisma_max", "unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage", "gyro-on", "armor-quickness-pen", "unarmed-specialized", "unarmed-miscmod", "weaponfocus-specialized", "metatype", "meleeselected"];
+		var meleeattrs=["sheettype", "character_name","strength_max", "martialarts", "attackdamage", "attackpower", "reaction_max", "charisma_max", "unarmed", "unarmed-specialized", "cyberimplant", "weaponfocus-equipped", "weaponfocus-damage", "gyro-on", "armor-quickness-pen",  "unarmed-miscmods", "weaponfocus-specialized", "metatype", "meleeselected"];
 		if ( mymode == "repeatingmelee" ) {
 			var source=info['sourceAttribute'].split('_');
 			var sourceattr=source.pop();
@@ -6058,7 +6043,7 @@ on('clicked:matrixattack', (info) => {
 			   	gyropen=4;
 				gyropenroll = "{{gyropen=" + gyropen + "}}";
 			}
-			if (( mymode == "astralattack" ) || ( (payload != null) && (payload["plane"]=="astral"))) {
+			if (( mymode == "astralattack" ) || ( (payload != "none") && (payload["plane"]=="astral"))) {
 				pool="astralpool";
 				myweapon="Astral Attack";
 				var myskill="@{astralcombat}";
@@ -6071,7 +6056,8 @@ on('clicked:matrixattack', (info) => {
 				mypower=myval["charisma_max"];
 				focus="{{weaponfocus=@{weaponfocus-name}}}"
 				force="{{focusforce=@{weaponfocus-force}}}"
-			} else if (( mymode == "unarmedattack" ) || (( attacktype.includes("defend") ) && (myval["meleeselected"] == "unarmed-equipped"))) {
+			} else if ((mymode="unarmedattack") || (( mymode.includes("defend"))  && (myval["meleeselected"] == "unarmed-equipped"))) {
+			   console.log('unarmed melee');
 			   mydamage=attackdamage;
 			   myskill=myval["unarmed"];
 			   myspec=myval["unarmed-specialized"];
@@ -6107,7 +6093,7 @@ on('clicked:matrixattack', (info) => {
 				mytnmod=myval[myrepeat.concat("tnmods")];
 				if ( myval["metatype"] == "Troll" )  myreach=myval[myrepeat.concat("reach")] + 1;
 				else myreach=myval[myrepeat.concat("reach")];
-			} else if ((attacktype.includes("defend")) && (myval["meleeselected"] != "unarmed-equipped")) {
+			} else if ((mymode.includes("defend")) && (myval["meleeselected"] != "unarmed-equipped")) {
 				myrepeat=myval["meleeselected"].slice(0, -12);
 				newgets=[];
 				repeatatts.forEach(myatt=>{ newgets.push(myrepeat.concat(myatt)); });
@@ -6128,7 +6114,7 @@ on('clicked:matrixattack', (info) => {
 			}
 			var calcTN="4 + @{meleeTN} + ( ( @{target|Target|meleereach|max} - " + myreach + " ) * ?{Use Reach Modifier?} ) + " + mytnmod + " + " + defaultpen + " + " + gyropen;
 			var calcDice=myskill + " + " + myspec ;
-                        var myroll="&{template:attack}{{myname=" + myname + "}}{{target=@{target|Target|token_name}}}{{weapondamage=[[0]]}}{{weaponpower=[[" + mypower + "]]}}"
+                        var myroll="&{template:melee}{{myname=" + myname + "}}{{target=@{target|Target|token_name}}}{{weapondamage=[[0]]}}{{weaponpower=[[" + mypower + "]]}}"
 			if ( quicknesslinked.includes(myskill) ) {
 				console.log('quick pen');
 				armorpen=myval["armor-quickness-pen"];
@@ -6154,8 +6140,9 @@ on('clicked:matrixattack', (info) => {
 			myroll+="{{senddata=[[0]]}}";
 			myroll+=defaultmsg;
 			myroll+=gyropenroll;
-			if ( payload == null ) { 
+			if ( payload == "none" ) { 
 				myroll+="{{attacktest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}" 
+			   	myroll += "{{meleedefend=reg and full}}";
 		 		payload={		
 					attacker: myname,
 					strength: strmax,
@@ -6175,7 +6162,7 @@ on('clicked:matrixattack', (info) => {
 				var reachmodtxt="Reach Bonus Applied" ;
 				if ( results.results.reachmod.result == 0 ) reachmodtxt="Reach Bonus Not Applied";
 				if ( pool != "none" ) updatepoolused(pool, results.results.pooldice.result );
-				payload["reachmode"]=results.results.reachmod.result;
+				payload["reachmode"]=results.results.reachmod;
 				payload["attacktest"]=results.results.attacktest.result;
 				finishRoll( results.rollId, {
 					reachmod: reachmodtxt,
@@ -6186,8 +6173,21 @@ on('clicked:matrixattack', (info) => {
 			});
 		});
 
+	};
+        on('clicked:meleedefend', (info) => {
+		payload=rollEscape.unescape(info["originalRollId"]);
+		meleecombat("defend", payload);
 	});
-    	on('clicked:repeating_meleeweapons:attack', (info) => {
+        on('clicked:meleedefendfull', (info) => {
+		payload=rollEscape.unescape(info["originalRollId"]);
+		meleecombat("defend-full", payload);
+	});
+        on('clicked:melee clicked:repeating_meleeweapons:attack', (info) => {
+		payload="none";
+		const mymode=info["htmlAttributes"]["id"];
+		meleecombat(mymode, payload);
+	});
+    	on('clicked:repeating_meleeweapons2:attack', (info) => {
 		console.log(info);
 		var atts=["combatpool-used", "gyro-on", "armor-quickness-pen"];
 		var rounds=1;
@@ -8631,6 +8631,19 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
 </rolltemplate>
+<rolltemplate class="sheet-rolltemplate-melee">
+    <div class="sheet-rtcontainer">
+        <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
+        <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div> 
+        {{#combatpool}}<div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>{{/combatpool}}
+        {{#weaponfocus}}<div class="sheet-rtrow"><b>Weapon Focus:</b> {{weaponfocus}} {{focusforce}}</div>{{/weaponfocus}}
+        {{#charreach}}<div class="sheet-rtrow"><b>{{myname}} Reach:</b> {{charreach}}</div>{{/charreach}}
+        {{#targetreach}}<div class="sheet-rtrow"><b>{{target}} Reach:</b> {{targetreach}}</div>{{/targetreach}}
+        {{#meleedefend}}<div class="sheet-rtrow"><b>{{target}}:</b> [Melee Defend](~selected|meleedefend||{{computed::senddata}}) [Melee Full Defense](~selected|meleedefensefull||{{computed::senddata}})</div>{{/senddata}}
+        {{#default}}<div class="sheet-rtrow">{{default}}</div>{{/default}}
+	{{#info}}<div class="sheet-rtrow">{{info}}</div>{{/info}}
+    </div>
+</rolltemplate>
 <rolltemplate class="sheet-rolltemplate-attack">
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
@@ -8655,7 +8668,6 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 	</div>
 	{{#info}}<div class="sheet-rtrow">{{info}}</div>{{/info}}
     </div>
-</rolltemplate>
 <rolltemplate class="sheet-rolltemplate-explosive">
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
