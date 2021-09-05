@@ -2185,7 +2185,7 @@
                 <option value="4">d12</option>
               </select>
               <input type="hidden" name="attr_food_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" />
+              <input class="input" type="checkbox" name="attr_food_carried" value="1" title="@{food_carried}" checked />
               <input type="hidden" name="attr_food_weight" value="0" />
               <select class="input" name="attr_food_weight" title="@{food_weight}">
                 <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
@@ -2202,7 +2202,7 @@
                 <option value="4">d12</option>
               </select>
               <input type="hidden" name="attr_water_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" />
+              <input class="input" type="checkbox" name="attr_water_carried" value="1" title="@{water_carried}" checked />
               <input type="hidden" name="attr_water_weight" value="0" />
               <select class="input" name="attr_water_weight" title="@{water_weight}">
                 <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
@@ -2219,13 +2219,13 @@
                 <option value="4">d12</option>
               </select>
               <input type="hidden" name="attr_arrows_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" />
+              <input class="input" type="checkbox" name="attr_arrows_carried" value="1" title="@{arrows_carried}" checked />
               <input type="hidden" name="attr_arrows_weight" value="0" />
               <select class="input" name="attr_arrows_weight" title="@{arrows_weight}">
                 <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
                 <option data-i18n="normal-abbr" data-i18n-title="weight-normal" value="1" disabled>N</option>
               </select>
-              <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} @{torches}">
+              <button class="roll-button-textonly header-h1" type="roll" name="roll_torches" title="%{torches}" value="@{whisper_option} &{template:forbiddenlands} {{character_name=@{character_name}}} {{character_id=@{character_id}}} {{name=^{consumable}}} {{footer=^{consumable-note}}} @{torches_macro}">
                   <span data-i18n="torches">Torches</span>
               </button>
               <select class="input" name="attr_torches" title="@{torches}">
@@ -2236,7 +2236,7 @@
                 <option value="4">d12</option>
               </select>
               <input type="hidden" name="attr_torches_macro" value="0" />
-              <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" />
+              <input class="input" type="checkbox" name="attr_torches_carried" value="1" title="@{torches_carried}" checked />
               <input type="hidden" name="attr_torches_weight" value="0" />
               <select class="input" name="attr_torches_weight" title="@{torches_weight}">
                 <option data-i18n="tiny-abbr" data-i18n-title="weight-tiny" value="0" selected disabled>T</option>
@@ -2270,9 +2270,10 @@
           </fieldset>
         </div>
         <div class="gear-weight">
-          <div><span class="label" data-i18n="gear">Gear</span></div>
+          <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
           <div>
-            <input class="input-number" type="text" name="attr_character_gear_encumbrance" value="0" title="@{character_gear_encumbrance}" readonly />
+            <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
+            <input type="hidden" name="attr_character_gear_encumbrance" value="0"/>
           </div>
           <div><span class="label" data-i18n="weapons">Weapons</span></div>
           <div>
@@ -4119,7 +4120,19 @@
     clog("Change Detected: "+eventInfo.sourceAttribute);
     repeatingSum("character_gear_encumbrance", "gear", ["gear_weight", "gear_qty", "gear_carried"]);
   });
-  
+
+  on('change:character_gear_encumbrance change:consumables_encumbrance', function(eventInfo) {
+    clog("Change Detected: "+eventInfo.sourceAttribute);
+    getAttrs(['character_gear_encumbrance', 'consumables_encumbrance'], function(values) {
+      let character_gear_encumbrance = float(values.character_gear_encumbrance),
+          consumables_encumbrance = float(values.consumables_encumbrance),
+          totalWeight = character_gear_encumbrance + consumables_encumbrance;
+      setAttrs({
+        "character_gear_and_consumables_encumbrance": totalWeight
+      });
+    });
+  });
+
   /* mount encumbrance */
   on("change:repeating_mount remove:repeating_mount", function (eventInfo) {
     clog("Change Detected: "+eventInfo.sourceAttribute);
@@ -4178,15 +4191,15 @@
     getAttrs(["gold", "silver", "copper", "gold_mount", "silver_mount", "copper_mount"], function (values) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       const gold = int(values["gold"]),
-        silver = int(values["silver"]),
-        copper = int(values["copper"]),
-        temp_carried = Math.floor((gold + silver + copper) / 100) * 100,
-        output_carried = (temp_carried * 0.005).toFixed(1),
-        gold_mount = int(values["gold_mount"]),
-        silver_mount = int(values["silver_mount"]),
-        copper_mount = int(values["copper_mount"]),
-        temp_mount = Math.floor((gold_mount + silver_mount + copper_mount) / 100) * 100,
-        output_mount = (temp_mount * 0.005).toFixed(1);
+            silver = int(values["silver"]),
+            copper = int(values["copper"]),
+            temp_carried = Math.floor((gold + silver + copper) / 100) * 100,
+            output_carried = (temp_carried * 0.005).toFixed(1),
+            gold_mount = int(values["gold_mount"]),
+            silver_mount = int(values["silver_mount"]),
+            copper_mount = int(values["copper_mount"]),
+            temp_mount = Math.floor((gold_mount + silver_mount + copper_mount) / 100) * 100,
+            output_mount = (temp_mount * 0.005).toFixed(1);
       setAttrs({
         coins_carried: output_carried,
         coins_carried_mount: output_mount,
@@ -4195,7 +4208,7 @@
   });
 
   /*consumables macro*/
-  on('change:food change:water change:arrows change:torches', function(eventInfo) {
+  on('sheet:opened change:food change:water change:arrows change:torches', function(eventInfo) {
     clog('~~~ Change Detected: '+eventInfo.sourceAttribute);
     getAttrs(['food', 'water', 'arrows', 'torches','food_macro', 'water_macro', 'arrows_macro', 'torches_macro'], function(values) {      
       const settings={};
@@ -4206,36 +4219,77 @@
           food_amcro = values.food_macro,
           water_macro = values.water_macro,
           arrows_macro = values.arrows_macro,
-          torches_macro = values.arrows_macro;
-      if (eventInfo.sourceAttribute === 'food') {
-        clog('~~~~~~~| FOOD |~~~~~~~~: '+eventInfo.newValue);
-        switch (eventInfo.newValue) {
-          case '0' : 
-            settings.food_macro = "{{subtitle=^{out-of-food}}}";
+          torches_macro = values.torches_macro;
+      if (food) {
+        switch (values.food) {
+          case '0' : settings.food_macro = "{{subtitle=^{out-of-food}}}";
             break;
-          case '1' : 
-            settings.food_macro = "{{subtitle=^{die-6-u} ^{of-food}}} {{consumable-die-six=[[ 1 ]] }} {{consumable-roll-six=[[ 1d6 ]] }}";
+          case '1' : settings.food_macro = "{{subtitle=^{die-6-u} ^{of-food}}} {{consumable-die-six=[[ 1 ]] }} {{consumable-roll-six=[[ 1d6 ]] }}";
             break;
-          case '2' : 
-            settings.food_macro = "{{subtitle=^{die-8-u} ^{of-food}}} {{consumable-die-eight=[[ 1 ]] }} {{consumable-roll-eight=[[ 1d8 ]] }}";
+          case '2' : settings.food_macro = "{{subtitle=^{die-8-u} ^{of-food}}} {{consumable-die-eight=[[ 1 ]] }} {{consumable-roll-eight=[[ 1d8 ]] }}";
             break;
-          case '3' : 
-            settings.food_macro = "{{subtitle=^{die-10-u} ^{of-food}}} {{consumable-die-ten=[[ 1 ]] }} {{consumable-roll-ten=[[ 1d10 ]] }}";
+          case '3' : settings.food_macro = "{{subtitle=^{die-10-u} ^{of-food}}} {{consumable-die-ten=[[ 1 ]] }} {{consumable-roll-ten=[[ 1d10 ]] }}";
             break;
-          case '4' : 
-            settings.food_macro = "{{subtitle=^{die-12-u} ^{of-food}}} {{consumable-die-twelve=[[ 1 ]] }} {{consumable-roll-twelve=[[ 1d12 ]] }}";
+          case '4' : settings.food_macro = "{{subtitle=^{die-12-u} ^{of-food}}} {{consumable-die-twelve=[[ 1 ]] }} {{consumable-roll-twelve=[[ 1d12 ]] }}";
             break;
-          default:
-            clog('~~~ ERROR: Food macro was not changed.');
+          default: clog('~~~ ERROR: Food macro was not changed.');
             break;
         }
       }
+      if (water) {
+        switch (values.water) {
+          case '0' : settings.water_macro = "{{subtitle=^{out-of-water}}}";
+            break;
+          case '1' : settings.water_macro = "{{subtitle=^{die-6-u} ^{of-water}}} {{consumable-die-six=[[ 1 ]] }} {{consumable-roll-six=[[ 1d6 ]] }}";
+            break;
+          case '2' : settings.water_macro = "{{subtitle=^{die-8-u} ^{of-water}}} {{consumable-die-eight=[[ 1 ]] }} {{consumable-roll-eight=[[ 1d8 ]] }}";
+            break;
+          case '3' : settings.water_macro = "{{subtitle=^{die-10-u} ^{of-water}}} {{consumable-die-ten=[[ 1 ]] }} {{consumable-roll-ten=[[ 1d10 ]] }}";
+            break;
+          case '4' : settings.water_macro = "{{subtitle=^{die-12-u} ^{of-water}}} {{consumable-die-twelve=[[ 1 ]] }} {{consumable-roll-twelve=[[ 1d12 ]] }}";
+            break;
+          default: clog('~~~ ERROR: water macro was not changed.');
+            break;
+        }
+      }
+      if (arrows) {
+        switch (values.arrows) {
+          case '0' : settings.arrows_macro = "{{subtitle=^{out-of-arrows}}}";
+            break;
+          case '1' : settings.arrows_macro = "{{subtitle=^{die-6-u} ^{of-arrows}}} {{consumable-die-six=[[ 1 ]] }} {{consumable-roll-six=[[ 1d6 ]] }}";
+            break;
+          case '2' : settings.arrows_macro = "{{subtitle=^{die-8-u} ^{of-arrows}}} {{consumable-die-eight=[[ 1 ]] }} {{consumable-roll-eight=[[ 1d8 ]] }}";
+            break;
+          case '3' : settings.arrows_macro = "{{subtitle=^{die-10-u} ^{of-arrows}}} {{consumable-die-ten=[[ 1 ]] }} {{consumable-roll-ten=[[ 1d10 ]] }}";
+            break;
+          case '4' : settings.arrows_macro = "{{subtitle=^{die-12-u} ^{of-arrows}}} {{consumable-die-twelve=[[ 1 ]] }} {{consumable-roll-twelve=[[ 1d12 ]] }}";
+            break;
+          default: clog('~~~ ERROR: arrows macro was not changed.');
+            break;
+        }
+      }
+      if (torches) {
+        switch (values.torches) {
+          case '0' : settings.torches_macro = "{{subtitle=^{out-of-torches}}}";
+            break;
+          case '1' : settings.torches_macro = "{{subtitle=^{die-6-u} ^{of-torches}}} {{consumable-die-six=[[ 1 ]] }} {{consumable-roll-six=[[ 1d6 ]] }}";
+            break;
+          case '2' : settings.torches_macro = "{{subtitle=^{die-8-u} ^{of-torches}}} {{consumable-die-eight=[[ 1 ]] }} {{consumable-roll-eight=[[ 1d8 ]] }}";
+            break;
+          case '3' : settings.torches_macro = "{{subtitle=^{die-10-u} ^{of-torches}}} {{consumable-die-ten=[[ 1 ]] }} {{consumable-roll-ten=[[ 1d10 ]] }}";
+            break;
+          case '4' : settings.torches_macro = "{{subtitle=^{die-12-u} ^{of-torches}}} {{consumable-die-twelve=[[ 1 ]] }} {{consumable-roll-twelve=[[ 1d12 ]] }}";
+            break;
+          default: clog('~~~ ERROR: torches macro was not changed.');
+            break;
+        }
+      };
       setAttrs(settings);
     });
   });
 
   /*consumables weight*/
-  on('change:food change:water change:arrows change:torches change:food_carried change:water_carried change:arrows_carried change:torches_carried', function(eventInfo) {
+  on('sheet:opened change:food change:water change:arrows change:torches change:food_carried change:water_carried change:arrows_carried change:torches_carried', function(eventInfo) {
     getAttrs(['food', 'water', 'arrows', 'torches', 'food_carried', 'water_carried', 'arrows_carried', 'torches_carried', 'food_weight', 'water_weight', 'arrows_weight', 'torches_weight', 'consumables_encumbrance'], function(values) {
       clog('~~~Change Detected: '+eventInfo.sourceAttribute + ': ' +eventInfo.newValue);
       let food_carried = values.food_carried,
@@ -4265,8 +4319,8 @@
   });
   
   /* total encumbrance */
-  on("change:character_gear_encumbrance change:mount_gear_encumbrance change:coins_carried change:coins_carried_mount change:weapons_encumbrance change:armor_encumbrance change:shield_encumbrance change:consumables_encumbrance", function (eventInfo) {
-    getAttrs(["character_gear_encumbrance", "mount_gear_encumbrance", "coins_carried", "coins_carried_mount", "weapons_encumbrance", "armor_encumbrance", "shield_encumbrance", "armor_shield_encumbrance", "consumables_encumbrance"], function (values) {
+  on("sheet:opened change:character_gear_encumbrance change:mount_gear_encumbrance change:coins_carried change:coins_carried_mount change:weapons_encumbrance change:armor_encumbrance change:shield_encumbrance change:consumables_encumbrance", function (eventInfo) {
+    getAttrs(["character_gear_encumbrance", "mount_gear_encumbrance", "coins_carried", "coins_carried_mount", "weapons_encumbrance", "armor_encumbrance", "shield_encumbrance", "armor_shield_encumbrance", "consumables_encumbrance", "character_gear_and_consumables_encumbrance"], function (values) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       const character_gear_encumbrance = float(values["character_gear_encumbrance"]),
             mount_gear_encumbrance = float(values["mount_gear_encumbrance"]),
@@ -4277,7 +4331,9 @@
             coins_carried = float(values["coins_carried"]),
             coins_carried_mount = float(values["coins_carried_mount"]),
             consumables_encumbrance = float(values["consumables_encumbrance"]),
-            sum_character_weight = character_gear_encumbrance + weapons_encumbrance + armor_encumbrance + shield_encumbrance + coins_carried + consumables_encumbrance,
+            character_gear_and_consumables_encumbrance = float(values["character_gear_and_consumables_encumbrance"]),
+            gear_and_consumables = character_gear_encumbrance + consumables_encumbrance,
+            sum_character_weight = weapons_encumbrance + armor_encumbrance + shield_encumbrance + coins_carried + gear_and_consumables,
             sum_mount_weight = mount_gear_encumbrance + coins_carried_mount;
       setAttrs({
         armor_shield_encumbrance: armor_shield_encumbrance,
@@ -4481,8 +4537,7 @@
     });
   });
   
-  /* set weapon bonus_total */
-  
+  /* set weapon bonus_total */  
   on("repeating_weapons:weapon_name change:repeating_weapons:weapon_bonus change:repeating_weapons:weapon_bonus_misc  change:repeating_weapons:weapon_bonus_max", function (eventInfo) {    
     clog("Change Detected: "+eventInfo.sourceAttribute);
     clog("Change Detected: Weapon Attacks - recalculating Bonus totals");
@@ -4950,9 +5005,7 @@
   });
   
   /* set armor and shield calcs */
-  on(
-    "change:melee change:strength_total change:armor1_equipped change:armor1_damage change:armor1_bonus change:armor1_bonus_max change:armor2_equipped change:armor2_damage change:armor2_bonus change:armor2_bonus_max change:armor3_equipped change:armor3_damage change:armor3_bonus change:armor3_bonus_max change:armor4_equipped change:armor4_damage change:armor4_bonus change:armor4_bonus_max change:shield1_equipped change:shield1_bonus change:shield1_bonus_max change:shield1_bonus_misc",
-    function (eventInfo) {
+  on("change:melee change:strength_total change:armor1_equipped change:armor1_damage change:armor1_bonus change:armor1_bonus_max change:armor2_equipped change:armor2_damage change:armor2_bonus change:armor2_bonus_max change:armor3_equipped change:armor3_damage change:armor3_bonus change:armor3_bonus_max change:armor4_equipped change:armor4_damage change:armor4_bonus change:armor4_bonus_max change:shield1_equipped change:shield1_bonus change:shield1_bonus_max change:shield1_bonus_misc", function (eventInfo) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       getAttrs(["melee", "strength_total", "armor1_equipped", "armor1_bonus", "armor1_bonus_max", "armor1_damage", "armor2_equipped", "armor2_bonus", "armor2_bonus_max", "armor2_damage", "armor3_equipped", "armor3_bonus", "armor3_bonus_max", "armor3_damage", "armor4_equipped", "armor4_bonus", "armor4_bonus_max", "armor4_damage", "shield1_equipped", "shield1_bonus", "shield1_bonus_misc", "shield1_bonus_max"], function (values) {
         const armor1_equipped = int(values.armor1_equipped),
@@ -5006,9 +5059,7 @@
   );
   
   /* set armor artifact dice totals */
-  on(
-    "change:armor_artifact_die_ocho change:armor_artifact_die_eight change:armor_artifact_die_ten change:armor_artifact_die_twelve change:armor1_artifact_die_ocho change:armor1_artifact_die_eight change:armor1_artifact_die_ten change:armor1_artifact_die_twelve change:armor2_artifact_die_ocho change:armor2_artifact_die_eight change:armor2_artifact_die_ten change:armor2_artifact_die_twelve change:armor3_artifact_die_ocho change:armor3_artifact_die_eight change:armor3_artifact_die_ten change:armor3_artifact_die_twelve change:armor4_artifact_die_ocho change:armor4_artifact_die_eight change:armor4_artifact_die_ten change:armor4_artifact_die_twelve",
-    function () {
+  on("change:armor_artifact_die_ocho change:armor_artifact_die_eight change:armor_artifact_die_ten change:armor_artifact_die_twelve change:armor1_artifact_die_ocho change:armor1_artifact_die_eight change:armor1_artifact_die_ten change:armor1_artifact_die_twelve change:armor2_artifact_die_ocho change:armor2_artifact_die_eight change:armor2_artifact_die_ten change:armor2_artifact_die_twelve change:armor3_artifact_die_ocho change:armor3_artifact_die_eight change:armor3_artifact_die_ten change:armor3_artifact_die_twelve change:armor4_artifact_die_ocho change:armor4_artifact_die_eight change:armor4_artifact_die_ten change:armor4_artifact_die_twelve", function (eventInfo) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       getAttrs(["armor_artifact_die_ocho", "armor_artifact_die_eight", "armor_artifact_die_ten", "armor_artifact_die_twelve", "armor1_artifact_die_ocho", "armor1_artifact_die_eight", "armor1_artifact_die_ten", "armor1_artifact_die_twelve", "armor2_artifact_die_ocho", "armor2_artifact_die_eight", "armor2_artifact_die_ten", "armor2_artifact_die_twelve", "armor3_artifact_die_ocho", "armor3_artifact_die_eight", "armor3_artifact_die_ten", "armor3_artifact_die_twelve", "armor4_artifact_die_ocho", "armor4_artifact_die_eight", "armor4_artifact_die_ten", "armor4_artifact_die_twelve"],
     function (values) {
@@ -5171,8 +5222,7 @@
   });
   
   /* Mount/Beast Carry calcs */
-  const carry = (strength, mounted) => (strength * 4) / (mounted + 1);
-  
+  const carry = (strength, mounted) => (strength * 4) / (mounted + 1);  
   on("change:mounted change:mount_strength", function (eventInfo) {
     clog("Change Detected: "+eventInfo.sourceAttribute);
     getAttrs(["mounted", "mount_strength"], function (values) {
@@ -5199,12 +5249,9 @@
   
   /* Broken Indicator flags*/
   // first create am array listing all 4 stats
-  const stats = ["strength", "agility", "wits", "empathy"];
-  
+  const stats = ["strength", "agility", "wits", "empathy"];  
   /* Update the Dice Pool indicator */
-  on(
-    "clicked:armor-roll clicked:dice_pool_animal_handling clicked:dice_pool_crafting clicked:dice_pool_crafting_monster clicked:dice_pool_endurance clicked:dice_pool_endurance_monster clicked:dice_pool_healing clicked:dice_pool_insight clicked:dice_pool_lore clicked:dice_pool_manipulation clicked:dice_pool_marksmanship clicked:dice_pool_melee clicked:dice_pool_melee_monster clicked:dice_pool_might clicked:dice_pool_might_monster clicked:dice_pool_move clicked:dice_pool_performance clicked:dice_pool_scouting clicked:dice_pool_sleight_of_hand clicked:dice_pool_stealth clicked:dice_pool_survival clicked:repeating_monster:monster-attack-roll clicked:repeating_spells:spell-roll clicked:repeating_weapons:attack-roll clicked:reputation-roll clicked:shield-roll clicked:shield-shove-roll",
-    function (eventInfo) {
+  on("clicked:armor-roll clicked:dice_pool_animal_handling clicked:dice_pool_crafting clicked:dice_pool_crafting_monster clicked:dice_pool_endurance clicked:dice_pool_endurance_monster clicked:dice_pool_healing clicked:dice_pool_insight clicked:dice_pool_lore clicked:dice_pool_manipulation clicked:dice_pool_marksmanship clicked:dice_pool_melee clicked:dice_pool_melee_monster clicked:dice_pool_might clicked:dice_pool_might_monster clicked:dice_pool_move clicked:dice_pool_performance clicked:dice_pool_scouting clicked:dice_pool_sleight_of_hand clicked:dice_pool_stealth clicked:dice_pool_survival clicked:repeating_monster:monster-attack-roll clicked:repeating_spells:spell-roll clicked:repeating_weapons:attack-roll clicked:reputation-roll clicked:shield-roll clicked:shield-shove-roll", function (eventInfo) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       getAttrs(["roll_the_dice_flag"], function (values) {
         const flag = int(values.roll_the_dice_flag);
@@ -5215,18 +5262,11 @@
     }
   );
   
-  on("sheet:opened change:roll_the_dice_flag", function (event) {
+  on("sheet:opened change:roll_the_dice_flag", function (eventInfo) {
     clog("Change Detected: resetting roll_the_dice_flag to zero");
-    const flag = int(event.newValue) || 0;
+    const flag = int(eventInfo.newValue) || 0;
     if (flag === 1)
-      setAttrs(
-        {
-          roll_the_dice_flag: 0,
-        },
-        {
-          silent: true,
-        }
-      );
+      setAttrs({roll_the_dice_flag: 0 }, {silent:true});
   });
   
   /* translate query text */
@@ -5275,58 +5315,22 @@
   });
   
   /* Update attributes total max */
-  on("sheet:opened change:strength_total", function (eventInfo) {
-    clog("Change Detected: "+eventInfo.sourceAttribute);
-    getAttrs(["strength", "strength_total", "strength_total_max"], function (values) {
-      const strength = int(values.strength),
-        strength_total = int(values.strength_total);
-      setAttrs({
-        strength: strength,
-        strength_total: strength_total,
-        strength_total_max: strength,
+  on("sheet:opened change:strength_total change:agility_total change:wits_total change:empathy_total", function(eventInfo) {
+    clog("Change Detected: " + eventInfo.sourceAttribute);
+    getAttrs(["strength", "strength_total", "strength_total_max", "agility", "agility_total", "agility_total_max", "wits", "wits_total", "wits_total_max","empathy", "empathy_total", "empathy_total_max"], function (values) {
+        const settings = {};
+          settings.strength = int(values.strength),
+          settings.strength_total = int(values.strength_total),
+          settings.agility = int(values.agility),
+          settings.agility_total = int(values.agility_total),
+          settings.wits = int(values.wits),
+          settings.wits_total = int(values.wits_total),
+          settings.empathy = int(values.empathy),
+          settings.empathy_total = int(values.empathy_total);
+        setAttrs(settings);
       });
-    });
   });
-  
-  on("sheet:opened change:agility_total", function (eventInfo) {
-    clog("Change Detected: "+eventInfo.sourceAttribute);
-    getAttrs(["agility", "agility_total", "agility_total_max"], function (values) {
-      const agility = int(values.agility),
-        agility_total = int(values.agility_total);
-      setAttrs({
-        agility: agility,
-        agility_total: agility_total,
-        agility_total_max: agility,
-      });
-    });
-  });
-  
-  on("sheet:opened change:wits_total", function (eventInfo) {
-    clog("Change Detected: "+eventInfo.sourceAttribute);
-    getAttrs(["wits", "wits_total", "wits_total_max"], function (values) {
-      const wits = int(values.wits),
-        wits_total = int(values.wits_total);
-      setAttrs({
-        wits: wits,
-        wits_total: wits_total,
-        wits_total_max: wits,
-      });
-    });
-  });
-  
-  on("sheet:opened change:empathy_total", function (eventInfo) {
-    clog("Change Detected: "+eventInfo.sourceAttribute);
-    getAttrs(["empathy", "empathy_total", "empathy_total_max"], function (values) {
-      const empathy = int(values.empathy),
-        empathy_total = int(values.empathy_total);
-      setAttrs({
-        empathy: empathy,
-        empathy_total: empathy_total,
-        empathy_total_max: empathy,
-      });
-    });
-  });
-  
+
   /* set strength dice pool */
   on("clicked:strength-roll", function (eventInfo) {
     clog("Change Detected: "+eventInfo.sourceAttribute);
