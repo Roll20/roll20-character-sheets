@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0]
+
+### Added
+
+- Roll templates inside roll queries (https://app.roll20.net/forum/post/10326105/roll-template-inside-roll-query/?pageforid=10361844#post-10361844)
+
 ## [1.1.0] - 2021-09-06
 
 ### Added
