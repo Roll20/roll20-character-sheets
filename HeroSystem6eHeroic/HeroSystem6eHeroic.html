@@ -303,6 +303,48 @@
 			<div class="item-characteristics-history">
 				<textarea name="attr_historyText" maxlength="4440">Biography</textarea>
 			</div> 
+			
+			<!-- Perception Rolls -->
+			
+			<div class="item-characteristics-perception">
+				<div class="subitem-characteristics-perception-row-container">
+					<div class="subitem-characteristics-perception-stat-container">
+						<h1>Perception</h1>
+						<div class="subitem-characteristics-perception-column-container">
+							<input type="text" name="attr_perceptionBase" readonly>
+							<span>+<input type="number" name="attr_enhancedPerceptionModifier" value="0" min="-10" max="10" step="1"></span>
+							<button type="roll" class='button buttonRoll' name="roll_perceptionRoll" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception }} {{Base Chance = [[?{Modifiers|0}+@{perceptionBase}+@{enhancedPerceptionModifier}]] }} {{Roll=[[3d6cf<7cs>0]]}} {{}}" >Roll</button>
+						</div>
+					</div>
+					
+					<div class="subitem-characteristics-perception-stat-container">
+						<input type="text" value="Vision" name="attr_perceptionType02" maxlength="12">
+						<div class="subitem-characteristics-perception-column-container">
+							<input type="text" name="attr_perceptionVision" readonly>
+							<span>+<input type="number" name="attr_perceptionModifierVision" value="0" min="-10" max="10" step="1"></span>
+							<button type="roll" class='button buttonRoll' name="roll_perceptionRollVision" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception }} {{Base Chance = [[?{Modifiers|0}+@{intelligenceChance}+@{enhancedPerceptionModifier}+@{perceptionModifierVision}]] }} {{Roll=[[3d6cf<7cs>0]]}} {{}}" >Roll</button>
+						</div>
+					</div>
+					
+					<div class="subitem-characteristics-perception-stat-container">
+						<input type="text" value="Hearing" name="attr_perceptionType03" maxlength="12">
+						<div class="subitem-characteristics-perception-column-container">
+							<input type="text" name="attr_perceptionHearing" readonly>
+							<span>+<input type="number" name="attr_perceptionModifierHearing" value="0" min="-10" max="10" step="1"></span>
+							<button type="roll" class='button buttonRoll' name="roll_perceptionRollHearing" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception }} {{Base Chance = [[?{Modifiers|0}+@{intelligenceChance}+@{enhancedPerceptionModifier}+@{perceptionModifierHearing}]] }} {{Roll=[[3d6cf<7cs>0]]}} {{}}" >Roll</button>
+						</div>
+					</div>
+					
+					<div class="subitem-characteristics-perception-stat-container">
+						<input type="text" value="Smell" name="attr_perceptionType04" maxlength="12">
+						<div class="subitem-characteristics-perception-column-container">
+							<input type="text" name="attr_perceptionSmell" readonly>
+							<span>+<input type="number" name="attr_perceptionModifierSmell" value="0" min="-10" max="10" step="1"></span>
+							<button type="roll" class='button buttonRoll' name="roll_perceptionRollSmell" value="&{template:custom} {{title=@{character_name} - @{character_title}}} {{subtitle= Uses Perception }} {{Base Chance = [[?{Modifiers|0}+@{intelligenceChance}+@{enhancedPerceptionModifier}+@{perceptionModifierSmell}]] }} {{Roll=[[3d6cf<7cs>0]]}} {{}}" >Roll</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		 </div>
 	</div>
 </div>
@@ -3896,14 +3938,20 @@
 	});
 	
 	// Update Intelligence
-	on("change:intelligence", function () {
-		getAttrs(["intelligence","useCharacteristicMaximums"], function(values) {
+	on("change:intelligence change:enhancedPerceptionModifier", function () {
+		getAttrs(["intelligence","useCharacteristicMaximums","enhancedPerceptionModifier"], function(values) {
 		  
 			const statValue = parseInt(values.intelligence)||0;
 			const useMaximums = values.useCharacteristicMaximums;
 			const baseStat = 10;
 			const maxStat = 20;
 			const costStat = 1;
+			
+			// Here we get the enhanced perception modifier. Perception is like a child of Intelligence.
+			// The base value of perception is the intelligence roll. The Perception roll is the base value plus the enhancedPerceptionModifier. 
+			// Individual senses start at Intelligence Chance + Perception modifier.
+			const enhancedPerceptionMod = parseInt(values.enhancedPerceptionModifier)||0;
+			
 			let statCP = 0;
 	
 			if ( (statValue>maxStat) && (useMaximums != 0) ) {
@@ -3915,7 +3963,11 @@
 			// Update cost and roll chance		
 			setAttrs({
 				"intelligenceCP":statCP,
-				"intelligenceChance":calculateRoll(statValue)
+				"intelligenceChance":calculateRoll(statValue),
+				"perceptionBase":calculateRoll(statValue),
+				"perceptionVision":calculateRoll(statValue)+enhancedPerceptionMod,
+				"perceptionHearing":calculateRoll(statValue)+enhancedPerceptionMod,
+				"perceptionSmell":calculateRoll(statValue)+enhancedPerceptionMod
 			});
 			
 			// Update costs
