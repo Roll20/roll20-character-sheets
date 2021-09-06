@@ -4,8 +4,6 @@
 
 ### Added
 
-- Roll templates inside roll queries (https://app.roll20.net/forum/post/10326105/roll-template-inside-roll-query/?pageforid=10361844#post-10361844)
-
 ## [1.1.0] - 2021-09-06
 
 ### Added
@@ -18,6 +16,7 @@
 - Add left border to Modifier Picker
 - Move Initiative outside of Ancient section
 - Add Initiative roll to tracker
+- Roll templates inside roll queries for certain saving throws (Despair, Illusion, Mind Control, Pain, Possession, Telepathic Probe) (https://app.roll20.net/forum/post/10326105/roll-template-inside-roll-query/?pageforid=10361844#post-10361844). Player is prompted for the type of attack - Magic, Psionic, or Other - and the selected bonus is added to the roll.
 
 ### Changed
 
