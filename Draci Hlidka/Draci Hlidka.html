@@ -18,7 +18,7 @@
     <input type="hidden" name="attr_speed" value="0">
     <input type="hidden" name="attr_raceSpeed" value="0">
     <input type="hidden" name="attr_speedMod" value="0">
-    <input type="hidden" name="attr_loadLevel" value="nenaložený">
+    <input type="hidden" name="attr_loadLevel" value="nepřetížený">
     <input type="hidden" name="attr_fatigueLevel" value="svěží">
     <input type="hidden" name="attr_isSelfCarried" value="1">
     <input type="hidden" name="attr_isBagCarried" value="1">
@@ -876,7 +876,7 @@
                             </div>
                             <div class="dh_section dh_weapons dh_pa">
                                 <div class="dh_col_12">
-                                    <div class="dh_row">
+                                    <div class="dh_row dh_melee">
                                         <div class="dh_col_12">
                                             <div class="dh_label"><span title="repeating_melee">Zbraně na boj zblízka</span>
                                             </div>
@@ -943,7 +943,7 @@
                                             </fieldset>
                                         </div>
                                     </div>
-                                    <div class="dh_row">
+                                    <div class="dh_row dh_throwing">
                                         <div class="dh_col_12">
                                             <div class="dh_label"><span title="repeating_throwing">Vrhací zbraně</span>
                                             </div>
@@ -1016,7 +1016,7 @@
                                             </fieldset>
                                         </div>
                                     </div>
-                                    <div class="dh_row">
+                                    <div class="dh_row dh_ranged">
                                         <div class="dh_col_12">
                                             <div class="dh_label"><span title="repeating_ranged">Střelné zbraně</span>
                                             </div>
@@ -1089,7 +1089,7 @@
                                             </fieldset>
                                         </div>
                                     </div>
-                                    <div class="dh_row">
+                                    <div class="dh_row dh_shields">
                                         <div class="dh_col_12">
                                             <div class="dh_label"><span title="repeating_shields">Štíty</span>
                                             </div>
@@ -1134,7 +1134,7 @@
                                             </fieldset>
                                         </div>
                                     </div>
-                                    <div class="dh_row">
+                                    <div class="dh_row dh_armors">
                                         <div class="dh_col_12">
                                             <div class="dh_label"><span title="repeating_armors">Zbroje</span>
                                             </div>
@@ -1973,6 +1973,23 @@
                                                                 </div>
                                                                 <div class="dh_row">
                                                                     <input type="text" size="1" name="attr_reachRange" class="dh_inline_input">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="dh_col dh_shrink dh_rangedWeapon">
+                                                            <div class="dh_">
+                                                                <div title="ammunitionId" class="dh_label dh_text_left"><span>ID munice</span>
+                                                                </div>
+                                                                <div class="dh_row">
+                                                                    <input type="text" size="1" name="attr_ammunitionId" class="dh_inline_input">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="dh_col dh_shrink dh_rangedWeapon">
+                                                            <div class="dh_">
+                                                                <div title="ammunitionName" class="dh_label dh_text_left"><span>Název Munice</span>
+                                                                </div>
+                                                                <div class="dh_row"><span name="attr_ammunitionName" class="dh_inline_input"></span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -3281,11 +3298,17 @@
     const workerLog = (...args) => {
         console.log(...args);
     };
+    const version = '1.0.1';
     const defaultSettings = {
         settings: {
             sheetType: 'pc',
             sheetTypeModal: true,
             activeTab: 'character',
+            melee: true,
+            throwing: true,
+            ranged: true,
+            shields: true,
+            armors: true,
             editHeaderImage: false,
             editCharacterName: false,
             editXp: false,
@@ -3308,6 +3331,10 @@
             editSkillPoints: false,
         }
     };
+    const migrateVersion = (from, to) => {
+        console.log(`migrating from v${from} to v${to}`);
+        setAttrs({ version: to });
+    };
     const validateSettings = (settings) => {
         if (settings === '' && !settings.startsWith('{') && !settings.endsWith('}')) {
             return false;
@@ -3323,7 +3350,11 @@
     };
     on('sheet:opened', (eventInfo) => {
         workerLog('sheet:opened', { eventInfo });
-        getAttrs(['settings', 'addSkillType', 'selectedProfession', 'level', 'allocatedPoints', 'availableSkillPoints'], (values => {
+        getAttrs(['version', 'settings', 'addSkillType', 'selectedProfession', 'level', 'allocatedPoints', 'availableSkillPoints'], (values => {
+            const previousVersion = values['version'];
+            if (version !== previousVersion) {
+                migrateVersion(previousVersion, version);
+            }
             const settings = values['settings'];
             const valid = validateSettings(settings);
             let set = {};
@@ -3911,13 +3942,15 @@
                 weaponDefense: 0,
                 shieldDefense: 0,
             };
+            const leftHandExists = typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0;
+            const rightHandExists = typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0;
             let leftHand = 0;
             let rightHand = 0;
             let isRangedAttack = false;
-            if (typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0) {
+            if (leftHandExists) {
                 leftHand = JSON.parse(values.leftHand);
             }
-            if (typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0) {
+            if (rightHandExists) {
                 rightHand = JSON.parse(values.rightHand);
             }
             if ((leftHand.sectionName && leftHand.sectionName.endsWith('ranged'))
@@ -4051,105 +4084,235 @@
             const attributes = [
                 `${sectionName}_${id}_itemId`,
                 `${sectionName}_${id}_hands`,
-                `${sectionName}_${id}_count`,
-                `${sectionName}_${id}_name`,
-                `${sectionName}_${id}_isTwoHanded`,
-                `${sectionName}_${id}_attack`,
-                `${sectionName}_${id}_damage`,
-                `${sectionName}_${id}_defense`,
-                `${sectionName}_${id}_damageType`,
-                `${sectionName}_${id}_reach`,
-                `${sectionName}_${id}_reachRange`,
-                `${sectionName}_${id}_shieldQuality`,
-                `${sectionName}_${id}_armorQuality`,
                 'leftHand',
                 'rightHand'
             ];
             getAttrs([...attributes], (values) => {
                 const setSilent = {};
                 const set = {};
+                const itemId = values[`${sectionName}_${id}_itemId`];
                 let leftHand = 0;
                 let rightHand = 0;
-                if (typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0) {
+                const leftHandExists = typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0;
+                const rightHandExists = typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0;
+                if (leftHandExists) {
                     leftHand = JSON.parse(values.leftHand);
                 }
-                if (typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0) {
+                if (rightHandExists) {
                     rightHand = JSON.parse(values.rightHand);
                 }
-                const item = {
-                    sectionName,
-                    id,
-                    itemId: values[`${sectionName}_${id}_itemId`],
-                    hands: values[`${sectionName}_${id}_hands`],
-                    count: values[`${sectionName}_${id}_count`],
-                    name: values[`${sectionName}_${id}_name`],
-                    isTwoHanded: values[`${sectionName}_${id}_isTwoHanded`],
-                    attack: values[`${sectionName}_${id}_attack`],
-                    damage: values[`${sectionName}_${id}_damage`],
-                    defense: values[`${sectionName}_${id}_defense`],
-                    damageType: values[`${sectionName}_${id}_damageType`],
-                    reach: values[`${sectionName}_${id}_reach`],
-                    reachRange: values[`${sectionName}_${id}_reachRange`],
-                    shieldQuality: values[`${sectionName}_${id}_shieldQuality`],
-                    armorQuality: values[`${sectionName}_${id}_armorQuality`],
-                };
-                if (item.hands !== Hands.None) {
-                    if (item.hands === Hands.Left) {
-                        set['leftHand'] = 0;
-                    }
-                    else if (item.hands === Hands.Right) {
-                        set['rightHand'] = 0;
-                    }
-                    else if (item.hands === Hands.Both) {
-                        setSilent['leftHand'] = 0;
-                        set['rightHand'] = 0;
-                    }
-                    setSilent[`${sectionName}_${id}_hands`] = Hands.None;
-                }
-                else {
-                    if (Number(item.isTwoHanded)) {
-                        setSilent[`${leftHand.sectionName}_${leftHand.id}_hands`] = Hands.None;
-                        setSilent[`${rightHand.sectionName}_${rightHand.id}_hands`] = Hands.None;
-                        setSilent[`${sectionName}_${id}_hands`] = Hands.Both;
-                        setSilent['leftHand'] = JSON.stringify(item);
-                        set['rightHand'] = JSON.stringify(item);
-                    }
-                    else if (Number(values.leftHand) === 0) {
-                        setSilent[`${sectionName}_${id}_hands`] = Hands.Left;
-                        set['leftHand'] = JSON.stringify(item);
-                    }
-                    else if (Number(values.rightHand) === 0) {
-                        setSilent[`${sectionName}_${id}_hands`] = Hands.Right;
-                        set['rightHand'] = JSON.stringify(item);
+                const itemAttributes = [
+                    `repeating_items_${itemId}_itemId`,
+                    `repeating_items_${itemId}_count`,
+                    `repeating_items_${itemId}_name`,
+                    `repeating_items_${itemId}_isTwoHanded`,
+                    `repeating_items_${itemId}_attack`,
+                    `repeating_items_${itemId}_damage`,
+                    `repeating_items_${itemId}_defense`,
+                    `repeating_items_${itemId}_damageType`,
+                    `repeating_items_${itemId}_reach`,
+                    `repeating_items_${itemId}_reachRange`,
+                    `repeating_items_${itemId}_shieldQuality`,
+                    `repeating_items_${itemId}_armorQuality`,
+                ];
+                getAttrs([...itemAttributes], (itemValues) => {
+                    const item = {
+                        sectionName,
+                        id,
+                        itemId: itemValues[`repeating_items_${itemId}_itemId`],
+                        hands: values[`${sectionName}_${id}_hands`],
+                        count: itemValues[`repeating_items_${itemId}_count`],
+                        name: itemValues[`repeating_items_${itemId}_name`],
+                        isTwoHanded: itemValues[`repeating_items_${itemId}_isTwoHanded`],
+                        attack: itemValues[`repeating_items_${itemId}_attack`],
+                        damage: itemValues[`repeating_items_${itemId}_damage`],
+                        defense: itemValues[`repeating_items_${itemId}_defense`],
+                        damageType: itemValues[`repeating_items_${itemId}_damageType`],
+                        reach: itemValues[`repeating_items_${itemId}_reach`],
+                        reachRange: itemValues[`repeating_items_${itemId}_reachRange`],
+                        shieldQuality: itemValues[`repeating_items_${itemId}_shieldQuality`],
+                        armorQuality: itemValues[`repeating_items_${itemId}_armorQuality`],
+                    };
+                    if (item.hands !== Hands.None) {
+                        if (item.hands === Hands.Left) {
+                            set['leftHand'] = 0;
+                        }
+                        else if (item.hands === Hands.Right) {
+                            set['rightHand'] = 0;
+                        }
+                        else if (item.hands === Hands.Both) {
+                            setSilent['leftHand'] = 0;
+                            set['rightHand'] = 0;
+                        }
+                        setSilent[`${sectionName}_${id}_hands`] = Hands.None;
                     }
                     else {
-                        setSilent[`${leftHand.sectionName}_${leftHand.id}_hands`] = Hands.None;
-                        setSilent[`${rightHand.sectionName}_${rightHand.id}_hands`] = Hands.None;
-                        setSilent[`${sectionName}_${id}_hands`] = Hands.Left;
-                        setSilent['rightHand'] = 0;
-                        set['leftHand'] = JSON.stringify(item);
+                        console.log('item new', item);
+                        if (Number(item.isTwoHanded)) {
+                            setSilent[`${leftHand.sectionName}_${leftHand.id}_hands`] = Hands.None;
+                            setSilent[`${rightHand.sectionName}_${rightHand.id}_hands`] = Hands.None;
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Both;
+                            setSilent['leftHand'] = JSON.stringify(item);
+                            set['rightHand'] = JSON.stringify(item);
+                        }
+                        else if (Number(values.leftHand) === 0) {
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Left;
+                            set['leftHand'] = JSON.stringify(item);
+                        }
+                        else if (Number(values.rightHand) === 0) {
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Right;
+                            set['rightHand'] = JSON.stringify(item);
+                        }
+                        else {
+                            setSilent[`${leftHand.sectionName}_${leftHand.id}_hands`] = Hands.None;
+                            setSilent[`${rightHand.sectionName}_${rightHand.id}_hands`] = Hands.None;
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Left;
+                            setSilent['rightHand'] = 0;
+                            set['leftHand'] = JSON.stringify(item);
+                        }
                     }
-                }
-                setAttrs(setSilent, { silent: true }, () => {
-                    setAttrs(set);
+                    setAttrs(setSilent, { silent: true }, () => {
+                        setAttrs(set);
+                    });
                 });
             });
         }
     };
+    const checkEquippedItem = (eventInfo) => {
+        const arr = eventInfo.sourceAttribute.split('_');
+        if (arr.length === 4) {
+            const id = arr[2];
+            const sectionName = `${arr[0]}_${arr[1]}`;
+            const attributes = [
+                `${sectionName}_${id}_itemId`,
+                `${sectionName}_${id}_hands`,
+                'leftHand',
+                'rightHand'
+            ];
+            getAttrs([...attributes], (values) => {
+                const setSilent = {};
+                const set = {};
+                const itemId = values[`${sectionName}_${id}_itemId`];
+                let leftHand = 0;
+                let rightHand = 0;
+                const leftHandExists = typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0;
+                const rightHandExists = typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0;
+                if (leftHandExists) {
+                    leftHand = JSON.parse(values.leftHand);
+                }
+                if (rightHandExists) {
+                    rightHand = JSON.parse(values.rightHand);
+                }
+                const itemAttributes = [
+                    `repeating_items_${itemId}_itemId`,
+                    `repeating_items_${itemId}_count`,
+                    `repeating_items_${itemId}_name`,
+                    `repeating_items_${itemId}_isTwoHanded`,
+                    `repeating_items_${itemId}_attack`,
+                    `repeating_items_${itemId}_damage`,
+                    `repeating_items_${itemId}_defense`,
+                    `repeating_items_${itemId}_damageType`,
+                    `repeating_items_${itemId}_reach`,
+                    `repeating_items_${itemId}_reachRange`,
+                    `repeating_items_${itemId}_shieldQuality`,
+                    `repeating_items_${itemId}_armorQuality`,
+                ];
+                getAttrs([...itemAttributes], (itemValues) => {
+                    const item = {
+                        sectionName,
+                        id,
+                        itemId: itemValues[`repeating_items_${itemId}_itemId`],
+                        hands: values[`${sectionName}_${id}_hands`],
+                        count: itemValues[`repeating_items_${itemId}_count`],
+                        name: itemValues[`repeating_items_${itemId}_name`],
+                        isTwoHanded: itemValues[`repeating_items_${itemId}_isTwoHanded`],
+                        attack: itemValues[`repeating_items_${itemId}_attack`],
+                        damage: itemValues[`repeating_items_${itemId}_damage`],
+                        defense: itemValues[`repeating_items_${itemId}_defense`],
+                        damageType: itemValues[`repeating_items_${itemId}_damageType`],
+                        reach: itemValues[`repeating_items_${itemId}_reach`],
+                        reachRange: itemValues[`repeating_items_${itemId}_reachRange`],
+                        shieldQuality: itemValues[`repeating_items_${itemId}_shieldQuality`],
+                        armorQuality: itemValues[`repeating_items_${itemId}_armorQuality`],
+                    };
+                    if (!leftHandExists && !rightHandExists) {
+                        if (Number(item.isTwoHanded)) {
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Both;
+                            setSilent['leftHand'] = JSON.stringify(item);
+                            set['rightHand'] = JSON.stringify(item);
+                        }
+                        else {
+                            setSilent[`${sectionName}_${id}_hands`] = Hands.Left;
+                            set['leftHand'] = JSON.stringify(item);
+                        }
+                        setAttrs(setSilent, { silent: true }, () => {
+                            setAttrs(set);
+                        });
+                    }
+                    else {
+                        if (leftHandExists && leftHand.itemId === item.itemId) {
+                            set['leftHand'] = JSON.stringify(item);
+                            setAttrs(set);
+                        }
+                        if (rightHandExists && rightHand.itemId === item.itemId) {
+                            set['rightHand'] = JSON.stringify(item);
+                            setAttrs(set);
+                        }
+                    }
+                });
+            });
+        }
+        ;
+    };
+    const calculateModifierForType = (values, type) => {
+        const attributesWithTextMacro = ['rollMod', 'initiativeMod', 'attackMod', 'attackRangeMod', 'damageMod', 'damageRangeMod', 'defenseRangeMod', 'defenseMod', 'basicDefenseMod', 'strengthMod', 'strengthBonusMod', 'dexterityMod', 'dexterityBonusMod', 'constitutionMod', 'constitutionBonusMod', 'intelligenceMod', 'intelligenceBonusMod', 'charismaMod', 'charismaBonusMod'];
+        const triggerAttributeType = type;
+        let attributeTypeSections = [];
+        for (const [key, value] of Object.entries(values)) {
+            if (value === triggerAttributeType) {
+                let id = key.split('_');
+                if (values['repeating_modifiers_' + id[2] + '_isActive'] === "1") {
+                    attributeTypeSections.push(id[2]);
+                }
+            }
+        }
+        let newValue = 0;
+        let newTextValue = '';
+        let isTextAttribute = attributesWithTextMacro.includes(triggerAttributeType);
+        for (let c = 0; c < attributeTypeSections.length; c++) {
+            newValue += Number(values['repeating_modifiers_' + attributeTypeSections[c] + '_modifier']);
+            if (isTextAttribute) {
+                let modifierValue = Number(values['repeating_modifiers_' + attributeTypeSections[c] + '_modifier']);
+                let signSymbol = modifierValue >= 0 ? '+' : '';
+                newTextValue += ` {{${values['repeating_modifiers_' + attributeTypeSections[c] + '_name']} ${signSymbol}[[(${modifierValue})]]}}`;
+            }
+        }
+        let attrsToUpdate = {};
+        attrsToUpdate[triggerAttributeType] = newValue;
+        if (isTextAttribute) {
+            attrsToUpdate[triggerAttributeType + 'Text'] = newTextValue;
+        }
+        return attrsToUpdate;
+    };
     on(`change:repeating_melee:name change:repeating_melee:isTwoHanded change:repeating_melee:attack change:repeating_melee:damage change:repeating_melee:defense change:repeating_melee:damageType change:repeating_melee:reach`, (eventInfo) => {
         workerLog('sync melee', eventInfo);
+        checkEquippedItem(eventInfo);
     });
     on(`change:repeating_ranged:name change:repeating_ranged:isTwoHanded change:repeating_ranged:attack change:repeating_ranged:damage change:repeating_ranged:defense change:repeating_ranged:damageType change:repeating_ranged:reachRange`, (eventInfo) => {
         workerLog('sync ranged', eventInfo);
+        checkEquippedItem(eventInfo);
     });
     on(`change:repeating_throwing:name change:repeating_throwing:isTwoHanded change:repeating_throwing:attack change:repeating_throwing:damage change:repeating_throwing:defense change:repeating_throwing:damageType change:repeating_throwing:reachRange`, (eventInfo) => {
         workerLog('sync throwing', eventInfo);
+        checkEquippedItem(eventInfo);
     });
     on(`change:repeating_shields:name change:repeating_shields:isTwoHanded change:repeating_shields:shieldQuality`, (eventInfo) => {
         workerLog('sync shields', eventInfo);
+        checkEquippedItem(eventInfo);
     });
     on(`change:repeating_armors:name change:repeating_armors:size change:repeating_armors:armorQuality`, (eventInfo) => {
         workerLog('sync armors', eventInfo);
+        checkEquippedItem(eventInfo);
     });
     on("clicked:repeating_melee:none clicked:repeating_throwing:none clicked:repeating_ranged:none clicked:repeating_shields:none", (eventInfo) => {
         workerLog('clicked:repeating_melee:none', eventInfo);
@@ -4169,6 +4332,39 @@
     });
     on('remove:repeating_melee remove:repeating_throwing remove:repeating_ranged remove:repeating_shields remove:repeating_armors', eventInfo => {
         workerLog('remove repeating combat', eventInfo);
+        const key = Object.keys(eventInfo.removedInfo).find(key => key.endsWith('_itemId'));
+        if (key) {
+            const arr = key.split('_');
+            if (arr.length === 4) {
+                const id = arr[2];
+                const sectionName = `${arr[0]}_${arr[1]}`;
+                const itemId = eventInfo.removedInfo[key];
+                const attributes = [
+                    'leftHand',
+                    'rightHand'
+                ];
+                getAttrs([...attributes], (values) => {
+                    let leftHand = 0;
+                    let rightHand = 0;
+                    const leftHandExists = typeof values.leftHand !== "undefined" && Number(values.leftHand) !== 0;
+                    const rightHandExists = typeof values.rightHand !== "undefined" && Number(values.rightHand) !== 0;
+                    if (leftHandExists) {
+                        leftHand = JSON.parse(values.leftHand);
+                    }
+                    if (rightHandExists) {
+                        rightHand = JSON.parse(values.rightHand);
+                    }
+                    const set = {};
+                    if (leftHand.itemId === itemId) {
+                        set['leftHand'] = 0;
+                    }
+                    if (rightHand.itemId === itemId) {
+                        set['rightHand'] = 0;
+                    }
+                    setAttrs(set);
+                });
+            }
+        }
     });
     on('change:leftHand change:rightHand change:armorDefense change:strengthBonus change:dexterityBonus', eventInfo => {
         workerLog('change:leftHand change:rightHand change:armorDefense change:strengthBonus change:dexterityBonus', eventInfo);
@@ -4240,36 +4436,6 @@
             });
         });
     });
-    function calculateModifierForType(values, type) {
-        const attributesWithTextMacro = ['rollMod', 'initiativeMod', 'attackMod', 'attackRangeMod', 'damageMod', 'damageRangeMod', 'defenseRangeMod', 'defenseMod', 'basicDefenseMod', 'strengthMod', 'strengthBonusMod', 'dexterityMod', 'dexterityBonusMod', 'constitutionMod', 'constitutionBonusMod', 'intelligenceMod', 'intelligenceBonusMod', 'charismaMod', 'charismaBonusMod'];
-        const triggerAttributeType = type;
-        let attributeTypeSections = [];
-        for (const [key, value] of Object.entries(values)) {
-            if (value === triggerAttributeType) {
-                let id = key.split('_');
-                if (values['repeating_modifiers_' + id[2] + '_isActive'] === "1") {
-                    attributeTypeSections.push(id[2]);
-                }
-            }
-        }
-        let newValue = 0;
-        let newTextValue = '';
-        let isTextAttribute = attributesWithTextMacro.includes(triggerAttributeType);
-        for (let c = 0; c < attributeTypeSections.length; c++) {
-            newValue += Number(values['repeating_modifiers_' + attributeTypeSections[c] + '_modifier']);
-            if (isTextAttribute) {
-                let modifierValue = Number(values['repeating_modifiers_' + attributeTypeSections[c] + '_modifier']);
-                let signSymbol = modifierValue >= 0 ? '+' : '';
-                newTextValue += ` {{${values['repeating_modifiers_' + attributeTypeSections[c] + '_name']} ${signSymbol}[[(${modifierValue})]]}}`;
-            }
-        }
-        let attrsToUpdate = {};
-        attrsToUpdate[triggerAttributeType] = newValue;
-        if (isTextAttribute) {
-            attrsToUpdate[triggerAttributeType + 'Text'] = newTextValue;
-        }
-        return attrsToUpdate;
-    }
     
     const getPriceText = (copperTotal, silverTotal, goldTotal) => {
         if (goldTotal === 0 && silverTotal === 0 && copperTotal === 0) {
@@ -4510,11 +4676,22 @@
         getSectionIDs(repeatingSectionName, (idArray) => {
             for (const id of idArray) {
                 repAttributes.push(`${repeatingSectionName}_${id}_itemId`);
+                repAttributes.push(`${repeatingSectionName}_${id}_hands`);
             }
             getAttrs(repAttributes, values => {
                 const foundAttr = Object.keys(values).find(key => values[key] === itemId);
                 if (foundAttr) {
                     const rowId = foundAttr.split('_')[2];
+                    if (values[`${repeatingSectionName}_${rowId}_hands`] === Hands.Left) {
+                        setAttrs({ leftHand: 0 });
+                    }
+                    if (values[`${repeatingSectionName}_${rowId}_hands`] === Hands.Right) {
+                        setAttrs({ rightHand: 0 });
+                    }
+                    if (values[`${repeatingSectionName}_${rowId}_hands`] === Hands.Both) {
+                        setAttrs({ leftHand: 0 });
+                        setAttrs({ rightHand: 0 });
+                    }
                     removeRepeatingRow(`${repeatingSectionName}_${rowId}`);
                 }
             });
@@ -4637,6 +4814,8 @@
                 `repeating_items_shieldQuality`,
                 `repeating_items_armorQuality`,
                 `repeating_items_size`,
+                `repeating_items_ammunitionId`,
+                `repeating_items_ammunitionName`,
                 `repeating_items_isMelee`,
                 `repeating_items_isThrowing`,
                 `repeating_items_isRanged`,
@@ -4656,6 +4835,46 @@
                     syncItem(eventInfo, values, itemId);
                 }
             });
+        }
+    });
+    on('change:repeating_items:ammunitionId', (eventInfo) => {
+        workerLog('change ammunitionId', eventInfo);
+        const arr = eventInfo.sourceAttribute.split('_');
+        if (arr.length === 4) {
+            const id = arr[2];
+            const ammunitionId = eventInfo.newValue;
+            if (!ammunitionId) {
+                const attributes = [
+                    `repeating_items_${id}_itemId`,
+                ];
+                getAttrs(attributes, (values) => {
+                    setAttrs({ [`repeating_items_${id}_ammunitionName`]: ' ' }, { silent: true }, () => {
+                        const item = {
+                            itemId: values[`repeating_items_${id}_itemId`],
+                            count: 0,
+                            ammunitionName: ''
+                        };
+                        updateSectionRow('repeating_ranged', item);
+                    });
+                });
+            }
+            else {
+                const attributes = [
+                    `repeating_items_${id}_itemId`,
+                    `repeating_items_${ammunitionId}_name`,
+                    `repeating_items_${ammunitionId}_count`
+                ];
+                getAttrs(attributes, (values) => {
+                    const item = {
+                        itemId: values[`repeating_items_${id}_itemId`],
+                        count: values[`repeating_items_${ammunitionId}_count`],
+                        ammunitionName: values[`repeating_items_${ammunitionId}_name`]
+                    };
+                    setAttrs({ [`repeating_items_${id}_ammunitionName`]: item.ammunitionName }, { silent: true }, () => {
+                        updateSectionRow('repeating_ranged', item);
+                    });
+                });
+            }
         }
     });
     on('remove:repeating_items', (eventInfo) => {
