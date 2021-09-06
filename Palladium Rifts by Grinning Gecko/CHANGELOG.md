@@ -27,3 +27,4 @@
 - Replace debug class with checkbox. Rename `Imp/Exp` tab to `Options`
 - Replace logo with github link
 - Fix bad HTML on Perception Check emoji
+- Separate Trust/Intimidate into Trust and Intimidate
