@@ -558,17 +558,11 @@ const COMBAT_KEYS = [
 ];
 const SAVE_KEYS_ATTRIBUTE_BONUSES = {
   me_bonus: ["psionics", "insanity"],
-  pe_bonus: [
-    "magic",
-    "lethalpoison",
-    "nonlethalpoison",
-    "disease",
-    "pain",
-    "drugs",
-  ],
+  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
   pe_coma_bonus: ["comadeath"],
   perception_bonus: ["perceptioncheck"],
   none: [
+    "pain",
     "horrorfactor",
     "mindcontrol",
     "illusions",
