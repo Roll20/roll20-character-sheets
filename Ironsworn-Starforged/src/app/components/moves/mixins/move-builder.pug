@@ -1,18 +1,19 @@
 include ./container
-include ./oracle-table
+include ../../oracles/mixins/oracle-table
 
 mixin movePreviewFactory(move, options)
   +container(move, options)
     .rules-text!=move.Text
     if move.Oracle
       .move-oracle-container
-        if move.Name === 'Ask the Oracle'
-          //- TODO: resolve this so it pulls AtA properly
-        else
-          - var singleOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
-          +oracleTable(singleOracle)
+        - var moveOracle = oracles.find(group => { return group.Name === 'Move' }).Oracles.find(oracle => { return oracle.Name === move.Name })
+        if moveOracle.Table
+          +oracleTable(moveOracle)
+        else if moveOracle.Tables
+          each subOracle in moveOracle.Tables
+            +oracleSubTable(subOracle)
 
-mixin preview(move, options)
+mixin movePreview(move, options)
   if options.no_title
     div
   else
@@ -31,10 +32,10 @@ mixin preview(move, options)
 mixin container(move, options = false)
   if options.visibility
     div.move-visible
-      +preview(move, options)
+      +movePreview(move, options)
         block
   else
     input(type='radio' name='attr_move_preview' class=`${move.id} hide-element` value=move.Name)
     div(class=`${move.id} showhide`)
-      +preview(move, options)
+      +movePreview(move, options)
         block
