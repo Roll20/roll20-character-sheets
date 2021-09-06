@@ -33,7 +33,7 @@ async function migrateAttributes() {
         );
         const a = await getAttrsAsync(attrKeys);
         const attrs = ids.reduce((acc, id) => {
-          for (const to in attribute.to) {
+          for (const to of attribute.to) {
             const fromKey = `repeating_${section}_${id}_${attribute.from}`;
             if (a[fromKey]) {
               acc[`repeating_${section}_${id}_${to}`] = a[fromKey];
