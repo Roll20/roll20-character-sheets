@@ -4602,7 +4602,7 @@
     <span name="attr_initiative"></span>
     <button
       type="roll"
-      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative}]]}}"
+      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative} &{tracker}]]}}"
       name="roll_bonus_initiative"
     ></button>
   </label>
@@ -5637,7 +5637,7 @@
     <span name="attr_initiative"></span>
     <button
       type="roll"
-      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative}]]}}"
+      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative} &{tracker}]]}}"
       name="roll_bonus_initiative"
     ></button>
   </label>
@@ -8358,6 +8358,36 @@ on("clicked:getdefaultprofile", async (e) => {
   console.log(a);
 });
 
+/**
+ * Add a token {attack} times to the Turn Tracker in order against other tokens.
+ * Requires API script access.
+ * For use on an action button.
+ *
+ * [[d20+@{selected|repeating_profiles_-MibcwHG5hZXUJn6A7OG_initiative} &{tracker}]]
+ */
+async function palladiumAddToTurnTracker(e) {
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const {
+    [`${rowPrefix}_initiative`]: init,
+    [`${rowPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([`${rowPrefix}_initiative`, `${rowPrefix}_attacks`]);
+  const roll = await startRoll(
+    `&{template:test} {{name=Test}} {{roll1=[[1d20]]}}`
+  );
+  console.log(roll);
+  const computed = roll.results.roll1.result + init;
+  console.log(computed);
+  finishRoll(roll.rollId, {
+    roll1: computed,
+  });
+  const addToTracker = await startRoll(`[[[[${computed}]] &{tracker}]]`);
+  finishRoll(addToTracker.rollId);
+  // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
+  const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
+  finishRoll(dupeTracker.rollId);
+}
+
   /* endinject */
 
   /* inject:js/attributes.js */
@@ -9276,6 +9306,7 @@ on("sheet:opened", async (e) => {
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
    *
+   * [x] Add init roll to tracker
    * [x] Move Initiative outside of Ancient section
    * [x] Range Strike roll template - update text for single/burst
    * [x] Make debug a button/attribute instead of having to edit the markup
@@ -9473,6 +9504,16 @@ on("sheet:opened", async (e) => {
       {{/allprops() title subtitle desc color}} {{#desc}}
       <div class="sheet-desc">{{desc}}</div>
       {{/desc}}
+    </div>
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-test">
+  <div class="sheet-template-container">
+    <h1>{{name}}</h1>
+    <div class="sheet-results">
+      <h4>Result = {{roll1}}</h4>
+      <h4>Custom Result = {{computed::roll1}}</h4>
     </div>
   </div>
 </rolltemplate>
