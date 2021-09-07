@@ -1,3 +1,36 @@
+<div>
+    <button type="action" name="act_character" checked="checked">Character</button>
+    <button type="action" name="act_journal" >Journal</button>
+    <button type="action" name="act_monster" >Monster</button>
+</div>
+<input type="hidden" class="sheet-tabstoggle" name="attr_sheetTab"  value="character"  />
+
+<div class="sheet-character">
+    <h2>Character</h2>
+</div>
+<div class="sheet-journal">
+    <h2>Journal/Notes</h2>
+    <span>Journal/Notes</span>
+	<textarea name="attr_my-text1"></textarea>
+	<textarea name="attr_my-text2"></textarea>
+	<textarea name="attr_my-text3"></textarea>
+</div>
+<div class="sheet-monster">
+    <h2>Monster</h2>
+    <span>Monster goes here</span> 
+</div>
+
+<script type="text/worker">
+    const buttonlist = ["character","journal","monster"];
+    buttonlist.forEach(button => {
+        on(`clicked:${button}`, function() {
+            setAttrs({
+                sheetTab: button
+            });
+        });
+    });
+</script>
+<div class="sheet-character">
 <div class="sheet-2colrow">
    <div class="sheet-col">
       <table>
@@ -37,9 +70,24 @@
                   <option value="Chaotic Evil">Chaotic Evil</option>
                </select>
             </td>
-            <td></td>
+			<td></td>
             <td class="boldme">Movement:</td>
             <td><input type="number" name="attr_Movement" class="short" value="30"/></td>
+         </tr>
+	
+		 <tr>
+            <td class="boldme">Hair:</td>
+            <td><input type="text" name="attr_Hair" class="medium" value="0" /></td>
+            <td></td>
+            <td class="boldme">Height:</td>
+            <td><input type="text" name="attr_Height" class="short" value="0"/></td>
+         </tr>
+		<tr>
+            <td class="boldme">Eyes:</td>
+            <td><input type="text" name="attr_Eyes" class="medium" value="0" /></td>
+            <td></td>
+            <td class="boldme">Weight</td>
+            <td><input type="text" name="attr_Weight" class="short" value="0"/></td>
          </tr>
          <tr>
             <td colspan="5" class="boldme">Languages</td>
@@ -59,121 +107,44 @@
             <td colspan="5" class="bluehilite botul">Turn Undead</td>
         </tr>
         <tr>
-            <td colspan="2" class="bluehilite">Turning Check</td>
-            <td class="bluehilite"></td>
-            <td colspan="2"  class="bluehilite"># Turned</td>
+            <td colspan="3" class="bluehilite">Turning Check</td>
+            <td colspan="1" class="bluehilite">Success Roll</td>
+            <td colspan="1" class="bluehilite"># Turned</td>
          </tr>
          <tr>
-            <td colspan="2" width="50%"><input type="text" name="attr_TurnUndeadCheck" class="undead" value="WIS (12 + Monster HD)" /></td>
-            <td>&nbsp;</td>
-            <td colspan="2" width="50%"><input  type="text" name="attr_TurnUndeadTurned" class="undead" value="d12 + 0" /></td>
+            <td colspan="2" width="30%"><input type="text" name="attr_TurnUndeadCheck" class="undead" value="WIS (12 + Monster HD)" disabled="true"/></td>
+			<td></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Turning Undead}} {{Result=[[1d20+@{Level}+@{WisdomMod}]]}}" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Common Undead}} {{Result=[[1d12+@{CharismaMod}]] common undead turned}}" /></td>
          </tr>
          <tr>
             <td colspan="5">&nbsp;</td>
          </tr>
+		 <tr>
+            <td class="boldme">Roll For Initiative</td>
+			<td class="attrchk alleft"><button type="roll" value="&{template:default} {{name=Initiative Roll}} {{Result=[[1d10 &{tracker}]]}}" /></td>
+		 </tr>
+        <tr>
+            <td colspan="2" class="bluehilite botul">Armor</td>
+			<td colspan="3" class="bluehilite botul">Hit Points</td>
+        </tr>
          <tr>
             <td class="boldme">Armor:</td>
-            <td colspan="4"><input type="text" name="attr_ArmorWorn" value="" /></td>
+            <td colspan="2"><input type="text" name="attr_ArmorWorn" value="" /></td>
+            <td colspan="3" class="alcenter"><input type="number" name="attr_HP" class="short" value="10"/>/<input type="number" name="attr_HPmax" class="short" value="10"/></td>
          </tr>
          <tr>
             <td class="boldme">Shield:</td>
             <td colspan="2"><input type="text" name="attr_ShieldWorn" value="" /></td>
-            <td colspan="2"class="boldme alcenter">Hit Points:</td>
+			<td colspan="3">&nbsp;</td>
          </tr>
          <tr>
             <td class="boldme">Helm:</td>
             <td colspan="2"><input type="text" name="attr_HelmWorn" value="" /></td>
-            <td colspan="2" class="alcenter"><input type="number" name="attr_HP" class="short" value="10"/>/<input type="number" name="attr_HPmax" class="short" value="10"/></td>
+			<td colspan="3">&nbsp;</td>
          </tr>
     </table>
-   </div>
-   <div class="sheet-col">
-      <table class="attrtab">
-        <tr>
-            <td colspan="6" class="alcenter"><img src="http://cf.geekdo-images.com/images/pic1807281_t.png"></img></td>
-        </tr>
-         <tr>
-            <td colspan="2" class="boldme">Attributes</td>
-            <td colspan="4">(Attribute check: d20 + lvl + mod)</td>
-         </tr>
-         <tr>
-            <td class="bluehilite alleft attrchk">Check</td>
-            <td class="bluehilite attrhdrtext">Pri Sec Ter</td>
-            <td class="bluehilite"></td>
-            <td class="bluehilite">Score</td>
-            <td class="bluehilite">Mod</td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter"><button type="roll" value="/roll d20+@{Level}+@{StrengthMod} (Strength Check)" /></td>
-            <td class="alcenter tiny" />
-				<input type="checkbox" title='Primary' name="attr_StrengthPri" class="supertiny" value="1" /> 
-				<input type="checkbox" title='Secondary' name="attr_StrengthSec" class="supertiny" value="1" />
-				<input type="checkbox" title='Ternary' name="attr_StrengthTer" class="supertiny" value="1" />
-			</td>
-            <td title='Paralysis &amp; Constriction' class="mnattr attrtext alcenter">Strength</td>
-            <td><input type="number" name="attr_Strength" class="attrtext" value="@{Strength}" /></td>
-            <td><input type="number" name="attr_StrengthMod" class="attrtext" value="0" /></td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter" ><button type="roll" value="/roll d20+@{Level}+@{DexterityMod} (Dexterity check)"/></td>
-            <td class="alcenter tiny" />
-                <input type="checkbox" title='Primary' name="attr_DexterityPri" class="supertiny" value="1" />
-			    <input type="checkbox" title='Secondary' name="attr_DexteritySec" class="supertiny" value="1" />
-			    <input type="checkbox" title='Ternary' name="attr_DexterityTer" class="supertiny" value="1" />
-			</td>
-            <td title='Breath weapon &amp; Traps' class="mnattr attrtext alcenter">Dexterity</td>
-            <td><input type="number" name="attr_Dexterity" class="short" value="@{Dexterity}" /></td>
-            <td><input type="number" name="attr_DexterityMod" class="short" value="0" /></td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter" ><button type="roll" value="/roll d20+@{Level}+@{ConstitutionMod} (Constitution check)" /></td>
-            <td class="alcenter tiny" />
-                <input type="checkbox" title='Primary' name="attr_ConstitutionPri" class="supertiny" value="1" />
-			    <input type="checkbox" title='Secondary' name="attr_ConstitutionSec" class="supertiny" value="1" />
-			    <input type="checkbox" title='Ternary' name="attr_ConstitutionTer" class="supertiny" value="1" />
-            </td>
-            <td title='Disease, Energy drain &amp; Poison' class="mnattr attrtext alcenter">Constitution</td>
-            <td><input type="number" name="attr_Constitution" class="short" value="@{Constitution}" /></td>
-            <td><input type="number" name="attr_ConstitutionMod" class="short" value="0" /></td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter"><button type="roll" value="/roll d20+@{Level}+@{IntelligenceMod} (Intelligence check)" /></td>
-            <td class="alcenter tiny" />
-                <input type="checkbox" title='Primary' name="attr_IntelligencePri" class="supertiny" value="1" />
-			    <input type="checkbox" title='Secondary' name="attr_IntelligenceSec" class="supertiny" value="1" />
-			    <input type="checkbox" title='Ternary' name="attr_IntelligenceTer" class="supertiny" value="1" />
-			</td>
-            <td title='Arcane magic &amp; Illusion' class="mnattr attrtext alcenter">Intelligence</td>
-            <td><input type="number" name="attr_Intelligence" class="short" value="@{Intelligence}" /></td>
-            <td><input type="number" name="attr_IntelligenceMod" class="short" value="0" /></td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter" ><button type="roll" value="/roll d20+@{Level}+@{WisdomMod} (Wisdom check)" /></td>
-            <td class="alcenter tiny" />
-                <input type="checkbox" title='Primary' name="attr_WisdomPri" class="supertiny" value="1" />
-			    <input type="checkbox" title='Secondary' name="attr_WisdomSec" class="supertiny" value="1" />
-			    <input type="checkbox" title='Ternary' name="attr_WisdomTer" class="supertiny" value="1" />
-			</td>
-            <td title='Confusion, Divine magic &amp; Gaze attack' class="mnattr attrtext alcenter">Wisdom</td>
-            <td><input type="number" name="attr_Wisdom" class="short" value="@{Wisdom}" /></td>
-            <td><input type="number" name="attr_WisdomMod" class="short" value="0" /></td>
-         </tr>
-         <tr>
-            <td class="attrchk alcenter"><button type="roll" value="/roll d20+@{Level}+@{CharismaMod} (Charisma check)" /></td>
-            <td class="alcenter tiny" />
-                <input type="checkbox" title='Primary' name="attr_CharismaPri" class="supertiny" value="1" />
-			    <input type="checkbox" title='Secondary' name="attr_CharismaSec" class="supertiny" value="1" />
-			    <input type="checkbox" title='Ternary' name="attr_CharismaTer" class="supertiny" value="1" />
-			</td>
-            <td title='Death attack, Charm &amp; Fear' class="mnattr attrtext alcenter">Charisma</td>
-            <td><input type="number" name="attr_Charisma" class="short" value="@{Charisma}" /></td>
-            <td><input type="number" name="attr_CharismaMod" class="short" value="0" /></td>
-         </tr>
-         <tr>
-            <td colspan="5"></td>
-         </tr>
-      </table>
-      <table>
+	<table>
          <tr>
             <td class="bluehilite alleft">AC</td>
             <td class="bluehilite alcenter">Armor</td>
@@ -192,7 +163,199 @@
          </tr>
          <tr>
             <td colspan="6"></td>
+		 </tr>
+	</table>
+
+   </div>
+   <div class="sheet-col">
+      <table class="attrtab">
+        <tr>
+            <td colspan="6" class="alcenter"><img src="https://i.imgur.com/ivQOW2B.png"></img></td>
+        </tr>
+         <tr>
+            <td colspan="2" class="boldme">Attributes</td>
+            <td colspan="4">(Attribute check: d20 + lvl + mod)</td>
          </tr>
+         <tr>
+            <td class="bluehilite alleft attrchk">Check</td>
+            <td class="bluehilite attrhdrtext">Pri Sec Ter</td>
+            <td class="bluehilite"></td>
+            <td class="bluehilite">Score</td>
+            <td class="bluehilite">Mod</td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Strength Check}} {{Result=[[1d20+@{Level}+@{StrengthMod}]]}} {{Strength Prime=@{StrengthPri}}}" /></td>
+            <td class="alcenter tiny" />
+				<input type="checkbox" title='Primary' name="attr_StrengthPri" class="supertiny" value="1" />
+				<input type="checkbox" title='Secondary' name="attr_StrengthSec" class="supertiny" value="0" />
+				<input type="checkbox" title='Ternary' name="attr_StrengthTer" class="supertiny" value="0" />
+			</td>
+            <td title='Paralysis &amp; Constriction' class="mnattr attrtext alcenter">Strength</td>
+            <td><input type="number" name="attr_Strength" class="attrtext" value="@{Strength}" /></td>
+            <td><input type="number" name="attr_StrengthMod" class="attrtext" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=Dexterity Check}} {{Result=[[1d20+@{Level}+@{DexterityMod}]]}} {{Dexterity Prime=@{DexterityPri}}}"/></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_DexterityPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_DexteritySec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_DexterityTer" class="supertiny" value="0" />
+			</td>
+            <td title='Breath weapon &amp; Traps' class="mnattr attrtext alcenter">Dexterity</td>
+            <td><input type="number" name="attr_Dexterity" class="short" value="@{Dexterity}" /></td>
+            <td><input type="number" name="attr_DexterityMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=Constitution Check}} {{Result=[[1d20+@{Level}+@{ConstitutionMod}]]}} {{Constitution Prime=@{ConstitutionPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_ConstitutionPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_ConstitutionSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_ConstitutionTer" class="supertiny" value="0" />
+            </td>
+            <td title='Disease, Energy drain &amp; Poison' class="mnattr attrtext alcenter">Constitution</td>
+            <td><input type="number" name="attr_Constitution" class="short" value="@{Constitution}" /></td>
+            <td><input type="number" name="attr_ConstitutionMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Intelligence Check}} {{Result=[[1d20+@{Level}+@{IntelligenceMod}]]}} {{Intelligence Prime=@{IntelligencePri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_IntelligencePri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_IntelligenceSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_IntelligenceTer" class="supertiny" value="0" />
+			</td>
+            <td title='Arcane magic &amp; Illusion' class="mnattr attrtext alcenter">Intelligence</td>
+            <td><input type="number" name="attr_Intelligence" class="short" value="@{Intelligence}" /></td>
+            <td><input type="number" name="attr_IntelligenceMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=Wisdom Check}} {{Result=[[1d20+@{Level}+@{WisdomMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_WisdomPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_WisdomSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_WisdomTer" class="supertiny" value="0" />
+			</td>
+            <td title='Confusion, Divine magic &amp; Gaze attack' class="mnattr attrtext alcenter">Wisdom</td>
+            <td><input type="number" name="attr_Wisdom" class="short" value="@{Wisdom}" /></td>
+            <td><input type="number" name="attr_WisdomMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Charisma Check}} {{Result=[[1d20+@{Level}+@{CharismaMod}]]}} {{Charisma Prime=@{CharismaPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_CharismaPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_CharismaSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_CharismaTer" class="supertiny" value="0" />
+			</td>
+            <td title='Death attack, Charm &amp; Fear' class="mnattr attrtext alcenter">Charisma</td>
+            <td><input type="number" name="attr_Charisma" class="short" value="@{Charisma}" /></td>
+            <td><input type="number" name="attr_CharismaMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td colspan="5"></td>
+         </tr>
+      </table>
+		<table class="attrtab">
+		 <tr>
+            <td colspan="2" class="boldme">Saving Throws</td>
+            <td colspan="4">(Attribute check: d20 + lvl + mod)</td>
+         </tr>
+         <tr>
+            <td class="bluehilite alleft attrchk">Check</td>
+            <td class="bluehilite">Save Type</td>
+            <td class="bluehilite alleft">Mod</td>
+            <td class="bluehilite alleft attrchk">Check</td>
+            <td class="bluehilite">Save Type</td>
+            <td class="bluehilite alleft">Mod</td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Paralysis}} {{Result=[[1d20+@{Level}+@{StrengthMod}+@{SaveParalysisSaveMod}]]}} {{Strength Prime=@{StrengthPri}}}" /></td>
+			</td>
+            <td title='Paralysis' class="attrhdrtext alcenter">Paralysis</td>
+            <td><input type="number" name="attr_SaveParalysisSaveMod" class="attrtext" value="0" /></td>
+			<td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Constriction}} {{Result=[[1d20+@{Level}+@{StrengthMod}+@{SaveConstrictionSaveMod}]]}} {{Strength Prime=@{StrengthPri}}}" /></td>
+			</td>
+			<td title='Constriction' class="attrhdrtext alcenter">Constriction</td>
+            <td><input type="number" name="attr_SaveConstrictionSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Breath Weapon}} {{Result=[[1d20+@{Level}+@{DexterityMod}+@{SaveBreathWeaponSaveMod}]]}} {{Dexterity Prime=@{DexterityPri}}}" /></td>
+			</td>
+            <td title='Breath Weapon' class="attrhdrtext alcenter">Breath Weapon</td>
+            <td><input type="number" name="attr_SaveBreathWeaponSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Traps}} {{Result=[[1d20+@{Level}+@{DexterityMod}+@{SaveTrapsSaveMod}]]}} {{Dexterity Prime=@{DexterityPri}}}" /></td>
+			</td>
+            <td title='Traps' class="attrhdrtext alcenter">Traps</td>
+            <td><input type="number" name="attr_SaveTrapsSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Disease}} {{Result=[[1d20+@{Level}+@{ConstitutionMod}+@{SaveDiseaseSaveMod}]]}} {{Constitution Prime=@{ConstitutionPri}}}" /></td>
+			</td>
+            <td title='Disease' class="attrhdrtext alcenter">Disease</td>
+            <td><input type="number" name="attr_SaveDiseaseSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Poison}} {{Result=[[1d20+@{Level}+@{ConstitutionMod}+@{SavePoisonSaveMod}]]}} {{Constitution Prime=@{ConstitutionPri}}}" /></td>
+			</td>
+            <td title='Poison' class="attrhdrtext alcenter">Poison</td>
+            <td><input type="number" name="attr_SavePoisonSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Arcane Magic}} {{Result=[[1d20+@{Level}+@{IntelligenceMod}+@{SaveArcaneMagicSaveMod}]]}} {{Intelligence Prime=@{IntelligencePri}}}" /></td>
+			</td>
+            <td title='Arcane Magic' class="attrhdrtext alcenter">Arcane Magic</td>
+            <td><input type="number" name="attr_SaveArcaneMagicSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Illusion}} {{Result=[[1d20+@{Level}+@{IntelligenceMod}+@{SaveIllusionSaveMod}]]}} {{Intelligence Prime=@{IntelligencePri}}}" /></td>
+			</td>
+            <td title='Illusion' class="attrhdrtext alcenter">Illusion</td>
+            <td><input type="number" name="attr_SaveIllusionSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Confusion}} {{Result=[[1d20+@{Level}+@{WisdomMod}+@{SaveConfusionSaveMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+			</td>
+            <td title='Confusion' class="attrhdrtext alcenter">Confusion</td>
+            <td><input type="number" name="attr_SaveConfusionSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Divine Magic}} {{Result=[[1d20+@{Level}+@{WisdomMod}+@{SaveDivineMagicSaveMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+			</td>
+            <td title='Divine Magic' class="attrhdrtext alcenter">Divine Magic</td>
+            <td><input type="number" name="attr_SaveDivineMagicSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Gaze Attack}} {{Result=[[1d20+@{Level}+@{WisdomMod}+@{SaveGazeAttackSaveMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+			</td>
+            <td title='Gaze Attack' class="attrhdrtext alcenter">Gaze Attack</td>
+            <td><input type="number" name="attr_SaveGazeAttackSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Petrification}} {{Result=[[1d20+@{Level}+@{WisdomMod}+@{SavePetrificationSaveMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+			</td>
+            <td title='Petrification' class="attrhdrtext alcenter">Petrification</td>
+            <td><input type="number" name="attr_SavePetrificationSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Death Attack}} {{Result=[[1d20+@{Level}+@{CharismaMod}+@{SaveDeathAttackSaveMod}]]}} {{Charisma Prime=@{CharismaPri}}}" /></td>
+			</td>
+            <td title='Death Attack' class="attrhdrtext alcenter">Death Attack</td>
+            <td><input type="number" name="attr_SaveDeathAttackSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Charm}} {{Result=[[1d20+@{Level}+@{CharismaMod}+@{SaveCharmSaveMod}]]}} {{Charisma Prime=@{CharismaPri}}}" /></td>
+			</td>
+            <td title='Charm' class="attrhdrtext alcenter">Charm</td>
+            <td><input type="number" name="attr_SaveCharmSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Fear}} {{Result=[[1d20+@{Level}+@{CharismaMod}+@{SaveFearSaveMod}]]}} {{Charisma Prime=@{CharismaPri}}}" /></td>
+			</td>
+            <td title='Fear' class="attrhdrtext alcenter">Fear</td>
+            <td><input type="number" name="attr_SaveFearSaveMod" class="attrtext" value="0" /></td>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Energy Drain}} {{Result=[[1d20+@{Level}+@{ConstitutionMod}+@{SaveEnergyDrainSaveMod}]]}} {{Constitution Prime=@{ConstitutionPri}}}" /></td>
+			</td>
+            <td title='Energy Drain' class="attrhdrtext alcenter">Energy Drain</td>
+            <td><input type="number" name="attr_SaveEnergyDrainSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+		 <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=Save Vs Polymorph}} {{Result=[[1d20+@{Level}+@{WisdomMod}+@{SavePolymorphSaveMod}]]}} {{Wisdom Prime=@{WisdomPri}}}" /></td>
+			</td>
+            <td title='Polymorph' class="attrhdrtext alcenter">Polymorph</td>
+            <td><input type="number" name="attr_SavePolymorphSaveMod" class="attrtext" value="0" /></td>
+         </tr>
+<!--		<tr>
+			<td class="attrchk alcenter"><button type="roll" value="/roll d20+@{Level}+@{StrengthMod} (Strength Check) (Prime = @{StrengthPri} )" /></td>
+			<td class="attrchk alcenter"><button type="roll" value="/roll d20+@{Level}+@{StrengthMod} (Strength Check)" /></td>
+       </tr>--> 
       </table>
    </div>
 </div>
@@ -218,8 +381,8 @@
         </tr>
         <tr>
             <td>
-               <button type="roll" value="/roll d20+@{WeaponHitTotal_1} Attack with @{WeaponName_1}" name="roll_WeaponHitOne" />
-               <button type="roll" value="/roll @{WeaponDmg_1}+@{WeaponDmgTotal_1}  @{WeaponName_1} damage" name="roll_WeaponDmgOne" />
+			   <button type="roll" value="&{template:default} {{name=Attack with @{WeaponName_1}}} {{Result=[[1d20++@{WeaponHitTotal_1}]]}}" name="roll_WeaponHitOne" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{WeaponName_1}}} {{Result=[[@{WeaponDmg_1}+@{WeaponDmgTotal_1}]]}}" name="roll_WeaponDmgOne" />
             </td>
             <td><input type="text" name="attr_WeaponName_1" class="medium" value="Empty" /></td>
             <td><input type="number" name="attr_WeaponBth_1" class="short" value="0" />+</td>
@@ -236,8 +399,8 @@
         </tr>
         <tr>
             <td>
-               <button type="roll" value="/roll d20+@{WeaponHitTotal_2} Attack with @{WeaponName_2}" name="roll_WeaponHitTwo" />
-               <button type="roll" value="/roll @{WeaponDmg_2}+@{WeaponDmgTotal_2} @{WeaponName_2} damage" name="roll_WeaponDmgTwo" />
+			   <button type="roll" value="&{template:default} {{name=Attack with @{WeaponName_2}}} {{Result=[[1d20++@{WeaponHitTotal_2}]]}}" name="roll_WeaponHitTwo" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{WeaponName_2}}} {{Result=[[@{WeaponDmg_2}+@{WeaponDmgTotal_2}]]}}" name="roll_WeaponDmgTwo" />
             </td>
             <td><input type="text" name="attr_WeaponName_2" class="medium" value="Empty" /></td>
             <td><input type="number" name="attr_WeaponBth_2" class="short" value="0" />+</td>
@@ -254,8 +417,8 @@
         </tr>
         <tr>
             <td>
-               <button type="roll" value="/roll d20+@{WeaponHitTotal_3} Attack with @{WeaponName_3}" name="roll_WeaponHitThree" />
-               <button type="roll" value="/roll @{WeaponDmg_3}+@{WeaponDmgTotal_3} @{WeaponName_3} damage" name="roll_WeaponDmgThree" />
+			   <button type="roll" value="&{template:default} {{name=Attack with @{WeaponName_3}}} {{Result=[[1d20++@{WeaponHitTotal_3}]]}}" name="roll_WeaponHitThree" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{WeaponName_3}}} {{Result=[[@{WeaponDmg_3}+@{WeaponDmgTotal_3}]]}}" name="roll_WeaponDmgThree" />
             </td>
             <td><input type="text" name="attr_WeaponName_3" class="medium" value="Empty" /></td>
             <td><input type="number" name="attr_WeaponBth_3" class="short" value="0" />+</td>
@@ -272,8 +435,8 @@
         </tr>
         <tr>
             <td>
-               <button type="roll" value="/roll d20+@{WeaponHitTotal_4} Attack with @{WeaponName_4}" name="roll_WeaponHitFour" />
-               <button type="roll" value="/roll @{WeaponDmg_4}+@{WeaponDmgTotal_4} @{WeaponName_4} damage" name="roll_WeaponDmgFour" />
+			   <button type="roll" value="&{template:default} {{name=Attack with @{WeaponName_4}}} {{Result=[[1d20++@{WeaponHitTotal_4}]]}}" name="roll_WeaponHitFour" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{WeaponName_4}}} {{Result=[[@{WeaponDmg_4}+@{WeaponDmgTotal_4}]]}}" name="roll_WeaponDmgFour" />
             </td>
             <td><input type="text" name="attr_WeaponName_4" class="medium" value="Empty" /></td>
             <td><input type="number" name="attr_WeaponBth_4" class="short" value="0" />+</td>
@@ -290,8 +453,8 @@
         </tr>
         <tr>
             <td>
-               <button type="roll" value="/roll d20+@{WeaponHitTotal_5} Attack with @{WeaponName_5}" name="roll_WeaponHitFive" />
-               <button type="roll" value="/roll @{WeaponDmg_5}+@{WeaponDmgTotal_5} @{WeaponName_5} damage" name="roll_WeaponDmgFive" />
+			   <button type="roll" value="&{template:default} {{name=Attack with @{WeaponName_5}}} {{Result=[[1d20++@{WeaponHitTotal_5}]]}}" name="roll_WeaponHitFive" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{WeaponName_5}}} {{Result=[[@{WeaponDmg_5}+@{WeaponDmgTotal_5}]]}}" name="roll_WeaponDmgFive" />
             </td>
             <td><input type="text" name="attr_WeaponName_5" class="medium" value="Empty" /></td>
             <td><input type="number" name="attr_WeaponBth_5" class="short" value="0" />+</td>
@@ -305,6 +468,181 @@
             <td><input type="number" name="attr_WeaponDmgMisc_5" class="short" value="0" />+</td>
             <td><input type="number" name="attr_WeaponDmgMagic_5" class="short" value="0" />=</td>
             <td><input type="number" name="attr_WeaponDmgTotal_5" class="short" value="@{WeaponDmgMod_5}+@{WeaponDmgMisc_5}+@{WeaponDmgMagic_5}" disabled="true" /></td>
+        </tr>
+    </table>
+	<table>
+        <tr>
+            <td colspan="13" class="ceme" class="boldme">Class and Race Skills</td>
+        </tr>
+        <tr>
+            <td class="bluehilite boldme">Roll</td>
+            <td class="bluehilite boldme alcenter">Name</td>
+			<td class="bluehilite boldme alcenter">Attr</td>
+            <td class="bluehilite boldme alcenter">AttrBonus</td>
+            <td class="bluehilite boldme alcenter">Misc</td>
+            <td class="bluehilite boldme alcenter">Magic</td>
+            <td class="bluehilite boldme alcenter">Total</td>
+
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name1}}} {{Result=[[1d20+@{SkillCheckTotal_1}]]}}" name="roll_SkillCheckOne"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name1" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment1">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_1" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_1" class="short" value="@{level}+@{AttrBonus1}+@{SkillBonusMisc_1}+@{SkillBonusMagic_1}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name2}}} {{Result=[[1d20+@{SkillCheckTotal_2}]]}}" name="roll_SkillCheckTwo"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name2" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment2">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_2" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_2" class="short" value="@{level}+@{AttrBonus2}+@{SkillBonusMisc_2}+@{SkillBonusMagic_2}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name3}}} {{Result=[[1d20+@{SkillCheckTotal_3}]]}}" name="roll_SkillCheckThree"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name3" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment3">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_3" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_3" class="short" value="@{level}+@{AttrBonus3}+@{SkillBonusMisc_3}+@{SkillBonusMagic_3}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name4}}} {{Result=[[1d20+@{SkillCheckTotal_4}]]}}" name="roll_SkillCheckFour"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name4" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment4">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_4" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_4" class="short" value="@{level}+@{AttrBonus4}+@{SkillBonusMisc_4}+@{SkillBonusMagic_4}" disabled="true" /></td>
+         </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name5}}} {{Result=[[1d20+@{SkillCheckTotal_5}]]}}" name="roll_SkillCheckFive"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name5" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment5">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus5" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_5" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_5" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_5" class="short" value="@{level}+@{AttrBonus5}+@{SkillBonusMisc_5}+@{SkillBonusMagic_5}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name6}}} {{Result=[[1d20+@{SkillCheckTotal_6}]]}}" name="roll_SkillCheckSix"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name6" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment6">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus6" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_6" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_6" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_6" class="short" value="@{level}+@{AttrBonus6}+@{SkillBonusMisc_6}+@{SkillBonusMagic_6}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name7}}} {{Result=[[1d20+@{SkillCheckTotal_7}]]}}" name="roll_SkillCheckSeven"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name7" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment7">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus7" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_7" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_7" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_7" class="short" value="@{level}+@{AttrBonus7}+@{SkillBonusMisc_7}+@{SkillBonusMagic_7}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+				<button type="roll" value="&{template:default} {{name=Attempt with @{Skill_Name8}}} {{Result=[[1d20+@{SkillCheckTotal_8}]]}}" name="roll_SkillCheckEight"/>
+            </td>
+            <td><input type="text" name="attr_Skill_Name8" class="long" value="Empty" /></td>
+			<td>
+                <select name="attr_Alignment8">
+                  <option value="Strength">Strength</option>
+                  <option value="Dexterity">Dexterity</option>
+                  <option value="Constitution">Constitution</option>
+                  <option value="Intelligence">Intelligence</option>
+                  <option value="Wisdom">Wisdom</option>
+                  <option value="Charisma">Charisma</option>
+               </select>
+            </td>
+            <td><input type="number" name="attr_AttrBonus8" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMisc_8" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_SkillBonusMagic_8" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_SkillCheckTotal_8" class="short" value="@{level}+@{AttrBonus8}+@{SkillBonusMisc_8}+@{SkillBonusMagic_8}" disabled="true" /></td>
         </tr>
     </table>
 </div>
@@ -337,7 +675,7 @@
       </table>
    </div>
    <div class="sheet-col">
-      <table width="100%">
+      <table width="80%">
       <tr>
             <td></td>
         </tr>
@@ -354,11 +692,15 @@
             <td></td>
          </tr>
          <tr>
-            <td class="boldme">Senses</td>
+            <td class="boldme">Spellbook</td>
          <tr>
-            <td>
-               <fieldset class="repeating_senses">
-                  <input type="text" name="attr_Senses" class="long" />
+            <td align="left" class="bluehilite">Spell / Level / Memorized</td>
+         </tr>
+            <td style="white-space:nowrap">
+               <fieldset class="repeating_Spells">
+                  <input type="text" name="attr_Spells" class="medium" />
+				  <input type="number" name="attr_spelllevel" class="short" value="0" />
+				  <input type="number" name="attr_numbermemorized" class="short" value="0" />
                </fieldset>
             </td>
          </tr>
@@ -440,4 +782,275 @@
          </tr>
       </table>
    </div>
+</div>
+</div>
+<div class="sheet-monster">
+<div class="sheet-2colrow">
+   <div class="sheet-col">
+      <table>
+         <tr>
+            <td class="boldme">Name:</td>
+            <td><input type="text" name="attr_MonsterName" value="Monster Name" /></td>
+            <td></td>
+            <td class="boldme">HitDice:</td>
+            <td><input type="number" name="attr_MonsterHD" class="short" value="1"/></td>
+         </tr>
+         <tr>
+            <td class="boldme">Int</td>
+            <td><input type="text" name="attr_MonsterInt" value="Average" /></td>
+            <td></td>
+            <td class="boldme">Saves</td>
+            <td><input type="text" name="attr_MonsterSave" class="short" value="P"/></td>
+         </tr>
+         <tr>
+            <td class="boldme">Type:</td>
+            <td><input type="text" name="attr_MonRace" value="Type" /></td>
+            <td></td>
+            <td class="boldme">ArmorClass</td>
+            <td><input type="number" name="attr_MonsterAC" value="10" /></td>
+         </tr>
+         <tr>
+            <td class="boldme">Alignment:</td>
+            <td>
+                <select name="attr_MonAlignment">
+                  <option value="Lawful Good">Lawful Good</option>
+                  <option value="Neutral Good">Neutral Good</option>
+                  <option value="Chaotic Good">Chaotic Good</option>
+                  <option value="Lawful Neutral">Lawful Neutral</option>
+                  <option value="Neutral" selected="selected">Neutral</option>
+                  <option value="Chaotic Neutral">Chaotic Neutral</option>
+                  <option value="Lawful Evil">Lawful Evil</option>
+                  <option value="Neutral Evil">Neutral Evil</option>
+                  <option value="Chaotic Evil">Chaotic Evil</option>
+               </select>
+            </td>
+			<td></td>
+            <td class="boldme">Movement:</td>
+            <td><input type="number" name="attr_MonsterMovement" class="short" value="30"/></td>
+         </tr>
+	
+		 <tr>
+            <td class="boldme">Size</td>
+            <td><input type="text" name="attr_MonsterSize" class="medium" value="M" /></td>
+            <td></td>
+            <td class="boldme">No. Encountered</td>
+            <td><input type="text" name="attr_MonsterEncountered" class="short" value="1"/></td>
+         </tr>
+            <td class="boldme">Roll For Initiative</td>
+			<td class="attrchk alleft"><button type="roll" value="&{template:default} {{name=Initiative Roll}} {{Result=[[1d10 &{tracker}]]}}" /></td>
+		 </tr>
+        <tr>
+            <td colspan="2" class="bluehilite botul">Special Attacks</td>
+			<td colspan="3" class="bluehilite botul">Hit Points</td>
+        </tr>
+         <tr>
+            <td>&nbsp;</td>
+            <td colspan="2">&nbsp;</td>
+            <td colspan="3" class="alcenter"><input type="number" name="attr_MonHP" class="short" value="10"/>/<input type="number" name="attr_MonHPmax" class="short" value="10"/></td>
+         </tr>
+         <tr>
+            <td class="boldme">Special Attacks:</td>
+            <td colspan="2"><input type="text" name="attr_MonsSpec1" value="" /></td>
+            <td colspan="3" class="alcenter"><input type="text" name="attr_MonSA1" class="short" value="1d6"/></td>
+			<td class="attrchk alleft"><button type="roll" value="&{template:default} {{name=@{MonsSpec1}}} {{Result=[[@{MonSA1}]]}}" /></td>
+         </tr>
+         <tr>
+            <td class="boldme">Special Attacks:</td>
+            <td colspan="2"><input type="text" name="attr_MonsSpec2" value="" /></td>
+            <td colspan="3" class="alcenter"><input type="text" name="attr_MonSA2" class="short" value="1d6"/></td>
+			<td class="attrchk alleft"><button type="roll" value="&{template:default} {{name=@{MonsSpec2}}} {{Result=[[@{MonSA2}]]}}" /></td>
+         </tr>
+         <tr>
+            <td class="boldme">Special Defenses:</td>
+            <td colspan="2"><input type="text" name="attr_MonSpec3" value="" /></td>
+			<td colspan="3">&nbsp;</td>
+         </tr>
+    </table>
+	</div>
+	  <div class="sheet-col">
+      <table class="attrtab">
+        <tr>
+            <td colspan="6" class="alcenter"><img src="https://i.imgur.com/ivQOW2B.png"></img></td>
+        </tr>
+         <tr>
+            <td colspan="2" class="boldme">Attributes</td>
+            <td colspan="4">(Attribute check: d20 + lvl + mod)</td>
+         </tr>
+         <tr>
+            <td class="bluehilite alleft attrchk">Check</td>
+            <td class="bluehilite attrhdrtext">Pri Sec Ter</td>
+            <td class="bluehilite"></td>
+            <td class="bluehilite">Score</td>
+            <td class="bluehilite">Mod</td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=MonStr Check}} {{Result=[[1d20+@{Level}+@{MonStrMod}]]}} {{MonStr Prime=@{MonStrPri}}}" /></td>
+            <td class="alcenter tiny" />
+				<input type="checkbox" title='Primary' name="attr_MonStrPri" class="supertiny" value="1" />
+				<input type="checkbox" title='Secondary' name="attr_MonStrSec" class="supertiny" value="0" />
+				<input type="checkbox" title='Ternary' name="attr_MonStrTer" class="supertiny" value="0" />
+			</td>
+            <td title='Paralysis &amp; Constriction' class="mnattr attrtext alcenter">Str</td>
+            <td><input type="number" name="attr_MonStr" class="attrtext" value="@{MonStr}" /></td>
+            <td><input type="number" name="attr_MonStrMod" class="attrtext" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=MonDex Check}} {{Result=[[1d20+@{Level}+@{MonDexMod}]]}} {{MonDex Prime=@{MonDexPri}}}"/></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_MonDexPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_MonDexSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_MonDexTer" class="supertiny" value="0" />
+			</td>
+            <td title='Breath weapon &amp; Traps' class="mnattr attrtext alcenter">Dex</td>
+            <td><input type="number" name="attr_MonDex" class="short" value="@{MonDex}" /></td>
+            <td><input type="number" name="attr_MonDexMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=MonCon Check}} {{Result=[[1d20+@{Level}+@{MonConMod}]]}} {{MonCon Prime=@{MonConPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_MonConPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_MonConSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_MonConTer" class="supertiny" value="0" />
+            </td>
+            <td title='Disease, Energy drain &amp; Poison' class="mnattr attrtext alcenter">Con</td>
+            <td><input type="number" name="attr_MonCon" class="short" value="@{MonCon}" /></td>
+            <td><input type="number" name="attr_MonConMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=MonInt Check}} {{Result=[[1d20+@{Level}+@{MonIntMod}]]}} {{MonInt Prime=@{MonIntPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_MonIntPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_MonIntSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_MonIntTer" class="supertiny" value="0" />
+			</td>
+            <td title='Arcane magic &amp; Illusion' class="mnattr attrtext alcenter">Int</td>
+            <td><input type="number" name="attr_MonInt" class="short" value="@{MonInt}" /></td>
+            <td><input type="number" name="attr_MonIntMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter" ><button type="roll" value="&{template:default} {{name=MonWis Check}} {{Result=[[1d20+@{Level}+@{MonWisMod}]]}} {{MonWis Prime=@{MonWisPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_MonWisPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_MonWisSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_MonWisTer" class="supertiny" value="0" />
+			</td>
+            <td title='Confusion, Divine magic &amp; Gaze attack' class="mnattr attrtext alcenter">Wis</td>
+            <td><input type="number" name="attr_MonWis" class="short" value="@{MonWis}" /></td>
+            <td><input type="number" name="attr_MonWisMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td class="attrchk alcenter"><button type="roll" value="&{template:default} {{name=MonCha Check}} {{Result=[[1d20+@{Level}+@{MonChaMod}]]}} {{MonCha Prime=@{MonChaPri}}}" /></td>
+            <td class="alcenter tiny" />
+                <input type="checkbox" title='Primary' name="attr_MonChaPri" class="supertiny" value="1" />
+			    <input type="checkbox" title='Secondary' name="attr_MonChaSec" class="supertiny" value="0" />
+			    <input type="checkbox" title='Ternary' name="attr_MonChaTer" class="supertiny" value="0" />
+			</td>
+            <td title='Death attack, Charm &amp; Fear' class="mnattr attrtext alcenter">Cha</td>
+            <td><input type="number" name="attr_MonCha" class="short" value="@{MonCha}" /></td>
+            <td><input type="number" name="attr_MonChaMod" class="short" value="0" /></td>
+         </tr>
+         <tr>
+            <td colspan="5"></td>
+         </tr>
+      </table>
+</div>
+</div>
+    <table>
+        <tr>
+            <td colspan="13" class="ceme" class="boldme">Attacks</td>
+        </tr>
+        <tr>
+            <td class="bluehilite boldme">HitDmg</td>
+            <td class="bluehilite boldme alcenter">Name</td>
+            <td class="bluehilite boldme alcenter">BtH</td>
+            <td class="bluehilite boldme alcenter">Mod</td>
+            <td class="bluehilite boldme alcenter">Misc</td>
+            <td class="bluehilite boldme alcenter">Magic</td>
+            <td class="bluehilite boldme alcenter">Total</td>
+            <td class="bluehilite boldme alcenter">|</td>
+            <td class="bluehilite boldme alcenter">Dmg</td>
+            <td class="bluehilite boldme alcenter">Mod</td>
+            <td class="bluehilite boldme alcenter">Misc</td>
+            <td class="bluehilite boldme alcenter">Magic</td>
+            <td class="bluehilite boldme alcenter">Total</td>
+        </tr>
+        <tr>
+            <td>
+			   <button type="roll" value="&{template:default} {{name=Attack with @{MonWeaponName_1}}} {{Result=[[1d20++@{MonWeaponHitTotal_1}]]}}" name="roll_MonWeaponHitOne" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{MonWeaponName_1}}} {{Result=[[@{MonWeaponDmg_1}+@{MonWeaponDmgTotal_1}]]}}" name="roll_MonWeaponDmgOne" />
+            </td>
+            <td><input type="text" name="attr_MonWeaponName_1" class="medium" value="Empty" /></td>
+            <td><input type="number" name="attr_MonWeaponBth_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMod_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMisc_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMagic_1" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponHitTotal_1" class="short" value="@{MonWeaponBth_1}+@{MonWeaponHitMod_1}+@{MonWeaponHitMisc_1}+@{MonWeaponHitMagic_1}" disabled="true" /></td>
+            <td class="boldme">|</td>
+            <td><input type="text" name="attr_MonWeaponDmg_1" class="short" value="1d0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMod_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMisc_1" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMagic_1" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponDmgTotal_1" class="short" value="@{MonWeaponDmgMod_1}+@{MonWeaponDmgMisc_1}+@{MonWeaponDmgMagic_1}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+			   <button type="roll" value="&{template:default} {{name=Attack with @{MonWeaponName_2}}} {{Result=[[1d20++@{MonWeaponHitTotal_2}]]}}" name="roll_MonWeaponHitTwo" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{MonWeaponName_2}}} {{Result=[[@{MonWeaponDmg_2}+@{MonWeaponDmgTotal_2}]]}}" name="roll_MonWeaponDmgTwo" />
+            </td>
+            <td><input type="text" name="attr_MonWeaponName_2" class="medium" value="Empty" /></td>
+            <td><input type="number" name="attr_MonWeaponBth_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMod_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMisc_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMagic_2" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponHitTotal_2" class="short" value="@{MonWeaponBth_2}+@{MonWeaponHitMod_2}+@{MonWeaponHitMisc_2}+@{MonWeaponHitMagic_2}" disabled="true" /></td>
+            <td class="boldme">|</td>
+            <td><input type="text" name="attr_MonWeaponDmg_2" class="short" value="2d0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMod_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMisc_2" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMagic_2" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponDmgTotal_2" class="short" value="@{MonWeaponDmgMod_2}+@{MonWeaponDmgMisc_2}+@{MonWeaponDmgMagic_2}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+			   <button type="roll" value="&{template:default} {{name=Attack with @{MonWeaponName_3}}} {{Result=[[1d20++@{MonWeaponHitTotal_3}]]}}" name="roll_MonWeaponHitThree" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{MonWeaponName_3}}} {{Result=[[@{MonWeaponDmg_3}+@{MonWeaponDmgTotal_3}]]}}" name="roll_MonWeaponDmgThree" />
+            </td>
+            <td><input type="text" name="attr_MonWeaponName_3" class="medium" value="Empty" /></td>
+            <td><input type="number" name="attr_MonWeaponBth_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMod_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMisc_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMagic_3" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponHitTotal_3" class="short" value="@{MonWeaponBth_3}+@{MonWeaponHitMod_3}+@{MonWeaponHitMisc_3}+@{MonWeaponHitMagic_3}" disabled="true" /></td>
+            <td class="boldme">|</td>
+            <td><input type="text" name="attr_MonWeaponDmg_3" class="short" value="3d0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMod_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMisc_3" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMagic_3" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponDmgTotal_3" class="short" value="@{MonWeaponDmgMod_3}+@{MonWeaponDmgMisc_3}+@{MonWeaponDmgMagic_3}" disabled="true" /></td>
+        </tr>
+        <tr>
+            <td>
+			   <button type="roll" value="&{template:default} {{name=Attack with @{MonWeaponName_4}}} {{Result=[[1d20++@{MonWeaponHitTotal_4}]]}}" name="roll_MonWeaponHitFour" />
+			   <button type="roll" value="&{template:default} {{name=Damage with @{MonWeaponName_4}}} {{Result=[[@{MonWeaponDmg_4}+@{MonWeaponDmgTotal_4}]]}}" name="roll_MonWeaponDmgFour" />
+            </td>
+            <td><input type="text" name="attr_MonWeaponName_4" class="medium" value="Empty" /></td>
+            <td><input type="number" name="attr_MonWeaponBth_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMod_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMisc_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponHitMagic_4" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponHitTotal_4" class="short" value="@{MonWeaponBth_4}+@{MonWeaponHitMod_4}+@{MonWeaponHitMisc_4}+@{MonWeaponHitMagic_4}" disabled="true" /></td>
+            <td class="boldme">|</td>
+            <td><input type="text" name="attr_MonWeaponDmg_4" class="short" value="4d0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMod_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMisc_4" class="short" value="0" />+</td>
+            <td><input type="number" name="attr_MonWeaponDmgMagic_4" class="short" value="0" />=</td>
+            <td><input type="number" name="attr_MonWeaponDmgTotal_4" class="short" value="@{MonWeaponDmgMod_4}+@{MonWeaponDmgMisc_4}+@{MonWeaponDmgMagic_4}" disabled="true" /></td>
+        </tr>
+    </table>
+	<table>
+		<td colspan="1" class="bluehilite">Notes</td>
+	</table>
+		<textarea name="attr_Monmy-text"></textarea>
+
+	</div>
 </div>

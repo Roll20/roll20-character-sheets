@@ -5,7 +5,7 @@ Cortex Prime: Hammerhead Character Sheet
 - Open the Journal tab, and add a new Character.
 - Click on save changes.
 - Open the Character Sheet Tab
-- Tick the Edit Checkbox.
+- Hover over the green buttons and click the Edit Traits button to toggle the edit panel on and off.
 - Select One of the Portraits, or select the dot next to the word Portrait to set no portrait.
 - Set the dice values for the Attributes, Training Packages, and Relationships using the drop downs.
 - Untick the Edit check box to hide the editor
@@ -13,9 +13,7 @@ Cortex Prime: Hammerhead Character Sheet
 
 ##Stress
 
-I have been using API macro's to adjust Stress values. But these are simply Attributes (PhysicalStress, MentalStress, SocialStress).
-
-You can add these to the Attributes and Abilities tab manually, and assign values ranging from 2 to show the character has no stress - 4,6,8,10 or 12 corresponding to the dice value, or a value of 14 indicates the character has been stressed out.
+NEW: Two buttons have been added to the top of the character sheet, hover over the green buttons and click on the Edit Stress button to toggle the edit feature on. New trait boxes appear below the attributes and info block, and you can select from not stressed/d4/d6/d8/d10/d12/stressed out for each of the stress values.
 
 ###Diceroller
 
@@ -32,6 +30,11 @@ Character Portraits sourced from https://thispersondoesnotexist.com/
 
 
 ##Changelog
+
+### V1.3 2021-04-08
+
+Changed the Edit checkbox to a styled hover button.
+Added a second button that shows/hides a specific edit feature for Stress values.
 
 ### V1.2 2021-03-22
 
@@ -53,4 +56,4 @@ Removed Trauma
 Added d10 and d12 settings to relationships
 Minor adjustments
 
-### v.1.0 2021-03-13"
+### v.1.0 2021-03-13
