@@ -373,20 +373,7 @@
           title="Flying Speed"
         />
       </div>
-      <div class="ss-2b">
-        <label for="charm-impress">Charm/Impress</label>
-        <input
-          id="charm-impress"
-          type="number"
-          value="0"
-          name="attr_charmimpress"
-        /><span>%</span>
-        <button
-          type="roll"
-          value="@{character_name} Charm/Impress check: [[d100<@{charmimpress}]]"
-          name="roll_skill"
-        ></button>
-      </div>
+      <div class="ss-2b"></div>
       <div class="ss-2c">
         <label
           ><span>Hit Points</span>
@@ -447,11 +434,6 @@
             value="0"
             name="attr_perception"
           />
-          <button
-            type="roll"
-            value="Perception: [[d20+@{perception}]]"
-            name="roll_perception"
-          ></button>
         </label>
       </div>
     </div>
@@ -4616,7 +4598,7 @@
       <span name="attr_strike"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20+@{strike}]]}}"
+        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20cs>@{critical}+@{strike}]]}}"
         name="roll_bonus_strike"
       ></button>
     </label>
@@ -4686,7 +4668,7 @@
       <span name="attr_flipthrow"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20+@{flipthrow}]]}}"
+        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20cs>@{critical}+@{flipthrow}]]}}"
         name="roll_bonus_flipthrow"
       ></button>
     </label>
@@ -5670,7 +5652,7 @@
       <span name="attr_strike"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20+@{strike}]]}}"
+        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20cs>@{critical}+@{strike}]]}}"
         name="roll_bonus_strike"
       ></button>
     </label>
@@ -5740,7 +5722,7 @@
       <span name="attr_flipthrow"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20+@{flipthrow}]]}}"
+        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20cs>@{critical}+@{flipthrow}]]}}"
         name="roll_bonus_flipthrow"
       ></button>
     </label>
@@ -9351,7 +9333,6 @@ on("sheet:opened", async (e) => {
    * [] Ability to hide tabs (ex. a Grunt doesn't need Magic and Psionics tabs)
    * [] Add Cybernetics/Bionics tab
    * [] Prompt to add Magic/Psionic bonus when saving against Mind Control, Illusions, Pain, Curses, Possession
-   * [] Factor in critical strike when rolling strike-type-moves with roll template
    * [] Armor tab / repeater; Armor checkboxes in Aggregate Bonuses, and Armor list (name, MDC) underneath
    *  - [x] Move Damage/Apply Damage outside repeater
    *  - [] "Add to Armor" checkbox on Abilities/Psionics/Magic/Modifiers
@@ -9397,6 +9378,8 @@ on("sheet:opened", async (e) => {
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
    *
+   * [x] Factor in critical strike when rolling strike-type-moves with roll template
+   * [x] Remove Charm/Impress and Perception dice roll from Core tab
    * [x] Add init roll to tracker
    * [x] Move Initiative outside of Ancient section
    * [x] Range Strike roll template - update text for single/burst
@@ -9575,6 +9558,29 @@ on("sheet:opened", async (e) => {
       {{#^rollLess() roll target }}
       <div class="sheet-template-row">Success!</div>
       {{/^rollLess() roll target }}
+    </div>
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-strike">
+  <div class="sheet-container sheet-color-{{color}}">
+    <div class="sheet-header">
+      {{#title}}
+      <div class="sheet-title">{{title}}</div>
+      {{/title}} {{#subtitle}}
+      <div class="sheet-subtitle">{{subtitle}}</div>
+      {{/subtitle}}
+    </div>
+    <div class="sheet-content">
+      {{#rollWasCrit() strikeroll}}
+      <div class="sheet-key">Crit!</div>
+      <div class="sheet-value">{{strikeroll}}</div>
+      {{/rollWasCrit() strikeroll}}
+      <!-- -->
+      {{#^rollWasCrit() strikeroll}}
+      <div class="sheet-key">Strike</div>
+      <div class="sheet-value">{{strikeroll}}</div>
+      {{/^rollWasCrit() strikeroll}}
     </div>
   </div>
 </rolltemplate>
