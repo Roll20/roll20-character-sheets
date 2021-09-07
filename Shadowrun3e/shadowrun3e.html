@@ -5288,6 +5288,7 @@ on('clicked:matrixattack', (info) => {
 	}
 
 	const ammomods = { 
+		melee: { armor: "impact", av: 0, power: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
 		regular: { armor: "ballistic", av: 0, power: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: ""},
 		adps: { armor: "Math.floor(ballistic * 0.5)", av: 0, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 0.5, knockdown: 1, amsg: "" },
 		explosive: { armor: "ballistic", av: 0, power: 1, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" },
@@ -6136,8 +6137,9 @@ on('clicked:matrixattack', (info) => {
 					maxd: 4 - damagetable[mydamage]
 				};
 			} else { 
-				myroll+="{{attacktest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}"
+				myroll+="{{defensetest=[[ [[" + calcDice + "]]d6>[[ {2,[[ " + calcTN + "]]}kh1]]!!  ]] }}"
 			   	myroll += "{{resist=yes}}";
+			   	myroll += "{{winner=[[0]]}}";
 				myroll += (payload["defmode"]=="regular")? "{{attackmode=Defend}}" : "{{attackmode=Full Defense}}{{dodge=yes}}";
 		 		payload["defender"]=myname,
 		 		payload["dstrength"]=strmax,
@@ -6154,23 +6156,26 @@ on('clicked:matrixattack', (info) => {
 				payload["reachmode"]=results.results.reachmod.result;
 				if (payload["attacktest"]) {
 					console.log('defense run');
-					defroll=results.results.attacktest.result;
+					defroll=results.results.defensetest.result;
+					paylaod["ammotype"]="melee";
+					payload["range"]="melee";
 					if (payload["attacktest"] >= defroll ) {
 						delta=Math.floor((payload["attacktest"] - defroll)/2);
 						finaldmg=(delta >= payload["maxd"])? 4 : damagetable[payload["wdmg"]] + delta;
-						finalpower=(delta >= payload["maxd"])? payload["power"] + (delta - payload["maxd"]) : payload["power"];
-
+	   					payload["wdmg"]=damagetable[finaldmg];
+						payload["power"]=(delta >= payload["maxd"])? payload["power"] + (delta - payload["maxd"]) : payload["power"];
 						console.log('attacker wins');
 					} else {
 						console.log('defender wins');
 						delta=Math.floor((defroll - payload["attacktest"])/2);
 						if ( payload["defmode"] == "regular" ) {
 							finaldmg=(delta >= payload["dmaxd"])? 4 : damagetable[payload["dwdmg"]] + delta;
-							finalpower=(delta >= payload["maxd"])? payload["power"] + (delta - payload["maxd"]) : payload["power"];
+	   						payload["wdmg"]=damagetable[finaldmg];
+							payload["power"]=(delta >= payload["maxd"])? payload["power"] + (delta - payload["maxd"]) : payload["power"];
 						} else {
 							console.log('full defense mode');
-							finalpower="Attack";
-							finaldamage="Parried";
+							payload["wdmg"]="Attack";
+							payload["power"]="Parried";
 						}
 					}
 				} else {
@@ -8669,14 +8674,15 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader"><b>{{myname}}:</b> {{weaponname}} vs. {{target}}</div>
         <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} </div> 
-        <div class="sheet-rtrow"><b>{{attackmode}} Test:</b> {{attacktest}}</div>
+        {{#attacktest}}<div class="sheet-rtrow"><b>Attack Test:</b> {{attacktest}}</div>{{/attacktest}}
+        {{#defensetest}}<div class="sheet-rtrow"><b>Defense Test:</b> {{defensetest}}</div>{{/defensetest}}
         <div class="sheet-rtrow"><b>Weapon Damage:</b> {{computed::weaponpower}} <b>{{computed::weapondamage}}</div>
         {{#combatpool}}<div class="sheet-rtrow"><b>Combat Pool Used:</b> {{combatpool}} </div>{{/combatpool}}
         {{#pooldice}}<div class="sheet-rtrow"><b>{{pooltype}} Poll Used:</b> {{pooldice}}</div>{{/pooldice}}
         {{#weaponfocus}}<div class="sheet-rtrow"><b>Weapon Focus:</b> {{weaponfocus}} {{focusforce}}</div>{{/weaponfocus}}
         {{#charreach}}<div class="sheet-rtrow"><b>{{myname}} Reach:</b> {{charreach}}</div>{{/charreach}}
         {{#targetreach}}<div class="sheet-rtrow"><b>{{target}} Reach:</b> {{targetreach}}</div>{{/targetreach}}
-        <div class="sheet-rtrow"><b>{{target}}:</b> {{#defend}}[Defend](~selected|meleedefend||{{computed::senddata}}) [Full Defense](~selected|meleedefendfull||{{computed::senddata}}){{/defend}}
+        <div class="sheet-rtrow"><b>{{target}}:</b> {{#defensetest}}[Defend](~selected|meleedefend||{{computed::senddata}}) [Full Defense](~selected|meleedefendfull||{{computed::senddata}}){{/defensetest}}
         {{#dodge}}[Dodge](~selected|dodge||{{computed::senddata}}){{/dodge}}{{#resist}}[Resist](~selected|meleedefensefull||{{computed::senddata}}){{/resist}}</div>
 	<div class="sheet-rtrow"><b>Mods:</b>
 	{{#reachmod}} Reach:{{computed::reachmod}}{{/reachmod}}
