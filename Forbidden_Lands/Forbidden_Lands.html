@@ -24,10 +24,12 @@
     <span class="footer">08/31/21</span>
     <ol style="margin: 0 2em 0 2em; padding: 0 1em 0 3em;">
       <span>v1.77</span>
-      <li>Added "localized" roll buttons. When you select a sheet button that loads the dice pool, (most buttons on the sheet), a small "Roll" button will now appear that can be used to make the roll directly instead of navigating to the Dice Pool's "Roll" button. Local rolls adhere to the API Dice option as well.</li>
-      <li>Small layout adjustment to the roll template for the quotes used in the {{subtitle}} key.</li>
-      <li>Fixed Monster strength bug where values over 25 would display one less skull/damage.</li>
-      <li>Improved the visibility of dice selections in the dice pool panel.</li>
+      <li>Consumables are now inlcuded in weight calculations. d6-d12 is one 'normal' item. NOTE: if you have tracked consumable's weight as gear, you should remove them to avoid duplicate encumbrance calculations.</li>
+      <li>Added a red dashed border to encumbrance when overburdened.</li>
+      <li>Added "localized" roll buttons. Selecting a sheet button that 'pre-loads' the dice pool (most buttons on the sheet), exposes a small "Roll" button that can be used to make the roll directly instead of navigating to the Dice Pool. NOTE: if you need to make adjustments to your dice pool after 'pre-loading' from a sheet button, you can simply ignore the local "Roll" button and adjust the pool as before.</li>
+      <li>Small layout adjustment to the roll template for the quotes used in the {{subtitle}} key. Quotes now appear at the begining and end of multi-line subtitle text.</li>
+      <li>Fixed Monster strength bug where values over 25 would display one less skull/damage than the total.</li>
+      <li>Improved visibility of dice selections in the dice pool panel.</li>
     </ol>
     <br />
     <input type="checkbox" class="announcements-older-show" name="attr_show_announcements_old" value="1" data-i18n-title="old-announcements" />
@@ -2273,7 +2275,6 @@
           <div><span class="label" data-i18n="gear-consumables">Gear & Consumables</span></div>
           <div>
             <input class="input-number" type="text" name="attr_character_gear_and_consumables_encumbrance" value="0" title="@{character_gear_and_consumables_encumbrance}" readonly />
-            <input type="hidden" name="attr_character_gear_encumbrance" value="0"/>
           </div>
           <div><span class="label" data-i18n="weapons">Weapons</span></div>
           <div>
@@ -2296,14 +2297,14 @@
             <span class="label" data-i18n="carry">Carry</span>
           </div>
           <div class="gear">
-            <input class="input-number" type="text" name="attr_carry" value="(2*(@{strength})+@{pack_rat})" title="@{carry} = 2 x @{strength} + @{pack_rat}" disabled />
-          </div>
+            <input class="input-number" type="text" name="attr_carry" value="0" title="@{carry} = 2 x @{strength} + @{pack_rat}" readonly />
+          </div>          
           <div class="gear">
-            <span class="label" data-i18n="encumbrance">Encumbrance</span>
+            <span class="label over-encumbered" data-i18n="encumbrance">Encumbrance</span>
           </div>
+          <input class="hidden warning" type="checkbox" name="attr_encumbered_flag" value="1" />
           <div class="gear">
-            <input type="hidden" name="attr_character_gear_encumbrance" value="1" />
-            <input class="input-number" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
+            <input class="input-number over-encumbered" type="text" name="attr_character_encumbrance" value="0" title="@{character_encumbrance}" readonly />
           </div>
         </div>
       </div>
@@ -2401,10 +2402,9 @@
           <div class="mount_gear">
             <span class="label" data-i18n="encumbrance">Encumbrance</span>
           </div>
+          <input class="hidden warning" type="checkbox" name="attr_mount_encumbered_flag" value="1" />
           <div class="mount_gear">
-            <input class="input" type="hidden" name="attr_mount_gear_encumbrance" value="1.5" />
-            <input class="input-number" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}"
-              readonly />
+            <input class="input-number over-encumbered" type="text" name="attr_mount_encumbrance" value="0" title="@{mount_encumbrance}" readonly />
           </div>
         </div>
       </div>
@@ -4319,8 +4319,8 @@
   });
   
   /* total encumbrance */
-  on("sheet:opened change:character_gear_encumbrance change:mount_gear_encumbrance change:coins_carried change:coins_carried_mount change:weapons_encumbrance change:armor_encumbrance change:shield_encumbrance change:consumables_encumbrance", function (eventInfo) {
-    getAttrs(["character_gear_encumbrance", "mount_gear_encumbrance", "coins_carried", "coins_carried_mount", "weapons_encumbrance", "armor_encumbrance", "shield_encumbrance", "armor_shield_encumbrance", "consumables_encumbrance", "character_gear_and_consumables_encumbrance"], function (values) {
+  on("sheet:opened change:character_gear_encumbrance change:mount_gear_encumbrance change:coins_carried change:coins_carried_mount change:weapons_encumbrance change:armor_encumbrance change:shield_encumbrance change:consumables_encumbrance change:carry change:strength change:pack_rat change:mount_carry change:mount_strength", function (eventInfo) {
+    getAttrs(["character_gear_encumbrance", "mount_gear_encumbrance", "coins_carried", "coins_carried_mount", "weapons_encumbrance", "armor_encumbrance", "shield_encumbrance", "armor_shield_encumbrance", "consumables_encumbrance", "character_gear_and_consumables_encumbrance", "carry", "strength", "pack_rat","encumbered_flag", "mount_carry", "mount_encumbered_flag"], function (values) {
       clog("Change Detected: "+eventInfo.sourceAttribute);
       const character_gear_encumbrance = float(values["character_gear_encumbrance"]),
             mount_gear_encumbrance = float(values["mount_gear_encumbrance"]),
@@ -4333,12 +4333,25 @@
             consumables_encumbrance = float(values["consumables_encumbrance"]),
             character_gear_and_consumables_encumbrance = float(values["character_gear_and_consumables_encumbrance"]),
             gear_and_consumables = character_gear_encumbrance + consumables_encumbrance,
+            strength = int(values["strength"]),
+            pack_rat = int(values["pack_rat"]),
+            carry = (2*(strength)) + pack_rat,
+            mount_carry = float(values["mount_carry"]),
             sum_character_weight = weapons_encumbrance + armor_encumbrance + shield_encumbrance + coins_carried + gear_and_consumables,
             sum_mount_weight = mount_gear_encumbrance + coins_carried_mount;
+          //sets warning if overburdened
+            let encumbered_flag_chk = 0,
+            mount_encumbered_flag_chk = 0;
+            (sum_character_weight > carry) ? encumbered_flag_chk = 1 : encumbered_flag_chk = 0;
+            (sum_mount_weight > mount_carry) ? mount_encumbered_flag_chk = 1 : mount_encumbered_flag_chk = 0;
+
       setAttrs({
         armor_shield_encumbrance: armor_shield_encumbrance,
         character_encumbrance: sum_character_weight,
         mount_encumbrance: sum_mount_weight,
+        carry: carry,
+        encumbered_flag: encumbered_flag_chk,
+        mount_encumbered_flag: mount_encumbered_flag_chk
       });
     });
   });
@@ -5222,15 +5235,15 @@
   });
   
   /* Mount/Beast Carry calcs */
-  const carry = (strength, mounted) => (strength * 4) / (mounted + 1);  
+  const carry = (strength, mounted) => (strength * 4) / (mounted + 1);
   on("change:mounted change:mount_strength", function (eventInfo) {
     clog("Change Detected: "+eventInfo.sourceAttribute);
     getAttrs(["mounted", "mount_strength"], function (values) {
       const mounted = int(values["mounted"]),
-        strength = int(values["mount_strength"]),
-        Carry = carry(strength, mounted);
+            strength = int(values["mount_strength"]),
+            Carry = carry(strength, mounted);
       setAttrs({
-        mount_carry: Carry,
+        mount_carry: Carry
       });
     });
   });
@@ -5239,10 +5252,10 @@
     clog("Change Detected: "+eventInfo.sourceAttribute);
     getAttrs(["repeating_beasts_beast_mounted", "repeating_beasts_beast_strength"], function (values) {
       const mounted = int(values["repeating_beasts_beast_mounted"]),
-        strength = int(values["repeating_beasts_beast_strength"]),
-        Carry = carry(strength, mounted);
+            strength = int(values["repeating_beasts_beast_strength"]),
+            Carry = carry(strength, mounted);
       setAttrs({
-        repeating_beasts_beast_carry: Carry,
+        repeating_beasts_beast_carry: Carry
       });
     });
   });
