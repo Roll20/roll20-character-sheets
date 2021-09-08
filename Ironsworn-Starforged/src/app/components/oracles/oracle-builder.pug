@@ -14,10 +14,11 @@ mixin oracleRowBuilder(table, row, index)
   - const initChance = (index === 0) ? row.Chance - (row.Chance - 1) : table[index - 1].Chance + 1
   - const finalChance = row.Chance
   - const range = (initChance === finalChance) ? finalChance : `${initChance}-${finalChance}`
-  - const result = row.Description.charAt(0).toUpperCase() + row.Description.slice(1)
+  - const result = row.Description
+  // TODO: consider whether to display row.Details here
   .oracle-row
     span.oracle-roll=range
-    span.oracle-result=result 
+    span.oracle-result=result
 
 mixin oracleRollGroup(group)
   .oracle-box
@@ -27,10 +28,10 @@ mixin oracleRollGroup(group)
       - const groupFormattedName = group.Name.toLowerCase().replace(/\s/g, '-')
       - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
       - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
-  
+
       .oracle
         .button-container
-          if oracle.Tables 
+          if oracle.Tables
             - const options = oracle.Tables.map((obj, index) => { return `${obj['Display name']},${index}` })
             - const rollQuery = `{{tableChoice=[[(?{Choose Table|${options.join('|')}})]]}}`
             button(
@@ -51,8 +52,8 @@ mixin oracleRollGroup(group)
         label.toggle-btn.oracle-btn
           input.hide-element.btn-input(
             type='radio'
-            title=`@{oracle_starforged_button}`
-            name=`attr_oracle_starforged_button`
+            title=`@{selected_oracle}`
+            name=`attr_selected_oracle`
             value=id
           )
           .btn-content.oracle-name=oracle.Name
@@ -60,11 +61,11 @@ mixin oracleRollGroup(group)
 mixin oracleBuilder(oracle, groupName)
   - const groupFormattedName = groupName.toLowerCase().replace(/\s/g, '-')
   - const oracleFormattedName = oracle.Name.toLowerCase().replace(/\s/g, '-')
-  - const id = `${groupFormattedName}-${oracleFormattedName}`
+  - const id = (oracleFormattedName === 'encountered-behavior') ? `${groupFormattedName}-encountered-beehavior` : `${groupFormattedName}-${oracleFormattedName}`
   //- Stupid way for me to generate orcale ccs
   //- - console.log(`input[type=radio].${id}:checked ~ div.${id},`)
 
-  input(class=`${id} hide-element` type='radio' name=`attr_oracle_starforged` value=id)
+  input(class=`${id} hide-element` type='radio' name=`attr_oracle_preview` value=id)
   div(class=`${id} showhide`)
     .oracle-title.oracle-table-preview=`${groupName} - ${oracle.Name}`
     .oracle-table

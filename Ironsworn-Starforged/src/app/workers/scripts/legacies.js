@@ -29,7 +29,6 @@ function generateLegacyAttrArray (type) {
 
 on('change:legacy_quests_plus_ten_button change:legacy_bonds_plus_ten_button change:legacy_discoveries_plus_ten_button', function(values) {
   const type = values.sourceAttribute.match(/legacy_(.*?)_/)[1]
-  console.log(values)
 
   const tenDisabledValue = `floor((@{legacy_progress_${type}_1}+@{legacy_progress_${type}_2}+@{legacy_progress_${type}_3}+@{legacy_progress_${type}_4}+@{legacy_progress_${type}_5}+@{legacy_progress_${type}_6}+@{legacy_progress_${type}_7}+@{legacy_progress_${type}_8}+@{legacy_progress_${type}_9}+@{legacy_progress_${type}_10})/4)`
   const tenEnabledValue = 10
