@@ -143,6 +143,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
   await repeatingStringConcatAsync({
     destinations: [
       `${destinationPrefix}_damage`,
+      `${destinationPrefix}_damage_paired`,
+      `${destinationPrefix}_damage_mainhand`,
+      `${destinationPrefix}_damage_offhand`,
       `${destinationPrefix}_damage_range`,
       `${destinationPrefix}_damage_range_single`,
       `${destinationPrefix}_damage_range_burst`,
@@ -150,6 +153,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
     section: "bonuses",
     fields: [
       "damage",
+      "damage_paired",
+      "damage_mainhand",
+      "damage_offhand",
       "damage_range",
       "damage_range_single",
       "damage_range_burst",
