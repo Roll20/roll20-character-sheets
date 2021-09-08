@@ -44,6 +44,12 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+## Perception
+
+The default roll for Perception is equal to the character's intelligence roll. This can be improved via the power #Enhanced Senses# either as a spell, racial bonus, technical aid, magical item, and so forth. Furthermore, the perception of invidual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
+
+![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
+
 ## Page 2: Gear
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
@@ -102,7 +108,7 @@ The Power page can accommodate ten powers. The left and right sides have differe
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
 
-The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a general 3d6 success roll, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
+The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
@@ -139,3 +145,5 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 *Villain In Glasses, August 1, 2021.*
 
 *Updated August 7, 2021 to include Hit Location support.*
+
+*Updated Sepember 8, 2021 to include notes on Perception Rolls.*
