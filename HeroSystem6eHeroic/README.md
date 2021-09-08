@@ -46,9 +46,9 @@ In the upper right corner of Page 1 and Page 2 is a health status indicator. The
 
 ## Perception
 
-The default roll for Perception is equal to the character's intelligence roll. This can be improved via the power #Enhanced Senses# either as a spell, racial bonus, technical aid, magical item, and so forth. Furthermore, the perception of invidual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
-
 ![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
+
+The default roll for Perception is equal to the character's intelligence roll. This can be improved via the power #Enhanced Senses# either as a spell, racial bonus, technical aid, magical item, and so forth. Furthermore, the perception of invidual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
 ## Page 2: Gear
 
