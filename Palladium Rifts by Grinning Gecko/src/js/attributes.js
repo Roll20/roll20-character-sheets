@@ -1,17 +1,22 @@
 async function iqBonus(value, prefix = "") {
   console.log("iqBonus", value, prefix);
-  const iq_bonus = value > 15 ? value - 14 : 0;
-  const perception_bonus = getBiAttributeBonus(value);
-  const attrs = {
-    [`${prefix}iq_bonus`]: iq_bonus,
-    [`${prefix}perception_bonus`]: perception_bonus,
-  };
+
+  const attrs = {};
+  attrs[`${prefix}iq_bonus`] = value > 15 ? value - 14 : 0;
+
+  // check if Perception option is enabled
+  const { opt_iq_perception } = await getAttrsAsync(["opt_iq_perception"]);
+  if (!!+opt_iq_perception) {
+    const perception_bonus = getBiAttributeBonus(value);
+    attrs[`${prefix}perception_bonus`] = perception_bonus;
+  }
+
   console.log(attrs);
   await setAttrsAsync(attrs);
 
-  // this should check and only get called if the default (top) profile changes
-  const profilesSections = await getSectionIDsOrderedAsync("profiles");
-  if (!profilesSections || prefix.includes(profilesSections[0])) {
+  const defaultProfile = await getDefaultProfileID();
+  const profilesSections = await getSectionIDsAsync("profiles");
+  if (!profilesSections || prefix.includes(defaultProfile)) {
     await updateSkills();
   }
 }

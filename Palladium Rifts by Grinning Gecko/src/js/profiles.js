@@ -1,3 +1,8 @@
+async function getDefaultProfileID() {
+  const { default_profile } = await getAttrsAsync(["default_profile"]);
+  return default_profile;
+}
+
 async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])

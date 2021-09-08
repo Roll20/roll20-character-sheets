@@ -6283,46 +6283,64 @@
       </div>
     </div>
 
+    <!-- inject:partials/options.html -->
     <div class="r-tab-content">
-      <div class="importexport">
-        <h3>Options</h3>
-        <input type="hidden" name="attr_version" value="1.1.0" />
-        <label>Version: <span name="attr_version"></span></label>
-        <input type="hidden" name="attr_migrated" value="0" />
-        <label>Migrated: <span name="attr_migrated"></span></label>
-        <label
-          ><input type="checkbox" name="attr_debug" value="1" /> Debug</label
-        >
-        <hr />
-        <h3>Import/Export</h3>
-        <details>
-          <summary><b>Instructions</b></summary>
-          <p>
-            Click the <b>Export</b> button to get a JSON object representing
-            your character. Paste a valid JSON object and click <b>Import</b> to
-            import a character.
-          </p>
-          <p>
-            In order to know what the valid fields are, complete all the fields
-            with at least one of each repeating section and do an Export.
-          </p>
-        </details>
-        <p>Click <b>Instructions</b> for detailed instructions.</p>
-        <button type="action" name="act_import">
-          <span></span><span></span><span></span><span></span>
-          Import
-        </button>
-        <button type="action" name="act_export">
-          <span></span><span></span><span></span><span></span>
-          Export
-        </button>
-        <!-- <button type="action" name="act_test">Test</button> -->
-        <label>Status: <span name="attr_importexportstatus"></span></label>
-        <input type="hidden" name="attr_importexportstatus" />
-        <textarea class="full tall" name="attr_importexport"></textarea>
-      </div>
-    </div>
+  <div class="importexport">
+    <h3>Options</h3>
+    <input type="hidden" name="attr_version" value="1.1.0" />
+    <label>Version: <span name="attr_version"></span></label>
+    <input type="hidden" name="attr_migrated" value="0" />
+    <label>Migrated: <span name="attr_migrated"></span></label>
+    <label><input type="checkbox" name="attr_debug" value="1" /> Debug</label>
+    <label
+      ><input type="checkbox" name="attr_opt_pp_extras" value="1" /> Add PP
+      bonus to Disarm and Entangle</label
+    >
+    <label
+      ><input type="checkbox" name="attr_opt_iq_perception" value="1" /> Add IQ
+      bonus to Perception as per Rifter #13, p.16</label
+    >
+    <label
+      ><input type="checkbox" name="attr_opt_punch_damage" value="1" /> Add
+      Supernatural/Robotic punch damage to melee attacks</label
+    >
+    <label
+      ><input type="checkbox" name="attr_opt_paired_damage" value="1" /> Apply
+      PS damage to <b>each hand</b> in Paired attack</label
+    >
+    <hr />
+    <h3>Import/Export</h3>
+    <details>
+      <summary><b>Instructions</b></summary>
+      <p>
+        Click the <b>Export</b> button to get a JSON object representing your
+        character. Paste a valid JSON object and click <b>Import</b> to import a
+        character.
+      </p>
+      <p>
+        In order to know what the valid fields are, complete all the fields with
+        at least one of each repeating section and do an Export.
+      </p>
+    </details>
+    <p>Click <b>Instructions</b> for detailed instructions.</p>
+    <button type="action" name="act_import">
+      <span></span><span></span><span></span><span></span>
+      Import
+    </button>
+    <button type="action" name="act_export">
+      <span></span><span></span><span></span><span></span>
+      Export
+    </button>
+    <!-- <button type="action" name="act_test">Test</button> -->
+    <label>Status: <span name="attr_importexportstatus"></span></label>
+    <input type="hidden" name="attr_importexportstatus" />
+    <textarea class="full tall" name="attr_importexport"></textarea>
   </div>
+</div>
+
+    <!-- endinject -->
+  </div>
+
   <!-- .r-tabbed -->
   <input type="hidden" name="attr_prefix" value="@{" />
 </main>
@@ -8225,7 +8243,12 @@ on("change:repeating_armor:is_active", (e) => recalculateMovement());
   /* endinject */
 
   /* inject:js/profiles.js */
-  async function updateProfile(rowId) {
+  async function getDefaultProfileID() {
+  const { default_profile } = await getAttrsAsync(["default_profile"]);
+  return default_profile;
+}
+
+async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
   ).repeating_profiles_bonus_ids.split(",");
@@ -8469,18 +8492,23 @@ async function palladiumAddToTurnTracker(e) {
   /* inject:js/attributes.js */
   async function iqBonus(value, prefix = "") {
   console.log("iqBonus", value, prefix);
-  const iq_bonus = value > 15 ? value - 14 : 0;
-  const perception_bonus = getBiAttributeBonus(value);
-  const attrs = {
-    [`${prefix}iq_bonus`]: iq_bonus,
-    [`${prefix}perception_bonus`]: perception_bonus,
-  };
+
+  const attrs = {};
+  attrs[`${prefix}iq_bonus`] = value > 15 ? value - 14 : 0;
+
+  // check if Perception option is enabled
+  const { opt_iq_perception } = await getAttrsAsync(["opt_iq_perception"]);
+  if (!!+opt_iq_perception) {
+    const perception_bonus = getBiAttributeBonus(value);
+    attrs[`${prefix}perception_bonus`] = perception_bonus;
+  }
+
   console.log(attrs);
   await setAttrsAsync(attrs);
 
-  // this should check and only get called if the default (top) profile changes
-  const profilesSections = await getSectionIDsOrderedAsync("profiles");
-  if (!profilesSections || prefix.includes(profilesSections[0])) {
+  const defaultProfile = await getDefaultProfileID();
+  const profilesSections = await getSectionIDsAsync("profiles");
+  if (!profilesSections || prefix.includes(defaultProfile)) {
     await updateSkills();
   }
 }
@@ -9327,6 +9355,8 @@ on("sheet:opened", async (e) => {
   /* endinject */
 
   /**
+   * [] Fix iq_bonus() function to use default profile, not top.
+   * - [] skill bonuses aren't calculating properly.
    * [] Refactor to get rid of the Bonuses repeating section and instead go straight from Modifiers to Picked Modifiers. I think the Bonuses section causes weird issues related to network/multiple updates at the same time.
    * [] Fix CSS on "Psionics vs. [n]"
    * [] Add range to modifiers (guns)
@@ -9350,7 +9380,7 @@ on("sheet:opened", async (e) => {
    * [x] Make Imp/Exp -> Options, and add checkboxes for:
    * ** Or use sheet options - "useroptions" https://wiki.roll20.net/Sheet.json#Example
    *  - [] Add PP to disarm/entangle
-   *  - [] Add IQ to Perception
+   *  - [x] Add IQ to Perception
    *  - [] Apply PS damage to each hand or total in Paired attack
    *  - [] Add Supernatural (and Robotic) punch damage to melee attacks
    *  - [] Increased magic at Ley Line (+50%, +100%, +200%)
