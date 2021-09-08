@@ -135,6 +135,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
 
   console.log("combineBonuses", rowIds, destinationPrefix);
 
+  const options = await getAttrsAsync(["opt_pp_extras"]);
+  const optPpExtras = Boolean(+options["opt_pp_extras"]);
+
   await repeatingAbsoluteAttributes(rowIds, destinationPrefix);
 
   await repeatingStringConcatAsync({
@@ -177,7 +180,7 @@ async function combineBonuses(rowIds, destinationPrefix) {
     filter: rowIds,
   });
 
-  const noAttributeBonusFields = [
+  let noAttributeBonusFields = [
     "attacks",
     "initiative",
     "pull",
@@ -189,6 +192,27 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "strike_range_called",
     "disarm_range",
   ];
+
+  let ppBonusFields = [
+    "strike",
+    "parry",
+    "dodge",
+    "throw",
+    "dodge_flight",
+    "dodge_auto",
+    "dodge_teleport",
+    "dodge_motion",
+    "dodge_underwater",
+    "flipthrow",
+  ];
+
+  const ppExtras = ["disarm", "entangle"];
+  if (optPpExtras) {
+    ppBonusFields = ppBonusFields.concat(ppExtras);
+  } else {
+    noAttributeBonusFields = noAttributeBonusFields.concat(ppExtras);
+  }
+
   // No attribute bonuses.
   await repeatingSumAsync(
     noAttributeBonusFields.map((field) => `${destinationPrefix}_${field}`),
@@ -245,20 +269,6 @@ async function combineBonuses(rowIds, destinationPrefix) {
     `filter:${rowIds.toString()}`
   );
 
-  const ppBonusFields = [
-    "strike",
-    "parry",
-    "dodge",
-    "throw",
-    "disarm",
-    "entangle",
-    "dodge_flight",
-    "dodge_auto",
-    "dodge_teleport",
-    "dodge_motion",
-    "dodge_underwater",
-    "flipthrow",
-  ];
   await repeatingSumAsync(
     ppBonusFields.map((field) => `${destinationPrefix}_${field}`),
     "bonuses",
