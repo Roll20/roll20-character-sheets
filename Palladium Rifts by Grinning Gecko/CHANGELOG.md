@@ -17,6 +17,15 @@
 - Move Initiative outside of Ancient section
 - Add Initiative roll to tracker
 - Roll templates inside roll queries for certain saving throws (Despair, Illusion, Mind Control, Pain, Possession, Telepathic Probe) (https://app.roll20.net/forum/post/10326105/roll-template-inside-roll-query/?pageforid=10361844#post-10361844). Player is prompted for the type of attack - Magic, Psionic, or Other - and the selected bonus is added to the roll.
+- Add migration script for attribute changes
+- Factor in Critical value when rolling Strike/Body Flip
+- Add optional modifier to all skill rolls (including ability skill percentages)
+- Add Options tab and `useroptions` in `sheet.json`
+  - Add PP bonus to Disarm and Entangle
+  - Add IQ bonus to Perception as per Rifter 13, p.16
+  - Apply PS damage to each hand in Paired attack
+  - Apply Hand to Hand critical (19-20, 18-20) to modern weapons as well
+- Add Damage: Paired, Main Hand, and Off Hand to modifiers.
 
 ### Changed
 
@@ -28,3 +37,9 @@
 - Replace logo with github link
 - Fix bad HTML on Perception Check emoji
 - Separate Trust/Intimidate into Trust and Intimidate
+- Make The Trouble With Credits link a button
+- Better (more accurate, more efficient) Skill calculations
+
+### Removed
+
+- Remove Charm/Impress and Perception roll button from Core tab
