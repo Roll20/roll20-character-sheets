@@ -44,6 +44,12 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+## Perception
+
+![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
+
+The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power #Enhanced Senses# which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
+
 ## Page 2: Gear
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
@@ -80,7 +86,7 @@ The basic maneuvers list is contained in a slideshow so that it can be hidden by
 
 To make a targeted attack select the radio button corresponding to desired focus of your attack. If the target is stunned or otherwise incapacitated check the "1/2 penalty" option. Characters who purchased penalty skill levels may also apply them using the "Apply PSL" input. Any of the attack buttons on the Gear sheet will automatically calculate the character's OCV, determine the hit location, and caculate stun for killing attacks. The attack message will also display post-defense STUN and BODY modifiers. An attack using a weapon marked as "AoE" will not use the hit location system (this allows the hit location system to be applied on a case by case basis).
 
-![Hit Locations](/HeroSystem6eHeroic/images/HitLocations.png)
+![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
 
 ## Page 3: Skills
 
@@ -102,7 +108,7 @@ The Power page can accommodate ten powers. The left and right sides have differe
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
 
-The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a general 3d6 success roll, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
+The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
@@ -139,3 +145,5 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 *Villain In Glasses, August 1, 2021.*
 
 *Updated August 7, 2021 to include Hit Location support.*
+
+*Updated Sepember 8, 2021 to include notes on Perception Rolls.*
