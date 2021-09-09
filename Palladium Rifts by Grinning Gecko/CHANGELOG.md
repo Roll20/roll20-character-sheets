@@ -26,6 +26,7 @@
   - Apply PS damage to each hand in Paired attack
   - Apply Hand to Hand critical (19-20, 18-20) to modern weapons as well
 - Add Damage: Paired, Main Hand, and Off Hand to modifiers.
+- Add WP: Bayonet
 
 ### Changed
 
