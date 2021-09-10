@@ -4,6 +4,12 @@
 
 ### Added
 
+- Prompt for gunfire dodge penalty if option is enabled
+
+### Changed
+
+- Fix issue with absolute value calculation in profile
+
 ## [1.1.0] - 2021-09-06
 
 ### Added
