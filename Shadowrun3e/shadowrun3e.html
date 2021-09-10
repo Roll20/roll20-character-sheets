@@ -786,6 +786,7 @@
 <div class='sheet-magic'>
     <!-- Magic Tab -->
     <input type='hidden' class='magictype' name='attr_magic-type' />
+    <input type='hidden' name='attr_spelldefmin' value=0 />
     <input type='hidden' name='attr_sorcery-used' value=0 />
     <input type='hidden' name='attr_sorcery-used-total' value=0 />
     <input type='hidden' name='attr_conjuring-used' value=0 />
@@ -5017,7 +5018,7 @@ on('clicked:matrixattack', (info) => {
 		atts["combatpool-used"]=0; 
 		atts["spellpool-used"]=0;
 		atts["sorcery-used"]=0;
-		atts["spelldefense-used"]=0;
+		atts["spelldefensedice-used"]=0;
 		atts["taskpool-used"]=0;
 		setAttrs(atts);
 	};
@@ -5091,7 +5092,7 @@ on('clicked:matrixattack', (info) => {
 			var calcDrainTN="floor(?{Force?}/2) + " + drain + " + ( 2 * @{spellsus} )";
 			var calcDrainDice="@{willpower|max} + ?{Sorcery Dice for Drain?} + ?{Spell Pool Dice for Drain?}";
 			myroll+="{{senddata=[[0]]}}";
-			myroll+="{{draindamage=[[0]]}}";
+			myroll+="{{draindamage=[[0]]}}{{finaldrain=[[0]]}}";
 			myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spellcasting}} + ?{Sorcery Dice for Drain?|0}]]}}";
 			myroll+="{{spellpool=[[?{Spell Pool Dice?|0} + ?{Spell Pool Dice for Drain?|0}]]}}";
 			myroll+="{{spellname=" + name + "}}";
@@ -5147,24 +5148,39 @@ on('clicked:matrixattack', (info) => {
 					let dmglvl=parseInt(results.results.spelldamage.result);
 					draindmg=eval(drainlvl);
 					console.log('drdmg calc: ' + draindmg);
-					var dmgmax=4;
-					var dmgmin=0;
-					if (draindmg >= 10) dmgmax=13;
-					if (draindmg >= 10) dmgmin=9;
-					if (draindmg > dmgmax) draindmg=dmgmax;
-					if (draindmg < dmgmin) draindmg=dmgmin;
 
 				} else {
+					console.log('drain straight');
 					draindmg = parseInt(drainlvl);
 					console.log('drdmg stright: ' + damagetable[draindmg]);
 				}
+				console.log('drain damage base ' + draindmg);
+				var dmgmax=4;
+				var dmgmin=0;
+				if (draindmg > dmgmax) draindmg=dmgmax;
+				if (draindmg < dmgmin) draindmg=dmgmin;
+				console.log('dmgmin ' + dmgmin + ' dmgmax ' + dmgmax);
 				/* set drain damage to stun damage if force of spell is less than magic rating*/
 				const finalforce = payload["power"] = results.results.castforce.result
-				if ( (draindmg < 10 ) && ( finalforce <= magic  )) draindmg = draindmg + 9;
+				if ( (draindmg < 10 ) && ( finalforce <= magic  )) {
+					draindmg = draindmg + 9;
+					dmgmax=13;
+					dmgmin=9;
+				} 
 				/* set drain damage to physical damage if force of spell is greater than magic rating*/
-				if ( (draindmg >= 10 ) && ( finalforce > magic  )) draindmg = draindmg - 9;
+				if ( (draindmg >= 10 ) && ( finalforce > magic  )) {
+					draindmg = draindmg - 9;
+					dmgmax=4;
+					dmgmin=0;
+				}
+				drainstaged=draindmg - Math.floor(results.results.draintest.result/2);
+				console.log(' drain staged ' + drainstaged);
+				drainstaged=(drainstaged < dmgmin)? dmgmin :(drainstaged > dmgmax)? dmgmax : drainstaged;
+				console.log(' drain staged check min/max ' + drainstaged);
+				myfinaldrain=damagetable[drainstaged];
 				draindmg=damagetable[draindmg];
 				console.log('drdmg : ' + draindmg);
+				console.log('finaldrain : ' + myfinaldrain);
 				atts["sorcery-used"]= sorceryused + parseInt(results.results.sorcerydice.result);
 				atts["spellpool-used"]= spused + parseInt(results.results.spellpool.result);
 				if ( range == "AoE" )  { 
@@ -5176,6 +5192,7 @@ on('clicked:matrixattack', (info) => {
                 				{
                     				spelldamage: finaldmg,
                     				draindamage: draindmg,
+                    				finaldrain: myfinaldrain,
                     				cast: finalcast,
                     				roll: testinfo,
 						senddata: rollEscape.escape(payload),
@@ -5187,6 +5204,7 @@ on('clicked:matrixattack', (info) => {
 					finishRoll( results.rollId, {
 						senddata: rollEscape.escape(payload),
                     				spelldamage: finaldmg,
+                    				finaldrain: myfinaldrain,
                     				draindamage: draindmg,
                 			});
 
@@ -5321,6 +5339,9 @@ on('clicked:matrixattack', (info) => {
 	}
 
 	const ammomods = { 
+		d: { armorname: "'impact'", armor: "impact", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
+		c: { armorname: "'impact'", armor: "impact", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
+		o: { armorname: "'impact'", armor: "impact", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
 		elemental: { armorname: "'half impact'", armor: "Math.floor(impact/2)", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
 		melee: { armorname: "'impact'", armor: "impact", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 0, barrier: 0, knockdown: 0 , amsg: ""},
 		regular: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: ""},
@@ -5364,16 +5385,18 @@ on('clicked:matrixattack', (info) => {
 			const armorval = eval(ammomods[ammo]["armor"]);
 			const powermod = eval(ammomods[ammo]["rpower"]);
 			const dmgmod = eval(ammomods[ammo]["rdmg"]);
-			console.log('dmgmod at resist ' + dmgmod);
-			console.log('ball ' + ballistic + ' imp ' + impact);
 			dmgcode = damagetable[weapondmg] + dmgmod;
-			console.log ('armorval ' + armorval + ' powermod ' + powermod + ' dmgmod ' + dmgmod + ' range ' + range);
 			myroll +="{{Power=?{Attack Power|" + mods.power + "}}}";
 			myroll+="{{wpndmg=" + weapondmg + "}}";
 			myroll +="{{attacktest=[[" + mods["attacktest"] + "]]}}";
 			myroll+="{{dodge=[[" + mods["dodge"] + "]]}}";
 	 		myroll +="{{AttackType=" + ammo  + "}}";
 			calcTN="?{Attack Power} + " +  powermod + " - " + armorval;
+			if ( mods["blast"] ) { 
+				myroll+="{{distance=[[?{Distance from Explosive in Meters|0}]]}}"
+				myroll+="{{blastredux=[[?{Distance from Explosive in Meters|0} / " + mods["bast"] + "]]}}"
+				calcTN+=" - ( ?{Distance from Explosive in Meters} / " + mods["blast"] + ")";
+			}
 			myid=eval(ammomods[ammo]["armorname"]);
 			console.log('test 1 ' + myid);
 			myroll += "{{armorvalue=" + armorval + "}}";
@@ -5394,12 +5417,9 @@ on('clicked:matrixattack', (info) => {
 		console.log(myroll);
 		console.log(' unmod weapons code ' + dmgcode);
         	startRoll(myroll, (results) => {
-			console.log('dmgcode ' + dmgcode);
 			const netresult=results.results.attacktest.result - ( results.results.roll.result + dodge );
-			console.log('netresult ' + netresult);
 			const stage=floor(netresult/2);
 			var finaldmg=dmgcode + stage;
-			console.log('finaldmg ' + finaldmg);
 			var dmgmax=4;
 			var dmgmin=0;
 			if (dmgcode >= 10) dmgmax=13;
@@ -5700,10 +5720,11 @@ on('clicked:matrixattack', (info) => {
 			if ( payload["ammotype"]=="elemental" ) myroll+="{{dodge=yes}}";
 			myroll+="{{defensetest=[[0]]}}";
 			myroll+="{{senddata=[[0]]}}";
+			myroll+="{{attacks=[[" + payload["attacktest"] + "]]}}";
 		}
 		var calcDice="?{Sorcery Dice?} + ?{Spell Pool Dice?}";
 		var calcTN="?{Force of Spell?}";
-		myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{spelldefensedice}}]]}}";
+		myroll+="{{sorcerydice=[[?{Sorcery Dice?|@{sorcery-defense}}]]}}";
 		myroll+="{{castforce=[[?{Force of Spell?|" + myforce + "}]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{spellpool=[[?{Spell Pool Dice?|@{spellpool-defense}}]]}}";
@@ -5714,8 +5735,9 @@ on('clicked:matrixattack', (info) => {
 		console.log(myroll);
 		if (payload != "none" ) {
                 startRoll(myroll, (results) => {
+			updatepoolused("sorcery", results.results.sorcerydice.result);	
 			updatepoolused("spellpool", results.results.spellpool.result);	
-			updatepoolused("spelldefensedice", results.results.sorcerydice.result);	
+			updatepoolused("spelldefensedice", results.results.sorcerydice.result + results.results.spellpool.result);	
 			const delta=parseInt(payload["attacktest"]) - results.results.casttest.result;
 			console.log(' delta ' + delta);
 			var finalattack=delta;
@@ -6488,7 +6510,7 @@ on('clicked:matrixattack', (info) => {
     	on('clicked:repeating_explosives:rangedattack', (info) => {
 		var setatts={};
 		var scatter="";
-		var atts=["combatpool-used", "controlpool-used"];
+		var atts=["combatpool-used", "controlpool-used", "character_name"];
 		var rounds=1;
 		var expint=0;
 		var source=info['sourceAttribute'].split('_');
@@ -6496,21 +6518,24 @@ on('clicked:matrixattack', (info) => {
 		var myrepeat=source.join('_').concat('_');
 		var mymode=info["htmlAttributes"]["id"]
 		const scatimg="https://raw.githubusercontent.com/bahornbeck/img/master/images/scatterdiagram";
-		const weaponattrs=["damage", "power", "name", "ammoremain", "skill", "wfamily", "specialized", "targeting", "recoilcomp", "gyro", "ammo", "scatter", "blast","scatterredux", "missleint", "tnmods"] ;
+		const weaponattrs=["damage", "power", "name", "exptype", "ammoremain", "skill", "wfamily", "specialized", "targeting", "recoilcomp", "gyro", "ammo", "scatter", "blast","scatterredux", "missleint", "tnmods"] ;
 		weaponattrs.forEach(myatt=>{
 			atts.push(myrepeat.concat(myatt));
 		});
    		getAttrs(atts, function(myval) {
 			const combatused= parseInt(myval["combatpool-used"]);
 			const controlused= parseInt(myval["controlpool-used"]);
+			const myname= myval["character_name"];
 			const myweapon= myval[myrepeat.concat("name")];
 			const wdmg= myval[myrepeat.concat("damage")];
+			const [grenadeshape,grenadetype]= myval[myrepeat.concat("exptype")].split(":");
+			const wpower= myval[myrepeat.concat("power")];
 			const ammoremain= myval[myrepeat.concat("ammoremain")];
 			const gyro= myval[myrepeat.concat("gyro")];
 			const targetaim= myval[myrepeat.concat("targeting")];
 			const tnmods= myval[myrepeat.concat("tnmods")];
 			var dmgnumber= damagetable[wdmg];
-			var range="{{range=?{Range|Short,4|Medium,5|Long,6|Extreme,9}}}";
+			var range="{{range=[[?{Range|Short,4|Medium,5|Long,6|Extreme,9}]]}}";
 			var missleintel=0;
 			var calcTN;
 			if ( mymode=="sensorexp") { 
@@ -6552,8 +6577,8 @@ on('clicked:matrixattack', (info) => {
 			   calcTN += " + ?{Additional Modifiers|" + tnmods + "} ]]"
                 	   var roll="&{template:explosive}{{myname=@{character_name}}}{{target=@{target|Target|token_name}}}" + range
 			   roll += "{{rolldice=" + calcDice + "}}{{targetnumber=[[{2,( " + calcTN + ")}kh1]]}}";
-			   roll += "{{weapondamage=" + myval[myrepeat.concat("damage")] + "}}";
-			   roll += "{{weaponpower=" + myval[myrepeat.concat("power")]  + "}}" + expint;
+			   roll += "{{weapondamage=" + wdmg + "}}{{senddata=[[0]]}}";
+			   roll += "{{weaponpower=" + wpower + "}}" + expint;
 			   if (  ( mymode=="vehicle-explosive" ) || ( mymode=="vehicle-sensorexp") ) roll += "{{controlpool=[[?{Control Pool Dice|0}]]}}";
 			   else roll += "{{combatpool=[[?{Combat Pool Dice|0}]]}}";
 			   roll += "{{weaponname=" + myval[myrepeat.concat("name")] + "}}";
@@ -6561,7 +6586,7 @@ on('clicked:matrixattack', (info) => {
 			   roll += "{{scatdir=[[1d6]]}}{{scatter=[[" + myscat + "d6]]}}{{blastradius=" + myblast ;
 			   roll += "}}{{scatterredux=" + myredux + "}}{{scatdirnumber=[[" + direction ; 
 			   roll += "]]}}{{scatdir=" + scatimg + direction  + ".png}}";
-			   roll += "{{resist=[Resist Explosive](~selected|resist-impact-normal)}}";
+			   roll += "{{expresist=yes}}";
 			   console.log(roll);
                 	   startRoll(roll, (results) => {
 			   	var myscatter = results.results.scatter.result;
@@ -6569,10 +6594,26 @@ on('clicked:matrixattack', (info) => {
 				console.log('start scatter: ' + myscatter);
 				console.log('successes: ' + mysuccess);
 				myscatter = myscatter - ( mysuccess * myredux) - missleintel;
+				console.log('myscatter ' + myscatter);
 				if ( myscatter < 0 ) myscatter=0;
+				let payload= {
+					attacker: myname,
+					weapon: myweapon,
+					armortype: "impact",
+					range: results.results.range.result,
+					wdmg: wdmg,
+					rounds: 1,
+					dodge: 0,
+					attacktest: results.results.attacktest.result,
+					power:  wpower,
+					scatter: myscat,
+					blast: myblast,
+					ammotype: grenadetype.toLowerCase(),
+				}
 			   	finishRoll( results.rollId,
                 		{
                     			scatter: myscatter, 
+					senddata: rollEscape.escape(payload),
                 		}
 				);
 			   	if (( mymode=="vehicle-explosive" ) || ( mymode=="vehicle-sensorexp")) setatts["controlpool-used"] = results.results.controlpool.result + controlused;
@@ -8139,15 +8180,23 @@ on("change:deck-dni change:intelligence_max change:reaction change:deck-asist ch
     });
 });
 
+on("change:spelldefense", function() {
+	getAttrs(["sorcery", "spelldefense"], function (myval) {
+		spd=parseInt(myval["spelldefense"]) - parseInt(myval["sorcery"]);
+		if ( spd  < 0 ) spd=0;
+		setAttrs({spelldefmin: spd});
+	});
+});
 
-on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:spellpool-used", function() {
-	getAttrs(["sorcery-defense", "spellpool", "sorcery", "spellpool-defense", "spellpool-used", "sorcery-used"], function (myval) {
+on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:spellpool-used, change:spelldefmin", function() {
+	getAttrs(["sorcery-defense", "spellpool", "sorcery", "spellpool-defense", "spellpool-used", "sorcery-used", "spelldefmin"], function (myval) {
 		atts=[];
 	        console.log('updating defense dice');
 		var poolover=0;
 		var sorceryover=0;
 		let sorcery=parseInt(myval["sorcery"]);
 		let pool=parseInt(myval["spellpool"]);
+		let spd=parseInt(myval["spelldefmin"]);
 		let md=parseInt(myval["spellpool-defense"]);
 		let sd=parseInt(myval["sorcery-defense"]);
 		let mpu=parseInt(myval["spellpool-used"]);
@@ -8158,7 +8207,7 @@ on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:s
 		if ( pooltotal > pool ) poolover=1;
 		atts["sorcery-over"]=sorceryover;
 		atts["spellpool-over"]=poolover;
-		atts["spelldefensedice"]=md + sd;
+		atts["spelldefensedice"]=spd + md + sd;
 		atts["sorcery-used-total"]=sd + su;
 		atts["spellpool-used-total"]=md + mpu;
 		console.log(atts);
@@ -8813,33 +8862,39 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 		});
 	});
 
-
-
-    
 </script>
 
 <rolltemplate class="sheet-rolltemplate-spell">
     <div class="sheet-rtcontainer">
-        <div class="sheet-rtheader">{{myname}}: {{spellname}} {{castforce}} vs. {{targetofspell}}</div>
-        <div class="sheet-rtrow"><b>Rolling:</b> {{computed::rolldice}}d6 vs. {{targetnumber}} </div>
-        {{#spelldamage}}<div class="sheet-rtrow"><b>Damage:</b> {{computed::spelldamage}} </div>{{/spelldamage}}
-        {{#sorcerydice}}<div class="sheet-rtrow"><b>Sorcery Dice Used:</b> {{sorcerydice}}</div>{{/sorcerydice}}
-        {{#spellpool}}<div class="sheet-rtrow"><b>Spell Pool Used:</b> {{spellpool}}</div>{{/spellpool}}
-        {{#roll}}<div class="sheet-rtrow"><b>Casting Test:</b> {{computed::cast}} {{computed::roll}}</div>{{/roll}}
-        {{#casttest}}<div class="sheet-rtrow"><b>Casting Test:</b> {{casttest}}</div>{{/casttest}}
-        {{#draintest}}<div class="sheet-rtrow"><b>Drain Test:</b> {{draintest}} vs. {{computed::draindamage}}</div>
-        {{/draintest}}
+        <div class="sheet-rtheader">{{myname}}: {{spellname}} vs. {{targetofspell}}</div>
+        <div class="sheet-rtrow">Rolling: {{computed::rolldice}}d6 vs. {{targetnumber}} = {{casttest}}</div>
+        {{#spelldamage}}<div class="sheet-rtrow">Force: {{castforce}} Damage: {{computed::spelldamage}} </div>{{/spelldamage}}
+        {{#sorcerydice}}
+	<div class="sheet-spell-resist-table">
+		<div>Dice</div><div></div><div>Sorcery</div><div></div><div>Pool</div>
+		<div>Used</div><div></div><div>{{sorcerydice}}</div><div></div><div>{{#spellpool}}{{spellpool}}{{/spellpool}}</div>
+	</div>{{/sorcerydice}}
+        {{#roll}}<div class="sheet-rtrow">Casting Test: {{computed::cast}} {{computed::roll}}</div>{{/roll}}
+        {{#draintest}}
+	<div class="sheet-spell-resist-table">
+		<div>Drain</div><div></div><div>Resist Test</div><div></div><div>Final</div>
+		<div>{{computed::draindamage}}</div><div></div><div>{{draintest}}</div><div></div><div>{{computed::finaldrain}}</div>
+	</div>
+	{{/draintest}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
-        {{#resist}}<div class="sheet-rtrow"><b>{{targetofspell}}:</b> {{resist}}</div>{{/resist}}
-        {{#defensetest}}<div class="sheet-rtrow"><b>Defense Result:</b> {{computed::defensetest}}</div>{{/defensetest}}
+        {{#resist}}<div class="sheet-rtrow">{{targetofspell}}: {{resist}}</div>{{/resist}}
+        {{#defensetest}}<div class="sheet-spell-resist-table">
+		<div>Attack</div><div></div><div>Defense</div><div></div><div>Result</div>
+		<div>{{attacks}}</div><div>-</div><div>{{casttest}}</div><div>=</div><div>{{computed::defensetest}}</div>
+	</div>{{/defensetest}}
         <div class="sheet-rtrow">{{#spelldefense}}[Spell Defense](~selected|spelldefense||{{computed::senddata}}){{/spelldefense}}
-        {{#casttest}}<b>{{targetofspell}}:</b>
+        {{#casttest}}{{targetofspell}}:
 	{{#dodge}}[Dodge](~{{targetofspell}}|dodge||{{computed::senddata}}){{/dodge}}
 	[Resist](~{{targetofspell}}|{{resisttype}}||{{computed::senddata}})
 	</div>{{/casttest}}
-        {{#roll}}<div class="sheet-rtrow"><b>{{targetofspell}}:</b> [AOE](~selected|checkaoe||{{computed::senddata}})</div>{{/roll}}
+        {{#roll}}<div class="sheet-rtrow">{{targetofspell}}: [AOE](~selected|checkaoe||{{computed::senddata}})</div>{{/roll}}
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-adept">
@@ -8915,7 +8970,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
-        {{#resist}}<div class="sheet-rtrow"><b>{{target}}:</b> {{resist}}</div>{{/resist}}
+        {{#senddata}}<div class="sheet-rtrow"><b>{{target}}:</b> [Resist Explosive](~selected|resistroll||{{computed::senddata}})</div>{{/senddata}}
     </div>
 </rolltemplate>
 
@@ -8985,22 +9040,23 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 <rolltemplate class="sheet-rolltemplate-resistance">
     <div class="sheet-rtcontainer">
         <div class="sheet-rtheader">{{character}}: {{Power}}{{wpndmg}} vs {{name}} {{armorvalue}}</div>
-        <div class="sheet-rtrow"><b>Rolling:</b> {{rolldice}}d6 vs. {{targetnumber}} = {{roll}}</div>
+        <div class="sheet-rtrow">Rolling: {{rolldice}}d6 vs. {{targetnumber}} = {{roll}}</div>
+	{{#distance}}<div class="rtrow">Distance from Explosion: {{distance}}meter(s) Power Reduced by {{blastredux}}</div>{{/distance}}
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
 	{{#finaldmg}}
 	<div class="sheet-resist-table">
-		<div><b>Attack</div><div></div><div><b>Resist</div><div></div><div>Dodge</div><div></div><div><b>Result</div>
+		<div>Attack</div><div></div><div>Resist</div><div></div><div>Dodge</div><div></div><div>Result</div>
 		<div>{{attacktest}}</div><div>-</div><div>({{roll}}</div><div>+</div><div>{{dodge}})</div><div>=</div><div>{{computed::netresult}}</div>
 	</div>
-	<div class="rtrow"><b>Final Damage:</b> staged to <b>{{computed::finaldmg}}</b></div>{{/finaldmg}}
+	<div class="rtrow">Final Damage: staged to {{computed::finaldmg}}</div>{{/finaldmg}}
 	{{#spelldmg}}
 	<div class="sheet-spell-resist-table">
-		<div><b>Attack</div><div></div><div><b>Resist</div><div></div><div><b>Result</div>
+		<div>Attack</div><div></div><div>Resist</div><div></div><div>Result</div>
 		<div>{{attacktest}}</div><div>-</div><div>{{roll}}</div><div>=</div><div>{{computed::netresult}}</div>
 	</div>
-	<div class="rtrow"><b>Final Damage:</b> staged to <b>{{computed::spelldmg}}</b></div>{{/spelldmg}}
+	<div class="rtrow">Final Damage: staged to {{computed::spelldmg}}</div>{{/spelldmg}}
         <div class="sheet-rtrow">Combat Pool Used: {{combatpool}}</div>
-        {{#senddata}}<div class="sheet-rtrow"><b>{{character}}:</b> [Resist](~selected|resistroll||{{computed::senddata}})</div>{{/senddata}}
+        {{#senddata}}<div class="sheet-rtrow">{{character}}: [Resist](~selected|resistroll||{{computed::senddata}})</div>{{/senddata}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
     </div>
