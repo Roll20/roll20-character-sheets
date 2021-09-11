@@ -3729,10 +3729,14 @@
 			
 			setAttrs({
 				"currentSTUN":maxSTUN,
-				"currentEND":maxEND
+				"currentEND":maxEND,
+				"gearCurrentSTUN":maxSTUN,
+				"gearCurrentEND":maxEND
 			});
 		});
 	}
+	
+	/* Recover Buttons */
 	
 	// Recover endurance and stun when the recover button in the item-characteristics-health box is clicked.
 	on("clicked:recoverHealth", function () {
@@ -3745,38 +3749,73 @@
 	});
 	
 	function applyRecovery() {
-		getAttrs(["endurance","stun","currentEND","currentSTUN","recovery"], function(values) {
+		getAttrs(["endurance","stun","currentEND","currentSTUN","gearCurrentEND","gearCurrentSTUN","recovery","sheetTab"], function(values) {
 			const maxEND = parseInt(values.endurance);
 			const maxSTUN = parseInt(values.stun);
 			const recovery = parseInt(values.recovery);
-			let currentEND = parseInt(values.currentEND);
-			let currentSTUN = parseInt(values.currentSTUN);
-		
-			if (currentSTUN<=maxSTUN) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
-				if (currentSTUN+recovery<=maxSTUN) {
-					setAttrs({
-						"currentSTUN":currentSTUN+recovery
-					});
-				} else {
-					setAttrs({
-						"currentSTUN":maxSTUN
-					});
+			const currentSheet = values.sheetTab;
+			
+			if (currentSheet=="characteristics") {
+				// The player is viewing the Page 1: characteristics.
+				let currentEND = parseInt(values.currentEND);
+				let currentSTUN = parseInt(values.currentSTUN);
+				
+				if (currentSTUN<=maxSTUN) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
+					if (currentSTUN+recovery<=maxSTUN) {
+						setAttrs({
+							"currentSTUN":currentSTUN+recovery
+						});
+					} else {
+						setAttrs({
+							"currentSTUN":maxSTUN
+						});
+					}
 				}
+			
+				if (currentEND<=maxEND) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
+					if (currentEND+recovery<=maxEND) {
+						setAttrs({
+							"currentEND":currentEND+recovery
+						});
+					} else {
+						setAttrs({
+							"currentEND":maxEND
+						});
+					}
+				}	
+			} else {
+				// The player is viewing Page 2: gear.
+				let currentEND = parseInt(values.gearCurrentEND);
+				let currentSTUN = parseInt(values.gearCurrentSTUN);
+				
+				if (currentSTUN<=maxSTUN) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
+					if (currentSTUN+recovery<=maxSTUN) {
+						setAttrs({
+							"gearCurrentSTUN":currentSTUN+recovery
+						});
+					} else {
+						setAttrs({
+							"gearCurrentSTUN":maxSTUN
+						});
+					}
+				}
+			
+				if (currentEND<=maxEND) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
+					if (currentEND+recovery<=maxEND) {
+						setAttrs({
+							"gearCurrentEND":currentEND+recovery
+						});
+					} else {
+						setAttrs({
+							"gearCurrentEND":maxEND
+						});
+					}
+				}	
 			}
-		
-			if (currentEND<=maxEND) { // Check to see if character hasn't been boosted above character max by Aid power or similar.
-				if (currentEND+recovery<=maxEND) {
-					setAttrs({
-						"currentEND":currentEND+recovery
-					});
-				} else {
-					setAttrs({
-						"currentEND":maxEND
-					});
-				}
-			}	
 		});
 	}
+	
+	/* Synchronize health statuses */
 	
 	// Keep the gear tab's health status up to date with the character tab's health status.
 	on("change:currentBODY change:currentSTUN change:currentEND", function () {
@@ -3811,7 +3850,7 @@
 			}
 		});
 	});
-	
+		
 	/* -------------------------------------- */
 	/* Functions used for characteristics tab */
 	/* -------------------------------------- */
