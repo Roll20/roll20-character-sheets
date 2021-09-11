@@ -2258,15 +2258,13 @@
             <div class="table-item"><span name="attr_rcdeck-range"></div>
             <div class="table-item-left">ECCM:</div>
             <div class="table-item"><input type="number" name="attr_eccm-rating" min=0 value=0></div>
-            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest"
-                    id="eccm-rating control" title="ECCM Test">L</button></div>
+            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest" id="eccm-rating control" title="ECCM Test">L</button></div>
             <div class="table-item"><span name="attr_eccm-flux"></div>
             <div class="table-item"><input type="number" name="attr_eccm-fluxmod" min=0 value=0></div>
             <div class="table-item"><span name="attr_eccm-range"></div>
             <div class="table-item-left">Electrons Warfare:</div>
             <div class="table-item"><input type="number" name="attr_ewarfare" value=0 /></div>
-            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest" id="ewarfare control"
-                    title="Electronic Warfare or Signal Intercept Test">L</button></div>
+            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest" id="ewarfare control" title="Electronic Warfare or Signal Intercept Test">L</button></div>
             <div class="table-item"></div>
             <div class="table-item"></div>
             <div class="table-item"></div>
@@ -2278,8 +2276,7 @@
             <div class="table-item"></div>
             <div class="table-item-left">Decryption Module:</div>
             <div class="table-item"><input type="number" name="attr_rcdeck-decryption-rating" value=0 /></div>
-            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest"
-                    id="rcdeck-decryption-rating control" title="Decryption Test">L</button></div>
+            <div class="table-item"><button class="d6-button" type="action" name="act_skilltest" id="rcdeck-decryption-rating control" title="Decryption Test">L</button></div>
             <div class="table-item"></div>
             <div class="table-item"></div>
             <div class="table-item"></div>
@@ -3562,8 +3559,9 @@
         <div class="vehicle-quickstats-border">
             	<input type='hidden' class='buttontoggle' name='attr_sheettype' />
 	   <div class="vehicle-driver">
-            	<header>Driver: </header>
+                <button type="action" name="act_setrigger" id="rigger" title="Set Rigger/Vehicle Operator Name by Selecting Token">Driver</button>
 	    	<input type="text" name="attr_rigger" class="myweapontxt" />
+                <button type="action" class="pictos-button" name="act_setrigger" id="refresh-rigger" title="Update Control Pool and Gunnery skill for operator">0</button>
 	    </div>
             <div class="vehicle-quickstats">
                 <input type='hidden' class='buttontoggle' name='attr_sheettype' />
@@ -3571,7 +3569,7 @@
 		<div>Max</div>
 		<div>Used</div>
                 <div>Control Pool:</div>
-                <input type="number" name="attr_control-pool" min=0 value=0>
+                <input type="number" name="attr_controlpool" min=0 value=0>
                 <div><input type='hidden' class='controlpool-over' name='attr_controlpool-over' /><span class="controlpool-over" name="attr_controlpool-used"></span></div>
 	     </div>
 	     <br>
@@ -3779,7 +3777,6 @@
             <div class="table-item"><span name="attr_eccm-fluxmax"></div>
 	    <div class="table-item"><button type="action" class="d6-button" name="act_ewarfare" title="ECCM Counter-Jamming" id="eccmcounter">L</button></div>
 	    <div class="table-item"><button type="action" class="d6-button" name="act_ewarfare" title="ECCM Opposition Test" id="eccmopposition">L</button></div>
-            <div class="table-item"><button type="roll" class="d6-dice" name="roll_skill" title="ECCM Opposition Test"
             <div class="table-item-left">ED:</div>
             <div class="table-item"><input type="number" name="attr_ed-rating" min=0 value=0></div>
             <div class="table-item"><span name="attr_ed-flux"></div>
@@ -4685,6 +4682,39 @@ buttonlist.forEach(button => {
 		console.log(info);
 
 	};
+	on("clicked:setrigger", function(info) {
+		console.log(info);
+		const myid=info["htmlAttributes"]["id"]
+		var myroll="/w gm &{template:info}{{character=@{character_name}}}";
+		var designator;
+		var sets={};
+		getAttrs(["sheettype", "rigger"], function(myval) {
+			console.log(myval);
+			if ((myid == "refresh-rigger") && (myval["rigger"])) {
+				myroll+="{{action=Update Gunnery and Conrol Pool}}";
+				designator="@{" + myval["rigger"];	
+			} else if (myval["sheettype"] == "Drone")  {
+				myroll+="{{action=Set Rigger}}";
+				designator="@{target|Rigger";	
+			} else  {
+				myroll+="{{action=Set Vehicle Operator}}";
+				designator="@{target|Operator";	
+			}
+			myroll+="{{name=[[0[" + designator + "|character_name}]]]}}";
+			myroll+="{{gunnery=[[" + designator + "|gunnery}]]}}";
+			myroll+="{{controlpool=[[" + designator + "|controlpool}]]}}";
+			console.log(myroll);
+                	startRoll(myroll, (results) => {
+				sets["rigger"]=results.results.name.expression.match(/\[(.*)\]/)[1];
+				sets["controlpool"]=results.results.controlpool.result;
+				sets["gunnery"]=results.results.gunnery.result;
+				console.log(sets);
+				finishRoll( results.rollId);
+				setAttrs(sets);
+			});
+		});
+	});
+
 	on("clicked:repeating_intruders:settokenname", function(info) {
 		console.log(info);
 		const source=info['sourceAttribute'].split('_');
