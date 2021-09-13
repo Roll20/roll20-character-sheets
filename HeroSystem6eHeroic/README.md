@@ -54,7 +54,9 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
-The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers. Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn.
+The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers.
+
+Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
@@ -108,15 +110,19 @@ The Power page can accommodate ten powers. The left and right sides have differe
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
 
-The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
+The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll an unmodified attack roll of 3d6, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. 
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
+
+The endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
 
 ## Page 5: Talents and Complications
 
 ![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
-The "Perks & Talents" column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. 
+The "Perks & Talents" column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. Press the "show" button to send the description text to chat.
+
+![Show](/HeroSystem6eHeroic/images/GrayButtonChat.png)
 
 The only trick to the Complications column is to remember that points gained from selecting Complications *subtract* from the total points calculated in the Tally Bar. 
 
@@ -138,12 +144,12 @@ The last page of this sheet contains a number of important options:
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
 *Villain In Glasses, August 1, 2021.*
 
 *Updated August 7, 2021 to include Hit Location support.*
-
 *Updated Sepember 8, 2021 to include notes on Perception Rolls.*
+*Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
