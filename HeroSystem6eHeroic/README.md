@@ -120,7 +120,9 @@ The endurance cost shown is not automatically deducted from the character's heal
 
 ![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
-The "Perks & Talents" column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. 
+The "Perks & Talents" column can be used for Talents, Perks, or any other item that doesn't fit elsewhere. Points spent in this section are counted as Powers in the Tally Bar. Press the "show" button to send the description text to chat.
+
+![Show](/HeroSystem6eHeroic/images/GrayButtonChat.png)
 
 The only trick to the Complications column is to remember that points gained from selecting Complications *subtract* from the total points calculated in the Tally Bar. 
 
@@ -149,5 +151,5 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 *Villain In Glasses, August 1, 2021.*
 
 *Updated August 7, 2021 to include Hit Location support.*
-
 *Updated Sepember 8, 2021 to include notes on Perception Rolls.*
+*Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
