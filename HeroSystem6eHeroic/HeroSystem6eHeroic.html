@@ -2513,32 +2513,37 @@
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Lift</h1>
 				<h1>Weight</h1>
-				<input class="number" name="attr_liftWeight" value="100" readonly/>
+				<input type="number" name="attr_liftWeight" value="100" readonly/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Free</h1>
 				<h1>Carry</h1>
-				<input class="number" name="attr_encumbranceFreeCarry" value="10" readonly/>
+				<input type="number" name="attr_encumbranceFreeCarry" value="10" readonly/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Carried</h1>
 				<h1>Load</h1>
-				<input class="number" name="attr_carriedWeight" value="0" readonly/>
+				<input type="number" name="attr_carriedWeight" value="0" readonly/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>END</h1>
 				<h1>per Turn</h1>
-				<input class="number" name="attr_weightEndPenalty" value="0" readonly/>
+				<input type="number" name="attr_weightEndPenalty" value="0" readonly/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>DCV & DEX</h1>
 				<h1>Roll Penalty</h1>
-				<input class="number" name="attr_weightDexDCVPenalty" value="0" readonly/>
+				<input type="number" name="attr_weightDexDCVPenalty" value="0" readonly/>
+			</div>
+			<div class="subitem-tab-gear-flex-container-encumbrance">
+				<h1>DCV</h1>
+				<h1>Modifier</h1>
+				<input type="number" name="attr_bonusDCVmodifier" value="0" step="1" min="-10" max="+10"/>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Movement</h1>
 				<h1>Penalty</h1>
-				<input class="number" name="attr_weightMovePenalty" value="0" readonly/>
+				<input type="number" name="attr_weightMovePenalty" value="0" readonly/>
 			</div>
 		</div>
 
@@ -4332,12 +4337,13 @@
 	
 	// Update Defensive Combat Value
 	// Update hidden attribute currentDCV
-	on("change:dcv change:weightDexDCVPenalty change:shieldDCV", function () {
-		getAttrs(["dcv","useCharacteristicMaximums","currentDCV","weightDexDCVPenalty","shieldDCV"], function(values) {
+	on("change:dcv change:weightDexDCVPenalty change:shieldDCV change:bonusDCVmodifier", function () {
+		getAttrs(["dcv","useCharacteristicMaximums","currentDCV","weightDexDCVPenalty","shieldDCV","bonusDCVmodifier"], function(values) {
 		  
 			const statValue = parseInt(values.dcv)||0;
 			const shieldBonus = parseInt(values.shieldDCV)||0;
 			const weightPenalty = parseInt(values.weightDexDCVPenalty)||0;
+			const bonusModifier = parseInt(values.bonusDCVmodifier)||0;
 			const useMaximums = values.useCharacteristicMaximums;
 			const baseStat = 3;
 			const maxStat = 8;
@@ -4353,7 +4359,7 @@
 			// Update cost and current DCV
 			setAttrs({
 				"dcvCP":statCP,
-				"currentDCV":statValue+shieldBonus+weightPenalty
+				"currentDCV":statValue+shieldBonus+weightPenalty+bonusModifier
 			});
 			
 			// Update costs
