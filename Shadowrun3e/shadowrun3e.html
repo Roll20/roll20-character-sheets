@@ -1683,7 +1683,9 @@
         <input type='hidden' class='buttontoggle' name='attr_sheettype' />
         <div class="matrix-show-deck">
             <div class='deck-memory-used'>
-                <div class="SRH4">Memory In Use:</div>
+        	<input type='hidden' class='matrix-status' name='attr_matrix-status' value="out" />
+                <div>Jack In</div><button class="pictos-button matrix-status" type="action" name="act_jackin">Q</button>
+                <div>Memory In Use:</div>
                 <div><input type='hidden' class='deck-mem-full' name='attr_deck-mem-overloaded' value=0 />
                     <span class="deck-overload" name="attr_deck-util-size-loaded"></span>
                 </div>
@@ -8896,6 +8898,21 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 		});
 	});
 
+	on('clicked:jackin', function(info) {
+		console.log(info);
+		getAttrs(["matrix-status"], function(myval) {
+			var sets={};
+			const mstatus=myval["matrix-status"];
+			var myroll="/w gm &{template:info}{{character=@{character_name}}}";
+			myroll+= (mstatus == "out")? "{{type=Jack In}}": "{{type=Jack Out}}";
+			myroll += "{{action=Complex}}";
+			sets["matrix-status"]= (mstatus == "out")? "in" : "out";
+                	startRoll(myroll, (results) => {
+				setAttrs(sets);
+				finishRoll( results.rollId);
+			});
+		});
+	});
 </script>
 
 <rolltemplate class="sheet-rolltemplate-spell">
