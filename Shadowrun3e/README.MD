@@ -1,5 +1,15 @@
 # Shadowrun 3rd Edition
 
+## Release Notes 9/8/2021
+
+### changes/bug fixes
+1. Tar Pit ad Tar baby: when using the "execute" button it will roll the Opposed test between the ic ratin and the utility as well as a sensor test.  The resutls of the three rolls will be whispered to the GM.
+2. added chat buttons at the end of melee attack.  Defending character can click on either Defense or Full defense.  The results of the attack test will be passed to the new "defense" roll.  The defense roll will compare successes and determin winner.  Weapon damage and power will be stagged up as per the melee combat rules of srun3e.  If the attacker wins the contest, the defeder will get  Resist buton.
+If "full defense" was chosen, the defender will also be presented with a "dodge" button.  Choosing dodge will roll a melee dodge test and present the player with a "resist" button.  The only differnce between the "Resist" button displayed afer the offense test and the dodge test is that the reults of the dodge are passed to the resist and count towards the resist successes.  If the defender wins the melee contest and they choose "full defence" the roll will result in "Attack Parried".  Else, a "resist" button will be displayed and the attacking character will be able to roll damage resistnace based on the staged up weapon damage and power for the melee weapon currently equipped by the defender.   The chat buttons do not have to be used, regular sheet rolls can still be used i.e. the defender can use the attack button for a melee weapon and then the player that looses the contest can roll a resistance test.  The benefit for the chat buttons is that they reduce the amount of roll queries presented to the players as the data is already sent to the roll. 
+
+### Impact on existing characters.
+
+
 ## Release Notes 9/1/2021
 
 ### changes/bug fixes
