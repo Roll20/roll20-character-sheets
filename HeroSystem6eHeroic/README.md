@@ -110,7 +110,7 @@ The Power page can accommodate ten powers. The left and right sides have differe
 
 ![Multipower](/HeroSystem6eHeroic/images/Multipower.png)
 
-The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
+The "Roll" button produces general output that may or may not apply to the power being used. When pressed, Roll20 will make a 3d6 success roll to compare against the given activation roll target, roll an unmodified attack roll of 3d6, roll the dice provided as an effect (which may need to be translated as normal damage), displays the endurance cost, and shows the text box contents as a description. Note that the endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
