@@ -797,7 +797,7 @@
 			<div class="skill-header skill-value">Lvl</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Casting Time (seconds)">CT</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Duration (seconds)">Dur</div>
-			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Rng</div>
+			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Range</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Base of spell when using individual spell skills">SB</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Index of spell when using individual spell skills">SI</div>
 			<div class="skill-header skill-value">ML</div>
@@ -829,7 +829,7 @@
 			<div class="skill-header skill-value">Lvl</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Casting Time (seconds)">CT</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Duration (seconds)">Dur</div>
-			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Rng</div>
+			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Range</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Base of spell when using individual ritual skills">SB</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Index of spell when using individual ritual skills">SI</div>
 			<div class="skill-header skill-value">ML</div>
@@ -858,7 +858,7 @@
 			<div class="skill-value skill-header harntooltip" data-tooltiptext="Fatigue Penalty">FP</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Casting Time (seconds)">CT</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Duration (seconds)">Dur</div>
-			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Rng</div>
+			<div class="skill-header skill-value harntooltip" data-tooltiptext="Range (meters, self or touch)">Range</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Base of spell when using individual spell skills">SB</div>
 			<div class="skill-header skill-value harntooltip" data-tooltiptext="Skill Index of spell when using individual spell skills">SI</div>
 			<div class="skill-header skill-value">ML</div>
@@ -1589,8 +1589,11 @@
 			<input id=showhorsetoggle name="attr_hrhorseonsheet" type="checkbox" value="1" checked>
 			<label for=showpietytoggle class="harntooltip" data-tooltiptext="When this is unchecked the sheet will show space for tracking piety per god with repeating rows" >Show consolidated piety?</label>
 			<input id=showpietytoggle name="attr_hrconsolidatedpiety" type="checkbox" value="1" checked>
+			<div class="full-width skill-header">Legacy info</div>
 			<label for=showlegacyarmortoggle>Hide armor info from legacy (v1) sheet?</label>
-			<input id=showlegacyarmortoggle name="attr_legacyarmorhidden" type="checkbox" value="1">			
+			<input id=showlegacyarmortoggle name="attr_legacyarmorhidden" type="checkbox" value="1">	
+			<label for=legacycharname class="full-width">Name stored in old "name" field:</label>
+			<input id=legacycharname name="attr_name" type="text" class="full-width" readonly>
 			<div class="full-width skill-header">Sheet version</div>
 			<div class="full-width">
 			  <input name="attr_character_sheet_version" type="number" value="20210912" readonly>
@@ -1618,6 +1621,7 @@
 				<li>Add SB field to spells to allow for optional rule Individual Spell skills (Shek-Pvar 24)</li>
 				<li>Added more fields to spells to quickly see time, duration etc. Added auto-calculation for Skill Index (SI) </li>
 				<li>layout changes to spells section to track additional info and create more space for spell description</li>
+				<li>background script to copy back character name to old "name" field for backward compatibility</li>
 			</ul>
 		</details>		
 		<h3>20210804 - Version 2.3</h3>
@@ -1991,8 +1995,8 @@ function migrateTo20210801 (migrationChain) {
 		setAttrs({
 		    'combat_effectivecondition': effectivecondition,
 			'healing_effectivecondition': healeffcondition,
-			'character_name': charname,
-			'name': 0 /* clear the old name so we don't keep resetting back the version */
+			'character_name': charname
+			/* 'name': 0  we don't need to clear the old name, migration check works based on presence of old name field and version being set or not*/
 			});
 		});
 	/* re-calculate all weapons in the repeating weapons section. */ 
@@ -2025,7 +2029,16 @@ function migrateTo20210801 (migrationChain) {
 		});
 }
 
-
+<!-- restore Character name in old name variable in parallel to new character_name for backward compatibility (old variable was empty out by migration script -->
+on('sheet:opened', function() {
+	getAttrs(['character_name'], function(values) {	
+		var charactername = values['character_name'];
+		setAttrs({
+			'name': charactername
+		});
+	});
+});	
+		
 <!-- weapon load totals /-->
 on('change:repeating_weapon remove:repeating_weapon', function() {
 	repeatingSum('load_weapons_total', 'weapon',['weapon_wgt','weapon_iscarried']);
