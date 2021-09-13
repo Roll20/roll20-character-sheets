@@ -1616,6 +1616,7 @@
 				<li>Fix bug in horse penalty calculation (encumbrance was ignored)</li>
 				<li>Fixed horse dodge roll button not working</li> 
 				<li>Add SB field to spells to allow for optional rule Individual Spell skills (Shek-Pvar 24)</li>
+				<li>Added more fields to spells to quickly see time, duration etc. Added auto-calculation for Skill Index (SI) </li>
 				<li>layout changes to spells section to track additional info and create more space for spell description</li>
 			</ul>
 		</details>		
@@ -2514,7 +2515,21 @@ on('change:repeating_armoritems remove:repeating_armoritems', function() {
 }); 
 
 <!-- spell characteristics -->
-<!-- TODO build sheetworker to calculate SI from SB . and SB from spell level and magic skill? (complicated?) ; attr_spell_si attr_spell_sb -->
+<!-- calculate SI from SB -->
+on('change:repeating_spells:spell_eml change:repeating_rituals:ritual_eml change:repeating_psionics:talent_eml', function() {
+    getAttrs(['repeating_spells_spell_eml', 'repeating_rituals_ritual_eml', 'repeating_psionics_talent_eml'], function(values) {
+		var spellsi = Math.floor(parseInt(values['repeating_spells_spell_eml']/10));
+		var ritualsi = Math.floor(parseInt(values['repeating_rituals_ritual_eml']/10));
+		var talentsi = Math.floor(parseInt(values['repeating_psionics_talent_eml']/10));
+		console.log("spell si: ", spellsi);
+		setAttrs({
+			repeating_spells_spell_si: spellsi,
+			repeating_rituals_ritual_si: ritualsi,
+			repeating_psionics_talent_si: talentsi
+		});
+	});
+});
+
 
 <!-- miscellaneous -->
 
