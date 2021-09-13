@@ -54,7 +54,9 @@ The default roll for Perception is equal to the character's Intelligence Roll. P
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
-The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers. Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn.
+The Gear page provides space for most of a character's physical goods (weapons, armor, and equipment) as well as a list of common and marital combat maneuvers.
+
+Along the top is an accounting of your carried weight and DCV and movement penalties. The Endurance cost should be accounted for manually by deducting points from the character's health status at the end of each turn. Each value is read-only except "DCV Modifier." Use this field to account for skill levels or items that might reduce or enhance your DCV (see the note on current DCV in the token section below).
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
@@ -138,7 +140,7 @@ The last page of this sheet contains a number of important options:
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
-Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty.
+Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
