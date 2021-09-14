@@ -457,7 +457,7 @@
 			<input type="hidden" name="attr_Used_MeleeTwoHanded" value="0" disabled="true" />	
 			<input type="hidden" name="attr_slbonusAtkMain" value="@{Used_MeleePractical}+@{Used_MeleePrecise}" disabled="true" />	
 			<input type="hidden" name="attr_slbonusAtkOff" value="@{Used_DefensePractical}+@{Used_DefensePrecise}" disabled="true" />	
-			<input type="hidden" name="attr_slbonusRgd" value="@{Used_RangedPractical}+@{Used_RangedPrecise}" disabled="true" />	
+			<input type="hidden" name="attr_slbonusRgd" value="@{Used_RangedPractical}+@{Used_RangedPrecise}-@{Used_RangedImprecise}" disabled="true" />	
 			<input type="hidden" name="attr_slbonusCast" value="@{Talent_InstinctiveDictionLvl}+@{Talent_PerfectPitchLvl}" disabled="true" />	
 			<input type="hidden" name="attr_slbonusChannel" value="@{Talent_AethyricAttunementLvl}" disabled="true" />	
 			<input type="hidden" name="attr_slbonusDefMain" value="@{DefensiveTotal}+@{Used_MeleePractical}+@{Talent_RiposteLvl}+@{Talent_ReversalLvl}+(@{Used_MeleeShield}*@{Talent_ShieldsmanLvl})" disabled="true" />
@@ -25973,14 +25973,14 @@
 					{{/rollTotal() computed::SLmod 0}}{{/computed::slbonusdef}}{{/computed::slbonusatk}}
 					
 					{{#rollGreater() computed::slbonusatk 0}}	
-					<span style="color: red">{{computed::sl}}</span>
+					<span style="color: red">-{{computed::sl}}</span>
 					{{/rollGreater() computed::slbonusatk 0}}
 					{{#^rollGreater() computed::slbonusatk 0}}	
 					{{#rollTotal() computed::SLmod 0}}<span style="background-color: yellow">-{{computed::sl}}</span>{{/rollTotal() computed::SLmod 0}}
 					{{#^rollTotal() computed::SLmod 0}}<span style="color: red">-{{computed::sl}}</span>{{/^rollTotal() computed::SLmod 0}}
 					{{/^rollGreater() computed::slbonusatk 0}}					
 					{{#rollGreater() computed::slbonusdef 0}}	
-					<span style="color: red">{{computed::sl}}</span>
+					<span style="color: red">-{{computed::sl}}</span>
 					{{/rollGreater() computed::slbonusdef 0}}				
 					{{#^rollGreater() computed::slbonusdef 0}}	
 					{{#rollTotal() computed::SLmod 0}}<span style="background-color: yellow">-{{computed::sl}}</span>{{/rollTotal() computed::SLmod 0}}
@@ -26012,17 +26012,17 @@
 					{{/rollTotal() computed::SLmod 0}}{{/computed::slbonusdef}}{{/computed::slbonusatk}}
 					
 					{{#rollGreater() computed::slbonusatk 0}}	
-					<span style="color: red">{{computed::sl}}</span>
+					<span style="color: red">-{{computed::sl}}</span>
 					{{/rollGreater() computed::slbonusatk 0}}
 					{{#^rollGreater() computed::slbonusatk 0}}	
 					{{#rollTotal() computed::SLmod 0}}<span style="background-color: yellow">-{{computed::sl}}</span>{{/rollTotal() computed::SLmod 0}}
 					{{#^rollTotal() computed::SLmod 0}}<span style="color: red">-{{computed::sl}}</span>{{/^rollTotal() computed::SLmod 0}}
 					{{/^rollGreater() computed::slbonusatk 0}}					
 					{{#rollGreater() computed::slbonusdef 0}}	
-					<span style="color: red">{{computed::sl}}</span>
+					<span style="color: red">-{{computed::sl}}</span>
 					{{/rollGreater() computed::slbonusdef 0}}				
 					{{#^rollGreater() computed::slbonusdef 0}}	
-					{{#rollTotal() computed::SLmod 0}}<span style="background-color: yellow">{{computed::sl}}</span>{{/rollTotal() computed::SLmod 0}}
+					{{#rollTotal() computed::SLmod 0}}<span style="background-color: yellow">-{{computed::sl}}</span>{{/rollTotal() computed::SLmod 0}}
 					{{#^rollTotal() computed::SLmod 0}}<span style="color: red">-{{computed::sl}}</span>{{/^rollTotal() computed::SLmod 0}}
 					{{/^rollGreater() computed::slbonusdef 0}}
 					
@@ -26164,6 +26164,9 @@
 				{{#rollLess() SLmod 0}}
 					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: red">{{SLmod}}SL <span data-i18n="MODIFIER"></span></div>
 				{{/rollLess() SLmod 0}}
+				{{#rollGreater() imprecise 0}}
+					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: red">-{{imprecise}}SL <span data-i18n="IMPRECISE"></span></div>
+				{{/rollGreater() imprecise 0}}
 
 				<!-- SL SUCCESSFUL TEST MOD -->	
 				
@@ -32265,6 +32268,7 @@ on("change:repeating_ranged:UsedRanged", function (event) {
 						"Used_RangedRepeater": '0',
 						"Used_RangedRepeaterRating": '0',
 						"Used_RangedEntangle": '0',
+						"Used_RangedImprecise": '0',
 						"Used_Ranged_modtype1": '',
 						"Used_Ranged_mod1": '',
 						"Used_Ranged_modtype2": '',
@@ -32282,7 +32286,7 @@ on("change:repeating_ranged:UsedRanged", function (event) {
                     setAttrs(output, {silent: true});
                     // we use silent:true, so this change doesnt trigger the sheet worker again.
 
-   getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_RangedAccurate","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedReload","repeating_ranged_RangedReloadRatingInput","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
+   getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_UsedImprecise","repeating_ranged_RangedAccurate","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedReload","repeating_ranged_RangedReloadRatingInput","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
    
    
   console.log("Ranged change");
@@ -32305,6 +32309,7 @@ on("change:repeating_ranged:UsedRanged", function (event) {
                 "Used_RangedImpale": v.repeating_ranged_RangedImpale,
 				"Used_RangedAccurate": v.repeating_ranged_RangedAccurate,
 				"Used_RangedPrecise": v.repeating_ranged_RangedPrecise,
+				"Used_RangedImprecise": v.repeating_ranged_UsedImprecise,
 				"Used_RangedPractical": v.repeating_ranged_RangedPractical,
 				"Used_RangedPenetrating": v.repeating_ranged_RangedPenetrating,
 				"Used_RangedBlackpowder": v.repeating_ranged_UsedBlackpowder,
@@ -32331,13 +32336,13 @@ on("change:repeating_ranged:UsedRanged", function (event) {
 });		
 			
 		
-on('change:repeating_ranged:RangedWeapon_settings_hide change:repeating_ranged:RangedWeaponName change:repeating_ranged:RangedBalisticSkill change:repeating_ranged:RangedBonus change:repeating_ranged:RangedStrengthBonus change:repeating_ranged:RangedDamageBonus change:repeating_ranged:WeaponRange change:repeating_ranged:RangedAmmo change:repeating_ranged:RangedAmmoType change:repeating_ranged:RangedDamage change:repeating_ranged:RangedQualities change:repeating_ranged:RangedImpale change:repeating_ranged:RangedAccurate change:repeating_ranged:RangedPrecise change:repeating_ranged:RangedPractical change:repeating_ranged:RangedBlast change:repeating_ranged:RangedBlastRating change:repeating_ranged:RangedRepeater change:repeating_ranged:RangedRepeaterRating change:repeating_ranged:UsedEntangle change:repeating_ranged:RangedPenetrating change:repeating_ranged:UsedBlackpowder change:repeating_ranged:UsedDamaging change:repeating_ranged:RangedReload change:repeating_ranged:RangedReload change:repeating_ranged:RangedReloadRatingInput change:repeating_ranged:RangedWeapon_modtype1 change:repeating_ranged:RangedWeapon_mod1 change:repeating_ranged:RangedWeapon_modtype2 change:repeating_ranged:RangedWeapon_mod2 change:repeating_ranged:RangedWeapon_modtype3 change:repeating_ranged:RangedWeapon_mod3', function(event){
+on('change:repeating_ranged:RangedWeapon_settings_hide change:repeating_ranged:RangedWeaponName change:repeating_ranged:RangedBalisticSkill change:repeating_ranged:RangedBonus change:repeating_ranged:RangedStrengthBonus change:repeating_ranged:RangedDamageBonus change:repeating_ranged:WeaponRange change:repeating_ranged:RangedAmmo change:repeating_ranged:RangedAmmoType change:repeating_ranged:RangedDamage change:repeating_ranged:RangedQualities change:repeating_ranged:RangedImpale change:repeating_ranged:RangedAccurate change:repeating_ranged:RangedPrecise change:repeating_ranged:UsedImprecise change:repeating_ranged:RangedPractical change:repeating_ranged:RangedBlast change:repeating_ranged:RangedBlastRating change:repeating_ranged:RangedRepeater change:repeating_ranged:RangedRepeaterRating change:repeating_ranged:UsedEntangle change:repeating_ranged:RangedPenetrating change:repeating_ranged:UsedBlackpowder change:repeating_ranged:UsedDamaging change:repeating_ranged:RangedReload change:repeating_ranged:RangedReload change:repeating_ranged:RangedReloadRatingInput change:repeating_ranged:RangedWeapon_modtype1 change:repeating_ranged:RangedWeapon_mod1 change:repeating_ranged:RangedWeapon_modtype2 change:repeating_ranged:RangedWeapon_mod2 change:repeating_ranged:RangedWeapon_modtype3 change:repeating_ranged:RangedWeapon_mod3', function(event){
 	if (event.sourceType === 'sheetworker') return;
 	const playerclickedid = event.sourceAttribute.split('_')[2] || '';
 	getSectionIDs("repeating_ranged", function (ids) {
 		ids.forEach(id => {
 			if(playerclickedid.toLowerCase() == id.toLowerCase()) {
-				getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_RangedReload","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedAccurate","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedReloadRatingInput","repeating_ranged_UsedRanged","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
+				getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_UsedImprecise","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_RangedReload","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedAccurate","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedReloadRatingInput","repeating_ranged_UsedRanged","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
 					if(v.repeating_ranged_UsedRanged == 1)
 					{
 						setAttrs(
@@ -32355,6 +32360,7 @@ on('change:repeating_ranged:RangedWeapon_settings_hide change:repeating_ranged:R
 							"Used_RangedImpale":  v.repeating_ranged_RangedImpale,
 							"Used_RangedAccurate": v.repeating_ranged_RangedAccurate,
 							"Used_RangedPrecise": v.repeating_ranged_RangedPrecise,
+							"Used_RangedImprecise": v.repeating_ranged_UsedImprecise,
 							"Used_RangedPractical": v.repeating_ranged_RangedPractical,
 							"Used_RangedPenetrating": v.repeating_ranged_RangedPenetrating,
 							"Used_RangedBlackpowder": v.repeating_ranged_UsedBlackpowder,
@@ -32386,7 +32392,7 @@ on('sheet:opened', function(event){
 	if (event.sourceType === 'sheetworker') return;
 	getSectionIDs("repeating_ranged", function (ids) {
 		ids.forEach(id => {
-				getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_RangedReload","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedAccurate","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedReloadRatingInput","repeating_ranged_UsedRanged","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
+				getAttrs(["repeating_ranged_RangedWeaponName","repeating_ranged_RangedBalisticSkill","repeating_ranged_RangedBonus","repeating_ranged_RangedStrengthBonus","repeating_ranged_RangedDamageBonus","repeating_ranged_WeaponRange","repeating_ranged_RangedAmmo","repeating_ranged_RangedAmmoType","repeating_ranged_RangedDamage","repeating_ranged_RangedQualities","repeating_ranged_RangedImpale","repeating_ranged_RangedPrecise","repeating_ranged_UsedImprecise","repeating_ranged_RangedPractical","repeating_ranged_RangedPenetrating","repeating_ranged_UsedDamaging","repeating_ranged_RangedReload","repeating_ranged_UsedEntangle","repeating_ranged_RangedBlast","repeating_ranged_RangedBlastRating","repeating_ranged_RangedRepeater","repeating_ranged_RangedRepeaterRating","repeating_ranged_RangedAccurate","repeating_ranged_UsedBlackpowder","repeating_ranged_RangedReloadRatingInput","repeating_ranged_UsedRanged","repeating_ranged_RangedWeapon_modtype1","repeating_ranged_RangedWeapon_mod1","repeating_ranged_RangedWeapon_modtype2","repeating_ranged_RangedWeapon_mod2","repeating_ranged_RangedWeapon_modtype3","repeating_ranged_RangedWeapon_mod3"], function(v) {
 					if(v.repeating_ranged_UsedRanged == 1)
 					{
 						setAttrs(
@@ -32404,6 +32410,7 @@ on('sheet:opened', function(event){
 							"Used_RangedImpale":  v.repeating_ranged_RangedImpale,
 							"Used_RangedAccurate": v.repeating_ranged_RangedAccurate,
 							"Used_RangedPrecise": v.repeating_ranged_RangedPrecise,
+							"Used_RangedImprecise": v.repeating_ranged_UsedImprecise,
 							"Used_RangedPractical": v.repeating_ranged_RangedPractical,
 							"Used_RangedPenetrating": v.repeating_ranged_RangedPenetrating,
 							"Used_RangedBlackpowder": v.repeating_ranged_UsedBlackpowder,
@@ -34531,7 +34538,7 @@ on('clicked:ripostedmgoff', (eventInfo) => {
 on('clicked:rangedatk', (eventInfo) => {
 	getAttrs(["initiative_houserule"], function(v) {	
 	
-   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} {{hitlocation=true}} {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammo=@{Used_RangedAmmo}}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtk)}} {{RTcrit=@{RT-crit}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}}';
+   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_RangedPrecise}+@{Used_RangedPractical}-@{Used_RangedImprecise} [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusRgd}]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{modvalue=[[?{Ranged Attack Modifier|@{Used_RangedBonus}}]]}} {{title=@{Used_RangedWeaponName}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{RANGED}}} {{target=[[ [[@{condgen_see_move}*-1]] [COND] + [[@{Used_RangedBalisticSkill}]] [SKILL] + [[10*@{Used_RangedAccurate}]] [TALENTS] + [[@{Advantage}*10]] [ADV] +?{Ranged Attack Modifier|0} [MOD] ]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} {{hitlocation=true}} {{damaging=[[@{Used_RangedDamaging}]]}} {{reach=@{Used_WeaponRange}}} {{rolltype=[[@{Used_RangedImpale}]]}} {{qualities=@{Used_RangedQualities}}} {{damage=[[@{Used_RangedStrengthBonus}+@{Used_RangedDamage}+@{Talent_AccurateShotLvl}]]}} {{ammo=@{Used_RangedAmmo}}} {{ammotype=@{Used_RangedAmmoType}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Ranged_modtype1}]]}} {{mod1=@{Used_Ranged_mod1}}} {{mod2type=[[@{Used_Ranged_modtype2}]]}} {{mod2=@{Used_Ranged_mod2}}} {{mod3type=[[@{Used_Ranged_modtype3}]]}} {{mod3=@{Used_Ranged_mod3}}} {{NPC=[[0]]}} {{reroll=@{RT-reroll}RangedAtk)}} {{RTcrit=@{RT-crit}}} {{RTfumble=@{RT-fumble}}} {{precise=[[@{Used_RangedPrecise}]]}} {{imprecise=[[@{Used_RangedImprecise}]]}} {{blast=[[@{Used_RangedBlast}*@{Used_RangedBlastRating}]]}} {{repeater=[[@{Used_RangedRepeater}*@{Used_RangedRepeaterRating}]]}} {{entangle=[[@{Used_RangedEntangle}]]}} {{penetrating=[[@{Used_RangedPenetrating}]]}} {{tiring=[[0]]}} {{blackpowder=[[@{Used_RangedBlackpowder}]]}} {{practical=[[@{Used_RangedPractical}]]}} {{accurate=[[@{Used_RangedAccurate}*10]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:wfrp4e}';
@@ -34543,6 +34550,7 @@ on('clicked:rangedatk', (eventInfo) => {
             const sl = results.results.sl.result
             const practical = results.results.practical.result
             const precise = results.results.precise.result
+            const imprecise = results.results.imprecise.result
             const slbonus = results.results.slbonus.result
             const SLmod = results.results.SLmod.result
             const slbonusatk = results.results.slbonusatk.result
@@ -34550,9 +34558,9 @@ on('clicked:rangedatk', (eventInfo) => {
             const computed2 = (((test-1)%10)+1) ;		
                console.log(slbonusatk);	
 			
-			if ( test <= target ) { var computed3 = computed + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
-			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
-			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + precise + SLmod - imprecise ;} else  { var computed3 = computed + practical + SLmod - imprecise  ;}
+			if ( test <= target ) { var computed4 = slbonusatk - practical  ;} else  { var computed4 = practical - imprecise ;}
+			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod - imprecise ;}
 						
             finishRoll(
                 results.rollId,
