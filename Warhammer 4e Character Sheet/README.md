@@ -73,6 +73,17 @@ Note conditions are not intended for out of combat situations, GM simply makes t
  
 ///// ============ Change Log ============ /////  
 
+September 14th 2021 v1.53
+
+- Various bug fixes
+- All Test Results now display inline with the Target in the Target v Test form.
+- Hovering over roll buttons will now show very clearly which button is about to be clicked.
+- Melee/Ranged Weapon selection will now allow clearing for the selected Weapon.
+- Melee/Ranged Weapons settings popout style changed a bit, added a wrap box.
+- Skills which are affected by advantage or penaties now have tooltip markers to indicate it.
+- Added experimental SL system and custom roll parsing sheet workers, these are hidden and dont interfere with the base page.
+
+
 August 25th 2021 v1.52
 
 - Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
@@ -265,7 +276,7 @@ July 13 2020 - v1.0
 - And a number of minor bug fixes 
 
 
-July 5 020 
+July 5 2020 
 
 - Add Armor value to NPC boxes 
 - Overburdened value now correctly increments when you go over the max encumbrance value, rather then at max encumbrance value. 
