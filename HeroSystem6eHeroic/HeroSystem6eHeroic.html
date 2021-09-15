@@ -2535,10 +2535,20 @@
 				<h1>Roll Penalty</h1>
 				<input type="number" name="attr_weightDexDCVPenalty" value="0" readonly/>
 			</div>
-			<div class="subitem-tab-gear-flex-container-encumbrance">
+			<div class="subitem-tab-gear-flex-container-encumbrance-bonus">
 				<h1>DCV</h1>
 				<h1>Modifier</h1>
-				<input type="number" name="attr_bonusDCVmodifier" value="0" step="1" min="-10" max="+10"/>
+				<div class="subitem-tab-gear-plus-minus-enclosure">
+					<input type="text" name="attr_bonusDCVmodifier" value="0" maxlength="2" pattern="[0-9]+"/>
+					<div class="subitem-tab-gear-flex-container-stat">
+						<button type="action" class="button buttonPlus" name="act_bonusDCVmodifierPlus">
+							<span>&#10095;</span>
+						</button>
+						<button type="action" class="button buttonMinus"name="act_bonusDCVmodifierMinus">
+							<span>&#10094;</span>
+						</button>
+					</div>
+				</div>
 			</div>
 			<div class="subitem-tab-gear-flex-container-encumbrance">
 				<h1>Movement</h1>
@@ -4336,6 +4346,29 @@
 	});
 	
 	// Update Defensive Combat Value
+	
+	// Encumbrance Section: Add 1 to bonusDCVmodifier
+	on("clicked:bonusDCVmodifierPlus", function () {
+		getAttrs(["bonusDCVmodifier"], function(values) {
+			const currentValue = parseInt(values.bonusDCVmodifier)||0;
+			
+			setAttrs({
+				"bonusDCVmodifier":Math.min(Math.max(-10, (currentValue+1) ), +10)
+			});
+		});
+	});
+	
+	// Encumbrance Section: Subtract 1 from bonusDCVmodifier
+	on("clicked:bonusDCVmodifierMinus", function () {
+		getAttrs(["bonusDCVmodifier"], function(values) {
+			const currentValue = parseInt(values.bonusDCVmodifier)||0;
+			
+			setAttrs({
+				"bonusDCVmodifier":Math.min(Math.max(-10, (currentValue-1) ), +10)
+			});
+		});
+	});
+	
 	// Update hidden attribute currentDCV
 	on("change:dcv change:weightDexDCVPenalty change:shieldDCV change:bonusDCVmodifier", function () {
 		getAttrs(["dcv","useCharacteristicMaximums","currentDCV","weightDexDCVPenalty","shieldDCV","bonusDCVmodifier"], function(values) {
