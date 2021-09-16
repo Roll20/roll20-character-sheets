@@ -1,5 +1,17 @@
-async function addH2hToBonuses() {
-  // can i leverage addWpToBonuses() or addModifierToBonusesAsync()
+async function updateHandToHands(section, newCharacterLevel) {
+  const ids = await getSectionIDsAsync(section);
+  const attrNames = ids.map((id) => `repeating_${section}_${id}_name`);
+  const a = await getAttrsAsync(attrNames);
+  for (rowId of ids) {
+    const rowPrefix = `repeating_${section}_${rowId}`;
+    await calculateH2h(
+      section,
+      rowId,
+      rowPrefix,
+      a[`${rowPrefix}_name`],
+      newCharacterLevel
+    );
+  }
 }
 
 async function calculateH2h(section, rowId, keyPrefix, name, level) {
