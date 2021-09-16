@@ -15,11 +15,11 @@ mixin ability(asset, ability, number, name)
     - var translationAbility = `asset-${name}-ability-${number}`
     - var assetBodyPlaceholder=translation[translationAbility]
     .asset-ability
-      div(data-i18n=translationAbility)!=assetBodyPlaceholder
+      div.i18n-text(data-i18n=translationAbility)!=assetBodyPlaceholder
       if ability.Input
         each field in ability.Input
-          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${field.toLowerCase().replace(/\s/g, '-')}`
-          .asset-ability-write-in(data-i18n=translationAbilityField)=translation[translationAbilityField]
+          - var translationAbilityField = `asset-${name}-ability-${number}-textinput-${_.kebabCase(field)}`
+          span.i18n-text.asset-ability-write-in(data-i18n=translationAbilityField)=translation[translationAbilityField]
           input.border-bottom.no-border(type='text' name=`attr_ability_field${field}` value='')
 
 mixin description(asset, key)
@@ -29,15 +29,15 @@ mixin description(asset, key)
 
 mixin field(field, assetName)
   .write-in-container
-    .asset-write-in.asset-name(
-      data-i18n=`asset-${assetName}-textinput-${field.toLowerCase()}`
-    )=translation[`asset-${assetName}-textinput-${field.toLowerCase()}`]
+    .i18n-text.asset-write-in.asset-name(
+      data-i18n=`asset-${assetName}-textinput-${_.kebabCase(field)}`
+    )=translation[`asset-${assetName}-textinput-${_.kebabCase(field)}`]
     input.border-bottom.no-border(type='text' name=`attr_field-${field}` value='')
 
 mixin track(track, assetName)
   .asset-track-wrapper
     - var currentTrack = 0
-    while currentTrack <= track.Value
+    while currentTrack <= track.Max
       .asset-track-box
         if currentTrack == 0
           .asset-track-box-display=0
@@ -47,11 +47,13 @@ mixin track(track, assetName)
         - currentTrack++
 
 mixin assetTemplate(asset, options)
-  - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
-  - var category = asset.Category.toLowerCase().replace(/\s/g, '-')
+  - let id = asset.id
+  - let name = `${id.replace(/asset-/i, "")}`
+  - let category = _.kebabCase(asset.Category)
+  - let assetNameClass = name;
   if options.visiblityToggle === true
-    input(class=`${options.classes} ${name}` type='checkbox' name=`attr_${name}`)
-  div(class=`${options.classes} ${name} category-${category}`)
+    input(class=`${options.classes} ${assetNameClass}` type='checkbox' name=`attr_${name}`)
+  div(class=`${options.classes} ${assetNameClass} category-${category}`)
     .asset-content-header
       .asset-details
         .category=asset.Category
@@ -69,15 +71,16 @@ mixin assetTemplate(asset, options)
     if asset['Condition Meter'] && options.standalone === false
       +track(asset['Condition Meter'], name)
 
-mixin genericBuilder(assetsArray, listId)
+mixin genericAssetBuilder(assetsArray, listId)
   //- Asset Datalist
   input.asset-options-header(type='text' list=listId name='attr_asset' placeholder=translation["type-asset-name"])
   datalist(id=listId)
     each asset in assetsArray
-      - var name = asset.Name.toLowerCase().replace(/\s/g, '-')
-      //- - console.log(`input[type=checkbox].${name}:checked ~ div.${name},`)
-      option(data-i18n=`asset-${name}-name` value=name)=translation[`asset-${name}-name`]
-    option(data-i18n=`asset-custom-name` value='custom')=translation[`asset-custom-name`]
+      - let assetNameClass = `${asset.id.replace(/asset-/i, "")}`
+      //- generates classes and outputs to stdout
+      //- - console.log(`input[type=checkbox].${assetNameClass}:checked ~ div.${assetNameClass},`)
+      option.i18n-text(data-i18n=`${asset.id}-name` value=assetNameClass)=translation[`${asset.id}-name`]
+    option.i18n-text(data-i18n=`asset-custom-name` value='custom')=translation[`asset-custom-name`]
 
   //- Asset Content
   each asset in assetsArray
