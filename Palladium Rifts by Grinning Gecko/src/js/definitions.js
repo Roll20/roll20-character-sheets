@@ -1,3 +1,154 @@
+const H2H = {
+  "hand to hand: basic": [
+    { attacks: 4, pull: 2, roll: 2 },
+    { parry: 2, dodge: 2 },
+    { description: "Kick attack does 1D8 points of damage\n" },
+    { attacks: 1 },
+    { strike: 1, disarm: 1 },
+    { critical: 19 },
+    { damage: 2 },
+    {
+      description:
+        "Judo-style body flip/throw; does 1D6 damage, and victim loses initiative and one attack\n",
+    },
+    { attacks: 1 },
+    { pull: 2, roll: 2 },
+    { parry: 1, dodge: 1 },
+    { strike: 1 },
+    { description: "Critical Strike or knockout from behind\n" },
+    { damage: 2 },
+    { attacks: 1 },
+  ],
+  "hand to hand: expert": [
+    { attacks: 4, pull: 2, roll: 2, description: "kick attack 1D8 damage\n" },
+    { parry: 3, dodge: 3, pull: 1 },
+    { strike: 2, disarm: 2, description: "can perform a Karate Punch\n" },
+    { attacks: 1 },
+    { description: "Can perform a Karate Kick, does 2D6 damage\n" },
+    { critical: 18 },
+    {
+      description:
+        "W.P. Paired Weapons\nbackhand strike (average, does 1D4 damage)\n",
+    },
+    {
+      description:
+        "Body flip/throw; does 1D6 damage, and victim loses initiative and one attack\n",
+    },
+    { attacks: 1, disarm: 1 },
+    { damage: 3 },
+    { knockout: 18 },
+    { parry: 2, dodge: 2 },
+    {
+      description: "Critical Strike or knockout from behind (triple damage)\n",
+    },
+    { attacks: 1 },
+    { deathblow: 20 },
+  ],
+  "hand to hand: martial arts": [
+    {
+      attacks: 4,
+      pull: 3,
+      roll: 3,
+      description:
+        "body flip/throw; does ID6 damage, victim loses initiative and one attack\n",
+    },
+    {
+      parry: 3,
+      dodge: 3,
+      strike: 2,
+      description: "may perform Ka­rate and any hand strike/punch\n",
+    },
+    {
+      initiative: 1,
+      description:
+        "may perform a Karate-style kick (does 2D6 damage) and any foot strike except Leap Kick\n",
+    },
+    { attacks: 1 },
+    {
+      entangle: 2,
+      description: "Leap Kick (3D8 damage, but counts as two melee attacks)\n",
+    },
+    { critical: 18 },
+    { disarm: 2, description: "W.P. Paired Weapons\ncan perform Holds\n" },
+    { description: "Back flip and back flip escape\n" },
+    { attacks: 1 },
+    { disarm: 2, description: "Back flip attack\n" },
+    { damage: 4, initiative: 1 },
+    { parry: 2, dodge: 2 },
+    { knockout: 18 },
+    { attacks: 1 },
+    { deathblow: 20 },
+  ],
+  "hand to hand: assassin": [
+    { attacks: 3, strike: 2, description: "W.P. Paired Weapons\n" },
+    { initiative: 1, attacks: 2 },
+    { pull: 3, roll: 2, description: "Karate Punch (2D4 damage)\n" },
+    { damage: 4, initiative: 1, description: "Karate Kick (2D6 damage)\n" },
+    { attacks: 1, throw: 1 },
+    {
+      parry: 3,
+      dodge: 3,
+      entangle: 2,
+      description: "backhand strike (martial arts 1D6)\n",
+    },
+    {
+      knockout: 17,
+      description: "leap kick (3D8 damage, but counts as two melee attacks)\n",
+    },
+    { attacks: 1, strike_range: 1, initiative: 1 },
+    { initiative: 1 },
+    { critical: 19 },
+    {
+      strike: 2,
+      throw: 1,
+      strike_range: 1,
+      description: "can perform back flip attack\n",
+    },
+    { pull: 2, deathblow: 19 },
+    { attacks: 1 },
+    { damage: 2, description: "can perform Holds\n" },
+    { strike: 2, strike_range: 1 },
+  ],
+  "hand to hand: commando": [
+    {
+      attacks: 4,
+      horrorfactor: 2,
+      description: "W.P. Paired Weapons, body flip/throw, body block/tackle\n",
+    },
+    {
+      initiative: 1,
+      strike: 1,
+      parry: 2,
+      dodge: 2,
+      roll: 3,
+      pull: 3,
+      description:
+        "Backward sweep kick, used only against opponents coming up behind the character. Does no damage; it is purely a knockdown attack (same penalties as body flip) but cannot be parried (an opponent can try to dodge it but is -2 to do so)\n",
+    },
+    {
+      initiative: 1,
+      disarm: 1,
+      description: "Karate punch/strike (does 2D4 damage)\n",
+    },
+    {
+      attacks: 1,
+      description:
+        "Karate kick (does 2D6). The karate-style kick starts with bringing the knee, folded, up to chest level, then the foot is completely extended\n",
+    },
+    { dodge_auto: 2, description: "all foot strikes\n" },
+    { initiative: 1, strike: 1, parry: 1, dodge: 1, flipthrow: 1 },
+    { damage: 2, horrorfactor: 1, disarm: 1, dodge_auto: 1, pull: 2 },
+    { attacks: 1, flipthrow: 2, roll: 1 },
+    { deathblow: 18, pull: 2 },
+    { horrorfactor: 2, initiative: 1, strike: 1 },
+    { disarm: 1, pull: 1, flipthrow: 2 },
+    { damage: 2, parry: 1, dodge: 1, dodge_auto: 2 },
+    { attacks: 1 },
+    { initiative: 1, description: "Can perform holds\n" },
+    { critical: 17 },
+  ],
+};
+
 const WP = {
   "w.p. archery": [
     { strike: 1, parry: 1, rof: 2 },
@@ -767,6 +918,7 @@ const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 const EQUIPMENT_KEYS = ["equipment"];
 
 const SECTIONS = {
+  h2h: REPEATING_BONUS_KEYS,
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,
