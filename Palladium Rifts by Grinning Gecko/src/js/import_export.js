@@ -33,6 +33,7 @@
   on("clicked:export", async (e) => {
     console.log("export", e);
     const attrs = {};
+    attrs.h2h = await getRepeatingRowsAsync("h2h");
     attrs.wp = await getRepeatingRowsAsync("wp");
     attrs.wpmodern = await getRepeatingRowsAsync("wpmodern");
     attrs.skills = await getRepeatingRowsAsync("skills");
@@ -98,6 +99,7 @@
     // importAll(data);
     // return;
     await setAttrsAsync(data.core);
+    await setRepeatingRowsAsync("h2h", data.h2h);
     await setRepeatingRowsAsync("wp", data.wp);
     await setRepeatingRowsAsync("wpmodern", data.wpmodern);
     await setRepeatingRowsAsync("skills", data.skills);

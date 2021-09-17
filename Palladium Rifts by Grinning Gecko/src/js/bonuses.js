@@ -194,6 +194,7 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "initiative",
     "pull",
     "roll",
+    "breakfall",
     "strike_range",
     "strike_range_single",
     "strike_range_burst",

@@ -1,3 +1,19 @@
+/**
+ * Run this function in the console, and modify as needed
+ * for other definitions
+ */
+function getKeysFromH2h() {
+  const keys = new Set();
+  Object.entries(H2H).forEach(([name, skill]) => {
+    skill.forEach((level) => {
+      Object.keys(level).forEach((mod) => {
+        keys.add(mod);
+      });
+    });
+  });
+  console.log(JSON.stringify([...keys]));
+}
+
 const H2H = {
   "hand to hand: basic": [
     { attacks: 4, pull: 2, roll: 2 },
@@ -135,7 +151,7 @@ const H2H = {
       description:
         "Karate kick (does 2D6). The karate-style kick starts with bringing the knee, folded, up to chest level, then the foot is completely extended\n",
     },
-    { dodge_auto: 2, description: "all foot strikes\n" },
+    { dodge_auto: 2, description: "Automatic dodge, all foot strikes\n" },
     { initiative: 1, strike: 1, parry: 1, dodge: 1, flipthrow: 1 },
     { damage: 2, horrorfactor: 1, disarm: 1, dodge_auto: 1, pull: 2 },
     { attacks: 1, flipthrow: 2, roll: 1 },
@@ -146,6 +162,26 @@ const H2H = {
     { attacks: 1 },
     { initiative: 1, description: "Can perform holds\n" },
     { critical: 17 },
+  ],
+  "hand to hand: aikido": [
+    { attacks: 4, breakfall: 3, roll: 2, flipthrow: 2, pull: 2 },
+    { initiative: 1, parry: 2, dodge: 2 },
+    { disarm: 1, description: "Automatic dodge\n" },
+    { attacks: 1, flipthrow: 1 },
+    {
+      description:
+        "Critical body flip/throw on Natural 18-20 (double damage)\n",
+    },
+    { parry: 1, dodge: 1, flipthrow: 1 },
+    { pull: 2, description: "Automatic flip/throw\n" },
+    { attacks: 1 },
+    { initiative: 1, strike: 1, parry: 1, dodge: 1 },
+    { disarm: 1, description: "Double existing P.P.E. (inner spirit)\n" },
+    { parry: 1, dodge: 2, flipthrow: 1 },
+    { attacks: 1 },
+    { initiative: 1, flipthrow: 2 },
+    { critical: 18 },
+    { attacks: 1 },
   ],
   "hand to hand: dragon": [
     {
@@ -416,6 +452,34 @@ const H2H = {
     {},
   ],
 };
+
+const H2H_KEYS = [
+  "name",
+  "level",
+  "attacks",
+  "pull",
+  "roll",
+  "breakfall",
+  "parry",
+  "dodge",
+  "description",
+  "strike",
+  "disarm",
+  "critical",
+  "damage",
+  "knockout",
+  "deathblow",
+  "initiative",
+  "entangle",
+  "throw",
+  "strike_range",
+  "horrorfactor",
+  "dodge_auto",
+  "flipthrow",
+  "dodge_flight",
+  "dodge_teleport",
+  "dodge_motion",
+];
 
 const WP = {
   "w.p. archery": [
@@ -965,6 +1029,7 @@ const COMBAT_KEYS = [
   "entangle",
   "pull",
   "roll",
+  "breakfall",
   "damage",
   "damage_paired",
   "damage_mainhand",
@@ -1186,7 +1251,7 @@ const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 const EQUIPMENT_KEYS = ["equipment"];
 
 const SECTIONS = {
-  // h2h: REPEATING_BONUS_KEYS, // this will be inefficient. need to specify the exact keys required
+  h2h: H2H_KEYS,
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,
