@@ -1,5 +1,8 @@
 Change Log
 ==============================================
+**2021-09-21 ** v.42 Chuz (James Culp)
+	Grunt/Spirit sheet Added Magic AR beside Drain roll button
+	Grunt sheet added Direct Magic and Indirect Magic defense roll buttons and rearranged things a little.
 **2021-09-08 ** v.41 Chuz (James Culp)
 	Bugfix - Drone/Vehicle Initiative should have been normal Initiative but Pilot * 2 + 4d6.
 	Bugfix - Grunt template was applying wounds to Soak rolls.
