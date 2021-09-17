@@ -1,6 +1,9 @@
 Change Log
 ==============================================
 **2021-09-21 ** v.42 Chuz (James Culp)
+	Added Matrix Action buttons to the bottom of Grunt sheets IF "Has Matrix Device" is checked.
+	Grunt Group checkbox and count are no longer hidden when settings mode is not active.
+	Found some Soak rollbuttons were including wound modifiers, that was incorrect, fixed now.
 	Grunt/Spirit sheet Added Magic AR beside Drain roll button
 	Grunt sheet added Direct Magic and Indirect Magic defense roll buttons and rearranged things a little.
 **2021-09-08 ** v.41 Chuz (James Culp)
