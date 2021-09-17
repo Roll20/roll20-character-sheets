@@ -1,6 +1,8 @@
 Change Log
 ==============================================
 **2021-09-21 ** v.42 Chuz (James Culp)
+	Grunt sheet Added tooltips for Direct/Indirect Magic Defense, Defense, Soak, Soak Matrix and Soak Biofeedback.
+	PC Sheet Changes to Charisma now trigger the Social Rating to update.
 	Added Matrix Action buttons to the bottom of Grunt sheets IF "Has Matrix Device" is checked.
 	Grunt Group checkbox and count are no longer hidden when settings mode is not active.
 	Found some Soak rollbuttons were including wound modifiers, that was incorrect, fixed now.
