@@ -204,8 +204,8 @@ const H2H = {
     { attacks: 1, description: "Bite & Grip, and Tail Sweep\n" },
     { strike: 1, parry: 1, dodge_flight: 2, description: "Tail Parry\n" },
     {
-      description:
-        "+1 to Spell Strength, gains the Wing Sweep and Grappling Hold.\n",
+      mod_spellstrength: 1,
+      description: "gains the Wing Sweep and Grappling Hold.\n",
     },
     { disarm: 2, entangle: 2, pull: 2, description: "Wing Attack: Advanced\n" },
     {
@@ -222,11 +222,11 @@ const H2H = {
         "Gains Breath Weapon Concentrated Beam, and an additional +5% to Dimensional Teleport (a natural ability).\n",
     },
     { initiative: 1, critical: 19, description: "Teleport Dodge\n" },
-    { damage: 2, dodge_flight: 2, description: "+1 to Spell Strength\n" },
+    { damage: 2, dodge_flight: 2, mod_spellstrength: 1 },
     { attacks: 1, strike: 1, dodge_teleport: 1 },
     { initiative: 1, description: "Breath Weapon Cone\n" },
     { dodge_teleport: 1, pull: 1 },
-    { description: "+1 to Spell Strength and + 1D4x10 to M.D.C\n" },
+    { mod_spellstrength: 1, description: "+ 1D4x10 to M.D.C\n" },
     { attacks: 1, damage: 2 },
     { dodge_teleport: 1, dodge_flight: 1 },
     { strike: 1, parry: 1, description: "+ 1 to Spell Strength\n" },
@@ -479,6 +479,7 @@ const H2H_KEYS = [
   "dodge_flight",
   "dodge_teleport",
   "dodge_motion",
+  "mod_spellstrength",
 ];
 
 const WP = {
