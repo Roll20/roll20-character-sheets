@@ -147,6 +147,274 @@ const H2H = {
     { initiative: 1, description: "Can perform holds\n" },
     { critical: 17 },
   ],
+  "hand to hand: dragon": [
+    {
+      attacks: 3,
+      roll: 2,
+      pull: 1,
+      description:
+        "Instinctively knows the following attack types: Bite, punch, kick, Claw Swipe, and standard use of breath weapon (counts as one melee attack). Dragon metamor­phosis takes one full melee (15 seconds).\n",
+    },
+    {
+      parry: 2,
+      dodge: 2,
+      description: "Tail Slap, Wing At­tack: Basic, and Crush\n",
+    },
+    {
+      damage: 2,
+      description:
+        "Dragon metamorphosis takes half a melee round (7 sec­onds), and Tail Slap Power Strike\n",
+    },
+    { attacks: 1, description: "Bite & Grip, and Tail Sweep\n" },
+    { strike: 1, parry: 1, dodge_flight: 2, description: "Tail Parry\n" },
+    {
+      description:
+        "+1 to Spell Strength, gains the Wing Sweep and Grappling Hold.\n",
+    },
+    { disarm: 2, entangle: 2, pull: 2, description: "Wing Attack: Advanced\n" },
+    {
+      attacks: 1,
+      strike: 1,
+      parry: 1,
+      dodge_flight: 1,
+      description: "Wing Gliding Sweep Attack\n",
+    },
+    {
+      roll: 1,
+      pull: 1,
+      description:
+        "Gains Breath Weapon Concentrated Beam, and an additional +5% to Dimensional Teleport (a natural ability).\n",
+    },
+    { initiative: 1, critical: 19, description: "Teleport Dodge\n" },
+    { damage: 2, dodge_flight: 2, description: "+1 to Spell Strength\n" },
+    { attacks: 1, strike: 1, dodge_teleport: 1 },
+    { initiative: 1, description: "Breath Weapon Cone\n" },
+    { dodge_teleport: 1, pull: 1 },
+    { description: "+1 to Spell Strength and + 1D4x10 to M.D.C\n" },
+    { attacks: 1, damage: 2 },
+    { dodge_teleport: 1, dodge_flight: 1 },
+    { strike: 1, parry: 1, description: "+ 1 to Spell Strength\n" },
+    {
+      dodge_teleport: 1,
+      disarm: 1,
+      roll: 1,
+      description: "+1D4x10 to physical M.D.C.\n",
+    },
+    { attacks: 1 },
+  ],
+  "rpa combat: basic": [
+    {
+      attacks: 1,
+      strike: 1,
+      parry: 1,
+      dodge: 1,
+      roll: 1,
+      description:
+        "Power Armor Body Block/Tackle/Ram: 1D4 M.D. plus a 01-50% chance of knocking an opponent down, causing him to lose initiative and one melee attack/action. Counts as two of the power armor's melee attacks.\n" +
+        "Robot Body Block/Tackle/Ram: M.D. equal to Robot Punch M.D. plus a 01-60% chance of knocking down an opponent that is approxi­ mately the same size or larger. Increase the odds of knocking down an opponent that is half the size or smaller than the robot to 0 1 -80%. The victim suffers M.D. and loses initiative and two melee attacks/actions. Counts as two ofthe robot's melee attacks.\n",
+    },
+  ],
+  "rpa combat: flying power armor": [
+    {
+      attacks: 1,
+      initiative: 2,
+      strike_range: 2,
+      strike: 2,
+      parry: 2,
+      dodge: 2,
+      dodge_flight: 5,
+      disarm: 2,
+      pull: 3,
+      roll: 4,
+      description:
+        "Punch Damage: As per Robot (or Augmented) P.S.\nPower Punch: Double damage, but counts as two melee attacks. Tear or Pry with Hands: 1D4 M.D.\nKick Damage: As per Robot (or Augmented) P.S.\nBody B1ock/Ram: Equal to the Robot P.S. punch damage.\nFull Speed Running Ram: Double Robot P.S. punch damage, plus 01-60% likelihood of knocking an opponent off his feet if the opponent is the same size or smaller (reduce by half if twice as big). Victim takes M.D. and is knocked off his feet, losing initiative and two melee at­tacks/actions.\n",
+    },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+  ],
+  "rpa combat: ground-based power armor": [
+    {
+      attacks: 1,
+      initiative: 1,
+      strike_range: 2,
+      strike: 3,
+      parry: 2,
+      dodge: 2,
+      disarm: 3,
+      pull: 3,
+      roll: 2,
+      description:
+        "Punch Damage: As per Robot (or Augmented) P.S.\nPower Punch: Double damage, but counts as two melee attacks.\nTear or Pry with Hands: 1D4 M.D.\nKick Damage: As per Robot (or Augmented) P.S.\nBody B1ock/Ram: Equal to the Robot P.S. punch damage.\nFull Speed Running Ram: Double Robot P.S. punch damage, plus 01-50% likelihood of knocking an opponent off his feet if the opponent is the same size or smaller (reduce by half if twice as big). Victim takes M.D. and is knocked off his feet, losing initiative and two melee at­tacks/actions.\n",
+    },
+    {},
+    { attacks: 1 },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+  ],
+  "rpa combat: heavy vehicular style robots": [
+    {
+      attacks: 1,
+      initiative: 1,
+      strike_range: 3,
+      strike: 1,
+      parry: 1,
+      dodge: 1,
+      dodge_motion: 2,
+      roll: 1,
+      description:
+        "Punch/Kick Damage: As per Robot P.S.\n" +
+        "Power Punch/Kick: Double damage, but counts as two melee attacks.\n" +
+        "Kick Damage: As per Robot P.S.\n" +
+        "Body Block/Ram: Equal to the Robot P.S. punch damage.\n" +
+        "Full Speed Running Ram: Triple the Robot P.S. punch damage, plus 01-80% likelihood of knocking opponent off his feet if the opponent is the same size or smaller. Victim takes M.D. and is knocked off his feet, losing initiative and two melee attacks/actions.\n" +
+        "Stomp: 1D6 M.D.; effective only against objects smaller than one third the robot's total height.\n",
+    },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+  ],
+  "rpa combat: heavy ground robots": [
+    {
+      attacks: 1,
+      initiative: 1,
+      strike_range: 1,
+      strike: 2,
+      parry: 3,
+      dodge: 1,
+      dodge_motion: 2,
+      disarm: 1,
+      pull: 2,
+      roll: 3,
+      description:
+        "Punch Damage: As per Robot P.S.\n" +
+        "Power Punch: Double damage, but counts as two melee attacks.\n" +
+        "Tear or Pry with Hands: 1D6 M.D.\n" +
+        "Kick Damage: As per Robot P.S.\n" +
+        "Body Block/Ram: Equal to the Robot P.S. punch damage.\n" +
+        "Full Speed Running Ram: Double the Robot P.S. punch damage, plus 01-85% likelihood of knocking opponent off his feet if the opponent is the same size or smaller. Victim takes M.D. and is knocked off his feet, losing initiative and two melee attacks/actions.\n" +
+        "Stomp: 1D6 M.D.; effective only against objects smaller than one third the robot's total height.\n",
+    },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+  ],
+  "rpa combat: light ground robots": [
+    {
+      attacks: 1,
+      initiative: 2,
+      strike_range: 1,
+      strike: 3,
+      parry: 3,
+      dodge: 2,
+      dodge_motion: 3,
+      disarm: 2,
+      pull: 4,
+      roll: 4,
+      description:
+        "Punch Damage: As per Robot P.S.\n" +
+        "Power Punch: Double damage, but counts as two melee attacks.\n" +
+        "Tear or Pry with Hands: 1D4 M.D.\n" +
+        "Kick Damage: As per Robot P.S.\n" +
+        "Body Block/Ram: Equal to the Robot P.S. punch damage.\n" +
+        "Full Speed Running Ram: Double the Robot P.S. punch damage, plus 01-70% likelihood of knocking opponent off his feet if the opponent is the same size or smaller. Victim takes M.D. and is knocked off his feet, losing initiative and two melee attacks/actions.\n" +
+        "Stomp: 1D4 M.D.; effective only against objects smaller than one third the robot's total height.\n",
+    },
+    {},
+    { attacks: 1 },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+  ],
+  "rpa combat: glitter boy": [
+    {
+      attacks: 2,
+      initiative: 2,
+      strike_range: 2,
+      strike: 2,
+      parry: 2,
+      dodge: 2,
+      disarm: 1,
+      pull: 4,
+      roll: 3,
+      description:
+        "Punch Damage: 1D4 M.D. on a restrained punch, 1D6 M.D. on a full strength punch.\n" +
+        "Power Punch: 2D6 M.D., but counts as two melee attacks.\n" +
+        "Kick Damage: 2D4 M.D., Power Kick is not possible.\n" +
+        "Running Leap Kick: 4D6 M.D., but counts as three attacks.\n" +
+        "Tear or Pry with Hands (Special): 1D6 M.D.\n" +
+        "Body BlocklRam: 2D4 M.D.\n" +
+        "Full Speed Running Ram: 3D6 M.D., but this attack uses up three melee actions.\n" +
+        "Stomp: 1D6 M.D.; effective only against objects smaller than three feet (0.9 m) tall.\n" +
+        "Pylon Impalement: 1D6 M.D., not very useful in most combat situa­tions.\n",
+    },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+  ],
 };
 
 const WP = {
