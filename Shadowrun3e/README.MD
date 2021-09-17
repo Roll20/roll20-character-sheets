@@ -1,6 +1,6 @@
 # Shadowrun 3rd Edition
 
-## Release Notes 9/16/2021
+## Release Notes 9/18/2021
 
 ### changes/bug fixes
 1. Tar Pit ad Tar baby: when using the "execute" button it will roll the Opposed test between the ic ratin and the utility as well as a sensor test.  The resutls of the three rolls will be whispered to the GM.
@@ -16,7 +16,8 @@ If "full defense" was chosen, the defender will also be presented with a "dodge"
 10. added chat button after magic attack or spell defense to resist spell. Resistance is based on attribute if not an elemental spell, in which case resistance is 1/2 impact.
 11. All chat buttons published after magic attack roll template pass the value of the original roll to prepopulate most of the roll questions. 
 12. Resist and Dodge buttons presented after ranged attack roll template will pass value of original roll to dodge and resist rolls.
-13. Added translation tags for Always Displayed section of the sheet as well as the Attributes, Skills and Magic tabs.  
+13. Added translation tags for all html elements.  
+14. removed the use of case statements
 
 ### Impact on existing characters.
 none
@@ -24,7 +25,6 @@ none
 ### Todo
 add knockdown test chat button after melee and ranged attacks.
 add shotgun ammo to ammo type list on repeating ranged weapons.
-add translation tags to the remaining sheets.
 add translation to sheet worker rolls.
 
 
