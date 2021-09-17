@@ -918,7 +918,7 @@ const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 const EQUIPMENT_KEYS = ["equipment"];
 
 const SECTIONS = {
-  h2h: REPEATING_BONUS_KEYS,
+  // h2h: REPEATING_BONUS_KEYS, // this will be inefficient. need to specify the exact keys required
   wp: WP_KEYS.wp,
   wpmodern: WP_KEYS.wpmodern,
   skills: SKILL_KEYS,

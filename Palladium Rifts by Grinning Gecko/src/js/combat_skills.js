@@ -16,8 +16,13 @@ async function updateHandToHands(section, newCharacterLevel) {
 
 async function calculateH2h(section, rowId, keyPrefix, name, level) {
   console.log("calculateH2h", name, keyPrefix, level);
+  const lowerCaseName = name.toLowerCase();
+  if (!Object.keys(H2H).includes(lowerCaseName)) {
+    // Exit if this isn't one of the pre-defined skills
+    return;
+  }
   const attrs = {};
-  const levelBonuses = H2H[name.toLowerCase()].slice(0, level);
+  const levelBonuses = H2H[lowerCaseName].slice(0, level);
   const totalBonuses = mergeAndAddObjects(levelBonuses);
   console.log(totalBonuses);
   for (const [key, val] of Object.entries(totalBonuses)) {
@@ -29,19 +34,26 @@ async function calculateH2h(section, rowId, keyPrefix, name, level) {
   await addModifierToBonusesAsync(section, rowId);
 }
 
-on("change:repeating_h2h", (e) => {
+on("change:repeating_h2h", async (e) => {
   /**
-   * Allow player-updated fields, but handle name and level elsewhere
+   * Allow custom Hand to Hand
    */
-  const [r, section, rowId] = e.sourceAttribute.split("_");
-  if (
-    e.sourceType === "sheetworker" ||
-    e.sourceAttribute.endsWith(`${rowId}_name`) ||
-    e.sourceAttribute.endsWith(`${rowId}_level`)
-  ) {
+  if (e.sourceType === "sheetworker") {
     return;
   }
+
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const rowPrefix = `repeating_${section}_${rowId}`;
+  const { [`${rowPrefix}_name`]: h2hName } = await getAttrsAsync([
+    `${rowPrefix}_name`,
+  ]);
+  const lowerCaseName = h2hName.toLowerCase();
+  if (Object.keys(H2H).includes(lowerCaseName)) {
+    return;
+  }
+
   console.log("change:repeating_h2h", e);
+  await addModifierToBonusesAsync(section, rowId);
 });
 
 on("change:repeating_h2h:name change:repeating_h2h:level", async (e) => {
