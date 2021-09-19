@@ -2734,12 +2734,13 @@
 			<input type="hidden" name='attr_gear_type_r' value='other'>
 			<div class='sheet-equipment_gear'>
 				<input name='attr_gear_carry_r' type='checkbox' class='sheet-equipment_gear_gs0' value='1' checked />
-				<input name='attr_gear_name_r' type='text' placeholder='Gear / Item Name' class='sheet-equipment_gear_gs1' />
+				<input name='attr_gear_name_r' type='text' placeholder='Gear / Item Name' class='sheet-equipment_gear_gs1' value='New Item' />
 				<input name='attr_gear_crafts_r' type='text' value='Common' class='sheet-equipment_gear_gs2' />
 				<input name='attr_gear_quantity_r' type='text' value='1' placeholder='Amount' class='sheet-equipment_gear_gs3' />
 				<input name='attr_gear_avail_r' type='text' placeholder='Availability' class='sheet-equipment_gear_gs4' />
 				<input name='attr_gear_weight_r' type='text' value='0' class='sheet-equipment_gear_gs5' />
-				<select name='attr_gear_type_r' type='text' placeholder='Page #' class='sheet-equipment_gear_gs6 sheet-select_corection'>
+				<input type="hidden" name="attr_gear_type_r" value="@{equipmentTab}">
+				<select name='attr_gear_type_r' type='text' class='sheet-equipment_gear_gs6 sheet-select_corection'>
 					<option value='weapon'>Weapon</option>
 					<option value='armour'>Armour</option>
 					<option value='gear'>Gear</option>
@@ -3891,6 +3892,14 @@
 		<!-- Settings -->
 		<h2>Settings</h2>
 
+		<h3>Charactermancer</h3>
+		<button 
+			name='act_charmancer' 
+			type='action' 
+				class='sheet-core_button sheet-bold_text sheet-full_width sheet-edge_padding'
+			>Start Charactermancer
+		</button>
+	
 		<h3>Initiative Overrides</h3>
 		<select name='attr_initmod0' class='sheet-full_width sheet-edge_padding'>
 			<option selected='selected' value='[[floor'>No tiebreaker</option>
@@ -4373,13 +4382,13 @@
 
 </div>
 
-
 <!--
 NOTE: replace worker by javascript for IDE functionality
 			don't forget to put worker back for published version
 -->
 <script type='text/worker'>
 // <script>
+
 	// repeating sections data array
     const BUFF = {
         active: 'active_r',
@@ -4840,7 +4849,7 @@ NOTE: replace worker by javascript for IDE functionality
                 const weight_repeating = idArray.reduce((total, id) => total + (getValue(id, 'gear_weight_r') * getValue(id, 'gear_quantity_r') * getValue(id, 'gear_carry_r')), 0)
                 const weapon_weight = parseFloat(v.M_weapon_weight_t) + parseFloat(v.R_weapon_weight_t)
                 setAttrs({
-                    weight_total: weight_repeating + weapon_weight
+                    weight_total: (weight_repeating + weapon_weight).toFixed(3)
                 });
             });
         });
@@ -5811,7 +5820,7 @@ NOTE: replace worker by javascript for IDE functionality
      * @param {Array} fields - list of the attributes
      * @param {Function} callback - function to pass the array of objects
      */
-    const getSectionObjects = function (section, fields, callback) {
+    const getSectionObjects = (section, fields, callback) => {
         if (!Array.isArray(fields)) fields = [fields];
         getSectionIDs(`repeating_${section}`, idArray => {
             const attrArray = idArray.reduce( (m,id) => [...m, ...(Object.values(fields).map(field => `repeating_${section}_${id}_${(Array.isArray(field) ? field[1] : field)}`))],[]);
@@ -6341,7 +6350,7 @@ NOTE: replace worker by javascript for IDE functionality
         let attr = {},
             section = 'notes',
             id = generateRowID();
-        attr[`repeating_${section}_${id}_notes`] = note.name || '';
+        attr[`repeating_${section}_${id}_notes`] = note.name || note || '';
         return attr;
     }
     const mapVehicle = (vehicle) => {
@@ -6421,9 +6430,1255 @@ NOTE: replace worker by javascript for IDE functionality
         attr[`repeating_${section}_${id}_P_desc_r`] = power.desc || '';
         return attr;
     }
+	
+
+	// charactermancer
+
+	const GENOS = [
+		{ name : 'Human',
+			stats : {
+				WS  : 20,
+				BS  : 20,
+				STR : 20,
+				TOU : 20,
+				AGI : 20,
+				INT : 20,
+				PER : 20,
+				WP  : 20,
+				FEL : 20,
+				INF : 20
+			},
+			traits : ['Size (4)'],
+			bonus : [
+				{ name : 'Pure of Form', desc : 'Pure of form and undiluted, there is no greater perfection than that of humanity. After applying Genos Characteristic Modifiers (see Page X) but before applying Home-World Characteristic Modifiers, a Human may distribute up to five 1-point increases across their characteristics. No Characteristic may be raised above 40 with these points.'}
+			],
+			aptitudes : [],
+			wounds : 7
+		}, 
+		{ name : 'Ogryn',
+			stats : {
+				WS  : 15,
+				BS  : 15,
+				STR : 30,
+				TOU : 30,
+				AGI : 10,
+				INT : 05,
+				PER : 15,
+				WP  : 15,
+				FEL : 10,
+				INF : 15
+			},
+			traits : ['Auto-Stabilised', ' Blatant', ' Clumsy', ' Size (5)', ' Unnatural Strength (3)', ' Unnatural Toughness (2)', ' Moderate Phobia Disorder (Claustrophobia)'],
+			bonus : [
+				{ name: 'Giant’s Fortitude', desc: 'Though mighty and durable, the Orgyn lack natural abilities in many other areas. Thankfully, their fortitude allows them to easily maintain what little faculties they have. An Orgyn treats their Characteristic Bonuses as 2 higher for the purposes of determining when their Characteristics are reduced by Fatigue.'}
+			],
+			aptitudes : ['Strength', 'Toughness'],
+			wounds : 15
+		},
+		{ name : 'Ratling',
+			stats : {
+				WS  : 20,
+				BS  : 20,
+				STR : 15,
+				TOU : 10,
+				AGI : 25,
+				INT : 20,
+				PER : 30,
+				WP  : 20,
+				FEL : 25,
+				INF : 15
+			},
+			traits : ['Size (3)'],
+			bonus : [
+				{ name : 'Masterfully Duplicitous', desc: 'When conventional methods fail, one can always trust a Ratling to get their hands on what is needed. Whenever a Ratling character attempts an Acquisition Test, they may reduce their warband’s Subtlety Score by 1 to gain a +20 Untyped Bonus on the Test. This Subtlety Loss cannot be negated or reduced by abilities that reduce Subtlety Loss. This ability can only be used once per Acquisition Test.'}
+			],
+			aptitudes : ['Fellowship', 'Perception'],
+			wounds : 5
+		},
+		{ name : 'Squat',
+			stats : {
+				WS : 20,
+				BS : 20,
+				STR : 20,
+				TOU : 30,
+				AGI : 10,
+				INT : 20,
+				PER : 15,
+				WP : 25,
+				FEL : 10,
+				INF : 20
+			},
+			traits : ['Size (4)', ' Sturdy'],
+			bonus : [{name :'Everlasting Grudge', desc: 'Hate comes easy to the Squat people. They have suffered at the hands of many enemies before, and they are more than ready to return the favour. Whenever a Squat Character or a member of their Warband suffers Critical Damage from or has Righteous Fury inflicted against them by an opponent, the Squat gains the Hatred Talent against that individual. If the Squat already possesses the Hatred Talent against that opponent, increase the Talent\'s Attack Bonus against that opponent by 5. This Genos Bonus can only apply once against any given Opponent. Additionally, its effects only last until either the individual’s death or the end of the Encounter. Additionally, Squat Characters also begin with the Hatred (Orks) and the Hatred (Tyranids) Talents.'}],
+			aptitudes : ['Toughness', 'Willpower'],
+			wounds : 8
+		},
+		{ name : 'Ghul',
+			stats : {
+				WS : 25,
+				BS : 20,
+				STR : 20,
+				TOU : 10,
+				AGI : 30,
+				INT : 20,
+				PER : 25,
+				WP : 20,
+				FEL : 10,
+				INF : 15
+			},
+			traits : ['Size (4)', ' Blatant', 'Dark-Sight', 'Natural Weapons'],
+			bonus : [
+				{name : 'The Huntsman', desc : 'Expert trackers capable of moving across treacherous terrain with ease, Ghuls are the bane of all enemies of Mankind who hope to flee the Imperium’s retribution through Flight. Ghul Acolytes ignore all Treacherous Environments with a Penalty of -20 or less except Zero Gravity and gain a +20 Bonus on Athletics Tests made to Climb. Additionally, Ghul Acolytes do not halve their Movement Speed when performing the Tracking Use of the Survival Skill.'},
+				{name : 'Twisted Form', desc : 'Made from unblessed bones and accursed flesh, the Ghul may manipulate themselves in ways others might deem unnatural. Ghul’s Character’s count as Size (3) for the purposes of Squeezing. Additionally, a Ghul Acolyte may suffer 1d5 Toughness Damage in order to increase their Degrees of Success on a Successful Dodge or Parry Test by 2.'}
+			],
+			aptitudes : ['Agility', 'Perception'],
+			wounds : 6
+		}
+	]
+	const HOMEWORLDS = [
+		{ name : "Agri-World", 
+			aptitudes : ["Strength","Toughness"], 
+			bonus : { name : "Strength from the Land", desc : "An Agri-World character starts with either the Brutal Charge (2) or Sturdy Trait, decided by the character upon selecting this homeworld." }, 
+			characteristics : { STR : +3, TOU : +3, AGI : -3 }, 
+			fate : 2, 
+			empBlessing : 7, 
+			wounds : +2
+		},
+		{ name : "Daemon World", 
+			aptitudes : ["Willpower","Perception"], 
+			bonus : { name : "Touched by the Warp", desc : "A character from a Daemon World is attuned to the nature of the Warp. As such, they begin with one Rank in the Psyniscience Skill. Should they gain this Skill again in a later step of character creation, they instead gain one additional Rank in the Skill. Additionally, a Daemon Worlder may take ranks in the Psyniscience Skill even if they do not possess the Psyker Trait. This character also begins with 1d10+5 Corruption Points. Finally, a Daemon World Acolyte gains a +10 Bonus to Resist Fear Effects caused by Psychic Powers, Psychic Phenomena, Perils of the Warp, or the Fear Trait of creatures with the Daemonic Trait." }, 
+			characteristics : { WP : +3, PER : +3, FEL : -3}, 
+			fate : 3, 
+			empBlessing : 8, 
+			wounds : +1
+		},
+		{ name : "Death World", 
+			aptitudes : ["Agility","Perception"], 
+			bonus : { name : "Inured to Death", desc : "Whenever a Death World Acolyte would suffer a Critical Effect, they reduce the Severity of that Critical Effect by 1. Additionally, Death World Acolytes gain a +10 Bonus on all Tests made to resist the effects of Critical Effects." }, 
+			characteristics : { AGI : +3, PER : +3, FEL : -3}, 
+			fate : 2, 
+			empBlessing : 5, 
+			wounds : +2
+		},
+		{ name : "Feral World", 
+			aptitudes : ["Strength","Weapon Skill"], 
+			bonus : { name : "The Old Ways", desc : "A Feral World Acolyte Removes the Primitive Quality from and adds the Proven (3) Quality to all Melee and Low-Tech weapons that they wield." }, 
+			characteristics : {STR : +3, WS : +3, INF : -3}, 
+			fate : 2, 
+			empBlessing : 6, 
+			wounds : +2
+		},
+		{ name : "Feudal World", 
+			aptitudes : ["Strength","Weapon Skill"], 
+			bonus : { name : "Live by the Sword", desc : "Feudal World Acolytes increase the Agility Maximum of all Armours by 20. Additionally, a Feudal World Character gains one additional Degree of Success on all Successful Attacks with Melee and Low-Tech weapons." }, 
+			characteristics : { STR:+3, WS:+3, INT:-3}, 
+			fate : 3, 
+			empBlessing : 7, 
+			wounds : +2
+		},
+		{ name : "Forge World", 
+			aptitudes : ["Intelligence","Toughness"], 
+			bonus : { name : "Omnissiah’s Chosen", desc : "A forge world character gains a +20 Bonus on to apply weapon modifications. Additionally, they gain a +10 Bonus when repairing damaged items." }, 
+			characteristics : { INT: +3, TOU: +3, FEL: -3}, 
+			fate : 3, 
+			empBlessing : 8, 
+			wounds : +1
+		},
+		{ name : "Fortress World", 
+			aptitudes : ["Ballistic Skill","Weapon Skill"], 
+			bonus : { name : "The Fortress Stands", desc : "While a fortress world character is Critically Wounded, they gain the Unnatural Toughness (X) Trait, where the number in parentheses (X) is equal to half of their Willpower Bonus. If they already possess this Trait, they increase their Unnatural Toughness Trait’s value by this value instead." }, 
+			characteristics : { BS: +3, WS: +3, AGI: -3}, 
+			fate : 2, 
+			empBlessing : 6, 
+			wounds : +2
+		},
+		{ name : "Frontier World", 
+			aptitudes : ["Ballistic Skill","Toughness"], 
+			bonus : { name : "It’s a Strange World out Here", desc : "Frontier World Acolytes gain a +20 Bonus on Mundane Fear Tests. Additionally, a Frontier World Character reduces their Degrees of Failure on Mundane Fear Tests by 2 (Minimum 1)." }, 
+			characteristics : { BS: +3, TOU: +3, FEL: -3}, 
+			fate : 3, 
+			empBlessing : 8, 
+			wounds : +1
+		},
+		{ name : "Garden World", 
+			aptitudes : ["Willpower","Fellowship"], 
+			bonus : { name : "Green Serenity: Whenever a garden world character rolls on Table X-X: Shock or Table X-X", desc : "Mental Traumas (See Page X and X), they may roll twice and take the result of their choice. Additionally, whenever a Garden World Character would gain Insanity Points, they gain 1 less Insanity Point (to a minimum of 0). Additionally, a Garden World Acolyte gains a +20 Bonus on Tests to resist the effects of Mental Disorders" }, 
+			characteristics : { WP: +3, FEL: +3, WS: -3}, 
+			fate : 3, 
+			empBlessing : 4, 
+			wounds : 0
+		},
+		{ name : "Highborn", 
+			aptitudes : ["Fellowship","Leadership"], 
+			bonus : { name : "Breeding Counts", desc : "Any time a highborn character fails an Influence Test, they may re-roll the Test at a -10 Penalty, keeping the result of the re-roll." }, 
+			characteristics : { FEL: +3, INF: +3, TOU: -3}, 
+			fate : 4, 
+			empBlessing : 10, 
+			wounds : 0
+		},
+		{ name : "Hive World", 
+			aptitudes : ["Agility","Perception"], 
+			bonus : { name : "Teeming Masses in Metal Mountains", desc : "A hive world character ignores crowds for the purposes of movement, treating them as open terrain. Hive Worlders also gain a +20 Bonus on Acrobatics Tests made to Disengage or Move Through Occupied Spaces. Additionally, When in enclosed spaces, they also gain +20 Bonus to Navigate (Surface) Tests. HiveWorld Acolytes also gain a +20 Bonus on Athletics Tests made to Climb buildings and synthetic structures." }, 
+			characteristics : { AGI: +3, PER: +3, WP: -3}, 
+			fate : 2, 
+			empBlessing : 6, 
+			wounds : +2
+		},
+		{ name : "Penal Colony", 
+			aptitudes : ["Toughness","Perception"], 
+			bonus : { name : "Finger on the Pulse", desc : "One survives a penal colony by instinctively knowing when to act, when to engage in fight or flight. A penal colony character starts with the Constant Vigilance Talent. Additionally they gain a +2 Bonus to Initiative Rolls." }, 
+			characteristics : { TOU: +3, PER: +3, INF: -3}, 
+			fate : 2, 
+			empBlessing : 7, 
+			wounds : +2
+		},
+		{ name : "Quarantine World", 
+			aptitudes : ["Agility","Perception"], 
+			bonus : { name : "Secretive by Nature", desc : "Those who manage to leave a quarantine world learn how to keep secrets. Whenever the warband’s Subtlety would decrease, it decreases by 2 less (to a minimum reduction of 1). Additionally, whenever the warband’s Subtlety would increase, they gain 1 additional Subtlety." }, 
+			characteristics : { AGI: +3, PER: +3,INF: -3}, 
+			fate : 3, 
+			empBlessing : 9, 
+			wounds : +1
+		},
+		{ name : "Research Station", 
+			aptitudes : ["Intelligence","Perception"], 
+			bonus : { name : "Pursuit of Data", desc : "Whenever a research station character fails a Common Lore, Scholastic Lore, or Forbidden Lore Test, they may re-roll the Test at no Penalty." }, 
+			characteristics : { INT: +3, PER: +3,FEL: -3}, 
+			fate : 3, 
+			empBlessing : 5, 
+			wounds : 0
+		},
+		{ name : "Shrine World", 
+			aptitudes : ["Willpower","Fellowship"], 
+			bonus : { name : "Faith in the Creed", desc : "Whenever a shrine world character makes a Salvation roll, they save their Fate Point on a result of either 1 or 10, rather than just 10." }, 
+			characteristics : { WP: +3, FEL: +3, PER: -3}, 
+			fate : 3, 
+			empBlessing : 5, 
+			wounds : 0
+		},
+		{ name : "Voidborn", 
+			aptitudes : ["Intelligence","Ballistic Skill"], 
+			bonus : { name : "Child of the Void", desc : "A voidborn character may re-roll any failed Willpower Test to resist any Psychic Powers at no Penalty. Additionally, they may re-roll any failed Tests made to move in zero gravity environments at no Penalty." }, 
+			characteristics : { INT: +3, BS: +3, STR: -3}, 
+			fate : 3, 
+			empBlessing : 4, 
+			wounds : 0
+		}
+	]
+	const BACKGROUNDS = [
+		{ name : "Adepta Sororitas", 
+			aptitudes : ["Offence","Conviction"], 
+			talents: [['Weapon Training (Flame)','Weapon Training (Low-Tech)'],'Weapon Training (Chain)'], 
+			skills : [[' Charm', 'Intimidate'], 'Athletics', 'Common Lore (Adepta Sororitas)', 'Common Lore (Imperial Creed)', 'Linguistics (Low Gothic)', 'Linguistics (High Gothic)', ['Medicae', 'Parry'], 'Scrutiny'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Incorruptible Devotion", desc : "Whenever an Adepta Sororitas character would gain 1 or more Corruption points, she gains that many Insanity Points minus 1 (to a minimum of 0) instead." }, 
+			equipment : [['Hand flamer','Repeating Crossbow with 4 clips of Mono-Bolts'], 'Chain-Sword with Sacred Inscriptions Weapon Modification', 'Armoured Body-Glove', 'Sanctified Idol'], 
+			restrictions : ['Human'], 
+			wounds: 0
+		},
+		{ name : "Adeptus Administratum", 
+			aptitudes : ["Knowledge","Social"], 
+			talents: [['Weapon Training (Las)', 'Weapon Training (Solid Projectile)'],'Peer (Adeptus Administratum)'],
+			skills : [['Commerce','Logic'],'Linguistics (Low Gothic)', 'Linguistics (High Gothic)',['Common Lore (Adeptus Administratum)','Common Lore (Imperium)'], 'Scholastic Lore (Bureaucracy)', 'Trade (Any One)'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Master of Paperwork", desc : "Whenever an Adeptus Administratum Acolyte succeeds on an Acquisition Test, they increase their Degrees of Success by half of their Influence Bonus." }, 
+			equipment : [['Las-Pistol','Stub Automatic'], 'Imperial Robes', 'Auto- Quill', 'Chrono', 'Data-Slate', 'Scraps of Knowledge'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Adeptus Arbites", 
+			aptitudes : ["Offence","Defence"], 
+			talents: [['Weapon Training (Low-Tech)', 'Weapon Training (Shock)'], 'Weapon Training (Solid Projectile)'], 
+			skills : ['Common Lore (Adeptus Arbites)', 'Common Lore (Underworld)', ['Inquiry', 'Interrogation'], 'Intimidate', 'Linguistics (Low Gothic)', 'Scholastic Lore (Judgement)', ['Scrutiny', 'Scrutiny']], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "The Face of the Law", desc : "A character with the Adeptus Arbites background can re-roll any Intimidation or Interrogation Test, and can substitute their their Willpower Bonus for their Degrees of Success on Successful Tests with these Skills." }, 
+			equipment : ['Shotgun with 4 Clips of Standard Ammo and 2 Clips of Shotgun Submission Shells', ['Man-Catcher', 'Shock Maul'], 'Light Carapace Armour', '6 Manacles'], 
+			restrictions : [], 
+			wounds: 1
+		},
+		{ name : "Adeptus Astra Telepathica", 
+			aptitudes : ["Defence","Conviction"], 
+			talents: ['Weapon Training (Las)', 'Weapon Training (Low-Tech)'], 
+			skills : [['Awareness', 'Inquiry'], 'Common Lore (Adeptus Astra Telepathica)', 'Forbidden Lore (The Warp)', 'Linguistics (Low Gothic)', 'Psyniscience', ['Scrutiny', 'Intimidation'], 'Scholastic Lore (Psykers)'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : [
+				{ name : "The Constant Threat", desc : "When this character or an ally within a number of metres equal to half of this character’s Perception Characteristic Score triggers a roll on Table X-X: Psychic Phenomenon (see Page X), the Adeptus Astra Telepathica character can increase or decrease the result by an amount equal to their Willpower Bonus."},
+				{ name : "Sanctioned by Rite", desc : "If a character with the Adeptus Astra Telepathica background takes the Psyker Novice Advance during character creation, they also gain the Sanctioned Trait (see Page X). Note that this will result in them starting play as a Gamma Rank Psyker (see Page X)."}
+			], 
+			equipment : ['Las-Pistol', 'Staff with Mono Weapon Modification', 'Flak Cloak', ['Warding Idol', 'Psy Focus']], 
+			restrictions : ['Human'], 
+			wounds: 0
+		},
+		{ name : "Adeptus Mechanicus", 
+			aptitudes : ["Knowledge","Tech"], 
+			talents: ['Mechadendrite Use (Utility)', 'Weapon Training (Solid Projectile)'], 
+			skills : [['Awareness', 'Operate (Pick One)'], 'Common Lore (Adeptus Mechanicus)','Common Lore (Tech)', 'Linguistics (Techna-Lingua)', 'Linguistics (Low Gothic)', 'Logic', ['Security', 'Trade (Any One)'], 'Tech-Use'], 
+			traits : ['Mechanicus Implants'], 
+			malignancies : [], 
+			bonus : { name : "Replace the Weak Flesh", desc : "An Adeptus Mechanicus character gains a +20 Bonus all Tests to Craft (see Page X) or Install (see Page X) Cybernetics." }, 
+			equipment : [['Autogun', 'Hand-Cannon'], 'Combi-Tool', ['Monotask Servo-Skull', 'Optical Mechadendrite'], 'Imperial Robes', '2 Vials of Sacred Unguents', 'Scraps of Knowledge'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Adeptus Ministorum", 
+			aptitudes : ["Leadership","Conviction "], 
+			talents: [['Weapon Training (Flame)', 'Weapon Training (Solid Projectile)'], 'Weapon Training (Low-Tech)'], 
+			skills : [['Charm', 'Interrogation'], ['Command', 'Intimidate'], 'Common Lore (Ecclesiarchy)', 'Common Lore (Imperial Creed)', 'Inquiry', 'Scrutiny', 'Linguistics (Low Gothic)', 'Linguistics (High Gothic)'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Faith is All", desc : "When spending a Fate Point to Augment a Test, an Adeptus Ministorum character gains a +30 Bonus instead of a +20 Bonus. Additionally, when spending a Fate Point to Re-Roll a Test, an Adeptus Ministorum character gains a +15 Bonus instead of a +10 Bonus." }, 
+			equipment : [[['Hand Flamer', 'Sword'], ['Warhammer', 'Stub Revolver']], ['Imperial Robes', 'Flak Vest'], 'Glow-Globe', 'Monotask Servo-Skull (Laud Hailer)', 'Sanctified Idol'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Commissariat", 
+			aptitudes : ["Social","Leadership "], 
+			talents: ['Weapon Training (Chain)', 'Weapon Training (Solid Projectile)'], 
+			skills : [['Charm', 'Intimidate'], 'Command', ['Common Lore (Imperial Guard)', 'Common Lore (Imperial Navy)', 'Common Lore (Planetary Defence Force)'], ['Inquiry', 'Interrogation'], 'Linguistics (Imperial Codes)', 'Linguistics (High Gothic)', 'Linguistics (Low Gothic)', 'Scholastic Lore (Tactica)', 'Scrutiny'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Stand and Fight!", desc : "Whenever a Commissariat Character successfully uses the Terrify Reaction Use of the Command Skill, they may Immediately use the Inspire use of the Command Skill as a Free Action, even if it is not their Turn. For the purposes of determining Modifiers to the Terrify Action’s Opposed Test, the Commissariat Acolyte is considered to have the Mundane Fear (2) Trait." }, 
+			equipment : ['Hand-Cannon', 'Chainsword', 'Great-Cloak', 'Chrono', ['Laud Hailer', 'Microbead'], 'Magnoculars'], 
+			restrictions : 'Human', 
+			wounds: 0
+		},
+		{ name : "Exorcised", 
+			aptitudes : ["Defence","Knowledge"], 
+			talents: ['Weapon Training (Solid Projectile)', 'Weapon Training (Chain)'], 
+			skills : ['Awareness', ['Deceive', 'Inquiry'], 'Dodge', 'Forbidden Lore (Daemonology)', ['Intimidate', 'Scrutiny'], 'Linguistics (Low Gothic)', 'Scholastic Lore (Occult)'], 
+			traits : [], 
+			malignancies : ['An Exorcised character starts with one Malignancy or their choice, chosen from Table X-X: Malignancies (see page X).'], 
+			bonus : { name : "Touched by a Daemon", desc : "An Exorcised character counts their Insanity Bonus as 2 higher for the purposes of avoiding Fear Tests (see Page X). They also gain a +30 Bonus on all Tests to resist Possession." }, 
+			equipment : [['Auto-Pistol', 'Stub Revolver'], 'Shotgun', 'Chainblade', 'Imperial Robes', 'Nails of Benediction', 'Sanctified Idol'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Heretek", 
+			aptitudes : ["Finesse","Tech"], 
+			talents: ['Weapon Training (Solid Projectile)', 'Mechadendrite Use (Any One)'], 
+			skills : [['Deceive', 'Inquiry'], 'Common Lore (Tech)', ['Forbidden Lore (Archeotech)', 'Forbidden Lore (Mutants)', 'Forbidden Lore (The Warp)', 'Forbidden Lore (Any One Xenos)'], 'Linguistics (Low Gothic)', 'Linguistics (Techna-Lingua)', ['Medicae', 'Security'], ['Scholastic Lore (Any One)', 'Trade (Any One)'], 'Tech-Use'], 
+			traits : ['Mechanicus Implants'], 
+			malignancies : ['An Exorcised character starts with one Malignancy or their choice, chosen from Table X-X: Malignancies (see page X).'], 
+			bonus : { name : "Adept of Innovation", desc : "For the purpose of Trade Skill Tests made to Craft, a Heretek Acolyte increases their Degrees of Success by 1 on Successful Tests and reduces their Degrees of Failure on Failed Tests by 1 (Minimum 1)" }, 
+			equipment : ['Stub Revolver with 4 Standard Clips and 2 Clips of Expander Rounds', '3 Photon Flash Grenades', 'Flak Cloak', 'Combi-Tool', 'Data-Slate'], 
+			restrictions : ['Human', 'Ratling', 'Squat', 'Ghul'], 
+			wounds: 0
+		},
+		{ name : "Imperial Guard", 
+			aptitudes : ["Fieldcraft","Leadership"], 
+			talents: ['Weapon Training (Las)', 'Weapon Training (Low-Tech)'], 
+			skills : ['Acrobatics', 'Athletics', ['Command', 'Intimidate'], 'Common Lore (Imperial Guard)', 'Linguistics (Imperial Codes)', 'Linguistics (Low Gothic)', ['Medicae', 'Operate (Surface)'], 'Navigate (Surface)'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Hammer of the Emperor", desc : "When a Guardsman character is attacking a target that an ally has attacked since the end of the Guardsman’s last Turn, the Guardsman can re-roll any natural die results of 1 or 2 on Damage rolls." }, 
+			equipment : [['Lasgun', ['Las-Pistol', 'Sword']], 'Combat Vest', 'Flak Armour', 'Grapnel and Line', ['12 Lho Sticks', '3 Doses of Recaff'], 'Micro-Bead'], 
+			restrictions : [], 
+			wounds: 1
+		},
+		{ name : "Imperial Navy", 
+			aptitudes : ["Offence","Tech "], 
+			talents: [['Weapon Training (Chain)', 'Weapon Training (Shock)'], 'Weapon Training (Solid Projectile)'], 
+			skills : [['Acrobatics', 'Athletics'], 'Command', 'Common Lore (Imperial Navy)', 'Common Lore (Imperium)', 'Linguistics (Imperial Codes)', 'Linguistics (Low Gothic)', ['Operate (Aeronautica)', 'Trade (Any One)'], 'Tech-Use'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Close Quarter Discipline", desc : "An Imperial Navy character scores one additional degree of success on Successful Ballistic Skill Tests they make against targets at Point- Blank Range, at Short Range, and with whom they are engaged in melee." }, 
+			equipment : [['Shotgun', 'Hand Cannon'], ['Chain-Sword', 'Shock Maul'], 'Flak Coat', 'Micro-Bead', ['3 Doses of Recaff', '6 Doses of Swill'], 'Respirator'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Legiones Skitarii", 
+			aptitudes : ["Offence","Fieldcraft"], 
+			talents: ['Weapon Training (Shock)', 'Weapon Training (Solid Projectile)'], 
+			skills : ['Athletics', 'Awareness', 'Common Lore (Adeptus Mechanicus)', ['Common Lore (Tech)', 'Security'], ['Dodge', 'Parry'], 'Linguistics (Low Gothic)', 'Linguistics (Techna-Lingua)', 'Tech- Use'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Strength of Steel", desc : "For the purposes of determining when their Characteristics are reduces by Fatigue (See Page X), a Skitarii Acolyte treats all of their Characteristic Bonuses as 1 higher. Also, Skitarii Characters do not suffer a -20 Penalty on Ballistic Skill Tests while Pinned, and gain a +20 Bonus on Tests to escape Pinning. Additionally, if the Skitarii Acolyte is Immune to Pinning for any reason, this +20 Bonus to escape Pinning becomes a +10 Bonus against on all Fear Tests." }, 
+			equipment : ['Autogun with 4 Magazines', 'Shock Maul', 'Flak Cloak', 'Bionic Legs', 'Magnoculars', 'Respirator'], 
+			restrictions : ['Human'], 
+			wounds: 1
+		},
+		{ name : "Merchant Guild", 
+			aptitudes : ["Social","Knowledge"], 
+			talents: ['Weapon Training (Shock)', 'Weapon Training (Solid Projectile)'], 
+			skills : ['Charm', 'Commerce', 'Common Lore (Chartist Captains)', ['Deceive', 'Sleight of Hand'], ['Inquiry', 'Security'], 'Linguistics (Low Gothic)', 'Scrutiny'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Born to Barter", desc : "A character with the Merchant Guild background can re-roll any Commerce or Acquisition Test, and can substitute their their Intelligence or Fellowship (character’s choice) Bonus for their Degrees of Success on Successful Commerce or Acquisition Tests." }, 
+			equipment : ['Auto-Gun', 'Shock Maul', 'Flak Coat', 'Auto-Quill', 'Chrono', 'Data-Slate'], 
+			restrictions : [], 
+			wounds: 0
+		},
+		{ name : "Mutant", 
+			aptitudes : ["Fieldcraft","Offence"], 
+			talents: ['Weapon Training (Low-Tech)', 'Weapon Training (Solid Projectile)'], 
+			skills : [['Acrobatics', 'Athletics'], 'Awareness', 'Common Lore (Mutants)', ['Deceive', 'Intimidate'], 'Linguistics (Low Gothic)', 'Stealth', 'Survival'], 
+			traits : [['Amphibious', 'Dark-Sight', 'Natural Weapons', 'Sonar Sense', 'Sturdy', 'Toxic (0)', 'Unnatural Agility (1)', 'Unnatural Strength (1)', 'Unnatural Toughness (1)']], 
+			malignancies : ['A Mutant character gins with 10 Corruption Points. Instead of rolling as normal for a Malignancy or Mutation, the character starts with a mutation of their choice that would result from anywhere between a roll of 1 and 50 on Table X-X: Mutations (see Page X).'], 
+			bonus : { name : "Twisted Flesh", desc : "A Mutant character may always choose to fail any Test associated with gaining Malignancy or Mutation. Whenever they would gain a Malignancy, they may instead roll on Table X-X : Mutations to gain a Mutation." }, 
+			equipment : [[['Shotgun', 'Truncheon'], ['Stub Revolver', 'Great Weapon']], 'Heavy Leathers', 'Injector/Inhaler', '2 Doses of Stimm'], 
+			restrictions : ['Human'], 
+			wounds: 1
+		},
+		{ name : "Outcast", 
+			aptitudes : ["Fieldcraft","Social"], 
+			talents: ['Weapon Training (Chain)', 'Weapon Training (Solid Projectile)'], 
+			skills : [['Acrobatics', 'Sleight of Hand'], 'Common Lore (Underworld)', 'Deceive', 'Dodge', 'Linguistics (Low Gothic)', ['Security', 'Survival'], 'Stealth'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Rugged Defiance", desc : "Unwilling to bend to any control other than their own, an Outcast may re-roll any failed Toughness or Willpower Test against any Mind-Affecting Ability, Psychic Power, or Drug at a -10 Penalty. This ability cannot be used to avoid re-roll Tests made to resist Psychic Bolts, Barrages, Beams, Blasts, or Storms." }, 
+			equipment : [['Auto-Pistol', 'Hunting Rifle'], 'Chameleoline Cloak', 'Chain-Blade', 'Concealed Holster', 'Flak Coat', 'Security Kit'], 
+			restrictions : [], 
+			wounds: 1
+		},
+		{ name : "Rogue Trader Fleet", 
+			aptitudes : ["Finesse","Social"], 
+			talents: [['Weapon Training (Las)', 'Weapon Training (Solid Projectile)'], 'Weapon Training (Shock)'], 
+			skills : ['Awareness', ['Charm', 'Scrutiny'], ['Commerce', 'Command'], 'Common Lore (The Crimson Gulf)', 'Common Lore (Rogue Traders)', 'Deceive', 'Linguistics (Low Gothic)', 'Linguistics (One Xenos Language)'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "Face to the Unknown", desc : "A character from a Rogue Trader Fleet gains a +10 Bonus to Fear Tests. Additionally, they treat all Supernatural Fears caused by a Supernatural Fear Trait of Fear (2) or below as Mundane Fears." }, 
+			equipment : ['1 Bottle of Amasec', 'Auspex', 'Chrono', 'Mesh Cloak', ['Las-Gun', 'Hunting Rifle'], 'Shock Maul'], 
+			restrictions : [], 
+			wounds: 0
+			},
+		{ name : "Savage", 
+			aptitudes : ["Offence","Fieldcraft"], 
+			talents: ['Resistance (Any One)', 'Weapon Training (Low-Tech)'], 
+			skills : ['Acrobatics', 'Athletics', 'Awareness', ['Dodge', 'Parry'], ['Intimidate', 'Stealth'], 'Linguistics (Low Gothic)', 'Survival'], 
+			traits : [], 
+			malignancies : [], 
+			bonus : { name : "The Beast Beneath", desc : "At the start of their Turn, a Savage character may grant themselves the Unnatural Strength (2) or Unnatural Agility (2) Traits for one Round. If they already possess the Trait they wish to gain, they instead increase that Trait’s value by 2. At the start of their next Turn after using this ability, the Savage character gains one Level of Fatigue." }, 
+			equipment : ['2 Bolas', '2 Doses of Dusk-Leaf', ['Great Weapon', ['Hunting Bow with Mono-Arrows', 'Sword']], 'Xenos Hide Vest'], 
+			restrictions : [], 
+			wounds: 1
+		}
+	]
+	const ROLES = [
+		{ name : "Ace",
+			aptitudes : ['Agility', 'Ballistic Skill', 'Finesse', 'Perception', ['Fieldcraft', 'Tech']],
+			talents : [['Hard Target', 'Hotshot Pilot']],
+			bonus : [{ name: "Right Stuff", desc: "An Ace Character may spend a Fate Point when failing an Operate Test or a Survival Test to control a Steed to reduce their Degrees of Failure by an amount equal to 1 plus half of their Base Agility Bonus. If this would reduce the Degrees of Failure to 0 or below, the Ace Instead succeeds on the Test with a number of degrees of success equal to half their Agility Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Assassin",
+			aptitudes : ['Agility', ['Ballistic Skill', 'Weapon Skill'], 'Fieldcraft', 'Finesse', 'Perception'],
+			talents : [['Ambush', 'Jaded']],
+			bonus : [{ name: "Sure Kill", desc: "When an assassin successfully hits with an Attack, they may spend a Fate Point to inflict additional damage Equal to their Degrees of Success on the Attack roll (Maximum +10 Damage). This additional damage only applies to the first hit the attack inflicts."}],
+			restrictions : []
+		},
+		{ name : "Chirurgeon",
+			aptitudes : ['Fieldcraft', 'Intelligence', 'Knowledge', 'Perception', 'Willpower'],
+			talents : [['Aspiring Healer', 'Cease the Flow']],
+			bonus : [{ name: "Dedicated Healer", desc: "A Chirurgeon Character may spend a Fate Point when failing Medicae or Trade (Chymist) Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Intelligence Bonus. If this would reduce the Degrees of Failure to 0 or below, the Ace Instead succeeds on the Test with a number of degrees of success equal to half their Intelligence Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Crusader",
+			aptitudes : ['Conviction', 'Defence', 'Toughness', 'Weapon Skill', 'Willpower'],
+			talents : [['Bodyguard', 'Vanguard']],
+			bonus : [{ name: "Smite the Unholy", desc: "A Crusader Character may spend a Fate Point when failing a Fear Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Willpower Bonus. If this would reduce the Degrees of Failure to 0 or below, the Crusader Instead succeeds on the Test with a number of degrees of success equal to half their Willpower Bonus. This ability cannot be used on Tests with targets of 0 or below. In addition, whenever a Crusader hits with a melee attack against a target with the Fear (X) Trait, they inflict additional damage on each hit equal to the number in Parentheses (X)."}],
+			restrictions : []
+		},
+		{ name : "Desperado",
+			aptitudes : ['Agility', 'Ballistic Skill', 'Defence', 'Fellowship', 'Finesse'],
+			talents : [['Hammer Blast', 'Quick Draw']],
+			bonus : [{ name: "The Quick and the Dead", desc: "Knowing when the time to act is upon them, a Desperado makes their move before any other. Whenever a Desperado Acolyte rolls for Initiative, if they roll a natural 7 or higher on their Initiative die, they may immediately take a Half Action of their choice before the first Round Begins. If a Desperado Acolyte instead rolls a natural 10 or chooses to spend a Fate Point to treat their Initiative as if they rolled a 10, they may instead make a Full Action or two Half Actions of their choice before the first Round begins instead. Note that these two Half Actions are considered to occur in the same turn, and as such are subject to Action Type restrictions, such as not being able to take two Attack Type Actions in the same Turn. A Desperado Character cannot use this Ability if they are Surprised, and this Ability does not confer any form of Surprise beyond that which a character already possesses."}],
+			restrictions : []
+		},
+		{ name : "Fanatic",
+			aptitudes : ['Conviction', 'Offence', 'Toughness', 'Weapon Skill', 'Willpower'],
+			talents : [['Resistance (Psychic Powers)', 'Jaded']],
+			bonus : [{ name: "Death to All Who Opposed Me!", desc: "In their mission to destroy the God-Emperor’s enemies, a Fanatic can summon powers other warriors could only dream of. Whenever a Fanatic Acolyte successfully deals damage on an Attack (after accounting for reductions from Armour and Toughness), they may spend a Fate Point to treat the damaging hit as if it inflicted Righteous Fury. If the Fanatic uses this ability, they increase the Severity of the resulting Critical Effect by 1. Alternatively, a Fanatic may spend a Fate Point whenever they inflict Righteous Fury as the result of a Natural 10 to increase the Severity of the resulting Critical Effect by 2."}],
+			restrictions : []
+		},
+		{ name : "Hierophant",
+			aptitudes : ['Fellowship', 'Offence', 'Social', 'Toughness', 'Willpower'],
+			talents : [['Cunning Orator', 'Hatred (any)']],
+			bonus : [{ name: "Sway the Masses", desc: "A Hierophant Character may spend a Fate Point when failing a Charm, Deceive, or Intimidate Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Willpower Bonus. If this would reduce the Degrees of Failure to 0 or below, the Hierophant Instead succeeds on the Test with a number of Degrees of Success equal to half their Willpower Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Infiltrator",
+			aptitudes : ['Agility', 'Finesse', 'Fieldcraft', 'Intelligence', 'Perception'],
+			talents : [['Leap Up', 'Fleet-Feet']],
+			bonus : [{ name: "Shadow in the Night", desc: "An Infiltrator Character may spend a Fate Point when failing a Security or Stealth Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Agility Bonus. If this would reduce the Degrees of Failure to 0 or below, the Infiltrator Instead succeeds on the Test with a number of degrees of success equal to half their Agility Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Mystic",
+			aptitudes : ['Conviction', 'Intelligence', 'Knowledge', 'Perception', 'Willpower'],
+			talents : [['Resistance (Psychic Powers)', 'Warp Sensees']],
+			bonus : [{ name: "Stare into the Warp", desc: "A Mystic character starts the game with the Psyker Beginner Advance. Practiced in the Dark Arts: Whenever a Mystic Character rolls on Table X-X: Perils of the Warp, they may spend a Fate Point to roll 6d10 instead of 1d100."}],
+			restrictions : ['Humans', 'Squats']
+		},
+		{ name : "Penitent",
+			aptitudes : ['Conviction', 'Offence', 'Strength', 'Toughness', 'Willpower'],
+			talents : [['Inner Rage', 'Flagellant']],
+			bonus : [{ name: "Cleansing Pain", desc: "Whenever a Penitent character suffers 1 or more points of Damage (after reductions for Toughness and Armour), they gain a +10 Bonus to the first Test they make before the end of their next turn. If the Penitent Character spends a Fate Point upon the Activation of this Ability, they instead gain a +20 Bonus on all Tests they make until the end of their Next Turn."}],
+			restrictions : []
+		},
+		{ name : "Sage",
+			aptitudes : ['Intelligence', 'Knowledge', 'Perception', 'Tech', 'Willpower'],
+			talents : [['Spark of Knowledge', 'Logical Deduction']],
+			bonus : [{ name: "Quest for Knowledge", desc: "A Sage Character may spend a Fate Point when failing a Logic or Lore Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Intelligence Bonus. If this would reduce the Degrees of Failure to 0 or below, the Sage Instead succeeds on the Test with a number of degrees of success equal to half their Intelligence Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Seeker",
+			aptitudes : ['Fellowship', 'Intelligence', 'Perception', 'Social', 'Tech'],
+			talents : [['Charming Demeanour', 'Keen Intuition']],
+			bonus : [{ name: "Right Stuff", desc: "A Seeker Character may spend a Fate Point when failing an Awareness or Inquiry Test to reduce their Degrees of Failure by an amount equal to 1 plus half of their Perception Bonus. If this would reduce the Degrees of Failure to 0 or below, the Seeker Instead succeeds on the Test with a number of degrees of success equal to half their Perception Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Tactician",
+			aptitudes : ['Fellowship', 'Intelligence', 'Knowledge', 'Leadership', 'Perception'],
+			talents : [['Commanding Presence', 'Shared Destiny']],
+			bonus : [{ name: "Tactical Expertise", desc: "A Tactician Character may spend a Fate Point when failing a Command Test or Test to activate a Stratagem to reduce their Degrees of Failure by an amount equal to 1 plus half of their Intelligence Bonus. If this would reduce the Degrees of Failure to 0 or below, the Tactician Instead succeeds on the Test with a number of degrees of success equal to half their Intelligence Bonus. This ability cannot be used on Tests with targets of 0 or below."}],
+			restrictions : []
+		},
+		{ name : "Warrior",
+			aptitudes : ['Ballistic Skill', 'Defence', 'Offence', 'Strength', 'Weapon Skill'],
+			talents : [['Iron Jaw', 'Rapid Reload']],
+			bonus : [{ name: "Expert at Violence", desc: "After making a successful Attack Test, but before determining hits, a Warrior character may spend a Fate Point to substitute their Weapon Skill (for melee) or Ballistic Skill (for ranged) Bonus for the Degrees of Success scored on the Attack Test."}],
+			restrictions : []
+		}
+	]
+
+	on(`clicked:charmancer`, (eventinfo) => {
+		startCharactermancer('intro')
+		console.log(eventinfo)
+	});
+
+	on("mancer:cancel", (eventinfo) => {
+		deleteCharmancerData(['genos', 'homeworld', 'background', 'role', 'aptitudes', 'equipments', 'talents', 'skills'])
+	})
+
+
+	// GENOS
+
+	function getGenos() {
+		return GENOS.find(race => race.name === getCharmancerData()?.genos?.values?.genos)
+	}
+
+	function generateGenos(name) {
+		let genos = GENOS.find(genos => genos.name === name)
+		if (!genos) return ('<h2>Something went wrong</h2>')
+		var text = ''
+		text += `<h3>Characteristics</h3>`
+		text += `<p/>+${genos.stats.WS} Weapon Skill, +${genos.stats.BS} Ballistic Skill, +${genos.stats.STR} Strength, +${genos.stats.TOU} Toughness, +${genos.stats.AGI} Agility, +${genos.stats.INT} Intelligence, +${genos.stats.PER} Perception, +${genos.stats.WP} Willpower, +${genos.stats.FEL} Fellowship, +${genos.stats.INF} Influence</p>`
+		text += `<h3>Genos Traits</h3>`
+		text += `<p/>`
+		genos.traits.forEach(trait => {
+			text += `${trait}, `
+		})
+		text += `<p/>`
+		text += `<h3>Genos Bonus</h3>`
+		genos.bonus.forEach(bonus => {
+			text += `<p/> ${bonus.name}: ${bonus.desc}<p/>`
+		})
+		text += `<h3>Genos Aptitude</h3>`
+		text += (genos.aptitudes.length) ? `<p>${genos.aptitudes[0]} or ${genos.aptitudes[1]}</p>` : `<p>Any one Aptitude of the player’s choice</p>`
+		text += `<h3>Base Vitality</h3>`
+		text += `<p>${genos.wounds}</p>`
+		return text
+	}
+
+	on("page:genos", (eventinfo) => {
+		setCharmancerText({"genos_infos":generateGenos('Human')})
+	})
+
+	on("mancerchange:genos", (eventinfo) => {
+		setCharmancerText({"genos_infos":generateGenos(eventinfo.newValue)})
+	});
+
+	// STATS
+
+	function assignRolls(rolls) {
+		let attrs = {}
+		rolls.forEach((roll, i) => {
+		attrs[`roll_${i}_value`] = roll.result
+		})
+		return attrs
+	}
+
+	on("page:stats", (eventinfo) => {
+		let genos = getCharmancerData()?.genos?.values?.genos
+		let stats = GENOS.find(race => race.name === genos)?.stats
+		let points = (genos === 'Human') ? 5 : 0
+		let rolled = getCharmancerData()?.stats?.values?.rolled ?? false
+		let rerolled = getCharmancerData()?.stats?.values?.rerolled ?? false
+		let points_spent = getCharmancerData()?.stats?.values?.points_spent ?? 0
+		if (rolled) setCharmancerText({"rolled":''})
+		setAttrs({...stats, 'points': points, 'rolled': rolled, 'rerolled': rerolled, 'points_spent': points_spent})
+	})
+
+	on("mancerchange:points_spent", (eventinfo) => {
+		let points_spent = eventinfo.newValue ?? 0
+		let points = (getCharmancerData()?.genos?.values?.genos === 'Human') ? 5 : 0
+		let points_left = points - parseInt(points_spent,10)
+		setAttrs({"points": points_left})
+	});
+
+	on("mancerchange:points", (eventinfo) => {
+		let points = eventinfo.newValue
+		let points_left = (points > 0) ? `<p>You have <b>${points} points</b> left to spend</p>` : ''
+		setCharmancerText({"points_left": points_left})
+	});
+
+	on("mancerroll:standard", e => {
+		setCharmancerText({"roll_low":''})
+		var rolls = e.roll
+		var minimum = 110
+		var total = rolls.reduce((total, roll) => total + roll.result, 0)
+		if (total < minimum) return setCharmancerText({"roll_low":'<h2>Dice roll was too low, please try again</h2>'})
+		setCharmancerText({"rolled":''})
+		setAttrs({...assignRolls(rolls), 'rolled': 'true'})
+	})
+
+	for (let i = 0; i < 10; i++) {
+		on(`mancerroll:reroll_${i}`, e => {
+			let reroll = getCharmancerData()?.stats?.values?.rerolled
+			if (reroll === 'true') return setCharmancerText({"rolled":'<h2>You already rerolled one of the dice</h2>'})
+			let attr = {}
+			attr[`roll_${i}_value`] = e.roll[0].result
+			attr[`rerolled`] = 'true'
+			setAttrs(attr)
+		})
+
+		on(`mancerchange:roll_${i}_char`, e => {
+			let diceCharacteristics = getCharmancerData()?.stats?.values
+			for (let j = 0; j < 10; j++) {
+				if (!diceCharacteristics[`roll_${i}_char`]) break
+				if (i == j) continue
+				if (diceCharacteristics[`roll_${i}_char`] === diceCharacteristics[`roll_${j}_char`]) {
+					let attr = {}
+					attr[`roll_${j}_char`] = ''
+					setAttrs(attr)
+				}
+			}
+			assignRollToCharacteristics()
+		})
+	}
+
+	function assignRollToCharacteristics() {
+		let genos = GENOS.find(genos => genos.name === getCharmancerData()?.genos?.values?.genos)?.stats
+		let rolls = getCharmancerData()?.stats?.values
+		let stats = {...genos}
+		for (let i = 0; i < 10; i++) {
+			if (rolls[`roll_${i}_char`] === 'WS' ) stats.WS  += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'BS' ) stats.BS  += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'STR') stats.STR += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'TOU') stats.TOU += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'AGI') stats.AGI += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'INT') stats.INT += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'PER') stats.PER += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'WP' ) stats.WP  += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'FEL') stats.FEL += parseInt(rolls[`roll_${i}_value`], 10)
+			if (rolls[`roll_${i}_char`] === 'INF') stats.INF += parseInt(rolls[`roll_${i}_value`], 10)
+		}
+		setAttrs({...stats, 'points_spent': 0})
+	}
+
+	['WS', 'BS', 'STR', 'TOU', 'AGI', 'INT', 'PER', 'WP', 'FEL', 'INF'].forEach(characteristic => {
+		on(`clicked:decrease_${characteristic}`, () => {
+			setCharmancerText({"roll_low":''})
+			let points_spent = parseInt(getCharmancerData()?.stats?.values?.points_spent, 10)
+			let char_points_spent = parseInt(getCharmancerData()?.stats?.values?.[`${characteristic}_points`], 10)
+			if (!char_points_spent || !points_spent) return setCharmancerText({"roll_low":'<h2>You can\'t do that</h2>'})
+
+			let attr = {}
+			attr[characteristic] = parseInt(getCharmancerData()?.stats?.values?.[characteristic], 10) -1
+			attr[`${characteristic}_points`] = char_points_spent -1
+			attr['points_spent'] = points_spent -1
+
+			setAttrs(attr)
+		})
+		on(`clicked:increase_${characteristic}`, () => {
+			setCharmancerText({"roll_low":''})
+			let points_left = parseInt(getCharmancerData()?.stats?.values?.points, 10)
+			let char = parseInt(getCharmancerData()?.stats?.values?.[characteristic], 10)
+			if (!points_left || char >= 40) return setCharmancerText({"roll_low":'<h2>You can\'t do that</h2>'})
+
+			let char_points_spent = parseInt(getCharmancerData()?.stats?.values?.[`${characteristic}_points`], 10) || 0
+			let points_spent = parseInt(getCharmancerData()?.stats?.values?.points_spent, 10)
+			let attr = {}
+			attr[characteristic] = parseInt(getCharmancerData()?.stats?.values?.[characteristic], 10) +1
+			attr[`${characteristic}_points`] = char_points_spent +1
+			attr['points_spent'] = points_spent +1
+
+			setAttrs(attr)
+		})
+	})
+
+	// HOMEWORLDS
+
+	function getHomeworld() {
+		return HOMEWORLDS.find(world => world.name === getCharmancerData()?.homeworld?.values?.homeworld)
+	}
+
+	function generateHomeworld(name) {
+		let world = HOMEWORLDS.find(world => world.name === name)
+		if (!world) return ('<h2>Something went wrong</h2>')
+		var text = ''
+		text += `<h3>Aptitude</h3>`
+		text += `<p>${world.aptitudes[0]} or ${world.aptitudes[1]}</p>`
+		text += `<h3>Characteristics</h3>`
+		text += `<p>`
+			for (const key in world.characteristics) {
+				if (Object.hasOwnProperty.call(world.characteristics, key)) {
+					text += `${key} : ${world.characteristics[key]}`
+				}
+			}
+			text += `</p>`
+		text += `<h3>World Bonus</h3>`
+		text += `
+		<p /> ${world.bonus.name}: ${world.bonus.desc}
+		<p />`
+		text += `<h3>Fate</h3>`
+		text += `<p>${world.fate}</p>`
+		text += `<p>Emperor BLessing : ${world.empBlessing}</p>`
+		text += `<h3>Vitality</h3>`
+		text += `<p>+${world.wounds}</p>`
+		return text
+	}
+
+	on("page:homeworld", (eventinfo) => {
+		let list = ''
+		HOMEWORLDS.forEach(homeworld => {
+			list += ` <option value="${homeworld.name}">${homeworld.name}</option>`
+		})
+		setCharmancerText({"homeworld_choices": list})
+		setCharmancerText({"homeworld_infos":generateBackground(HOMEWORLDS[0].name)})
+	})
+
+	on("mancerchange:homeworld", (eventinfo) => {
+		setCharmancerText({"homeworld_infos":generateHomeworld(eventinfo.newValue)})
+	});
+
+	// BACKGROUNDS
+
+	function getBackground() {
+		return background = BACKGROUNDS.find(background => background.name === getCharmancerData()?.background?.values?.background)
+	}
+
+	function generateBackground(name) {
+		let background = BACKGROUNDS.find(background => background.name === name)
+		if (!background) return ('<h2>Something went wrong</h2>')
+		var text = ''
+		text += `<h3>Aptitude</h3>`
+		text += `<p>${background.aptitudes[0]} or ${background.aptitudes[1]}</p>`
+		text += `<h3>Talents</h3>`
+		text += `<p>`
+			background.talents.forEach(talent => {
+				if (Array.isArray(talent)) {
+					for (let i = 0; i < talent.length; i++) {
+						if (i > 0) text += ' or '
+						if (Array.isArray(talent[i])) {
+							text += talent[i].join(' and ')
+						} else {
+							text += `${talent[i]}, `
+						}
+					}
+				} else {
+					text += `${talent}, `
+				}
+			})
+		text += `</p>`
+		text += `<h3>Skills</h3>`
+		text += `<p>`
+		background.skills.forEach(skill => {
+			if (Array.isArray(skill)) {
+				for (let i = 0; i < skill.length; i++) { 
+					if (i> 0) text += ' or '
+					if (Array.isArray(skill[i])) {
+						text += skill[i].join(' and ')
+					} else {
+						text += `${skill[i]}, `
+					}
+				}
+			} else {
+				text += `${skill}, `
+			}
+		})
+		text += `</p>`
+		if (background.traits.length) {
+			text += `<h3>Traits</h3><p>`
+			background.traits.forEach(trait => text += `${trait}, `)
+			text += `</p>`
+		}
+		text += `</p>`
+			if (background.malignancies.length) {
+			text += `<h3>Malignacies</h3><p>`
+				background.malignancies.forEach(malignancy => text += `${malignancy}, `)
+				text += `</p>`
+		}
+		text += `<h3>Bonus</h3>`
+		text += `<p> ${background.bonus.name}: ${background.bonus.desc}	</p>`
+		text += `<h3>Equipment</h3>`
+		text += `<p>`
+		background.equipment.forEach(equipment => {
+			if (Array.isArray(equipment)) {
+				for (let i = 0; i < equipment.length; i++) { 
+					if (i> 0) text += ' or '
+					if (Array.isArray(equipment[i])) {
+						text += equipment[i].join(' and ')
+					} else {
+						text += `${equipment[i]}, `
+					}
+				}
+			} else {
+				text += `${equipment}, `
+			}
+		})
+		text += `</p>`
+		if (background.wounds) text += `<h3>Bonus Vitality: ${background.wounds}</h3> `
+		return text
+	}
+
+	on("page:background", (eventinfo) => {
+		let backgrounds = BACKGROUNDS.filter(background => (background.restrictions.length === 0 || background.restrictions.includes(getCharmancerData()?.genos?.values?.genos)))
+		let list = ''
+		backgrounds.forEach(background => {
+			list += ` <option value="${background.name}">${background.name}</option>`
+		})
+		setCharmancerText({"background_choices": list})
+		setCharmancerText({"background_infos":generateBackground(backgrounds[0].name)})
+	})
+
+	on("mancerchange:background", (eventinfo) => {
+		setCharmancerText({"background_infos":generateBackground(eventinfo.newValue)})
+	});
+
+	// ROLES
+
+	function getRole() {
+		return ROLES.find(role => role.name === getCharmancerData()?.role?.values?.role)
+	}
+
+	function generateRoles(name) {
+		let role = ROLES.find(role => role.name === name)
+		if (!role) return ('<h2>Something went wrong</h2>')
+		var text = ''
+		text += `<h3>Aptitude</h3>`
+		text += `<p>`
+		role.aptitudes.forEach(aptitude => {
+			if (Array.isArray(aptitude)) {
+				text += aptitude.join(' or ') + ', '
+			} else {
+				text += `${aptitude}, `
+			}
+		})
+		text += `</p>`
+		text += `<h3>Talents</h3>`
+		text += `<p>`
+		role.talents.forEach(talent => {
+			if (Array.isArray(talent)) {
+				text += talent.join(' or ') + ', '
+			} else {
+				text += `${talent}, `
+			}
+		})
+		text += `</p>`
+		text += `<h3>Bonus</h3>`
+		role.bonus.forEach(bonus => {
+			text += `<p> ${bonus.name}: ${bonus.desc}</p>`
+		})
+		return text
+		}
+
+	on("page:role", (eventinfo) => {
+		let roles = ROLES.filter(role => (role.restrictions.length === 0 || role.restrictions.includes(getCharmancerData()?.genos?.values?.genos)))
+		let list = ''
+		roles.forEach(role => {
+			list += ` <option value="${role.name}">${role.name}</option>`
+		})
+		setCharmancerText({"role_choices": list})
+		setCharmancerText({"role_infos":generateRoles(roles[0].name)})
+	})
+
+	on("mancerchange:role", (eventinfo) => {
+		setCharmancerText({"role_infos":generateRoles(eventinfo.newValue)})
+	});
+
+	// APTITUDES 
+	
+	on("page:aptitudes", e => {
+		let genos = getGenos().aptitudes,
+			homeworld = getHomeworld().aptitudes,
+			background = getBackground().aptitudes,
+			role = getRole().aptitudes
+		
+		let aptitudes = [genos, homeworld, background, ...role]
+
+		let text = ''
+		let attr = {}
+		aptitudes.forEach((aptitude, i) => {
+			if (Array.isArray(aptitude)) {
+				if (aptitude.length > 0) {
+					text += `<select name="comp_aptitude_${i+1}" class="sheet-full_width role_choices" required>`
+					text += ` <option value=''> -- </option> `
+					text += ` <option value='${aptitude[0]}'>${aptitude[0]}</option> `
+					text += ` <option value='${aptitude[1]}'>${aptitude[1]}</option> `
+					text += '</select>'
+				} else {
+					text += `<input type='text' list='Aptitudes' name="comp_aptitude_${i+1}" class="sheet-full_width role_choices" required />`
+				}
+			} else {
+				text += `<p>${aptitude}</p>`
+				attr[`aptitude_${i+1}`] = aptitude
+			}
+		})
+		attr['aptitude_9'] = 'General'
+		setAttrs(attr)
+		setCharmancerText({"aptitudes_block": text})
+	})
+
+	// TALENTS 
+	
+	on("page:talents", e => {
+		let background = getBackground().talents,
+			role = getRole().talents
+
+		let talents = [...background, ...role]
+		
+		let text = ''
+		let attr = {}
+		talents.forEach((talent, i) => {
+			if (Array.isArray(talent)) {
+				if (talent.length > 0) {
+					text += `<select name="comp_talent_${i+1}" class="sheet-full_width role_choices" required>`
+					text += ` <option value=''> -- </option> `
+					text += ` <option value='${talent[0]}'>${talent[0]}</option> `
+					text += ` <option value='${talent[1]}'>${talent[1]}</option> `
+					text += '</select>'
+				} else {
+					text += `<input type='text' list='Aptitudes' name="comp_talent_${i+1}" class="sheet-full_width role_choices" required />`
+				}
+			} else {
+				text += `<p>${talent}</p>`
+				attr[`talent_${i+1}`] = talent
+			}
+		})
+		setAttrs(attr)
+		setCharmancerText({"talents_block": text})
+	})
+
+	// EQUIPMENTS 
+	
+	on("page:equipments", e => {
+		let equipments = getBackground().equipment
+		
+		let text = ''
+		let attr = {}
+		equipments.forEach((equipment, i) => {
+			if (Array.isArray(equipment)) {
+				if (equipment.length > 0) {
+					text += `<select name="comp_equipment_${i+1}" class="sheet-full_width role_choices" required>`
+					text += ` <option value=''> -- </option> `
+					text += ` <option value='${equipment[0]}'>${equipment[0]}</option> `
+					text += ` <option value='${equipment[1]}'>${equipment[1]}</option> `
+					text += '</select>'
+				} else {
+					text += `<input type='text' list='Aptitudes' name="comp_equipment_${i+1}" class="sheet-full_width role_choices" required />`
+				}
+			} else {
+				text += `<p>${equipment}</p>`
+				attr[`equipment_${i+1}`] = equipment
+			}
+		})
+		setAttrs(attr)
+		setCharmancerText({"equipments_block": text})
+	})
+
+	// SKILLS 
+	
+	on("page:skills", e => {
+		let skills = getBackground().skills
+		
+		let text = ''
+		let attr = {}
+		skills.forEach((skill, i) => {
+			if (Array.isArray(skill)) {
+				if (skill.length > 0) {
+					text += `<select name="comp_skill_${i+1}" class="sheet-full_width role_choices" required>`
+					text += ` <option value=''> -- </option> `
+					text += ` <option value='${skill[0]}'>${skill[0]}</option> `
+					text += ` <option value='${skill[1]}'>${skill[1]}</option> `
+					text += '</select>'
+				} else {
+					text += `<input type='text' list='Aptitudes' name="comp_skill_${i+1}" class="sheet-full_width role_choices" required />`
+				}
+			} else {
+				text += `<p>${skill}</p>`
+				attr[`skill_${i+1}`] = skill
+			}
+		})
+		setAttrs(attr)
+		setCharmancerText({"skills_block": text})
+	})
+
+	// WOUNDS
+
+	on("page:wounds", (eventinfo) => {
+		let genos = getGenos().wounds
+		let homeworld = getHomeworld()
+		let background = getBackground().wounds
+		let wounds_max = getCharmancerData()?.wounds?.values?.wounds ?? ''
+		let fate_max = getCharmancerData()?.wounds?.values?.fate ?? ''
+		let divination = getCharmancerData()?.wounds?.values?.divination ?? ''
+		
+		let wounds = genos + homeworld.wounds + background
+		let fate = homeworld.fate
+		let empBlessing = homeworld.empBlessing
+
+		setAttrs({'wounds': wounds_max, 'fate': fate_max, 'divination': divination})
+		setCharmancerText({'wounds':wounds, 'fate': fate, 'empBlessing': empBlessing, 'wounds_max': wounds_max, 'fate_max': fate_max, 'divination': divination})
+	})
+	
+	on("mancerroll:wounds", e => {
+		let wounds_max = getCharmancerData()?.wounds?.values?.wounds ?? ''
+		if (wounds_max) return
+		var roll = e.roll[0].result
+		let wounds = roll + getGenos().wounds + getBackground().wounds + getHomeworld().wounds
+		setCharmancerText({"wounds_max": wounds})
+		setAttrs({'wounds': wounds})
+	})
+	
+	on("mancerroll:fate", e => {
+		let fate_max = getCharmancerData()?.wounds?.values?.fate ?? ''
+		if (fate_max) return
+		var roll = e.roll[0].result
+		let { fate, empBlessing } = getHomeworld()
+
+		if (roll >= empBlessing) fate++
+		
+		setCharmancerText({"fate_max": fate})
+		setAttrs({'fate': fate})
+	})
+	
+	on("mancerroll:divination", e => {
+		let divination = getCharmancerData()?.wounds?.values?.divination ?? ''
+		if (divination) return
+		divination = e.roll[0].result
+		
+		setCharmancerText({"divination": divination})
+		setAttrs({'divination': divination})
+	})
+
+	// MANCER FINISH
+
+	on("mancerfinish:recap", data => {
+		data = data.data
+		console.log(data)
+		setCharmancerText({'recap_progress': `<progress value="0" max="100" style="width:100%;">0%</progress>`})
+
+		let genos = data.genos.values.genos
+		let stats = data.stats.values
+		let homeworld = data.homeworld.values.homeworld
+		let background = data.background.values.background
+		let role = data.role.values.role
+		let aptitudes = data.aptitudes.values
+		let skills = Object.values(data.skills.values)
+		let talents = Object.values(data.talents.values)
+		let equipments = Object.values(data.equipments.values)
+		let { wounds, fate, divination } = data.wounds.values
+
+		let text = ''
+
+		text += `Genos : ${genos}\n`
+		text += `Homeworld : ${homeworld}\n`
+		text += `Background : ${background}\n`
+		text += `Role : ${role}\n`
+		text += `\n`
+		text += `Stats : \n`
+		text += `WS : ${stats.WS}\n`
+		text += `BS : ${stats.BS}\n`
+		text += `STR : ${stats.STR}\n`
+		text += `TOU : ${stats.TOU}\n`
+		text += `AGI : ${stats.AGI}\n`
+		text += `INT : ${stats.INT}\n`
+		text += `PER : ${stats.PER}\n`
+		text += `WP : ${stats.WP}\n`
+		text += `FEL : ${stats.FEL}\n`
+		text += `INF : ${stats.INF}\n`
+		text += `\n`
+		text += `Aptitudes : ${Object.values(aptitudes).join(', ')}\n`
+		text += `\n`
+		text += `Skills : ${skills.join(', ')}\n`
+		text += `\n`
+		text += `Talents : ${talents.join(', ')}\n`
+		text += `\n`
+		text += `Equipment : ${equipments.join(', ')}\n`
+		text += `\n`
+		text += `Wounds : ${wounds}\n`
+		text += `Fate : ${fate}\n`
+		text += `Divination : ${divination}\n`
+
+		console.log(text)
+
+		setAttrs({...mapNote(text), 'sheetTab' : 'journal'})
+		finishCharactermancer()
+
+	})
+
+	on("mancerfinish:random", eventinfo => {
+		// TODO : random character generator
+		let random = (max) => Math.floor(Math.random() * max)
+
+		let genos = GENOS[random(GENOS.length)]
+
+		let stats = {}
+		stats.WS  = genos.stats.WS  + random(11) + random(11)
+		stats.BS  = genos.stats.BS  + random(11) + random(11)
+		stats.STR = genos.stats.STR + random(11) + random(11)
+		stats.TOU = genos.stats.TOU + random(11) + random(11)
+		stats.AGI = genos.stats.AGI + random(11) + random(11)
+		stats.INT = genos.stats.INT + random(11) + random(11)
+		stats.PER = genos.stats.PER + random(11) + random(11)
+		stats.WP  = genos.stats.WP  + random(11) + random(11)
+		stats.FEL = genos.stats.FEL + random(11) + random(11)
+		stats.INF = genos.stats.INF + random(11) + random(11)
+
+		let homeworld = HOMEWORLDS[random(HOMEWORLDS.length)]
+		let background = BACKGROUNDS[random(BACKGROUNDS.length)]
+		let role = ROLES[random(ROLES.length)]
+
+		const APTITUDES = [
+			"Agility",
+			"Ballistic Skill",
+			"Defence",
+			"Fellowship",
+			"Fieldcraft",
+			"Finesse",
+			"General",
+			"Intelligence",
+			"Knowledge",
+			"Leadership",
+			"Offence",
+			"Perception",
+			"Psyker",
+			"Social",
+			"Strength",
+			"Tech",
+			"Toughness",
+			"Weapon Skill",
+			"Willpower"
+		]
+
+		let TempAptitudes = [genos.aptitudes, homeworld.aptitudes, background.aptitudes, ...role.aptitudes]
+
+		let aptitudes = []
+		console.log(TempAptitudes)
+
+		TempAptitudes.forEach((aptitude, i) => {
+			if (Array.isArray(aptitude)) {
+				if (aptitude.length > 0) {
+					aptitudes.push(aptitude[random(aptitude.length)])
+				} else {
+					aptitudes.push(APTITUDES[random(APTITUDES.length)])
+				}
+			} else {
+				aptitudes.push(aptitude)
+			}
+		})
+
+		let skills = []
+		let TempSkills = background.skills
+		console.log(TempSkills)
+
+
+		TempSkills.forEach((skill, i) => {
+			if (Array.isArray(skill)) {
+				if (skill.length > 0) {
+					skills.push(skill[random(skill.length)])
+				} else {
+					skills.push('AN ERROR OCCURED')
+				}
+			} else {
+				skills.push(skill)
+			}
+		})
+
+
+		let talents = []
+		let TempTalents = [...background.talents, ...role.talents]
+		console.log(TempTalents)
+
+
+		TempTalents.forEach((talent, i) => {
+			if (Array.isArray(talent)) {
+				if (talent.length > 0) {
+					talents.push(talent[random(talent.length)])
+				} else {
+					talents.push('AN ERROR OCCURED')
+				}
+			} else {
+				talents.push(talent)
+			}
+		})
+
+		let equipments = []
+		let TempEquipments = background.equipment
+		console.log(TempEquipments)
+
+
+		TempEquipments.forEach((equipment, i) => {
+			if (Array.isArray(equipment)) {
+				if (equipment.length > 0) {
+					equipments.push(equipment[random(equipment.length)])
+				} else {
+					equipments.push('AN ERROR OCCURED')
+				}
+			} else {
+				equipments.push(equipment)
+			}
+		})
+		let wounds = genos.wounds + homeworld.wounds + background.wounds + random(5)+1
+		let fate = homeworld.fate
+		if (random(10)+1 > homeworld.empBlessing) fate++
+		let divination = random(100)+1
+
+		let text = ''
+
+		text += `Genos : ${genos.name}\n`
+		text += `Homeworld : ${homeworld.name}\n`
+		text += `Background : ${background.name}\n`
+		text += `Role : ${role.name}\n`
+		text += `\n`
+		text += `Stats : \n`
+		text += `WS : ${stats.WS}\n`
+		text += `BS : ${stats.BS}\n`
+		text += `STR : ${stats.STR}\n`
+		text += `TOU : ${stats.TOU}\n`
+		text += `AGI : ${stats.AGI}\n`
+		text += `INT : ${stats.INT}\n`
+		text += `PER : ${stats.PER}\n`
+		text += `WP : ${stats.WP}\n`
+		text += `FEL : ${stats.FEL}\n`
+		text += `INF : ${stats.INF}\n`
+		text += `\n`
+		text += `Aptitudes : ${aptitudes.join(', ')}\n`
+		text += `\n`
+		text += `Skills : ${skills.join(', ')}\n`
+		text += `\n`
+		text += `Talents : ${talents.join(', ')}\n`
+		text += `\n`
+		text += `Equipment : ${equipments.join(', ')}\n`
+		text += `\n`
+		text += `Wounds : ${wounds}\n`
+		text += `Fate : ${fate}\n`
+		text += `Divination : ${divination}\n`
+
+		console.log(text)
+
+		setAttrs({...mapNote(text), 'sheetTab' : 'journal'})
+		finishCharactermancer()
+	})
+
+
 </script>
 
-
+<!-- ROLLTEMPLATE -->
 
 <rolltemplate class="sheet-rolltemplate-mythic">
 
@@ -8033,3 +9288,604 @@ NOTE: replace worker by javascript for IDE functionality
 
 	</div>
 </rolltemplate>
+
+<!-- CHARACTERMANCER -->
+
+<charmancer class="sheet-charmancer-intro">
+	<div class="sheet-charmancer">
+		<h2>Welcome to the Shadowbane Inquisition Charactermancer!</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin sed lorem arcu. Etiam accumsan lacus tellus,
+			et iaculis ipsum interdum non. Vestibulum sit amet consequat neque. Vivamus sed justo metus. Donec feugiat
+			commodo erat. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.
+			Proin vestibulum metus ac arcu sagittis, non tristique turpis pharetra. Vestibulum ultrices commodo risus,
+			eu egestas magna sodales vitae. Nam ultricies, enim sed consequat gravida, lacus nunc fermentum ante, vitae
+			ultricies nulla dui eget lacus. Fusce sit amet erat velit. Class aptent taciti sociosqu ad litora torquent
+			per conubia nostra, per inceptos himenaeos. Nulla facilisi.</p>
+		<p>Curabitur scelerisque sapien in lacus tincidunt, a aliquam tellus malesuada. Nam nec consectetur ipsum. Etiam
+			bibendum tincidunt elit vitae sagittis. Nam scelerisque erat consequat, fringilla diam ac, aliquam neque.
+			Vestibulum sollicitudin, massa at interdum cursus, libero justo fringilla dui, ac pharetra velit ligula vel
+			erat. Proin placerat augue purus, vitae feugiat orci tempus euismod. Aenean tincidunt sodales odio id
+			aliquam. Sed vel tempor metus.</p>
+		<p>Get started by clicking "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="back" value="genos">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+			<button type="finish" value="random">Create Random Character??????</button>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-genos">
+	<div class="sheet-charmancer">
+		<h2>Choose Your Genos</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div>
+				<select name="comp_genos" class="sheet-full_width">
+					<option value="Human" selected>Human</option>
+					<option value="Ogryn">Ogryn</option>
+					<option value="Ratling">Ratling</option>
+					<option value="Squat">Squat</option>
+					<option value="Ghul">Ghul</option>
+				</select>
+				<div class="genos_infos">
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<p>Select your Genos then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="stats">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-stats">
+	<div class="sheet-charmancer">
+		<h2>Generate Characteristics</h2>
+		<div>
+			<div class='rolled'>
+				<button type='roll' name='roll_standard'
+					value="/r [[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]+[[2d10]]">Standard</button>
+			</div>
+			<input type="hidden" name="comp_rolled">
+			<input type="hidden" name="comp_rerolled">
+			<input type="hidden" name="comp_points">
+			<input type="hidden" name="comp_points_spent">
+			<div class="sheet-characteristics_main">
+				<div>
+					<button name='roll_reroll_0' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_0_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_0_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_1' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_1_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_1_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_2' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_2_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_2_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_3' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_3_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_3_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_4' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_4_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_4_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_5' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_5_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_5_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_6' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_6_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_6_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_7' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_7_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_7_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_8' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_8_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_8_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+				<div>
+					<button name='roll_reroll_9' type='roll'
+						class='sheet-clear sheet-full_width sheet-characteristics_button' value='/r [[2d10}]]'> reroll
+					</button>
+					<input name='comp_roll_9_value' type='text' value='${roll.result}'
+						class='sheet-characteristics_input sheet-full_width' readonly />
+					<select name='comp_roll_9_char' class='sheet-full_width' required>
+						<option value='' selected='selected'>N/A</option>
+						<option value='WS'>WS</option>
+						<option value='BS'>BS</option>
+						<option value='STR'>STR</option>
+						<option value='TOU'>TOU</option>
+						<option value='AGI'>AGI</option>
+						<option value='INT'>INT</option>
+						<option value='PER'>PER</option>
+						<option value='WP'>WP</option>
+						<option value='FEL'>FEL</option>
+						<option value='INF'>INF</option>
+					</select>
+				</div>
+			</div>
+			<div class="roll_low">
+
+			</div>
+			<br />
+			<div class="points_left">
+
+			</div>
+			<div style="columns: 5;">
+				<label for="comp_WS">Weapon Skil </label><button type='action' name='act_decrease_WS'>-</button><input
+					type="number" name="comp_WS" id="comp_WS" readonly /><button type='action'
+					name='act_increase_WS'>+</button>
+				<input type="hidden" name="comp_WS_points">
+				<label for="comp_BS">Ballistic Skill</label><button type='action'
+					name='act_decrease_BS'>-</button><input type="number" name="comp_BS" id="comp_BS" readonly /><button
+					type='action' name='act_increase_BS'>+</button>
+				<input type="hidden" name="comp_BS_points">
+				<label for="comp_STR">Strength </label><button type='action' name='act_decrease_STR'>-</button><input
+					type="number" name="comp_STR" id="comp_STR" readonly /><button type='action'
+					name='act_increase_STR'>+</button>
+				<input type="hidden" name="comp_STR_points">
+				<label for="comp_TOU">Toughness </label><button type='action' name='act_decrease_TOU'>-</button><input
+					type="number" name="comp_TOU" id="comp_TOU" readonly /><button type='action'
+					name='act_increase_TOU'>+</button>
+				<input type="hidden" name="comp_TOU_points">
+				<label for="comp_AGI">Agility </label><button type='action' name='act_decrease_AGI'>-</button><input
+					type="number" name="comp_AGI" id="comp_AGI" readonly /><button type='action'
+					name='act_increase_AGI'>+</button>
+				<input type="hidden" name="comp_AGI_points">
+				<label for="comp_INT">Intelligence </label><button type='action'
+					name='act_decrease_INT'>-</button><input type="number" name="comp_INT" id="comp_INT"
+					readonly /><button type='action' name='act_increase_INT'>+</button>
+				<input type="hidden" name="comp_INT_points">
+				<label for="comp_PER">Perception </label><button type='action' name='act_decrease_PER'>-</button><input
+					type="number" name="comp_PER" id="comp_PER" readonly /><button type='action'
+					name='act_increase_PER'>+</button>
+				<input type="hidden" name="comp_PER_points">
+				<label for="comp_WP">Willpower </label><button type='action' name='act_decrease_WP'>-</button><input
+					type="number" name="comp_WP" id="comp_WP" readonly /><button type='action'
+					name='act_increase_WP'>+</button>
+				<input type="hidden" name="comp_WP_points">
+				<label for="comp_FEL">Fellowship </label><button type='action' name='act_decrease_FEL'>-</button><input
+					type="number" name="comp_FEL" id="comp_FEL" readonly /><button type='action'
+					name='act_increase_FEL'>+</button>
+				<input type="hidden" name="comp_FEL_points">
+				<label for="comp_INF">Influence </label><button type='action' name='act_decrease_INF'>-</button><input
+					type="number" name="comp_INF" id="comp_INF" readonly /><button type='action'
+					name='act_increase_INF'>+</button>
+				<input type="hidden" name="comp_INF_points">
+			</div>
+		</div>
+		<p>Get started by clicking "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="homeworld">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-homeworld">
+	<div class="sheet-charmancer">
+		<h2>Choose Your Homeworld</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div>
+				<select name="comp_homeworld" class="sheet-full_width  homeworld_choices">
+				</select>
+				<div class="homeworld_infos">
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<p>Select your homeworld then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="background">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-background">
+	<div class="sheet-charmancer">
+		<h2>Choose Your Background</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div>
+				<select name="comp_background" class="sheet-full_width background_choices">
+				</select>
+				<div class="background_infos">
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<p>Select your background then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="role">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-role">
+	<div class="sheet-charmancer">
+		<h2>Choose Your Role</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div>
+				<select name="comp_role" class="sheet-full_width role_choices">
+				</select>
+				<div class="role_infos">
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<p>Select your role then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="aptitudes">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-aptitudes">
+	<div class="sheet-charmancer">
+		<h2>Determine your Aptitudes</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div class="aptitudes_block">
+			</div>
+			<div>
+			</div>
+			<input type="hidden" name="comp_aptitude_1">
+			<input type="hidden" name="comp_aptitude_2">
+			<input type="hidden" name="comp_aptitude_3">
+			<input type="hidden" name="comp_aptitude_4">
+			<input type="hidden" name="comp_aptitude_5">
+			<input type="hidden" name="comp_aptitude_6">
+			<input type="hidden" name="comp_aptitude_7">
+			<input type="hidden" name="comp_aptitude_8">
+			<input type="hidden" name="comp_aptitude_9">
+		</div>
+		<p>Select your aptitudes then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="talents">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-talents">
+	<div class="sheet-charmancer">
+		<h2>Determine your Talents</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div class="talents_block">
+			</div>
+			<div>
+			</div>
+			<input type="hidden" name="comp_talent_1">
+			<input type="hidden" name="comp_talent_2">
+			<input type="hidden" name="comp_talent_3">
+			<input type="hidden" name="comp_talent_4">
+			<input type="hidden" name="comp_talent_5">
+			<input type="hidden" name="comp_talent_6">
+		</div>
+		<p>Select your talents then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="equipments">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-equipments">
+	<div class="sheet-charmancer">
+		<h2>Determine your Equipment</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div class="equipments_block">
+			</div>
+			<div>
+			</div>
+			<input type="hidden" name="comp_equipment_1">
+			<input type="hidden" name="comp_equipment_2">
+			<input type="hidden" name="comp_equipment_3">
+			<input type="hidden" name="comp_equipment_4">
+			<input type="hidden" name="comp_equipment_5">
+			<input type="hidden" name="comp_equipment_6">
+			<input type="hidden" name="comp_equipment_7">
+			<input type="hidden" name="comp_equipment_8">
+			<input type="hidden" name="comp_equipment_9">
+		</div>
+		<p>Select your equipments then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="skills">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-skills">
+	<div class="sheet-charmancer">
+		<h2>Determine your Skills</h2>
+		<div style="
+				grid-template-columns: 50% calc(50% - 20px);
+				display: grid;
+				column-gap: 20px;">
+			<div class="skills_block">
+			</div>
+			<div>
+			</div>
+			<input type="hidden" name="comp_skill_1">
+			<input type="hidden" name="comp_skill_2">
+			<input type="hidden" name="comp_skill_3">
+			<input type="hidden" name="comp_skill_4">
+			<input type="hidden" name="comp_skill_5">
+			<input type="hidden" name="comp_skill_6">
+			<input type="hidden" name="comp_skill_7">
+			<input type="hidden" name="comp_skill_8">
+			<input type="hidden" name="comp_skill_9">
+		</div>
+		<p>Select your skills then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="wounds">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-wounds">
+	<div class="sheet-charmancer">
+		<h2>Generate Characteristics</h2>
+		<div>
+			<div>
+				<h3>Wounds</h3>
+				<p>Base Wounds: <span class="wounds"></span> <br />
+					(Determined by Homeworld)</p>
+				<button type='roll' name='roll_wounds' value="/r [[1d5]]">1d5 wounds</button>
+				<p>Total Wounds : <span class="wounds_max"></span></p>
+			</div>
+			<div>
+				<h3>Fate Threshold</h3>
+				<p>Base Fate Threshold: <span class="fate"></span> <br />
+					(Determined by Homeworld)
+					<br />
+					Emperor's Blessing: <span class="empBlessing"></span> <br />
+					(Gain an additional 1 to Fate Threshold if you roll this number or above)</p>
+				<button type='roll' name='roll_fate' value="/r [[1d10]]">1d10 Emperor's Blessing</button>
+				<p>Total Fate : <span class="fate_max"></span></p>
+			</div>
+			<div>
+				<h3>Divination</h3>
+				<p>Divination roll: <input type="text" name="comp_divination" readonly required></p>
+				<button type='roll' name='roll_divination' value="/r [[1d100]]">1d100 Divination</button>
+			</div>
+			<input type="hidden" name="comp_wounds">
+			<input type="hidden" name="comp_fate">
+			<input type="hidden" name="comp_divination">
+		</div>
+		<p>Get started by clicking "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="finish" value="recap">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+</charmancer>
+
+<charmancer class="sheet-charmancer-final">
+	<div class="sheet-charmancer">
+		<h2>Finishing up</h2>
+		<div>
+			<div>
+				<div class="recap_infos">
+				</div>
+				<div class="recap_progress">
+					<progress value="10" max="100">10%</progress>
+				</div>
+			</div>
+			<div>
+			</div>
+		</div>
+		<p>Select your recap then click "Next".</p>
+		<div class="bottombar">
+			<button type="cancel" value="cancel">Discard and exit</button>
+			<button type="submit" value="recap">Next</button>
+			<p class="warning"><span>Discard and Exit will discard all choices you’ve made in Charactermancer and let
+					you edit your character sheet directly.</span></p>
+		</div>
+	</div>
+
+	<button type="cancel" value="example">Cancel Charactermancer</button>
+	<button type="back" value="example">Back</button>
+	<button type="submit" value="example">Next</button>
+	<button type="finish" value="example">Apply Changes</button>
+</charmancer>
