@@ -997,6 +997,7 @@
           <input class="tab-switch" name="attr_weapon_type_toggle" type="hidden" value="range"/>
           <div class="rows repeating-container weapon-range">
             <div class="row-long headers">
+              <span></span>
               <h2 data-i18n="weapon">Weapon</h2>
               <h2 data-i18n="pool">Pool</h2>
               <h2 data-i18n="dam">Dam</h2>
@@ -1005,7 +1006,6 @@
               <h2 class="center" data-i18n="m" title="Medium 51-250">M</h2>
               <h2 class="center" data-i18n="f" title="Far 251-500">F</h2>
               <h2 class="center" data-i18n="e" title="Extreme 500+">E</h2>
-              <h2 data-i18n="mode">Mode</h2>
               <h2 data-i18n="ammo">Ammo</h2>
             </div>
             <fieldset class="repeating_range">
@@ -1016,7 +1016,9 @@
               <input name="attr_updateme" type="hidden" value="0"/>
               <input class="flag-primary" name="attr_primary" type="hidden" value=""/>
               <input class="flag-primary" name="attr_additional" type="hidden" value=""/>
-              <button name="roll_range_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode @{mode}, Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
+		        <input class="toggle" name="attr_primary" value="primary" type="checkbox" checked="checked"/>
+		        <span class="pictos powerbutton">2</span>
+              <button name="roll_range_weapon" type="roll" value="@{gm_toggle} &{template:rolls}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon}\n@{skill} + @{attribute}}}{{dice=[[(@{rating}+@{attr_rating}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}]]}}{{desc=Mode: SS, Damage @{damage}, Skill: @{skill}, Attribute: @{attribute}, Notes @{notes}}}{{wilddie=[[@{wild_die}d6]]}}"><span name="attr_weapon"></span></button>
               <span class="center" name="attr_dicepool"></span>
               <span class="center" name="attr_damage"></span>
               <span class="center" name="attr_close"></span>
@@ -1024,18 +1026,12 @@
               <span class="center" name="attr_medium"></span>
               <span class="center" name="attr_far"></span>
               <span class="center" name="attr_extreme"></span>
-              <select name="attr_mode" title="@{mode}">
-                <option data-i18n="ss" value="SS">SS</option>
-                <option data-i18n="sa" value="SA">SA</option>
-                <option data-i18n="bf" value="BF">BF</option>
-                <option data-i18n="fa" value="FA">FA</option>
-                <option data-i18n="other" value="Other">Other</option>
-              </select>
               <span class="center" name="attr_ammo"></span>
               <input class="collapse-flag" name="attr_display_flag" type="checkbox"/><span class="pictos">i</span>
               <input class="settings-flag" name="attr_flag" title="Settings toggle" type="checkbox" checked="checked"/><span class="pictos">x</span>
               <div class="collapse"><span name="attr_notes"></span></div>
               <div class="settings">
+                <span></span>
                 <label data-i18n-title="weapon" title="weapon">
                   <input name="attr_weapon" placeholder="Ares Predator" title="@{repeating_range_${x}_weapon}" type="text" value=""/>
                 </label>
@@ -1060,13 +1056,6 @@
                 <label data-i18n-title="e" title="Extreme">
                   <input name="attr_extreme" placeholder="-" title="@{repeating_range_${x}_extreme}" type="text" value=""/>
                 </label>
-                <select name="attr_mode" title="@{mode}">
-                  <option data-i18n="ss" value="SS">SS</option>
-                  <option data-i18n="sa" value="SA">SA</option>
-                  <option data-i18n="bf" value="BF">BF</option>
-                  <option data-i18n="fa" value="FA">FA</option>
-                  <option data-i18n="other" value="Other">Other</option>
-                </select>
                 <label data-i18n-title="ammo" title="ammo">
                   <input name="attr_ammo" placeholder="15" title="@{repeating_range_${x}_ammo}" type="number" value=""/>
                 </label>
@@ -1077,10 +1066,12 @@
                   <label data-i18n-title="modeoptions" title="Mode Options">
                     <input name="attr_firing_modes" placeholder="SA/BF/FA" type="text" title="@{repeating_range_${x}_firing_modes}}"/>
                   </label>
+<!--
                   <h3 data-i18n="primary">primary</h3>
                   <label data-i18n-title="primary" title="Primary">
                     <input name="attr_primary" type="checkbox" title="@{repeating_range_${x}_primary}" value="primary"/>
                   </label>
+-->
                   <h3 data-i18n="modifier">modifier</h3>
                   <label data-i18n-title="modifier" title="modifier">
                     <input name="attr_dicepool_modifier" title="@{repeating_range_${x}_dicepool_modifier}" value='0' type="number"/>
@@ -5325,7 +5316,7 @@
 //Sheet workers
 
 
-on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes change:repeating_IC:IC_note", (eventInfo) => {
+on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeating_augmentations:notes change:repeating_quality:notes change:repeating_IC:IC_note change:repeating_range:notes change:repeating_melee:notes", (eventInfo) => {
 	if(eventInfo.sourceType != 'player') {
 		return;
 	}
@@ -7191,7 +7182,8 @@ console.log(skill);
 
 
 
-			if (source.includes('primary')) {
+			// If the player changed the primary status of the weapon, uncheck the other weapons
+			if (source.includes('primary') && eventInfo.sourceType === "player") {
 				//Set the other repeating_weapon primarys to 0 aka unchecked
 				getSectionIDs(`${weap}`, function(ids) {
 					let IDs = [];
@@ -7204,7 +7196,7 @@ console.log(skill);
 					IDs.forEach(id => {
 						if (id != source) {
 							update[`${id}`] = 0;
-						};
+						}
 					});
 
 					setAttrs(update);

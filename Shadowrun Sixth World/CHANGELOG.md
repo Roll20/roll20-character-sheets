@@ -1,6 +1,9 @@
 Change Log
 ==============================================
 **2021-09-21 ** v.42 Chuz (James Culp)
+	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
+	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.
+	Added Ranged and Melee weapons (PC->Arms and Grunt) to pastable raw data
 	Bugfix: Fixed a minor but annoying issue where if you added a skill and it was Astral the default attribute was Agility not Intuition
 	Updated skill roll button outputs to display the associated attribute for the roll.
 	Grunt sheet Added tooltips for Direct/Indirect Magic Defense, Defense, Soak, Soak Matrix and Soak Biofeedback.
