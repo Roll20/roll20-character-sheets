@@ -86,7 +86,7 @@ The basic maneuvers list is contained in a slideshow so that it can be hidden by
 
 Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
 
-![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversShat.png)
+![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversChat.png)
 
 *Hit location system (Optional)*
 
