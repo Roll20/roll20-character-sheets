@@ -22,7 +22,7 @@ Roll buttons are color-coded:
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
-![Gray Button](/HeroSystem6eHeroic/images/PurpleButton.png) Gray buttons send description text to chat.
+![Gray Button](/HeroSystem6eHeroic/images/GrayButton.png) Gray buttons send description text to chat.
 
 ## The Tally Bar
 
