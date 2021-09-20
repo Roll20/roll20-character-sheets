@@ -44,6 +44,12 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+## Turn Segments and Initiative
+
+![Turn Segments](/HeroSystem6eHeroic/images/TurnSegments.png)
+
+A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or ##phases## it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
+
 ## Perception
 
 ![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
