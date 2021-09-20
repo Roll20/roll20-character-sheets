@@ -1,5 +1,14 @@
 Change Log
 ==============================================
+**2021-09-08 ** v.41 Chuz (James Culp)
+	Bugfix - Drone/Vehicle Initiative should have been normal Initiative but Pilot * 2 + 4d6.
+	Bugfix - Grunt template was applying wounds to Soak rolls.
+	Added IC to the list of pastable raw data
+	Host->IC now display notes in the roll template	
+**2021-08-31 ** v.40 Chuz (James Culp)
+	Added Social Rating to derived tests (even though it's not a test) just to the right of the Edge Attribute.  This is a total of Charisma + any cumulative + primary armor social adjustments.
+	Added mouseovers for Composure, Judge Intentions, Memory and Lift & Carry buttons detailing where the values come from for those of us that forget.
+	Added the ability to add Spells, NPC Spells, Qualities and Augmentations by pasting raw data into the Notes textarea for a new repeating row.
 **2021-07-19 ** v.39 Chuz (James Culp)
 	Added Grunt Groups and Autocalculations based on the # of grunts
 	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
