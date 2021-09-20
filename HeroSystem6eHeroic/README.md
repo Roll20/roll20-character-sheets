@@ -48,13 +48,13 @@ In the upper right corner of Page 1 and Page 2 is a health status indicator. The
 
 ![Turn Segments](/HeroSystem6eHeroic/images/TurnSegments.png)
 
-A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or #phases# it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
+A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or *phases* it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
 
 ## Perception
 
 ![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
 
-The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power #Enhanced Senses# which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
+The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power *Enhanced Senses*, which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
 ## Page 2: Gear
 
