@@ -48,7 +48,7 @@ In the upper right corner of Page 1 and Page 2 is a health status indicator. The
 
 ![Turn Segments](/HeroSystem6eHeroic/images/TurnSegments.png)
 
-A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or ##phases## it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
+A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or #phases# it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
 
 ## Perception
 
