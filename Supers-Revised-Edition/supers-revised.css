@@ -6,14 +6,14 @@
 
 .sheet-medium {width: 25%}
 
-select {width: 25%;}
+select {width: auto;}
 
 
 /* --------- Text ------------- */
 
 label {display: inline;}
 
-h2 {
+h2,.sheet-h2 {
     color: blue;
     text-align: center;
 }
@@ -48,7 +48,10 @@ input[type="number"]{
 input[type="number"]{
   text-align: center;
 }
-
+.sheet-input-label input[type='text']{
+  width: 100%;
+  box-sizing: border-box;
+}
 textarea {
   background-color: transparent;
   width: 89%;
@@ -66,7 +69,32 @@ input[type="text"]:focus,
 input[type="number"]:focus{
   background-color: #F6CED8;
 }
-
+.sheet-stacked{
+  display: grid;
+  grid:
+    repeat(2,auto)
+    /
+    auto
+  ;
+  grid-template-areas:
+    "over"
+    "under"
+  ;
+  padding: 0;
+  margin: 0;
+}
+.sheet-stacked > :not(input){
+  text-align: center;
+}
+.sheet-stacked.sheet-over > :not(input){
+  grid-area: over;
+}
+.sheet-stacked.sheet-under > :not(input){
+  grid-area: under;
+}
+.sheet-main .sheet-stacked > input{
+  width: 100%;
+}
 /* -----Hides up/down buttons on numberfields that don't need them ---*/
 
 input[type=number].sheet-ref::-webkit-inner-spin-button,
@@ -85,11 +113,35 @@ input[type=number].sheet-txtfield {
 
 button {border-top: 1px;}
 
-.charsheet button[type=roll].sheet-d6::before {    /*new die changes die roller to d6*/
+.charsheet button:is([type='roll'],[type='action']).sheet-d6::before {    /*new die changes die roller to d6*/
     font-family: 'dicefontd6';
     content: 'F ';
 }
-
+button[type='action']{
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  border-bottom-color: #bbb;
+  display: inline-block;
+  line-height: 18px;
+  color: #333;
+  text-shadow: 0 1px 1px rgb(255 255 255 / 75%);
+  vertical-align: middle;
+  background-color: #f5f5f5;
+  background-image: -webkit-linear-gradient(top,#fff,#e6e6e6);
+  background-repeat: repeat-x;
+  border-color: rgba(0,0,0,0.1) rgba(0,0,0,0.1) rgba(0,0,0,0.25);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%), 0 1px 2px rgb(0 0 0 / 5%);
+  cursor: pointer;
+  font-size: 18.59px;
+  padding: 2px 3px;
+  margin: 0px 3px 0px 3px;
+}
+button[type='action']:hover{
+  color: #333;
+  text-decoration: none;
+  background-color: #e6e6e6;
+  background-position: 0 -15px;
+}
 /*-----------------------------------------------------------------*\
   #SECTIONS
 \*-----------------------------------------------------------------*/
@@ -118,11 +170,13 @@ button {border-top: 1px;}
 
 .sheet-section {
     padding: 5px;
-    min-height: 90%;
 }
 
 .sheet-border{
     border: solid 4px black;
+}
+.sheet-main .sheet-boxed{
+  border: 2px solid black;
 }
 
 /*  ----- Character Sheet Structure -------
@@ -130,44 +184,105 @@ button {border-top: 1px;}
 It uses 'Grid template areas' to name  each sheet section,
 so that they can be positioned in the grid easily,
  while also providing a human-readable overview. */
-div.sheet-main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 2fr 3.25fr 3fr 3.75fr 2fr 1fr;
-    grid-template-areas:"name        logo          "
-                      "resistances aptitudes     "
-                      "advantages  disadvantages "
-                      "powers      powers        "
-                      "tracker     comp-dice     "
-                      "cost        cost          ";
-    grid-gap: 4px;
-    width:    1000px; /* Defines the width and height of the sheet */
-    height:   1600px;
+.sheet-section-control[value="character"] ~ .sheet-main > .sheet-mook,
+.sheet-section-control[value="mook"] ~ .sheet-main > .sheet-character{
+  display: none;
 }
 
-
+.sheet-character > .sheet-name{
+  grid-template-columns: 1fr;
+}
+/*
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3,auto);
+    grid-template-areas: 
+        "name           logo"
+        "rating         qualities"
+        "exceptional    exceptional"
+    ;
+    grid-gap: 4px;
+*/
+.sheet-section-control[value="character"] ~ .sheet-main{
+  grid-template-rows:repeat(2,auto) repeat(5,auto) 8em;
+  grid-template-areas:
+    "name        logo"
+    "toggle      version"
+    "resistances aptitudes"
+    "advantages  disadvantages"
+    "powers      powers"
+    "tracker     comp-dice"
+    "cost        cost"
+  ;
+}
+.sheet-section-control[value="mook"] ~ .sheet-main{
+  grid-template-rows:repeat(2,auto) repeat(3,auto);
+  grid-template-areas:
+    "name        logo"
+    "toggle      version"
+    "rating      qualities"
+    "exceptional exceptional"
+    "tracker     tracker"
+  ;
+}
+.sheet-main{
+  display: grid;
+  grid-template-columns: repeat(2,minmax(auto,1fr));
+  grid-gap: 4px;
+}
+.sheet-character {
+    display: contents;
+}
+.sheet-toggle{
+  grid-area: toggle;
+  display: grid;
+  grid-template-columns: repeat(4,auto);
+  place-content: center start;
+  align-items: center;
+  gap: 8px;
+}
+.sheet-section-control:not([value="mook"]) ~ .sheet-main > .sheet-toggle > .sheet-mook-type{
+  display: none;
+}
+.sheet-mook-type{
+  margin: 0;
+}
+.sheet-toggle > h4{
+  display: inline;
+}
+.sheet-automation{
+  grid-area: version;
+  place-self: center start;
+}
 /* NAME SECTION */
 
 div.sheet-name{
   grid-area: name;
-  padding: 30px 0px 0px 50px;
-}
-
-div.sheet-name input[type="text"]{
-  width: 460px;
+  display: grid;
+  gap: 4px;
 }
 div.sheet-name h6{
   padding-left: 10px;
 }
 
 /* LOGO SECTION */
-
+.sheet-version{
+  grid-area: version;
+  display: grid;
+  place-self: center end;
+  gap: 0.5rem;
+  align-content: center;
+  grid-template-columns: repeat(2,auto);
+}
+.sheet-version > *{
+  line-height: 0;
+}
 div.sheet-logo{
   grid-area: logo;
   background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Supers-Revised-Edition/images/logo.png);
-  background-size: 344px 150px;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
   display: flex;
   justify-content: flex-end;
   align-items: flex-end;
@@ -178,29 +293,28 @@ div.sheet-logo{
 /* RESISTANCES */
 div.sheet-resistances{
   grid-area:resistances;
+  display: grid;
+  grid-template-columns: 1fr;
+  place-items: center;
+  align-content: start;
 }
 
 span.sheet-resistance {background-color: white;color: black;}
 
 div.sheet-resistances h2{
-  width: 200px;
-  padding-left: 150px;
 }
 
 div.sheet-resistances .sheet-res-grid{
   display: grid;
   grid-template-columns: 3fr 2fr 2fr 1fr 6fr;
   grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
-  width: 320px;
 }
 
 div.sheet-resistances input[type="text"].sheet-notes{
-  width: 240px;
+  width: 100%;
 }
 div.sheet-resistances input[type="number"]{
   border-style: solid;
-}
-.sheet-initiative {margin-left: 225px;
 }
 
 
@@ -209,20 +323,18 @@ div.sheet-aptitudes{
   grid-area: aptitudes;
 }
 
-div.sheet-aptitudes input[type="text"].sheet-bold{
-  font-size: 1.3em;
-  width: 158px;
-}
-
 div.sheet-powers input[type="text"].sheet-bold{
   font-size: 1.3em;
-  width: 200px;
 }
-
-div.sheet-aptitudes input[type="text"].sheet-longap{
-  width: 225px;
+.repitem input[type="text"]{
+  width: 100%;
+  box-sizing: border-box;
 }
-
+.sheet-aptitudes .repitem{
+  display: grid;
+  grid-template-columns: 15rem repeat(2,auto) 1fr;
+  gap: 4px;
+}
 
 /* Advantages &  Disadvantages */
 div.sheet-advantages{
@@ -232,23 +344,28 @@ div.sheet-advantages{
 div.sheet-disadvantages{
   grid-area: disadvantages;
 }
-
+.sheet-advantages .repcontainer,
+.sheet-disadvantages .repcontainer{
+  margin-bottom: 4px;
+}
+.sheet-advantages .repitem,
+.sheet-disadvantages .repitem{
+  display: grid;
+  grid-template-columns: 15rem auto 1fr;
+  gap: 0.5rem;
+}
+.sheet-advantages .repitem > *,
+.sheet-disadvantages .repitem > *{
+  width: 100%;
+}
+.sheet-advantages .itemcontrol,
+.sheet-disadvantages .itemcontrol{
+  grid-column: 1/-1;
+}
 div.sheet-advantages input[type="number"],
 div.sheet-disadvantages input[type="number"]{
   width: 30px;
 }
-
-div.sheet-advantages input[type="text"].sheet-notes{
-  width: 240px;
-}
-
-div.sheet-disadvantages input[type="text"].sheet-notes{
-  width: 210px;
-}
-
-.sheet-mediumadv {width: 188px; margin: 2px;}
-
-.sheet-mediumdis {width: 43%; margin: 2px;}
 
 
 
@@ -258,38 +375,72 @@ div.sheet-powers{
   grid-area: powers;
 }
 .sheet-mediumpow {width: 17%}
+.sheet-powers .sheet-d6{
+  place-self: center;
+}
 
+/*
+  Repeating Powers styling
+*/
+.sheet-powers .repitem,
+.sheet-exceptional .repitem{
+  display: grid;
+  grid-template-columns: 30rem auto auto 1fr;
+  grid-gap: 2px;
+}
 
 /* TRACKER SECTION */
 
-div.sheet-tracker{
+.sheet-tracker{
   grid-area: tracker;
 }
 
-div.sheet-def-tracker{
-  background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Supers-Revised-Edition/images/Original-Tracker.png);
-  background-size: 490px 180px;
-  background-repeat: no-repeat;
-  height: 180px;
-  width: 490px;
-}
-
-div.sheet-alt-tracker{
-  background-image: url(https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Supers-Revised-Edition/images/alternate-tracker.png);
-  background-size: 490px 180px;
-  background-repeat: no-repeat;
-  height: 180px;
-  width: 490px;
-}
-
-div.sheet-def-tracker,
-input.sheet-tracker-switch:checked ~ .sheet-alt-tracker{
-  display: block;
-}
-
-div.sheet-alt-tracker,
-input.sheet-tracker-switch:checked ~ .sheet-def-tracker{
+input.sheet-tracker-switch:checked ~ .sheet-def-tracker,
+input.sheet-tracker-switch:not(:checked) ~ .sheet-alt-tracker{
   display: none;
+}
+.sheet-tracker{
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: repeat(2,auto);
+}
+.sheet-tracker-type{
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  align-items: center;
+}
+.sheet-tracker > table{
+  grid-column: 1/-1;
+}
+.sheet-cell-display{
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+.sheet-tracker > table tr:first-child{
+  border-bottom: 4px solid black;
+}
+
+.sheet-track-row:nth-child(odd){
+  background-color: #d9e2f3;
+}
+
+.sheet-section-control[value="character"] ~ .sheet-main input.sheet-tracker-switch:not(:checked) ~ div.sheet-alt-tracker,
+.sheet-section-control[value="character"] ~  .sheet-main input.sheet-tracker-switch:checked ~ .sheet-def-tracker{
+  display: none;
+}
+.sheet-section-control[value="mook"] ~ .sheet-main > .sheet-tracker{
+  display: contents;
+}
+.sheet-section-control[value="mook"] ~ .sheet-main > .sheet-tracker > :is(span,input){
+  display: none;
+}
+.sheet-section-control[value="mook"] ~ .sheet-main > .sheet-tracker > :is(.sheet-def-tracker,.sheet-alt-tracker){
+  box-sizing: border-box;
+  width: 100%;
+  grid-column: span 1;
+  display: table;
 }
 
 /* COMP DICE */
@@ -306,43 +457,167 @@ div.sheet-temp-comp-dice{
 /* Cost */
 div.sheet-cost{
   grid-area: cost;
-  justify-content: space-around;
+  display: grid;
+  grid: 
+    auto [total-start total-value-start]auto[total-start total-value-start]
+    /
+    auto auto auto [total-start] auto auto [total-end total-value-start] auto [total-value-end] auto auto auto auto
+  ;
+  align-content: start;
 }
 
 div.sheet-cost span{
     padding: 3px 0px 0px 10px;
 }
-
-/*-----------------------------------------------------------------*\
+.sheet-cost > .sheet-total{
+  grid-area: total;
+  justify-self: end;
+}
+.sheet-cost > .sheet-total-value{
+  grid-area: total-value;
+}
+/* Mooks */
+.sheet-mook{
+    display: contents;
+}
+.sheet-mook > .sheet-name{
+  grid: 
+    1fr 1fr
+    /
+    1fr
+  ;
+  grid-template-areas: 
+    "name"
+    "description"
+  ;
+  grid-gap: 4px;
+  align-items: center;
+}
+.sheet-mook > .sheet-name .sheet-description{
+  grid-area: description;
+}
+.sheet-mook > .sheet-rating{
+  padding: 4px;
+  display: grid;
+  --gutterSize: 30px;
+  grid: 
+    auto repeat(2,5em)
+    /
+    var(--gutterSize) repeat(2,5em) var(--gutterSize)
+  ;
+  grid-area: rating;
+  grid-row-gap: 4px;
+  grid-template-areas: 
+    ". header     header     ."
+    ". max        current    rating-button"
+    ". initiative initiative initiative-button"
+  ;
+  place-content: start center;
+}
+.sheet-mook > .sheet-rating > h2{
+  grid-area: header;
+  text-align: center;
+}
+.sheet-mook > .sheet-rating > .sheet-max{
+  grid-area: max;
+}
+.sheet-mook > .sheet-rating > .sheet-current{
+  grid-area: current;
+}
+.sheet-mook > .sheet-rating > .sheet-initiative{
+  grid-area: initiative;
+  place-self: center;
+  grid-template-columns: repeat(3,1fr);
+  grid-template-rows: repeat(2,auto);
+  grid-template-areas: 
+    "header header header"
+    ".      input  button"
+  ;
+}
+.sheet-mook > .sheet-rating > .sheet-initiative > input{
+  justify-self: center;
+  width: 40px;
+  grid-area: input;
+}
+.sheet-mook > .sheet-rating > .sheet-initiative > button{
+  place-self: center;
+  grid-area: button;
+}
+.sheet-mook > .sheet-rating > .sheet-initiative > h2{
+  justify-self: center;
+  grid-area: header;
+}
+.sheet-mook > .sheet-rating > .sheet-d6{
+  place-self: center end;
+}
+.sheet-mook > .sheet-rating > .sheet-rating.sheet-d6{
+  grid-area: rating-button;
+}
+.sheet-mook > .sheet-rating > .sheet-initiative-button{
+  grid-area: initiative-button;
+}
+.sheet-mook > .sheet-qualities{
+  grid-area: qualities;
+}
+.sheet-mook > .sheet-exceptional{
+  grid-area: exceptional;
+}
+.sheet-qualities .repitem{
+  display: grid;
+  grid-template-columns: 15rem 1fr;
+  gap: 4px;
+}
+/*
   #ROLL TEMPLATE
-\*-----------------------------------------------------------------*/
 
-/* ----------- BLACK -----------*/
-.sheet-rolltemplate-black div {
- width:100%;
- background-color:white;
- border:1px solid rgba(0, 0, 0,1);
+  ----------- Supers -----------
+*/
+.sheet-rolltemplate-supers .sheet-template-container{
+  background-color: white;
+  border: 1px solid black;
+  display: grid;
+  grid-template-columns: 1fr;
 }
-.sheet-rolltemplate-black caption {
- background-color:rgba(0, 0, 0,1);
- color:white;
- font-family:"Helvetica Neue",Helvetica,sans-serif;
- font-weight:600;
- text-align:center;
- font-size:1.1em;
- padding:5px;
+.sheet-rolltemplate-supers .sheet-template-container div > *{
+  white-space: pre-wrap;
 }
-.sheet-rolltemplate-black td {
+.sheet-rolltemplate-supers .sheet-header{
+  display: grid;
+  grid-template-rows: repeat(2,auto);
+  background-color:#000000;
+  color: white;
+  font-family:"Helvetica Neue",Helvetica,sans-serif;
+}
+.sheet-rolltemplate-supers .sheet-header *{
+  color: white;
+}
+.sheet-rolltemplate-supers .sheet-header h4 {
+  font-size:1.1em;
+  padding:5px;
+  place-self: center start;
+}
+.sheet-rolltemplate-supers .sheet-header a {
+  font-size:1em;
+  padding:5px;
+  place-self: center end;
+  font-weight: bold;
+}
+.sheet-rolltemplate-supers .sheet-template-container div:not(.sheet-header) {
  padding:5px;
  line-height:1.4em;
- vertical-align:top;
+ display: grid;
+ grid-template-columns: repeat(2,1fr);
+ justify-items: center;
 }
-.sheet-rolltemplate-black td:first-child {
- font-weight:bold;
- text-align:right;
- min-width:50px;
- padding-right:10px;
-}
-.sheet-rolltemplate-black tr:nth-child(even) {
+.sheet-rolltemplate-supers .sheet-template-container div:nth-child(even) {
  background-color:#eee;
+}
+.sheet-rolltemplate-supers .sheet-successes{
+  justify-self: center;
+  grid-column: span 2;
+}
+.sheet-rolltemplate-supers .sheet-successes .inlinerollresult,
+.sheet-rolltemplate-supers .sheet-successes .inlinerollresult:is(.fullcrit,.fullfail,.importantroll){
+  background-color: transparent;
+  border: none;
 }
