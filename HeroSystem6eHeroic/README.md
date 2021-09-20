@@ -22,6 +22,8 @@ Roll buttons are color-coded:
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
+![Gray Button](/HeroSystem6eHeroic/images/GrayButton.png) Gray buttons send description text to chat.
+
 ## The Tally Bar
 
 ![Tally Bar](/HeroSystem6eHeroic/images/TallyBar.png)
@@ -44,11 +46,17 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+## Turn Segments and Initiative
+
+![Turn Segments](/HeroSystem6eHeroic/images/TurnSegments.png)
+
+A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or *phases* it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
+
 ## Perception
 
 ![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
 
-The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power #Enhanced Senses# which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
+The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power *Enhanced Senses*, which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
 ## Page 2: Gear
 
@@ -83,6 +91,10 @@ The fifth weapon's green roll button produces similar output, but assumes the we
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
+
+Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
+
+![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversChat.png)
 
 *Hit location system (Optional)*
 
@@ -151,5 +163,9 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 *Villain In Glasses, August 1, 2021.*
 
 *Updated August 7, 2021 to include Hit Location support.*
+
 *Updated Sepember 8, 2021 to include notes on Perception Rolls.*
+
 *Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
+
+*Updated Sepember 20, 2021 to include notes on speed and initiative.*
