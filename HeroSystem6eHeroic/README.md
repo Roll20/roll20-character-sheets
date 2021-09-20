@@ -163,3 +163,4 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 *Updated August 7, 2021 to include Hit Location support.*
 *Updated Sepember 8, 2021 to include notes on Perception Rolls.*
 *Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
+*Updated Sepember 20, 2021 to include notes on speed and initiative.*
