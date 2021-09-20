@@ -3292,13 +3292,21 @@
       if(Array.isArray(statblock)){
         statblock = statblock[0];
       }
+      debug({statblock});
       await clearSections();
-      let minions = !Array.isArray(statblock.minions.character) ? [{...statblock.minions.character}] : [...statblock.minions.character];
-      parseMinions(minions,setObj,powerNames);
+      if(statblock.minions){
+        let minions = !Array.isArray(statblock.minions.character) ? [{...statblock.minions.character}] : [...statblock.minions.character];
+        parseMinions(minions,setObj,powerNames);
+      }
       initialParse(statblock,setObj);
       Object.keys(parsers).forEach((parser)=>{
-        let arrRef = Object.keys(statblock[parser])[0];
-        parsers[parser](statblock[parser][arrRef],setObj,powerNames);
+        if(statblock[parser]){
+          let arrRef = Object.keys(statblock[parser])[0];
+          if(statblock[parser][arrRef]){
+            debug(`parsing statblock[${parser}][${arrRef}]`);
+            parsers[parser](statblock[parser][arrRef],setObj,powerNames);
+          }
+        }
       });
       debug({setObj});
       set(setObj);
