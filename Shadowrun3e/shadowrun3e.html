@@ -8,11 +8,11 @@
             <div></div>
             <div></div>
             <div class="SRH5" data-i18n="sheet-type">Sheet Type:</div>
-            <select name="attr_sheettype" class="largeselect">
+            <select name="attr_sheettype" class="largeselect" value="Character">
                     <option data-i18n="character" value="Character" selected>Character</option>
                     <option data-i18n="npc" value="NPC">NPC</option>
                     <option data-i18n="critter" value="Critter">Critter</option>
-                    <option data-i18n="spirit" value="Spririt">Spirit</option>
+                    <option data-i18n="spirit" value="Spirit">Spirit</option>
                     <option data-i18n="drone" value="Drone">Drone</option>
                     <option data-i18n="vehicle" value="Vehicle">Vehicle</option>
                     <option data-i18n="matrix" value="Matrix">Matrix</option>
@@ -85,6 +85,11 @@
 
 
 <div class="hidden-constants">
+    <input type="hidden" name="attr_api-newsheet" value=0>
+    <input type="hidden" name="attr_stun_pen" value=0>
+    <input type="hidden" name="attr_wound_pen" value=0>
+    <input type="hidden" name="attr_meleevizTN" value=0>
+    <input type="hidden" name="attr_rangedvizTN" value=0>
     <input type="hidden" name="attr_iconstatuscode" value=0>
     <input type='hidden' name='attr_gyro-on' value=0 />
     <input type='hidden' name='attr_armor-on' value=0 />
@@ -1492,10 +1497,12 @@
 <div class='sheet-decks'>
     <input type='hidden' class='buttontoggle' name='attr_sheettype' />
     <!--Decks Tab -->
-    <div class="matrix-show-deck"></div>
+    <div class="matrix-show-deck">
         <div class="SRH2" data-i18n="cyberdecks-and-utilities">Cyberdecks and Utilities</div>
-    <div class="matrix-show-frame"></div>
-        <div class="SRH2" data-i18n="smart-frames-and-agents">Smart Frames and Agents</div>
+    </div>
+    <div class="matrix-show-frame">
+        <div class="SRH2" data-i18n="smart-frames-and-agents">Smart Frames and Agents</div> 
+	</div>
     <div class="deck-combat">
         <div>
             <input type='hidden' class='buttontoggle' name='attr_sheettype' />
@@ -2058,7 +2065,7 @@
 </div>
 </div>
 <div class='sheet-karma'>
-    <div data-i18n="sensors" class="SRH3">Karma</div>
+    <div data-i18n="karma" class="SRH3">Karma</div>
     <div class="karma-summary">
     	<header data-i18n="karma-pool" class="table-top-left">Karma Pool:</header>
     	<header data-i18n="good-karma" class="table-top-mid">Good Karma:</header>
@@ -2092,8 +2099,15 @@
 </div>
 
 <div class='sheet-gear'>
-    <div class="nuyen-total">
-    	<div class="SRH3">Nuyen:</div><input type="number" style="width:200px;" name="attr_nuyen" value=0>
+    <input type="hidden" class="gear-tabs-switch" name="attr_geartab" value="gear">
+    <div class="gear-tabs">
+    	<input type="hidden" class="gear-tabs-switch" name="attr_geartab" value="gear">
+    	<input type="hidden" class="gear-tabs-switch" name="attr_geartab" value="gear">
+    	<button class="gear-tabs-gear" type="action" name="act_gear-tab" data-i8n="gear-uppercase" data-i18n-title="gear" title="Gear">GEAR</button>
+    	<button class="gear-tabs-credsticks" type="action" name="act_credsticks-tab" data-i8n="credsticks-uppercase" data-i18n-title="credsticks" title="credsticks">CREDSTICKS</button>
+    	<button class="gear-tabs-vehiclelist" type="action" name="act_vehiclelist-tab" data-i8n="vehicles-list-uppercase" data-i18n-title="vehilces-owned-by-character" title="Vehicles Owned by Character">Vehicles List</button>
+	<div></div>
+    	<div class="nuyen-total"><div class="SRH3">Nuyen:</div><input type="number" style="width:200px;" name="attr_nuyen" value=0></div>
     </div>
     <div class="gear">
         <div class="SRH3" data-i18n="gear">Gear</div>
@@ -2135,7 +2149,7 @@
             </div>
         </fieldset>
     </div>
-    <br>
+    <div class="credsticks-show">
     <div class="SRH3" data-i18n="credsticks" >Credsticks &#165;</div>
     <div class="credsticks">
             <header data-i18n="type" class="table-top-left">Type</header>
@@ -2169,7 +2183,7 @@
     	    <div class="table-item"><input type="text" class="myweapontxt" name="attr_notes"></div>
 	    </div>
 	</fieldset>
-    <br>
+	</div>
     <div class="vehicles-list">
         <div class="SRH3" data-i18n="vehicles-list">Vehicles List</div>
         <div class="table-top" data-i18n="vehicles-skill-message" >Vehicle Details and Skill rating go on sepperate Vehicle Character Sheet</div>
@@ -4327,12 +4341,57 @@ buttonlist.forEach(button => {
     });
 });
 
+const geartabs = ["gear", "credsticks", "vehiclelist"];
+geartabs.forEach(tab => {
+    button=tab + "-tab";
+    console.log(button)
+    on(`clicked:${button}`, function() {
+        setAttrs({ geartab: tab });
+    });
+});
+
 const magictabs = ["astral", "skills", "adept", "conjuring", "geas", "totem", "initiate", "foci", "spells"];
 magictabs.forEach(magic => {
     button=magic + "-tab";
     console.log(button)
     on(`clicked:${button}`, function() {
         setAttrs({ magictab: magic });
+    });
+});
+
+const combattabs = ["skills", "ranged", "melee", "explosives", "armor", "ammunition"];
+combattabs.forEach(tab => {
+    button=tab + "-tab";
+    console.log(button)
+    on(`clicked:${button}`, function() {
+        setAttrs({ combattab: tab });
+    });
+});
+
+const riggertabs = ["rcdeck", "subscriber", "skill"];
+riggertabs.forEach(tab => {
+    button=tab + "-tab";
+    console.log(button)
+    on(`clicked:${button}`, function() {
+        setAttrs({ combattab: tab });
+    });
+});
+
+const waretabs = ["cyberware", "bioware", "nanoware"];
+waretabs.forEach(tab => {
+    button=tab + "-tab";
+    console.log(button)
+    on(`clicked:${button}`, function() {
+        setAttrs({ waretab: tab });
+    });
+});
+
+const deckingtabs = ["skills", "cyberdeck", "utilities"];
+deckingtabs.forEach(tab => {
+    button=tab + "-tab";
+    console.log(button)
+    on(`clicked:${button}`, function() {
+        setAttrs({ deckingtab: tab });
     });
 });
 
@@ -5624,30 +5683,27 @@ on('clicked:matrixattack', (info) => {
 	});
 
    	const conjuring = function (myid, spirittype="spirit", force="ask", name="none") {
+		console.log('spirittype: ' + spirittype);
 		const atts=["charisma_max", "magic-type", "magic", "summoning", "banishing", "spiritcontrol", "character_name"]
 		getAttrs(atts, function(myval) {
 			if ( name == "none" ) { 
 				name = (spirittype)? spirittype : "spirit";
 			}
 			const mycharisma=myval["charisma_max"];
+		    	const actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
+			const calcDrainDice=mycharisma + " + ?{Conjuring Dice for Drain?|0} + ?{Spirit Focus Dice}";
+			const myskill = parseInt(myval[myid]);
+		 	var calcDrainTN = (force=="ask")? "?{Force?}" : force;
+			var calcDice= myskill + " + ?{Spirit Focus Dice} + ?{Are you the summoner of the spirit?|Yes," + mycharisma + "|No,0}"
 		 	var calcTN;
-		 	var calcDrainTN;
-			var calcDice= parseInt(myval[myid]) + " + ?{Spirit Focus Dice} + ?{Are you the summoner of the spirit?|Yes," + mycharisma + "|No,0}"
-			var action;
 			if (myid == "summoning" ) {
-				calcDice= parseInt(myval[myid]) + " - ?{Conjuring Dice for Drain?} + ?{Spirit Focus Dice}";
+				calcDice= myskill + " - ?{Conjuring Dice for Drain?} + ?{Spirit Focus Dice}";
 				calcTN = (force=="ask")? "?{Force?}" : force;
-				calcDrainTN = (force=="ask")? "?{Force?}" : force;
-				action= (force =="ask")? "Conjure Force ?{Force?} Spirit" : "Conjure Force " + force + " Spirit";;
-
 			} else {
 				calcTN="@{target|Target|force}";
-		    		let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-				action= actionname + " Force @{target|Target|force} Spirit";
 			}
-			var calcDrainDice=mycharisma + " + ?{Conjuring Dice for Drain?|0} + ?{Spirit Focus Dice}";
 			var myroll="&{template:conjure}{{myname=" + myval["character_name"] + "}}";
-			myroll+="{{draindamage=[[0]]}}"
+			myroll+="{{draindamage=[[0]]}}{{finaldrain=[[0]]}}";
 			if (myid == "summoning" )  {
 				if (force=="ask") myroll+="{{spiritforce=[[?{Force?|1}]]}}"
 				else myroll+="{{spiritforce=[[" + force + "]]}}";
@@ -5656,35 +5712,45 @@ on('clicked:matrixattack', (info) => {
 			}
 			else  { 
 				myroll+="{{spiritforce=[[  @{target|Target|force} ]]}}"
+				myroll+="{{spirittype=Spirit}}";
 				myroll+="{{spellpool=[[?{Spell Pool Dice|0} + ?{Drain Pool Dice|0}]]}}";
 			}
-			myroll+="{{spellname=" + action + "}}";
+			myroll+="{{spellname=" + actionname + "}}{{skill=[[" + myskill + "]]}}";
 			myroll+="{{spiritdice=[[?{Spirit Focus Dice|0}]]}}";
-			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 			if (myid == "summoning" ) { 
 				myroll+="{{draintn=[[" + calcDrainTN + "]]}}";
 			 	myroll+="{{draindice=[[" + calcDrainDice + "]]}}";
+				myroll+="{{conjuredicedrain=[[?{Conjuring Dice for Drain?}]]}}";
 				myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
 			}
+			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			if (myid == "banishing" ) myroll += "{{resist=[Resist Banish](~@{target|Target|character_name}|resistbanish)}}"
 			console.log(myroll);
         		startRoll(myroll, (results) => {
-			const spiritforce=results.results.spiritforce.result;
-			var finaldrain;
-			if ( spiritforce <= (mycharisma/2)) finaldrain="L";
-			else if ( spiritforce <= mycharisma ) finaldrain="M";
-			else if ( spiritforce >= ( mycharisma * 1.5 ) ) finaldrain="D";
-			else finaldrain="S";
-			if (  spiritforce <= myval["magic"] ) finaldrain.concat("(s)");
-			console.log('roll')
-			console.log(results.results.rolldice.result);
-			console.log('tn')
-			console.log(results.results.targetnumber.result);
-			finishRoll( results.rollId, {
-				draindamage: finaldrain,
-			});
+			if (myid == "summoning") {
+				const spiritforce=results.results.spiritforce.result;
+				var basedrain;
+				if ( spiritforce <= (mycharisma/2)) basedrain="L";
+				else if ( spiritforce <= mycharisma ) basedrain="M";
+				else if ( spiritforce >= ( mycharisma * 1.5 ) ) basedrain="D";
+				else basedrain="S";
+				if (  spiritforce <= myval["magic"] ) basedrain.concat("(stun)");
+				var dmgnumber = damagetable[basedrain];
+				console.log('dmgnumber: ' + dmgnumber);
+				const staging = Math.floor(results.results.draintest.result / 2)
+				console.log('staging: ' + staging);
+				const conjuredicefinal=results.results.skill.result - results.results.conjuredicedrain.result;
+				dmgnumber -= staging;
+				const stageddrain=damagetable[dmgnumber];
+				finishRoll( results.rollId, {
+					draindamage: basedrain,
+					finaldrain: stageddrain,
+				});
+			} else {
+				finishRoll( results.rollId, {});
+			}
 		});
 	});
 
@@ -5701,16 +5767,18 @@ on('clicked:matrixattack', (info) => {
 		var source=info['sourceAttribute'].split('_');
 		var sourceattr=source.pop();
 		const myrepeat=source.join('_').concat('_');
-		const attributes=["name", "force", "spirit-type"];
+		const attributes=["name", "force", "type"];
 		attributes.forEach( attr=> {
 			atts.push(myrepeat + attr);
 		});
 		console.log(atts);
 		getAttrs(atts, function(myval) {
+			console.log(myval);
 			var name=myval[myrepeat + "name"];
 			if (!name) name="none";
 			const force=parseInt(myval[myrepeat + "force"]);
-			const spirittype=myval[myrepeat + "spirit-type"];
+			const spirittype=myval[myrepeat + "type"];
+			console.log('spirit-type: ' + spirittype);
 			conjuring("summoning", spirittype, force, name);
 		});
 	});
@@ -7714,7 +7782,7 @@ var setmatrixsystem = function (rating) {
         setAttrs(atts);
 };
 
-    on("sheet:opened", function(){
+    on("sheet:opened changed:api-newsheet", function(){
         getAttrs(["first_time"], function(myval){
             if (myval.first_time != "false") {
                 console.log('running firstime');
@@ -8310,10 +8378,12 @@ on("change:repeating_explosives:exptype", function(eventinfo){
     });
 };
 
-on("change:combatpool-mods change:armor-combatpool-pen change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base change:gyro-on", function () {
+on("sheet:opened change:combatpool-mods change:armor-combatpool-pen change:combatpool-base change:spellpool-mods change:spellpool-base change:hackingpool-mods change:hackingpool-base change:controlpool-mods change:controlpool-base change:astralpool-mods change:astralpool-base change:gyro-on", function () {
 	sets={};
 	atts=["combatpool-mods", "combatpool-base", "armor-combatpool-pen","spellpool-mods", "spellpool-base", "hackingpool-mods", "hackingpool-base", "controlpool-mods", "controlpool-base", "astralpool-mods", "astralpool-base", "gyro-on"]
 	getAttrs(atts, function (myval) {
+		console.log('pool setup atts');
+		console.log(myval);
 		if ( myval["gyro-on"] == 1 ) sets["combatpool"] = Math.floor(( parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]) ) / 2);
 		else sets["combatpool"] = parseInt(myval["combatpool-mods"]) + parseInt(myval["combatpool-base"]) + parseInt(myval["armor-combatpool-pen"]);
 		sets["spellpool"] = parseInt(myval["spellpool-mods"]) + parseInt(myval["spellpool-base"]);
@@ -8341,7 +8411,7 @@ var updatepools = function() {
         var myint = parseInt(myval.intelligence_max);
         var mychar = parseInt(myval.charisma_max);
         var mybody = parseInt(myval.body_max);
-	
+	console.log('combat pool agil ' + myagil + ' int ' + Math.max(myint,myperception) + ' will ' + mywill);	
         myatts["combatpool-base"]= Math.floor((myagil + Math.max(myint,myperception) + mywill)/2);
 
         if (myval.sheettype != "Spirit" ) myatts["reaction"] = Math.floor((myagil + myint)/2);
@@ -8371,13 +8441,14 @@ var updatepools = function() {
 	} else {
 	    	myatts["controlpool-base"] = 0;
 	}
-
+	console.log('setting update pool');
+	console.log(myatts);
         setAttrs(myatts);
     });
 };
 
 var setupdefaults = function() {
-    setAttrs({sheettype: "Character", targetMove: -1, charisma_max: 1, strength_max: 1, willpower_max: 1, body_max: 1, quickness_max: 1, intelligence_max: 1, attr_rangedTN: 0, attr_meleeTN: 0, attr_misccombatmods: 0, signature: 4 })
+    setAttrs({ targetMove: -1, charisma_max: 1, strength_max: 1, willpower_max: 1, body_max: 1, quickness_max: 1, intelligence_max: 1, attr_rangedTN: 0, attr_meleeTN: 0, attr_misccombatmods: 0, signature: 4 })
 };
 
 var updatePenalty = function(attribute) {
@@ -8459,8 +8530,9 @@ var setattributelimits = function(metatype) {
 var updateMeleeTNs = function() {
     getAttrs(["meleevizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen"], function(myval) {
         console.log("updateMeleeTN")
+	console.log(myval);
         targetNumberMelee = parseInt(myval.calledshot) + parseInt(myval.meleevizTN) + parseInt(myval.enemies) - parseInt(myval.friends) + parseInt(myval.misccombatmods) + ( 2 * parseInt(myval.meleetargets) ) - parseInt(myval.position) + parseInt(myval.stun_pen) + parseInt(myval.wound_pen);
-        console.log(targetNumberMelee)
+        console.log('meleeTN ' + targetNumberMelee)
         setAttrs({meleeTN: targetNumberMelee});
     });
 };
@@ -8468,6 +8540,7 @@ var updateMeleeTNs = function() {
 
 var updateRangeTNs = function() {
     getAttrs(["rangedvizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen", "manualgunneryTN" ], function(myval) {
+	console.log(myval);
         var sets={};
 	console.log('updating ranged tn');
     	const move=parseInt(myval.move);
@@ -8485,6 +8558,7 @@ var updateRangeTNs = function() {
 	mytargetMove = (move == 0)? -1 : (move ==4)? 2: (move ==6)? 2: 0;
 	sets["rangedTN"]=targetNumberRange;
 	sets["targetMove"]=mytargetMove;
+	console.log('sets');
 	console.log(sets);
         setAttrs(sets);
 
@@ -8630,7 +8704,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
    
    on("change:spirit-type change:force", function() {
    	getAttrs(["spirit-type", "sheettype", "force"], function(myval) {
-		var atts=[];
+		var atts={};
 		const sheettype=myval["sheettype"];
 		const spirittype=myval["spirit-type"];
 		const F=parseInt(myval["force"]);
@@ -8659,6 +8733,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 			atts["attackpower"]=eval(spirits[spirittype]["attackpower"]); 
 			atts["attackdamage"]=spirits[spirittype]["attackdmg"]; 
 			const powers=spirits[spirittype]["powers"];
+			console.log(atts);
 			getSectionIDs("critter-powers", function(idarray) {
 				idarray.forEach(id=>{
 					removeRepeatingRow("repeating_critter-powers_" + id);
@@ -8683,7 +8758,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 					atts["repeating_critter-powers_" + newrowid + "_name"  ] = power;
 				});
 			};
-			console.log(atts);
+			console.log('setting atts ');
+			console.log(JSON.stringify(atts));
 			setAttrs(atts);
 
 		}
@@ -8786,14 +8862,13 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 
 <rolltemplate class="sheet-rolltemplate-conjure">
     <div class="sheet-rtcontainer">
-        <div class="sheet-rtheader">{{myname}}: {{spellname}} vs. {{targetofspell}}</div>
-        <div class="sheet-rtrow">Rolling: {{computed::rolldice}}d6 vs. {{targetnumber}} = {{casttest}}</div>
-        {{#spelldamage}}<div class="sheet-rtrow">Force: {{castforce}} Damage: {{computed::spelldamage}} </div>{{/spelldamage}}
-        {{#sorcerydice}}
+        <div class="sheet-rtheader">{{myname}}: {{spellname}} {{spiritforce}} {{spirittype}}</div>
+        <div class="sheet-rtrow">Rolling: {{rolldice}}d6 vs. {{targetnumber}} = {{casttest}}</div>
+        {{#conjuredice}}
 	<div class="sheet-conjure-resist-table">
-		<div>Dice</div><div></div><div>Sorcery</div><div></div><div>Pool</div>
-		<div>Used</div><div></div><div>{{sorcerydice}}</div><div></div><div>{{#spellpool}}{{spellpool}}{{/spellpool}}</div>
-	</div>{{/sorcerydice}}
+		<div>Total</div><div></div><div>Summon</div><div></div><div>Drain</div>
+		<div>{{skill}}</div><div></div><div>{{computed::skill}}</div><div></div><div>{{conjuredicedrain}}</div>
+	</div>{{/conjuredice}}
         {{#roll}}<div class="sheet-rtrow">Casting Test: {{computed::cast}} {{computed::roll}}</div>{{/roll}}
         {{#draintest}}
 	<div class="sheet-conjure-resist-table">
@@ -8804,17 +8879,6 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#description}}<div class="rtrow">{{description}}</div>{{/description}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
         {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
-        {{#resist}}<div class="sheet-rtrow">{{targetofspell}}: {{resist}}</div>{{/resist}}
-        {{#defensetest}}<div class="sheet-conjure-resist-table">
-		<div>Attack</div><div></div><div>Defense</div><div></div><div>Result</div>
-		<div>{{attacks}}</div><div>-</div><div>{{casttest}}</div><div>=</div><div>{{computed::defensetest}}</div>
-	</div>{{/defensetest}}
-        <div class="sheet-rtrow">{{#spelldefense}}[Spell Defense](~selected|spelldefense||{{computed::senddata}}){{/spelldefense}}
-        {{#casttest}}{{targetofspell}}:
-	{{#dodge}}[Dodge](~{{targetofspell}}|dodge||{{computed::senddata}}){{/dodge}}
-	[Resist](~{{targetofspell}}|{{resisttype}}||{{computed::senddata}})
-	</div>{{/casttest}}
-        {{#roll}}<div class="sheet-rtrow">{{targetofspell}}: [AOE](~selected|checkaoe||{{computed::senddata}})</div>{{/roll}}
     </div>
 </rolltemplate>
 <rolltemplate class="sheet-rolltemplate-spell">
