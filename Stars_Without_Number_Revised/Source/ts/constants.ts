@@ -21,7 +21,7 @@ const shipStatEvent = [
 const weaponSkills = [
     "skill_exert", "skill_punch", "skill_shoot", "skill_stab", "skill_combat_energy",
     "skill_combat_gunnery", "skill_combat_primitive", "skill_combat_projectile",
-    "skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis"
+    "skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis", "skill_sunblade"
 ];
 const weaponDisplayEvent = [
     ...["attack", "name", "skill_bonus", "attribute_mod", "damage", "shock", "shock_damage",

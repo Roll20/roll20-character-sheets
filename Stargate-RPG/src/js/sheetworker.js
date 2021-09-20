@@ -1,6 +1,6 @@
 
 //current sheet version
-const currentversion = "1.73";
+const currentversion = "1.75";
 
 const int = score => parseInt(score, 10) || 0;
 
