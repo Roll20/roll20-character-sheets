@@ -101,7 +101,6 @@
     <input type='hidden' name='attr_wp-matrix' value="(@{stun_pen} + @{wound_pen} + @{matrix-penalty})" />
     <input type='hidden' name='attr_wp-vehicle'
         value="(@{vehicle-penalty} +@{rccommand-penalty} + @{rcsimsense-penalty} +@{rcsystem-penalty})" />
-    <input type='hidden' name='attr_ask-range' value="?{Range|Short,4|Medium,5|Long,6|Extreme,9}" />
     <button type="action" name="act_init-aug" class="d6-button" title="Augmented Initiative">L</button>
     <button type="action" name="act_endturn" class="d6-button" title="End Combat Turn">L</button>
     <button type="action" name="act_resistroll" class="d6-button" title="Resist Roll">L</button>
@@ -4610,7 +4609,15 @@ deckingtabs.forEach(tab => {
    	lang["are-you-the-summoner"] = getTranslationByKey("are-you-the-summoner");
    	lang["additional-modifiers"] = getTranslationByKey("additional-modifiers");
    	lang["successes-from-hiding-test"] = getTranslationByKey("successes-from-hiding-test");
+   	lang["urban-setting"] = getTranslationByKey("urban-setting");
    	lang["icon"] = getTranslationByKey("icon");
+   	lang["ic-rating"] = getTranslationByKey("ic-rating");
+   	lang["light"] = getTranslationByKey("light");
+   	lang["moderate"] = getTranslationByKey("moderate");
+   	lang["serious"] = getTranslationByKey("serious");
+   	lang["damage"] = getTranslationByKey("damage");
+   	lang["wound-level"] = getTranslationByKey("wound-level");
+   	lang["utility-rating"] = getTranslationByKey("utility-rating");
    	lang["yes"] = getTranslationByKey("yes");
    	lang["no"] = getTranslationByKey("no");
    	lang["miscellaneous-modifiers"] = getTranslationByKey("miscellaneous-modifiers");
@@ -4651,6 +4658,7 @@ deckingtabs.forEach(tab => {
    	lang["attack-power"] = getTranslationByKey("attack-power");
    	lang["attack-type"] = getTranslationByKey("attack-type");
    	lang["distance-from-explosive-in-meters"] = getTranslationByKey("distance-from-explosive-in-meters");
+   	lang["how-many-additional-enemy-vehicles"] = getTranslationByKey("how-many-additional-enemy-vehicles");
    	lang["normal"] = getTranslationByKey("normal");
    	lang["elemental"] = getTranslationByKey("elemental");
    	lang["adps"] = getTranslationByKey("adps");
@@ -4663,6 +4671,10 @@ deckingtabs.forEach(tab => {
    	lang["missed-msg"] = getTranslationByKey("missed-msg");
    	lang["verification-system-rating"] = getTranslationByKey("verification-system-rating");
    	lang["operator"] = getTranslationByKey("operator");
+   	lang["short"] = getTranslationByKey("short");
+   	lang["medium"] = getTranslationByKey("medium");
+   	lang["long"] = getTranslationByKey("long");
+   	lang["extreme"] = getTranslationByKey("extreme");
    	lang["rigger"] = getTranslationByKey("rigger");
    	lang["spell-resistance-test"] = getTranslationByKey("spell-resistance-test");
    	lang["set-vehicle-operator"] = getTranslationByKey("set-vehicle-operator");
@@ -4884,10 +4896,10 @@ deckingtabs.forEach(tab => {
 			const pool=mypool + "pool";
 			console.log('start roll for ' + skill);
 			var calcDice= rating;
-			if ( mypool != "none" ) calcDice += " + ?{" + poolname + " Pool Dice?}";
+			if ( mypool != "none" ) calcDice += " + ?{" + lang[poolname + "-pool-dice"] + "?}";
 			const calcTN="?{" + lang["target-number"] +"?|4} + @{stun_pen} + @{wound_pen}";
 			var myroll="&{template:skill} {{skill=" + skill + "}}{{myname=" + myval["character_name"] +  "}}";
-			if ( mypool != "none" ) myroll += "{{pooldice=[[?{" + poolname + " Pool Dice?|0}]]}}{{poolname=" + poolname + " Pool}}";
+			if ( mypool != "none" ) myroll += "{{pooldice=[[?{" + lang[poolname + "-pool-dice"] + "?|0}]]}}{{poolname=" + lang[poolname + "-pool"] + "}}";
 			myroll +="{{targetnumber=[[ " + calcTN + " ]]}}{{rolldice=[[ " + calcDice + " ]]}}";
 			myroll += "{{result=[[ [[ " + calcDice + " ]]d6>[[{2,( " + calcTN + " )}kh1]]!!} ]]}}";
                 	startRoll(myroll, (results) => {
@@ -5117,8 +5129,8 @@ deckingtabs.forEach(tab => {
 			attacktype=payload["attacktype"];
 			attacker=payload["attacker"];
 			if (( attacktype == "Tar Baby") || (attacktype == "Tar pit" )) {
-				calcDice="?{Utility Rating?|" + basetn  + "} + ?{" + lang["hacking-pool-dice"] + "|0}";
-				calcTN= "?{IC Rating?|" + power + "}";
+				calcDice="?{" + lang["utility-rating"] + "?|" + basetn  + "} + ?{" + lang["hacking-pool-dice"] + "|0}";
+				calcTN= "?{" + lang["ic-rating"] + "?|" + power + "}";
 			} else {
 				calcDice="@{deck-bod-final} + ?{" + lang["hacking-pool-dice"] + "|0}";
 				calcTN= "?{" + lang["attack-power"] +"?|" + power + "} - @{deckarmor-rating-final}";
@@ -5198,13 +5210,13 @@ on('clicked:matrixattack', (info) => {
 		console.log(info);
 		const myid=info["htmlAttributes"]["id"]
 		const mytitle=info["htmlAttributes"]["title"]
-		var calcTN="?{Wound Level?|Light,4|Moderate,5|Serious,6}";
+		var calcTN="?{" + lang["wound-level"] + "?|" + lang["light"] + ",4|" + lang["moderate"] + ",5|" + lang["serious"] + ",6}";
 		var calcDice="@{deckmedic-rating-final}" 
         	var myroll="&{template:matrix}"
 		myroll+="{{action=Medic Utility}}" 
 		myroll+="{{rolldice=[[" + calcDice + "]]}}"
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+="{{myname=@{character_name}}}{{target=?{Wound Level?} Damage}}{{hackingpool=Not Available}}"
+		myroll+="{{myname=@{character_name}}}{{target=?{" + lang["wound-level"] + "?}" + lang["damage"] + "}}{{hackingpool=Not Available}}"
 		myroll+="{{utilitylevel=@{deckmedic-rating-final}}}" 
 		myroll+="{{roll= [[ [[ " + calcDice + "]]d6>[[ {2,( " + calcTN + ")}kh1 ]]!! ]] }}"
 		console.log(myroll);
@@ -5311,13 +5323,12 @@ on('clicked:matrixattack', (info) => {
 			console.log('2x: ' + my2x);
 			console.log('Drain: ' + drainlvl);
 		
-			var calcDice="@{magic} + ?{"+ lang["spell-pool-dice"] +"}";
+			var calcDice="@{magic}";
 			var calcTN="ceil(@{" + myid + "}/2 )";
 			var calcDrainTN="ceil((@{" + myid + "} + @{adept" + myid + "boost} ) /2 )";
-			var calcDrainDice="@{willpower|max} + ?{Drain Pool Dice}";
+			var calcDrainDice="@{willpower|max}";
 
 			var myroll="&{template:adept}{{myname=@{character_name}}}";
-			myroll+="{{spellpool=[[?{"+ lang["spell-pool-dice"] +"|0} + ?{Drain Pool Dice|0}]]}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 			myroll+="{{targetofspell=@{" + uppermyid + "}}}";
@@ -5416,7 +5427,7 @@ on('clicked:matrixattack', (info) => {
 
 			}
 			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
-			var calcDrainTN="floor(?{Force?}/2) + " + drain + " + ( 2 * @{spellsus} )";
+			var calcDrainTN="floor(?{" + lang["force"] + "?}/2) + " + drain + " + ( 2 * @{spellsus} )";
 			var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}";
 			myroll+="{{senddata=[[0]]}}";
 			myroll+="{{draindamage=[[0]]}}{{finaldrain=[[0]]}}";
@@ -5425,7 +5436,7 @@ on('clicked:matrixattack', (info) => {
 			myroll+="{{spellname=" + name + "}}";
 			myroll+="{{description=" + description +"}}";
 			myroll+="{{spelldamage=[[" + damage + "]]}}"
-			myroll+="{{castforce=[[?{Force?|" + force + "}]]}}";
+			myroll+="{{castforce=[[?{" + lang["force"] + "?|" + force + "}]]}}";
 			myroll+="{{targetofspell=" + targetofspell + "}}";
 			myroll+="{{rolldice=[[" + calcDice + "]]}}";
 			myroll+="{{cast=[[0]]}}";
@@ -6071,7 +6082,7 @@ on('clicked:matrixattack', (info) => {
 		console.log("clicked dispell");
 		var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
 		var calcTN="?{" + lang["force-of-spell"] + "?}";
-		var calcDrainTN="floor( ?{Force of Spell?}/2) + ( 2 * @{spellsus} )";
+		var calcDrainTN="floor( ?{" + lang["force-of-spell"] + "?}/2) + ( 2 * @{spellsus} )";
 		var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?} +?{Drain Modifier?|0}";
 		var myroll="&{template:spell}{{myname=@{character_name}}}";
 		myroll+="{{sorcerydice=[[?{"+ lang["sorcery-dice"] +"?|@{spellcasting}} + ?{" + lang["sorcery-dice-for-drain"] + "?|0}]]}}";
@@ -6150,7 +6161,7 @@ on('clicked:matrixattack', (info) => {
 
 	
 	on('clicked:vehicledriving', (info) => {
-		    calcTN="@{handling} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} - @{driving-test-interface} +@{driving-test-weather} +@{driving-test-terrain} +@{driving-test-size} +?{Additional Modifiers|0}";
+		    calcTN="@{handling} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} - @{driving-test-interface} +@{driving-test-weather} +@{driving-test-terrain} +@{driving-test-size} +?{" + lang["miscellaneous-modifiers"] + "|0}";
 		    calcDice="[[@{vehicle-skill-final} + @{driving-test-autonav} + ?{" + lang["control-pool-dice"] + "?}]]"
 		    var myroll="&{template:vehicle}{{type=Driving Test}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
 		    myroll += "{{targetnumber=[[" + calcTN + "]]}}"
@@ -6164,7 +6175,7 @@ on('clicked:matrixattack', (info) => {
 	});
 
 	on('clicked:vehiclesensor', (info) => {
-		    calcTN="[[{2,(@{target|" + lang["target"] +"|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{Additional Modifiers|0})}kh1]]";
+		    calcTN="[[{2,(@{target|" + lang["target"] +"|signature} +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban} +?{" + lang["miscellaneous-modifiers"] + "|0})}kh1]]";
 		    calcDice="[[@{sensors-rating}]]";
 		    calcDiceECD="[[@{ecd-rating} * @{ecd-enabled} ]]";
 		    var myroll="&{template:vehicle}{{type=Sensor Test}}{{character=@{character_name}}}";
@@ -6235,7 +6246,7 @@ on('clicked:matrixattack', (info) => {
 		    var myaction = myaction.charAt(0).toUpperCase() + myaction.slice(1);
 		    var autonav="@{autonav}";
 		    var vcr = "@{vehicle-actionbonus}";
-		    var miscmods="?{How many additional enemy vehicles?";
+		    var miscmods="?{" + lang["how-many-additional-enemy-vehicles"] + "?}";
 		    var speeding=1;
 		    var vmbelow10=4;
 		    var vmbelow00=2;
@@ -6254,7 +6265,7 @@ on('clicked:matrixattack', (info) => {
 	            }
 		    else if ( myaction =="Relocate" ) {
 		    	myterrain="driving-relocate-terrain";
-		    	miscmods="?{Successes from Hiding Test?";
+		    	miscmods="?{" + lang["successes-from-hiding-test"] + "?}";
 		    	speeding=2;
 			vcr=0;
 		        autonav="( @{autonav} * -1)";
@@ -6346,7 +6357,7 @@ on('clicked:matrixattack', (info) => {
 		var calcDice="@{" + mymap[mytype]["dice"]  + "}";
 		calcTN="@{target|" + lang["target"] +"|" + mymap[mytype]["target"] + "}";
 		if (mytype=="sonar" ) calcTN+=" +@{wp-vehicle} +@{sensor-test-los}  +@{sensor-test-weather} +@{sensor-test-terrain} +@{vehicle-urban}";
-		calcTN += "+?{Additional Modifiers|0}";
+		calcTN += "+?{" + lang["miscellaneous-modifiers"] + "|0}";
 		myroll="&{template:vehicle}{{type=" + mytitle + "}}{{character=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN  + "]]}}";
 		myroll+="{{roll=[[ [[ " + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!!]]}}";
@@ -6531,19 +6542,20 @@ on('clicked:matrixattack', (info) => {
 			   pool="combatpool";
 			}
 
-			calcTN += " + ?{Additional Modifiers|" + tnmods + "} + " + recoil;
+			calcTN += " + ?{" + lang["miscellaneous-modifiers"] + "|" + tnmods + "} + " + recoil;
 			calcTN += " ]]"
 
-			var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + poolname + " Pool Dice|0}"
+			var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + lang[poolname + "-pool-dice"]+"|0}"
 			if ( mymode == "vehiclesensor" ) calcDice += " + " + Math.floor(vehiclesensors / 2 )
 			calcDice += " ]]"
 
 
                 	var roll="&{template:attack}{{myname=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}";
-			roll += "{{rounds=[[" + rounds + "]]}}{{range=[[@{ask-range}]]}}"; 
+			roll += "{{rounds=[[" + rounds + "]]}}{{range=[[?{" + lang["range"] + "|" + lang["short"] + ",4|" + lang["medium"] + ",5|" + lang["long"] + ",6|" + lang["extreme"] + ",9}]]}}";
+
 			roll += "{{targetnumber=" + calcTN + " }}{{rolldice=" + calcDice + "}}";
 			roll += "{{weaponname=" + myweapon + "}}{{weapondamage=[[" + dmgnumber  + "]]}}{{weaponpower=[[" + wpower + "]]}}";
-			roll += "{{" + pool + "=[[?{" + poolname + " Pool Dice}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}";
+			roll += "{{" + pool + "=[[?{" + lang[poolname + "-pool-dice"] +"}]]}}{{weaponname=" + myweapon + "}}{{ammotype=" + ammotype  + "}}";
 			roll += "{{attacktest=[[ " + calcDice + "d6>[[ {2, " + calcTN + "}kh1 ]]!! ]] }}";
 			if ( mymode == "rangedattack" )  {
 				roll += "{{dodge=[Dodge](~@{target|" + lang["target"] +"|token_name}|dodge)}}";
@@ -6930,21 +6942,21 @@ on('clicked:matrixattack', (info) => {
 			const targetaim= myval[myrepeat.concat("targeting")];
 			const tnmods= myval[myrepeat.concat("tnmods")];
 			var dmgnumber= damagetable[wdmg];
-			var range="{{range=[[?{Range|Short,4|Medium,5|Long,6|Extreme,9}]]}}";
+			var range="{{range=[[?{" + lang["range"] + "|" + lang["short"] + ",4|" + lang["medium"] + ",5|" + lang["long"] + ",6|" + lang["extreme"] + ",9}]]}}";
 			var missleintel=0;
 			var calcTN;
 			if ( mymode=="sensorexp") { 
 				range="";
 				missleintel=myval[myrepeat.concat("missleint")] || 0;
 				expint="{{expint=[[" + missleintel + "]]}}"
-				calcTN="[[ @{target|" + lang["target"] +"|signature} + ?{Urban Environment?|Yes,2|No,0} + @{wp-char}";
+				calcTN="[[ @{target|" + lang["target"] +"|signature} + ?{" + lang["urban-setting"] + "?|" + lang["yes"] + ",2|" + lang["no"] + ",0} + @{wp-char}";
 				poolname="Combat";
 				pool="combatpool";
 			} else if ( mymode=="vehicle-sensorexp" )  {
 				range="";
 				missleintel=myval[myrepeat.concat("missleint")] || 0;
 				expint="{{expint=[[" + missleintel + "]]}}"
-				calcTN="[[ @{target|" + lang["target"] +"|signature} + ?{Urban Environment?|Yes,2|No,0} + @{wp-vehicle} + @{gunnery-test-los}";
+				calcTN="[[ @{target|" + lang["target"] +"|signature} + ?{" + lang["urban-setting"] + "?|" + lang["yes"] + ",2|" + lang["no"] + ",0} + @{wp-vehicle} + @{gunnery-test-los}";
 				poolname="Control";
 				pool="controlpool";
 			} else if ( mymode=="vehicle-explosive" ) {
@@ -6968,8 +6980,8 @@ on('clicked:matrixattack', (info) => {
 					finishRoll( results.rollId,{});
 				});
 			} else {
-			   var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + poolname + " Pool Dice|0} + " + missleintel + " ]]"
-			   calcTN += " + ?{Additional Modifiers|" + tnmods + "} ]]"
+			   var calcDice = "[[ " + myskill + " + " + specialized + " + ?{" + lang[poolname + "-pool-dice"] + "|0} + " + missleintel + " ]]"
+			   calcTN += " + ?{" + lang["miscellaneous-modifiers"] + "|" + tnmods + "} ]]"
                 	   var roll="&{template:explosive}{{mytoken=@{selected|token_id}}}{{myname=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}{{targettoken=@{target|" + lang["target"] +"|token_id}}}" + range
 			   roll += "{{rolldice=" + calcDice + "}}{{targetnumber=[[{2,( " + calcTN + ")}kh1]]}}";
 			   roll += "{{weapondamage=" + wdmg + "}}{{senddata=[[0]]}}";
@@ -7684,7 +7696,7 @@ on("change:deckattacklevel", function() {
 				ictest="@{target|decker|deck-detection-final}";
 				senddata="";
 			} else {
-				ictest="?{Utility Rating?|6}";
+				ictest="?{" + lang["utility-rating"] + "?|6}";
 			}
 			const payload = {
 				attacker: name,
@@ -7712,12 +7724,12 @@ on("change:deckattacklevel", function() {
 			if (( ictype == "Tar Baby") || (ictype == "Tar pit")) {
                 		myroll="/w gm &{template:matrix}{{myname=" + name + "}}";
 				myroll += "{{target=@{target|decker|token_name}}}";
-				myroll += "{{targetnumber=[[?{Utility Rating?|4}]]}}";
+				myroll += "{{targetnumber=[[?{" + lang["utility-rating"] + "?|4}]]}}";
 				myroll += "{{action=" + name + " Test}}";
 				myroll += "{{basetn=[[0]]}}";
 				myroll += "{{rolldice=[[ " + rating + "]]}}";
-				myroll += "{{roll=[[[[" + rating +" ]]d6>[[?{Utility Rating?} + " + penalty +"]]!!]]}}";
-				myroll += "{{oppose=[[[[?{Utility Rating?}]]d6>[[" + rating + " @{target|decker|matrix-penalty}]]!!]]}}";
+				myroll += "{{roll=[[[[" + rating +" ]]d6>[[?{" + lang["utility-rating"] + "?} + " + penalty +"]]!!]]}}";
+				myroll += "{{oppose=[[[[?{" + lang["utility-rating"] + "?}]]d6>[[" + rating + " @{target|decker|matrix-penalty}]]!!]]}}";
 				myroll += "{{sensor=[[[[@{target|decker|deck-sensors-final}]]d6>[[" + rating + " + @{target|decker|matrix-penalty} ]]!!]]}}";
 			}
 			console.log(myroll);
@@ -8429,7 +8441,7 @@ on("change:repeating_ic:ictype", function(eventinfo) {
 		console.log(mytype);
 		if (mytype=="Probe") sets[ictarget]="@{target|decker|deck-detection-final}";
 		else if (attackic.includes(mytype)) sets[ictarget]="Attack"; 
-		else if ((mytype=="Tar Baby") || (mytype=="Tar pit")) sets[ictarget]="?{Utility Rating?|4}";
+		else if ((mytype=="Tar Baby") || (mytype=="Tar pit")) sets[ictarget]="?{" + lang["utility-rating"] + "?|4}";
 		console.log(sets);
 		setAttrs(sets);
 	});
@@ -9133,7 +9145,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 			const mstatus=myval["matrix-status"];
 			var myroll="/w gm &{template:info}{{character=@{character_name}}}";
 			myroll+= (mstatus == "out")? "{{type=Jack In}}": "{{type=Jack Out}}";
-			myroll += "{{action=" lang["complex"] + "}}";
+			myroll += "{{action=" + lang["complex"] + "}}";
 			sets["matrix-status"]= (mstatus == "out")? "in" : "out";
                 	startRoll(myroll, (results) => {
 				setAttrs(sets);
