@@ -18,6 +18,8 @@ If "full defense" was chosen, the defender will also be presented with a "dodge"
 12. Resist and Dodge buttons presented after ranged attack roll template will pass value of original roll to dodge and resist rolls.
 13. Added translation tags for all html elements.  
 14. removed the use of case statements
+15. switched from show/hide buttons to tabs for sub tabs
+
 
 ### Impact on existing characters.
 none
@@ -26,6 +28,8 @@ none
 add knockdown test chat button after melee and ranged attacks.
 add shotgun ammo to ammo type list on repeating ranged weapons.
 add translation to sheet worker rolls.
+add opposition tests with payload for banish rolls
+add opposition tests with payload for spirit control rolls
 
 
 ## Release Notes 9/1/2021
