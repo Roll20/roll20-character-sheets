@@ -152,7 +152,7 @@ The last page of this sheet contains a number of important options:
 
 (4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-## Token Settings
+## Player Token Settings
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
@@ -160,13 +160,13 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turn using token actions.
+## Turn Tracker Token Settings
+
+We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. For full instructions on linking macros to tokens see the wiki at https://wiki.roll20.net/Linking_Tokens_to_Journals. For Hero System, I suggest making a new character called "Turn Token" or something similar. Assign its avatar to some kind of informative image such at the clock face below.
+
+![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
-
-Make a new character called "Turn Token" or something similar. Assign its avatar to some king of informative image such at the clock face below.
-
-![Hero Clock Token](/HeroSystem6eHeroic/images/Hero Clock Token.png)
 
 *Villain In Glasses, August 1, 2021.*
 
