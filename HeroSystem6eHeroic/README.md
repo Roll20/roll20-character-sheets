@@ -176,7 +176,7 @@ Create the following four macros:
 
 *Segment-Minus-1*: [[ 1 &{tracker:-} ]]
 
-Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities with these four macros and check them as token actions. You can spice the macros up so that they send flavor text to the chat message, but at the bare bones level, the new abilities need only look something like this:
+Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities with these four macros and check them as token actions. You can spice the macros up so that they send flavor text to chat, but at the bare bones level, the new abilities need only look something like this:
 
 ![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
 
