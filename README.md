@@ -2,9 +2,8 @@
   <a href="https://roll20.net">
     <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
   </a>
+  Roll20 Character Sheets
 </h1>
-
-# Roll20 Character Sheets
 
 Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming to the web the right way. Built on a powerful platform of tools, yet elegantly simple, it focuses on enhancing what makes tabletop gaming great: storytelling and camaraderie.
 
