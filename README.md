@@ -12,7 +12,7 @@ This repository consist of over 📜 **800 community contributed sheets**, from 
 
 ## Community Conduct
 
-The Roll20 Code of Conduct applies to your participation on this repository, and can be viewed in full here: https://help.roll20.net/hc/en-us/articles/360037254334-Community-Code-of-Conduct
+The [Roll20 Code of Conduct](https://help.roll20.net/hc/en-us/articles/360037254334-Community-Code-of-Conduct) applies to your participation on this repository.
 
 **tl;dr**
 
