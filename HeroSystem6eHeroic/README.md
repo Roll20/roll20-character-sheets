@@ -162,11 +162,14 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ## Turn Tracker Token Settings
 
-We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. For full instructions on linking macros to tokens see the wiki at https://wiki.roll20.net/Linking_Tokens_to_Journals. For Hero System, I suggest making a new character called "Turn Token" or something similar. Assign its avatar to some kind of informative image such at the clock face below.
+We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. For full instructions on linking macros to tokens see the wiki at https://wiki.roll20.net/Linking_Tokens_to_Journals. For Hero System, I suggest making a new character called "Turn Token" or something similar. Assign its avatar to some kind of informative image such at the clock face below. Drag it to the map to create a token.
 
 ![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
+
+Create four macros:
+[[ 1 &{tracker} ]]
 
 *Villain In Glasses, August 1, 2021.*
 
