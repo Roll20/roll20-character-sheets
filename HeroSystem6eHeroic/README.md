@@ -172,9 +172,9 @@ Create the following four macros:
 
 *Set-Segment-12*: [[ 12 &{tracker} ]]
 
-*Segment+1*: [[ 1 &{tracker:+} ]]
+*Segment-Plus-1*: [[ 1 &{tracker:+} ]]
 
-*Segment-1*: [[ 1 &{tracker:-} ]]
+*Segment-Minus-1*: [[ 1 &{tracker:-} ]]
 
 Follow the instructions in the wiki on *Linking Tokens To Journals* to create character abilities with these four macros and check them as token actions. 
 
