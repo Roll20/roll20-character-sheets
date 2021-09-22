@@ -1,6 +1,8 @@
-<a href="https://roll20.net" align="center" >
-  <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
-</a>
+<h1 align="center">
+  <a href="https://roll20.net">
+    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
+  </a>
+</h1>
 
 # Roll20 Character Sheets
 
