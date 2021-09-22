@@ -158,6 +158,12 @@ The last page of this sheet contains a number of important options:
 
 Roll20 tokens can display numeric values of three attributes as well as three status bars. Let me suggest the attributes *currentDCV,* *currentBODY,* and *currentEND* coupled with their maximum values as shown in the example settings dialog below. The hidden attribute *currentDCV* is presently equal to the character's DCV + Shield DCV Bonus - DCV Weight Penalty + DCV Modifier.
 
+![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
+
+![Hero Clock Token](/HeroSystem6eHeroic/images/Hero Clock Token.png)
+
+We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turn with token actions.
+
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
 *Villain In Glasses, August 1, 2021.*
