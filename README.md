@@ -1,8 +1,8 @@
-<a href="https://roll20.net">
-    <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20"" align="center" height="60" />
+<a href="https://roll20.net" align="center" >
+  <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
 </a>
 
-# 🎲 Roll20 Character Sheets
+# Roll20 Character Sheets
 
 Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming to the web the right way. Built on a powerful platform of tools, yet elegantly simple, it focuses on enhancing what makes tabletop gaming great: storytelling and camaraderie.
 
@@ -10,9 +10,18 @@ This repository is the collection of all the community-contributed character she
 
 This repository consist of over 📜 **800 community contributed sheets**, from over 🧑 **300 contributors**, who have written over ⌨️ **400,000 lines of code**. This is an 🦦 **otter**.
 
+## Community Conduct
+
+The Roll20 Code of Conduct applies to your participation on this repository, and can be viewed in full here: https://help.roll20.net/hc/en-us/articles/360037254334-Community-Code-of-Conduct
+
+**tl;dr**
+
+Following the Roll20 Code of Conduct means **no racism, no sexism, no hate speech, no backseat gaming, no personal attacks, no transphobia, no misgendering, no ableism, no anti-LGBTQIA+ sentiments (and so on) are allowed.**
+
 ## Table of Contents
 
-- [🎲 Roll20 Character Sheets](#-roll20-character-sheets)
+- [Roll20 Character Sheets](#roll20-character-sheets)
+  - [Community Conduct](#community-conduct)
   - [Table of Contents](#table-of-contents)
   - [Contributing](#contributing)
     - [Getting Started](#getting-started)
@@ -60,7 +69,7 @@ A character sheet, at a minimum requires four files in an appropriately named su
 * **\<sheetname>.html** - This HTML file describes the structure and functionality of your character sheet. It might consist of [inputs to store user data](https://wiki.roll20.net/Building_Character_Sheets#Text_.26_Numbers), [buttons to make rolls](https://wiki.roll20.net/Button#Roll_Button) to the VTT, [repeating sections](https://wiki.roll20.net/Repeating_Sections) to store lists of information (like inventory items), or more advanced elements such as [roll templates](https://wiki.roll20.net/Building_Character_Sheets/Roll_Templates) or [sheet workers](https://wiki.roll20.net/Sheet_Worker_Scripts).
 * **\<sheetname>.css** - This CSS file is primarily responsible for adding styles to your character sheet. However, CSS can be very versatile and such is used for [much](https://wiki.roll20.net/CSS_Wizardry#Tabs), [much](https://wiki.roll20.net/CSS_Wizardry#Custom_Progress_Bar), [much](https://wiki.roll20.net/CSS_Wizardry#Clocks) more. 
 * **preview.(jpg/png/gif)** - This image file is what users will see as a preview, before selecting your sheet.
-* **sheet.json** - This JSON file includes meta information about the sheet, including the filenames for your sheet, your credit as author(s), and much more. See [this document](https://wiki.roll20.net/Sheet.json) for more information.
+* **sheet.json** - This JSON file includes metadata about the sheet, including the filenames for your sheet, your credit as author(s), and much more. It's integral to your sheet being implemented correctly that this format is followed. Please see [this document](https://wiki.roll20.net/Sheet.json) for more information.
 
 ### Submission Guidelines
 
