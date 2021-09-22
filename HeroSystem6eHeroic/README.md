@@ -162,7 +162,7 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ## Turn Tracker
 
-We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag it avatar to the map to create a token. There you I suggest giving it a Nameplate name such as "Phase."
+We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag it avatar to the map to create a token. There you I suggest giving it a Nameplate name such as "Phase."
 
 ![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
