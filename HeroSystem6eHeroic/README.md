@@ -180,7 +180,7 @@ Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wik
 
 ![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
 
-During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current phase, which you can change with the token actions. It might also be handy for other character tokens to have their phases listed next to their names in the Turn Tracker.
+During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current phase, which you can change with the token actions. It might also be handy for other character tokens to have the phases they act on listed next to their names in the Turn Tracker.
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
