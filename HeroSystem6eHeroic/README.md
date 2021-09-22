@@ -162,7 +162,7 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ## Turn Tracker
 
-We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Assign its avatar to some kind of informative image such at the clock face below. Drag it to the map to create a token. There you can give it a Nameplate name such as "Phase."
+We can make the Roll20 Turn Tracker a little more useful for playing with Hero's 12-segment turns using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag it avatar to the map to create a token. There you I suggest giving it a Nameplate name such as "Phase."
 
 ![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
@@ -176,11 +176,11 @@ Create the following four macros:
 
 *Segment-Minus-1*: [[ 1 &{tracker:-} ]]
 
-Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities with these four macros and check them as token actions. You can spice the macros up so that they send flavor text to chat, but at the bare bones level, the new abilities need only look something like this:
+Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities for each of these four macros and check them as token actions. You can spice the macros up so that they send flavor text to chat, but at the bare bones level, the new abilities need only look something like this:
 
 ![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
 
-During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for Turn Token can be used to indicate the current turn segment. Use the token actions above to display phases 1-12. It might also be handy for other character tokens to have their phases listed next to their names in the Turn Tracker.
+During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current phase, which you can change with the token actions. It might also be handy for other character tokens to have their phases listed next to their names in the Turn Tracker.
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
