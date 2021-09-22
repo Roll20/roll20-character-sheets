@@ -176,7 +176,9 @@ Create the following four macros:
 
 *Segment-1*: [[ 1 &{tracker:-} ]]
 
-Follow the instructions in the wiki on *Linking Tokens To Journals* to create character abilities with these four macros and check them as token actions. Add the character to the Turn Tracer using the "Tracker" button on the token's character. The initiative shown for the turn token can be used to indicate the current turn segment. Use the token actions above to display phases 1-12.
+Follow the instructions in the wiki on *Linking Tokens To Journals* to create character abilities with these four macros and check them as token actions. 
+
+During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for Turn Token can be used to indicate the current turn segment. Use the token actions above to display phases 1-12.
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
