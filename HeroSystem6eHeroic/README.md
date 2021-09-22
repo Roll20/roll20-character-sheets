@@ -176,18 +176,12 @@ Create the following four macros:
 
 *Segment-Minus-1*: [[ 1 &{tracker:-} ]]
 
-Follow the instructions in the wiki on *Linking Tokens To Journals* to create character abilities with these four macros and check them as token actions. 
+Follow the instructions in the wiki on *Linking Tokens To Journals* to create character abilities with these four macros and check them as token actions. You can add flavor text to the chat message, but at the bare bones level, the ability entries need only look something like this:
 
-During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for Turn Token can be used to indicate the current turn segment. Use the token actions above to display phases 1-12.
+![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
+
+During play, add the Turn Token character to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for Turn Token can be used to indicate the current turn segment. Use the token actions above to display phases 1-12. It might also be useful for other tokens to have their phases listed next to their names in the Turn Tracker.
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
-*Villain In Glasses, August 1, 2021.*
-
-*Updated August 7, 2021 to include Hit Location support.*
-
-*Updated Sepember 8, 2021 to include notes on Perception Rolls.*
-
-*Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
-
-*Updated Sepember 20, 2021 to include notes on speed and initiative.*
+*Villain In Glasses, August 1, 2021. Last updated on September 22, 2021 to include notes on the Turn Tracker.*
