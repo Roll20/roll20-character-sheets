@@ -5348,6 +5348,5 @@ for (const [_, section] of Object.entries(wizardSpells)) {
         wizmonster[spellName] = spell;
     }
 }
-console.log(wizmonster);
 wizardSpells['wizmonster'] = wizmonster;
 /* ---- Wizard spells end ---- */
