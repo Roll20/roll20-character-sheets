@@ -152,7 +152,7 @@ The last page of this sheet contains a number of important options:
 
 (4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-## Token Settings
+## Player Token Settings
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
@@ -160,12 +160,28 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-*Villain In Glasses, August 1, 2021.*
+## Turn Tracker
 
-*Updated August 7, 2021 to include Hit Location support.*
+We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag the avatar to the map to create a token. There I suggest giving the token a Nameplate name such as "Phase."
 
-*Updated Sepember 8, 2021 to include notes on Perception Rolls.*
+![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
-*Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
+Create the following four macros:
 
-*Updated Sepember 20, 2021 to include notes on speed and initiative.*
+*Set-Segment-1*: [[ 1 &{tracker} ]]
+
+*Set-Segment-12*: [[ 12 &{tracker} ]]
+
+*Segment-Plus-1*: [[ 1 &{tracker:+} ]]
+
+*Segment-Minus-1*: [[ 1 &{tracker:-} ]]
+
+Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities for each of these four macros and check them as token actions. You can spice the macros up so that they send flavor text to chat, but at the bare bones level, the new abilities need only look something like this:
+
+![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
+
+During play, add the Turn Token to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current phase, which you can change with the token actions. It might also be handy for other character tokens to have the phases they act on listed next to their names in the Turn Tracker.
+
+![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
+
+*Villain In Glasses, August 1, 2021. Last updated on September 22, 2021 to include notes on the Turn Tracker.*
