@@ -6,22 +6,30 @@
 	background-color: white;
 	background: dodgerblue;
 	width: 680px;
+	height: 900px;
 }
 
-/* Roll20 Roll Button re-styling, Thanks to Scott C.*/
+/* Roll20 Roll Button re-styling, Thanks to Scott C. */
 
 button[type=roll] {
+	/* Override Roll20 default styling */
 	border: none;
-	line-height: 13px;
+	text-shadow: none;
+	line-height: 14px;
 	background-image: none;
 	box-shadow: none;
+	
+	/* Set global border radius of 'Roll' buttons here. */
+	border-radius: 3px;
+	
+	/* Set global font weight and size here. */
+	font-style: normal;
 	font-weight: bold;
 	font-size: 13px !important;
-	padding: 0px;
-	margin: 0px;
 }
 
 button[type=roll]::before{
+	/* Remove Roll20 d20 */
 	content: "" !important;
 }
 
@@ -31,55 +39,32 @@ button[type=roll]::before{
 
 @media screen and (-webkit-min-device-pixel-ratio:0) {
 	/* CSS Statements that only apply on webkit-based browsers (Chrome, Safari, etc.) */
-	.charsheet {
-		height: 890px;
+	
+	input[type=number]:hover,
+	input[type=number]:focus {
+		padding-right: 1px;  // Keeps some numbers from shifting during mouse hover and click.
+	}
+	
+	input:read-only::-webkit-outer-spin-button,
+	input:read-only::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
 	}
 }
 
 @-moz-document url-prefix() {
 	/* CSS Statements that only apply on Firefox */
-	.charsheet {
-		height: 910px;
+
+	input[type=number]:hover,
+	input[type=number]:focus {
+		-moz-appearance: number-input;
+		padding-right: 0px;  // Keeps some numbers from shifting during mouse hover and click.
 	}
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-	-webkit-appearance: none;
-	margin: 0px;
-}
-
-input[type=number]:read-write:hover::-webkit-inner-spin-button,
-input[type=number]:read-write:focus::-webkit-inner-spin-button {
-	-webkit-appearance: inner-spin-button;
-	margin: 0;
-}
-
-input[type=number]:read-write:hover::-webkit-outer-spin-button,
-input[type=number]:read-write:focus::-webkit-outer-spin-button {
-	-webkit-appearance: outer-spin-button;
-	margin: 0;
-}
-
-input[type=number]:read-only {
-	  -moz-appearance: textfield;
-}
-
-input[type=number]:hover,
-input[type=number]:focus {
-	-moz-appearance: number-input;
-}
-
-input[type=number]::-webkit-inner-spin-button {  
-	width: 16px;
-	height: 20px;
-	margin: 0;
-}
-
-input[type=number]::-webkit-outer-spin-button {  
-	width: 16px;
-	height: 20px;
-	margin: 0;
+	
+	input[type=number]:read-only {
+		  -moz-appearance: textfield;
+	} 
+	
 }
 
 /* --------------------------------------------------- */
@@ -123,6 +108,7 @@ input.customCheckbox {
 /* Chrome, and Safari. From:                                       */
 /* @link https://moderncss.dev/custom-select-styles-with-pure-css/ */
 /* --------------------------------------------------------------- */
+
 
 select,
 select::before,
@@ -304,12 +290,18 @@ select:focus + .focus {
 .sheet-flex-tallybar input {
 	max-width: 40px;
 	text-align: right;
-	padding-right: 2px;
+	padding-right: 0px;
+}
+
+.sheet-flex-tallybar input[type=number]:hover,
+.sheet-flex-tallybar input[type=number]:focus {
+	padding-right: 0px;  // Keeps some numbers from shifting during mouse hover and click. Both webkit and moz. For some reason.
 }
 
 .sheet-flex-tallybar input[readonly]{
 	background: #fff990;
-	padding-right: 2px;
+	padding-right: 0px;
+	text-align: center;
 }
 
 /* --------------------------------------------------- */
@@ -541,7 +533,7 @@ select:focus + .focus {
 
 .item-characteristics-primary-attributes input[type=number] {
 	text-align: right;
-	padding-right: 2px;
+	padding-right: 0px;
 	border: solid 1px palegoldenrod;	
 }
 
@@ -653,7 +645,7 @@ select:focus + .focus {
 
 .item-characteristics-combat-attributes input[type=number] {
 	text-align: right;
-	padding-right: 2px;
+	padding-right: 0px;
 	border: solid 1px palegoldenrod;
 }
 
@@ -767,7 +759,7 @@ select:focus + .focus {
 
 .item-characteristics-movement-abilities input[type=number] {
 	text-align: right;
-	padding-right: 2px;
+	padding-right: 0px;
 	border: solid 1px palegoldenrod;
 }
 
@@ -863,12 +855,13 @@ select:focus + .focus {
 	display: grid;
 	grid-template-areas:
 	"portrait health"
-	"turnSegmentIndicators ."
+	"turnSegmentIndicators turnTracker"
+	"perception perception"
 	"history history";
 	grid-template-columns: 264px 68px;
-	grid-template-rows: 264px 30px 500px;
+	grid-template-rows: 260px 22px 100px 419px;
 	background: royalblue;
-	max-height: 801px;
+	max-height: 800px;
 	max-width: 300px;
 }
 
@@ -1007,50 +1000,119 @@ select:focus + .focus {
 	line-height: 1.2;
 }
 
+/* Item: health status                                     */
+/* Item: gear tab health status                            */
+/* Sheet worker used to synchronizes the contents of each  */
 
-/* Item: health status */
-.item-characteristics-health {
-	grid-area: health;
+.item-characteristics-health,
+.item-gear-health {
 	padding: 0px;
-	padding-top: 2px;
-	padding-left: 1px;
 	width: 68px;
 	background: royalblue;
 	border: white;
 	margin-top: 4px;
-	height: 254px;
-	align-content: center;
+	margin-right: 2px;
+	height: 250px;
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
 }
 
-.item-characteristics-health input {
-	max-width: 64px;
-	padding: 2px;
-	padding-left: 0px;
-	margin-left: 2px;
-	margin-top: 1px;
-	padding-right: 0px;
-	text-align: right;
-	background: gold;
-	color: black;
-	font-style: bold;
-	line-height: 1.49;
-	font-size: 18px;
-	min-width: 60px;
+.item-characteristics-health  {
+	grid-area: health;
 }
 
-.item-characteristics-health span {
+.item-gear-health {
+	grid-area: gearHealth;
+}
+
+.item-gear-health h2,
+.item-characteristics-health h2 {
 	color: white;
+	background-color: inherit;
 	text-align: center;
-}
-
-.item-characteristics-health p {
-	color: white;
-	text-align: center;
-	font-size: 18px;
-	line-height: 1.49;
-	margin-top: 2px;
+	font-size: 17px;
+	line-height: 1.0em;
+	margin-top: 0px;
 	margin-bottom: 0px;
 	padding: 0px;
+}
+
+.item-health-stat {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width: 63px;
+	height: 30px;
+	background-color: gold;
+	border-radius: 3px;
+	align-items: center;
+	padding: 0px;
+	margin-right: 1px;
+	margin-bottom: 2px;
+	border: solid 1px darkgoldenrod;
+}
+
+.item-health-stat-plus-minus-enclosure {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	max-height: 20px;
+	width: 20px;
+	align-items: center;
+	padding: 1px;
+}
+
+.item-health-stat input[type=text] {
+	max-width: 45px;
+	height: 30px;
+	font-size: 20px;
+	background-color: gold;
+}
+
+.item-health-stat input[type=text]:focus{
+	outline: transparent;
+}
+
+.item-health-stat button.buttonPlus,
+.item-health-stat button.buttonMinus {
+	background-color: LemonChiffon;
+	border: solid 1px slategray;
+	color: slategray;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	display: inline-block;
+	font-size: 16px;
+	margin: 0px 0px;
+	line-height: 1.4ch;
+	border-radius: 0px;
+}
+
+.item-health-stat button.buttonPlus span,
+.item-health-stat button.buttonMinus span {
+	display: inline-block;
+	transform: rotate(-90deg);
+	text-align: center;
+}
+
+.item-health-stat button.buttonPlus:hover,
+.item-health-stat button.buttonMinus:hover {
+	background-color: gray;
+	color: white;
+	transition: 0.05s;
+}
+
+/* Item: Turn Tracker Button Space */
+
+.item-characteristics-turn-tracker {
+	grid-area: turnTracker;
+	width: 68px;
+	height: 22px;
+	padding: 0px;
+	line-height: 20px;
 }
 
 /* Item: character history */
@@ -1062,7 +1124,7 @@ select:focus + .focus {
 	background-color: inherit;
 	margin-bottom: 1px;
 	margin-right: 6px;
-	max-height: 513px;
+	max-height: 402px;
 	margin-bottom: 6px;
 }
 
@@ -1075,12 +1137,88 @@ select:focus + .focus {
 .item-characteristics-speedIndicatorButtons {
 	grid-area: speedIndicatorButtons;
 	padding-left: 2px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding-top: 1px;
+	padding-bottom: 1px;
 	background-color: royalblue;
-	max-height: 30px;
 	width: 264px;
 	margin: 0px;
+}
+
+/* Item: Perception */
+.item-characteristics-perception {
+	grid-area: perception;
+	max-width: 323px;
+	background-color: inherit;
+	max-height: 95px;
+	margin-left: 3px;
+	border: transparent;
+	margin-top: 0px;
+}
+
+.item-characteristics-perception h1 {
+	font-size: 13px;
+	line-height: 1.6;
+	text-align: left;
+	background-color: royalblue;
+	color: white;
+}
+
+.item-characteristics-perception input[type=number] {
+	text-align: right;
+	padding-right: 0px;
+	border: solid 1px palegoldenrod;
+	margin: 0px;
+	margin-bottom: 3px;
+	background-color: white;
+	max-width: 40px;
+}
+
+.subitem-characteristics-perception-stat-container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	background-color: inherit;
+	padding-left: 0px;
+	align-items: center;
+}
+
+.subitem-characteristics-perception-stat-container input[type=text] {
+	font-size: 13px;
+	max-width: 65px;
+	text-align: center;
+	background-color: royalblue;
+	color: white;
+	font-weight: bold;
+	margin-top: 2px;
+}
+
+.subitem-characteristics-perception-column-container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+	background-color: lightblue;
+	padding: 2px;
+	align-items: center;
+	border-radius: 5px;
+	border: solid lightcyan 2px;
+}
+
+.subitem-characteristics-perception-column-container input[type=text] {
+	font-size: 13px;
+	max-width: 32px;
+	line-height: 1.3;
+	text-align: center;
+	background-color: lightcyan;
+	padding: 0px;
+	color: black;
+	font-weight: normal;
+}
+
+.subitem-characteristics-perception-row-container {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	margin-top: 2px;
 }
 
 /* --------------------------------------------------- */
@@ -1127,21 +1265,13 @@ select:focus + .focus {
 /* --------------------------------------------------- */
 
 .button {
-	  border: none;
-	  color: white;
-	  text-decoration: none;
-	  display: inline-block;
-	  font-size: 14px;
-	  cursor: pointer;
-	  border-radius: 4px;
-	  transition-duration: 0.4s;
-	  font-weight: bold !important;
-	  text-align: center;
-	}
-	
-.button:hover{
-	color: black;
-	background-color: orange;
+	border: none;
+	color: white;
+	text-decoration: none;
+	display: inline-block;
+	cursor: pointer;
+	transition-duration: 0.2s;
+	text-align: center;
 }
 	
 .buttonRecover {
@@ -1150,20 +1280,15 @@ select:focus + .focus {
 	padding-bottom: 4px;
 	margin-left: 2px;
 	margin-right: 2px;
-	margin-top: 6px;
-	margin-bottom: 4px;
+	margin-top: 0px;
+	margin-bottom: 0px;
 	padding-left: 4px;
 	padding-right: 3.5px;
 	vertical-align: middle;
 	text-align: right;
-	font-weight: 500;
-}
-
-.buttonRecover:hover,
-.buttonReset:hover {
-	color: black;
-	background-color: lightgray;
-	text-align: right;
+	font-size: 13px;
+	font-weight: bold;
+	border-radius: 3px;
 }
 
 .buttonReset {
@@ -1172,13 +1297,51 @@ select:focus + .focus {
 	padding-bottom: 4px;
 	margin-left: 2px;
 	margin-right: 2px;
-	margin-top: 4px;
-	margin-bottom: 4px;
+	margin-top: 0px;
+	margin-bottom: 0px;
 	padding-left: 12px;
 	padding-right: 12px;
 	vertical-align: middle;
 	text-align: center;
+	font-size: 13px;
 	font-weight: bold;
+	border-radius: 3px;
+}
+
+.buttonTracker {
+	background-color: dodgerblue;
+	padding-left: 3px;
+	padding-right: 3px;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	font-weight: bold;
+}
+
+.button-Power-END-right,
+.button-Power-END-left {
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-right: 2px;
+	padding-left: 2px;
+	min-height: 16px;
+	max-height: 16px;
+	text-align: middle;
+	font-weight: bold;
+	border-radius: 3px;
+}
+
+.button-Power-END-left {
+	background-color: olive;
+	margin-right: 0px;
+	min-width: 34px;
+	max-width: 35px;
+}
+
+.button-Power-END-right {
+	background-color: salmon;
+	margin-right: 0px;
+	min-width: 34px;
+	max-width: 35px;
 }
 
 .buttonRoll,
@@ -1187,17 +1350,15 @@ select:focus + .focus {
 .buttonRollNormalDamage,
 .buttonRollShow,
 .buttonRollPower {
-	min-height: 15px;
-	max-height: 15px;
 	padding-left: 3px;
 	padding-right: 3px;
 	text-align: center;
-	font-size: 13px;
-	font-weight: bold;
-	border-radius: 4px;
 	line-height: 13px;
 	padding-top: 2px;
 	padding-bottom: 2px;
+	font-weight: bold;
+	max-height: 16px;
+	min-height: 15px;
 }
 
 .buttonRoll,
@@ -1208,12 +1369,15 @@ select:focus + .focus {
 	max-width: 26px;
 }
 
-.buttonRollShow,
+
 .buttonRollPower {
-	min-width: 33px;
+	min-width: 32px;
 	max-width: 34px;
 }
 
+.button:hover,
+.buttonRecover:hover,
+.buttonReset:hover,
 .buttonRoll:hover,
 .buttonRollDamage:hover,
 .buttonRollActivate:hover,
@@ -1225,12 +1389,19 @@ select:focus + .focus {
 	text-align: center;
 }
 
+.button-Power-END-left:hover,
+.button-Power-END-right:hover {
+	background-color: #ff9900;
+	color: black;
+}
+
 .buttonRoll {
 	background-color: orange;
 }
 
 .buttonRollDamage {
 	background-color: indianred;
+	border-radius: 2.5px;
 }
 
 .buttonRollActivate {
@@ -1239,10 +1410,13 @@ select:focus + .focus {
 
 .buttonRollNormalDamage {
 	background-color: olivedrab;
+	border-radius: 2.5px;
 }
 
 .buttonRollShow {
 	background-color: lightslategray;
+	min-width: 36	px;
+	max-width: 38px;
 }
 
 .buttonRollPower {
@@ -1259,14 +1433,14 @@ select:focus + .focus {
 
 .portrait-display-button-left,
 .portrait-display-button-right {
-background-color: orange;
-padding-top: 4px;
-padding-bottom: 4px;
-margin: 4px 2px;
-padding-left: 14px;
-padding-right: 14px;
-vertical-align: middle;
-text-align: center;
+	background-color: orange;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	margin: 4px 2px;
+	padding-left: 14px;
+	padding-right: 14px;
+	vertical-align: middle;
+	text-align: center;
 }
 
 .portrait-display-button-left:hover,
@@ -1284,40 +1458,40 @@ text-align: center;
 
 /* Customize the label (the container) */
 .container-checkbox {
-  display: inline-block;
-  position: relative;
-  padding-left: 25px;
-  padding-top: 2px;
-  //margin-bottom: 10px;
-  cursor: pointer;
-  max-width: 400px;
-  font-size: 12px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  border: transparent;
+	display: inline-block;
+	position: relative;
+	padding-left: 25px;
+	padding-top: 2px;
+	//margin-bottom: 10px;
+	cursor: pointer;
+	max-width: 400px;
+	font-size: 12px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	border: transparent;
 }
 
 /* Hide the browser's default checkbox */
 .container-checkbox input,
 .container-checkbox-small input,
 .container-checkbox-small-gray input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
+	position: absolute;
+	opacity: 0;
+	cursor: pointer;
+	height: 0;
+	width: 0;
 }
 
 /* Create a custom checkbox */
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 20px;
-  width: 20px;
-  background-color: gold;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 20px;
+	width: 20px;
+	background-color: gold;
 }
 
 /* On mouse-over, add a grey background color */
@@ -1845,7 +2019,7 @@ text-align: center;
 	display: flex;
 	flex-wrap: nowrap;
 	justify-content: space-between;
-	align-items: baseline;
+	align-items: center;
 	flex-direction: row;
 	margin-bottom: 0px;
 	padding: 0px;
@@ -1868,6 +2042,7 @@ text-align: center;
 	max-width: 45px;
 	padding: 2px;
 	margin: 0px;
+	padding-right: 0px;
 	text-align: right;
 	border: solid 1px darkgray;
 }
@@ -1931,6 +2106,7 @@ text-align: center;
 	max-width: 45px;
 	padding: 2px;
 	margin: 0px;
+	padding-right: 0px;
 	text-align: right;
 	border: solid 1px darkgray;
 }
@@ -1996,12 +2172,6 @@ text-align: center;
 	margin-bottom: 0px;
 }
 
-.grid-container-powers label {
-	display:inline-block;
-	font-size: 13px;
-	margin: 0px;
-}
-
 .grid-container-powers h1 {
 	display:inline-block;
 	margin-left: 0px;
@@ -2017,37 +2187,12 @@ text-align: center;
 }
 
 .grid-container-powers input[type=number] {
-	padding-right: 2px;
+	padding-right: 0px;
 	padding-top: 2px;
 	width: 30px;
 	height: 20px;
 	margin: 0px;
 	text-align: right;
-}
-
-.button-Power-END-right,
-.button-Power-END-left {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	padding-right: 2px;
-	padding-left: 2px;
-	min-height: 16px;
-	max-height: 16px;
-	text-align: middle;
-}
-
-.button-Power-END-left {
-	background-color: olive;
-	margin-right: 0px;
-	min-width: 35px;
-	max-width: 35px;
-}
-
-.button-Power-END-right {
-	background-color: salmon;
-	margin-right: 0px;
-	min-width: 35px;
-	max-width: 35px;
 }
 
 .flex-container-powers-right,
@@ -2121,7 +2266,8 @@ text-align: center;
 .subitem-flex-power-heading-right select {
 	font-size: 13px;
 	height: 19px;
-	max-width: 90px;
+	max-width: 100px;
+	min-width: 95px;
 	margin: 0px;
 }
 
@@ -2132,9 +2278,20 @@ text-align: center;
 
 .subitem-flex-power-effect-left input[type=text]:nth-child(2), /* Dice */
 .subitem-flex-power-effect-right input[type=text]:nth-child(2) /* Dice */ {
-	max-width: 45px;
-	min-width: 45px;
+	max-width: 61px;
+	min-width: 61px;
 	text-align: center;
+	margin-left: 2px;
+	margin-right: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+.subitem-flex-power-effect-left input[type=number]:nth-child(4), /* Roll chance */
+.subitem-flex-power-effect-right input[type=number]:nth-child(4) /* Roll chance */ {
+	max-width: 41px;
+	min-width: 41px;
+	text-align: right;
 	margin-left: 0px;
 	margin-right: 0px;
 }
@@ -2160,14 +2317,17 @@ text-align: center;
 	background: lightcyan;
 	border: solid 1px #89abb9;
 	line-height: 1.0;
-	max-width: 38px;
 }
 
 .flex-container-powers-left textarea{
 	border: 1px solid #89ABB9;
 }
 
-.subitem-flex-power-heading-left input[type=text],
+.subitem-flex-power-heading-left input[type=text]{
+	border: solid 1px #89ABB9;
+	max-width: 28px;
+}
+
 .subitem-flex-power-effect-left input[type=text],
 .subitem-flex-power-effect-left input[type=number]{
 	border: solid 1px #89ABB9;
@@ -2229,14 +2389,17 @@ text-align: center;
 	background: #fff990;
 	border: solid 1px goldenrod;
 	line-height: 1.0;
-	max-width: 38px;
 }
 
 .flex-container-powers-right textarea{
 	border: 1px solid goldenrod;
 }
 
-.subitem-flex-power-heading-right input[type=text],
+.subitem-flex-power-heading-right input[type=text] {
+	max-width: 28px;
+	border: solid 1px goldenrod;
+}
+
 .subitem-flex-power-effect-right input[type=text],
 .subitem-flex-power-effect-right input[type=number]{
 	border: solid 1px goldenrod;
@@ -2360,7 +2523,7 @@ text-align: center;
 .item-skillsTab-flex-container-skills-group02 input[type=number],
 .item-skillsTab-flex-container-skills-group03 input[type=number] {
 	text-align: right;
-	padding-right: 2px;
+	padding-right: 0px;
 	margin-top: 1px;
 	margin-bottom: 1px;
 	border: solid 1px palegoldenrod;
@@ -2372,26 +2535,28 @@ text-align: center;
 	text-align: center;
 	background-color: #fff990; 
 	border: transparent;
-	max-width: 40px;
+	max-width: 24px;
 }
 
 .item-skillsTab-flex-container-skills-group01 input[type=text]:nth-child(1),
 .item-skillsTab-flex-container-skills-group02 input[type=text]:nth-child(1),
 .item-skillsTab-flex-container-skills-group03 input[type=text]:nth-child(1) {
-	max-width: 125px;
+	max-width: 140px;
 	margin-top: 1px;
 	margin-bottom: 1px;
 	font-size: 13px;
 	text-align: left;
 	margin-left: 4px;
 	margin-right: 2px;
+	padding-left: 1px;
+	padding-right: 1px;
 	border: solid 1px palegoldenrod;
 }
 
 /* Sub-Item: Flex containers for rows */
 .subitem-skillsTab-grid-container-skills-heading-left {
 	grid-template-areas: "skillName skillType rollChance . skillCost";
-	grid-template-columns: 155px 67px 37px 35px 33px;
+	grid-template-columns: 170px 60px 29px 35px 33px;
 	display: grid;
 }
 
@@ -2431,7 +2596,7 @@ text-align: center;
 	grid-template-areas: 
 	"skillNames skillLevels skillTypes skillCosts"
 	"skillLevelNames skillLevels . skillCosts";
-	grid-template-columns: 150px 50px 59px 40px;
+	grid-template-columns: 150px 50px 61px 38px;
 	grid-template-rows: 199px 76px;
 	max-width: 297px;
 	padding-left: 4px;
@@ -2461,6 +2626,8 @@ text-align: center;
 	font-size: 13px;
 	text-align: left;
 	margin-left: 4px;
+	padding-left: 1px;
+	padding-right: 1px;
 	border: solid 1px palegoldenrod;
 }
 
@@ -2496,12 +2663,13 @@ text-align: center;
 	justify-content: space-between;
 	margin-top: 7px;
 	margin-bottom: 3px;
-	max-height: 261px;
+	max-height: 260px;
 }
 
 .subitem-skillsTab-flex-container-combat-skills-levels input[type=number] {
 	text-align: center;
 	padding-left: 3px;
+	padding-right: 1px; /* Fix for shifting spinners on focus */
 	max-width: 45px;
 	margin-right: 5px;
 	padding-bottom: 1px;
@@ -2555,7 +2723,7 @@ text-align: center;
 	text-align: center;
 	padding-top: 0px;
 	padding-bottom: 0px;
-	padding-right: 2px;
+	padding-right: 0px;
 	max-height: 18px;
 	max-width: 40px;
 }
@@ -2572,33 +2740,33 @@ text-align: center;
 	grid-area: theLanguageSkills;
 	display: flex;
 	flex-direction: column;
-	justify-content: space-evenly;
-	max-width: 305px;
-	margin-left: 0px;
+	justify-content: space-between;
+	max-width: 297px;
 	background-color: #fff990; 
 	border: solid 2px goldenrod;
 	border-radius: 3px;
 	line-height: 1.10;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-bottom: 3px;
 }
 
 /* Sub-Item: Flex containers for columns */
 .subitem-skillsTab-flex-container-languages-heading {
 	grid-template-areas: "skillName skillFluency literacy skillCost";
-	grid-template-columns: 145px 55px 65px 40px;
+	grid-template-columns: 148px 83px 30px 38px;
 	display: grid;
-	margin-left: 6px;
+	margin-left: 0px;
 }
 
 .subitem-skillsTab-flex-container-languages-heading-name {
 	grid-area: skillName;
-}
-
-.subitem-skillsTab-flex-container-languages-heading-name h1 {
-	text-align: center;
+	text-align: left;
 }
 
 .subitem-skillsTab-flex-container-languages-heading-fluency {
 	grid-area: skillFluency;
+	text-align: center;
 }
 
 .subitem-skillsTab-flex-container-languages-heading-literacy {
@@ -2608,40 +2776,43 @@ text-align: center;
 
 .subitem-skillsTab-flex-container-languages-heading-cost {
 	grid-area: skillCost;
+	text-align: center;
 }
 
 .subitem-skillsTab-flex-container-language {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-evenly;
-	padding-left: 0px;
-	max-width: 305px;
-	margin-right: 4px;
-	margin-left: 8px;
+	justify-content: space-between;
+	max-width: 285px;
+	margin-left: 0px;
+	padding: 0px;
+	margin-left: 4px;
 }
 
-.subitem-skillsTab-flex-container-language input[type=text] {
+.subitem-skillsTab-flex-container-language input[type=text]:nth-child(1) {
 	text-align: left;
-	padding-left: 3px;
-	max-width: 130px;
-	margin-right: 8px;
+	padding-left: 2px;
+	min-width: 140px;
+	margin-right: 0px;
 	border: solid 1px palegoldenrod;	
 }
 
 .subitem-skillsTab-flex-container-language input[readonly] {
 	text-align: center;
 	background-color: #fff990;
-	max-width: 40px;
+	max-width: 22px;
+	margin-right: 0px;
 	border: transparent;
 }
 
 .subitem-skillsTab-flex-container-language .container-checkbox-small {
 	margin-top: 3px;
+	margin-left: 10px;
 }
 
 .subitem-skillsTab-flex-container-language .custom-select {
 	min-width: 70px;
-	margin-right: 15px;
+	margin-left: 8px;
 }
 
 
@@ -2653,7 +2824,7 @@ text-align: center;
 	". skillEnhancersHeading skillEnhancersHeading skillEnhancersHeading"
 	"checkboxes skillNames . skillCosts"
 	". skillNames skillLevels skillCosts";
-	grid-template-columns: 25px 165px 68px 40px;
+	grid-template-columns: 25px 175px 65px 38px;
 	grid-template-rows: 20px 110px 110px;
 	max-width: 300px;
 	padding-left: 5px;
@@ -2662,14 +2833,13 @@ text-align: center;
 	border: solid 2px goldenrod;
 	border-radius: 3px;
 	max-height: 247px;
-
 }
 
 .item-skillsTab-grid-container-skill-enhancers input[readonly]{
 	background-color: #fff990;
 	text-align: center;
 	height: 18px;
-	max-width: 40px;
+	max-width: 30px;
 }
 
 .subitem-skillsTab-flex-container-skill-enhancers-checkboxes {
@@ -2692,11 +2862,11 @@ text-align: center;
 	padding-top: 4px;
 	justify-content: space-between;
 	line-height: 1.15;
-	width: 277px;
+	width: 264px;
 }
 
 .subitem-skillsTab-flex-container-skill-enhancers-heading h1:nth-child(2) {
-	padding-right: 15px;
+	padding-right: 0px;
 	line-height: 1.15;
 }
 
@@ -2756,15 +2926,16 @@ text-align: center;
 	"theEquipment theSlides theSlides";
 	grid-gap: 8px;
 	grid-template-columns: 250px 336px 84px;
-	grid-template-rows: 60px 175px 155px 322px;
+	grid-template-rows: 63px 174px 155px 322px;
 	max-width: 692px;
-	padding: 2px;
+	padding: 0px;
+	padding-left: 2px;
 	font-size: 16px;
 	background-color: royalblue;
 	border: 3px solid #fff990;
 	border-radius: 5px;
 	justify-content: middle;
-	min-height: 797px;
+	min-height: 801px;
 }
 
 .grid-container-tab-gear h1 {
@@ -2787,53 +2958,7 @@ text-align: center;
 	max-width: 110px;
 }
 
-/* Item: gear tab health status                      */
-/* Identical to the same on the characteristics tab. */
-/* Script synchronizes the two.                      */
-
-.item-gear-health {
-	grid-area: gearHealth;
-	padding: 0px;
-	padding-top: 0px;
-	padding-left: 1px;
-	width: 68px;
-	background: royalblue;
-	border: white;
-	margin-top: 4px;
-	height: 254px;
-	align-content: center;
-}
-
-.item-gear-health input {
-	max-width: 64px;
-	padding: 2px;
-	padding-left: 0px;
-	margin-left: 2px;
-	margin-top: 1px;
-	padding-right: 0px;
-	text-align: right;
-	background: gold;
-	color: black;
-	font-style: bold;
-	line-height: 1.49;
-	font-size: 18px;
-	min-width: 60px;
-}
-
-.item-gear-health span {
-	color: white;
-	text-align: center;
-}
-
-.item-gear-health p {
-	color: white;
-	text-align: center;
-	font-size: 18px;
-	line-height: 1.49;
-	margin-top: 2px;
-	margin-bottom: 0px;
-	padding: 0px;
-}
+/* Health status styling grouped with item-health-characteristics */
 
 /* Encumbrance */
 .item-tab-gear-flex-container-encumbrance {
@@ -2842,40 +2967,113 @@ text-align: center;
 	flex-direction: row;
 	justify-content: space-between;
 	margin-left: 4px;
-	margin-top: 4px;
+	margin-top: 6px;
 	padding: 0px;
 	max-width: 594px;
-	max-height: 55px;
-	padding-left: 40px;
-	padding-right: 40px;
+	max-height: 56px;
+	padding-left: 20px;
+	padding-right: 20px;
 	text-align: left;
 	vertical-align: middle;
 	background-color: royalblue;
 	border: none;
 }
 
-.subitem-tab-gear-flex-container-encumbrance {
-	display:flex;
-	flex-direction: column;
-	justify-content: space-between;
-	max-width: 80px;
-}
-
-.subitem-tab-gear-flex-container-encumbrance h1 {
+.item-tab-gear-flex-container-encumbrance h1 {
 	text-align: center;
 	color: white;
 	font-size: 13px;
 }
 
-.subitem-tab-gear-flex-container-encumbrance input[readonly]{
+.item-tab-gear-flex-container-encumbrance input[type=number]{
 	background-color: #fff990;
 	text-align: center;
-	max-width: 75px;
+	max-width: 70px;
 	background-color: gold;
 	border: solid 1px goldenrod;
-	font-size: 15px;
-	margin-left: 2px;
+	font-size: 16px;
+	margin-left: 0px;
+	padding-right: 0px;
+	min-height: 22px;
 }
+
+.subitem-tab-gear-flex-container-encumbrance,
+.subitem-tab-gear-flex-container-encumbrance-bonus {
+	display:flex;
+	flex-direction: column;
+	justify-content: space-between;
+	max-width: 80px;
+	align-items: center;
+}
+
+.subitem-tab-gear-flex-container-encumbrance-bonus {
+	margin-left: 0px;
+}
+
+.subitem-tab-gear-plus-minus-enclosure {
+	display: flex;
+	flex-direction: row;
+	background-color: gold;
+	justify-content: space-between;
+	width: 50px;
+	max-height: 20px;
+	border: solid 1px goldenrod;
+	border-radius: 3px;
+}
+
+.subitem-tab-gear-plus-minus-enclosure input[type=text] {
+	max-width: 40px;
+	height: 20px;
+	font-size: 16px;
+	background-color: transparent;
+	text-align: center;
+	vertical-align: center;
+}
+
+.subitem-tab-gear-plus-minus-enclosure input[type=text]:focus{
+	outline: transparent;
+}
+
+.subitem-tab-gear-flex-container-stat {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 20px;
+	width: 10px;
+	align-items: center;
+	padding: 0px;
+}
+
+.subitem-tab-gear-flex-container-stat button.buttonPlus,
+.subitem-tab-gear-flex-container-stat button.buttonMinus {
+	background-color: LemonChiffon;
+	border: solid 1px slategray;
+	color: slategray;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	display: inline-block;
+	font-size: 10px;
+	margin: 0px 0px;
+	line-height: 1.4ch;
+	border-radius: 0px;
+	max-width: 10px;
+}
+
+.subitem-tab-gear-flex-container-stat button.buttonPlus span,
+.subitem-tab-gear-flex-container-stat button.buttonMinus span {
+	display: inline-block;
+	transform: rotate(-90deg);
+	text-align: center;
+}
+
+.subitem-tab-gear-flex-container-stat button.buttonPlus:hover,
+.subitem-tab-gear-flex-container-stat button.buttonMinus:hover {
+	background-color: gray;
+	color: white;
+	transition: 0.05s;
+} 
 
 /* ------------- */
 /* Item: Armor   */
@@ -2925,7 +3123,7 @@ text-align: center;
 }
 
 .subitem-tab-gear-flex-container-armor-row h1:nth-child(7) {
-	min-width: 117px;
+	min-width: 140px;
 }
 
 .subitem-tab-gear-flex-container-armor-row input {
@@ -2936,7 +3134,7 @@ text-align: center;
 	text-align: right;
 	padding-left: 2px;
 	max-width: 60px;
-	min-width: 48px;
+	min-width: 42px;
 	padding-right: 0px;
 	margin-right: 0px;
 	margin-left: 0px;
@@ -2947,17 +3145,18 @@ text-align: center;
 .subitem-tab-gear-flex-container-armor-row input[type=text]:nth-child(7) {
 	padding-left: 1px;
 	padding-right: 1px;
-	max-width: 120px;
 	margin-right: 0px;
 	border: solid 1px palegoldenrod;
 }
 
 .subitem-tab-gear-flex-container-armor-row input[type=text]:nth-child(1) {
 	text-align: left;
+	max-width: 120px;
 }
 
 .subitem-tab-gear-flex-container-armor-row input[type=text]:nth-child(7) {
 	text-align: center;
+	max-width: 140px;
 }
 
 .subitem-tab-gear-flex-container-armor-row select {
@@ -2977,7 +3176,7 @@ text-align: center;
 }
 
 .subitem-tab-gear-flex-container-shield-row h1 {
-	min-width: 42px;
+	min-width: 40px;
 	text-align: center;
 	margin-bottom: 3px;
 }
@@ -2987,14 +3186,30 @@ text-align: center;
 	text-align: left;
 }
 
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(2),
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(5),
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(6) {
+	min-width: 42px;
+}
+
 .subitem-tab-gear-flex-container-shield-row h1:nth-child(3) {
-	min-width: 70px;
-	text-align: center;
+	min-width: 62px;
 }
 
 .subitem-tab-gear-flex-container-shield-row h1:nth-child(4) {
-	min-width: 34px;
-	max-width: 34px;
+	min-width: 28px;
+}
+
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(7) {
+	min-width: 36px;
+}
+
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(9) {
+	min-width: 52px;
+}
+
+.subitem-tab-gear-flex-container-shield-row h1:nth-child(10) {
+	min-width: 42px;
 }
 
 .subitem-tab-gear-flex-container-shield-row input[type=text]:nth-child(1),
@@ -3015,15 +3230,32 @@ text-align: center;
 	text-align: center;
 }
 
+.subitem-tab-gear-flex-container-shield-row  input[readonly]:nth-child(7){
+	background-color: inherit;
+	text-align: center;
+	padding-left: 0px;
+	width: 40px;
+	padding-right: 0px;
+	margin-right: 0px;
+	margin-left: 0px;
+	margin-top: 3px;
+	margin-bottom: 2px;
+}
+
 .subitem-tab-gear-flex-container-shield-row input[type=number] {
 	text-align: right;
 	padding-left: 3px;
 	max-width: 60px;
-	min-width: 48px;
-	padding-right: 1px;
+	min-width: 42px;
+	padding-right: 0px;
 	margin-right: 0px;
 	margin-left: 0px;
 	border: solid 1px palegoldenrod;
+}
+
+.subitem-tab-gear-flex-container-shield-row input[type=number]:nth-child(9) {
+	margin-right: 3px;
+	margin-left: 3px;
 }
 
 .subitem-tab-gear-flex-container-shield-row{
@@ -3100,7 +3332,7 @@ text-align: center;
 }
 
 .subitem-tab-gear-flex-container-weapon-row h1:nth-child(8) {
-	min-width: 34px;
+	min-width: 36px;
 	text-align: right;
 }
 
@@ -3160,7 +3392,7 @@ text-align: center;
 	text-align: right;
 	padding-left: 3px;
 	min-width: 42px;
-	padding-right: 1px;
+	padding-right: 0px;
 	margin-right: 0px;
 	margin-left: 0px;
 	border: solid 1px palegoldenrod;
@@ -3188,7 +3420,7 @@ text-align: center;
 	justify-content: space-between;
 	max-width: 248px;
 	padding-left: 5px;
-	margin-left: 3px;
+	margin-left: 4px;
 	padding: 4px;
 	background-color: lightcyan;
 	border: solid 2px lightgray;
@@ -3220,7 +3452,7 @@ text-align: center;
 	padding-left: 3px;
 	max-width: 120px;
 	min-width: 50px;
-	padding-right: 1px;
+	padding-right: 0px;
 	margin-right: 0px;
 	margin-left: 0px;
 	border: solid 1px #eaeaea;
@@ -3233,7 +3465,6 @@ text-align: center;
 .item-tab-gear-slide-container {
 	grid-area: theSlides;
 	position: relative;
-	width: 100%;
 }
 
 .item-tab-gear-slide-container h1 {
@@ -3288,14 +3519,22 @@ text-align: center;
 
 .item-tab-gear-slide-flex-container-maneuvers,
 .item-tab-gear-slide-flex-container-martial-maneuvers {
-	width: 405px;
+	width: 406px;
 	height: 375px;
 	padding: 0px;
-	background-color: lightcyan;
 	margin-left: 0px;
 	margin-bottom: 0px;
+	background-color: lightcyan;
 	border: solid 2px lightgray;
 	border-radius: 3px;
+}
+
+.item-tab-gear-slide-flex-container-martial-maneuvers-block {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	max-height: 280px;
+	min-height: 270px;
 }
 
 .item-tab-gear-slide-flex-container-martial-maneuvers input[type=text] {
@@ -3307,10 +3546,11 @@ text-align: center;
 	border: solid 1px lightgray;
 	margin: 0px;
 	padding: 0px;
+	padding-right: 0px;
 }
 
 .item-tab-gear-slide-flex-container-martial-maneuvers input[type=text]:nth-child(1) {
-	width: 105px;
+	width: 135px;
 	border: 1px solid lightgray;
 	margin: 0px;
 	text-align: left;
@@ -3337,7 +3577,7 @@ text-align: center;
 }
 
 .item-tab-gear-slide-flex-container-martial-maneuvers textarea {
-	width: 165px;
+	width: 135px;
 	border: 1px solid lightgray;
 	height: 36px;
 	padding: 1px;
@@ -3372,7 +3612,7 @@ text-align: center;
 }
 
 .item-tab-gear-slide-flex-container-martial-maneuvers h1:nth-child(1) {
-	width: 108px;
+	width: 138px;
 }
 
 .item-tab-gear-slide-flex-container-martial-maneuvers h1:nth-child(5) {
@@ -3386,11 +3626,11 @@ text-align: center;
 	flex-direction: row;
 	display: flex;
 	justify-content: flex-start;
-	width: 401px;
+	width: 402px;
 	height: 19px;
 	padding: 0px;
 	margin-left: 0px;
-	padding-top: 4px;
+	padding-top: 5px;
 	padding-left: 4px;
 	margin-bottom: 0px;
 	background-color: lightcyan;
@@ -3401,7 +3641,7 @@ text-align: center;
 	flex-direction: row;
 	display: flex;
 	justify-content: flex-start;
-	width: 401px;
+	width: 402px;
 	height: 19px;
 	padding: 0px;
 	margin-left: 0px;
@@ -3423,22 +3663,23 @@ text-align: center;
 	flex-direction: row;
 	display: flex;
 	justify-content: space-between;
-	width: 396px;
+	width: 397px;
 	height: 40px;
 	padding: 0px;
 	margin-left: 0px;
 	padding-top: 0px;
 	padding-left: 4px;
 	margin-top: 0px;
-	margin-bottom: 10px;
+	margin-bottom: 0px;
 }
+
 
 .subitem-tab-gear-slide-flex-container-martial-name-and-points {
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
 	min-height: 42px;
-	max-width: 104px;
+	max-width: 134px;
 	padding: 0px 0px;
 }
 
@@ -3449,10 +3690,16 @@ text-align: center;
 }
 
 .subitem-tab-gear-slide-flex-container-martial-name-and-points-row h1 {
-	padding-right: 3px;
+	padding-right: 0px;
 	padding-left: 30px;
 	padding-top: 4px;
 }
+
+.subitem-tab-gear-slide-flex-container-martial-name-and-points-row input[type=number] {
+	max-width: 42px;
+}
+
+/* Basic Attack */
 
 .subitem-tab-gear-slide-flex-container-standard-attack {
 	display: flex;
@@ -3460,28 +3707,75 @@ text-align: center;
 	justify-content: left;
 	margin-left: 3px;
 	margin-right: 3px;
+	margin-top: 13px;
+	align-items: center;
 }
 
 .subitem-tab-gear-slide-flex-container-standard-attack h1 {
-	max-width: 100px;
+	max-width: 90px;
 	margin-right: 5px;
 	margin-top: 2px;
 }
 
-.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(2),
+.subitem-tab-gear-slide-flex-container-standard-attack span {
+	min-width: 42px;
+	align-content: left;
+}
+
 .subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(3),
-.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(4) {
-	width: 41px;
+.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(4),
+.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(5) {
+	width: 40px;
 	text-align: center;
 	padding-right: 0px;
 	margin-top: 2px;
 }
 
-.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(5) {
-	max-width: 140px;
+.subitem-tab-gear-slide-flex-container-standard-attack h2:nth-child(6) {
+	max-width: 130px;
 	text-align: left;
 	margin-right: 6px;
 	margin-top: 2px;
+}
+
+.subitem-tab-gear-slide-flex-container-range-modifiers {
+	flex-direction: row;
+	display: flex;
+	justify-content: space-between;
+	width: 397px;
+	height: 30px;
+	padding: 0px;
+	margin-left: 0px;
+	padding-top: 0px;
+	padding-left: 5px;
+	margin-top: 13px;
+	margin-bottom: 0px;
+}
+
+.subitem-tab-gear-slide-range-modifier-container-first,
+.subitem-tab-gear-slide-range-modifier-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	height: 30px;
+}
+
+.subitem-tab-gear-slide-range-modifier-container-first {
+	min-width: 83px;
+	align-items: flex-start;
+}
+
+.subitem-tab-gear-slide-range-modifier-container {
+	min-width: 50px;
+	align-items: center;
+}
+
+.subitem-tab-gear-slide-range-modifier-container h2:nth-child(1) {
+	font-weight: bold;
+}
+
+.subitem-tab-gear-slide-range-modifier-container-first h2 {
+	font-weight: bold;
 }
 
 /* Item: Hit Locations */
@@ -3489,7 +3783,7 @@ text-align: center;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	width: 402px;
+	width: 403px;
 	height: 375px;
 	padding: 0px;
 	padding-left: 3px;
@@ -3742,7 +4036,7 @@ text-align: center;
 
 /* Item: Slide of treasure and notes box  */
 .item-tab-gear-slide-treasure-text {
-	width: 401px;
+	width: 402px;
 	height: 367px;
 	padding: 0px;
 	margin-left: 0px;
@@ -3750,7 +4044,7 @@ text-align: center;
 }
 
 .item-tab-gear-slide-treasure-text textarea {
-	width: 397px;
+	width: 398px;
 	height: 367px;
 	margin: 0px;
 	border: solid 2px lightgray;
