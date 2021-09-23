@@ -3145,4 +3145,12 @@ priestSpells['pri4'] = pri4;
 priestSpells['pri5'] = pri5;
 priestSpells['pri6'] = pri6;
 priestSpells['pri7'] = pri7;
+
+const primonster = {};
+for (const [_, section] of Object.entries(priestSpells)) {
+    for (const [spellName, spell] of Object.entries(section)) {
+        primonster[spellName] = spell;
+    }
+}
+priestSpells['primonster'] = primonster;
 /* ---- Priest spells end ---- */

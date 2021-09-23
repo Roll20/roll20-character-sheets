@@ -814,6 +814,7 @@ wizardSpellLevelsSections.forEach(spellLevel => {
         setupAutoFillSpellInfo(lastSection, wizardSpells);
     }
 });
+setupAutoFillSpellInfo("wizmonster", wizardSpells);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -830,6 +831,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
         setupAddPriestSpell(lastSection);
     }
 });
+setupAutoFillSpellInfo("primonster", priestSpells);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
