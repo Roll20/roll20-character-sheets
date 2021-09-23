@@ -1088,6 +1088,21 @@ followerWeapons.forEach(fw => {
    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
 });
 
+// Monster weapons
+on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+        [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+        [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+    };
+
+    setAttrs(weaponInfo);
+});
+
 //Weapon proficiency slots
 on('change:repeating_weaponprofs:weapprofnum remove:repeating_weaponprofs', function(eventInfo) {
     if (doEarlyReturn(eventInfo, ['weapprofnum']))
