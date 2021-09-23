@@ -4604,6 +4604,13 @@ deckingtabs.forEach(tab => {
    var lang={}
 
    on("sheet:opened", function() {
+   	lang["compare"] = getTranslationByKey("compare");
+   	lang["maneuver-score"] = getTranslationByKey("maneuver-score");
+   	lang["accelerate"] = getTranslationByKey("accelerate");
+   	lang["position"] = getTranslationByKey("position");
+   	lang["crash"] = getTranslationByKey("crash");
+   	lang["driving"] = getTranslationByKey("driving");
+   	lang["drain-modifiers"] = getTranslationByKey("drain-modifiers");
    	lang["cover-modifiers"] = getTranslationByKey("cover-modifiers");
    	lang["spirit-focus-dice"] = getTranslationByKey("spirit-focus-dice");
    	lang["are-you-the-summoner"] = getTranslationByKey("are-you-the-summoner");
@@ -5732,7 +5739,7 @@ on('clicked:matrixattack', (info) => {
 			calcTN="?{" + lang["attack-power"] + "} + " +  powermod + " - " + armorval;
 			if ( mods["blast"] ) { 
 				myroll+="{{distance=[[?{" + lang["distance-from-explosive-in-meters"] +"|0}]]}}"
-				myroll+="{{blastredux=[[?{" + lang["distance-from-explosive-in-meters"] +"|0} / " + mods["bast"] + "]]}}"
+				myroll+="{{blastredux=[[?{" + lang["distance-from-explosive-in-meters"] +"|0} / " + mods["blast"] + "]]}}"
 				calcTN+=" - ( ?{" + lang["distance-from-explosive-in-meters"] +"} / " + mods["blast"] + ")";
 			}
 			myid=eval(ammomods[ammo]["armorname"]);
@@ -6083,7 +6090,7 @@ on('clicked:matrixattack', (info) => {
 		var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
 		var calcTN="?{" + lang["force-of-spell"] + "?}";
 		var calcDrainTN="floor( ?{" + lang["force-of-spell"] + "?}/2) + ( 2 * @{spellsus} )";
-		var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?} +?{Drain Modifier?|0}";
+		var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?} +?{" + lang["drain-modifier"] + "?|0}";
 		var myroll="&{template:spell}{{myname=@{character_name}}}";
 		myroll+="{{sorcerydice=[[?{"+ lang["sorcery-dice"] +"?|@{spellcasting}} + ?{" + lang["sorcery-dice-for-drain"] + "?|0}]]}}";
 		myroll+="{{spellpool=[[?{"+ lang["spell-pool-dice"] +"?|0} + ?{"+ lang["spell-pool-dice-for-drain"] +"?|0}]]}}";
@@ -6163,7 +6170,7 @@ on('clicked:matrixattack', (info) => {
 	on('clicked:vehicledriving', (info) => {
 		    calcTN="@{handling} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} - @{driving-test-interface} +@{driving-test-weather} +@{driving-test-terrain} +@{driving-test-size} +?{" + lang["miscellaneous-modifiers"] + "|0}";
 		    calcDice="[[@{vehicle-skill-final} + @{driving-test-autonav} + ?{" + lang["control-pool-dice"] + "?}]]"
-		    var myroll="&{template:vehicle}{{type=Driving Test}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
+		    var myroll="&{template:vehicle}{{type=" + lang["driving"] + "}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
 		    myroll += "{{targetnumber=[[" + calcTN + "]]}}"
 		    myroll += "{{roll=[[ " + calcDice + "d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}"
 		    console.log(myroll);
@@ -6192,7 +6199,7 @@ on('clicked:matrixattack', (info) => {
 	on('clicked:vehicleposition', (info) => {
 		    calcTN="[[{2,(@{handling} + @{speed-exceeding} +  @{driving-position-terrain} - @{vehicle-actionbonus} + (@{vehicle-autonav} * @{autonav}) + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} + @{wp-vehicle} )}kh1]]";
 		    calcDice="[[@{vehicle-skill-final} + ?{" + lang["control-pool-dice"] + "?}]]"
-		    var myroll="&{template:vehicle}{{type=Position Maneuever}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
+		    var myroll="&{template:vehicle}{{type=" + lang["position"] + "}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
 		    myroll += "{{targetnumber=" + calcTN + "}}{{position=[[0]]}}"
 		    myroll += "{{roll=[[ " + calcDice + "d6>" + calcTN + "!! ]] }}"
 		    console.log(myroll);
@@ -6213,7 +6220,7 @@ on('clicked:matrixattack', (info) => {
 	on('clicked:vehiclecrash', (info) => {
 		    calcTN="[[{2,(@{handling} + @{driving-crash-terrain} + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} )}kh1]]"
 		    calcDice="[[@{vehicle-skill-final} + ?{" + lang["control-pool-dice"] + "?} + (@{vehicle-autonav} * @{autonav})]]"
-		    var myroll="&{template:vehicle}{{type=Crash Test}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
+		    var myroll="&{template:vehicle}{{type=" + lang["crash"] + "}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}}{{character=@{character_name}}}"
 		    myroll += "{{targetnumber=" + calcTN + "}}{{speed=[[@{speed-current}]]}}{{reaction=[[@{vehicle-driver}reaction|max}]]}}"
 		    myroll += "{{roll=[[ " + calcDice + "d6>" + calcTN + "!! ]] }}"
 		    console.log(myroll);
@@ -6275,7 +6282,7 @@ on('clicked:matrixattack', (info) => {
 		    var vmsmod=0;	
 		    var calcTN="[[{2,(" + baseTN + " + " + miscmods + "} + ( @{speed-exceeding} * " + speeding  +  ") +  @{" + myterrain + "} - " + vcr  + " + (@{vehicle-autonav} * "
 		    calcTN += autonav + ") + @{vehicle-driver}stun_pen} +@{vehicle-driver}wound_pen} +@{wp-vehicle} )}kh1]]"
-                    var myroll="&{template:vehicle} {{type=Accelerating Action}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}} {{character=@{character_name}}} {{miscmods=" + miscmods  + "|0}}}" 
+                    var myroll="&{template:vehicle} {{type=" + lang["accelerate"] + "}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}} {{character=@{character_name}}} {{miscmods=" + miscmods  + "|0}}}" 
 		    myroll += "{{rolldice=" + calcDice + "}}"
 		    myroll += "{{target=vs. @{target|" + lang["target"] +"|token_name}}}{{type=" + myaction + "}}"
 		    myroll += "{{targetnumber=" + calcTN  +  "}}"
@@ -6372,7 +6379,7 @@ on('clicked:matrixattack', (info) => {
     	on('clicked:maneuever', (info) => {
 		var mytype=info["htmlAttributes"]["id"]
 		if ( mytype == "generate") {
-			var manroll="&{template:vehicle} {{type=Maneuver Score}} {{character=@{character_name}}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}} {{roll=[[ [[@{vehicle-skill-final} + ?{" + lang["control-pool-dice"] + "?}]]d6KH1 + @{terrain-points} + @{speed-points} + @{vehicle-points}  ]] }}"
+			var manroll="&{template:vehicle} {{type=" + lang["maneuver-score"] + "}} {{character=@{character_name}}}{{controlpool=[[?{" + lang["control-pool-dice"] + "?|0}]]}} {{roll=[[ [[@{vehicle-skill-final} + ?{" + lang["control-pool-dice"] + "?}]]d6KH1 + @{terrain-points} + @{speed-points} + @{vehicle-points}  ]] }}"
                 startRoll(manroll, (results) => {
 			updatepoolused("controlpool", results.results.controlpool.result);	
 			console.log('results: ' + results.results.roll.result)			
@@ -6380,7 +6387,7 @@ on('clicked:matrixattack', (info) => {
 			setAttrs({"maneuver-score": results.results.roll.result});
 		});
 		} else {
-                 	var manroll="&{template:vehicle} {{type=Compare Maneuver Score}} {{character=@{character_name}}} {{target=@{target|" + lang["target"] +"|character_name}}} {{charscore=[[@{maneuver-score}]]}} {{targetscore=[[@{target|" + lang["target"] +"|maneuver-score}]]}} {{roll=[[@{maneuver-score} - @{target|" + lang["target"] +"|maneuver-score} ]]}} "
+                 	var manroll="&{template:vehicle} {{type=" + lang["compare"] + " " + lang["maneuver-score"] + "}} {{character=@{character_name}}} {{target=@{target|" + lang["target"] +"|character_name}}} {{charscore=[[@{maneuver-score}]]}} {{targetscore=[[@{target|" + lang["target"] +"|maneuver-score}]]}} {{roll=[[@{maneuver-score} - @{target|" + lang["target"] +"|maneuver-score} ]]}} "
                 	startRoll(manroll, (results) => {
 			finishRoll( results.rollId);
 			});
