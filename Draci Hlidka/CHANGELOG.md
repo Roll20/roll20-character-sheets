@@ -1,5 +1,30 @@
 # Changelog All notable changes to this project will be documented in this file. The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 1.1.0 (2021-09-22)
+## Changed
+
+* styles of inputs and roll buttons
+
+### Added
+
+* added additional properties to active abilities, fixed rename additionalMana
+
+### Fixed
+
+* fixed combat equip button, fixed modal
+* fixed order of active abilities attributes
+* fixed titles and input validations of skills
+
+## 1.0.2 (2021-09-15)
+
+### Added
+
+* added pergamen, fixed sections gap, feat added settings, added alternative icons, added authors
+
+### Fixed
+
+* fixed sections gap, fixed moved roll advange, fixed labels, fixed build comment styles, fixed build span white spaces, fixed rolltemplates, fixed roll skills with modifiers
+
 
 ## 1.0.1 (2021-09-06)
 
