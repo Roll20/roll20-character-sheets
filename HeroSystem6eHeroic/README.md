@@ -162,7 +162,7 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ## Turn Tracker
 
-We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag the avatar to the map to create a token. There I suggest giving the token a Nameplate name such as "Phase."
+We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag the avatar to the map to create a token. There I suggest giving the token a Nameplate name such as "Segment."
 
 ![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
 
@@ -180,7 +180,7 @@ Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wik
 
 ![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
 
-During play, add the Turn Token to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current phase, which you can change with the token actions. It might also be handy for other character tokens to have the phases they act on listed next to their names in the Turn Tracker.
+During play, add the Turn Token to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current segment, which you can change with the token actions. It might also be handy for other character tokens to have their phases listed in their Nameplate names so that they appear in the Turn Tracker.
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
