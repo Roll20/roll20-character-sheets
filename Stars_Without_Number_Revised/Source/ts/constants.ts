@@ -2,7 +2,7 @@
 
 /* Data constants */
 const sheetName = "Stars Without Number (revised)";
-const sheetVersion = "2.6.2";
+const sheetVersion = "2.6.5";
 const translate = getTranslationByKey;
 const attributes = ["strength", "dexterity", "constitution", "intelligence", "wisdom", "charisma"];
 const effortAttributes = ["wisdom_mod", "constitution_mod", "psionics_extra_effort",
@@ -21,7 +21,7 @@ const shipStatEvent = [
 const weaponSkills = [
     "skill_exert", "skill_punch", "skill_shoot", "skill_stab", "skill_combat_energy",
     "skill_combat_gunnery", "skill_combat_primitive", "skill_combat_projectile",
-    "skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis"
+    "skill_combat_psitech", "skill_combat_unarmed", "skill_telekinesis", "skill_sunblade"
 ];
 const weaponDisplayEvent = [
     ...["attack", "name", "skill_bonus", "attribute_mod", "damage", "shock", "shock_damage",
