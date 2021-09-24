@@ -4602,6 +4602,14 @@ deckingtabs.forEach(tab => {
 
    on("sheet:opened", function() {
    	lang["use-reach-modifier"] = getTranslationByKey("use-reach-modifier");
+   	lang["L"] = getTranslationByKey("light-damage-abbreviation");
+   	lang["M"] = getTranslationByKey("moderate-damage-abbreviation");
+   	lang["S"] = getTranslationByKey("serious-damage-abbreviation");
+   	lang["D"] = getTranslationByKey("deadly-damage-abbreviation");
+   	lang["L(stun)"] = getTranslationByKey("light-stun-abbreviation");
+   	lang["M(stun)"] = getTranslationByKey("moderate-stun-abbreviation");
+   	lang["S(stun)"] = getTranslationByKey("serious-stun-abbreviation");
+   	lang["D(stun)"] = getTranslationByKey("deadly-stun-abbreviation");
    	lang["decker"] = getTranslationByKey("decker");
    	lang["none"] = getTranslationByKey("none");
    	lang["compare"] = getTranslationByKey("compare");
@@ -4793,7 +4801,7 @@ deckingtabs.forEach(tab => {
 	});
    });
 
-      const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4}};
+      const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1, wdmg: 2}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2, wdmg: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3, wdmg: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4, wdmg: 3}};
       const matrixsecnumber={1: "BLUE", 2: "GREEN", 3: "ORANGE",4: "RED"};
       const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "force" ];
       const quicknesslinked=["@{blowgun}", "@{bracer}", "@{guncane}", "@{gyrojet}", "@{eyegun}", "@{oralgun}", "@{oralstrike}", "@{pistols}", "@{smgs}", "@{rifles}", "@{assaultrifles}", "@{lasers}", "@{whips}", "@{stealth}", "@{shotguns}"]
@@ -5156,18 +5164,14 @@ deckingtabs.forEach(tab => {
 		if ( payload ) {
 			console.log(payload);
 			power=payload["power"];
+			wdmg=payload["wdmg"];
 			basetn=payload["basetn"];
 			attribute=payload["attribute"];
 			attacktype=payload["attacktype"];
 			attacktest=payload["attacktest"];	
 			attacker=payload["attacker"];
-			if (( attacktype == "Tar Baby") || (attacktype == "Tar pit" )) {
-				calcDice="?{" + lang["utility-rating"] + "?|" + basetn  + "} + ?{" + lang["hacking-pool-dice"] + "|0}";
-				calcTN= "?{" + lang["ic-rating"] + "?|" + power + "}";
-			} else {
-				calcDice="@{deck-bod-final} + ?{" + lang["hacking-pool-dice"] + "|0}";
-				calcTN= "?{" + lang["attack-power"] +"?|" + power + "} - @{deckarmor-rating-final}";
-			}
+			calcDice="@{deck-bod-final} + ?{" + lang["hacking-pool-dice"] + "|0}";
+			calcTN= "?{" + lang["attack-power"] +"?|" + power + "} - @{deckarmor-rating-final}";
 			myroll+="{{target=" + attacker + "}}{{attackdmg=[[0]]}}";
 		} else {
 			calcTN="?{" + lang["attack-power"] +"?|0} - @{deckarmor-rating-final}";
@@ -5227,6 +5231,7 @@ on('clicked:matrixattack', (info) => {
 				updatepoolused("hackingpool", results.results.hackingpool.result);	
 				let payload= {
 					ammotype: myammo,
+					wdmg: matrixtn[mysystem]["wdmg"],
 					attacker: myval["character_name"],
 					attacktest: results.results.roll.result,
 					power: results.results.utilitylevel.result,
@@ -5589,12 +5594,12 @@ on('clicked:matrixattack', (info) => {
 		});
 	});
 
-	const calcFinalDrain = function(drainlevel, draintest) {
-		const dmgmax=(drainlevel >= 10)? 13 : 4;
-		const dmgmin=(drainlevel >= 10)? 9 : 0;
-		var drainstaged=drainlevel - Math.floor(draintest/2);
-		drainstaged = (drainstaged > dmgmax)? dmgmax : (drainstaged < dmgmin)? dmgmin : drainstaged;
-		return(damagetable[drainstaged]);
+	const calcFinalDmg = function(dmgstart, resist) {
+		const dmgmax=(dmgstart >= 10)? 13 : 4;
+		const dmgmin=(dmgstart >= 10)? 9 : 0;
+		var dmgstaged=dmgstart - Math.floor(resist/2);
+		dmgstaged = (dmgstaged > dmgmax)? dmgmax : (dmgstaged < dmgmin)? dmgmin : dmgstaged;
+		return(damagetable[dmgstaged]);
 	};
 
    var initiative = function (init, reaction, dmgpen, mytitle, character) {
@@ -6144,7 +6149,7 @@ on('clicked:matrixattack', (info) => {
 			updatepoolused("sorcery", results.results.sorcerydice.result);	
 			updatepoolused("spellpool", results.results.spellpool.result);	
 			const drainbase = damagetable[results.results.draindamage.result];
-			const finaldraintxt=calcFinalDrain(results.results.draindamage.result, results.results.draintest.result);
+			const finaldraintxt=calcFinalDmg(results.results.draindamage.result, results.results.draintest.result);
 			finishRoll( results.rollId, {
 				draindamage: drainbase,
 				finaldrain: finaldraintxt,
