@@ -43,6 +43,14 @@ If you want to compile everything just once, use `npm run build` instead.
 
 ## Changelog
 
+## 2.6.5
+
+* Fix icon link broken by external service.
+
+## 2.6.4
+
+* Fix weapon AB not displaying correctly with the Sunblade skill.
+
 ### 2.6.3
 
 * Fix quick menus giving "unrecognised command /w".
