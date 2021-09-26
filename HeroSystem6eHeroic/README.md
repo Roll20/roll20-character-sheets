@@ -82,11 +82,13 @@ Hero System weapons generally do killing damage or normal damage (e.g., a club o
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
-When a killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results. Attacking with a shield is similar to attacking with a weapon except that the DCV bonus for defense is an OCV penalty for attacks. Shields usually do normal damage, but in some cases can do killing damage (e.g., spiked shields). The shield attack button is brown to set it apart from other weapon attacks.
+When a weapon attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results. Attacking with a shield is similar to attacking with a weapon except that the DCV bonus for defense is an OCV penalty for attacks. Shields usually do normal damage, but in some cases can do killing damage (e.g., spiked shields). The shield attack button is brown to set it apart from other weapon attacks.
+
+An attack doing killing damage appears in chat with a red heading. The damage dice determine the BODY damage done. The STUN damage is determined from BODY damage times the total STUN multiple. 
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
-An attack doing normal damage appears in chat with a green heading. The weapon's damage dice determine STUN and BODY is calculated from the Hero formula: 1 pip is 0 BODY, 2-5 pips are 1 BODY, and 6 is 2 BODY.  Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
+An attack doing normal damage appears in chat with a green heading. The weapon's damage dice determine STUN and BODY is calculated from the Hero formula: 1 pip is 0 BODY, 2-5 pips are 1 BODY, and 6 is 2 BODY damage. The weapon's STUNx modifier is ignored. Note that a d3 result of "3" does 1 BODY and a "2" has a 50% chance to contribute 1 BODY damage as well. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)
 
