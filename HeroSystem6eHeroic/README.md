@@ -16,7 +16,9 @@ Roll buttons are color-coded:
 
 ![Blue Button](/HeroSystem6eHeroic/images/BlueButton.png) Blue buttons are for armor activation rolls.
 
-![Red Button](/HeroSystem6eHeroic/images/RedButton.png) Red buttons are for killing damage attacks.
+![Red Button](/HeroSystem6eHeroic/images/RedButton.png) Red buttons are weapon attacks. They can do killing or normal damage.
+
+![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield attacks.
 
 ![Green Button](/HeroSystem6eHeroic/images/GreenButton.png) Green buttons are for normal damage attacks.
 
@@ -72,19 +74,19 @@ The sheet includes space for four suits or pieces of armor. Although this sheet 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
-Click the "Roll" button to roll armor activation. The message like the one shown below will be sent to the chat window. The shield line assumes attacking with a shield is a normal damage attack and that the DCV bonus for defense is an OCV penalty for attacks.
+Click the "Roll" button to roll armor activation. The message like the one shown below will be sent to the chat window. 
 
 ![Armor Activation Chat Message](/HeroSystem6eHeroic/images/BlueButtonChat.png)
 
-The first four weapons have buttons for killing damage attacks. The fifth weapon slot can be used for a normal damage attack (e.g., a club or staff). In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon. The "AoE" checkbox indicates an Area of Effect weapon.
+Hero System weapons generally do killing damage or normal damage (e.g., a club or staff). Check the "N" box next to a weapon's damage dice to mark it as doing normal damage. In order to calculate the correct endurance expended, the STR field refers to the strength used, not the minimum strength required for the weapon. The "AoE" checkbox indicates an Area of Effect weapon.
 
 ![Weapons Table](/HeroSystem6eHeroic/images/weapons.png)
 
-When a red killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results.
+When a killing attack roll button is pressed, a dialog box will first ask for combat bonuses or penalties, then a chat window will show the character's name, attack roll made, hit location (optional), and the BODY and STUN damage results. Attacking with a shield is similar to attacking with a weapon except that the DCV bonus for defense is an OCV penalty for attacks. Shields usually do normal damage, but in some cases can do killing damage (e.g., spiked shields). The shield attack button is brown to set it apart from other weapon attacks.
 
 ![Killing Attack Chat Message](/HeroSystem6eHeroic/images/RedButtonChat.png)
 
-The fifth weapon's green roll button produces similar output, but assumes the weapon's damage dice are of type normal damage. Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
+An attack doing normal damage appears in chat with a green heading. The weapon's damage dice determine STUN and BODY is calculated from the Hero formula: 1 pip is 0 BODY, 2-5 pips are 1 BODY, and 6 is 2 BODY.  Note that a d3 result of "2" has a 50% chance to contribute 1 BODY damage. In the example below, the 1d3 damage added to the bo staff (here 5d6+1d3), contributed 1 BODY and 2 STUN.
 
 ![Normal Attack Chat Message](/HeroSystem6eHeroic/images/GreenButtonChatRoll.png)
 
@@ -184,4 +186,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
-*Villain In Glasses, August 1, 2021. Last updated on September 22, 2021 to include notes on the Turn Tracker.*
+*Villain In Glasses, August 1, 2021. Last updated on September 26, 2021 to reflect changes to weapon attacks being damage-type selectable.*
