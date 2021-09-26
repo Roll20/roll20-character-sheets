@@ -4,7 +4,7 @@
     </a>
 </div>
 
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Roll20/roll20-character-sheets/master?color=ff0066&label=last%20updated) ![GitHub contributors](https://img.shields.io/github/contributors/Roll20/roll20-character-sheets?color=ff0066) ![GitHub repo size](https://img.shields.io/github/repo-size/Roll20/roll20-character-sheets?color=ff0066)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Roll20/roll20-character-sheets/master?color=ff0066&label=last%20updated) ![GitHub contributors](https://img.shields.io/github/contributors/Roll20/roll20-character-sheets?color=ff0066) ![Lines of code](https://img.shields.io/tokei/lines/github/Roll20/roll20-character-sheets?color=ff0066&label=lines%20of%20code) ![GitHub repo size](https://img.shields.io/github/repo-size/Roll20/roll20-character-sheets?color=ff0066)
 
 # Roll20 Character Sheets
 
