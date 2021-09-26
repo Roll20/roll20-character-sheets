@@ -1,5 +1,23 @@
 Change Log
 ==============================================
+**2021-09-21 ** v.42 Chuz (James Culp)
+	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
+	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.
+	Added Ranged and Melee weapons (PC->Arms and Grunt) to pastable raw data
+	Bugfix: Fixed a minor but annoying issue where if you added a skill and it was Astral the default attribute was Agility not Intuition
+	Updated skill roll button outputs to display the associated attribute for the roll.
+	Grunt sheet Added tooltips for Direct/Indirect Magic Defense, Defense, Soak, Soak Matrix and Soak Biofeedback.
+	Bugfix: PC Sheet Changes to Charisma now trigger the Social Rating to update.
+	Added Matrix Action buttons to the bottom of Grunt sheets IF "Has Matrix Device" is checked.
+	Bugfix: Grunt Group checkbox and count are no longer hidden when settings mode is not active.
+	Bugfix: Found some Soak rollbuttons were including wound modifiers, that was incorrect, fixed now.
+	Grunt/Spirit sheet Added Magic AR beside Drain roll button
+	Grunt sheet added Direct Magic and Indirect Magic defense roll buttons and rearranged things a little.
+**2021-09-08 ** v.41 Chuz (James Culp)
+	Bugfix - Drone/Vehicle Initiative should have been normal Initiative but Pilot * 2 + 4d6.
+	Bugfix - Grunt template was applying wounds to Soak rolls.
+	Added IC to the list of pastable raw data
+	Host->IC now display notes in the roll template	
 **2021-08-31 ** v.40 Chuz (James Culp)
 	Added Social Rating to derived tests (even though it's not a test) just to the right of the Edge Attribute.  This is a total of Charisma + any cumulative + primary armor social adjustments.
 	Added mouseovers for Composure, Judge Intentions, Memory and Lift & Carry buttons detailing where the values come from for those of us that forget.

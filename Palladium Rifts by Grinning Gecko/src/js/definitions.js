@@ -33,6 +33,23 @@ const WP = {
     {},
     { strike: 1, parry: 1 },
   ],
+  "w.p. bayonet": [
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
+  ],
   "w.p. blunt": [
     { strike: 1, parry: 1 },
     {},
@@ -485,6 +502,8 @@ const ATTRIBUTE_KEYS = [
   "mod_kick_unit",
   "mod_leap_kick",
   "mod_leap_kick_unit",
+  "mod_liftcarry_weight_multiplier",
+  "mod_liftcarry_duration_multiplier",
   "mod_lift",
   "mod_carry",
   "mod_throw_distance",
@@ -502,8 +521,10 @@ const ATTRIBUTE_KEYS = [
   "hf_abs",
   "mod_spellstrength",
   "spellstrength_abs",
-  "mod_trustintimidate",
-  "trustintimidate_abs",
+  "mod_trust",
+  "trust_abs",
+  "mod_intimidate",
+  "intimidate_abs",
   "mod_charmimpress",
   "charmimpress_abs",
   "mod_skillbonus",
@@ -526,10 +547,14 @@ const COMBAT_KEYS = [
   "pull",
   "roll",
   "damage",
+  "damage_paired",
+  "damage_mainhand",
+  "damage_offhand",
   "dodge_flight",
   "dodge_auto",
   "dodge_teleport",
   "dodge_motion",
+  "dodge_underwater",
   "strike_range",
   "strike_range_single",
   "strike_range_burst",
@@ -543,6 +568,8 @@ const COMBAT_KEYS = [
   "strike_range_aimed_called_pulse",
   "disarm_range",
   "damage_range",
+  "damage_range_single",
+  "damage_range_burst",
   "critical",
   "knockout",
   "deathblow",
@@ -551,17 +578,11 @@ const COMBAT_KEYS = [
 ];
 const SAVE_KEYS_ATTRIBUTE_BONUSES = {
   me_bonus: ["psionics", "insanity"],
-  pe_bonus: [
-    "magic",
-    "lethalpoison",
-    "nonlethalpoison",
-    "disease",
-    "pain",
-    "drugs",
-  ],
+  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
   pe_coma_bonus: ["comadeath"],
   perception_bonus: ["perceptioncheck"],
   none: [
+    "pain",
     "horrorfactor",
     "mindcontrol",
     "illusions",
@@ -569,6 +590,8 @@ const SAVE_KEYS_ATTRIBUTE_BONUSES = {
     "curses",
     "maintainbalance",
     "fatigue",
+    "despair",
+    "telepathicprobes",
   ],
 };
 const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
@@ -702,7 +725,6 @@ const CORE_KEYS = [
   "pb_bonus",
   "spd",
   "spdfly",
-  "trustintimidate",
   "charmimpress",
   "character_hp",
   "character_sdc",
@@ -732,6 +754,14 @@ const CORE_KEYS = [
   "credits_blackmarketmerchandise",
 ];
 
+const ARMOR_KEYS = [
+  "is_active",
+  "name",
+  "movementpenalty",
+  "basemdc",
+  "currentmdc",
+];
+
 const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 
 const EQUIPMENT_KEYS = ["equipment"];
@@ -745,6 +775,7 @@ const SECTIONS = {
   psionics: PSIONICS_KEYS,
   movement: MOVEMENT_KEYS,
   powersabilities: ABILITIES_KEYS,
+  armor: ARMOR_KEYS,
   // profiles: PROFILES_KEYS, // Tricky to export because IDs that they refer to won't line up
-  // equipment: EQUIPMENT_KEYS,
+  equipment: EQUIPMENT_KEYS,
 };

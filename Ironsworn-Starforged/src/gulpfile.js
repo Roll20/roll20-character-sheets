@@ -80,7 +80,8 @@ gulp.task('html', () => {
     )
     .pipe(
       pug({
-        pretty: true,
+        // pretty: true,
+        ...require('./app/pug.config'),
       })
     )
     .pipe(gulp.dest('../'));

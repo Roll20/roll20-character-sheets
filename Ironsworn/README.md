@@ -17,7 +17,7 @@ These will then generate a dist folder that will have the finished code. From th
 ## Pushing Changes
 Roll20 does not build our pug/stylus code for when we merge. This needs to be done locally by running `npm run gulp:build` in the Ironsworn/src directory.
 ## Translations
-To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
+To keep our translation and fallback html content consistent. We are loading the translations into pug under the `locals` global variable. This allows us to call `locals.translations[<translation-key>]` to get our content. This way we can propagate changes and avoid hardcoding content.
 ## Compatibility
 The sheet has been tested across multiple browsers and devices, show below in the compatibility matrix:
 |Browser|Windows|MacOs|Android|iOS|

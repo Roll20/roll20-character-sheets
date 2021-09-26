@@ -239,7 +239,9 @@ async function repeatingStringConcatAsync({
       .reduce((attrAcc, attrCur) => {
         return a[attrCur] == "" || a[attrCur] == "0"
           ? attrAcc
-          : `${a[attrCur]}+${attrAcc}`.replace(/\+\s*$/, "");
+          : `${a[attrCur]}+${attrAcc}`
+              .replace(/\+\s*$/, "")
+              .replace(/^\s*\+/, "");
       }, "");
     return acc;
   }, {});

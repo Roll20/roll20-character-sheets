@@ -12,6 +12,9 @@ function importSingleArmor(armor, attributes) {
 
     var newrowid = generateRowID()
     attributes["repeating_armors_"+newrowid+"_armorname"] = armor.name;
+    if(armor.equipped == "True") {
+           attributes["repeating_armors_"+newrowid+"_armorworn"] = "on";
+    }
     attributes["repeating_armors_"+newrowid+"_armorrating"] = armor.armor;
     attributes["repeating_armors_"+newrowid+"_armornotes"] = "";
     if(armor.armormods!=null){

@@ -74,7 +74,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     "spdfly",
     "hf",
     "spellstrength",
-    "trustintimidate",
+    "trust",
+    "intimidate",
     "charmimpress",
   ];
   const fieldNames = rowIds.reduce((acc, rowId) => {
@@ -111,7 +112,7 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
       const rsaDestinations = [`${destinationPrefix}_mod_${field}`];
       const rsaFields = [`mod_${field}`];
       let base = field;
-      if (field == "trustintimidate") {
+      if (field == "trust" || field == "intimidate") {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
@@ -134,15 +135,31 @@ async function combineBonuses(rowIds, destinationPrefix) {
 
   console.log("combineBonuses", rowIds, destinationPrefix);
 
+  const options = await getAttrsAsync(["opt_pp_extras"]);
+  const optPpExtras = Boolean(+options["opt_pp_extras"]);
+
   await repeatingAbsoluteAttributes(rowIds, destinationPrefix);
 
   await repeatingStringConcatAsync({
     destinations: [
       `${destinationPrefix}_damage`,
+      `${destinationPrefix}_damage_paired`,
+      `${destinationPrefix}_damage_mainhand`,
+      `${destinationPrefix}_damage_offhand`,
       `${destinationPrefix}_damage_range`,
+      `${destinationPrefix}_damage_range_single`,
+      `${destinationPrefix}_damage_range_burst`,
     ],
     section: "bonuses",
-    fields: ["damage", "damage_range"],
+    fields: [
+      "damage",
+      "damage_paired",
+      "damage_mainhand",
+      "damage_offhand",
+      "damage_range",
+      "damage_range_single",
+      "damage_range_burst",
+    ],
     filter: rowIds,
   });
 
@@ -152,6 +169,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "knockout",
     "deathblow",
     "mod_character_ps_type",
+    "mod_liftcarry_weight_multiplier",
+    "mod_liftcarry_duration_multiplier",
   ];
   const pickBestDestinations = pickBestFieldsBase.map(
     (field) => `${destinationPrefix}_${field}`
@@ -162,12 +181,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
     destinations: pickBestDestinations,
     section: "bonuses",
     fields: pickBestFields,
-    defaultValues: [0, 20, 0, 0, core.character_ps_type],
-    ranks: ["high", "low", "low", "low", "high", "high"],
+    defaultValues: [0, 20, 0, 0, core.character_ps_type, 1, 1],
+    ranks: ["high", "low", "low", "low", "high", "high", "high", "high"],
     filter: rowIds,
   });
 
-  const noAttributeBonusFields = [
+  let noAttributeBonusFields = [
     "attacks",
     "initiative",
     "pull",
@@ -179,6 +198,27 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "strike_range_called",
     "disarm_range",
   ];
+
+  let ppBonusFields = [
+    "strike",
+    "parry",
+    "dodge",
+    "throw",
+    "dodge_flight",
+    "dodge_auto",
+    "dodge_teleport",
+    "dodge_motion",
+    "dodge_underwater",
+    "flipthrow",
+  ];
+
+  const ppExtras = ["disarm", "entangle"];
+  if (optPpExtras) {
+    ppBonusFields = ppBonusFields.concat(ppExtras);
+  } else {
+    noAttributeBonusFields = noAttributeBonusFields.concat(ppExtras);
+  }
+
   // No attribute bonuses.
   await repeatingSumAsync(
     noAttributeBonusFields.map((field) => `${destinationPrefix}_${field}`),
@@ -235,19 +275,6 @@ async function combineBonuses(rowIds, destinationPrefix) {
     `filter:${rowIds.toString()}`
   );
 
-  const ppBonusFields = [
-    "strike",
-    "parry",
-    "dodge",
-    "throw",
-    "disarm",
-    "entangle",
-    "dodge_flight",
-    "dodge_auto",
-    "dodge_teleport",
-    "dodge_motion",
-    "flipthrow",
-  ];
   await repeatingSumAsync(
     ppBonusFields.map((field) => `${destinationPrefix}_${field}`),
     "bonuses",
@@ -384,7 +411,9 @@ on("change:repeating_profiles:mod_ma", async (e) => {
 
 on(
   "change:repeating_profiles:mod_ps \
-  change:repeating_profiles:mod_character_ps_type",
+  change:repeating_profiles:mod_character_ps_type \
+  change:repeating_profiles:mod_liftcarry_weight_multiplier \
+  change:repeating_profiles:mod_liftcarry_duration_multiplier",
   async (e) => {
     console.log("change:repeating_profiles:mod_ps", e);
     const [r, section, rowId] = e.sourceAttribute.split("_");

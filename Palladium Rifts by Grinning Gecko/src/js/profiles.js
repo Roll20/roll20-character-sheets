@@ -1,3 +1,8 @@
+async function getDefaultProfileID() {
+  const { default_profile } = await getAttrsAsync(["default_profile"]);
+  return default_profile;
+}
+
 async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
@@ -206,3 +211,33 @@ on("clicked:getdefaultprofile", async (e) => {
   const a = await getAttrsAsync(["default_profile", "default_mdc"]);
   console.log(a);
 });
+
+/**
+ * Add a token {attack} times to the Turn Tracker in order against other tokens.
+ * Requires API script access.
+ * For use on an action button.
+ *
+ * [[d20+@{selected|repeating_profiles_-MibcwHG5hZXUJn6A7OG_initiative} &{tracker}]]
+ */
+async function palladiumAddToTurnTracker(e) {
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const {
+    [`${rowPrefix}_initiative`]: init,
+    [`${rowPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([`${rowPrefix}_initiative`, `${rowPrefix}_attacks`]);
+  const roll = await startRoll(
+    `&{template:test} {{name=Test}} {{roll1=[[1d20]]}}`
+  );
+  console.log(roll);
+  const computed = roll.results.roll1.result + init;
+  console.log(computed);
+  finishRoll(roll.rollId, {
+    roll1: computed,
+  });
+  const addToTracker = await startRoll(`[[[[${computed}]] &{tracker}]]`);
+  finishRoll(addToTracker.rollId);
+  // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
+  const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
+  finishRoll(dupeTracker.rollId);
+}

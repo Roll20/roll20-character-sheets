@@ -1,8 +1,8 @@
-<!-- Add class="debug" to <main> for debugging -->
-<main id="megaverse" class="xdebug">
+<input type="hidden" class="debug" name="attr_debug" />
+<main id="megaverse" class="">
   <img
     class="logo"
-    src="https://db4sgowjqfwig.cloudfront.net/game_systems/22/assets/1100695/rifts-logo.png"
+    src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Palladium%20Rifts%20by%20Grinning%20Gecko/rifts-logo.png"
   />
   <span name="attr_character_name"></span>
   <div class="r-tabbed">
@@ -31,7 +31,7 @@
       <li class="r-tab"><label for="tab-psionics">Psionics</label></li>
       <li class="r-tab"><label for="tab-modifiers">Modifiers</label></li>
       <li class="r-tab"><label for="tab-bonuses">Profiles</label></li>
-      <li class="r-tab"><label for="tab-importexport">Imp/Exp</label></li>
+      <li class="r-tab"><label for="tab-importexport">Options</label></li>
     </ul>
 
     <div class="r-tab-content">
@@ -90,6 +90,7 @@
 <datalist id="weapon-proficiencies">
   <option value="W.P. Archery"></option>
   <option value="W.P. Axe"></option>
+  <option value="W.P. Bayonet"></option>
   <option value="W.P. Blunt"></option>
   <option value="W.P. Chain"></option>
   <option value="W.P. Forked"></option>
@@ -373,33 +374,7 @@
           title="Flying Speed"
         />
       </div>
-      <div class="ss-2b">
-        <label for="trust-intimidate">Trust/Intimidate</label>
-        <input
-          id="trust-intimidate"
-          type="number"
-          value="0"
-          name="attr_trustintimidate"
-        /><span>%</span>
-        <button
-          type="roll"
-          value="@{character_name} Trust/Intimidate check: [[d100<@{trustintimidate}]]"
-          name="roll_skill"
-        ></button>
-
-        <label for="charm-impress">Charm/Impress</label>
-        <input
-          id="charm-impress"
-          type="number"
-          value="0"
-          name="attr_charmimpress"
-        /><span>%</span>
-        <button
-          type="roll"
-          value="@{character_name} Charm/Impress check: [[d100<@{charmimpress}]]"
-          name="roll_skill"
-        ></button>
-      </div>
+      <div class="ss-2b"></div>
       <div class="ss-2c">
         <label
           ><span>Hit Points</span>
@@ -460,11 +435,6 @@
             value="0"
             name="attr_perception"
           />
-          <button
-            type="roll"
-            value="Perception: [[d20+@{perception}]]"
-            name="roll_perception"
-          ></button>
         </label>
       </div>
     </div>
@@ -587,7 +557,7 @@
           <span class="readonly" name="attr_total"></span>
           <button
             type="roll"
-            value="&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{total},98}kl1]]}} {{roll=[[d100]]}}"
+            value="&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{total}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
             name="roll_skill"
           ></button>
         </div>
@@ -611,11 +581,15 @@
     <div class="r-tab-content">
       <div class="equipment">
         <h3>Finances</h3>
-        <p>
-          See
-          https://palladiumbooks.com/questions-resources/resources/the-cutting-room-floor/58-resources/cutting-room-floor/224-the-trouble-with-credits
-          for more details.
-        </p>
+        <button
+          class="no-dice"
+          type="roll"
+          value="[The Trouble With Credits](https://palladiumbooks.com/questions-resources/resources/the-cutting-room-floor/58-resources/cutting-room-floor/224-the-trouble-with-credits)"
+          name="roll_trouble_credits"
+        >
+          The Trouble With Credits
+        </button>
+        (link will appear in chat)
         <div class="finance-grid">
           <details>
             <summary>
@@ -742,6 +716,10 @@
       <p>
         Weapon Proficiencies are automatically added to Profiles &rarr;
         <span class="picker-title">Modifier Picker</span>.
+      </p>
+      <p>
+        W.P. Bayonet comes from Adventure Sourcebook - Mercenary Adventures,
+        page 45.
       </p>
     </details>
     <p>Click <b>Instructions</b> for detailed instructions.</p>
@@ -877,7 +855,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{character_name} @{name} check: [[d100<@{percentage}]]"
+      value="&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{percentage}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
       name="roll_powerability_skill"
     ></button>
   </div>
@@ -1232,12 +1210,20 @@
       <input type="number" value="0" name="attr_mod_spellstrength" />
     </label>
     <label>
-      <span>Trust/Intimidate</span>
+      <span>Trust</span>
       <label class="abs" title="Relative or absolute value">
-        <input type="checkbox" value="1" name="attr_trustintimidate_abs" />
+        <input type="checkbox" value="1" name="attr_trust_abs" />
         <span></span>
       </label>
-      <input type="number" value="0" name="attr_mod_trustintimidate" />
+      <input type="number" value="0" name="attr_mod_trust" />
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <label class="abs" title="Relative or absolute value">
+        <input type="checkbox" value="1" name="attr_intimidate_abs" />
+        <span></span>
+      </label>
+      <input type="number" value="0" name="attr_mod_intimidate" />
     </label>
     <label>
       <span>Charm/Impress</span>
@@ -1308,21 +1294,41 @@
       </select>
     </label>
 
+    <label title="Crazy 2x, Juicer 4x, etc."
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
+    <label title="Crazy, Juicer 10x, etc."
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
     <label
       ><span>Lift</span>
-      <input type="number" value="0" name="attr_mod_lift" value="0" />
+      <input type="number" value="0" name="attr_mod_lift" />
       <span>lbs</span>
     </label>
 
     <label
       ><span>Carry</span>
-      <input type="number" value="0" name="attr_mod_carry" value="0" />
+      <input type="number" value="0" name="attr_mod_carry" />
       <span>lbs</span></label
     >
 
     <label
       ><span>Throw (&frac12; Carry)</span>
-      <input type="number" value="0" name="attr_mod_throw_distance" value="0" />
+      <input type="number" value="0" name="attr_mod_throw_distance" />
       <span>Feet</span></label
     >
 
@@ -1355,14 +1361,14 @@
     ><span>Attacks</span>
     <input type="number" value="0" name="attr_attacks" />
   </label>
+  <label
+    ><span>Initiative</span>
+    <input type="number" value="0" name="attr_initiative" />
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="number" value="0" name="attr_initiative" />
-    </label>
     <label
       ><span>Strike</span>
       <input type="number" value="0" name="attr_strike" />
@@ -1370,6 +1376,18 @@
     <label
       ><span>Damage</span>
       <input type="text" value="0" name="attr_damage" />
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="text" value="0" name="attr_damage_paired" />
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="text" value="0" name="attr_damage_mainhand" />
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="text" value="0" name="attr_damage_offhand" />
     </label>
     <label
       ><span>Disarm</span>
@@ -1405,51 +1423,59 @@
   <div class="combat-offense-range bonus-type-container">
     <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="number" value="0" name="attr_strike_range" />
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="text" value="0" name="attr_damage_range" />
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="text" value="0" name="attr_damage_range_single" />
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="text" value="0" name="attr_damage_range_burst" />
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="number" value="0" name="attr_strike_range_single" />
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="number" value="0" name="attr_strike_range_burst" />
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="number" value="0" name="attr_strike_range_aimed" />
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span name="attr_strike_range_aimed_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span name="attr_strike_range_aimed_pulse"></span>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="number" value="0" name="attr_strike_range_called" />
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span name="attr_strike_range_called_single"></span>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span name="attr_strike_range_called_pulse"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -1458,7 +1484,7 @@
       <span name="attr_strike_range_aimed_called_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -1467,7 +1493,7 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="number" value="0" name="attr_disarm_range" />
     </label>
   </div>
@@ -1486,7 +1512,7 @@
       <input type="number" value="0" name="attr_dodge_flight" />
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="number" value="0" name="attr_dodge_auto" />
     </label>
     <label
@@ -1498,6 +1524,10 @@
       <input type="number" value="0" name="attr_dodge_motion" />
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="number" value="0" name="attr_dodge_underwater" />
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="number" value="0" name="attr_roll" />
     </label>
@@ -1505,72 +1535,80 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="number" value="0" name="attr_perceptioncheck" />
-    </label>
-    <label
-      ><span>Psionics</span>
-      <input type="number" value="0" name="attr_psionics" />
-    </label>
-    <label
-      ><span>Magic</span>
-      <input type="number" value="0" name="attr_magic" />
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="number" value="0" name="attr_horrorfactor" />
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="number" value="0" name="attr_mindcontrol" />
-    </label>
-    <label
-      ><span>Disease</span>
-      <input type="number" value="0" name="attr_disease" />
-    </label>
-    <label
-      ><span>Illusions</span>
-      <input type="number" value="0" name="attr_illusions" />
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="number" value="0" name="attr_possession" />
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="number" value="0" name="attr_insanity" />
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="number" value="0" name="attr_pain" />
-    </label>
-    <label
-      ><span>Lethal Poison</span>
-      <input type="number" value="0" name="attr_lethalpoison" />
-    </label>
-    <label
-      ><span>Non-Lethal Poison</span>
-      <input type="number" value="0" name="attr_nonlethalpoison" />
-    </label>
-    <label
-      ><span>Drugs</span>
-      <input type="number" value="0" name="attr_drugs" />
+      ><span>Coma/Death</span>
+      <input type="number" value="0" name="attr_comadeath" />
     </label>
     <label
       ><span>Curses</span>
       <input type="number" value="0" name="attr_curses" />
     </label>
     <label
-      ><span>Maintain Balance</span>
-      <input type="number" value="0" name="attr_maintainbalance" />
+      ><span>Despair</span>
+      <input type="number" value="0" name="attr_despair" />
+    </label>
+    <label
+      ><span>Disease</span>
+      <input type="number" value="0" name="attr_disease" />
+    </label>
+    <label
+      ><span>Drugs</span>
+      <input type="number" value="0" name="attr_drugs" />
     </label>
     <label
       ><span>Fatigue</span>
       <input type="number" value="0" name="attr_fatigue" />
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="number" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="number" value="0" name="attr_horrorfactor" />
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="number" value="0" name="attr_illusions" />
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="number" value="0" name="attr_insanity" />
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="number" value="0" name="attr_magic" />
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="number" value="0" name="attr_maintainbalance" />
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="number" value="0" name="attr_mindcontrol" />
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="number" value="0" name="attr_pain" />
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="number" value="0" name="attr_perceptioncheck" />
+    </label>
+    <label
+      ><span>Poison: Lethal</span>
+      <input type="number" value="0" name="attr_lethalpoison" />
+    </label>
+    <label
+      ><span>Poison: Non-Lethal</span>
+      <input type="number" value="0" name="attr_nonlethalpoison" />
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="number" value="0" name="attr_possession" />
+    </label>
+    <label
+      ><span>Psionics</span>
+      <input type="number" value="0" name="attr_psionics" />
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="number" value="0" name="attr_telepathicprobes" />
     </label>
   </div>
 </div>
@@ -1695,7 +1733,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{character_name} @{name} check: [[d100<@{percentage}]]"
+      value="&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{percentage}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
       name="roll_spell_skill"
     ></button>
     <input type="number" value="0" name="attr_ppecost" />
@@ -2039,12 +2077,20 @@
       <input type="number" value="0" name="attr_mod_spellstrength" />
     </label>
     <label>
-      <span>Trust/Intimidate</span>
+      <span>Trust</span>
       <label class="abs" title="Relative or absolute value">
-        <input type="checkbox" value="1" name="attr_trustintimidate_abs" />
+        <input type="checkbox" value="1" name="attr_trust_abs" />
         <span></span>
       </label>
-      <input type="number" value="0" name="attr_mod_trustintimidate" />
+      <input type="number" value="0" name="attr_mod_trust" />
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <label class="abs" title="Relative or absolute value">
+        <input type="checkbox" value="1" name="attr_intimidate_abs" />
+        <span></span>
+      </label>
+      <input type="number" value="0" name="attr_mod_intimidate" />
     </label>
     <label>
       <span>Charm/Impress</span>
@@ -2115,21 +2161,41 @@
       </select>
     </label>
 
+    <label title="Crazy 2x, Juicer 4x, etc."
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
+    <label title="Crazy, Juicer 10x, etc."
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
     <label
       ><span>Lift</span>
-      <input type="number" value="0" name="attr_mod_lift" value="0" />
+      <input type="number" value="0" name="attr_mod_lift" />
       <span>lbs</span>
     </label>
 
     <label
       ><span>Carry</span>
-      <input type="number" value="0" name="attr_mod_carry" value="0" />
+      <input type="number" value="0" name="attr_mod_carry" />
       <span>lbs</span></label
     >
 
     <label
       ><span>Throw (&frac12; Carry)</span>
-      <input type="number" value="0" name="attr_mod_throw_distance" value="0" />
+      <input type="number" value="0" name="attr_mod_throw_distance" />
       <span>Feet</span></label
     >
 
@@ -2162,14 +2228,14 @@
     ><span>Attacks</span>
     <input type="number" value="0" name="attr_attacks" />
   </label>
+  <label
+    ><span>Initiative</span>
+    <input type="number" value="0" name="attr_initiative" />
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="number" value="0" name="attr_initiative" />
-    </label>
     <label
       ><span>Strike</span>
       <input type="number" value="0" name="attr_strike" />
@@ -2177,6 +2243,18 @@
     <label
       ><span>Damage</span>
       <input type="text" value="0" name="attr_damage" />
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="text" value="0" name="attr_damage_paired" />
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="text" value="0" name="attr_damage_mainhand" />
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="text" value="0" name="attr_damage_offhand" />
     </label>
     <label
       ><span>Disarm</span>
@@ -2212,51 +2290,59 @@
   <div class="combat-offense-range bonus-type-container">
     <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="number" value="0" name="attr_strike_range" />
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="text" value="0" name="attr_damage_range" />
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="text" value="0" name="attr_damage_range_single" />
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="text" value="0" name="attr_damage_range_burst" />
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="number" value="0" name="attr_strike_range_single" />
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="number" value="0" name="attr_strike_range_burst" />
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="number" value="0" name="attr_strike_range_aimed" />
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span name="attr_strike_range_aimed_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span name="attr_strike_range_aimed_pulse"></span>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="number" value="0" name="attr_strike_range_called" />
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span name="attr_strike_range_called_single"></span>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span name="attr_strike_range_called_pulse"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -2265,7 +2351,7 @@
       <span name="attr_strike_range_aimed_called_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -2274,7 +2360,7 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="number" value="0" name="attr_disarm_range" />
     </label>
   </div>
@@ -2293,7 +2379,7 @@
       <input type="number" value="0" name="attr_dodge_flight" />
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="number" value="0" name="attr_dodge_auto" />
     </label>
     <label
@@ -2305,6 +2391,10 @@
       <input type="number" value="0" name="attr_dodge_motion" />
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="number" value="0" name="attr_dodge_underwater" />
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="number" value="0" name="attr_roll" />
     </label>
@@ -2312,72 +2402,80 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="number" value="0" name="attr_perceptioncheck" />
-    </label>
-    <label
-      ><span>Psionics</span>
-      <input type="number" value="0" name="attr_psionics" />
-    </label>
-    <label
-      ><span>Magic</span>
-      <input type="number" value="0" name="attr_magic" />
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="number" value="0" name="attr_horrorfactor" />
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="number" value="0" name="attr_mindcontrol" />
-    </label>
-    <label
-      ><span>Disease</span>
-      <input type="number" value="0" name="attr_disease" />
-    </label>
-    <label
-      ><span>Illusions</span>
-      <input type="number" value="0" name="attr_illusions" />
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="number" value="0" name="attr_possession" />
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="number" value="0" name="attr_insanity" />
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="number" value="0" name="attr_pain" />
-    </label>
-    <label
-      ><span>Lethal Poison</span>
-      <input type="number" value="0" name="attr_lethalpoison" />
-    </label>
-    <label
-      ><span>Non-Lethal Poison</span>
-      <input type="number" value="0" name="attr_nonlethalpoison" />
-    </label>
-    <label
-      ><span>Drugs</span>
-      <input type="number" value="0" name="attr_drugs" />
+      ><span>Coma/Death</span>
+      <input type="number" value="0" name="attr_comadeath" />
     </label>
     <label
       ><span>Curses</span>
       <input type="number" value="0" name="attr_curses" />
     </label>
     <label
-      ><span>Maintain Balance</span>
-      <input type="number" value="0" name="attr_maintainbalance" />
+      ><span>Despair</span>
+      <input type="number" value="0" name="attr_despair" />
+    </label>
+    <label
+      ><span>Disease</span>
+      <input type="number" value="0" name="attr_disease" />
+    </label>
+    <label
+      ><span>Drugs</span>
+      <input type="number" value="0" name="attr_drugs" />
     </label>
     <label
       ><span>Fatigue</span>
       <input type="number" value="0" name="attr_fatigue" />
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="number" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="number" value="0" name="attr_horrorfactor" />
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="number" value="0" name="attr_illusions" />
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="number" value="0" name="attr_insanity" />
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="number" value="0" name="attr_magic" />
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="number" value="0" name="attr_maintainbalance" />
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="number" value="0" name="attr_mindcontrol" />
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="number" value="0" name="attr_pain" />
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="number" value="0" name="attr_perceptioncheck" />
+    </label>
+    <label
+      ><span>Poison: Lethal</span>
+      <input type="number" value="0" name="attr_lethalpoison" />
+    </label>
+    <label
+      ><span>Poison: Non-Lethal</span>
+      <input type="number" value="0" name="attr_nonlethalpoison" />
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="number" value="0" name="attr_possession" />
+    </label>
+    <label
+      ><span>Psionics</span>
+      <input type="number" value="0" name="attr_psionics" />
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="number" value="0" name="attr_telepathicprobes" />
     </label>
   </div>
 </div>
@@ -2503,7 +2601,7 @@
     <span name="attr_percentage"></span>
     <button
       type="roll"
-      value="@{character_name} @{name} check: [[d100<@{percentage}]]"
+      value="&{template:skill} {{title=@{character_name} uses @{name}}} {{target=[[{@{percentage}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
       name="roll_psionic_skill"
     ></button>
     <input type="number" value="0" name="attr_ispcost" />
@@ -2847,12 +2945,20 @@
       <input type="number" value="0" name="attr_mod_spellstrength" />
     </label>
     <label>
-      <span>Trust/Intimidate</span>
+      <span>Trust</span>
       <label class="abs" title="Relative or absolute value">
-        <input type="checkbox" value="1" name="attr_trustintimidate_abs" />
+        <input type="checkbox" value="1" name="attr_trust_abs" />
         <span></span>
       </label>
-      <input type="number" value="0" name="attr_mod_trustintimidate" />
+      <input type="number" value="0" name="attr_mod_trust" />
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <label class="abs" title="Relative or absolute value">
+        <input type="checkbox" value="1" name="attr_intimidate_abs" />
+        <span></span>
+      </label>
+      <input type="number" value="0" name="attr_mod_intimidate" />
     </label>
     <label>
       <span>Charm/Impress</span>
@@ -2923,21 +3029,41 @@
       </select>
     </label>
 
+    <label title="Crazy 2x, Juicer 4x, etc."
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
+    <label title="Crazy, Juicer 10x, etc."
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
     <label
       ><span>Lift</span>
-      <input type="number" value="0" name="attr_mod_lift" value="0" />
+      <input type="number" value="0" name="attr_mod_lift" />
       <span>lbs</span>
     </label>
 
     <label
       ><span>Carry</span>
-      <input type="number" value="0" name="attr_mod_carry" value="0" />
+      <input type="number" value="0" name="attr_mod_carry" />
       <span>lbs</span></label
     >
 
     <label
       ><span>Throw (&frac12; Carry)</span>
-      <input type="number" value="0" name="attr_mod_throw_distance" value="0" />
+      <input type="number" value="0" name="attr_mod_throw_distance" />
       <span>Feet</span></label
     >
 
@@ -2970,14 +3096,14 @@
     ><span>Attacks</span>
     <input type="number" value="0" name="attr_attacks" />
   </label>
+  <label
+    ><span>Initiative</span>
+    <input type="number" value="0" name="attr_initiative" />
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="number" value="0" name="attr_initiative" />
-    </label>
     <label
       ><span>Strike</span>
       <input type="number" value="0" name="attr_strike" />
@@ -2985,6 +3111,18 @@
     <label
       ><span>Damage</span>
       <input type="text" value="0" name="attr_damage" />
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="text" value="0" name="attr_damage_paired" />
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="text" value="0" name="attr_damage_mainhand" />
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="text" value="0" name="attr_damage_offhand" />
     </label>
     <label
       ><span>Disarm</span>
@@ -3020,51 +3158,59 @@
   <div class="combat-offense-range bonus-type-container">
     <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="number" value="0" name="attr_strike_range" />
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="text" value="0" name="attr_damage_range" />
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="text" value="0" name="attr_damage_range_single" />
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="text" value="0" name="attr_damage_range_burst" />
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="number" value="0" name="attr_strike_range_single" />
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="number" value="0" name="attr_strike_range_burst" />
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="number" value="0" name="attr_strike_range_aimed" />
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span name="attr_strike_range_aimed_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span name="attr_strike_range_aimed_pulse"></span>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="number" value="0" name="attr_strike_range_called" />
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span name="attr_strike_range_called_single"></span>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span name="attr_strike_range_called_pulse"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -3073,7 +3219,7 @@
       <span name="attr_strike_range_aimed_called_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -3082,7 +3228,7 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="number" value="0" name="attr_disarm_range" />
     </label>
   </div>
@@ -3101,7 +3247,7 @@
       <input type="number" value="0" name="attr_dodge_flight" />
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="number" value="0" name="attr_dodge_auto" />
     </label>
     <label
@@ -3113,6 +3259,10 @@
       <input type="number" value="0" name="attr_dodge_motion" />
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="number" value="0" name="attr_dodge_underwater" />
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="number" value="0" name="attr_roll" />
     </label>
@@ -3120,72 +3270,80 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="number" value="0" name="attr_perceptioncheck" />
-    </label>
-    <label
-      ><span>Psionics</span>
-      <input type="number" value="0" name="attr_psionics" />
-    </label>
-    <label
-      ><span>Magic</span>
-      <input type="number" value="0" name="attr_magic" />
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="number" value="0" name="attr_horrorfactor" />
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="number" value="0" name="attr_mindcontrol" />
-    </label>
-    <label
-      ><span>Disease</span>
-      <input type="number" value="0" name="attr_disease" />
-    </label>
-    <label
-      ><span>Illusions</span>
-      <input type="number" value="0" name="attr_illusions" />
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="number" value="0" name="attr_possession" />
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="number" value="0" name="attr_insanity" />
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="number" value="0" name="attr_pain" />
-    </label>
-    <label
-      ><span>Lethal Poison</span>
-      <input type="number" value="0" name="attr_lethalpoison" />
-    </label>
-    <label
-      ><span>Non-Lethal Poison</span>
-      <input type="number" value="0" name="attr_nonlethalpoison" />
-    </label>
-    <label
-      ><span>Drugs</span>
-      <input type="number" value="0" name="attr_drugs" />
+      ><span>Coma/Death</span>
+      <input type="number" value="0" name="attr_comadeath" />
     </label>
     <label
       ><span>Curses</span>
       <input type="number" value="0" name="attr_curses" />
     </label>
     <label
-      ><span>Maintain Balance</span>
-      <input type="number" value="0" name="attr_maintainbalance" />
+      ><span>Despair</span>
+      <input type="number" value="0" name="attr_despair" />
+    </label>
+    <label
+      ><span>Disease</span>
+      <input type="number" value="0" name="attr_disease" />
+    </label>
+    <label
+      ><span>Drugs</span>
+      <input type="number" value="0" name="attr_drugs" />
     </label>
     <label
       ><span>Fatigue</span>
       <input type="number" value="0" name="attr_fatigue" />
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="number" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="number" value="0" name="attr_horrorfactor" />
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="number" value="0" name="attr_illusions" />
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="number" value="0" name="attr_insanity" />
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="number" value="0" name="attr_magic" />
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="number" value="0" name="attr_maintainbalance" />
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="number" value="0" name="attr_mindcontrol" />
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="number" value="0" name="attr_pain" />
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="number" value="0" name="attr_perceptioncheck" />
+    </label>
+    <label
+      ><span>Poison: Lethal</span>
+      <input type="number" value="0" name="attr_lethalpoison" />
+    </label>
+    <label
+      ><span>Poison: Non-Lethal</span>
+      <input type="number" value="0" name="attr_nonlethalpoison" />
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="number" value="0" name="attr_possession" />
+    </label>
+    <label
+      ><span>Psionics</span>
+      <input type="number" value="0" name="attr_psionics" />
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="number" value="0" name="attr_telepathicprobes" />
     </label>
   </div>
 </div>
@@ -3526,12 +3684,20 @@
       <input type="number" value="0" name="attr_mod_spellstrength" />
     </label>
     <label>
-      <span>Trust/Intimidate</span>
+      <span>Trust</span>
       <label class="abs" title="Relative or absolute value">
-        <input type="checkbox" value="1" name="attr_trustintimidate_abs" />
+        <input type="checkbox" value="1" name="attr_trust_abs" />
         <span></span>
       </label>
-      <input type="number" value="0" name="attr_mod_trustintimidate" />
+      <input type="number" value="0" name="attr_mod_trust" />
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <label class="abs" title="Relative or absolute value">
+        <input type="checkbox" value="1" name="attr_intimidate_abs" />
+        <span></span>
+      </label>
+      <input type="number" value="0" name="attr_mod_intimidate" />
     </label>
     <label>
       <span>Charm/Impress</span>
@@ -3602,21 +3768,41 @@
       </select>
     </label>
 
+    <label title="Crazy 2x, Juicer 4x, etc."
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
+    <label title="Crazy, Juicer 10x, etc."
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="number"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+      />
+      <span>&#x00D7;</span>
+    </label>
+
     <label
       ><span>Lift</span>
-      <input type="number" value="0" name="attr_mod_lift" value="0" />
+      <input type="number" value="0" name="attr_mod_lift" />
       <span>lbs</span>
     </label>
 
     <label
       ><span>Carry</span>
-      <input type="number" value="0" name="attr_mod_carry" value="0" />
+      <input type="number" value="0" name="attr_mod_carry" />
       <span>lbs</span></label
     >
 
     <label
       ><span>Throw (&frac12; Carry)</span>
-      <input type="number" value="0" name="attr_mod_throw_distance" value="0" />
+      <input type="number" value="0" name="attr_mod_throw_distance" />
       <span>Feet</span></label
     >
 
@@ -3649,14 +3835,14 @@
     ><span>Attacks</span>
     <input type="number" value="0" name="attr_attacks" />
   </label>
+  <label
+    ><span>Initiative</span>
+    <input type="number" value="0" name="attr_initiative" />
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="number" value="0" name="attr_initiative" />
-    </label>
     <label
       ><span>Strike</span>
       <input type="number" value="0" name="attr_strike" />
@@ -3664,6 +3850,18 @@
     <label
       ><span>Damage</span>
       <input type="text" value="0" name="attr_damage" />
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="text" value="0" name="attr_damage_paired" />
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="text" value="0" name="attr_damage_mainhand" />
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="text" value="0" name="attr_damage_offhand" />
     </label>
     <label
       ><span>Disarm</span>
@@ -3699,51 +3897,59 @@
   <div class="combat-offense-range bonus-type-container">
     <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="number" value="0" name="attr_strike_range" />
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="text" value="0" name="attr_damage_range" />
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="text" value="0" name="attr_damage_range_single" />
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="text" value="0" name="attr_damage_range_burst" />
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="number" value="0" name="attr_strike_range_single" />
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="number" value="0" name="attr_strike_range_burst" />
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="number" value="0" name="attr_strike_range_aimed" />
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span name="attr_strike_range_aimed_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span name="attr_strike_range_aimed_pulse"></span>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="number" value="0" name="attr_strike_range_called" />
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span name="attr_strike_range_called_single"></span>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span name="attr_strike_range_called_pulse"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -3752,7 +3958,7 @@
       <span name="attr_strike_range_aimed_called_single"></span>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -3761,7 +3967,7 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="number" value="0" name="attr_disarm_range" />
     </label>
   </div>
@@ -3780,7 +3986,7 @@
       <input type="number" value="0" name="attr_dodge_flight" />
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="number" value="0" name="attr_dodge_auto" />
     </label>
     <label
@@ -3792,6 +3998,10 @@
       <input type="number" value="0" name="attr_dodge_motion" />
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="number" value="0" name="attr_dodge_underwater" />
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="number" value="0" name="attr_roll" />
     </label>
@@ -3799,72 +4009,80 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="number" value="0" name="attr_perceptioncheck" />
-    </label>
-    <label
-      ><span>Psionics</span>
-      <input type="number" value="0" name="attr_psionics" />
-    </label>
-    <label
-      ><span>Magic</span>
-      <input type="number" value="0" name="attr_magic" />
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="number" value="0" name="attr_horrorfactor" />
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="number" value="0" name="attr_mindcontrol" />
-    </label>
-    <label
-      ><span>Disease</span>
-      <input type="number" value="0" name="attr_disease" />
-    </label>
-    <label
-      ><span>Illusions</span>
-      <input type="number" value="0" name="attr_illusions" />
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="number" value="0" name="attr_possession" />
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="number" value="0" name="attr_insanity" />
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="number" value="0" name="attr_pain" />
-    </label>
-    <label
-      ><span>Lethal Poison</span>
-      <input type="number" value="0" name="attr_lethalpoison" />
-    </label>
-    <label
-      ><span>Non-Lethal Poison</span>
-      <input type="number" value="0" name="attr_nonlethalpoison" />
-    </label>
-    <label
-      ><span>Drugs</span>
-      <input type="number" value="0" name="attr_drugs" />
+      ><span>Coma/Death</span>
+      <input type="number" value="0" name="attr_comadeath" />
     </label>
     <label
       ><span>Curses</span>
       <input type="number" value="0" name="attr_curses" />
     </label>
     <label
-      ><span>Maintain Balance</span>
-      <input type="number" value="0" name="attr_maintainbalance" />
+      ><span>Despair</span>
+      <input type="number" value="0" name="attr_despair" />
+    </label>
+    <label
+      ><span>Disease</span>
+      <input type="number" value="0" name="attr_disease" />
+    </label>
+    <label
+      ><span>Drugs</span>
+      <input type="number" value="0" name="attr_drugs" />
     </label>
     <label
       ><span>Fatigue</span>
       <input type="number" value="0" name="attr_fatigue" />
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="number" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="number" value="0" name="attr_horrorfactor" />
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="number" value="0" name="attr_illusions" />
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="number" value="0" name="attr_insanity" />
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="number" value="0" name="attr_magic" />
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="number" value="0" name="attr_maintainbalance" />
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="number" value="0" name="attr_mindcontrol" />
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="number" value="0" name="attr_pain" />
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="number" value="0" name="attr_perceptioncheck" />
+    </label>
+    <label
+      ><span>Poison: Lethal</span>
+      <input type="number" value="0" name="attr_lethalpoison" />
+    </label>
+    <label
+      ><span>Poison: Non-Lethal</span>
+      <input type="number" value="0" name="attr_nonlethalpoison" />
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="number" value="0" name="attr_possession" />
+    </label>
+    <label
+      ><span>Psionics</span>
+      <input type="number" value="0" name="attr_psionics" />
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="number" value="0" name="attr_telepathicprobes" />
     </label>
   </div>
 </div>
@@ -3950,9 +4168,10 @@
                   Apply Damage
                 </button>
               </div>
-              <div class="armor-labels">
+              <div class="armor-labels heading">
                 <label>Active</label>
                 <label>Name</label>
+                <label>Movement Modifier %</label>
                 <label>Base MDC</label>
                 <label>Current MDC</label>
               </div>
@@ -3963,6 +4182,7 @@
   ><input type="checkbox" class="is-active" name="attr_is_active" value="1"
 /></label>
 <input type="text" placeholder="Armor Name" name="attr_name" />
+<input type="number" placeholder="%" name="attr_movementpenalty" />
 <input type="number" placeholder="Base MDC" name="attr_basemdc" value="0" />
 <input
   type="number"
@@ -3987,7 +4207,7 @@
                   </button>
                   <input type="hidden" name="attr_default_mdc" />
                   <input type="hidden" name="attr_default_profile" />
-                  <label>Default</label>
+                  <label>Active</label>
                   <fieldset class="repeating_profiles">
                     <div class="repeating_profiles-inner">
                       <label>
@@ -4256,13 +4476,23 @@
       <span name="attr_mod_spellstrength"></span>
     </label>
     <label>
-      <span>Trust/Intimidate</span>
-      <input type="hidden" value="0" name="attr_mod_trustintimidate" />
-      <span name="attr_mod_trustintimidate"></span>
+      <span>Trust</span>
+      <input type="hidden" value="0" name="attr_mod_trust" />
+      <span name="attr_mod_trust"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} uses Trust/Intimidate}} {{target=[[{@{mod_trustintimidate},98}kl1]]}} {{roll=[[d100]]}}"
-        name="roll_trustintimidate"
+        value="&{template:skill} {{title=@{character_name} tries to gain someone's trust}} {{target=[[{@{mod_trust}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+        name="roll_trust"
+      ></button>
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <input type="hidden" value="0" name="attr_mod_intimidate" />
+      <span name="attr_mod_intimidate"></span>
+      <button
+        type="roll"
+        value="&{template:skill} {{title=@{character_name} tries to intimidate someone}} {{target=[[{@{mod_intimidate}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+        name="roll_intimidate"
       ></button>
     </label>
     <label>
@@ -4271,7 +4501,7 @@
       <span name="attr_mod_charmimpress"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} uses Charm/Impress}} {{target=[[{@{mod_charmimpress},98}kl1]]}} {{roll=[[d100]]}}"
+        value="&{template:skill} {{title=@{character_name} uses Charm/Impress}} {{target=[[{@{mod_charmimpress}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
         name="roll_charmimpress"
       ></button>
     </label>
@@ -4329,6 +4559,30 @@
     </label>
 
     <label
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="hidden"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+        value="1"
+      />
+      <span name="attr_mod_liftcarry_weight_multiplier"></span>
+      <span>&#x00D7;</span>
+    </label>
+
+    <label
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="hidden"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+        value="1"
+      />
+      <span name="attr_mod_liftcarry_duration_multiplier"></span>
+      <span>&#x00D7;</span>
+    </label>
+
+    <label
       ><span>Lift</span>
       <input type="hidden" value="0" name="attr_mod_lift" value="0" />
       <span name="attr_mod_lift"></span>
@@ -4379,21 +4633,21 @@
     <input type="hidden" value="0" name="attr_attacks" />
     <span name="attr_attacks"></span>
   </label>
+  <label class="roller"
+    ><span>Initiative</span>
+    <input type="hidden" value="0" name="attr_initiative" />
+    <span>+</span>
+    <span name="attr_initiative"></span>
+    <button
+      type="roll"
+      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative} &{tracker}]]}}"
+      name="roll_bonus_initiative"
+    ></button>
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="hidden" value="0" name="attr_initiative" />
-      <span>+</span>
-      <span name="attr_initiative"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative}]]}}"
-        name="roll_bonus_initiative"
-      ></button>
-    </label>
     <label
       ><span>Strike</span>
       <input type="hidden" value="0" name="attr_strike" />
@@ -4401,7 +4655,7 @@
       <span name="attr_strike"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20+@{strike}]]}}"
+        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20cs>@{critical}+@{strike}]]}}"
         name="roll_bonus_strike"
       ></button>
     </label>
@@ -4418,6 +4672,51 @@
           P.S. Bonus,@{mod_ps_bonus}
         }]]}}"
         name="roll_bonus_damage"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="hidden" value="0" name="attr_damage_paired" />
+      <span></span>
+      <span name="attr_damage_paired"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_paired} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } * [[ {{ @{opt_paired_damage},0 }dl1 } * 1 + 1 ]]
+        ]]}}"
+        name="roll_bonus_damage_paired"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="hidden" value="0" name="attr_damage_mainhand" />
+      <span></span>
+      <span name="attr_damage_mainhand"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_mainhand} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } / [[ {{ @{opt_paired_damage},0 }dl1 } * -1 + 2 ]]
+        ]]}}"
+        name="roll_bonus_damage_mainhand"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="hidden" value="0" name="attr_damage_offhand" />
+      <span></span>
+      <span name="attr_damage_offhand"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_offhand} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } / [[ {{ @{opt_paired_damage},0 }dl1 } * -1 + 2 ]]
+        ]]}}"
+        name="roll_bonus_damage_offhand"
       ></button>
     </label>
     <label
@@ -4471,7 +4770,7 @@
       <span name="attr_flipthrow"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20+@{flipthrow}]]}}"
+        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20cs>@{critical}+@{flipthrow}]]}}"
         name="roll_bonus_flipthrow"
       ></button>
     </label>
@@ -4495,15 +4794,15 @@
     </label>
   </div>
   <div class="combat-offense-range bonus-type-container">
-    <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
+    <h3><span>&#x1F52B;</span> Modern/Range <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="hidden" value="0" name="attr_strike_range" />
       <span>+</span>
       <span name="attr_strike_range"></span>
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="hidden" value="0" name="attr_damage_range" />
       <span></span>
       <span name="attr_damage_range"></span>
@@ -4514,85 +4813,107 @@
       ></button>
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="hidden" value="0" name="attr_damage_range_single" />
+      <span></span>
+      <span name="attr_damage_range_single"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts range damage from a single shot!}} {{Range Damage=[[@{damage_range_single}]]}}"
+        name="roll_bonus_damage_range_single"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="hidden" value="0" name="attr_damage_range_burst" />
+      <span></span>
+      <span name="attr_damage_range_burst"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts range damage from a burst!}} {{Range Damage=[[@{damage_range_burst}]]}}"
+        name="roll_bonus_damage_range_burst"
+      ></button>
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="hidden" value="0" name="attr_strike_range_single" />
       <span>+</span>
       <span name="attr_strike_range_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[d20+@{strike_range_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_single} ]]}}"
         name="roll_bonus_strike_range_single"
       ></button>
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="hidden" value="0" name="attr_strike_range_burst" />
       <span>+</span>
       <span name="attr_strike_range_burst"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a burst shot!}} {{Range Strike=[[d20+@{strike_range_burst}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_burst} ]]}}"
         name="roll_bonus_strike_range_burst"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed" />
       <span>+</span>
       <span name="attr_strike_range_aimed"></span>
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span>+</span>
       <span name="attr_strike_range_aimed_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed single shot!}} {{Range Aimed Single Strike=[[d20+@{strike_range_aimed_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed single shot!}} {{Range Aimed Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_single} ]]}}"
         name="roll_bonus_strike_range_aimed_single"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span>+</span>
       <span name="attr_strike_range_aimed_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed pulse shot!}} {{Range Aimed Pulse Strike=[[d20+@{strike_range_aimed_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed pulse shot!}} {{Range Aimed Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_pulse} ]]}}"
         name="roll_bonus_strike_range_aimed_pulse"
       ></button>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="hidden" value="0" name="attr_strike_range_called" />
       <span>+</span>
       <span name="attr_strike_range_called"></span>
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span>+</span>
       <span name="attr_strike_range_called_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a called single shot!}} {{Range Called Single Strike=[[d20+@{strike_range_called_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a called single shot!}} {{Range Called Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_called_single} ]]}}"
         name="roll_bonus_strike_range_called_single"
       ></button>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span>+</span>
       <span name="attr_strike_range_called_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a called pulse shot!}} {{Range Called Pulse Strike=[[d20+@{strike_range_called_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a called pulse shot!}} {{Range Called Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_called_pulse} ]]}}"
         name="roll_bonus_strike_range_called_pulse"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -4602,12 +4923,12 @@
       <span name="attr_strike_range_aimed_called_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed called single shot!}} {{Range Aimed Called Single Strike=[[d20+@{strike_range_aimed_called_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed called single shot!}} {{Range Aimed Called Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_called_single} ]]}}"
         name="roll_bonus_strike_range_aimed_called_single"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -4617,12 +4938,12 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed called pulse shot!}} {{Range Aimed Called Pulse Strike=[[d20+@{strike_range_aimed_called_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed called pulse shot!}} {{Range Aimed Called Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_called_pulse} ]]}}"
         name="roll_bonus_strike_range_aimed_called_pulse"
       ></button>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="hidden" value="0" name="attr_disarm_range" />
       <span>+</span>
       <span name="attr_disarm_range"></span>
@@ -4669,7 +4990,7 @@
       ></button>
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="hidden" value="0" name="attr_dodge_auto" />
       <span>+</span>
       <span name="attr_dodge_auto"></span>
@@ -4702,6 +5023,17 @@
       ></button>
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="hidden" value="0" name="attr_dodge_underwater" />
+      <span>+</span>
+      <span name="attr_dodge_underwater"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} attempts to dodge underwater!}} {{Dodge Underwater=[[d20+@{dodge_underwater}]]}}"
+        name="roll_bonus_dodge_underwater"
+      ></button>
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="hidden" value="0" name="attr_roll" />
       <span>+</span>
@@ -4716,62 +5048,47 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="hidden" value="0" name="attr_perceptioncheck" />
+      ><span>Coma/Death</span>
+      <input type="hidden" value="0" name="attr_comadeath" />
       <span>+</span>
-      <span name="attr_perceptioncheck"></span>
+      <span name="attr_comadeath"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} looks around carefully &#x1F440}} {{Perception Check=[[d20+@{perceptioncheck}]]}}"
-        name="roll_bonus_perceptioncheck"
+        value="&{template:skill} {{title=@{character_name} tries not to die!}} {{target=[[50+@{comadeath}]]}} {{roll=[[d100]]}}"
+        name="roll_bonus_comadeath"
       ></button>
     </label>
     <label
-      ><span>Psionics vs. <span name="attr_global_psionic_ability"></span></span>
-      <input type="hidden" value="0" name="attr_psionics" />
+      ><span>Curses vs. 15</span>
+      <input type="hidden" value="0" name="attr_curses" />
       <span>+</span>
-      <span name="attr_psionics"></span>
+      <span name="attr_curses"></span>
       <button
         type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against psionic attack!}} {{target=[[@{psionic_ability}]]}} {{roll=[[d20+@{psionics}]]}}"
-        name="roll_save_psionics"
+        value="&{template:goe} {{title=@{character_name} tries to save against being cursed!}} {{target=[[15]]}} {{roll=[[d20+@{curses}+?{Add modifier?|
+            None,0|
+            Magic,@{magic}|
+            Psionics,@{psionics}
+          }]]}}"
+        name="roll_bonus_curses"
       ></button>
     </label>
     <label
-      ><span>Magic</span>
-      <input type="hidden" value="0" name="attr_magic" />
+      ><span>Despair</span>
+      <input type="hidden" value="0" name="attr_despair" />
       <span>+</span>
-      <span name="attr_magic"></span>
+      <span name="attr_despair"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against magic attack!}} {{Save vs. Magic=[[d20+@{magic}]]}}"
-        name="roll_bonus_magic"
-      ></button>
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="hidden" value="0" name="attr_horrorfactor" />
-      <span>+</span>
-      <span name="attr_horrorfactor"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against horror factor!}} {{Save vs. Horror Factor=[[d20+@{horrorfactor}]]}}"
-        name="roll_bonus_horrorfactor"
-      ></button>
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="hidden" value="0" name="attr_mindcontrol" />
-      <span>+</span>
-      <span name="attr_mindcontrol"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to save vs. mind control!}} {{Save vs. Mind Control=[[d20+@{mindcontrol} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_mindcontrol"
+        value="?{Type of Despair|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to save vs. magic despair!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Despair=[[d20+@{despair}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to save vs. psionic despair!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{despair}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to save vs. despair!&amp;amp;#125;&amp;amp;#125; {{Save vs. Despair=[[d20+@{despair}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_despair"
       ></button>
     </label>
     <label
@@ -4786,80 +5103,6 @@
       ></button>
     </label>
     <label
-      ><span>Illusions</span>
-      <input type="hidden" value="0" name="attr_illusions" />
-      <span>+</span>
-      <span name="attr_illusions"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to see through the illusion!}} {{Save vs. Illusions=[[d20+@{illusions} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_illusions"
-      ></button>
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="hidden" value="0" name="attr_possession" />
-      <span>+</span>
-      <span name="attr_possession"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against possession!}} {{Save vs. Possession=[[d20+@{possession}]]}}"
-        name="roll_bonus_possession"
-      ></button>
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="hidden" value="0" name="attr_insanity" />
-      <span>+</span>
-      <span name="attr_insanity"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against insanity!}} {{target=[[12]]}} {{roll=[[d20+@{insanity}]]}}"
-        name="roll_bonus_insanity"
-      ></button>
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="hidden" value="0" name="attr_pain" />
-      <span>+</span>
-      <span name="attr_pain"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to push through the pain!}} {{Save vs. Pain=[[d20+@{pain} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_pain"
-      ></button>
-    </label>
-    <label
-      ><span>Lethal Poison vs. 14</span>
-      <input type="hidden" value="0" name="attr_lethalpoison" />
-      <span>+</span>
-      <span name="attr_lethalpoison"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against lethal poison!}} {{target=[[14]]}} {{roll=[[d20+@{lethalpoison}]]}}"
-        name="roll_bonus_lethalpoison"
-      ></button>
-    </label>
-    <label
-      ><span>Non-Lethal Poison vs. 16</span>
-      <input type="hidden" value="0" name="attr_nonlethalpoison" />
-      <span>+</span>
-      <span name="attr_nonlethalpoison"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against non-lethal poison!}} {{target=[[16]]}} {{roll=[[d20+@{nonlethalpoison}]]}}"
-        name="roll_bonus_nonlethalpoison"
-      ></button>
-    </label>
-    <label
       ><span>Drugs vs. 15</span>
       <input type="hidden" value="0" name="attr_drugs" />
       <span>+</span>
@@ -4868,32 +5111,6 @@
         type="roll"
         value="&{template:goe} {{title=@{character_name} tries to save against harmful drugs!}} {{target=[[15]]}} {{roll=[[d20+@{drugs}]]}}"
         name="roll_bonus_drugs"
-      ></button>
-    </label>
-    <label
-      ><span>Curses vs. 15</span>
-      <input type="hidden" value="0" name="attr_curses" />
-      <span>+</span>
-      <span name="attr_curses"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against being cursed!}} {{target=[[15]]}} {{roll=[[d20+@{curses} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_curses"
-      ></button>
-    </label>
-    <label
-      ><span>Maintain Balance</span>
-      <input type="hidden" value="0" name="attr_maintainbalance" />
-      <span>+</span>
-      <span name="attr_maintainbalance"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to stay standing!}} {{Maintain Balance=[[d20+@{maintainbalance}]]}}"
-        name="roll_bonus_maintainbalance"
       ></button>
     </label>
     <label
@@ -4908,14 +5125,183 @@
       ></button>
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="hidden" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="hidden" value="0" name="attr_horrorfactor" />
       <span>+</span>
-      <span name="attr_comadeath"></span>
+      <span name="attr_horrorfactor"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} tries not to die!}} {{target=[[50+@{comadeath}]]}} {{roll=[[d100]]}}"
-        name="roll_bonus_comadeath"
+        value="&{template:custom} {{title=@{character_name} tries to save against horror factor!}} {{Save vs. Horror Factor=[[d20+@{horrorfactor}]]}}"
+        name="roll_bonus_horrorfactor"
+      ></button>
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="hidden" value="0" name="attr_illusions" />
+      <span>+</span>
+      <span name="attr_illusions"></span>
+      <button
+        type="roll"
+        value="?{Type of Illusion|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to see through the magic illusion!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Illusions=[[d20+@{illusions}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to see through the psionic illusion!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{illusions}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to see through the illusion!&amp;amp;#125;&amp;amp;#125; {{Save vs. Illusions=[[d20+@{illusions}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_illusions"
+      ></button>
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="hidden" value="0" name="attr_insanity" />
+      <span>+</span>
+      <span name="attr_insanity"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against insanity!}} {{target=[[12]]}} {{roll=[[d20+@{insanity}]]}}"
+        name="roll_bonus_insanity"
+      ></button>
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="hidden" value="0" name="attr_magic" />
+      <span>+</span>
+      <span name="attr_magic"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} tries to save against magic attack!}} {{Save vs. Magic=[[d20+@{magic}]]}}"
+        name="roll_bonus_magic"
+      ></button>
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="hidden" value="0" name="attr_maintainbalance" />
+      <span>+</span>
+      <span name="attr_maintainbalance"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} tries to stay standing!}} {{Maintain Balance=[[d20+@{maintainbalance}]]}}"
+        name="roll_bonus_maintainbalance"
+      ></button>
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="hidden" value="0" name="attr_mindcontrol" />
+      <span>+</span>
+      <span name="attr_mindcontrol"></span>
+      <button
+        type="roll"
+        value="?{Type of Mind Control Attack|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to fight off magic mind control!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Mind Control=[[d20+@{mindcontrol}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to fight off psionic mind control!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{mindcontrol}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to fight off mind control!&amp;amp;#125;&amp;amp;#125; {{Save vs. Mind Control=[[d20+@{mindcontrol}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_mindcontrol"
+      ></button>
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="hidden" value="0" name="attr_pain" />
+      <span>+</span>
+      <span name="attr_pain"></span>
+      <button
+        type="roll"
+        value="?{Type of Pain Attack|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to push through the magic pain!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Pain=[[d20+@{pain}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to push through the psionic pain!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{pain}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to push through the pain!&amp;amp;#125;&amp;amp;#125; {{Save vs. Pain=[[d20+@{pain}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_pain"
+      ></button>
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="hidden" value="0" name="attr_perceptioncheck" />
+      <span>+</span>
+      <span name="attr_perceptioncheck"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} looks around carefully &#x1F440;}} {{Perception Check=[[d20+@{perceptioncheck}]]}}"
+        name="roll_bonus_perceptioncheck"
+      ></button>
+    </label>
+    <label
+      ><span>Poison: Lethal vs. 14</span>
+      <input type="hidden" value="0" name="attr_lethalpoison" />
+      <span>+</span>
+      <span name="attr_lethalpoison"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against lethal poison!}} {{target=[[14]]}} {{roll=[[d20+@{lethalpoison}]]}}"
+        name="roll_bonus_lethalpoison"
+      ></button>
+    </label>
+    <label
+      ><span>Poison: Non-Lethal vs. 16</span>
+      <input type="hidden" value="0" name="attr_nonlethalpoison" />
+      <span>+</span>
+      <span name="attr_nonlethalpoison"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against non-lethal poison!}} {{target=[[16]]}} {{roll=[[d20+@{nonlethalpoison}]]}}"
+        name="roll_bonus_nonlethalpoison"
+      ></button>
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="hidden" value="0" name="attr_possession" />
+      <span>+</span>
+      <span name="attr_possession"></span>
+      <button
+        type="roll"
+        value="?{Type of Possession|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} tries to prevent being magically possessed!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Possession=[[d20+@{possession}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} tries to prevent being psionically possessed!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{possession}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} tries to prevent being possessed!&amp;amp;#125;&amp;amp;#125; {{Save vs. Possession=[[d20+@{possession}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_possession"
+      ></button>
+    </label>
+    <label
+      ><span
+        >Psionics vs. <span name="attr_global_psionic_ability"></span
+      ></span>
+      <input type="hidden" value="0" name="attr_psionics" />
+      <span>+</span>
+      <span name="attr_psionics"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against psionic attack!}} {{target=[[@{psionic_ability}]]}} {{roll=[[d20+@{psionics}]]}}"
+        name="roll_save_psionics"
+      ></button>
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="hidden" value="0" name="attr_telepathicprobes" />
+      <span>+</span>
+      <span name="attr_telepathicprobes"></span>
+      <button
+        type="roll"
+        value="?{Type of Telepathic Probe|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to block a magic telepathic probe!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Telepathic Probe=[[d20+@{telepathicprobes}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to block a psionic telepathic probe!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{telepathicprobes}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to block a telepathic probe!&amp;amp;#125;&amp;amp;#125; {{Save vs. Mind Control=[[d20+@{telepathicprobes}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_telepathicprobes"
       ></button>
     </label>
   </div>
@@ -5189,13 +5575,23 @@
       <span name="attr_mod_spellstrength"></span>
     </label>
     <label>
-      <span>Trust/Intimidate</span>
-      <input type="hidden" value="0" name="attr_mod_trustintimidate" />
-      <span name="attr_mod_trustintimidate"></span>
+      <span>Trust</span>
+      <input type="hidden" value="0" name="attr_mod_trust" />
+      <span name="attr_mod_trust"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} uses Trust/Intimidate}} {{target=[[{@{mod_trustintimidate},98}kl1]]}} {{roll=[[d100]]}}"
-        name="roll_trustintimidate"
+        value="&{template:skill} {{title=@{character_name} tries to gain someone's trust}} {{target=[[{@{mod_trust}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+        name="roll_trust"
+      ></button>
+    </label>
+    <label>
+      <span>Intimidate</span>
+      <input type="hidden" value="0" name="attr_mod_intimidate" />
+      <span name="attr_mod_intimidate"></span>
+      <button
+        type="roll"
+        value="&{template:skill} {{title=@{character_name} tries to intimidate someone}} {{target=[[{@{mod_intimidate}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
+        name="roll_intimidate"
       ></button>
     </label>
     <label>
@@ -5204,7 +5600,7 @@
       <span name="attr_mod_charmimpress"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} uses Charm/Impress}} {{target=[[{@{mod_charmimpress},98}kl1]]}} {{roll=[[d100]]}}"
+        value="&{template:skill} {{title=@{character_name} uses Charm/Impress}} {{target=[[{@{mod_charmimpress}+?{Modifier?|0},98}kl1]]}} {{roll=[[d100]]}}"
         name="roll_charmimpress"
       ></button>
     </label>
@@ -5262,6 +5658,30 @@
     </label>
 
     <label
+      ><span>Lift/Carry Weight Multiplier</span>
+      <input
+        type="hidden"
+        value="1"
+        name="attr_mod_liftcarry_weight_multiplier"
+        value="1"
+      />
+      <span name="attr_mod_liftcarry_weight_multiplier"></span>
+      <span>&#x00D7;</span>
+    </label>
+
+    <label
+      ><span>Lift/Carry Duration Multiplier</span>
+      <input
+        type="hidden"
+        value="1"
+        name="attr_mod_liftcarry_duration_multiplier"
+        value="1"
+      />
+      <span name="attr_mod_liftcarry_duration_multiplier"></span>
+      <span>&#x00D7;</span>
+    </label>
+
+    <label
       ><span>Lift</span>
       <input type="hidden" value="0" name="attr_mod_lift" value="0" />
       <span name="attr_mod_lift"></span>
@@ -5312,21 +5732,21 @@
     <input type="hidden" value="0" name="attr_attacks" />
     <span name="attr_attacks"></span>
   </label>
+  <label class="roller"
+    ><span>Initiative</span>
+    <input type="hidden" value="0" name="attr_initiative" />
+    <span>+</span>
+    <span name="attr_initiative"></span>
+    <button
+      type="roll"
+      value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative} &{tracker}]]}}"
+      name="roll_bonus_initiative"
+    ></button>
+  </label>
 </div>
 <div class="modifiers-combat">
   <div class="combat-offense-melee bonus-type-container">
     <h3><span>&#x2694;</span> Ancient <span>&#x1F3F9;</span></h3>
-    <label
-      ><span>Initiative</span>
-      <input type="hidden" value="0" name="attr_initiative" />
-      <span>+</span>
-      <span name="attr_initiative"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} rolls Initiative}} {{Initiative=[[d20+@{initiative}]]}}"
-        name="roll_bonus_initiative"
-      ></button>
-    </label>
     <label
       ><span>Strike</span>
       <input type="hidden" value="0" name="attr_strike" />
@@ -5334,7 +5754,7 @@
       <span name="attr_strike"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20+@{strike}]]}}"
+        value="&{template:custom} {{title=@{character_name} strikes!}} {{Strike=[[d20cs>@{critical}+@{strike}]]}}"
         name="roll_bonus_strike"
       ></button>
     </label>
@@ -5351,6 +5771,51 @@
           P.S. Bonus,@{mod_ps_bonus}
         }]]}}"
         name="roll_bonus_damage"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Paired</span>
+      <input type="hidden" value="0" name="attr_damage_paired" />
+      <span></span>
+      <span name="attr_damage_paired"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_paired} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } * [[ {{ @{opt_paired_damage},0 }dl1 } * 1 + 1 ]]
+        ]]}}"
+        name="roll_bonus_damage_paired"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Main Hand</span>
+      <input type="hidden" value="0" name="attr_damage_mainhand" />
+      <span></span>
+      <span name="attr_damage_mainhand"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_mainhand} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } / [[ {{ @{opt_paired_damage},0 }dl1 } * -1 + 2 ]]
+        ]]}}"
+        name="roll_bonus_damage_mainhand"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Off Hand</span>
+      <input type="hidden" value="0" name="attr_damage_offhand" />
+      <span></span>
+      <span name="attr_damage_offhand"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts damage!}} {{Damage=[[@{damage_offhand} + ?{Add damage modifier?|
+          None,0|
+          Punch,@{mod_punch}|
+          P.S. Bonus,@{mod_ps_bonus} } / [[ {{ @{opt_paired_damage},0 }dl1 } * -1 + 2 ]]
+        ]]}}"
+        name="roll_bonus_damage_offhand"
       ></button>
     </label>
     <label
@@ -5404,7 +5869,7 @@
       <span name="attr_flipthrow"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20+@{flipthrow}]]}}"
+        value="&{template:custom} {{title=@{character_name} attempts a body flip/throw!}} {{Body Flip/Throw=[[d20cs>@{critical}+@{flipthrow}]]}}"
         name="roll_bonus_flipthrow"
       ></button>
     </label>
@@ -5428,15 +5893,15 @@
     </label>
   </div>
   <div class="combat-offense-range bonus-type-container">
-    <h3><span>&#x1F52B;</span> Modern <span>&#x1F4A3;</span></h3>
+    <h3><span>&#x1F52B;</span> Modern/Range <span>&#x1F4A3;</span></h3>
     <label
-      ><span>Strike: Range</span>
+      ><span>Strike</span>
       <input type="hidden" value="0" name="attr_strike_range" />
       <span>+</span>
       <span name="attr_strike_range"></span>
     </label>
     <label
-      ><span>Damage: Range</span>
+      ><span>Damage</span>
       <input type="hidden" value="0" name="attr_damage_range" />
       <span></span>
       <span name="attr_damage_range"></span>
@@ -5447,85 +5912,107 @@
       ></button>
     </label>
     <label
-      ><span>Range: Single</span>
+      ><span>Damage: Single</span>
+      <input type="hidden" value="0" name="attr_damage_range_single" />
+      <span></span>
+      <span name="attr_damage_range_single"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts range damage from a single shot!}} {{Range Damage=[[@{damage_range_single}]]}}"
+        name="roll_bonus_damage_range_single"
+      ></button>
+    </label>
+    <label
+      ><span>Damage: Pulse/Burst</span>
+      <input type="hidden" value="0" name="attr_damage_range_burst" />
+      <span></span>
+      <span name="attr_damage_range_burst"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} inflicts range damage from a burst!}} {{Range Damage=[[@{damage_range_burst}]]}}"
+        name="roll_bonus_damage_range_burst"
+      ></button>
+    </label>
+    <label
+      ><span>Strike: Single</span>
       <input type="hidden" value="0" name="attr_strike_range_single" />
       <span>+</span>
       <span name="attr_strike_range_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[d20+@{strike_range_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_single} ]]}}"
         name="roll_bonus_strike_range_single"
       ></button>
     </label>
     <label
-      ><span>Range: Burst</span>
+      ><span>Strike: Burst</span>
       <input type="hidden" value="0" name="attr_strike_range_burst" />
       <span>+</span>
       <span name="attr_strike_range_burst"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a burst shot!}} {{Range Strike=[[d20+@{strike_range_burst}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a single shot!}} {{Range Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_burst} ]]}}"
         name="roll_bonus_strike_range_burst"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed</span>
+      ><span>Strike: Aimed</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed" />
       <span>+</span>
       <span name="attr_strike_range_aimed"></span>
     </label>
     <label
-      ><span>Range: Aimed Single</span>
+      ><span>Strike: Aimed Single</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_single" />
       <span>+</span>
       <span name="attr_strike_range_aimed_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed single shot!}} {{Range Aimed Single Strike=[[d20+@{strike_range_aimed_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed single shot!}} {{Range Aimed Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_single} ]]}}"
         name="roll_bonus_strike_range_aimed_single"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Pulse</span>
+      ><span>Strike: Aimed Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_aimed_pulse" />
       <span>+</span>
       <span name="attr_strike_range_aimed_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed pulse shot!}} {{Range Aimed Pulse Strike=[[d20+@{strike_range_aimed_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed pulse shot!}} {{Range Aimed Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_pulse} ]]}}"
         name="roll_bonus_strike_range_aimed_pulse"
       ></button>
     </label>
     <label
-      ><span>Range: Called</span>
+      ><span>Strike: Called</span>
       <input type="hidden" value="0" name="attr_strike_range_called" />
       <span>+</span>
       <span name="attr_strike_range_called"></span>
     </label>
     <label
-      ><span>Range: Called Single</span>
+      ><span>Strike: Called Single</span>
       <input type="hidden" value="0" name="attr_strike_range_called_single" />
       <span>+</span>
       <span name="attr_strike_range_called_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a called single shot!}} {{Range Called Single Strike=[[d20+@{strike_range_called_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a called single shot!}} {{Range Called Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_called_single} ]]}}"
         name="roll_bonus_strike_range_called_single"
       ></button>
     </label>
     <label
-      ><span>Range: Called Pulse</span>
+      ><span>Strike: Called Pulse</span>
       <input type="hidden" value="0" name="attr_strike_range_called_pulse" />
       <span>+</span>
       <span name="attr_strike_range_called_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with a called pulse shot!}} {{Range Called Pulse Strike=[[d20+@{strike_range_called_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with a called pulse shot!}} {{Range Called Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_called_pulse} ]]}}"
         name="roll_bonus_strike_range_called_pulse"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Called Single</span>
+      ><span>Strike: Aimed Called Single</span>
       <input
         type="hidden"
         value="0"
@@ -5535,12 +6022,12 @@
       <span name="attr_strike_range_aimed_called_single"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed called single shot!}} {{Range Aimed Called Single Strike=[[d20+@{strike_range_aimed_called_single}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed called single shot!}} {{Range Aimed Called Single Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_called_single} ]]}}"
         name="roll_bonus_strike_range_aimed_called_single"
       ></button>
     </label>
     <label
-      ><span>Range: Aimed Called Pulse</span>
+      ><span>Strike: Aimed Called Pulse</span>
       <input
         type="hidden"
         value="0"
@@ -5550,12 +6037,12 @@
       <span name="attr_strike_range_aimed_called_pulse"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} shoots with an aimed called pulse shot!}} {{Range Aimed Called Pulse Strike=[[d20+@{strike_range_aimed_called_pulse}]]}}"
+        value="&{template:custom} {{title=@{character_name} shoots with an aimed called pulse shot!}} {{Range Aimed Called Pulse Strike=[[ d20cs>[[ {{ @{opt_critical},0 }dl1 } * (@{critical}-20) + 20]] + @{strike_range_aimed_called_pulse} ]]}}"
         name="roll_bonus_strike_range_aimed_called_pulse"
       ></button>
     </label>
     <label
-      ><span>Disarm: Range</span>
+      ><span>Disarm</span>
       <input type="hidden" value="0" name="attr_disarm_range" />
       <span>+</span>
       <span name="attr_disarm_range"></span>
@@ -5602,7 +6089,7 @@
       ></button>
     </label>
     <label
-      >Dodge: Auto
+      ><span>Dodge: Auto</span>
       <input type="hidden" value="0" name="attr_dodge_auto" />
       <span>+</span>
       <span name="attr_dodge_auto"></span>
@@ -5635,6 +6122,17 @@
       ></button>
     </label>
     <label
+      ><span>Dodge: Underwater</span>
+      <input type="hidden" value="0" name="attr_dodge_underwater" />
+      <span>+</span>
+      <span name="attr_dodge_underwater"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} attempts to dodge underwater!}} {{Dodge Underwater=[[d20+@{dodge_underwater}]]}}"
+        name="roll_bonus_dodge_underwater"
+      ></button>
+    </label>
+    <label
       ><span>Roll w/ Impact</span>
       <input type="hidden" value="0" name="attr_roll" />
       <span>+</span>
@@ -5649,62 +6147,47 @@
   <div class="bonus-type-container">
     <h3><span>&#x1F340;</span> Saving Throws <span>&#x1FAA6;</span></h3>
     <label
-      ><span>Perception</span>
-      <input type="hidden" value="0" name="attr_perceptioncheck" />
+      ><span>Coma/Death</span>
+      <input type="hidden" value="0" name="attr_comadeath" />
       <span>+</span>
-      <span name="attr_perceptioncheck"></span>
+      <span name="attr_comadeath"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} looks around carefully &#x1F440}} {{Perception Check=[[d20+@{perceptioncheck}]]}}"
-        name="roll_bonus_perceptioncheck"
+        value="&{template:skill} {{title=@{character_name} tries not to die!}} {{target=[[50+@{comadeath}]]}} {{roll=[[d100]]}}"
+        name="roll_bonus_comadeath"
       ></button>
     </label>
     <label
-      ><span>Psionics vs. <span name="attr_global_psionic_ability"></span></span>
-      <input type="hidden" value="0" name="attr_psionics" />
+      ><span>Curses vs. 15</span>
+      <input type="hidden" value="0" name="attr_curses" />
       <span>+</span>
-      <span name="attr_psionics"></span>
+      <span name="attr_curses"></span>
       <button
         type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against psionic attack!}} {{target=[[@{psionic_ability}]]}} {{roll=[[d20+@{psionics}]]}}"
-        name="roll_save_psionics"
+        value="&{template:goe} {{title=@{character_name} tries to save against being cursed!}} {{target=[[15]]}} {{roll=[[d20+@{curses}+?{Add modifier?|
+            None,0|
+            Magic,@{magic}|
+            Psionics,@{psionics}
+          }]]}}"
+        name="roll_bonus_curses"
       ></button>
     </label>
     <label
-      ><span>Magic</span>
-      <input type="hidden" value="0" name="attr_magic" />
+      ><span>Despair</span>
+      <input type="hidden" value="0" name="attr_despair" />
       <span>+</span>
-      <span name="attr_magic"></span>
+      <span name="attr_despair"></span>
       <button
         type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against magic attack!}} {{Save vs. Magic=[[d20+@{magic}]]}}"
-        name="roll_bonus_magic"
-      ></button>
-    </label>
-    <label
-      ><span>Horror Factor</span>
-      <input type="hidden" value="0" name="attr_horrorfactor" />
-      <span>+</span>
-      <span name="attr_horrorfactor"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against horror factor!}} {{Save vs. Horror Factor=[[d20+@{horrorfactor}]]}}"
-        name="roll_bonus_horrorfactor"
-      ></button>
-    </label>
-    <label
-      ><span>Mind Control</span>
-      <input type="hidden" value="0" name="attr_mindcontrol" />
-      <span>+</span>
-      <span name="attr_mindcontrol"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to save vs. mind control!}} {{Save vs. Mind Control=[[d20+@{mindcontrol} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_mindcontrol"
+        value="?{Type of Despair|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to save vs. magic despair!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Despair=[[d20+@{despair}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to save vs. psionic despair!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{despair}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to save vs. despair!&amp;amp;#125;&amp;amp;#125; {{Save vs. Despair=[[d20+@{despair}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_despair"
       ></button>
     </label>
     <label
@@ -5719,80 +6202,6 @@
       ></button>
     </label>
     <label
-      ><span>Illusions</span>
-      <input type="hidden" value="0" name="attr_illusions" />
-      <span>+</span>
-      <span name="attr_illusions"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} attempts to see through the illusion!}} {{Save vs. Illusions=[[d20+@{illusions} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_illusions"
-      ></button>
-    </label>
-    <label
-      ><span>Possession</span>
-      <input type="hidden" value="0" name="attr_possession" />
-      <span>+</span>
-      <span name="attr_possession"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to save against possession!}} {{Save vs. Possession=[[d20+@{possession}]]}}"
-        name="roll_bonus_possession"
-      ></button>
-    </label>
-    <label
-      ><span>Insanity</span>
-      <input type="hidden" value="0" name="attr_insanity" />
-      <span>+</span>
-      <span name="attr_insanity"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against insanity!}} {{target=[[12]]}} {{roll=[[d20+@{insanity}]]}}"
-        name="roll_bonus_insanity"
-      ></button>
-    </label>
-    <label
-      ><span>Pain</span>
-      <input type="hidden" value="0" name="attr_pain" />
-      <span>+</span>
-      <span name="attr_pain"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to push through the pain!}} {{Save vs. Pain=[[d20+@{pain} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_pain"
-      ></button>
-    </label>
-    <label
-      ><span>Lethal Poison vs. 14</span>
-      <input type="hidden" value="0" name="attr_lethalpoison" />
-      <span>+</span>
-      <span name="attr_lethalpoison"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against lethal poison!}} {{target=[[14]]}} {{roll=[[d20+@{lethalpoison}]]}}"
-        name="roll_bonus_lethalpoison"
-      ></button>
-    </label>
-    <label
-      ><span>Non-Lethal Poison vs. 16</span>
-      <input type="hidden" value="0" name="attr_nonlethalpoison" />
-      <span>+</span>
-      <span name="attr_nonlethalpoison"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against non-lethal poison!}} {{target=[[16]]}} {{roll=[[d20+@{nonlethalpoison}]]}}"
-        name="roll_bonus_nonlethalpoison"
-      ></button>
-    </label>
-    <label
       ><span>Drugs vs. 15</span>
       <input type="hidden" value="0" name="attr_drugs" />
       <span>+</span>
@@ -5801,32 +6210,6 @@
         type="roll"
         value="&{template:goe} {{title=@{character_name} tries to save against harmful drugs!}} {{target=[[15]]}} {{roll=[[d20+@{drugs}]]}}"
         name="roll_bonus_drugs"
-      ></button>
-    </label>
-    <label
-      ><span>Curses vs. 15</span>
-      <input type="hidden" value="0" name="attr_curses" />
-      <span>+</span>
-      <span name="attr_curses"></span>
-      <button
-        type="roll"
-        value="&{template:goe} {{title=@{character_name} tries to save against being cursed!}} {{target=[[15]]}} {{roll=[[d20+@{curses} + ?{Add modifier?|
-          None,0|
-          Magic,@{magic}|
-          Psionics,@{psionics}
-        }]]}}"
-        name="roll_bonus_curses"
-      ></button>
-    </label>
-    <label
-      ><span>Maintain Balance</span>
-      <input type="hidden" value="0" name="attr_maintainbalance" />
-      <span>+</span>
-      <span name="attr_maintainbalance"></span>
-      <button
-        type="roll"
-        value="&{template:custom} {{title=@{character_name} tries to stay standing!}} {{Maintain Balance=[[d20+@{maintainbalance}]]}}"
-        name="roll_bonus_maintainbalance"
       ></button>
     </label>
     <label
@@ -5841,14 +6224,183 @@
       ></button>
     </label>
     <label
-      ><span>Coma/Death</span>
-      <input type="hidden" value="0" name="attr_comadeath" />
+      ><span>Horror Factor</span>
+      <input type="hidden" value="0" name="attr_horrorfactor" />
       <span>+</span>
-      <span name="attr_comadeath"></span>
+      <span name="attr_horrorfactor"></span>
       <button
         type="roll"
-        value="&{template:skill} {{title=@{character_name} tries not to die!}} {{target=[[50+@{comadeath}]]}} {{roll=[[d100]]}}"
-        name="roll_bonus_comadeath"
+        value="&{template:custom} {{title=@{character_name} tries to save against horror factor!}} {{Save vs. Horror Factor=[[d20+@{horrorfactor}]]}}"
+        name="roll_bonus_horrorfactor"
+      ></button>
+    </label>
+    <label
+      ><span>Illusions</span>
+      <input type="hidden" value="0" name="attr_illusions" />
+      <span>+</span>
+      <span name="attr_illusions"></span>
+      <button
+        type="roll"
+        value="?{Type of Illusion|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to see through the magic illusion!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Illusions=[[d20+@{illusions}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to see through the psionic illusion!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{illusions}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to see through the illusion!&amp;amp;#125;&amp;amp;#125; {{Save vs. Illusions=[[d20+@{illusions}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_illusions"
+      ></button>
+    </label>
+    <label
+      ><span>Insanity</span>
+      <input type="hidden" value="0" name="attr_insanity" />
+      <span>+</span>
+      <span name="attr_insanity"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against insanity!}} {{target=[[12]]}} {{roll=[[d20+@{insanity}]]}}"
+        name="roll_bonus_insanity"
+      ></button>
+    </label>
+    <label
+      ><span>Magic</span>
+      <input type="hidden" value="0" name="attr_magic" />
+      <span>+</span>
+      <span name="attr_magic"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} tries to save against magic attack!}} {{Save vs. Magic=[[d20+@{magic}]]}}"
+        name="roll_bonus_magic"
+      ></button>
+    </label>
+    <label
+      ><span>Maintain Balance</span>
+      <input type="hidden" value="0" name="attr_maintainbalance" />
+      <span>+</span>
+      <span name="attr_maintainbalance"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} tries to stay standing!}} {{Maintain Balance=[[d20+@{maintainbalance}]]}}"
+        name="roll_bonus_maintainbalance"
+      ></button>
+    </label>
+    <label
+      ><span>Mind Control</span>
+      <input type="hidden" value="0" name="attr_mindcontrol" />
+      <span>+</span>
+      <span name="attr_mindcontrol"></span>
+      <button
+        type="roll"
+        value="?{Type of Mind Control Attack|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to fight off magic mind control!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Mind Control=[[d20+@{mindcontrol}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to fight off psionic mind control!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{mindcontrol}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to fight off mind control!&amp;amp;#125;&amp;amp;#125; {{Save vs. Mind Control=[[d20+@{mindcontrol}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_mindcontrol"
+      ></button>
+    </label>
+    <label
+      ><span>Pain</span>
+      <input type="hidden" value="0" name="attr_pain" />
+      <span>+</span>
+      <span name="attr_pain"></span>
+      <button
+        type="roll"
+        value="?{Type of Pain Attack|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to push through the magic pain!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Pain=[[d20+@{pain}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to push through the psionic pain!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{pain}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to push through the pain!&amp;amp;#125;&amp;amp;#125; {{Save vs. Pain=[[d20+@{pain}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_pain"
+      ></button>
+    </label>
+    <label
+      ><span>Perception</span>
+      <input type="hidden" value="0" name="attr_perceptioncheck" />
+      <span>+</span>
+      <span name="attr_perceptioncheck"></span>
+      <button
+        type="roll"
+        value="&{template:custom} {{title=@{character_name} looks around carefully &#x1F440;}} {{Perception Check=[[d20+@{perceptioncheck}]]}}"
+        name="roll_bonus_perceptioncheck"
+      ></button>
+    </label>
+    <label
+      ><span>Poison: Lethal vs. 14</span>
+      <input type="hidden" value="0" name="attr_lethalpoison" />
+      <span>+</span>
+      <span name="attr_lethalpoison"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against lethal poison!}} {{target=[[14]]}} {{roll=[[d20+@{lethalpoison}]]}}"
+        name="roll_bonus_lethalpoison"
+      ></button>
+    </label>
+    <label
+      ><span>Poison: Non-Lethal vs. 16</span>
+      <input type="hidden" value="0" name="attr_nonlethalpoison" />
+      <span>+</span>
+      <span name="attr_nonlethalpoison"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against non-lethal poison!}} {{target=[[16]]}} {{roll=[[d20+@{nonlethalpoison}]]}}"
+        name="roll_bonus_nonlethalpoison"
+      ></button>
+    </label>
+    <label
+      ><span>Possession</span>
+      <input type="hidden" value="0" name="attr_possession" />
+      <span>+</span>
+      <span name="attr_possession"></span>
+      <button
+        type="roll"
+        value="?{Type of Possession|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} tries to prevent being magically possessed!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Possession=[[d20+@{possession}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} tries to prevent being psionically possessed!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{possession}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} tries to prevent being possessed!&amp;amp;#125;&amp;amp;#125; {{Save vs. Possession=[[d20+@{possession}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_possession"
+      ></button>
+    </label>
+    <label
+      ><span
+        >Psionics vs. <span name="attr_global_psionic_ability"></span
+      ></span>
+      <input type="hidden" value="0" name="attr_psionics" />
+      <span>+</span>
+      <span name="attr_psionics"></span>
+      <button
+        type="roll"
+        value="&{template:goe} {{title=@{character_name} tries to save against psionic attack!}} {{target=[[@{psionic_ability}]]}} {{roll=[[d20+@{psionics}]]}}"
+        name="roll_save_psionics"
+      ></button>
+    </label>
+    <label
+      ><span>Telepathic Probes</span>
+      <input type="hidden" value="0" name="attr_telepathicprobes" />
+      <span>+</span>
+      <span name="attr_telepathicprobes"></span>
+      <button
+        type="roll"
+        value="?{Type of Telepathic Probe|
+          Magic,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to block a magic telepathic probe!&amp;amp;#125;&amp;amp;#125; {{Save vs. Magic Telepathic Probe=[[d20+@{telepathicprobes}+@{magic}]]&amp;amp;#125;&amp;amp;#125;|
+          Psionic,
+            &{template:goe&amp;amp;#125; {{title=@{character_name} attempts to block a psionic telepathic probe!&amp;amp;#125;&amp;amp;#125; {{target=[[@{psionic_ability}]]&amp;amp;#125;&amp;amp;#125; {{roll=[[d20+@{telepathicprobes}+@{psionics}]]&amp;amp;#125;&amp;amp;#125;|
+          Other,
+            &{template:custom&amp;amp;#125; {{title=@{character_name} attempts to block a telepathic probe!&amp;amp;#125;&amp;amp;#125; {{Save vs. Mind Control=[[d20+@{telepathicprobes}]]&amp;amp;#125;&amp;amp;#125;
+        }"
+        name="roll_bonus_telepathicprobes"
       ></button>
     </label>
   </div>
@@ -5874,37 +6426,87 @@
       </div>
     </div>
 
+    <!-- inject:partials/options.html -->
     <div class="r-tab-content">
-      <div class="importexport">
-        <h3>Import/Export</h3>
-        <details>
-          <summary><b>Instructions</b></summary>
-          <p>
-            Click the <b>Export</b> button to get a JSON object representing
-            your character. Paste a valid JSON object and click <b>Import</b> to
-            import a character.
-          </p>
-          <p>
-            In order to know what the valid fields are, complete all the fields
-            with at least one of each repeating section and do an Export.
-          </p>
-        </details>
-        <p>Click <b>Instructions</b> for detailed instructions.</p>
-        <button type="action" name="act_import">
-          <span></span><span></span><span></span><span></span>
-          Import
-        </button>
-        <button type="action" name="act_export">
-          <span></span><span></span><span></span><span></span>
-          Export
-        </button>
-        <!-- <button type="action" name="act_test">Test</button> -->
-        <label>Status: <span name="attr_importexportstatus"></span></label>
-        <input type="hidden" name="attr_importexportstatus" />
-        <textarea class="full tall" name="attr_importexport"></textarea>
-      </div>
-    </div>
+  <div class="importexport">
+    <h3>Options</h3>
+    <input type="hidden" name="attr_version" value="1.1.0" />
+    <label>Version: <span name="attr_version"></span></label>
+    <input type="hidden" name="attr_migrated" value="0" />
+    <label>Migrated: <span name="attr_migrated"></span></label>
+    <label
+      ><input type="checkbox" name="attr_debug" value="1" /> View Sheet in Debug
+      Mode</label
+    >
+    <hr />
+    <label
+      ><input type="checkbox" name="attr_opt_pp_extras" value="1" /> Add PP
+      bonus to Disarm and Entangle</label
+    >
+    <p>
+      Add bonus from PP attribute to Disarm and Entangle, in addition to
+      Strike/Parry/Dodge.
+    </p>
+    <label
+      ><input type="checkbox" name="attr_opt_iq_perception" value="1" /> Add IQ
+      bonus to Perception as per Rifter #13, p.16</label
+    >
+    <p>
+      Rifter #13, p.16 describes a Perception bonus based on IQ. Checking this
+      will factor in that bonus.
+    </p>
+    <label
+      ><input type="checkbox" name="attr_opt_paired_damage" value="1" /> Apply
+      PS damage to <b>each hand</b> in Paired attack</label
+    >
+    <p>
+      If attacking using paired weapons, checking this will apply any PS
+      bonus/Punch damage as applicable to <b>each weapon</b> in a Paired Weapons
+      attack. Otherwise the PS damage is applied once to the total of both
+      hands. If unchecked, this will also divide the PS damage by 2 when using
+      Paired Weapons but only striking with one weapon.
+    </p>
+    <label
+      ><input type="checkbox" name="attr_opt_critical" value="1" /> Apply Hand
+      to Hand critical (19-20, 18-20) to modern weapons as well</label
+    >
+    <p>
+      If a character has a critical on 19-20 or 18-20 from their Hand to Hand
+      skill, apply this to modern weapons as well.
+    </p>
+    <hr />
+    <h3>Import/Export</h3>
+    <details>
+      <summary><b>Instructions</b></summary>
+      <p>
+        Click the <b>Export</b> button to get a JSON object representing your
+        character. Paste a valid JSON object and click <b>Import</b> to import a
+        character.
+      </p>
+      <p>
+        In order to know what the valid fields are, complete all the fields with
+        at least one of each repeating section and do an Export.
+      </p>
+    </details>
+    <p>Click <b>Instructions</b> for detailed instructions.</p>
+    <button type="action" name="act_import">
+      <span></span><span></span><span></span><span></span>
+      Import
+    </button>
+    <button type="action" name="act_export">
+      <span></span><span></span><span></span><span></span>
+      Export
+    </button>
+    <!-- <button type="action" name="act_test">Test</button> -->
+    <label>Status: <span name="attr_importexportstatus"></span></label>
+    <input type="hidden" name="attr_importexportstatus" />
+    <textarea class="full tall" name="attr_importexport"></textarea>
   </div>
+</div>
+
+    <!-- endinject -->
+  </div>
+
   <!-- .r-tabbed -->
   <input type="hidden" name="attr_prefix" value="@{" />
 </main>
@@ -6041,6 +6643,23 @@ function getSingleAttrAsync(prop) {
     {},
     {},
     { strike: 1, parry: 1 },
+  ],
+  "w.p. bayonet": [
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
+    { strike: 1, parry: 1 },
+    {},
+    {},
+    {},
   ],
   "w.p. blunt": [
     { strike: 1, parry: 1 },
@@ -6494,6 +7113,8 @@ const ATTRIBUTE_KEYS = [
   "mod_kick_unit",
   "mod_leap_kick",
   "mod_leap_kick_unit",
+  "mod_liftcarry_weight_multiplier",
+  "mod_liftcarry_duration_multiplier",
   "mod_lift",
   "mod_carry",
   "mod_throw_distance",
@@ -6511,8 +7132,10 @@ const ATTRIBUTE_KEYS = [
   "hf_abs",
   "mod_spellstrength",
   "spellstrength_abs",
-  "mod_trustintimidate",
-  "trustintimidate_abs",
+  "mod_trust",
+  "trust_abs",
+  "mod_intimidate",
+  "intimidate_abs",
   "mod_charmimpress",
   "charmimpress_abs",
   "mod_skillbonus",
@@ -6535,10 +7158,14 @@ const COMBAT_KEYS = [
   "pull",
   "roll",
   "damage",
+  "damage_paired",
+  "damage_mainhand",
+  "damage_offhand",
   "dodge_flight",
   "dodge_auto",
   "dodge_teleport",
   "dodge_motion",
+  "dodge_underwater",
   "strike_range",
   "strike_range_single",
   "strike_range_burst",
@@ -6552,6 +7179,8 @@ const COMBAT_KEYS = [
   "strike_range_aimed_called_pulse",
   "disarm_range",
   "damage_range",
+  "damage_range_single",
+  "damage_range_burst",
   "critical",
   "knockout",
   "deathblow",
@@ -6560,17 +7189,11 @@ const COMBAT_KEYS = [
 ];
 const SAVE_KEYS_ATTRIBUTE_BONUSES = {
   me_bonus: ["psionics", "insanity"],
-  pe_bonus: [
-    "magic",
-    "lethalpoison",
-    "nonlethalpoison",
-    "disease",
-    "pain",
-    "drugs",
-  ],
+  pe_bonus: ["magic", "lethalpoison", "nonlethalpoison", "disease", "drugs"],
   pe_coma_bonus: ["comadeath"],
   perception_bonus: ["perceptioncheck"],
   none: [
+    "pain",
     "horrorfactor",
     "mindcontrol",
     "illusions",
@@ -6578,6 +7201,8 @@ const SAVE_KEYS_ATTRIBUTE_BONUSES = {
     "curses",
     "maintainbalance",
     "fatigue",
+    "despair",
+    "telepathicprobes",
   ],
 };
 const SAVE_KEYS = Object.values(SAVE_KEYS_ATTRIBUTE_BONUSES).reduce(
@@ -6711,7 +7336,6 @@ const CORE_KEYS = [
   "pb_bonus",
   "spd",
   "spdfly",
-  "trustintimidate",
   "charmimpress",
   "character_hp",
   "character_sdc",
@@ -6741,6 +7365,14 @@ const CORE_KEYS = [
   "credits_blackmarketmerchandise",
 ];
 
+const ARMOR_KEYS = [
+  "is_active",
+  "name",
+  "movementpenalty",
+  "basemdc",
+  "currentmdc",
+];
+
 const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 
 const EQUIPMENT_KEYS = ["equipment"];
@@ -6754,8 +7386,9 @@ const SECTIONS = {
   psionics: PSIONICS_KEYS,
   movement: MOVEMENT_KEYS,
   powersabilities: ABILITIES_KEYS,
+  armor: ARMOR_KEYS,
   // profiles: PROFILES_KEYS, // Tricky to export because IDs that they refer to won't line up
-  // equipment: EQUIPMENT_KEYS,
+  equipment: EQUIPMENT_KEYS,
 };
 
   /* endinject */
@@ -7002,7 +7635,9 @@ async function repeatingStringConcatAsync({
       .reduce((attrAcc, attrCur) => {
         return a[attrCur] == "" || a[attrCur] == "0"
           ? attrAcc
-          : `${a[attrCur]}+${attrAcc}`.replace(/\+\s*$/, "");
+          : `${a[attrCur]}+${attrAcc}`
+              .replace(/\+\s*$/, "")
+              .replace(/^\s*\+/, "");
       }, "");
     return acc;
   }, {});
@@ -7040,6 +7675,61 @@ async function getSectionIDsOrderedAsync(sectionName) {
     ),
   ];
   return ids;
+}
+
+  /* endinject */
+
+  /* inject:js/migrate.js */
+  async function migrateAttributes() {
+  const lcOpts = [undefined, { numeric: true, sensitivity: "base" }];
+
+  const versions = [
+    {
+      version: "1.1.0",
+      attributes: [
+        {
+          repeating: ["modifiers", "magic", "psionics", "powersabilities"],
+          from: "trustintimidate",
+          to: ["trust", "intimidate"],
+        },
+      ],
+    },
+  ];
+
+  const { version, migrated } = await getAttrsAsync(["version", "migrated"]);
+  // https://stackoverflow.com/a/65687141/177943
+  const [latest] = versions.slice(-1);
+  if (
+    latest.version.localeCompare(version, ...lcOpts) < 1 &&
+    Boolean(+migrated)
+  ) {
+    return;
+  }
+
+  for (const v of versions) {
+    for (const attribute of v.attributes) {
+      for (const section of attribute.repeating) {
+        const ids = await getSectionIDsAsync(section);
+        const attrKeys = ids.map(
+          (id) => `repeating_${section}_${id}_${attribute.from}`
+        );
+        const a = await getAttrsAsync(attrKeys);
+        const attrs = ids.reduce((acc, id) => {
+          for (const to of attribute.to) {
+            const fromKey = `repeating_${section}_${id}_${attribute.from}`;
+            if (a[fromKey]) {
+              acc[`repeating_${section}_${id}_${to}`] = a[fromKey];
+            }
+            return acc;
+          }
+        }, {});
+        if (Object.keys(attrs).length > 0) {
+          await setAttrsAsync(attrs);
+        }
+      }
+    }
+  }
+  await setAttrsAsync({ version: latest.version, migrated: 1 });
 }
 
   /* endinject */
@@ -7121,7 +7811,8 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     "spdfly",
     "hf",
     "spellstrength",
-    "trustintimidate",
+    "trust",
+    "intimidate",
     "charmimpress",
   ];
   const fieldNames = rowIds.reduce((acc, rowId) => {
@@ -7158,7 +7849,7 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
       const rsaDestinations = [`${destinationPrefix}_mod_${field}`];
       const rsaFields = [`mod_${field}`];
       let base = field;
-      if (field == "trustintimidate") {
+      if (field == "trust" || field == "intimidate") {
         base = `${destinationPrefix}_mod_ma_bonus`;
       } else if (field == "charmimpress") {
         base = `${destinationPrefix}_mod_pb_bonus`;
@@ -7181,15 +7872,31 @@ async function combineBonuses(rowIds, destinationPrefix) {
 
   console.log("combineBonuses", rowIds, destinationPrefix);
 
+  const options = await getAttrsAsync(["opt_pp_extras"]);
+  const optPpExtras = Boolean(+options["opt_pp_extras"]);
+
   await repeatingAbsoluteAttributes(rowIds, destinationPrefix);
 
   await repeatingStringConcatAsync({
     destinations: [
       `${destinationPrefix}_damage`,
+      `${destinationPrefix}_damage_paired`,
+      `${destinationPrefix}_damage_mainhand`,
+      `${destinationPrefix}_damage_offhand`,
       `${destinationPrefix}_damage_range`,
+      `${destinationPrefix}_damage_range_single`,
+      `${destinationPrefix}_damage_range_burst`,
     ],
     section: "bonuses",
-    fields: ["damage", "damage_range"],
+    fields: [
+      "damage",
+      "damage_paired",
+      "damage_mainhand",
+      "damage_offhand",
+      "damage_range",
+      "damage_range_single",
+      "damage_range_burst",
+    ],
     filter: rowIds,
   });
 
@@ -7199,6 +7906,8 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "knockout",
     "deathblow",
     "mod_character_ps_type",
+    "mod_liftcarry_weight_multiplier",
+    "mod_liftcarry_duration_multiplier",
   ];
   const pickBestDestinations = pickBestFieldsBase.map(
     (field) => `${destinationPrefix}_${field}`
@@ -7209,12 +7918,12 @@ async function combineBonuses(rowIds, destinationPrefix) {
     destinations: pickBestDestinations,
     section: "bonuses",
     fields: pickBestFields,
-    defaultValues: [0, 20, 0, 0, core.character_ps_type],
-    ranks: ["high", "low", "low", "low", "high", "high"],
+    defaultValues: [0, 20, 0, 0, core.character_ps_type, 1, 1],
+    ranks: ["high", "low", "low", "low", "high", "high", "high", "high"],
     filter: rowIds,
   });
 
-  const noAttributeBonusFields = [
+  let noAttributeBonusFields = [
     "attacks",
     "initiative",
     "pull",
@@ -7226,6 +7935,27 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "strike_range_called",
     "disarm_range",
   ];
+
+  let ppBonusFields = [
+    "strike",
+    "parry",
+    "dodge",
+    "throw",
+    "dodge_flight",
+    "dodge_auto",
+    "dodge_teleport",
+    "dodge_motion",
+    "dodge_underwater",
+    "flipthrow",
+  ];
+
+  const ppExtras = ["disarm", "entangle"];
+  if (optPpExtras) {
+    ppBonusFields = ppBonusFields.concat(ppExtras);
+  } else {
+    noAttributeBonusFields = noAttributeBonusFields.concat(ppExtras);
+  }
+
   // No attribute bonuses.
   await repeatingSumAsync(
     noAttributeBonusFields.map((field) => `${destinationPrefix}_${field}`),
@@ -7282,19 +8012,6 @@ async function combineBonuses(rowIds, destinationPrefix) {
     `filter:${rowIds.toString()}`
   );
 
-  const ppBonusFields = [
-    "strike",
-    "parry",
-    "dodge",
-    "throw",
-    "disarm",
-    "entangle",
-    "dodge_flight",
-    "dodge_auto",
-    "dodge_teleport",
-    "dodge_motion",
-    "flipthrow",
-  ];
   await repeatingSumAsync(
     ppBonusFields.map((field) => `${destinationPrefix}_${field}`),
     "bonuses",
@@ -7431,7 +8148,9 @@ on("change:repeating_profiles:mod_ma", async (e) => {
 
 on(
   "change:repeating_profiles:mod_ps \
-  change:repeating_profiles:mod_character_ps_type",
+  change:repeating_profiles:mod_character_ps_type \
+  change:repeating_profiles:mod_liftcarry_weight_multiplier \
+  change:repeating_profiles:mod_liftcarry_duration_multiplier",
   async (e) => {
     console.log("change:repeating_profiles:mod_ps", e);
     const [r, section, rowId] = e.sourceAttribute.split("_");
@@ -7703,6 +8422,10 @@ on(
   await setAttrsAsync(attrs);
 }
 
+on("change:repeating_armor:movementpenalty", async (e) => {
+  recalculateMovement();
+});
+
 on("clicked:armorapplydamage", async (e) => {
   console.log("clicked:armorapplydamage", e);
   const a = await getAttrsAsync([`armordamage`]);
@@ -7719,10 +8442,17 @@ on("clicked:repeating_armor:resetmdc", async (e) => {
   });
 });
 
+on("change:repeating_armor:is_active", (e) => recalculateMovement());
+
   /* endinject */
 
   /* inject:js/profiles.js */
-  async function updateProfile(rowId) {
+  async function getDefaultProfileID() {
+  const { default_profile } = await getAttrsAsync(["default_profile"]);
+  return default_profile;
+}
+
+async function updateProfile(rowId) {
   const bonusIds = (
     await getAttrsAsync(["repeating_profiles_bonus_ids"])
   ).repeating_profiles_bonus_ids.split(",");
@@ -7931,23 +8661,58 @@ on("clicked:getdefaultprofile", async (e) => {
   console.log(a);
 });
 
+/**
+ * Add a token {attack} times to the Turn Tracker in order against other tokens.
+ * Requires API script access.
+ * For use on an action button.
+ *
+ * [[d20+@{selected|repeating_profiles_-MibcwHG5hZXUJn6A7OG_initiative} &{tracker}]]
+ */
+async function palladiumAddToTurnTracker(e) {
+  const [r, section, rowId] = e.sourceAttribute.split("_");
+  const rowPrefix = `${r}_${section}_${rowId}`;
+  const {
+    [`${rowPrefix}_initiative`]: init,
+    [`${rowPrefix}_attacks`]: attacks,
+  } = await getAttrsAsync([`${rowPrefix}_initiative`, `${rowPrefix}_attacks`]);
+  const roll = await startRoll(
+    `&{template:test} {{name=Test}} {{roll1=[[1d20]]}}`
+  );
+  console.log(roll);
+  const computed = roll.results.roll1.result + init;
+  console.log(computed);
+  finishRoll(roll.rollId, {
+    roll1: computed,
+  });
+  const addToTracker = await startRoll(`[[[[${computed}]] &{tracker}]]`);
+  finishRoll(addToTracker.rollId);
+  // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
+  const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
+  finishRoll(dupeTracker.rollId);
+}
+
   /* endinject */
 
   /* inject:js/attributes.js */
   async function iqBonus(value, prefix = "") {
   console.log("iqBonus", value, prefix);
-  const iq_bonus = value > 15 ? value - 14 : 0;
-  const perception_bonus = getBiAttributeBonus(value);
-  const attrs = {
-    [`${prefix}iq_bonus`]: iq_bonus,
-    [`${prefix}perception_bonus`]: perception_bonus,
-  };
+
+  const attrs = {};
+  attrs[`${prefix}iq_bonus`] = value > 15 ? value - 14 : 0;
+
+  // check if Perception option is enabled
+  const { opt_iq_perception } = await getAttrsAsync(["opt_iq_perception"]);
+  if (!!+opt_iq_perception) {
+    const perception_bonus = getBiAttributeBonus(value);
+    attrs[`${prefix}perception_bonus`] = perception_bonus;
+  }
+
   console.log(attrs);
   await setAttrsAsync(attrs);
 
-  // this should check and only get called if the default (top) profile changes
-  const profilesSections = await getSectionIDsOrderedAsync("profiles");
-  if (!profilesSections || prefix.includes(profilesSections[0])) {
+  const defaultProfile = await getDefaultProfileID();
+  const profilesSections = await getSectionIDsAsync("profiles");
+  if (!profilesSections || prefix.includes(defaultProfile)) {
     await updateSkills();
   }
 }
@@ -7985,7 +8750,8 @@ async function maBonus(value, prefix = "") {
       : 0;
   setAttrs({
     [`${prefix}ma_bonus`]: ma_bonus,
-    [`${prefix}trustintimidate`]: ma_bonus,
+    [`${prefix}trust`]: ma_bonus,
+    [`${prefix}intimidate`]: ma_bonus,
   });
 }
 
@@ -8002,10 +8768,16 @@ async function psBonusComplete(prefix = "") {
     `${prefix}ps`,
     `${prefix}character_ps_type`,
     `${prefix}pe`,
+    `${prefix}liftcarry_weight_multiplier`,
+    `${prefix}liftcarry_duration_multiplier`,
   ]);
   const ps = +a[`${prefix}ps`];
   const pe = +a[`${prefix}pe`];
   const ps_type = a[`${prefix}character_ps_type`];
+  const liftcarry_weight_multiplier =
+    +a[`${prefix}liftcarry_weight_multiplier`];
+  const liftcarry_duration_multiplier =
+    +a[`${prefix}liftcarry_duration_multiplier`];
   const ps_bonus = ps > 15 ? ps - 15 : 0;
 
   let restrained_punch = (punch = power_punch = kick = leap_kick = "");
@@ -8218,6 +8990,14 @@ async function psBonusComplete(prefix = "") {
       }
       break;
   }
+  if (liftcarry_weight_multiplier > 0) {
+    lift *= liftcarry_weight_multiplier;
+    carry *= liftcarry_weight_multiplier;
+    throw_distance *= liftcarry_weight_multiplier;
+  }
+  if (liftcarry_duration_multiplier > 0) {
+    hold_max *= liftcarry_duration_multiplier;
+  }
   const attrs = {
     [`${prefix}character_ps_type_name`]: name,
     [`${prefix}ps_bonus`]: ps_bonus,
@@ -8257,6 +9037,7 @@ async function pbBonus(value, prefix = "") {
   });
 }
 
+// DEPRECATED
 async function spdBonus(value) {
   const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
   const a = await getAttrsAsync([
@@ -8294,13 +9075,13 @@ on("change:pb", async (e) => {
 });
 
 on("change:spd", async (e) => {
-  await spdBonus(e.newValue);
+  recalculateMovement();
 });
 
   /* endinject */
 
   /* inject:js/skills.js */
-  async function updateSkill(rowId, iqBonusKey = "iq_bonus") {
+  async function updateSkillOld(rowId, iqBonusKey = "iq_bonus") {
   const additionalModifiers = [iqBonusKey];
 
   const profileMeta = await getAttrsAsync(["default_profile"]);
@@ -8324,11 +9105,72 @@ on("change:spd", async (e) => {
   await setAttrsAsync(attrs);
 }
 
-async function updateSkills() {
+async function updateSkill(rowId) {
+  const row = `repeating_skills_${rowId}`;
+  const keys = SKILL_KEYS.map((key) => `${row}_${key}`).concat([
+    "default_profile",
+  ]);
+  console.log("keys", keys);
+  const a = await getAttrsAsync(keys);
+  console.log(a);
+
+  const iqBonusKey = `repeating_profiles_${a["default_profile"]}_mod_iq_bonus`;
+  const skillBonusKey = `repeating_profiles_${a["default_profile"]}_mod_skillbonus`;
+  const profileKeys = [iqBonusKey, skillBonusKey];
+  console.log("profileKeys", profileKeys);
+  const profileBonuses = await getAttrsAsync(profileKeys);
+  console.log(profileBonuses);
+
+  const total =
+    +a[`${row}_base`] +
+    +a[`${row}_bonus`] +
+    (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`] +
+    (+profileBonuses[iqBonusKey] || 0) +
+    (+profileBonuses[skillBonusKey] || 0);
+  console.log("total", total);
+  await setAttrsAsync({ [`${row}_total`]: total });
+}
+
+async function updateSkillsOld() {
   const ids = await getSectionIDsAsync("skills");
   for (const id of ids) {
     await updateSkill(id);
   }
+}
+
+async function updateSkills() {
+  console.log("updateSkills");
+  const ids = await getSectionIDsAsync("skills");
+  const keys = ids
+    .reduce((acc, cur) => {
+      const row = `repeating_skills_${cur}`;
+      const skillKeys = SKILL_KEYS.map((key) => `${row}_${key}`);
+      return acc.concat(skillKeys);
+    }, [])
+    .concat(["default_profile"]);
+  console.log("keys", keys);
+  const a = await getAttrsAsync(keys);
+  console.log("a", a);
+  // calculate IQ bonus once we know the default_profile
+  const iqBonusKey = `repeating_profiles_${a["default_profile"]}_mod_iq_bonus`;
+  const skillBonusKey = `repeating_profiles_${a["default_profile"]}_mod_skillbonus`;
+  const profileKeys = [iqBonusKey, skillBonusKey];
+  console.log("profileKeys", profileKeys);
+  const profileBonuses = await getAttrsAsync(profileKeys);
+  console.log("profileBonuses", profileBonuses);
+  const totals = ids.reduce((acc, cur) => {
+    const row = `repeating_skills_${cur}`;
+    const total =
+      +a[`${row}_base`] +
+      +a[`${row}_bonus`] +
+      (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`] +
+      (+profileBonuses[iqBonusKey] || 0) +
+      (+profileBonuses[skillBonusKey] || 0);
+    acc[`${row}_total`] = total;
+    return acc;
+  }, {});
+  console.log("totals", totals);
+  await setAttrsAsync(totals);
 }
 
 async function updateSkillLevels(newCharacterLevel, oldCharacterLevel) {
@@ -8346,6 +9188,7 @@ async function updateSkillLevels(newCharacterLevel, oldCharacterLevel) {
 
 on("change:repeating_skills", async (e) => {
   console.log("change:repeating_skills", e);
+  if (e.sourceType === "sheetworker") return;
   if (e.sourceAttribute.endsWith("_name")) return;
   const sourceParts = e.sourceAttribute.split("_");
   // Return if no attribute is changed and it's the row itself
@@ -8592,6 +9435,63 @@ on("change:repeating_movement:ft_melee", async (e) => {
   await setAttrsAsync(attrs);
 });
 
+async function recalculateMovement(manualFeetPerMelee) {
+  console.log("Recalculating Speed Values");
+  let feetPerMelee = manualFeetPerMelee;
+  let attacksPerMelee = 2;
+
+  const orderedSectionIds = await getSectionIDsOrderedAsync("profiles");
+  /**
+   * @todo short-term - this should use Default profile
+   * @todo long-term - movement section should be incorporated into each profile
+   */
+  const attacksAttrName = `repeating_profiles_${orderedSectionIds[0]}_attacks`;
+
+  if (!manualFeetPerMelee) {
+    const ids = await getSectionIDsOrderedAsync("armor");
+    const {
+      spd,
+      [attacksAttrName]: perMelee,
+      ...penalties
+    } = await getAttrsAsync([
+      "spd",
+      attacksAttrName,
+      ...ids.map((id) => `repeating_armor_${id}_is_active`),
+      ...ids.map((id) => `repeating_armor_${id}_movementpenalty`),
+    ]);
+    attacksPerMelee = perMelee;
+
+    const activeArmorIds = ids.reduce((acc, id) => {
+      if (!!Number(penalties[`repeating_armor_${id}_is_active`])) {
+        acc.push(id);
+      }
+      return acc;
+    }, []);
+
+    const speedPenalty = activeArmorIds.reduce((penalty, id) => {
+      const p = +penalties[`repeating_armor_${id}_movementpenalty`];
+      return penalty + p;
+    }, 0);
+
+    feetPerMelee = spd * 15;
+    feetPerMelee = Math.round(
+      feetPerMelee + feetPerMelee * (speedPenalty / 100.0)
+    );
+  } else {
+    // To save a network call, pull only attacks on a manual override
+    const { [attacksAttrName]: perMelee } = await getAttrsAsync([
+      attacksAttrName,
+    ]);
+    attacksPerMelee = perMelee;
+  }
+  const attrs = {
+    run_mph: ((feetPerMelee * 4 * 60) / 5280).toFixed(1),
+    run_ft_melee: feetPerMelee,
+    run_ft_attack: Math.round(feetPerMelee / attacksPerMelee),
+  };
+  await setAttrsAsync(attrs);
+}
+
   /* endinject */
 
   /* inject:js/import_export.js */
@@ -8612,7 +9512,7 @@ on("change:repeating_movement:ft_melee", async (e) => {
   }
 
   async function getRepeatingRowsAsync(section) {
-    const ids = await getSectionIDsAsync(section);
+    const ids = await getSectionIDsOrderedAsync(section);
     const attrNames = ids.reduce((acc, id) => {
       SECTIONS[section].forEach((key) => {
         acc.push(`repeating_${section}_${id}_${key}`);
@@ -8638,6 +9538,8 @@ on("change:repeating_movement:ft_melee", async (e) => {
     attrs.movement = await getRepeatingRowsAsync("movement");
     attrs.powersabilities = await getRepeatingRowsAsync("powersabilities");
     attrs.modifiers = await getRepeatingRowsAsync("modifiers");
+    attrs.armor = await getRepeatingRowsAsync("armor");
+    attrs.equipment = await getRepeatingRowsAsync("equipment");
     // Profiles are tricky to export because IDs that they refer to won't line up
     // attrs.profiles = await getRepeatingRowsAsync("profiles");
     attrs.core = await getAttrsAsync(CORE_KEYS);
@@ -8701,6 +9603,8 @@ on("change:repeating_movement:ft_melee", async (e) => {
     await setRepeatingRowsAsync("movement", data.movement);
     await setRepeatingRowsAsync("powersabilities", data.powersabilities);
     await setRepeatingRowsAsync("modifiers", data.modifiers);
+    await setRepeatingRowsAsync("armor", data.armor);
+    await setRepeatingRowsAsync("equipment", data.equipment);
     await setAttrsAsync({
       importexportstatus:
         "Done importing, but triggered events are probably still running. To be sure open your browser console and when the logging stops, the import is really done.",
@@ -8708,11 +9612,26 @@ on("change:repeating_movement:ft_melee", async (e) => {
   });
 })();
 
+on("sheet:opened", async (e) => {
+  console.log("sheet:opened", e);
+  await setAttrsAsync({ debug: "0" });
+  await migrateAttributes();
+});
+
   /* endinject */
 
   /**
-   * [] Prompt to add Magic/Psionic bonus when saving against Mind Control, Illusions, Pain, Curses
-   * [] Factor in critical strike when rolling strike-type-moves with roll template
+   * [] Add a non-repeating section for Default Profile so that profile attributes can be set on the token
+   * [] Refactor to get rid of the Bonuses repeating section and instead go straight from Modifiers to Picked Modifiers. I think the Bonuses section causes weird issues related to network/multiple updates at the same time.
+   * [] Fix CSS on "Psionics vs. [n]"
+   * [] Add range to modifiers (guns)
+   * [] Add minions/pets/henchmen (could just be equivalent to a Profile)
+   * [] Factor in "Aimed Attack/Called Shot" (/disarm) from WP Targeting (RUE p328)
+   *  - [] Also factor in the natural 19-20 automatic success with a roll template/green highlight
+   *  - [] Including check has WP Targeting
+   * [] Ability to hide tabs (ex. a Grunt doesn't need Magic and Psionics tabs)
+   * [] Add Cybernetics/Bionics tab
+   * [] Prompt to add Magic/Psionic bonus when saving against Mind Control, Illusions, Pain, Curses, Possession
    * [] Armor tab / repeater; Armor checkboxes in Aggregate Bonuses, and Armor list (name, MDC) underneath
    *  - [x] Move Damage/Apply Damage outside repeater
    *  - [] "Add to Armor" checkbox on Abilities/Psionics/Magic/Modifiers
@@ -8721,22 +9640,25 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Add Range, Ammo to Modifiers
    * [] Carry PS damage rolls through to profile (ex. kick: 2d4 sdc)
    * [] Add details/summary to some Core background fields like Insanity, Environment, Family Origin, Disposition
-   * [] Set range and duration to text instead of number
    * [] Add roll buttons for punches/kicks
    * [] Add WP Sharpshooting that takes into account the PP of the profile it's used in
-   * [] Make Imp/Exp -> Options, and add checkboxes for:
-   *  - [] Add PP to disarm/entangle
-   *  - [] Add IQ to Perception
-   *  - [] Apply PS damage to each hand or total in Paired attack
-   * [] Two hands worth of damage
-   *  - Separate Main Hand, Off Hand, and Combined damage
-   *  - Each damage should include a checkbox for "stacks" vs. "overrides". Overrides uses greatest of.
-   *  - If Combined is empty on the Profile, it should use the combined main+off.
-   * [] Separate Left, Right, and Combined damage. On modifiers,
+   * [x] Make Imp/Exp -> Options, and add checkboxes for:
+   * ** Or use sheet options - "useroptions" https://wiki.roll20.net/Sheet.json#Example
+   *  - [x] Add PP to disarm/entangle
+   *  - [x] Add IQ to Perception
+   *  - [x] Apply PS damage to each hand or total in Paired attack
+   *  - [] Add Supernatural (and Robotic) punch damage to melee attacks
+   *  - [] Increased magic at Ley Line (+50%, +100%, +200%)
+   * [x] Two hands worth of damage
+   *  - [x] Separate Main Hand, Off Hand, and Combined damage
+   *  - [] Each damage should include a checkbox for "stacks" vs. "overrides". Overrides uses greatest of.
+   *  - [] If Combined is empty on the Profile, it should use the combined main+off.
    * [] Make range/duration text instead of number ("2D6 minutes", "varies", "touch")
    * [] Profile damage should use bonus damage if it exists instead of calculating based on PS type
    * [] Add option for increased magic/psionics at Ley Line (+50%, +100%, +200%)
-   * [] Add "vs. #" for rolls that are against a static target
+   *  - Not sure how to implement this. Does it go on the psionic, on the profile? Feels like it should be a sheet wide toggle,
+   *    but then damage values in the profile need to know that they came from, ex. psi-sword, and only to multiply that portion
+   *    of the total damage. Complicated.
    *
    * [] Changing values causes other fields to set to 0
    *    - ex. change frequency starting then quickly change frequency per level
@@ -8749,10 +9671,29 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * [] Add Sort Alphabetically option for skills/abilities/magic/psionics
    * [] Add Sort by Spell Level option for magic
    * [] Add weight to abilities/magic/psionics
-   * [] Add a non-repeating section for Default Profile so that profile attributes can be set on the token
    * [] Pressing space when typing an ability name expands and collapses the Details panel
    * [] Removing Bonus Sources doesn't remove them from Selections
    *
+   * [x] Add "vs. #" for rolls that are against a static target
+   * [x] Fix iq_bonus() function to use default profile, not top.
+   * - [x] skill bonuses aren't calculating properly.
+   * - [x] TEST THOROUGHLY!
+   * [x] Prompt for modifier when rolling a skill
+   * [x] Factor in critical strike when rolling strike-type-moves with roll template
+   * [x] Remove Charm/Impress and Perception dice roll from Core tab
+   * [x] Add init roll to tracker
+   * [x] Move Initiative outside of Ancient section
+   * [x] Range Strike roll template - update text for single/burst
+   * [x] Make debug a button/attribute instead of having to edit the markup
+   * [x] Make sure that armor attributes are in definitions.js
+   * [x] Make export use ordered section IDs
+   * [x] Add vs Telepathic Probes (Changeling)
+   * [x] Add vs Despair (Psyscape)
+   * [x] Separate Trust and Intimidate (cuz kraks get a bonus to trust and a penalty to intimidate)
+   * [x] Add multiplier option for lift/carry (juicer, crazy, etc.)
+   * [x] Add Single and Pulse damage to Range Combat modifiers
+   * [x] There's a disconnect between level and skill level. It seems like level needs to be changed once before it "connects" to skill level, at which point it's out of sync if they both started at 1.
+   * [x] Add Dodge: Underwater
    * [x] Add Spd: Fly attribute
    * [x] Add Fatigue to Saves
    * [x] Show name above tabs
@@ -8851,7 +9792,16 @@ on("change:repeating_movement:ft_melee", async (e) => {
    * This one could be a doozy
    * */
   on("change:character_level", async (e) => {
+    console.log(e);
     console.log("change:character_level", e.newValue, e.previousValue);
+
+    /**
+     * Defend against
+     * https://app.roll20.net/forum/post/10351259/first-time-the-value-is-changed-previousvalue-and-newvalue-are-the-same
+     * */
+    if (e.newValue == e.previousValue) {
+      e.previousValue = "1";
+    }
     // Update WPs
     await updateWeaponProficiencies("wp", e.newValue, e.previousValue);
     await updateWeaponProficiencies("wpmodern", e.newValue, e.previousValue);
@@ -8913,6 +9863,29 @@ on("change:repeating_movement:ft_melee", async (e) => {
   </div>
 </rolltemplate>
 
+<rolltemplate class="sheet-rolltemplate-strike">
+  <div class="sheet-container sheet-color-{{color}}">
+    <div class="sheet-header">
+      {{#title}}
+      <div class="sheet-title">{{title}}</div>
+      {{/title}} {{#subtitle}}
+      <div class="sheet-subtitle">{{subtitle}}</div>
+      {{/subtitle}}
+    </div>
+    <div class="sheet-content">
+      {{#rollWasCrit() strikeroll}}
+      <div class="sheet-key">Crit!</div>
+      <div class="sheet-value">{{strikeroll}}</div>
+      {{/rollWasCrit() strikeroll}}
+      <!-- -->
+      {{#^rollWasCrit() strikeroll}}
+      <div class="sheet-key">Strike</div>
+      <div class="sheet-value">{{strikeroll}}</div>
+      {{/^rollWasCrit() strikeroll}}
+    </div>
+  </div>
+</rolltemplate>
+
 <rolltemplate class="sheet-rolltemplate-custom">
   <div class="sheet-container sheet-color-{{color}}">
     <div class="sheet-header">
@@ -8929,6 +9902,16 @@ on("change:repeating_movement:ft_melee", async (e) => {
       {{/allprops() title subtitle desc color}} {{#desc}}
       <div class="sheet-desc">{{desc}}</div>
       {{/desc}}
+    </div>
+  </div>
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-test">
+  <div class="sheet-template-container">
+    <h1>{{name}}</h1>
+    <div class="sheet-results">
+      <h4>Result = {{roll1}}</h4>
+      <h4>Custom Result = {{computed::roll1}}</h4>
     </div>
   </div>
 </rolltemplate>
