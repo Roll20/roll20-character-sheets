@@ -2143,6 +2143,7 @@
             <div class="row-long row-matrix-combat-stats">
             	<input type="hidden" name="attr_matrix_device_rating" value="0">
             	<input type="hidden" name="attr_matrix_defense_rating" value="0">
+            	<input type="hidden" name="attr_matrix_defense_rating_modifier" value="0">
             	<input type="hidden" name="attr_matrix_attack_rating" value="0">
             	<input type="hidden" name="attr_matrix_device_initiative_bonus" value="0">
             	<input type="hidden" name="attr_matrix_device_essence_cost" value="0">
@@ -5309,7 +5310,7 @@
 <input type="hidden" name="attr_combat_paralysis_initiative_mod" value="" />
 <input type="hidden" name="attr_bad_luck" value="1" />
 
-<input type="hidden" name="attr_sheet_version" value="0.42">
+<input type="hidden" name="attr_sheet_version" value="0.43">
 <input type="hidden" name="attr_data_version" value="0">
 
 <script type="text/worker">
@@ -5589,7 +5590,7 @@ console.log(eventInfo);
 		'overflow_modifier', 'physical_modifier', 'stun_modifier',
 		'initiative_mod', 'initiative_dice_mod', 'astral_initiative_mod', 'astral_dice_mod', 'matrix_initiative_mod', 'matrix_dice_mod', 'cold_sim_initiative_mod', 'cold_sim_initiative_dice_mod', 'hot_sim_initiative_mod', 'hot_sim_initiative_dice_mod',
 		'composure_modifier', 'judge_intentions_modifier', 'memory_modifier', 'lift_carry_modifier', 'move_speed', 'sprint_speed', 'sprint_modifier',
-		'attack_modifier', 'sleaze_modifier', 'data_processing_modifier', 'firewall_modifier',
+		'attack_modifier', 'sleaze_modifier', 'data_processing_modifier', 'firewall_modifier', 'matrix_defense_rating_modifier',
 		'combat_paralysis'
 	];
 	var attrsToGet = ['enable_modifiers', 'enable_unrestricted_modifiers'];
@@ -6237,12 +6238,13 @@ on("sheet:opened change:attack change:sleaze", (eventInfo) => {
 });
 
 
-on("sheet:opened change:data_processing change:firewall", (eventInfo) => {
-	getAttrs(['data_processing', 'firewall'], (v) => {
+on("sheet:opened change:data_processing change:firewall change:matrix_defense_rating_modifier", (eventInfo) => {
+	getAttrs(['data_processing', 'firewall', 'matrix_defense_rating_modifier'], (v) => {
 		const data_processing = v['data_processing'] || 0;
 		const firewall = v['firewall'] || 0;
+		const matrix_defense_rating_modifier = v['matrix_defense_rating_modifier'] || 0;
 		setAttrs({
-			matrix_defense_rating: parseInt(data_processing) + parseInt(firewall)
+			matrix_defense_rating: parseInt(data_processing) + parseInt(firewall) + parseInt(matrix_defense_rating_modifier)
 		});
 	});
 });
