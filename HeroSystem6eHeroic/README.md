@@ -18,7 +18,7 @@ Roll buttons are color-coded:
 
 ![Red Button](/HeroSystem6eHeroic/images/RedButton.png) Red buttons are weapon attacks. They can do killing or normal damage.
 
-![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield attacks.
+![Brown Button](/HeroSystem6eHeroic/images/BrownButton.png) The brown button is for shield attacks. They can do killing or normal damage.
 
 ![Green Button](/HeroSystem6eHeroic/images/GreenButton.png) Green buttons are for normal damage attacks.
 
