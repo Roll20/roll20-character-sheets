@@ -130,7 +130,7 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
-The endurance cost shown can *optionally* be automatically deducted from the character's health status. However, some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to manually deducts a power's endurance cost.
+The endurance cost shown can *optionally* be automatically deducted from the character's health status. However, some powers require additional endurance payments (such as Autofire powers) or endurance costs that must be satisfied every phase (constant powers). Use the "END" button to manually deducts a power's endurance cost.
 
 ## Page 5: Talents and Complications
 
