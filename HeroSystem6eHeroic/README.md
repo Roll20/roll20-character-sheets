@@ -70,7 +70,7 @@ Along the top is an accounting of your carried weight and DCV and movement penal
 
 ![Encumbrance](/HeroSystem6eHeroic/images/encumbrance.png)
 
-The sheet includes space for four suits or pieces of armor. Although this sheet is currently written for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
+The sheet includes space for four suits or pieces of armor. Although this sheet is designed for the simpler armor activation system, there is a field for hit locations if your GM chooses to use that system. 
 
 ![Armor Table](/HeroSystem6eHeroic/images/armor.png)
 
@@ -130,7 +130,7 @@ The "Roll" button produces general output that may or may not apply to the power
 
 ![Multipower](/HeroSystem6eHeroic/images/PurpleButtonChat.png)
 
-The endurance cost shown is not automatically deducted from the character's health status. Some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to deduct a power's endurance cost.
+The endurance cost shown is can optionally be automatically deducted from the character's health status. However, some powers require multiple endurance costs (such as Autofire powers) or endurance every phase. Use the "END" button to manually deducts a power's endurance cost.
 
 ## Page 5: Talents and Complications
 
@@ -146,15 +146,17 @@ The only trick to the Complications column is to remember that points gained fro
 
 ![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
-The last page of this sheet contains a number of important options:
+The last page of this sheet contains a number of options:
 
 (1) Use Characteristic Maximums. If checked, character point costs are doubled above the standard Hero System maximums.
 
-(2) Super-heroic Campaign Endurance. If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+(2) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
 
-(3) Literacy Costs Character Points. If checked, literacy costs 1 CP per language selected in the Skills tab. Typical for Fantasy Hero settings but not Star Hero campaigns.
+(3) Attack and Power Buttons Apply END Costs. If checked, these buttons will subtract an attack or power's endurance cost once from a character's current END in addition to their normal effects.
 
-(4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
+(4) Super-heroic Campaign Endurance. If checked, Strength costs 1 END per 5 STR to use rather than 1 END per 10 STR.
+
+(5) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
 ## Player Token Settings
 
@@ -188,4 +190,4 @@ During play, add the Turn Token to the Turn Tracker using the "Tracker" button o
 
 ![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
 
-*Villain In Glasses, August 1, 2021. Last updated on September 26, 2021 to reflect changes to weapon attacks being damage-type selectable.*
+*Villain In Glasses, August 1, 2021. Last updated on September 26, 2021 to reflect changes to weapon attacks being damage-type selectable as well as the option to automatically apply END costs.*
