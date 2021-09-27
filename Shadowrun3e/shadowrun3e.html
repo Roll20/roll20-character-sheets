@@ -4580,6 +4580,7 @@ deckingtabs.forEach(tab => {
    var lang={}
 
    on("sheet:opened", function() {
+   	lang["blackic"] = getTranslationByKey("black-ic");
    	lang["blackiclethal"] = getTranslationByKey("black-ic-lethal");
    	lang["blackicnonlethal"] = getTranslationByKey("black-ic-non-lethal");
    	lang["cerebropathic"] = getTranslationByKey("cerebropathic");
@@ -5374,23 +5375,47 @@ on('clicked:matrixattack', (info) => {
 	});
 
     	on('clicked:matrixmaneuvers', (info) => {
-		const mytitle=info["htmlAttributes"]["title"]
-		const myid=info["htmlAttributes"]["id"]
-		var myutil="@{deckcloak-rating-final}";
-		var myatt="deck-evasion-final";
+		atts=["character_name", "deck-evasion-final", "deckcloak-rating-final"
+		getAttrs(atts, function(myval) {
+			var payload;
+			if ( info["originalRollId"] != undefined ) {
+				payload=rollEscape.unescape(info["originalRollId"]);
+			}
+			if (payload != null ) console.log('payload');
+			console.log(payload);
+			const mytitle=info["htmlAttributes"]["title"]
+			const myid=info["htmlAttributes"]["id"]
+			var myutil="@{deckcloak-rating-final}";
+			var myatt="deck-evasion-final";
 		if ( mytitle == "Evade Detection" ) myatt = "deck-sensors-final";
                 if ( mytitle == "Parry Attack" ) myutil = "@{decklockon-rating-final}";
                 if ( mytitle == "Sensor Test" ) myutil = "@{decklockon-rating-final}";
 		var calcTN="@{target|" + lang["target"] +"|" + myatt + "} + @{wp-matrix} +?{" + lang["miscellaneous-modifiers"] + "|0} - " + myutil;
 		var calcDice="@{decking} + ?{" + lang["hacking-pool-dice"] + "}"
                 var myroll="&{template:matrix}{{myname=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}"
+		if (payload == null) myroll+="{{senddata2=[[0]]}}{{winner=[[0]]}}";
+		else myroll+="{{testresult=[[0]]}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
 		myroll+="{{action=" + mytitle + "}}"
+		myroll+="{{targetname=@{target|" + lang["target"] + "|character_name}}"
 		myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
 		myroll+="{{detect=[Detect](~@{target|" + lang["target"] +"|token_name}|detection)}}"
+		var payload={};
                 startRoll(myroll, (results) => {
 			updatepoolused("hackingpool", results.results.hackingpool.result);	
-			finishRoll( results.rollId);
+			if ( payload == null) {  
+				payload={successes: results.results.roll.result, attacker: };
+				finishRoll( results.rollId,
+                		{
+					senddata2: rollEscape.escape(payload),
+                		});
+			} else {
+				finishRoll( results.rollId,
+				const delta = payload["successes"] - 
+                		{
+					testresult: rollEscape.escape(payload),
+                		});
+			}
 		});
 	});
 	on('clicked:adeptpower', (info) => {
@@ -9596,8 +9621,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtrow"><b>{{action}} {{utilitylevel}}:</b> {{computed::roll}} {{computed::wdmg}}</div>
         {{#resist}}<div class="sheet-rtrow"><b data-i18n="final-damage-staged-to">Final Damage staged to</b> {{computed::finaldamage}}</div>{{/resist}}
         {{#debuff}}<div class="sheet-rtrow"><b>{{debuff}}</b> <span data-i18n="reduce-by">Reduce by</span> {{computed::finaldamage}}</div>{{/debuff}}
-        {{#senddata}}<div class="sheet-rtrow"><b>{{target}}:</b>
-            [<span data-i18n="resist">Resist</span>](~selected|matrixresist||{{computed::senddata}})</div>{{/senddata}}
+        {{#senddata}}<div class="sheet-rtrow"><b>{{target}}:</b> [<span data-i18n="resist">Resist</span>](~selected|matrixresist||{{computed::senddata}})</div>{{/senddata}}
+        {{#senddata2}}<div class="sheet-rtrow"><b>{{target}}:</b> [<span data-i18n="oppose">Oppose</span>](~{{targetname}}|matrixmaneuvers||{{computed::senddata2}})</div>{{/senddata2}}
         {{#oppose}}<div class="sheet-rtrow"><b data-i18n="utility-test">Utility Test</b> {{oppose}}</div>{{/oppose}}
         {{#sensor}}<div class="sheet-rtrow"><b data-i18n="sensor-test">Sensor Test</b> {{sensor}}</div>{{/sensor}}
         {{#blackic}}<div class="sheet-rtrow">[{{blackic}} <span data-i18n="resist">Resist</span>](~selected|resistroll||{{computed::payload}})</div>{{/blackic}}
