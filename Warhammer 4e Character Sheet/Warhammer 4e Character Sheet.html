@@ -953,7 +953,13 @@
 							
 		<input type="checkbox" name="attr_BNEDisarmShow" class="sheet-hidden sheet-hider" value="1" />	
 				<div class="sheet-row" style="letter-spacing: normal; border-left: 0px">
+		<input type="checkbox" name="attr_InfightShow" class="sheet-hidden sheet-hider" value="0" />	
 				<div class="sheet-col-1-3 sheet-center" style="normal; border-left: 0px">
+				</div>
+		<input type="checkbox" name="attr_InfightShow" class="sheet-hidden sheet-hider" value="1" />	
+				<div class="sheet-col-1-3 sheet-center" style="normal; border-left: 0px">
+				<span data-i18n="INFIGHT">Infight</span>
+				<input type="checkbox" name="attr_MeleeMode_Infight" value="1"/>
 				</div>
 		<input type="checkbox" name="attr_DisarmShow" class="sheet-hidden sheet-hider" value="0" />	
 				<div class="sheet-col-1-3 sheet-center" style="normal; border-left: 0px">
@@ -962,6 +968,9 @@
 				<div class="sheet-col-1-3 sheet-center" style="normal; border-left: 0px">
 				<span data-i18n="DISARM">Disarm</span>
 				<input type="checkbox" name="attr_MeleeMode_Disarm" value="1"/>
+				</div>
+		<input type="checkbox" name="attr_BNEShow" class="sheet-hidden sheet-hider" value="0" />	
+				<div class="sheet-col-1-3 sheet-center" style="normal; border-left: 0px">
 				</div>
 		<input type="checkbox" name="attr_BNEShow" class="sheet-hidden sheet-hider" value="1" />	
 				<div class="sheet-col-1-3 sheet-right" style="padding-right: 7.4px">
@@ -23049,7 +23058,7 @@
 								<span data-i18n="IN-FIGHTER" class="sheet-nowrap"></span>
 							</div>
 							<div class="sheet-col-1-4 sheet-center">			
-						<input class="meleeshow-check" type="checkbox" name="attr_ShowInFighting" value="1"/>
+						<input class="meleeshow-check" type="checkbox" name="attr_ShowInFighter" value="1"/>
 							</div>
 						</div>
 						<div class="sheet-row">	
@@ -25305,7 +25314,7 @@
 								<span data-i18n="IN-FIGHTER">In-fighter</span>
 							</div>
 							<div class="sheet-col-8-100 sheet-center sheet-talents-border">
-								<span data-i18n="ABBREVIATE-DEXETERITY"></span>
+								<span data-i18n="ABBREVIATE-DEXTERITY"></span>
 							</div>
 							<div class="sheet-col-8-100 sheet-center sheet-vert-middle">
 								<input class="sheet-center" type="number" name="attr_Talent_InfighterLvl" value="0" min="0" />
@@ -35861,6 +35870,9 @@
 				{{#rollGreater() fastshot 0}}
 					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #55B800">+{{fastshot}}SL <span data-i18n="FAST-SHOT"></span></div>
 				{{/rollGreater() fastshot 0}}
+				{{#rollGreater() infight 0}}
+					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #55B800">+{{infight}}SL <span data-i18n="IN-FIGHTER"></span></div>
+				{{/rollGreater() infight 0}}
 				{{#rollGreater() shieldsman 0}}		
 					<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #55B800">+{{shieldsman}}SL <span data-i18n="SHIELDSMAN"></span></div>
 				{{/rollGreater() shieldsman 0}}
@@ -36172,6 +36184,9 @@
 							{{#rollGreater() etiquette6 0}}
 								<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #858585">+{{etiquette6}}SL <span  data-i18n="ETIQUETTE"></span> {{etiquette6name}}</div>
 							{{/rollGreater() etiquette6 0}}
+							{{#rollGreater() impzeal 0}}
+								<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #858585">+{{impzeal}}SL <span  data-i18n="IMPASSIONED-ZEAL"></span></div>
+							{{/rollGreater() impzeal 0}}
 							{{#rollGreater() fasthands 0}}
 								<div class="sheet-col-1 sheet-center sheet-pad-l-md sheet-pad-r-md sheet-rt-slmod" style="color: #858585">+{{fasthands}}SL <span  data-i18n="FAST-HANDS"></span></div>
 							{{/rollGreater() fasthands 0}}
@@ -45019,7 +45034,7 @@ on('sheet:opened change:initiative_houserule', function(event) {
 
 
 on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain clicked:dualwieldmain', (eventInfo) => {
-	getAttrs(["Advantageinput","LastRollOff","LastCritRoll", "Used_MeleeWeaponSkill", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Drilled", "MeleeMode_Disarm"], function(v) {	
+	getAttrs(["Advantageinput","LastRollOff","LastCritRoll", "Used_MeleeWeaponSkill", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Drilled", "MeleeMode_Disarm", "MeleeMode_Infight"], function(v) {	
 	
 			prevroll = JSON.stringify(v["LastRollOff"])||0;
 			if (prevroll >= 1 && prevroll <= 9) {
@@ -45033,7 +45048,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
             lastcrit = v.LastCritRoll;
                console.log(lastcrit);
 			   
-   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_MeleePrecise}+@{Used_MeleePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkMain}>addsl<]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{sitmod=[[@{Mainattcustadd}]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_MeleeBonus}}]]}} {{title=@{Used_MeleeWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} {{hitlocation=true}} {{damaging=[[@{Used_MeleeDamaging}]]}} {{reach=@{Used_MeleeReach}}} {{rolltype=[[@{Used_MeleeImpale}]]}} {{qualities=@{Used_MeleeQualities}}} {{damage=[[@{Used_MeleeStrengthBonus}+@{Used_MeleeDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_MeleeDmgTaken}-@{Used_MeleeDurable}]],[[0]]}kh1]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Melee_modtype1}]]}} {{mod1=@{Used_Melee_mod1}}} {{mod2type=[[@{Used_Melee_modtype2}]]}} {{mod2=@{Used_Melee_mod2}}} {{mod3type=[[@{Used_Melee_modtype3}]]}} {{mod3=@{Used_Melee_mod3}}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{fast=[[@{Used_MeleeFast}]]}} {{slow=[[@{Used_MeleeSlow}]]}} {{hack=[[@{Used_MeleeHack}]]}} {{precise=[[@{Used_MeleePrecise}]]}} {{impact=[[@{Used_MeleeImpact}]]}} {{tiring=[[@{Used_MeleeTiring}]]}} {{penetrating=[[@{Used_MeleePenetrating}]]}} {{pummel=[[@{Used_MeleePummel}]]}} {{practical=[[@{Used_MeleePractical}]]}} {{wrap=[[@{Used_MeleeWrap}]]}} {{distract=[[@{Used_MeleeDistract}]]}} {{undamaging=[[@{Used_MeleeUndamaging}]]}} {{dualwield=[[@{Talent_DualWielderLvl}]]}} {{sitmod=[[@{Talent_DualWielderLvl}]]}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{slayer=[[@{Talent_SlayerLvl}*@{StrengthBonusStart}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{dis=[[@{MeleeMode_Disarm}]]}}';
+   let roll = '{{sl=[[0 [Roll SL]]]}} {{slbonus=[[@{Used_MeleePrecise}+@{Used_MeleePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkMain}>addsl<]]}} {{sladd=[[0]]}} {{test=[[@{roll_rule}]]}} {{sitmod=[[@{Mainattcustadd}]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_MeleeBonus}}]]}} {{title=@{Used_MeleeWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0} [SL Mod]]]}} {{hitlocation=true}} {{damaging=[[@{Used_MeleeDamaging}]]}} {{reach=@{Used_MeleeReach}}} {{rolltype=[[@{Used_MeleeImpale}]]}} {{qualities=@{Used_MeleeQualities}}} {{damage=[[@{Used_MeleeStrengthBonus}+@{Used_MeleeDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_MeleeDmgTaken}-@{Used_MeleeDurable}]],[[0]]}kh1]]}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{deafened=[[0]]}} {{mod1type=[[@{Used_Melee_modtype1}]]}} {{mod1=@{Used_Melee_mod1}}} {{mod2type=[[@{Used_Melee_modtype2}]]}} {{mod2=@{Used_Melee_mod2}}} {{mod3type=[[@{Used_Melee_modtype3}]]}} {{mod3=@{Used_Melee_mod3}}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{fast=[[@{Used_MeleeFast}]]}} {{slow=[[@{Used_MeleeSlow}]]}} {{hack=[[@{Used_MeleeHack}]]}} {{precise=[[@{Used_MeleePrecise}]]}} {{impact=[[@{Used_MeleeImpact}]]}} {{tiring=[[@{Used_MeleeTiring}]]}} {{penetrating=[[@{Used_MeleePenetrating}]]}} {{pummel=[[@{Used_MeleePummel}]]}} {{practical=[[@{Used_MeleePractical}]]}} {{wrap=[[@{Used_MeleeWrap}]]}} {{distract=[[@{Used_MeleeDistract}]]}} {{undamaging=[[@{Used_MeleeUndamaging}]]}} {{dualwield=[[@{Talent_DualWielderLvl}]]}} {{sitmod=[[@{Talent_DualWielderLvl}]]}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{slayer=[[@{Talent_SlayerLvl}*@{StrengthBonusStart}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{dis=[[@{MeleeMode_Disarm}]]}} {{inf=[[@{MeleeMode_Infight}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e}';
@@ -45087,6 +45102,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 	if (v.MeleeMode_BNE  == 1) {rollPart4 += " {{breakenter=[[@{Talent_BreakandEnterLvl}]]}}"; addsldf += '+@{Talent_BreakandEnterLvl}'; adddmg += '+@{Talent_BreakandEnterLvl}';}
 	if (v.MeleeMode_Drilled  == 1) {rollPart4 += " {{drilled=[[@{Talent_DrilledLvl}]]}}"; addsldf += '+@{Talent_DrilledLvl}';}
 	if (v.MeleeMode_Disarm  == 1) {rollPart4 += " {{disarm=[[@{Talent_DisarmLvl}]]}}"; addsldf += '+@{Talent_DisarmLvl}';}
+	if (v.MeleeMode_Infight  == 1) {rollPart4 += " {{infight=[[@{Talent_InFighterLvl}]]}}"; addsldf += '+@{Talent_InFighterLvl}';}
    
 	rollPart = rollPart4.replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg);
 	
@@ -45108,6 +45124,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
             	if (trigger == "dualwieldmain") {dualwield = results.results.dualwield.result} else {dualwield = 0;}
             	if (v.MeleeMode_BNE  == 1) {breakenter = results.results.breakenter.result} else {breakenter = 0;}
             	if (v.MeleeMode_Disarm  == 1) {disarm = results.results.disarm.result} else {disarm = 0;}
+            	if (v.MeleeMode_infight == 1) {infight = results.results.infight.result} else {infight = 0;}
             const computed = (Math.floor(target / 10) - Math.floor(test / 10)) ;
             const computed2 = (((test-1)%10)+1) ;		
 
@@ -45169,6 +45186,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 			
 
 			if (breakenter > 0) {if (v.MeleeMode_BNE  == 1) {bneadd = breakenter;} else {bneadd = 0;}} else {bneadd = 0;}
+			if (infight > 0) {if (values.MeleeMode_infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
 			
 			
 		setAttrs({
@@ -45180,7 +45198,7 @@ on('clicked:meleeattackmain clicked:furiousassaultmain clicked:meleechargemain c
 	    }, {silent: true});				
 			
 			
-			if ( test <= target ) { var computed3 = computed + disarm + bneadd + dirtyfighting + bfrenzy + dualwield + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + infadd + disarm + bneadd + dirtyfighting + bfrenzy + dualwield + precise + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
 			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
 	
@@ -45366,7 +45384,7 @@ on('clicked:ripostedmgmain', (eventInfo) => {
 on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clicked:dualwieldoff', (eventInfo) => {
 
 	if (eventInfo.sourceType === 'sheetworker') return;
-			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE"], function(values) {	
+			getAttrs(["Used_DefenseWeaponSkill", "Talent_AmbidextrousLvl","Used_MeleeTwohanded","Advantageinput","LastRollMain","LastCritRoll", "Talent_BattleRageLvl", "Talent_FrenzyLvl", "MeleeMode_Frenzy", "MeleeMode_BNE", "MeleeMode_Infight"], function(values) {	
 			
 			prevroll = JSON.stringify(values["LastRollMain"])||0;
 			if (prevroll >= 1 && prevroll <= 9) {
@@ -45383,7 +45401,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			if (values.Talent_AmbidextrousLvl == 2) {ambipen = 0;}
 			if (values.Used_MeleeTwohanded == 1) {ambipen = 0;}
 
-   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{hitlocation=true}} {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{breakenter=[[@{Talent_BreakandEnterLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}}';
+   let roll = '{{test=[[>test<]]}} {{sl=[[0]]}} {{slbonus=[[@{Used_DefensePrecise}+@{Used_DefensePractical}>addsl< [SL TOTAL]]]}} {{slbonusatk=[[@{slbonusAtkOff}>addsl<]]}} {{sladd=[[0]]}} {{csloc=[[0>csloc<]]}} {{cscount=[[0>cscount<]]}} {{modvalue=[[?{Opposed Attack Modifier|@{Used_DefenseBonus}}]]}} {{title=@{Used_DefenseWeapon}}} {{advantage=[[@{AdvantageDisplay}]]}} {{character_name=@{character_name}}} {{attacktype=^{ATTACK}}} {{target=[[>target<]]}} {{offpen=[[>ambi<]]}} {{attacktest=true}} {{showdmg=[[1]]}} {{SLmod=[[?{SL Modifier|0}]]}} {{hitlocation=true}} {{reach=@{Used_DefenseReach}}} {{damaging=[[@{Used_DefenseDamaging}]]}} {{rolltype=[[@{Used_DefenseImpale}]]}} {{qualities=@{Used_DefenseQualities}}} {{sitmod=[[0]]}} {{damage=[[@{Used_DefenseStrengthBonus}+@{Used_DefenseDamageBonus}+@{Talent_StrikeMightyBlowLvl}>adddmg<-{[[@{Used_DefenseDmgTaken}-@{Used_DefenseDurable}]],[[0]]}kh1]]}} {{NPC=[[0]]}} {{RTcrit=@{RT-critical}}} {{RTfumble=@{RT-fumble}}} {{unconscious=[[@{UnconsciousMod}]]}} {{cond=[[@{condgen_see_move}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[@{ProneMod}]]}} {{fast=[[@{Used_DefenseFast}]]}} {{slow=[[@{Used_DefenseSlow}]]}} {{entangled=[[@{EntangledMod}]]}} {{blinded=[[@{BlindedMod}]]}} {{tiring=[[@{Used_DefenseTiring}]]}} {{penetrating=[[@{Used_DefensePenetrating}]]}} {{pummel=[[@{Used_DefensePummel}]]}} {{hack=[[@{Used_DefenseHack}]]}} {{precise=[[@{Used_DefensePrecise}]]}} {{impact=[[@{Used_DefenseImpact}]]}} {{practical=[[@{Used_DefensePractical}]]}} {{wrap=[[@{Used_DefenseWrap}]]}} {{distract=[[@{Used_DefenseDistract}]]}} {{undamaging=[[@{Used_DefenseUndamaging}]]}} {{mod1type=[[@{Used_Defense_att_modtype1}]]}} {{mod1=@{Used_Defense_att_mod1}}} {{mod2type=[[@{Used_Defense_att_modtype2}]]}} {{mod2=@{Used_Defense_att_mod2}}} {{mod3type=[[@{Used_Defense_att_modtype3}]]}} {{mod3=@{Used_Defense_att_mod3}}} {{battlerage=[[@{Talent_BattleRageLvl}]]}} {{frenzy=[[@{Talent_FrenzyLvl}*@{MeleeMode_Frenzy}]]}} {{carefulstrike=[[@{Talent_CarefulStrikeLvl}]]}} {{bne=[[@{MeleeMode_BNE}]]}} {{inf=[[@{MeleeMode_Infight}]]}}';
    var trigger = eventInfo.triggerName.slice(8);
    var prefix = trigger.split('_').slice(0,3).join('_') + '_';
    let rollBegins = '@{Whisper} &{template:whfrp2e} ';
@@ -45429,7 +45447,8 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
    battlefrenzy = values.Talent_BattleRageLvl*(values.Talent_FrenzyLvl*values.MeleeMode_Frenzy);
    if (battlefrenzy > 0) {addsldf += '+@{Talent_BattleRageLvl}';} 
    
-	if (values.MeleeMode_BNE  == 1) {addsldf += '+@{Talent_BreakandEnterLvl}'; adddmg += '+@{Talent_BreakandEnterLvl}';} 
+	if (values.MeleeMode_BNE  == 1) {rollPart4 += " {{breakenter=[[@{Talent_BreakandEnterLvl}]]}}";addsldf += '+@{Talent_BreakandEnterLvl}'; adddmg += '+@{Talent_BreakandEnterLvl}';} 
+	if (v.MeleeMode_Infight  == 1) {rollPart4 += " {{infight=[[@{Talent_InFighterLvl}]]}}"; addsldf += '+@{Talent_InFighterLvl}';}
  
    let rollPart = rollPart4.replaceAll('>ambi<', ambipen).replaceAll('>addsldf<', addsldf).replaceAll('>adddmg<', adddmg);
    
@@ -45453,6 +45472,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
             const slbonusatk = results.results.slbonusatk.result
 			if (trigger == "dualwieldoff") {dualwield = results.results.dualwield.result} else  {dualwield = 0}
             if (values.MeleeMode_BNE  == 1) {breakenter = results.results.breakenter.result} else {breakenter = 0;}
+			if (values.MeleeMode_infight == 1) {infight = results.results.infight.result} else {infight = 0;}
 				
             const computed = (Math.floor(target / 10) - Math.floor(test / 10)) ;
             const computed2 = (((test-1)%10)+1) ;		
@@ -45515,6 +45535,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
 			} else {output = ""; cscount = 0;}	
 
 			if (breakenter > 0) {if (values.MeleeMode_BNE  == 1) {bneadd = breakenter;} else {bneadd = 0;}} else {bneadd = 0;}
+			if (infight > 0) {if (values.MeleeMode_infight  == 1) {infadd = infight;} else {infadd = 0;}} else {infadd = 0;}
 			
 			
                console.log(bneadd);
@@ -45526,7 +45547,7 @@ on('clicked:meleeattackoff clicked:meleechargeoff clicked:furiousassaultoff clic
             "LastUnitDieOff": computed2
 	    }, {silent: true});					   
 			
-			if ( test <= target ) { var computed3 = computed + bneadd + dirtyfighting + bfrenzy + precise + dualwield + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
+			if ( test <= target ) { var computed3 = computed + infadd + bneadd + dirtyfighting + bfrenzy + precise + dualwield + SLmod ;} else  { var computed3 = computed + practical + SLmod ;}
 			if ( test <= target ) { var computed4 = slbonusatk - practical ;} else  { var computed4 = practical ;}
 			if ( test <= target ) { var computed5 = slbonusatk - practical + SLmod ;} else  { var computed5 = practical + SLmod ;}
 
@@ -46276,8 +46297,8 @@ on('clicked:repeating_divinemiracles:miracle clicked:repeating_divinemiracles:mi
 	else if (trigger === 'bribery') {cond = '{{cond=[[@{condgen}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{briber=[[@{Talent_BriberLvl}]]}}';
 	addsl = '+@{Talent_BriberLvl}';
 	rollPart = rollPart2.replaceAll('cond-', `condgen_see_move`).replaceAll('>addsl<', addsl);}    
-	else if (trigger === 'charm') {cond = '{{cond=[[@{condgen}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{argumetative=[[@{Talent_ArgumentativeLvl}]]}} {{attractive=[[@{Talent_AttractiveLvl}]]}} {{blather=[[@{Talent_BlatherLvl}]]}} {{carouser2=[[@{Talent_CarouserLvl}]]}} {{cattongued=[[@{Talent_CattonguedLvl}]]}} {{etiquette1=[[@{Talent_Etiquette1Lvl}]]}} {{etiquette1name=@{Talent_Etiquette1}}} {{etiquette2=[[@{Talent_Etiquette2Lvl}]]}} {{etiquette2name=@{Talent_Etiquette2}}} {{etiquette3=[[@{Talent_Etiquette3Lvl}]]}} {{etiquette3name=@{Talent_Etiquette3}}} {{etiquette4=[[@{Talent_Etiquette4Lvl}]]}} {{etiquette4name=@{Talent_Etiquette4}}} {{etiquette5=[[@{Talent_Etiquette5Lvl}]]}} {{etiquette5name=@{Talent_Etiquette5}}} {{etiquette6=[[@{Talent_Etiquette6Lvl}]]}} {{etiquette6name=@{Talent_Etiquette6}}}';
-	sitmods = '+@{Talent_ArgumentativeLvl}+@{Talent_AttractiveLvl}+@{Talent_BlatherLvl}+@{Talent_CarouserLvl}+@{Talent_CattonguedLvl}+@{Talent_Etiquette1Lvl}+@{Talent_Etiquette2Lvl}+@{Talent_Etiquette3Lvl}+@{Talent_Etiquette4Lvl}+@{Talent_Etiquette5Lvl}+@{Talent_Etiquette6Lvl}';
+	else if (trigger === 'charm') {cond = '{{cond=[[@{condgen}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{argumetative=[[@{Talent_ArgumentativeLvl}]]}} {{attractive=[[@{Talent_AttractiveLvl}]]}} {{blather=[[@{Talent_BlatherLvl}]]}} {{carouser2=[[@{Talent_CarouserLvl}]]}} {{cattongued=[[@{Talent_CattonguedLvl}]]}} {{etiquette1=[[@{Talent_Etiquette1Lvl}]]}} {{etiquette1name=@{Talent_Etiquette1}}} {{etiquette2=[[@{Talent_Etiquette2Lvl}]]}} {{etiquette2name=@{Talent_Etiquette2}}} {{etiquette3=[[@{Talent_Etiquette3Lvl}]]}} {{etiquette3name=@{Talent_Etiquette3}}} {{etiquette4=[[@{Talent_Etiquette4Lvl}]]}} {{etiquette4name=@{Talent_Etiquette4}}} {{etiquette5=[[@{Talent_Etiquette5Lvl}]]}} {{etiquette5name=@{Talent_Etiquette5}}} {{etiquette6=[[@{Talent_Etiquette6Lvl}]]}} {{etiquette6name=@{Talent_Etiquette6}}} {{impzeal=[[@{Talent_ImpassionedZealLvl}]]}}';
+	sitmods = '+@{Talent_ArgumentativeLvl}+@{Talent_AttractiveLvl}+@{Talent_BlatherLvl}+@{Talent_CarouserLvl}+@{Talent_CattonguedLvl}+@{Talent_Etiquette1Lvl}+@{Talent_Etiquette2Lvl}+@{Talent_Etiquette3Lvl}+@{Talent_Etiquette4Lvl}+@{Talent_Etiquette5Lvl}+@{Talent_Etiquette6Lvl}+@{Talent_ImpassionedZealLvl}';
 	rollPart = rollPart2.replaceAll('cond-', `condgen`).replaceAll('>sitmod<', sitmods);}
 	else if (trigger === 'charmanimal') {cond = '{{cond=[[@{condgen}]]}} {{fatigued=[[@{FatiguedMod}]]}} {{broken=[[@{BrokenMod}]]}} {{stuned=[[@{StunedMod}]]}} {{poisoned=[[@{PoisonedMod}]]}} {{prone=[[0]]}} {{entangled=[[0]]}} {{blinded=[[0]]}} {{deafened=[[0]]}} {{animalaffinity=[[@{Talent_AnimalAffinityLvl}]]}}';
 	rollPart = rollPart2.replaceAll('cond-', `condgen`);
@@ -47611,6 +47632,7 @@ on('clicked:resetMeleeMode clicked:resetDefenseMode', function(event){
 		"MeleeMode_BNE": 0,
 		"MeleeMode_Drilled": 0,
 		"MeleeMode_Disarm": 0,	
+		"MeleeMode_Infight": 0,	
 		"MeleeMode_Outnumbered": 0,
 		"DefenseMode_Defensive": 0,
 	}, {silent: true});			   
@@ -47655,6 +47677,7 @@ on('sheet:opened', function(event){
 		"MeleeMode_BNE": 0,
 		"MeleeMode_Drilled": 0,
 		"MeleeMode_Disarm": 0,	
+		"MeleeMode_Infight": 0,	
 		"DefenseMode_Defensive": 0,
 		"RangedMode_hide": 0,
 		"MeleeMode_hide": 0,
@@ -47721,22 +47744,24 @@ on('clicked:advantagereset', function(event){
 });	
 
 
-on('sheet:opened change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_DisarmLvl', function(event){
+on('sheet:opened change:Talent_DrilledLvl change:Talent_BreakandEnterLvl change:Talent_DisarmLvl change:Talent_InFighterLvl', function(event){
         if (event.sourceType === 'sheetworker') return;
     console.log("Advantage reset");	
-	getAttrs(["Talent_DrilledLvl", "Talent_BreakandEnterLvl", "Talent_DisarmLvl"], function(v) {	
+	getAttrs(["Talent_DrilledLvl", "Talent_BreakandEnterLvl", "Talent_DisarmLvl", "Talent_InFighterLvl"], function(v) {	
 	
 	bnedis = 0;
 	
 	if (v.Talent_DrilledLvl > 0) {drill = 1;} else {drill = 0;}
 	if (v.Talent_BreakandEnterLvl > 0) {bne = 1; bnedis = 1;} else {bne = 0;}
 	if (v.Talent_DisarmLvl > 0) {disarm = 1; bnedis = 1;} else {disarm = 0;}
+	if (v.Talent_InFighterLvl > 0) {infight = 1; bnedis = 1;} else {infight = 0;}
 	
 	setAttrs(
 	{
 		"DrilledShow": drill,
 		"DisarmShow": disarm,
 		"BNEShow": bne,
+		"InfightShow": infight,
 		"BNEDisarmShow": bnedis,
 	}, {silent: true});			   
 	});		
