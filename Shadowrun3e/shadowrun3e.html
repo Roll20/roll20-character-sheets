@@ -1674,21 +1674,15 @@
                     name=attr_deck-reaction-final></span>
                 <button type="action" name="act_init" class="d6-button" title="Matrix Initiative"
                     id="matrixinit">L</button>
-                <div data-i18n="end-turn">End Turn</div><button type="action" name="act_endturn" class="d6-button"
-                    title="End Combat Turn" id="endturn">L</button>
-                <div data-i18n="sensor">Sensor</div><button type="action" name="act_matrixmaneuvers" class="d6-button"
-                    title="Sensor Test" id="matrixsensor">L</button>
-                <div data-i18n="evade">Evade</div><button type="action" name="act_matrixmaneuvers" class="d6-button"
-                    title="Evade Detection" id="matrixevade">L</button>
-                <div data-i18n="parry">Parry</div><button type="action" name="act_matrixmaneuvers" class="d6-button"
-                    title="Parry Attack" id="matrixparry">L</button>
+                <div data-i18n="end-turn">End Turn</div><button type="action" name="act_endturn" class="d6-button" title="End Combat Turn" id="endturn">L</button>
+                <div data-i18n="attack">Attack></div><div><button type="action" name="act_matrixattack" class="pictos-custom-attack" title="Execute Attack vs. System Code or Icon" id="deckattack">[</button></div>
+                <div data-i18n="evade">Evade</div><button type="action" name="act_matrixmaneuvers" class="d6-button" title="Evade Detection" id="matrixevade">L</button>
+                <div data-i18n="parry">Parry</div><button type="action" name="act_matrixmaneuvers" class="d6-button" title="Parry Attack" id="matrixparry">L</button>
                 <div data-i18n="position">Posistion</div><button type="action" name="act_matrixmaneuvers"
                     class="d6-button" title="Position Attack" id="matrixposition">L</button>
             </div>
             <div class="deck-combat-system2">
                 <div class="numberspan" data-i18n="combat-tn">Combat TN</div><span name="attr_deck-tn"></span>
-                <div></div>
-                <div data-i18n="attack">Attack></div><div><button type="action" name="act_matrixattack" class="pictos-custom-attack" title="Execute Attack vs. System Code or Icon" id="deckattack">[</button></div>
                 <div></div>
                 <div data-i18n="resist">Resist</div><div><button type="action" name="act_matrixresist" class="pictos3-button" title="Damage Resistance Test" id="matrixresist">b</button></div>
                 <div></div>
@@ -5375,47 +5369,65 @@ on('clicked:matrixattack', (info) => {
 	});
 
     	on('clicked:matrixmaneuvers', (info) => {
-		atts=["character_name", "deck-evasion-final", "deckcloak-rating-final"
+		atts=["character_name", "deck-evasion-final", "deck-sensors-final", "decklockon-rating-final", "deckcloak-rating-final", "wp-matrix", "decking"];
 		getAttrs(atts, function(myval) {
-			var payload;
-			if ( info["originalRollId"] != undefined ) {
-				payload=rollEscape.unescape(info["originalRollId"]);
-			}
-			if (payload != null ) console.log('payload');
-			console.log(payload);
-			const mytitle=info["htmlAttributes"]["title"]
 			const myid=info["htmlAttributes"]["id"]
-			var myutil="@{deckcloak-rating-final}";
-			var myatt="deck-evasion-final";
-		if ( mytitle == "Evade Detection" ) myatt = "deck-sensors-final";
-                if ( mytitle == "Parry Attack" ) myutil = "@{decklockon-rating-final}";
-                if ( mytitle == "Sensor Test" ) myutil = "@{decklockon-rating-final}";
-		var calcTN="@{target|" + lang["target"] +"|" + myatt + "} + @{wp-matrix} +?{" + lang["miscellaneous-modifiers"] + "|0} - " + myutil;
-		var calcDice="@{decking} + ?{" + lang["hacking-pool-dice"] + "}"
-                var myroll="&{template:matrix}{{myname=@{character_name}}}{{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}"
-		if (payload == null) myroll+="{{senddata2=[[0]]}}{{winner=[[0]]}}";
-		else myroll+="{{testresult=[[0]]}}";
-		myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+="{{action=" + mytitle + "}}"
-		myroll+="{{targetname=@{target|" + lang["target"] + "|character_name}}"
-		myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}"
-		myroll+="{{detect=[Detect](~@{target|" + lang["target"] +"|token_name}|detection)}}"
-		var payload={};
-                startRoll(myroll, (results) => {
-			updatepoolused("hackingpool", results.results.hackingpool.result);	
-			if ( payload == null) {  
-				payload={successes: results.results.roll.result, attacker: };
-				finishRoll( results.rollId,
-                		{
-					senddata2: rollEscape.escape(payload),
-                		});
-			} else {
-				finishRoll( results.rollId,
-				const delta = payload["successes"] - 
-                		{
-					testresult: rollEscape.escape(payload),
-                		});
-			}
+			var mytitle=info["htmlAttributes"]["title"]
+			const evasion=myval["deck-evasion-final"];
+			const sensors=myval["deck-sensors-final"];
+			const cloak=myval["deckcloak-rating-final"];
+			const lockon=myval["decklockon-rating-final"];
+			const wpmatrix=myval["wp-matrix"];
+			const decking=myval["decking"];
+			if ( info["originalRollId"] != undefined ) var payload=rollEscape.unescape(info["originalRollId"]);
+			var calcDice=evasion + " + ?{" + lang["hacking-pool-dice"] + "}";
+			var calcTN="@{target|" + lang["target"] +"|deck-sensors-final} + " + wpmatrix + " +?{" + lang["miscellaneous-modifiers"] + "|0} - " + cloak;
+			if (payload != null ) {
+				console.log('payload');
+				console.log(payload);
+				mytitle=payload["attacktype"];
+				calcDice=sensors + " + ?{" + lang["hacking-pool-dice"] + "}";
+				calcTN="@{target|" + lang["target"] +"|deck-evasion-final} + " + wpmatrix + " +?{" + lang["miscellaneous-modifiers"] + "|0} - " + lockon;
+			} 
+                	var myroll="&{template:matrix}";
+			if (payload == null) myroll+="{{senddata2=[[0]]}}";
+			else myroll+="{{testresult=[[0]]}}{{winner=[[0]]}}";
+			myroll+="{{mytoken=[[0[@{selected|token_name}]]]}}";
+			myroll+="{{myname=@{selected|token_name}}}";
+			myroll+="{{target=@{target|" + lang["target"] +"|token_name}}}{{hackingpool=[[?{" + lang["hacking-pool-dice"] + "|0}]]}}";
+			myroll+="{{rolldice=[[" + calcDice + "]]}}{{targetnumber=[[" + calcTN + "]]}}";
+			myroll+="{{action=" + mytitle + "}}";
+			myroll+="{{targetname=@{target|" + lang["target"] + "|character_name}}}";
+			myroll+="{{roll= [[ [[" + calcDice + "]]d6>[[ {2,(" + calcTN + ")}kh1]]!! ]] }}";
+			console.log(myroll);
+                	startRoll(myroll, (results) => {
+				const mytoken=results.results.mytoken.expression.match(/\[(.*)\]/)[1];
+				updatepoolused("hackingpool", results.results.hackingpool.result);	
+				if ( payload == null) {  
+					payload={
+						successes: results.results.roll.result, 
+						attacker: mytoken,
+						attacktype: mytitle + " Oppose"
+					};
+					finishRoll( results.rollId,
+                			{ 
+						senddata2: rollEscape.escape(payload), 
+					});
+				} else {
+					console.log('payload success is ' + payload["successes"]);
+					var delta = payload["successes"] - results.results.roll.result;
+					console.log('delta is ' + delta);
+					const mywinner=(delta > 0)? payload["attacker"]: (delta < 0)? mytoken : "none";
+					console.log('winner is ' + mywinner);
+					delta=(delta < 0)? (delta * -1) : delta;
+					console.log('delta is ' + delta);
+					finishRoll( results.rollId,
+                			{ 
+						testresult: delta, 
+						winner: mywinner, 
+					});
+				}
+			});
 		});
 	});
 	on('clicked:adeptpower', (info) => {
@@ -7676,9 +7688,15 @@ on(utilsizechange, function(info) {
 
 on("change:matrixsecurityrating", function() {
 	console.log('change of sec rating');
+	const atlist=["deck-bod-max", "deck-evasion-max", "deck-masking-max", "deck-sensors-max", "deck-mpcp-max", "deck-detection-max", "decking"];
 	getAttrs(["matrixsecurityrating"], function(myval) {
+		sets={};
 		let sr = parseInt(myval["matrixsecurityrating"]);
-		setAttrs({"deck-bod-max":sr, "deck-evasion-max":sr, "deck-masking-max":sr, "deck-sensors-max":sr, "deck-mpcp-max":sr, "deck-detection-max":sr});
+		atlist.forEach(at=> {
+			sets[at]=sr;
+		});
+		console.log(sets);
+		setAttrs(sets);
 	});
 });
 
@@ -9627,7 +9645,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#sensor}}<div class="sheet-rtrow"><b data-i18n="sensor-test">Sensor Test</b> {{sensor}}</div>{{/sensor}}
         {{#blackic}}<div class="sheet-rtrow">[{{blackic}} <span data-i18n="resist">Resist</span>](~selected|resistroll||{{computed::payload}})</div>{{/blackic}}
         {{#notes}}<div class="sheet-rtrow"> {{notes}}</div>{{/notes}}
-        {{#notes2}}<div class="sheet-rtrow"> {{notes2}}</div>{{/notes2}}
+	{{#winner}}<div class="sheet-rtrow"><b data-i18n="winner">Winner</b> {{computed::winner}} : {{computed::testresult}} </div>{{/winner}}
         {{#detect}}<div class="sheet-rtrow"><b>{{target}}:</b> {{detect}}</div>{{/detect}}
         {{#clickme}}<div class="sheet-rtrow">{{clickme}}</div>{{/clickme}}
 	{{#matrixdmg}}<div class="sheet-rtrow">{{matrixdmg}} <span data-i18n="damage-reduced-by"></span>{{computed::roll}}{{/matrixdmg}}
