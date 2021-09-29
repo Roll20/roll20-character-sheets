@@ -935,7 +935,7 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
-function getWeaponWithBonus(weaponName) {
+function getWeaponWithBonus(weaponName, isMonster) {
     if (!weaponName)
         return undefined;
     
@@ -944,26 +944,40 @@ function getWeaponWithBonus(weaponName) {
     if (baseWeapon) {
         return {
             ...baseWeapon,
-            bonus: '0'
+            'bonus' : '0'
         };
     }
     
-    let match = weaponName.match(/\s*\+[0-9]+\s*/);
+    let match = weaponName.match(/\s*\+([0-9])+\s*/);
     if (!match)
         return undefined;
 
     let baseWeaponName = weaponName.replace(match[0], ' ').trim();
     baseWeapon = weapons[baseWeaponName];
-    let bonusString = match[0].trim().replace('+', '');
-    let bonus = parseInt(bonusString)
-    if (!baseWeapon || isNaN(bonus))
+    if (!baseWeapon)
         return undefined;
+    
+    let bonusString = match[1];
+    let bonus = parseInt(bonusString)
+    if (isNaN(bonus))
+        return undefined;
+    
+    if (bonus < 1)
+        return {
+            ...baseWeapon,
+            'bonus' : '0'
+        };
     
     let weaponWithBonus = {
         ...baseWeapon,
-        'speed' : Math.max(baseWeapon['speed'] - bonus, 1),
+        'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
         'bonus' : `+${bonus}`
     }
+    if (isMonster) {
+        weaponWithBonus['small-medium'] += `+${bonus}`
+        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`
+    }
+    
     return weaponWithBonus;
 }
 
@@ -1092,12 +1106,13 @@ followerWeapons.forEach(fw => {
 
 // Monster weapons
 on('change:repeating_monsterweapons:weaponname', function(eventInfo){
-    let weapon = getWeaponWithBonus(eventInfo.newValue);
+    let weapon = getWeaponWithBonus(eventInfo.newValue, true);
     if (weapon === undefined)
         return;
 
     let weaponInfo = {
         [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+        [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
         [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
         [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
     };
