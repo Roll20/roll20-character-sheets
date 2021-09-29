@@ -22,6 +22,8 @@ Roll buttons are color-coded:
 
 ![Purple Button](/HeroSystem6eHeroic/images/PurpleButton.png) Purple buttons are for powers.
 
+![Gray Button](/HeroSystem6eHeroic/images/GrayButton.png) Gray buttons send description text to chat.
+
 ## The Tally Bar
 
 ![Tally Bar](/HeroSystem6eHeroic/images/TallyBar.png)
@@ -44,11 +46,17 @@ The first page also includes a portrait section designed as a slideshow. The fir
 
 In the upper right corner of Page 1 and Page 2 is a health status indicator. The BODY field is an independent field and not linked to your character's maximum BODY value. The STUN and END fields are linked to your maximum STUN and Endurance. The Reset button will set these two status fields to your maximum values. The Recover button will add one recovery step to STUN and END, up to your characteristic values.
 
+## Turn Segments and Initiative
+
+![Turn Segments](/HeroSystem6eHeroic/images/TurnSegments.png)
+
+A combat turn in Hero is divided into twelve 1-second segments. A character's speed determines the segments or *phases* it may act. These are inicated in hot pink squares shown below the character portrait. The "Tracker" button sends the character's Dexterity value to the Turn Tracker for a selected token.
+
 ## Perception
 
 ![Perception Rolls](/HeroSystem6eHeroic/images/PerceptionRolls.png)
 
-The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power #Enhanced Senses# which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
+The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power *Enhanced Senses*, which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
 ## Page 2: Gear
 
@@ -83,6 +91,10 @@ The fifth weapon's green roll button produces similar output, but assumes the we
 The basic maneuvers list is contained in a slideshow so that it can be hidden by players familiar with these rules. A second pane allows for the addition of purchased martial maneuvers (shown below). The third pane contains hit location tables and targeting options. A fourth pane can be used for notes and treasures.
 
 ![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuvers.png)
+
+Basic information about a martial maneuver can be shared in the chat window via the 'show' buttons.
+
+![Martial Manuevers](/HeroSystem6eHeroic/images/martialManeuversChat.png)
 
 *Hit location system (Optional)*
 
@@ -140,7 +152,7 @@ The last page of this sheet contains a number of important options:
 
 (4) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-## Token Settings
+## Player Token Settings
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
@@ -148,8 +160,28 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-*Villain In Glasses, August 1, 2021.*
+## Turn Tracker
 
-*Updated August 7, 2021 to include Hit Location support.*
-*Updated Sepember 8, 2021 to include notes on Perception Rolls.*
-*Updated Sepember 13, 2021 to include notes on DCV modifier, "show" buttons, and power attack roll.*
+We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag the avatar to the map to create a token. There I suggest giving the token a Nameplate name such as "Segment."
+
+![Hero Clock Token](/HeroSystem6eHeroic/images/HeroClockToken.png)
+
+Create the following four macros:
+
+*Set-Segment-1*: [[ 1 &{tracker} ]]
+
+*Set-Segment-12*: [[ 12 &{tracker} ]]
+
+*Segment-Plus-1*: [[ 1 &{tracker:+} ]]
+
+*Segment-Minus-1*: [[ 1 &{tracker:-} ]]
+
+Follow the instructions in the wiki on *Linking Tokens To Journals* (https://wiki.roll20.net/Linking_Tokens_to_Journals) to create character abilities for each of these four macros and check them as token actions. You can spice the macros up so that they send flavor text to chat, but at the bare bones level, the new abilities need only look something like this:
+
+![Turn Token Abilities](/HeroSystem6eHeroic/images/TurnTokenAbilities.png)
+
+During play, add the Turn Token to the Turn Tracker using the "Tracker" button on the token's character sheet. The initiative shown for the Turn Token can be used to indicate the current segment, which you can change with the token actions. It might also be handy for other character tokens to have their phases listed in their Nameplate names so that they appear in the Turn Tracker.
+
+![Turn Tracker](/HeroSystem6eHeroic/images/TurnTracker.png)
+
+*Villain In Glasses, August 1, 2021. Last updated on September 22, 2021 to include notes on the Turn Tracker.*

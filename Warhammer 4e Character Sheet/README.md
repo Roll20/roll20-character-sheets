@@ -56,7 +56,7 @@ The sheet should work on latest version of Firefox, MS Egde & Chrome.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage integration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommend separate character sheet for actual NPC bosses/major characters).  
 - Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stunned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too.  
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v2 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip) due to naming convention. 
+This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v3.1 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip) due to naming convention. 
 
 Condition effects are currently hard coded as follows (updated June 15th 2021): 
 
