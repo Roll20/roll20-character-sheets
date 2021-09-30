@@ -13,6 +13,8 @@ If you would like more flexibility in creating macros and have a Pro-level subsc
 
 [Page 2: Gear and Maneuvers](#Page-2)
 
+[Page 3: Skills](#Page-3)
+
 ## Buttons
 Roll buttons are color-coded:
 
@@ -64,7 +66,7 @@ A combat turn in Hero is divided into twelve 1-second segments. A character's sp
 
 The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power *Enhanced Senses*, which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
-### Page 2: Gear and Maneuvers{#Page-2}
+### Page 2: Gear and Maneuvers {#Page-2}
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
@@ -110,7 +112,7 @@ To make a targeted attack select the radio button corresponding to desired focus
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
 
-## Page 3: Skills
+### Page 3: Skills {#Page-3}
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
 
