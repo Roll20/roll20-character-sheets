@@ -9,13 +9,25 @@ This sheet has support for either armor activation rolls or the optional hit loc
 
 If you would like more flexibility in creating macros and have a Pro-level subscription you might consider adding Hero Roller https://wiki.roll20.net/Script:HeroRoller to your game API settings. This is an optional addition and is not necessary to play the game. 
 
+[Buttons and the Tally Bar](#buttons)
+
 [Page 1: Characteristics](#page-1)
 
 [Page 2: Gear and Maneuvers](#page-2)
 
 [Page 3: Skills](#page-3)
 
-## Buttons
+[Page 4: Powers](#page-4)
+
+[Page 5: Talens and Complications](#page-5)
+
+[Page 6: Options](#page-6)
+
+[Tokens](#tokens)
+
+[The Turn Tracker](#tracker)
+
+# <a id="buttons">Buttons and the Tally Bar</a>
 Roll buttons are color-coded:
 
 ![Orange Button](/HeroSystem6eHeroic/images/OrangeButton.png) Orange buttons are for skill checks and characteristic rolls.
@@ -66,7 +78,7 @@ A combat turn in Hero is divided into twelve 1-second segments. A character's sp
 
 The default roll for Perception is equal to the character's Intelligence Roll. Perception can be improved via the power *Enhanced Senses*, which can come in the form of a spell, racial bonus, technical aid, magical item, and so forth. Perception might even be reduced via a physical complication. Furthermore, the perception of individual senses can vary. This character sheet provides space for four different perception values, starting with the base value, and adding vision, hearing, and smell. The individual senses are only labels and can be changed to radar, infra-red vision, sonar, or what have you. The modifier for the base level perception applies to all other perception rolls. Since perception roll modifiers can come form many sources you will need to account for character points spent on them elsewhere.
 
-### Page 2: Gear and Maneuvers {#page-2}
+# <a id="page-2">Page 2: Gear and Maneuvers</a>
 
 ![Page 2](/HeroSystem6eHeroic/images/screenshot-02-scaled.png)
 
@@ -112,7 +124,7 @@ To make a targeted attack select the radio button corresponding to desired focus
 
 ![Hit Locations](/HeroSystem6eHeroic/images/HitLocationTable.png)
 
-### Page 3: Skills {#page-3}
+# <a id="page-3">Page 3: Skills</a>
 
 ![Page 3](/HeroSystem6eHeroic/images/screenshot-03-scaled.png)
 
@@ -124,7 +136,7 @@ There is space for up to nine languages. Any language skill selected with "Nativ
 
 Skill Enhancers, when purchased (checked), reduce the cost of relevant knowledge-type skills. The benefit is reflected in the calculated skill rolls as per the number of points spent on each skill. The enhancer does not subtract character points. Note that the Skill Enhancer "Well-Connected" is not considered in the automatic calculation of any skill roll field. Keep this skill enhancer's benefit in mind when you calculate points spent on Perks on Page 5.
 
-## Page 4: Powers
+# <a id="page-4">Page 4: Powers</a>
 
 ![Page 4](/HeroSystem6eHeroic/images/screenshot-04-scaled.png)
 
@@ -138,7 +150,7 @@ The "Roll" button produces general output that may or may not apply to the power
 
 The endurance cost shown can *optionally* be automatically deducted from the character's health status. However, some powers require additional endurance payments (such as Autofire powers) or endurance costs that must be satisfied every phase (constant powers). Use the "END" button to manually deducts a power's endurance cost.
 
-## Page 5: Talents and Complications
+# <a id="page-5">Page 5: Talents and Complications</a>
 
 ![Page 5](/HeroSystem6eHeroic/images/screenshot-05-scaled.png)
 
@@ -148,7 +160,7 @@ The "Perks & Talents" column can be used for Talents, Perks, or any other item t
 
 The only trick to the Complications column is to remember that points gained from selecting Complications *subtract* from the total points calculated in the Tally Bar. 
 
-## Page 6: Options
+# <a id="page-6">Page 6: Options</a>
 
 ![Page 6](/HeroSystem6eHeroic/images/screenshot-06-scaled.png)
 
@@ -164,7 +176,7 @@ The last page of this sheet contains a number of options:
 
 (5) Use Hit Location System. Select this option if your GM uses this optional game mechanic. Hit Location Tables and support for attack options appear alongside the maneuvers and treasures panes.
 
-## Player Token Settings
+# <a id="tokens">Tokens Settings</a>
 
 ![Token](/HeroSystem6eHeroic/images/SampleToken.png)
 
@@ -172,7 +184,7 @@ Roll20 tokens can display numeric values of three attributes as well as three st
 
 ![Token Settings](/HeroSystem6eHeroic/images/TokenSettings.png)
 
-## Turn Tracker
+# <a id="tracker">Turn Tracker</a>
 
 We can make the Roll20 Turn Tracker a little more useful by creating a phase indicator using token actions. Make a new character called "Turn Token" or something similar. You can leave it as-is, but I'd suggest giving it a 12 Dexterity. Give it an approprate avatar image such as the clock face below. Drag the avatar to the map to create a token. There I suggest giving the token a Nameplate name such as "Segment."
 
