@@ -21,7 +21,7 @@ If you would like more flexibility in creating macros and have a Pro-level subsc
 
 &emsp; [Page 4: Powers](#page-4)
 
-&emsp; [Page 5: Talens and Complications](#page-5)
+&emsp; [Page 5: Talents and Complications](#page-5)
 
 &emsp; [Page 6: Options](#page-6)
 
