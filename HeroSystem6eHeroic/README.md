@@ -9,23 +9,23 @@ This sheet has support for either armor activation rolls or the optional hit loc
 
 If you would like more flexibility in creating macros and have a Pro-level subscription you might consider adding Hero Roller https://wiki.roll20.net/Script:HeroRoller to your game API settings. This is an optional addition and is not necessary to play the game. 
 
-&nbsp;[Buttons and the Tally Bar](#buttons)
+[Nots About Buttons and The Tally Bar](#buttons)
 
-&nbsp;[Page 1: Characteristics](#page-1)
+[Page 1: Characteristics](#page-1)
 
-&nbsp;[Page 2: Gear and Maneuvers](#page-2)
+[Page 2: Gear and Maneuvers](#page-2)
 
-&nbsp;[Page 3: Skills](#page-3)
+[Page 3: Skills](#page-3)
 
-&nbsp;[Page 4: Powers](#page-4)
+[Page 4: Powers](#page-4)
 
-&nbsp;[Page 5: Talens and Complications](#page-5)
+[Page 5: Talens and Complications](#page-5)
 
-&nbsp;[Page 6: Options](#page-6)
+[Page 6: Options](#page-6)
 
-&nbsp;[Token Settings](#tokens)
+[Token Settings](#tokens)
 
-&nbsp;[The Turn Tracker](#tracker)
+[The Turn Tracker](#tracker)
 
 # <a id="buttons">Buttons and the Tally Bar</a>
 Roll buttons are color-coded:
