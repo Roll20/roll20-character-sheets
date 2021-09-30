@@ -9,7 +9,7 @@ This sheet has support for either armor activation rolls or the optional hit loc
 
 If you would like more flexibility in creating macros and have a Pro-level subscription you might consider adding Hero Roller https://wiki.roll20.net/Script:HeroRoller to your game API settings. This is an optional addition and is not necessary to play the game. 
 
-[Page 1: Characteristics] (#Page-1)
+[Page 1: Characteristics](#Page-1)
 
 ## Buttons
 Roll buttons are color-coded:
