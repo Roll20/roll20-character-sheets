@@ -11,7 +11,7 @@ If you would like more flexibility in creating macros and have a Pro-level subsc
 
 [Buttons and The Tally Bar](#buttons)
 
-| [Page 1: Characteristics](#page-1)
+&emsp; [Page 1: Characteristics](#page-1)
 
 [Page 2: Gear and Maneuvers](#page-2)
 
