@@ -8,10 +8,10 @@ The number of skills (30 general, 7 combat, 6 maneuvers, and 9 languages) and po
 This sheet has support for either armor activation rolls or the optional hit location system (see Options). The choice to use one or the other system is a GM campaign-level decision.
 
 If you would like more flexibility in creating macros and have a Pro-level subscription you might consider adding Hero Roller https://wiki.roll20.net/Script:HeroRoller to your game API settings. This is an optional addition and is not necessary to play the game. 
-+
+
 [Buttons and The Tally Bar](#buttons)
-+
-[Page 1: Characteristics](#page-1)
+
+| [Page 1: Characteristics](#page-1)
 
 [Page 2: Gear and Maneuvers](#page-2)
 
