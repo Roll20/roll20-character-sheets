@@ -40,7 +40,7 @@ At the bottom of the character sheet you will find the Tally Bar. The Total fiel
 
 Note that the total points may not update immediately. You may force an update by clicking on any other item on the character sheet.
 
-### Page 1: Characteristics {#page-1}
+### Page 1: Characteristics (#page-1)
 
 ![Page 1](/HeroSystem6eHeroic/images/screenshot-01-scaled.png)
 
