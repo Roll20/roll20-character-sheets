@@ -3,7 +3,9 @@
         <img src="https://raw.githubusercontent.com/Roll20/roll20-character-sheets/master/Roll20%20Logo.png" alt="Roll20 logo" title="Roll20" height="60" />
     </a>
 </div>
-  
+
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/Roll20/roll20-character-sheets/master?color=ff0066&label=last%20updated) ![GitHub contributors](https://img.shields.io/github/contributors/Roll20/roll20-character-sheets?color=ff0066) ![Lines of code](https://img.shields.io/tokei/lines/github/Roll20/roll20-character-sheets?color=ff0066&label=lines%20of%20code) ![GitHub repo size](https://img.shields.io/github/repo-size/Roll20/roll20-character-sheets?color=ff0066)
+
 # Roll20 Character Sheets
 
 Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming to the web the right way. Built on a powerful platform of tools, yet elegantly simple, it focuses on enhancing what makes tabletop gaming great: storytelling and camaraderie.
@@ -61,6 +63,8 @@ In general, this should look something like this:
 * Once everyone is satisfied with the changes, we can merge the changes into the existing sheet.
 
  We have learned from experience that it is better to have a single sheet that is contributed to by a number of people, rather than perpetuating the cycle of a contributing a sheet, losing interest, moving on, and then the next contributor creating an entirely new sheet. This is a collaborative community, please feel empowered to collaborate!
+
+[Beginner's Guide to GitHub](https://wiki.roll20.net/Github) - for Roll20 character sheets
 
 ### Starting a New Character Sheet
 
