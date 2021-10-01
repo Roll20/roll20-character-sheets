@@ -22,6 +22,8 @@ Change Log
 	Added Social Rating to derived tests (even though it's not a test) just to the right of the Edge Attribute.  This is a total of Charisma + any cumulative + primary armor social adjustments.
 	Added mouseovers for Composure, Judge Intentions, Memory and Lift & Carry buttons detailing where the values come from for those of us that forget.
 	Added the ability to add Spells, NPC Spells, Qualities and Augmentations by pasting raw data into the Notes textarea for a new repeating row.
+**2021-08-04 ** v.40 Chuz (James Culp)
+
 **2021-07-19 ** v.39 Chuz (James Culp)
 	Added Grunt Groups and Autocalculations based on the # of grunts
 	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
