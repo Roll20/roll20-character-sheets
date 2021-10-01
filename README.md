@@ -10,7 +10,7 @@ Roll20.net is the easy-to-use virtual tabletop that brings pen and paper gaming 
 
 This repository is the collection of all the community-contributed character sheets that are available for use on [Roll20](https://roll20.net). These are, mostly, created for free, for use by the community, and represent dozens, if not hundreds of hours of effort on the parts of their creators. 
 
-This repository consist of over 📜 **800 community contributed sheets**, from over 🧑 **300 contributors**, who have written over ⌨️ **400,000 lines of code**. This is an 🦦 **otter**.
+This repository consists of over 📜 **800 community contributed sheets**, from over 🧑 **300 contributors**, who have written over ⌨️ **400,000 lines of code**. This is an 🦦 **otter**.
 
 ## Community Conduct
 
@@ -42,7 +42,7 @@ There are many ways in which you can contribute to these sheets, and to the heal
 * [Report issues and bugs](https://github.com/Roll20/roll20-character-sheets/issues) you encounter when using the sheets.
 * [Review sheet code changes](https://github.com/Roll20/roll20-character-sheets/pulls)
 * Review and contribute to the documentation on the [community wiki](https://wiki.roll20.net/Building_Character_Sheets).
-* Write or contribute to a character sheet of your own!
+* Write or contribute to a new or existing character sheet!
 
 ### Getting Started
 
