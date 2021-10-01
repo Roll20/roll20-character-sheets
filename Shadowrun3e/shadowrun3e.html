@@ -139,7 +139,7 @@
 </div>
 <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
 <div class="characters-npcs">
-    <input type='hidden' class='buttontoggle' name='attr_sheettype' />
+    <input type='hidden' class='buttontoggle' name='attr_sheettype' value="Character" />
     <div class="alwaysdisplayed-buttons">
         <input type='hidden' class='magictype' name='attr_magic-type' value="mage" />
         <input type='hidden' class='sheet-tabstoggle' name='attr_sheetTab' value="character" />
@@ -1465,13 +1465,13 @@
             <input type="number" name="attr_initiategrade" value=0>
         </div>
         <div class="metamagic-table">
-            <header class="table-top-left-w" data-i18n="metamagic">Metamagic</header>
-            <header class="table-top-right-w" data-i18n="notes">Notes</header>
+            <header class="table-top-left" data-i18n="metamagic">Metamagic</header>
+            <header class="table-top-right" data-i18n="notes">Notes</header>
         </div>
         <fieldset class="repeating_metamagic">
             <div class="metamagic-table">
-                <div class="table-item-left-nc"><input type="text" name="attr_metamagicname" /></div>
-                <div class="table-item-nc"><input type="text" name="attr_metamagicnotes" /></div>
+                <div class="table-item-left"><input type="text" name="attr_metamagicname" /></div>
+                <div class="table-item"><input type="text" name="attr_metamagicnotes" /></div>
             </div>
         </fieldset>
         <br>
@@ -3303,7 +3303,7 @@
         </div>
         <br>
         <div class="securitysheaf">
-            <div class="securitytally">
+            <div class="securitytally-header">
                 <header data-i18n="trigger-step" class="table-top-left">Trigger Step</header>
                 <header data-i18n="event" class="table-top-right">Event</header>
             </div>
@@ -3314,7 +3314,7 @@
                 </div>
             </fieldset>
             <br>
-            <div class="matrix-intruder-tally">
+            <div class="matrix-intruder-tally-header">
                 <header data-i18n="intruder" class="table-top-left">Intruder</header>
                 <header data-i18n="detection" class="table-top-mid">Detection</header>
                 <header data-i18n="security-tally" class="table-top-mid">Security Tally</header>
@@ -4457,7 +4457,7 @@
     <div class="critter-powers">
         <div>
             <div class="SRH4" data-i18n="powers">Powers</div>
-            <div class="critter-powers-table">
+            <div class="critter-powers-table-header">
                 <div class="table-top-left"><b data-i18n="power">Power</div>
                 <div class="table-top-right"><b data-i18n="description">Description</div>
             </div>
@@ -7266,6 +7266,12 @@ on('clicked:matrixattack', (info) => {
        });
 
 
+   const otherattrs=["vcr", "initiategrade", "totem", "totemenv", "totemadv", "totemdisadv"];
+   const weaponfocus={ 
+   	props: ["name", "reach", "conceal", "skill", "force", "power", "damage", "specialized", "tnmods", "notes"],
+   	attadd: "weaponfocus-"
+   };
+   const otherskills=["computers"];
    const loadattributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "perception", "reaction", "initiative"];
    const critteratts=[ "perception", "attacks", "force", "reach"];
    const weaponskills=[ "clubs", "assaultrifles", "cyberimplant", "edged", "gunnery", "heavyweapons", "lasers", "launchers", "pistols", "poles", "projectiles", "rifles", "shotguns", "smgs", "whips", "throwing", "demolitions", "underwatercombat", "unarmed" ]
@@ -7276,18 +7282,139 @@ on('clicked:matrixattack', (info) => {
    const deckspec=["hardware", "decking", "programming"];
    const vehiclespec=["vehicle-type", "vehicle-size", "handling-street", "handling-offroad", "speed-rating", "acceleration", "body", "armor", "signature", "autonav", "pilot", "firmpoints", "hardpoints", "seating", "entry", "fuel", "economy", "cargo", "load", "vehicle-skill", "gunnery", "ivis-pool", "totalcost", "driver", "rigger"];
    const vehiclespec2=[{"type": "vehicle-type"}, {"size": "vehicle-size"}, {"street": "handling-street"}, {"offroad": "vehicle-offroad"}, {"speed": "speed-rating"}, {"skill": "vehicle-skill"}];
-   const rangedatts=["name", "skill", "conceal", "short", "medium", "long", "extreme", "ammo", "power", "damage", "specialized", "modes", "recoilcomp", "gyro", "targeting", "notes"]
-   const meleeatts=["name", "skill", "conceal", "power", "damage", "specialized", "reach",  "notes"]
-   const explosiveatts=["name", "skill", "conceal", "short", "medium", "long", "extreme", "ammo", "power", "damage", "specialized", "modes", "recoilcomp", "gyro", "targeting", "notes", "missleint", "blast", "scatter", "rangefinder"]
-   const gearatts=["name", "quantity", "weight", "rating", "description"];
    const decklist=["mpcp", "bod", "evasion", "masking", "sensors"];
    const deckopts=["hardening", "activemem", "storagemem", "response", "iccm", "offlinestorage"];
    const utillist=["sleaze" , "track", "utility", "armor", "cloak", "lockon", "medic", "blackhammer", "killjoy", "slow"];
-   const spellatts=["name", "specialized", "force", "type", "range", "target", "damage", "drain", "drainlvl", "description"];
-   const cyberatts=["name", "rating", "essence", "notes"];
-   const bioatts=["name", "rating", "index", "notes"];
-   const critterpoweratts=["name", "description"];
    const poollist=["combatpool-mods","spellpool-mods","spellpool-mods","hackingpool-mods","controlpool-mods","astralpool-mods","taskpool"];
+   const repeatprops={
+   	armor: { 
+		props: ["armorname", "ballistic", "impact", "slot"],
+		attmap: {armorname: "name"}
+	},
+   	skills: { 
+		props: ["skillname", "skillrating", "pool" ],
+		attmap: {skillname: "name", skillrating: "rating"}
+	},
+	edges: {
+		props: ["name", "rating"]
+	},
+	flaws: {
+		props: ["name", "rating"]
+	},
+	adeptpowers: {
+		props: ["adeptpower", "powerrating", "powernotes", "powercost"],
+		attmap: {adeptpower: "name", powerrating: "rating", powercost: "cost", powernotes: "notes"}
+	},
+	spells: {
+		props: ["name", "spellcategory", "specialized", "force", "foci", "range", "target", "damage", "duration", "drain", "drainlvl", "description"]
+	},
+	geas: {
+		props: ["type", "notes"],
+		attadd: "geas"
+	},
+	foci: {
+		props: ["type", "category", "force", "qty"]
+	},
+	metamagic: {
+		props: ["name", "notes"],
+		attadd: "metamagic"
+	},
+	cyberware: {
+		props: ["name", "rating", "essence", "notes"],
+		attadd: "cyberware-"
+	},
+	nanotech: {
+		props: ["name", "rating", "essence", "notes"],
+		attadd: "nanotech-"
+	},
+	bioware: {
+		props: ["name", "rating", "index", "notes"],
+		attadd: "bioware-"
+	},
+	rangedweapons: {
+		props: ["name", "type", "conceal", "power", "ammo", "damage", "specialized", "tnmods", "recoilcomp", "gyro", "targeting", "reloadmethod", "notes"]
+	},
+	meleeweapons: {
+		props: ["name", "skill", "conceal", "reach", "power", "damage", "specialized", "tnmods", "notes"]
+	},
+	explosives: {
+		props: ["name", "type", "conceal", "power", "damage", "missleint", "specialized", "tnmods", "recoilcomp", "gyro", "targeting", "rangefinder", "notes"],
+		attmap: {exptype: "type"}
+	},
+	'critter-powers': {
+		props: ["name", "description"]
+	},
+	'critter-weaknesses': {
+		props: ["name", "description"]
+	},
+	gear: {
+		props: ["name", "rating", "weight", "conceal", "type", "quantity", "pool"]
+	},
+	credsticks: {
+		props: ["type", "id", "rating", "balance", "notes"]
+	},
+	vehicles: {
+		props: ["name", "model", "cost", "notes"]
+	},
+	offensiveutils: {
+		props: ["utility", "rating", "multiplier", "size", "utilitynotes"],
+		attmap: {utilitynotes: "notes"}
+	},
+	defensiveutils: {
+		props: ["utility", "rating", "multiplier", "size", "utilitynotes"],
+		attmap: {utilitynotes: "notes"}
+	},
+	'deck-utilities': {
+		props: ["utility", "rating", "target", "multiplier", "size", "notes"]
+	}
+   };
+
+
+for ( const [key,val] of Object.entries(repeatprops)) {
+	var onevent ="sheet:opened "
+	repeatprops[key]["props"].forEach( prop=>{
+		if ("attadd" in repeatprops[key]) prop=repeatprops[key]["attadd"] + prop;
+		onevent +="change:repeating_" + key + ":" + prop + " ";
+	});
+	onevent = onevent.substring(0, onevent.length - 1);
+	console.log(onevent);
+	on(onevent, function() {
+		const jsonatt=key + "-json";
+		exportRepeat(key);	
+	});
+}
+
+const exportRepeat = function(key) {
+		const jsonatt=key + "-json";
+		var sets={}
+		var mylist=[];
+        	getSectionIDs(key, function(idarray) {
+			var gets=[];
+			idarray.forEach((m, id) => {
+				repeatprops[key]["props"].forEach( prop=>{
+					prop=("attadd" in repeatprops[key])? repeatprops[key]["attadd"] + prop : prop;
+					gets.push("repeating_" + key + "_" + m + "_" + prop)
+				});
+			});
+			getAttrs(gets, function(myval) {
+				idarray.forEach((m, id) => {
+					myobj={};
+					repeatprops[key]["props"].forEach( prop=>{
+						myprop=("attadd" in repeatprops[key])? repeatprops[key]["attadd"] + prop : prop;
+						if ("attmap" in repeatprops[key]) {
+							prop=(prop in repeatprops[key]["attmap"])? repeatprops[key]["attmap"][prop] : prop;
+						}
+						myobj[prop]=myval["repeating_" + key + "_" + m + "_" + myprop];
+					});
+					mylist.push(myobj);
+				});
+				const myout=JSON.stringify(mylist);
+				sets[jsonatt]=myout;
+				setAttrs(sets);
+			});
+		});
+
+}
 
    on("clicked:jsonimport-char", function(){
    	getAttrs(["jsonnpc"], function(myval) {
@@ -7301,6 +7428,7 @@ on('clicked:matrixattack', (info) => {
 		exportCharacter(myval["sheet-type"]);
 	});
  });
+
    const exportCharacter = function(sheet) {
 	console.log('loading attributes');
 	longlist=[];
@@ -7311,11 +7439,64 @@ on('clicked:matrixattack', (info) => {
 		atts.push(myatt);
 		atts.push(myatt + "-mods");
 	});
+	atts=atts.concat(critteratts);
+	atts=atts.concat(magicskills);
+	atts=atts.concat(weaponskills);
+	atts=atts.concat(deckspec);
+	decklist.forEach(myatt=>{
+		atts.push("deck-" + myatt + "-max");
+	});
 	getAttrs(atts, function(myval) {
-		myout=JSON.stringify(myval);
+		var skillsother=[];
+		var adeptother=[];
+		var offensiveother=[];
+		var defensiveother=[];
+		const jsonout={
+			skills: [],
+			adeptpowers: [],
+			offensiveutils: [],
+			defensiveutils: []
+		};
 		console.log(myval);
-		console.log(myout);
-		setAttrs({jsonout: myout});
+		for ( const [key,val] of Object.entries(myval)) {
+			var obj={};
+			if ((magicskills.includes(key)) || (otherskills.includes(key)) || (weaponskills.includes(key)) || (deckspec.includes(key))){ 
+				obj["name"]=key;
+				obj["rating"]=val;
+				if (val != 0 ) skillsother.push(obj);
+			}
+			else jsonout[key]=val;
+			
+		};
+		jsonatts=[]
+		for ( const [key,val] of Object.entries(repeatprops)) {
+			jsonatts.push(key + "-json");
+		};
+		getAttrs(jsonatts, function(v) {
+			console.log('v');
+			console.log(v);
+			for ( const [key,val] of Object.entries(repeatprops)) {
+				const jv=key + "-json";
+				console.log(jv);
+				if ( jv in v ) {
+					let obj = JSON.parse(v[key + "-json"]);
+					jsonout[key]=obj;
+					console.log(obj);
+				}
+			}
+			if ( "skills" in jsonout) jsonout["skills"] = jsonout["skills"].concat(skillsother);
+			else jsonout["skills"] = skillsother;
+			if ( "adeptpowers" in jsonout) jsonout["adeptpowers"] = jsonout["adeptpowers"].concat(adeptother);
+			else jsonout["adeptpowers"] = adeptother;
+			if ( "offensiveutils" in jsonout) jsonout["offensiveutils"] = jsonout["offensiveutils"].concat(offensiveother);
+			else jsonout["offensiveutils"] = offensiveother;
+			if ( "defensiveutils" in jsonout) jsonout["defensiveutils"] = jsonout["defensiveutils"].concat(defensiveother);
+			else jsonout["defensiveutils"] = defensiveother;
+
+			console.log(jsonout);
+			myout=JSON.stringify(jsonout);
+			setAttrs({jsonout: myout});
+		});
 	});
 	
 	
@@ -7327,23 +7508,13 @@ on('clicked:matrixattack', (info) => {
 		repeatskills=[];
 		npc=JSON.parse(myval["jsonnpc"]);
 		console.log(npc);
-		if ( npc["skills"] ) { var skills = npc["skills"]; } else { var skills = [];}
 		if ( npc["pools"] ) { var skills = npc["pools"]; } else { var pools = [];}
 		if ( npc["vehicles"] ) { var vehicles = npc["vehicles"]; } else { var vehicles = [];}
-		if ( npc["spells"] ) { var spells = npc["spells"]; } else { var spells = [];}
-		if ( npc["cyberware"] ) { var cyberware = npc["cyberware"]; } else { var cyberware = [];}
-		if ( npc["bioware"] ) { var bioware = npc["bioware"]; } else { var bioware = [];}
-		if ( npc["nanotech"] ) { var nanotech = npc["nanotech"]; } else { var nanotech = [];}
 		if ( npc["gear"] ) { var gear = npc["gear"]; } else { var gear = [];}
 		if ( npc["weaknesses"] ) { var weaknesses = npc["weaknesses"]; } else { var weaknesses = [];}
 		if ( npc["powers"] ) { var powers = npc["powers"]; } else { var powers = [];}
-		if ( npc["foci"] ) { var foci = npc["foci"]; } else { var foci = [];}
 		if ( npc["cyberdeck"] ) { var cyberdeck = npc["cyberdeck"]; } else { var cyberdeck = {};}
 		if ( npc["utilities"] ) { var utilities = npc["utilities"]; } else { var utilities = [];}
-		if ( npc["armor"] ) { var armorsets = npc["armor"]; } else { var armorsets = [];}
-		if ( npc["ranged"] ) { var ranged = npc["ranged"]; } else { var ranged = [];}
-		if ( npc["melee"] ) { var melee = npc["melee"]; } else { var melee = [];}
-		if ( npc["explosives"] ) { var explosives = npc["explosives"]; } else { var explosives = [];}
 		if ( npc["character_name"] )  atts["character_name"]=npc["character_name"] ; 
 		if ( npc["metatype"] ) { atts["metatype"]=npc["metatype"] ; } else {  atts["metatype"]="Human";}
 		if ( npc["vcr"] ) atts["vcr"]=npc["vcr"];
@@ -7378,6 +7549,7 @@ on('clicked:matrixattack', (info) => {
 				}
 			});
 
+		
 	        console.log('loading skills');
 		skills.forEach(skill=>{
 			let myskill = skill["name"].toLowerCase();
@@ -7399,157 +7571,25 @@ on('clicked:matrixattack', (info) => {
 
 			} 
 		});
-	        console.log('loading armor');
-		armorsets.forEach(armor=>{
-			console.log(armor);
-			var newrowid = generateRowID();
-			atts["repeating_armor_" + newrowid + "_armorname"] = armor["name"];
-			atts["repeating_armor_" + newrowid + "_ballistic"] = armor["ballistic"];
-			atts["repeating_armor_" + newrowid + "_impact"] = armor["impact"];
-			if ( armor["equipped"]  == true )  atts["repeating_armor_" + newrowid + "_equipped"] = "on";
-		
-		});
+		npc["skills"]=repeatskills;
+		for ( const [key,val] of Object.entries(repeatprops)) {
+			if ( key in npc ) {
+				console.log('loading ' + key);
+				npc[key].forEach( repeat => {
+					var newrowid = generateRowID();
+					repeatprops[key]["props"].forEach( prop => {
+						myprop=prop;
+						prop=("attadd" in repeatprops[key])? repeatprops[key]["attadd"] + prop : prop;
+						if ("attmap" in repeatprops[key]) {
+							myprop=(prop in repeatprops[key]["attmap"])? repeatprops[key]["attmap"][prop] : prop;
+						}
+						atts["repeating_" + key + "_" + newrowid + "_" + prop]=repeat[myprop];
+					});
+				});
+			}
+
+		};
 	        console.log('loading ranged');
-		ranged.forEach(weapon=>{
-			var newrowid = generateRowID();
-			let pre="@{";
-			let post="}";
-			let mycheck="check";
-			console.log('adding ranged weapon ' + weapon["name"]);
-			rangedatts.forEach(myatt=>{
-				if (weapon[myatt]) {
-					if ( myatt=="skill" )  {
-						atts["repeating_rangedweapons_" + newrowid + "_" + myatt ]  = pre.concat(weapon[myatt].concat(post));
-						console.log('ranged skill' + pre.concat(weapon[myatt].concat(post)) );
-					} else if  (myatt=="modes") {
-						console.log('adding ranged weapon modes');
-						weapon[myatt].forEach(firemode=>{
-							atts["repeating_rangedweapons_" + newrowid + "_" + firemode.concat(mycheck) ]  = 1;
-						});
-					} else {
-						console.log('adding ranged weapon ' + weapon["name"] + ' attribute ' + myatt + ' value ' + weapon[myatt]);
-						atts["repeating_rangedweapons_" + newrowid + "_" + myatt ]  = weapon[myatt];
-					}
-				}
-			});
-			atts["repeating_rangedweapons_" + newrowid + "_showweaponmod"] = 1;
-		});
-	        console.log('loading explosives');
-		explosives.forEach(weapon=>{
-			var newrowid = generateRowID();
-			let pre="@{";
-			let post="}";
-			explosiveatts.forEach(myatt=>{
-				if (weapon[myatt]) {
-					if ( myatt=="skill" )  {
-						atts["repeating_explosives_" + newrowid + "_" + myatt ]  = pre.concat(weapon[myatt].concat(post));
-					} else {
-						atts["repeating_explosives_" + newrowid + "_" + myatt ]  = weapon[myatt];
-					}
-				}
-			});
-		});
-	        console.log('loading melee weapons');
-		melee.forEach(weapon=>{
-			var newrowid = generateRowID();
-			let pre="@{";
-			let post="}";
-			meleeatts.forEach(myatt=>{
-				if (weapon[myatt]) {
-					if ( myatt=="skill" )  {
-						atts["repeating_melee_" + newrowid + "_" + myatt ]  = pre.concat(weapon[myatt].concat(post));
-					} else {
-						atts["repeating_melee_" + newrowid + "_" + myatt ]  = weapon[myatt];
-					}
-				}
-			});
-		});
-	        console.log('loading skills ');
-		repeatskills.forEach(skill=>{
-			var newrowid = generateRowID();
-			atts["repeating_skills_" + newrowid + "_skillname"] = skill["name"];
-			atts["repeating_skills_" + newrowid + "_skillrating"] = skill["rating"];
-		});
-
-	        console.log('loading spells ');
-		spells.forEach(spell=>{
-			var newrowid = generateRowID();
-			spellatts.forEach(myatt=>{
-				if (spell[myatt]) {
-					atts["repeating_spells_" + newrowid + "_" + myatt ] = spell[myatt];
-				}
-			});
-			
-		});
-	        console.log('loading foci ');
-		foci.forEach(myfoci=>{
-			var newrowid = generateRowID();
-			atts["repeating_foci_" + newrowid + "_fociname"] = myfoci["name"];
-			atts["repeating_foci_" + newrowid + "_type"] = myfoci["specialized"] || "E";
-			atts["repeating_foci_" + newrowid + "_qty"] = myfoci["qty"] ||0 ;
-			atts["repeating_foci_" + newrowid + "_power"] = myfoci["force"] || 0;
-		});
-
-		vehicles.forEach(car=>{
-			var newrowid = generateRowID();
-			atts["repeating_vehicles_" + newrowid + "_name"] = car["name"];
-			atts["repeating_vehicles_" + newrowid + "_cost"] = car["cost"] ||0 ;
-			if (car["model"]) atts["repeating_vehicles_" + newrowid + "_model"] = car["model"];
-			if (car["notes"]) atts["repeating_vehicles_" + newrowid + "notes"] = car["notes"];
-		});
-
-		cyberware.forEach(ware=>{
-			var newrowid = generateRowID();
-			cyberatts.forEach(myatt=>{
-				if (ware[myatt]) {
-					atts["repeating_cyberware_" + newrowid + "_cyberware-" + myatt] = ware[myatt];
-				}
-			});
-		});
-		nanotech.forEach(nano=>{
-			var newrowid = generateRowID();
-			cyberatts.forEach(myatt=>{
-				if (nano[myatt]) {
-					atts["repeating_nanotech_" + newrowid + "_nanotech-" + myatt ] = nano[myatt];
-				}
-			});
-		});
-
-		bioware.forEach(bio=>{
-			var newrowid = generateRowID();
-			bioatts.forEach(myatt=>{
-				if (bio[myatt]) {
-					atts["repeating_bioware_" + newrowid + "_bioware-" + myatt ] = bio[myatt];
-				}
-			});
-		});
-
-		gear.forEach(item=>{
-			var newrowid = generateRowID();
-			gearatts.forEach(myatt=>{
-				if (item[myatt]) {
-					atts["repeating_gear_" + newrowid + "_" + myatt ] = item[myatt];
-				}
-			});
-		});
-		powers.forEach(power=>{
-			var newrowid = generateRowID();
-			critterpoweratts.forEach(myatt=>{
-				if (power[myatt]) {
-					atts["repeating_critter-powers_" + newrowid + "_" + myatt ] = power[myatt];
-				}
-			});
-		});
-		weaknesses.forEach(weak=>{
-			console.log('weak:'+ weak);
-			var newrowid = generateRowID();
-			critterpoweratts.forEach(myatt=>{
-				if (weak[myatt]) {
-					atts["repeating_critter-weaknesses_" + newrowid + "_" + myatt ] = weak[myatt];
-				}
-			});
-		});
-
 		var deckp="deck-";
 		var decks="-max";
 		for (const [key, value] of Object.entries(cyberdeck)) {
@@ -7594,8 +7634,10 @@ on('clicked:matrixattack', (info) => {
 		      if ( npc[key]) atts[value]=npc[key];
  	
 		};
-
-		console.log(repeatskills);
+		console.log('before atts');
+		console.log(atts);
+		Object.keys(atts).forEach(key => atts[key] === undefined && delete atts[key])
+		console.log('final atts');
 		console.log(atts);
 		setAttrs(atts);
 	});
@@ -9121,6 +9163,22 @@ var updateManualGunneryTNs = function() {
     });
 };
 
+	on("change:repeating_spells:range change:repeating_spells:spellcategory", function(myval) {
+		if (!("yes" in lang)) geti18n();
+		getAttrs(["repeating_spells_spellcategory", "repeating_spells_range"], function(myval) {
+		const spellcategory=myval["repeating_spells_spellcategory"];
+		const range=myval["repeating_spells_range"];
+		console.log(spellcategory)
+		console.log(range)
+		atts=[];
+		if ( spellcategory == "Elemental" ) {
+			atts["repeating_spells_target"]="@{target|" + lang["target"] +"|targetMove}";
+			console.log(atts);
+			setAttrs(atts);
+		}
+		});
+	});
+
 
 </script>
 
@@ -9377,21 +9435,6 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
 
 	});
 
-	on("change:repeating_spells:range change:repeating_spells:spellcategory", function(myval) {
-		if (!("yes" in lang)) geti18n();
-		getAttrs(["repeating_spells_spellcategory", "repeating_spells_range"], function(myval) {
-		const spellcategory=myval["repeating_spells_spellcategory"];
-		const range=myval["repeating_spells_range"];
-		console.log(spellcategory)
-		console.log(range)
-		atts=[];
-		if ( spellcategory == "Elemental" ) {
-			atts["repeating_spells_target"]="@{target|" + lang["target"] +"|targetMove}";
-			console.log(atts);
-			setAttrs(atts);
-		}
-		});
-	});
 
 </script>
 
@@ -9437,7 +9480,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         <div class="sheet-rtheader">{{myname}}: {{spellname}} <span data=i18n="versus">vs.</span> {{targetofspell}}</div>
         <div class="sheet-rtrow"><span data-i18n="rolling">Rolling</span>: {{rolldice}}d6 <span data=i18n="versus">vs.</span> {{targetnumber}} = {{casttest}}</div>
         {{#spelldamage}}<div class="sheet-rtrow"><span data-i18n="force">Force</span>: {{castforce}} <span data-i18n="damage">Damage</span>: {{computed::spelldamage}} </div> {{/spelldamage}}
-        {{#sorcerydice}}<div><b data-i18n="sorcery-dice">Sorcery Dice</b>: {{sorcerydice}} {{#spellpool}} <b data-i18n="spell-pool">Spell Pool</b>: {{spellpool}}{{/spellpool}}</div>{{/sorcerydice}}
+        {{#sorcerydice}}<div class="sheet-rtrow"><span data-i18n="sorcery-dice">Sorcery Dice</span>: {{sorcerydice}} </div>{{/sorcerydice}}
+        {{#spellpool}}<div class="sheet-rtrow"><span data-i18n="spell-pool">Spell Pool</span>: {{spellpool}} </div>{{/spellpool}}
         {{#roll}}<div class="sheet-rtrow"><span data-i18n="casting-test">Casting Test</span>: {{computed::cast}} {{computed::roll}}</div>{{/roll}}
         {{#draintest}}
         <div class="sheet-spell-resist-table">
