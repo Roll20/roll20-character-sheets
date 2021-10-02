@@ -1,5 +1,38 @@
 # Shadowrun 3rd Edition
 
+## Release Notes 9/28/2021
+
+### changes/bug fixes
+1. Tar Pit ad Tar baby: when using the "execute" button it will roll the Opposed test between the ic ratin and the utility as well as a sensor test.  The resutls of the three rolls will be whispered to the GM.
+2. added chat buttons at the end of melee attack.  Defending character can click on either Defense or Full defense.  The results of the attack test will be passed to the new "defense" roll.  The defense roll will compare successes and determin winner.  Weapon damage and power will be stagged up as per the melee combat rules of srun3e.  If the attacker wins the contest, the defeder will get  Resist buton.
+If "full defense" was chosen, the defender will also be presented with a "dodge" button.  Choosing dodge will roll a melee dodge test and present the player with a "resist" button.  The only differnce between the "Resist" button displayed afer the offense test and the dodge test is that the reults of the dodge are passed to the resist and count towards the resist successes.  If the defender wins the melee contest and they choose "full defence" the roll will result in "Attack Parried".  Else, a "resist" button will be displayed and the attacking character will be able to roll damage resistnace based on the staged up weapon damage and power for the melee weapon currently equipped by the defender.   The chat buttons do not have to be used, regular sheet rolls can still be used i.e. the defender can use the attack button for a melee weapon and then the player that looses the contest can roll a resistance test.  The benefit for the chat buttons is that they reduce the amount of roll queries presented to the players as the data is already sent to the roll. 
+3. fixed bug on matrix wound penalty
+4. added pool tracking for dispel tests
+5. added foci to repeating spells
+6. added button to select and add player to the "operator/rigger" section of the vehicle tab.  Will also update value of control pool and gunnery skill.  Vehicle skill still needs to be updated manually.
+7. resist explosion now asks for distance in meters from explosion and calculates power reduction accordingly.
+8. added chat button after AoE spells.  Any charcter in the range of the spell can click on the button and it will determine attack successes.
+9. added chat button after magic attack ( regular and AoE ) for spell defense for an ally mage/shaman to click on.
+10. added chat button after magic attack or spell defense to resist spell. Resistance is based on attribute if not an elemental spell, in which case resistance is 1/2 impact.
+11. All chat buttons published after magic attack roll template pass the value of the original roll to prepopulate most of the roll questions. 
+12. Resist and Dodge buttons presented after ranged attack roll template will pass value of original roll to dodge and resist rolls.
+13. Added translation tags for all html elements and rolls 
+14. removed the use of case statements
+15. switched from show/hide buttons to tabs for sub tabs
+16. fixed bugs and added opposed roll for Matrix Combat Manuevers
+
+
+### Impact on existing characters.
+none
+
+### Todo
+add knockdown test chat button after melee and ranged attacks.
+add shotgun ammo to ammo type list on repeating ranged weapons.
+add translation to sheet worker rolls.
+add opposition tests with payload for banish rolls
+add opposition tests with payload for spirit control rolls
+
+
 ## Release Notes 9/1/2021
 
 ### changes/bug fixes
