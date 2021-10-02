@@ -5341,4 +5341,12 @@ wizardSpells['wiz6'] = wiz6;
 wizardSpells['wiz7'] = wiz7;
 wizardSpells['wiz8'] = wiz8;
 wizardSpells['wiz9'] = wiz9;
+
+const wizmonster = {};
+for (const [_, section] of Object.entries(wizardSpells)) {
+    for (const [spellName, spell] of Object.entries(section)) {
+        wizmonster[spellName] = spell;
+    }
+}
+wizardSpells['wizmonster'] = wizmonster;
 /* ---- Wizard spells end ---- */
