@@ -1199,15 +1199,15 @@
                     <div class="table-item"><input type="number" name="attr_adeptbodyboostcost" value=0></div>
                     <div class="table-item"><button class="d6-button" type="action" name="act_adeptpower" id="body"
                             title="Boost Body">L</button></div>
-                    <div class="table-item"><input type="text" name="attr_aadeptstrengthboostnotes"></div>
+                    <div class="table-item"><input type="text" name="attr_aadeptbodyboostnotes"></div>
                 </div>
                 <div class="adept-skills-table">
                     <header class="table-item-left" data-i18n="strength-boost">Strength Boost: </header>
-                    <div class="table-item"><input type="number" name="attr_adeptstrboost" value=0 /></div>
-                    <div class="table-item"><input type="number" name="attr_adeptstrboostcost" value=0></div>
+                    <div class="table-item"><input type="number" name="attr_adeptstrengthboost" value=0 /></div>
+                    <div class="table-item"><input type="number" name="attr_adeptstrengthboostcost" value=0></div>
                     <div class="table-item"><button class="d6-button" type="action" name="act_adeptpower" id="strength"
                             title="Boost Strength">L</button></div>
-                    <div class="table-item"><input type="text" name="attr_adeptstrboostnotes"></div>
+                    <div class="table-item"><input type="text" name="attr_adeptstrengthboostnotes"></div>
                 </div>
                 <div class="adept-skills-table">
                     <header class="table-item-left" data-i18n="agility-boost">Agility Boost: </header>
@@ -7271,6 +7271,12 @@ on('clicked:matrixattack', (info) => {
    	props: ["name", "reach", "conceal", "skill", "force", "power", "damage", "specialized", "tnmods", "notes"],
    	attadd: "weaponfocus-"
    };
+   const adeptpowers={ attadd: "adept", props: ["cost", "notes", ""], list: ["improvedreflexes", "bodyboost", "strengthboost", "quicknessboost", "painres" ] };
+   const deckutils={ 
+	list: ["specialutils", "defensiveutils", "offensiveutils"],
+	specialutils: ["sleaze" , "track"], defensiveutils: ["armor", "cloak", "lockon", "medic"], offensiveutils: [ "attack", "blackhammer", "killjoy", "slow"], 
+	props: ["-rating", "-notes", ""], attadd: "deck"
+   };
    const otherskills=["computers"];
    const loadattributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "perception", "reaction", "initiative"];
    const critteratts=[ "perception", "attacks", "force", "reach"];
@@ -7284,7 +7290,6 @@ on('clicked:matrixattack', (info) => {
    const vehiclespec2=[{"type": "vehicle-type"}, {"size": "vehicle-size"}, {"street": "handling-street"}, {"offroad": "vehicle-offroad"}, {"speed": "speed-rating"}, {"skill": "vehicle-skill"}];
    const decklist=["mpcp", "bod", "evasion", "masking", "sensors"];
    const deckopts=["hardening", "activemem", "storagemem", "response", "iccm", "offlinestorage"];
-   const utillist=["sleaze" , "track", "utility", "armor", "cloak", "lockon", "medic", "blackhammer", "killjoy", "slow"];
    const poollist=["combatpool-mods","spellpool-mods","spellpool-mods","hackingpool-mods","controlpool-mods","astralpool-mods","taskpool"];
    const repeatprops={
    	armor: { 
@@ -7431,6 +7436,8 @@ const exportRepeat = function(key) {
 
    const exportCharacter = function(sheet) {
 	console.log('loading attributes');
+	adeptlist=[];
+	utillist=[];
 	longlist=[];
 	longlist=longlist.concat(loadattributes);
 	longlist=longlist.concat(poollist);
@@ -7446,6 +7453,21 @@ const exportRepeat = function(key) {
 	decklist.forEach(myatt=>{
 		atts.push("deck-" + myatt + "-max");
 	});
+	adeptpowers["list"].forEach(power =>{
+		adeptpowers["props"].forEach(prop =>{
+			atts.push(adeptpowers.attadd + power + prop);
+			adeptlist.push(adeptpowers.attadd + power + prop);
+		});
+	});
+	deckutils["list"].forEach( util => {
+		deckutils[util].forEach(u=> {		
+			deckutils["props"].forEach(p=> {
+				let myatt=deckutils.attadd + u + p;
+				atts.push(myatt);
+				utillist.push(myatt);
+			});
+		});
+	});
 	getAttrs(atts, function(myval) {
 		var skillsother=[];
 		var adeptother=[];
@@ -7455,7 +7477,8 @@ const exportRepeat = function(key) {
 			skills: [],
 			adeptpowers: [],
 			offensiveutils: [],
-			defensiveutils: []
+			defensiveutils: [],
+			specialutils: []
 		};
 		console.log(myval);
 		for ( const [key,val] of Object.entries(myval)) {
@@ -7464,8 +7487,11 @@ const exportRepeat = function(key) {
 				obj["name"]=key;
 				obj["rating"]=val;
 				if (val != 0 ) skillsother.push(obj);
-			}
-			else jsonout[key]=val;
+			} else if (adeptlist.includes(key)) {
+				continue;
+			} else if (utillist.includes(key)) {
+				continue;
+			} else jsonout[key]=val;
 			
 		};
 		jsonatts=[]
@@ -7486,13 +7512,33 @@ const exportRepeat = function(key) {
 			}
 			if ( "skills" in jsonout) jsonout["skills"] = jsonout["skills"].concat(skillsother);
 			else jsonout["skills"] = skillsother;
-			if ( "adeptpowers" in jsonout) jsonout["adeptpowers"] = jsonout["adeptpowers"].concat(adeptother);
-			else jsonout["adeptpowers"] = adeptother;
-			if ( "offensiveutils" in jsonout) jsonout["offensiveutils"] = jsonout["offensiveutils"].concat(offensiveother);
-			else jsonout["offensiveutils"] = offensiveother;
-			if ( "defensiveutils" in jsonout) jsonout["defensiveutils"] = jsonout["defensiveutils"].concat(defensiveother);
-			else jsonout["defensiveutils"] = defensiveother;
-
+			
+			if ( "adeptpowers" in jsonout) { 
+				jsonout["adeptpowers"] = jsonout["adeptpowers"].concat(adeptother);
+			}
+			console.log('starting adept out')
+			adeptpowers["list"].forEach(power =>{
+				const obj={};
+				obj["name"]=power;
+				console.log(adeptpowers.attadd + power);
+				console.log(myval[adeptpowers.attadd + power]);
+				obj["rating"]=myval[adeptpowers.attadd + power];
+				obj["cost"]=myval[adeptpowers.attadd + power + "-cost"];
+				obj["notes"]=myval[adeptpowers.attadd + power + "-notes"];
+				if (myval[adeptpowers.attadd + power] > 0 ) jsonout["adeptpowers"].push(obj);
+			});
+			console.log('starting deck util out')
+			deckutils["list"].forEach( util => {
+				deckutils[util].forEach(u=> {		
+					const obj={};
+					let rating=deckutils.attadd + u + "-rating";
+					let notes=deckutils.attadd + u + "-notes";
+					obj["utility"]=u;
+					obj["rating"]=myval[rating];
+					obj["notes"]=myval[notes];
+					if ( myval[rating] > 0 ) jsonout[util].push(obj);
+				});
+			});
 			console.log(jsonout);
 			myout=JSON.stringify(jsonout);
 			setAttrs({jsonout: myout});
@@ -7508,18 +7554,15 @@ const exportRepeat = function(key) {
 		repeatskills=[];
 		npc=JSON.parse(myval["jsonnpc"]);
 		console.log(npc);
-		if ( npc["pools"] ) { var skills = npc["pools"]; } else { var pools = [];}
-		if ( npc["vehicles"] ) { var vehicles = npc["vehicles"]; } else { var vehicles = [];}
-		if ( npc["gear"] ) { var gear = npc["gear"]; } else { var gear = [];}
-		if ( npc["weaknesses"] ) { var weaknesses = npc["weaknesses"]; } else { var weaknesses = [];}
-		if ( npc["powers"] ) { var powers = npc["powers"]; } else { var powers = [];}
-		if ( npc["cyberdeck"] ) { var cyberdeck = npc["cyberdeck"]; } else { var cyberdeck = {};}
-		if ( npc["utilities"] ) { var utilities = npc["utilities"]; } else { var utilities = [];}
-		if ( npc["character_name"] )  atts["character_name"]=npc["character_name"] ; 
-		if ( npc["metatype"] ) { atts["metatype"]=npc["metatype"] ; } else {  atts["metatype"]="Human";}
-		if ( npc["vcr"] ) atts["vcr"]=npc["vcr"];
-		if ( npc["magic"] ) atts["magic"]=npc["magic"];
-		if ( npc["essense"] ) { atts["essense"]=npc["essense"]; } else { atts["essense"]=6;}
+		const skills = ( "skills" in npc )? npc["skills"] : [];
+		const pools = ( "pools" in npc )? npc["pools"] : [];
+		const cyberdeck = ( "cyberdeck" in npc )? npc["cyberdeck"] : {};
+		atts["essense"]  = ("essense" in npc)? npc["essense"] : 6;
+		atts["metatype"] = ( "metatype" in npc )? npc["metatype"] : "Human";
+		if ( "character_name" in npc )  atts["character_name"]=npc["character_name"] ; 
+		if ( "type" in npc ) atts["sheettype"]=npc["type"]; 
+		if ( "vcr" in npc ) atts["vcr"]=npc["vcr"];
+		if ( "magic" in npc ) atts["magic"]=npc["magic"];
 	
 	        console.log('loading attributes');
 		loadattributes.forEach(myatt=>{
@@ -7571,6 +7614,31 @@ const exportRepeat = function(key) {
 
 			} 
 		});
+	        console.log('loading adept powers');
+		   if ( "adeptpowers" in npc ) {
+			for (i = npc["adeptpowers"].length - 1; i >= 0; i -= 1) {
+				if ( adeptpowers["list"].includes(npc["adeptpowers"][i]["name"])) {
+					console.log('found non repeating power ' + npc["adeptpowers"][i]["name"]);
+					atts[adeptpowers.attadd + npc["adeptpowers"][i]["name"]]=npc["adeptpowers"][i]["rating"];
+					npc["adeptpowers"].splice(i, 1);
+				} 
+			};
+		   }
+			
+		deckutils["list"].forEach( util => {
+	        	console.log('loading deck utils ' + util);
+			if (npc[util]) {
+				for (i = npc[util].length - 1; i >= 0; i -= 1) {
+					console.log('u ' + npc[util][i]["utility"]);
+					if ( deckutils[util].includes(npc[util][i]["utility"])) {;
+						console.log('found non repeating utility ' + npc[util][i]["utility"]);
+						atts[deckutils.attadd +  npc[util][i]["utility"]] = npc[util][i]["rating"];
+						npc[util].splice(i, 1);
+					}
+				};
+			}
+		});
+	        console.log('loading repeat skills');
 		npc["skills"]=repeatskills;
 		for ( const [key,val] of Object.entries(repeatprops)) {
 			if ( key in npc ) {
@@ -7589,7 +7657,6 @@ const exportRepeat = function(key) {
 			}
 
 		};
-	        console.log('loading ranged');
 		var deckp="deck-";
 		var decks="-max";
 		for (const [key, value] of Object.entries(cyberdeck)) {
@@ -7600,32 +7667,8 @@ const exportRepeat = function(key) {
 			} else if ( deckopts.includes(key))  { 
 				let atutil = deckp.concat(key);
 				atts[atutil]=value;
-				}
-		};
-		utilities.forEach(util=>{
-			let myutil = util["name"].toLowerCase();
-			if ( utillist.includes(myutil)) { 
-			let pre="deck";
-			let rat="-rating";
-			let mul="-multiplier";
-			let size="-multiplier";
-			let myrat=pre.concat(myutil.concat(rat));
-			let mymul=pre.concat(myutil.concat(mul));
-			let mysize=pre.concat(myutil.concat(size));
-
-			if (util["rating"]) atts[myrat]=util["rating"];
-			if (util["multiplier"]) atts[mymul]=util["multiplier"];
-			if (util["size"]) atts[mysize]=util["size"];
-			} 
-			else {
-				var newrowid = generateRowID();
-				atts["repeating_deck-utilities_" + newrowid + "_utility"] = util["name"];
-				atts["repeating_deck-utilities_" + newrowid + "_rating"] = util["rating"] || 0;
-				atts["repeating_deck-utilities_" + newrowid + "_target"] = util["target"] || "matrixaccess";
-				atts["repeating_deck-utilities_" + newrowid + "_multiplier"] = util["multiplier"] || 1;
-				atts["repeating_deck-utilities_" + newrowid + "_size"] = util["size"] || 0;
 			}
-			});
+		};
 
 		vehiclespec.forEach(myatt=>{
 		      if ( npc[myatt]) atts[myatt]=npc[myatt];
