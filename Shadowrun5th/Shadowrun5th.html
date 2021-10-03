@@ -10292,6 +10292,7 @@ Click again to switch to Manual and Remote">
 <!--     Buttons used for reaction rolls-->
     <div class="hidden-section" style="display:none">
         <button type="action" name="act_reactdodge"></button>
+        <button type="action" name="act_reactsoak"></button>
     </div>
 
 </div>
@@ -13286,26 +13287,59 @@ const rollDogableAttack = async (rollPart, dmgType) => {
 }
 
 on('clicked:reactdodge', async (ev) => {
-    await rollReact(ev);
+    await rollReactDodge(ev);
 });
 
-const rollReact = async (ev) => {
+const rollReactDodge = async (ev) => {
     // The data we passed into the button will be stored in the originalRollId key
     let attackRoll = rollEscape.unescape(ev.originalRollId);
     let attrs = await asw.getAttrs(['gmroll','character_name','rea_total', 'int_total', 'avoid_total', 'avoid_bonus', 'edgeroll','edg_total','wound_total','sustainedspells','edgn','standardroll']);
 
-    let rollBase = `${attrs.gmroll}&{template:reactdodge}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}]]}}`;
+    let rollBase = `${attrs.gmroll}&{template:reactdodge}{{nethits=[[0]]}}{{attackAp=[[0]]}}{{attackDamage=[[0]]}}{{attackDmgType=[[0]]}}{{passthrough=[[0]]}}{{name=${attrs.character_name}}}{{attacker_name=${attackRoll.attacker}}}{{rea=[[${attrs.rea_total}}]]}}{{int=[[${attrs.int_total}]]}}{{bonus=[[${attrs.avoid_bonus}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{wounds_num=[[${attrs.wound_total}]]}}{{sustainedspells=[[${attrs.sustainedspells}*2]]}}{{result=[[(${attrs.avoid_total}+?{Situational Modifiers}-[[${attrs.wound_total}]]-[[${attrs.sustainedspells}*2]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}]]}}`;
     let defendRoll = await startRoll(rollBase);
 
     let defendSuccesses = defendRoll.results.result.result;
     let nethits = attackRoll.attackHits - defendSuccesses;
     let attackDamage = attackRoll.attackDV + nethits;
 
+    let rollData = {
+        attackAp: attackRoll.attackAp,
+        attackDamage: attackDamage,
+        attackDmgType: attackRoll.attackDmgType,
+    }
+
     finishRoll(defendRoll.rollId, {
         nethits: nethits,
         attackAp: attackRoll.attackAp,
         attackDamage: attackDamage,
-        attackDmgType: attackRoll.attackDmgType
+        attackDmgType: attackRoll.attackDmgType,
+        passthrough: rollEscape.escape(rollData),
+    });
+}
+
+on('clicked:reactsoak', async (ev) => {
+    await rollReactSoak(ev);
+});
+
+const rollReactSoak = async (ev) => {
+    // The data we passed into the button will be stored in the originalRollId key
+    let dmgRoll = rollEscape.unescape(ev.originalRollId);
+    let attrs = await asw.getAttrs(['gmroll','character_name','bod_total', 'armor_total', 'soak_bonus', 'edgeroll','edg_total','edgn','standardroll']);
+
+    let rollBase = `${attrs.gmroll}&{template:reactsoak}{{dmgTaken=[[0]]}}{{dmgType=[[0]]}}{{name=${attrs.character_name}}}{{body=[[${attrs.bod_total}}]]}}{{armor=[[${attrs.armor_total}]]}}{{ap=[[${dmgRoll.attackAp}]]}}{{bonus=[[${attrs.soak_bonus}]]}}{{mod=[[?{Situational Modifiers|0}]]}}{{edge=${attrs.edgeroll}}}{{edge_num=[[${attrs.edg_total}]]}}{{result=[[([[${attrs.bod_total}}]]+[[${attrs.armor_total}]]+[[${attrs.soak_bonus}]]+[[${dmgRoll.attackAp}]]+[[?{Situational Modifiers}]]+[[${attrs.edgn}*${attrs.edg_total}]])${attrs.standardroll}${attrs.edgeroll}]]}}`;
+    let soakRoll = await startRoll(rollBase);
+
+    let soakSuccesses = soakRoll.results.result.result;
+    let dmgTaken = dmgRoll.attackDamage - soakSuccesses;
+    let dmgType = dmgRoll.attackDmgType;
+
+    if(dmgType.includes('P')) {
+     dmgType = dmgRoll.attackDamage > (attrs.armor_total - dmgRoll.attackAp + soakRoll.results.mod.result) ? dmgRoll.attackDmgType : 'S';
+    }
+
+    finishRoll(soakRoll.rollId, {
+        dmgTaken: dmgTaken,
+        dmgType: dmgType
     });
 }
 
@@ -13636,12 +13670,93 @@ const asw = (() => {
                 </tr>
             {{/rollGreater() computed::nethits 0}}
             {{#^rollGreater() computed::nethits 0}}
-            <tr class="sheet-rolltemplate-results-success">
-                <td class="result">0 Nethits</td>
-            </tr>
-
+                <tr class="sheet-rolltemplate-results-success">
+                    <td class="result">0 Nethits</td>
+                </tr>
             {{/^rollGreater() computed::nethits 0}}
-
         {{/nethits}}
+    </table>
+    {{#rollGreater() computed::nethits 0}}
+        {{#^rollTotal() computed::passthrough 0}}
+            <div class="sheet-rolltemplate-button">
+                [Soak](~{{name}}|reactsoak||{{computed::passthrough}})
+            </div>
+        {{/^rollTotal() computed::passthrough 0}}
+    {{/rollGreater() computed::nethits 0}}
+</rolltemplate>
+
+<rolltemplate class="sheet-rolltemplate-reactsoak">
+    <table>
+        <tr>
+            <th>
+                {{name}} rolls to Absorb Damage
+            </th>
+        </tr>
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Dicepool</div></td></tr>
+        <tr>
+            <td>> Body({{body}})</td>
+        </tr>
+        <tr>
+            <td>> Armor({{armor}})</td>
+        </tr>
+        {{#^rollTotal() ap 0}}
+        <tr>
+            <td>> Armor Penetration({{ap}})</td>
+        </tr>
+        {{/^rollTotal() ap 0}}
+        {{#^rollTotal() bonus 0}}
+            <tr>
+                <td>> Bonus({{bonus}})</td>
+            </tr>
+        {{/^rollTotal() bonus 0}}
+
+        {{#mod}}
+        {{#^rollTotal() mod 0}}
+            <tr>
+                <td>> Modifiers({{mod}})</td>
+            </tr>
+        {{/^rollTotal() mod 0}}
+        {{/mod}}
+        {{#edge}}
+            <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+            <tr><td><div class="sheet-rolltemplate-sectionheading">Edge</div></td></tr>
+            <tr>
+                <td><div class="sheet-rolltemplate-limit">> Edge({{edge_num}})</div></td>
+            </tr>
+        {{/edge}}
+        {{#result}}
+        <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+        <tr><td><div class="sheet-rolltemplate-sectionheading">Result</div></td></tr>
+        {{#rollGreater() result 1}}
+            <tr class="sheet-rolltemplate-results-success">
+                <td class="result">{{result}} Successes</td>
+            </tr>
+        {{/rollGreater() result 1}}
+        {{#rollTotal() result 1}}
+        <tr class="sheet-rolltemplate-results-success">
+            <td class="result">{{result}} Success</td>
+        </tr>
+        {{/rollTotal() result 1}}
+        {{#rollTotal() result 0}}
+        <tr class="sheet-rolltemplate-results-fail">
+            <td class="result">{{result}} Successes</td>
+        </tr>
+        {{/rollTotal() result 0}}
+        {{/result}}
+        {{#dmgTaken}}
+            <tr><td><div class="sheet-rolltemplate-spacer"> </div></td></tr>
+            <tr><td><div class="sheet-rolltemplate-sectionheading">Damage taken</div></td></tr>
+            {{#rollGreater() computed::dmgTaken 0}}
+            <tr class="sheet-rolltemplate-results-fail">
+                <td class="result">{{computed::dmgTaken}} {{computed::dmgType}}</td>
+            </tr>
+            {{/rollGreater() computed::dmgTaken 0}}
+            {{#^rollGreater() computed::dmgTaken 0}}
+            <tr class="sheet-rolltemplate-results-success">
+                <td class="result">0 Damage taken</td>
+            </tr>
+            {{/^rollGreater() computed::dmgTaken 0}}
+        {{/dmgTaken}}
     </table>
 </rolltemplate>
