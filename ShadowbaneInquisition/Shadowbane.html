@@ -1898,6 +1898,7 @@
 				<div class='sheet-skill_grid'>
 					<p class='sheet-bold_text sheet-skills_text'>Scrutiny</p>
 					<select name='attr_scrutiny_char' class='sheet-full_width sheet-full_height'>
+						<option value='int'>INT</option>
 						<option value='per' selected='selected'>PER</option>
 						<option value='fel'>FEL</option>
 					</select>
@@ -4636,7 +4637,7 @@ NOTE: replace worker by javascript for IDE functionality
     let fieldsFA = [
         'fatigue_mod',
         'tou', 'tou_unnat', 'tou_advancement', 'tou_mod',
-        'wp', 'wp_unnat', 'wp_advancement',
+        'wp', 'wp_unnat', 'wp_advancement', 'wp_mod',
         'armor_head', 'armor_arm_right', 'armor_body', 'armor_arm_left', 'armor_leg_right', 'armor_leg_left'
     ];
     on('sheet:opened ' + fieldsFA.map(field => 'change:' + field).join(' '), function() {
@@ -4648,12 +4649,12 @@ NOTE: replace worker by javascript for IDE functionality
             var toughness_advancement = parseInt(values['tou_advancement'], 10) || 0;
             var toughness_modifier    = parseInt(values['tou_mod'], 10) || 0;
             var toughness_bonus       = Math.floor((toughness + toughness_advancement + toughness_modifier) / 10 + toughness_unnat);
-            var toughness_mod         = Math.floor((toughness + toughness_advancement) / 10 + toughness_unnat);
 
             var willpower             = parseInt(values['wp'], 10) || 0;
             var willpower_unnat       = parseInt(values['wp_unnat'], 10) || 0;
             var willpower_advancement = parseInt(values['wp_advancement'], 10) || 0;
-            var willpower_mod         = Math.floor((willpower + willpower_advancement) / 10 + willpower_unnat);
+            var willpower_modifier    = parseInt(values['wp_mod'], 10) || 0;
+            var willpower_bonus       = Math.floor((willpower + willpower_advancement + willpower_modifier) / 10 + willpower_unnat);
 
             var armor_head            = parseInt(values['armor_head'], 10) || 0;
             var armor_arm_right       = parseInt(values['armor_arm_right'], 10) || 0;
@@ -4670,7 +4671,7 @@ NOTE: replace worker by javascript for IDE functionality
                 soak_arm_left:  (armor_arm_left + toughness_bonus),
                 soak_leg_right: (armor_leg_right + toughness_bonus),
                 soak_leg_left:  (armor_leg_left + toughness_bonus),
-                fatigue_max:    (toughness_mod + willpower_mod + fatigue_mod)
+                fatigue_max:    (toughness_bonus + willpower_bonus + fatigue_mod)
             });
 
         });
