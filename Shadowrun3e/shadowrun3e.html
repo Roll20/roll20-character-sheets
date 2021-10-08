@@ -2175,15 +2175,8 @@
     <input type="hidden" class="gear-tabs-switch" name="attr_geartab" value="gear">
     <div class="gear-tabs">
         <input type="hidden" class="gear-tabs-switch" name="attr_geartab" value="gear">
-	<div class="gear-tabs-gear nuyen-total">
-           <button class="no-border" type="action" name="act_gear-tab" data-i8n="gear-uppercase" data-i18n-title="gear" title="Gear">GEAR</button>
-   	   <span name="attr_carrying-weight"></span><span>kg</span>
-	</div>
-        <div class="gear-tabs-credsticks nuyen-total">
-		<button type="action" class="no-border" name="act_credsticks-tab" data-i8n="credsticks-uppercase"
-            data-i18n-title="credsticks" title="credsticks">CREDSTICKS</button>
-	    <span name="attr_nuyen"></span><span>&#165;</span>
-	    </div>
+        <button class="gear-tabs-gear nuyen-total" type="action" name="act_gear-tab" data-i18n-title="gear" title="Gear"><span data-i18n="gear">GEAR</span><span>&nbsp;</span><span name="attr_carrying-weight"></span><span>kg</span></button>
+        <button class="gear-tabs-credsticks nuyen-total" type="action" name="act_credsticks-tab" title="credsticks" data-i18n-title="credsticks"><span data-i18n="credsticks">Credsticks</span><span>&nbsp;</span><span name="attr_nuyen"></span><span>&#165;</span></button>
         <button class="gear-tabs-vehiclelist" type="action" name="act_vehiclelist-tab"
             data-i8n="vehicles-list-uppercase" data-i18n-title="vehilces-owned-by-character"
             title="Vehicles Owned by Character">Vehicles List</button>
@@ -7426,6 +7419,9 @@ on('clicked:matrixattack', (info) => {
        });
 
 
+   const matrixattrs={ props: ["security", "access", "control", "index", "files", "slave"],
+   	attadd: "matrix", attappend: "rating"}
+
    const otherattrs=["sheettype", "vcr", "initiategrade", "totem", "totemenv", "totemadv", "totemdisadv"];
    const weaponfocus={ 
    	props: ["name", "reach", "conceal", "skill", "force", "power", "damage", "specialized", "tnmods", "notes"],
@@ -7652,6 +7648,14 @@ const exportRepeat = function(key) {
 	var utillist=[];
 	var longlist=[];
 	var atts=[];
+	var matrixlist=[];
+	if (sheet == "Matrix") {
+		atts.push("matrixcode", "matrixobject", "parentgrid", "sheettype");
+		matrixattrs.props.forEach(myatt=>{
+			matrixlist.push(matrixattrs.attadd + myatt + matrixattrs.attappend);
+			atts.push(matrixattrs.attadd + myatt + matrixattrs.attappend);
+		});
+	} else {
 	longlist=longlist.concat(loadattributes);
 	longlist=longlist.concat(poollist);
 	longlist=longlist.concat(otherattrs);
@@ -7691,6 +7695,7 @@ const exportRepeat = function(key) {
 			});
 		});
 	});
+	}
 	getAttrs(atts, function(myval) {
 		var skillsother=[];
 		var adeptother=[];
@@ -7702,6 +7707,7 @@ const exportRepeat = function(key) {
 			cyberdeck: {},
 			weaponfocus: {},
 			skills: [],
+			securitysheaf: [],
 			adeptpowers: [],
 			offensiveutils: [],
 			defensiveutils: [],
@@ -7734,7 +7740,9 @@ const exportRepeat = function(key) {
 					let mykey=(key in rcdeck.attmap)? rcdeck.attmap[key] : key;
 					jsonout["rcdeck"][mykey]=val;
 				};
-			} else if ( val !=0 ) jsonout[key]=val;
+			} else if ( key=="matrixcode" ) jsonout["code"]=val;
+			 else if ( matrixlist.includes(key)) jsonout[(key.replace(matrixattrs.attadd, "")).replace(matrixattrs.attappend, "")]=val;
+			 else if ( val !=0 ) jsonout[key]=val;
 			
 		};
 		jsonatts=[]
@@ -7747,7 +7755,8 @@ const exportRepeat = function(key) {
 			for ( const [key,val] of Object.entries(repeatprops)) {
 				const jv=key + "-json";
 				console.log(jv);
-				if ( jv in v ) jsonout[key]=JSON.parse(v[key + "-json"]);
+				const okey=(key=="security")? "securitysheaf" : key;
+				if ( jv in v ) jsonout[okey]=JSON.parse(v[key + "-json"]);
 			}
 			if ( "skills" in jsonout) jsonout["skills"] = jsonout["skills"].concat(skillsother);
 			else jsonout["skills"] = skillsother;
@@ -7779,7 +7788,11 @@ const exportRepeat = function(key) {
 				});
 			});
 			for ( const [key,val] of Object.entries(repeatprops)) {
-				if (jsonout[key].length === 0 ) delete jsonout[key]
+			        if (key == "security") {
+					if (jsonout["securitysheaf"].length === 0 ) delete jsonout["securitysheaf"]
+				} else {
+					if (jsonout[key].length === 0 ) delete jsonout[key]
+				}
 			};
 			if ( jsonout.specialutils.length === 0 ) delete jsonout.specialutils;
 			if ( Object.keys(jsonout.cyberdeck).length === 0 ) delete jsonout.cyberdeck;
@@ -7809,7 +7822,36 @@ const exportRepeat = function(key) {
 		if ( "type" in npc ) atts["sheettype"]=npc["type"]; 
 		if ( "vcr" in npc ) atts["vcr"]=npc["vcr"];
 		if ( "magic" in npc ) atts["magic"]=npc["magic"];
-	
+		const sheettype=("sheettype" in npc)? npc.sheettype : "Character";
+		if ( sheettype=="Matrix") {
+	            console.log('loading matrix');
+		    atts["sheettype"]=sheettype;
+		    atts["matrixobject"]=("matrixobject" in npc)? npc["matrixobject"] : "Host";
+		    atts["matrixcode"]=("code" in npc)? npc["code"] : "GREEN";
+		    if ( "ic" in npc ) {
+				npc.ic.forEach( repeat => {
+					var newrowid = generateRowID();
+					repeatprops.ic.props.forEach( prop => {
+						myprop=prop;
+						prop=repeatprops.ic.attadd + prop;
+						atts["repeating_ic_" + newrowid + "_" + prop]=repeat[myprop];
+					});
+				});
+		   }
+		   if ( "securitysheaf" in npc ) {
+				npc.securitysheaf.forEach( repeat => {
+					var newrowid = generateRowID();
+					repeatprops.security.props.forEach( prop => {
+						myprop=prop;
+						atts["repeating_security_" + newrowid + "_" + prop]=repeat[myprop];
+					});
+				});
+		   }
+		   matrixattrs.props.forEach(attr=>{
+		   	if ( attr in npc ) atts[matrixattrs.attadd + attr + matrixattrs.attappend]=npc[attr];
+		   });
+
+		} else {	
 	        console.log('loading attributes');
 		loadattributes.forEach(myatt=>{
 		        let max=myatt.concat("_max");
@@ -7931,6 +7973,7 @@ const exportRepeat = function(key) {
 			}
 
 		};
+		}
 		console.log('before atts');
 		console.log(atts);
 		Object.keys(atts).forEach(key => atts[key] === undefined && delete atts[key])
