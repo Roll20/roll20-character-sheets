@@ -82,7 +82,7 @@ const skillXPChanged = ({
         const skillNameLookupKey = skillName.split("_")[0]
         const subSkill = values[subSkillAttrName]
 
-        let skillAttributesToSet = {}
+        const skillAttributesToSet = {}
 
         skillAttributesToSet[skillLevel] = calculateSkillLevel(Number(newValue), values.learning_speed)
 

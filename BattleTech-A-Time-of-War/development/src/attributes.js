@@ -17,14 +17,14 @@ export const CHARISMA_LINK = "charisma_link"
 const EDGE_LINK = "edge_link"
 
 export const linkedAttributeDisplayNames = {
-    STRENGTH_LINK: "STR",
-    BODY_LINK: "BOD",
-    REFLEX_LINK: "RFL",
-    DEXTERITY_LINK: "DEX",
-    INTELLIGENCE_LINK: "INT",
-    WILL_LINK: "WIL",
-    CHARISMA_LINK: "CHA",
-    EDGE_LINK: "EDG",
+    [STRENGTH_LINK]: "STR",
+    [BODY_LINK]: "BOD",
+    [REFLEX_LINK]: "RFL",
+    [DEXTERITY_LINK]: "DEX",
+    [INTELLIGENCE_LINK]: "INT",
+    [WILL_LINK]: "WIL",
+    [CHARISMA_LINK]: "CHA",
+    [EDGE_LINK]: "EDG",
 }
 
 export const calculateAttributeScore = (attributeXPName, attributeXP) => {
