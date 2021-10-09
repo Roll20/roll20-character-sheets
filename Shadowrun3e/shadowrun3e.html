@@ -6420,19 +6420,23 @@ on('clicked:matrixattack', (info) => {
 		console.log("clicked dispell");
 		var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
 		var calcTN="?{" + lang["force-of-spell"] + "?}";
-		var calcDrainTN="floor( ?{" + lang["force-of-spell"] + "?}/2) + ( 2 * @{spellsus} + ?{" + lang["drain-modifiers"] + "?})";
-		var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?} +?{" + lang["drain-modifiers"] + "?|0}";
-		var myroll="&{template:spell}{{myname=@{character_name}}}{{finaldrain=[[0]]}}";
+		var calcDrainTN="floor( ?{" + lang["force-of-spell"] + "?|0}/2) + ( 2 * @{spellsus} + ?{" + lang["drain-modifiers"] + "?|0})";
+		var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}";
+		var myroll="&{template:spell}";
+		myroll+="{{finaldrain=[[0]]}}{{draintnfinal=[[" + calcDrainTN + "]]}}";
 		myroll+="{{sorcerydice=[[?{"+ lang["sorcery-dice"] +"?|@{spellcasting}} + ?{" + lang["sorcery-dice-for-drain"] + "?|0}]]}}";
 		myroll+="{{draindamage=[[?{" + lang["drain-damage"] + "?|" + lang["light"] + ",1|" + lang["moderate"] + ",2|" + lang["serious"] + ",3|" + lang["deadly"] + ",4|"; 
 		myroll+= lang["light-stun"] + ",10|" + lang["moderate-stun"] + ",11|" + lang["serious-stun"] + ",12|" + lang["deadly-stun"] + ",13|" + lang["none"] + ",0}]]}}";
 		myroll+="{{spellpool=[[?{"+ lang["spell-pool-dice"] +"?|0} + ?{"+ lang["spell-pool-dice-for-drain"] +"?|0}]]}}";
+		myroll+="{{castforce=[[?{" + lang["force-of-spell"] + "?}]]}}";
+		myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
 		myroll+="{{spellname=" + lang["dispell"] + "}}";
-		myroll+="{{castforce=[[?{" + lang["force-of-spell"] + "?|0}]]}}";
 		myroll+="{{rolldice=[[" + calcDice + "]]}}";
 		myroll+="{{targetnumber=[[" + calcTN + "]]}}";
-		myroll+="{{draintest= [[ [[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1 ]]!! ]] }}";
 		myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
+		myroll+="{{draindice=[[" + calcDrainDice +"]]}}";
+		myroll+="{{myname=@{character_name}}}"
+		myroll+="{{dispell=yes}}"
 		console.log(myroll);
         	startRoll(myroll, (results) => {
 			updatepoolused("sorcery", results.results.sorcerydice.result);	
@@ -9843,7 +9847,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#spellpool}}<div class="sheet-rtrow"><span data-i18n="spell-pool">Spell Pool</span>: {{spellpool}} </div>{{/spellpool}}
         {{#roll}}<div class="sheet-rtrow"><span data-i18n="casting-test">Casting Test</span>: {{computed::cast}} {{computed::roll}}</div>{{/roll}}
         {{#draintest}}
-        <div><span data-i18n="drain"></span>{{draindice}}d6 vs {{computed::draintnfinal}} = {{computed::draintest}}</div>
+        {{#cast}}<div><span data-i18n="drain"></span>{{draindice}}d6 vs {{computed::draintnfinal}} = {{computed::draintest}}</div>{{/cast}}
+        {{#dispell}}<div><span data-i18n="drain"></span>{{draindice}}d6 vs {{computed::draintnfinal}} = {{draintest}}</div>{{/dispell}}
         <div class="sheet-spell-resist-table">
             <div data-i18n="drain">Drain</div>
             <div></div>
@@ -9852,7 +9857,8 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
             <div data-i18n="final">Final</div>
             <div>{{computed::draindamage}}</div>
             <div></div>
-            <div>{{computed::draintest}}</div>
+            {{#cast}}<div>{{computed::draintest}}</div>{{/cast}}
+            {{#dispell}}<div>{{draintest}}</div>{{/dispell}}
             <div></div>
             <div>{{computed::finaldrain}}</div>
         </div>
@@ -10132,5 +10138,5 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#type}}<div class="sheet-rtrow">Type: {{type}}</div>{{/type}}
         {{#info1}}<div class="sheet-rtrow">{{info1}}</div>{{/info1}}
         {{#info2}}<div class="sheet-rtrow">{{info2}}</div>{{/info2}}
-    </div>
+    /div>
 </rolltemplate>
