@@ -1,1 +1,63 @@
-Tales of Xadia: The Dragon Prince RPG - Playtest Character Sheet - Cortex Prime\n\n##Set up\n\n- Open the Journal tab, and add a new Character.\n- Click on save changes.\n- Now switch to the Character Sheet tab.\n- Check the Edit box in the top left corner.\n- Select the Character Portrait from the list - this will select and fill out the distinction blocks. Select 'Tales of Xadia logo' if you are not using any of the pregen characters.\n- Set the dice values for the Attributes, Values, and Specialities using the further drop downs.\n- Uncheck the Edit box to hide the editor.\n- Enter the remaining details - Name, Description, Value statements, Asset details and (if needed) custom Distinctions in the editable text fields.\n\n- Repeat this for each of the remaining characters.\n\n##Dice Pool Builder\n\nThe inbuilt Dice Pool Builder pulls from the character's attributes, rolls and displays the dice used and what they rolled. Hitches show up with black icons.\n\n*NOTE* This dice roller does not support the 3D dice feature in Roll20. - Also it won't work with the Beta Mobile App.\n\n##Stress and Trauma\n\nI have been using API macro's to adjust Stress values. But these are simply Attributes (Afraid, Angry, Corrupted, Exhausted, Injured, Insecure and AfraidTrauma, AngryTrauma, CorruptedTrauma, ExhaustedTrauma, InjuredTrauma, InsecureTrauma).\nAs with the Edit attribute you can add these to the Attributes and Abilities tab manually, and assign values ranging from the 4,6,8,10 or 12 corresponding to the dice value.\n\nThe traits will only display on the character sheet as they are assigned to the character, in the same manner as the Specialities. If you have added a stress and it's not showing check the spelling, Capitalisation, and dice value to be sure you got those all correct.\n*NOTE* ToX does not use d4 stress so this value can be used to hide these fields on the character sheet.\n\nAny feedback, or requests - I'm happy to hear.\n\n---\n\nTales of Xadia: The Dragon Prince Roleplaying Game is published by Fandom Inc.\nTales of Xadia: The Dragon Prince Roleplaying Game uses the Cortex system. The Cortex system and the Fandom logos are © 2020 Fandom Inc. All rights reserved. Reference to other copyrighted material in no way constitutes a challenge to the respective copyright holders of that material.\nThe Dragon Prince and all associated characters and elements are © 2020 Wonderstorm, Inc. and used under license by Fandom Inc. All rights reserved.\nArtwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.\n\n\n##Changelog\n\n### v.1.2 2021-03-30\n\nUpdated the code base to match the standards used in my Cortex Hammerheads build.\nAdded support for Mobile Display.\nAdded a Roll Template matching the style in the Hammerheads build, customised to ToX.\n\n### v.1.2 2021-03-05
+Tales of Xadia: The Dragon Prince RPG - Playtest Character Sheet - Cortex Prime
+
+##Set up
+
+- Open the Journal tab, and add a new Character.
+- Click on save changes.
+- Now switch to the Character Sheet tab.
+- There is a green Edit button to make changes to the sheet.
+- Select the Character Portrait from the list - this will also select and fill out the distinction blocks.
+- Select 'Custom Character' option if you are not using any of the pregen characters.
+- Set the dice values for the Attributes, Values, and Specialities using the further drop downs.
+- Enter the remaining details - Name, Description, Value statements, Asset details and (if needed) custom Distinctions in the editable text fields.
+- Click the Edit button again to hide the editor.
+
+- Repeat this for each of the remaining characters.
+
+##Dice Pool Builder
+
+The inbuilt Dice Pool Builder pulls from the character's attributes, rolls and displays the dice used and what they rolled. Hitches show up with black icons.
+
+*NOTE* This dice roller does not support the 3D dice feature in Roll20. - Also it won't work with the Beta Mobile App.
+
+##Stress and Trauma
+
+These traits will only display on the character sheet as they are assigned to the character, in the same manner as the Specialities.
+
+Any feedback, or requests - I'm happy to hear.
+
+---
+
+Tales of Xadia: The Dragon Prince Roleplaying Game is published by Fandom Inc.
+Tales of Xadia: The Dragon Prince Roleplaying Game uses the Cortex system. The Cortex system and the Fandom logos are © 2020 Fandom Inc. All rights reserved. Reference to other copyrighted material in no way constitutes a challenge to the respective copyright holders of that material.
+The Dragon Prince and all associated characters and elements are © 2020 Wonderstorm, Inc. and used under license by Fandom Inc. All rights reserved.
+Artwork and graphics © and ™ Wonderstorm, Inc. All rights reserved.
+
+
+##Changelog
+
+### v.1.5 2021-06-02
+
+Added further Pre-Gen characters.
+
+### v.1.4 2021-05-26
+
+Added further Pre-Gen characters.
+Overhauled the edit function.
+Corrected minor issues and faults, including a change to the description field which was incorrectly named.
+
+### v.1.3.5 2021-05-05
+
+Added two additional Pre-Gens and the specialities associated with those,
+Corrected a few minor issues with displaying attributes
+Changed the edit panel and added a stress and trauma editing feature.
+
+### v.1.2 2021-03-30
+
+Updated the code base to match the standards used in my Cortex Hammerheads build.
+Added support for Mobile Display.
+Added a Roll Template matching the style in the Hammerheads build, customised to ToX.
+
+### v.1.2 2021-03-05
+
+

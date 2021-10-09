@@ -6,9 +6,9 @@ const fillClassStats = () => {
     getAttrs(["class", "class_ability", "attack_bonus"], v => {
         const label = v.class && reverseClasses[v.class ? v.class.toLowerCase() : ""];
         if (label && autofillData.classes.hasOwnProperty(label)) {
-            const data: {[key: string]: string | false} = Object.assign({}, autofillData.classes[label]);
+            const data = Object.assign({}, autofillData.classes[label as keyof typeof autofillData.classes]);
             Object.keys(data).forEach(key => {
-                if (!(["", "0"].includes(`${v[key]}`))) delete data[key];
+                if (!(["", "0"].includes(`${v[key]}`))) delete data[key as keyof typeof data];
             });
             mySetAttrs(data, v);
         }
@@ -179,28 +179,29 @@ const getAutofillInfo = ({sName, v, data, label}: AutofillData) => {
     }
     return "";
 };
-const generateAutofillRow = (sName: string) => {
+
+const generateAutofillRow = (sName: Exclude<keyof typeof autofillData, 'droneFittings'>) => {
     // Event handler for generating a new row when button is pressed
     getAttrs([`generate_${sName}_source`, "ship_class"], v => {
         const label = v[`generate_${sName}_source`];
         v.ship_multiplier = getShipMultiplier(v.ship_class).toString();
         v.ship_price_multiplier = getShipPriceMultiplier(v.ship_class).toString();
         if (label && autofillData[sName].hasOwnProperty(label)) {
-            const data = getAutofillData({sName : sName, v : v, data : autofillData[sName][label], label : label});
+            const data = getAutofillData({sName : sName, v : v, data : autofillData[sName][label as keyof typeof autofillData[typeof sName]], label : label});
             delete data.class;
             delete data.level;
             fillRepeatingSectionFromData(sName, data);
         }
     });
 };
-const generateAutofillInfo = (sName: string) => {
+const generateAutofillInfo = (sName: Exclude<keyof typeof autofillData, 'droneFittings'>) => {
     // Event handler for showing info about the selected item
     getAttrs([`generate_${sName}_source`, "ship_class"], v => {
         const label = v[`generate_${sName}_source`];
         v.ship_multiplier = getShipMultiplier(v.ship_class).toString();
         v.ship_price_multiplier = getShipPriceMultiplier(v.ship_class).toString();
         if (label && autofillData[sName].hasOwnProperty(label)) {
-            const info = getAutofillInfo({sName: sName, v: v, data: autofillData[sName][label], label: label});
+            const info = getAutofillInfo({sName: sName, v: v, data: autofillData[sName][label as keyof typeof autofillData[typeof sName]], label: label});
             if (info) setAttrs({
                 [`generate_${sName}_info`]: info
             });

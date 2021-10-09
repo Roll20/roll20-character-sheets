@@ -16,12 +16,12 @@
                 <h1>Character</h1>
                 <div><label>Character name: <input name="attr_character_name" type="text" style="width:120px;" /></label></div>
                 <div><label>Tier of Power <input name="attr_tier_of_power" type="text" value="@{hidden_power}" style="width: 30px;" disabled/></label></div>
-                <input type="hidden" name="attr_hidden_power" value="1d0"/>
+                <input type="hidden" name="attr_hidden_power" value="[[1d0]]"/>
                 <script type="text/worker">
                     on("change:power_level", function(){
                         getAttrs(["POWER_LEVEL"], function(values){
                             var powerlist = [5, 10, 15, 20, 25];
-                            var dicelist = ["1d4", "1d6", "1d8", "1d10", "1d10+1d4"];
+                            var dicelist = ["[[1d4]]", "[[1d6]]", "[[1d8]]", "[[1d10]]", "[[1d10+1d4]]"];
                             let pl = parseInt(values.POWER_LEVEL)||0;
                             var changed = false;
                             for(i=0;i<powerlist.length; i++){
@@ -35,23 +35,23 @@
                             if(!changed){
                                 if(pl<5){
                                     setAttrs({
-                                        "hidden_power":"1d0"
+                                        "hidden_power":"[[1d0]]"
                                     });
                                 }else if(pl<10){
                                     setAttrs({
-                                        "hidden_power":"1d4"
+                                        "hidden_power":"[[1d4]]"
                                     });
                                 }else if(pl<15){
                                     setAttrs({
-                                        "hidden_power":"1d6"
+                                        "hidden_power":"[[1d6]]"
                                     });
                                 }else if(pl<20){
                                     setAttrs({
-                                        "hidden_power":"1d8"
+                                        "hidden_power":"[[1d8]]"
                                     });
                                 }else if(pl<25){
                                     setAttrs({
-                                        "hidden_power":"1d10"
+                                        "hidden_power":"[[1d10]]"
                                     });
                                 };
                             };
@@ -70,6 +70,7 @@
                         <option value="namekians">Namekians</option>
                         <option value="majin">Majin</option>
                         <option value="saiyan">Saiyan</option>
+                        <option value="shinjin">Shinjin</option>
                     </select>
                     </label>
                 </div>
@@ -103,9 +104,15 @@
                                                     "subrace":"Majin"
                                                 });
                                             }else{
-                                                setAttrs({
-                                                    "subrace":"Full Blood, Half-Blood"
-                                                });
+                                                if(race == "saiyan"){
+                                                    setAttrs({
+                                                        "subrace":"Full Blood, Half-Blood"
+                                                    });
+                                                }else{
+                                                    setAttrs({
+                                                         "subrace":"Kaio, Makaio"
+                                                    })
+                                                } 
                                             };
                                         };
                                     };
@@ -268,6 +275,20 @@
                                 setAttrs({
                                     "tenacity":5
                                 });
+                            }else if(race == "shinjin"){
+                                if(subrace == "Kaio"){
+                                    setAttrs({
+                                        "hp_modifier":5
+                                    });
+                                }else{
+                                    setAttrs({
+                                        "hp_modifier":4
+                                    });
+                                }
+                                setAttrs({
+                                    "insight":5,
+                                    "spirit":5
+                                })
                             }
                         });
                     });
@@ -378,7 +399,7 @@
                 <div><label class="skill-label">Pilot (Agi): <input type="number" name="attr_pilot" value="0"/><button class="skill" type="roll" name="roll_pilot" value="/r 1d10!10+@{agility_modifier}+@{pilot}+floor(@{scholarship_modifier}/2)+@{hidden_power}"></button></label></div>
                 <div><label class="skill-label">Profession (Sch): <input type="number" name="attr_profession" value="0"/><button class="skill" type="roll" name="roll_profession" value="/r 1d10!10+@{scholarship_modifier}+@{profession}+floor(@{scholarship_modifier})+@{hidden_power}"></label></div>
                 <div><label class="skill-label">Science (Sch): <input type="number" name="attr_science" value="0"/><button class="skill" type="roll" name="roll_science" value="/r 1d10!10+@{scholarship_modifier}+@{science}+floor(@{scholarship_modifier})+@{hidden_power}"></label></div>
-                <div><label class="skill-label">Stealth (Agi): <input type="number" name="attr_stealth" value="0"/><button class="skill" type="roll" name="roll_stealth" value="/r 1d10!10+@{agility_modifier}+@{stealth}+floor(@{scholarship_modifier}/2)+@{hidden_power}"></button></label></div>
+                <div><label class="skill-label">Stealth (Agi): <input type="number" name="attr_stealth" value="0"/><button class="skill" type="roll" name="roll_stealth" value="/r 1d10!10+@{agility_modifier}+@{stealth)+floor(@{scholarship_modifier}/2)}+@{hidden_power}"></button></label></div>
                 <div><label class="skill-label">Survival (Ins): <input type="number" name="attr_survival" value="0"/><button class="skill" type="roll" name="roll_survival" value="/r 1d10!10+@{insight_modifier}+@{survival}+floor(@{scholarship_modifier}/2)+@{hidden_power}"></label></div>
                 <div><label class="skill-label">Thievery (Agi): <input type="number" name="attr_thievery" value="0"/><button class="skill" type="roll" name="roll_thievery" value="/r 1d10!10+@{agility_modifier}+@{thievery}+floor(@{scholarship_modifier}/2)+@{hidden_power}"></button></label></div>
                 <div><label class="skill-label">Use Magic (Spi): <input type="number" name="attr_use_magic" value="0"/><button class="skill" type="roll" name="roll_use_magic" value="/r 1d10!10+@{spirit_modifier}+@{use_magic}+floor(@{scholarship_modifier}/2)+@{hidden_power}"></label></div>
@@ -504,7 +525,7 @@
                     <div class="ccol2"><input type="number" name="attr_custom_attack_ki" value="0"></div>
                     <div class="ccol3"><input type="number" name="attr_custom_attack_technique" value="0" ></div>  
                     <div class="ccol4"><input type="text" name="attr_custom_attack_hit" value="0" style="width: 50px;"></div>
-                    <div class="ccol5"><input type="text" name="attr_custom_attack_wound" value="0" style="width: 50px;"><button class="attack-button" type="roll" name="roll_custom_attack" value="/em @{custom_attack_name} for [[@{custom_attack_hit}+@{hidden_power}+floor(@{agility_modifier}/2)+@{insight_modifier}+@{global_hit}]], dealing [[@{custom_attack_wound}+@{hidden_power}+@{global_wound}+?{What ability are you using?|Strength,@{strength_modifier} | Potency,@{potency_modifier} |Spirit,@{spirit_modifier} | Balistic, 0}+@{hidden_power}+@{global_wound}]] and costing @{custom_attack_ki} ki"></button></div>
+                    <div class="ccol5"><input type="text" name="attr_custom_attack_wound" value="0" style="width: 50px;"><button class="attack-button" type="roll" name="roll_custom_attack" value="/em @{custom_attack_name} for [[@{custom_attack_hit}+@{hidden_power}+floor(@{agility_modifier}/2)+@{insight_modifier}+@{global_hit}]], dealing [[@{custom_attack_wound}+@{hidden_power}+@{global_wound}+?{What ability are you using?|Strength,@{strength_modifier} | Potency,@{potency_modifier} |Spirit,@{spirit_modifier} | Balistic, 0}+@{global_wound}]] and costing @{custom_attack_ki} ki"></button></div>
                 </div>
             </fieldset>
         </div>

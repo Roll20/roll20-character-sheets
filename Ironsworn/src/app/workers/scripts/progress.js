@@ -1,4 +1,4 @@
-const progressStrings = [
+const stdProgress = [
   'one',
   'two',
   'three',
@@ -11,13 +11,26 @@ const progressStrings = [
   'ten'
 ]
 
+const vowProgress = [
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9'
+]
+
 function getCurrentProgress (progressValues) {
   let total = 0
   progressValues.map(x =>{ total = x + total })
   return total
 }
 
-function updateProgressValues (newValue) {
+function updateProgressValues (newValue, progressStrings) {
   let progressNumber = 0
   for (; newValue > 0;) {
     let updateValue = (newValue < 4) ? newValue : 4
@@ -30,36 +43,33 @@ function updateProgressValues (newValue) {
   }
 }
 
-function updateProgress (mark, progressArray) {
+function updateProgress (mark, progressArray, progressStrings) {
   let newValue = mark + getCurrentProgress(progressArray)
   let finalValue = (newValue < 40) ? newValue : 40
-  updateProgressValues(finalValue)
+  updateProgressValues(finalValue, progressStrings)
 }
 
 function chosenDifficulty (rank) {
   switch (rank) {
     case 1:
-      return 12
-      break;
+      return 12;
     case 2:
-      return 8
-      break;
+      return 8;
     case 3:
-      return 4
-      break;
+      return 4;
     case 4:
-      return 2
-      break;
+      return 2;
     case 5:
-      return 1
-      break;
+      return 1;
     default:
-      return null
+      return null;
   }
 }
 
 on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress change:repeating_sites:mark_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
+  const progressStrings = type === 'vow' ? vowProgress : stdProgress
+
   getAttrs([
     `repeating_${type}_rank`,
     `repeating_${type}_progress_${progressStrings[0]}`,
@@ -88,12 +98,14 @@ on('change:repeating_progress:mark_progress change:repeating_vow:mark_progress c
     ]
     const rank = parseInt(attrValues[`repeating_${type}_rank`])
     const mark = chosenDifficulty(rank)
-    updateProgress(mark, progress)
+    updateProgress(mark, progress, progressStrings)
   });
 });
 
 on('change:repeating_progress:clear_progress change:repeating_vow:clear_progress change:repeating_sites:clear_progress', function(values) {
   const type = values.sourceAttribute.match(/repeating_(.*?)_/)[1]
+  const progressStrings = type === 'vow' ? vowProgress : stdProgress
+
   setAttrs({ 
     ['repeating_' + type + '_progress_' + progressStrings[0]]: '0',
     ['repeating_' + type + '_progress_' + progressStrings[1]]: '0',

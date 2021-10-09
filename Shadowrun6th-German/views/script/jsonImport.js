@@ -135,6 +135,7 @@ for (var i = 0; i < data["skills"].length; i++) {
         newrowid = generateRowID();
         c["repeating_language_" + newrowid + "_language_name"]=data["skills"][i].name;
         c["repeating_language_" + newrowid + "_language_level"]=data["skills"][i].rating;
+        if (c["repeating_language_" + newrowid + "_language_level"]==4) c["repeating_language_" + newrowid + "_language_level"]=99;
     }
     if(data["skills"][i].id!="language" && data["skills"][i].id!="knowledge"){
 

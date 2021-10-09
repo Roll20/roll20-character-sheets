@@ -1,112 +1,102 @@
-<table>
-    <tr>
-        <td style="background:none" Rowspan="3">
-            <center>
-                <img src="https://img4.hostingpics.net/pics/540346TitrePsiRun3.png">
-            </center>
-        </td>
-        <td  style="background:none;" width="50%"><!-- NOM -->
-            <table>
-                <tr>
-                    <td>
-                        <h4>Nom du Fugitif :</h4>
-                            <INPUT type="text" name="attr_character_name" title="Nom de votre personnage" placeholder="Nom de votre personnage"></INPUT> <!-- FIN NOM -->
-                            <br><br>
-                    </td>
-                </tr>
-                <tr style="height:20px">
-                    
-                </tr>
-                <tr>
-                    <td>
-                        <h4>Age Apparent :</h4>
-                            <INPUT type="number" name="attr_AGE" title="Age" value="6" min="6"></INPUT><br><br>
-                    </td>
-                </tr>
-                <tr style="height:20px">
-                    
-                </tr>
-                <tr>
-                    <td>
-                        <h4>Pouvoir Psi :</h4>
-                        <input type = "text" name = "attr_psi" /><br><br>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-</table><br>
+<script type="text/worker">
 
-<table>
-    <tr>
-        <td width="65%"><br>
-            <h4>Quand je me regarde dans le Miroir, je vois :</h4>
-                <textarea name="description miroir"></textarea>
-        </td>
-        <td style="background:none; width:40px">
-            
-        </td>
-        <td width="30%"><br><!-- ETAT -->
-            <h4>Etat : </h4>
-            <table>
-                <tr>
-                    <td style="background:none">
-                        <input type="radio" name="attr_etatSante" class="etatSante" value="0" checked />
-                            <span title="Je suis en Forme" class="etatSante"></span>
-                    </td>
-                </tr>
-                <tr style="height:5px">
-                    
-                </tr>
-                <tr>
-                    <td style="background:none">
-                        <input type="radio" name="attr_etatSante" class="etatSante" value="1" checked />
-                            <span title="Je suis Blessé" class="etatSante"></span>
-                    </td>
-                </tr>
-                <tr style="height:5px">
-                    
-                </tr>
-                <tr>
-                    <td style="background:none">
-                        <input type="radio" name="attr_etatSante" class="etatSante" value="2" checked />
-                            <span title="Je suis doublement Blessé" class="etatSante"></span>
-                    </td>
-                </tr>
-            </table><!-- FIN ETAT --><br>
-            <DIV> <!-- FORCE -->
-                <BUTTON type="roll" name="JetEtat" value="[[(4+?{pouvoir|0}-@{ETATSANTE})d6]]" title="Jet" /></BUTTON>
-            </DIV> <!-- FIN FORCE --><br>
-        </td>
-    </tr>
-</table><br>
+on("sheet:opened", function(eventInfo){
+    setAttrs({
+        psiprompt: getTranslationByKey("ask-using-psi-power"),
+        harmprompt: getTranslationByKey("ask-risking-harm"),
+        yesanswer: getTranslationByKey("yes"),
+        noanswer: getTranslationByKey("no"),
+        rollquery: "(([[@{baseroll}]])+?{@{psiprompt}|@{yesanswer},1|@{noanswer},0}+?{@{harmprompt}|@{yesanswer},1|@{noanswer},0})d6kl[[([[@{baseroll}]])+?{@{psiprompt}}+?{@{harmprompt}}+(@{drophigh})]]dl[[@{droplow}]]sd"
+    });
+});
 
-<table>
-    <tr>
-        <td><!--QUESTIONS-->
-            <h4>J'ai des Questions ...</h4>
-                <fieldset class="repeating_questions">
-                Question <input type="text"  name="attr_ques_nom" placeholder="description de la question" title="description de la question"/><br>
-                Réponse <textarea name="attr_ques_descr" placeholder="description de la réponse" title="description de la réponse"></textarea>
-                </fieldset><!--fin de questions-->
-        </td>
-    </tr>
-</table><br>
-
-<table>
-    <tr>
-        <td> <!-- EPILOGUE -->
-            <h4>Epilogue : </h4>
-            <SELECT name="attr_CLASSE">
-                <OPTION selected>Quelle fin à votre personnage ?</OPTION>
-                <OPTION>Piégé</OPTION>
-                <OPTION>A la Maison</OPTION>
-                <OPTION>Caché</OPTION>
-                <OPTION>En Quête</OPTION>
-                <OPTION>Perdu</OPTION>
-                <OPTION>Retourne la Situation</OPTION>
-                <OPTION>Fait une Découverte</OPTION>
-            </SELECT><!-- FIN EPILOGUE -->
-        </td>
-    </tr>
-</table>
+</script>
+<div class="sheet-runner">
+    <div class="sheet-block sheet-name">
+        <label>
+            <span data-i18n="runner-name">Runner's Name</span>
+            <input type="text" name="attr_character_name"
+                placeholder="Your character's name"
+                data-i18n-placeholder="runner-name-placeholder"/>
+        </label>
+    </div>
+    <div class="sheet-block sheet-age">
+        <label>
+            <span data-i18n="apparent-age">Apparent Age</span>
+            <input type="number" name="attr_age" min="0"/>
+        </label>
+    </div>
+    <div class="sheet-block sheet-power">
+        <label>
+            <span data-i18n="psi-power">Psi Power</span>
+            <input type="text" name="attr_psi_power"
+                placeholder="Your character's psi power"
+                data-i18n-placeholder="psi-power-placeholder"/>
+        </label>
+    </div>
+    <div class="sheet-block sheet-appearance">
+        <label>
+            <span><span data-i18n="in-the-mirror...">When I look in the mirror, I see...</span></span>
+            <textarea name="attr_appearance"></textarea>
+        </label>
+    </div>
+    <div class="sheet-block sheet-roll">
+        <div>
+            <input type="hidden" name="attr_baseroll" value="4 - {@{harm},0}kh1" disabled="true"/>
+            <input type="hidden" name="attr_droplow" value="1 - {(@{harm}*@{harm}),0}kh1" disabled="true"/>
+            <input type="hidden" name="attr_drophigh" value="{@{harm},0}kl1" disabled="true"/>
+            <span style="display: none" data-i18n="ask-using-psi-power">Are you using your psi power?</span>
+            <span style="display: none" data-i18n="ask-risking-harm">Are you risking harm to anyone?</span>
+            <span style="display: none" data-i18n="yes">Yes</span>
+            <span style="display: none" data-i18n="no">No</span>
+            <button type="roll" name="roll_risk" value="/roll @{rollquery}" data-i18n="take-a-risk">Take a Risk</button>
+        </div>
+    </div>
+    <div class="sheet-block sheet-harm">
+        <strong><span data-i18n="harm">Harm</span></strong>
+        <label>
+            <input type="radio" name="attr_harm" value="0" checked />
+            <span data-i18n="unimpaired">I'm unimpaired</span>
+        </label>
+        <label>
+            <input type="radio" name="attr_harm" value="1"/>
+            <span data-i18n="impaired">I'm impaired!</span>
+        </label>
+        <label>
+            <input type="radio" name="attr_harm" value="-1" />
+            <span data-i18n="doubly-impaired">I'm doubly impaired!</span>
+        </label>
+    </div>
+    <div class="sheet-block sheet-questions">
+        <strong><span data-i18n="i-have-questions...">I Have Questions...</span></strong>
+        <fieldset class="repeating_question">
+            <label>
+                <span data-i18n="question">Question</span>
+                <input type="text"  name="attr_question"
+                    placeholder="your question"
+                    data-i18n-placeholder="question-placeholder"/>
+            </label>
+            <label>
+                <span data-i18n="answer">Answer</span>
+                <textarea name="attr_answer"
+                    placeholder="the question's answer"
+                    data-i18n-placeholder="answer-placeholder"></textarea>
+            </label>
+        </fieldset>
+    </div>
+    <div class="sheet-block sheet-endgame">
+        <label>
+            <span data-i18n="endgame">Endgame</span>
+            <select name="attr_endgame">
+                <option selected data-i18n="your-character-endgame">What is your character's endgame?</option>
+                <option data-i18n="trapped">Trapped</option>
+                <option data-i18n="home">Home</option>
+                <option data-i18n="hidden">Hidden</option>
+                <option data-i18n="on-a-quest">On a quest</option>
+                <option data-i18n="lost">Lost</option>
+                <option data-i18n="turning-the-tables">Turning the tables</option>
+                <option data-i18n="making-a-discovery">Making a discovery</option>
+            </select>
+        </label>
+    </div>
+</div>
