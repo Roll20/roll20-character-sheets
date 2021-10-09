@@ -3,7 +3,7 @@ const wfrpModule = ( () => {
     // Global Variables
 
     const wfrp = {
-        sheet_version: "1.0.3",
+        sheet_version: "1.0.4",
 
         characteristics: [
             "weapon_skill",
@@ -96,6 +96,7 @@ const wfrpModule = ( () => {
             "explosives",
             "sling",
             "throwing",
+            "azyr",
             "aqshy",
             "chamon",
             "dhar",
@@ -104,7 +105,8 @@ const wfrpModule = ( () => {
             "hysh",
             "shyish",
             "ulgu",
-            "magick"
+            "magick",
+            "custom"
         ],
 
         repeating_skills: [
@@ -137,7 +139,10 @@ const wfrpModule = ( () => {
 
     const initSheet = () => {
 
-        wfrp.characteristics.forEach(char => calculateCharacteristic(char));
+        wfrp.characteristics.forEach(char => {
+            calculateCharacteristic(char)
+            recalculateAttribute(`${char}_modifier`, char);
+        });
 
         wfrp.skills.forEach(skill => calculateSkill(skill));
 
@@ -188,7 +193,7 @@ const wfrpModule = ( () => {
         let slbonus = "";
 
         if (new_value === "1") {
-            query = "?{Bonus|0}";
+            query = "?{Target Bonus|0}";
             slbonus = "{{sl_bonus=?{SL Bonus|0}}}"
         }
         
@@ -217,11 +222,10 @@ const wfrpModule = ( () => {
     }
 
     const toggleInitOption = (new_value) => {
-        const init = (new_value === "1") ? `{{init=[[@{initiative} &{tracker}]]}}` :
-                     (new_value === "2") ? `{{init=[[@{initiative}+1d10 &{tracker}]]}}` :
-                     (new_value === "3") ? `{{init=[[@{agility_bonus}+@{initiative_bonus}+1d10 &{tracker}]]}}` :
+        const init = (new_value === "1") ? `{{init=[[@{initiative}+@{init_bonus} &{tracker}]]}}` :
+                     (new_value === "2") ? `{{init=[[@{initiative}+1d10+@{init_bonus} &{tracker}]]}}` :
+                     (new_value === "3") ? `{{init=[[@{agility_bonus}+@{initiative_bonus}+1d10+@{init_bonus} &{tracker}]]}}` :
                      `{{init=[[@{initiative}]]}}`;
-
         setAttrs({roll_init:init});
     }
 
@@ -266,7 +270,7 @@ const wfrpModule = ( () => {
     }
 
     const recalculateAttribute = (attribute, query) => {
-        const attrs = [...wfrp.characteristics, ...wfrp.characteristics.map(item => `${item}_bonus`)];
+        const attrs = [...wfrp.characteristics, ...wfrp.characteristics.map(item => `${item}_bonus`), ...wfrp.characteristics.map(item => `${item}_custom_mod`)];
         let match_array = [query];
         const parsed_query = query.replace(/ /g, "_");
 
@@ -346,6 +350,8 @@ const wfrpModule = ( () => {
                         }
                     });
 
+                    if (wfrp.characteristics.includes(query)) mod_array.push(+values[`${parsed_query}_custom_mod`]);
+
                     const new_value = mod_array.reduce((a,b) => a+b, 0);
 
                     setAttrs({[attribute]:new_value});
@@ -367,6 +373,9 @@ const wfrpModule = ( () => {
             size: 0
         }
 
+        if (new_value === "") {
+            return;
+        }
         if (new_value === "human") {
             update["fate"] = 2;
             update["resilience"] = 1;
@@ -396,6 +405,12 @@ const wfrpModule = ( () => {
             update["resilience"] = 0;
             update["movement"] = 5;
             update["size"] = "average";
+        }
+        if (new_value === "gnome") {
+            update["fate"] = 2;
+            update["resilience"] = 0;
+            update["movement"] = 3;
+            update["size"] = "small";
         }
 
         if (new_value !== "custom") {
@@ -441,8 +456,10 @@ const wfrpModule = ( () => {
                     update[`species_talent_${talent_index}_advances`] = "0";
                     talent_index++;
                 }
+
+                update["advances_changed"] = 1;
     
-                setAttrs(update, {silent:true}, callback => calculateTalentAdvances());
+                setAttrs(update, {silent:true});
             });
 
         } else {
@@ -496,7 +513,7 @@ const wfrpModule = ( () => {
             const initial = parseInt(values[`${characteristic}_initial`]) || 0;
             const advances = parseInt(values[`${characteristic}_advances`]) || 0;
             const modifier = parseInt(values[`${characteristic}_modifier`]) || 0;
-            const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
+            // const custom_mod = parseInt(values[`${characteristic}_custom_mod`]) || 0;
             const bonusmod = parseInt(values[`${characteristic}_bonusmod`]) || 0;
 
             if (values["npc"] === "on") {
@@ -512,7 +529,7 @@ const wfrpModule = ( () => {
                 return;
             } else {
 
-                const current = initial + advances + modifier + custom_mod;
+                const current = initial + advances + modifier;
     
                 const bonus = Math.floor(current / 10) + bonusmod;
     
@@ -1166,7 +1183,7 @@ const wfrpModule = ( () => {
         });   
     }
 
-    const calculateSkillAdvances = (skill) => {
+    const calculateSkillAdvances = () => {
         getSectionIDs("careers", id_array => {
 
             getSectionIDs("noncareer-skills", id_array_2 => {
@@ -1345,7 +1362,7 @@ const wfrpModule = ( () => {
 
                                 const key_array = Object.keys(values).filter(item => item !== "");
 
-                                let page_name = key.split("(")[0].trim() || key;
+                                let page_name = key.trim() || key;
 
                                 if (value_array_test.includes(page_name.toLowerCase())) {
                                     const index = value_array_test.indexOf(page_name.toLowerCase());
@@ -1388,7 +1405,7 @@ const wfrpModule = ( () => {
     const calculateInitColumns = (source_attribute, new_value) => {
         const attrs = [];
         const source_type = (source_attribute.match(/talent/g)) ? "talent" :
-                            (source_attribute.match(/skill/g)) ? "skill" :
+                            (source_attribute.match(/career_skill/g)) ? "skill" :
                             false;
         const source_id = helperFunctions.extractRepeatingId(source_attribute, "careers");
         const is_init = source_attribute.match(/init/);
@@ -1409,6 +1426,7 @@ const wfrpModule = ( () => {
 
         getAttrs(attrs, values => {
             const spent = Object.values(values).filter(item => item !== "").map(item => parseInt(item));
+            if (spent.length === 0) return;
             const total = spent.reduce((a,b) => a+b) || 0;
             const maximum_allowed = (source_type === "skill") ? 40 : 1;
             
@@ -1420,6 +1438,14 @@ const wfrpModule = ( () => {
 
         });
 
+    }
+
+    const updateAdvances = () => {
+        wfrp.characteristics.forEach(characteristic => calculateCharacteristicAdvances(characteristic));
+        calculateSkillAdvances();
+        calculateTalentAdvances();
+
+        setAttrs({advances_changed:0});
     }
 
     // Trappings, Weapons & Armor Functions
@@ -1547,7 +1573,7 @@ const wfrpModule = ( () => {
                         armour_array.forEach(id => {
                             const worn = values[`repeating_armour_${id}_armour_worn`] || false;
                             const enc = parseInt(values[`repeating_armour_${id}_armour_enc`])
-                            const total = (worn === "on") ? enc - 1 : enc || 0
+                            const total = (enc > 0 && worn === "on") ? enc - 1 : enc || 0
 
                             total_enc += total;
                         });
@@ -1564,7 +1590,7 @@ const wfrpModule = ( () => {
                             const worn = values[`repeating_trappings_${id}_trappings_worn`] || false;
                             const inenc = values[`repeating_trappings_${id}_trappings_inenc`] || "0";
 
-                            const total = (worn === "on") ? (enc - 1) * amount : enc * amount;
+                            const total = (enc > 0 && worn === "on") ? (enc - 1) * amount : enc * amount;
 
                             if (inenc === "on") total_enc += total;
                         });
@@ -1844,6 +1870,11 @@ const wfrpModule = ( () => {
             "intuition",
             "perception",
             "cool",
+            "npc_dodge",
+            "npc_endurance",
+            "npc_intuition",
+            "npc_perception",
+            "npc_cool",
             ...wfrp.characteristics
         ];
 
@@ -1851,11 +1882,31 @@ const wfrpModule = ( () => {
             if (values[`NPC`] === "0") return;
             const update = {};
 
-            if (!values[`dodge`]) update[`dodge`] = values[`agility`];
-            if (!values[`endurance`]) update[`endurance`] = values[`toughness`];
-            if (!values[`intuition`]) update[`intuition`] = values[`initiative`];
-            if (!values[`perception`]) update[`perception`] = values[`initiative`];
-            if (!values[`cool`]) update[`cool`] = values[`willpower`];
+            const dodge = (values["dodge"]) ? values["dodge"] :
+                            (values["npc_dodge"]) ? values["npc_dodge"] : 
+                            values["agility"];
+
+            const endurance = (values["endurance"]) ? values["endurance"] :
+                            (values["npc_endurance"]) ? values["npc_endurance"] : 
+                            values["toughness"];
+
+            const intuition = (values["intuition"]) ? values["intuition"] :
+                            (values["npc_intuition"]) ? values["npc_intuition"] : 
+                            values["initiative"];
+
+            const perception = (values["perception"]) ? values["perception"] :
+                            (values["npc_perception"]) ? values["npc_perception"] : 
+                            values["initiative"];
+
+            const cool = (values["cool"]) ? values["cool"] :
+                            (values["npc_cool"]) ? values["npc_cool"] : 
+                            values["willpower"];
+
+            update[`npc_dodge`] = dodge;
+            update[`npc_endurance`] = endurance;
+            update[`npc_intuition`] = intuition;
+            update[`npc_perception`] = perception;
+            update[`npc_cool`] = cool;
 
             setAttrs(update);
 
@@ -1876,6 +1927,7 @@ const wfrpModule = ( () => {
         toggleRollCrits:toggleRollCrits,
         toggleInitOption:toggleInitOption,
         toggleWhisper:toggleWhisper,
+        recalculateAttribute:recalculateAttribute,
         parseModField:parseModField,
 
         // Class and Species Controls
@@ -1890,7 +1942,6 @@ const wfrpModule = ( () => {
         // Skill Functions
         calculateSkill: calculateSkill,
         calculateSpecialisation: calculateSpecialisation,
-        //updateRepeatingSkillBase: updateRepeatingSkillBase,
         recalculateRepeatingSkill: recalculateRepeatingSkill,
         cascadeSkillChanges:cascadeSkillChanges,
 
@@ -1899,18 +1950,19 @@ const wfrpModule = ( () => {
         updateCurrentCareer: updateCurrentCareer,
         updateCurrentCareerLevel: updateCurrentCareerLevel,
         updateCareerNames: updateCareerNames,
-        updateFirstCareer:updateFirstCareer,
+        updateFirstCareer: updateFirstCareer,
 
         // Experience Functions
-        calculateTotalAdvances:calculateTotalAdvances,
-        recalculateEarnedXP:recalculateEarnedXP,
-        recalculateCurrentXP:recalculateCurrentXP,
-        recalculateSpentXP:recalculateSpentXP,
         calculateCharacteristicAdvances:calculateCharacteristicAdvances,
         calculateSkillAdvances:calculateSkillAdvances,
         calculateTalentAdvances:calculateTalentAdvances,
+        calculateTotalAdvances:calculateTotalAdvances,
         calculateInitColumns:calculateInitColumns,
         consolidateXP:consolidateXP,
+        recalculateEarnedXP:recalculateEarnedXP,
+        recalculateCurrentXP:recalculateCurrentXP,
+        recalculateSpentXP:recalculateSpentXP,
+        updateAdvances: updateAdvances,
 
         // Trappings, Weapons & Armor Functions
         calculateArmour:calculateArmour,
@@ -1959,7 +2011,11 @@ on(`change:setting_whisper`, eventInfo => wfrpModule.toggleWhisper(eventInfo.new
     "repeating_weapon:weapon_mods",
     "repeating_armour:armour_mods",
 ].forEach(modifier => {
-    on(`change:${modifier}`, eventInfo => wfrpModule.parseModField(eventInfo.newValue, eventInfo.previousValue))
+    on(`change:${modifier}`, eventInfo => wfrpModule.parseModField(eventInfo.newValue, eventInfo.previousValue));
+});
+
+wfrpModule.wfrp.characteristics.forEach(characteristic => {
+    on(`change:${characteristic}_custom_mod`, eventInfo => wfrpModule.recalculateAttribute(`${characteristic}_modifier`, characteristic));
 });
 
 // CLASS AND SPECIES CONTROLS
@@ -2011,6 +2067,8 @@ wfrpModule.wfrp.repeating_skills.forEach(section => {
 
 // CAREERS CHANGES
 
+on(`clicked:update_advances`, eventInfo => wfrpModule.updateAdvances());
+
 on(`change:repeating_careers change:_reporder:careers`, eventInfo => {
     if (eventInfo.sourceType === "player" && !eventInfo.sourceAttribute.match(/reporder/g)) wfrpModule.calculateTotalAdvances(eventInfo.sourceAttribute);
     wfrpModule.updateCareerPath();
@@ -2043,35 +2101,33 @@ on(`change:current_xp change:spent_xp change:total_xp remove:repeating_experienc
 
 on(`change:repeating_experience change:repeating_experiencespent change:experience_mod remove:repeating_experiencespent remove:repeating_experience`, eventInfo => wfrpModule.recalculateSpentXP());
 
+const advance_triggers = []
+
 wfrpModule.wfrp.characteristics.forEach(characteristic => {
-    on(`change:repeating_careers:career_${characteristic}_advances change:repeating_careers:career_${characteristic}_init`, eventInfo => wfrpModule.calculateCharacteristicAdvances(characteristic))
+    advance_triggers.push(`change:repeating_careers:career_${characteristic}_advances change:repeating_careers:career_${characteristic}_init`)
 });
 
 [1,2,3,4].forEach(level => {
     [1,2,3,4,5].forEach(talent => {
-        on(`change:repeating_careers:career_talent_${level}_${talent}_name 
-            change:repeating_careers:career_talent_${level}_${talent}_init 
-            change:repeating_careers:career_talent_${level}_${talent}_advances`, 
-            eventInfo => wfrpModule.calculateTalentAdvances());
+        advance_triggers.push(`change:repeating_careers:career_talent_${level}_${talent}_name change:repeating_careers:career_talent_${level}_${talent}_init change:repeating_careers:career_talent_${level}_${talent}_advances`)
     });
 
     [1,2,3,4,5,6,7,8,9,10].forEach(skill => {
-        on(`change:repeating_careers:career_skill_${level}_${skill}_name 
-            change:repeating_careers:career_skill_${level}_${skill}_init 
-            change:repeating_careers:career_skill_${level}_${skill}_advances`, 
-            eventInfo => wfrpModule.calculateSkillAdvances());
+        advance_triggers.push(`change:repeating_careers:career_skill_${level}_${skill}_name change:repeating_careers:career_skill_${level}_${skill}_init change:repeating_careers:career_skill_${level}_${skill}_advances`);
     });
 });
 
 for (let index = 1; index <= 12; index++) {
-    on(`clicked:remove_skill_${index}`, eventInfo => setAttrs({[`species_skill_${index}_advances`]:"0"}));
+    advance_triggers.push(`clicked:remove_skill_${index}`);
 
-    on(`change:species_skill_${index}_advances`, eventInfo => wfrpModule.calculateSkillAdvances());
+    advance_triggers.push(`change:species_skill_${index}_advances`);
 } 
 
 for (let index = 1; index <= 10; index++) {
-    on(`change:species_talent_${index}_advances`, eventInfo => wfrpModule.calculateTalentAdvances())
+    advance_triggers.push(`change:species_talent_${index}_advances`);
 };
+
+on(advance_triggers.join(" "), eventInfo => setAttrs({advances_changed:"1"}));
 
 on(`clicked:combinexp`, eventInfo => wfrpModule.consolidateXP());
 
@@ -2089,7 +2145,7 @@ on(`change:repeating_careers`, eventInfo => wfrpModule.calculateInitColumns(even
 
 on(`change:repeating_armour remove:repeating_armour`, eventInfo => wfrpModule.calculateArmour());
 
-on(`change:repeating_trappings change:repeating_armour:armour_enc change:repeating_weapons:weapon_enc`, eventInfo => wfrpModule.calculateCurrentEncumbrance());
+on(`change:repeating_trappings change:repeating_armour:armour_enc change:repeating_armour:armour_worn change:repeating_weapons:weapon_enc`, eventInfo => wfrpModule.calculateCurrentEncumbrance());
 
 on(`change:repeating_weapons:weapon_damage_flat change:repeating_weapons:weapon_damage_bonus`, eventInfo => wfrpModule.updateWeaponDamage(eventInfo.sourceAttribute));
 
@@ -2121,11 +2177,9 @@ on(`change:repeating_attacks:attack_name change:repeating_attacks:attack_type`, 
 
 on(`change:weapon_skill change:ballistic_skill`, eventInfo => wfrpModule.cascadeNPCAttacks());
 
-wfrpModule.wfrp.characteristics.forEach(characteristic => {
+[...wfrpModule.wfrp.characteristics, "initiative", "dodge", "endurance", "intuition", "perception", "cool"].forEach(characteristic => {
     on(`change:${characteristic} change:${characteristic}_bonus`, eventInfo => wfrpModule.updateNPCButtons())
 });
 
 on(`change:npc sheet:opened`, eventInfo => wfrpModule.updateNPCButtons());
-
-//# sourceURL=sheetworkers.js
 

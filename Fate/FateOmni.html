@@ -1,5 +1,6 @@
 <input type="hidden" name="attr_theme" value="blue" class="theme">
 <div class="Wrapper">
+
 	<!-- input type="checkbox" name="attr_uninitialized" value="1" checked> (Testing Only) -->
 	<input type="checkbox" name="attr_uninitialized" value="1" class="triggerbox" checked>
 	<div>
@@ -33,9 +34,19 @@
 				<div data-i18n="custom-aspects-desc"></div>
 			</div>
 			<div>
-				<b><span data-i18n="custom-conditions"></span>:</b>
-				<input type="text" name="attr_custom-conditions" value="">
-				<div data-i18n="custom-conditions-desc"></div>
+				<b><span data-i18n="custom-skills"></span>:</b>
+				<input type="text" name="attr_custom-skills" value="">
+				<div data-i18n="custom-skills-desc"></div>
+			</div>
+			<div>
+				<b><span data-i18n="custom-combos-columns"></span>:</b>
+				<input type="text" name="attr_custom-combos" value="">
+				<div data-i18n="custom-combos-desc"></div>
+			</div>
+			<div>
+				<b><span data-i18n="custom-stress"></span>:</b>
+				<input type="text" name="attr_custom-stress" value="">
+				<div data-i18n="custom-stress-desc"></div>
 			</div>
 			<div>
 				<b><span data-i18n="custom-consequences"></span>:</b>
@@ -43,14 +54,9 @@
 				<div data-i18n="custom-consequences-desc"></div>
 			</div>
 			<div>
-				<b><span data-i18n="custom-skills"></span>:</b>
-				<input type="text" name="attr_custom-skills" value="">
-				<div data-i18n="custom-skills-desc"></div>
-			</div>
-			<div>
-				<b><span data-i18n="custom-stress"></span>:</b>
-				<input type="text" name="attr_custom-stress" value="">
-				<div data-i18n="custom-stress-desc"></div>
+				<b><span data-i18n="custom-conditions"></span>:</b>
+				<input type="text" name="attr_custom-conditions" value="">
+				<div data-i18n="custom-conditions-desc"></div>
 			</div>
 		</div>
 	</div>
@@ -58,14 +64,17 @@
 	<input type="checkbox" class="triggerbox" name="attr_SheetOptions" value="1">
 	<div class="optbar">
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Aspects" value="1" checked><span class="checker" data-i18n="aspects">Aspects</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-Combinable" value="1"><span class="checker" data-i18n="combine-skills">Combinable Skills</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Conditions" value="1" checked><span class="checker" data-i18n="conditions">Conditions</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Consequences" value="1" checked><span class="checker" data-i18n="consequences">Consequences</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Corruption" value="1"><span class="checker" data-i18n="corruption">Corruption</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-DeveloperMode" value="1"><span class="checker" data-i18n="developer-mode">Developer Mode</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Extras" value="1"><span class="checker" data-i18n="extras">Extras</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-FP" value="1" checked><span class="checker" data-i18n="fp">Fate Points</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Logo" value="1"><span class="checker" data-i18n="logo">Logo</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Modes" value="1"><span class="checker" data-i18n="modes">Modes</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Notes" value="1" checked><span class="checker" data-i18n="notes">Notes</span> </span>
+		<span><input type="checkbox" class="checkbox" name="attr_Show-Packages" value="1"><span class="checker" data-i18n="packages">Packages</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Powers" value="1"><span class="checker" data-i18n="powers">Powers</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Refresh" value="1" checked><span class="checker" data-i18n="refresh">Refresh</span> </span>
 		<span><input type="checkbox" class="checkbox" name="attr_Show-Roles" value="1"><span class="checker" data-i18n="roles">Roles</span> </span>
@@ -135,6 +144,20 @@
 			</div>
 		</div>
 	</div>
+
+	<input type="checkbox" class="triggerbox" name="attr_Show-DeveloperMode" value="1"><div class="StuntCell"><div class="SectionHeader"><span data-i18n="developer-mode"></span></div><div class="StuntDisplay">
+		Please proceed with caution. The stuff here messes with the sheet data directly and extensively.
+		<hr>
+		Click this button to export the entire sheet as a JSON object that can be imported to another sheet using the import area below.
+		<div><button type="action" name="act_exportsheet">Export</button></div>
+		<div><textarea name="attr_exportsheetdata" style="width: 90%"></textarea></div>
+		<hr>
+		Clicking this button will empty out all the dynamic elements of the sheet. It will leave some attributes untouched, but should blank out aspects, skills, stunts, stress, consequences, conditions, tempaspects, modes, roles, swaps, packages, powers, extras, and notes. 
+		<div><button type="action" name="act_clearsheet">Clear Sheet</button></div>
+		<hr>
+		Import: If you paste the JSON in this field and then move out of it, the sheet will notice and perform an import of the data. Please note, this will ADD to the existing content of this sheet rather than overwrite it where possible (causing duplicates in your skill list, potentially, etc). If you need it to REPLACE everything, please first click the "clear sheet" button above.
+		<div><textarea name="attr_importsheetdata" style="width: 90%"></textarea></div>
+	</div></div>
 
 	<div class="SheetFlex">
 		<div class="SheetCol">
@@ -243,22 +266,24 @@
 							<div class="fieldlabel" data-i18n="add-roles">Add Role</div>
 							<select name="attr_addrole">
 								<option value="" data-i18n="role-choose"></option>
-								<option value="brain" data-i18n="brain"></option>
-								<option value="brawler" data-i18n="brawler"></option>
-								<option value="cop" data-i18n="cop"></option>
-								<option value="detective" data-i18n="detective"></option>
-								<option value="dilettante" data-i18n="dilettante"></option>
-								<option value="face" data-i18n="face"></option>
-								<option value="hacker" data-i18n="hacker"></option>
-								<option value="inventor" data-i18n="inventor"></option>
-								<option value="leader" data-i18n="leader"></option>
-								<option value="ninja" data-i18n="ninja"></option>
-								<option value="saboteur" data-i18n="saboteur"></option>
-								<option value="soldier" data-i18n="soldier"></option>
-								<option value="spy" data-i18n="spy"></option>
-								<option value="thief" data-i18n="thief"></option>
-								<option value="warrior" data-i18n="warrior"></option>
-								<option value="wheels" data-i18n="wheels"></option>
+								<optgroup label="Shadow of the Century" data-i18n-label="shotc">
+									<option value="brain" data-i18n="brain"></option>
+									<option value="brawler" data-i18n="brawler"></option>
+									<option value="cop" data-i18n="cop"></option>
+									<option value="detective" data-i18n="detective"></option>
+									<option value="dilettante" data-i18n="dilettante"></option>
+									<option value="face" data-i18n="face"></option>
+									<option value="hacker" data-i18n="hacker"></option>
+									<option value="inventor" data-i18n="inventor"></option>
+									<option value="leader" data-i18n="leader"></option>
+									<option value="ninja" data-i18n="ninja"></option>
+									<option value="saboteur" data-i18n="saboteur"></option>
+									<option value="soldier" data-i18n="soldier"></option>
+									<option value="spy" data-i18n="spy"></option>
+									<option value="thief" data-i18n="thief"></option>
+									<option value="warrior" data-i18n="warrior"></option>
+									<option value="wheels" data-i18n="wheels"></option>
+								</optgroup>
 							</select>
 						</div>
 					</div>
@@ -311,6 +336,103 @@
 			</div>
 			<!-- / Swappable Skillsets -->
 
+			<!-- Combinable Skills -->
+			<input type="checkbox" class="triggerbox" name="attr_Show-Combinable" value="1">
+			<div class="SkillCell">
+				<div class="SectionHeader">
+					<span><span data-i18n="combine-skills">Combinable Skills</span> <span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditCombos" value="1" checked><span class="pencilbox"/></span></span>
+				</div>
+				<div class="SkillFrame">
+					<input type="checkbox" class="triggerbox" name="attr_EditCombos" value="1" checked>
+					<div class="SkillEdit">
+						<div class="EditTitleBar">
+							<span><span data-i18n="edit">Edit</span> <span data-i18n="combine-skills">Combinable Skills</span></span>
+							<span><input type="checkbox" class="checkbox" name="attr_EditCombos" value="1" checked><span class="pencilbox"/></span>
+						</div>
+						<div>
+						<span data-i18n="combine-skills-instruct"></span>
+						<fieldset class="repeating_skills">
+							<input type="hidden" name="attr_skill">
+							<div class="SkillEditRow" style="padding-bottom: 6px;">
+								<div class="nowrap">#<input type="number" value="1" min="0" max="3" name="attr_column" class="ultracompact"></div>
+								<div class="nowrap clipped" style="width: 100%;"><span name="attr_skill"></span></div>
+							</div>
+						</fieldset>
+						</div>
+						<div>
+						<input type="checkbox" class="checkbox" name="attr_combomulti" value="1"><span class="checkmark"></span> <span data-i18n="combine-skills-multi">Allow selection of multiple skills from the same column</span>
+						</div>
+						<div class="fieldlabel" data-i18n="column names optional">
+							Column Names (Optional)
+						</div>
+						<div>
+							#1&nbsp;<input type="text" name="attr_combocol1" value="">
+						</div>
+						<div>
+							#2&nbsp;<input type="text" name="attr_combocol2" value="">
+						</div>
+						<div>
+							#3&nbsp;<input type="text" name="attr_combocol3" value="">
+						</div>
+					</div> <!-- end edit frame -->
+					<div>
+						<div>
+							<input type="hidden" name="attr_combotally" value="0">
+							<input type="hidden" name="attr_combotext" value="" class="hideIfNull">
+							<div class="SkillDisplay">
+								<button type="roll" value="&{template:fateroll} {{theme=@{theme}}} {{name=@{character_name}: @{combotext}}} {{roll=[[4dF+@{combotally}+@{Show-Diceprompts}]]}}" name="roll_SkillRoll">
+									<b><span name="attr_combotext"></span></b>
+									=
+									<span name="attr_combotally"></span>
+								</button>
+							</div>
+						</div>
+						<div class="ComboColumns">
+							<input type="hidden" name="attr_combocol1" value="">
+							<input type="hidden" name="attr_combocol2" value="">
+							<input type="hidden" name="attr_combocol3" value="">
+							<div class="ComboColumn">
+								<div class="fieldlabel"><span name="attr_combocol1" class="label"></span></div>
+								<fieldset class="repeating_skills">
+									<input type="hidden" name="attr_skill">
+									<input type="hidden" name="attr_rating-word">
+									<input type="hidden" name="attr_column">
+									<div class="SkillColumnFirst">
+										<input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span>
+										<b><span name="attr_skill"></span></b>: <span name="attr_rating-word"></span>
+									</div>
+								</fieldset>
+							</div>
+							<div class="ComboColumn">
+								<div class="fieldlabel"><span name="attr_combocol2" class="label"></span></div>
+								<fieldset class="repeating_skills">
+									<input type="hidden" name="attr_skill">
+									<input type="hidden" name="attr_rating-word">
+									<input type="hidden" name="attr_column">
+									<div class="SkillColumnSecond">
+										<input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span>
+										<b><span name="attr_skill"></span></b>: <span name="attr_rating-word"></span>
+									</div>
+								</fieldset>
+							</div>
+							<div class="ComboColumn">
+								<div class="fieldlabel"><span name="attr_combocol3" class="label"></span></div>
+								<fieldset class="repeating_skills">
+									<input type="hidden" name="attr_skill">
+									<input type="hidden" name="attr_rating-word">
+									<input type="hidden" name="attr_column">
+									<div class="SkillColumnThird">
+										<input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span>
+										<b><span name="attr_skill"></span></b>: <span name="attr_rating-word"></span>
+									</div>
+								</fieldset>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- / Combinable Skills -->
+
 			<!-- Skills -->
 
 			<input type="checkbox" class="triggerbox" checked name="attr_Show-Skills" value="1">
@@ -330,6 +452,7 @@
 						<input type="checkbox" class="deeptrigger" name="attr_Show-Roles" value="1">
 						<fieldset class="repeating_skills">
 							<div class="SkillEditRow">
+								<input name="attr_column" type="hidden" value="1">
 								<input name="attr_skill" type="text" class="compact">
 								<input type="number" value="0" min="-4" max="10" name="attr_rating" class="ultracompact">
 								<input type="hidden" name="attr_bonus" value="0">
@@ -833,6 +956,75 @@
 				</div> <!-- /StuntFrame -->
 			</div> <!-- /StuntCell -->
 
+			<!-- Packages -->
+			<input type="checkbox" class="triggerbox" name="attr_Show-Packages" value="1">
+			<div class="RoleCell"> 
+				<div class="SectionHeader">
+					<span><span data-i18n="packages">Packages</span> <span class="boxcorner"><input type="checkbox" class="checkbox" name="attr_EditPackages" value="1" checked><span class="pencilbox"/></span></span>
+				</div>
+				<div class="StuntFrame">
+					<input type="checkbox" class="triggerbox" name="attr_EditPackages" value="1" checked>
+					<div class="SkillEdit">
+						<div class="EditTitleBar">
+							<span><span data-i18n="edit">Edit</span> <span data-i18n="packages">Packages</span></span>
+							<span><input type="checkbox" class="checkbox" name="attr_EditPackages" value="1" checked><span class="pencilbox"/></span>
+						</div>
+						<fieldset class="repeating_packages"><div class="AspectSeparator">
+							<div class="fieldlabel"><span data-i18n="package"></span></div>
+							<input type="text" name="attr_package" value="">
+							<div class="fieldlabel"><span data-i18n="aspects"></span></div>
+							<input type="text" name="attr_aspects" value="">
+							<div data-i18n="package-aspects-instruct">Enter a list of aspects from this package, separated by commas: Aspect, Aspect2, etc</div>
+							<div class="fieldlabel"><span data-i18n="skills"></span></div>
+							<input type="text" name="attr_skills" value="">
+							<div data-i18n="package-skills-instruct">Enter a list of skills and the points to allocate to each of them in this format: First:1, Second:2, etc. The named skills must already exist on your sheet, so make sure to establish those first.</div>
+							<div class="fieldlabel"><span data-i18n="stunts"></span></div>
+							<textarea name="attr_stunts"></textarea>
+							<div data-i18n="package-stunts-instruct">Enter a list of stunts, one per line, in the format: Stunt Name: Stunt Description.</div>
+						</div></fieldset>
+						<div class="fieldlabel" data-i18n="package-add-set">Add Package Sets</div>
+						<select name="attr_addpackage">
+							<option value="" data-i18n="package-choose"></option>
+							<option value="inmf" data-i18n-label="inmf">It's Not My Fault</option>
+							<option value="inmfif" data-i18n-label="inmfif">It's Not My Fault I'm Fantastic</option>
+						</select>
+					</div>
+					<div class="StuntDisplay">
+						<div style="padding: 6px;">
+							<span data-i18n="packages-instructions"></span>
+						</div>
+						<fieldset class="repeating_packages">
+							<input type="hidden" name="attr_package" value="">
+							<input type="hidden" name="attr_aspects" value="">
+							<input type="hidden" name="attr_skills" value="">
+							<input type="hidden" name="attr_stunts" value="">
+							<div class="AspectSeparator">
+								<div class="fieldlabel">
+									<span name="attr_package"></span>
+									<button type="action" name="act_add"><span data-i18n="package-add"></span></button>
+									<button type="action" name="act_subtract"><span data-i18n="package-subtract"></span></button>
+								</div>
+								<input type="hidden" name="attr_aspects" value="" class="hideIfNull">
+								<div>
+									<b><span data-i18n="aspects"></span></b>: <span name="attr_aspects"></span>
+								</div>
+								<input type="hidden" name="attr_skills" value="" class="hideIfNull">
+								<div>
+									<b><span data-i18n="skills"></span></b>: <span name="attr_skills"></span>
+								</div>
+								<input type="hidden" name="attr_aspects" value="" class="hideIfNull">
+								<div>
+									<b><span data-i18n="stunts"></span></b>: <span name="attr_stunts"></span>
+								</div>
+							</div>
+						</fieldset>
+					</div>
+
+				</div>
+			</div>
+			<!-- End Packages -->
+
+
 			<input type="checkbox" class="triggerbox" name="attr_Show-Powers" value="1">
 			<div class="PowerCell">
 				<div class="SectionHeader">
@@ -1069,7 +1261,7 @@
 					</div> <!-- /ExtraEdit -->
 					
 					<div class="ExtraDisplay">
-						<fieldset class="repeating_Extras">
+						<fieldset class="repeating_extras">
 							<input type="hidden" name="attr_element" class="element" value="">
 							<div class="title clear-all space-above" width="100%">
 								<span name="attr_name"></span>
@@ -1083,7 +1275,7 @@
 								<div class="indented"><span name="attr_text"></span></div>
 							</div>
 							<div class="aspect space-below clear-all">
-								<input type="hidden" class="hideUnlessNull" name="attr_label" value=""><div class="fieldlabel"><b><span data-i18n="aspects"></span></b></div>
+								<!-- input type="hidden" class="hideUnlessNull" name="attr_label" value=""><div class="fieldlabel"><b><span data-i18n="aspects"></span></b></div -->
 								<input type="hidden" class="hideIfNull" name="attr_label" value=""><div class="fieldlabel"><b><span name="attr_label"></span></b></div>
 								<div class="aspect indented">
 									<span name="attr_text" class="aspect"></span>
@@ -1231,7 +1423,7 @@
 								<div class="fieldlabel" data-i18n="category header optional">Category Header (optional)</div>
 								<input name="attr_category" type="text" value="">
 								<div class="fieldlabel" data-i18n="label">Label</div>
-								<input name="attr_label" type="text" value="Aspect">
+								<input name="attr_label" type="text" value="">
 								<div class="fieldlabel" data-i18n="aspect">Aspect</div>
 								<input name="attr_aspect" type="text">
 								<div class="fieldlabel" data-i18n="flags">Flags</div>
@@ -1242,7 +1434,7 @@
 								</div>
 								<div class="fieldlabel deeptriggered">
 									<span data-i18n="aspect-value">Aspect Value When Rolled</span>
-									<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> </select>
+									<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> <option>4</option> <option>5</option> <option>6</option> <option>7</option> <option>8</option> <option>9</option> <option>10</option> </select>
 								</div>
 								<div class="fieldlabel" data-i18n="notes">Notes</div>
 								<input name="attr_notes" type="text" style="width: 100%;">
@@ -1255,14 +1447,24 @@
 						<fieldset class="repeating_aspects">
 							<input type="hidden" name="attr_category" value="" class="hideIfNull"><div class="aspect-category"><span name="attr_category"></span></div>
 							<div class="aspect">
-								<div class="AspectLabelBar">
+								<input type="hidden" value="" name="attr_label" class="hideIfNull"><div class="AspectLabelBar">
 									<span class="label">
 										<span name="attr_label"></span>
-										<input type="hidden" value="" name="attr_flags" class="hideIfNull"><span>(<span name="attr_flags"></span>)</span>
 									</span>
+								</div>
+								<div>
+									<span class="deeptriggered"><input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span></span>
+									<span class="name"><span class="deeptriggered"><input type="checkbox" class="triggerbox" name="attr_rollthis" value="1"><span>+</span></span><span name="attr_aspect"></span><span class="deeptriggered"> (+<span name="attr_rollvalue"></span>)</span></span>
+									<input type="hidden" value="" name="attr_flags" class="hideIfNull"><span>(<span name="attr_flags"></span>)</span>
 									<span>
 										<input type="checkbox" class="checkbox" name="attr_options" value="1"><span class="optionsbox"></span>
 									</span>
+									<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: @{label} @{flags} ^{aspect}}} {{text=***@{aspect}*** @{notes}}}"></button>
+									<input type="hidden" name="attr_label" value="">
+									<input type="hidden" name="attr_flags" value="">
+									<input type="hidden" name="attr_aspect" value="">
+									<input type="hidden" name="attr_notes" value="">
+									<input type="hidden" name="attr_rollvalue" value="1">
 								</div>
 								<input type="checkbox" name="attr_options" class="triggerbox" value="1">
 								<div class="AspectOptionsBox">
@@ -1284,7 +1486,7 @@
 											</div>
 											<div class="fieldlabel deeptriggered">
 												<span data-i18n="aspect-value">Aspect Value When Rolled</span>
-												<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> </select>
+												<select name="attr_rollvalue" style="width: 20%"> <option value="" selected>1</option> <option>2</option> <option>3</option> <option>4</option> <option>5</option> <option>6</option> <option>7</option> <option>8</option> <option>9</option> <option>10</option> </select>
 											</div>
 											<div>
 												<div class="fieldlabel" data-i18n="notes">Notes</div>
@@ -1292,17 +1494,6 @@
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="name">
-									<span class="deeptriggered"><input type="checkbox" class="checkbox" name="attr_rollthis" value="1"><span class="checkmark"></span></span>
-									<span name="attr_aspect"></span>
-									<input type="hidden" name="attr_label" value="">
-									<input type="hidden" name="attr_flags" value="">
-									<input type="hidden" name="attr_aspect" value="">
-									<input type="hidden" name="attr_notes" value="">
-									<button type="roll" class="share" value="&{template:share} {{theme=@{theme}}} {{name=@{character_name}: @{label} @{flags} ^{aspect}}} {{text=***@{aspect}*** @{notes}}}"></button>
-									<input type="hidden" name="attr_rollvalue" value="1">
-									<span class="deeptriggered"><input type="checkbox" class="triggerbox" name="attr_rollthis" value="1"><span>(+<span name="attr_rollvalue"></span>)</span></span>
 								</div>
 								<div class="notes">
 									<span name="attr_notes"></span>
@@ -1665,7 +1856,7 @@
 								<div class="OptionsBox">
 									<div class="OptionsEdit">
 										<div class="OptionsTitleBar">
-											<span><span name="attr_label"></span> <span name="options">Options</span></span>
+											<span><span name="options">Options</span></span>
 											<span>
 												<input type="checkbox" class="checkbox" name="attr_options" value="1"><span class="optionsbox"></span>
 											</span>
@@ -1887,6 +2078,8 @@ var gamesets = {
 		consequences: [],
 		conditions: [],
 		skills: [],
+		combos: [[],[],[]],
+		combosnames: [],
 		settings: {}
 	},
 	ngen: {
@@ -2227,6 +2420,213 @@ var gamesets = {
 			"Show-Stress": 1,
 			"Show-Stunts": 1,
 			"Show-TempAspects": 1
+		}
+	}
+};
+
+var packages = {
+	"inmf": {
+		"inmf-alchemist": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmf-alchemist"),
+			"stunts": getTranslationByKey("inmf-alchemist-stunt")
+		},
+		"inmf-assassin": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-assassin"),
+			"stunts": getTranslationByKey("inmf-assassin-stunt")
+		},
+		"inmf-barbarian": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-barbarian"),
+			"stunts": getTranslationByKey("inmf-barbarian-stunt")
+		},
+		"inmf-burglar": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-burglar"),
+			"stunts": getTranslationByKey("inmf-burglar-stunt")
+		},
+		"inmf-conartist": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-conartist"),
+			"stunts": getTranslationByKey("inmf-conartist-stunt")
+		},
+		"inmf-cutpurse": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-cutpurse"),
+			"stunts": getTranslationByKey("inmf-cutpurse-stunt")
+		},
+		"inmf-diplomat": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-diplomat"),
+			"stunts": getTranslationByKey("inmf-diplomat-stunt")
+		},
+		"inmf-illusionist": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-illusionist"),
+			"stunts": getTranslationByKey("inmf-illusionist-stunt")
+		},
+		"inmf-merchant": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1",
+			"aspects": getTranslationByKey("inmf-merchant"),
+			"stunts": getTranslationByKey("inmf-merchant-stunt")
+		},
+		"inmf-performer": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-performer"),
+			"stunts": getTranslationByKey("inmf-performer-stunt")
+		},
+		"inmf-pirate": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-pirate"),
+			"stunts": getTranslationByKey("inmf-pirate-stunt")
+		},
+		"inmf-ranger": {
+			"skills": getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-ranger"),
+			"stunts": getTranslationByKey("inmf-ranger-stunt")
+		},
+		"inmf-scholar": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-scholar"),
+			"stunts": getTranslationByKey("inmf-scholar-stunt")
+		},
+		"inmf-sharpshooter": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-sharpshooter"),
+			"stunts": getTranslationByKey("inmf-sharpshooter-stunt")
+		},
+		"inmf-soldier": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-soldier"),
+			"stunts": getTranslationByKey("inmf-soldier-stunt")
+		},
+		"inmf-sorcerer": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmf-sorcerer"),
+			"stunts": getTranslationByKey("inmf-sorcerer-stunt")
+		},
+		"inmf-strategist": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmf-strategist"),
+			"stunts": getTranslationByKey("inmf-strategist-stunt")
+		},
+		"inmf-swashbuckler": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmf-swashbuckler"),
+			"stunts": getTranslationByKey("inmf-swashbuckler-stunt")
+		},
+		"inmf-warrior": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmf-warrior"),
+			"stunts": getTranslationByKey("inmf-warrior-stunt")
+		},
+		"inmf-wizard": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Flashy") + ":1",
+			"aspects": getTranslationByKey("inmf-wizard"),
+			"stunts": getTranslationByKey("inmf-wizard-stunt")
+		}
+	},
+	"inmfif": {
+		"inmfif-beastblooded": {
+			"skills": getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-beastblooded"),
+			"stunts": getTranslationByKey("inmfif-beastblooded-stunt")
+		},
+		"inmfif-centaur": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-centaur"),
+			"stunts": getTranslationByKey("inmfif-centaur-stunt")
+		},
+		"inmfif-clockwork": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmfif-clockwork"),
+			"stunts": getTranslationByKey("inmfif-clockwork-stunt")
+		},
+		"inmfif-demonspawn": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-demonspawn"),
+			"stunts": getTranslationByKey("inmfif-demonspawn-stunt")
+		},
+		"inmfif-doppelganger": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-doppelganger"),
+			"stunts": getTranslationByKey("inmfif-doppelganger-stunt")
+		},
+		"inmfif-dragonkin": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-dragonkin"),
+			"stunts": getTranslationByKey("inmfif-dragonkin-stunt")
+		},
+		"inmfif-dwarf": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-dwarf"),
+			"stunts": getTranslationByKey("inmfif-dwarf-stunt")
+		},
+		"inmfif-elemental": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1",
+			"aspects": getTranslationByKey("inmfif-elemental"),
+			"stunts": getTranslationByKey("inmfif-elemental-stunt")
+		},
+		"inmfif-elf": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-elf"),
+			"stunts": getTranslationByKey("inmfif-elf-stunt")
+		},
+		"inmfif-faerie": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-faerie"),
+			"stunts": getTranslationByKey("inmfif-faerie-stunt")
+		},
+		"inmfif-giant": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmfif-giant"),
+			"stunts": getTranslationByKey("inmfif-giant-stunt")
+		},
+		"inmfif-gnome": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-gnome"),
+			"stunts": getTranslationByKey("inmfif-gnome-stunt")
+		},
+		"inmfif-goblin": {
+			"skills": getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-goblin"),
+			"stunts": getTranslationByKey("inmfif-goblin-stunt")
+		},
+		"inmfif-halfling": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-halfling"),
+			"stunts": getTranslationByKey("inmfif-halfling-stunt")
+		},
+		"inmfif-merfolk": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-merfolk"),
+			"stunts": getTranslationByKey("inmfif-merfolk-stunt")
+		},
+		"inmfif-minotaur": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1",
+			"aspects": getTranslationByKey("inmfif-minotaur"),
+			"stunts": getTranslationByKey("inmfif-minotaur-stunt")
+		},
+		"inmfif-nephilim": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Quick") + ":1",
+			"aspects": getTranslationByKey("inmfif-nephilim"),
+			"stunts": getTranslationByKey("inmfif-nephilim-stunt")
+		},
+		"inmfif-orc": {
+			"skills": getTranslationByKey("Careful") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-orc"),
+			"stunts": getTranslationByKey("inmfif-orc-stunt")
+		},
+		"inmfif-vampire": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Forceful") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-vampire"),
+			"stunts": getTranslationByKey("inmfif-vampire-stunt")
+		},
+		"inmfif-zombie": {
+			"skills": getTranslationByKey("Clever") + ":1, " + getTranslationByKey("Flashy") + ":1, " + getTranslationByKey("Sneaky") + ":1",
+			"aspects": getTranslationByKey("inmfif-zombie"),
+			"stunts": getTranslationByKey("inmfif-zombie-stunt")
 		}
 	}
 };
@@ -2781,10 +3181,11 @@ var loadGame = function(key) {
 			if ( key === "custom" ) {
 				
 				getAttrs(
-					[ "custom-aspects", "custom-consequences", "custom-skills", "custom-stress", "custom-conditions" ],
+					[ "custom-aspects", "custom-consequences", "custom-skills", "custom-stress", "custom-conditions", "custom-combos" ],
 					function(c) {
 						var aspects = c["custom-aspects"].trim();
 						var skills = c["custom-skills"].trim();
+						var combos = c["custom-combos"].trim();
 						var consequences = c["custom-consequences"].trim();
 						var conditions = c["custom-conditions"].trim();
 						var stresses = c["custom-stress"].trim();
@@ -2794,6 +3195,41 @@ var loadGame = function(key) {
 						if ( skills !== "" ) { 
 							set.skills = skills.toString().split(/\s*,\s*/);
 							set.settings["SkillStyle"] = "list"; // So it'll display something at all
+						}
+						if ( combos !== "" ) { 
+							var tempsplit = [];
+							set.combos = combos.toString().split(/\s*;\s*/); // column groups are separated by semicolons
+							set.combosnames = ["","",""]; // ZOD
+							if ( typeof set.combos[0] !== "undefined" && set.combos[0] !== "" ) {
+								set.combos[0] = set.combos[0].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							if ( typeof set.combos[1] !== "undefined" && set.combos[1] !== "" ) {
+								set.combos[1] = set.combos[1].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							if ( typeof set.combos[2] !== "undefined" && set.combos[2] !== "" ) {
+								set.combos[2] = set.combos[2].toString().split(/\s*,\s*/); // split up the comma separated skills in the column, make it an array entry
+							}
+							tempsplit = set.combos[0][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[0] = tempsplit[0];
+								set.combos[0][0] = tempsplit[1];
+							}
+							tempsplit = set.combos[1][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[1] = tempsplit[0];
+								set.combos[1][0] = tempsplit[1];
+							}
+							tempsplit = set.combos[1][0].toString().split(/\s*:\s*/);
+							if(typeof tempsplit[1] !== "undefined" && tempsplit[1] !== "") {
+								log("got a column label: " + tempsplit[0]);
+								// Then we've got the column label in tempsplit[0] and the actual skill name in tempsplit[1]
+								set.combosnames[2] = tempsplit[0];
+								set.combos[2][0] = tempsplit[1];
+							}
 						}
 						if ( consequences !== "" ) { 
 							var cons = consequences.toString().split(/\s*,\s*/);
@@ -3040,6 +3476,192 @@ var addExtra = function(values) {
 	setAttrs(attrs);
 };
 
+var addPackages = function(values) {
+	var packagename = values.addpackage;
+	if ( typeof packages[packagename] !== "undefined" ) {
+		var packageset = packages[packagename];
+		log(packageset);
+		attrs = { "addpackage": "" };
+		for(var [pkgname,pkg] of Object.entries(packageset) ) {
+			var newid = generateActuallyUniqueRowID();
+			var packageid = "repeating_packages_" + newid + "_package";
+			var skillsid = "repeating_packages_" + newid + "_skills";
+			var aspectsid = "repeating_packages_" + newid + "_aspects";
+			var stuntsid = "repeating_packages_" + newid + "_stunts";
+			attrs[packageid] = getTranslationByKey(pkgname);
+			attrs[skillsid] = pkg.skills;
+			attrs[aspectsid] = pkg.aspects;
+			attrs[stuntsid] = pkg.stunts;
+		}
+		setAttrs(attrs);
+	} else {
+		log("package "+packagename+" not recognized");
+	}
+};
+
+on("clicked:repeating_packages:add", function(e) {
+	const rowprefix = (e.sourceAttribute).slice(0,-3); // Strips off the add
+	const skillsid = rowprefix + "skills";
+	const aspectsid = rowprefix + "aspects";
+	const stuntsid = rowprefix + "stunts";
+	getSectionIDs("skills", function(s) {
+		var fields = [skillsid,aspectsid,stuntsid];
+		for(var i=0; i < s.length; i++) {
+			fields[i*2+3] = "repeating_skills_" + s[i] + "_skill";
+			fields[i*2+4] = "repeating_skills_" + s[i] + "_rating";
+		}
+		getAttrs(fields, function(v) {
+			log(v);
+			var attrs = {};
+			var alist = v[aspectsid].toString().split(/\s*,\s*/);
+			var sklist = v[skillsid].toString().split(/\s*,\s*/);
+			var stlist = v[stuntsid].toString().split(/\s*\n\s*/);
+			log(alist);
+			for(var j=0; j < alist.length; j++ ) {
+				if ( typeof alist[j] !== "undefined" && alist[j] !== "" ) {
+					var newarowid = generateActuallyUniqueRowID();
+					var newaid = "repeating_aspects_" + newarowid + "_aspect";
+					attrs[newaid] = alist[j];
+				}
+			}
+			log(stlist);
+			for(var j=0; j < stlist.length; j++ ) {
+				if ( typeof stlist[j] !== "undefined" && stlist[j] !== "" ) {
+					var newstrowid = generateActuallyUniqueRowID();
+					var newstnameid = "repeating_stunts_" + newstrowid + "_name";
+					var newstdescid = "repeating_stunts_" + newstrowid + "_desc";
+					var stuntpart = stlist[j].toString().split(/\s*:\s*/);
+					attrs[newstnameid] = stuntpart[0];
+					attrs[newstdescid] = stuntpart[1];
+				}
+			}
+			log(sklist);
+			for(var j=0; j < sklist.length; j++ ) {
+				if ( typeof sklist[j] !== "undefined" && sklist[j] !== "" ) {
+					var skillpart = sklist[j].toString().split(/\s*:\s*/);
+					var skillname = skillpart[0];
+					var skillpoint = Number(skillpart[1]);
+					if ( skillpoint === Number.NaN ) {
+						continue; // No point in adding a non-numeric value; skip to next iteration in loop
+					}
+					// Now find the skill that matches the skill name
+					for(var i = 0; i < s.length; i++ ) {
+						var sid = "repeating_skills_" + s[i] + "_skill";
+						var rid = "repeating_skills_" + s[i] + "_rating";
+						// These values should already exist in v
+						var sname = v[sid];
+						var sval = Number(v[rid]);
+						if ( sval === Number.NaN ) { sval = 0; }
+						if ( sname === skillname ) {
+							// Then we have a match!
+							attrs[rid] = sval + skillpoint; // Make sure we're setting the skill's new value to its existing rating value plus the skill point allocation
+							v[rid] = attrs[rid]; // Make sure we're updating the current understanding of the skill's rating is in case we encounter another add to it later
+							break; // we can break out of this for loop as we've found our candidate skill
+						}
+					}
+				}
+			}
+			setAttrs(attrs);
+			log(attrs);
+		});
+	});
+});
+
+on("clicked:repeating_packages:subtract", function(e) { // this is to remove an already-added package; has some heavy lifting to do!
+
+	const rowprefix = (e.sourceAttribute).slice(0,-8); // Strips off the subtract
+	const skillsid = rowprefix + "skills";
+	const aspectsid = rowprefix + "aspects";
+	const stuntsid = rowprefix + "stunts";
+
+	getSectionIDs("skills", function(sk) { getSectionIDs("stunts", function(st) { getSectionIDs("aspects", function(asp) {
+		var fields = [skillsid,aspectsid,stuntsid];
+		var adder = fields.length;
+		for(var i=0; i < sk.length; i++) {
+			fields[i*2+adder] = "repeating_skills_" + sk[i] + "_skill";
+			fields[i*2+adder+1] = "repeating_skills_" + sk[i] + "_rating";
+		}
+		var adder = adder + sk.length*2;
+		for(var i=0; i < st.length; i++) {
+			fields[i*2+adder] = "repeating_stunts_" + st[i] + "_name";
+			fields[i*2+adder+1] = "repeating_stunts_" + st[i] + "_desc";
+		}
+		var adder = adder + st.length*2;
+		for(var i=0; i < asp.length; i++) {
+			fields[i*1+adder] = "repeating_aspects_" + asp[i] + "_aspect";
+		}
+		
+		getAttrs(fields, function(v) {
+			log(v);
+			var attrs = {};
+			var alist = v[aspectsid].toString().split(/\s*,\s*/);
+			var sklist = v[skillsid].toString().split(/\s*,\s*/);
+			var stlist = v[stuntsid].toString().split(/\s*\n\s*/);
+
+			log(alist);
+			for(var j=0; j < alist.length; j++ ) {
+				if ( typeof alist[j] !== "undefined" && alist[j] !== "" ) {
+					for(var i = 0; i < asp.length; i++ ) {
+						var arowid = "repeating_aspects_" + asp[i];
+						var aid = arowid + "_aspect";
+						if ( alist[j] === v[aid] ) {
+							removeRepeatingRow(arowid);
+							break; // Only need to do this to the first one encountered
+						}
+					}
+				}
+			}
+
+			log(stlist);
+			for(var j=0; j < stlist.length; j++ ) {
+				if ( typeof stlist[j] !== "undefined" && stlist[j] !== "" ) {
+					for(var i = 0; i < st.length; i++ ) {
+						var strowid = "repeating_stunts_" + st[i];
+						var stnid = strowid + "_name";
+						var stdid = strowid + "_desc";
+						var stuntpart = stlist[j].toString().split(/\s*:\s*/);
+						log(v); log(stuntpart);
+						if ( stuntpart[0] === v[stnid] && stuntpart[1] === v[stdid] ) {
+							removeRepeatingRow(strowid);
+							break; // Only need to do this to the first one encountered
+						}
+					}
+				}
+			}
+
+			log(sklist);
+			for(var j=0; j < sklist.length; j++ ) {
+				if ( typeof sklist[j] !== "undefined" && sklist[j] !== "" ) {
+					var skillpart = sklist[j].toString().split(/\s*:\s*/);
+					var skillname = skillpart[0];
+					var skillpoint = Number(skillpart[1]);
+					if ( skillpoint === Number.NaN ) {
+						continue; // No point in subtracting a non-numeric value; skip to next iteration in loop
+					}
+					// Now find the skill that matches the skill name
+					for(var i = 0; i < sk.length; i++ ) {
+						var sid = "repeating_skills_" + sk[i] + "_skill";
+						var rid = "repeating_skills_" + sk[i] + "_rating";
+						// These values should already exist in v
+						var sname = v[sid];
+						var sval = Number(v[rid]);
+						if ( sval === Number.NaN ) { sval = 0; }
+						if ( sname === skillname ) {
+							// Then we have a match!
+							attrs[rid] = sval - skillpoint; // Make sure we're setting the skill's new value to its existing rating value MINUS the skill point allocation
+							v[rid] = attrs[rid]; // Make sure we're updating the current understanding of the skill's rating is in case we encounter another subtract from it later
+							break; // we can break out of this for loop as we've found our candidate skill
+						}
+					}
+				}
+			}
+
+			setAttrs(attrs);
+			log(attrs);
+		});
+	}); }); });
+});
+
 var addRole = function(values) {
 	var rolename = values.addrole;
 	if ( typeof roles[rolename] !== "undefined" ) {
@@ -3098,6 +3720,14 @@ var addSkills = function(values) {
 	}
 	var attrs = { addskills: "" };
 	
+	if ( typeof values.combosnames === "object" ) {
+		// ZOD combocol1, 2, 3 
+		for(var i=0; i < values.combosnames.length; i++) {
+			var colnum = i+1;
+			attrs["combocol"+colnum] = values.combosnames[i];
+		}
+	}
+	
 	getSectionIDs("skills", function(currentskills) {
 
 		var skillFilter = {};
@@ -3130,6 +3760,20 @@ var addSkills = function(values) {
 						var skillid = "repeating_skills_" + newid + "_skill";
 						attrs[skillid] = skillname;
 						attrs["repeating_skills_" + newid + "_rating"] = 0;
+						attrs["repeating_skills_" + newid + "_column"] = 1; // ZOD ZOD ZOD ZOD ZOD ZOD ZOD ZOD
+						if ( typeof values.combos === "object" ) {
+							for(var x=0;x < values.combos.length;x++) {
+								var stopnow = false;
+								for(var y=0;y < values.combos[x].length;y++) {
+									if ( skillname === values.combos[x][y] ) {
+										attrs["repeating_skills_" + newid + "_column"] = x+1;
+										stopnow = true; break;
+									}
+								}
+								if (stopnow) { break; }
+							}
+						}
+
 						// loadSkills() does this work too, but this makes sure that it won't have weird gaps if the rating attribute is encountered before the skill
 						skillFilter[skillname] = true;
 						skillNameByID[skillid] = skillname;
@@ -3783,6 +4427,16 @@ on("change:addrole", function() {
 	});
 });
 
+on("change:addpackage", function() {
+	log("Event: addpackage change");
+	getAttrs(["addpackage"], function(values) {
+		if ( values.addpackage !== "" ) {
+			log("addpackage: non null package detected");
+			addPackages(values);
+		}
+	});
+});
+
 on("change:addmode", function() {
 	log("Event: addmode change");
 	getAttrs(["addmode"], function(values) {
@@ -3825,10 +4479,12 @@ on("change:addconsequence", function() {
 
 on("change:setgame sheet:opened", function() {
 	log("Event: setgame change");
-	getAttrs(["setgame","uninitialized"], function(values) {
+	getAttrs(["setgame","uninitialized","importsheetdata"], function(values) {
 		if ( values.setgame !== "" ) {
 			log("setgame: non null setgame detected");
-			if ( values.uninitialized == "1" ) {
+			if ( values.importsheetdata !== "" ) {
+				log("setgame: sheet has non-null importsheetdata, and as such shouldn't load any presets");
+			} else if ( values.uninitialized == "1" ) {  
 				log("setgame: sheet has not been initialized");
 				loadGame(values.setgame);
 			} else {
@@ -3880,6 +4536,65 @@ on("change:repeating_extras:rating", function(e) {
 		attrs[wordid] = word;
 		setAttrs(attrs);
 	}
+});
+
+on("change:repeating_skills:rollthis change:combomulti", function(e) {
+	log("rollthis or combomulti marked in repeating_skills - skill combo feature");
+	log(e);
+	getSectionIDs("skills", function(list) {
+		var fieldlist = ["combomulti"];
+		for(var i=0; i < list.length; i++) {
+			fieldlist[i*5+1] = "repeating_skills_" + list[i] + "_skill"; // Name of skill
+			fieldlist[i*5+2] = "repeating_skills_" + list[i] + "_rating"; // skill's base rating
+			fieldlist[i*5+3] = "repeating_skills_" + list[i] + "_bonus"; // skill's bonus from externals
+			fieldlist[i*5+4] = "repeating_skills_" + list[i] + "_rollthis"; // indicates if selected
+			fieldlist[i*5+5] = "repeating_skills_" + list[i] + "_column"; // indicates which column skill is in
+		}
+		getAttrs(fieldlist, function(v) {
+			var attrs = {};
+			attrs["combotally"] = 0;
+			attrs["combotext"] = "";
+			var colused = [false,false,false,false]; // The 0 position is n/a, but I don't care, convenient this way
+			var multi = v["combomulti"];
+			if ( e.sourceAttribute !== "combomulti" && multi !== "1" && e.newValue == "1" ) {  
+				log("we have a situation where the triggering attribute is not combomulti, and combomulti is disabled (meaning multiple selections from the same column are disallowed), and the triggering attribute was toggled on; therefore we must make sure only the triggering attribute is counted for that column");
+				var columnid = e.sourceAttribute.replace(/_rollthis$/,"_column");
+				var mycol = v[columnid];
+				for(var i=0; i < list.length; i++ ) {
+					var rtname = "repeating_skills_" + list[i] + "_rollthis";
+					var thiscolid = "repeating_skills_" + list[i] + "_column";
+					var thiscol = v[thiscolid];
+					if ( rtname !== e.sourceAttribute && v[rtname] == "1" && thiscol == mycol ) {
+						v[rtname] = "0"; // Overwrite the current value as loaded, so it's treated right in the coming for loop
+						attrs[rtname] = "0"; // Ensure the current value for this non-matching entity is set to 'don't roll it' 
+					}
+				}
+			}
+			for(var i=0; i < list.length; i++ ) {
+				var skill = v["repeating_skills_" + list[i] + "_skill"];
+				var rating = v["repeating_skills_" + list[i] + "_rating"];
+				var bonus = v["repeating_skills_" + list[i] + "_bonus"];
+				var include = v["repeating_skills_" + list[i] + "_rollthis"];
+				var column = v["repeating_skills_" + list[i] + "_column"];
+				if( include == "1" ) {
+					if ( multi !== "1" && colused[Number(column)] == true ) {
+						if ( e.sourceAttribute === "combomulti" && e.newValue === "0" ) {
+							log("combomulti attribute toggled off this time, need to clear up this extra entry in the column");
+							attrs["repeating_skills_" + list[i] + "_rollthis"] = "0";
+						}
+						continue; // Skip this iteration, as you've already got one element from the given column
+					}
+					colused[Number(column)] = true;
+					attrs["combotally"] = attrs["combotally"] + Number(bonus) + Number(rating);
+					if ( attrs["combotext"] !== "" ) {
+						attrs["combotext"] = attrs["combotext"] + " + ";
+					}
+					attrs["combotext"] = attrs["combotext"] + skill;
+				}
+			}
+			setAttrs(attrs);
+		});
+	});
 });
 
 on("change:repeating_aspects:rollthis", function(e) {
@@ -3995,6 +4710,411 @@ on("clicked:repeating_swaps:loadswap", function(e) {
 		});
 	});
 });
+
+// 
+// COMPENDIUM EXPORT/IMPORT SUPPORT AREA
+//
+
+// a bunch of skill-rowX-Y attributes exist, but those 
+// should be created as skill list gets populated and/or
+// sheet gets opened
+// 
+// Similarly there are a few action-triggering attributes
+// like "addskills", etc, which aren't a part of this as
+// their at-rest state is empty anyway.
+
+const attributes = [
+	"character_name", "uninitialized", "SheetOptions", "Show-Aspects", "Show-Combinable", "Show-Conditions", "Show-Consequences", "Show-Corruption", "Show-Diceprompts", "Show-Extras", "Show-FP", "Show-Logo", "Show-Modes", "Show-Notes", "Show-Packages", "Show-Powers", "Show-Refresh", "Show-Roles", "Show-RollableAspects", "Show-Skills", "Show-Skillswaps", "Show-Stress", "Show-Stunts", "Show-TempAspects", "EditAspects", "EditCombos", "EditConditions", "EditConsequences", "EditExtras", "EditModes", "EditNotes", "EditPackages", "EditPowers", "EditRoles", "EditSkills", "EditStress", "EditStunts", "EditSwaps", "EditTempAspects", "aspectlist", "combomulti", "combotally", "combotext", "combocol1", "combocol2", "combocol3", "corruption", "custom-aspects", "custom-combos", "custom-conditions", "custom-consequences", "custom-skills", "custom-stress", "focused", "fp", "lastswapped", "pronouns", "refresh", "rolllist", "rolltally", "setgame", "skillcount", "SkillStyle", "specialized", "stuntcount", "theme"
+];
+
+const fieldsets = {
+	aspects: [
+		"category","label","aspect","flags","invokes",
+		"rollvalue","notes","rollthis","options",
+		"check1","check2","check3","check4","check5",
+		"check6","check7","check8","check9","check10"
+	],
+	skills: [
+		"skill","rating","bonus","column","rating-word",
+		"rollthis"
+	],
+	stunts: [
+		"name","desc","skill","skillvalue","bonus","rollable"
+	],
+	stress: [
+		"label","track","notes","options",
+		"track1","track2","track3","track4","track5",
+		"track6","track7","track8","track9","track10",
+		"check1","check2","check3","check4","check5",
+		"check6","check7","check8","check9","check10"
+	],
+	consequences: [
+		"label","track","trackcheck","recovery","aspect"
+	],
+	conditions: [
+		"label","track","notes","options",
+		"track1","track2","track3","track4","track5",
+		"track6","track7","track8","track9","track10",
+		"check1","check2","check3","check4","check5",
+		"check6","check7","check8","check9","check10"
+	],
+	tempaspects: [
+		"aspect","invokes","notes","options",
+		"check1","check2","check3","check4","check5",
+		"check6","check7","check8","check9","check10"
+	],
+	modes: [
+		"mode","rating","word","skills"
+	],
+	roles: [
+		"role","skills"
+	],
+	swaps: [
+		"label","skills"
+	],
+	packages: [
+		"package","aspects","skills","stunts",
+	],
+	powers: [
+		"name","desc","breakdown","sfx","sfxmenu", 
+		"drawbacks","collateral","cost"
+	],
+	extras: [
+		"element","name","label","icon","icon2","icon3",
+		"skill","rating","word","rollable","bonus",
+		"skillvalue","text","track",
+		"track1","track2","track3","track4","track5",
+		"track6","track7","track8","track9","track10",
+		"check1","check2","check3","check4","check5",
+		"check6","check7","check8","check9","check10"
+	],
+	notes: [
+		"name","desc"
+	]
+};
+
+// Deadly button: click it, and all your fieldset data goes bye-bye.
+
+on("clicked:clearsheet", function(e) {
+	log("clear sheet clicked");
+	for(const [id,value] of Object.entries(fieldsets) ) {
+		log("working "+id);
+		getSectionIDs(id, function(clearme) {
+			log(clearme);
+			for(var i=0; i < clearme.length; i++) {
+				var rowid = "repeating_"+id+"_"+clearme[i];
+				removeRepeatingRow(rowid);
+			}
+		});
+	}
+});
+
+// This is the importer. Hopefully works clean!
+// ZOD
+
+on("change:importsheetdata sheet:opened", function() {
+	log("Event: importsheetdata change or sheet open");
+	getAttrs(["importsheetdata"], function(values) {
+		if ( values.importsheetdata !== "" ) { // Then it's gonna get processed.
+			log("importsheetdata: non null importablesheetdata detected");
+			var impsheet = JSON.parse(values.importsheetdata); // Hope this works!
+			var attrs = impsheet.attr; // this should get us the "flat attributes" that are just gonna get overwritten, as our starter object
+			var fsets = impsheet.fieldset; // An array of objects each representing a row in one of the many fieldsets this sheet uses
+			attrs["importsheetdata"] = ""; // Initialize the import field now that we've read it in.
+			for(var i=0; i < fsets.length; i++) {
+				var row = fsets[i]; // This is an object
+				var fs = row["_fieldset"]; // This is the name of the fieldset the row's content goes into
+				var newid = generateActuallyUniqueRowID(); // This gets us an actual unique row ID for the new entry
+				var rowprefix = "repeating_" + fs + "_" + newid + "_";
+				for(const [rowfield,rowcontent] of Object.entries(row) ) {
+					if ( rowfield !== "_fieldset" ) {
+						var rfname = rowprefix + rowfield;
+						attrs[rfname] = rowcontent;
+					}
+				}
+			}
+			log("Committing changes for importsheetdata")
+			setAttrs(attrs);
+			loadSkills("importsheetdata",{silent:false},function() { log("importsheetdata callback to loadSkills"); loadSkills("addSkills"); });
+		}
+	});
+});
+
+// all the fieldsets so far: 
+// aspects, skills, stunts, stress, consequences, conditions, tempaspects, modes, roles, swaps, packages, powers, extras, notes
+// ZOD
+
+on("clicked:exportsheet", function(e) {
+	var exsheet = { "attr": {}, "fieldset": [] };
+	var fields = [];
+	fields = fields.concat(attributes); // grab the list of flat non-fieldset attributes into the master fields list
+
+	getSectionIDs("aspects", function(aspectsList) {
+		var flist = fieldsets["aspects"];
+		var fnames = [];
+		for(var i=0; i < aspectsList.length; i++) {
+			for(var j=0; j < flist.length; j++) {
+				fnames[i*flist.length+j] = "repeating_aspects_" + aspectsList[i] + "_" + flist[j];
+			}
+		}
+		fields = fields.concat(fnames);
+		
+		getSectionIDs("skills", function(skillsList) {
+			var flist = fieldsets["skills"];
+			var fnames = [];
+			for(var i=0; i < skillsList.length; i++) {
+				for(var j=0; j < flist.length; j++) {
+					fnames[i*flist.length+j] = "repeating_skills_" + skillsList[i] + "_" + flist[j];
+				}
+			}
+			fields = fields.concat(fnames);
+
+			getSectionIDs("stunts", function(stuntsList) {
+				var flist = fieldsets["stunts"];
+				var fnames = [];
+				for(var i=0; i < stuntsList.length; i++) {
+					for(var j=0; j < flist.length; j++) {
+						fnames[i*flist.length+j] = "repeating_stunts_" + stuntsList[i] + "_" + flist[j];
+					}
+				}
+				fields = fields.concat(fnames);
+
+				getSectionIDs("stress", function(stressList) {
+					var flist = fieldsets["stress"];
+					var fnames = [];
+					for(var i=0; i < stressList.length; i++) {
+						for(var j=0; j < flist.length; j++) {
+							fnames[i*flist.length+j] = "repeating_stress_" + stressList[i] + "_" + flist[j];
+						}
+					}
+					fields = fields.concat(fnames);
+
+					getSectionIDs("consequences", function(consequencesList) {
+						var flist = fieldsets["consequences"];
+						var fnames = [];
+						for(var i=0; i < consequencesList.length; i++) {
+							for(var j=0; j < flist.length; j++) {
+								fnames[i*flist.length+j] = "repeating_consequences_" + consequencesList[i] + "_" + flist[j];
+							}
+						}
+						fields = fields.concat(fnames);
+
+						getSectionIDs("conditions", function(conditionsList) {
+							var flist = fieldsets["conditions"];
+							var fnames = [];
+							for(var i=0; i < conditionsList.length; i++) {
+								for(var j=0; j < flist.length; j++) {
+									fnames[i*flist.length+j] = "repeating_conditions_" + conditionsList[i] + "_" + flist[j];
+								}
+							}
+							fields = fields.concat(fnames);
+
+							getSectionIDs("tempaspects", function(tempaspectsList) {
+								var flist = fieldsets["tempaspects"];
+								var fnames = [];
+								for(var i=0; i < tempaspectsList.length; i++) {
+									for(var j=0; j < flist.length; j++) {
+										fnames[i*flist.length+j] = "repeating_tempaspects_" + tempaspectsList[i] + "_" + flist[j];
+									}
+								}
+								fields = fields.concat(fnames);
+
+								getSectionIDs("modes", function(modesList) {
+									var flist = fieldsets["modes"];
+									var fnames = [];
+									for(var i=0; i < modesList.length; i++) {
+										for(var j=0; j < flist.length; j++) {
+											fnames[i*flist.length+j] = "repeating_modes_" + modesList[i] + "_" + flist[j];
+										}
+									}
+									fields = fields.concat(fnames);
+
+									getSectionIDs("roles", function(rolesList) {
+										var flist = fieldsets["roles"];
+										var fnames = [];
+										for(var i=0; i < rolesList.length; i++) {
+											for(var j=0; j < flist.length; j++) {
+												fnames[i*flist.length+j] = "repeating_roles_" + rolesList[i] + "_" + flist[j];
+											}
+										}
+										fields = fields.concat(fnames);
+
+										getSectionIDs("swaps", function(swapsList) {
+											var flist = fieldsets["swaps"];
+											var fnames = [];
+											for(var i=0; i < swapsList.length; i++) {
+												for(var j=0; j < flist.length; j++) {
+													fnames[i*flist.length+j] = "repeating_swaps_" + swapsList[i] + "_" + flist[j];
+												}
+											}
+											fields = fields.concat(fnames);
+
+											getSectionIDs("packages", function(packagesList) {
+												var flist = fieldsets["packages"];
+												var fnames = [];
+												for(var i=0; i < packagesList.length; i++) {
+													for(var j=0; j < flist.length; j++) {
+														fnames[i*flist.length+j] = "repeating_packages_" + packagesList[i] + "_" + flist[j];
+													}
+												}
+												fields = fields.concat(fnames);
+
+												getSectionIDs("powers", function(powersList) {
+													var flist = fieldsets["powers"];
+													var fnames = [];
+													for(var i=0; i < powersList.length; i++) {
+														for(var j=0; j < flist.length; j++) {
+															fnames[i*flist.length+j] = "repeating_powers_" + powersList[i] + "_" + flist[j];
+														}
+													}
+													fields = fields.concat(fnames);
+
+													getSectionIDs("extras", function(extrasList) {
+														var flist = fieldsets["extras"];
+														var fnames = [];
+														for(var i=0; i < extrasList.length; i++) {
+															for(var j=0; j < flist.length; j++) {
+																fnames[i*flist.length+j] = "repeating_extras_" + extrasList[i] + "_" + flist[j];
+															}
+														}
+														fields = fields.concat(fnames);
+
+														getSectionIDs("notes", function(notesList) {
+															var flist = fieldsets["notes"];
+															var fnames = [];
+															for(var i=0; i < notesList.length; i++) {
+																for(var j=0; j < flist.length; j++) {
+																	fnames[i*flist.length+j] = "repeating_notes_" + notesList[i] + "_" + flist[j];
+																}
+															}
+															fields = fields.concat(fnames);
+
+															// We actually get ALL the data now
+															getAttrs(fields, function(v) {
+																log(v);
+																for(var i = 0; i < attributes.length; i++) {
+																	var fname = attributes[i];
+																	exsheet["attr"][fname] = v[fname];
+																}
+																for(var i=0; i < aspectsList.length; i++) {
+																	var thisrow = { "_fieldset": "aspects" };
+																	for(var j=0; j < fieldsets["aspects"].length; j++) {
+																		thisrow[fieldsets["aspects"][j]] = v["repeating_aspects_" + aspectsList[i] + "_" + fieldsets["aspects"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < skillsList.length; i++) {
+																	var thisrow = { "_fieldset": "skills" };
+																	for(var j=0; j < fieldsets["skills"].length; j++) {
+																		thisrow[fieldsets["skills"][j]] = v["repeating_skills_" + skillsList[i] + "_" + fieldsets["skills"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < stuntsList.length; i++) {
+																	var thisrow = { "_fieldset": "stunts" };
+																	for(var j=0; j < fieldsets["stunts"].length; j++) {
+																		thisrow[fieldsets["stunts"][j]] = v["repeating_stunts_" + stuntsList[i] + "_" + fieldsets["stunts"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < stressList.length; i++) {
+																	var thisrow = { "_fieldset": "stress" };
+																	for(var j=0; j < fieldsets["stress"].length; j++) {
+																		thisrow[fieldsets["stress"][j]] = v["repeating_stress_" + stressList[i] + "_" + fieldsets["stress"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < consequencesList.length; i++) {
+																	var thisrow = { "_fieldset": "consequences" };
+																	for(var j=0; j < fieldsets["consequences"].length; j++) {
+																		thisrow[fieldsets["consequences"][j]] = v["repeating_consequences_" + consequencesList[i] + "_" + fieldsets["consequences"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < conditionsList.length; i++) {
+																	var thisrow = { "_fieldset": "conditions" };
+																	for(var j=0; j < fieldsets["conditions"].length; j++) {
+																		thisrow[fieldsets["conditions"][j]] = v["repeating_conditions_" + conditionsList[i] + "_" + fieldsets["conditions"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < tempaspectsList.length; i++) {
+																	var thisrow = { "_fieldset": "tempaspects" };
+																	for(var j=0; j < fieldsets["tempaspects"].length; j++) {
+																		thisrow[fieldsets["tempaspects"][j]] = v["repeating_tempaspects_" + tempaspectsList[i] + "_" + fieldsets["tempaspects"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < modesList.length; i++) {
+																	var thisrow = { "_fieldset": "modes" };
+																	for(var j=0; j < fieldsets["modes"].length; j++) {
+																		thisrow[fieldsets["modes"][j]] = v["repeating_modes_" + modesList[i] + "_" + fieldsets["modes"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < rolesList.length; i++) {
+																	var thisrow = { "_fieldset": "roles" };
+																	for(var j=0; j < fieldsets["roles"].length; j++) {
+																		thisrow[fieldsets["roles"][j]] = v["repeating_roles_" + rolesList[i] + "_" + fieldsets["roles"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < swapsList.length; i++) {
+																	var thisrow = { "_fieldset": "swaps" };
+																	for(var j=0; j < fieldsets["swaps"].length; j++) {
+																		thisrow[fieldsets["swaps"][j]] = v["repeating_swaps_" + swapsList[i] + "_" + fieldsets["swaps"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < packagesList.length; i++) {
+																	var thisrow = { "_fieldset": "packages" };
+																	for(var j=0; j < fieldsets["packages"].length; j++) {
+																		thisrow[fieldsets["packages"][j]] = v["repeating_packages_" + packagesList[i] + "_" + fieldsets["packages"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < powersList.length; i++) {
+																	var thisrow = { "_fieldset": "powers" };
+																	for(var j=0; j < fieldsets["powers"].length; j++) {
+																		thisrow[fieldsets["powers"][j]] = v["repeating_powers_" + powersList[i] + "_" + fieldsets["powers"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < extrasList.length; i++) {
+																	var thisrow = { "_fieldset": "extras" };
+																	for(var j=0; j < fieldsets["extras"].length; j++) {
+																		thisrow[fieldsets["extras"][j]] = v["repeating_extras_" + extrasList[i] + "_" + fieldsets["extras"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																for(var i=0; i < notesList.length; i++) {
+																	var thisrow = { "_fieldset": "notes" };
+																	for(var j=0; j < fieldsets["notes"].length; j++) {
+																		thisrow[fieldsets["notes"][j]] = v["repeating_notes_" + notesList[i] + "_" + fieldsets["notes"][j]];
+																	}
+																	exsheet["fieldset"].push(thisrow);
+																}
+																
+																// And finally, we stringify the object and set the export field value
+																setAttrs({ "exportsheetdata": JSON.stringify(exsheet) });
+															});
+
+														}); // notes
+													}); // extras
+												}); // powers
+											}); // packages
+										}); // swaps
+									}); // roles
+								}); // modes
+							}); // tempaspects
+						}); // conditions
+					}); // consequences
+				}); // stress
+			}); // stunts
+		}); // skills
+	}); // aspects
+});
+
 
 </script>
 

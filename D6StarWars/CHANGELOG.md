@@ -1,3 +1,43 @@
+### Version 2.42 (2021-08):
+- **Attributes & Skills:**
+  - added names to roll buttons (so they can be dragged to macro bar or called in chat)
+  - skill name selection now have "(A)" on Advanced Skills
+- **Force:** "Burst of Speed" added to control powers, lightsaber combat name shorter
+- **Starship:**
+  - make main info block more compact
+  - weapons now have "location"-field, and the weapon's text-fields are more compact.
+  - "Other Ship Stats" is more compact
+- **Settings**
+  - added button/link to sheet instructions/Changelog
+  - clarify & cleanup settings options
+- updated "Instructions" on sheet.json 
+- minor visual fixes (Sheet-logo/title, wound level, init-bonus tracker, Background-section, footer)
+
+### Version 2.41 (2021-05):
+- fix broken styles
+
+### Version 2.40 (2021-05):
+- refactor sheet to be able to use the new Roll20 Sheet framework
+- Feature: Skills, Species, Force Powers auto-suggestions, suggest relevant names as you start typing
+- more code cleanup
+
+### Version 2.34 (2021-05):
+- Enhance Player Core info section's layout
+- Reformats Player Secondary Info section
+- Enhance Attributes & Skills section's layout
+- Enhance Weapons & Armors section's layout
+- Enhance Force section's layout
+- FIX: cleaning up HTML code
+- FIX: removes invalid CSS code
+- FIX: Resist Pain effect works as expected
+
+### Version 2.33 (2021-04-06):
+- remove duplicated control force power name field
+- fix force power section width
+
+### Version 2.32 (2021-02-09):
+- add missing lightsaber damage roll button
+
 ### Version 2.31 (2020-10-03):
 - removed broken logo at top
 - revamp of starship section

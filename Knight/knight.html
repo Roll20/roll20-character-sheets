@@ -1620,12 +1620,14 @@
 						break;
 						
 					case "berserk":
+						defenseM = defBM+bonusDefense+defenseODBonus;
+					
 						if(berserkRage == 1)
-							defenseM = 0-berserkN1;
+							defenseM -= berserkN1;
 						else if(berserkRage == 2)
-							defenseM = 0-berserkN2;
+							defenseM -= berserkN2;
 						else if(berserkRage == 3)
-							defenseM = 0-berserkN3;
+							defenseM -= berserkN3;
 						break;
 						
 					case "sorcerer":
@@ -1711,7 +1713,7 @@
 			var reactionM = 0;
 			var reactionT = 0;
 			var reactionMecha = 0;
-				
+
 			if(fichePNJ == 0)
 			{				
 				const armure = value["armure"];
@@ -1762,12 +1764,14 @@
 						break;
 						
 					case "berserk":
+						reactionM = rctBM+bonusReaction+reactionODBonus;
+					
 						if(berserkRage == 1)
-							reactionM = 0-berserkN1;
+							reactionM -= berserkN1;
 						else if(berserkRage == 2)
-							reactionM = 0-berserkN2;
+							reactionM -= berserkN2;
 						else if(berserkRage == 3)
-							reactionM = 0-berserkN3;
+							reactionM -= berserkN3;							
 						break;
 											
 					case "sorcerer":
@@ -4831,6 +4835,397 @@
 	});
 	//FIN MECHAARMURE
 	
+	on("clicked:importKNPCG",function()
+	{
+		getAttrs(["importKNPCG"], function(value)
+		{
+			const json = JSON.parse(value["importKNPCG"]);
+			const aspects = json.aspects;
+			const capacites = json.capacities;
+			const weapons = json.weapons;
+				
+			let type = json.type.charAt(0).toUpperCase()+json.type.substr(1);
+			let level = json.level.charAt(0).toUpperCase()+json.level.substr(1);
+			
+			let chair = {"score":0, "majeur":0, "mineur":0};
+			let bete = {"score":0, "majeur":0, "mineur":0};
+			let machine = {"score":0, "majeur":0, "mineur":0};
+			let dame = {"score":0, "majeur":0, "mineur":0};
+			let masque = {"score":0, "majeur":0, "mineur":0};
+			let lAspects = {"chair":chair, "bête":bete, "machine":machine, "dame":dame, "masque":masque};
+			
+			let health = json.health || 0;
+			let armor = json.armor || 0;
+			let energy = json.energy || 0;
+			let shield = json.shield || 0;
+			let forcefield = json.forcefield || 0;
+			let defense = json.defense || 0;
+			let reaction = json.reaction || 0;
+
+			let diceInitiative = 3;
+			let initiative = json.initiative || 1;
+			
+			let tabResilience = 0;
+			let resilience = json.resilience || 0;
+			
+			let debordement = json.outbreak || 0;
+			
+			let weakness = json.weakness || "";
+			
+			for (var key in aspects) {
+				let result = aspects[key];
+				lAspects[result.name].score = result.score;
+				
+				if(result.major == true)
+					lAspects[result.name].majeur = result.exceptional;
+				else
+					lAspects[result.name].mineur = result.exceptional;
+			}
+						
+			getSectionIDs("repeating_capacites", function(idarray) {
+				for(var i=0; i < idarray.length; i++) {
+				removeRepeatingRow("repeating_capacites_" + idarray[i]);
+				}
+			});
+			
+			for (var key in capacites) {
+				let result = capacites[key];
+				
+				var newrowid = generateRowID();
+				var newrowattrs = {};
+				newrowattrs["repeating_capacites_" + newrowid + "_nomCapacite"] = result.name;
+				newrowattrs["repeating_capacites_" + newrowid + "_descCapacite"] = result.description;
+				setAttrs(newrowattrs);
+			}
+			
+			getSectionIDs("repeating_armeCaC", function(idarray) {
+				for(var i=0; i < idarray.length; i++) {
+				removeRepeatingRow("repeating_armeCaC_" + idarray[i]);
+				}
+			});
+			
+			getSectionIDs("repeating_armedist", function(idarray) {
+				for(var i=0; i < idarray.length; i++) {
+				removeRepeatingRow("repeating_armedist_" + idarray[i]);
+				}
+			});
+			
+			let otherWPNEffects = [];
+			
+			for (var key in weapons) {
+				let result = weapons[key];
+				let contact = result.contact;
+				let range = result.range;
+				let path = "";
+				let otherEffects = [];
+								
+				const effects = result.effects;
+				
+				var newrowid = generateRowID();
+				var newrowattrs = {};
+				
+				if(contact == true)
+				{
+					path = "repeating_armeCaC_";
+					
+					let raw = result.raw-lAspects.bête.mineur-lAspects.bête.majeur;
+					
+					if(raw < 0)
+						raw = 0;
+					
+					newrowattrs[path + newrowid + "_ArmeCaC"] = result.name;
+					newrowattrs[path + newrowid + "_armeCaCDegat"] = result.dices;
+					newrowattrs[path + newrowid + "_armeCaCBDegat"] = raw;
+					newrowattrs[path + newrowid + "_armeCaCViolence"] = result.violenceDices;
+					newrowattrs[path + newrowid + "_armeCaCBDegat"] = raw;
+					newrowattrs[path + newrowid + "_armeCaCBViolence"] = result.violenceRaw
+					newrowattrs[path + newrowid + "_armeCaCPortee"] = "^{portee-"+range+"}";
+				}
+				else
+				{
+					path = "repeating_armedist_";
+				
+					newrowattrs[path + newrowid + "_ArmeDist"] = result.name;
+					newrowattrs[path + newrowid + "_armeDistDegat"] = result.dices;
+					newrowattrs[path + newrowid + "_armeDistViolence"] = result.violenceDices;
+					newrowattrs[path + newrowid + "_armeDistBDegat"] = result.raw;
+					newrowattrs[path + newrowid + "_armeDistBViolence"] = result.violenceRaw
+					newrowattrs[path + newrowid + "_armeDistPortee"] = "^{portee-"+range+"}";
+				}
+				
+				for (var cle in effects) {
+					let eff = effects[cle].name.split(" ");
+					let length = eff.length;
+					
+					if(length > 1)
+						length = length-1;
+					else
+						length = 1;
+						
+					let name = effects[cle].name.split(" ", length).join(" ").toLowerCase();
+					let value = eff[length] || 0;
+					
+					switch(name){
+						case "anathème":
+							newrowattrs[path + newrowid + "_anatheme"] = "{{anatheme=Anathème}}";
+						break;
+						
+						case "anti-anathème":
+							newrowattrs[path + newrowid + "_antiAnatheme"] = "{{antiAnathème=Anti Anathème}}";
+						break;
+						
+						case "anti-véhicule":
+							newrowattrs[path + newrowid + "_antiVehicule"] = "{{antiVehicule=Anti Véhicule}} ";
+						break;
+						
+						case "anti-véhicule":
+							newrowattrs[path + newrowid + "_artillerie"] = "{{artillerie=Artillerie}}";
+						break;
+						
+						case "assassin":
+							newrowattrs[path + newrowid + "_assassin"] = "{{assassin=[[@{assassinValue}d6]]}} ";
+							newrowattrs[path + newrowid + "_assassinValue"] = Number(value);
+						break;
+						
+						case "assistance à l'attaque":
+							newrowattrs[path + newrowid + "_assistanceAttaque"] = "{{assistanceAttaque=Assistance à l'attaque}}";
+						break;
+						
+						case "barrage":
+							newrowattrs[path + newrowid + "_barrage"] = "{{barrage=^{barrage} @{barrageValue}}} ";
+							newrowattrs[path + newrowid + "_barrageValue"] = Number(value);
+						break;
+						
+						case "cadence":
+							newrowattrs[path + newrowid + "_cadence"] = "[[?{Plusieurs cibles ?|Oui, 3.5|Non, 0.5}]]";
+							newrowattrs[path + newrowid + "_cadenceValue"] = Number(value);
+						break;
+						
+						case "chargeur":
+							newrowattrs[path + newrowid + "_chargeur"] = "{{chargeur=^{chargeur} @{chargeurValue}}} ";
+							newrowattrs[path + newrowid + "_chargeurValue"] = Number(value);
+						break;
+						
+						case "choc":
+							newrowattrs[path + newrowid + "_choc"] = "{{choc=^{choc} @{chocValue}}}";
+							newrowattrs[path + newrowid + "_chocValue"] = Number(value);
+						break;
+						
+						case "défense":
+							newrowattrs[path + newrowid + "_defense"] = "{{defense=^{defense} @{defenseValue}}}";
+							newrowattrs[path + newrowid + "_defenseValue"] = Number(value);
+						break;
+						
+						case "dégâts continus":
+							newrowattrs[path + newrowid + "_degatContinue"] = "{{degatContinus=^{degats-continus} @{degatContinueValue} ([[1D6]] ^{tours})}}";
+							newrowattrs[path + newrowid + "_degatContinueValue"] = Number(value);
+						break;
+						
+						case "deux mains":
+							newrowattrs[path + newrowid + "_deuxMains"] = "{{deuxMains=Deux Mains}}";
+						break;
+						
+						case "démoralisant":
+							newrowattrs[path + newrowid + "_demoralisant"] = "{{demoralisant=Démoralisant}}";
+						break;
+						
+						case "désignation":
+							newrowattrs[path + newrowid + "_designation"] = "{{designation=Désignation}}";
+						break;
+						
+						case "destructeur":
+							newrowattrs[path + newrowid + "_destructeur"] = "{{destructeur=[[2D6]]}}";
+						break;
+						
+						case "dispersion":
+							newrowattrs[path + newrowid + "_dispersion"] = "{{dispersion=^{dispersion} @{dispersionValue}}} ";
+							newrowattrs[path + newrowid + "_dispersionValue"] = Number(value);
+						break;
+						
+						case "en chaîne":
+							newrowattrs[path + newrowid + "_enChaine"] = "{{enChaine=En Chaîne}}";
+						break;
+						
+						case "espérance":
+							newrowattrs[path + newrowid + "_esperance"] = "{{esperance=Espérance}}";
+						break;
+						
+						case "fureur":
+							newrowattrs[path + newrowid + "_fureur"] = "{{fureur=[[4D6]]}}";
+						break;
+						
+						case "ignore armure":
+							newrowattrs[path + newrowid + "_ignoreArmure"] = "{{ignoreArmure=Ignore Armure}}";
+						break;
+						
+						case "ignore champ de force":
+							newrowattrs[path + newrowid + "_ignoreCdF"] = "{{ignoreCdF=Ignore Champs de Force}}";
+						break;
+						
+						case "jumelé (akimbo)":
+							newrowattrs[path + newrowid + "_akimbo"] = "2";
+						break;
+						
+						case "jumelé (ambidextrie)":
+							newrowattrs[path + newrowid + "_ambidextrie"] = "2";
+						break;
+						
+						case "lesté":
+							newrowattrs[path + newrowid + "_lestePNJ"] = "{{leste=[[@{Chair}]]}}";
+						break;
+						
+						case "lourd":
+							newrowattrs[path + newrowid + "_lourd"] = "1";
+						break;
+						
+						case "lumière":
+							newrowattrs[path + newrowid + "_lumiere"] = "{{lumiere=^{lumiere} @{lumiereValue}}}";
+							newrowattrs[path + newrowid + "_lumiereValue"] = Number(value);
+						break;
+						
+						case "meurtrier":
+							newrowattrs[path + newrowid + "_meurtrier"] = "{{meurtrier=[[2D6]]}}";
+						break;
+						
+						case "oblitération":
+							newrowattrs[path + newrowid + "_obliteration"] = "{{obliteration=Oblitération}}";
+						break;
+						
+						case "orfèvrerie":
+							newrowattrs[path + newrowid + "_orfevreriePNJ"] = "{{orfevrerie=[[ceil(@{masque}/2)]]}}";
+						break;
+						
+						case "parasitage":
+							newrowattrs[path + newrowid + "_parasitage"] = "{{parasitage=^{parasitage} @{parasitageValue}}}";
+							newrowattrs[path + newrowid + "_parasitageValue"] = Number(value);
+						break;
+						
+						case "pénétrant":
+							newrowattrs[path + newrowid + "_penetrant"] = "{{penetrant=^{penetrant} @{penetrantValue}}}";
+							newrowattrs[path + newrowid + "_penetrantValue"] = Number(value);
+						break;
+						
+						case "perce Armure":
+							newrowattrs[path + newrowid + "_perceArmure"] = "{{perceArmure=^{perce-armure} @{perceArmureValue}}}";
+							newrowattrs[path + newrowid + "_perceArmureValue"] = Number(value);
+						break;
+						
+						case "précision":
+							newrowattrs[path + newrowid + "_precisionPNJ"] = "{{precision=[[(ceil((@{machine})/2))]]}}";
+						break;
+						
+						case "réaction":
+							newrowattrs[path + newrowid + "_reaction"] = "{{reaction=^{reaction} @{reactionValue}}}";
+							newrowattrs[path + newrowid + "_reactionValue"] = Number(value);
+						break;
+						
+						case "silencieux":
+							newrowattrs[path + newrowid + "_silencieux"] = "{{silencieux=Silencieux}}";
+						break;
+						
+						case "soumission":
+							newrowattrs[path + newrowid + "_soumission"] = "{{soumission=Soumission}}";
+						break;
+						
+						case "ténébricide":
+							newrowattrs[path + newrowid + "_tenebricite"] = "{{tenebricide=Ténébricide}}";
+						break;
+						
+						case "tir en rafale":
+							newrowattrs[path + newrowid + "_tirRafale"] = "{{tirRafale=Tir en Rafale}}";
+						break;
+						
+						case "tir en sécurité":
+							newrowattrs[path + newrowid + "_tirSecurite"] = "3";
+						break;
+						
+						case "ultraviolence":
+							newrowattrs[path + newrowid + "_ultraViolence"] = "{{ultraviolence=[[2D6]]}}";
+						break;
+						
+						default:
+							otherEffects.push(effects[cle].name);
+						break;
+					}
+				}
+				
+				if(otherEffects.length > 0)
+				{					
+					otherWPNEffects.push(result.name+" : "+otherEffects.join(", "));
+				}
+				
+				setAttrs(newrowattrs);
+			}
+
+			if(json.resilience > 0)
+				tabResilience = 1;
+	
+			if(type == "Bande")
+			{
+				setAttrs({
+					fichePNJ:3
+				});
+				
+				diceInitiative = 0;
+			}
+
+			defense = defense-lAspects.masque.majeur-lAspects.masque.mineur;
+			reaction = reaction-lAspects.machine.majeur-lAspects.machine.mineur;
+
+			setAttrs({
+				character_name:json.name,
+				typePNJ:type+" ("+level+")",
+				
+				chair:lAspects["chair"].score,
+				chairPNJAE:lAspects["chair"].mineur,
+				chairPNJAEMaj:lAspects["chair"].majeur,
+				bete:lAspects["bête"].score,
+				betePNJAE:lAspects["bête"].mineur,
+				betePNJAEMaj:lAspects["bête"].majeur,
+				machine:lAspects["machine"].score,
+				machinePNJAE:lAspects["machine"].mineur,
+				machinePNJAEMaj:lAspects["machine"].majeur,
+				dame:lAspects["dame"].score,
+				damePNJAE:lAspects["dame"].mineur,
+				damePNJAEMaj:lAspects["dame"].majeur,
+				masque:lAspects["masque"].score,
+				masquePNJAE:lAspects["masque"].mineur,
+				masquePNJAEMaj:lAspects["masque"].majeur,
+				
+				santePNJ:health,
+				santePNJ_max:health,
+				
+				armurePNJ:armor,
+				armurePNJ_max:armor,
+				
+				energiePNJ:energy,
+				energiePNJ_max:energy,
+				
+				bouclierPNJ:shield,
+				bouclierPNJ_max:shield,
+				
+				cdfPNJ:forcefield,
+				cdfPNJ_max:forcefield,
+				
+				defensePNJ:defense,
+				reactionPNJ:reaction,
+				
+				diceInitiative:diceInitiative,
+				bonusInitiativeP:initiative,
+				
+				ptsFaibles:weakness,
+				
+				pnjCapaciteNotes:otherWPNEffects.join("\r\n"),
+				
+				tabResilience:tabResilience,
+				resilience:resilience,
+				resilience_max:resilience,
+				
+				bandeDebordement:debordement
+			});
+		});
+	});
+	
 	on("sheet:opened",function()
 	{
 		getAttrs(["version"], function(v)
@@ -6202,13 +6597,13 @@
 			MANDronesAirainDuree: getTranslationByKey("sans-limite"),
 			MANDronesAirainPortee: getTranslationByKey("portee-longue"),
 			MAAMIPortee: getTranslationByKey("portee-courte"),
-			MAACMEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("parasitage")+" 2 / "+getTranslationByKey("degats-continus")+" 10 ([[1D6]] "+getTranslationByKey("tours")+") / "+getTranslationByKey("brise-resilience"),
+			MAACMEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("parasitage")+" 2 / "+getTranslationByKey("degats-continus")+" 10 ([[1D6]] "+getTranslationByKey("tours")+") / "+getTranslationByKey("briser-resilience"),
 			MAACanonMetatronEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("parasitage")+" 2 / "+getTranslationByKey("degats-continus")+" 10 / "+getTranslationByKey("briser-resilience"),
 			MAACanonMetatronPortee: getTranslationByKey("portee-moyenne"),
-			MANCMEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("dispersion")+" 12 / "+getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("brise-resilience"),
+			MANCMEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("dispersion")+" 12 / "+getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("briser-resilience"),
 			MANCanonMagmaEffets: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("dispersion")+" 12 / "+getTranslationByKey("anti-anatheme")+" / "+getTranslationByKey("briser-resilience"),
 			MANCanonMagmaPortee: getTranslationByKey("portee-moyenne"),
-			MADLCGEffetsListe: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("penetrant")+" 10 / "+getTranslationByKey("ignore-cdf"),
+			MADLCGEffetsListe: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("penetrant")+" 10 / "+getTranslationByKey("ignore-champ-de-force"),
 			MADLCGEffets: getTranslationByKey("lames-cinetiques-geantes-effets"),
 			MAACanonNoePortée: getTranslationByKey("portee-longue"),
 			MANMSEffetsListe: getTranslationByKey("anti-vehicule")+" / "+getTranslationByKey("demoralisant"),
@@ -6554,6 +6949,14 @@
 							<input type="checkbox" name="attr_tabMechaArmure" value="1">
 							<span data-i18n="acces-mecha-armures">Accès aux mécha-armures.</span> 
 						</label>
+					</div>
+					<div class="fichePNJ ficheCreature ficheBande">
+						<label class="plainText">
+							<span>Import depuis Knight NPC Generator</span>
+							<span>http://kng.magusgeek.com/</span>
+							<textarea name="attr_importKNPCG"></textarea>
+						</label>
+						<button type="action" name="act_importKNPCG">Import</button>
 					</div>
 				</div>
 			</div>
@@ -7958,12 +8361,7 @@
 					</div>
 				</div>
 			
-				<div class="monk styleCombat">
-					<input type="hidden" name="attr_atkCompBM" readonly />
-					<input type="hidden" name="attr_dgtCompBM" readonly />
-					<input type="hidden" name="attr_rctCompBM" readonly />
-					<input type="hidden" name="attr_defCompBM" readonly />
-					
+				<div class="monk styleCombat">					
 					<h1 data-i18n="style-de-combat">Style de Combat</h1>
 					<div>
 						<select name="attr_styleCombat">
@@ -8033,76 +8431,76 @@
 				</div>
 			</div>
 		
-			<div class="fichePNJ">
+			<div class="fichePNJ ficheCreature ficheBande">
 				<div class="aspectsExceptionnels">
-					<input type="hidden" name="attr_ChairPNJAE" value="0" />
-					<input type="hidden" name="attr_ChairPNJAEMaj" value="0" />
-					<input type="hidden" name="attr_BetePNJAE" value="0" />
-					<input type="hidden" name="attr_BetePNJAEMaj" value="0" />
-					<input type="hidden" name="attr_MachinePNJAE" value="0" />
-					<input type="hidden" name="attr_MachinePNJAEMaj" value="0" />
-					<input type="hidden" name="attr_DamePNJAE" value="0" />
-					<input type="hidden" name="attr_DamePNJAEMaj" value="0" />
-					<input type="hidden" name="attr_MasquePNJAE" value="0" />
-					<input type="hidden" name="attr_MasquePNJAEMaj" value="0" />
+					<input type="hidden" name="attr_ChairPNJAE" value="0" class="chairPNJAE" />
+					<input type="hidden" name="attr_ChairPNJAEMaj" value="0" class="chairPNJAE chairPNJAEMaj" />
+					<input type="hidden" name="attr_BetePNJAE" value="0" class="betePNJAE" />
+					<input type="hidden" name="attr_BetePNJAEMaj" value="0" class="betePNJAE betePNJAEMaj" />
+					<input type="hidden" name="attr_MachinePNJAE" value="0" class="machinePNJAE" />
+					<input type="hidden" name="attr_MachinePNJAEMaj" value="0" class="machinePNJAE machinePNJAEMaj" />
+					<input type="hidden" name="attr_DamePNJAE" value="0" class="damePNJAE" />
+					<input type="hidden" name="attr_DamePNJAEMaj" value="0" class="damePNJAE damePNJAEMaj" />
+					<input type="hidden" name="attr_MasquePNJAE" value="0" class="masquePNJAE" />
+					<input type="hidden" name="attr_MasquePNJAEMaj" value="0" class="masquePNJAE masquePNJAEMaj" />
 					
-					<div>
+					<div class="chairPNJAE">
 						<h1 data-i18n="chair">Chair</h1>
-						<div>
+						<div class="chairPNJAE">
 							<span data-i18n="mineur">Mineur</span>
 							<span data-i18n="aspect-exceptionnel-chair-mineur">
 								Le PNJ soustrait toujours son score de l’aspect exceptionnel Chair aux dégâts qu’il reçoit.
 							</span>
 						</div>
-						<div>
+						<div class="chairPNJAEMaj">
 							<span data-i18n="majeur">Majeur</span>
 							<span data-i18n="aspect-exceptionnel-chair-majeur">Le PNJ ignore purement les effets barrage X, choc X et meurtrier des armes.</span>
 						</div>
 					</div>
 					
-					<div>
+					<div class="betePNJAE">
 						<h1 data-i18n="bete">Bête</h1>
-						<div>
+						<div class="betePNJAE">
 							<span data-i18n="mineur">Mineur</span>
 							<span data-i18n="aspect-exceptionnel-bete-mineur">(Déjà inclus) Le PNJ ajoute à ses dégâts au contact son score de l’aspect exceptionnel Bête.</span>
 						</div>
-						<div>
+						<div class="betePNJAEMaj">
 							<span data-i18n="majeur">Majeur</span>
 							<span data-i18n="aspect-exceptionnel-bete-majeur">(Déjà inclus)  Le PNJ ajoute à ses dégâts au contact son score de l’aspect Bête (en plus du score de l’aspect exceptionnel).</span>
 						</div>
 					</div>
 					
-					<div>
+					<div class="machinePNJAE">
 						<h1 data-i18n="machine">Machine</h1>
-						<div>
+						<div class="machinePNJAE">
 							<span data-i18n="mineur">Mineur</span>
 							<span data-i18n="aspect-exceptionnel-machine-mineur">(Déjà inclus) Le PNJ ajoute son score de Machine exceptionnelle à son score de réaction.</span>
 						</div>
-						<div>
+						<div class="machinePNJAEMaj">
 							<span data-i18n="majeur">Majeur</span>
 							<span data-i18n="aspect-exceptionnel-machine-majeur">Le PNJ est insensible aux capacités d’armure qui jouent sur les sens telles que le mode Ghost ou le mode Changeling. L’invisibilité comme les illusions ou les leurres n’ont pas d’effet sur lui.</span>
 						</div>
 					</div>
 					
-					<div>
+					<div class="damePNJAE">
 						<h1 data-i18n="dame">Dame</h1>
-						<div>
+						<div class="damePNJAE">
 							<span data-i18n="mineur">Mineur</span>
 							<span data-i18n="aspect-exceptionnel-dame-mineur">Le PNJ, s’il est accompagné d’autres PNJ de la même faction que lui, peut toujours décider de reporter les dégâts qu’il subit sur des alliés proches, à portée courte. Cela représente le fait que des PNJ alliés s’interposent pour sauvegarder sa vie.</span>
 						</div>
-						<div>
+						<div class="damePNJAEMaj">
 							<span data-i18n="majeur">Majeur</span>
 							<span data-i18n="aspect-exceptionnel-dame-majeur">Un PJ qui souhaite attaquer ce PNJ doit réussir un test base Hargne dont la difficulté est égale au score de la Dame exceptionnelle du PNJ. S’il ne réussit pas ce test, il est subjugué par le PNJ et ne se résout pas à l’attaquer.</span>
 						</div>
 					</div>
 					
-					<div>
+					<div class="masquePNJAE">
 						<h1 data-i18n="masque">Masque</h1>
-						<div>
+						<div class="masquePNJAE">
 							<span data-i18n="mineur">Mineur</span>
 							<span data-i18n="aspect-exceptionnel-masque-mineur">(Déjà inclus) Le PNJ ajoute son score de Masque exceptionnel à son score de défense.</span>
 						</div>
-						<div>
+						<div class="masquePNJAEMaj">
 							<span data-i18n="majeur">Majeur</span>
 							<span data-i18n="aspect-exceptionnel-masque-majeur">(Déjà inclus) Le PNJ agit toujours, peu importe son nombre d’actions, comme s’il avait un score d’initiative de 30. Le MJ ne lance pas les dés.</span>
 						</div>
@@ -8870,7 +9268,7 @@
 						</div>
 					</div>
 				</div>
-			
+		
 				<div class="priest priestMechanic">
 					<h1 data-i18n="priest-mode-mechanic">Mode Mechanic</h1>
 					<div>
@@ -8903,7 +9301,7 @@
 						<input type="number" name="attr_jetModifDes" value="0" />
 					</div>
 					<div>
-						<select name="attr_caracteristique1Priest" disabled>
+						<select name="attr_caracteristique1Priest">
 							<option value="{{carac1=^{technique}}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+" selected>Technique</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -8987,7 +9385,7 @@
 						<button name="roll_jetPsionPuppet" type="roll" class="psion150" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{carSup=[[@{bonusCarac}]]}} @{caracteristique3Psion} @{caracteristique4Psion} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 					</div>
 					<div class="psion150">
-						<select name="attr_caracteristique1Psion" disabled>
+						<select name="attr_caracteristique1Psion">
 							<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -9077,7 +9475,7 @@
 						<input type="number" name="attr_jetModifDes" value="0" />
 					</div>
 					<div class="psion200">
-						<select name="attr_caracteristique1Psion" disabled>
+						<select name="attr_caracteristique1Psion">
 							<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -9167,7 +9565,7 @@
 						<button name="roll_baseRanger" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}} {{carac1=^{perception}}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+ @{jetModifDes}+ @{caracteristique2} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 					</div>
 					<div>
-						<select name="attr_caracteristique1Ranger" disabled>
+						<select name="attr_caracteristique1Ranger">
 							<option value="{{carac1=^{perception}}} {{bonusMALWarrOD1=[[@{MALWarriorScoutA}]]}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+"  data-i18n="perception" selected>Perception</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -9314,7 +9712,7 @@
 						</select>
 					</div>
 				</div>
-			
+		
 				<div class="shaman shamanImpregnation">
 					<div class="titreBS2L1R">
 						<label>
@@ -10220,12 +10618,7 @@
 					</div>
 				</div>
 			
-				<div class="ranger wizard styleCombat">
-					<input type="hidden" name="attr_atkCompBM" readonly />
-					<input type="hidden" name="attr_dgtCompBM" readonly />
-					<input type="hidden" name="attr_rctCompBM" readonly />
-					<input type="hidden" name="attr_defCompBM" readonly />
-					
+				<div class="ranger wizard styleCombat">					
 					<h1 data-i18n="style-de-combat">Style de Combat</h1>
 					<div>
 						<select name="attr_styleCombat">
@@ -10427,7 +10820,7 @@
 								<input type="number" name="attr_MALJetModifDes" value="0" />
 							</div>
 							<div>
-								<select name="attr_caracteristique1Priest" disabled>
+								<select name="attr_caracteristique1Priest">
 									<option value="{{carac1=^{technique}}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+" selected>Technique</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -10703,7 +11096,7 @@
 							<button name="roll_MALBaseRanger" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}} {{carac1=^{perception}}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+ @{jetModifDes}+ @{caracteristique2} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 						</div>
 						<div>
-							<select name="attr_MALCaracteristique1Ranger" disabled>
+							<select name="attr_MALCaracteristique1Ranger">
 								<option value="{{carac1=^{perception}}} {{bonusMALWarrOD1=[[@{MALWarriorScoutA}]]}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+"  data-i18n="perception" selected>Perception</option>
 							</select>
 							<select name="attr_caracteristique2">
@@ -10812,7 +11205,7 @@
 								<button name="roll_jetPsionPuppet" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{carSup=[[@{bonusCarac}]]}} @{caracteristique3Psion} @{caracteristique4Psion} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 							</div>
 							<div>
-								<select name="attr_caracteristique1Psion" disabled>
+								<select name="attr_caracteristique1Psion">
 									<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -10901,7 +11294,7 @@
 								<input type="number" name="attr_jetModifDes" value="0" />
 							</div>
 							<div>
-								<select name="attr_caracteristique1Psion" disabled>
+								<select name="attr_caracteristique1Psion">
 									<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -11666,12 +12059,8 @@
 									<b>D6+</b>
 									<input type="number" name="attr_druidLionBaseViolenceBonus" class="left" value="0" disabled />
 								</div>					
-								<div><select name="attr_druidLionBasePortee" disabled>
+								<div><select name="attr_druidLionBasePortee">
 									<option data-i18n="portee-contact" value="^{portee-contact}" selected>Contact</option>
-									<option data-i18n="portee-courte" value="^{portee-courte}" >Courte</option>
-									<option data-i18n="portee-moyenne" value="^{portee-moyenne}" >Moyenne</option>
-									<option data-i18n="portee-longue" value="^{portee-longue}">Longue</option>
-									<option data-i18n="portee-lointaine" value="^{portee-lointaine}">Lointaine</option>
 								</select></div>					
 								<div><select name="attr_aspectDruidLionBase">
 									<option value="{{jet=[[{ [[{[[@{druidLionChairTot}+@{jetModifDesComp}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{aspect=^{chair}}} {{AE=[[@{druidLionChairAE}]]}}" data-i18n="chair">Chair</option>
@@ -12385,11 +12774,11 @@
 							<div>
 								<div>
 									<span data-i18n="defense">Défense</span>
-									<input type="number" name="attr_druidWolfDefenseTot" value="@{defCompBM}+4+@{druidWolfMasqueAE}" disabled />
+									<input type="number" name="attr_druidWolfDefenseTot" value="4+@{druidWolfMasqueAE}" disabled />
 								</div>
 								<div>
 									<span data-i18n="reaction">Réaction</span>
-									<input type="number" name="attr_druidWolfReactionTot" value="@{rctCompBM}+4+@{druidWolfMachineAE}" disabled />
+									<input type="number" name="attr_druidWolfReactionTot" value="4+@{druidWolfMachineAE}" disabled />
 								</div>
 								<div>
 									<span data-i18n="initiative">Initiative</span>
@@ -12843,7 +13232,7 @@
 						<input type="hidden" name="attr_degatsEvolRanger" value="{{Degats=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						<input type="hidden" name="attr_violenceEvolRanger" value="{{Violence=[[ [[{ [[@{rangerArmeViolenceEvol}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 						
-						<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
+						<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
 						
 						<input type="hidden" name="attr_styleBMRanger" value="[[@{atkAkimbo}]]+[[@{atkAmbidextre}]]+[[{@{atkCouvert}+@{interfaceGuidageRanger}, 0}kl1]]+[[@{atkDefensif}]]+[[@{atkAgressif}]]+[[@{atkPilonnage}]]" />
 						
@@ -13369,12 +13758,8 @@
 										<b>D6+</b>
 										<input type="number" name="attr_MALDruidLionBaseViolenceBonus" class="left" value="0" disabled />
 									</div>					
-									<div><select name="attr_MALDruidLionBasePortee" disabled>
+									<div><select name="attr_MALDruidLionBasePortee">
 										<option data-i18n="portee-contact" value="^{portee-contact}" selected>Contact</option>
-										<option data-i18n="portee-courte" value="^{portee-courte}" >Courte</option>
-										<option data-i18n="portee-moyenne" value="^{portee-moyenne}" >Moyenne</option>
-										<option data-i18n="portee-longue" value="^{portee-longue}">Longue</option>
-										<option data-i18n="portee-lointaine" value="^{portee-lointaine}">Lointaine</option>
 									</select></div>					
 									<div><select name="attr_MALAspectDruidLionBase">
 										<option value="{{jet=[[{ [[{[[@{MALDruidLionChairTot}+@{MALJetModifDesComp}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{aspect=^{chair}}} {{AE=[[@{MALDruidLionChairAE}]]}}" data-i18n="chair">Chair</option>
@@ -14088,11 +14473,11 @@
 								<div>
 									<div>
 										<span data-i18n="defense">Défense</span>
-										<input type="number" name="attr_MALDruidWolfDefenseTot" value="@{MALDefCompBM}+4+@{MALDruidWolfMasqueAE}" disabled />
+										<input type="number" name="attr_MALDruidWolfDefenseTot" value="4+@{MALDruidWolfMasqueAE}" disabled />
 									</div>
 									<div>
 										<span data-i18n="reaction">Réaction</span>
-										<input type="number" name="attr_druidWolfReactionTot" value="@{MALRctCompBM}+4+@{MALDruidWolfMachineAE}" disabled />
+										<input type="number" name="attr_druidWolfReactionTot" value="4+@{MALDruidWolfMachineAE}" disabled />
 									</div>
 									<div>
 										<span data-i18n="initiative">Initiative</span>
@@ -14216,11 +14601,11 @@
 							</div>
 							<input type="hidden" name="attr_MALTabDruidWolf" value="0" />
 							<div class="druidCompanionWolfTab3">
-								<input type="hidden" name="attr_druidWolfChairBase" value="2" disabled />
-								<input type="hidden" name="attr_druidWolfBeteBase" value="4" disabled />
-								<input type="hidden" name="attr_druidWolfMachineBase" value="4" disabled />
-								<input type="hidden" name="attr_druidWolfDameBase" value="2" disabled />
-								<input type="hidden" name="attr_druidWolfMasqueBase" value="4" disabled />
+								<input type="hidden" name="attr_MALDruidWolfChairBase" value="2" disabled />
+								<input type="hidden" name="attr_MALDruidWolfBeteBase" value="4" disabled />
+								<input type="hidden" name="attr_MALDruidWolfMachineBase" value="4" disabled />
+								<input type="hidden" name="attr_MALDruidWolfDameBase" value="2" disabled />
+								<input type="hidden" name="attr_MALDruidWolfMasqueBase" value="4" disabled />
 								
 								<div>
 									<div>
@@ -15468,7 +15853,7 @@
 						<input type="number" name="attr_jetModifDes" value="0" />
 					</div>
 					<div>
-						<select name="attr_caracteristique1Priest" disabled>
+						<select name="attr_caracteristique1Priest">
 							<option value="{{carac1=^{technique}}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+" selected>Technique</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -15552,7 +15937,7 @@
 						<button name="roll_jetPsionPuppet" type="roll" class="psion150" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{carSup=[[@{bonusCarac}]]}} @{caracteristique3Psion} @{caracteristique4Psion} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 					</div>
 					<div class="psion150">
-						<select name="attr_caracteristique1Psion" disabled>
+						<select name="attr_caracteristique1Psion">
 							<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -15642,7 +16027,7 @@
 						<input type="number" name="attr_jetModifDes" value="0" />
 					</div>
 					<div class="psion200">
-						<select name="attr_caracteristique1Psion" disabled>
+						<select name="attr_caracteristique1Psion">
 							<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 						</select>
 						<select name="attr_caracteristique2">
@@ -15735,7 +16120,7 @@
 							<input type="hidden" name="attr_degatsEvolRanger" value="{{Degats=[[ [[{ [[@{rangerArmeDegatEvol}-@{chargeurGrappesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							<input type="hidden" name="attr_violenceEvolRanger" value="{{Violence=[[ [[{ [[@{rangerArmeViolenceEvol}-@{chargeurExplosivesRanger}-@{munitionsIEMRanger}]], 0}kh1]]d6]]}}" />
 							
-							<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pSpilonnage}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
+							<input type="hidden" name="attr_styleRanger" value="{{stylePilonnageD=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{stylePilonnageV=[[ [[@{pilonnageRanger}-1]]d6 ]]}} {{styleSuppressionMalusInfligeD=[[floor(@{styleSuppressionD}/2)]]}} {{styleSuppressionMalusInfligeV=[[floor(@{styleSuppressionV}/2)]]}}" />
 							
 							<input type="hidden" name="attr_styleBMRanger" value="[[@{atkAkimbo}]]+[[@{atkAmbidextre}]]+[[{@{atkCouvert}+@{interfaceGuidageRanger}, 0}kl1]]+[[@{atkDefensif}]]+[[@{atkAgressif}]]+[[@{atkPilonnage}]]" />
 							
@@ -17188,7 +17573,7 @@
 								<input type="number" name="attr_MALJetModifDes" value="0" />
 							</div>
 							<div>
-								<select name="attr_caracteristique1Priest" disabled>
+								<select name="attr_caracteristique1Priest">
 									<option value="{{carac1=^{technique}}} {{OD1=[[@{technOD}]]}} {{jet=[[ {[[{@{technique}+" selected>Technique</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -17464,7 +17849,7 @@
 							<button name="roll_MALBaseRanger" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}} {{carac1=^{perception}}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+ @{jetModifDes}+ @{caracteristique2} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 						</div>
 						<div>
-							<select name="attr_MALCaracteristique1Ranger" disabled>
+							<select name="attr_MALCaracteristique1Ranger">
 								<option value="{{carac1=^{perception}}} {{bonusMALWarrOD1=[[@{MALWarriorScoutA}]]}} {{bonusWarrOD1=[[@{warriorScoutA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{percOD}]]}} {{jet=[[ {[[{@{perception}+"  data-i18n="perception" selected>Perception</option>
 							</select>
 							<select name="attr_caracteristique2">
@@ -17573,7 +17958,7 @@
 								<button name="roll_jetPsionPuppet" type="roll" value="@{jetGM} &{template:simple} {{Nom=@{name}}}  {{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+ @{jetModifDes}+ @{caracteristique2} {{carSup=[[@{bonusCarac}]]}} @{caracteristique3Psion} @{caracteristique4Psion} {{@{armureLegende}MAL=@{armure}MAL}} {{@{armure}=@{armure}}} {{situationnel=[[@{jetModifDes}]]}} {{MALTaille=[[@{MALBarbarianGoliath}]]}} {{taille=[[@{barbarianGoliath}]]}}"></button>
 							</div>
 							<div>
-								<select name="attr_caracteristique1Psion" disabled>
+								<select name="attr_caracteristique1Psion">
 									<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -17662,7 +18047,7 @@
 								<input type="number" name="attr_jetModifDes" value="0" />
 							</div>
 							<div>
-								<select name="attr_caracteristique1Psion" disabled>
+								<select name="attr_caracteristique1Psion">
 									<option value="{{carac1=^{aura}}} {{bonusMALWarrOD1=[[@{MALWarriorHeraldA}]]}} {{bonusWarrOD1=[[@{warriorHeraldA}]]}} {{MALBonusBarb1=[[0]]}} {{bonusBarb1=[[0]]}} {{OD1=[[@{auraOD}]]}} {{jet=[[ {[[{@{aura}+" data-i18n="aura" selected>Aura</option>
 								</select>
 								<select name="attr_caracteristique2">
@@ -18281,12 +18666,8 @@
 											<b>D6+</b>
 											<input type="number" name="attr_MALDruidLionBaseViolenceBonus" class="left" value="0" disabled />
 										</div>					
-										<div><select name="attr_MALDruidLionBasePortee" disabled>
+										<div><select name="attr_MALDruidLionBasePortee">
 											<option data-i18n="portee-contact" value="^{portee-contact}" selected>Contact</option>
-											<option data-i18n="portee-courte" value="^{portee-courte}" >Courte</option>
-											<option data-i18n="portee-moyenne" value="^{portee-moyenne}" >Moyenne</option>
-											<option data-i18n="portee-longue" value="^{portee-longue}">Longue</option>
-											<option data-i18n="portee-lointaine" value="^{portee-lointaine}">Lointaine</option>
 										</select></div>					
 										<div><select name="attr_MALAspectDruidLionBase">
 											<option value="{{jet=[[{ [[{[[@{MALDruidLionChairTot}+@{MALJetModifDesComp}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{aspect=^{chair}}} {{AE=[[@{MALDruidLionChairAE}]]}}" data-i18n="chair">Chair</option>
@@ -19000,11 +19381,11 @@
 									<div>
 										<div>
 											<span data-i18n="defense">Défense</span>
-											<input type="number" name="attr_MALDruidWolfDefenseTot" value="@{MALDefCompBM}+4+@{MALDruidWolfMasqueAE}" disabled />
+											<input type="number" name="attr_MALDruidWolfDefenseTot" value="4+@{MALDruidWolfMasqueAE}" disabled />
 										</div>
 										<div>
 											<span data-i18n="reaction">Réaction</span>
-											<input type="number" name="attr_druidWolfReactionTot" value="@{MALRctCompBM}+4+@{MALDruidWolfMachineAE}" disabled />
+											<input type="number" name="attr_druidWolfReactionTot" value="4+@{MALDruidWolfMachineAE}" disabled />
 										</div>
 										<div>
 											<span data-i18n="initiative">Initiative</span>
@@ -19589,12 +19970,8 @@
 										<b>D6+</b>
 										<input type="number" name="attr_druidLionBaseViolenceBonus" class="left" value="0" disabled />
 									</div>					
-									<div><select name="attr_druidLionBasePortee" disabled>
+									<div><select name="attr_druidLionBasePortee">
 										<option data-i18n="portee-contact" value="^{portee-contact}" selected>Contact</option>
-										<option data-i18n="portee-courte" value="^{portee-courte}" >Courte</option>
-										<option data-i18n="portee-moyenne" value="^{portee-moyenne}" >Moyenne</option>
-										<option data-i18n="portee-longue" value="^{portee-longue}">Longue</option>
-										<option data-i18n="portee-lointaine" value="^{portee-lointaine}">Lointaine</option>
 									</select></div>					
 									<div><select name="attr_aspectDruidLionBase">
 										<option value="{{jet=[[{ [[{[[@{druidLionChairTot}+@{jetModifDesComp}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{aspect=^{chair}}} {{AE=[[@{druidLionChairAE}]]}}" data-i18n="chair">Chair</option>
@@ -20308,11 +20685,11 @@
 								<div>
 									<div>
 										<span data-i18n="defense">Défense</span>
-										<input type="number" name="attr_druidWolfDefenseTot" value="@{defCompBM}+4+@{druidWolfMasqueAE}" disabled />
+										<input type="number" name="attr_druidWolfDefenseTot" value="4+@{druidWolfMasqueAE}" disabled />
 									</div>
 									<div>
 										<span data-i18n="reaction">Réaction</span>
-										<input type="number" name="attr_druidWolfReactionTot" value="@{rctCompBM}+4+@{druidWolfMachineAE}" disabled />
+										<input type="number" name="attr_druidWolfReactionTot" value="4+@{druidWolfMachineAE}" disabled />
 									</div>
 									<div>
 										<span data-i18n="initiative">Initiative</span>
@@ -20899,12 +21276,8 @@
 											<b>D6+</b>
 											<input type="number" name="attr_MALDruidLionBaseViolenceBonus" class="left" value="0" disabled />
 										</div>					
-										<select name="attr_MALDruidLionBasePortee" disabled>
+										<select name="attr_MALDruidLionBasePortee">
 											<option data-i18n="portee-contact" value="^{portee-contact}" selected>Contact</option>
-											<option data-i18n="portee-courte" value="^{portee-courte}" >Courte</option>
-											<option data-i18n="portee-moyenne" value="^{portee-moyenne}" >Moyenne</option>
-											<option data-i18n="portee-longue" value="^{portee-longue}">Longue</option>
-											<option data-i18n="portee-lointaine" value="^{portee-lointaine}">Lointaine</option>
 										</select>						
 										<select name="attr_MALAspectDruidLionBase">
 											<option value="{{jet=[[{ [[{[[@{MALDruidLionChairTot}+@{MALJetModifDesComp}]], 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{aspect=^{chair}}} {{AE=[[@{MALDruidLionChairAE}]]}}" data-i18n="chair">Chair</option>
@@ -21608,11 +21981,11 @@
 									<div>
 										<div>
 											<span data-i18n="defense">Défense</span>
-											<input type="number" name="attr_MALDruidWolfDefenseTot" value="@{MALDefCompBM}+4+@{MALDruidWolfMasqueAE}" disabled />
+											<input type="number" name="attr_MALDruidWolfDefenseTot" value="4+@{MALDruidWolfMasqueAE}" disabled />
 										</div>
 										<div>
 											<span data-i18n="reaction">Réaction</span>
-											<input type="number" name="attr_druidWolfReactionTot" value="@{MALRctCompBM}+4+@{MALDruidWolfMachineAE}" disabled />
+											<input type="number" name="attr_druidWolfReactionTot" value="4+@{MALDruidWolfMachineAE}" disabled />
 										</div>
 										<div>
 											<span data-i18n="initiative">Initiative</span>
@@ -22336,6 +22709,7 @@
 					</div>
 				</div>
 				<input type="hidden" name="attr_styleCombat" value="0" />
+				
 				<input type="hidden" name="attr_armeSPS" value="0"/>
 				<div class="armeSection1">
 					<div class="data">
@@ -22352,7 +22726,7 @@
 						<input type="hidden" name="attr_pSCstylesVB" value="{{styleViolBM=[[ [[floor([[@{pSCaCViolence}]]/2)]]d6]]}}" />
 						
 						<!-- Les effets -->
-						<input type="hidden" name="attr_pSClisteEffets" value="@{pSCdestructeur} @{pSCfureur} @{pSCleste} @{pSCmeurtrier} @{pSCorfevrerie} @{pSCparasitage} @{pSCprecision} {{tirSecurite=[[@{pSCtirSecurite}]]}} @{pSCultraViolence} @{pSCantiAnatheme} @{pSCantiVehicule} @{pSCartillerie} @{pSCantiAnatheme} @{pSCassistanceAttaque} @{pSCbarrage} @{pSCchargeur} @{pSCchoc} @{pSCdefense} @{pSCdeuxMains} @{pSCdispersion} @{pSCdegatContinue} @{pSCdemoralisant} @{pSCdesignation} @{pSCenChaine} @{pSCesperance} @{pSCignoreArmure} @{pSCignoreCdF} {{lourd=[[@{pSClourd}]]}} @{pSClumiere} @{pSCobliteration} @{pSCpenetrant} @{pSCperceArmure} @{pSCreaction} @{pSCsilencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{pSCtenebricite} {{jumelageAkimbo=[[@{pSCakimbo}]]}} {{jumelageAmbidextrie=[[@{pSCambidextrie}]]}} @{pSCtirRafale} @{pSCassassin} {{cadence=[[ceil(@{pSCcadence})]]}} {{scoreCadence=@{pSCcadenceValue}}} @{pSCsoumission}" />
+						<input type="hidden" name="attr_pSClisteEffets" value="@{pSCdestructeur} @{pSCfureur} @{pSCleste} @{pSCmeurtrier} @{pSCorfevrerie} @{pSCparasitage} @{pSCprecision} {{tirSecurite=[[@{pSCtirSecurite}]]}} @{pSCultraViolence} @{pSCantiAnatheme} @{pSCantiVehicule} @{pSCartillerie} @{pSCantiAnatheme} @{pSCassistanceAttaque} @{pSCbarrage} @{pSCchargeur} @{pSCchoc} @{pSCdefense} @{pSCdeuxMains} @{pSCdispersion} @{pSCdegatContinue} @{pSCdemoralisant} @{pSCdesignation} @{pSCenChaine} @{pSCesperance} @{pSCignoreArmure} @{pSCignoreCdF} {{lourd=[[@{pSClourd}]]}} @{pSClumiere} @{pSCobliteration} @{pSCpenetrant} @{pSCperceArmure} @{pSCreaction} {{silencieux=Silencieux}} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{pSCtenebricite} {{jumelageAkimbo=[[@{pSCakimbo}]]}} {{jumelageAmbidextrie=[[@{pSCambidextrie}]]}} @{pSCtirRafale} @{pSCassassin} {{cadence=[[ceil(@{pSCcadence})]]}} {{scoreCadence=@{pSCcadenceValue}}} @{pSCsoumission}" />
 						
 						<!-- Les améliorations structurelles -->
 						<input type="hidden" name="attr_pSClisteAS" value="{{soeur=[[@{pSCsoeur}]]}} {{jumelle=[[@{pSCjumelle}]]}} @{pSCassassine} {{ASAllegee=[[@{pSCallegee}]]}} {{protectrice=[[@{pSCprotectrice}]]}} @{pSCbarbelee} @{pSCelectrifiee} @{pSCsournoise} @{pSCindestructible} @{pSCconnectee} @{pSCsurmesure} @{pSClumineuse} @{pSCmassive} @{pSCagressive}" />
@@ -22645,8 +23019,7 @@
 							<span data-i18n-title="reaction" title="Réaction"></span>
 							<input type="number" name="attr_pSCreactionValue" value="0" />
 						</label>
-						<label class="simple">
-							<input type="checkbox" name="attr_pSCsilencieux" value="{{silencieux=Silencieux}}" checked disabled />
+						<label class="simple checked">
 							<span data-i18n-title="silencieux" title="Silencieux"></span>
 						</label>
 						<label class="simple">
@@ -22828,6 +23201,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<input type="hidden" name="attr_armeSME" value="0"/>
 				<div class="armeSection2">
 					<div class="data">
@@ -22844,7 +23218,7 @@
 						<input type="hidden" name="attr_mECstylesVB" value="{{styleViolBM=[[ [[floor([[@{mECaCViolence}]]/2)]]d6]]}}" />
 						
 						<!-- Les effets -->
-						<input type="hidden" name="attr_mEClisteEffets" value="@{mECdestructeur} @{mECfureur} @{mECleste} @{mECmeurtrier} @{mECorfevrerie} @{mECparasitage} @{mECprecision} {{tirSecurite=[[@{mECtirSecurite}]]}} @{mECultraViolence} @{mECantiAnatheme} @{mECantiVehicule} @{mECartillerie} @{mECantiAnatheme} @{mECassistanceAttaque} @{mECbarrage} @{mECchargeur} @{mECchoc} @{mECdefense} @{mECdeuxMains} @{mECdispersion} @{mECdegatContinue} @{mECdemoralisant} @{mECdesignation} @{mECenChaine} @{mECesperance} @{mECignoreArmure} @{mECignoreCdF} {{lourd=[[@{mEClourd}]]}} @{mEClumiere} @{mECobliteration} @{mECpenetrant} @{mECperceArmure} @{mECreaction} @{mECsilencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{mECtenebricite} {{jumelageAkimbo=[[@{mECakimbo}]]}} {{jumelageAmbidextrie=[[@{mECambidextrie}]]}} @{mECtirRafale} @{mECassassin} {{cadence=[[ceil(@{mECcadence})]]}} {{scoreCadence=@{mECcadenceValue}}} @{mECsoumission}" />
+						<input type="hidden" name="attr_mEClisteEffets" value="@{mECdestructeur} @{mECfureur} @{mECleste} @{mECmeurtrier} @{mECorfevrerie} @{mECparasitage} @{mECprecision} {{tirSecurite=[[@{mECtirSecurite}]]}} @{mECultraViolence} @{mECantiAnatheme} @{mECantiVehicule} @{mECartillerie} @{mECantiAnatheme} @{mECassistanceAttaque} @{mECbarrage} @{mECchargeur} @{mECchoc} @{mECdefense} @{mECdeuxMains} @{mECdispersion} @{mECdegatContinue} @{mECdemoralisant} @{mECdesignation} @{mECenChaine} @{mECesperance} @{mECignoreArmure} @{mECignoreCdF} {{lourd=[[@{mEClourd}]]}} @{mEClumiere} @{mECobliteration} @{mECpenetrant} {{perceArmure=^{perce-armure} @{mECperceArmureValue}}} @{mECreaction} @{mECsilencieux} {{silencieuxD=[[@{discretion}+@{dextOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{mECtenebricite} {{jumelageAkimbo=[[@{mECakimbo}]]}} {{jumelageAmbidextrie=[[@{mECambidextrie}]]}} @{mECtirRafale} @{mECassassin} {{cadence=[[ceil(@{mECcadence})]]}} {{scoreCadence=@{mECcadenceValue}}} @{mECsoumission}" />
 						
 						<!-- Les améliorations structurelles -->
 						<input type="hidden" name="attr_mEClisteAS" value="{{soeur=[[@{mECsoeur}]]}} {{jumelle=[[@{mECjumelle}]]}} @{mECassassine} {{ASAllegee=[[@{mECallegee}]]}} {{protectrice=[[@{mECprotectrice}]]}} @{mECbarbelee} @{mECelectrifiee} @{mECsournoise} @{mECindestructible} @{mECconnectee} @{mECsurmesure} @{mEClumineuse} @{mECmassive} @{mECagressive}" />
@@ -23123,8 +23497,7 @@
 							<span data-i18n-title="penetrant" title="Pénétrant"></span>
 							<input type="number" name="attr_mECpenetrantValue" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mECperceArmure" value="{{perceArmure=^{perce-armure} @{mECperceArmureValue}}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="perce-armure" title="Perce Armure"></span>
 							<input type="number" name="attr_mECperceArmureValue" value="40" disabled />
 						</label>
@@ -23320,6 +23693,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<fieldset class="repeating_armeCaC">
 					<div class="data">
 						<!-- Les dégâts de l'arme -->
@@ -23837,6 +24211,7 @@
 				</div>
 				<input type="hidden" name="attr_bonusCarac" value="0" />
 				<input type="hidden" name="attr_styleCombat" value="0" />
+				
 				<input type="hidden" name="attr_armeSPS" value="0"/>
 				<div class="armeSection1">
 					<div class="data">
@@ -23851,7 +24226,7 @@
 						<input type="hidden" name="attr_pSstylesVB" value="{{styleViolBM=[[ [[{ [[(floor([[@{pSDistViolence}-@{pSchargeurExplosives}+@{pSchargeurGrappes}-@{pSmunitionsIEM}]]/2))]], 0}kh1]]d6]]}}" />
 						
 						<!-- Les effets -->
-						<input type="hidden" name="attr_pSlisteEffets" value="@{pSdestructeur} @{pSfureur} @{pSleste} @{pSmeurtrier} @{pSorfevrerie} @{pSparasitage} @{pSprecision} @{pSultraViolence} @{pSantiAnatheme} @{pSantiVehicule} @{pSartillerie} @{pSassistanceAttaque} @{pSbarrage} @{pSchargeur} @{pSchoc} @{pSdefense} @{pSdeuxMains} @{pSdispersion} @{pSdegatContinue} @{pSdemoralisant} @{pSdesignation} @{pSenChaine} @{pSesperance} @{pSignoreArmure} @{pSignoreCdF} {{lourd=[[@{pSlourd}]]}} @{pSlumiere} @{pSobliteration} @{pSpenetrant} @{pSperceArmure} @{pSreaction} @{pSsilencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{pStenebricite} @{pSakimbo} @{pSambidextrie} @{pStirRafale} @{pSassassin} {{jumelageAkimbo=[[@{pSakimbo}]]}} {{jumelageAmbidextrie=[[@{pSambidextrie}]]}} {{tirSecurite=[[@{pStirSecurite}]]}}" />
+						<input type="hidden" name="attr_pSlisteEffets" value="@{pSdestructeur} @{pSfureur} @{pSleste} @{pSmeurtrier} @{pSorfevrerie} @{pSparasitage} @{pSprecision} @{pSultraViolence} @{pSantiAnatheme} @{pSantiVehicule} @{pSartillerie} @{pSassistanceAttaque} @{pSbarrage} @{pSchargeur} @{pSchoc} @{pSdefense} @{pSdeuxMains} @{pSdispersion} @{pSdegatContinue} @{pSdemoralisant} @{pSdesignation} @{pSenChaine} @{pSesperance} @{pSignoreArmure} @{pSignoreCdF} {{lourd=[[@{pSlourd}]]}} @{pSlumiere} @{pSobliteration} @{pSpenetrant} @{pSperceArmure} @{pSreaction} {{silencieux=Silencieux}} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{pStenebricite} @{pSakimbo} @{pSambidextrie} @{pStirRafale} @{pSassassin} {{jumelageAkimbo=[[@{pSakimbo}]]}} {{jumelageAmbidextrie=[[@{pSambidextrie}]]}} {{tirSecurite=[[@{pStirSecurite}]]}}" />
 						
 						<!-- Les améliorations -->
 						<input type="hidden" name="attr_pSlisteAmeliorations" value="{{cadence=[[ceil(@{pScadence})]]}} {{scoreCadence=@{pScadenceValue}}} @{pSsoumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{pSchargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{pSchargeurExplosives}]]}} @{pSpointeurLaser} @{pSlunetteIntelligente} @{pScanonLong} @{pSmunitionsSubsoniques} @{pSprotectionArme} @{pSstructureElement} @{pSmunitionsHyperVelocite} @{pSmunitionsDrone} {{munitionsNonLetales=[[@{pSmunitionsNonLetales}]]}} {{munitionsIEM=[[@{pSmunitionsIEM}]]}} @{pSjumelage} {{chambreDouble=[[ceil(@{pSchambreDouble})]]}} @{pSsystemeRefroidissement} {{revetementOmega=[[@{pSrevetementOmega}D6]]}} {{interfaceGuidage=[[@{pSinterfaceGuidage}]]}}" />
@@ -24127,8 +24502,7 @@
 							<span data-i18n-title="reaction" title="Réaction"></span>
 							<input type="number" name="attr_pSreactionValue" class="center" value="0" />
 						</label>
-						<label class="simple">
-							<input type="checkbox" name="attr_pSsilencieux" value="{{silencieux=Silencieux}}" checked disabled />
+						<label class="simple checked">
 							<span data-i18n-title="silencieux" title="Silencieux"></span>
 						</label>
 						<label class="simple">
@@ -24257,6 +24631,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<input type="hidden" name="attr_armeSME" value="0"/>
 				<div class="armeSection2">
 					<div class="data">
@@ -24273,7 +24648,7 @@
 						<input type="hidden" name="attr_mEstylesVB" value="{{styleViolBM=[[ [[{ [[(floor([[@{mEDistViolence}-@{mEchargeurExplosives}+@{mEchargeurGrappes}-@{mEmunitionsIEM}]]/2))]], 0}kh1]]d6]]}}" />
 						
 						<!-- Les effets -->
-						<input type="hidden" name="attr_mElisteEffets" value="@{mEdestructeur} @{mEfureur} @{mEleste} @{mEmeurtrier} @{mEorfevrerie} @{mEparasitage} @{mEprecision} @{mEultraViolence} @{mEantiAnatheme} @{mEantiVehicule} @{mEartillerie} @{mEassistanceAttaque} @{mEbarrage} @{mEchargeur} @{mEchoc} @{mEdefense} @{mEdeuxMains} @{mEdispersion} @{mEdegatContinue} @{mEdemoralisant} @{mEdesignation} @{mEenChaine} @{mEesperance} @{mEignoreArmure} @{mEignoreCdF} {{lourd=[[@{mElourd}]]}} @{mElumiere} @{mEobliteration} @{mEpenetrant} @{mEperceArmure} @{mEreaction} @{mEsilencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{mEtenebricite} @{mEakimbo} @{mEambidextrie} @{mEtirRafale} @{mEassassin} {{jumelageAkimbo=[[@{mEakimbo}]]}} {{jumelageAmbidextrie=[[@{mEambidextrie}]]}} {{tirSecurite=[[@{mEtirSecurite}]]}}" />
+						<input type="hidden" name="attr_mElisteEffets" value="@{mEdestructeur} @{mEfureur} @{mEleste} @{mEmeurtrier} @{mEorfevrerie} @{mEparasitage} @{mEprecision} @{mEultraViolence} @{mEantiAnatheme} @{mEantiVehicule} @{mEartillerie} @{mEassistanceAttaque} @{mEbarrage} {{chargeur=^{chargeur} @{mEchargeurValue}}} @{mEchoc} @{mEdefense} @{mEdeuxMains} {{dispersion=^{dispersion} @{mEdispersionValue}}} {{degatContinus=^{degats-continus} @{mEdegatContinueValue} ([[1D6]] ^{tours})}} @{mEdemoralisant} @{mEdesignation} @{mEenChaine} @{mEesperance} @{mEignoreArmure} @{mEignoreCdF} {{lourd=[[@{mElourd}]]}} {{lumiere=^{lumiere} @{mElumiereValue}}} @{mEobliteration} @{mEpenetrant} @{mEperceArmure} @{mEreaction} @{mEsilencieux} {{silencieuxD=[[@{discretion}+@{discrOD}]]}} {{silencieuxWOD=[[@{discretion}]]}} @{mEtenebricite} @{mEakimbo} @{mEambidextrie} @{mEtirRafale} @{mEassassin} {{jumelageAkimbo=[[@{mEakimbo}]]}} {{jumelageAmbidextrie=[[@{mEambidextrie}]]}} {{tirSecurite=[[@{mEtirSecurite}]]}}" />
 						
 						<!-- Les améliorations -->
 						<input type="hidden" name="attr_mElisteAmeliorations" value="{{cadence=[[ceil(@{mEcadence})]]}} {{scoreCadence=@{mEcadenceValue}}} @{mEsoumission} {{chargeurGrappes=[[1D6]]}} {{ballesGrappes=[[@{mEchargeurGrappes}]]}} {{chargeurExplosives=[[1D6]]}} {{ballesExplosives=[[@{mEchargeurExplosives}]]}} @{mEpointeurLaser} @{mElunetteIntelligente} @{mEcanonLong} @{mEmunitionsSubsoniques} @{mEprotectionArme} @{mEstructureElement} @{mEmunitionsHyperVelocite} @{mEmunitionsDrone} {{munitionsNonLetales=[[@{mEmunitionsNonLetales}]]}} {{munitionsIEM=[[@{mEmunitionsIEM}]]}} @{mEjumelage} {{chambreDouble=[[ceil(@{mEchambreDouble})]]}} @{mEsystemeRefroidissement} {{revetementOmega=[[@{mErevetementOmega}D6]]}} {{interfaceGuidage=[[@{mEinterfaceGuidage}]]}}" />
@@ -24432,8 +24807,7 @@
 							<span data-i18n-title="cadence" title="Cadence"></span>
 							<input type="number" name="attr_mEcadenceValue" class="center" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEchargeur" value="{{chargeur=^{chargeur} @{mEchargeurValue}}} " checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="chargeur" title="Chargeur"></span>
 							<input type="number" name="attr_mEchargeurValue" class="center" value="1" disabled />
 						</label>
@@ -24447,8 +24821,7 @@
 							<span data-i18n-title="defense" title="Défense"></span>
 							<input type="number" name="attr_mEdefenseValue" class="center" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEdegatContinue" value="{{degatContinus=^{degats-continus} @{mEdegatContinueValue} ([[1D6]] ^{tours})}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="degats-continus" title="Dégâts Continus"></span>
 							<input type="number" name="attr_mEdegatContinueValue" class="center" size="2" value="3" disabled />
 						</label>
@@ -24468,8 +24841,7 @@
 							<input type="checkbox" name="attr_mEdestructeur" value="{{destructeur=[[2D6]]}}" />
 							<span data-i18n-title="destructeur" title="Destructeur"></span>
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEdispersion" value="{{dispersion=^{dispersion} @{mEdispersionValue}}} " checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="dispersion" title="Dispersion"></span>
 							<input type="number" name="attr_mEdispersionValue" class="center" value="3" disabled />
 						</label>
@@ -24509,8 +24881,7 @@
 							<input type="checkbox" name="attr_mElourd" value="1" />
 							<span data-i18n-title="lourd" title="Lourd"></span>
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mElumiere" value="{{lumiere=^{lumiere} @{mElumiereValue}}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="lumiere" title="Lumière"></span>
 							<input type="number" name="attr_mElumiereValue" class="center" size="2" value="2" disabled />
 						</label>
@@ -24680,6 +25051,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<fieldset class="repeating_armeDist">
 					<div class="data">
 						<!-- Les dégâts de l'arme -->
@@ -25783,7 +26155,7 @@
 				</div>
 			</div>
 		</div>
-	
+		
 		<div class="fichePNJ ficheCreature ficheBande center">
 			<div class="menuCombatPNJ">
 				<label>
@@ -25985,7 +26357,7 @@
 						<!-- FanMade -->
 						<input type="hidden" name="attr_pSClisteFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les effets -->
-						<input type="hidden" name="attr_pSClisteEffetsPNJ" value="@{pSCanatheme} @{pSCdestructeur} @{pSCfureur} @{pSClestePNJ} @{pSCmeurtrier} @{pSCorfevreriePNJ} @{pSCparasitage} @{pSCprecisionPNJ} {{tirSecurite=[[@{pSCtirSecurite}]]}} @{pSCultraViolence} @{pSCantiAnatheme} @{pSCantiVehicule} @{pSCartillerie} @{pSCantiAnatheme} @{pSCassistanceAttaque} @{pSCbarrage} @{pSCchargeur} @{pSCchoc} @{pSCdefense} @{pSCdeuxMains} @{pSCdispersion} @{pSCdegatContinue} @{pSCdemoralisant} @{pSCdesignation} @{pSCenChaine} @{pSCesperance} @{pSCignoreArmure} @{pSCignoreCdF} {{lourd=[[@{pSClourd}]]}} @{pSClumiere} @{pSCobliteration} @{pSCpenetrant} @{pSCperceArmure} @{pSCreaction} @{pSCsilencieux} {{silencieuxD=[[ceil(@{machine}/2)+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{pSCtenebricite} {{jumelageAkimbo=[[@{pSCakimbo}]]}} {{jumelageAmbidextrie=[[@{pSCambidextrie}]]}} @{pSCtirRafale} @{pSCassassin} {{cadence=[[ceil(@{pSCcadence})]]}} {{scoreCadence=@{pSCcadenceValue}}} @{pSCsoumission}" />
+						<input type="hidden" name="attr_pSClisteEffetsPNJ" value="@{pSCanatheme} @{pSCdestructeur} @{pSCfureur} @{pSClestePNJ} @{pSCmeurtrier} @{pSCorfevreriePNJ} @{pSCparasitage} @{pSCprecisionPNJ} {{tirSecurite=[[@{pSCtirSecurite}]]}} @{pSCultraViolence} @{pSCantiAnatheme} @{pSCantiVehicule} @{pSCartillerie} @{pSCantiAnatheme} @{pSCassistanceAttaque} @{pSCbarrage} @{pSCchargeur} @{pSCchoc} @{pSCdefense} @{pSCdeuxMains} @{pSCdispersion} @{pSCdegatContinue} @{pSCdemoralisant} @{pSCdesignation} @{pSCenChaine} @{pSCesperance} @{pSCignoreArmure} @{pSCignoreCdF} {{lourd=[[@{pSClourd}]]}} @{pSClumiere} @{pSCobliteration} @{pSCpenetrant} @{pSCperceArmure} @{pSCreaction} {{silencieux=Silencieux}} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{pSCtenebricite} {{jumelageAkimbo=[[@{pSCakimbo}]]}} {{jumelageAmbidextrie=[[@{pSCambidextrie}]]}} @{pSCtirRafale} @{pSCassassin} {{cadence=[[ceil(@{pSCcadence})]]}} {{scoreCadence=@{pSCcadenceValue}}} @{pSCsoumission}" />
 						<!-- Les améliorations structurelles -->
 						<input type="hidden" name="attr_pSClisteASPNJ" value="{{soeur=[[@{pSCsoeur}]]}} {{jumelle=[[@{pSCjumelle}]]}} @{pSCassassine} {{ASAllegee=[[@{pSCallegee}]]}} {{protectrice=[[@{pSCprotectrice}]]}} @{pSCbarbelee} @{pSCelectrifiee} @{pSCsournoisePNJ} @{pSCindestructible} @{pSCconnectee} @{pSCsurmesurePNJ} @{pSClumineuse} @{pSCmassive} @{pSCagressive}" />
 						<!-- Les améliorations structurelles -->
@@ -26193,8 +26565,7 @@
 							<span data-i18n-title="reaction" title="Réaction"></span>
 							<input type="number" name="attr_pSCreactionValue" value="0" />
 						</label>
-						<label class="simple">
-							<input type="checkbox" name="attr_pSCsilencieux" value="{{silencieux=Silencieux}}" checked disabled />
+						<label class="simple checked">
 							<span data-i18n-title="silencieux" title="Silencieux"></span>
 						</label>
 						<label class="simple">
@@ -26389,7 +26760,7 @@
 						<!-- FanMade -->
 						<input type="hidden" name="attr_mEClisteFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les effets -->
-						<input type="hidden" name="attr_mEClisteEffetsPNJ" value="@{mECanatheme} @{mECdestructeur} @{mECfureur} @{mEClestePNJ} @{mECmeurtrier} @{mECorfevreriePNJ} @{mECparasitage} @{mECprecisionPNJ} {{tirSecurite=[[@{mECtirSecurite}]]}} @{mECultraViolence} @{mECantiAnatheme} @{mECantiVehicule} @{mECartillerie} @{mECantiAnatheme} @{mECassistanceAttaque} @{mECbarrage} @{mECchargeur} @{mECchoc} @{mECdefense} @{mECdeuxMains} @{mECdispersion} @{mECdegatContinue} @{mECdemoralisant} @{mECdesignation} @{mECenChaine} @{mECesperance} @{mECignoreArmure} @{mECignoreCdF} {{lourd=[[@{mEClourd}]]}} @{mEClumiere} @{mECobliteration} @{mECpenetrant} @{mECperceArmure} @{mECreaction} @{mECsilencieux} {{silencieuxD=[[ceil(@{machine}/2)+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{mECtenebricite} {{jumelageAkimbo=[[@{mECakimbo}]]}} {{jumelageAmbidextrie=[[@{mECambidextrie}]]}} @{mECtirRafale} @{mECassassin} {{cadence=[[ceil(@{mECcadence})]]}} {{scoreCadence=@{mECcadenceValue}}} @{mECsoumission}" />
+						<input type="hidden" name="attr_mEClisteEffetsPNJ" value="@{mECanatheme} @{mECdestructeur} @{mECfureur} @{mEClestePNJ} @{mECmeurtrier} @{mECorfevreriePNJ} @{mECparasitage} @{mECprecisionPNJ} {{tirSecurite=[[@{mECtirSecurite}]]}} @{mECultraViolence} @{mECantiAnatheme} @{mECantiVehicule} @{mECartillerie} @{mECantiAnatheme} @{mECassistanceAttaque} @{mECbarrage} @{mECchargeur} @{mECchoc} @{mECdefense} @{mECdeuxMains} @{mECdispersion} @{mECdegatContinue} @{mECdemoralisant} @{mECdesignation} @{mECenChaine} @{mECesperance} @{mECignoreArmure} @{mECignoreCdF} {{lourd=[[@{mEClourd}]]}} @{mEClumiere} @{mECobliteration} @{mECpenetrant} {{perceArmure=^{perce-armure} @{mECperceArmureValue}}} @{mECreaction} @{mECsilencieux} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{mECtenebricite} {{jumelageAkimbo=[[@{mECakimbo}]]}} {{jumelageAmbidextrie=[[@{mECambidextrie}]]}} @{mECtirRafale} @{mECassassin} {{cadence=[[ceil(@{mECcadence})]]}} {{scoreCadence=@{mECcadenceValue}}} @{mECsoumission}" />
 						<!-- Les améliorations structurelles -->
 						<input type="hidden" name="attr_mEClisteASPNJ" value="{{soeur=[[@{mECsoeur}]]}} {{jumelle=[[@{mECjumelle}]]}} @{mECassassine} {{ASAllegee=[[@{mECallegee}]]}} {{protectrice=[[@{mECprotectrice}]]}} @{mECbarbelee} @{mECelectrifiee} @{mECsournoisePNJ} @{mECindestructible} @{mECconnectee} @{mECsurmesurePNJ} @{mEClumineuse} @{mECmassive} @{mECagressive}" />
 						<!-- Les améliorations structurelles -->
@@ -26583,8 +26954,7 @@
 							<span data-i18n-title="penetrant" title="Pénétrant"></span>
 							<input type="number" name="attr_mECpenetrantValue" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mECperceArmure" value="{{perceArmure=^{perce-armure} @{mECperceArmureValue}}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="perce-armure" title="Perce Armure"></span>
 							<input type="number" name="attr_mECperceArmureValue" value="40" disabled />
 						</label>
@@ -26780,6 +27150,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<fieldset class="repeating_armeCaC">
 					<div class="data">
 						<!-- Les dégâts de l'arme -->
@@ -26791,7 +27162,7 @@
 						<!-- FanMade -->
 						<input type="hidden" name="attr_listeFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les effets -->
-						<input type="hidden" name="attr_listeEffetsPNJ" value="@{anatheme} @{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{parasitage} @{precisionPNJ} {{tirSecurite=[[@{tirSecurite}]]}} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} {{lourd=[[@{lourd}]]}} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[ceil(@{machine}/2)+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{tenebricite} {{jumelageAkimbo=[[@{akimbo}]]}} {{jumelageAmbidextrie=[[@{ambidextrie}]]}} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}" />
+						<input type="hidden" name="attr_listeEffetsPNJ" value="@{anatheme} @{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{parasitage} @{precisionPNJ} {{tirSecurite=[[@{tirSecurite}]]}} @{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{antiAnatheme} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} {{lourd=[[@{lourd}]]}} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{tenebricite} {{jumelageAkimbo=[[@{akimbo}]]}} {{jumelageAmbidextrie=[[@{ambidextrie}]]}} @{tirRafale} @{assassin} {{cadence=[[ceil(@{cadence})]]}} {{scoreCadence=@{cadenceValue}}} @{soumission}" />
 						<!-- Les améliorations structurelles -->
 						<input type="hidden" name="attr_listeASPNJ" value="{{soeur=[[@{soeur}]]}} {{jumelle=[[@{jumelle}]]}} @{assassine} {{ASAllegee=[[@{allegee}]]}} {{protectrice=[[@{protectrice}]]}} @{barbelee} @{electrifiee} @{sournoisePNJ} @{indestructible} @{connectee} @{surmesurePNJ} @{lumineuse} @{massive} @{agressive}" />
 						<!-- Les améliorations structurelles -->
@@ -27207,7 +27578,7 @@
 						<!-- La violence de l'pS -->
 						<input type="hidden" name="attr_pSviolencePNJ" value="{{Violence=[[ [[{ [[@{pSDistViolence}-@{pSchargeurExplosives}-@{pSmunitionsIEM}]], 0}kh1]]d6+@{pSDistBViolence}]]}}" />
 						<!-- Les effets -->
-						<input type="hidden" name="attr_pSlisteEffetsPNJ" value="@{pSanatheme} @{pSdestructeur} @{pSfureur} @{pSlestePNJ} @{pSmeurtrier} @{pSorfevreriePNJ} @{pSparasitage} @{pSprecisionPNJ} {{tirSecurite=[[@{pStirSecurite}]]}}@{pSultraViolence} @{pSantiAnatheme} @{pSantiVehicule} @{pSartillerie} @{pSassistanceAttaque} @{pSbarrage} @{pSchargeur} @{pSchoc} @{pSdefense} @{pSdeuxMains} @{pSdispersion} @{pSdegatContinue} @{pSdemoralisant} @{pSdesignation} @{pSenChaine} @{pSesperance} @{pSignoreArmure} @{pSignoreCdF} {{lourd=[[@{pSlourd}]]}} @{pSlumiere} @{pSobliteration} @{pSpenetrant} @{pSperceArmure} @{pSreaction} @{pSsilencieux} {{silencieuxD=[[@{machine}+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{pStenebricite} {{jumelageAkimbo=[[@{pSakimbo}]]}} {{jumelageAmbidextrie=[[@{pSambidextrie}]]}} @{pStirRafale} @{pSassassin}" />
+						<input type="hidden" name="attr_pSlisteEffetsPNJ" value="@{pSanatheme} @{pSdestructeur} @{pSfureur} @{pSlestePNJ} @{pSmeurtrier} @{pSorfevreriePNJ} @{pSparasitage} @{pSprecisionPNJ} {{tirSecurite=[[@{pStirSecurite}]]}}@{pSultraViolence} @{pSantiAnatheme} @{pSantiVehicule} @{pSartillerie} @{pSassistanceAttaque} @{pSbarrage} @{pSchargeur} @{pSchoc} @{pSdefense} @{pSdeuxMains} @{pSdispersion} @{pSdegatContinue} @{pSdemoralisant} @{pSdesignation} @{pSenChaine} @{pSesperance} @{pSignoreArmure} @{pSignoreCdF} {{lourd=[[@{pSlourd}]]}} @{pSlumiere} @{pSobliteration} @{pSpenetrant} @{pSperceArmure} @{pSreaction} {{silencieux=Silencieux}} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{pStenebricite} {{jumelageAkimbo=[[@{pSakimbo}]]}} {{jumelageAmbidextrie=[[@{pSambidextrie}]]}} @{pStirRafale} @{pSassassin}" />
 						<!-- FanMade -->
 						<input type="hidden" name="attr_pSlisteFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les améliorations -->
@@ -27409,8 +27780,7 @@
 							<span data-i18n-title="reaction" title="Réaction"></span>
 							<input type="number" name="attr_pSreactionValue" value="0" />
 						</label>
-						<label class="simple">
-							<input type="checkbox" name="attr_pSsilencieux" value="{{silencieux=Silencieux}}" checked disabled />
+						<label class="simple checked">
 							<span data-i18n-title="silencieux" title="Silencieux"></span>
 						</label>
 						<label class="simple">
@@ -27539,6 +27909,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<input type="hidden" name="attr_armeSME" value="0"/>
 				<div class="armeSection2">
 					<div class="data">
@@ -27547,7 +27918,7 @@
 						<!-- La violence de l'mE -->
 						<input type="hidden" name="attr_mEviolencePNJ" value="{{Violence=[[ [[{ [[@{mEDistViolence}-@{mEchargeurExplosives}-@{mEmunitionsIEM}]], 0}kh1]]d6+@{mEDistBViolence}]]}}" />
 						<!-- Les effets -->
-						<input type="hidden" name="attr_mElisteEffetsPNJ" value="@{mEanatheme} @{mEdestructeur} @{mEfureur} @{mElestePNJ} @{mEmeurtrier} @{mEorfevreriePNJ} @{mEparasitage} @{mEprecisionPNJ} {{tirSecurite=[[@{mEtirSecurite}]]}}@{mEultraViolence} @{mEantiAnatheme} @{mEantiVehicule} @{mEartillerie} @{mEassistanceAttaque} @{mEbarrage} @{mEchargeur} @{mEchoc} @{mEdefense} @{mEdeuxMains} @{mEdispersion} @{mEdegatContinue} @{mEdemoralisant} @{mEdesignation} @{mEenChaine} @{mEesperance} @{mEignoreArmure} @{mEignoreCdF} {{lourd=[[@{mElourd}]]}} @{mElumiere} @{mEobliteration} @{mEpenetrant} @{mEperceArmure} @{mEreaction} @{mEsilencieux} {{silencieuxD=[[@{machine}+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{mEtenebricite} {{jumelageAkimbo=[[@{mEakimbo}]]}} {{jumelageAmbidextrie=[[@{mEambidextrie}]]}} @{mEtirRafale} @{mEassassin}" />
+						<input type="hidden" name="attr_mElisteEffetsPNJ" value="@{mEanatheme} @{mEdestructeur} @{mEfureur} @{mElestePNJ} @{mEmeurtrier} @{mEorfevreriePNJ} @{mEparasitage} @{mEprecisionPNJ} {{tirSecurite=[[@{mEtirSecurite}]]}}@{mEultraViolence} @{mEantiAnatheme} @{mEantiVehicule} @{mEartillerie} @{mEassistanceAttaque} @{mEbarrage} {{chargeur=^{chargeur} @{mEchargeurValue}}} @{mEchoc} @{mEdefense} @{mEdeuxMains} {{dispersion=^{dispersion} @{mEdispersionValue}}} {{degatContinus=^{degats-continus} @{mEdegatContinueValue} ([[1D6]] ^{tours})}} @{mEdemoralisant} @{mEdesignation} @{mEenChaine} @{mEesperance} @{mEignoreArmure} @{mEignoreCdF} {{lourd=[[@{mElourd}]]}} {{lumiere=^{lumiere} @{mElumiereValue}}} @{mEobliteration} @{mEpenetrant} @{mEperceArmure} @{mEreaction} @{mEsilencieux} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{mEtenebricite} {{jumelageAkimbo=[[@{mEakimbo}]]}} {{jumelageAmbidextrie=[[@{mEambidextrie}]]}} @{mEtirRafale} @{mEassassin}" />
 						<!-- FanMade -->
 						<input type="hidden" name="attr_mElisteFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les améliorations -->
@@ -27632,8 +28003,7 @@
 							<span data-i18n-title="cadence" title="Cadence"></span>
 							<input type="number" name="attr_mEcadenceValue" class="center" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEchargeur" value="{{chargeur=^{chargeur} @{mEchargeurValue}}} " checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="chargeur" title="Chargeur"></span>
 							<input type="number" name="attr_mEchargeurValue" class="center" value="1" disabled />
 						</label>
@@ -27647,8 +28017,7 @@
 							<span data-i18n-title="defense" title="Défense"></span>
 							<input type="number" name="attr_mEdefenseValue" class="center" value="0" />
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEdegatContinue" value="{{degatContinus=^{degats-continus} @{mEdegatContinueValue} ([[1D6]] ^{tours})}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="degats-continus" title="Dégâts Continus"></span>
 							<input type="number" name="attr_mEdegatContinueValue" class="center" size="2" value="3" disabled />
 						</label>
@@ -27668,8 +28037,7 @@
 							<input type="checkbox" name="attr_mEdestructeur" value="{{destructeur=[[2D6]]}}" />
 							<span data-i18n-title="destructeur" title="Destructeur"></span>
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mEdispersion" value="{{dispersion=^{dispersion} @{mEdispersionValue}}} " checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="dispersion" title="Dispersion"></span>
 							<input type="number" name="attr_mEdispersionValue" class="center" value="3" disabled />
 						</label>
@@ -27709,8 +28077,7 @@
 							<input type="checkbox" name="attr_mElourd" value="1" />
 							<span data-i18n-title="lourd" title="Lourd"></span>
 						</label>
-						<label class="double">
-							<input type="checkbox" name="attr_mElumiere" value="{{lumiere=^{lumiere} @{mElumiereValue}}}" checked disabled />
+						<label class="double checked">
 							<span data-i18n-title="lumiere" title="Lumière"></span>
 							<input type="number" name="attr_mElumiereValue" class="center" size="2" value="2" disabled />
 						</label>
@@ -27880,6 +28247,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<fieldset class="repeating_armeDist">
 					<div class="data">
 						<!-- Les dégâts de l'arme -->
@@ -27887,7 +28255,7 @@
 						<!-- La violence de l'arme -->
 						<input type="hidden" name="attr_violencePNJ" value="{{Violence=[[ [[{ [[@{armeDistViolence}-@{chargeurExplosives}-@{munitionsIEM}]], 0}kh1]]d6+@{armeDistBViolence}]]}}" />
 						<!-- Les effets -->
-						<input type="hidden" name="attr_listeEffetsPNJ" value="@{anatheme} @{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{parasitage} @{precisionPNJ} {{tirSecurite=[[@{tirSecurite}]]}}@{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} {{lourd=[[@{lourd}]]}} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[@{machine}+@{machinePNJAE}+@{machinePNJAEMaj}]]}} @{tenebricite} {{jumelageAkimbo=[[@{akimbo}]]}} {{jumelageAmbidextrie=[[@{ambidextrie}]]}} @{tirRafale} @{assassin}" />
+						<input type="hidden" name="attr_listeEffetsPNJ" value="@{anatheme} @{destructeur} @{fureur} @{lestePNJ} @{meurtrier} @{orfevreriePNJ} @{parasitage} @{precisionPNJ} {{tirSecurite=[[@{tirSecurite}]]}}@{ultraViolence} @{antiAnatheme} @{antiVehicule} @{artillerie} @{assistanceAttaque} @{barrage} @{chargeur} @{choc} @{defense} @{deuxMains} @{dispersion} @{degatContinue} @{demoralisant} @{designation} @{enChaine} @{esperance} @{ignoreArmure} @{ignoreCdF} {{lourd=[[@{lourd}]]}} @{lumiere} @{obliteration} @{penetrant} @{perceArmure} @{reaction} @{silencieux} {{silencieuxD=[[ceil(@{masque}/2)+@{masquePNJAE}+@{masquePNJAEMaj}]]}} @{tenebricite} {{jumelageAkimbo=[[@{akimbo}]]}} {{jumelageAmbidextrie=[[@{ambidextrie}]]}} @{tirRafale} @{assassin}" />
 						<!-- FanMade -->
 						<input type="hidden" name="attr_listeFanMade" value="{{type=[[@{fichePNJ}]]}} {{FM=[[@{capaciteFanMade}]]}} @{attaqueOmbre}"/>
 						<!-- Les améliorations -->
@@ -28803,7 +29171,7 @@
 				</div>
 			</div>
 		</div>
-	
+		
 		<div class="fichePJ bottom">
 			<div class="effetsArmes">
 				<h1 data-i18n="effet-des-armes">Effet des armes</h1>
@@ -30538,7 +30906,7 @@
 		</div>
 	
 		<div class="center">
-			<div class="fichePJ armeDistancePJ">
+			<div class="fichePJ armeDistancePJ armeVehiculePJ">
 				<div class="titreBS2L">
 					<label>
 						<input type="checkbox" name="attr_bonusCarac" data-i18n-title="+1 Caractéristique" title="+1 Caractéristique" value="1" />
@@ -32198,8 +32566,8 @@
 								<span data-i18n="noyaux">Noyaux</span>
 							</div>
 							<div>
-								<div><input type="text" name="attr_MANOGStationPortee" value="Moyenne" readonly /></div>
 								<div><input type="text" name="attr_MANOGStationDuree" value="Sans limite" readonly /></div>
+								<div><input type="text" name="attr_MANOGStationPortee" value="Moyenne" readonly /></div>
 								<div><input type="text" name="attr_MANOGStationNoyaux" value="3" readonly /></div>
 							</div>
 							<div>
@@ -32223,16 +32591,24 @@
 							<div>
 								<div>
 									<span data-i18n="debordement">Débordement</span>
-									<button type="roll" name="roll_MANOGStationDebordement" value=""></button>
+									<button type="roll" name="roll_MANOGStationDebordement" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{debordement}}} {{arme=[[1]]}} {{Debordement=[[10*@{MANOGStationTourDebordement}]]}} {{situationnel=[[0]]}}"></button>
 								</div>
 								<div>
 									<span data-i18n="pod-missile">Pod Missile</span>
-									<button type="roll" name="roll_MANOGStationMissile" value=""></button>
+									<button type="roll" name="roll_MANOGStationMissile" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{pod-missile}}} {{arme=[[1]]}} {{Degats=[[6D6+3]]}} {{Violence=[[1D6+6]]}} {{Portee=^{portee-longue}}} {{situationnel=[[0]]}} {{effets=^{artillerie} / ^{anti-vehicule}}}"></button>
 								</div>
 								<div>
 									<span data-i18n="pod-roquette">Pod Roquette</span>
-									<button type="roll" name="roll_MANOGStationRoquette" value=""></button>
+									<button type="roll" name="roll_MANOGStationRoquette" value="@{jetGM} &{template:mechaArmure} {{Nom=@{name}}} {{Special=@{mechaArmureNom}}} {{titre=^{station-defense-automatisee}}} {{type=^{pod-roquette}}} {{arme=[[1]]}} {{Degats=[[1D6+3]]}} {{Violence=[[8D6+12]]}} {{Portee=^{portee-longue}}} {{situationnel=[[0]]}} {{effets=^"></button>
 								</div>
+							</div>
+							<div>
+								<div>
+									<span data-i18n="tour-actuel">Tour Actuel</span>
+									<input type="number" name="attr_MANOGStationTourDebordement" value="1" />
+								</div>
+								<div></div>
+								<div></div>
 							</div>
 						</div>
 					</div>
@@ -35037,7 +35413,9 @@
 					{{/sans}}
 				{{/guardian}}
 				{{^warrior}}
-					{{orfevrerie}}
+					{{^warriorMAL}}
+						{{orfevrerie}}
+					{{/warriorMAL}}
 				{{/warrior}}
 			</span>
 		</div>
@@ -36082,7 +36460,9 @@
 					{{/sans}}
 				{{/guardian}}
 				{{^warrior}}
-					{{orfevrerie}}
+					{{^warriorMAL}}
+						{{orfevrerie}}
+					{{/warriorMAL}}
 				{{/warrior}}
 			</span>
 		</div>
@@ -36102,7 +36482,9 @@
 					{{/sans}}
 				{{/guardian}}
 				{{^warrior}}
-					{{precision}}
+					{{^warriorMAL}}
+						{{precision}}
+					{{/warriorMAL}}
 				{{/warrior}}
 			</span>
 		</div>
@@ -36159,7 +36541,9 @@
 						{{/sans}}
 					{{/guardian}}
 					{{^warrior}}
-						{{ASSurMesureD}}
+						{{^warriorMAL}}
+							{{ASSurMesureD}}
+						{{/warriorMAL}}
 					{{/warrior}}
 				</span>
 			</div>
@@ -38903,10 +39287,10 @@
 			<span>+{{carac4}}</span>
 			<span>{{jCarac4}}</span>
 		</div>
-			<div>
-				<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
-				<span>{{OD4}}</span>
-			</div>
+		<div>
+			<span class="espaceSupp">+{{carac4}} <span data-i18n="od">OD</span></span>
+			<span>{{OD4}}</span>
+		</div>
 	{{/rollTotal() carSup 2}}
 	{{#moduleWraith}}
 		<div>
@@ -38915,10 +39299,12 @@
 		</div>
 	{{/moduleWraith}}
 	{{#arme}}
+		{{#Degats}}
 		<div class="success">
 			<span data-i18n="degats">Dégâts</span>
 			<span>{{Degats}}</span>
 		</div>
+		{{/Degats}}
 		{{#akimbo}}
 			<div>
 				<span>+<span data-i18n="style">Style</span></span>
@@ -38937,10 +39323,12 @@
 				<span>{{DegatsMax}}</span>
 			</div>
 		{{/moduleWraith}}
-		<div class="success">
-			<span data-i18n="violence">Violence</span>
-			<span>{{Violence}}</span>
-		</div>
+		{{#Violence}}
+			<div class="success">
+				<span data-i18n="violence">Violence</span>
+				<span>{{Violence}}</span>
+			</div>
+		{{/Violence}}
 		{{#akimbo}}
 			<div>
 				<span>+<span data-i18n="style">Style</span></span>
@@ -38959,6 +39347,12 @@
 				<span>{{ultraviolence}}</span>
 			</div>
 		{{/ultraviolence}}
+		{{#Debordement}}
+			<div class="success">
+				<span data-i18n="debordement">Débordement</span>
+				<span>{{Debordement}}</span>
+			</div>
+		{{/Debordement}}
 		<h2 data-i18n="effets-de-l'arme">Effets de l'Arme</h2>
 		<span>
 			{{effets}}

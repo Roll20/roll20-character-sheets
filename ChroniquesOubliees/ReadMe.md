@@ -11,9 +11,18 @@ Il est aussi possible d'utiliser cette fiche pour jouer avec l'ensemble de règl
 Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements gratuits sont disponibles sur le site de l&apos;&eacute;diteur [Black Book Editions](http://www.black-book-editions.fr/catalogue.php?id=13).
 
 # Version courante
-4.03 [Screenshot](co_v3.jpg)
+4.04 [Screenshot](co_v3.jpg)
 
 # Notes de version
+## v5.00 (2021-07-09)
+* Ajout d'une partie dédiée pour l'interaction avec le script
+* Ajout d'un type de dégâts drain
+* Passage en legacy=false
+
+## v4.04 (2021-02-01)
+* Séparation des capacités en titre + texte
+* Ajout d'un texte pour les voies
+
 ## v4.03 (2020-11-27)
 * Possibilité de ne plus avoir le bonus de base en attaque égal au niveau
 
