@@ -5679,6 +5679,22 @@ on('clicked:matrixattack', (info) => {
 				resistattr=target.split("|")[2];
 			}
 			var myroll="&{template:spell}";
+			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
+			var calcDrainTN="floor(?{" + lang["force"] + "?}/2) + " + drain + " + ( 2 * @{spellsus} )";
+			/* var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}"; */
+			var calcDrainDice="@{willpower|max}d6!![willpower] + ?{" + lang["sorcery-dice-for-drain"] + "?}d6!![sorcery dice] + ?{"+ lang["spell-pool-dice-for-drain"] +"?}d6!![spell pool]";
+			var caldDrainDiceTotal="@{willpower|max}[willpower] + ?{" + lang["sorcery-dice-for-drain"] + "?}[sorcery dice] + ?{"+ lang["spell-pool-dice-for-drain"] +"?}[spell pool]";
+			myroll+="{{senddata=[[0]]}}";
+			myroll+="{{draindamage=[[0]]}}{{finaldrain=[[0]]}}";
+			myroll+="{{cast=[[0]]}}{{draintnfinal=[[0]]}}";
+			myroll+="{{sorcerydice=[[?{"+ lang["sorcery-dice"] +"?|@{spellcasting}} + ?{" + lang["sorcery-dice-for-drain"] + "?|0}]]}}";
+			myroll+="{{spellpool=[[?{"+ lang["spell-pool-dice"] +"?|0} + ?{"+ lang["spell-pool-dice-for-drain"] +"?|0}]]}}";
+			myroll+="{{spelldamage=[[" + damage + "]]}}"
+			myroll+="{{castforce=[[?{" + lang["force"] + "?|" + force + "}]]}}";
+			/* myroll+="{{draintest=[[[[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1]]!!]]}}"; */
+			myroll+="{{draintest=[[" + calcDrainDice + "]]}}";
+			myroll+="{{rolldice=[[" + calcDice + "]]}}";
+			myroll+="{{draindice=[[" + caldDrainDiceTotal + "]]}}";
 			if ( range == "AoE" ) {
 				targetofspell="AoE";
 				if ( spellcat == "Elemental" ) {
@@ -5695,7 +5711,7 @@ on('clicked:matrixattack', (info) => {
 					}
 					resisttype="resistspell";
 				}
-
+				myroll+="{{roll=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
 			} else {
 				if ( spellcat == "Elemental" ) {
 					calcTN = target + " + 4 + @{rangedTN} + (2*(@{spellstack}+@{spellsus})) +@{spellmisc} + @{move}";
@@ -5706,23 +5722,6 @@ on('clicked:matrixattack', (info) => {
 					myroll+="{{targetnumber=[[" + calcTN + "]]}}";
 					resisttype="resistspell";
 				}
-
-			}
-			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
-			var calcDrainTN="floor(?{" + lang["force"] + "?}/2) + " + drain + " + ( 2 * @{spellsus} )";
-			var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}";
-			myroll+="{{senddata=[[0]]}}";
-			myroll+="{{draindamage=[[0]]}}{{finaldrain=[[0]]}}";
-			myroll+="{{cast=[[0]]}}{{draintnfinal=[[0]]}}";
-			myroll+="{{sorcerydice=[[?{"+ lang["sorcery-dice"] +"?|@{spellcasting}} + ?{" + lang["sorcery-dice-for-drain"] + "?|0}]]}}";
-			myroll+="{{spellpool=[[?{"+ lang["spell-pool-dice"] +"?|0} + ?{"+ lang["spell-pool-dice-for-drain"] +"?|0}]]}}";
-			myroll+="{{spelldamage=[[" + damage + "]]}}"
-			myroll+="{{castforce=[[?{" + lang["force"] + "?|" + force + "}]]}}";
-			myroll+="{{rolldice=[[" + calcDice + "]]}}";
-			myroll+="{{draintest=[[[[" + calcDrainDice + "]]d6>[[ {2, ( " + calcDrainTN + ")}kh1]]!!]]}}";
-			if ( range == "AoE" ) {
-				myroll+="{{roll=[[ [[" + calcDice + "]]d6>[[" + calcTN + "]]!! ]] }}";
-			} else {
 				myroll+="{{targetname=[[0[@{target|" + lang["target"] +"|token_name}]]]}}";
 				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			}
@@ -6430,7 +6429,7 @@ on('clicked:matrixattack', (info) => {
 			updatepoolused("sorcery", results.results.sorcerydice.result);	
 			updatepoolused("spellpool", results.results.spellpool.result);	
 			const drainbase = damagetable[results.results.draindamage.result];
-			const finaldraintxt=calcFinalDmg(( -1 * results.results.draindamage.result), results.results.draintest.result);
+			const finaldraintxt=calcFinalDmg(results.results.draindamage.result, (-1 * results.results.draintest.result));
 			finishRoll( results.rollId, {
 				draindamage: drainbase,
 				finaldrain: finaldraintxt,
@@ -9781,6 +9780,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
         {{#spellpool}}<div class="sheet-rtrow"><span data-i18n="spell-pool">Spell Pool</span>: {{spellpool}} </div>{{/spellpool}}
         {{#roll}}<div class="sheet-rtrow"><span data-i18n="casting-test">Casting Test</span>: {{computed::cast}} {{computed::roll}}</div>{{/roll}}
         {{#draintest}}
+        <div><span data-i18n="drain"></span>{{draindice}}d6 vs {{computed::draintnfinal}} = {{computed::draintest}}</div>
         <div class="sheet-spell-resist-table">
             <div data-i18n="drain">Drain</div>
             <div></div>
@@ -9789,7 +9789,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
             <div data-i18n="final">Final</div>
             <div>{{computed::draindamage}}</div>
             <div></div>
-            <div>{{draintest}}</div>
+            <div>{{computed::draintest}}</div>
             <div></div>
             <div>{{computed::finaldrain}}</div>
         </div>
