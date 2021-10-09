@@ -1025,7 +1025,7 @@
 </div>
 
 
-<script type="text/worker">
+<script>
 	// type="text/worker"
 
 	'use strict';
@@ -1050,7 +1050,7 @@
 		return attr;
 	};
 
-	/* ===== PARAMETERS ==========
+	/* ===== Repeating Sum PARAMETERS ==========
 	destinations = the name of the attribute that stores the total quantity
 				section = name of repeating fieldset, WITHOUT "repeating_"
 				fields = the name of the attribute field to be summed
@@ -1155,6 +1155,7 @@
 			});
 	});
 
+	//Versioning
 	on('sheet:opened', () => {
 		// SET LATEST VERSION HERE. needs to be => the last update made in versionator below
 			let final_version = 1.58;
@@ -1233,6 +1234,7 @@
 									'@{rSlots}': '@{nwp_slots}',
 									'@{rModifier}': '@{nwp_modifier}',
 									'@{short_description}': '@{nwp_short_description}',
+									'@{macro-text}': '@{nwp_macro_text}',
 									'@{description}': '@{nwp_description}'
 							};
 							const oldMacrotext = "&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Non Weapon Proficiency: @{name}}} {{Proficiency Check=[[ 1d20 + [[@{rmodifier}]][MOD] + [[?{Additional modifier?|0}]][MOD] ]] vs [[ @{rAttribute}[ATTR] ]]}}{{freetext=@{short_description}}}";
@@ -1277,6 +1279,7 @@
 									'@{current}': '@{ability_current}',
 									'@{current_max}': '@{ability_current_max}',
 									'@{short_description}': '@{ability_short_description}',
+									'@{macro-text}': '@{ability_macro_text}',
 									'@{description}': '@{ability_description}'
 							};
 							const oldMacrotext = "&{template:general} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=Special Ability: @{name}}} {{freetext=@{short_description} @{description}}}";
@@ -1433,6 +1436,7 @@
 									'@{weight}': '@{weapon_weight}',
 									'@{weaponspeed}': '@{weapon_speed}',
 									'@{cost}': '@{weapon_cost}',
+									'@{macro-text}': '@{weapon_macro_text}',
 									'@{weaponnotes}': '@{weapon_notes}'
 							};
 							const oldMacrotext = "&{template:attacks} {{color=@{color_option}}} {{name=@{character_name}}} {{subtag=@{WeaponName}}} {{attack1=[[1d20 + @{ToHitBonus}[BON] + @{MagicBonus}[MAG] + ?{To Hit Modifier?|0}[MOD] ]]}} {{damage1vsSM=[[@{DamageSmallMedium} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{damage1vsL=[[@{DamageLarge} + @{AttackDmgBonus}[BON] + @{MagicBonus}[MAG] + ?{Damage Modifier?|0}[MOD] ]]}} {{WeaponNotes=@{WeaponNotes}}} @{whisper_to-hit}";
@@ -1464,7 +1468,7 @@
 			});
 	};
 
-	//replace default macro-text of non weapon proficiencies ONLY IF they haven't been edited
+	//replace default macro-text of non-weapon proficiencies ONLY IF they haven't been edited
 	const nwpMacroUpdate = function (current_version, final_version) {
 		var update = {},
 				updateNwps = {};
@@ -1480,12 +1484,12 @@
 					};
 					_.each(idnwps, function (id) {
 						if (v['repeating_nonweaponproficiencies_' + id + '_macro-text']) {
-							updateNwps['repeating_nonweaponproficiencies_' + id + '_macro-text'] = v['repeating_nonweaponproficiencies_' + id + '_macro-text'].replace(replacements.nwp_old, replacements.nwp_new);
+							update['repeating_nonweaponproficiencies_' + id + '_macro-text'] = v['repeating_nonweaponproficiencies_' + id + '_macro-text'].replace(replacements.nwp_old, replacements.nwp_new);
+							clog('nwpMacroUpdate check completed on: ' + attrsNWPs);
 						}
 					});
 					update.sheet_version = current_version;
-					clog('nwpMacroUpdate check completed on: ' + attrsNWPs);
-					setAttrs(update, {
+					setAttrs( update, {
 					silent: true
 					}, versionator(current_version, final_version)); //Update
 				});
@@ -1517,7 +1521,7 @@
 													attrsAbility.push('repeating_ability_' + itemid + '_ability_macro_text');
 											});
 											_.each(idspells, function (itemid) {
-													attrsSpells.push('repeating_spells_' + itemid + '_spells_macro_text');
+													attrsSpells.push('repeating_spells_' + itemid + '_spell_macro_text');
 											});
 											getAttrs([...attrsNWP, ...attrsWeapon, ...attrsAbility, ...attrsSpells], function (v) {
 													const replacements = {
@@ -1532,30 +1536,30 @@
 													};
 													_.each(idnwps, function (id) {
 															if (v['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text']) {
-																	updateNwp['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'] = v['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'].replace(replacements.nwp_old, replacements.nwp_new);
+																	update['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'] = v['repeating_nonweaponproficiencies_' + id + '_nwp_macro_text'].replace(replacements.nwp_old, replacements.nwp_new);
+																	clog('nwpMacroUpdate check completed on: ' + attrsNWP);
 																}
 													});
 													_.each(idweapons, function (id) {
 															if (v['repeating_weapon_' + id + '_weapon_macro_text']) {
-																	updateWeapon['repeating_weapon_' + id + '_weapon_macro_text'] = v['repeating_weapon_' + id + '_weapon_macro_text'].replace(replacements.wpn_old, replacements.wpn_new);
+																	update['repeating_weapon_' + id + '_weapon_macro_text'] = v['repeating_weapon_' + id + '_weapon_macro_text'].replace(replacements.wpn_old, replacements.wpn_new);
+																	clog('colorUpdate check completed on: ' + attrsWeapon);
 																	}
 													});
 													_.each(idabilities, function (id) {
 															if (v['repeating_ability_' + id + '_ability_macro_text']) {
-																	updateAbility['repeating_ability_' + id + '_ability_macro_text'] = v['repeating_ability_' + id + '_ability_macro_text'].replace(replacements.abl_old, replacements.abl_new);
+																	update['repeating_ability_' + id + '_ability_macro_text'] = v['repeating_ability_' + id + '_ability_macro_text'].replace(replacements.abl_old, replacements.abl_new);
+																	clog('colorUpdate check completed on: ' + attrsAbility);
 																	}
 													});
 													_.each(idspells, function (id) {
-															if (v['repeating_spells_' + id + '_spells_macro_text']) {
-																	updateSpells['repeating_spells_' + id + '_spells_macro_text'] = v['repeating_spells_' + id + '_spells_macro_text'].replace(replacements.spl_old, replacements.spl_new);
+															if (v['repeating_spells_' + id + '_spell_macro_text']) {
+																	update['repeating_spells_' + id + '_spell_macro_text'] = v['repeating_spells_' + id + '_spell_macro_text'].replace(replacements.spl_old, replacements.spl_new);
+																	clog('colorUpdate check completed on: ' + attrsSpells);
 																	}
 													});
 													update.sheet_version = current_version;
-														clog('nwpMacroUpdate check completed on: ' + attrsNWP);
-														clog('colorUpdate check completed on: ' + attrsWeapon);
-														clog('colorUpdate check completed on: ' + attrsAbility);
-														clog('colorUpdate check completed on: ' + attrsSpells);
-													setAttrs(update, {
+													setAttrs( update, {
 															silent: true
 													}, versionator(current_version, final_version)); //Update
 											});
