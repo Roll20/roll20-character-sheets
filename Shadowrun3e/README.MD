@@ -1,5 +1,12 @@
 # Shadowrun 3rd Edition
 
+## Release Notes 10/8/2021
+
+## changes/bug fixes
+1. added import for characters, criters, matrix, vehicles and spirits 
+2. added carring weight for Ammo, Armor, Weapons and Gear. 
+3. added toggle for "carrying" or "in stash" to seperate gear that is brought on a run and counts towards encumberance vs. gear owned but not being carried.
+
 ## Release Notes 9/28/2021
 
 ### changes/bug fixes
