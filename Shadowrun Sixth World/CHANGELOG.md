@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2021-10-11 ** v.43 Chuz (James Culp)
+	Added roll post-processing to PC sheet buttons.  This includes a new way to handle Wild Dice and glitch/crit glitch detection.
 **2021-09-21 ** v.42 Chuz (James Culp)
 	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
 	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.
@@ -22,8 +24,6 @@ Change Log
 	Added Social Rating to derived tests (even though it's not a test) just to the right of the Edge Attribute.  This is a total of Charisma + any cumulative + primary armor social adjustments.
 	Added mouseovers for Composure, Judge Intentions, Memory and Lift & Carry buttons detailing where the values come from for those of us that forget.
 	Added the ability to add Spells, NPC Spells, Qualities and Augmentations by pasting raw data into the Notes textarea for a new repeating row.
-**2021-08-04 ** v.40 Chuz (James Culp)
-
 **2021-07-19 ** v.39 Chuz (James Culp)
 	Added Grunt Groups and Autocalculations based on the # of grunts
 	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
