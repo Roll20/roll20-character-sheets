@@ -12960,7 +12960,7 @@
     </div>
 
 
-    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20210831"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
+    <b>&bdquo;Das Schwarze Auge&ldquo;-Heldenbogen für Roll20.net, Version <input type="text" class="sheet-stat-immutable sheet-stat-immutable-version" disabled="disabled" name="attr_character_sheet_version" value="20211010"><input type="hidden" class="sheet-stat-immutable sheet-stat-immutable-version" readonly="readonly" name="attr_data_version" value=""></b>
     </table>
 </div>
 
@@ -16151,7 +16151,8 @@ var versionsWithMigrations = [
     20190427,
     20200809,
     20210413,
-    20210718
+    20210718,
+    20211010
 ]
 
 /*
@@ -16627,6 +16628,30 @@ function migrateTo20210718 (migrationChain) {
 		update["BE_RG_INI"] = calculateRuestungBE(values, {"sourceType": "migration"})["BE_RG_INI"];
 		debugLog(caller, "Gathering new values complete:", update);
 		safeSetAttrs(update, {}, function() {
+			callNextMigration(migrationChain);
+		});
+	});
+}
+
+/*
+	Migration steps:
+	- Initialize "new" attributes LE to LEAktuell, AU to AusAktuell, AE to ASPAktuell, KE to KEAktuell
+*/
+function migrateTo20211010(migrationChain) {
+	var caller = "migrateTo20211010";
+	debugLog(caller, "migrateTo20211010 invoked");
+
+	safeGetAttrs([
+			"LEAktuell", "AusAktuell", "ASPAktuell", "KEAktuell"
+			], function(v) {
+
+		var attrsToChange = {};
+		attrsToChange["LE"] = v["LEAktuell"];
+		attrsToChange["AU"] = v["AusAktuell"];
+		attrsToChange["AE"] = v["ASPAktuell"];
+		attrsToChange["KE"] = v["KEAktuell"];
+
+		safeSetAttrs(attrsToChange, {}, function(){
 			callNextMigration(migrationChain);
 		});
 	});
