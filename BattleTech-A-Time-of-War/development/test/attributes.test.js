@@ -1,5 +1,5 @@
 import {
-    calculateAbilityScore,
+    calculateAttributeScore,
     calculateLinkedAttributeValue
 } from '../src/attributes'
 import {
@@ -44,16 +44,16 @@ test('attribute with value of 10 should have linked value of 2', () => {
 
 // Calculate ability score tests
 test('should return undefined if attribute value is not number', () => {
-    expect(calculateAbilityScore({ newValue: "potato", })).toBe(undefined)
-    expect(calculateAbilityScore({})).toBe(undefined)
-    expect(calculateAbilityScore({ newValue: [], })).toBe(undefined)
-    expect(calculateAbilityScore({ newValue: {}, })).toBe(undefined)
-    expect(calculateAbilityScore({ newValue: () => {}, })).toBe(undefined)
+    expect(calculateAttributeScore("strength_xp", "potato")).toBe(undefined)
+    expect(calculateAttributeScore("strength_xp", undefined)).toBe(undefined)
+    expect(calculateAttributeScore("strength_xp", [])).toBe(undefined)
+    expect(calculateAttributeScore("strength_xp", {})).toBe(undefined)
+    expect(calculateAttributeScore("strength_xp", () => {})).toBe(undefined)
 })
 
 test('should calculate attribute value and linked attribute value for each attribute type, or return error for unknown attribute type', () => {
     // strength
-    expect(calculateAbilityScore({ sourceAttribute: "strength_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("strength_xp", 200)).toStrictEqual({
         name: "strength",
         value: 2,
         linkName: "strength_link",
@@ -61,7 +61,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // body
-    expect(calculateAbilityScore({ sourceAttribute: "body_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("body_xp", 200)).toStrictEqual({
         name: "body",
         value: 2,
         linkName: "body_link",
@@ -69,7 +69,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // reflex
-    expect(calculateAbilityScore({ sourceAttribute: "reflex_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("reflex_xp", 200)).toStrictEqual({
         name: "reflex",
         value: 2,
         linkName: "reflex_link",
@@ -77,7 +77,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // dexterity
-    expect(calculateAbilityScore({ sourceAttribute: "dexterity_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("dexterity_xp", 200)).toStrictEqual({
         name: "dexterity",
         value: 2,
         linkName: "dexterity_link",
@@ -85,7 +85,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // intelligence
-    expect(calculateAbilityScore({ sourceAttribute: "intelligence_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("intelligence_xp", 200)).toStrictEqual({
         name: "intelligence",
         value: 2,
         linkName: "intelligence_link",
@@ -93,7 +93,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // will
-    expect(calculateAbilityScore({ sourceAttribute: "will_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("will_xp", 200)).toStrictEqual({
         name: "will",
         value: 2,
         linkName: "will_link",
@@ -101,7 +101,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // charisma
-    expect(calculateAbilityScore({ sourceAttribute: "charisma_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("charisma_xp", 200)).toStrictEqual({
         name: "charisma",
         value: 2,
         linkName: "charisma_link",
@@ -109,7 +109,7 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // edge
-    expect(calculateAbilityScore({ sourceAttribute: "edge_xp", newValue: 200, })).toStrictEqual({
+    expect(calculateAttributeScore("edge_xp", 200)).toStrictEqual({
         name: "edge",
         value: 2,
         linkName: "edge_link",
@@ -117,5 +117,5 @@ test('should calculate attribute value and linked attribute value for each attri
     })
 
     // unknown
-    expect(calculateAbilityScore({ sourceAttribute: "psychic_xp", newValue: 200, })).toBe(undefined)
+    expect(calculateAttributeScore("psychic_xp", 200)).toBe(undefined)
 })
