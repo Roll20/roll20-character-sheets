@@ -4414,9 +4414,9 @@
                     </div>
                     <select name="attr_zustand" class="d--flex__item--grow2 pr--2">  
                         <optgroup>
-                            <option value="benommen" selected="selected">Unbesch&auml;digt</option>
-                            <option value="bewusstlos">Angeschlagen (-3)</option>
-                            <option value="erschoepft">Demoliert</option>
+                            <option value="unbeschaedigt" selected="selected">Unbesch&auml;digt</option>
+                            <option value="angeschlagen">Angeschlagen (-3)</option>
+                            <option value="demoliert">Demoliert</option>
                         </optgroup>
                     </select>
                     <label class="pr--2 text--center">
@@ -4842,10 +4842,10 @@
                 <td>&nbsp;</td>
             </tr>
             <tr>
-                <td><p style="font-size:9px"><strong>Hinweise:</strong> Aufgrund der stetig wachsenden Datenbasis kann es vereinzelt zu fehlerhaft importierten Daten kommen (insbes. Zauberspr&uuml;che und Meisterschaften), erkennbar daran, dass die Begriffe dann auf englisch vorliegen. Bitte beachte, dass der Import von Waffen, R&uuml;stungen, Schilden sowie Ausru&uuml;stung technisch nicht m&ouml;glich ist. Falls der Importer nicht funktioniert, kann das an einer veralteten Genesis-Version liegen. In dem Fall upgrade bitte auf Genesis 6.</p></td>
+                <td><p style="font-size:9px"><strong>Hinweise:</strong> Aufgrund der stetig wachsenden Datenbasis kann es vereinzelt zu fehlerhaft importierten Daten kommen (insbes. Zauberspr&uuml;che und Meisterschaften), erkennbar daran, dass die Begriffe dann auf englisch vorliegen. Falls der Importer nicht funktioniert, kann das an einer veralteten Genesis-Version liegen. In dem Fall upgrade bitte auf Genesis 6.</p></td>
             </tr>
             <tr>
-                <td align="center"><textarea placeholder="JSON-String hier einfÃ¼gen" name="attr_jsonimport" style="width:61.25em; background-color:#81BEF7"></textarea></td>
+                <td align="center"><textarea placeholder="JSON-String hier einfügen" name="attr_jsonimport" style="width:61.25em; background-color:#81BEF7"></textarea></td>
             </tr>
             <tr>
                 <td align="center"><button type="action" name="act_startimport" style="background-color:#0489B1; color:white; font-weight: bold;">Import starten</button></td>
@@ -6062,6 +6062,12 @@ on('sheet:opened',function(){
         }
     });
     transferRessources();
+    setAttrs({
+        gmroll: 0
+    });
+    setAttrs({
+        gmroll: 1
+    });
 });
 
 function migrateFightAndMagicSkillMastery() {
@@ -8200,6 +8206,9 @@ function writeToSheet (characterData) {
                 }
             }
         }
+        if (characterData["notes"] != null) {
+            character["notizen"] = characterData["notes"];
+        }
         let meleeskills = {"BEW":"bew","STÃ„":"stae","AUS":"aus","INT":"int","KON":"kon","MYS":"mys","VER":"ver","WIL":"wil"};
         if (characterData["meleeWeapons"].length > 0) {
             let merkmale = "";
@@ -8306,9 +8315,8 @@ function writeToSheet (characterData) {
             character["schildbe"] = characterData["shields"][0]["handicap"];
             character["schildtickplus"] = characterData["shields"][0]["tickMalus"];
             character["schildmerkmale"] = characterData["shields"][0]["features"][0]["name"];
-            
             newrowid = generateRowID();
-            character["repeating_nahkampfwaffen_" + newrowid + "_waffenname"] = "SchildstoÃŸ";
+            character["repeating_nahkampfwaffen_" + newrowid + "_waffenname"] = "Schildstoß";
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenskill"] = characterData["shields"][0]["skill"].toLowerCase();
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr1"] = "bew";
             character["repeating_nahkampfwaffen_" + newrowid + "_waffenattr2"] = "stae";
@@ -8329,9 +8337,6 @@ function writeToSheet (characterData) {
                 character["repeating_ausruestung_" + newrowid + "_name"] = item;
                 character["repeating_ausruestung_" + newrowid + "_getragen"] = true;
             }
-        }
-        if (characterData["notes"] != null) {
-            character["notizen"] = characterData["notes"];
         }
         setAttrs(character);
     } else {
@@ -10424,7 +10429,7 @@ on("change:lebenspunkte_v", function(eventInfo) {
     });
 }); 
 
-on("change:rolldamagecheck change:rolldamagensccheck change:repeating_nahkampfwaffen change:repeating_fernkampfwaffen", function(eventInfo) {
+on("change:rolldamagecheck change:rolldamagensccheck change:repeating_nahkampfwaffen change:repeating_fernkampfwaffen sheet:opened", function(eventInfo) {
   getAttrs(["rolldamagensccheck", "rolldamagecheck"], function(v) {
       let damagensc = "";
       let damagescnah = "";
