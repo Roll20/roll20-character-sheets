@@ -6,6 +6,7 @@
 1. added import for characters, criters, matrix, vehicles and spirits 
 2. added carring weight for Ammo, Armor, Weapons and Gear. 
 3. added toggle for "carrying" or "in stash" to seperate gear that is brought on a run and counts towards encumberance vs. gear owned but not being carried.
+4. added new ammo types: screamer, hammerhead, gyrojet plus, gyrojet seeker, gyrojet seeker plus, shock lock, incindiary, big d's temper, bola and flare. 
 
 ## Release Notes 9/28/2021
 
