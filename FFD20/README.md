@@ -17,6 +17,51 @@ The Monster sheet type is meant for monsters, to be used exclusively by the DM. 
 
 ### Changelog
 
+__Version 1.6 (pushed 7/4/2021)__
+
+A couple changes here and there; expect a bigger update in a little while!
+
+Character Sheet
+
+* Miscellaneous aesthetic changes.
+* Fixed a bug with user created macros not showing notes for certain skills.
+* Fixed a bug with CMD not adding dodge or deflection bonuses.
+* Fixed the "Extra MP" feature to be in line with the site changes to the feat.
+* Added Inherent column for Ability Scores section.
+
+__Version 1.5 (pushed 10/26/2020)__
+
+Special thanks to TamedFlame for accomplishing most of this update!
+
+Iterative attacks will be on the next update scheduled before New Years!
+
+Character Sheet
+
+* Spell failure roll on all spells if you have greater than 0% spell failure chance from equipment.
+* Size modifiers are now factored in for Fly and Stealth skills.
+* Added "Racial" trait option.
+* Added spell DC field for spell levels and a modifier for individual spells.
+* Chat display buttons for character traits/feats/class features.
+* Modifiable ability scores for character skills.
+
+Monster Sheet
+
+* Aesthetic changes.
+
+Universal
+
+* Added GM roll toggle under the Sheet Options.
+
+__Version 1.4 (pushed 6/21/2020)__
+
+##### This update was realized by TamedFlame
+
+Universal
+
+* The background color gradient is now customisable from the Options section. You can select a color for each corner, and the sheet shall use those to generate a new background gradient. These options are set per character, and as such each PC, Monster, or NPC can have a style of their own. These settings also affect the backgrounds for the rolls in the chat, and as such you can use them to identify characters. 
+
+>  #### User discretion is advised when selcting colors, consider talking to your fellow players if any of them has difficulties with certain combinations.
+
 __Version 1.3 (pushed 2/23/2019)__
 
 Character Sheet

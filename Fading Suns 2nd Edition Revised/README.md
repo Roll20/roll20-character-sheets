@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.2.1
+- Fixed roll buttons not triggering for newly created combat actions, psi powers and theurgy rites.
+- Added ability to increase the number of damage dice rolled (from VPs).
+
 ## 1.2.0
 - Renamed sheet to `Fading Suns 2nd Edition Revised` from `Fading Suns v2.75`
 - Added ability to select the characteristic for the roll of a skill on the fly (as opposed to having to select a characteristic beforehand)
@@ -28,6 +32,8 @@
 - first release of the Fading Suns v2.75 (a.k.a. 2nd Edition Revised by FASA).
 
 # TODO list
+
+- Make the "+/- #d" roll query more comprehensible and add to i18n.
 
 - General improvements to goal rolls
   - Ability to switch b/w public vs GM roll

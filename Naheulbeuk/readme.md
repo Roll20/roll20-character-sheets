@@ -31,7 +31,7 @@ La fiche reprend les éléments de la feuille de personnage officielle réorgani
 - Compagnons
 	* Permet de gérer montures ou animaux de compagnies
 
-Il est possible de basculter les feuilles en un affichage plus compacte pour les PNJ en cliquant sur le bouton PJ en haut à gauche.
+Il est possible de basculer les feuilles en un affichage plus compacte pour les PNJ en cliquant sur le bouton PJ en haut à gauche.
 
 Il est également possible d'exporter toutes les données de la fiche en un format texte que vous pourrez sauvegarder, puis l'importer dans une fiche vierge d'une autre campagne pour la préremplir.
 
