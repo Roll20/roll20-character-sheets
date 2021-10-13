@@ -83,6 +83,8 @@ September 14th 2021 v1.53
 - Skills which are affected by advantage or penaties now have tooltip markers to indicate it.
 - Added experimental SL system and custom roll parsing sheet workers, these are hidden and dont interfere with the base page.
 
+-- Added many more integrated talents ~75% of RAW in experimental mode
+
 
 August 25th 2021 v1.52
 
