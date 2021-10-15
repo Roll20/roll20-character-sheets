@@ -1,4 +1,4 @@
-async function updateSkill(rowId, iqBonusKey = "iq_bonus") {
+async function updateSkillOld(rowId, iqBonusKey = "iq_bonus") {
   const additionalModifiers = [iqBonusKey];
 
   const profileMeta = await getAttrsAsync(["default_profile"]);
@@ -22,11 +22,72 @@ async function updateSkill(rowId, iqBonusKey = "iq_bonus") {
   await setAttrsAsync(attrs);
 }
 
-async function updateSkills() {
+async function updateSkill(rowId) {
+  const row = `repeating_skills_${rowId}`;
+  const keys = SKILL_KEYS.map((key) => `${row}_${key}`).concat([
+    "default_profile",
+  ]);
+  console.log("keys", keys);
+  const a = await getAttrsAsync(keys);
+  console.log(a);
+
+  const iqBonusKey = `repeating_profiles_${a["default_profile"]}_mod_iq_bonus`;
+  const skillBonusKey = `repeating_profiles_${a["default_profile"]}_mod_skillbonus`;
+  const profileKeys = [iqBonusKey, skillBonusKey];
+  console.log("profileKeys", profileKeys);
+  const profileBonuses = await getAttrsAsync(profileKeys);
+  console.log(profileBonuses);
+
+  const total =
+    +a[`${row}_base`] +
+    +a[`${row}_bonus`] +
+    (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`] +
+    (+profileBonuses[iqBonusKey] || 0) +
+    (+profileBonuses[skillBonusKey] || 0);
+  console.log("total", total);
+  await setAttrsAsync({ [`${row}_total`]: total });
+}
+
+async function updateSkillsOld() {
   const ids = await getSectionIDsAsync("skills");
   for (const id of ids) {
     await updateSkill(id);
   }
+}
+
+async function updateSkills() {
+  console.log("updateSkills");
+  const ids = await getSectionIDsAsync("skills");
+  const keys = ids
+    .reduce((acc, cur) => {
+      const row = `repeating_skills_${cur}`;
+      const skillKeys = SKILL_KEYS.map((key) => `${row}_${key}`);
+      return acc.concat(skillKeys);
+    }, [])
+    .concat(["default_profile"]);
+  console.log("keys", keys);
+  const a = await getAttrsAsync(keys);
+  console.log("a", a);
+  // calculate IQ bonus once we know the default_profile
+  const iqBonusKey = `repeating_profiles_${a["default_profile"]}_mod_iq_bonus`;
+  const skillBonusKey = `repeating_profiles_${a["default_profile"]}_mod_skillbonus`;
+  const profileKeys = [iqBonusKey, skillBonusKey];
+  console.log("profileKeys", profileKeys);
+  const profileBonuses = await getAttrsAsync(profileKeys);
+  console.log("profileBonuses", profileBonuses);
+  const totals = ids.reduce((acc, cur) => {
+    const row = `repeating_skills_${cur}`;
+    const total =
+      +a[`${row}_base`] +
+      +a[`${row}_bonus`] +
+      (+a[`${row}_level`] - 1) * +a[`${row}_perlevel`] +
+      (+profileBonuses[iqBonusKey] || 0) +
+      (+profileBonuses[skillBonusKey] || 0);
+    acc[`${row}_total`] = total;
+    return acc;
+  }, {});
+  console.log("totals", totals);
+  await setAttrsAsync(totals);
 }
 
 async function updateSkillLevels(newCharacterLevel, oldCharacterLevel) {
@@ -44,6 +105,9 @@ async function updateSkillLevels(newCharacterLevel, oldCharacterLevel) {
 
 on("change:repeating_skills", async (e) => {
   console.log("change:repeating_skills", e);
+  if (e.sourceType === "sheetworker" && !e.sourceAttribute.endsWith("_level")) {
+    return;
+  }
   if (e.sourceAttribute.endsWith("_name")) return;
   const sourceParts = e.sourceAttribute.split("_");
   // Return if no attribute is changed and it's the row itself

@@ -239,7 +239,9 @@ async function repeatingStringConcatAsync({
       .reduce((attrAcc, attrCur) => {
         return a[attrCur] == "" || a[attrCur] == "0"
           ? attrAcc
-          : `${a[attrCur]}+${attrAcc}`.replace(/\+\s*$/, "");
+          : `${a[attrCur]}+${attrAcc}`
+              .replace(/\+\s*$/, "")
+              .replace(/^\s*\+/, "");
       }, "");
     return acc;
   }, {});
@@ -256,7 +258,11 @@ function mergeAndAddObjects(data) {
   data.forEach((obj) => {
     for (let [key, value] of Object.entries(obj)) {
       if (result[key]) {
-        result[key] += value;
+        if (key === "critical" || key === "knockout" || key === "deathblow") {
+          result[key] = result[key] > value ? value : result[key];
+        } else {
+          result[key] += value;
+        }
       } else {
         result[key] = value;
       }
@@ -277,4 +283,35 @@ async function getSectionIDsOrderedAsync(sectionName) {
     ),
   ];
   return ids;
+}
+
+/**
+ * Add a token {attack} times to the Turn Tracker in order against other tokens.
+ * Requires API script access.
+ * For use on an action button.
+ *
+ * [[d20+@{selected|repeating_profiles_-MibcwHG5hZXUJn6A7OG_initiative} &{tracker}]]
+ */
+async function palladiumAddToTurnTracker(initKey, attacksKey) {
+  const { [initKey]: init, [attacksKey]: attacks } = await getAttrsAsync([
+    initKey,
+    attacksKey,
+  ]);
+  const initString = init > 0 ? `+${init}` : `${init}`;
+  const roll = await startRoll(
+    `&{template:initiative} {{title=@{selected|character_name} rolls initiative!}} {{diceroll=[[1d20]]}} {{modifier=${initString}}}`
+  );
+  console.log(roll);
+  const computed = roll.results.diceroll.result + init;
+  console.log(computed);
+  finishRoll(roll.rollId, {
+    diceroll: computed,
+  });
+  const addToTracker = await startRoll(
+    `Setting @{selected|character_name}'s initiative to [[[[${computed}]] &{tracker}]] in the Turn Tracker.`
+  );
+  finishRoll(addToTracker.rollId);
+  // https://app.roll20.net/forum/post/6817409/multiple-initiative-values-for-a-single-character/?pageforid=6817748#post-6817748
+  const dupeTracker = await startRoll(`!dup-turn ${attacks}`);
+  finishRoll(dupeTracker.rollId);
 }
