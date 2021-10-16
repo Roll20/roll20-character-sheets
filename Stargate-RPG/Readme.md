@@ -5,6 +5,15 @@ Offical Roll20 Character sheet for "Stargate RPG" by Wyvern Gaming, sheet create
 
 ### Changelog
 
+**v.1.76 (Sept 30th)**
+* add passive perception(next to bulk)
+
+**v.1.75 (Sept 7th)**
+* Moved Eureka Points to main page. Shown to Scientists by default, setting option to always show it
+* Added HD & TD buttons to main page, changed HD to dropdown
+* rearrange WIS & INT to correct order
+* minor visual fixes
+
 **v.1.74 (2021-08-31)**
 * Add adv./disadv. options to Init & moxie rolls
 * Add 6th & 7th weapon slot
