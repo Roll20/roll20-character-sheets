@@ -15,19 +15,34 @@ const impactsAttrs = [
   'impactOther2'
 ]
 
-const momentumAttrs = [
-  'momentum_max',
-  'momentum_reset'
+const shipImpactAttrs = [
+  'impactShipBattered',
+  'impactShipCursed'
 ]
 
-on(impactsAttrs.map(impact => `change:${impact}`).join(" "),
+const momentumAttrs = [
+  'momentum_max',
+  'momentum_reset',
+  'onboard_check_ship_button'
+]
+
+function buildImpactEvents (impacts) {
+  return impacts.map(impact => `change:${impact}`).join(' ')
+}
+
+on(`${buildImpactEvents(impactsAttrs)} ${buildImpactEvents(shipImpactAttrs)} change:onboard_check_ship_button`,
   function() {
     var numImpacts = 0;
     getAttrs(
-      impactsAttrs.concat(momentumAttrs),
+      impactsAttrs.concat(momentumAttrs).concat(shipImpactAttrs),
       function(values) {
         for (var attr in impactsAttrs) {
-          if (values[impactsAttrs[attr]] === "on") {
+          if (values[impactsAttrs[attr]] === 'on') {
+            numImpacts += 1;
+          }
+        }
+        for (var attr in shipImpactAttrs) {
+          if (values[shipImpactAttrs[attr]] === 'on' && values['onboard_check_ship_button'] === 'on') {
             numImpacts += 1;
           }
         }

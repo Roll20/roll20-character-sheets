@@ -8,6 +8,10 @@
   <input type="hidden" name="attr_pnj_default_jets_caches" value="false" />
   <input type="hidden" name="attr_max_attack_label" value=0 />
   <input type="hidden" name="attr_maxrangaction" value=0 />
+  <input type="hidden" name="attr_maxrangaction1" value=0 />
+  <input type="hidden" name="attr_maxrangaction2" value=0 />
+  <input type="hidden" name="attr_maxrangaction3" value=0 />
+  <input type="hidden" name="attr_maxrangaction4" value=0 />
   <input type="hidden" name="attr_titrevoie4" value="Voie 4" />
   <input type="hidden" name="attr_titrevoie5" value="Voie 5" />
   <input type="hidden" name="attr_titrecapaciteraciale" value="Capacité raciale" />
@@ -646,7 +650,7 @@
                 </tr>
               </table>
             </div>
-            <div class="options">
+            <div class="options" style="margin-bottm:6px; margin-top:-2px;">
               <table class="tabsep">
                 <tr>
                   <td style="width:18px; text-align:center;">
@@ -687,6 +691,24 @@
                   </td>
                 </tr>
               </table>
+      <input type="checkbox" class="block-switch hidden-tab" name="attr_armejet"><span></span>
+      <div class="block-show" style="margin-top:-2px">
+              <table class="tabsep">
+                <tr>
+                  <td style="min-width:30px; text-align:center;"></td>
+                  <td class="boxinputleft-atk">
+                  Disponibles : <input name="attr_armejetqte" type="number" min="0" value="1">
+                  </td>
+                  <td class="boxinputleft-atk">
+                  Possédés : <input name="attr_armejetqte_max" type="number" min="0" value="1">
+                  </td>
+                  <td class="boxinputleft-atk">
+                  Taux de pertes : <input name="attr_armejettaux" type="number" min="0" max="100" value="0">%
+                  </td>
+                  <td style="width:100%; text-align:center;"></td>
+                </tr>
+              </table>
+      </div>
             </div>
           </div>
         </fieldset>
@@ -2245,7 +2267,7 @@
     </div> <!-- FIN tab4 de fiche type PJ -->
     <div class="tab-content tab5"> <!-- Données pour le script -->
       <input type="checkbox" class="block-switch hidden-tab" name="attr_show_script" value="1"><span></span>
-      <div class=block-hidden><span class=textbasesmall>Le script COFantasy n'est pas installé. </span> </div>
+      <div class="block-hidden"><span class=textbasesmall>Le script COFantasy n'est pas installé. </span> </div>
       <div class="block-show">
         <input type="hidden" name="attr_message_version" value="Pas encore utilisable par le script" />
         <div style="text-align:center;">
@@ -2390,7 +2412,7 @@
           <div class="sheet-col">
             <table>
               <tr><td class="boxtitre">Prédicats</td></tr>
-              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" title="Predicats"></textarea></td></tr>
+              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" spellcheck="false" title="Predicats"></textarea></td></tr>
             </table>
           </div>
         </div>
@@ -2577,7 +2599,7 @@
                 </tr>
               </table>
             </div>
-            <div class="options">
+            <div class="options" style="margin-bottm:6px; margin-top:-2px;">
               <table class="tabsep">
                 <tr>
                   <td style="width:18px; text-align:center;">
@@ -2618,6 +2640,24 @@
                   </td>
                 </tr>
               </table>
+      <input type="checkbox" class="block-switch hidden-tab" name="attr_armejet"><span></span>
+      <div class="block-show" style="margin-top:-2px">
+              <table class="tabsep">
+                <tr>
+                  <td style="min-width:30px; text-align:center;"></td>
+                  <td class="boxinputleft-atk">
+                  Disponibles : <input name="attr_armejetqte" type="number" min="0" value="1">
+                  </td>
+                  <td class="boxinputleft-atk">
+                  Possédés : <input name="attr_armejetqte_max" type="number" min="0" value="1">
+                  </td>
+                  <td class="boxinputleft-atk">
+                  Taux de pertes : <input name="attr_armejettaux" type="number" min="0" max="100" value="0">%
+                  </td>
+                  <td style="width:100%; text-align:center;"></td>
+                </tr>
+              </table>
+      </div>
             </div>
           </div>
         </fieldset>
@@ -2874,7 +2914,7 @@
           <div class="sheet-col">
             <table>
               <tr><td class="boxtitre">Prédicats</td></tr>
-              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" title="Predicats"></textarea></td></tr>
+              <tr><td class="boxinputleft"><textarea name="attr_predicats_script" style="height:15em;" spellcheck="false" title="Predicats"></textarea></td></tr>
             </table>
           </div>
         </div>
@@ -2986,7 +3026,7 @@
 <!-- FIN TEMPLATES -->
 <!-- **** SCRIPTS / SHEET WORKERS -->
 <script type="text/worker">
-  on('sheet:opened', function() {
+ on('sheet:opened', function() {
     // **** Gestion transition de version
     getAttrs(["version", "option_setting"], function(v) {
       var verfdp = parseFloat(v.version) || 0;
@@ -3043,16 +3083,15 @@
           silent: true
         });
         getAttrs(["charisme", "option_pc", "pc", "pc_max"], function(values) {
-          var option_pc = values.option_pc;
+          let option_pc = values.option_pc;
           if (option_pc == 1 || option_pc == 'on') {
-            var charisme = parseInt(values.charisme);
+            let charisme = parseInt(values.charisme);
             if (!isNaN(charisme) && charisme > 0) {
-              var pc_base = 3 + Math.floor((charisme - 10) / 2);
-              var toSet = {
+              let pc_base = 3 + Math.floor((charisme - 10) / 2);
+              let toSet = {
                 pc_base: pc_base
               };
-              var new_pc = 3;
-              var pc_max = parseInt(values.pc_max);
+              let pc_max = parseInt(values.pc_max);
               if (!isNaN(pc_max) && pc_max != pc_base) {
                 toSet.pc_bonus = pc_max - pc_base;
               } else {
@@ -3312,13 +3351,13 @@
           }
         }
         getAttrs(a, function(values) {
-          var s = {};
+          let s = {};
           for (voie = 1; voie < 10; voie++) {
             for (rang = 1; rang < 6; rang++) {
-              var titre = 'v' + voie + 'r' + rang + 'titre';
+              let titre = 'v' + voie + 'r' + rang + 'titre';
               if (values[titre] !== '') continue;
               var capa = 'voie' + voie + '-' + rang;
-              var r = extraireTitreCapacite(values[capa]);
+              let r = extraireTitreCapacite(values[capa]);
               if (r.titre === '') continue;
               s[titre] = r.titre;
               s[capa] = r.texte;
@@ -3327,14 +3366,21 @@
           setAttrs(s);
         });
       }
+      if (verfdp < 5.00) {
+        getAttrs(['montrerarmeenmain'], function(v) {
+          let montrer = v.montrerarmeenmain === '1';
+          updateAttaques45('armes', montrer);
+          updateAttaques45('pnjatk', montrer);
+        });
+      }
       setAttrs({
-        version: 4.04
+        version: 5.00
       });
       if (v.option_setting == 'arran') {
         //Quelques valeurs de départ selon la famille de profil par défaut
         getAttrs(['famille_par_defaut', 'famille', 'charisme', 'sagesse', 'niveau'], function(values) {
           if (values.famille_par_defaut == 1 && values.famille == 'aventurier') {
-            var attr = {
+            let attr = {
               famille_par_defaut: 0,
               DV: 8,
               mod_atkcac: 1,
@@ -3367,6 +3413,25 @@
     });
   });
 
+  function updateAttaques45(section, montrer) {
+    getSectionIDs('repeating_' + section, function(idArray) {
+      idArray.forEach(function(id) {
+        const prefix = 'repeating_' + section + '_' + id + '_';
+        getAttrs([prefix + 'armetypeattaque'], function(values) {
+          let toSet = {};
+          let at = values[prefix + 'armetypeattaque'];
+          if (at == 'Arme de jet') {
+            toSet[prefix + 'armejet'] = 'on';
+            setAttrs(toSet);
+          } else if (montrer && at.startsWith('Arme')) {
+            toSet[prefix + 'armeactionvisible'] = 1;
+            setAttrs(toSet);
+          }
+        });
+      });
+    });
+  }
+
   function extraireTitreCapacite(capacite) {
     var res = {
       titre: capacite,
@@ -3393,12 +3458,12 @@
   function appliqueModificateurs34(section) {
     getSectionIDs('repeating_' + section, function(idArray) {
       idArray.forEach(function(id) {
-        var prefix = 'repeating_' + section + '_' + id + '_';
+        const prefix = 'repeating_' + section + '_' + id + '_';
         getAttrs([prefix + 'armemodificateurs'], function(values) {
-          var modifs = values[prefix + 'armemodificateurs'].split(',');
-          var attrs = {};
-          var nbDes = 1; //Nombre de dés pour l'attaque
-          var plusFort = true;
+          let modifs = values[prefix + 'armemodificateurs'].split(',');
+          let attrs = {};
+          let nbDes = 1; //Nombre de dés pour l'attaque
+          let plusFort = true;
           modifs.forEach(function(m) {
             switch (m.trim()) {
               case 'tempDmg':
@@ -4141,15 +4206,6 @@
 
   const mapArmes = keyListToMap(listeArmes);
 
-  //values doit contenir montrerarmeenmain et scriptVersion_max
-  function montrerArme(typeAttaque, values) {
-    if (!typeAttaque.startsWith('Arme')) return false;
-    if (typeAttaque == 'Arme de jet') return false;
-    var version = parseFloat(values.scriptVersion_max);
-    return !isNaN(version) && version >= 3 &&
-      values.montrerarmeenmain && values.montrerarmeenmain === '1';
-  }
-
   //values doit contenir au moins:
   // - scriptVersion
   // - scriptVersion_max
@@ -4163,6 +4219,7 @@
       var s = mapArmes[mot];
       if (s && s.typeattaque) {
         newAttrs[prefix + 'typeattaque'] = s.typeattaque;
+        if (s.typeattaque == 'Arme de jet') newAttrs[prefix + 'armejet'] = 'on';
         typeAttaque = s.typeattaque;
         newAttrs[prefix + 'modificateurs'] = s.modificateurs;
         newAttrs[prefix + 'typedegats'] = s.typedegats;
@@ -4177,9 +4234,6 @@
     }
     if (values.scriptVersion && values.scriptVersion !== '') {
       newAttrs[prefix + 'optflag'] = 'on';
-      if (montrerArme(typeAttaque, values)) {
-        newAttrs[prefix + 'actionvisible'] = '0';
-      }
     }
   }
 
@@ -4545,25 +4599,35 @@
     });
   });
 
-  //Montrer ou cacher l'attaque selon le type. Ne cascade pas.
+  //Montrer ou cacher les options d'arme de jet. Ne cascade pas.
   on('change:repeating_armes:armetypeattaque', function(eventinfo) {
-    getAttrs(['repeating_armes_armetypeattaque', 'scriptVersion_max', 'montrerarmeenmain'], function(values) {
-      if (montrerArme(values.repeating_armes_armetypeattaque, values))
-        setAttrs({
-          repeating_armes_armeactionvisible: '0'
-        }, {
-          silent: true
-        });
+    getAttrs(['repeating_armes_armetypeattaque', 'repeating_armes_armejet'], function(values) {
+      if (values.repeating_armes_armetypeattaque == 'Arme de jet') {
+        if (values.repeating_armes_armejet != 'on')
+          setAttrs({
+            repeating_armes_armejet: 'on'
+          });
+      } else {
+        if (values.repeating_armes_armejet != 'off')
+          setAttrs({
+            repeating_armes_armejet: 'off'
+          });
+      }
     });
   });
   on('change:repeating_pnjatk:armetypeattaque', function(eventinfo) {
-    getAttrs(['repeating_pnjatk_armetypeattaque', 'scriptVersion_max', 'montrerarmeenmain'], function(values) {
-      if (montrerArme(values.repeating_pnjatk_armetypeattaque, values))
-        setAttrs({
-          repeating_pnjatk_armeactionvisible: '0'
-        }, {
-          silent: true
-        });
+    getAttrs(['repeating_pnjatk_armetypeattaque', 'repeating_pnjatk_armejet'], function(values) {
+      if (values.repeating_pnjatk_armetypeattaque == 'Arme de jet') {
+        if (values.repeating_pnjatk_armejet != 'on')
+          setAttrs({
+            repeating_pnkatk_armejet: 'on'
+          });
+      } else {
+        if (values.repeating_pnjatk_armejet != 'off')
+          setAttrs({
+            repeating_pnjatk_armejet: 'off'
+          });
+      }
     });
   });
 
@@ -4872,14 +4936,19 @@
     if (eventinfo.newValue != 'Script' && eventinfo.newValue != 'script pnj') return;
     getAttrs(['show_script', 'scriptVersion', 'scriptVersion_max'], function(values) {
       if (values.scriptVersion) {
-        if (values.show_script == 1) return;
-        var sa = {
-          show_script: 1
+        let sa = {
+          message_version: ''
         };
-        var version = parseFloat(values.scriptVersion_max);
+        const version = parseFloat(values.scriptVersion_max);
         if (!isNaN(version) && version >= 3)
           sa.message_version = "COFantasy version " + version;
-        setAttrs(sa);
+        if (values.show_script === '0')
+          sa = {
+            show_script: 1
+          };
+        setAttrs(sa, {
+          silent: true
+        });
       } else {
         if (values.show_script == 0) return;
         setAttrs({
@@ -5549,7 +5618,7 @@
 
   //Les capacités
 
-  var capacites = {
+  /*let capacites = {
     mecanismes: {
       voie: "voie de l'artilleur",
       rang: 1,
@@ -5564,5 +5633,5 @@
         valeur: 'rang'
       }, ]
     },
-  };
+  };*/
 </script>

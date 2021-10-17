@@ -34,6 +34,27 @@ To remove the experience checkbox from a skill add a - at the start of the name 
 
 STR and DEX minimums are not currently supported this maybe added in a future release.
 
+
+## 10.06.2021
+
+	To account for damage reduction in the attack results tables
+	Added display of special damage and normal damage to critical attack results
+	Added display of normal damage to critical attack results
+
+## 23.08.2021
+
+	Added inputs for final attack and parry values
+	
+	Added input for magical damage bonus
+
+	Added support for minimum chance of  success of 5%
+
+	Increased the size of the modifier inputs in the weapons to allow for calculations instead of fixed value e.g. 10-25 as possible clarification for reducing skills to 100 for opposed rolls.  
+	
+	Added Other Notes section  
+
+
+
 ## 09.08.2021
 
 	Added missing translation tags 
