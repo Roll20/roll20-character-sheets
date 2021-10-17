@@ -121,6 +121,21 @@ async function migrateAttributes() {
         },
       ],
     },
+    {
+      version: "1.2.0",
+      attributes: [
+        {
+          repeating: ["armor"],
+          from: "currentmdc",
+          to: ["mdc"],
+        },
+        {
+          repeating: ["armor"],
+          from: "basemdc",
+          to: ["mdc_max"],
+        },
+      ],
+    },
   ];
 
   const { version, migrated } = await getAttrsAsync(["version", "migrated"]);

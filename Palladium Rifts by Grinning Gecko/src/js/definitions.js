@@ -164,7 +164,16 @@ const H2H = {
     { critical: 17 },
   ],
   "hand to hand: aikido": [
-    { attacks: 4, breakfall: 3, roll: 2, flipthrow: 2, pull: 2 },
+    {
+      attacks: 4,
+      breakfall: 3,
+      roll: 2,
+      flipthrow: 2,
+      pull: 2,
+      mod_pp: 1,
+      mod_pe: 1,
+      description: "+2D6 S.D.C., +1D4 to M.E.\n",
+    },
     { initiative: 1, parry: 2, dodge: 2 },
     { disarm: 1, description: "Automatic dodge\n" },
     { attacks: 1, flipthrow: 1 },
@@ -179,8 +188,257 @@ const H2H = {
     { disarm: 1, description: "Double existing P.P.E. (inner spirit)\n" },
     { parry: 1, dodge: 2, flipthrow: 1 },
     { attacks: 1 },
-    { initiative: 1, flipthrow: 2 },
+    { initiative: 1, tackle: 2 },
     { critical: 18 },
+    { attacks: 1 },
+  ],
+  "hand to hand: judo": [
+    {
+      attacks: 4,
+      roll: 3,
+      pull: 3,
+      mod_me: 1,
+      mod_pp: 1,
+      description:
+        "+2D4 S.D.C.\nBody block/tackle, body flip/throw, break fall, disarm, roll with punch/fall/impact, strike, parry, dodge, and pull punch are available at first level.\n",
+    },
+    { parry: 2, dodge: 2, strike: 1 },
+    { flipthrow: 1, tackle: 1, disarm: 1 },
+    { attacks: 1, description: "Karate-style kick (2D6 damage).\n" },
+    { critical: 19 },
+    { strike: 1, parry: 1, dodge: 1, flipthrow: 1 },
+    { damage: 2, description: "W.P. Paired Weapons\n" },
+    { roll: 1, description: "Jump kick\n" },
+    { attacks: 1 },
+    { initiative: 2, parry: 1, dodge: 1 },
+    { breakfall: 1, disarm: 1 },
+    { critical: 18 },
+    { damage: 2, knockout: 19 },
+    { attacks: 1 },
+    { description: "Automatic body flip/throw.\n" },
+  ],
+  "hand to hand: jujitsu": [
+    {
+      mod_ps: 2,
+      mod_pp: 1,
+      attacks: 4,
+      roll: 3,
+      parry: 2,
+      dodge: 2,
+      pull: 2,
+      description:
+        "+3D6 S.D.C.\nsnap kick (1D6 damage), knife hand (2D4 damage)\nMaintain balance, break fall, disarm, body block/tackle, body flip/throw, holds, roll with punch/fall/impact, pull punch, kick attack (2D4 damage), knee and elbow strikes (1D6 damage), and the usual strike, parry and dodge.\n",
+    },
+    { strike: 1, leghook: 1, backwardsweepkick: 1 },
+    { initiative: 1, description: "Critical strike from behind.\n" },
+    { attacks: 1, damage: 2 },
+    { description: "Palm strike (2D4 damage) and drop kick.\n" },
+    { critical: 18 },
+    { strike: 1, flipthrow: 1, disarm: 1 },
+    { attacks: 1, maintainbalance: 1 },
+    { description: "Critical body flip/throw on natural 1 7-20.\n" },
+    { description: "Jump kick and leap attacks.\n" },
+    { attacks: 1, pull: 2 },
+    { initiative: 1, parry: 1, dodge: 1, strike: 1 },
+    { damage: 2, pull: 2, breakfall: 2 },
+    { attacks: 1 },
+    { description: "Death blow!\n" },
+  ],
+  "hand to hand: karate": [
+    {
+      mod_pe: 2,
+      mod_spd: 2,
+      attacks: 4,
+      initiative: 1,
+      roll: 2,
+      parry: 2,
+      dodge: 1,
+      breakfall: 1,
+      pull: 2,
+      description:
+        "+3D6 S.D.C., +1D4 to P.S.\nBreak fall, body block/tackle, roll with punch/fall/impact, pull punch, kick at­tack (2D4 damage), karate kick (2D6 damage), karate punch (2D4 damage), knees and elbow strikes (1D6 damage), and the usual strike, parry and dodge.\n",
+    },
+    { strike: 1, leghook: 1, backwardsweepkick: 1 },
+    { attacks: 1, damage: 2 },
+    {
+      initiative: 1,
+      disarm: 1,
+      description: "roundhouse kick (3D6 damage).\n",
+    },
+    { description: "Power punch and palm strike (2D4 damage).\n" },
+    { attacks: 1, pull: 2 },
+    {
+      strike: 1,
+      parry: 1,
+      breakfall: 1,
+      description: "Power kick, wheel kick\n",
+    },
+    {
+      critical: 18,
+      deathblow: 20,
+      description: "critical strike from behind.\n",
+    },
+    { attacks: 1, damage: 2 },
+    { description: "Jump kick and leap attacks.\n" },
+    { initiative: 1, parry: 1, dodge: 1, strike: 1 },
+    { attacks: 1, pull: 2 },
+    { description: "Death Blow!\n" },
+    { damage: 2, pull: 2, breakfall: 2 },
+    { attacks: 1 },
+  ],
+  "hand to hand: kendo": [
+    {
+      mod_ps: 1,
+      mod_pp: 1,
+      mod_spd: 2,
+      attacks: 4,
+      initiative: 1,
+      roll: 2,
+      disarm: 1,
+      parry: 1,
+      dodge: 1,
+      breakfall: 1,
+      pull: 2,
+      description:
+        "+2D4 S.D.C.\n+2 to parry with sword or staff (in addition to W.P. bonuses)\nDisarm, break fall, roll with punch/fall/impact, pull punch, karate punch (2D4 damage), kick attack (2D4), knees and elbow strikes (1D6 damage), and the usual strike, parry and dodge.\n",
+    },
+    { strike: 1, description: "W.P. Paired Weapons\n" },
+    { attacks: 1, damage: 2 },
+    { initiative: 1, disarm: 1, parry: 1 },
+    { description: "Tripping/leg hook and backward sweep kicks.\n" },
+    { description: "Power punch and palm strike (2D4 damage).\n" },
+    { attacks: 1, pull: 2 },
+    {
+      critical: 18,
+      deathblow: 19,
+      description: "critical strike from behind\n",
+    },
+    { attacks: 1, damage: 4 },
+    { description: "Automatic dodge.\n" },
+    { initiative: 1, strike: 1, breakfall: 2 },
+    { attacks: 1, pull: 2 },
+    { description: "Jump kick and leap attacks.\n" },
+    { description: "Death Blow!\n" },
+    { attacks: 1 },
+  ],
+  "hand to hand: ninjitsu": [
+    {
+      mod_ma: 2,
+      mod_ps: 1,
+      mod_pe: 1,
+      mod_pp: 1,
+      mod_spd: 4,
+      attacks: 4,
+      roll: 2,
+      initiative: 2,
+      parry: 1,
+      dodge: 2,
+      pull: 2,
+      description:
+        "snap kick (1D6 dam­age), knife hand (2D4 damage)\nW.P. Paired Weapons\nMaintain balance, back flip, body block/tackle, body flip/throw, holds, roll with punch/fall/impact, pull punch, drop kick, kick attack (2D4 damage), knee and elbow strikes (1D6 damage), paired weapons, and the usual strike, parry and dodge. Also see Samurai Hand to Hand combat.",
+    },
+    {
+      strike: 1,
+      description:
+        "cartwheel (attack), back flip (escape), back flip (defensive), and back flip (attack).\n",
+    },
+    { attacks: 1, description: "palm strike (2D4 damage).\n" },
+    {
+      description:
+        "Leap attack, axe kick, and +2 to strike when performing any backflip or cartwheel.\n",
+    },
+    { description: "Tripping/leg hook and backward sweep kicks\n", damage: 2 },
+    { attacks: 1, description: "roundhouse kick (3D6).\n" },
+    { critical: 18, deathblow: 20, description: "Critical from behind.\n" },
+    { initiative: 1, strike: 1, parry: 1, roll: 1, maintainbalance: 2 },
+    { description: "Death Blow!\n" },
+    { attacks: 1, pull: 2 },
+    { description: "Double existing P.P.E. (inner spirit)!\n" },
+    { initiative: 1, roll: 2 },
+    { damage: 2, disarm: 1 },
+    { damage: 2, description: "Jump kick, +2 to back flip/cartwheel\n" },
+    { attacks: 1 },
+  ],
+  "hand to hand: samurai": [
+    {
+      mod_me: 2,
+      mod_pp: 2,
+      mod_pe: 1,
+      attacks: 4,
+      initiative: 2,
+      roll: 2,
+      dodge: 3,
+      damage: 2,
+      pull: 2,
+      description:
+        "+3D6 S.D.C.\n+2 to parry with sword or staff (in addition to W.P. bonuses)\nDisarm, maintain balance, roll with punch/fall/im­ pact, pull punch, Karate punch (2D4 damage), kick attack (2D4), knee and elbow strikes (1D6 damage), and the usual strike, parry and dodge.\n",
+    },
+    { attacks: 1, disarm: 1, maintainbalance: 1 },
+    {
+      initiative: 1,
+      strike: 1,
+      parry: 1,
+      deathblow: 20,
+      description: "critical strike from behind\n",
+    },
+    { attacks: 1, damage: 2 },
+    { critical: 18, maintainbalance: 1 },
+    { roll: 1, dodge: 1, maintainbalance: 1 },
+    {
+      description:
+        "Power punch/stab (with hand or sword), jump kick and backward sweep kick.\n",
+    },
+    { attacks: 1, dodge: 1 },
+    { description: "Death Blow!\n" },
+    { initiative: 1, horrorfactor: 1, maintainbalance: 1 },
+    { attacks: 1 },
+    {
+      damage: 2,
+      horrorfactor: 1,
+      description:
+        'the knowledge and skill to create a "true" samurai sword.\n',
+    },
+    { attacks: 1 },
+    { disarm: 1, description: "Double existing P.P.E. (inner spirit)\n" },
+    { attacks: 1 },
+  ],
+  "hand to hand: teng-jutsu": [
+    {
+      attacks: 4,
+      dodge: 2,
+      pull: 2,
+      disarm: 1,
+      roll: 1,
+      maintainbalance: 3,
+      breakfall: 1,
+      description:
+        "Break fall, roll with punch/fall/impact, maintain balance, back flip escape, back flip attack, cartwheel (attack), body block/tackle, pull punch, kick attack (2D4 damage), karate kick (2D6 damage), karate punch (2D4 damage), knees and elbow strikes (1D6 damage), and the usual strike, parry and dodge, plus the Tengu special mystic martial art powers.\n",
+    },
+    {
+      initiative: 1,
+      description: "Drop kick, +2 on all back flips.\n",
+    },
+    { strike: 1, disarm: 1, description: "+1 to leap dodge." },
+    { attacks: 1 },
+    {
+      description:
+        "Critical strike from all kicks (double damage) and jump kick and leap attacks.\n",
+    },
+    { roll: 1, pull: 2, description: "+ 1 to leap dodge.\n" },
+    {
+      initiative: 1,
+      description: "tripping/leg hook and backward sweep kicks.\n",
+    },
+    { attacks: 1 },
+    {
+      disarm: 2,
+      description: "+1 on all back flips, and +1 on cartwheel attack.\n",
+    },
+    { initiative: 1, parry: 1, description: "Axe kick\n" },
+    { attacks: 1 },
+    { disarm: 1, description: "+1 to leap dodge\n" },
+    { description: "Snap kick and wheel kick.\n" },
+    { pull: 1, description: "+1 to leap dodge\n" },
     { attacks: 1 },
   ],
   "hand to hand: dragon": [
@@ -451,6 +709,150 @@ const H2H = {
     {},
     {},
   ],
+  "rpa combat: silverhawk": [
+    {
+      strike: 2,
+      parry: 4,
+      dodge: 4,
+      dodge_flight: 6,
+      roll: 3,
+      pull: 2,
+      attacks: 2,
+      description:
+        "Restrained Punch - 1D6 M.D.\n" +
+        "Full Strength Punch - 3D6 M.D.\n" +
+        "Power Punch - 6D6 M.D. (counts as two attacks) Kick - 4D6 M.D.\n" +
+        "Leap Kick - 6D6 +3 (counts as two attacks) Body Block/Ram (on the ground) - 2D6 M.D.\n" +
+        "Body Block/Ram (flying) - 4D6 M.D.\n",
+    },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+  ],
+  "rpa combat: battleram": [
+    {
+      strike: 1,
+      parry: 1,
+      dodge_flight: 1,
+      description:
+        "Restrained Punch - 4D6 M.D.\n" +
+        "Full Strength Punch - 2D6x10 M.D.\n" +
+        "Power Punch - 4D6x10 M.D. (counts as two attacks)\n" +
+        "Crush, Pry or Tear - 2D6x10 M.D.\n" +
+        "Kick - 3D4x10 M.D.\n" +
+        "Leap Kick (only while flying) - 4D6x10 M.D.\n" +
+        "Body Flip/Throw - 4D6 M.D.\n" +
+        "Body BlocklRam (on the ground ) - 2D4x10 M.D.\n" +
+        "Flying Ram - 5D6x10 M.D.\n" +
+        "Stomp - 6D6 M.D. against targets 15 feet (4.5 m) tall or smaller.\n",
+    },
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+  ],
+  "rpa combat: bombard": [
+    {
+      strike: 2,
+      parry: 4,
+      dodge: 2,
+      roll: 3,
+      pull: 4,
+      attacks: 2,
+      description:
+        "Restrained Punch - 1D6 M.D.\n" +
+        "Full Strength Punch - 2D6 M.D.\n" +
+        "Power Punch - 4D6 M.D. (counts as two attacks) Vibro-blade - 4D6 M.D.\n" +
+        "Crush, Pry or Tear - 1D6 M.D.\n" +
+        "Kick - 2D6 M.D.\n" +
+        "Body Flip/Throw - 1D6 M.D.\n" +
+        "Body Block/Ram - 2D4 M.D.\n" +
+        "Stomp - 2D4 M.D. against man-sized targets\n",
+    },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+  ],
+  "space fighter: basic": [
+    {
+      attacks: 1,
+      strike_range: 2,
+      dodge_flight: 3,
+      description:
+        "+1 to dog-fighting rolls\n" +
+        "Critical strike, same as pilot's hand to hand.\n",
+    },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+  ],
+  "space fighter: elite": [
+    {
+      attacks: 2,
+      strike_range: 2,
+      dodge_flight: 5,
+      description:
+        "+3 to dog-fighting rolls\n" +
+        "Critical strike, same as pilot's hand to hand.\n",
+    },
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    { attacks: 1 },
+    {},
+    {},
+    {},
+    {},
+    {},
+  ],
 };
 
 const H2H_KEYS = [
@@ -476,10 +878,20 @@ const H2H_KEYS = [
   "horrorfactor",
   "dodge_auto",
   "flipthrow",
+  "tackle",
+  "leghook",
+  "backwardsweepkick",
+  "maintainbalance",
   "dodge_flight",
   "dodge_teleport",
   "dodge_motion",
   "mod_spellstrength",
+  "mod_me",
+  "mod_ma",
+  "mod_ps",
+  "mod_pp",
+  "mod_pe",
+  "mod_spd",
 ];
 
 const WP = {
@@ -1059,6 +1471,9 @@ const COMBAT_KEYS = [
   "knockout",
   "deathblow",
   "flipthrow",
+  "tackle",
+  "leghook",
+  "backwardsweepkick",
   "description",
 ];
 const SAVE_KEYS_ATTRIBUTE_BONUSES = {
@@ -1092,6 +1507,7 @@ const SKILL_KEYS = [
   "perlevel",
   "level",
   "total",
+  "description",
 ];
 
 const ABILITIES_REPEATERS = ["magic", "psionics", "powersabilities"];
@@ -1107,19 +1523,20 @@ const MAGIC_KEYS = REPEATING_BONUS_KEYS.concat([
   "ppecost",
   "range_starting",
   "range_per_level",
-  "range_units",
+  "range_unit",
   "damage_starting",
   "damage_per_level",
-  "damage_units",
+  "damage_unit",
   "dc_starting",
   "dc_per_level",
-  "dc_units",
+  "dc_unit",
   "duration_starting",
   "duration_per_level",
-  "duration_units",
+  "duration_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
+  "description",
 ]);
 
 const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat([
@@ -1131,19 +1548,20 @@ const PSIONICS_KEYS = REPEATING_BONUS_KEYS.concat([
   "ispcost",
   "range_starting",
   "range_per_level",
-  "range_units",
+  "range_unit",
   "damage_starting",
   "damage_per_level",
-  "damage_units",
+  "damage_unit",
   "dc_starting",
   "dc_per_level",
-  "dc_units",
+  "dc_unit",
   "duration_starting",
   "duration_per_level",
-  "duration_units",
+  "duration_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
+  "description",
 ]);
 
 const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat([
@@ -1154,22 +1572,23 @@ const ABILITIES_KEYS = REPEATING_BONUS_KEYS.concat([
   "percentage",
   "range_starting",
   "range_per_level",
-  "range_units",
+  "range_unit",
   "damage_starting",
   "damage_per_level",
-  "damage_units",
+  "damage_unit",
   "dc_starting",
   "dc_per_level",
-  "dc_units",
+  "dc_unit",
   "duration_starting",
   "duration_per_level",
-  "duration_units",
+  "duration_unit",
   "frequency_starting",
   "frequency_per_level",
-  "frequency_units",
+  "frequency_unit",
   "percentage_starting",
   "percentage_per_level",
   "addtobonuses",
+  "description",
 ]);
 
 const PROFILES_KEYS = REPEATING_BONUS_KEYS.concat(["bonus_ids", "bonus_names"]);
@@ -1239,13 +1658,7 @@ const CORE_KEYS = [
   "credits_blackmarketmerchandise",
 ];
 
-const ARMOR_KEYS = [
-  "is_active",
-  "name",
-  "movementpenalty",
-  "basemdc",
-  "currentmdc",
-];
+const ARMOR_KEYS = ["is_active", "name", "movementpenalty", "mdc", "mdc_max"];
 
 const MOVEMENT_KEYS = ["name", "mph", "ft_melee", "cruising", "dur_at_max"];
 

@@ -214,6 +214,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "dodge_motion",
     "dodge_underwater",
     "flipthrow",
+    "tackle",
+    "leghook",
+    "backwardsweepkick",
   ];
 
   const ppExtras = ["disarm", "entangle"];
