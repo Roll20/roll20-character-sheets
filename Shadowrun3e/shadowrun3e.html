@@ -2243,7 +2243,7 @@
 		<div class="table-item-left" data-i18n="armor">Armor</div>
 		<div class="table-item"><span name="attr_armor-weight"></span></div>
 		<div class="table-item-left" data-i18n="ammunition">Ammunition</div>
-		<div class="table-item"><span name="attr_ammo-weight"></span></div>
+		<div class="table-item"><span name="attr_ammunition-weight"></span></div>
 		<div class="table-item-left" data-i18n="gear">Gear</div>
 		<div class="table-item"><span name="attr_gear-weight"></span></div>
 		<b class="table-item-left" data-i18n="total">total</b>
@@ -3302,11 +3302,43 @@
             </div>
             <fieldset class="repeating_ammunition">
                 <div class="ammo-table-row">
-                    <div><input type="text" name="attr_ammotype"></div>
-                    <div><input type="number" name="attr_ammocount"></div>
-                    <div><input type="number" name="attr_ammoweight"></div>
-                    <div class="text-mid"><input type="radio" name="attr_load" value=1 checked></div>
-                    <div class="text-mid"><input type="radio" name="attr_load" value=0></div>
+                    <select name="attr_ammotype" class="mediumselect2 ammotype">
+                        <option data-i18n="regular" value="regular">Regular</option>
+                        <option data-i18n="explosive" value="explosive">Explosive</option>
+                        <option data-i18n="explosive-ex" value="explosive2">Explosive EX</option>
+                        <option value="gyrojet">GyroJet</option>
+                        <option value="gyrojetplus">GyroJet Plus</option>
+                        <option value="gyrojetplusseeker">GyroJet Plus Seeker</option>
+                        <option value="gyrojetseeker">GyroJet Seeker</option>
+                        <option value="arrows">Arrows</option>
+                        <option value="arrowsexp">Arrow Explosive</option>
+                        <option value="arrowsexpex">Arrow Explosive EX</option>
+                        <option value="screamer">Screamer</option>
+                        <option data-i18n="hammerheads" value="hammerheads">Hammerheads</option>
+                        <option value="net">Net</option>
+                        <option value="largenet">Large Net</option>
+                        <option data-i18n="adps" value="adps">ADPS</option>
+                        <option data-i18n="flechette" value="flechette">Flechette</option>
+                        <option data-i18n="gel" value="gel">Gel</option>
+                        <option data-i18n="tracer" value="tracer">Tracer</option>
+                        <option data-i18n="anti-vehicle" value="av">Anti-Vehicl</option>
+                        <option data-i18n="capsule" value="capsule">Capsule</option>
+                        <option data-i18n="glazer" value="glazer">Glazer</option>
+                        <option data-i18n="Hi-C" value="hic">Hi-C</option>
+                        <option data-i18n="hollow-point" value="hpoint">Hollow Point</option>
+                        <option data-i18n="incendiary" value="incendiary">Incendiary</option>
+                        <option data-i18n="mercury" value="mercury">Mercury</option>
+                        <option data-i18n="tracker" value="tracker">Tracker</option>
+                        <option value="bigd">Big D's Temper</option>
+                        <option data-i18n="bola" value="bola">Bola</option>
+                        <option data-i18n="flare" value="flare">Flare</option>
+                        <option value="shocklock">Shock Lock</option>
+                        <option data-i18n="stun-shell" value="stunshell">Stun Shell</option>
+                    </select>
+                    <div><input type="number" name="attr_ammocount" value=0></div>
+                    <div><input type="number" name="attr_ammoweight" value=0 step='0.01'></div>
+                    <div class="text-mid"><input type="radio" name="attr_ammoload" value=1 checked></div>
+                    <div class="text-mid"><input type="radio" name="attr_ammoload" value=0></div>
                     <input name="attr_ammonotes" type="text"></input>
                 </div>
                 <div class="table-bottom" />
@@ -3315,7 +3347,7 @@
 	<div class="weight">
 	    <div data-i18n="weight">Weight</div>
 	    <div></div>
-	    <div class="numberspan"><span name="attr_ammo-weight"></span>kg</div>
+	    <div class="numberspan"><span name="attr_ammunition-weight"></span>kg</div>
 	</div>
         </div>
     </div>
@@ -4913,11 +4945,24 @@ deckingtabs.forEach(tab => {
 			});
 		});
 	});
-   on("change:ammo-weight change:armor-weight change:weaponfocus-weight change:meleeweapons-weight change:explosives-weight change:rangedweapons-weight change:gear-weight change:weaponfocus-load", function()  {
-	getAttrs(["ammo-weight", "armor-weight", "weaponfocus-weight", "weaponfocus-load", "meleeweapons-weight", "explosives-weight", "rangedweapons-weight", "gear-weight"], function(myval) {
+   on("change:repeating_ammunition:ammotype change:repeating_ammunition:ammoload change:repeating_ammunition:ammocount", function() {
+   	getAttrs(["repeating_ammunition_ammotype", "repeating_ammunition_ammocount",  "repeating_ammunition_ammoload"], function(myval) {
+		const type=myval["repeating_ammunition_ammotype"];
+		const qty=parseInt(myval["repeating_ammunition_ammocount"]);
+		const load=parseInt(myval["repeating_ammunition_ammoload"]);
+		const aweight=(type in ammomods)? ammomods[type]["weight"] : .05;
+		const atts={};
+		atts["repeating_ammunition_ammoweight"]=Number((qty * aweight).toFixed(2));
+		console.log(atts);
+		setAttrs(atts);
+		});
+   });
+
+   on("change:ammunition-weight change:armor-weight change:weaponfocus-weight change:meleeweapons-weight change:explosives-weight change:rangedweapons-weight change:gear-weight change:weaponfocus-load", function()  {
+	getAttrs(["ammunition-weight", "armor-weight", "weaponfocus-weight", "weaponfocus-load", "meleeweapons-weight", "explosives-weight", "rangedweapons-weight", "gear-weight"], function(myval) {
 		console.log(myval);
 		var sets={};
-		let ammo=parseFloat(myval["ammo-weight"]);
+		let ammo=parseFloat(myval["ammunition-weight"]);
 		let armor=parseFloat(myval["armor-weight"]);
 		let focus=parseFloat(myval["weaponfocus-weight"]) * parseInt(myval["weaponfocus-load"]);
 		let melee=parseFloat(myval["meleeweapons-weight"]);
@@ -6029,7 +6074,10 @@ on('clicked:matrixattack', (info) => {
 		bigd: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 2, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "Choke Rules not Applied", weight: .1},
 		bola: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 1, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 2 , amsg: "", weight: .1},
 		arrows: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: 0.01},
+		arrowsexp: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: 0.01},
+		arrowsexpex: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: 0.01},
 		regular: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: 0.05},
+		net: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: .5},
 		largenet: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: .7},
 		shocklock: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 1, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 2, knockdown: 1, amsg: "" , weight: .075},
 		flare: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: .1},
@@ -6037,6 +6085,7 @@ on('clicked:matrixattack', (info) => {
 		gyrojetplus: { armorname: "'half Ballistic'", armor: "Math.floor(ballistic * 0.5)", av: 1, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 0.5, knockdown: 1, amsg: "" , weight: .2},
 		gyrojetplusseeker: { armorname: "'half Ballistic'", armor: "Math.floor(ballistic * 0.5)", av: 1, power: 0, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 0.5, knockdown: 1, amsg: "" , weight: .225},
 		gyrojetseeker: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: .2},
+		gyrojet: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 0, rpower: 0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1 , amsg: "", weight: .175},
 		explosive: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 1, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" , weight: .075},
 		explosive2: { armorname: "'ballistic'", armor: "ballistic", av: 0, power: 2, rpower:0, dmg: 0, rdmg:0, recoil: 1, barrier: 1, knockdown: 1, amsg: "" , weight: .075},
 		flechette: { armorname: "(ballistic >(2*impact))? 'ballistic' : 'impact';", armor: "(Math.max(ballistic, (impact * 2)))", av: -0.5, power: 0, rpower:0, dmg:0, rdmg: "(armoron == 0)? 1 : 0;", recoil: 1, barrier: 2, knockdown: 1, amsg: "Final Damage Level depends on Armor" , weight: .05},
@@ -7545,8 +7594,8 @@ on('clicked:matrixattack', (info) => {
 		props: ["name", "type", "conceal", "power", "damage", "missleint", "specialized", "tnmods", "recoilcomp", "gyro", "targeting", "rangefinder", "notes", "weight", "load", "ammoremain"],
 		attmap: {exptype: "type"}
 	},
-	ammo: {
-		props: ["type", "count", "weight", "notes", "weight", "load"],
+	ammunition: {
+		props: ["type", "count", "weight", "notes", "load"],
 		attadd: "ammo"
 	},
 	security: {
@@ -7612,7 +7661,7 @@ for ( const [key,val] of Object.entries(repeatprops)) {
 }
 
 const exportRepeat = function(key) {
-		const calcweight=["gear", "rangedweapons", "meleeweapons", "armor", "ammo"];
+		const calcweight=["gear", "rangedweapons", "meleeweapons", "armor"];
 		const jsonatt=key + "-json";
 		var sets={}
 		var mylist=[];
@@ -7639,6 +7688,7 @@ const exportRepeat = function(key) {
 						myobj[prop]=myval["repeating_" + key + "_" + m + "_" + myprop];
 					});
 					if ( calcweight.includes(key)) weight+= parseFloat(myval["repeating_" + key + "_" + m + "_weight"]) * parseInt(myval["repeating_" + key + "_" + m + "_load"]);
+					if (key == "ammunition") weight+= parseFloat(myval["repeating_" + key + "_" + m + "_ammoweight"]) * parseInt(myval["repeating_" + key + "_" + m + "_ammoload"]);
 					if (key == "rangedweapons" ) weight+=parseFloat(myval["repeating_" + key + "_" + m + "_ammoweight"]);
 					if (key == "explosives" ) {
 						console.log('explosives weight');
@@ -7652,8 +7702,8 @@ const exportRepeat = function(key) {
 				let wkey=key + "-weight";
 				weight=Number((weight).toFixed(2));
 				nuyen=Number((nuyen).toFixed(2));
-				if (( calcweight.includes(key)) || (key == "explosives")) sets[wkey]=weight;
-				if (( calcweight.includes(key)) || (key=="explosives")) console.log('calc weight ' + key);
+				if (( calcweight.includes(key)) || (key == "explosives") || (key == "ammunition")) sets[wkey]=weight;
+				if (( calcweight.includes(key)) || (key=="explosives") || (key == "ammunition")) console.log('calc weight ' + key);
 				if (key == "credsticks") sets["nuyen"]=nuyen;
 				console.log(sets);
 				setAttrs(sets);
