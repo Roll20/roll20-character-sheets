@@ -3677,7 +3677,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     return result;
 }
 
-function getWeaponsEffectsPNJ(prefix, data, vChair, vMachine, vMachineAE, vMasque, vMasqueAE) {
+function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE) {
     let result = {};
 
     let exec = [];
@@ -3859,7 +3859,11 @@ function getWeaponsEffectsPNJ(prefix, data, vChair, vMachine, vMachineAE, vMasqu
             
     if(eLeste) {
         bDegats += Math.floor(vChair/2);
-        exec.push("{{vLeste="+Math.floor(vChair/2)+"}}");
+
+        if(addChair)
+            exec.push("{{vLeste="+Math.floor(vChair/2)+"}}");
+        else
+            exec.push("{{vLeste="+vChair+"}}");
 
         isLeste = true;
     }
@@ -26718,6 +26722,7 @@ rollCombatPNJContact.forEach(button => {
 
         let diceDegats = 0;
         let bDegats = 0;
+        let addChair = 0;
 
         let diceViolence = 0;
         let bViolence = 0;
@@ -26804,6 +26809,7 @@ rollCombatPNJContact.forEach(button => {
                 portee = "{{portee=^{portee} ^{portee-contact}}}";
 
                 listAttrs.push("pSCAspectPNJ");
+                listAttrs.push("pSCAddChair");
 
                 listAttrs = listAttrs.concat(effets, effetsValue, AS, AO, special, specialValue);
                 break;
@@ -26827,6 +26833,7 @@ rollCombatPNJContact.forEach(button => {
                 portee = "{{portee=^{portee} ^{portee-contact}}}";
 
                 listAttrs.push("mECAspectPNJ");
+                listAttrs.push("mECAddChair");
 
                 listAttrs = listAttrs.concat(effets, effetsValue, AS, AO, special, specialValue);
                 break;
@@ -26849,6 +26856,7 @@ rollCombatPNJContact.forEach(button => {
                 
                 listAttrs.push(`${prefix}armeCaCDegat`);
                 listAttrs.push(`${prefix}armeCaCBDegat`);
+                listAttrs.push(`${prefix}addChair`);
                 listAttrs.push(`${prefix}armeCaCViolence`);
                 listAttrs.push(`${prefix}armeCaCBViolence`);
 
@@ -26870,10 +26878,12 @@ rollCombatPNJContact.forEach(button => {
 
             diceDegats = Number(attrs[`${prefix}armeCaCDegat`]) || 0;
             bDegats = Number(attrs[`${prefix}armeCaCBDegat`]) || 0;
+            addChair = isApplied(attrs[`${prefix}addChair`]);
 
             diceViolence = Number(attrs[`${prefix}armeCaCViolence`]) || 0;
             bViolence = Number(attrs[`${prefix}armeCaCBViolence`]) || 0;
-        }
+        } else
+        addChair = isApplied(attrs[`${prefix}AddChair`]);
 
         if(aBase != "0")
             aspect = aBase.slice(2, -1);
@@ -26892,7 +26902,7 @@ rollCombatPNJContact.forEach(button => {
             exec.push(aspect);
         }
 
-        if(vChair > 0) {
+        if(vChair > 0 && addChair == "1") {
             let vChairD = Math.ceil(vChair/2);
 
             bDegats += vChairD;
@@ -26921,7 +26931,7 @@ rollCombatPNJContact.forEach(button => {
 
         //GESTION DES EFFETS
                 
-        let rEffets = getWeaponsEffectsPNJ(prefix, attrs, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+        let rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
 
         firstExec = firstExec.concat(rEffets.firstExec);
         exec = exec.concat(rEffets.exec);
@@ -48828,7 +48838,7 @@ rollCombatAutrePNJ.forEach(button => {
                     <span data-i18n="arme">Arme</span>
                 </div>
                 
-                <div class="midCol">
+                <div class="midColL">
                     <span data-i18n="degats">Dégâts</span>
                 </div>
                 <div class="midCol">
@@ -48848,10 +48858,16 @@ rollCombatAutrePNJ.forEach(button => {
                     
                     <div class="ligne">
                         <div class="firstCol armeNom"><input type="text" name="attr_pSCaC" value="Couteau de Service" readonly /></div>
-                        <div class="midCol armeDegats">
-                            <input class="nbre" type="number" name="attr_pSCaCDegat" value="1" readonly  />
-                            <b>D6+</b>
-                            <input class="bonus" type="number" name="attr_pSCaCBDegat" value="0" readonly />
+                        <div class="midColL armeDegats">
+                            <div>
+                                <input class="nbre" type="number" name="attr_pSCaCDegat" value="1" readonly  />
+                                <b>D6+</b>
+                                <input class="bonus" type="number" name="attr_pSCaCBDegat" value="0" readonly />
+                            </div>
+                            <label class="fakeButton">
+                                <input type="checkbox" name="attr_pSCAddChair" value="1" />
+                                <span data-i18n-title="ajouter Chair / 2" title="+ Ajouter Chair/2"></span>
+                            </label>
                         </div>
                         <div class="midCol armeViolence">
                             <input class="nbre" type="number" name="attr_pSCaCViolence" value="0" readonly />
@@ -49270,10 +49286,16 @@ rollCombatAutrePNJ.forEach(button => {
 
                     <div class="ligne">
                         <div class="firstCol armeNom"><input type="text" name="attr_mECaC" value="Marteau-Épieu (Contact)" readonly /></div>
-                        <div class="midCol armeDegats">
-                            <input class="nbre" type="number" name="attr_mECaCDegat" value="3" readonly  />
-                            <b>D6+</b>
-                            <input class="bonus" type="number" name="attr_mECaCBDegat" value="0" readonly />
+                        <div class="midColL armeDegats">
+                            <div>
+                                <input class="nbre" type="number" name="attr_mECaCDegat" value="3" readonly  />
+                                <b>D6+</b>
+                                <input class="bonus" type="number" name="attr_mECaCBDegat" value="0" readonly />
+                            </div>
+                            <label class="fakeButton">
+                                <input type="checkbox" name="attr_mECaddChair" value="1" />
+                                <span data-i18n-title="ajouter Chair / 2" title="+ Ajouter Chair/2"></span>
+                            </label>
                         </div>
                         <div class="midCol armeViolence">
                             <input class="nbre" type="number" name="attr_mECaCViolence" value="1" readonly />
@@ -49693,10 +49715,16 @@ rollCombatAutrePNJ.forEach(button => {
 
                     <div class="ligne">
                         <div class="firstCol armeNom"><input type="text" name="attr_ArmeCaC" /></div>
-                        <div class="midCol armeDegats">
-                            <input class="nbre" type="number" name="attr_armeCaCDegat" class="textCenter" value="0" />
-                            <b>D6+</b>
-                            <input class="bonus" type="number" name="attr_armeCaCBDegat" class="textCenter" value="0" />
+                        <div class="midColL armeDegats">
+                            <div>
+                                <input class="nbre" type="number" name="attr_armeCaCDegat" class="textCenter" value="0" />
+                                <b>D6+</b>
+                                <input class="bonus" type="number" name="attr_armeCaCBDegat" class="textCenter" value="0" />
+                            </div>
+                            <label class="fakeButton">
+                                <input type="checkbox" name="attr_addChair" value="1" />
+                                <span data-i18n-title="ajouter Chair / 2" title="+ Ajouter Chair/2"></span>
+                            </label>
                         </div>
                         <div class="midCol armeViolence">
                             <input class="nbre" type="number" name="attr_armeCaCViolence" value="0" />
