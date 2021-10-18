@@ -180,7 +180,7 @@ function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite,
     let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
     let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
     let eDesignation = isApplied(effet[`${prefix}designation`]);
-    let eDestructeur = isApplied(effet[`${prefix}degatContinue`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
     let eDispersion = isApplied(effet[`${prefix}dispersion`]);
     let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
@@ -586,7 +586,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
     let eDeuxMains = isApplied(data[`${prefix}deuxMains`]);
     let eDemoralisant = isApplied(data[`${prefix}eDemoralisant`]);
     let eDesignation = isApplied(data[`${prefix}designation`]);
-    let eDestructeur = isApplied(data[`${prefix}degatContinue`]);
+    let eDestructeur = isApplied(data[`${prefix}destructeur`]);
     let eDestructeurV = 2;
     let eDispersion = isApplied(data[`${prefix}dispersion`]);
     let eDispersionV = data[`${prefix}dispersionValue`] || 0;
@@ -974,7 +974,7 @@ function getWeaponsEffectsAutre(prefix, effet) {
     let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
     let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
     let eDesignation = isApplied(effet[`${prefix}designation`]);
-    let eDestructeur = isApplied(effet[`${prefix}degatContinue`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
     let eDispersion = isApplied(effet[`${prefix}dispersion`]);
     let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
@@ -1350,7 +1350,7 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
     let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
     let eDesignation = isApplied(effet[`${prefix}designation`]);
-    let eDestructeur = isApplied(effet[`${prefix}degatContinue`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
     let eDispersion = isApplied(effet[`${prefix}dispersion`]);
     let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
