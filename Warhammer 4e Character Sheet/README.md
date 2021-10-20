@@ -12,7 +12,7 @@ I'm a active WFRP player and I plan to further enhance this sheet at time goes o
 This sheet attempts to simplify the WFRP 4e Core book rules into a workable mostly automated roll20 sheet, without the need to track too many variables manually. This is accomplished by a combination of manual configuration for each character, as every character is different, and a highly integrated and standardized roll template. There is some additional integration like TEW companion rules, and options for certain custom house rules.
 
 
-My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip 
+My optional Custom WFRP4e token marker set 2.0 is available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. Follow Roll20 Token marker update instructions for your server.
 The sheet should work on latest version of Firefox, MS Egde & Chrome.
 
   
@@ -56,7 +56,7 @@ The sheet should work on latest version of Firefox, MS Egde & Chrome.
 - NPC tab is intended of quick persistent and contained NPC creation without the need for full character sheets for each of them. With template integration, semi featured with contained Name / Characteristic / Condition / Advantage integration and up to 5 weapons & spells for each NPC, and a collapsible notes section. Good for GMs and players. (I would still recommend separate character sheet for actual NPC bosses/major characters).  
 - Condition Tracking integration into roll template. Option to choose between Advantage +xx showing only on all combat rolls and all (new default v1.3) non-situational roll modifying conditions (e.g. Broken, Fatigued Stunned, Prone..) to be add to appropriate rolls automatically. Includes NPC tab support too.  
 
-This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v2 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset2.0.zip) due to naming convention. 
+This sheet has TokenMod integrated (TokenMod API needs to be install in the game!) buttons which can set/unset conditions, it does requires my custom WFRP4e Tokens v3.1 (download @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip) due to naming convention. 
 
 Condition effects are currently hard coded as follows (updated June 15th 2021): 
 
@@ -72,6 +72,27 @@ Note conditions are not intended for out of combat situations, GM simply makes t
 
  
 ///// ============ Change Log ============ /////  
+
+September 14th 2021 v1.53
+
+- Various bug fixes
+- All Test Results now display inline with the Target in the Target v Test form.
+- Hovering over roll buttons will now show very clearly which button is about to be clicked.
+- Melee/Ranged Weapon selection will now allow clearing for the selected Weapon.
+- Melee/Ranged Weapons settings popout style changed a bit, added a wrap box.
+- Skills which are affected by advantage or penaties now have tooltip markers to indicate it.
+- Added experimental SL system and custom roll parsing sheet workers, these are hidden and dont interfere with the base page.
+
+-- Added many more integrated talents ~75% of RAW in experimental mode
+
+
+August 25th 2021 v1.52
+
+- Changed Fortune and Resolve display so it shows ( remaining / max ) of each stat, also added configurable modifiers for both stats to allow players to account for talents like Luck and Strong-minded. This allows easier tracking of these stats and their modifiers.
+- WFRP4e marker 3.1 update, added Lamp and Distrated markers, and Torn Muscle/Broken Bone markers with Minor/Major (M/m) and Loction (A/B/H/L = Arm/Body/Head/Leg) identifers. This greatly helps the flow and tracking of battle on roll20, particularly for the GM. File available @ https://github.com/Djjus/Vault/blob/master/Warhammer%204e%20Character%20Sheet/markers/WFRP4eset3.1.zip. This is Optional. Follow Roll20 Token marker update instructions for your server.
+- Added Torn Muscle and Broken Bone effect information to the Critical outcome text. E.g. Torn Muscle (Minor) injury (Suffer a penalty of –10 to all Tests involving the location).
+- Melee Opposed Attacks can now show hitloc/dmg if check box is selected in the weapon config section (cog). Handy for Riposte talent.
+
 
 July 12th 2021 v1.51 
 
@@ -257,7 +278,7 @@ July 13 2020 - v1.0
 - And a number of minor bug fixes 
 
 
-July 5 020 
+July 5 2020 
 
 - Add Armor value to NPC boxes 
 - Overburdened value now correctly increments when you go over the max encumbrance value, rather then at max encumbrance value. 

@@ -1,5 +1,43 @@
 @import url('https://fonts.googleapis.com/css?family=Ubuntu|Roboto+Mono|Open+Sans|Lato&display=swap');
 
+.charsheet summary {
+    display: list-item;
+    opacity: .35;
+    font-size: 1.5rem;
+}
+
+.charsheet summary > * {
+    display: inline;
+}
+
+.charsheet div.npc-statblock-row:hover + details summary {
+    opacity: 1;
+}
+
+.charsheet summary:hover,
+.charsheet details:hover {
+    color: #f00;
+    cursor: pointer;
+    opacity: 1;
+}
+
+.charsheet summary + .details-box {
+    align-items: center;
+    background-color: #ffffee;
+    border-radius: 6px;
+    border: 1px solid grey;
+    color: initial;
+    display: inline-flex;
+    justify-content: space-around;
+    margin-top: 4px;
+    padding: 0 2px 0 2px;
+}
+
+.charsheet .details-box .small-label2 {
+	height: auto;
+	display: inline-grid;
+}
+
 .charsheet html,
 .charsheet .pf-wrapper,
 .sheet-rolltemplate-pf_generic,
@@ -34,28 +72,29 @@
 }
 
 .charsheet label {
+    color: initial;
     display: inline-block;
     font-size: inherit;
     line-height: 1em;
     margin-bottom: initial;
     padding-right: initial;
-    width: initial;
-    color: initial;
     position: relative;
+    width: initial;
 }
 
 .charsheet select {
-    width: initial;
+    cursor: pointer;
     margin: initial;
-    padding: initial;
     padding-top: 0;
+    padding: initial;
+    width: initial;
 }
 
 .charsheet textarea {
     height: initial;
-    resize: initial;
     overflow-x: hidden;
     overflow-y: auto;
+    resize: initial;
 }
 
 .charsheet button,
@@ -107,9 +146,9 @@
 }
 
 .charsheet .pf-wrapper {
-    width: 100%;
-    min-width: 822px;
-    margin-top: -1rem;
+  width: 100%;
+  min-width: 822px;
+  margin-top: -1rem;
 }
 
 /* standalone generic toggles */
@@ -284,7 +323,7 @@
 .charsheet .linked-tablecell .macro-text-inline.linked-cellfield {
     width: calc(97% - 3.5em);
     max-width: calc(100% - 3.5em);
-    vertical-align: inherit;
+    vertical-align: middle;
 }
 
 .charsheet .linked-tablecell-short select.linked-cellfield,
@@ -753,6 +792,7 @@ pf-wrapper,
 /* reduce header text in readonly/compact mode */
 .charsheet .readonly-show:not(:checked)~.main .table-header,
 .charsheet .readonly-show:not(:checked)~.main .small-label2 span:not(.autoexpand),
+.charsheet .readonly-show:not(:checked) ~ .main .npc-statblock-row .small-label2 span:not(.autoexpand),
 .charsheet .readonly-show:not(:checked)~.main .table-cell.small-label span {
     font-size: 1rem;
     padding: 0;
@@ -801,12 +841,12 @@ pf-wrapper,
     margin: 0;
 }
 
-.charsheet .three-columns {
+.charsheet .three-columns,
+.charsheet .readonly-show:not(:checked)~.main .h3-section .three-columns.h3-section.wide-readonly {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-column-gap: 1em;
 }
-
 /* make error row more visible (colorblind users could not see slightly darker border )
 also need 1 more level in selector or base css will override border */
 
@@ -843,9 +883,8 @@ also need 1 more level in selector or base css will override border */
     width: 100%;
     padding-top: .25em;
 }
-
 /* used to signify imperial/metric toggle */
-.charsheet input[type="checkbox"].use-metrics:not(:checked)~div>div .weight-used::after {
+.charsheet .weight-used::after {
     content: '(lbs)';
     margin-left: 5px;
     font-weight: normal;
@@ -853,50 +892,56 @@ also need 1 more level in selector or base css will override border */
     font-size: 1rem;
     font-family: 'Roboto Mono', monospace;
 }
-
-.charsheet input[type="checkbox"].use-metrics:checked~div>div .weight-used::after {
+.charsheet .use-metrics:checked ~ div .weight-used::after {
     content: '(kgs)';
-    margin-left: 5px;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 1rem;
-    font-family: 'Roboto Mono', monospace;
 }
 
-.charsheet input[type="checkbox"].use-metrics:not(:checked)~div>div .distance-used::after,
-.charsheet input[type="checkbox"].use-metrics:not(:checked)~div>div span .distance-used::after {
+.charsheet .distance-used::after,
+.charsheet input.distance-used ~ span::before {
     content: '(ft)';
     margin: 0 -5px 0 0;
+    padding-left: 1px;
     position: relative;
-    top: -5px;
+    top: -3px;
     font-style: normal;
     font-size: .85rem;
     font-family: 'Roboto Mono', monospace;
 }
 
-.charsheet input[type="checkbox"].use-metrics:checked~div>div .distance-used::after,
-.charsheet input[type="checkbox"].use-metrics:checked~div>div span .distance-used::after {
+.charsheet .use-metrics:checked ~ div .distance-used::after,
+.charsheet .use-metrics:checked ~ div input.distance-used ~ span::before {
     content: '(m)';
-    margin-left: 2px;
-    font-weight: normal;
+}
+
+/* npc/monster adjustment */
+.charsheet input.distance-used ~ span::before {
+    content: 'ft.';
+    margin: 1rem -.75em 0 -.75rem;
     font-style: normal;
     font-size: 1rem;
     font-family: 'Roboto Mono', monospace;
 }
 
+.charsheet .use-metrics:checked ~ div input.distance-used ~ span::before {
+    content: 'm.';
+}
+
 /* hide base-speed*/
-.charsheet span.shown input.input-feet,
-.charsheet span.shown input.input-meters {
+.charsheet .use-metrics ~ div input.input-feet,
+.charsheet .use-metrics ~ div span.small-label2 input.input-feet,
+.charsheet .use-metrics ~ div input.input-meters,
+.charsheet .use-metrics ~ div span.small-label2 input.input-meters {
     display: none;
 }
 
 /* show base-speed in feet at step="5" */
-.charsheet input[type="checkbox"].use-metrics:not(:checked)~div>div span.shown input.input-feet {
+.charsheet input[type="checkbox"].use-metrics:not(:checked) ~ div input.input-feet,
+.charsheet input[type="checkbox"].use-metrics:not(:checked) ~ div span input.input-feet {
     display: inline-block;
 }
-
 /* show base-speed in meters at step="1.5" */
-.charsheet input[type="checkbox"].use-metrics:checked~div>div span.shown input.input-meters {
+.charsheet input[type="checkbox"].use-metrics:checked ~ div input.input-meters,
+.charsheet input[type="checkbox"].use-metrics:checked ~ div span input.input-meters {
     display: inline-block;
 }
 
@@ -1131,7 +1176,6 @@ also need 1 more level in selector or base css will override border */
 .charsheet .calc,
 .charsheet input.calc,
 .charsheet input:disabled {
-    background-color: #4A6486;
     background-color: rgba(74, 100, 134, 0.28);
     border-width: 0;
     color: #222;
@@ -1170,13 +1214,13 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet input[type="text"].entry-custom-header {
-    font-style: inherit;
-    font-size: inherit;
-    border-bottom: inherit;
-    font-weight: inherit;
-    color: inherit;
-    height: 2.125em;
-    border: 1px solid #d3d3d3;
+  font-style: inherit;
+  font-size: inherit;
+  border-bottom: inherit;
+  font-weight: inherit;
+  color: inherit;
+  height: 2.125em;
+  border: 1px solid #d3d3d3;
 }
 
 /* CANNOT PUT THESE ALL IN ONE IDK why but it breaks, so separate them */
@@ -1213,6 +1257,11 @@ also need 1 more level in selector or base css will override border */
     letter-spacing: -.08em;
     position: absolute;
     margin: -1px 0 0 1px;
+}
+
+.charsheet .pf-wrapper .small-label2 span.super::after {
+    position: inherit;
+    margin: -5px -5px 0 0;
 }
 
 .charsheet .pf-wrapper span.note-a::after,
@@ -1258,7 +1307,8 @@ also need 1 more level in selector or base css will override border */
     font-size: 1.4rem;
 }
 
-.charsheet button[type="roll"].command-button:hover {
+.charsheet button[type="roll"].command-button:hover,
+.charsheet button[type="roll"].command-button:focus {
     color: #f00;
     box-shadow: 0.1rem 0.1rem 0.2rem #333;
 }
@@ -1271,6 +1321,12 @@ also need 1 more level in selector or base css will override border */
 .charsheet .skills .table-row .table-cell:first-child {
     font-size: 1.6rem;
     padding-left: 0;
+}
+/* emphasize ranks column */
+.charsheet .skills div span.table-cell:nth-child(4) {
+    background-color: #556677;
+    min-width: 3.5em;
+    padding: 0 2px 2px 2px;
 }
 
 .charsheet .skills .table-row.adventure,
@@ -1610,13 +1666,45 @@ also need 1 more level in selector or base css will override border */
 .charsheet .tabs.custbordernav~.tabinput.tab11:checked~.repeating-fields .custnavsection-new:not(:checked)~.custnavsection-11:not(:checked)~.custrepeating-border {
     display: none;
 }
+/* abilities tabs */
+.charsheet .abilities .selected-tabtitle.tab0,
+.charsheet .abilities .selected-tabtitle.tab1,
+.charsheet .abilities .selected-tabtitle.tab2,
+.charsheet .abilities .selected-tabtitle.tab3,
+.charsheet .abilities .selected-tabtitle.tab4,
+.charsheet .abilities .selected-tabtitle.tab5,
+.charsheet .abilities .selected-tabtitle.tab6,
+.charsheet .abilities .selected-tabtitle.tab7,
+.charsheet .abilities .selected-tabtitle.tab8,
+.charsheet .abilities .selected-tabtitle.tab9,
+.charsheet .abilities .selected-tabtitle.tab10,
+.charsheet .abilities .selected-tabtitle.tab11,
+.charsheet .abilities .selected-tabtitle.tab99 {
+    display: none;
+}
+
+.charsheet .abilities .tabinput.tab0:checked ~ .selected-tabtitle.tab0,
+.charsheet .abilities .tabinput.tab1:checked ~ .selected-tabtitle.tab1,
+.charsheet .abilities .tabinput.tab2:checked ~ .selected-tabtitle.tab2,
+.charsheet .abilities .tabinput.tab3:checked ~ .selected-tabtitle.tab3,
+.charsheet .abilities .tabinput.tab4:checked ~ .selected-tabtitle.tab4,
+.charsheet .abilities .tabinput.tab5:checked ~ .selected-tabtitle.tab5,
+.charsheet .abilities .tabinput.tab6:checked ~ .selected-tabtitle.tab6,
+.charsheet .abilities .tabinput.tab7:checked ~ .selected-tabtitle.tab7,
+.charsheet .abilities .tabinput.tab8:checked ~ .selected-tabtitle.tab8,
+.charsheet .abilities .tabinput.tab9:checked ~ .selected-tabtitle.tab9,
+.charsheet .abilities .tabinput.tab10:checked ~ .selected-tabtitle.tab10,
+.charsheet .abilities .tabinput.tab11:checked ~ .selected-tabtitle.tab11,
+.charsheet .abilities .tabinput.tab99:checked ~ .selected-tabtitle.tab99 {
+    display: inline-block;
+}
 
 /* if all pressed show all */
 .charsheet .tabs.custbordernav~.tabinput.tab99:checked~.repeating-fields .custrepeating-border {
     display: block !important;
 }
 
-/* extra abiliites tab: hide old .sections */
+/* extra abilities tab: hide old .sections */
 .charsheet .tabs.custbordernav.abilitiesnav~.tabinput.tab0:not(:checked)~.tabinput.tab99:not(:checked)~.section0,
 .charsheet .tabs.custbordernav.abilitiesnav~.tabinput.tab1:not(:checked)~.tabinput.tab99:not(:checked)~.section1,
 .charsheet .tabs.custbordernav.abilitiesnav~.tabinput.tab2:not(:checked)~.tabinput.tab99:not(:checked)~.section2,
@@ -1670,7 +1758,6 @@ also need 1 more level in selector or base css will override border */
     border: 0.2rem solid #CCCCCC;
     border-radius: 0.7rem;
 }
-
 
 .charsheet .h2-section.current-loads,
 .charsheet .h2-section.loads-and-lift,
@@ -1790,7 +1877,6 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .showarrow.npc-details-show+.showsect::before {
     color: White;
-    padding-top: .5em;
     padding-left: .5em;
 }
 
@@ -1840,9 +1926,9 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .skills .showarrow {
-    width: 7em;
-    margin-right: -9em;
-    margin-left: -1.2em;
+  width: 7em;
+  margin-right: -9em;
+  margin-left: -1.2em;
 }
 
 .charsheet .showarrow.npc-details-show {
@@ -1858,6 +1944,7 @@ also need 1 more level in selector or base css will override border */
     padding-left: 1em;
     width: 90%;
     text-align: left;
+    vertical-align: revert;
 }
 
 .charsheet .showarrow.npc-details-show+.showsect.npc-header .table-cell:last-child {
@@ -1866,21 +1953,117 @@ also need 1 more level in selector or base css will override border */
     min-width: 6em;
 }
 
+/* NPC/Monster */
+
+.charsheet .section-npc.npc-only {
+    border-radius: 10px;
+    border: 2px solid black;
+    display: grid;
+    grid-template-rows: 1em;
+}
+
 .charsheet .table.npc-header {
-    margin: 0;
-    display: inline-table;
-    color: White;
+    align-items: center;
     background-color: black;
-    /*margin-right:-2em;*/
+    color: White;
+    display: inline-flex;
+    flex-direction: row;
     line-height: 1em;
+    margin: 0;
+}
+
+/* padding npc section */
+.charsheet .npc-details,
+.charsheet .npc-defense,
+.charsheet .npc-offense,
+.charsheet .npc-tactics,
+.charsheet .npc-abilities,
+.charsheet .npc-racial-abilities,
+.charsheet .npc-statistics,
+.charsheet .npc-ecology {
+    padding: 0 1em 0 1em;
 }
 
 .charsheet .table.npc-header .table-cell input {
-    color: White !important;
     background-color: black !important;
+    color: White !important;
     font-weight: bold;
-    vertical-align: text-top;
+    line-height: 1em;
     white-space: nowrap;
+}
+
+.charsheet .monster-statblock-import {
+    border: .2rem solid black;
+	padding: 0.75em;
+	margin: 2em;
+	width: auto;
+}
+
+.charsheet .npchead-top ~ .showarrow + .showsect {
+	margin: -1.5em 0 -2em 0;
+}
+
+.charsheet .npc-statblock-row {
+    align-items: start;
+    display: inline-flex;
+    flex-wrap: wrap;
+    height: 2.75em;
+    width: inherit;
+}
+
+.charsheet .npc-statblock-row .small-label2>.calc,
+.charsheet .npc-statblock-row .small-label2>input[type="number"] {
+    display: inline-block;
+    line-height: 2em;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: 2em;
+}
+
+.charsheet .npc-statblock-row .small-label2>input:not(.cssbutton)::placeholder {
+    color: darkgray;
+    font-size: 1rem;
+}
+
+/*npc buttons*/
+.charsheet .npc-statblock-row button[type="roll"].command-button {
+    background-color: #eee;
+    border-bottom-width: .2rem;
+    border-right-width: .2rem;
+    height: 2.5rem;
+}
+
+.charsheet .npc-statblock-row button[type="roll"].command-button > span {
+    color: #000;
+}
+
+.charsheet .npc-statblock-row button[type="roll"].command-button:hover {
+    background-color: #fff;
+}
+
+.charsheet .npc-statblock-row button[type="roll"].command-button:hover > span {
+    color: #f00;
+    cursor: pointer;
+}
+
+.charsheet .npc-statblock-row span.small-label2,
+.charsheet .npc-statblock-row span.small-label2 span {
+    align-items: center;
+    display: inline-flex;
+    font-size: 1em;
+    font-style: normal;
+}
+
+.charsheet .npc-statblock-row span.small-label2 span+input {
+    display: inline-block;
+}
+
+.charsheet .npc-statblock-row .small-label2 span:not(.autoexpand) {
+    cursor: default;
+    font-size: 1.3rem;
+    font-style: normal;
+    margin: 0 2px 0 2px;
 }
 
 .charsheet .sect.expand .attack-damage,
@@ -2312,11 +2495,9 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .counted,
 .charsheet .counted.sect-show {
-    position: absolute;
     left: .25em;
     top: 0;
-    width: 2.5em;
-    height: 2em;
+    width: 2em;
     padding: 0;
 }
 
@@ -2325,10 +2506,8 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .counted+span {
-    position: relative;
-    width: 2.5em;
-    min-width: 2.5em;
-    margin-left: -2em;
+    margin-left: -2.25em;
+    font-size: .85em;
 }
 
 .charsheet .counted+span.table-cell {
@@ -2351,6 +2530,7 @@ also need 1 more level in selector or base css will override border */
 .charsheet .nontable-repeating .repeating-rollbutton button {
     position: relative;
     margin-left: 0;
+    min-width: 2em;
 }
 
 /*highlight text */
@@ -2364,6 +2544,7 @@ also need 1 more level in selector or base css will override border */
     line-height: 1.75em;
     font-weight: normal;
     padding: .12em .5em .2em .5em;
+    white-space: nowrap;
 }
 
 .charsheet .boldlabel-check:checked+b:not(.offCase),
@@ -2493,13 +2674,13 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .footnotes {
-    width: 100%;
+    width: 98%;
     font-size: 1rem;
     font-family: 'Roboto Mono', monospace;
     list-style: none;
-    text-indent: -2.5em;
+    padding-left: 1em;
     white-space: pre-line;
-    line-height: 1rem;
+    line-height: 1.2em;
 }
 
 .charsheet .compendium-note {
@@ -2551,7 +2732,6 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .repcontainer.editmode .repitem .itemcontrol {
     z-index: 3;
-    background-color: gray;
     background-color: rgba(220, 220, 220, 0.40);
 }
 
@@ -2608,7 +2788,6 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .repcontrol .repcontrol_edit:after {
     /*	content: 'W'; hamburger menu*/
-    font-family: Arial;
     font-weight: bold;
     content: '☰';
     visibility: visible;
@@ -2762,26 +2941,7 @@ also need 1 more level in selector or base css will override border */
     padding: 0 0 0 .25em;
 }
 
-/* when a highlighted field is not showing error, put hidden 0.2rem border so size doesn't change */
-
-.charsheet input.highlight,
-.charsheet .highlight input,
-.charsheet .highlight input:disabled,
-.charsheet .highlight input.calc,
-.charsheet .highlight input[readonly] {
-    border-top: 0.2rem transparent solid;
-    border-left: 0.2rem transparent solid;
-    border-right: 0.2rem transparent solid;
-}
-
-.charsheet input.highlight:disabled,
-.charsheet input.highlightinputcalc,
-.charsheet input.highlight[readonly] .highlight input:disabled,
-.charsheet .highlight input.calc,
-.charsheet .highlight input[readonly] {
-    border-bottom: 0.2rem transparent solid;
-}
-
+/* use an outline for invalid input/calculation or to bring attention to the field */
 .charsheet .warn-show:checked+textarea.highlight,
 .charsheet .warn-show:checked+input.highlight,
 .charsheet .warn-mshow:checked~input.highlight,
@@ -2790,7 +2950,7 @@ also need 1 more level in selector or base css will override border */
 .charsheet .warn-show:checked+.highlight textarea,
 .charsheet .warn-mshow:checked~.highlight input,
 .charsheet .warn-mshow:checked~.highlight textarea {
-    border: 0.2rem #B8860B dashed !important;
+    outline: 0.2rem #B8860B dashed !important;
 }
 
 .charsheet .error-show:checked+input.highlight,
@@ -2801,10 +2961,12 @@ also need 1 more level in selector or base css will override border */
 .charsheet .error-show:checked+.highlight textarea,
 .charsheet .error-mshow:checked~.highlight input,
 .charsheet .error-mshow:checked~.highlight textarea {
-    border: 0.2rem #FF0044 dotted !important;
+    outline: 0.2rem #FF0044 dotted !important;
 }
 
 .charsheet .offscreen {
+    top: 0;
+    left: 0;
     position: absolute !important;
     clip: rect(0.1rem, 0.1rem, 0.1rem, 0.1rem);
     overflow: hidden !important;
@@ -2835,15 +2997,15 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .table-header {
-    display: table-cell;
-    padding: 0 2px 0 2px;
-    text-align: center;
-    font-style: italic;
-    font-weight: bold;
-    vertical-align: middle;
-    background-color: LightGray;
-    min-height: 1.25em;
-    overflow: hidden;
+  display: table-cell;
+  padding: 0 2px 0 2px;
+  text-align: center;
+  font-style: italic;
+  font-weight: bold;
+  vertical-align: middle;
+  background-color: LightGray;
+  min-height: 1.25em;
+  overflow: hidden;
 }
 
 .charsheet .class-grid .table-header {
@@ -2983,6 +3145,7 @@ also need 1 more level in selector or base css will override border */
 /* webkit (chrome) needs different css firefox centers perfectly, not chrome.must make it equal to 1.825 */
 .charsheet .small-label2>input[type="checkbox"]:not(.cssbutton),
 .charsheet .small-label2>input[type="radio"]:not(.cssbutton) {
+    margin: auto;
     width: 3rem;
     height: 1.5rem;
     border: none;
@@ -3175,10 +3338,11 @@ also need 1 more level in selector or base css will override border */
 
 .charsheet .divider-lg,
 .charsheet .divider-db-lg {
-    width: 1em;
-    white-space: nowrap;
-    font-size: 1.125em;
-    font-weight: bold;
+  width: 1.5rem;
+  white-space: nowrap;
+  font-size: 1.125em;
+  font-weight: bold;
+  line-height: 1rem;
 }
 
 .charsheet .divider,
@@ -3204,14 +3368,18 @@ also need 1 more level in selector or base css will override border */
 }
 
 .charsheet .nontable-name {
-    display: table-caption;
     caption-side: top;
     width: 100%;
     display: block;
 }
 
-.charsheet .spellclassnav~.h2nontable-name {
+.charsheet .spellclassnav~.nontable-name {
     margin-top: 0;
+    line-height: normal;
+}
+
+.charsheet .spellclassnav~.tab99:checked~.nontable-name:not(.section0) {
+    margin-top: .33em;
 }
 
 /* important so overrides more specific */
@@ -3299,6 +3467,7 @@ spellclass-concentration spellcaster-button {
     border-width: 0.2rem;
     border-radius: 0.5rem;
     margin-bottom: 0.6rem;
+    overflow: hidden;
 }
 
 .charsheet .entry-wide,
@@ -3376,7 +3545,6 @@ spellclass-concentration spellcaster-button {
     margin-left: -2.25em;
     width: 2.5em;
 }
-
 /*
 .charsheet .split-column-show:checked~.repeating-fields .small-label2 {
     height: auto;
@@ -3390,7 +3558,7 @@ spellclass-concentration spellcaster-button {
 
 /*** when collapsed (sheet-counted unchecked) shrink width
   * if split, then widen width (so it is more than 1/2 wide)
-  * split should override collapse/minimize 
+  * split should override collapse/minimize
   * without -shrink should .expand on split but not collapse
   */
 .charsheet .entry-60p,
@@ -3619,7 +3787,7 @@ spellclass-concentration spellcaster-button {
 }
 
 .charsheet .status-panel .options .small-label2 {
-    height: 2.85em;
+    height: 3em;
     margin-bottom: -.25em;
 }
 
@@ -3632,9 +3800,9 @@ spellclass-concentration spellcaster-button {
 }
 
 .charsheet .monster-indicator {
-    width: 100%;
-    display: block;
-    margin-top: -1em;
+    display: flex;
+    justify-content: center;
+    margin-top: -2em;
     text-align: center;
 }
 
@@ -3762,8 +3930,10 @@ spellclass-concentration spellcaster-button {
 /* pc vs npc */
 .charsheet .npc-show:checked~.pc-only,
 .charsheet .npc-show:checked~span .pc-only,
+.charsheet .npc-show:checked~div .pc-only,
 .charsheet .npc-show:checked~.pfsheet .pc-only,
 .charsheet .npc-show:not(:checked)~.npc-only,
+.charsheet .npc-show:not(:checked )~div .npc-only,
 .charsheet .npc-show:not(:checked)~span .npc-only,
 .charsheet .npc-show:not(:checked)~.pfsheet .npc-only,
 /* generic .sections */
@@ -3935,11 +4105,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     width: 100%;
     display: table;
     border-width: 0.1rem;
-    border-style: solid;
     border-spacing: 0;
-    /*
-    border-collapse: collapse;
-    */
     -moz-box-shadow: 0.2rem 0.2rem 0.5rem Black;
     -webkit-box-shadow: 0.2rem 0.2rem 0.5rem Black;
     box-shadow: 0.2rem 0.2rem 0.5rem Black;
@@ -3995,12 +4161,12 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     overflow: hidden;
 }
 
-.sheet-rolltemplate-pf_generic .sheet-roll-tablerounded,
-.sheet-rolltemplate-pf_ability .sheet-roll-tablerounded,
-.sheet-rolltemplate-pf_defense .sheet-roll-tablerounded,
-.sheet-rolltemplate-pf_attack .sheet-roll-tablerounded,
-.sheet-rolltemplate-pf_spell .sheet-roll-tablerounded,
-.sheet-rolltemplate-pf_block .sheet-roll-tablerounded {
+.sheet-rolltemplate-pf_generic .sheet-rounded,
+.sheet-rolltemplate-pf_ability .sheet-rounded,
+.sheet-rolltemplate-pf_defense .sheet-rounded,
+.sheet-rolltemplate-pf_attack .sheet-rounded,
+.sheet-rolltemplate-pf_spell .sheet-rounded,
+.sheet-rolltemplate-pf_block .sheet-rounded {
     border-radius: 0.5rem;
 }
 
@@ -4026,10 +4192,10 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .sheet-rolltemplate-pf_attack .sheet-header-image,
 .sheet-rolltemplate-pf_spell .sheet-header-image,
 .sheet-rolltemplate-pf_block .sheet-header-image {
-    float: right;
-    padding: 2px;
-    vertical-align: baseline;
-    min-width: 3rem;
+  float: right;
+  padding: 2px;
+  vertical-align: baseline;
+  min-width: 3rem;
 }
 
 .sheet-rolltemplate-pf_generic .sheet-img,
@@ -4090,24 +4256,23 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .sheet-rolltemplate-pf_attack .sheet-roll-cell,
 .sheet-rolltemplate-pf_spell .sheet-roll-cell,
 .sheet-rolltemplate-pf_block .sheet-roll-cell {
-    line-height: 1.1em;
-    font-size: 1.3rem;
-    overflow: hidden;
-    display: inline-block;
+	line-height: 1.1em;
+	font-size: 1.3rem;
+	overflow: hidden;
+	display: inline-block;
 }
 
 .sheet-rolltemplate-pf_attack .sheet-roll-groupi>.sheet-roll-row:nth-child(2) {
-    height: 1em;
-    line-height: 1em;
+      height: 1em;
+      line-height: 1em;
 }
 
 /* damage type */
 .sheet-rolltemplate-pf_attack .sheet-roll-groupi>.sheet-roll-row div:first-child>span {
     margin-left: .25em;
-    /*  white-space: nowrap; */
+/*  white-space: nowrap; */
     position: inherit;
 }
-
 /*
 .sheet-rolltemplate-pf_attack .sheet-roll-groupi>.sheet-roll-row div:first-child {
     position: absolute;
@@ -4197,11 +4362,11 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .sheet-rolltemplate-pf_spell .sheet-roll-groupi .sheet-roll-row .sheet-roll-cell:last-child,
 .sheet-rolltemplate-pf_attack .sheet-roll-groupc .sheet-roll-row .sheet-roll-cell:last-child,
 .sheet-rolltemplate-pf_spell .sheet-roll-groupc .sheet-roll-row .sheet-roll-cell:last-child {
-    text-align: right;
-    padding-right: 0.25rem;
-    position: relative;
-    z-index: 1;
-    float: right;
+	text-align: right;
+	padding-right: 0.25rem;
+	position: relative;
+	z-index: 1;
+	float: right;
 }
 
 .sheet-rolltemplate-pf_generic .sheet-right,
@@ -4888,8 +5053,8 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
     background-color: white;
 }
 
+ /*doubled up the class to increase specificity*/
 .sheet-rolltemplate-pf_attack .sheet-roll-accessible>label.sheet-atk.sheet-atk,
-/*doubled up the class to increase speceficity*/
 .sheet-rolltemplate-pf_attack .sheet-roll-accessible>label.sheet-confirm,
 .sheet-rolltemplate-pf_attack .sheet-roll-groupi>.sheet-roll-row:first-child,
 .sheet-rolltemplate-pf_spell .sheet-roll-groupi>.sheet-roll-row:first-child,
@@ -5132,7 +5297,9 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .charsheet .readonly-show:not(:checked)~.main .repeating-fields .armor-attributes:not(.show-readonly),
 .charsheet .readonly-show:not(:checked)~.main .repeating-fields .armor-attributes-showlabel:not(.show-readonly),
 .charsheet .readonly-show:not(:checked)~.main .repeating-fields .weapon-attributes:not(.show-readonly),
-.charsheet .readonly-show:not(:checked)~.main .repeating-fields .weapon-attributes-showlabel:not(.show-readonly) {
+.charsheet .readonly-show:not(:checked)~.main .repeating-fields .weapon-attributes-showlabel:not(.show-readonly),
+.charsheet .readonly-show:not(:checked) ~ .main .hide-readonly ~ .npc-header.showsect::before,
+.charsheet .readonly-show:not(:checked) ~ .main .hide-readonly ~ .npc-header.showsect::after {
     display: none !important;
 }
 
@@ -5179,7 +5346,6 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .charsheet .hasexpandrows .expand3+span {
     top: 7.25em;
 }
-
 /*
 .charsheet .class-table.hasexpandrows .expand1,
 .charsheet .class-table.hasexpandrows .expand1+span {
@@ -5195,7 +5361,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .charsheet .class-table.hasexpandrows .expand3+span {
     top: 9em;
 }
-*/
+
 .charsheet .readonly-show:not(:checked)~.main .class-table.hasexpandrows .expand1,
 .charsheet .readonly-show:not(:checked)~.main .class-table.hasexpandrows .expand1+span {
     top: 5.25em;
@@ -5210,7 +5376,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .charsheet .readonly-show:not(:checked)~.main .class-table.hasexpandrows .expand3+span {
     top: 9.25em;
 }
-
+*/
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1,
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1+span {
     top: 4.5em;
@@ -5223,7 +5389,7 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2,
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2+span {
-    top: 9.75em;
+    top: 9em;
 }
 
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:not(:checked)~.expand3,
@@ -5235,47 +5401,47 @@ equipmentnav ~ tabinputtab99:not(:checked) ~ tabinputtab9:not(:checked) ~ tabinp
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:checked~.expand3+span,
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:not(:checked)~.expand3,
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:not(:checked)~.expand3+span {
-    top: 11em;
+    top: 11.25em;
 }
 
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:checked~.expand3,
 .charsheet .readonly-show:checked~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:checked~.expand3+span {
-    top: 13.25em;
+    top: 13.5em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1+span {
-    top: 2.5em;
+    top: 1.25em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2+span {
-    top: 4.75em;
+    top: 3.5em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2+span {
-    top: 7em;
+    top: 5.75em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:not(:checked)~.expand3,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:not(:checked)~.expand3+span {
-    top: 7em;
+    top: 5.75em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:checked~.expand3,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:not(:checked)~.expand2:checked~.expand3+span,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:not(:checked)~.expand3,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:not(:checked)~.expand3+span {
-    top: 9.25em;
+    top: 8em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:checked~.expand3,
 .charsheet .readonly-show:not(:checked)~.main .attack-grid.hasexpandrows .expand1:checked~.expand2:checked~.expand3+span {
-    top: 11.5em;
+    top: 10.25em;
 }
 
-/* repeating .sections take up half on "all" view 
+/* repeating .sections take up half on "all" view
 also if multiple repeating sects inside h2 they are 100% wide and only h2 is narrow.
 */
 .charsheet .readonly-show:not(:checked)~.main .section .half-readonly,
@@ -5531,7 +5697,6 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     /*margin: 0.2rem;
 	width: calc(50% - 6px);*/
     min-width: 24em;
-    min-height: 9em;
 }
 
 .charsheet .readonly-show:not(:checked)~.main .section-attacks .attack-grid .linked-tablecell-short {
@@ -5557,7 +5722,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 }
 
 .charsheet .readonly-show:not(:checked)~.main .section-attacks .h2-section.advanced-macros {
-    /*margin: 0.2rem; 
+    /*margin: 0.2rem;
 	width: calc(100% - 4px);*/
     border: none;
 }
@@ -5635,7 +5800,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
     width: 100%;
 }
 
-/* .col 2 worn items 
+/* .col 2 worn items
 .charsheet .worn-items {
     max-width: 100%;
 }
@@ -5998,9 +6163,20 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 .charsheet .small-label2.autoexpand input {
     position: absolute;
     overflow: hidden;
-    height: 1.5em;
+    height: 1.75em;
     top: .3em;
     text-align: center;
+}
+
+/* fix height of autoexpand fields in npc section */
+.charsheet .npc-details .small-label2.autoexpand input,
+.charsheet .npc-defense .small-label2.autoexpand input,
+.charsheet .npc-offense .small-label2.autoexpand input,
+.charsheet .npc-tactics .small-label2.autoexpand input,
+.charsheet .npc-statistics .small-label2.autoexpand input,
+.charsheet .npc-ecology .small-label2.autoexpand input,
+.charsheet .npc-desc .small-label2.autoexpand input {
+    height: auto;
 }
 
 .charsheet .small-label2.autoexpand span.autoexpand {
@@ -6081,13 +6257,13 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 .charsheet textarea.macro-text,
 .charsheet textarea.skill-macro-text,
 .charsheet input.skill-macro-text {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 1rem;
-    line-height: 2rem;
-    padding: 2px;
-    box-sizing: border-box;
-    vertical-align: inherit;
-    word-break: break-all;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1rem;
+  line-height: 2rem;
+  padding: 2px;
+  box-sizing: border-box;
+  vertical-align: inherit;
+  word-break: break-all;
 }
 
 .charsheet .accessible:checked~.pf-wrapper input.macro-text-inline,
@@ -6140,7 +6316,7 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 .charsheet .racial-traits-show:not(:checked)~.section-racial-traits,
 .charsheet .racial-traits-show:not(:checked)~div .section-racial-traits,
 .charsheet .traits-show:not(:checked)~.section-traits,
-.charsheet .traits-show:not(:checked)~div .ection-traits,
+.charsheet .traits-show:not(:checked)~div .section-traits,
 .charsheet .featlist-show:not(:checked)~.section-featlist,
 .charsheet .featlist-show:not(:checked)~div .section-featlist,
 .charsheet .classfeatures-show:not(:checked)~.section-classfeatureslist,
@@ -6162,10 +6338,11 @@ also if multiple repeating sects inside h2 they are 100% wide and only h2 is nar
 
 /*styles sheet mode note*/
 .charsheet div.mode {
-    float: right;
-    clear: right;
-    font-weight: bold;
+    display: flex;
+    flex-direction: row-reverse;
     font-style: italic;
+    font-weight: bold;
+    grid-area: 1/2/1/2;
 }
 
 .charsheet div.mode:hover {
