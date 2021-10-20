@@ -2,7 +2,7 @@
 const rollCombatGrenadePNJ = ["grenade1PNJ", "grenade2PNJ", "grenade3PNJ", "grenade4PNJ", "grenade5PNJ"];
 
 rollCombatGrenadePNJ.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         var hasDgts = true;
@@ -48,7 +48,10 @@ rollCombatGrenadePNJ.forEach(button => {
         let bDegats = 0;
         let bViolence = 0;
 
-        let aspect = PNJData[`aspectPNJGrenade`] || "0";
+        let listAttrs = [`aspectPNJGrenade`];
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let aspect = attrs[`aspectPNJGrenade`] || "0";
         
         let aspectNom = "";
 
@@ -69,6 +72,8 @@ rollCombatGrenadePNJ.forEach(button => {
 
             cBase.push(AspectNom[aspectNom]);
             cRoll.push(aspectValue);
+
+            exec.push("{{vAE="+AE+"}}");
         };
 
         if(mod != 0) {
@@ -103,8 +108,6 @@ rollCombatGrenadePNJ.forEach(button => {
         if(vBeteD > 0)
             exec.push(`{{vBeteD=${vBeteD}}}`);
         //FIN DE GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
-
-        console.log(attaquesSurprisesCondition);
 
         //GESTION DES EFFETS
 
@@ -161,8 +164,6 @@ rollCombatGrenadePNJ.forEach(button => {
             if(attaquesSurprisesCondition == "")
                 attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`;
         }
-
-        console.log(attaquesSurprisesCondition);
 
         //FIN GESTION DES EFFETS
 

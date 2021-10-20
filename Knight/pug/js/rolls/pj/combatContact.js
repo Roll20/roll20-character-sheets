@@ -1,7 +1,7 @@
 const rollCombatContact = ["poingContact", "poingMAContact", "pSContact", "mEContact", "repeating_armeCaC:armecontact"];
 
 rollCombatContact.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let firstExec = [];
@@ -15,22 +15,16 @@ rollCombatContact.forEach(button => {
         let hasOptions = true;
         let hasSpecial = true;
 
+        let prefix = "";
         var name = "";
         var portee = "";
 
-        let data = [];
         let dEffets = [];
         let dEffetsValue = [];
         let AS = [];
         let AO = [];
         let special = [];
         let specialValue = [];
-
-        let C1 = "0";
-        let C2 = "0";
-        let C3 = "0";
-        let C4 = "0";
-        let CPrecis = "0";
 
         let baseDegats = 0;
         let baseViolence = 0;
@@ -41,14 +35,18 @@ rollCombatContact.forEach(button => {
         let bDegats = [];
         let bViolence = [];
 
+        let listAttrs = [];
+
         switch(button) {
             case "poingContact":
                 name = `{{special1=${i18n_coupPoing}}}`;
 
-                C1 = PJData["poingCcaracteristique1Equipement"] || "0";
-                C2 = PJData["poingCcaracteristique2Equipement"] || "0";
-                C3 = PJData["poingCcaracteristique3Equipement"] || "0";
-                C4 = PJData["poingCcaracteristique4Equipement"] || "0";
+                prefix = "poingC";
+
+                listAttrs.push("poingCcaracteristique1Equipement");
+                listAttrs.push("poingCcaracteristique2Equipement");
+                listAttrs.push("poingCcaracteristique3Equipement");
+                listAttrs.push("poingCcaracteristique4Equipement");
 
                 baseDegats = 0;
                 baseViolence = 0;
@@ -66,13 +64,17 @@ rollCombatContact.forEach(button => {
             case "poingMAContact":
                 name = `{{special1=${i18n_coupPoing}}}`;
 
-                special = wpnS["poingMAC"];
-                specialValue = wpnSValue["poingMAC"];
+                prefix = "poingMAC";
 
-                C1 = PJData["poingMACcaracteristique1Equipement"] || "0";
-                C2 = PJData["poingMACcaracteristique2Equipement"] || "0";
-                C3 = PJData["poingMACcaracteristique3Equipement"] || "0";
-                C4 = PJData["poingMACcaracteristique4Equipement"] || "0";
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push("poingMACcaracteristique1Equipement");
+                listAttrs.push("poingMACcaracteristique2Equipement");
+                listAttrs.push("poingMACcaracteristique3Equipement");
+                listAttrs.push("poingMACcaracteristique4Equipement");
+
+                listAttrs = listAttrs.concat(special, specialValue);
 
                 baseDegats = 1;
                 baseViolence = 0;
@@ -89,18 +91,22 @@ rollCombatContact.forEach(button => {
             case "pSContact":
                 name = `{{special1=${i18n_couteauService}}}`;
 
-                dEffets = wpnE["pSC"];
-                dEffetsValue = wpnEValue["pSC"];
-                AS = wpnAS["pSC"];
-                AO = wpnAO["pSC"];
-                special = wpnS["pSC"];
-                specialValue = wpnSValue["pSC"];
+                prefix = "pSC";
 
-                C1 = PJData["pSCcaracteristique1Equipement"] || "0";
-                C2 = PJData["pSCcaracteristique2Equipement"] || "0";
-                C3 = PJData["pSCcaracteristique3Equipement"] || "0";
-                C4 = PJData["pSCcaracteristique4Equipement"] || "0";
-                CPrecis = PJData["pSCcaracteristiqueSPrecis"] || "0";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push("pSCcaracteristique1Equipement");
+                listAttrs.push("pSCcaracteristique2Equipement");
+                listAttrs.push("pSCcaracteristique3Equipement");
+                listAttrs.push("pSCcaracteristique4Equipement");
+                listAttrs.push("pSCcaracteristiqueSPrecis");
+
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AS, AO, special, specialValue);
 
                 baseDegats = 1;
                 baseViolence = 0;
@@ -115,18 +121,22 @@ rollCombatContact.forEach(button => {
             case "mEContact":
                 name = `{{special1=${i18n_marteauEpieuC}}}`;
 
-                dEffets = wpnE["mEC"];
-                dEffetsValue = wpnEValue["mEC"];
-                AS = wpnAS["mEC"];
-                AO = wpnAO["mEC"];
-                special = wpnS["mEC"];
-                specialValue = wpnSValue["mEC"];
+                prefix = "mEC";
 
-                C1 = PJData["mECcaracteristique1Equipement"] || "0";
-                C2 = PJData["mECcaracteristique2Equipement"] || "0";
-                C3 = PJData["mECcaracteristique3Equipement"] || "0";
-                C4 = PJData["mECcaracteristique4Equipement"] || "0";
-                CPrecis = PJData["mECcaracteristiqueSPrecis"] || "0";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push("mECcaracteristique1Equipement");
+                listAttrs.push("mECcaracteristique2Equipement");
+                listAttrs.push("mECcaracteristique3Equipement");
+                listAttrs.push("mECcaracteristique4Equipement");
+                listAttrs.push("mECcaracteristiqueSPrecis");
+
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AS, AO, special, specialValue);
 
                 baseDegats = 3;
                 baseViolence = 1;
@@ -140,40 +150,59 @@ rollCombatContact.forEach(button => {
 
             case "repeating_armeCaC:armecontact":
                 let id = info.triggerName.split("_")[2];
-                
-                data = wpnData[id] || [];
-                dEffets = wpnE[id] || [];
-                dEffetsValue = wpnEValue[id] || [];
-                AS = wpnAS[id] || [];
-                AO = wpnAO[id] || [];
-                special = wpnS[id] || [];          
-                specialValue = wpnSValue[id] || []; 
 
-                C1 = data["caracteristique1Equipement"] || "0";
-                C2 = data["caracteristique2Equipement"] || "0";
-                C3 = data["caracteristique3Equipement"] || "0";
-                C4 = data["caracteristique4Equipement"] || "0";
-                CPrecis = data["caracteristiqueSPrecis"] || "0";
+                prefix = `repeating_armeCaC_${id}_`;
 
-                let dName = data["ArmeCaC"] || "";
-                let dPortee = data["armeCaCPortee"] || "^{portee-contact}";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
 
-                name = `{{special1=${dName}}}`;
-                portee = `{{portee=^{portee} ${dPortee}}}`;
+                listAttrs.push(`${prefix}caracteristique1Equipement`);
+                listAttrs.push(`${prefix}caracteristique2Equipement`);
+                listAttrs.push(`${prefix}caracteristique3Equipement`);
+                listAttrs.push(`${prefix}caracteristique4Equipement`);
+                listAttrs.push(`${prefix}caracteristiqueSPrecis`);
 
-                baseDegats = Number(data["armeCaCDegat"]) || 0;
-                baseViolence = Number(data["armeCaCBDegat"]) || 0;
+                listAttrs.push(`${prefix}ArmeCaC`);
+                listAttrs.push(`${prefix}armeCaCPortee`);
 
-                diceDegats = Number(data["armeCaCDegat"]) || 0;
-                bDegats.push(Number(data["armeCaCBDegat"]) || 0);
+                listAttrs.push(`${prefix}armeCaCDegat`);
+                listAttrs.push(`${prefix}armeCaCViolence`);
 
-                diceViolence = Number(data["armeCaCViolence"]) || 0;
-                bViolence.push(Number(data["armeCaCBViolence"]) || 0);
+                listAttrs.push(`${prefix}armeCaCBDegat`);
+                listAttrs.push(`${prefix}armeCaCBViolence`);
 
-                exec.push(portee);
-                exec.push(name);
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AS, AO, special, specialValue);
                 break;
         }
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        if(button == "repeating_armeCaC:armecontact") {
+            name = attrs[`${prefix}ArmeCaC`] || "";
+            portee = attrs[`${prefix}armeCaCPortee`] || "^{portee-contact}";
+
+            exec.push(`{{special1=${name}}}`);
+            exec.push(`{{portee=^{portee} ${portee}}}`);
+
+            baseDegats = Number(attrs[`${prefix}armeCaCDegat`]) || 0;
+            baseViolence = Number(attrs[`${prefix}armeCaCViolence`]) || 0;
+
+            diceDegats = Number(attrs[`${prefix}armeCaCDegat`]) || 0;
+            bDegats.push(Number(attrs[`${prefix}armeCaCBDegat`]) || 0);
+
+            diceViolence = Number(attrs[`${prefix}armeCaCViolence`]) || 0;
+            bViolence.push(Number(attrs[`${prefix}armeCaCBViolence`]) || 0);
+        }
+
+        let C1 = attrs[`${prefix}caracteristique1Equipement`] || "0";
+        let C2 = attrs[`${prefix}caracteristique2Equipement`] || "0";
+        let C3 = attrs[`${prefix}caracteristique3Equipement`] || "0";
+        let C4 = attrs[`${prefix}caracteristique4Equipement`] || "0";
+        let CPrecis = attrs[`${prefix}caracteristiqueSPrecis`] || "0";
 
         if(armure == "sans" || armure == "guardian")
             hasArmure = false;
@@ -379,7 +408,7 @@ rollCombatContact.forEach(button => {
         if(hasOptions) {
                 //GESTION DES EFFETS
 
-                var effets = getWeaponsEffects(dEffets, dEffetsValue, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
+                var effets = getWeaponsEffects(prefix, attrs, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir);
 
                 bDegats = bDegats.concat(effets.bDegats);
                 eASAssassin = effets.eASAssassin;
@@ -442,7 +471,7 @@ rollCombatContact.forEach(button => {
 
                 //GESTION DES AMELIORATIONS STRUCTURELLES
 
-                var ameliorationsS = getWeaponsContactAS(AS, hasArmure, nowSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat);
+                var ameliorationsS = getWeaponsContactAS(prefix, AS, hasArmure, nowSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat);
 
                 autresAmeliorationsS = autresAmeliorationsS.concat(ameliorationsS.autresAmeliorations);
 
@@ -485,7 +514,7 @@ rollCombatContact.forEach(button => {
 
                 //GESTION DES AMELIORATIONS ORNEMENTALES
 
-                var ameliorationsO = getWeaponsContactAO(AO, isCadence, vCadence, isObliteration, isAntiAnatheme);
+                var ameliorationsO = getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, isAntiAnatheme);
 
                 if(ameliorationsO.isChromee) {
                     sCadence = ameliorationsO.rCadence;
@@ -554,16 +583,18 @@ rollCombatContact.forEach(button => {
         if(hasSpecial) {
             //GESTION DES BONUS SPECIAUX
 
-            let sBonusDegats = special["BDDiversTotal"];
-            let sBonusDegatsD6 = specialValue["BDDiversD6"];
-            let sBonusDegatsFixe = specialValue["BDDiversFixe"];
+            let sBonusDegats = isApplied(attrs[`${prefix}BDDiversTotal`]);
+            let sBonusDegatsD6 = attrs[`${prefix}BDDiversD6`];
+            let sBonusDegatsFixe = attrs[`${prefix}BDDiversFixe`];
 
-            let sBonusViolence = special["BVDiversTotal"];
-            let sBonusViolenceD6 = specialValue["BVDiversD6"];
-            let sBonusViolenceFixe = specialValue["BVDiversFixe"];
+            let sBonusViolence = isApplied(attrs[`${prefix}BVDiversTotal`]);
+            let sBonusViolenceD6 = attrs[`${prefix}BVDiversD6`];
+            let sBonusViolenceFixe = attrs[`${prefix}BVDiversFixe`];
 
-            var sEnergie = special["energie"];
-            var sEnergieValue = specialValue["energieValue"];
+            var sEnergie = isApplied(attrs[`${prefix}energie`]);
+            var sEnergieValue = attrs[`${prefix}energieValue`];
+
+            log(sBonusDegats);
 
             if(sBonusDegats) {
                 exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
@@ -619,8 +650,6 @@ rollCombatContact.forEach(button => {
             //FIN DE GESTION DES BONUS SPECIAUX
         }
 
-        
-
         //GESTION DES BONUS D'ARMURE
 
         let armorBonus = getArmorBonus(PJData, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
@@ -644,8 +673,8 @@ rollCombatContact.forEach(button => {
         diceViolence += Number(armorBonus.diceViolence);
 
         ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-        ODShaman = ODBarbarian.concat(armorBonus.ODShaman);
-        ODWarrior = ODBarbarian.concat(armorBonus.ODWarrior);
+        ODShaman = ODShaman.concat(armorBonus.ODShaman);
+        ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
 
         let MALBonus = getMALBonus(PJData, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
@@ -669,8 +698,8 @@ rollCombatContact.forEach(button => {
         diceViolence += Number(MALBonus.diceViolence);
 
         ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-        ODMALShaman = ODBarbarian.concat(MALBonus.ODMALShaman);
-        ODMALWarrior = ODBarbarian.concat(MALBonus.ODMALWarrior);
+        ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+        ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
         //FIN GESTION DES BONUS D'ARMURE
 
@@ -883,8 +912,6 @@ rollCombatContact.forEach(button => {
         }
         
         exec = firstExec.concat(exec);
-
-        console.log(exec);
 
         if(pasEnergie == false) {
             startRoll(exec.join(" "), (results) => {
