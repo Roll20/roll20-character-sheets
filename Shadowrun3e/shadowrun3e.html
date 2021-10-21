@@ -5796,7 +5796,7 @@ on('clicked:matrixattack', (info) => {
 				myroll+="{{targetname=[[0[@{target|" + lang["target"] +"|token_name}]]]}}";
 				myroll+="{{casttest=[[ [[" + calcDice + "]]d6>[[{2,(" + calcTN + ")}kh1]]!! ]] }}";
 			}
-			myroll+="{{resisttype=" + resisttype + "}}";
+			myroll+="{{resisttype2=" + resisttype + "}}";
 			myroll+="{{targetofspell=" + targetofspell + "}}";
 			myroll+="{{draintn=[[ " + calcDrainTN + "]]}}";
 			myroll+="{{spellname=" + name + "}}";
@@ -6988,12 +6988,12 @@ on('clicked:matrixattack', (info) => {
 			   mypool="control"
 
 			} else if ( mymode == "vehicleranged" ) { 
-			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + @{wp-vehicle}";
+			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + " + targetaim + " + @{wp-vehicle}";
 			   poolname="Control";
 			   pool="controlpool";
 			   mypool="control"
 			} else {
-			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + {0,( @{move} - " + gyro + ") }kh1 + " + targetaim + " + " + armorpen;
+			   calcTN += " ?{" + lang["range"] + "} + @{rangedTN} + @{target|" + lang["target"] +"|targetMove} + " + targetaim + " + " + armorpen;
 			   poolname="Combat";
 			   pool="combatpool";
 			   mypool="combat"
@@ -9169,7 +9169,7 @@ on("change:dermal-armor change:repeating_armor:equipped change:repeating_armor:b
 });
 
 
-on("sheet:opened change:rangedvizTN change:meleevizTN change:cover change:move change:dualwield change:calledshot change:aim change:enemies change:friends change:meleetargets change:position change:misccombatmods change:stun_pen change:wound_pen change:manualgunneryTN", function() {
+on("sheet:opened change:rangedvizTN change:meleevizTN change:cover change:move change:dualwield change:calledshot change:aim change:enemies change:friends change:meleetargets change:position change:misccombatmods change:stun_pen change:wound_pen change:manualgunneryTN change:rangedselected change:gryo-on", function() {
     updateRangeTNs();
     updateMeleeTNs();
 });
@@ -9608,30 +9608,44 @@ var updateMeleeTNs = function() {
     });
 };
   
-
 var updateRangeTNs = function() {
-    getAttrs(["rangedvizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen", "manualgunneryTN" ], function(myval) {
+    getAttrs(["rangedvizTN", "cover", "move", "dualwield", "calledshot", "aim", "enemies", "friends", "meleetargets", "position", "misccombatmods", "stun_pen","wound_pen", "manualgunneryTN", "rangedselected", "gyro-on" ], function(myval) {
 	console.log(myval);
-        var sets={};
-	console.log('updating ranged tn');
-    	const move=parseInt(myval.move);
-    	const called=parseInt(myval.calledshot);
-    	const viz=parseInt(myval.rangedvizTN);
-    	const cover=parseInt(myval.cover);
-    	const dual=parseInt(myval.dualwield);
-    	const enemies=parseInt(myval.enemies);
-    	const aim=parseInt(myval.aim);
-    	const misc=parseInt(myval.misccombatmods);
-    	const stun=parseInt(myval.stun_pen);
-    	const wound=parseInt(myval.wound_pen);
-    	const gunnery=parseInt(myval.manualgunneryTN);
-        targetNumberRange = called + viz + cover + dual + (2 * enemies) - aim + misc + stun + wound + gunnery;
-	mytargetMove = (move == 0)? -1 : (move ==4)? 2: (move ==6)? 2: 0;
-	sets["rangedTN"]=targetNumberRange;
-	sets["targetMove"]=mytargetMove;
-	console.log('sets');
-	console.log(sets);
-        setAttrs(sets);
+    	moreatts=["rangedselected"];	
+	const gyroon=parseInt(myval["gyro-on"]);
+	var rselect="None";
+	if (( myval["rangedselected"] != "None") && ( myval["gyro-on"] == 1 )) {
+		let mybase= myval["rangedselected"].split("_");
+		const myattr=mybase.pop();
+		const myrepeat=mybase.join('_'); 
+		rselect=myrepeat + "_gyro";
+		moreatts.push(rselect);
+	}
+	getAttrs(moreatts, function(mygyro) {
+		const gyro=(rselect == "None")? 0 : parseInt(mygyro[rselect]) * gyroon ;
+		console.log('gyro val ' + gyro);
+        	var sets={};
+		console.log('updating ranged tn');
+    		const move=parseInt(myval.move);
+    		const called=parseInt(myval.calledshot);
+    		const viz=parseInt(myval.rangedvizTN);
+    		const cover=parseInt(myval.cover);
+    		const dual=parseInt(myval.dualwield);
+    		const enemies=parseInt(myval.enemies);
+    		const aim=parseInt(myval.aim);
+    		const misc=parseInt(myval.misccombatmods);
+    		const stun=parseInt(myval.stun_pen);
+    		const wound=parseInt(myval.wound_pen);
+    		const gunnery=parseInt(myval.manualgunneryTN);
+		const movepen=((move - gyro) < 0 )? 0: move - gyro;
+		console.log('movepen ' + movepen);
+        	targetNumberRange = called + viz + cover + dual + (2 * enemies) - aim + misc + stun + wound + gunnery + movepen;
+		mytargetMove = (move == 0)? -1 : (move ==4)? 2: (move ==6)? 2: 0;
+		sets["rangedTN"]=targetNumberRange;
+		sets["targetMove"]=mytargetMove;
+		console.log(sets);
+        	setAttrs(sets);
+	});
 
     });
 };
@@ -10003,6 +10017,7 @@ powers: ["Accident", "Divination", "Guard", "Materialization", "Search"]
             {{#casttest}}{{targetofspell}}:
             {{#dodge}}[Dodge](~{{targetofspell}}|dodge||{{computed::senddata}}){{/dodge}}
             {{#resisttype}}[<span data-i18n="resist">Resist</span>](~{{targetofspell}}|{{computed::resisttype}}||{{computed::senddata}}){{/resisttype}}
+            {{#resisttype2}}[<span data-i18n="resist">Resist</span>](~{{targetofspell}}|{{resisttype2}}||{{computed::senddata}}){{/resisttype}}
         </div>{{/casttest}}
         {{#roll}}<div class="sheet-rtrow">{{targetofspell}}: [<span data-i18n="area-of-effect-acronym">AOE</span>](~selected|checkaoe||{{computed::senddata}})</div>
         {{/roll}}
