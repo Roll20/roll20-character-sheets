@@ -1,454 +1,29 @@
-var wpnData = {}
-
-var wpnE = {
-    "pSC":{
-        "akimbo":false, 
-        "ambidextrie":false,
-        "anatheme":false, 
-        "antiAnatheme":false, 
-        "antiVehicule":false, 
-        "artillerie":false, 
-        "assassin":false, 
-        "assistanceAttaque":false, 
-        "barrage":false, 
-        "cadence":false, 
-        "chargeur":false, 
-        "choc":false, 
-        "defense":false, 
-        "degatContinue":false, 
-        "deuxMains":false, 
-        "demoralisant":false,
-        "designation":false, 
-        "destructeur":false, 
-        "dispersion":false, 
-        "enChaine":false, 
-        "esperance":false, 
-        "fureur":false, 
-        "ignoreArmure":false, 
-        "ignoreCdF":false, 
-        "leste":false, 
-        "lestePNJ":false, 
-        "lourd":false, 
-        "lumiere":false, 
-        "meurtrier":false, 
-        "obliteration":false,
-        "orfevrerie":false, 
-        "orfevreriePNJ":false, 
-        "parasitage":false, 
-        "penetrant":false, 
-        "perceArmure":false,
-        "precision":false, 
-        "precisionPNJ":false, 
-        "reaction":false, 
-        "silencieux":true,
-        "soumission":false, 
-        "tenebricite":false,
-        "tirRafale":false, 
-        "tirSecurite":false, 
-        "ultraViolence":false
-    },
-    "mEC":{
-        "akimbo":false, 
-        "ambidextrie":false,
-        "anatheme":false, 
-        "antiAnatheme":false, 
-        "antiVehicule":false, 
-        "artillerie":false, 
-        "assassin":false, 
-        "assistanceAttaque":false, 
-        "barrage":false, 
-        "cadence":false, 
-        "chargeur":false, 
-        "choc":false, 
-        "defense":false, 
-        "degatContinue":false, 
-        "deuxMains":false, 
-        "demoralisant":false,
-        "designation":false, 
-        "destructeur":false, 
-        "dispersion":false, 
-        "enChaine":false, 
-        "esperance":false, 
-        "fureur":false, 
-        "ignoreArmure":false, 
-        "ignoreCdF":false, 
-        "leste":false, 
-        "lestePNJ":false, 
-        "lourd":false, 
-        "lumiere":false, 
-        "meurtrier":false, 
-        "obliteration":false,
-        "orfevrerie":false, 
-        "orfevreriePNJ":false, 
-        "parasitage":false, 
-        "penetrant":false, 
-        "perceArmure":true,
-        "precision":false, 
-        "precisionPNJ":false, 
-        "reaction":false, 
-        "silencieux":false,
-        "soumission":false, 
-        "tenebricite":false,
-        "tirRafale":false, 
-        "tirSecurite":false, 
-        "ultraViolence":false
-    },
-    "pS":{
-        "akimbo":false, 
-        "ambidextrie":false,
-        "anatheme":false, 
-        "antiAnatheme":false, 
-        "antiVehicule":false, 
-        "artillerie":false, 
-        "assassin":false, 
-        "assistanceAttaque":false, 
-        "barrage":false, 
-        "cadence":false, 
-        "chargeur":false, 
-        "choc":false, 
-        "defense":false, 
-        "degatContinue":false, 
-        "deuxMains":false, 
-        "demoralisant":false,
-        "designation":false, 
-        "destructeur":false, 
-        "dispersion":false, 
-        "enChaine":false, 
-        "esperance":false, 
-        "fureur":false, 
-        "ignoreArmure":false, 
-        "ignoreCdF":false, 
-        "leste":false, 
-        "lestePNJ":false, 
-        "lourd":false, 
-        "lumiere":false, 
-        "meurtrier":false, 
-        "obliteration":false,
-        "orfevrerie":false, 
-        "orfevreriePNJ":false, 
-        "parasitage":false, 
-        "penetrant":false, 
-        "perceArmure":false,
-        "precision":false, 
-        "precisionPNJ":false, 
-        "reaction":false, 
-        "silencieux":true,
-        "soumission":false, 
-        "tenebricite":false,
-        "tirRafale":false, 
-        "tirSecurite":false, 
-        "ultraViolence":false
-    },
-    "mE":{
-        "akimbo":false, 
-        "ambidextrie":false,
-        "anatheme":false, 
-        "antiAnatheme":false, 
-        "antiVehicule":false, 
-        "artillerie":false, 
-        "assassin":false, 
-        "assistanceAttaque":false, 
-        "barrage":false, 
-        "cadence":false, 
-        "chargeur":true, 
-        "choc":false, 
-        "defense":false, 
-        "degatContinue":true, 
-        "deuxMains":false, 
-        "demoralisant":false,
-        "designation":false, 
-        "destructeur":false, 
-        "dispersion":true, 
-        "enChaine":false, 
-        "esperance":false, 
-        "fureur":false, 
-        "ignoreArmure":false, 
-        "ignoreCdF":false, 
-        "leste":false, 
-        "lestePNJ":false, 
-        "lourd":false, 
-        "lumiere":true, 
-        "meurtrier":false, 
-        "obliteration":false,
-        "orfevrerie":false, 
-        "orfevreriePNJ":false, 
-        "parasitage":false, 
-        "penetrant":false, 
-        "perceArmure":false,
-        "precision":false, 
-        "precisionPNJ":false, 
-        "reaction":false, 
-        "silencieux":false,
-        "soumission":false, 
-        "tenebricite":false,
-        "tirRafale":false, 
-        "tirSecurite":false, 
-        "ultraViolence":false
+const asw = (() => {
+    const setActiveCharacterId = function(charId){
+        let oldAcid=getActiveCharacterId();
+        let ev = new CustomEvent("message");
+        ev.data={"id":"0", "type":"setActiveCharacter", "data":charId};
+        self.dispatchEvent(ev);
+        return oldAcid;
+    };
+    const promisifyWorker = (worker, parameters) => {
+        let acid=getActiveCharacterId(); 
+        let prevAcid=null;               
+        return new Promise((res,rej)=>{
+            prevAcid=setActiveCharacterId(acid);  
+            try {if (worker===0) getAttrs(parameters[0]||[],(v)=>res(v));
+                else if (worker===1) setAttrs(parameters[0]||{}, parameters[1]||{},(v)=>res(v));
+                else if (worker===2) getSectionIDs(parameters[0]||'',(v)=>res(v));
+            } catch(err) {rej(console.error(err))}
+        }).finally(()=>setActiveCharacterId(prevAcid));
     }
-}
-
-var wpnEValue = {
-    "pSC":{
-        "assassinValue":0,
-        "barrageValue":0,
-        "cadenceValue":0,
-        "chargeurValue":0,
-        "chocValue":0,
-        "defenseValue":0,
-        "degatContinueValue":0,
-        "dispersionValue":0,
-        "lumiereValue":0,
-        "parasitageValue":0,
-        "penetrantValue":0,
-        "perceArmureValue":0,
-        "reactionValue":0
-    },
-    "mEC":{
-        "assassinValue":0,
-        "barrageValue":0,
-        "cadenceValue":0,
-        "chargeurValue":0,
-        "chocValue":0,
-        "defenseValue":0,
-        "degatContinueValue":0,
-        "dispersionValue":0,
-        "lumiereValue":0,
-        "parasitageValue":0,
-        "penetrantValue":0,
-        "perceArmureValue":40,
-        "reactionValue":0
-    },
-    "pS":{
-        "assassinValue":0,
-        "barrageValue":0,
-        "cadenceValue":0,
-        "chargeurValue":0,
-        "chocValue":0,
-        "defenseValue":0,
-        "degatContinueValue":0,
-        "dispersionValue":0,
-        "lumiereValue":0,
-        "parasitageValue":0,
-        "penetrantValue":0,
-        "perceArmureValue":0,
-        "reactionValue":0
-    },
-    "mE":{
-        "assassinValue":0,
-        "barrageValue":0,
-        "cadenceValue":0,
-        "chargeurValue":1,
-        "chocValue":0,
-        "defenseValue":0,
-        "degatContinueValue":3,
-        "dispersionValue":3,
-        "lumiereValue":2,
-        "parasitageValue":0,
-        "penetrantValue":0,
-        "perceArmureValue":0,
-        "reactionValue":0
+    return {
+        getAttrs(attrArray) {return promisifyWorker(0, [attrArray])},
+        setAttrs(attrObj, options) {return promisifyWorker(1, [attrObj, options])},
+        getSectionIDs(section) {return promisifyWorker(2, [section])},
+        setActiveCharacterId,
     }
-}
-
-var wpnAS = {
-    "pSC":{
-        "agressive":false, 
-        "allegee":false, 
-        "assassine":false, 
-        "barbelee":false,
-        "connectee":false, 
-        "electrifiee":false, 
-        "indestructible":false, 
-        "jumelle":false,
-        "lumineuse":false, 
-        "massive":false, 
-        "protectrice":false, 
-        "soeur":false, 
-        "sournoise":false, 
-        "sournoisePNJ":false, 
-        "surmesure":false,
-        "surmesurePNJ":false
-    },
-    "mEC":{
-        "agressive":false, 
-        "allegee":false, 
-        "assassine":false, 
-        "barbelee":false,
-        "connectee":false, 
-        "electrifiee":false, 
-        "indestructible":false, 
-        "jumelle":false,
-        "lumineuse":false, 
-        "massive":false, 
-        "protectrice":false, 
-        "soeur":false, 
-        "sournoise":false, 
-        "sournoisePNJ":false, 
-        "surmesure":false,
-        "surmesurePNJ":false
-    }
-}
-
-var wpnAO = {
-    "pSC":{
-        "arabesquesIridescentes":false, 
-        "armeAzurine":false, 
-        "armeRougeSang":false, 
-        "armureGravee":false,
-        "blasonChevalier":false, 
-        "bouclierGrave":false, 
-        "cheneSculpte":false, 
-        "chromeeLignesLC":false, 
-        "codeKnightGrave":false, 
-        "craneRieurGrave":false, 
-        "faucheuseGravee":false, 
-        "fauconsPlumesL":false,
-        "flammesStylisees":false, 
-        "griffuresGravees":false, 
-        "masqueBriseSculpte":false, 
-        "rouagesCassesGraves":false,
-        "sillonsFLF":false
-    },
-    "mEC":{
-        "arabesquesIridescentes":false, 
-        "armeAzurine":false, 
-        "armeRougeSang":false, 
-        "armureGravee":false,
-        "blasonChevalier":false, 
-        "bouclierGrave":false, 
-        "cheneSculpte":false, 
-        "chromeeLignesLC":false, 
-        "codeKnightGrave":false, 
-        "craneRieurGrave":false, 
-        "faucheuseGravee":false, 
-        "fauconsPlumesL":false,
-        "flammesStylisees":false, 
-        "griffuresGravees":false, 
-        "masqueBriseSculpte":false, 
-        "rouagesCassesGraves":false,
-        "sillonsFLF":false
-    }
-}
-
-var wpnS = {
-    "poingMAC":{
-        "BDDiversTotal":false, 
-        "BVDiversTotal":false,
-        "energie":false
-    },
-    "pSC":{
-        "BDDiversTotal":false, 
-        "BVDiversTotal":false,
-        "energie":false
-    },
-    "mEC":{
-        "BDDiversTotal":false, 
-        "BVDiversTotal":false,
-        "energie":false
-    },
-    "pS":{
-        "BDDiversTotal":false, 
-        "BVDiversTotal":false,
-        "energie":false
-    },
-    "mE":{
-        "BDDiversTotal":false, 
-        "BVDiversTotal":false,
-        "energie":false
-    }
-}
-
-var wpnSValue = {
-    "poingMAC":{
-        "BDDiversD6":0, 
-        "BDDiversFixe":0,
-        "BVDiversD6":0, 
-        "BVDiversFixe":0,
-        "energieValue":0
-    },
-    "pSC":{
-        "BDDiversD6":0, 
-        "BDDiversFixe":0,
-        "BVDiversD6":0, 
-        "BVDiversFixe":0,
-        "energieValue":0
-    },
-    "mEC":{
-        "BDDiversD6":0, 
-        "BDDiversFixe":0,
-        "BVDiversD6":0, 
-        "BVDiversFixe":0,
-        "energieValue":0
-    },
-    "pS":{
-        "BDDiversD6":0, 
-        "BDDiversFixe":0,
-        "BVDiversD6":0, 
-        "BVDiversFixe":0,
-        "energieValue":0
-    },
-    "mE":{
-        "BDDiversD6":0, 
-        "BDDiversFixe":0,
-        "BVDiversD6":0, 
-        "BVDiversFixe":0,
-        "energieValue":0
-    }
-}
-
-var wpnAA = {
-    "pS":{
-        "chargeurGrappes":false, 
-        "canonLong":false, 
-        "canonRaccourci":false, 
-        "chambreDouble":false, 
-        "interfaceGuidage":false,
-        "jumelage":false, 
-        "lunetteIntelligente":false, 
-        "munitionsHyperVelocite":false, 
-        "munitionsDrone":false,
-        "chargeurExplosives":false, 
-        "munitionsIEM":false, 
-        "munitionsNonLetales":false, 
-        "munitionsSubsoniques":false,
-        "pointeurLaser":false, 
-        "protectionArme":false, 
-        "revetementOmega":false, 
-        "structureElement":false, 
-        "systemeRefroidissement":false
-    },
-    "mE":{
-        "chargeurGrappes":false, 
-        "canonLong":false, 
-        "canonRaccourci":false, 
-        "chambreDouble":false, 
-        "interfaceGuidage":false,
-        "jumelage":false, 
-        "lunetteIntelligente":false, 
-        "munitionsHyperVelocite":false, 
-        "munitionsDrone":false,
-        "chargeurExplosives":false, 
-        "munitionsIEM":false, 
-        "munitionsNonLetales":false, 
-        "munitionsSubsoniques":false,
-        "pointeurLaser":false, 
-        "protectionArme":false, 
-        "revetementOmega":false, 
-        "structureElement":false, 
-        "systemeRefroidissement":false
-    }
-}
-
-var wpnAAValue = {
-    "pS":{
-        "jumelageValue":"", 
-        "jumelageType":"", 
-    },
-    "mE":{
-        "jumelageValue":"", 
-        "jumelageType":"", 
-    }
-}
+})();
 
 const wpnContactData = [
     "ArmeCaC",
@@ -532,692 +107,16 @@ const wpnSpecialValue = [
     "BDDiversD6", "BDDiversFixe", "BVDiversD6", "BVDiversFixe", "energieValue"
 ];
 
-on("remove:repeating_armeCaC", function(info) {
-    let id = info.triggerName.split("_")[2];
+function isApplied(e) {
+    let result = false;
 
-    wpnData[id] = {};
-    wpnE[id] = {};
-    wpnEValue[id] = {};
-    wpnAS[id] = {};
-    wpnAO[id] = {};
-    wpnS[id] = {};
-    wpnSValue[id] = {};
-});
+    if(e != "0")
+        result = e;
 
-on("remove:repeating_armeDist remove:repeating_armeDistVehicule", function(info) {
-    let id = info.triggerName.split("_")[2];
+    return result;
+}
 
-    wpnData[id] = {};
-    wpnE[id] = {};
-    wpnEValue[id] = {};
-    wpnAA[id] = {};
-    wpnAAValue[id] = {};
-});
-
-on("remove:repeating_armeAutre", function(info) {
-    let id = info.triggerName.split("_")[2];
-
-    wpnData[id] = {};
-    wpnE[id] = {};
-    wpnEValue[id] = {};
-    wpnAA[id] = {};
-    wpnAAValue[id] = {};
-    wpnS[id] = {};
-    wpnSValue[id] = {};
-});
-
-wpnContactData.forEach(data => {
-    on(`change:repeating_armeCaC:${data}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnData[id] == undefined)
-            wpnData[id] = {};
-
-        wpnData[id][data] = newValue;
-    });
-})
-
-wpnDistanceData.forEach(data => {
-    on(`change:repeating_armeDist:${data}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnData[id] == undefined)
-            wpnData[id] = {};
-
-        wpnData[id][data] = newValue;
-    });
-
-    on(`change:repeating_armeDistVehicule:${data}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnData[id] == undefined)
-            wpnData[id] = {};
-
-        wpnData[id][data] = newValue;
-    });
-})
-
-wpnAutreData.forEach(data => {
-    on(`change:repeating_armeAutre:${data}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnData[id] == undefined)
-            wpnData[id] = {};
-
-        wpnData[id][data] = newValue;
-    });
-})
-
-wpnEffects.forEach(effet => {
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${couteauService}${effet}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[couteauService][effet] = v;
-    });
-
-    on(`change:${marteauContact}${effet}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[marteauContact][effet] = v;
-    });
-
-    on(`change:${pistoletService}${effet}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[pistoletService][effet] = v;
-    });
-
-    on(`change:${marteauDistance}${effet}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[marteauDistance][effet] = v;
-    });
-
-    on(`change:repeating_armeCaC:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnE[id] == undefined)
-            wpnE[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[id][effet] = v;
-    });
-
-    on(`change:repeating_armeDist:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnE[id] == undefined)
-            wpnE[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[id][effet] = v;
-    });
-
-    on(`change:repeating_armeautre:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnE[id] == undefined)
-            wpnE[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[id][effet] = v;
-    });
-
-    on(`change:repeating_armeDistVehicule:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnE[id] == undefined)
-            wpnE[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnE[id][effet] = v;
-    });
-})
-
-wpnEffectsValue.forEach(effet => {
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${couteauService}${effet}`, function(info) { 
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[couteauService][effet] = Number(v);
-    });
-
-    on(`change:${marteauContact}${effet}`, function(info) { 
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[marteauContact][effet] = Number(v);
-    });
-
-    on(`change:${pistoletService}${effet}`, function(info) { 
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[pistoletService][effet] = Number(v);
-    });
-
-    on(`change:${marteauDistance}${effet}`, function(info) { 
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[marteauDistance][effet] = Number(v);
-    });
-
-    on(`change:repeating_armeCaC:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(wpnEValue[id] == undefined)
-            wpnEValue[id] = {};
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[id][effet] = Number(v);
-    });
-
-    on(`change:repeating_armeDist:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(wpnEValue[id] == undefined)
-            wpnEValue[id] = {};
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[id][effet] = Number(v);
-    });
-
-    on(`change:repeating_armeautre:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(wpnEValue[id] == undefined)
-            wpnEValue[id] = {};
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[id][effet] = Number(v);
-    });
-    
-    on(`change:repeating_armeDistVehicule:${effet}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = 0;
-        let newValue = info.newValue;
-
-        if(wpnEValue[id] == undefined)
-            wpnEValue[id] = {};
-
-        if(newValue != undefined)
-            v = newValue;
-
-        wpnEValue[id][effet] = Number(v);
-    });
-})
-
-wpnAmeliorationS.forEach(AS => {
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-
-    on(`change:${couteauService}${AS}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAS[couteauService][AS] = v;
-    });
-
-    on(`change:${marteauContact}${AS}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAS[marteauContact][AS] = v;
-    });
-
-    on(`change:repeating_armeCaC:${AS}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnAS[id] == undefined)
-            wpnAS[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAS[id][AS] = v;
-    });
-})
-
-wpnAmeliorationO.forEach(AO => {
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-
-    on(`change:${couteauService}${AO}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAO[couteauService][AO] = v;
-    });
-
-    on(`change:${marteauContact}${AO}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAO[marteauContact][AO] = v;
-    });
-
-    on(`change:repeating_armeCaC:${AO}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnAO[id] == undefined)
-            wpnAO[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAO[id][AO] = v;
-    });
-})
-
-wpnAmeliorationA.forEach(AA => {
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${pistoletService}${AA}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAA[pistoletService][AA] = v;
-    });
-
-    on(`change:${marteauDistance}${AA}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAA[marteauContact][AA] = v;
-    });
-
-    on(`change:repeating_armeDist:${AA}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnAA[id] == undefined)
-            wpnAA[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAA[id][AA] = v;
-    });
-
-    on(`change:repeating_armeautre:${AA}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnAA[id] == undefined)
-            wpnAA[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAA[id][AA] = v;
-    });
-    
-    on(`change:repeating_armeDistVehicule:${AA}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnAA[id] == undefined)
-            wpnAA[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnAA[id][AA] = v;
-    });
-})
-
-wpnAmeliorationAValue.forEach(special => {
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${pistoletService}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnAAValue[pistoletService][special] = newValue;
-    });
-
-    on(`change:${marteauDistance}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnAAValue[marteauDistance][special] = newValue;
-    });
-
-    on(`change:repeating_armeCaC:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnAAValue[id] == undefined)
-            wpnAAValue[id] = {};
-
-        wpnAAValue[id][special] = newValue;
-    });
-
-    on(`change:repeating_armeDist:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnAAValue[id] == undefined)
-            wpnAAValue[id] = {};
-
-        wpnAAValue[id][special] = newValue;
-    });
-
-    on(`change:repeating_armeautre:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnAAValue[id] == undefined)
-            wpnAAValue[id] = {};
-
-        wpnAAValue[id][special] = newValue;
-    });
-    
-    on(`change:repeating_armeDistVehicule:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnAAValue[id] == undefined)
-            wpnAAValue[id] = {};
-
-        wpnAAValue[id][special] = newValue;
-    });
-})
-
-wpnSpecial.forEach(special => {
-    let poingMA = "poingMAC";
-
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${poingMA}${special}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0" || special == "energie")
-            v = false;
-
-        wpnS[poingMA][special] = v;
-    });
-
-    on(`change:${couteauService}${special}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[couteauService][special] = v;
-    });
-
-    on(`change:${marteauContact}${special}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[marteauContact][special] = v;
-    });
-
-    on(`change:${pistoletService}${special}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[pistoletService][special] = v;
-    });
-
-    on(`change:${marteauDistance}${special}`, function(info) { 
-        let v = true;
-        let newValue = info.newValue;
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[marteauDistance][special] = v;
-    });
-
-    on(`change:repeating_armeCaC:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnS[id] == undefined)
-            wpnS[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[id][special] = v;
-    });
-
-    on(`change:repeating_armeDist:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnS[id] == undefined)
-            wpnS[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[id][special] = v;
-    });
-
-    on(`change:repeating_armeautre:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnS[id] == undefined)
-            wpnS[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[id][special] = v;
-    });
-    
-    on(`change:repeating_armeDistVehicule:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let v = true;
-        let newValue = info.newValue;
-
-        if(wpnS[id] == undefined)
-            wpnS[id] = {};
-
-        if(newValue == "0")
-            v = false;
-
-        wpnS[id][special] = v;
-    });
-})
-
-wpnSpecialValue.forEach(special => {
-    let poingMA = "poingMAC";
-    let couteauService = "pSC";
-    let marteauContact = "mEC";
-    
-    let pistoletService = "pS";
-    let marteauDistance = "mE";
-
-    on(`change:${poingMA}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnSValue[poingMA][special] = newValue;
-    });
-
-    on(`change:${couteauService}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnSValue[couteauService][special] = newValue;
-    });
-
-    on(`change:${marteauContact}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnSValue[marteauContact][special] = newValue;
-    });
-
-    on(`change:${pistoletService}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnSValue[pistoletService][special] = newValue;
-    });
-
-    on(`change:${marteauDistance}${special}`, function(info) { 
-        let newValue = info.newValue;
-
-        wpnSValue[marteauDistance][special] = newValue;
-    });
-
-    on(`change:repeating_armeCaC:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnSValue[id] == undefined)
-            wpnSValue[id] = {};
-
-        wpnSValue[id][special] = newValue;
-    });
-
-    on(`change:repeating_armeDist:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnSValue[id] == undefined)
-            wpnSValue[id] = {};
-
-        wpnSValue[id][special] = newValue;
-    });
-
-    on(`change:repeating_armeautre:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnSValue[id] == undefined)
-            wpnSValue[id] = {};
-
-        wpnSValue[id][special] = newValue;
-    });
-    
-    on(`change:repeating_armeDistVehicule:${special}`, function(info) {
-        let id = info.triggerName.split("_")[2];
-        let newValue = info.newValue;
-
-        if(wpnSValue[id] == undefined)
-            wpnSValue[id] = {};
-
-        wpnSValue[id][special] = newValue;
-    });
-})
-
-function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir) {
+function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir) {
     let result = {};
 
     let exec = [];
@@ -1260,62 +159,62 @@ function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, 
     let isTenebricide = false;
     let isTirRafale = false;
 
-    let eAntiAnatheme = effet["antiAnatheme"] || false;
-    let eAntiVehicule = effet["antiVehicule"] || false;
-    let eArtillerie = effet["artillerie"] || false;
-    let eAssassin = effet["assassin"] || false;
-    let eAssassinV = value["assassinValue"] || 0;
-    let eAssistanceAttaque = effet["assistanceAttaque"] || false;
-    let eBarrage = effet["barrage"] || false;
-    let eBarrageV = value["barrageValue"] || 0;
-    let eCadence = effet["cadence"] || false;
-    let eCadenceV = value["cadenceValue"] || 0;
-    let eChargeur = effet["eChargeur"] || false;
-    let eChargeurV = value["chargeurValue"] || 0;
-    let eChoc = effet["choc"] || false;
-    let eChocV = value["chocValue"] || 0;
-    let eDefense = effet["eDefense"] || false;
-    let eDefenseV = value["defenseValue"] || 0;
-    let eDegatsContinus = effet["degatContinue"] || false;
-    let eDegatsContinusV = value["degatContinueValue"] || 0;
-    let eDeuxMains = effet["deuxMains"] || false;
-    let eDemoralisant = effet["eDemoralisant"] || false;
-    let eDesignation = effet["designation"] || false;
-    let eDestructeur = effet["degatContinue"] || false;
+    let eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
+    let eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
+    let eArtillerie = isApplied(effet[`${prefix}artillerie`]);
+    let eAssassin = isApplied(effet[`${prefix}assassin`]);
+    let eAssassinV = effet[`${prefix}assassinValue`] || 0;
+    let eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
+    let eBarrage = isApplied(effet[`${prefix}barrage`]);
+    let eBarrageV = effet[`${prefix}barrageValue`] || 0;
+    let eCadence = isApplied(effet[`${prefix}cadence`]);
+    let eCadenceV = effet[`${prefix}cadenceValue`] || 0;
+    let eChargeur = isApplied(effet[`${prefix}eChargeur`]);
+    let eChargeurV = effet[`${prefix}chargeurValue`] || 0;
+    let eChoc = isApplied(effet[`${prefix}choc`]);
+    let eChocV = effet[`${prefix}chocValue`] || 0;
+    let eDefense = isApplied(effet[`${prefix}eDefense`]);
+    let eDefenseV = effet[`${prefix}defenseValue`] || 0;
+    let eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
+    let eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
+    let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
+    let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+    let eDesignation = isApplied(effet[`${prefix}designation`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
-    let eDispersion = effet["dispersion"] || false;
-    let eDispersionV = value["dispersionValue"] || 0;
-    let eEnChaine = effet["enChaine"] || false;
-    let eEsperance = effet["esperance"] || false;
-    let eFureur = effet["fureur"] || false;
+    let eDispersion = isApplied(effet[`${prefix}dispersion`]);
+    let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
+    let eEnChaine = isApplied(effet[`${prefix}enChaine`]);
+    let eEsperance = isApplied(effet[`${prefix}esperance`]);
+    let eFureur = isApplied(effet[`${prefix}fureur`]);
     let eFureurV = 4;
-    let eIgnoreArmure = effet["ignoreArmure"] || false;
-    let eIgnoreCDF = effet["ignoreCdF"] || false;
-    let eJAkimbo = effet["akimbo"] || false;
-    let eJAmbidextrie = effet["ambidextrie"] || false;
-    let eLeste = effet["leste"] || false;
-    let eLourd = effet["lourd"] || false;
-    let eLumiere = effet["lumiere"] || false;
-    let eLumiereV = value["lumiereValue"] || 0;
-    let eMeurtrier = effet["meurtrier"] || false;
+    let eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
+    let eIgnoreCDF = isApplied(effet[`${prefix}ignoreCdF`]);
+    let eJAkimbo = isApplied(effet[`${prefix}akimbo`]);
+    let eJAmbidextrie = isApplied(effet[`${prefix}ambidextrie`]);
+    let eLeste = isApplied(effet[`${prefix}leste`]);
+    let eLourd = isApplied(effet[`${prefix}lourd`]);
+    let eLumiere = isApplied(effet[`${prefix}lumiere`]);
+    let eLumiereV = effet[`${prefix}lumiereValue`] || 0;
+    let eMeurtrier = isApplied(effet[`${prefix}meurtrier`]);
     let eMeurtrierV = 2;
-    let eObliteration = effet["obliteration"] || false;
-    let eOrfevrerie = effet["orfevrerie"] || false;
-    let eParasitage = effet["parasitage"] || false;
-    let eParasitageV = value["parasitageValue"] || 0;
-    let ePenetrant = effet["penetrant"] || false;
-    let ePenetrantV = value["penetrantValue"] || 0;
-    let ePerceArmure = effet["perceArmure"] || false;
-    let ePerceArmureV = value["perceArmureValue"] || 0;
-    let ePrecision = effet["precision"] || false;
-    let eReaction = effet["reaction"] || false;
-    let eReactionV = value["reactionValue"] || 0;
-    let eSilencieux = effet["silencieux"] || false;
-    let eSoumission = effet["soumission"] || false;
-    let eTenebricide = effet["tenebricite"] || false;
-    let eTirRafale = effet["tirRafale"] || false;
-    let eTirSecurite = effet["tirSecurite"] || false;
-    let eUltraviolence = effet["ultraViolence"] || false;
+    let eObliteration = isApplied(effet[`${prefix}obliteration`]);
+    let eOrfevrerie = isApplied(effet[`${prefix}orfevrerie`]);
+    let eParasitage = isApplied(effet[`${prefix}parasitage`]);
+    let eParasitageV = effet[`${prefix}parasitageValue`] || 0;
+    let ePenetrant = isApplied(effet[`${prefix}penetrant`]);
+    let ePenetrantV = effet[`${prefix}penetrantValue`] || 0;
+    let ePerceArmure = isApplied(effet[`${prefix}perceArmure`]);
+    let ePerceArmureV = effet[`${prefix}perceArmureValue`] || 0;
+    let ePrecision = isApplied(effet[`${prefix}precision`]);
+    let eReaction = isApplied(effet[`${prefix}reaction`]);
+    let eReactionV = effet[`${prefix}reactionValue`] || 0;
+    let eSilencieux = isApplied(effet[`${prefix}silencieux`]);
+    let eSoumission = isApplied(effet[`${prefix}soumission`]);
+    let eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
+    let eTirRafale = isApplied(effet[`${prefix}tirRafale`]);
+    let eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
+    let eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
     let eUltraviolenceV = 2;
 
 
@@ -1456,7 +355,7 @@ function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, 
         exec.push("{{vPrecision="+vPrecision+"}}");
     }
 
-    if(eSilencieux) {
+    if(eSilencieux || prefix == "pS" || prefix == "pSC") {
         let totalSilencieux = vDiscretion;
         isConditionnelD = true;
 
@@ -1510,23 +409,31 @@ function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, 
     if(eChargeur) 
         autresEffets.push(i18n_chargeur+" "+eChargeurV);
 
+    if(prefix == "mE")
+        autresEffets.push(i18n_chargeur+" 1");
+
     if(eDefense) 
         autresEffets.push(i18n_defense+" "+eDefenseV);
     
     if(eDegatsContinus) 
         autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
+
+    if(prefix == "mE")  
+        autresEffets.push(i18n_degatsContinus+" 3 ([[1d6]] "+i18n_tours+")");
     
     if(eDeuxMains) {
         autresEffets.push(i18n_deuxMains);
         isDeuxMains = true;
-    }
-        
+    }        
     
     if(eDesignation) 
         autresEffets.push(i18n_designation);
 
     if(eDispersion) 
         autresEffets.push(i18n_dispersion+" "+eDispersionV);
+
+    if(prefix == "mE")  
+        autresEffets.push(i18n_dispersion+" 3");
 
     if(eIgnoreArmure) 
         autresEffets.push(i18n_ignoreArmure);
@@ -1554,12 +461,21 @@ function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, 
         eLumiereValue = eLumiereV;
         isELumiere = true;
     }
+
+    if(prefix == "mE")  {
+        eLumiereS = i18n_lumiere;
+        eLumiereValue = 2;
+        isELumiere = true;
+    }
     
     if(ePenetrant) 
         autresEffets.push(i18n_penetrant+" "+ePenetrantV);
     
     if(ePerceArmure) 
         autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
+    
+    if(prefix == "mEC") 
+        autresEffets.push(i18n_perceArmure+" 40");
     
     if(eReaction) 
         autresEffets.push(i18n_reaction+" "+eReactionV);
@@ -1612,7 +528,7 @@ function getWeaponsEffects(effet, value, hasArmure, armure, vForce, vDexterite, 
     return result;
 }
 
-function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque, vMasqueAE) {
+function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE) {
     let result = {};
 
     let exec = [];
@@ -1648,63 +564,63 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
     let isOrfevrerie = false;
     let isSilencieux = false;
     
-    let eAnatheme = data["anatheme"] || false;
-    let eAntiAnatheme = data["antiAnatheme"] || false;
-    let eAntiVehicule = data["antiVehicule"] || false;
-    let eArtillerie = data["artillerie"] || false;
-    let eAssassin = data["assassin"] || false;
-    let eAssassinV = value["assassinValue"] || 0;
-    let eAssistanceAttaque = data["assistanceAttaque"] || false;
-    let eBarrage = data["barrage"] || false;
-    let eBarrageV = value["barrageValue"] || 0;
-    let eCadence = data["cadence"] || false;
-    let eCadenceV = value["cadenceValue"] || 0;
-    let eChargeur = data["eChargeur"] || false;
-    let eChargeurV = value["chargeurValue"] || 0;
-    let eChoc = data["choc"] || false;
-    let eChocV = value["chocValue"] || 0;
-    let eDefense = data["eDefense"] || false;
-    let eDefenseV = value["defenseValue"] || 0;
-    let eDegatsContinus = data["degatContinue"] || false;
-    let eDegatsContinusV = value["degatContinueValue"] || 0;
-    let eDeuxMains = data["deuxMains"] || false;
-    let eDemoralisant = data["eDemoralisant"] || false;
-    let eDesignation = data["designation"] || false;
-    let eDestructeur = data["degatContinue"] || false;
+    let eAnatheme = isApplied(data[`${prefix}anatheme`]);
+    let eAntiAnatheme = isApplied(data[`${prefix}antiAnatheme`]);
+    let eAntiVehicule = isApplied(data[`${prefix}antiVehicule`]);
+    let eArtillerie = isApplied(data[`${prefix}artillerie`]);
+    let eAssassin = isApplied(data[`${prefix}assassin`]);
+    let eAssassinV = data[`${prefix}assassinValue`] || 0;
+    let eAssistanceAttaque = isApplied(data[`${prefix}assistanceAttaque`]);
+    let eBarrage = isApplied(data[`${prefix}barrage`]);
+    let eBarrageV = data[`${prefix}barrageValue`] || 0;
+    let eCadence = isApplied(data[`${prefix}cadence`]);
+    let eCadenceV = data[`${prefix}cadenceValue`] || 0;
+    let eChargeur = isApplied(data[`${prefix}eChargeur`]);
+    let eChargeurV = data[`${prefix}chargeurValue`] || 0;
+    let eChoc = isApplied(data[`${prefix}choc`]);
+    let eChocV = data[`${prefix}chocValue`] || 0;
+    let eDefense = isApplied(data[`${prefix}eDefense`]);
+    let eDefenseV = data[`${prefix}defenseValue`] || 0;
+    let eDegatsContinus = isApplied(data[`${prefix}degatContinue`]);
+    let eDegatsContinusV = data[`${prefix}degatContinueValue`] || 0;
+    let eDeuxMains = isApplied(data[`${prefix}deuxMains`]);
+    let eDemoralisant = isApplied(data[`${prefix}eDemoralisant`]);
+    let eDesignation = isApplied(data[`${prefix}designation`]);
+    let eDestructeur = isApplied(data[`${prefix}destructeur`]);
     let eDestructeurV = 2;
-    let eDispersion = data["dispersion"] || false;
-    let eDispersionV = value["dispersionValue"] || 0;
-    let eEnChaine = data["enChaine"] || false;
-    let eEsperance = data["esperance"] || false;
-    let eFureur = data["fureur"] || false;
+    let eDispersion = isApplied(data[`${prefix}dispersion`]);
+    let eDispersionV = data[`${prefix}dispersionValue`] || 0;
+    let eEnChaine = isApplied(data[`${prefix}enChaine`]);
+    let eEsperance = isApplied(data[`${prefix}esperance`]);
+    let eFureur = isApplied(data[`${prefix}fureur`]);
     let eFureurV = 4;
-    let eIgnoreArmure = data["ignoreArmure"] || false;
-    let eIgnoreCDF = data["ignoreCdF"] || false;
-    let eJAkimbo = data["akimbo"] || false;
-    let eJAmbidextrie = data["ambidextrie"] || false;
-    let eLeste = data["lestePNJ"] || false;
-    let eLourd = data["lourd"] || false;
-    let eLumiere = data["lumiere"] || false;
-    let eLumiereV = value["lumiereValue"] || 0;
-    let eMeurtrier = data["meurtrier"] || false;
+    let eIgnoreArmure = isApplied(data[`${prefix}ignoreArmure`]);
+    let eIgnoreCDF = isApplied(data[`${prefix}ignoreCdF`]);
+    let eJAkimbo = isApplied(data[`${prefix}akimbo`]);
+    let eJAmbidextrie = isApplied(data[`${prefix}ambidextrie`]);
+    let eLeste = isApplied(data[`${prefix}lestePNJ`]);
+    let eLourd = isApplied(data[`${prefix}lourd`]);
+    let eLumiere = isApplied(data[`${prefix}lumiere`]);
+    let eLumiereV = data[`${prefix}lumiereValue`] || 0;
+    let eMeurtrier = isApplied(data[`${prefix}meurtrier`]);
     let eMeurtrierV = 2;
-    let eObliteration = data["obliteration"] || false;
-    let eOrfevrerie = data["orfevreriePNJ"] || false;
-    let eParasitage = data["parasitage"] || false;
-    let eParasitageV = value["parasitageValue"] || 0;
-    let ePenetrant = data["penetrant"] || false;
-    let ePenetrantV = value["penetrantValue"] || 0;
-    let ePerceArmure = data["perceArmure"] || false;
-    let ePerceArmureV = value["perceArmureValue"] || 0;
-    let ePrecision = data["precisionPNJ"] || false;
-    let eReaction = data["reaction"] || false;
-    let eReactionV = value["reactionValue"] || 0;
-    let eSilencieux = data["silencieux"] || false;
-    let eSoumission = data["soumission"] || false;
-    let eTenebricide = data["tenebricite"] || false;
-    let eTirRafale = data["tirRafale"] || false;
-    let eTirSecurite = data["tirSecurite"] || false;
-    let eUltraviolence = data["ultraViolence"] || false;
+    let eObliteration = isApplied(data[`${prefix}obliteration`]);
+    let eOrfevrerie = isApplied(data[`${prefix}orfevreriePNJ`]);
+    let eParasitage = isApplied(data[`${prefix}parasitage`]);
+    let eParasitageV = data[`${prefix}parasitageValue`] || 0;
+    let ePenetrant = isApplied(data[`${prefix}penetrant`]);
+    let ePenetrantV = data[`${prefix}penetrantValue`] || 0;
+    let ePerceArmure = isApplied(data[`${prefix}perceArmure`]);
+    let ePerceArmureV = data[`${prefix}perceArmureValue`] || 0;
+    let ePrecision = isApplied(data[`${prefix}precisionPNJ`]);
+    let eReaction = isApplied(data[`${prefix}reaction`]);
+    let eReactionV = data[`${prefix}reactionValue`] || 0;
+    let eSilencieux = isApplied(data[`${prefix}silencieux`]);
+    let eSoumission = isApplied(data[`${prefix}soumission`]);
+    let eTenebricide = isApplied(data[`${prefix}tenebricite`]);
+    let eTirRafale = isApplied(data[`${prefix}tirRafale`]);
+    let eTirSecurite = isApplied(data[`${prefix}tirSecurite`]);
+    let eUltraviolence = isApplied(data[`${prefix}ultraViolence`]);
     let eUltraviolenceV = 2;
 
 
@@ -1794,7 +710,11 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
             
     if(eLeste) {
         bDegats += Math.floor(vChair/2);
-        exec.push("{{vLeste="+Math.floor(vChair/2)+"}}");
+
+        if(addChair)
+            exec.push("{{vLeste="+Math.floor(vChair/2)+"}}");
+        else
+            exec.push("{{vLeste="+vChair+"}}");
 
         isLeste = true;
     }
@@ -1841,7 +761,7 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
         exec.push("{{vPrecision="+vPrecision+"}}");
     }
 
-    if(eSilencieux) {
+    if(eSilencieux || prefix == "pS" || prefix == "pSC") {
         let totalSilencieux = Math.ceil(vMasque/2)+vMasqueAE;
 
         isConditionnelD = true;
@@ -1896,11 +816,17 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
     if(eChargeur) 
         autresEffets.push(i18n_chargeur+" "+eChargeurV);
 
+    if(prefix == "mE") 
+        autresEffets.push(i18n_chargeur+" 1");
+
     if(eDefense) 
         autresEffets.push(i18n_defense+" "+eDefenseV);
     
     if(eDegatsContinus) 
         autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
+
+    if(prefix == "mE")
+        autresEffets.push(i18n_degatsContinus+" 3 ([[1d6]] "+i18n_tours+")");
     
     if(eDeuxMains)
         autresEffets.push(i18n_deuxMains);   
@@ -1910,6 +836,9 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
 
     if(eDispersion) 
         autresEffets.push(i18n_dispersion+" "+eDispersionV);
+
+    if(prefix == "mE")
+        autresEffets.push(i18n_dispersion+" 3");
 
     if(eIgnoreArmure) 
         autresEffets.push(i18n_ignoreArmure);
@@ -1929,11 +858,17 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
     if(eLumiere)
         autresEffets.push(i18n_lumiere+" "+eLumiereV);
     
+    if(prefix == "mE")
+        autresEffets.push(i18n_lumiere+" 2");
+    
     if(ePenetrant) 
         autresEffets.push(i18n_penetrant+" "+ePenetrantV);
     
     if(ePerceArmure) 
         autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
+    
+    if(prefix == "mEC") 
+        autresEffets.push(i18n_perceArmure+" 40");
     
     if(eReaction) 
         autresEffets.push(i18n_reaction+" "+eReactionV);
@@ -1975,7 +910,7 @@ function getWeaponsEffectsPNJ(data, value, vChair, vMachine, vMachineAE, vMasque
     return result;
 }
 
-function getWeaponsEffectsAutre(effet, value) {
+function getWeaponsEffectsAutre(prefix, effet) {
     let result = {};
 
     let exec = [];
@@ -2018,62 +953,62 @@ function getWeaponsEffectsAutre(effet, value) {
     let isTenebricide = false;
     let isTirRafale = false;
 
-    let eAntiAnatheme = effet["antiAnatheme"] || false;
-    let eAntiVehicule = effet["antiVehicule"] || false;
-    let eArtillerie = effet["artillerie"] || false;
-    let eAssassin = effet["assassin"] || false;
-    let eAssassinV = value["assassinValue"] || 0;
-    let eAssistanceAttaque = effet["assistanceAttaque"] || false;
-    let eBarrage = effet["barrage"] || false;
-    let eBarrageV = value["barrageValue"] || 0;
-    let eCadence = effet["cadence"] || false;
-    let eCadenceV = value["cadenceValue"] || 0;
-    let eChargeur = effet["eChargeur"] || false;
-    let eChargeurV = value["chargeurValue"] || 0;
-    let eChoc = effet["choc"] || false;
-    let eChocV = value["chocValue"] || 0;
-    let eDefense = effet["eDefense"] || false;
-    let eDefenseV = value["defenseValue"] || 0;
-    let eDegatsContinus = effet["degatContinue"] || false;
-    let eDegatsContinusV = value["degatContinueValue"] || 0;
-    let eDeuxMains = effet["deuxMains"] || false;
-    let eDemoralisant = effet["eDemoralisant"] || false;
-    let eDesignation = effet["designation"] || false;
-    let eDestructeur = effet["degatContinue"] || false;
+    let eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
+    let eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
+    let eArtillerie = isApplied(effet[`${prefix}artillerie`]);
+    let eAssassin = isApplied(effet[`${prefix}assassin`]);
+    let eAssassinV = effet[`${prefix}assassinValue`] || 0;
+    let eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
+    let eBarrage = isApplied(effet[`${prefix}barrage`]);
+    let eBarrageV = effet[`${prefix}barrageValue`] || 0;
+    let eCadence = isApplied(effet[`${prefix}cadence`]);
+    let eCadenceV = effet[`${prefix}cadenceValue`] || 0;
+    let eChargeur = isApplied(effet[`${prefix}eChargeur`]);
+    let eChargeurV = effet[`${prefix}chargeurValue`] || 0;
+    let eChoc = isApplied(effet[`${prefix}choc`]);
+    let eChocV = effet[`${prefix}chocValue`] || 0;
+    let eDefense = isApplied(effet[`${prefix}eDefense`]);
+    let eDefenseV = effet[`${prefix}defenseValue`] || 0;
+    let eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
+    let eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
+    let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
+    let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+    let eDesignation = isApplied(effet[`${prefix}designation`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
-    let eDispersion = effet["dispersion"] || false;
-    let eDispersionV = value["dispersionValue"] || 0;
-    let eEnChaine = effet["enChaine"] || false;
-    let eEsperance = effet["esperance"] || false;
-    let eFureur = effet["fureur"] || false;
+    let eDispersion = isApplied(effet[`${prefix}dispersion`]);
+    let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
+    let eEnChaine = isApplied(effet[`${prefix}enChaine`]);
+    let eEsperance = isApplied(effet[`${prefix}esperance`]);
+    let eFureur = isApplied(effet[`${prefix}fureur`]);
     let eFureurV = 4;
-    let eIgnoreArmure = effet["ignoreArmure"] || false;
-    let eIgnoreCDF = effet["ignoreCdF"] || false;
-    let eJAkimbo = effet["akimbo"] || false;
-    let eJAmbidextrie = effet["ambidextrie"] || false;
-    let eLeste = effet["leste"] || false;
-    let eLourd = effet["lourd"] || false;
-    let eLumiere = effet["lumiere"] || false;
-    let eLumiereV = value["lumiereValue"] || 0;
-    let eMeurtrier = effet["meurtrier"] || false;
+    let eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
+    let eIgnoreCDF = isApplied(effet[`${prefix}ignoreCdF`]);
+    let eJAkimbo = isApplied(effet[`${prefix}akimbo`]);
+    let eJAmbidextrie = isApplied(effet[`${prefix}ambidextrie`]);
+    let eLeste = isApplied(effet[`${prefix}leste`]);
+    let eLourd = isApplied(effet[`${prefix}lourd`]);
+    let eLumiere = isApplied(effet[`${prefix}lumiere`]);
+    let eLumiereV = effet[`${prefix}lumiereValue`] || 0;
+    let eMeurtrier = isApplied(effet[`${prefix}meurtrier`]);
     let eMeurtrierV = 2;
-    let eObliteration = effet["obliteration"] || false;
-    let eOrfevrerie = effet["orfevrerie"] || false;
-    let eParasitage = effet["parasitage"] || false;
-    let eParasitageV = value["parasitageValue"] || 0;
-    let ePenetrant = effet["penetrant"] || false;
-    let ePenetrantV = value["penetrantValue"] || 0;
-    let ePerceArmure = effet["perceArmure"] || false;
-    let ePerceArmureV = value["perceArmureValue"] || 0;
-    let ePrecision = effet["precision"] || false;
-    let eReaction = effet["reaction"] || false;
-    let eReactionV = value["reactionValue"] || 0;
-    let eSilencieux = effet["silencieux"] || false;
-    let eSoumission = effet["soumission"] || false;
-    let eTenebricide = effet["tenebricite"] || false;
-    let eTirRafale = effet["tirRafale"] || false;
-    let eTirSecurite = effet["tirSecurite"] || false;
-    let eUltraviolence = effet["ultraViolence"] || false;
+    let eObliteration = isApplied(effet[`${prefix}obliteration`]);
+    let eOrfevrerie = isApplied(effet[`${prefix}orfevrerie`]);
+    let eParasitage = isApplied(effet[`${prefix}parasitage`]);
+    let eParasitageV = effet[`${prefix}parasitageValue`] || 0;
+    let ePenetrant = isApplied(effet[`${prefix}penetrant`]);
+    let ePenetrantV = effet[`${prefix}penetrantValue`] || 0;
+    let ePerceArmure = isApplied(effet[`${prefix}perceArmure`]);
+    let ePerceArmureV = effet[`${prefix}perceArmureValue`] || 0;
+    let ePrecision = isApplied(effet[`${prefix}precision`]);
+    let eReaction = isApplied(effet[`${prefix}reaction`]);
+    let eReactionV = effet[`${prefix}reactionValue`] || 0;
+    let eSilencieux = isApplied(effet[`${prefix}silencieux`]);
+    let eSoumission = isApplied(effet[`${prefix}soumission`]);
+    let eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
+    let eTirRafale = isApplied(effet[`${prefix}tirRafale`]);
+    let eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
+    let eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
     let eUltraviolenceV = 2;
 
 
@@ -2350,7 +1285,7 @@ function getWeaponsEffectsAutre(effet, value) {
     return result;
 }
 
-function getWeaponsEffectsAutrePNJ(effet, value) {
+function getWeaponsEffectsAutrePNJ(prefix, effet) {
     let result = {};
 
     let exec = [];
@@ -2393,63 +1328,63 @@ function getWeaponsEffectsAutrePNJ(effet, value) {
     let isTenebricide = false;
     let isTirRafale = false;
 
-    let eAnatheme = effet["anatheme"] || false;
-    let eAntiAnatheme = effet["antiAnatheme"] || false;
-    let eAntiVehicule = effet["antiVehicule"] || false;
-    let eArtillerie = effet["artillerie"] || false;
-    let eAssassin = effet["assassin"] || false;
-    let eAssassinV = value["assassinValue"] || 0;
-    let eAssistanceAttaque = effet["assistanceAttaque"] || false;
-    let eBarrage = effet["barrage"] || false;
-    let eBarrageV = value["barrageValue"] || 0;
-    let eCadence = effet["cadence"] || false;
-    let eCadenceV = value["cadenceValue"] || 0;
-    let eChargeur = effet["eChargeur"] || false;
-    let eChargeurV = value["chargeurValue"] || 0;
-    let eChoc = effet["choc"] || false;
-    let eChocV = value["chocValue"] || 0;
-    let eDefense = effet["eDefense"] || false;
-    let eDefenseV = value["defenseValue"] || 0;
-    let eDegatsContinus = effet["degatContinue"] || false;
-    let eDegatsContinusV = value["degatContinueValue"] || 0;
-    let eDeuxMains = effet["deuxMains"] || false;
-    let eDemoralisant = effet["eDemoralisant"] || false;
-    let eDesignation = effet["designation"] || false;
-    let eDestructeur = effet["degatContinue"] || false;
+    let eAnatheme = isApplied(effet[`${prefix}anatheme`]);
+    let eAntiAnatheme = isApplied(effet[`${prefix}antiAnatheme`]);
+    let eAntiVehicule = isApplied(effet[`${prefix}antiVehicule`]);
+    let eArtillerie = isApplied(effet[`${prefix}artillerie`]);
+    let eAssassin = isApplied(effet[`${prefix}assassin`]);
+    let eAssassinV = effet[`${prefix}assassinValue`] || 0;
+    let eAssistanceAttaque = isApplied(effet[`${prefix}assistanceAttaque`]);
+    let eBarrage = isApplied(effet[`${prefix}barrage`]);
+    let eBarrageV = effet[`${prefix}barrageValue`] || 0;
+    let eCadence = isApplied(effet[`${prefix}cadence`]);
+    let eCadenceV = effet[`${prefix}cadenceValue`] || 0;
+    let eChargeur = isApplied(effet[`${prefix}eChargeur`]);
+    let eChargeurV = effet[`${prefix}chargeurValue`] || 0;
+    let eChoc = isApplied(effet[`${prefix}choc`]);
+    let eChocV = effet[`${prefix}chocValue`] || 0;
+    let eDefense = isApplied(effet[`${prefix}eDefense`]);
+    let eDefenseV = effet[`${prefix}defenseValue`] || 0;
+    let eDegatsContinus = isApplied(effet[`${prefix}degatContinue`]);
+    let eDegatsContinusV = effet[`${prefix}degatContinueValue`] || 0;
+    let eDeuxMains = isApplied(effet[`${prefix}deuxMains`]);
+    let eDemoralisant = isApplied(effet[`${prefix}eDemoralisant`]);
+    let eDesignation = isApplied(effet[`${prefix}designation`]);
+    let eDestructeur = isApplied(effet[`${prefix}destructeur`]);
     let eDestructeurV = 2;
-    let eDispersion = effet["dispersion"] || false;
-    let eDispersionV = value["dispersionValue"] || 0;
-    let eEnChaine = effet["enChaine"] || false;
-    let eEsperance = effet["esperance"] || false;
-    let eFureur = effet["fureur"] || false;
+    let eDispersion = isApplied(effet[`${prefix}dispersion`]);
+    let eDispersionV = effet[`${prefix}dispersionValue`] || 0;
+    let eEnChaine = isApplied(effet[`${prefix}enChaine`]);
+    let eEsperance = isApplied(effet[`${prefix}esperance`]);
+    let eFureur = isApplied(effet[`${prefix}fureur`]);
     let eFureurV = 4;
-    let eIgnoreArmure = effet["ignoreArmure"] || false;
-    let eIgnoreCDF = effet["ignoreCdF"] || false;
-    let eJAkimbo = effet["akimbo"] || false;
-    let eJAmbidextrie = effet["ambidextrie"] || false;
-    let eLeste = effet["leste"] || false;
-    let eLourd = effet["lourd"] || false;
-    let eLumiere = effet["lumiere"] || false;
-    let eLumiereV = value["lumiereValue"] || 0;
-    let eMeurtrier = effet["meurtrier"] || false;
+    let eIgnoreArmure = isApplied(effet[`${prefix}ignoreArmure`]);
+    let eIgnoreCDF = isApplied(effet[`${prefix}ignoreCdF`]);
+    let eJAkimbo = isApplied(effet[`${prefix}akimbo`]);
+    let eJAmbidextrie = isApplied(effet[`${prefix}ambidextrie`]);
+    let eLeste = isApplied(effet[`${prefix}leste`]);
+    let eLourd = isApplied(effet[`${prefix}lourd`]);
+    let eLumiere = isApplied(effet[`${prefix}lumiere`]);
+    let eLumiereV = effet[`${prefix}lumiereValue`] || 0;
+    let eMeurtrier = isApplied(effet[`${prefix}meurtrier`]);
     let eMeurtrierV = 2;
-    let eObliteration = effet["obliteration"] || false;
-    let eOrfevrerie = effet["orfevrerie"] || false;
-    let eParasitage = effet["parasitage"] || false;
-    let eParasitageV = value["parasitageValue"] || 0;
-    let ePenetrant = effet["penetrant"] || false;
-    let ePenetrantV = value["penetrantValue"] || 0;
-    let ePerceArmure = effet["perceArmure"] || false;
-    let ePerceArmureV = value["perceArmureValue"] || 0;
-    let ePrecision = effet["precision"] || false;
-    let eReaction = effet["reaction"] || false;
-    let eReactionV = value["reactionValue"] || 0;
-    let eSilencieux = effet["silencieux"] || false;
-    let eSoumission = effet["soumission"] || false;
-    let eTenebricide = effet["tenebricite"] || false;
-    let eTirRafale = effet["tirRafale"] || false;
-    let eTirSecurite = effet["tirSecurite"] || false;
-    let eUltraviolence = effet["ultraViolence"] || false;
+    let eObliteration = isApplied(effet[`${prefix}obliteration`]);
+    let eOrfevrerie = isApplied(effet[`${prefix}orfevrerie`]);
+    let eParasitage = isApplied(effet[`${prefix}parasitage`]);
+    let eParasitageV = effet[`${prefix}parasitageValue`] || 0;
+    let ePenetrant = isApplied(effet[`${prefix}penetrant`]);
+    let ePenetrantV = effet[`${prefix}penetrantValue`] || 0;
+    let ePerceArmure = isApplied(effet[`${prefix}perceArmure`]);
+    let ePerceArmureV = effet[`${prefix}perceArmureValue`] || 0;
+    let ePrecision = isApplied(effet[`${prefix}precision`]);
+    let eReaction = isApplied(effet[`${prefix}reaction`]);
+    let eReactionV = effet[`${prefix}reactionValue`] || 0;
+    let eSilencieux = isApplied(effet[`${prefix}silencieux`]);
+    let eSoumission = isApplied(effet[`${prefix}soumission`]);
+    let eTenebricide = isApplied(effet[`${prefix}tenebricite`]);
+    let eTirRafale = isApplied(effet[`${prefix}tirRafale`]);
+    let eTirSecurite = isApplied(effet[`${prefix}tirSecurite`]);
+    let eUltraviolence = isApplied(effet[`${prefix}ultraViolence`]);
     let eUltraviolenceV = 2;
 
 
@@ -2729,7 +1664,7 @@ function getWeaponsEffectsAutrePNJ(effet, value) {
     return result;
 }
 
-function getWeaponsContactAS(AS, hasArmure, isSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat) {
+function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat) {
     let result = {};
     let exec = [];
     
@@ -2755,21 +1690,21 @@ function getWeaponsContactAS(AS, hasArmure, isSilencieux, isMeurtrier, isAssista
     let bDegats = [];
     let autresAmeliorations = [];
 
-    let aAgressive = AS["agressive"] || false;
-    let aAllegee = AS["allegee"] || false;
-    let aAssassine = AS["assassine"] || false;
-    let aBarbelee = AS["barbelee"] || false;
+    let aAgressive = isApplied(AS[`${prefix}agressive`]);
+    let aAllegee = isApplied(AS[`${prefix}allegee`]);
+    let aAssassine = isApplied(AS[`${prefix}assassine`]);
+    let aBarbelee = isApplied(AS[`${prefix}barbelee`]);
     let aBarbeleeV = 2;
-    let aConnectee = AS["connectee"] || false;
-    let aElectrifiee = AS["electrifiee"] || false;
-    let aIndestructible = AS["indestructible"] || false;
-    let aJumelle = AS["jumelle"] || false;
-    let aLumineuse = AS["lumineuse"] || false;
-    let aMassive = AS["massive"] || false;
-    let aProtectrice = AS["protectrice"] || false;
-    let aSoeur = AS["soeur"] || false;
-    let aSournoise = AS["sournoise"] || false;
-    let aSurmesure = AS["surmesure"] || false;
+    let aConnectee = isApplied(AS[`${prefix}connectee`]);
+    let aElectrifiee = isApplied(AS[`${prefix}electrifiee`]);
+    let aIndestructible = isApplied(AS[`${prefix}indestructible`]);
+    let aJumelle = isApplied(AS[`${prefix}jumelle`]);
+    let aLumineuse = isApplied(AS[`${prefix}lumineuse`]);
+    let aMassive = isApplied(AS[`${prefix}massive`]);
+    let aProtectrice = isApplied(AS[`${prefix}protectrice`]);
+    let aSoeur = isApplied(AS[`${prefix}soeur`]);
+    let aSournoise = isApplied(AS[`${prefix}sournoise`]);
+    let aSurmesure = isApplied(AS[`${prefix}surmesure`]);
 
     if(aAgressive) {
         nowAgressive = true;
@@ -2914,7 +1849,7 @@ function getWeaponsContactAS(AS, hasArmure, isSilencieux, isMeurtrier, isAssista
     return result;
 }
 
-function getWeaponsContactASPNJ(data, isAssistanceAttaque, isChoc, isLeste, isMeurtrier, isOrfevrerie, isSilencieux, vBete, vChair, vMasque, vMasqueAE) {
+function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLeste, isMeurtrier, isOrfevrerie, isSilencieux, vBete, vChair, vMasque, vMasqueAE) {
     let result = {};
     let exec = [];
     
@@ -2931,21 +1866,21 @@ function getWeaponsContactASPNJ(data, isAssistanceAttaque, isChoc, isLeste, isMe
     let bDegats = 0;
     let autresAmeliorations = [];
 
-    let aAgressive = data["agressive"] || false;
-    let aAllegee = data["allegee"] || false;
-    let aAssassine = data["assassine"] || false;
-    let aBarbelee = data["barbelee"] || false;
+    let aAgressive = isApplied(data[`${prefix}agressive`]);
+    let aAllegee = isApplied(data[`${prefix}allegee`]);
+    let aAssassine = isApplied(data[`${prefix}assassine`]);
+    let aBarbelee = isApplied(data[`${prefix}barbelee`]);
     let aBarbeleeV = 2;
-    let aConnectee = data["connectee"] || false;
-    let aElectrifiee = data["electrifiee"] || false;
-    let aIndestructible = data["indestructible"] || false;
-    let aJumelle = data["jumelle"] || false;
-    let aLumineuse = data["lumineuse"] || false;
-    let aMassive = data["massive"] || false;
-    let aProtectrice = data["protectrice"] || false;
-    let aSoeur = data["soeur"] || false;
-    let aSournoise = data["sournoisePNJ"] || false;
-    let aSurmesure = data["surmesurePNJ"] || false;
+    let aConnectee = isApplied(data[`${prefix}connectee`]);
+    let aElectrifiee = isApplied(data[`${prefix}electrifiee`]);
+    let aIndestructible = isApplied(data[`${prefix}indestructible`]);
+    let aJumelle = isApplied(data[`${prefix}jumelle`]);
+    let aLumineuse = isApplied(data[`${prefix}lumineuse`]);
+    let aMassive = isApplied(data[`${prefix}massive`]);
+    let aProtectrice = isApplied(data[`${prefix}protectrice`]);
+    let aSoeur = isApplied(data[`${prefix}soeur`]);
+    let aSournoise = isApplied(data[`${prefix}sournoisePNJ`]);
+    let aSurmesure = isApplied(data[`${prefix}surmesurePNJ`]);
 
     if(aAllegee) {
         exec.push("{{vAllegee=-1D6}}");
@@ -3061,7 +1996,7 @@ function getWeaponsContactASPNJ(data, isAssistanceAttaque, isChoc, isLeste, isMe
     return result;
 }
 
-function getWeaponsContactAO(AO, isCadence, vCadence, isObliteration, isAntiAnatheme) {
+function getWeaponsContactAO(prefix, AO, isCadence, vCadence, isObliteration, isAntiAnatheme) {
     let result = {};
     let exec = [];
     let firstExec = [];
@@ -3096,23 +2031,23 @@ function getWeaponsContactAO(AO, isCadence, vCadence, isObliteration, isAntiAnat
     let bDegats = [];
     let autresAmeliorations = [];
 
-    let aArabesques = AO["arabesquesIridescentes"] || false;
-    let aArmeAzurine = AO["armeAzurine"] || false;
-    let aArmeRougeSang = AO["armeRougeSang"] || false;
-    let aArmureGravee = AO["armureGravee"] || false;
-    let aBlasonChevalier = AO["blasonChevalier"] || false;
-    let aBouclierGrave = AO["bouclierGrave"] || false;
-    let aCheneSculpte = AO["cheneSculpte"] || false;
-    let aChromeeLignesLC = AO["chromeeLignesLC"] || false;
-    let aCodeKnightGrave = AO["codeKnightGrave"] || false;
-    let aCraneRieurGrave = AO["craneRieurGrave"] || false;
-    let aFaucheuseGravee = AO["faucheuseGravee"] || false;
-    let aFauconsPlumesL = AO["fauconsPlumesL"] || false;
-    let aFlammesStylisees = AO["flammesStylisees"] || false;
-    let aGriffuresGravees = AO["griffuresGravees"] || false;
-    let aMasqueBriseSculpte = AO["masqueBriseSculpte"] || false;
-    let aRouagesCassesGraves = AO["rouagesCassesGraves"] || false;
-    let aSillonsFLF = AO["sillonsFLF"] || false;
+    let aArabesques = isApplied(AO[`${prefix}arabesquesIridescentes`]);
+    let aArmeAzurine = isApplied(AO[`${prefix}armeAzurine`]);
+    let aArmeRougeSang = isApplied(AO[`${prefix}armeRougeSang`]);
+    let aArmureGravee = isApplied(AO[`${prefix}armureGravee`]);
+    let aBlasonChevalier = isApplied(AO[`${prefix}blasonChevalier`]);
+    let aBouclierGrave = isApplied(AO[`${prefix}bouclierGrave`]);
+    let aCheneSculpte = isApplied(AO[`${prefix}cheneSculpte`]);
+    let aChromeeLignesLC = isApplied(AO[`${prefix}chromeeLignesLC`]);
+    let aCodeKnightGrave = isApplied(AO[`${prefix}codeKnightGrave`]);
+    let aCraneRieurGrave = isApplied(AO[`${prefix}craneRieurGrave`]);
+    let aFaucheuseGravee = isApplied(AO[`${prefix}faucheuseGravee`]);
+    let aFauconsPlumesL = isApplied(AO[`${prefix}fauconsPlumesL`]);
+    let aFlammesStylisees = isApplied(AO[`${prefix}flammesStylisees`]);
+    let aGriffuresGravees = isApplied(AO[`${prefix}griffuresGravees`]);
+    let aMasqueBriseSculpte = isApplied(AO[`${prefix}masqueBriseSculpte`]);
+    let aRouagesCassesGraves = isApplied(AO[`${prefix}rouagesCassesGraves`]);
+    let aSillonsFLF = isApplied(AO[`${prefix}sillonsFLF`]);
 
     if(aArabesques) {
         aLumiere = i18n_arabesques;
@@ -3277,7 +2212,7 @@ function getWeaponsContactAO(AO, isCadence, vCadence, isObliteration, isAntiAnat
     return result;
 }
 
-function getWeaponsContactAOPNJ(data, isCadence, vCadence, isObliteration, isAntiAnatheme) {
+function getWeaponsContactAOPNJ(prefix, data, isCadence, vCadence, isObliteration, isAntiAnatheme) {
     let result = {};
     let exec = [];
     let firstExec = [];
@@ -3309,23 +2244,23 @@ function getWeaponsContactAOPNJ(data, isCadence, vCadence, isObliteration, isAnt
     let bDegats = 0;
     let autresAmeliorations = [];
 
-    let aArabesques = data["arabesquesIridescentes"] || false;
-    let aArmeAzurine = data["armeAzurine"] || false;
-    let aArmeRougeSang = data["armeRougeSang"] || false;
-    let aArmureGravee = data["armureGravee"] || false;
-    let aBlasonChevalier = data["blasonChevalier"] || false;
-    let aBouclierGrave = data["bouclierGrave"] || false;
-    let aCheneSculpte = data["cheneSculpte"] || false;
-    let aChromeeLignesLC = data["chromeeLignesLC"] || false;
-    let aCodeKnightGrave = data["codeKnightGrave"] || false;
-    let aCraneRieurGrave = data["craneRieurGrave"] || false;
-    let aFaucheuseGravee = data["faucheuseGravee"] || false;
-    let aFauconsPlumesL = data["fauconsPlumesL"] || false;
-    let aFlammesStylisees = data["flammesStylisees"] || false;
-    let aGriffuresGravees = data["griffuresGravees"] || false;
-    let aMasqueBriseSculpte = data["masqueBriseSculpte"] || false;
-    let aRouagesCassesGraves = data["rouagesCassesGraves"] || false;
-    let aSillonsFLF = data["sillonsFLF"] || false;
+    let aArabesques = isApplied(data[`${prefix}arabesquesIridescentes`]);
+    let aArmeAzurine = isApplied(data[`${prefix}armeAzurine`]);
+    let aArmeRougeSang = isApplied(data[`${prefix}armeRougeSang`]);
+    let aArmureGravee = isApplied(data[`${prefix}armureGravee`]);
+    let aBlasonChevalier = isApplied(data[`${prefix}blasonChevalier`]);
+    let aBouclierGrave = isApplied(data[`${prefix}bouclierGrave`]);
+    let aCheneSculpte = isApplied(data[`${prefix}cheneSculpte`]);
+    let aChromeeLignesLC = isApplied(data[`${prefix}chromeeLignesLC`]);
+    let aCodeKnightGrave = isApplied(data[`${prefix}codeKnightGrave`]);
+    let aCraneRieurGrave = isApplied(data[`${prefix}craneRieurGrave`]);
+    let aFaucheuseGravee = isApplied(data[`${prefix}faucheuseGravee`]);
+    let aFauconsPlumesL = isApplied(data[`${prefix}fauconsPlumesL`]);
+    let aFlammesStylisees = isApplied(data[`${prefix}flammesStylisees`]);
+    let aGriffuresGravees = isApplied(data[`${prefix}griffuresGravees`]);
+    let aMasqueBriseSculpte = isApplied(data[`${prefix}masqueBriseSculpte`]);
+    let aRouagesCassesGraves = isApplied(data[`${prefix}rouagesCassesGraves`]);
+    let aSillonsFLF = isApplied(data[`${prefix}sillonsFLF`]);
 
     if(aArmeAzurine) {
         isConditionnelD = true;
@@ -3485,7 +2420,7 @@ function getWeaponsContactAOPNJ(data, isCadence, vCadence, isObliteration, isAnt
     return result;
 }
 
-function getWeaponsDistanceAA(AA, AAV, vDiscretion, oDiscretion, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
+function getWeaponsDistanceAA(prefix, AA, vDiscretion, oDiscretion, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
     let result = {};
     let exec = [];
     
@@ -3514,26 +2449,26 @@ function getWeaponsDistanceAA(AA, AAV, vDiscretion, oDiscretion, eAssistanceAtta
     let autresAmeliorations = [];
     let autresEffets = [];
 
-    let aChargeurGrappes = AA["chargeurGrappes"] || false;
-    let aCanonLong = AA["canonLong"] || false;
-    let aCanonRaccourci = AA["canonRaccourci"] || false;
-    let aChambreDouble = AA["chambreDouble"] || false;
-    let aInterfaceGuidage = AA["interfaceGuidage"] || false;
-    let aJumelage = AA["jumelage"] || false;
-    let aJumelageV = AAV["jumelageValue"] || false;
-    let aJumelageT = AAV["jumelageType"] || false;
-    let aLunetteIntelligente = AA["lunetteIntelligente"] || false;
-    let aMunitionsHyperVelocite = AA["munitionsHyperVelocite"] || false;
-    let aMunitionsDrone = AA["munitionsDrone"] || false;
-    let aChargeurExplosives = AA["chargeurExplosives"] || false;
-    let aMunitionsIEM = AA["munitionsIEM"] || false;
-    let aMunitionsNonLetales = AA["munitionsNonLetales"] || false;
-    let aMunitionsSubsoniques = AA["munitionsSubsoniques"] || false;
-    let aPointeurLaser = AA["pointeurLaser"] || false;
-    let aProtectionArme = AA["protectionArme"] || false;
-    let aRevetementOmega = AA["revetementOmega"] || false;
-    let aStructureElement = AA["structureElement"] || false;
-    let aSystemeRefroidissement = AA["systemeRefroidissement"] || false;
+    let aChargeurGrappes = isApplied(AA[`${prefix}chargeurGrappes`]);
+    let aCanonLong = isApplied(AA[`${prefix}canonLong`]);
+    let aCanonRaccourci = isApplied(AA[`${prefix}canonRaccourci`]);
+    let aChambreDouble = isApplied(AA[`${prefix}chambreDouble`]);
+    let aInterfaceGuidage = isApplied(AA[`${prefix}interfaceGuidage`]);
+    let aJumelage = isApplied(AA[`${prefix}jumelage`]);
+    let aJumelageV = AA[`${prefix}jumelageValue`];
+    let aJumelageT = AA[`${prefix}jumelageType`];
+    let aLunetteIntelligente = isApplied(AA[`${prefix}lunetteIntelligente`]);
+    let aMunitionsHyperVelocite = isApplied(AA[`${prefix}munitionsHyperVelocite`]);
+    let aMunitionsDrone = isApplied(AA[`${prefix}munitionsDrone`]);
+    let aChargeurExplosives = isApplied(AA[`${prefix}chargeurExplosives`]);
+    let aMunitionsIEM = isApplied(AA[`${prefix}munitionsIEM`]);
+    let aMunitionsNonLetales = isApplied(AA[`${prefix}munitionsNonLetales`]);
+    let aMunitionsSubsoniques = isApplied(AA[`${prefix}munitionsSubsoniques`]);
+    let aPointeurLaser = isApplied(AA[`${prefix}pointeurLaser`]);
+    let aProtectionArme = isApplied(AA[`${prefix}protectionArme`]);
+    let aRevetementOmega = isApplied(AA[`${prefix}revetementOmega`]);
+    let aStructureElement = isApplied(AA[`${prefix}structureElement`]);
+    let aSystemeRefroidissement = isApplied(AA[`${prefix}systemeRefroidissement`]);
 
     if(aChargeurGrappes) {
         diceDegats -= 1;
@@ -3696,7 +2631,7 @@ function getWeaponsDistanceAA(AA, AAV, vDiscretion, oDiscretion, eAssistanceAtta
     return result;
 }
 
-function getWeaponsDistanceAAPNJ(AA, AAV, vMasque, vMasqueAE, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
+function getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
     let result = {};
     let exec = [];
     
@@ -3722,26 +2657,26 @@ function getWeaponsDistanceAAPNJ(AA, AAV, vMasque, vMasqueAE, eAssistanceAttaque
     let autresAmeliorations = [];
     let autresEffets = [];
 
-    let aChargeurGrappes = AA["chargeurGrappes"] || false;
-    let aCanonLong = AA["canonLong"] || false;
-    let aCanonRaccourci = AA["canonRaccourci"] || false;
-    let aChambreDouble = AA["chambreDouble"] || false;
-    let aInterfaceGuidage = AA["interfaceGuidage"] || false;
-    let aJumelage = AA["jumelage"] || false;
-    let aJumelageV = AAV["jumelageValue"] || false;
-    let aJumelageT = AAV["jumelageType"] || false;
-    let aLunetteIntelligente = AA["lunetteIntelligente"] || false;
-    let aMunitionsHyperVelocite = AA["munitionsHyperVelocite"] || false;
-    let aMunitionsDrone = AA["munitionsDrone"] || false;
-    let aChargeurExplosives = AA["chargeurExplosives"] || false;
-    let aMunitionsIEM = AA["munitionsIEM"] || false;
-    let aMunitionsNonLetales = AA["munitionsNonLetales"] || false;
-    let aMunitionsSubsoniques = AA["munitionsSubsoniques"] || false;
-    let aPointeurLaser = AA["pointeurLaser"] || false;
-    let aProtectionArme = AA["protectionArme"] || false;
-    let aRevetementOmega = AA["revetementOmega"] || false;
-    let aStructureElement = AA["structureElement"] || false;
-    let aSystemeRefroidissement = AA["systemeRefroidissement"] || false;
+    let aChargeurGrappes = isApplied(attrs[`${prefix}chargeurGrappes`]);
+    let aCanonLong = isApplied(attrs[`${prefix}canonLong`]);
+    let aCanonRaccourci = isApplied(attrs[`${prefix}canonRaccourci`]);
+    let aChambreDouble = isApplied(attrs[`${prefix}chambreDouble`]);
+    let aInterfaceGuidage = isApplied(attrs[`${prefix}interfaceGuidage`]);
+    let aJumelage = isApplied(attrs[`${prefix}jumelage`]);
+    let aJumelageV = attrs[`${prefix}jumelageValue`];
+    let aJumelageT = attrs[`${prefix}jumelageType`];
+    let aLunetteIntelligente = isApplied(attrs[`${prefix}lunetteIntelligente`]);
+    let aMunitionsHyperVelocite = isApplied(attrs[`${prefix}munitionsHyperVelocite`]);
+    let aMunitionsDrone = isApplied(attrs[`${prefix}munitionsDrone`]);
+    let aChargeurExplosives = isApplied(attrs[`${prefix}chargeurExplosives`]);
+    let aMunitionsIEM = isApplied(attrs[`${prefix}munitionsIEM`]);
+    let aMunitionsNonLetales = isApplied(attrs[`${prefix}munitionsNonLetales`]);
+    let aMunitionsSubsoniques = isApplied(attrs[`${prefix}munitionsSubsoniques`]);
+    let aPointeurLaser = isApplied(attrs[`${prefix}pointeurLaser`]);
+    let aProtectionArme = isApplied(attrs[`${prefix}protectionArme`]);
+    let aRevetementOmega = isApplied(attrs[`${prefix}revetementOmega`]);
+    let aStructureElement = isApplied(attrs[`${prefix}structureElement`]);
+    let aSystemeRefroidissement = isApplied(attrs[`${prefix}systemeRefroidissement`]);
 
     if(aChargeurGrappes) {
         diceDegats -= 1;
@@ -3898,7 +2833,7 @@ function getWeaponsDistanceAAPNJ(AA, AAV, vMasque, vMasqueAE, eAssistanceAttaque
     return result;
 }
 
-function getWeaponsAutreAA(AA, AAV, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
+function getWeaponsAutreAA(prefix, AA, eAssistanceAttaque, eASAssassinValue, isCadence, vCadence, eSilencieux, eTirRafale, isObliteration, isAntiAnatheme) {
     let result = {};
     let exec = [];
     
@@ -3927,26 +2862,26 @@ function getWeaponsAutreAA(AA, AAV, eAssistanceAttaque, eASAssassinValue, isCade
     let autresAmeliorations = [];
     let autresEffets = [];
 
-    let aChargeurGrappes = AA["chargeurGrappes"] || false;
-    let aCanonLong = AA["canonLong"] || false;
-    let aCanonRaccourci = AA["canonRaccourci"] || false;
-    let aChambreDouble = AA["chambreDouble"] || false;
-    let aInterfaceGuidage = AA["interfaceGuidage"] || false;
-    let aJumelage = AA["jumelage"] || false;
-    let aJumelageV = AAV["jumelageValue"] || false;
-    let aJumelageT = AAV["jumelageType"] || false;
-    let aLunetteIntelligente = AA["lunetteIntelligente"] || false;
-    let aMunitionsHyperVelocite = AA["munitionsHyperVelocite"] || false;
-    let aMunitionsDrone = AA["munitionsDrone"] || false;
-    let aChargeurExplosives = AA["chargeurExplosives"] || false;
-    let aMunitionsIEM = AA["munitionsIEM"] || false;
-    let aMunitionsNonLetales = AA["munitionsNonLetales"] || false;
-    let aMunitionsSubsoniques = AA["munitionsSubsoniques"] || false;
-    let aPointeurLaser = AA["pointeurLaser"] || false;
-    let aProtectionArme = AA["protectionArme"] || false;
-    let aRevetementOmega = AA["revetementOmega"] || false;
-    let aStructureElement = AA["structureElement"] || false;
-    let aSystemeRefroidissement = AA["systemeRefroidissement"] || false;
+    let aChargeurGrappes = isApplied(AA[`${prefix}chargeurGrappes`]);
+    let aCanonLong = isApplied(AA[`${prefix}canonLong`]);
+    let aCanonRaccourci = isApplied(AA[`${prefix}canonRaccourci`]);
+    let aChambreDouble = isApplied(AA[`${prefix}chambreDouble`]);
+    let aInterfaceGuidage = isApplied(AA[`${prefix}interfaceGuidage`]);
+    let aJumelage = isApplied(AA[`${prefix}jumelage`]);
+    let aJumelageV = AA[`${prefix}jumelageValue`];
+    let aJumelageT = AA[`${prefix}jumelageType`];
+    let aLunetteIntelligente = isApplied(AA[`${prefix}lunetteIntelligente`]);
+    let aMunitionsHyperVelocite = isApplied(AA[`${prefix}munitionsHyperVelocite`]);
+    let aMunitionsDrone = isApplied(AA[`${prefix}munitionsDrone`]);
+    let aChargeurExplosives = isApplied(AA[`${prefix}chargeurExplosives`]);
+    let aMunitionsIEM = isApplied(AA[`${prefix}munitionsIEM`]);
+    let aMunitionsNonLetales = isApplied(AA[`${prefix}munitionsNonLetales`]);
+    let aMunitionsSubsoniques = isApplied(AA[`${prefix}munitionsSubsoniques`]);
+    let aPointeurLaser = isApplied(AA[`${prefix}pointeurLaser`]);
+    let aProtectionArme = isApplied(AA[`${prefix}protectionArme`]);
+    let aRevetementOmega = isApplied(AA[`${prefix}revetementOmega`]);
+    let aStructureElement = isApplied(AA[`${prefix}structureElement`]);
+    let aSystemeRefroidissement = isApplied(AA[`${prefix}systemeRefroidissement`]);
 
     if(aChargeurGrappes) {
         diceDegats -= 1;
@@ -4166,7 +3101,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
                     isConditionnelD = true;
 
                     exec.push("{{vODGhostA="+i18n_ghost+"}}");
-                    exec.push("{{vODGhostAValue=[["+vDiscretion+"D6+"+oDiscretion+"]]}}");
+                    exec.push("{{vODGhostAValue=[[{"+vDiscretion+"D6cs2cs4cs6cf1cf3cf5s%2}=0+"+oDiscretion+"]]}}");
                     exec.push("{{vODGhostCondition="+i18n_attaqueSurpriseCondition+"}}");
 
                     attaquesSurprises.unshift(i18n_ghost);

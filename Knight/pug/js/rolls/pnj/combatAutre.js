@@ -1,20 +1,40 @@
 const rollCombatAutrePNJ = ["repeating_armeautre:armeautrepnj"];
 
 rollCombatAutrePNJ.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
-        let id = info.triggerName.split("_")[2];
-        let data = wpnData[id] || [];
-        let effet = wpnE[id] || [];
-        let effetValue = wpnEValue[id] || [];
-        let AA = wpnAA[id] || [];
-        let AAValue = wpnAAValue[id] || [];
-        let special = wpnS[id] || [];   
-        let specialValue = wpnSValue[id] || [];
+        let listAttrs = [];
 
-        let name = data["ArmeAutre"] || "";
-        let portee = data["armeAutrePortee"] || "^{portee-contact}";
+        let id = info.triggerName.split("_")[2];
+
+        let prefix = `repeating_armeautre_${id}_`;
+
+        let effet = wpnEffects.map(a => `${prefix}${a}`);
+        let effetValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+        let AA = wpnAmeliorationA.map(a => `${prefix}${a}`);
+        let AAValue = wpnAmeliorationAValue.map(a => `${prefix}${a}`);
+        let special = wpnSpecial.map(a => `${prefix}${a}`);
+        let specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+        listAttrs.push(`${prefix}ArmeAutre`);
+        listAttrs.push(`${prefix}armeAutrePortee`);
+
+        listAttrs.push(`${prefix}armeODAutre`);
+        listAttrs.push(`${prefix}armeAttaqueAutre`);
+
+        listAttrs.push(`${prefix}armeAutreDegat`);
+        listAttrs.push(`${prefix}armeAutreViolence`);
+
+        listAttrs.push(`${prefix}armeAutreBDegat`);
+        listAttrs.push(`${prefix}armeAutreBViolence`);
+
+        listAttrs = listAttrs.concat(effet, effetValue, AA, AAValue, special, specialValue);
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let name = attrs[`${prefix}ArmeAutre`] || ``;
+        let portee = attrs[`${prefix}armeAutrePortee`] || `^{portee-contact}`;
 
         let firstExec = [];
         let exec = [];
@@ -27,11 +47,12 @@ rollCombatAutrePNJ.forEach(button => {
         let isConditionnelD = false;
         let isConditionnelV = false;
 
-        let OD = data["armeODAutre"] || 0;
+        let OD = Number(attrs[`${prefix}armeODAutre`]) || 0;
 
         let cRoll = [
-            data[`armeAttaqueAutre`] || 0
+            Number(attrs[`${prefix}armeAttaqueAutre`]) || 0
         ];
+        
         let bonus = [
             OD
         ];
@@ -45,14 +66,14 @@ rollCombatAutrePNJ.forEach(button => {
         let bDegats = [];
         let bViolence = [];
 
-        baseDegats += Number(data[`armeAutreDegat`]) || 0;
-        baseViolence += Number(data[`armeAutreViolence`]) || 0;
+        baseDegats += Number(attrs[`armeAutreDegat`]) || 0;
+        baseViolence += Number(attrs[`armeAutreViolence`]) || 0;
 
-        diceDegats += Number(data[`armeAutreDegat`]) || 0;
-        diceViolence += Number(data[`armeAutreViolence`]) || 0;
+        diceDegats += Number(attrs[`armeAutreDegat`]) || 0;
+        diceViolence += Number(attrs[`armeAutreViolence`]) || 0;
 
-        bDegats.push(Number(data[`armeAutreBDegat`]) || 0);
-        bViolence.push(Number(data[`armeAutreBViolence`]) || 0);
+        bDegats.push(Number(attrs[`armeAutreBDegat`]) || 0);
+        bViolence.push(Number(attrs[`armeAutreBViolence`]) || 0);
 
         let degats = [];
         let violence = [];
@@ -97,7 +118,7 @@ rollCombatAutrePNJ.forEach(button => {
 
         //GESTION DES EFFETS
 
-        var effets = getWeaponsEffectsAutrePNJ(effet, effetValue);
+        var effets = getWeaponsEffectsAutrePNJ(prefix, attrs);
 
         bDegats = bDegats.concat(effets.bDegats);
         eASAssassin = effets.eASAssassin;
@@ -114,7 +135,6 @@ rollCombatAutrePNJ.forEach(button => {
         isAntiAnatheme = effets.isAntiAnatheme;
 
         isAssistantAttaque = effets.isAssistantAttaque;
-        console.log(wpnE);
 
         isCadence = effets.isCadence;
         sCadence = effets.sCadence;
@@ -157,14 +177,12 @@ rollCombatAutrePNJ.forEach(button => {
 
         if(effets.isConditionnelV)
             isConditionnelV = true;
-
-        console.log(effets);
         
         //FIN GESTION DES EFFETS
 
         //GESTION DES AMELIORATIONS D'ARMES
 
-        var ameliorationsA = getWeaponsAutreAA(AA, AAValue, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
+        var ameliorationsA = getWeaponsAutreAA(prefix, attrs, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
         
         exec = exec.concat(ameliorationsA.exec);
 
@@ -217,16 +235,16 @@ rollCombatAutrePNJ.forEach(button => {
 
         //GESTION DES BONUS SPECIAUX
 
-        let sBonusDegats = special["BDDiversTotal"];
-        let sBonusDegatsD6 = specialValue["BDDiversD6"];
-        let sBonusDegatsFixe = specialValue["BDDiversFixe"];
+        let sBonusDegats = isApplied(attrs[`${prefix}BDDiversTotal`]);
+        let sBonusDegatsD6 = attrs[`${prefix}BDDiversD6`];
+        let sBonusDegatsFixe = attrs[`${prefix}BDDiversFixe`];
 
-        let sBonusViolence = special["BVDiversTotal"];
-        let sBonusViolenceD6 = specialValue["BVDiversD6"];
-        let sBonusViolenceFixe = specialValue["BVDiversFixe"];
+        let sBonusViolence = isApplied(attrs[`${prefix}BVDiversTotal`]);
+        let sBonusViolenceD6 = attrs[`${prefix}BVDiversD6`];
+        let sBonusViolenceFixe = attrs[`${prefix}BVDiversFixe`];
 
-        let sEnergie = special["energie"];
-        let sEnergieValue = specialValue["energieValue"];
+        let sEnergie = isApplied(attrs[`${prefix}energie`]);
+        let sEnergieValue = attrs[`${prefix}energieValue`];
 
         if(sBonusDegats) {
             exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");

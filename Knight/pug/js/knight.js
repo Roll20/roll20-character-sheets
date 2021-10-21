@@ -2980,9 +2980,19 @@ on("change:MALDruidWolfConfiguration sheet:opened", function()
     });
 });
 
-on("clicked:druidWolfConfiguration",function()
+
+on("change:tabArmureLegende",function(eventInfo)
 {
+    var mal = eventInfo.newValue;
+
+    if(mal == "0") {
+        setAttrs({
+            armureLegende:"sans"
+        });
+    }
 });
+
+
 //FIN META-ARMURE DE LEGENDE
 on("change:druidWolfConfiguration sheet:opened", function() 
 {			
@@ -3683,15 +3693,17 @@ on("change:mechaArmure change:mechaArmureVitesseModif change:mechaArmureManoeuvr
     getAttrs(["mechaArmure", "mechaArmureVitesseModif", "mechaArmureManoeuvrabiliteModif", "mechaArmurePuissanceModif", "mechaArmureSenseursModif", "mechaArmureSystemesModif", "mechaArmureResilienceModif", "MANOGSTActive","mechaArmureBlindageModif", "mechaArmureCdfModif", "mechaArmureNoyauxEnergieModif"], function(value)
     {
         const MA = value["mechaArmure"];
-        const vitesse = parseInt(mechaArmure[MA]["vitesse"], 10)||0;
-        const manoeuvrabilite = parseInt(mechaArmure[MA]["manoeuvrabilite"], 10)||0;
-        const puissance = parseInt(mechaArmure[MA]["puissance"], 10)||0;
-        const senseurs = parseInt(mechaArmure[MA]["senseurs"], 10)||0;
-        const systemes = parseInt(mechaArmure[MA]["systemes"], 10)||0;
-        const resilience = parseInt(mechaArmure[MA]["resilience"], 10)||0;
-        const blindage = parseInt(mechaArmure[MA]["blindage"], 10)||0;
-        const cdf = parseInt(mechaArmure[MA]["cdf"], 10)||0;
-        const noyaux = parseInt(mechaArmure[MA]["noyaux"], 10)||0;
+        const type = mechaArmure[MA] || [];
+
+        const vitesse = parseInt(type["vitesse"], 10)||0;
+        const manoeuvrabilite = parseInt(type["manoeuvrabilite"], 10)||0;
+        const puissance = parseInt(type["puissance"], 10)||0;
+        const senseurs = parseInt(type["senseurs"], 10)||0;
+        const systemes = parseInt(type["systemes"], 10)||0;
+        const resilience = parseInt(type["resilience"], 10)||0;
+        const blindage = parseInt(type["blindage"], 10)||0;
+        const cdf = parseInt(type["cdf"], 10)||0;
+        const noyaux = parseInt(type["noyaux"], 10)||0;
         
         const vitesseM = parseInt(value["mechaArmureVitesseModif"], 10)||0;
         const manoeuvrabiliteM = parseInt(value["mechaArmureManoeuvrabiliteModif"], 10)||0;
@@ -3719,9 +3731,16 @@ on("change:mechaArmure change:mechaArmureVitesseModif change:mechaArmureManoeuvr
         var blindageTotal = blindage+blindageM;
         var cdfTotal = cdf+cdfM;
         var noyauxTotal = noyaux+noyauxM;
+
+        let translation;
+
+        if(!MA)
+            translation = "";
+        else
+            translation = getTranslationByKey(MA);
         
         setAttrs({
-            mechaArmureNom: getTranslationByKey(MA),
+            mechaArmureNom: translation,
             mechaArmureVitesse: vitesseTotal,
             mechaArmureManoeuvrabilite: manoeuvrabiliteTotal,
             mechaArmurePuissance: puissanceTotal,

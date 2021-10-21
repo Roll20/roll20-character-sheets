@@ -1,17 +1,19 @@
 const rollCombatDistancePNJ = ["pSDistancePNJ", "mEDistancePNJ", "repeating_armeDist:armedistancepnj"];
 
 rollCombatDistancePNJ.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let firstExec = [];
         let exec = [];
         firstExec.push(roll);
 
+        let listAttrs = [];
+        let prefix = "";
+        let id = "";
         var name = "";
         var portee = "";
 
-        let data = [];
         let dEffets = [];
         let dEffetsValue = [];
         let AA = [];
@@ -20,18 +22,12 @@ rollCombatDistancePNJ.forEach(button => {
         let specialValue = [];
 
         let vChair = Number(AspectValue["Chair"].value);
-        let vBete = Number(AspectValue["Bete"].value);
-        let vBeteAEMin = Number(AspectValue["Bete"].AEMin);
-        let vBeteAEMaj = Number(AspectValue["Bete"].AEMaj);
         let vMachine = AspectValue["Machine"].value;
         let vMachineAE = Number(AspectValue["Machine"].AEMin)+Number(AspectValue["Machine"].AEMaj);
         let vMasque = AspectValue["Masque"].value;
         let vMasqueAE = Number(AspectValue["Masque"].AEMin)+Number(AspectValue["Masque"].AEMaj);
 
-        let aspect = "0";
         let AE = 0;
-
-        let vBeteD = 0;
 
         let baseDegats = 0;
         let baseViolence = 0;
@@ -46,14 +42,16 @@ rollCombatDistancePNJ.forEach(button => {
             case "pSDistancePNJ":
                 name = i18n_pistoletService;
 
-                dEffets = wpnE["pS"];
-                dEffetsValue = wpnEValue["pS"];
-                AA = wpnAA["pS"] || [];
-                AAValue = wpnAAValue["pS"] || [];
-                special = wpnS["pS"];
-                specialValue = wpnSValue["pS"];
+                prefix = "pS";
 
-                aspect = PNJData["pSAspectPNJ"] || "0";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AA = wpnAmeliorationA.map(a => `${prefix}${a}`);
+                AAValue = wpnAmeliorationAValue.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push("pSAspectPNJ");
 
                 baseDegats = 2;
                 baseViolence = 1;
@@ -62,19 +60,23 @@ rollCombatDistancePNJ.forEach(button => {
                 bDegats = 6;
 
                 diceViolence = 1;
+
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AA, AAValue, special, specialValue);
                 break;
 
             case "mEDistancePNJ":
                 name = i18n_marteauEpieuD;
 
-                dEffets = wpnE["mE"];
-                dEffetsValue = wpnEValue["mE"];
-                AA = wpnAA["mE"] || [];
-                AAValue = wpnAAValue["mE"] || [];
-                special = wpnS["mE"];
-                specialValue = wpnSValue["mE"];
+                prefix = "mE";
 
-                aspect = PNJData["mEDistancePNJ"] || "0";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AA = wpnAmeliorationA.map(a => `${prefix}${a}`);
+                AAValue = wpnAmeliorationAValue.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push("mEAspectPNJ");
 
                 baseDegats = 3;
                 baseViolence = 3;
@@ -84,40 +86,83 @@ rollCombatDistancePNJ.forEach(button => {
 
                 diceViolence = 3;
                 bViolence = 12;
+
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AA, AAValue, special, specialValue);
                 break;
 
             case "repeating_armeDist:armedistancepnj":
-            case "repeating_armeDistVehicule:armedistancepnj":
-                let id = info.triggerName.split("_")[2];
-                
-                data = wpnData[id] || [];
-                dEffets = wpnE[id] || [];
-                dEffetsValue = wpnEValue[id] || [];
-                AA = wpnAA[id] || [];
-                AAValue = wpnAAValue[id] || [];
-                special = wpnS[id] || [];          
-                specialValue = wpnSValue[id] || []; 
+                id = info.triggerName.split("_")[2];
 
-                aspect = data["aspectPNJ"] || "0";
+                prefix = `repeating_armeDist_${id}_`;
 
-                name = data["ArmeDist"] || "";
-                portee = data["armeDistPortee"] || "^{portee-contact}";
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AA = wpnAmeliorationA.map(a => `${prefix}${a}`);
+                AAValue = wpnAmeliorationAValue.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
 
-                let dName = `{{special1=${name}}}`;
-                let dPortee = `{{portee=^{portee} ${portee}}}`;
+                listAttrs.push(`${prefix}AspectPNJ`);
+                listAttrs.push(`${prefix}ArmeDist`);
+                listAttrs.push(`${prefix}armeDistPortee`);
 
-                baseDegats = Number(data["armeDistDegat"]) || 0;
-                baseViolence = Number(data["armeDistBDegat"]) || 0;
+                listAttrs.push(`${prefix}armeDistDegat`);
+                listAttrs.push(`${prefix}armeDistBDegat`);
 
-                diceDegats = Number(data["armeDistDegat"]) || 0;
-                bDegats = Number(data["armeDistBDegat"]) || 0;
+                listAttrs.push(`${prefix}armeDistViolence`);
+                listAttrs.push(`${prefix}armeDistBViolence`);
 
-                diceViolence = Number(data["armeDistViolence"]) || 0;
-                bViolence = Number(data["armeDistBViolence"]) || 0;
-
-                exec.push(dPortee);
-                exec.push(dName);
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AA, AAValue, special, specialValue);
                 break;
+
+            case "repeating_armeDistVehicule:armedistancepnj":
+                id = info.triggerName.split("_")[2];
+
+                prefix = `repeating_armeDistVehicule_${id}_`;
+
+                dEffets = wpnEffects.map(a => `${prefix}${a}`);
+                dEffetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AA = wpnAmeliorationA.map(a => `${prefix}${a}`);
+                AAValue = wpnAmeliorationAValue.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+
+                listAttrs.push(`${prefix}aspectPNJ`);
+                listAttrs.push(`${prefix}ArmeDist`);
+                listAttrs.push(`${prefix}armeDistPortee`);
+
+                listAttrs.push(`${prefix}armeDistDegat`);
+                listAttrs.push(`${prefix}armeDistBDegat`);
+
+                listAttrs.push(`${prefix}armeDistViolence`);
+                listAttrs.push(`${prefix}armeDistBViolence`);
+
+                listAttrs = listAttrs.concat(dEffets, dEffetsValue, AA, AAValue, special, specialValue);
+                break;
+        }
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let aspect = attrs[`${prefix}AspectPNJ`] || "0";
+
+        if(button == "repeating_armeDist:armedistancepnj" || button == "repeating_armeDistVehicule:armedistancepnj") {
+            let dName = attrs[`${prefix}ArmeDist`] || "";
+            let dPortee = attrs[`${prefix}armeDistPortee`] || "^{portee-contact}";
+
+            name = `{{special1=${dName}}}`;
+            portee = `{{portee=^{portee} ${dPortee}}}`;
+
+            baseDegats = Number(attrs[`${prefix}armeDistDegat`]) || 0;
+            baseViolence = Number(attrs[`${prefix}armeDistBDegat`]) || 0;
+
+            diceDegats = Number(attrs[`${prefix}armeDistDegat`]) || 0;
+            bDegats = Number(attrs[`${prefix}armeDistBDegat`]) || 0;
+
+            diceViolence = Number(attrs[`${prefix}armeDistViolence`]) || 0;
+            bViolence = Number(attrs[`${prefix}armeDistBViolence`]) || 0;
+
+            exec.push(name);
+            exec.push(portee);
         }
 
         let isConditionnelA = false;
@@ -175,34 +220,16 @@ rollCombatDistancePNJ.forEach(button => {
             cRoll.push(aspectValue);
 
             exec.push("{{vAE="+AE+"}}");
-        };
+        }
 
         if(mod != 0) {
             cRoll.push(mod);
             exec.push("{{mod="+mod+"}}");
         }
 
-        //GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
-        if(vBeteAEMin > 0 || vBeteAEMaj > 0) {
-            bDegats += vBeteAEMin;
-            bDegats += vBeteAEMaj;
-
-            vBeteD += vBeteAEMin;
-            vBeteD += vBeteAEMaj;
-        }
-
-        if(vBeteAEMaj > 0) {
-            bDegats += vBete;
-            vBeteD += vBete;
-        }
-
-        if(vBeteD > 0)
-            exec.push(`{{vBeteD=${vBeteD}}}`);
-        //FIN DE GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
-
         //GESTION DES EFFETS
 
-        var effets = getWeaponsEffectsPNJ(dEffets, dEffetsValue, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+        var effets = getWeaponsEffectsPNJ(prefix, attrs, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
 
         bDegats = bDegats += Number(effets.bDegats);
         eASAssassin = effets.eASAssassin;
@@ -219,7 +246,6 @@ rollCombatDistancePNJ.forEach(button => {
         isAntiAnatheme = effets.isAntiAnatheme;
 
         isAssistantAttaque = effets.isAssistantAttaque;
-        console.log(wpnE);
 
         isCadence = effets.isCadence;
         sCadence = effets.sCadence;
@@ -272,7 +298,7 @@ rollCombatDistancePNJ.forEach(button => {
 
         //GESTION DES AMELIORATIONS D'ARMES
 
-        var ameliorationsA = getWeaponsDistanceAAPNJ(AA, AAValue, vMasque, vMasqueAE, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
+        var ameliorationsA = getWeaponsDistanceAAPNJ(prefix, attrs, vMasque, vMasqueAE, isAssistantAttaque, eASAssassinValue, isCadence, vCadence, nowSilencieux, isTirRafale, isObliteration, isAntiAnatheme);
         
         exec = exec.concat(ameliorationsA.exec);
 
@@ -319,19 +345,16 @@ rollCombatDistancePNJ.forEach(button => {
 
         //GESTION DES BONUS SPECIAUX
 
-        let sBonusDegats = special["BDDiversTotal"];
-        let sBonusDegatsD6 = specialValue["BDDiversD6"];
-        let sBonusDegatsFixe = specialValue["BDDiversFixe"];
+        let sBonusDegats = isApplied(attrs[`BDDiversTotal`]);
+        let sBonusDegatsD6 = attrs[`BDDiversD6`];
+        let sBonusDegatsFixe = attrs[`BDDiversFixe`];
 
-        let sBonusViolence = special["BVDiversTotal"];
-        let sBonusViolenceD6 = specialValue["BVDiversD6"];
-        let sBonusViolenceFixe = specialValue["BVDiversFixe"];
+        let sBonusViolence = isApplied(attrs[`BVDiversTotal`]);
+        let sBonusViolenceD6 = attrs[`BVDiversD6`];
+        let sBonusViolenceFixe = attrs[`BVDiversFixe`];
 
-        let sEnergie = special["energie"];
-        let sEnergieValue = specialValue["energieValue"];
-
-        console.log(energie);
-        console.log(sEnergieValue);
+        let sEnergie = isApplied(attrs[`energie`]);
+        let sEnergieValue = attrs[`energieValue`];
 
         if(sBonusDegats) {
             exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
@@ -579,7 +602,6 @@ rollCombatDistancePNJ.forEach(button => {
                 }
                 
                 if(sEnergie != "0") {
-                    console.log(newEnergie);
                     setAttrs({
                         energiePNJ: newEnergie
                     });

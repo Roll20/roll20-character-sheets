@@ -444,8 +444,6 @@ for(let i = 0;i < rollMAImprovise;i++) {
             diceDegats += getStyle.diceDegats;
             diceViolence += getStyle.diceViolence;
 
-            console.log(bonus);
-
             //FIN GESTION DU STYLE
 
             if(cRoll.length == 0)
@@ -496,8 +494,6 @@ for(let i = 0;i < rollMAImprovise;i++) {
 
             if(isConditionnelD)
                 exec.push("{{degatsConditionnel=true}}");
-
-            console.log(exec);
 
             startRoll(exec.join(" "), (results) => {
                 let tJet = results.results.jet.result;
@@ -596,8 +592,6 @@ rollArchangel.forEach(button => {
                 break;
         }
 
-        console.log(exec);
-
         startRoll(exec.join(" "), (results) => {
             finishRoll(
                 results.rollId, {}
@@ -609,7 +603,7 @@ rollArchangel.forEach(button => {
 const rollCombatArchangel = ["MAACanonMetatron"];
 
 rollCombatArchangel.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value.split(";");
 
         const style = {
@@ -624,6 +618,8 @@ rollCombatArchangel.forEach(button => {
         }
 
         let exec = [];
+        let listAttrs = [];
+        let attrs = [];
 
         let base = roll[0];
 
@@ -661,10 +657,19 @@ rollCombatArchangel.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["canonMetatronCaracteristique1"];
-                C2 = MAData["canonMetatronCaracteristique2"];
-                C3 = MAData["canonMetatronCaracteristique3"];
-                C4 = MAData["canonMetatronCaracteristique4"];
+                listAttrs = [
+                    "canonMetatronCaracteristique1",
+                    "canonMetatronCaracteristique2",
+                    "canonMetatronCaracteristique3",
+                    "canonMetatronCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+
+                C1 = attrs["canonMetatronCaracteristique1"];
+                C2 = attrs["canonMetatronCaracteristique2"];
+                C3 = attrs["canonMetatronCaracteristique3"];
+                C4 = attrs["canonMetatronCaracteristique4"];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -866,9 +871,7 @@ rollNephilim.forEach(button => {
                 break;
        }
 
-        console.log(exec);
-
-        startRoll(exec.join(" "), (results) => {
+       startRoll(exec.join(" "), (results) => {
             finishRoll(
                 results.rollId, {}
             );            
@@ -879,7 +882,7 @@ rollNephilim.forEach(button => {
 const rollCombatNephilim = ["MANCanonMagma", "MANMSurtur"];
 
 rollCombatNephilim.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value.split(";");
 
         const style = {
@@ -894,6 +897,8 @@ rollCombatNephilim.forEach(button => {
         }
 
         let exec = [];
+        let listAttrs = [];
+        let attrs = [];
 
         let base = roll[0];
 
@@ -933,10 +938,19 @@ rollCombatNephilim.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["canonMagmaCaracteristique1"];
-                C2 = MAData["canonMagmaCaracteristique2"];
-                C3 = MAData["canonMagmaCaracteristique3"];
-                C4 = MAData["canonMagmaCaracteristique4"];
+                listAttrs = [
+                    "canonMagmaCaracteristique1",
+                    "canonMagmaCaracteristique2",
+                    "canonMagmaCaracteristique3",
+                    "canonMagmaCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+
+                C1 = attrs["canonMagmaCaracteristique1"];
+                C2 = attrs["canonMagmaCaracteristique2"];
+                C3 = attrs["canonMagmaCaracteristique3"];
+                C4 = attrs["canonMagmaCaracteristique4"];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -1044,10 +1058,19 @@ rollCombatNephilim.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["MSurturCaracteristique1"];
-                C2 = MAData["MSurturCaracteristique2"];
-                C3 = MAData["MSurturCaracteristique3"];
-                C4 = MAData["MSurturCaracteristique4"];
+                listAttrs = [
+                    "MSurturCaracteristique1",
+                    "MSurturCaracteristique2",
+                    "MSurturCaracteristique3",
+                    "MSurturCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+
+                C1 = attrs["MSurturCaracteristique1"];
+                C2 = attrs["MSurturCaracteristique2"];
+                C3 = attrs["MSurturCaracteristique3"];
+                C4 = attrs["MSurturCaracteristique4"];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -1151,10 +1174,7 @@ rollCombatNephilim.forEach(button => {
                 break;
         }
 
-        console.log(exec);
-
         startRoll(exec.join(" "), (results) => {
-            console.log(results);
             let tJet = results.results.jet.result;
 
             let tBonus = results.results.bonus.result;
@@ -1214,8 +1234,6 @@ rollDemon.forEach(button => {
                 break;
        }
 
-        console.log(exec);
-
         startRoll(exec.join(" "), (results) => {
             finishRoll(
                 results.rollId, {}
@@ -1227,7 +1245,7 @@ rollDemon.forEach(button => {
 const rollCombatDemon = ["MADSouffle", "MADjinnWraith", "MADPSoniques", "MADLCG"];
 
 rollCombatDemon.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value.split(";");
 
         const style = {
@@ -1262,6 +1280,9 @@ rollCombatDemon.forEach(button => {
         let oDiscretion = CaracValue["discretion"].VraiOD;
         let oTir = CaracValue["tir"].VraiOD;
 
+        let listAttrs = [];
+        let attrs = [];
+
         var jet;
         let cRoll = [];
         let rollBonus = [];
@@ -1285,10 +1306,19 @@ rollCombatDemon.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["DSouffleCaracteristique1"];
-                C2 = MAData["DSouffleCaracteristique2"];
-                C3 = MAData["DSouffleCaracteristique3"];
-                C4 = MAData["DSouffleCaracteristique4"];
+                listAttrs = [
+                    "DSouffleCaracteristique1",
+                    "DSouffleCaracteristique2",
+                    "DSouffleCaracteristique3",
+                    "DSouffleCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+        
+                C3 = attrs[`DSouffleCaracteristique1`];
+                C3 = attrs[`DSouffleCaracteristique2`];
+                C3 = attrs[`DSouffleCaracteristique3`];
+                C4 = attrs[`DSouffleCaracteristique4`];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -1396,14 +1426,18 @@ rollCombatDemon.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = "@{discretion}";
-                C2 = MAData["caracteristiqueWraith2"];
-                C3 = MAData["caracteristiqueWraith3"];
-                C4 = MAData["caracteristiqueWraith4"];
+                listAttrs = [
+                    "caracteristiqueWraith2",
+                    "caracteristiqueWraith3",
+                    "caracteristiqueWraith4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
 
-                console.log(C2);
-                console.log(C3);
-                console.log(C4);
+                C1 = "@{discretion}";
+                C2 = attrs["caracteristiqueWraith2"];
+                C3 = attrs["caracteristiqueWraith3"];
+                C4 = attrs["caracteristiqueWraith4"];
                 
                 if(active != "0")
                     exec.push("{{special2=^{module-wraith} ^{active}}}");
@@ -1485,10 +1519,19 @@ rollCombatDemon.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["APoingsCaracteristique1"];
-                C2 = MAData["APoingsCaracteristique2"];
-                C3 = MAData["APoingsCaracteristique3"];
-                C4 = MAData["APoingsCaracteristique4"];
+                listAttrs = [
+                    "APoingsCaracteristique1",
+                    "APoingsCaracteristique2",
+                    "APoingsCaracteristique3",
+                    "APoingsCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+
+                C1 = attrs["APoingsCaracteristique1"];
+                C2 = attrs["APoingsCaracteristique2"];
+                C3 = attrs["APoingsCaracteristique3"];
+                C4 = attrs["APoingsCaracteristique4"];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -1593,10 +1636,19 @@ rollCombatDemon.forEach(button => {
                 bCarac = PJData["bonusCarac"];
                 mod = PJData["jetModifDes"];
 
-                C1 = MAData["LCGCaracteristique1"];
-                C2 = MAData["LCGCaracteristique2"];
-                C3 = MAData["LCGCaracteristique3"];
-                C4 = MAData["LCGCaracteristique4"];
+                listAttrs = [
+                    "LCGCaracteristique1",
+                    "LCGCaracteristique2",
+                    "LCGCaracteristique3",
+                    "LCGCaracteristique4"
+                ]
+        
+                attrs = await asw.getAttrs(listAttrs);
+
+                C1 = attrs["LCGCaracteristique1"];
+                C2 = attrs["LCGCaracteristique2"];
+                C3 = attrs["LCGCaracteristique3"];
+                C4 = attrs["LCGCaracteristique4"];
 
                 if(C1 != "0") {
                     C1Nom = C1.slice(2, -1);
@@ -1700,10 +1752,7 @@ rollCombatDemon.forEach(button => {
 
         }
 
-        console.log(exec);
-
         startRoll(exec.join(" "), (results) => {
-            console.log(results);
             let tJet = results.results.jet.result;
 
             let tBonus = results.results.bonus.result;
