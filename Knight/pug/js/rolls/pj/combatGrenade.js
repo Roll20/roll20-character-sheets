@@ -2,7 +2,7 @@
 const rollCombatGrenade = ["grenade1", "grenade2", "grenade3", "grenade4", "grenade5"];
 
 rollCombatGrenade.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
         let armure = donneesPJ["Armure"];
         let armureL = donneesPJ["ArmureLegende"];
@@ -52,10 +52,19 @@ rollCombatGrenade.forEach(button => {
         let degats = [];
         let violence = [];
 
-        let C1 = PJData[`caracteristique1Grenade`] || "0";
-        let C2 = PJData[`caracteristique2Grenade`] || "0";
-        let C3 = PJData[`caracteristique3Grenade`] || "0";
-        let C4 = PJData[`caracteristique4Grenade`] || "0";
+        let listAttrs = [
+            "caracteristique1Grenade",
+            "caracteristique2Grenade",
+            "caracteristique3Grenade",
+            "caracteristique4Grenade"
+        ]
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let C1 = attrs[`caracteristique1Grenade`] || "0";
+        let C2 = attrs[`caracteristique2Grenade`] || "0";
+        let C3 = attrs[`caracteristique3Grenade`] || "0";
+        let C4 = attrs[`caracteristique4Grenade`] || "0";
         
         let C1Nom = "";
         let C2Nom = "";
@@ -176,8 +185,6 @@ rollCombatGrenade.forEach(button => {
         }
         //FIN DE GESTION DES BONUS DES OD
 
-        console.log(attaquesSurprisesCondition);
-
         //GESTION DES EFFETS
 
         switch(button) {
@@ -226,8 +233,6 @@ rollCombatGrenade.forEach(button => {
 
         //FIN GESTION DES EFFETS
 
-        console.log(attaquesSurprisesCondition);
-
         //GESTION DU STYLE
 
         let getStyle = getStyleDistanceMod(PJData, diceDegats, diceViolence, "", hasArmure, oTir, false, false, false, false);
@@ -238,8 +243,6 @@ rollCombatGrenade.forEach(button => {
         diceViolence += getStyle.diceViolence;
 
         //FIN GESTION DU STYLE
-
-        console.log(attaquesSurprisesCondition);
 
         //GESTION DES BONUS D'ARMURE
 
@@ -264,8 +267,8 @@ rollCombatGrenade.forEach(button => {
         diceViolence += Number(armorBonus.diceViolence);
 
         ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-        ODShaman = ODBarbarian.concat(armorBonus.ODShaman);
-        ODWarrior = ODBarbarian.concat(armorBonus.ODWarrior);
+        ODShaman = ODShaman.concat(armorBonus.ODShaman);
+        ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
         if(armure == "berserk") {
             isTenebricide = true;
@@ -296,8 +299,8 @@ rollCombatGrenade.forEach(button => {
         diceViolence += Number(MALBonus.diceViolence);
 
         ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-        ODMALShaman = ODBarbarian.concat(MALBonus.ODMALShaman);
-        ODMALWarrior = ODBarbarian.concat(MALBonus.ODMALWarrior);
+        ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+        ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
         //FIN GESTION DES BONUS D'ARMURE
 
@@ -388,8 +391,6 @@ rollCombatGrenade.forEach(button => {
             exec.push("{{violenceConditionnel=true}}");
 
         exec = firstExec.concat(exec);
-
-        console.log(exec);
 
         startRoll(exec.join(" "), (results) => {
             let tJet = results.results.jet.result;

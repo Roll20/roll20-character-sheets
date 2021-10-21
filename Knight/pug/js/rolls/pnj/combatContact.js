@@ -1,7 +1,7 @@
 const rollCombatPNJContact = ["pSContactPNJ", "mEContactPNJ", "repeating_armeCaC:armecontactpnj"];
 
 rollCombatPNJContact.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let firstExec = [];
@@ -10,6 +10,8 @@ rollCombatPNJContact.forEach(button => {
         let mod = PJData["jetModifDes"];
         let energie = PNJData["energiePNJ"];
 
+        let listAttrs = [];
+        let prefix = "";
         let name = "";
         let id = "";
         let data = false;
@@ -34,14 +36,13 @@ rollCombatPNJContact.forEach(button => {
 
         let diceDegats = 0;
         let bDegats = 0;
+        let addChair = 0;
 
         let diceViolence = 0;
         let bViolence = 0;
 
         let portee = "";
 
-        let aBase = "0";
-        let aspect = "0";
         let aspectValue = 0;
         let AEValue = 0;
         
@@ -103,13 +104,15 @@ rollCombatPNJContact.forEach(button => {
         let attaquesOmbres = PNJData["attaqueOmbre"];
 
         switch(button) {
-            case "pSContactPNJ":            
-                effets = wpnE["pSC"];
-                effetsValue = wpnEValue["pSC"];
-                AS = wpnAS["pSC"];
-                AO = wpnAO["pSC"];
-                special = wpnS["pSC"];
-                specialValue = wpnSValue["pSC"];
+            case "pSContactPNJ":
+                prefix = "pSC";
+
+                effets = wpnEffects.map(a => `${prefix}${a}`);
+                effetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);    
 
                 name = `{{special1=${i18n_couteauService}}}`;
 
@@ -119,21 +122,21 @@ rollCombatPNJContact.forEach(button => {
 
                 portee = "{{portee=^{portee} ^{portee-contact}}}";
 
-                aBase = PNJData["pSCAspectPNJ"];
+                listAttrs.push("pSCAspectPNJ");
+                listAttrs.push("pSCAddChair");
 
-                console.log(aBase);
-
-                if(aBase != "0")
-                    aspect = aBase.slice(2, -1);
+                listAttrs = listAttrs.concat(effets, effetsValue, AS, AO, special, specialValue);
                 break;
 
             case "mEContactPNJ":
-                effets = wpnE["mEC"];
-                effetsValue = wpnEValue["mEC"];
-                AS = wpnAS["mEC"];
-                AO = wpnAO["mEC"];
-                special = wpnS["mEC"];
-                specialValue = wpnSValue["mEC"];
+                prefix = "mEC";
+
+                effets = wpnEffects.map(a => `${prefix}${a}`);
+                effetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);    
 
                 name = `{{special1=${i18n_marteauEpieuC}}}`;
 
@@ -143,41 +146,61 @@ rollCombatPNJContact.forEach(button => {
 
                 portee = "{{portee=^{portee} ^{portee-contact}}}";
 
-                aBase = PNJData["mECAspectPNJ"];
+                listAttrs.push("mECAspectPNJ");
+                listAttrs.push("mECAddChair");
 
-                if(aBase != "0")
-                    aspect = aBase.slice(2, -1);
+                listAttrs = listAttrs.concat(effets, effetsValue, AS, AO, special, specialValue);
                 break;
 
             case "repeating_armeCaC:armecontactpnj":
                 id = info.triggerName.split("_")[2];
 
-                data = wpnData[id] || [];
-                effets = wpnE[id] || [];
-                effetsValue = wpnEValue[id] || [];
-                AS = wpnAS[id] || [];
-                AO = wpnAO[id] || [];
-                special = wpnS[id] || [];          
-                specialValue = wpnSValue[id] || [];      
+                prefix = `repeating_armeCaC_${id}_`;
 
-                let dName = data["ArmeCaC"] || "";
-                name = `{{special1=${dName}}}`;
+                effets = wpnEffects.map(a => `${prefix}${a}`);
+                effetsValue = wpnEffectsValue.map(a => `${prefix}${a}`);
+                AS = wpnAmeliorationS.map(a => `${prefix}${a}`);
+                AO = wpnAmeliorationO.map(a => `${prefix}${a}`);
+                special = wpnSpecial.map(a => `${prefix}${a}`);
+                specialValue = wpnSpecialValue.map(a => `${prefix}${a}`);
+                
+                listAttrs.push(`${prefix}ArmeCaC`);
+                listAttrs.push(`${prefix}AspectPNJ`);
+                listAttrs.push(`${prefix}armeCaCPortee`);
+                
+                listAttrs.push(`${prefix}armeCaCDegat`);
+                listAttrs.push(`${prefix}armeCaCBDegat`);
+                listAttrs.push(`${prefix}addChair`);
+                listAttrs.push(`${prefix}armeCaCViolence`);
+                listAttrs.push(`${prefix}armeCaCBViolence`);
 
-                diceDegats = Number(data["armeCaCDegat"]) || 0;
-                bDegats = Number(data["armeCaCBDegat"]) || 0;
-
-                diceViolence = Number(data["armeCaCViolence"]) || 0;
-                bViolence = Number(data["armeCaCBViolence"]) || 0;
-
-                let dPortee = data["armeCaCPortee"] || "^{portee-contact}";
-                portee = `{{portee=^{portee} ${dPortee}}}`;
-
-                aBase = data["aspectPNJ"] || "0";
-
-                if(aBase != "0")
-                    aspect = aBase.slice(2, -1);
+                listAttrs = listAttrs.concat(effets, effetsValue, AS, AO, special, specialValue);
                 break;
         }
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let aBase = attrs[`${prefix}AspectPNJ`] || "0";
+        let aspect = "0"
+
+        if(button == "repeating_armeCaC:armecontactpnj") {
+            let dName = attrs[`${prefix}ArmeCaC`] || "";
+            let dPortee = attrs[`${prefix}armeCaCPortee`] || "^{portee-contact}";
+
+            name = `{{special1=${dName}}}`;
+            portee = `{{portee=^{portee} ${dPortee}}}`;
+
+            diceDegats = Number(attrs[`${prefix}armeCaCDegat`]) || 0;
+            bDegats = Number(attrs[`${prefix}armeCaCBDegat`]) || 0;
+            addChair = isApplied(attrs[`${prefix}addChair`]);
+
+            diceViolence = Number(attrs[`${prefix}armeCaCViolence`]) || 0;
+            bViolence = Number(attrs[`${prefix}armeCaCBViolence`]) || 0;
+        } else
+        addChair = isApplied(attrs[`${prefix}AddChair`]);
+
+        if(aBase != "0")
+            aspect = aBase.slice(2, -1);
 
         firstExec.push(roll);
         exec.push(portee);
@@ -193,7 +216,7 @@ rollCombatPNJContact.forEach(button => {
             exec.push(aspect);
         }
 
-        if(vChair > 0) {
+        if(vChair > 0 && addChair == "1") {
             let vChairD = Math.ceil(vChair/2);
 
             bDegats += vChairD;
@@ -215,8 +238,6 @@ rollCombatPNJContact.forEach(button => {
             vBeteD += vBete;
         }
 
-        console.log(bDegats);
-
         if(vBeteD > 0)
             exec.push(`{{vBeteD=${vBeteD}}}`);
 
@@ -224,7 +245,7 @@ rollCombatPNJContact.forEach(button => {
 
         //GESTION DES EFFETS
                 
-        let rEffets = getWeaponsEffectsPNJ(effets, effetsValue, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+        let rEffets = getWeaponsEffectsPNJ(prefix, attrs, addChair, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
 
         firstExec = firstExec.concat(rEffets.firstExec);
         exec = exec.concat(rEffets.exec);
@@ -279,7 +300,7 @@ rollCombatPNJContact.forEach(button => {
 
         //GESTION DES AMELIORATIONS STRUCTURELLES
 
-        let rAS = getWeaponsContactASPNJ(AS, isAssistanceAttaque, isChoc, isLeste, isMeurtrier, isOrfevrerie, isSilencieux, vBete, vChair, vMasque, vMasqueAE);
+        let rAS = getWeaponsContactASPNJ(prefix, attrs, isAssistanceAttaque, isChoc, isLeste, isMeurtrier, isOrfevrerie, isSilencieux, vBete, vChair, vMasque, vMasqueAE);
 
         exec = exec.concat(rAS.exec);
 
@@ -307,7 +328,7 @@ rollCombatPNJContact.forEach(button => {
         //FIN GESTION DES AMELIORATIONS STRUCTURELLES
 
         //GESTION DES AMELIORATIONS ORNEMENTALLES
-        let rAO = getWeaponsContactAOPNJ(AO, isCadence, vCadence, isObliteration, isAntiAnatheme);
+        let rAO = getWeaponsContactAOPNJ(prefix, attrs, isCadence, vCadence, isObliteration, isAntiAnatheme);
 
         firstExec = firstExec.concat(rAO.firstExec);
         exec = exec.concat(rAO.exec);
@@ -362,16 +383,16 @@ rollCombatPNJContact.forEach(button => {
 
         //GESTION DES BONUS SPECIAUX
 
-        let sBonusDegats = special["BDDiversTotal"];
-        let sBonusDegatsD6 = specialValue["BDDiversD6"];
-        let sBonusDegatsFixe = specialValue["BDDiversFixe"];
+        let sBonusDegats = isApplied(attrs[`${prefix}BDDiversTotal`]);
+        let sBonusDegatsD6 = attrs[`${prefix}BDDiversD6`];
+        let sBonusDegatsFixe = attrs[`${prefix}BDDiversFixe`];
 
-        let sBonusViolence = special["BVDiversTotal"];
-        let sBonusViolenceD6 = specialValue["BVDiversD6"];
-        let sBonusViolenceFixe = specialValue["BVDiversFixe"];
+        let sBonusViolence = isApplied(attrs[`${prefix}BVDiversTotal`]);
+        let sBonusViolenceD6 = attrs[`${prefix}BVDiversD6`];
+        let sBonusViolenceFixe = attrs[`${prefix}BVDiversFixe`];
 
-        let sEnergie = special["energie"];
-        let sEnergieValue = specialValue["energieValue"];
+        let sEnergie = isApplied(attrs[`${prefix}energie`]);
+        let sEnergieValue = attrs[`${prefix}energieValue`];
         let sEnergieText = "";
         let pasEnergie = false;
 
@@ -572,8 +593,6 @@ rollCombatPNJContact.forEach(button => {
             exec.push("{{violenceConditionnel=true}}");
 
         firstExec = firstExec.concat(exec);
-
-        console.log(firstExec);
 
         if(pasEnergie == false) {
             startRoll(firstExec.join(" "), (results) => {

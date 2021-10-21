@@ -3168,8 +3168,6 @@ on(`clicked:pilotage`, function(info) {
         if(isConditionnel)
             exec.push("{{conditionnel=true}}");
 
-        console.log(exec);
-
         startRoll(exec.join(" "), (results) => {
             let tJet = results.results.jet.result;
             let tBonus = results.results.tBonus.result;
