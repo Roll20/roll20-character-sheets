@@ -94,14 +94,17 @@ async function repeatingAbsoluteAttributes(rowIds, destinationPrefix) {
     rowIds.forEach((rowId) => {
       const rowFieldAbs = a[`repeating_bonuses_${rowId}_${field}_abs`];
       if (Boolean(Number(rowFieldAbs)) == true) {
-        rowFieldValue = a[`repeating_bonuses_${rowId}_mod_${field}`];
-        fieldAbsValue =
-          fieldAbsValue > rowFieldValue ? fieldAbsValue : rowFieldValue;
+        rowFieldValue = +a[`repeating_bonuses_${rowId}_mod_${field}`];
+        fieldAbsValue = +(fieldAbsValue > rowFieldValue
+          ? fieldAbsValue
+          : rowFieldValue);
       }
     });
     if (fieldAbsValue) {
       // compare the modified absolute value against the original attribute
-      const coreValue = (await getAttrsAsync([field]))[field];
+      // const coreValue = (await getAttrsAsync([field]))[field];
+      const { [field]: rawCoreValue } = await getAttrsAsync([field]);
+      const coreValue = +rawCoreValue;
       const newValue = coreValue > fieldAbsValue ? coreValue : fieldAbsValue;
       const attr = {
         [`${destinationPrefix}_mod_${field}`]: newValue,
@@ -191,6 +194,7 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "initiative",
     "pull",
     "roll",
+    "breakfall",
     "strike_range",
     "strike_range_single",
     "strike_range_burst",
@@ -210,6 +214,9 @@ async function combineBonuses(rowIds, destinationPrefix) {
     "dodge_motion",
     "dodge_underwater",
     "flipthrow",
+    "tackle",
+    "leghook",
+    "backwardsweepkick",
   ];
 
   const ppExtras = ["disarm", "entangle"];
