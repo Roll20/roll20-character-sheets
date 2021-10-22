@@ -417,7 +417,7 @@ function isNewSpellSection(section) {
 }
 
 function isRemoving0(eventInfo, fieldNames) {
-    return fieldNames?.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
+    return fieldNames.some(fieldName => !parseInt(eventInfo.removedInfo[`${eventInfo.sourceAttribute}_${fieldName}`]));
 }
 
 function isOverwriting0(eventInfo) {
@@ -603,7 +603,10 @@ function parseSpheres(spheresStrings, regex) {
 
 function isSpellAvailable(spellName, spellSphereString, availableSpheres, elementalSpheres) {
     let primarySpellSpheres = spellSphereString.match(noElementalRegex);
-    let isAvailable = primarySpellSpheres?.some((sphere) => availableSpheres.has(sphere));
+    if (!primarySpellSpheres)
+        return false;
+    
+    let isAvailable = primarySpellSpheres.some((sphere) => availableSpheres.has(sphere));
     if (isAvailable)
         return true;
 
@@ -717,10 +720,17 @@ function setupSpellSlotsReset(buttonName, tab, spellLevels, allSections) {
                 sections = allSections;
             else if (resetSection === 'level') {
                 let level = values[tab];
-                sections = spellLevels.find(sl => sl.level === level)?.sections;
+                if (!level)
+                    return;
+                
+                let spellLevel = spellLevels.spellLevel(sl => sl.level === level);
+                if (!spellLevel)
+                    return;
+                
+                sections = spellLevel.sections || [];
             }
             
-            if (!sections?.length)
+            if (!sections.length)
                 return
             
             let updateFunction;
@@ -804,6 +814,7 @@ wizardSpellLevelsSections.forEach(spellLevel => {
         setupAutoFillSpellInfo(lastSection, wizardSpells);
     }
 });
+setupAutoFillSpellInfo("wizmonster", wizardSpells);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -820,6 +831,7 @@ priestSpellLevelsSections.forEach(spellLevel => {
         setupAddPriestSpell(lastSection);
     }
 });
+setupAutoFillSpellInfo("primonster", priestSpells);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
@@ -923,35 +935,49 @@ on('change:nonprof-penalty', function (eventInfo) {
     });
 })
 
-function getWeaponWithBonus(weaponName) {
-    weaponName = weaponName?.toLowerCase();
+function getWeaponWithBonus(weaponName, isMonster) {
     if (!weaponName)
         return undefined;
     
+    weaponName = weaponName.toLowerCase();
     let baseWeapon = weapons[weaponName];
     if (baseWeapon) {
         return {
             ...baseWeapon,
-            bonus: '0'
+            'bonus' : '0'
         };
     }
     
-    let match = weaponName.match(/\s*\+[0-9]+\s*/);
+    let match = weaponName.match(/\s*\+([0-9])+\s*/);
     if (!match)
         return undefined;
 
     let baseWeaponName = weaponName.replace(match[0], ' ').trim();
     baseWeapon = weapons[baseWeaponName];
-    let bonusString = match[0].trim().replace('+', '');
-    let bonus = parseInt(bonusString)
-    if (!baseWeapon || isNaN(bonus))
+    if (!baseWeapon)
         return undefined;
+    
+    let bonusString = match[1];
+    let bonus = parseInt(bonusString)
+    if (isNaN(bonus))
+        return undefined;
+    
+    if (bonus < 1)
+        return {
+            ...baseWeapon,
+            'bonus' : '0'
+        };
     
     let weaponWithBonus = {
         ...baseWeapon,
-        'speed' : Math.max(baseWeapon['speed'] - bonus, 1),
+        'speed' : Math.max(baseWeapon['speed'] - bonus, 0),
         'bonus' : `+${bonus}`
     }
+    if (isMonster) {
+        weaponWithBonus['small-medium'] += `+${bonus}`
+        weaponWithBonus['thac0'] = `@{monsterthac0}-${bonus}`
+    }
+    
     return weaponWithBonus;
 }
 
@@ -1076,6 +1102,22 @@ const followerWeapons = [
 
 followerWeapons.forEach(fw => {
    setupFollowerWeaponsAutoFill(fw.repeating, fw.sections) 
+});
+
+// Monster weapons
+on('change:repeating_monsterweapons:weaponname', function(eventInfo){
+    let weapon = getWeaponWithBonus(eventInfo.newValue, true);
+    if (weapon === undefined)
+        return;
+
+    let weaponInfo = {
+        [`repeating_monsterweapons_attacknum`] : weapon['rof'] || '1',
+        [`repeating_monsterweapons_ThAC0`]     : weapon['thac0'] || '@{monsterthac0}',
+        [`repeating_monsterweapons_damsm`]     : weapon['small-medium'],
+        [`repeating_monsterweapons_weapspeed`] : weapon['speed'],
+    };
+
+    setAttrs(weaponInfo);
 });
 
 //Weapon proficiency slots

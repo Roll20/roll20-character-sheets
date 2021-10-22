@@ -1,5 +1,44 @@
 Change Log
 ==============================================
+**2021-10-11 ** v.43 Chuz (James Culp)
+	Added roll post-processing to PC sheet buttons.  This includes a new way to handle Wild Dice and glitch/crit glitch detection.
+**2021-09-21 ** v.42 Chuz (James Culp)
+	Removed Firing Modes from Arms->Ranged because it did nothing in that section.
+	Moved "Primary" selector outside the settings area so it's easier to select a primary weapon.
+	Added Ranged and Melee weapons (PC->Arms and Grunt) to pastable raw data
+	Bugfix: Fixed a minor but annoying issue where if you added a skill and it was Astral the default attribute was Agility not Intuition
+	Updated skill roll button outputs to display the associated attribute for the roll.
+	Grunt sheet Added tooltips for Direct/Indirect Magic Defense, Defense, Soak, Soak Matrix and Soak Biofeedback.
+	Bugfix: PC Sheet Changes to Charisma now trigger the Social Rating to update.
+	Added Matrix Action buttons to the bottom of Grunt sheets IF "Has Matrix Device" is checked.
+	Bugfix: Grunt Group checkbox and count are no longer hidden when settings mode is not active.
+	Bugfix: Found some Soak rollbuttons were including wound modifiers, that was incorrect, fixed now.
+	Grunt/Spirit sheet Added Magic AR beside Drain roll button
+	Grunt sheet added Direct Magic and Indirect Magic defense roll buttons and rearranged things a little.
+**2021-09-08 ** v.41 Chuz (James Culp)
+	Bugfix - Drone/Vehicle Initiative should have been normal Initiative but Pilot * 2 + 4d6.
+	Bugfix - Grunt template was applying wounds to Soak rolls.
+	Added IC to the list of pastable raw data
+	Host->IC now display notes in the roll template	
+**2021-08-31 ** v.40 Chuz (James Culp)
+	Added Social Rating to derived tests (even though it's not a test) just to the right of the Edge Attribute.  This is a total of Charisma + any cumulative + primary armor social adjustments.
+	Added mouseovers for Composure, Judge Intentions, Memory and Lift & Carry buttons detailing where the values come from for those of us that forget.
+	Added the ability to add Spells, NPC Spells, Qualities and Augmentations by pasting raw data into the Notes textarea for a new repeating row.
+**2021-07-19 ** v.39 Chuz (James Culp)
+	Added Grunt Groups and Autocalculations based on the # of grunts
+	Bugfix - PC->Rolls tab was showing conversions on the Matrix Actions Tab
+**2021-07-12 ** v.38 Chuz (James Culp)
+	Bugfix - NPC->Grunt fixed a bug or oversight on grunt repeating skills.   They were all showing Agility on the roll template as their ability.  Upon first opening a grunt sheet all repeating skills for the grunt will be re-set to use their default associated attribute and the display attribute will also be fixed.
+	Bugfix - NPC->Host IC dice roll buttons weren't working.
+	Bugfix - PC->Rolls->Misc fixed width on conversions
+**2021-07-05 ** v.37 Chuz (James Culp)
+	Rolls->Misc tab added and now contains a way to do quick and dirty conversions for Standard to Metric and vice versa.  Feet <=> Meters, Pounds <=> Kilograms, and Miles <=> Kilometers.
+	PC->Arms->Range/Melee Added "Engineering" option to the skill dropdown.
+	Bugfix - PC->Arms->Range/Melee fixed the dicepool display to now reflect the actual dicepool.  To make sure this is up to date when viewing a character sheet for the first time after this version goes live just toggle settings mode off/on or on/off for each weapon, that should trigger the update and update your primary displays as well.
+	Added some behind the scenes code to try and update the weapons to have the Attribute, Attribute Rating and Dicepool Modifier attributes set correctly after loading.  Also added versioning for the character sheet data.
+	NPC Astral Initiative now auto-calculates for spirits and awakened grunts	NPC->Vehicle/Drone fixed hot sim initiative auto-calculation (now pilot * 2 + 4d6)
+	NPC->Grunt fixed sprint speed being 0 by default
+	PC Sheet -> Condition Modifiers box - added Natural Healing Physical and Stun buttons.  Currently do not update player's CM.
 **2021-06-21 ** v.36 Chuz (James Culp)
 	PC Sheet Modifiers text boxes in various places in the sheet (Qualities, Augs, Gear, Matrix Devices, Programs, and Echos) now allow the player to add/subtract from attributes on the sheet.  See roll20 forum thread for further details.
 	PC Sheet Removed Modifications from sprites.

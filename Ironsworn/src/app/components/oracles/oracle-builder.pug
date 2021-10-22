@@ -9,11 +9,12 @@ mixin oracleLabel(type, name, id)
       name=`attr_oracle_${type}_button`
       value=id
     )
-    .btn-content.oracle-name=name
+    div(data-i18n=`oracle-label-${id}`).btn-content.oracle-name=name
 
 mixin oracleRollGroup(group, type, key)
   .oracle-box
-    .oracle-title=key.replace(/_/g, ' ')
+    .oracle-title(data-i18n=`oracle-title-${key}`)=key.replace(/_/g, ' ')
+    //- - console.log(`"oracle-title-${key}":"${key.replace(/_/g, ' ')}",`)
     each oracle in group.oracles
       - var header = oracle.name.replace(/_/g, ' ')
       - var id = `${key}${oracle.roll_id}`
@@ -45,48 +46,58 @@ mixin oracleRollGroup(group, type, key)
               )
           +oracleLabel(type, header, id)
 
+mixin oracleResult(id, index, result)
+  if id === 'namesIronlander' || id === 'namesElf' || id === 'namesGiant' || id === 'namesVarou' || id === 'namesTroll' || id === 'site_nameNamesake'
+    span.oracle-result!=result
+  else
+    span(data-i18n=`${id}-${index}`).oracle-result!=result
+
 mixin oracleBuilder(opts, type, key)
   - var id = opts.roll_id
   - var oracleName = `${key}-${opts.name}`
+  - var oracleTranslationId = `${key}${opts.roll_id}`
   - var oracleClass = oracleName.replace(/_/g, '-')
+
   input(class=`${oracleClass} hide-element` type='radio' name=`attr_oracle_${type}` value=`${key}${id}`)
   div(class=`${oracleClass} showhide`)
-    .oracle-title.oracle-table-preview=opts.name.replace(/_/g, ' ')
+    .oracle-title.oracle-table-preview(data-i18n=`oracle-label-${oracleTranslationId}`)=opts.name.replace(/_/g, ' ')
+    //- - console.log(`"oracle-title-${key}":"${key.replace(/_/g, ' ')}",`)
     if opts.oracle_move
       +moveBuilder(moveList[opts.name], { visibility: true, no_title: true })
     else if opts.oracle_group === '2'
       .oracle-table.flex-table
         each sub_oracle in opts.sub_oracles
           .oracle-sub-column
-            each row in sub_oracle.rows
+            each row, index in sub_oracle.rows
               .oracle-row
                 span.oracle-roll=row.roll
-                span.oracle-result!=row.result
+                //- - console.log(sub_oracle)
+                +oracleResult(`${key}${sub_oracle.roll_id}`, index, row.result)
     else
       if opts.columns === '2'
         .oracle-table.oracle-table-2-column
-          each row in opts.rows
+          each row, index in opts.rows
             .oracle-row.oracle-row-2
               span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+              +oracleResult(oracleTranslationId, index, row.result)
 
       else if opts.columns === '3'
         .oracle-table.oracle-table-3-column
-          each row in opts.rows
+          each row,index in opts.rows
             .oracle-row.oracle-row-3
               span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+              +oracleResult(oracleTranslationId, index, row.result)
       
       else if opts.columns === '4'
         .oracle-table.oracle-table-4-column
-          each row in opts.rows
+          each row,index in opts.rows
             .oracle-row.oracle-row-4
               span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+              +oracleResult(oracleTranslationId, index, row.result)
 
       else
         .oracle-table
-          each row in opts.rows
+          each row,index in opts.rows
             .oracle-row
               span.oracle-roll=row.roll
-              span.oracle-result!=row.result
+              +oracleResult(oracleTranslationId, index, row.result)

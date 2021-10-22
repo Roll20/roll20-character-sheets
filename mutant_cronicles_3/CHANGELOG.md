@@ -14,6 +14,12 @@ If you have any issue, you can contact me through a private message in my Roll20
 - Repercussion range does not include the Unskilled modifier.
 
 
+## [1.1.1] - July 2021
+
+### Changed
+
+- Images now hosted on roll20 character sheet repository.
+
 ## [1.1.0] - June 2021
 
 ### Added

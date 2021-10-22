@@ -1,3 +1,18 @@
+### Version 2.42 (2021-08):
+- **Attributes & Skills:**
+  - added names to roll buttons (so they can be dragged to macro bar or called in chat)
+  - skill name selection now have "(A)" on Advanced Skills
+- **Force:** "Burst of Speed" added to control powers, lightsaber combat name shorter
+- **Starship:**
+  - make main info block more compact
+  - weapons now have "location"-field, and the weapon's text-fields are more compact.
+  - "Other Ship Stats" is more compact
+- **Settings**
+  - added button/link to sheet instructions/Changelog
+  - clarify & cleanup settings options
+- updated "Instructions" on sheet.json 
+- minor visual fixes (Sheet-logo/title, wound level, init-bonus tracker, Background-section, footer)
+
 ### Version 2.41 (2021-05):
 - fix broken styles
 

@@ -31,6 +31,14 @@ Things we want to add to the character sheet, presented in no particular order o
 
 ## Changelog
 
+### Jul 17th, 2021
+- Added a level field to the `hybrid` _(or Pokémon (Character Class))_ character type.
+  - Uses the `level1` attribute, so it matches what is shown in the main class for the Trainer character type.
+- Altered some CSS ever so slightly to ensure the new _"Level / Honors"_ label is displayed on one line for the default font size.
+
+### Jul 1st, 2021
+- Updated the `roll-quick-move` button value to include an `effectiveness-roll` parameter, so that the roll-template doesn't add an undesired row to the chat log output
+
 ### Jun 22nd, 2021
 - Updated the description of some of the configuration options for better wording, and to make them accurate
 - Allows hiding the accuracy check in a customised `move` roll template, by not supplying an `accuracy` field

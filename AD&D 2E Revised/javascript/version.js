@@ -1,13 +1,13 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.1.0';
+const sheetVersion = '4.2.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
-        let cs=_.rest((attrs.character_sheet||'').match(/(.*?)\s+v(.*)?$/)),
-            sheet_name=cs[0]||'',
-            sheet_version=cs[1]||'';
+        let cs=(attrs.character_sheet||'').match(/(.*)\s+v(.*)/) || [];
+        let sheet_name=cs[1] || '';
+        let sheet_version=cs[2] || '0.0.0';
 
         // do something with sheet_name and sheet_version, if you might be converting
 
@@ -42,7 +42,7 @@ on('sheet:opened', function(){
 
 //#region Helpers
 function SheetVersion(sheetVersionString) {
-    let splitVersions = sheetVersionString.match(/(\d+)\.(\d+)\.(\d+)/);
+    let splitVersions = sheetVersionString.match(/(\d+)\.(\d+)\.(\d+)/) || [];
     this.major = parseInt(splitVersions[1]) || 0;
     this.minor = parseInt(splitVersions[2]) || 0;
     this.bug   = parseInt(splitVersions[3]) || 0;

@@ -14,7 +14,12 @@ Le jeu complet, des suppl&eacute;ments et des t&eacute;l&eacute;chargements grat
 4.04 [Screenshot](co_v3.jpg)
 
 # Notes de version
-## v4.04 (2020-02-01)
+## v5.00 (2021-07-09)
+* Ajout d'une partie dédiée pour l'interaction avec le script
+* Ajout d'un type de dégâts drain
+* Passage en legacy=false
+
+## v4.04 (2021-02-01)
 * Séparation des capacités en titre + texte
 * Ajout d'un texte pour les voies
 
