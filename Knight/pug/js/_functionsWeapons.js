@@ -3549,6 +3549,8 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
     let bName = "";
     let modA = 0;
 
+    log(isAProtectrice);
+
     switch(style) {
         case "standard": 
             exec.push("{{style="+i18n_style+" "+i18n_standard+"}}");
