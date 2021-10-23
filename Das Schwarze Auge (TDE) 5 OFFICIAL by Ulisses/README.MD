@@ -1,8 +1,7 @@
 
 # Official Das Schwarze Auge 5/The Dark Eye 5th system for Roll20
 ![TDE_Roll20](https://user-images.githubusercontent.com/75448500/133844250-62f177c1-af3a-4f1c-bdc1-114162286011.jpg)
-
-Official feedback hub for the roll 20 ulisses TDE character sheet & future compendium books
+[Official feedback hub](https://github.com/Plushtoast/TDE-Roll20-Official) for the Roll 20 ulisses TDE character sheet & future compendium books
 
 
 ### Current Version:
