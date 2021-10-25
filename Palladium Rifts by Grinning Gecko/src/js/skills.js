@@ -105,7 +105,9 @@ async function updateSkillLevels(newCharacterLevel, oldCharacterLevel) {
 
 on("change:repeating_skills", async (e) => {
   console.log("change:repeating_skills", e);
-  if (e.sourceType === "sheetworker") return;
+  if (e.sourceType === "sheetworker" && !e.sourceAttribute.endsWith("_level")) {
+    return;
+  }
   if (e.sourceAttribute.endsWith("_name")) return;
   const sourceParts = e.sourceAttribute.split("_");
   // Return if no attribute is changed and it's the row itself
