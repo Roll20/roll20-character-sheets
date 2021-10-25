@@ -406,8 +406,12 @@ function repeatingMultipleSum(section, valueField, multiplierField, destination,
         .reduce(function(m, r) {
             return m + r.F[valueField] * r.F[multiplierField];
         }, 0, function(t,r,a) {
-            let dec = parseInt(decimals) || 0;
-            a.D[dec][destination] = t;
+            let dec = parseInt(decimals);
+            if (isNaN(dec)) {
+                a[destination] = t;
+            } else {
+                a.D[dec][destination] = t;
+            }
         })
         .execute();
 }
@@ -1174,32 +1178,8 @@ on('change:repeating_gear-stored:gear-stored-weight change:repeating_gear-stored
         .execute();
 })
 
-function setupCalculateTotalGemsValue(totalField, valueField, multiplierField, section) {
-    let repeatingSection = `repeating_${section}`;
-    let onChange = `change:${valueField} change:${multiplierField} change:${repeatingSection}:${valueField} change:${repeatingSection}:${multiplierField} remove:${repeatingSection}`
-    on(onChange, function(eventInfo){
-        if (doEarlyReturn(eventInfo, [valueField, multiplierField]))
-            return;
-        
-        TAS.repeating(section)
-            .attrs(totalField, valueField, multiplierField)
-            .fields(valueField, multiplierField)
-            .reduce(function(m,r){
-                m.total+=(r.F[valueField]*r.I[multiplierField]);
-                return m;
-            },{total:0},function(m,r,a){
-                m.total+=(a.F[valueField]*a.I[multiplierField]);
-                a[totalField]=m.total;
-            })
-            .execute();
-    });
-}
-
-// --- Start setup gem total value calculation for all settings --- //
-let gemSections = ['', '2', '3', '4', '5', '6'];
-gemSections.forEach(i => {
-    setupCalculateTotalGemsValue(`gemstotalvalue${i}`, `gemvalue${i}`, `gemqty${i}`, `gem${i}`);
-});
-// --- End setup gem total value calculation for all settings --- //
+on(`change:repeating_gem:gemvalue change:repeating_gem:gemqty remove:repeating_gem`, function(eventInfo) {
+    repeatingMultipleSum('gem', 'gemvalue', 'gemqty', 'gemstotalvalue');
+})
 
 // --- ALL SHEET WORKERS END --- //

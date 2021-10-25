@@ -1,7 +1,7 @@
 // --- Version change start --- //
 
 const sheetName = 'AD&D 2E Revised';
-const sheetVersion = '4.2.0';
+const sheetVersion = '4.3.0';
 
 on('sheet:opened', function(){
     getAttrs(['character_sheet'],function(attrs){
@@ -32,6 +32,9 @@ on('sheet:opened', function(){
 
             if (oldSheetVersion.isBelowMigrate(3, 4, 0))
                 migrate3_4_0();
+
+            if (oldSheetVersion.isBelowMigrate(4, 3, 0))
+                migrate4_3_0();
             
             //#endregion
         }
@@ -77,6 +80,97 @@ function moveStaticToRepeating(section, fieldsToMove) {
 
             setAttrs(newValue);
         }
+    });
+}
+//#endregion
+
+//#region version 4.3.0
+let oldCurrencySections = [['2', 'Dragonlance'], ['3', 'Dark Sun'], ['4', 'Ravenloft'], ['5', 'Maztica'], ['6', 'BirthRight']];
+let fieldArray = ['gemdesc', 'gemvalue', 'gemqty', 'gemsizecut'];
+function migrate4_3_0() {
+    console.log('Migrating to v4.3.0');
+    migrateGems();
+    migrateOtherValuables();
+}
+
+function migrateGems() {
+    moveStaticToRepeating('gem', fieldArray) // Move Standard static gem
+    oldCurrencySections.forEach(section => {
+        let index = section[0];
+        let name = section[1];
+        let oldGemFields = fieldArray.map(s => `${s}${index}`);
+        let sectionName = `gem${index}`;
+        TAS.repeating(sectionName)
+            .attrs(oldGemFields)
+            .fields(oldGemFields)
+            .reduce(function (memo, row) {
+                if (row.S[`gemdesc${index}`] || row.S[`gemsizecut${index}`] || row.F[`gemvalue${index}`] || row.F[`gemqty`]) {
+                    console.log(`Moving repeating gem: '${row.S[`gemdesc${index}`]}'`)
+                    memo.push(oldGemFields.map(field => row.S[field]));
+                    removeRepeatingRow(`repeating_${sectionName}_${row.id}`);
+                }
+                return memo;
+            }, [], function (memo, rowSet, attrSet) {
+                let newValue = {};
+                if (attrSet.S[`gemdesc${index}`] || attrSet.S[`gemsizecut${index}`] || attrSet.F[`gemvalue${index}`] || attrSet.F[`gemqty`]) {
+                    console.log(`Moving static gem: '${attrSet.S[`gemdesc${index}`]}'`)
+                    
+                    memo.splice(0, 0, oldGemFields.map(field => attrSet.S[field]));
+                    newValue[`gemdesc${index}`] = '';
+                    newValue[`gemvalue${index}`] = '';
+                    newValue[`gemqty${index}`] = '';
+                    newValue[`gemsizecut${index}`] = '';
+                }
+                if (memo.length > 0) {
+                    memo.splice(0, 0, [`--${name}--`, '', '', '---------']);
+                }
+                memo.forEach(gem => {
+                    let newrowid = generateRowID();
+                    newValue[`repeating_gem_${newrowid}_gemdesc`] = gem[0];
+                    newValue[`repeating_gem_${newrowid}_gemvalue`] = gem[1];
+                    newValue[`repeating_gem_${newrowid}_gemqty`] = gem[2];
+                    newValue[`repeating_gem_${newrowid}_gemsizecut`] = gem[3];
+                })
+                setAttrs(newValue);
+            })
+            .execute();
+    })
+}
+
+function migrateOtherValuables() {
+    let newValue = {};
+    let allCurrencySections = [['']].concat(oldCurrencySections);
+    let valuablesFields = allCurrencySections.map(s => `otherval${s[0]}`);
+    let gpFields = allCurrencySections.map(s => `othervalue${s[0]}`);
+    getAttrs(gpFields.concat(valuablesFields), function(values) {
+        let total = 0;
+        let valuablesString = '';
+        gpFields.forEach(field => {
+            total += parseInt(values[field]) || 0;
+            newValue[field] = '';
+        });
+        newValue['othervalue'] = total;
+        
+        valuablesFields.forEach(field => {
+            let oldValue = values[field];
+            if (oldValue) {
+                if (valuablesString) {
+                    valuablesString += '\n\n';
+                }
+                
+                if (field === 'otherval') { // Standard case, no name needed
+                    valuablesString += oldValue;
+                } else {
+                    let index = field.slice(-1);
+                    let array = oldCurrencySections.find(arr => arr[0] === index);
+                    valuablesString += `--- ${array[1]} ---\n${oldValue}`;
+                    newValue[field] = '';
+                }
+            }
+        });
+        newValue['otherval'] = valuablesString;
+        
+        setAttrs(newValue);
     });
 }
 //#endregion
