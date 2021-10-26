@@ -3,7 +3,7 @@ const rollCombatImprovise = 14;
 for(let i = 0;i < rollCombatImprovise;i++) {
     let str = `AI${i}`;
 
-    on(`clicked:${str}`, function(info) {
+    on(`clicked:${str}`, async function(info) {
         let roll = info.htmlAttributes.value;
         let armure = donneesPJ["Armure"];
         let armureL = donneesPJ["ArmureLegende"];
@@ -121,8 +121,15 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let C1Nom;
         let C2Nom;
 
-        let C3 = PJData[`caracteristique3ArmeImprovisee`];
-        let C4 = PJData[`caracteristique4ArmeImprovisee`];
+        let listAttrs = [
+            "caracteristique3ArmeImprovisee",
+            "caracteristique4ArmeImprovisee"
+        ]
+
+        let attrs = await asw.getAttrs(listAttrs);
+
+        let C3 = attrs[`caracteristique3ArmeImprovisee`];
+        let C4 = attrs[`caracteristique4ArmeImprovisee`];
         
         if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
             C1Nom = "force";
@@ -132,8 +139,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
             C2Nom = "tir";
         }
 
-        let C3Nom = C3.slice(2, -1);
-        let C4Nom = C4.slice(2, -1);
+        let C3Nom = "";
+        let C4Nom = "";
 
         let ODBarbarian = [];
         let ODMALBarbarian = [];
@@ -177,6 +184,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
         if(hasBonus == 1 || hasBonus == 2) {
             if(C3 != "0") {
+                C3Nom = C3.slice(2, -1);
+                
                 let C3Value = Number(CaracValue[C3Nom].value);
                 let C3OD = Number(CaracValue[C3Nom].OD);
 
@@ -189,6 +198,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
             if(hasBonus == 2) {
                 if(C4 != "0") {
+                    C4Nom = C4.slice(2, -1);
+
                     let C4Value = Number(CaracValue[C4Nom].value);
                     let C4OD = Number(CaracValue[C4Nom].OD);
 
@@ -276,10 +287,10 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         diceViolence += Number(armorBonus.diceViolence);
 
         ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-        ODShaman = ODBarbarian.concat(armorBonus.ODShaman);
-        ODWarrior = ODBarbarian.concat(armorBonus.ODWarrior);
+        ODShaman = ODShaman.concat(armorBonus.ODShaman);
+        ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
-        console.log(bonus);
+        log(PJData);
 
         let MALBonus = getMALBonus(PJData, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
@@ -302,10 +313,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         diceViolence += Number(MALBonus.diceViolence);
 
         ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-        ODMALShaman = ODBarbarian.concat(MALBonus.ODMALShaman);
-        ODMALWarrior = ODBarbarian.concat(MALBonus.ODMALWarrior);
-
-        console.log(bonus);
+        ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+        ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
         //FIN GESTION DES BONUS D'ARMURE
 
@@ -322,9 +331,6 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         bonus = bonus.concat(ODMALShaman);
         bonus = bonus.concat(ODWarrior);
         bonus = bonus.concat(ODMALWarrior);
-
-        console.log(armorBonus);
-        console.log(MALBonus);
 
         degats.push(`${diceDegats}D6`);
         degats = degats.concat(bDegats);
@@ -405,8 +411,6 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
         if(isConditionnelV)
             exec.push("{{violenceConditionnel=true}}");
-
-        console.log(exec);
 
         startRoll(exec.join(" "), (results) => {
             let tJet = results.results.jet.result;
