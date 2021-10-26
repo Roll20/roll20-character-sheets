@@ -1,5 +1,7 @@
 Change Log
 ==============================================
+**2021-10-26 ** v.44 Chuz (James Culp)
+	Bugfix returned notes to the roll template outputs for PC roll buttons in repeating sections.
 **2021-10-11 ** v.43 Chuz (James Culp)
 	Added roll post-processing to PC sheet buttons.  This includes a new way to handle Wild Dice and glitch/crit glitch detection.
 **2021-09-21 ** v.42 Chuz (James Culp)

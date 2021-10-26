@@ -1,5 +1,9 @@
 # Shadowrun 3rd Edition
 
+## Release Notes 10/25/2021
+1. movment pentaly is now shown in RangedTN modifiers
+2. fixed calculation of ammo weight
+
 ## Release Notes 10/8/2021
 
 ## changes/bug fixes
