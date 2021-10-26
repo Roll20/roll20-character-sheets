@@ -471,7 +471,7 @@ rollCombatContact.forEach(button => {
 
                 //GESTION DES AMELIORATIONS STRUCTURELLES
 
-                var ameliorationsS = getWeaponsContactAS(prefix, AS, hasArmure, nowSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat);
+                var ameliorationsS = getWeaponsContactAS(prefix, attrs, hasArmure, nowSilencieux, isMeurtrier, isAssistantAttaque, isChoc, isLeste, isOrfevrerie, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vCombat, oCombat);
 
                 autresAmeliorationsS = autresAmeliorationsS.concat(ameliorationsS.autresAmeliorations);
 
