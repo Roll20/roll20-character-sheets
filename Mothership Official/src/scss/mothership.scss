@@ -10,6 +10,7 @@ $ms-invert-foreground: white;
 $ms-invert-background: #111;
 $ms-recessed: dimgray;
 $ms-light: lightgray;
+$ms-lighter: lighten(lightgray, 10%);
 
 $ms-accent: red; 
 $ms-enabled: rgb(255, 174, 0); 
@@ -40,8 +41,8 @@ $ms-fonts-input: "Century Gothic", "Diadact Gothic", sans-serif;
 $ms-pictos: "Pictos";
 
 $ms-font-general: 1.25rem;
-$ms-font-small: 0.8em;
-$ms-font-large: 1.2em;
+$ms-font-small: 1rem;
+$ms-font-large: 1.5rem;
 $ms-font-h1: 1.75rem;
 $ms-font-h2: 1.65rem;
 $ms-font-h3: 1.55rem;
@@ -50,6 +51,7 @@ $ms-font-input: 1.45rem;
 .sheet-ms {
 
     &-wrapper {
+        position: relative;
 
         // Specificity hack
 
@@ -75,6 +77,11 @@ $ms-font-input: 1.45rem;
 
                 &.sheet-ms-rounded {
                     border-radius: 1em;
+                }
+
+                &:focus,
+                &:active {
+                    outline: none;
                 }
             }
 
@@ -228,12 +235,100 @@ $ms-font-input: 1.45rem;
             }
         }
     }
+    
+    &-settings {
+        display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: $ms-margin-small;
 
+        position: absolute;
+            left: 0;
+            top: 20px;
+            z-index: 100;
+        width: 40%;
+        padding: $ms-margin-small;
+
+        background: $ms-background;
+        border: $ms-border-thicker;
+            border-radius: $ms-border-radius;
+
+        font-size: $ms-font-small;
+
+        &__toggle {
+            width: 2.5rem;
+            height: 2.5rem;
+            position: absolute; 
+                left: 0;
+                top: 0;
+                z-index: 100;
+            cursor: pointer;
+            padding: .25rem !important;
+
+            border-radius: 50%;
+            background: $ms-invert-background;
+
+            text-align: center;
+
+            span {
+                color: $ms-invert-foreground;
+                
+                font-family: $ms-pictos;
+                font-weight: normal;
+            }
+
+            input[type="checkbox"] {
+                display: none;
+
+                &:checked + span {
+                    color: $ms-accent;
+                }
+            }
+        } 
+
+        &__row {
+            display: grid;
+                grid-template-columns: 1fr 2fr;
+                align-items: center;
+            padding: $ms-margin-small;
+
+            border-bottom: $ms-border;
+
+            &--pc,
+            &--ship {
+                @extend .sheet-ms-settings__row;
+                display: none;
+            }
+
+            button[type="action"] {
+                width: 50%;
+                margin: auto;
+                
+                border: $ms-border;
+
+                font-family: $ms-fonts-header;
+                font-weight: bold;
+                text-transform: uppercase;
+            }
+        }
+
+        &__label {
+            font-family: $ms-fonts-header;
+            font-size: $ms-font-general;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        &__setting {
+
+        }
+    }
+
+    &-ship, 
+    &-npc, 
     &-pc {
         position: relative;
         
         display: grid;
-            grid-template-columns: 1fr;
             gap: $ms-margin-large;
 
         background: $ms-background;
@@ -256,61 +351,12 @@ $ms-font-input: 1.45rem;
 
         .sheet-ms {
 
-            &-settings {
-                display: none;
-                    grid-template-columns: 1fr 1fr;
-                    gap: $ms-margin-small;
-
-                position: absolute;
-                    right: 0;
-                    top: 20px;
-                width: 40%;
-                padding: $ms-margin-small;
-
-                background: $ms-background;
-                border: $ms-border-thicker;
-                    border-radius: $ms-border-radius;
-
-                font-size: $ms-font-small;
-
-                &__toggle {
-                    position: absolute; 
-                        right: 0;
-                        top: 0;
-
-                     + span {
-                        font-family: $ms-pictos;
-                    }
-
-                    &:checked {
-
-                        ~ .sheet-ms-settings {
-                            display: grid; 
-                        }
-                    }
-                } 
-
-                &__row {
-                    display: grid;
-                        grid-template-columns: 1fr 2fr;
-
-                    border-bottom: $ms-border-recessed;
-                }
-
-                &__label {
-
-                }
-
-                &__setting {
-
-                }
-            }
-
             &-header {
                 display: grid;
                     grid-template-columns: 1fr 1fr;
                     gap: $ms-margin-large;
                     align-items: center;
+                    grid-column: 1 / -1;
                 padding: $ms-margin-large;
 
                 background: $ms-invert-background;
@@ -326,7 +372,7 @@ $ms-font-input: 1.45rem;
 
                 &__details {
                     display: grid;
-                        grid-template-columns: .3fr 1fr;
+                        grid-template-columns: 1fr 1fr 1fr 1fr;
                         gap: $ms-margin-large;
                 }
 
@@ -335,6 +381,8 @@ $ms-font-input: 1.45rem;
                         flex-direction: row no-wrap;
                         align-items: center;
 
+                    &--ship_class,
+                    &--type,
                     &--character_name,
                     &--level,
                     &--rank_title,
@@ -347,8 +395,14 @@ $ms-font-input: 1.45rem;
                         grid-column: 1 / -1;
                     }
 
-                    &:nth-child(3) {
-                        margin-left: $ms-margin-large
+                    &--rank_title, 
+                    &--class {
+                        grid-column: span 3;
+                    }
+
+                    &--ship_class,
+                    &--type {
+                        grid-column: span 2;
                     }
                 }
 
@@ -657,6 +711,8 @@ $ms-font-input: 1.45rem;
                 }
             }
 
+            &-cargo,
+            &-crew,
             &-skillpoints {
                 position: relative; 
                 display: grid;
@@ -689,6 +745,13 @@ $ms-font-input: 1.45rem;
                 &__input[type="number"] {
                     text-align: center;
                 }
+            }
+
+            &-cargowrap {
+                display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: $ms-margin-large;
+                margin-top: $ms-margin-large;
             }
 
             &-skills {
@@ -911,7 +974,7 @@ $ms-font-input: 1.45rem;
                 background: $ms-tooltip-background;
                 color: $ms-invert-foreground;
 
-                strong {
+                strong.sheet-ms-tooltip__label {
                     font-family: $ms-fonts-header;
                     font-weight: bold;
                     text-transform: uppercase;
@@ -986,22 +1049,6 @@ $ms-font-input: 1.45rem;
                 display: grid;
                     grid-template-columns: 1fr 1.5fr;
                     grid-gap: $ms-margin;
-
-                h1 {
-                    width: 90%;
-                    margin-top: -$ms-margin;
-                    margin-left: -$ms-margin;
-                    margin-bottom: $ms-margin;
-                    padding: $ms-margin-small;
-                    border-bottom-right-radius: 1.5em;
-
-                    background: $ms-invert-background;
-                    color: $ms-invert-foreground;
-
-                    font-size: $ms-font-h1;
-                    font-family: $ms-fonts-header;
-                    text-align: left;
-                }
             }
 
             &-credits {
@@ -1034,6 +1081,9 @@ $ms-font-input: 1.45rem;
                 }
             }
 
+            &-shipcargo,
+            &-shipofficers,
+            &-shipweapons,
             &-attacks,
             &-equipment {
                 position: relative;
@@ -1044,20 +1094,56 @@ $ms-font-input: 1.45rem;
                 border-bottom-right-radius: 1.5em;
 
                 overflow: hidden;
+
+                h1 {
+                    width: 90%;
+                    margin-top: -$ms-margin;
+                    margin-left: -$ms-margin;
+                    margin-bottom: $ms-margin;
+                    padding: $ms-margin-small;
+                    border-bottom-right-radius: 1.5em;
+
+                    background: $ms-invert-background;
+                    color: $ms-invert-foreground;
+
+                    font-size: $ms-font-h1;
+                    font-family: $ms-fonts-header;
+                    text-align: left;
+                }
+            }
+
+            &-shipcargo {
+                .repcontainer {
+                    display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: $ms-margin-small;
+                }
             }
 
             &-equipment {  
                 padding-bottom: 3em;
             }
 
+            &-shipcargorow,
+            &-shipofficerrow,
+            &-shipweaponrow,
             &-equipmentrow,
+            &-npcattackrow,
+            &-npcabilityrow,
             &-attackrow {
                 display: grid;
                     gap: 0 $ms-margin;
                     align-items: center;
                 margin-bottom: $ms-margin-small;
+                padding-bottom: $ms-margin-small;
 
                 border-bottom: $ms-border-thick;
+
+                > * {
+                    &:not(:first-child) {
+                        text-align: center;
+                    }
+                }
                 
                 &__name,
                 &__type {
@@ -1070,8 +1156,11 @@ $ms-font-input: 1.45rem;
                     }
                 }
 
+                &__name {
+                    text-align: left !important;
+                }
+
                 &--head {
-                    @extend .sheet-ms-attackrow;
 
                     > div {
                         &:not(:first-child) {
@@ -1079,10 +1168,18 @@ $ms-font-input: 1.45rem;
                         }
                     }
                 }
+
+                select,
+                input[type="number"],
+                input[type="text"],
+                textarea {
+                    border-radius: .5rem;
+                    background-color: $ms-lighter;
+                }
                 
                 &__cog {
                     cursor: pointer; 
-
+                    
                     &:hover span {
                         opacity: 1;
                     }
@@ -1137,28 +1234,711 @@ $ms-font-input: 1.45rem;
                     input[type="text"],
                     textarea {
                         border-radius: 1em;
+                        background-color: $ms-background;
                     }
                 }
             }
 
             &-equipmentrow {
-                grid-template-columns: 1fr 1fr 2em;
+                grid-template-columns: 1fr .75fr 2em;
+
+                &--head {
+                    @extend .sheet-ms-equipmentrow;
+                }
 
                 input[name*="settings"][value="on"] ~ .sheet-ms-equipmentrow__settings {
                     display: grid;   
                 } 
+
+                &__settingsrow {
+                    display: grid;   
+                        grid-template-columns: 1fr 1fr;
+                        gap: $ms-margin;
+
+                    &--full {
+                        @extend .sheet-ms-equipmentrow__settingsrow;
+                        grid-template-columns: 1fr;
+                    }
+                }
+
+                .sheet-show_armor {
+                    display: none;
+                }
+
+                input[name*="type"][value*="Armor"] ~ * .sheet-show_armor {
+                    display: grid;
+                }
             }
 
             &-attackrow {
-                grid-template-columns: 1fr .5fr .5fr 2em;
+                grid-template-columns: 1.5fr 1fr 1fr 2em;
+
+                &--head {
+                    @extend .sheet-ms-attackrow;
+                }
 
                 input[name*="settings"][value="on"] ~ .sheet-ms-attackrow__settings {
+                    display: grid;
+                } 
+
+                &__settingsrow {
+                    display: grid;   
+                        grid-template-columns: 1fr 1fr;
+                        gap: $ms-margin;
+
+                    &--full,
+                    &--range {
+                        @extend .sheet-ms-attackrow__settingsrow;
+                    }
+
+                    &--full {
+                        grid-template-columns: 1fr;
+                    }
+
+                    &--range {
+                        grid-column: 1 / -1;
+                        display: grid;
+                            grid-template-columns: 1fr 1fr 1fr;
+                            
+                        .sheet-ms-attackrow__settingstitle {
+                            grid-column: 1 / -1;
+                        }
+                    }
+
+                    &--critical {
+                        grid-column: 1 / -1;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                    }
+                }
+
+                .sheet-show_ranged {
+                    display: none;
+                }
+
+                select[name*="type"][value*="Ranged"] ~ * .sheet-show_ranged {
+                    display: grid;
+                }
+            }
+
+            &-npcattackrow {
+                display: flex;
+                    justify-content: flex-start;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    gap: .125rem !important;
+                height: 2.5rem;
+
+                border-bottom: 0;
+
+                &__cog {
+                    flex-basis: 3rem;
+                    margin-left: auto !important;
+                }
+
+                &__settings {
+                    flex-basis: 100%;
+                    margin-left: auto !important;
+                }
+
+                &__arrow {
+                    flex-basis: 1em;
+                    font-family: $ms-pictos;
+                }
+
+                &--head {
+                    @extend .sheet-ms-npcattackrow;
+                }
+
+                input[name*="settings"][value="on"] ~ .sheet-ms-npcattackrow__settings {
                     display: grid;   
                 } 
             }
+
+            &-npcabilityrow {
+                border-bottom: 0px;
+            }
+
+            &-npcabilityrow {
+                grid-template-columns: 1fr 3rem;
+
+                &--head {
+                    @extend .sheet-ms-npcabilityrow;
+                }
+
+                input[name*="settings"][value="on"] ~ .sheet-ms-npcabilityrow__settings {
+                    display: grid;   
+                } 
+
+                &__text {
+                    grid-column: 1 / -1;
+                    padding: 0 $ms-margin-large;
+
+                    font-size: $ms-font-large;
+                    text-align: left !important;
+                }
+            }
+
+            &-shipweaponrow {
+                grid-template-columns: 1fr 1fr 2em;
+
+                &--head {
+                    @extend .sheet-ms-shipweaponrow;
+                }
+
+                input[name*="settings"][value="on"] ~ .sheet-ms-shipweaponrow__settings {
+                    display: grid;   
+                } 
+            }
+
+            &-shipofficerrow {
+                grid-template-columns: 1fr 1fr;
+
+                &--head {
+                    @extend .sheet-ms-shipofficerrow;
+                }
+
+                input[name*="settings"][value="on"] ~ .sheet-ms-shipofficerrow__settings {
+                    display: grid;   
+                } 
+            }
+
+            &-shipcargorow {
+                grid-template-columns: 1fr .25fr;
+
+                &--head {
+                    display: grid;
+                        grid-template-columns: 1fr .25fr 1fr .25fr;
+                }
+
+                input[name*="settings"][value="on"] ~ .sheet-ms-shipofficerrow__settings {
+                    display: grid;   
+                } 
+            }
+
+            &-shipbuilder {
+                position: relative; 
+
+                grid-column: 1 / -1;
+
+                display: grid;
+                    gap: $ms-margin-large;
+                margin-top: $ms-margin-large * 1.5;
+                padding: $ms-margin-large;
+
+                border: 3px dashed $ms-foreground;
+                border-radius: 4rem;
+
+                h2 {
+                    display: inline;
+                    padding: $ms-margin-small;
+                        padding-right: 0;
+
+                    background: $ms-invert-background;
+                    color: $ms-invert-foreground;
+                    
+                    border-radius: 2rem;
+
+                    font-family: $ms-fonts-header;
+                    text-transform: uppercase;
+
+                    .sheet-ms-invert {
+                        margin: $ms-margin-small;
+                        padding: 0 $ms-margin-small;
+
+                        background: $ms-background;
+                        color: $ms-foreground;
+                    
+                        border-radius: 2em;
+                    }
+                }
+
+                &__hwrap {
+                    grid-column: 1 / -1;
+                }
+
+                &__block {
+                    display: grid;
+                        grid-template-columns: 1fr 1fr;
+
+                    border: $ms-border-thick;
+
+                    &--engine {
+                        
+                        .sheet-ms-shipbuilder__flex > * {
+                            margin-right: 0;
+                        }
+                        
+                    }
+                }
+
+                &__title {
+                    grid-column: 1 / -1;
+                    padding: 0;
+
+                    h3 {
+                        display: inline-block;
+                        min-width: 50%;
+                        padding: $ms-margin-small $ms-margin-large;
+                        margin: 0;
+                        padding-right: $ms-margin-large;
+
+                        border-bottom-right-radius: 2em;
+    
+                        background: $ms-invert-background;
+                        color: $ms-invert-foreground;
+
+                        font-family: $ms-fonts-header;
+                        text-align: left;
+                        text-transform: uppercase;
+                    }
+                }
+
+                &__flex {
+                    display: flex;
+                        align-items: center;
+                        justify-content: space-between;
+                    padding: $ms-margin;
+
+                    > * {
+                        margin-right: 3rem;
+                    }
+                }
+
+                &__desc {
+                    padding: $ms-margin-small $ms-margin-large;
+
+                    p {
+                        font-family: $ms-fonts-body;
+                    }
+                }
+
+                &__item {
+                    display: grid;
+                        grid-template-columns: 1fr;
+                        grid-template-rows: 4rem 1fr;
+                        justify-content: center;
+
+                    max-width: 6rem;
+                    min-height: 8rem;
+
+                    text-align: center;
+                }
+
+                &__label { 
+                    font-family: $ms-fonts-header;
+                    font-size: $ms-font-small;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                }
+
+                &__hull {
+                    padding: $ms-margin;
+                }
+
+                &__arrow,
+                &__equals,
+                &__modifier {
+                    margin-top: -3rem;
+                    min-height: 3rem;
+                    min-width: 3rem;
+                    max-height: 3rem;
+                    max-width: 3rem;
+                    padding: .5rem;
+
+                    line-height: 1.5em;
+
+                    border-radius: 4rem;
+    
+                    background: $ms-invert-background;
+                    color: $ms-invert-foreground;
+
+                    text-align: center;
+                    font-weight: bold;
+
+                }
+
+                &__spacer {
+                    min-width: 4rem;
+                    max-width: 4rem;
+                }
+
+                &__arrow {
+                    font-family: $ms-pictos;
+                }
+
+                &__display {
+                    display: block;
+                    height: 3.5rem;
+                    width: 3.5rem;
+                    margin:auto;
+                    padding: .5em 0;
+
+                    border: $ms-border;
+
+                    background: $ms-light;
+
+                    font-size: $ms-font-general;
+                    font-weight: bold;
+                    text-align: center;
+                }
+
+                &__panel {
+                    grid-column: 1 / -1;
+                    position: sticky; 
+                        bottom: 0;
+                    display: flex;
+                        align-items: flex-start;
+                        justify-content: space-around;
+                    padding: $ms-margin-large;
+
+                    border-top: $ms-border-thicker;
+                    background: $ms-light;
+
+                    font-size: $ms-font-large;
+
+                    &item {
+                        text-align: center;
+                    }
+                }
+
+                &__wrapdisplay {
+                    display: flex;
+                    align-items: baseline;
+                }
+
+                &__largelabel {
+                    font-family: $ms-fonts-header;  
+                    font-size: $ms-font-large;
+                    text-align: center;
+                    text-transform: uppercase;
+                    font-weight: bold;
+                }
+
+                &__largedisplay {
+                    display: block;
+
+                    font-size: $ms-font-h1 * 2;
+                    font-weight: bold;
+                    text-align: center;
+
+                    &:empty {
+                        &:before {
+                            content: "-"
+                        }
+                    }
+                }
+
+                &__complete {
+                    grid-column: 1 / -1;
+                    text-align: center;
+
+                    button[type="action"] {
+                        border: $ms-border-thick;
+                        padding: $ms-margin-large;
+
+                        border-radius: 1rem;
+
+                        font-family: $ms-fonts-header;
+                        font-size: $ms-font-h1 * 2;
+                        font-weight: bold;
+                        text-transform: uppercase;
+
+                        &:hover {
+                            color: $ms-accent;
+                            border-color: $ms-accent;
+                        }
+                    }
+                }
+
+                input[type="number"].sheet-ms-shipbuilder__input {
+                    height: 3.5rem;
+                    width: 3.5rem;
+                    margin:auto;
+                    padding: 0;
+
+                    border: $ms-border;
+
+                    text-align: center;
+                }
+            }
+
+            &-shipwrapper {
+                display: grid;
+                    grid-template-columns: .75fr 1fr 1fr;
+                    gap: $ms-margin-large;
+                padding-bottom: 14rem;
+            }
+
+            &-crewwrap {
+                display: grid;
+                    grid-template-rows: auto 3rem 3rem;
+                    gap: $ms-margin-large;
+                    align-items: start;
+            }
+
+            &-shipstats {
+                grid-row: span 3;
+                align-self: start; 
+
+                display: grid; 
+                    gap: $ms-margin-large;
+                    align-items: start;
+
+                .sheet-ms-mainstat {
+                    display: grid;
+                        grid-template-columns: 1fr 3rem;
+                    margin-top: $ms-margin-large * 2;
+                }
+
+                .sheet-ms-topstat--minmax {
+                    gap: .5rem;
+
+                    width: 80%;
+                }
+            }
+
+            &-hullvalues {
+                display: grid;
+                    grid-template-columns: 1fr 1fr 1fr;
+                    gap: $ms-margin-small;
+                width: 80%;
+                margin: auto;
+
+                input[name="attr_hull_toggle"] {
+                    &[value="25"] ~ {
+                        .sheet-ms-topstat--25 {
+                            .sheet-ms-topstat__stat {
+                                border-color: $ms-accent;  
+                            }
+                            .sheet-ms-topstat__label--invert {
+                                background-color: $ms-accent;  
+                            }
+                        }
+                    }
+
+                    &[value="50"] ~ {
+                        .sheet-ms-topstat--50,
+                        .sheet-ms-topstat--25 {
+                            .sheet-ms-topstat__stat {
+                                border-color: $ms-accent;  
+                            }
+                            .sheet-ms-topstat__label--invert {
+                                background-color: $ms-accent;  
+                            }
+                        }
+                    }
+
+                    &[value="75"] ~ {
+                        .sheet-ms-topstat--75,
+                        .sheet-ms-topstat--50,
+                        .sheet-ms-topstat--25 {
+                            .sheet-ms-topstat__stat {
+                                border-color: $ms-accent;  
+                            }
+                            .sheet-ms-topstat__label--invert {
+                                background-color: $ms-accent;  
+                            }
+                        }
+                    }
+                }
+            }
+
+            &-shipcargo {
+                grid-column: span 2;
+            }
+
+            &-shipsecondaries {
+                grid-column: span 2;
+
+                display: grid;
+                    grid-template-columns: 1fr 1fr 1fr 1fr;
+                    gap: $ms-margin;
+                padding: $ms-margin;
+
+                .sheet-ms-topstat {
+                    grid-template-rows: 2em 1fr;
+                    gap: .5em;
+
+                    position: relative;
+                    width: 100%;
+                    margin-bottom: 32px;
+                    padding-bottom: 10px;
+                    
+                    background: $ms-light;
+                    border-radius: 2rem;
+
+                    &__label {
+                        align-self: center;
+                        font-size: $ms-font-general;
+
+                        cursor: pointer;
+
+                        &:hover + .sheet-ms-tooltip {
+                            display: inline-block;
+                            left: calc(50% - 150px);
+                            width: 400px;
+                        }
+                    }
+
+                    &__stat {
+                        margin-bottom: -32px;
+                    }
+                }
+            }
+        }
+    }
+
+    &-npcwrapper {
+        display: block;
+
+        > input {
+            float: right;
+        }
+    }
+
+    &-npcsettings {
+        display: grid;
+            grid-template-columns: 1fr 1fr;
+
+        &__row {
+            display: grid;
+                grid-template-columns: .5fr 1fr;
+                gap: $ms-margin-large;
+            padding: $ms-margin-small;
+            border-bottom: 1px solid $ms-foreground;
+        }
+    }
+
+    &-npcname {
+        display: flex;
+            align-items: center;
+        min-height: 10rem;
+        padding: 2em;
+            padding-bottom: 0;
+            padding-left: 1em;
+
+        background: $ms-invert-background;
+        color: $ms-invert-foreground;
+
+        button[type="action"].sheet-ms-npcname_button {
+            border: none; 
+            background: transparent; 
+            padding: 0 !important;
+            margin: 0;
+
+            color: $ms-foreground;
+
+            font-family: $ms-fonts-header;        
+            font-size: 38pt;
+            color: $ms-invert-foreground;
+            font-weight: bold;
+            text-transform: uppercase;
+
+            &:hover {
+                color: $ms-accent;
+            }
+
+            &:active {
+                padding: 0;
+                margin: 0;
+                text-indent: 0;
+            }
+        }
+
+        button.sheet-ms-npcname_switch,
+        input[type="text"] {
+            display: none; 
+        }
+
+        button.sheet-ms-npcname_switch {
+            height: 4rem;
+            width: 4rem;
+            min-height: 4rem;
+            min-width: 4rem;
+            max-height: 4rem;
+            max-width: 4rem;
+            margin-left: 1rem;
+
+            border: $ms-invert-foreground 3px solid;
+            border-radius: 2rem !important;
+            background: $ms-invert-background;
+            color: $ms-invert-foreground;
+
+            font-size: 14pt;
+            font-weight: bold;
+        }
+
+        input[type="text"][name="attr_character_name"] {
+            max-width: 50%;
+            margin: 0;
+            padding: 0;
+
+            border-bottom: $ms-border-thick !important;
+
+            font-family: $ms-fonts-header;
+            font-size: 24pt !important;
+            font-weight: bold;
+        }
+
+        input[type="hidden"][value="on"] { 
+            & ~ input[type="text"],
+            & ~ button.sheet-ms-npcname_switch {
+                display: block; 
+            }
+            
+            & ~ .sheet-ms-npcname_button {
+                display: none;
+            }
+        }
+    }
+
+
+    &-npcstats {
+        display: grid;
+            grid-template-columns: 1fr 1fr 1fr .75fr;
+            align-items: center;
+            gap: $ms-margin;
+        margin: $ms-margin-large 0;
+
+        .sheet-ms-mainstat {
+            grid-template-columns: 1fr 3em;
+        }
+    }
+
+    &-npcrepeating {
+        display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: $ms-margin-large;
+
+        h3 {
+            border-bottom: $ms-border-thick;
+            margin-bottom: 1rem;
+    
+            font-family: $ms-fonts-header;
+            font-size: 18pt;
+            line-height: 16pt;
+            text-transform: uppercase;
+        }
+
+        .repcontrol {
+            margin: $ms-margin-large 0;
+        }
+    }
+
+    &-npcdescription {
+        h3 {
+            border-bottom: $ms-border-thick;
+            margin-bottom: 1rem;
+    
+            font-family: $ms-fonts-header;
+            font-size: 18pt;
+            line-height: 16pt;
+            text-transform: uppercase;
         }
     }
 }
 
 @import "rolltemplate";
 @import "skillcontrol";
+@import "tabcontrol";

@@ -2,6 +2,108 @@
 
 [GitHub Project Status board](https://github.com/wesbaker/roll20-character-sheets/projects/1)
 
+## 1.9.3
+
+### Fixed
+
+- Fix a bug where "AttackMatrix6:#" appears when rolling dice with DAC
+
+## 1.9.2
+
+### Fixed
+
+- Fix a bug where the modifier inputs would throw validation errors when less than 0
+- Fix a bug where the modifiers could be changed
+
+## 1.9.1
+
+### Fixed
+
+- Fix a bug where the Death/Poison save incorrectly added the modifier
+
+## 1.9.0
+
+### Added
+
+- Add modifiers to attribute scores
+- Add roll button for NPC Reaction
+- Add spells tab
+- Add default sheet setting for default character type
+
+### Changed
+
+- Change rolltemplates to show character name
+- Change button hover color to orange for better contrast
+
+## 1.8.0
+
+### Changed
+
+- Change damage die to a text field to provide more flexibility
+
+## 1.7.1
+
+### Fixed
+
+- Fix a bug where newly created monsters did not have a die button
+
+## 1.7.0
+
+### Added
+
+- Add retainers tab for charisma based retainer modifiers
+- Add prompt for Wisdom bonus on saving throws
+
+### Fixed
+
+- Fix a bug where the spell level input was wider than the space in the grid
+- Fix a bug where setting the default sheet to DAC wouldn't create DAC characters
+
+## 1.6.2
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to new melee weapons
+- Fix a bug where strength and dexterity weapon modifiers didn't change when the attributes changed
+- Fix colored borders shown for skill rolls
+
+## 1.6.1
+
+### Fixed
+
+- Fix a bug where the roll templates were showing nothing
+
+## 1.6.0
+
+### Added
+
+- Add spells per level
+- Add memorized spell number input
+- Add attack value matrix to DAC sheet
+- Add option for individual initiative which accounts for both arbitrary bonus/penalty and dex bonus on players and arbitrary bonus/penalty for monsters
+
+### Changed
+
+- Update OSE Logo
+- Rename Critical Miss / Hit to Natural 1 / 20
+- Change default attributes to 10
+- Change encumbrance calculation to multiply quantity of items by their weight
+- Changed the contents of some placeholders and switched some placeholders to values to reduce confusion
+
+### Fixed
+
+- Fix incorrect or missing attack buttons for DAC sheet
+- Fix buttons not being draggable onto macro bar
+- Fix a bug where the worn checkbox didn't reduce the amount of armor worn when unchecked
+
+## 1.5.1
+
+### Fixed
+
+- Fix a bug where the strength bonus was not added to attack rolls
+- Fix a bug where new characters would have AC of 0
+- Fix armor calculation code to account for worn armor
+
 ## 1.5.0
 
 ### Added

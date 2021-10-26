@@ -17,6 +17,41 @@ The Monster sheet type is meant for monsters, to be used exclusively by the DM. 
 
 ### Changelog
 
+__Version 1.6 (pushed 7/4/2021)__
+
+A couple changes here and there; expect a bigger update in a little while!
+
+Character Sheet
+
+* Miscellaneous aesthetic changes.
+* Fixed a bug with user created macros not showing notes for certain skills.
+* Fixed a bug with CMD not adding dodge or deflection bonuses.
+* Fixed the "Extra MP" feature to be in line with the site changes to the feat.
+* Added Inherent column for Ability Scores section.
+
+__Version 1.5 (pushed 10/26/2020)__
+
+Special thanks to TamedFlame for accomplishing most of this update!
+
+Iterative attacks will be on the next update scheduled before New Years!
+
+Character Sheet
+
+* Spell failure roll on all spells if you have greater than 0% spell failure chance from equipment.
+* Size modifiers are now factored in for Fly and Stealth skills.
+* Added "Racial" trait option.
+* Added spell DC field for spell levels and a modifier for individual spells.
+* Chat display buttons for character traits/feats/class features.
+* Modifiable ability scores for character skills.
+
+Monster Sheet
+
+* Aesthetic changes.
+
+Universal
+
+* Added GM roll toggle under the Sheet Options.
+
 __Version 1.4 (pushed 6/21/2020)__
 
 ##### This update was realized by TamedFlame
