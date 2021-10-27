@@ -8,9 +8,6 @@ rollCombatContact.forEach(button => {
         let exec = [];
         firstExec.push(roll);
 
-        let armure = donneesPJ["Armure"];
-        let armureL = donneesPJ["ArmureLegende"];
-
         var hasArmure = true;
         let hasOptions = true;
         let hasSpecial = true;
@@ -35,7 +32,22 @@ rollCombatContact.forEach(button => {
         let bDegats = [];
         let bViolence = [];
 
-        let listAttrs = [];
+        let listAttrs = [
+            "force",
+            `${ODValue["force"]}`,
+            "discretion",
+            `${ODValue["discretion"]}`,
+            "dexterite",
+            `${ODValue["dexterite"]}`,
+            "tir",
+            `${ODValue["tir"]}`,
+            "combat",
+            `${ODValue["combat"]}`,
+            `energiePJ`,
+            `espoir`,
+        ];
+
+        listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
 
         switch(button) {
             case "poingContact":
@@ -179,7 +191,13 @@ rollCombatContact.forEach(button => {
                 break;
         }
 
-        let attrs = await asw.getAttrs(listAttrs);
+        let attrs = await getAttrsAsync(listAttrs);
+
+        let armure = attrs["armure"];
+        let armureL = attrs["armureLegende"];
+
+        let mod = attrs["jetModifDes"];
+        let hasBonus = attrs["bonusCarac"];
 
         if(button == "repeating_armeCaC:armecontact") {
             name = attrs[`${prefix}ArmeCaC`] || "";
@@ -204,9 +222,22 @@ rollCombatContact.forEach(button => {
         let C4 = attrs[`${prefix}caracteristique4Equipement`] || "0";
         let CPrecis = attrs[`${prefix}caracteristiqueSPrecis`] || "0";
 
+        let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4, CPrecis);
+
+        let CPrecisValues = {
+            "nom":"0",
+            "base":0
+        }
+
+        if(attrsCarac["CO1"]) {
+            CPrecisValues["nom"] = attrsCarac["CO1Nom"];
+            CPrecisValues["base"] = attrsCarac["CO1Base"];
+        }       
+
         if(armure == "sans" || armure == "guardian")
             hasArmure = false;
 
+        
         let isConditionnelA = false;
         let isConditionnelD = false;
         let isConditionnelV = false;
@@ -217,17 +248,9 @@ rollCombatContact.forEach(button => {
         let bonus = [];
 
         let OD = 0;
-        
-        let mod = PJData["jetModifDes"];
-        let hasBonus = PJData["bonusCarac"];
 
         let degats = [];
         let violence = [];
-        
-        let C1Nom = "";
-        let C2Nom = "";
-        let C3Nom = "";
-        let C4Nom = "";
 
         let ODBarbarian = [];
         let ODMALBarbarian = [];
@@ -236,16 +259,16 @@ rollCombatContact.forEach(button => {
         let ODWarrior = [];
         let ODMALWarrior = [];
 
-        let vForce = CaracValue["force"].value;
-        let oForce = CaracValue["force"].VraiOD;
-        let vDiscretion = CaracValue["discretion"].value;
-        let oDiscretion = CaracValue["discretion"].VraiOD;
-        let vDexterite = CaracValue["dexterite"].value;
-        let oDexterite = CaracValue["dexterite"].VraiOD;
-        let vTir = CaracValue["tir"].value;
-        let oTir = CaracValue["tir"].VraiOD;
-        let vCombat = CaracValue["combat"].value;
-        let oCombat = CaracValue["combat"].VraiOD;
+        let vForce = +attrs["force"];
+        let oForce = +attrs[`${ODValue["force"]}`];
+        let vDiscretion = +attrs["discretion"];
+        let oDiscretion = +attrs[`${ODValue["discretion"]}`];
+        let vDexterite = +attrs["dexterite"];
+        let oDexterite = +attrs[`${ODValue["dexterite"]}`];
+        let vTir = +attrs["tir"];
+        let oTir = +attrs[`${ODValue["tir"]}`];
+        let vCombat = +attrs["combat"];
+        let oCombat = +attrs[`${ODValue["combat"]}`];
 
         let attaquesSurprises = [];
         let attaquesSurprisesValue = [];
@@ -304,8 +327,8 @@ rollCombatContact.forEach(button => {
 
         let pasEnergie = false;
         let sEnergieText = "";
-        let energie = PJData["energiePJ"];
-        let espoir = PJData["espoir"];
+        let energie = attrs["energiePJ"];
+        let espoir = attrs["espoir"];
 
         let autresEffets = [];
         let autresAmeliorationsS = [];
@@ -315,66 +338,64 @@ rollCombatContact.forEach(button => {
         if(hasArmure)
             exec.push("{{OD=true}}");
 
-        if(C1 != "0") {
-            C1Nom = C1.slice(2, -1);
+        let C1Nom = "";
+        let C2Nom = "";
+        let C3Nom = "";
+        let C4Nom = "";
 
-            let C1Value = Number(CaracValue[C1Nom].value);
-            let C1OD = Number(CaracValue[C1Nom].OD);
+        if(attrsCarac["C1"]) {
+            C1Nom = attrsCarac["C1Brut"];
 
-            cBase.push(CaracNom[C1Nom]);
+            let C1Value = attrsCarac["C1Base"];
+            let C1OD = attrsCarac["C1OD"];
+
+            cBase.push(attrsCarac["C1Nom"]);
             cRoll.push(C1Value);
 
             if(hasArmure)
                 OD += C1OD;
-        };
+        }
 
-        if(C2 != "0") {
-            C2Nom = C2.slice(2, -1);
+        if(attrsCarac["C2"]) {
+            C2Nom = attrsCarac["C2Brut"];
 
-            let C2Value = Number(CaracValue[C2Nom].value);
-            let C2OD = Number(CaracValue[C2Nom].OD);
+            let C2Value = attrsCarac["C2Base"];
+            let C2OD = attrsCarac["C2OD"];
 
-            cBase.push(CaracNom[C2Nom]);
+            cBase.push(attrsCarac["C2Nom"]);
             cRoll.push(C2Value);
 
             if(hasArmure)
                 OD += C2OD;
         }
 
-        if(hasBonus == 1 || hasBonus == 2) {
-            if(C3 != "0") {
-                C3Nom = C3.slice(2, -1);
+        if(attrsCarac["C3"]) {
+            C3Nom = attrsCarac["C3Brut"];
 
-                let C3Value = Number(CaracValue[C3Nom].value);
-                let C3OD = Number(CaracValue[C3Nom].OD);
+            let C3Value = attrsCarac["C3Base"];
+            let C3OD = attrsCarac["C3OD"];
 
-                cBonus.push(CaracNom[C3Nom]);
-                cRoll.push(C3Value);
+            cBonus.push(attrsCarac["C3Nom"]);
+            cRoll.push(C3Value);
 
-                if(hasArmure)
-                    OD += C3OD;
-            }
-
-            if(hasBonus == 2) {
-                if(C4 != "0") {
-                    C4Nom = C4.slice(2, -1);
-
-                    let C4Value = Number(CaracValue[C4Nom].value);
-                    let C4OD = Number(CaracValue[C4Nom].OD);
-
-                    cBonus.push(CaracNom[C4Nom]);
-                    cRoll.push(C4Value);
-    
-                    if(hasArmure)
-                        OD += C4OD;
-                }
-            }
+            if(hasArmure)
+                OD += C3OD;
         }
 
-        if(OD.length == 0)
-            exec.push("{{vOD=0}}");
-        else
-            exec.push("{{vOD="+OD+"}}");
+        if(attrsCarac["C4"]) {
+            C4Nom = attrsCarac["C4Brut"];
+
+            let C4Value = attrsCarac["C4Base"];
+            let C4OD = attrsCarac["C4OD"];
+
+            cBonus.push(attrsCarac["C4Nom"]);
+            cRoll.push(C4Value);
+
+            if(hasArmure)
+                OD += C4OD;
+        }
+
+        exec.push("{{vOD="+OD+"}}");
 
         if(mod != 0) {
             cRoll.push(mod);
@@ -570,7 +591,7 @@ rollCombatContact.forEach(button => {
 
         //GESTION DU STYLE
 
-        let getStyle = getStyleContactMod(PJData, CPrecis, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
+        let getStyle = getStyleContactMod(attrs, CPrecisValues, baseDegats, baseViolence, hasArmure, oCombat, isEAkimbo, isEAmbidextrie, isAAgressive, isAJumelle, isASoeur, isAProtectrice, isEDeuxMains, isAAllegee, isELourd);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -652,7 +673,7 @@ rollCombatContact.forEach(button => {
 
         //GESTION DES BONUS D'ARMURE
 
-        let armorBonus = getArmorBonus(PJData, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let armorBonus = getArmorBonus(attrs, armure, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(armorBonus.exec);
         cRoll = cRoll.concat(armorBonus.cRoll);
@@ -677,7 +698,7 @@ rollCombatContact.forEach(button => {
         ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
 
-        let MALBonus = getMALBonus(PJData, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let MALBonus = getMALBonus(attrs, armureL, isELumiere, isASLumiere, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(MALBonus.exec);
         cRoll = cRoll.concat(MALBonus.cRoll);
@@ -716,6 +737,12 @@ rollCombatContact.forEach(button => {
         bonus = bonus.concat(ODMALShaman);
         bonus = bonus.concat(ODWarrior);
         bonus = bonus.concat(ODMALWarrior);
+
+        if(diceDegats < 0)
+            diceDegats = 0;
+
+        if(diceViolence < 0)
+            diceViolence = 0;
 
         degats.push(`${diceDegats}D6`);
         degats = degats.concat(bDegats);

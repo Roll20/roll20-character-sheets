@@ -31,7 +31,7 @@ rollCombatAutrePNJ.forEach(button => {
 
         listAttrs = listAttrs.concat(effet, effetValue, AA, AAValue, special, specialValue);
 
-        let attrs = await asw.getAttrs(listAttrs);
+        let attrs = await getAttrsAsync(listAttrs);
 
         let name = attrs[`${prefix}ArmeAutre`] || ``;
         let portee = attrs[`${prefix}armeAutrePortee`] || `^{portee-contact}`;
@@ -272,6 +272,12 @@ rollCombatAutrePNJ.forEach(button => {
         
         exec.push(`{{OD=true}}`);
         exec.push(`{{vOD=${OD}}}`);
+
+        if(diceDegats < 0)
+            diceDegats = 0;
+
+        if(diceViolence < 0)
+            diceViolence = 0;
 
         degats.push(`${diceDegats}D6`);
         degats = degats.concat(bDegats);

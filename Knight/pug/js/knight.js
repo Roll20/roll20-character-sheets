@@ -1,1787 +1,1281 @@
-
-on("change:armure change:armureLegende"
-, function() 
+on("change:armure", async function(newArmure) 
 {
-    getAttrs(["armure", "armureLegende", "warmaster150PG", "warmaster250PG"], function(value)
+    const armureName = newArmure.newValue;
+
+    const dArmureModif = listDonneesArmures.map(a => `${armureName}-${a}-modif`);
+    const dArmureActuel = listDonneesArmures.map(a => `${armureName}-${a}-actuel`);
+    
+    let listAttrs = [`warmaster150PG`, `warmaster250PG`];
+    listAttrs = listAttrs.concat(dArmureModif, dArmureActuel);
+
+    const attrs = await getAttrsAsync(listAttrs);
+
+    const warmaster150 = +attrs["warmaster150PG"];
+    const warmaster250 = +attrs["warmaster250PG"];
+
+    const armureActuel = +attrs[`${armureName}-armure-actuel`] || 0;
+    const energieActuel = +attrs[`${armureName}-energie-actuel`] || 0;
+
+    const armureModif = +attrs[`${armureName}-armure-modif`] || 0;
+    const energieModif = +attrs[`${armureName}-energie-modif`] || 0;
+    const cdfModif = +attrs[`${armureName}-cdf-modif`] || 0;
+
+    const armurePJMax = +dataArmure[armureName].armureMax || 0;
+    const energiePJMax = +dataArmure[armureName].energieMax || 0;
+    const cdfPJMax = +dataArmure[armureName].cdfMax || 0;
+
+    let totalArmure = 0;
+    let totalEnergie = 0;
+    let totalCdf = 0;
+
+    totalArmure = armurePJMax+armureModif;
+    totalCdf = cdfPJMax+cdfModif;
+
+    if(armureName == "warmaster")
+        totalEnergie = energiePJMax+warmaster150+warmaster250+energieModif;
+    else
+        totalEnergie = energiePJMax+energieModif;
+
+    let sTete = 0;
+    let sBG = 0;
+    let sTorse = 0;
+    let sJG = 0;
+    let sBD = 0;
+    let sJD = 0;
+
+    switch(armureName)
     {
-        const Arm = value["armure"];
-        const ArmL = value["armureLegende"];
+        case "barbarian":			
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "bard":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "berserk":					
+            sTete = 6;
+            sBG = 6;
+            sTorse = 10;
+            sJG = 6;
+            sBD = 6;
+            sJD = 6;
+            break;
+        case "druid":						
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "monk":					
+            sTete = 7;
+            sBG = 8;
+            sTorse = 10;
+            sJG = 6;
+            sBD = 8;
+            sJD = 6;
+            break;
+        case "necromancer":					
+            sTete = 12;
+            sBG = 12;
+            sTorse = 12;
+            sJG = 12;
+            sBD = 12;
+            sJD = 12;
+            break;
+        case "paladin":					
+            sTete = 7;
+            sBG = 7;
+            sTorse = 10;
+            sJG = 7;
+            sBD = 7;
+            sJD = 7;
+            break;
+        case "priest":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;            
+            break;
+        case "psion":					
+            sTete = 7;
+            sBG = 10;
+            sTorse = 12;
+            sJG = 7;
+            sBD = 10;
+            sJD = 7;
+            break;
+        case "ranger":					
+            sTete = 4;
+            sBG = 4;
+            sTorse = 6;
+            sJG = 4;
+            sBD = 4;
+            sJD = 4;
+            break;
+        case "rogue":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "shaman":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "sorcerer":					
+            sTete = 7;
+            sBG = 8;
+            sTorse = 10;
+            sJG = 6;
+            sBD = 8;
+            sJD = 6;
+            break;
+        case "warlock":					
+            sTete = 5;
+            sBG = 8;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 8;
+            sJD = 5;
+            break;
+        case "warmaster":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+        case "warrior":					
+            sTete = 7;
+            sBG = 10;
+            sTorse = 12;
+            sJG = 7;
+            sBD = 10;
+            sJD = 7;
+            break;
+        case "wizard":					
+            sTete = 5;
+            sBG = 5;
+            sTorse = 8;
+            sJG = 5;
+            sBD = 5;
+            sJD = 5;
+            break;
+    }
 
-        donneesPJ["Armure"] = Arm;
-        donneesPJ["ArmureLegende"] = ArmL;
+    let newAttrs = {
+        armurePJ:armureActuel,
+        armurePJ_max:totalArmure,
+        armurePJModif:armureModif,
+        energiePJ:energieActuel,
+        energiePJ_max:totalEnergie,
+        energiePJModif:energieModif,
+        cdfPJ:totalCdf,
+        cdfPJ_max:totalCdf,
+        cdfPJModif:cdfModif,
+        barbarianGoliath:0,
+        berserkIlluminationBeaconA:0,
+        berserkIlluminationTorchA:0,
+        berserkIlluminationProjectorA:0,
+        berserkIlluminationLighthouseA:0,
+        berserkIlluminationLanternA:0,
+        berserkRageA:0,
+        shamanNbreTotem:0,
+        shamanAscension:0,
+        sorcererMMVolNuee: 0,
+        sorcererMMPhase: 0,
+        sorcererMMEtirement: 0,
+        sorcererMMCorpMetal: 0,
+        sorcererMMCorpFluide: 0,
+        sorcererMMPMGuerre: 0,
+        sorcererMM250PG: 0,
+        warlockForward: 0,
+        warlockRecord: 0,
+        warlockRewind: 0,
+        warmasterImpFPersonnel:0,
+        warmasterImpGPersonnel:0,
+        warriorSoldierA:0,
+        warriorHunterA:0,
+        warriorScholarA:0,
+        warriorHeraldA:0,
+        warriorScoutA:0,
+        MALShamanNbreTotem:0,
+        MALWarriorSoldierA:0,
+        MALWarriorHunterA:0,
+        MALWarriorScholarA:0,
+        MALWarriorHeraldA:0,
+        MALWarriorScoutA:0,
+        MALWarmasterImpFPersonnel:0,
+        MALWarmasterImpGPersonnel:0,
+        MALRogueGhost:0,
+        rogueGhost:0,
+        MALBarbarianGoliath:0,
+        slotTeteMax:sTete,
+        slotTorseMax:sTorse,
+        slotJGMax:sJG,
+        slotJDMax:sJD,
+        slotBGMax:sBG,
+        slotBDMax:sBD,
+    }
+
+    await setAttrsAsync(newAttrs);
+});
+
+const listDonneesArmures = ["armure", "energie", "cdf"];
+
+listDonneesArmures.forEach(data => {
+    on(`change:${data}pj sheet:opened`, async ()=>{
+        const attrs = await getAttrsAsync([`${data}PJ`, "armure"]);
+        const armure = attrs["armure"];
+
+        let nValue = {};
+        nValue[`${armure}-${data}-actuel`] = +attrs[`${data}PJ`];
+
+        await setAttrsAsync(nValue);
+    });
+
+    on(`change:${data}pjmodif sheet:opened`, async ()=>{
+        const attrs = await getAttrsAsync([`${data}PJModif`, "armure"]);
+        const armure = attrs["armure"];
     
-        switch(Arm)
-        {
-            case "barbarian":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "bard":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "berserk":					
-                    setAttrs({
-                    slotTeteMax:6,
-                    slotTete:6,
-                    slotBGMax:6,
-                    slotBG:6,
-                    slotTorse:10,
-                    slotTorseMax:10,
-                    slotJG:6,
-                    slotJGMax:6,
-                    slotBD:6,
-                    slotBDMax:6,
-                    slotJDMax:6,
-                    slotJD:6
-                    });
-                break;
-            case "druid":						
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "monk":					
-                    setAttrs({
-                    slotTeteMax:7,
-                    slotTete:7,
-                    slotBGMax:8,
-                    slotBG:8,
-                    slotTorse:10,
-                    slotTorseMax:10,
-                    slotJG:6,
-                    slotJGMax:6,
-                    slotBD:8,
-                    slotBDMax:8,
-                    slotJDMax:6,
-                    slotJD:6
-                    });
-                break;
-            case "necromancer":					
-                    setAttrs({
-                    slotTeteMax:12,
-                    slotTete:12,
-                    slotBGMax:12,
-                    slotBG:12,
-                    slotTorse:12,
-                    slotTorseMax:12,
-                    slotJG:12,
-                    slotJGMax:12,
-                    slotBD:12,
-                    slotBDMax:12,
-                    slotJDMax:12,
-                    slotJD:12
-                    });
-                break;
-            case "paladin":					
-                    setAttrs({
-                    slotTeteMax:7,
-                    slotTete:7,
-                    slotBGMax:7,
-                    slotBG:7,
-                    slotTorse:10,
-                    slotTorseMax:10,
-                    slotJG:7,
-                    slotJGMax:7,
-                    slotBD:7,
-                    slotBDMax:7,
-                    slotJDMax:7,
-                    slotJD:7
-                    });
-                break;
-            case "priest":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "psion":					
-                    setAttrs({
-                    slotTeteMax:7,
-                    slotTete:7,
-                    slotBGMax:10,
-                    slotBG:10,
-                    slotTorse:12,
-                    slotTorseMax:12,
-                    slotJG:7,
-                    slotJGMax:7,
-                    slotBD:10,
-                    slotBDMax:10,
-                    slotJDMax:7,
-                    slotJD:7
-                    });
-                break;
-            case "ranger":					
-                    setAttrs({
-                    slotTeteMax:4,
-                    slotTete:4,
-                    slotBGMax:4,
-                    slotBG:4,
-                    slotTorse:6,
-                    slotTorseMax:6,
-                    slotJG:4,
-                    slotJGMax:4,
-                    slotBD:4,
-                    slotBDMax:4,
-                    slotJDMax:4,
-                    slotJD:4
-                    });
-                break;
-            case "rogue":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "shaman":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "sorcerer":					
-                    setAttrs({
-                    slotTeteMax:7,
-                    slotTete:7,
-                    slotBGMax:8,
-                    slotBG:8,
-                    slotTorse:10,
-                    slotTorseMax:10,
-                    slotJG:6,
-                    slotJGMax:6,
-                    slotBD:8,
-                    slotBDMax:8,
-                    slotJDMax:6,
-                    slotJD:6
-                    });
-                break;
-            case "warlock":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:8,
-                    slotBG:8,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:8,
-                    slotBDMax:8,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "warmaster":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            case "warrior":					
-                    setAttrs({
-                    slotTeteMax:7,
-                    slotTete:7,
-                    slotBGMax:10,
-                    slotBG:10,
-                    slotTorse:12,
-                    slotTorseMax:12,
-                    slotJG:7,
-                    slotJGMax:7,
-                    slotBD:10,
-                    slotBDMax:10,
-                    slotJDMax:7,
-                    slotJD:7
-                    });
-                break;
-            case "wizard":					
-                    setAttrs({
-                    slotTeteMax:5,
-                    slotTete:5,
-                    slotBGMax:5,
-                    slotBG:5,
-                    slotTorse:8,
-                    slotTorseMax:8,
-                    slotJG:5,
-                    slotJGMax:5,
-                    slotBD:5,
-                    slotBDMax:5,
-                    slotJDMax:5,
-                    slotJD:5
-                    });
-                break;
-            default:
-                setAttrs({
-                    slotTeteMax:0,
-                    slotTete:0,
-                    slotBGMax:0,
-                    slotBG:0,
-                    slotTorse:0,
-                    slotTorseMax:0,
-                    slotJG:0,
-                    slotJGMax:0,
-                    slotBD:0,
-                    slotBDMax:0,
-                    slotJDMax:0,
-                    slotJD:0
-                    });
-                break;
-        }
+        let nValue = {};
+        nValue[`${armure}-${data}-modif`] = +attrs[`${data}PJModif`];
         
-        const W150PG = parseInt(value["warmaster150PG"],10)||0;
-        const W250PG = parseInt(value["warmaster250PG"],10)||0;
+        await setAttrsAsync(nValue);
+    });
+});
+
+//ARMURE
+on("change:armurePJModif", async ()=>{
     
-        const armModif = armure[Arm]["armureModif"];
-        const eneModif = armure[Arm]["energieModif"];
-        const cdfModif = armure[Arm]["cdfModif"];
-        
-        var totalEnergie = armure[Arm]["energieMax"]+eneModif;
-        
-        if(Arm == "warmaster")
-        {
-            if(W150PG != 0)
-                totalEnergie = armure[Arm]["energieMax150"]+eneModif;
+    const attrs = await getAttrsAsync([`armurePJModif`, "armure"]);
+    const armure = attrs["armure"];
+    const modif = +attrs["armurePJModif"];
+
+    let armureValue = +dataArmure[armure].armureMax+modif;;
+
+    await setAttrsAsync({armurePJ_max:armureValue});
+});
+
+//ENERGIE
+on("change:energiePJModif change:warmaster150PG change:warmaster250PG", async ()=>{
+
+    const attrs = await getAttrsAsync(["armure", `warmaster150PG`, `warmaster250PG`, `energiePJModif`]);
+    const armure = attrs["armure"];
+
+    const warmaster150 = +attrs["warmaster150PG"];
+    const warmaster250 = +attrs["warmaster250PG"];
+    const modif = +attrs["energiePJModif"];
+
+    let energie = 0;
+
+    if(armure == "warmaster")
+        energie = +dataArmure[armure].energieMax+warmaster150+warmaster250+modif;
+    else
+        energie = +dataArmure[armure].energieMax+modif;
+
+    await setAttrsAsync({energiePJ_max:energie});
+});
+
+//CDF
+on("change:cdfPJModif change:barbarianGoliath change:MALBarbarianGoliath change:warmasterImpFPersonnel change:warmasterImpForce change:MALWarmasterImpFPersonnel change:MALWarmasterImpForce change:sorcererMMCorpMetal change:sorcerer150PG change:sorcererMM250PG", async ()=>{
+    
+    const attrs = await getAttrsAsync(["armure", "armureLegende", `cdfPJModif`, `barbarianGoliath`, `MALBarbarianGoliath`, `sorcererMMCorpMetal`, `sorcerer150PG`, `sorcererMM250PG`, `warmasterImpFPersonnel`, `warmasterImpForce`,`MALWarmasterImpFPersonnel`, `MALWarmasterImpForce`]);
+
+    const armure = attrs["armure"];
+    const armureL = attrs["armureLegende"];
+
+    const max = +dataArmure[armure].cdfMax;
+    const modif = +attrs[`cdfPJModif`];
+
+    const goliath = +attrs[`barbarianGoliath`];
+    const goliathMAL = +attrs[`MALBarbarianGoliath`];
+
+    const corpMetal = attrs[`sorcererMMCorpMetal`];
+    const CM150PG = attrs[`sorcerer150PG`];
+    const CM250PG = attrs[`sorcererMM250PG`];
+
+    const warmasterForce = attrs[`warmasterImpForce`];
+    const warmasterForcePers = +attrs[`warmasterImpFPersonnel`];
+
+    const warmasterForceMAL = attrs[`MALWarmasterImpForce`];
+    const warmasterForcePersMAL = +attrs[`MALWarmasterImpFPersonnel`];
+
+    let total = max+modif;
+
+    switch(armure) {
+        case "barbarian":
+            total += goliath;
+            break;
+
+        case "sorcerer":
+            if(corpMetal != 0 || CM250PG != 0)
+            {
+                total += 2;
                 
-            if(W250PG != 0)
-                totalEnergie = armure[Arm]["energieMax250"]+eneModif;
-        }
+                if(CM150PG != 0)
+                    total += 2;
+            }
+            break;
 
-        setAttrs({
-            armurePJ:armure[Arm]["armure"],
-            armurePJ_max:armure[Arm]["armureMax"]+armModif,
-            armurePJModif:armure[Arm]["armureModif"],
-            energiePJ:armure[Arm]["energie"],
-            energiePJ_max:totalEnergie,
-            energiePJModif:armure[Arm]["energieModif"],
-            cdfPJ:armure[Arm]["cdf"]+cdfModif,
-            cdfPJ_max:armure[Arm]["cdfMax"]+cdfModif,
-            cdfPJModif:armure[Arm]["cdfModif"],
-            barbarianGoliath:0,
-            berserkIlluminationBeaconA:0,
-            berserkIlluminationTorchA:0,
-            berserkIlluminationProjectorA:0,
-            berserkIlluminationLighthouseA:0,
-            berserkIlluminationLanternA:0,
-            berserkRageA:0,
-            shamanNbreTotem:0,
-            shamanAscension:0,
+        case "warmaster":
+            if(warmasterForce == "on" && warmasterForcePers != 0)
+                total += warmasterForcePers;
+            break;
+    }
+
+    switch(armureL) {
+        case "barbarian":
+            total += goliathMAL;
+            break;
+
+        case "warmaster":
+            if(warmasterForceMAL == "on" && warmasterForcePersMAL != 0)
+                total += warmasterForcePersMAL;
+            break;
+    }
+
+    await setAttrsAsync({
+        cdfPJ:total,
+        cdfPJ_max:total
+    });
+});
+
+//ESPOIR
+on("change:espoirModif change:fichePNJ change:armure change:berserk250PG", async function() 
+{
+    const attrs = await getAttrsAsync([`armure`, `espoirModif`, `fichePNJ`, `berserk250PG`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+
+    const armure = attrs["Armure"];
+
+    const modif = +attrs[`espoirModif`];
+
+    const berserk250PG = attrs[`berserk250PG`];
+
+    let max = 50;
+    let bonus = 0;
+    
+    let newAttrs = {};
+
+    switch(armure) {
+        case "berserk":
+            if(berserk250PG == "on")
+                bonus = 25;
+            else
+                bonus = 15;
+            break;
+
+        case "necromancer":
+                max = 10;
+            break;
+    }
+
+    newAttrs[`espoir_max`] = max+modif+bonus;
+
+    await setAttrsAsync(newAttrs);
+});
+
+//EGIDE
+on("change:fichePNJ change:armure change:berserkNiveaux change:berserkRageN1Egide change:berserkRageN2Egide change:berserkRageN3Egide", async ()=>{
+
+    const attrs = await getAttrsAsync([`armure`, `fichePNJ`, `berserkNiveaux`, `berserkRageN1Egide`, `berserkRageN2Egide`, `berserkRageN3Egide`]);
+    
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+    
+    const armure = attrs["armure"];
+
+    const rage = +attrs[`berserkNiveaux`];
+    const N1 = +attrs[`berserkRageN1Egide`];
+    const N2 = +attrs[`berserkRageN2Egide`];
+    const N3 = +attrs[`berserkRageN3Egide`];
+
+    let egide = 0;
+
+    if(armure == "berserk") 
+    {
+        switch(rage) {
+            case 1:
+                egide += N1;
+                break;
+
+            case 2:
+                egide += N2;
+                break;
+
+            case 3:
+                egide += N3;
+                break;
+        }
+    }
+
+    await setAttrsAsync({egideBonus:egide});
+});
+
+//DEFENSE
+on("change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkRageA change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:MADDjinnNanobrumeActive", async ()=>{
+
+    const attrs = await getAttrsAsync([`defense`, `defensePNJ`, `defBM`, `bonusDefense`, `defenseModifPerso`, `defenseODBonus`, 
+    `fichePNJ`, `armure`, "armureLegende",
+    `barbarianDef`, 
+    `MALBarbarianDef`, 
+    `berserkRageA`, `berserkNiveaux`, `berserkRageN1DR`, `berserkRageN2DR`, `berserkRageN3DR`,
+    `sorcererMMCorpFluide`, `sorcerer150PG`, `sorcerer250PG`,`sorcererMM250PG`,
+    `warmasterImpEsquive`, `warmasterImpEPersonnel`, 
+    `MALWarmasterImpEsquive`, `MALWarmasterImpEPersonnel`,
+    `MasquePNJAE`, `MasquePNJAEMaj`,
+    `MADDjinnNanobrumeActive`]);
+    
+    const fiche = +attrs[`fichePNJ`];
+    
+    const basePJ = +attrs[`defense`];
+    const basePNJ = +attrs[`defensePNJ`];
+
+    const modifStyle = parseInt(attrs["defBM"], 10) ||0;
+    const modifAutre = parseInt(attrs["bonusDefense"], 10) ||0;
+    const modifPJ = +attrs[`defenseModifPerso`];
+    const modifOD = parseInt(attrs["defenseODBonus"], 10) ||0;
+
+    const armure = attrs[`armure`];
+    const armureL = attrs[`armureLegende`];
+
+    const goliath = +attrs[`barbarianDef`];
+    const MALGoliath = +attrs[`MALBarbarianDef`];
+
+    const berserkRage = attrs[`berserkRageA`];
+    const berserkNiveau = attrs[`berserkNiveaux`];
+    const berserkRageN1 = +attrs[`berserkRageN1DR`];
+    const berserkRageN2 = +attrs[`berserkRageN2DR`];
+    const berserkRageN3 = +attrs[`berserkRageN3DR`];
+
+    const sorcererCorpFluide = attrs[`sorcererMMCorpFluide`];
+    const sorcerer150PG = attrs[`sorcerer150PG`];
+    const sorcerer250PG = attrs[`sorcerer250PG`];
+    const sorcererMM250PG = +attrs[`sorcererMM250PG`];
+
+    const warmasterEsquive = attrs[`warmasterImpEsquive`];
+    const warmasterEsquiveP = +attrs[`warmasterImpEPersonnel`];
+
+    const MALWarmasterEsquive = attrs[`MALWarmasterImpEsquive`];
+    const MALWarmasterEsquiveP = +attrs[`MALWarmasterImpEPersonnel`];
+
+    const masqueAE = +attrs[`MasquePNJAE`];
+    const masqueAEMaj = +attrs[`MasquePNJAEMaj`];
+
+    const mechaArmureNanoBrume = attrs[`MADDjinnNanobrumeActive`];
+
+    let base = 0;
+    let modif = 0;
+    let modifS = 0;
+    let totalMecha = 0;
+    let total = 0;
+
+    switch(fiche) {
+        case 0:
+            base += basePJ;
+            modifS += modifPJ;
+            totalMecha = basePJ+modifAutre+modifOD;
+
+            switch(armure) {
+                case "sans":
+                case "guardian":
+                    modif = modifStyle+modifAutre;
+                    break;
+
+                default:
+                    modif = modifStyle+modifAutre+modifOD;
+                    break;
+            }
+
+            if(armure == "barbarian")
+                modif -= goliath;
+
+            if(armure == "berserk" && berserkRage == "on") {
+                if(berserkNiveau == 1)
+                    modif -= berserkRageN1;
+                else if(berserkNiveau == 2)
+                    modif -= berserkRageN2;
+                else if(berserkNiveau == 3)
+                    modif -= berserkRageN3;
+            }
+
+            if(armure == "sorcerer") {
+                if(sorcerer250PG == "on") {
+                    if(sorcererMM250PG == 1) {
+                        modif += 2;
+
+                        if(sorcerer150PG != "0")
+                            modif += 1;
+                    }
+                } else if(sorcererCorpFluide != "0") {
+                        modif += 2;
+                        
+                        if(sorcerer150PG != "0")
+                            modif += 1;
+                }
+            }
+
+            if(armure == "warmaster" && warmasterEsquive != "0" && warmasterEsquiveP != "0")                      
+                modif += 2;
+
+            if(armureL == "warmaster" && MALWarmasterEsquive != "0" && MALWarmasterEsquiveP != "0")
+                modif += 2;
+                
+            if(armureL == "barbarian")
+                modif -= MALGoliath;
+                
+            if(mechaArmureNanoBrume == 1)
+                totalMecha += 3;
+            break;
+        case 1:
+        case 2:
+            base += basePNJ;
+            modifS += modifPJ;
+            modif += modifAutre+masqueAE+masqueAEMaj;
+            break;
+
+        case 3:
+            base += basePNJ;
+            modifS += modifPJ;
+            modif += masqueAE+masqueAEMaj;
+            break;
+    }
+
+    total += Math.max(base+modif+modifS, 0);
+
+    await setAttrsAsync({
+        defenseModif: modif,
+        defenseTotal: total,
+        mechaArmureDefense: totalMecha
+    });
+});
+
+//REACTION
+on("change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:MADDjinnNanobrumeActive", async ()=>{
+
+    const attrs = await getAttrsAsync([`reaction`, `reactionPNJ`, `rctBM`, `bonusReaction`, `reactionModifPerso`, `reactionODBonus`, 
+    `fichePNJ`, `armure`, "armureLegende",
+    `barbarianRea`, 
+    `MALBarbarianRea`, 
+    `berserkRageA`, `berserkNiveaux`, `berserkRageN1DR`, `berserkRageN2DR`, `berserkRageN3DR`,
+    `paladinWatchtower`,
+    `sorcererMMCorpFluide`, `sorcerer150PG`, `sorcerer250PG`,`sorcererMM250PG`,
+    `warmasterImpEsquive`, `warmasterImpEPersonnel`, 
+    `MALWarmasterImpEsquive`, `MALWarmasterImpEPersonnel`,
+    `MachinePNJAE`, `MachinePNJAEMaj`,
+    `MADDjinnNanobrumeActive`]);
+
+    const fiche = +attrs[`fichePNJ`];
+    
+    const basePJ = +attrs[`reaction`];
+    const basePNJ = +attrs[`reactionPNJ`];
+
+    const modifStyle = parseInt(attrs["rctBM"], 10) ||0;
+    const modifAutre = parseInt(attrs["bonusReaction"], 10) ||0;
+    const modifPJ = +attrs[`reactionModifPerso`];
+    const modifOD = parseInt(attrs["reactionODBonus"], 10) ||0;
+
+    const armure = attrs[`armure`];
+    const armureL = attrs[`armureLegende`];
+
+    const goliath = +attrs[`barbarianRea`];
+    const MALGoliath = +attrs[`MALBarbarianRea`];
+
+    const berserkRage = attrs[`berserkRageA`];
+    const berserkNiveau = attrs[`berserkNiveaux`];
+    const berserkRageN1 = +attrs[`berserkRageN1DR`];
+    const berserkRageN2 = +attrs[`berserkRageN2DR`];
+    const berserkRageN3 = +attrs[`berserkRageN3DR`];
+
+    const paladinWatchtower = attrs[`paladinWatchtower`];
+
+    const sorcererCorpFluide = attrs[`sorcererMMCorpFluide`];
+    const sorcerer150PG = attrs[`sorcerer150PG`];
+    const sorcerer250PG = attrs[`sorcerer250PG`];
+    const sorcererMM250PG = +attrs[`sorcererMM250PG`];
+
+    const warmasterEsquive = attrs[`warmasterImpEsquive`];
+    const warmasterEsquiveP = +attrs[`warmasterImpEPersonnel`];
+
+    const MALWarmasterEsquive = attrs[`MALWarmasterImpEsquive`];
+    const MALWarmasterEsquiveP = +attrs[`MALWarmasterImpEPersonnel`];
+
+    const machineAE = +attrs[`MachinePNJAE`];
+    const machineAEMaj = +attrs[`MachinePNJAEMaj`];
+
+    const mechaArmureNanoBrume = attrs[`MADDjinnNanobrumeActive`];
+
+    let base = 0;
+    let modif = 0;
+    let modifS = 0;
+    let totalMecha = 0;
+    let total = 0;
+
+    switch(fiche) {
+        case 0:
+            base += basePJ;
+            modifS += modifPJ;
+            totalMecha += basePJ+modifAutre+modifOD;
+
+            switch(armure) {
+                case "sans":
+                case "guardian":
+                    modif = modifStyle+modifAutre;
+                    break;
+
+                default:
+                    modif = modifStyle+modifAutre+modifOD;
+                    break;
+            }
+
+            if(armure == "barbarian")
+                modif -= goliath;
+
+            if(armure == "berserk" && berserkRage == "on") {
+                if(berserkNiveau == 1)
+                    modif -= berserkRageN1;
+                else if(berserkNiveau == 2)
+                    modif -= berserkRageN2;
+                else if(berserkNiveau == 3)
+                    modif -= berserkRageN3;
+            }
+
+            if(armure == "sorcerer") {
+                if(sorcerer250PG == "on") {
+                    if(sorcererMM250PG == 1) {
+                        modif += 2;
+
+                        if(sorcerer150PG != "0")
+                            modif += 1;
+                    }
+                } else if(sorcererCorpFluide != "0") {
+                        modif += 2;
+                        
+                        if(sorcerer150PG != "0")
+                            modif += 1;
+                }
+            }
+
+            if(armure == "warmaster" && warmasterEsquive != "0" && warmasterEsquiveP != "0")                      
+                modif += 2;
+
+            if(armureL == "warmaster" && MALWarmasterEsquive != "0" && MALWarmasterEsquiveP != "0")
+                modif += 2;
+                
+            if(armureL == "barbarian")
+                modif -= MALGoliath;
+
+            if(armure == "paladin" && paladinWatchtower == "Activé") {
+                let temp = base+modif+modifS;
+
+                modif -= Math.ceil(temp/2);
+            }
+                
+            if(mechaArmureNanoBrume == 1)
+                totalMecha += 3;            
+            break;
+        case 1:
+        case 2:
+            base += basePNJ;
+            modifS += modifPJ;
+            modif += modifAutre+machineAE+machineAEMaj;
+            break;
+
+        case 3:
+            base += basePNJ;
+            modifS += modifPJ;
+            modif += machineAE+machineAEMaj;
+            break;
+    }
+
+    total += Math.max(base+modif+modifS, 0);
+
+    await setAttrsAsync({
+        reactionModif: modif,
+        reactionTotal: total,
+        mechaArmureReaction: totalMecha
+    });
+});
+
+//RESILIENCE
+on("clicked:calculResilienceFinal", async ()=>{
+    const attrs = await getAttrsAsync([`listeTypePNJ`, `armurePNJ_max`, `santePNJ_max`]);
+
+    const type = +attrs["listeTypePNJ"];
+    const armure = +attrs["armurePNJ_max"];
+    const sante = +attrs["santePNJ_max"];
+
+    let total = 0;
+
+    switch(type)
+    {
+        case 1:
+            if(sante > 0)
+                total = Math.floor(sante/10);
+            else
+                total = Math.floor(armure/10);
+            break;
+            
+        case 2:
+            if(sante > 0)
+                total = Math.floor(sante/10)*2;
+            else
+                total = Math.floor(armure/10)*2;
+            break;
+            
+        case 3:
+            if(sante > 0)
+                total = Math.floor(sante/10)*3;
+            else
+                total = Math.floor(armure/10)*3;
+            break;
+            
+        case 4:
+            if(sante > 0)
+                total = Math.floor(sante/30);
+            else
+                total = Math.floor(armure/30);
+            break;
+            
+        case 5:
+            if(sante > 0)
+                total = Math.floor(sante/20);
+            else
+                total = Math.floor(armure/20);
+            break;
+            
+        case 6:
+            if(sante > 0)
+                total = Math.floor(sante/10);
+            else
+                total = Math.floor(armure/10);
+            break;
+    }
+
+    await setAttrsAsync({
+        popup: 0,
+        resilience: total,
+        resilience_max: total
+    });
+});
+
+on("clicked:calculerResilience", async ()=>{
+    await setAttrsAsync({
+        popup: 2
+    });			
+});
+
+on("change:berserk350PG", async ()=>{
+
+    const attrs = await getAttrsAsync([`berserk350PG`]);
+    const state = attrs["berserk350PG"];
+
+    let dgts = "2D6";
+    let violence = "2D6";
+    let beacon = `2 ${getTranslationByKey("reussites-automatiques")}`;
+    let egide = "2";
+
+    if(state == "on")
+    {
+        dgts = "4D6";
+        violence = "4D6";
+        beacon = `4 ${getTranslationByKey("reussites-automatiques")}`;
+        egide = "4";
+    }
+
+    await setAttrsAsync({
+        berserkIlluminationBlazeDgts: dgts,
+        berserkIlluminationBlazeViolence: violence,
+        berserkIlluminationBeaconBonus: beacon,
+        berserkIlluminationTorchEgide: egide
+    });
+});
+    
+//BARBARIAN
+on("change:barbarianNoMDefense change:barbarianGoliath", async ()=>{
+
+    const attrs = await getAttrsAsync([`barbarianGoliath`, `barbarianNoMDefense`]);
+
+    const goliath = +attrs["barbarianGoliath"];
+    const PG200 = attrs["barbarianNoMDefense"];
+
+    let defense = 0;
+    let reaction = goliath*2;
+    let dgts = `${goliath}D6`
+
+    if(PG200 == "0")
+        defense = goliath;
+
+    await setAttrsAsync({
+        barbarianDef:defense,
+        barbarianRea:reaction,
+        barbarianDegat:dgts
+    })
+});
+
+//SHAMAN
+on("change:shamanAscensionEnergie", async ()=>{
+
+    const attrs = await getAttrsAsync([`shamanAscension`, `shamanAscensionEnergie`]);
+
+    const ascension = +attrs["shamanAscension"];
+    const energie = +attrs["shamanAscensionEnergie"];
+
+    if(ascension == 1)
+        await setAttrsAsync({energieAscension_max: energie});
+});
+
+on("change:armurePJModif", async ()=>{
+
+    const attrs = await getAttrsAsync([`armurePJModif`]);
+
+    const base = 60;
+    const modif = +attrs["armurePJModif"];
+
+    await setAttrsAsync({armureAscension_max:base+modif});
+});
+
+on("change:cdfPJModif", async ()=>{
+
+    const attrs = await getAttrsAsync([`cdfPJModif`]);
+
+    const base = 10;
+    const modif = +attrs["cdfPJModif"];
+
+    await setAttrsAsync({cdfAscension_max:base+modif});
+});
+
+on("change:shamanNbreTotem", async ()=>{
+
+    const attrs = await getAttrsAsync([`shaman150PG`, `shamanNbreTotem`]);
+
+    const shaman150PG = +attrs["shaman150PG"];
+    const totem = +attrs["shamanNbreTotem"];
+
+    if(totem == 3 && shaman150PG == 0)
+        await setAttrsAsync({shamanNbreTotem: 2});
+});
+
+//GESTION DES ASPECTS ET CARACTERISTIQUES
+//Chair
+on("change:deplacement change:force change:endurance change:santeModif change:santeODBonus", async ()=>{
+
+    const attrs = await getAttrsAsync([`fichePNJ`, `chair`, `deplacement`, `force`, `endurance`, `santeModif`, `santeODBonus`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+    
+    const chair = +attrs[`chair`];
+
+    const deplacement = +attrs[`deplacement`];
+    const force = +attrs[`force`];
+    const endurance = +attrs[`endurance`];
+
+    const modif = +attrs[`santeModif`];
+    const OD = +attrs[`santeODBonus`];
+
+    maxCar("deplacement", deplacement, chair);
+    maxCar("force", force, chair);
+    maxCar("endurance", endurance, chair);
+
+    let total = 10+(Math.max(deplacement, force, endurance)*6)+modif+OD;
+
+    await setAttrsAsync({santepj_max:total});
+});
+//Bête
+on("change:fichePNJ change:armure change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns", async ()=>{
+
+    const attrs = await getAttrsAsync([`fichePNJ`, `armure`, `bete`, `hargne`, `combat`, `instinct`, `calODHar`, `calODCom`, `calODIns`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+
+    const armure = +attrs[`armure`];
+
+    const aspect = +attrs[`bete`];
+
+    const car1 = +attrs[`hargne`];
+    const car2 = +attrs[`combat`];
+    const car3 = +attrs[`instinct`];
+
+    const OD1 = +attrs[`calODHar`];
+    const OD2 = +attrs[`calODCom`];
+    const OD3 = +attrs[`calODIns`];
+
+    maxCar("hargne", car1, aspect);
+    maxCar("combat", car2, aspect);
+    maxCar("instinct", car3, aspect);
+
+    let total = 0;
+
+    switch(armure)
+    {
+        case "sans":
+        case "guardian":
+            total = Math.max(car1, car2, car3);
+            break;
+            
+        default:
+            total = Math.max(car1+OD1, car2+OD2, car3+OD3);
+            break;
+    }
+
+    await setAttrsAsync({defense:total});
+});
+//Machine
+on("change:fichePNJ change:armure change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec", async ()=>{
+    const attrs = await getAttrsAsync([`fichePNJ`, `armure`, `machine`, `tir`, `savoir`, `technique`, `calODTir`, `calODSav`, `calODTec`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+
+    const armure = +attrs[`armure`];
+
+    const aspect = +attrs[`machine`];
+
+    const car1 = +attrs[`tir`];
+    const car2 = +attrs[`savoir`];
+    const car3 = +attrs[`technique`];
+
+    const OD1 = +attrs[`calODTir`];
+    const OD2 = +attrs[`calODSav`];
+    const OD3 = +attrs[`calODTec`];
+
+    maxCar("tir", car1, aspect);
+    maxCar("savoir", car2, aspect);
+    maxCar("technique", car3, aspect);
+
+    let total = 0;
+
+    switch(armure)
+    {
+        case "sans":
+        case "guardian":
+            total = Math.max(car1, car2, car3);
+            break;
+            
+        default:
+            total = Math.max(car1+OD1, car2+OD2, car3+OD3);
+            break;
+    }
+
+    await setAttrsAsync({reaction:total});
+});
+//Dame
+on("change:aura change:parole change:sf", async ()=>{
+    const attrs = await getAttrsAsync([`fichePNJ`, `dame`, `aura`, `parole`, `sf`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+
+    const aspect = +attrs[`dame`];
+
+    const car1 = +attrs[`aura`];
+    const car2 = +attrs[`parole`];
+    const car3 = +attrs[`sf`];
+
+    maxCar("aura", car1, aspect);
+    maxCar("parole", car2, aspect);
+    maxCar("sf", car3, aspect);
+});
+
+on("change:fichePNJ change:armure change:discretion change:dexterite change:perception change:calODDis change:calODPer change:calODDex change:initiativeODBonus", async ()=>{
+
+    const attrs = await getAttrsAsync([`fichePNJ`, `armure`, `masque`, `discretion`, `dexterite`, `perception`, `calODDis`, `calODPer`, `calODDex`, `initiativeODBonus`]);
+
+    const fiche = +attrs[`fichePNJ`];
+
+    if(fiche != 0)
+        return;
+
+    const armure = +attrs[`armure`];
+
+    const aspect = +attrs[`masque`];
+
+    const car1 = +attrs[`discretion`];
+    const car2 = +attrs[`dexterite`];
+    const car3 = +attrs[`perception`];
+
+    const OD1 = +attrs[`calODDis`];
+    const OD2 = +attrs[`calODPer`];
+    const OD3 = +attrs[`calODDex`];
+
+    const bonus = +attrs[`initiativeODBonus`];
+
+    maxCar("discretion", car1, aspect);
+    maxCar("dexterite", car2, aspect);
+    maxCar("perception", car3, aspect);
+
+    let total = 0;
+
+    switch(armure)
+    {
+        case "sans":
+        case "guardian":
+            total = Math.max(car1, car2, car3);
+            break;
+            
+        default:
+            total = Math.max(car1+OD1, car2+OD2, car3+OD3)+bonus;
+            break;
+    }
+
+    await setAttrsAsync({bonusInitiative:total});
+});
+
+on("change:sorcerer250PG", async ()=>{
+
+    const attrs = await getAttrsAsync([`sorcerer250PG`]);
+
+    const PG250 = attrs["sorcerer250PG"];
+
+    if(PG250 == "on")
+        await setAttrsAsync({
             sorcererMMVolNuee: 0,
             sorcererMMPhase: 0,
             sorcererMMEtirement: 0,
             sorcererMMCorpMetal: 0,
             sorcererMMCorpFluide: 0,
-            sorcererMMPMGuerre: 0,
-            sorcererMM250PG: 0,
-            warlockForward: 0,
-            warlockRecord: 0,
-            warlockRewind: 0,
-            warmasterImpFPersonnel:0,
-            warmasterImpGPersonnel:0,
-            warriorSoldierA:0,
-            warriorHunterA:0,
-            warriorScholarA:0,
-            warriorHeraldA:0,
-            warriorScoutA:0,
-            MALWarriorSoldierA:0,
-            MALWarriorHunterA:0,
-            MALWarriorScholarA:0,
-            MALWarriorHeraldA:0,
-            MALWarriorScoutA:0,
-            MALWarmasterImpFPersonnel:0,
-            MALWarmasterImpGPersonnel:0,
-            MALRogueGhost:0,
-            rogueGhost:0,
-            MALBarbarianGoliath:0,
+            sorcererMMPMGuerre: 0
         });
-    });	
+    else
+        await setAttrsAsync({sorcererMM250PG:0});
 });
 
-on("change:armurePJ sheet:opened"
-, function() 
-{
-    getAttrs(["armure", "armurePJ"], function(value)
-    {
-        const Arm = value["armure"];
-        const vArmure = parseInt(value["armurePJ"], 10)||0;
-        
-        armure[Arm]["armure"] = vArmure;
+on("change:monk150PG change:monk250PG sheet:opened", async ()=>{
+
+    const attrs = await getAttrsAsync([`monk150PG`, `monk250PG`]);
+
+    const PG150 = +attrs["monk150PG"];
+    const PG250 = +attrs["monk250PG"];
+
+    let vagueDgts = 3;
+    let salveDgts = 3;
+    let rayonDgts = 4;
+    let rayonViolence = 2;
+
+    let vagueEffets = `${i18n_parasitage} 2 / ${i18n_dispersion} 3 / ${i18n_destructeur} / ${i18n_choc} 2`;
+    let salveEffets = `${i18n_ultraviolence} / ${i18n_meurtrier} / ${i18n_dispersion} 3 / ${i18n_parasitage} 1`;
+    let rayonEffets = `${i18n_parasitage} 1 / ${i18n_perceArmure} 40`;
+
+    if(PG150 == 2) {
+        vagueDgts += 2;
+        salveDgts += 2;
+        rayonDgts += 2;
+        rayonViolence += 2;
+    }
+
+    if(PG250 == 1) {
+        vagueDgts += 2;
+        salveDgts += 2;
+        rayonDgts += 2;
+        rayonViolence += 2;
+
+        vagueEffets = `${i18n_parasitage} 4 / ${i18n_dispersion} 3 / ${i18n_destructeur} / ${i18n_choc} 2`;
+        salveEffets = `${i18n_ultraviolence} / ${i18n_meurtrier} / ${i18n_dispersion} 6 / ${i18n_parasitage} 1`;
+        rayonEffets = `${i18n_parasitage} 1 / ${i18n_ignoreArmure}`;
+    }
+
+    await setAttrsAsync({
+        monkVagueDegat: `${vagueDgts}D6`,
+        monkSalveDegat: `${salveDgts}D6`,
+        monkRayonDegat: `${rayonDgts}D6`,
+        monkRayonViolence: `${rayonViolence}D6`,
+        monkVagueEffets: vagueEffets,
+        monkSalveEffets: salveEffets, 
+        monkRayonEffets: rayonEffets
     });
 });
 
-on("change:energiePJ sheet:opened"
-, function() 
-{
-    getAttrs(["armure", "energiePJ"], function(value)
-    {
-        const Arm = value["armure"];
-        const vEnergie = parseInt(value["energiePJ"], 10)||0;
-        
-        armure[Arm]["energie"] = vEnergie;
-    });
-});
-    
-on("change:armurePJModif sheet:opened"
-, function() 
-{
-    getAttrs(["armure", "armurePJModif"], function(value)
-    {
-        const Arm = value["armure"];
-        const armModif = parseInt(value["armurePJModif"], 10)||0;
-        
-        armure[Arm]["armureModif"] = armModif;
-        
-        setAttrs({
-            armurePJ_max:armure[Arm]["armureMax"]+armModif,
-        });
-    });
-});
+on("change:priest200PG", async ()=>{
 
-on("change:energiePJModif sheet:opened"
-, function() 
-{
-    getAttrs(["armure", "warmaster150PG", "warmaster250PG", "energiePJModif"], function(value)
-    {
-        const Arm = value["armure"];
-        const W150PG = parseInt(value["warmaster150PG"], 10)||0;
-        const W250PG = parseInt(value["warmaster250PG"], 10)||0;
-        const ene = armure[Arm]["energieMax"];
-        const ene150 = armure[Arm]["energieMax150"];
-        const ene250 = armure[Arm]["energieMax250"];
-        const eneModif = parseInt(value["energiePJModif"], 10)||0;
-        
-        armure[Arm]["energieModif"] = eneModif;
-        
-        var total = ene;
-        
-        if(Arm == "warmaster")
-        {
-            if(W150PG != 0)
-                total = ene150;
-                
-            if(W250PG != 0)
-                total = ene250;
-        }
-            
-        total += eneModif;
-        
-        setAttrs({
-            energiePJ_max:total
-        });
+    const attrs = await getAttrsAsync([`priest200PG`]);
+
+    const PG200 = +attrs["priest200PG"];
+
+    let contactDice = 3;
+    let distanceDice = 2;
+
+    let contactBonus = 6;
+    let distanceBonus = 6;
+
+    if(PG200 == "on") {
+        contactDice += 1;
+        distanceDice += 1;
+
+        contactBonus += 6;
+        distanceBonus += 6;
+    }
+
+    await setAttrsAsync({
+        priestMechanicContact: `${contactDice}D6+${contactBonus}`,
+        priestMechanicDistance: `${distanceDice}D6+${distanceBonus}`
     });
 });
 
-//CDF
-on("change:barbarianGoliath change:MALBarbarianGoliath change:MALWarmasterImpFPersonnel change:MALWarmasterImpForce change:warmasterImpFPersonnel change:warmasterImpForce change:cdfPJModif sheet:opened"
-, function() 
-{
-    getAttrs(["armure", "armureLegende", "cdfPJModif", "MALBarbarianGoliath", "barbarianGoliath", "sorcererMMCorpMetal", "sorcerer150PG", "sorcererMM250PG", "MALWarmasterImpForce", "MALWarmasterImpFPersonnel", "warmasterImpFPersonnel", "warmasterImpForce"], function(value)
-    {
-        const Arm = value["armure"];
-        const MAL = value["armureLegende"];
-        const cdfModif = parseInt(value["cdfPJModif"], 10)||0;
-        
-        const goliath = parseInt(value["barbarianGoliath"], 10)||0;
-        const goliathMAL = parseInt(value["MALBarbarianGoliath"], 10)||0;
-        
-        const CorpMetal = value["sorcererMMCorpMetal"];
-        const CM150PG = value["sorcerer150PG"];
-        const CM250PG = value["sorcererMM250PG"];
-        
-        const WIF = value["warmasterImpForce"];
-        const WIFPers = parseInt(value["warmasterImpFPersonnel"], 10)||0;
-        
-        const WIFMAL = value["MALWarmasterImpForce"];
-        const WIFPersMAL = parseInt(value["MALWarmasterImpFPersonnel"], 10)||0;
-        
-        armure[Arm]["cdfModif"] = cdfModif;
-        
-        var bonus = 0;
-        
-        if(Arm == "barbarian")
-            bonus += goliath;
-            
-        if(Arm == "sorcerer")
-        {
-            if(CorpMetal != 0 || CM250PG != 0)
-            {
-                bonus += 2;
-                
-                if(CM150PG != 0)
-                    bonus += 2;
-            }
-        }
-        
-        if(Arm == "warmaster" && WIFPers != 0 && WIF == "on")
-            bonus += WIFPers;
-        
-        if(MAL == "barbarian")
-            bonus += goliathMAL;
-            
-        if(MAL == "warmaster" && WIFPersMAL != 0 && WIFMAL == "on")
-            bonus += WIFPersMAL;
-        
-        setAttrs({
-            cdfPJ:armure[Arm]["cdf"]+cdfModif+bonus,
-            cdfPJ_max:armure[Arm]["cdfMax"]+cdfModif+bonus
-        });
+on("change:psion200PG", async ()=>{
+
+    const attrs = await getAttrsAsync([`psion200PG`]);
+
+    const PG200 = +attrs["psion200PG"];
+
+    let malusAction = 2;
+    let malusAutres = 2;
+
+    if(PG200 == "on") {
+        malusAction += 1;
+        malusAutres += 1;
+    }
+
+    await setAttrsAsync({
+        psionMalusA: `${malusAction}D`,
+        psionMalus: malusAutres
     });
 });
 
-//ESPOIR
-on("change:fichePNJ change:armure change:espoirModif change:berserk250PG sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "espoirModif", "berserk250PG", "espoirNecr", "espoirNecrModif", "MAJSheetworker"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const Arm = value["armure"];
-            const majE = parseInt(value["MAJSheetworker"], 10)||0;
-            const espoirBers = value["berserk250PG"];
-            const espoirNecr = parseInt(value["espoirNecr"], 10)||0;
-            const espoirNMod = parseInt(value["espoirNecrModif"], 10)||0;
-            
-            var bonusEspoir = 0;
-            
-            if(espoirNMod != 0 && majE != 1 && Arm == "necromancer")
-            {
-                setAttrs({
-                    espoirModif: espoirNMod,
-                    espoirNecrModif: 0
-                });
-            }
-            
-            if(espoirNecr != 10 && Arm == "necromancer" && majE != 1)
-            {
-                setAttrs({
-                    espoir: espoirNecr,
-                    espoirNecr: 10
-                });
-            }
-            
-            if(Arm == "berserk")
-            {
-                if(espoirBers == "on")
-                    bonusEspoir = 25;
-                else
-                    bonusEspoir = 15;
-            }
-            
-                            
-            const espoir = parseInt(value["espoirModif"], 10)||0;
-            
-            switch(Arm)
-            {
-                case "berserk":
-                    setAttrs({
-                        espoir_max: 50+espoir+bonusEspoir
-                    });
-                    break;
-                case "necromancer":
-                    setAttrs({
-                        espoir_max: 10+espoir+bonusEspoir
-                    });
-                    break;
-                default:
-                    setAttrs({
-                        espoir_max: 50+espoir+bonusEspoir
-                    });
-                    break;
-            }
-        }
-    });
+on("change:wizard150PG sheet:opened", async ()=>{
+
+    const attrs = await getAttrsAsync([`wizard150PG`]);
+
+    const PG200 = +attrs["wizard150PG"];
+
+    let portee = i18n_porteeCourte;
+
+    if(PG200 == "on")
+        portee = i18n_porteeMoyenne;
+
+    await setAttrsAsync({wizardBPortee:portee});
 });
 
-//EGIDE
-on("change:fichePNJ change:armure change:berserkNiveaux change:berserkRageN1Egide change:berserkRageN2Egide change:berserkRageN3Egide sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "berserkNiveaux", "berserkRageN1Egide", "berserkRageN2Egide", "berserkRageN3Egide"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {
-            const Arm = value["armure"];
-            
-            var bonusEgide = 0;
-            
-            if(Arm == "berserk")
-            {
-                const rage = parseInt(value["berserkNiveaux"], 10)||0;
-                const egideN1 = parseInt(value["berserkRageN1Egide"], 10)||0;
-                const egideN2 = parseInt(value["berserkRageN2Egide"], 10)||0;
-                const egideN3 = parseInt(value["berserkRageN3Egide"], 10)||0;
-            
-                bonusEgide = 6;
-                            
-                switch(rage)
-                {
-                    case 1:
-                        bonusEgide += egideN1;
-                        break;
-                    
-                    case 2:
-                        bonusEgide += egideN2;
-                        break;
-                        
-                    case 3:
-                        bonusEgide += egideN3;
-                        break;
-                }
-            }
-            
-            setAttrs({
-                egideBonus:bonusEgide
-            });
-        }
-    });
+on("change:wizard250PG sheet:opened", async ()=>{
+
+    const attrs = await getAttrsAsync([`wizard250PG`]);
+
+    const PG250 = +attrs["wizard250PG"];
+
+    let portee = i18n_porteeCourte;
+
+    if(PG250 == "on")
+        portee = i18n_porteeMoyenne;
+
+    await setAttrsAsync({wizardOPortee:portee});
 });
 
-//DEFENSE
-on("change:fichePNJ change:armure change:armureLegende change:defense change:defBM change:bonusDefense change:defenseODBonus change:defenseModifPerso change:barbarianDef change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALWarmasterImpEsquive change:MALBarbarianDef change:MasquePNJAE change:MasquePNJAEMaj change:defensePNJ change:MADDjinnNanobrumeActive sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "armureLegende", "defense", "defBM", "bonusDefense", "defenseODBonus", "defenseModifPerso", "barbarianDef", "berserkNiveaux", "berserkRageN1DR", "berserkRageN2DR", "berserkRageN3DR", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive", "MALWarmasterImpEPersonnel", "MALWarmasterImpEsquive", "MALBarbarianDef", "MasquePNJAE", "MasquePNJAEMaj", "defensePNJ", "defenseModifPNJ", "MADDjinnNanobrumeActive"], function(value)
+on("change:styleCombat", async ()=>{
+
+    const attrs = await getAttrsAsync([`styleCombat`]);
+
+    let Style = attrs["styleCombat"];
+
+    let agressif = "0";
+    let akimbo = "0";
+    let ambidextre = "0";
+    let couvert = "0";
+    let defensif = "0";
+    let pilonnage = "0";
+    let puissant = "0";
+    let suppressionD = 0;
+    let suppressionV = 0;
+    let rctBM = "";
+    let defBM = "";
+    let description = "";
+
+    switch(Style)
     {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        const bonusDefense = parseInt(value["bonusDefense"], 10)||0;
-        const defenseModifPerso = parseInt(value["defenseModifPerso"], 10)||0;
-        const AE = parseInt(value["MasquePNJAE"], 10)||0;
-        const AEM = parseInt(value["MasquePNJAEMaj"], 10)||0;
-        const defensePNJ = parseInt(value["defensePNJ"], 10)||0;
-        
-        var defenseM = 0;
-        var defenseT = 0;
-        var defenseMecha = 0;
-        
-        if(fichePNJ == 0)
-        {				
-            const armure = value["armure"];
-            const MAL = value["armureLegende"];
-            const defense = parseInt(value["defense"], 10)||0;
-            const defBM = parseInt(value["defBM"], 10)||0;
-            
-            const defenseODBonus = parseInt(value["defenseODBonus"], 10)||0;
-            
-            const barbarianDef = parseInt(value["barbarianDef"], 10)||0;
-            
-            const berserkRage = parseInt(value["berserkNiveaux"], 10)||0;
-            const berserkN1 = parseInt(value["berserkRageN1DR"], 10)||0;
-            const berserkN2 = parseInt(value["berserkRageN2DR"], 10)||0;
-            const berserkN3 = parseInt(value["berserkRageN3DR"], 10)||0;
-            
-            const CorpFluide = value["sorcererMMCorpFluide"];
-            const sorcerer150PG = value["sorcerer150PG"];
-            const sorcerer250PG = value["sorcerer250PG"];
-            const sorcererMM250PG = value["sorcererMM250PG"];
-            
-            const warmasterEP = parseInt(value["warmasterImpEPersonnel"], 10)||0;
-            const warmasterE = value["warmasterImpEsquive"];
-            
-            const MALWarmasterEP = parseInt(value["MALWarmasterImpEPersonnel"], 10)||0;
-            const MALWarmasterE = value["MALWarmasterImpEsquive"];
-            
-            const MALBarbarianDef = parseInt(value["MALBarbarianDef"], 10)||0;
-            
-            const nanobrume = parseInt(value["MADDjinnNanobrumeActive"], 10)||0;
-            
-            var defenseMecha = defense+defBM+defenseODBonus;
-            
-            if(nanobrume == 1)
-                defenseMecha += 3;
-            
-            switch(armure)
-            {
-                case "sans":
-                case "guardian":
-                    defenseM = defBM+bonusDefense;
-                    break;
-                    
-                case "barbarian":
-                    defenseM = defBM+bonusDefense+defenseODBonus-barbarianDef;
-                    break;
-                    
-                case "berserk":
-                    defenseM = defBM+bonusDefense+defenseODBonus;
-                
-                    if(berserkRage == 1)
-                        defenseM -= berserkN1;
-                    else if(berserkRage == 2)
-                        defenseM -= berserkN2;
-                    else if(berserkRage == 3)
-                        defenseM -= berserkN3;
-                    break;
-                    
-                case "sorcerer":
-                        defenseM = defBM+bonusDefense+defenseODBonus;
-                        
-                        if(sorcerer250PG != "0")
-                        {
-                            if(sorcererMM250PG != "0")
-                            {
-                                defenseM += 3;
-                            }
-                        }
-                        else
-                        {
-                            if(CorpFluide != "0")
-                            {
-                                defenseM += 2;
-                                
-                                if(sorcerer150PG != "0")
-                                    defenseM += 1;
-                            }
-                        }
-                    break;
-                    
-                case "warmaster":
-                    defenseM = defBM+bonusDefense+defenseODBonus;
-                        
-                        if(warmasterEP != "0" && warmasterE != "0")
-                            defenseM += 2;
-                    break;
-                    
-                default:
-                    defenseM = defBM+bonusDefense+defenseODBonus;
-                    break;
-            }
-            
-            if(MAL == "warmaster" && MALWarmasterEP != "0" && MALWarmasterE != "0")
-                defenseM += 2;
-                
-            if(MAL == "barbarian")
-                defenseM -= MALBarbarianDef;
-            
-            defenseT += Math.max(defense+defenseM+defenseModifPerso, 0)
-        }
-        if(fichePNJ == 1 || fichePNJ == 2)
-        {
-            defenseM += bonusDefense;
-            defenseM += AE;
-            defenseM += AEM;
-            
-            defenseT += Math.max(defensePNJ+defenseM+defenseModifPerso, 0);
-        }
-        if(fichePNJ == 3)
-        {
-            defenseM += AE;
-            defenseM += AEM;
-            
-            defenseT += Math.max(defensePNJ+defenseM+defenseModifPerso, 0);
-        }
-        
-        setAttrs({
-            defenseModif: defenseM,
-            defenseTotal: defenseT,
-            mechaArmureDefense: defenseMecha
-        });
-    });
-});
+        case "couvert":	
+            couvert = "-3";
+            rctBM = "+2";
+            description = getTranslationByKey("bonus-style-couvert");
+            break;
+        case "agressif":
+            agressif = "+3";
+            rctBM = "-2";
+            defBM = "-2";
+            description = getTranslationByKey("bonus-style-agressif");
+            break;
+        case "akimbo":
+            akimbo = "-3";
+            description = getTranslationByKey("bonus-style-akimbo");	
+            break;
+        case "ambidextre":
+            ambidextre = "-3";
+            description = getTranslationByKey("bonus-style-ambidextre");
+            break;
+        case "defensif":
+            defensif = "-3";
+            defBM = "+2";
+            description = getTranslationByKey("bonus-style-defensif");
+            break;
+        case "precis":
+            description = getTranslationByKey("bonus-style-precis");
+            break;
+        case "pilonnage":
+            pilonnage = "-2";
+            description = getTranslationByKey("bonus-style-pilonnage");
+            break;
+        case "puissant":
+            puissant = "@{stylePuissantBonus}";
+            rctBM = "-2";
+            defBM = "-2";
+            description = getTranslationByKey("bonus-style-puissant");
+            break;
+        case "suppression":
+            description = getTranslationByKey("bonus-style-suppression");
+            break;
+    }
 
-//REACTION
-on("change:fichePNJ change:armure change:armureLegende change:reaction change:rctBM change:bonusReaction change:reactionODBonus change:reactionModifPerso change:barbarianRea change:berserkNiveaux change:berserkRageN1DR change:berserkRageN2DR change:berserkRageN3DR change:paladinWatchtower change:sorcererMMCorpFluide change:sorcerer150PG change:sorcererMM250PG change:warmasterImpEPersonnel change:warmasterImpEsquive change:MALWarmasterImpEsquive change:MALWarmasterImpEPersonnel change:MALBarbarianRea change:MachinePNJAE change:MachinePNJAEMaj change:reactionPNJ change:MADDjinnNanobrumeActive sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "armureLegende", "reaction", "rctBM", "bonusReaction", "reactionODBonus", "reactionModifPerso", "barbarianRea", "berserkNiveaux", "berserkRageN1DR", "berserkRageN2DR", "berserkRageN3DR", "paladinWatchtower", "sorcererMMCorpFluide", "sorcerer150PG", "sorcerer250PG", "sorcererMM250PG", "warmasterImpEPersonnel", "warmasterImpEsquive", "MALWarmasterImpEPersonnel", "MALWarmasterImpEsquive", "MALBarbarianRea", "MachinePNJAE", "MachinePNJAEMaj", "reactionPNJ", "MADDjinnNanobrumeActive"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        const bonusReaction = parseInt(value["bonusReaction"], 10)||0;
-        const reactionModifPerso = parseInt(value["reactionModifPerso"], 10)||0;
-        const AE = parseInt(value["MachinePNJAE"], 10)||0;
-        const AEM = parseInt(value["MachinePNJAEMaj"], 10)||0;
-        const reactionPNJ = parseInt(value["reactionPNJ"], 10)||0;
-        
-        var reactionM = 0;
-        var reactionT = 0;
-        var reactionMecha = 0;
-
-        if(fichePNJ == 0)
-        {				
-            const armure = value["armure"];
-            const MAL = value["armureLegende"];
-            const reaction = parseInt(value["reaction"], 10)||0;
-            const rctBM = parseInt(value["rctBM"], 10)||0;
-            
-            const reactionODBonus = parseInt(value["reactionODBonus"], 10)||0;
-            
-            const barbarianRea = parseInt(value["barbarianRea"], 10)||0;
-            
-            const berserkRage = parseInt(value["berserkNiveaux"], 10)||0;
-            const berserkN1 = parseInt(value["berserkRageN1DR"], 10)||0;
-            const berserkN2 = parseInt(value["berserkRageN2DR"], 10)||0;
-            const berserkN3 = parseInt(value["berserkRageN3DR"], 10)||0;
-            
-            const paladinWatchtower = value["paladinWatchtower"];
-            
-            const CorpFluide = value["sorcererMMCorpFluide"];
-            const sorcerer150PG = value["sorcerer150PG"];
-            const sorcerer250PG = value["sorcerer250PG"];
-            const sorcererMM250PG = value["sorcererMM250PG"];
-            
-            const warmasterEP = parseInt(value["warmasterImpEPersonnel"], 10)||0;
-            const warmasterE = value["warmasterImpEsquive"];
-            
-            const MALWarmasterEP = parseInt(value["MALWarmasterImpEPersonnel"], 10)||0;
-            const MALWarmasterE = value["MALWarmasterImpEsquive"];
-            
-            const MALBarbarianRea = parseInt(value["MALBarbarianRea"], 10)||0;
-            
-            const nanobrume = parseInt(value["MADDjinnNanobrumeActive"], 10)||0;
-            
-            var reactionMecha = reaction+rctBM+reactionODBonus;
-            
-            if(nanobrume == 1)
-                reactionMecha += 3;
-            
-            switch(armure)
-            {
-                case "sans":
-                case "guardian":
-                    reactionM = rctBM+bonusReaction;
-                    break;
-                    
-                case "barbarian":
-                    reactionM = rctBM+bonusReaction+reactionODBonus-barbarianRea;
-                    break;
-                    
-                case "berserk":
-                    reactionM = rctBM+bonusReaction+reactionODBonus;
-                
-                    if(berserkRage == 1)
-                        reactionM -= berserkN1;
-                    else if(berserkRage == 2)
-                        reactionM -= berserkN2;
-                    else if(berserkRage == 3)
-                        reactionM -= berserkN3;							
-                    break;
-                                        
-                case "sorcerer":
-                        reactionM = rctBM+bonusReaction+reactionODBonus;
-                        
-                        if(sorcerer250PG != "0")
-                        {
-                            if(sorcererMM250PG != "0")
-                            {
-                                reactionM += 3;
-                            }
-                        }
-                        else
-                        {
-                            if(CorpFluide != "0")
-                            {
-                                reactionM += 2;
-                                
-                                if(sorcerer150PG != "0")
-                                    reactionM += 1;
-                            }
-                        }
-                    break;
-                    
-                case "warmaster":
-                    reactionM = rctBM+bonusReaction+reactionODBonus;
-                        
-                        if(warmasterEP != "0" && warmasterE != "0")
-                            reactionM += 2;
-                    break;
-                    
-                default:
-                    reactionM = rctBM+bonusReaction+reactionODBonus;
-                    break;
-            }
-            
-            if(MAL == "warmaster" && MALWarmasterEP != "0" && MALWarmasterE != "0")
-                reactionM += 2;
-                
-            if(MAL == "barbarian")
-                reactionM -= MALBarbarianRea;
-            
-            reactionT += Math.max(reaction+reactionM+reactionModifPerso, 0)
-
-            if(armure == "paladin" && paladinWatchtower == "Activé")
-            {
-                reactionM += Math.ceil(0-(reactionT/2));
-                reactionT = Math.max(reaction+reactionM+reactionModifPerso, 0);
-            }
-        }
-        if(fichePNJ == 1 || fichePNJ == 2)
-        {
-            reactionM += bonusReaction;
-            reactionM += AE;
-            reactionM += AEM;
-            
-            reactionT += Math.max(reactionPNJ+reactionM+reactionModifPerso, 0);
-        }
-        if(fichePNJ == 3)
-        {
-            reactionM += AE;
-            reactionM += AEM;
-            
-            reactionT += Math.max(reactionPNJ+reactionM+reactionModifPerso, 0);
-        }
-
-        setAttrs({
-            reactionModif: reactionM,
-            reactionTotal: reactionT,
-            mechaArmureReaction: reactionMecha
-        });
-    });
-});
-
-//RESILIENCE
-on("clicked:calculResilienceFinal"
-, function() 
-{
-    getAttrs(["listeTypePNJ", "armurePNJ_max", "santePNJ_max"], function(value)
-    {
-        const type = parseInt(value["listeTypePNJ"], 10)||0;
-        const armure = parseInt(value["armurePNJ_max"], 10)||0;
-        const sante = parseInt(value["santePNJ_max"], 10)||0;
-        
-        var total = 0;
-                    
-        switch(type)
-        {
-            case 1:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/10);
-                }
-                else
-                {
-                    total = Math.floor(armure/10);
-                }
-                break;
-                
-            case 2:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/10)*2;
-                }
-                else
-                {
-                    total = Math.floor(armure/10)*2;
-                }
-                break;
-                
-            case 3:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/10)*3;
-                }
-                else
-                {
-                    total = Math.floor(armure/10)*3;
-                }
-                break;
-                
-            case 4:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/30);
-                }
-                else
-                {
-                    total = Math.floor(armure/30);
-                }
-                break;
-                
-            case 5:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/20);
-                }
-                else
-                {
-                    total = Math.floor(armure/20);
-                }
-                break;
-                
-            case 6:
-                if(sante > 0)
-                {
-                    total = Math.floor(sante/10);
-                }
-                else
-                {
-                    total = Math.floor(armure/10);
-                }
-                break;
-        }
-        
-        
-    
-        setAttrs({
-            popup: 0,
-            resilience: total,
-            resilience_max: total
-        });
-    });
-});
-
-on("clicked:calculerResilience"
-, function() 
-{
-    setAttrs({
-        popup: 2
-    });			
-});
-
-on("change:fichePNJ change:berserk350PG sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "berserk350PG"], function(value)
-    {
-        const state = value["berserk350PG"];
-        
-        if(state == "on")
-        {
-            setAttrs({
-                berserkIlluminationBlazeDgts: "4D6",
-                berserkIlluminationBlazeViolence: "4D6",
-                berserkIlluminationBeaconBonus: "4 "+getTranslationByKey("reussites-automatiques"),
-                berserkIlluminationTorchEgide: "4"
-            });
-        }
-        else
-        {
-            setAttrs({
-                berserkIlluminationBlazeDgts: "2D6",
-                berserkIlluminationBlazeViolence: "2D6",
-                berserkIlluminationBeaconBonus: "2 "+getTranslationByKey("reussites-automatiques"),
-                berserkIlluminationTorchEgide: "2"
-            });
-        }
+    await setAttrsAsync({
+        atkAgressif: agressif,
+        atkAkimbo: akimbo,
+        atkAmbidextre: ambidextre,
+        atkCouvert: couvert,
+        atkDefensif: defensif,
+        atkPilonnage: pilonnage,
+        atkPuissant: puissant,
+        styleSuppressionD: suppressionD,
+        styleSuppressionV: suppressionV,
+        rctBM: rctBM,
+        defBM: defBM,
+        styleCombatDescr: description
     });
 });
     
-//BARBARIAN
-on("change:fichePNJ change:barbarianNoMDefense change:barbarianGoliath sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "barbarianGoliath", "barbarianNoMDefense"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {				
-            const Arm = value["armure"];
-            const goliath = parseInt(value["barbarianGoliath"], 10)||0;
-            const barbarian200 = value["barbarianNoMDefense"];
-            
-            var totalGoliath = goliath;
-            
-            if(barbarian200 != "0")
-                totalGoliath -= goliath;
-                            
-            setAttrs({
-                barbarianDef: totalGoliath,
-                barbarianRea: goliath*2,
-                barbarianDegat: totalGoliath+"D6"
-            });
-        }
-    });
-});
-
-//SHAMAN
-on("change:fichePNJ change:shamanAscension change:shamanAscensionEnergie sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "shamanAscension", "shamanAscensionEnergie"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {				
-            const ascension = parseInt(value["shamanAscension"], 10)||0;;
-            const energie = parseInt(value["shamanAscensionEnergie"], 10)||0;
-
-            if(ascension == 1)
-            {
-                setAttrs({
-                    energieAscension_max: energie
-                });
-            }
-        }
-    });
-});
-
-on("change:fichePNJ change:armurePJModif change:cdfPJModif sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armurePJModif", "cdfPJModif"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {
-            const armure = 60;
-            const cdf = 10;
-            
-            const armureModif = parseInt(value["armurePJModif"], 10)||0;;
-            const cdfModif = parseInt(value["cdfPJModif"], 10)||0;
-                
-            setAttrs({
-                armureAscension_max: armure+armureModif,
-                cdfAscension_max: cdf+cdfModif
-            });
-        }
-    });
-});
-
-on("change:fichePNJ change:shaman150PG change:shamanNbreTotem"
-, function() 
-{
-    getAttrs(["fichePNJ", "shaman150PG", "shamanNbreTotem"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {				
-            const shaman150PG = parseInt(value["shaman150PG"], 10)||0;;
-            const totem = parseInt(value["shamanNbreTotem"], 10)||0;
-            
-            if(totem == 3)
-            {
-                if(shaman150PG == 0)
-                {
-                    setAttrs({
-                        shamanNbreTotem: 2
-                    });
-                }
-            }
-        }
-    });
-});
-
-//SORCERER
-on("change:fichePNJ change:sorcererMMCorpMetal change:sorcererMM250PG change:sorcerer150PG sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "sorcererMMCorpMetal", "sorcererMM250PG", "sorcerer150PG"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {				
-            const Arm = value["armure"];
-            const CorpMetal = value["sorcererMMCorpMetal"];
-            const CM150PG = value["sorcerer150PG"];
-            const CM250PG = value["sorcererMM250PG"];
-            const cdf = armure[Arm]["cdfMax"];
-            const cdfModif = armure[Arm]["cdfModif"];
-            
-            var bonus = 0;
-            
-            if(CorpMetal != 0 || CM250PG != 0)
-            {
-                bonus += 2;
-                
-                if(CM150PG != 0)
-                    bonus += 2;
-            }
-
-            setAttrs({
-                cdfPJ: cdf+cdfModif+bonus,
-                cdfPJ_max: cdf+cdfModif+bonus
-            });
-        }
-    });
-});
-
-//WARMASTER
-on("change:fichePNJ change:warmaster150PG change:warmaster250PG sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "warmaster150PG", "warmaster250PG"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        
-        if(fichePNJ == 0)
-        {				
-            const Arm = value["armure"];
-            
-            if(Arm == "warmaster")
-            {					
-                const W150PG = value["warmaster150PG"];
-                const W250PG = value["warmaster250PG"];
-                const ene = armure[Arm]["energieMax"];
-                const ene150 = armure[Arm]["energieMax150"];
-                const ene250 = armure[Arm]["energieMax250"];
-                const eneModif = armure[Arm]["energieModif"];
-                
-                var total = ene;
-                
-                if(W150PG != 0)
-                    total = ene150;
-                    
-                if(W250PG != 0)
-                    total = ene250;
-                    
-                total += eneModif;
-                                        
-                setAttrs({
-                    energiePJ_max: total
-                });
-            }
-        }
-    });
-});
-
-//GESTION DES ASPECTS ET CARACTERISTIQUES
-on("change:fichePNJ change:armure change:chair change:deplacement change:force change:endurance change:calODDep change:calODFor change:calODEnd change:santeModif change:santeODBonus sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "chair", "deplacement", "force", "endurance", "calODDep", "calODFor", "calODEnd", "santeModif", "santeODBonus"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const armure = value["armure"];
-            const chair = parseInt(value["chair"], 10)||0;
-            const deplacement = parseInt(value["deplacement"], 10)||0;
-            const force = parseInt(value["force"], 10)||0;
-            const endurance = parseInt(value["endurance"], 10)||0;
-            
-            const calODDep = parseInt(value["calODDep"], 10)||0;
-            const calODFor = parseInt(value["calODFor"], 10)||0;
-            const calODEnd = parseInt(value["calODEnd"], 10)||0;
-            
-            const santepjModif = parseInt(value["santeModif"], 10)||0;
-            const OD = parseInt(value["santeODBonus"], 10)||0;
-            
-            maxCar("deplacement", deplacement, chair);
-            maxCar("force", force, chair);
-            maxCar("endurance", endurance, chair);
-                            
-            /*SANTE*/
-            setAttrs({
-                santepj_max: 10+(Math.max(deplacement, force, endurance)*6)+santepjModif+OD
-            });
-        }
-    });
-});
-
-on("change:fichePNJ change:armure change:bete change:hargne change:combat change:instinct change:calODHar change:calODCom change:calODIns sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "bete", "hargne", "combat", "instinct", "calODHar", "calODCom", "calODIns"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const armure = value["armure"];
-            const bete = parseInt(value["bete"], 10)||0;
-            const hargne = parseInt(value["hargne"], 10)||0;
-            const combat = parseInt(value["combat"], 10)||0;
-            const instinct = parseInt(value["instinct"], 10)||0;
-            
-            const calODHar = parseInt(value["calODHar"], 10)||0;
-            const calODCom = parseInt(value["calODCom"], 10)||0;
-            const calODIns = parseInt(value["calODIns"], 10)||0;
-            
-            maxCar("hargne", hargne, bete);
-            maxCar("combat", combat, bete);
-            maxCar("instinct", instinct, bete);
-            
-            var totalDefense = 0;
-            
-            switch(armure)
-            {
-                case "sans":
-                case "guardian":
-                    totalDefense = Math.max(hargne, combat, instinct);
-                    break;
-                    
-                default:
-                    totalDefense = Math.max(hargne+calODHar, combat+calODCom, instinct+calODIns);
-                    break;
-            }
-            
-            setAttrs({
-                defense: totalDefense
-            });
-        }
-    });
-});
-
-on("change:fichePNJ change:armure change:machine change:tir change:savoir change:technique change:calODTir change:calODSav change:calODTec sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "machine", "tir", "savoir", "technique", "calODTir", "calODSav", "calODTec"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const armure = value["armure"];
-            const machine = parseInt(value["machine"], 10)||0;
-            const tir = parseInt(value["tir"], 10)||0;
-            const savoir = parseInt(value["savoir"], 10)||0;
-            const technique = parseInt(value["technique"], 10)||0;
-            
-            const calODTir = parseInt(value["calODTir"], 10)||0;
-            const calODSav = parseInt(value["calODSav"], 10)||0;
-            const calODTec = parseInt(value["calODTec"], 10)||0;
-            
-            maxCar("tir", tir, machine);
-            maxCar("savoir", savoir, machine);
-            maxCar("technique", technique, machine);
-            
-            var totalReaction = 0;
-            
-            switch(armure)
-            {
-                case "sans":
-                case "guardian":
-                    totalReaction = Math.max(tir, savoir, technique);
-                    break;
-                    
-                default:
-                    totalReaction = Math.max(tir+calODTir, savoir+calODSav, technique+calODTec);
-                    break;
-            }
-            
-            setAttrs({
-                reaction: totalReaction
-            });
-        }
-    });
-});
-
-on("change:fichePNJ change:armure change:dame change:aura change:parole change:sf change:calODAur change:calODPar change:calODSFR sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "dame", "aura", "parole", "sf", "calODAur", "calODPar", "calODSFR"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const armure = value["armure"];
-            const dame = parseInt(value["dame"], 10)||0;
-            const aura = parseInt(value["aura"], 10)||0;
-            const parole = parseInt(value["parole"], 10)||0;
-            const sf = parseInt(value["sf"], 10)||0;
-            
-            const calODAur = parseInt(value["calODAur"], 10)||0;
-            const calODPar = parseInt(value["calODPar"], 10)||0;
-            const calODSFR = parseInt(value["calODSFR"], 10)||0;
-            
-            maxCar("aura", aura, dame);
-            maxCar("parole", parole, dame);
-            maxCar("sf", sf, dame);
-        }
-    });
-});
-
-on("change:fichePNJ change:armure change:masque change:discretion change:dexterite change:perception change:calODDis change:calODPer change:calODDex change:initiativeODBonus sheet:opened"
-, function() 
-{
-    getAttrs(["fichePNJ", "armure", "masque", "discretion", "dexterite", "perception", "calODDis", "calODPer", "calODDex", "initiativeODBonus"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        {
-            const armure = value["armure"];
-            const masque = parseInt(value["masque"], 10)||0;
-            const discretion = parseInt(value["discretion"], 10)||0;
-            const dexterite = parseInt(value["dexterite"], 10)||0;
-            const perception = parseInt(value["perception"], 10)||0;
-            
-            const calODDis = parseInt(value["calODDis"], 10)||0;
-            const calODPer = parseInt(value["calODPer"], 10)||0;
-            const calODDex = parseInt(value["calODDex"], 10)||0;
-            
-            const initiativeODBonus = parseInt(value["initiativeODBonus"], 10)||0;
-            
-            maxCar("discretion", discretion, masque);
-            maxCar("dexterite", dexterite, masque);
-            maxCar("perception", perception, masque);
-            
-            /*INITIATIVE*/
-            var totalInitiative = 0;
-            switch(armure)
-            {
-                case "sans":
-                case "guardian":
-                    totalInitiative = Math.max(discretion, dexterite, perception);
-                    break;
-                    
-                default:
-                    totalInitiative = Math.max(discretion+calODDis, dexterite+calODDex, perception+calODPer)+initiativeODBonus;
-                    break;
-            }
-            
-            setAttrs({
-                bonusInitiative: totalInitiative
-            });
-        }
-    });
-});
-
-on("change:sorcerer250PG sheet:opened"
-, function() 
-{
-    getAttrs(["sorcerer250PG"], function(value)
-    {
-        var NV = value["sorcerer250PG"];;
-    
-        if(NV == "on")
-        {
-            setAttrs
-            ({
-                sorcererMMVolNuee: 0,
-                sorcererMMPhase: 0,
-                sorcererMMEtirement: 0,
-                sorcererMMCorpMetal: 0,
-                sorcererMMCorpFluide: 0,
-                sorcererMMPMGuerre: 0
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                sorcererMM250PG: 0
-            });
-        }
-    });
-});
-
-on("change:monk150PG sheet:opened"
-, function() 
-{
-    getAttrs(["monk150PG"], function(value)
-    {
-        var NV = Number(value["monk150PG"]);
-    
-        if(NV == 2)
-        {
-            setAttrs
-            ({
-                monkSalveDegat: "5D6",
-                monkVagueDegat: "5D6",
-                monkRayonDegat: "6D6",
-                monkRayonViolence: "4D6"
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                monkSalveDegat: "3D6",
-                monkVagueDegat: "3D6",
-                monkRayonDegat: "4D6",
-                monkRayonViolence: "2D6"
-            });
-        }
-    });
-});
-
-on("change:monk150PG change:monk250PG sheet:opened"
-, function() 
-{
-    getAttrs(["monk250PG", "monk150PG"], function(v)
-    {
-        let PG250 = parseInt(v["monk250PG"], 10)||0;
-        let PG150 = parseInt(v["monk150PG"], 10)||0;
-
-        let salveDegats = 3;
-        let vagueDegats = 3;
-        let rayonDegats = 4;
-        let rayonViolence = 2;
-    
-        if(PG150 == 2) {
-            salveDegats += 2;
-            vagueDegats += 2;
-            rayonDegats += 2;
-            rayonViolence += 2;
-        }
-
-        if(PG250 == 1) {
-            salveDegats += 2;
-            vagueDegats += 2;
-            rayonDegats += 2;
-            rayonViolence += 2;
-
-            setAttrs({
-                monkSalveEffets: getTranslationByKey("parasitage")+" 1 / "+getTranslationByKey("dispersion")+" 6 / "+getTranslationByKey("ultraviolence")+" / "+getTranslationByKey("meutrier"), 
-                monkVagueEffets: getTranslationByKey("parasitage")+" 4 / "+getTranslationByKey("dispersion")+" 3 / "+getTranslationByKey("destructeur")+" / "+getTranslationByKey("choc")+" 2",
-                monkRayonEffets: getTranslationByKey("parasitage")+" 1 / "+getTranslationByKey("ignore-armure")
-            });
-        } else {
-            setAttrs({
-                monkSalveEffets: getTranslationByKey("parasitage")+" 1 / "+getTranslationByKey("dispersion")+" 3 / "+getTranslationByKey("ultraviolence")+" / "+getTranslationByKey("meutrier"), 
-                monkVagueEffets: getTranslationByKey("parasitage")+" 2 / "+getTranslationByKey("dispersion")+" 3 / "+getTranslationByKey("destructeur")+" / "+getTranslationByKey("choc")+" 2",
-                monkRayonEffets: getTranslationByKey("parasitage")+" 1 / "+getTranslationByKey("perce-armure")+" 40"
-            });
-        }
-
-        setAttrs({
-            monkSalveDegat: salveDegats+"D6",
-            monkVagueDegat: vagueDegats+"D6",
-            monkRayonDegat: rayonDegats+"D6",
-            monkRayonViolence: rayonViolence+"D6"
-        });
-    });
-});
-
-on("change:priest200PG sheet:opened"
-, function(eventInfo) 
-{
-    getAttrs(["priest200PG"], function(value)
-    {
-        var NV = value["priest200PG"];
-    
-        if(NV == "on")
-        {
-            setAttrs
-            ({
-                priestMechanicContact: "4D6+12",
-                priestMechanicDistance: "3D6+12"
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                priestMechanicContact: "3D6+6",
-                priestMechanicDistance: "2D6+6"
-            });
-        }
-    });
-});
-
-on("change:psion200PG sheet:opened"
-, function() 
-{
-    getAttrs(["psion200PG"], function(value)
-    {
-        var NV = value["psion200PG"];
-    
-        if(NV == "on")
-        {
-            setAttrs
-            ({
-                psionMalusA: "3D",
-                psionMalus: 3
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                psionMalusA: "2D",
-                psionMalus: 2
-            });
-        }
-    });
-});
-
-on("change:wizard150PG sheet:opened"
-, function() 
-{
-    getAttrs(["wizard150PG"], function(v)
-    {
-        var W150 = v["wizard150PG"];
-    
-        if(W150 == "on")
-        {
-            setAttrs
-            ({
-                wizardBPortee: getTranslationByKey("portee-moyenne")
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                wizardBPortee: getTranslationByKey("portee-courte")
-            });
-        }
-    });
-});
-
-on("change:wizard250PG sheet:opened"
-, function() 
-{
-    getAttrs(["wizard250PG"], function(v)
-    {
-        var W150 = v["wizard250PG"];
-    
-        if(W150 == "on")
-        {
-            setAttrs
-            ({
-                wizardOPortee: getTranslationByKey("portee-moyenne")
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                wizardOPortee: getTranslationByKey("portee-courte")
-            });
-        }
-    });
-});
-
-on("change:styleCombat sheet:opened"
-, function() 
-{
-    getAttrs(["styleCombat"], function(value)
-    {
-        var Style = value["styleCombat"];
-
-        switch(Style)
-        {
-            case "standard":				
-                setAttrs
-                ({
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "",
-                    styleCombatDescr: ""
-                });
-                break;
-            case "couvert":				
-                setAttrs
-                ({
-                    atkCouvert: "-3",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "+2",
-                    defBM: "",
-                    styleCombatDescr: getTranslationByKey("bonus-style-couvert")
-                });
-                break;
-            case "agressif":				
-                setAttrs
-                ({
-                    atkAgressif: "+3",
-                    atkCouvert: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "-2",
-                    defBM: "-2",
-                    styleCombatDescr: getTranslationByKey("bonus-style-agressif")
-                });
-                break;
-            case "akimbo":				
-                setAttrs
-                ({
-                    atkAkimbo: "-3",
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "",
-                    styleCombatDescr: getTranslationByKey("bonus-style-akimbo")
-                });
-                break;
-            case "ambidextre":
-                setAttrs
-                ({
-                    atkAmbidextre: "-3",
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "",
-                    styleCombatDescr: getTranslationByKey("bonus-style-ambidextre")
-                });
-                break;
-            case "defensif":
-                setAttrs
-                ({
-                    atkDefensif: "-3",
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "+2",
-                    styleCombatDescr: getTranslationByKey("bonus-style-defensif")
-                });
-                break;
-            case "precis":
-                setAttrs
-                ({
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "",
-                    styleCombatDescr: getTranslationByKey("bonus-style-precis")
-                });
-                break;
-            case "pilonnage":
-                setAttrs
-                ({
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "-2",
-                    atkPuissant: "0",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "",
-                    defBM: "",
-                    styleCombatDescr: getTranslationByKey("bonus-style-pilonnage")
-                });
-                break;
-            case "puissant":
-                setAttrs
-                ({
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "@{stylePuissantBonus}",
-                    styleSuppressionD:0,
-                    styleSuppressionV:0,
-                    rctBM: "-2",
-                    defBM: "-2",
-                    styleCombatDescr: getTranslationByKey("bonus-style-puissant")
-                });
-                break;
-            case "suppression":
-                setAttrs
-                ({
-                    atkCouvert: "0",
-                    atkAgressif: "0",
-                    atkAkimbo: "0",
-                    atkAmbidextre: "0",
-                    atkDefensif: "0",
-                    atkPilonnage: "0",
-                    atkPuissant: "0",
-                    rctBM: "0",
-                    defBM: "0",
-                    styleCombatDescr: getTranslationByKey("bonus-style-suppression")
-                });
-                break;
-        }
-    });
-});
-    
-on("change:repeating_modules remove:repeating_modules"
-, function() 
+on("change:repeating_modules remove:repeating_modules", function() 
 {
     TAS.repeatingSimpleSum("modules", "moduleSlotTete", "slotsOccupeTete");
     TAS.repeatingSimpleSum("modules", "moduleSlotTorse", "slotsOccupeTorse");
@@ -1791,8 +1285,7 @@ on("change:repeating_modules remove:repeating_modules"
     TAS.repeatingSimpleSum("modules", "moduleSlotJD", "slotsOccupeJD");
 });
 
-on("change:repeating_modulesDCLion remove:repeating_modulesDCLion"
-, function() 
+on("change:repeating_modulesDCLion remove:repeating_modulesDCLion", function() 
 {
     TAS.repeatingSimpleSum("modulesDCLion", "moduleSlotDCLTete", "slotsUDCLTeteTot");
     TAS.repeatingSimpleSum("modulesDCLion", "moduleSlotDCLTorse", "slotsUDCLTorseTot");
@@ -1802,724 +1295,701 @@ on("change:repeating_modulesDCLion remove:repeating_modulesDCLion"
     TAS.repeatingSimpleSum("modulesDCLion", "moduleSlotDCLJD", "slotsUDCLJDTot");
 });
 
-on("change:slotsOccupeTete change:slotsOccupeTorse change:slotsOccupeBG change:slotsOccupeBD change:slotsOccupeJG change:slotsOccupeJD"
-, function() 
-{
-    getAttrs(["slotsOccupeTete", "slotTeteMax", "slotsOccupeTorse", "slotTorseMax", "slotsOccupeBG", "slotBGMax", "slotsOccupeBD", "slotBDMax", "slotsOccupeJG", "slotJGMax", "slotsOccupeJD", "slotJDMax", "nomIA"], function(value)
+on("change:slotsOccupeTete change:slotsOccupeTorse change:slotsOccupeBG change:slotsOccupeBD change:slotsOccupeJG change:slotsOccupeJD", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `slotsOccupeTete`, `slotTeteMax`,
+        `slotsOccupeTorse`, `slotTorseMax`,
+        `slotsOccupeBG`, `slotBGMax`,
+        `slotsOccupeBD`, `slotBDMax`,
+        `slotsOccupeJG`, `slotJGMax`,
+        `slotsOccupeJD`, `slotJDMax`
+    ]);
+
+    const TeO = parseInt(attrs["slotsOccupeTete"], 10)||0;
+    const TeM = parseInt(attrs["slotTeteMax"], 10)||0;
+    
+    const ToO = parseInt(attrs["slotsOccupeTorse"], 10)||0;
+    const ToM = parseInt(attrs["slotTorseMax"], 10)||0;
+    
+    const BGO = parseInt(attrs["slotsOccupeBG"], 10)||0;
+    const BGM = parseInt(attrs["slotBGMax"], 10)||0;
+    
+    const BDO = parseInt(attrs["slotsOccupeBD"], 10)||0;
+    const BDM = parseInt(attrs["slotBDMax"], 10)||0;
+    
+    const JGO = parseInt(attrs["slotsOccupeJG"], 10)||0;
+    const JGM = parseInt(attrs["slotJGMax"], 10)||0;
+    
+    const JDO = parseInt(attrs["slotsOccupeJD"], 10)||0;
+    const JDM = parseInt(attrs["slotJDMax"], 10)||0;
+    
+    var totalTe = TeM-TeO;
+    var totalTo = ToM-ToO;
+    var totalBG = BGM-BGO;
+    var totalBD = BDM-BDO;
+    var totalJG = JGM-JGO;
+    var totalJD = JDM-JDO;
+    
+    var msg = "";
+    
+    PI["msgSlot"] = 0;
+    
+    if(PI["msgEnergie"] == 1)		
+        msg += "Erreur. Energie Indisponible. ";
+
+    if(totalTe < 0)
     {
-        const IA = value["nomIA"];
-        const TeO = parseInt(value["slotsOccupeTete"], 10)||0;
-        const TeM = parseInt(value["slotTeteMax"], 10)||0;
+        msg += "Erreur. ";
         
-        const ToO = parseInt(value["slotsOccupeTorse"], 10)||0;
-        const ToM = parseInt(value["slotTorseMax"], 10)||0;
-        
-        const BGO = parseInt(value["slotsOccupeBG"], 10)||0;
-        const BGM = parseInt(value["slotBGMax"], 10)||0;
-        
-        const BDO = parseInt(value["slotsOccupeBD"], 10)||0;
-        const BDM = parseInt(value["slotBDMax"], 10)||0;
-        
-        const JGO = parseInt(value["slotsOccupeJG"], 10)||0;
-        const JGM = parseInt(value["slotJGMax"], 10)||0;
-        
-        const JDO = parseInt(value["slotsOccupeJD"], 10)||0;
-        const JDM = parseInt(value["slotJDMax"], 10)||0;
-        
-        var totalTe = TeM-TeO;
-        var totalTo = ToM-ToO;
-        var totalBG = BGM-BGO;
-        var totalBD = BDM-BDO;
-        var totalJG = JGM-JGO;
-        var totalJD = JDM-JDO;
-        
-        var msg = "";
-        
-        PI["msgSlot"] = 0;
-        
-        if(PI["msgEnergie"] == 1)
-        {			
-            msg += "Erreur. Energie Indisponible. ";
-        }
-        
-        if(totalTe < 0)
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la tête. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
         }
         
-        if(totalTo < 0)
+        msg += "Trop de slots occupé au niveau de la tête. ";
+    }
+    
+    if(totalTo < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du torse. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
         }
         
-        if(totalBG < 0)
+        msg += "Trop de slots occupé au niveau du torse. ";
+    }
+    
+    if(totalBG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras gauche. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
         }
         
-        if(totalBD < 0)
+        msg += "Trop de slots occupé au niveau du bras gauche. ";
+    }
+    
+    if(totalBD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras droit. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
         }
         
-        if(totalJG < 0)
+        msg += "Trop de slots occupé au niveau du bras droit. ";
+    }
+    
+    if(totalJG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la jambe gauche. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
         }
         
-        if(totalJD < 0)
+        msg += "Trop de slots occupé au niveau de la jambe gauche. ";
+    }
+    
+    if(totalJD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité de l'Armure dépassée. ";
+        }
             
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité de l'Armure dépassée. ";
-            }
-                
-            msg += "Trop de slots occupé au niveau de la jambe droite. ";
+        msg += "Trop de slots occupé au niveau de la jambe droite. ";
+    }
+    
+    if(msg != "")
+        setPanneauInformation(msg, true, true);
+    else
+        resetPanneauInformation();
+});
+
+on("change:slotsUDCLTeteTot change:slotsUDCLTorseTot change:slotsUDCLBGTot change:slotsUDCLBDTot change:slotsUDCLJGTot change:slotsUDCLJDTot", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `slotsUDCLTeteTot`, `slotsDCLTeteMax`,
+        `slotsUDCLTorseTot`, `slotsDCLTorseMax`,
+        `slotsUDCLBGTot`, `slotsDCLBGMax`,
+        `slotsUDCLBDTot`, `slotsDCLBDMax`,
+        `slotsUDCLJGTot`, `slotsDCLJGMax`,
+        `slotsUDCLJDTot`, `slotsDCLJDMax`
+    ]);
+
+    const TeO = parseInt(attrs["slotsUDCLTeteTot"], 10)||0;
+    const TeM = parseInt(attrs["slotsDCLTeteMax"], 10)||0;
+
+    const ToO = parseInt(attrs["slotsUDCLTorseTot"], 10)||0;
+    const ToM = parseInt(attrs["slotsDCLTorseMax"], 10)||0;
+    
+    const BGO = parseInt(attrs["slotsUDCLBGTot"], 10)||0;
+    const BGM = parseInt(attrs["slotsDCLBGMax"], 10)||0;
+    
+    const BDO = parseInt(attrs["slotsUDCLBDTot"], 10)||0;
+    const BDM = parseInt(attrs["slotsDCLBDMax"], 10)||0;
+    
+    const JGO = parseInt(attrs["slotsUDCLJGTot"], 10)||0;
+    const JGM = parseInt(attrs["slotsDCLJGMax"], 10)||0;
+    
+    const JDO = parseInt(attrs["slotsUDCLJDTot"], 10)||0;
+    const JDM = parseInt(attrs["slotsDCLJDMax"], 10)||0;
+    
+    var totalTe = TeM-TeO;
+    var totalTo = ToM-ToO;
+    var totalBG = BGM-BGO;
+    var totalBD = BDM-BDO;
+    var totalJG = JGM-JGO;
+    var totalJD = JDM-JDO;
+    
+    var msg = "";
+    
+    PI["msgSlot"] = 0;
+    
+    if(PI["msgEnergie"] == 1)		
+        msg += "Erreur. Energie Indisponible. ";
+    
+    if(totalTe < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(msg != "")
-            setPanneauInformation(msg, true, true);
-        else
-            resetPanneauInformation();
+        msg += "Trop de slots occupé au niveau de la tête. ";
+    }
+    
+    if(totalTo < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
+        }
+        
+        msg += "Trop de slots occupé au niveau du torse. ";
+    }
+    
+    if(totalBG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
+        }
+        
+        msg += "Trop de slots occupé au niveau du bras gauche. ";
+    }
+    
+    if(totalBD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
+        }
+        
+        msg += "Trop de slots occupé au niveau du bras droit. ";
+    }
+    
+    if(totalJG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
+        }
+        
+        msg += "Trop de slots occupé au niveau de la jambe gauche. ";
+    }
+    
+    if(totalJD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
+        {
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
+        }
+            
+        msg += "Trop de slots occupé au niveau de la jambe droite. ";
+    }
+    
+    if(msg != "")
+        setPanneauInformation(msg, true, true);
+    else
+        resetPanneauInformation();
+});
+        
+on("change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `repeating_equipDefensif_defenseBonus`, 
+        `repeating_equipDefensif_reactionBonus`,
+        `repeating_equipDefensif_porte`
+    ]);
+    
+    let equipe = +attrs["repeating_equipDefensif_porte"];
+
+    let defense = 0;
+    let reaction = 0;
+
+    if(equipe == 1) {
+        defense = +attrs["repeating_equipDefensif_defenseBonus"];
+        reaction = +attrs["repeating_equipDefensif_reactionBonus"];
+    }
+
+    await setAttrsAsync({
+        repeating_equipDefensif_defLigne:defense,
+        repeating_equipDefensif_reaLigne:reaction
     });
 });
 
-on("change:slotsUDCLTeteTot change:slotsUDCLTorseTot change:slotsUDCLBGTot change:slotsUDCLBDTot change:slotsUDCLJGTot change:slotsUDCLJDTot"
-, function() 
-{
-    getAttrs(["slotsUDCLTeteTot", "slotsDCLTeteMax", "slotsUDCLTorseTot", "slotsDCLTorseMax", "slotsUDCLBGTot", "slotsDCLBGMax", "slotsUDCLBDTot", "slotsDCLBDMax", "slotsUDCLJGTot", "slotsDCLJGMax", "slotsUDCLJDTot", "slotsDCLJDMax"], function(value)
-    {
-        const IA = value["nomIA"];
-        const TeO = parseInt(value["slotsUDCLTeteTot"], 10)||0;
-        const TeM = parseInt(value["slotsDCLTeteMax"], 10)||0;
-
-        const ToO = parseInt(value["slotsUDCLTorseTot"], 10)||0;
-        const ToM = parseInt(value["slotsDCLTorseMax"], 10)||0;
-        
-        const BGO = parseInt(value["slotsUDCLBGTot"], 10)||0;
-        const BGM = parseInt(value["slotsDCLBGMax"], 10)||0;
-        
-        const BDO = parseInt(value["slotsUDCLBDTot"], 10)||0;
-        const BDM = parseInt(value["slotsDCLBDMax"], 10)||0;
-        
-        const JGO = parseInt(value["slotsUDCLJGTot"], 10)||0;
-        const JGM = parseInt(value["slotsDCLJGMax"], 10)||0;
-        
-        const JDO = parseInt(value["slotsUDCLJDTot"], 10)||0;
-        const JDM = parseInt(value["slotsDCLJDMax"], 10)||0;
-        
-        var totalTe = TeM-TeO;
-        var totalTo = ToM-ToO;
-        var totalBG = BGM-BGO;
-        var totalBD = BDM-BDO;
-        var totalJG = JGM-JGO;
-        var totalJD = JDM-JDO;
-        
-        var msg = "";
-        
-        PI["msgSlot"] = 0;
-        
-        if(PI["msgEnergie"] == 1)
-        {			
-            msg += "Erreur. Energie Indisponible. ";
-        }
-        
-        if(totalTe < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la tête. ";
-        }
-        
-        if(totalTo < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du torse. ";
-        }
-        
-        if(totalBG < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras gauche. ";
-        }
-        
-        if(totalBD < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras droit. ";
-        }
-        
-        if(totalJG < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la jambe gauche. ";
-        }
-        
-        if(totalJD < 0)
-        {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-                
-            msg += "Trop de slots occupé au niveau de la jambe droite. ";
-        }
-        
-        if(msg != "")
-            setPanneauInformation(msg, true, true);
-        else
-            resetPanneauInformation();
-    });
-});
-        
-on("change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus"
-, function() 
-{
-    getAttrs(["repeating_equipDefensif_defenseBonus", "repeating_equipDefensif_reactionBonus", "repeating_equipDefensif_porte"], function(vDef)
-    {
-        var vDefE = parseInt(vDef["repeating_equipDefensif_defenseBonus"]);
-        var vReaE = parseInt(vDef["repeating_equipDefensif_reactionBonus"]);
-        
-        var vPorte = vDef["repeating_equipDefensif_porte"];
-        
-        if(vPorte == "1")
-        {
-            setAttrs
-            ({
-                repeating_equipDefensif_reaLigne: vReaE,
-                repeating_equipDefensif_defLigne: vDefE
-            });
-        }
-        else
-        {
-            setAttrs
-            ({
-                repeating_equipDefensif_reaLigne: 0,
-                repeating_equipDefensif_defLigne: 0
-            });
-        }
-    });
-});
-
-on("change:repeating_equipDefensif:reaLigne remove:repeating_equipDefensif:reaLigne"
-, function() 
+on("change:repeating_equipDefensif:reaLigne remove:repeating_equipDefensif:reaLigne", function() 
 {
     TAS.repeatingSimpleSum("equipDefensif", "reaLigne", "bonusReaction");
 });
 
-on("change:repeating_equipDefensif:defLigne remove:repeating_equipDefensif:defLigne"
-, function() 
+on("change:repeating_equipDefensif:defLigne remove:repeating_equipDefensif:defLigne", function() 
 {
     TAS.repeatingSimpleSum("equipDefensif", "defLigne", "bonusDefense");
 });
 
-on("change:calODEnd change:armure sheet:opened"
-, function()
-{
-    getAttrs(["calODEnd", "armure"], function(value)
-    {
-        const armure = value["armure"];
-    
-        const OD = parseInt(value["calODEnd"], 10)||0;
-        
-        var bonus = 0;
-        
-        switch(armure)
-        {
-            case "sans":
-            case "guardian":
-                bonus = 0;
-                break;
-                
-            default:
-                if(OD >= 3)
-                    bonus = 6;
-                else
-                    bonus = 0;
-                break;
-        }
-        
-        setAttrs({
-                santeODBonus:bonus
-        });
+on("change:calODEnd change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODEnd`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODEnd"];
+
+    let bonus = 6;
+
+    if(armure == "sans" || armure == "guardian" || OD < 3)
+        bonus = 0;
+
+    await setAttrsAsync({
+            santeODBonus:bonus
     });
 });
 
-on("change:calODCom change:armure sheet:opened"
-, function()
-{
-    getAttrs(["calODCom", "armure"], function(value)
-    {
-        const armure = value["armure"];
-    
-        const OD = parseInt(value["calODCom"], 10)||0;
-        
-        var bonus = 0;
-        var bonusAkimbo = 0;
-        var bonusAmbidextrie = 0;
-        
-        switch(armure)
+on("change:calODCom change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODCom`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODCom"];
+
+    let bonus = 0;
+    let bonusAkimbo = 0;
+    let bonusAmbidextrie = 0;
+
+    if(armure == "sans" || armure == "guardian") {
+        bonus = 0;
+        bonusAkimbo = 0;
+        bonusAmbidextrie = 0;
+    } else {
+        switch(OD)
         {
-            case "sans":
-            case "guardian":
+            case 2:
+                bonus = 2;
+                bonusAkimbo = 0;
+                bonusAmbidextrie = 0;
+                break;
+            
+            case 3:
+                bonus = 2;
+                bonusAkimbo = 2;
+                bonusAmbidextrie = 0;
+                break;
+            
+            case 4:
+            case 5:
+                bonus = 2;
+                bonusAkimbo = 2;
+                bonusAmbidextrie = 2;
+                break;
+            
+            default:
                 bonus = 0;
                 bonusAkimbo = 0;
                 bonusAmbidextrie = 0;
                 break;
-                
-            default:
-                switch(OD)
-                {
-                    case 2:
-                        bonus = 2;
-                        bonusAkimbo = 0;
-                        bonusAmbidextrie = 0;
-                        break;
-                    
-                    case 3:
-                        bonus = 2;
-                        bonusAkimbo = 2;
-                        bonusAmbidextrie = 0;
-                        break;
-                    
-                    case 4:
-                    case 5:
-                        bonus = 2;
-                        bonusAkimbo = 2;
-                        bonusAmbidextrie = 2;
-                        break;
-                    
-                    default:
-                        bonus = 0;
-                        bonusAkimbo = 0;
-                        bonusAmbidextrie = 0;
-                        break;
-                }
-                break;
         }
-        
-        setAttrs({
-            reactionODBonus:bonus,
-            akimboContactODBonus:bonusAkimbo,
-            ambidextrieContactODBonus:bonusAmbidextrie
-        });
-    });
-});
-
-on("change:calODIns sheet:opened"
-, function(value)
-{
-    getAttrs(["calODIns"], function(value)
-    {
-        var NV = parseInt(value["calODIns"], 10)||0;
-        
-        if(NV >= 3)
-        {
-            setAttrs({
-                    initiativeODBonus:(3*NV)
-            });
-        }
-        else
-        {
-            setAttrs({
-                    initiativeODBonus:0
-            });
-        }
-    });
-});
-
-on("change:calODTir change:armure sheet:opened"
-, function()
-{
-    getAttrs(["calODTir", "armure"], function(value)
-    {
-        const armure = value["armure"];
+    }
     
-        const OD = parseInt(value["calODTir"], 10)||0;
-        
-        var bonusAkimbo = 0;
-        var bonusAmbidextrie = 0;
-        
-        switch(armure)
-        {
-            case "sans":
-            case "guardian":
+    await setAttrsAsync({
+        reactionODBonus:bonus,
+        akimboContactODBonus:bonusAkimbo,
+        ambidextrieContactODBonus:bonusAmbidextrie
+    });
+});
+
+on("change:calODIns change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODIns`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODIns"];
+
+    let bonus = 3*OD;
+
+    if(armure == "sans" || armure == "guardian" || OD < 3)
+        bonus = 0;
+
+    await setAttrsAsync({initiativeODBonus:bonus});
+});
+
+on("change:calODTir change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODTir`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODTir"];
+
+    let bonusAkimbo = 0;
+    let bonusAmbidextrie = 0;
+
+    if(armure == "sans" || armure == "guardian") {
+        bonusAkimbo = 0;
+        bonusAmbidextrie = 0;
+    } else {
+        switch(OD)
+        {            
+            case 3:
+                bonusAkimbo = 2;
+                bonusAmbidextrie = 0;
+                break;
+            
+            case 4:
+            case 5:
+                bonusAkimbo = 2;
+                bonusAmbidextrie = 2;
+                break;
+            
+            default:
                 bonusAkimbo = 0;
                 bonusAmbidextrie = 0;
                 break;
-                
-            default:
-                switch(OD)
-                {						
-                    case 3:
-                        bonusAkimbo = 2;
-                        bonusAmbidextrie = 0;
-                        break;
-                    
-                    case 4:
-                    case 5:
-                        bonusAkimbo = 2;
-                        bonusAmbidextrie = 2;
-                        break;
-                    
-                    default:
-                        bonusAkimbo = 0;
-                        bonusAmbidextrie = 0;
-                        break;
-                }
-                break;
         }
-        
-        setAttrs({
-            akimboDistanceODBonus:bonusAkimbo,
-            ambidextrieDistanceODBonus:bonusAmbidextrie
-        });
+    }
+    
+    await setAttrsAsync({
+        akimboDistanceODBonus:bonusAkimbo,
+        ambidextrieDistanceODBonus:bonusAmbidextrie
     });
 });
 
-on("change:calODAur change:aura sheet:opened"
-, function(value)
-{
-    getAttrs(["calODAur", "aura", "armure"], function(value)
-    {
-        const armure = value["armure"];
-    
-        const OD = parseInt(value["calODAur"], 10)||0;
-        const aura = parseInt(value["aura"], 10)||0;
-        
-        var bonus = 0;
-        
-        switch(armure)
-        {
-            case "sans":
-            case "guardian":
-                bonus = 0;
-                break;
-                
-            default:
-                switch(OD)
-                {												
-                    case 5:
-                        bonus = aura;
-                        break;
-                    
-                    default:
-                        bonus = 0;
-                        break;
-                }
-                break;
-        }
-        
-        setAttrs({
-            defenseODBonus:bonus
-        });
+on("change:calODAur change:aura change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODAur`,
+        `aura`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODAur"];
+    const carac = +attrs["aura"];
+
+    let bonus = carac;
+
+    if(armure == "sans" || armure == "guardian" || OD < 5)
+        bonus = 0;
+
+    await setAttrsAsync({
+        defenseODBonus:bonus
     });
 });
 
-on("change:calODDis change:armure sheet:opened"
-, function()
-{
-    getAttrs(["calODDis", "armure"], function(value)
-    {
-        const armure = value["armure"];
-    
-        const OD = parseInt(value["calODDis"], 10)||0;
-        
-        var bonus = "";
-        
-        switch(armure)
-        {
-            case "sans":
-            case "guardian":
-                bonus = "";
-                break;
-                
-            default:
-                switch(OD)
-                {						
-                    case 2:
-                    case 3:
-                    case 4:
-                        bonus = "{{ODDiscretion=[[@{discretion}]]}}";
-                        break;
-                    
-                    case 5:
-                        bonus = "{{ODDiscretion=[[@{discretion}+@{calODDis}]]}}";
-                        break;
-                    
-                    default:
-                        bonus = "";
-                        break;
-                }
-                break;
-        }
-        
-        setAttrs({
-            discretionDegatsBonus:bonus
-        });
+on("change:calODDis change:armure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armure`, 
+        `calODDis`
+    ]);
+
+    const armure = attrs["armure"];
+
+    const OD = +attrs["calODDis"];
+
+    let bonus = "";
+
+    if(armure == "sans" || armure == "guardian" || OD < 3)
+        bonus = "";
+    else if(OD == 4)
+        bonus = "{{ODDiscretion=[[@{discretion}]]}}";
+    else if(OD == 5)
+        bonus = "{{ODDiscretion=[[@{discretion}+@{calODDis}]]}}";
+
+    await setAttrsAsync({
+        discretionDegatsBonus:bonus
     });
 });
 
-on("change:warriorSoldierA change:deplOD change:forOD change:endOD sheet:opened"
-, function() 
-{		
-    getAttrs(["warriorSoldierA", "warrior250PG", "deplOD", "forOD", "endOD"], function(value)
-    {
-        var mode = value["warriorSoldierA"];
+on("change:warriorSoldierA change:warrior250PG change:deplOD change:forOD change:endOD", async ()=>{		
+
+    const attrs = await getAttrsAsync([
+        `warriorSoldierA`, 
+        `warrior250PG`, 
+        `deplOD`,
+        `forOD`,
+        `endOD`
+    ]);
+
+    let PG250 = +attrs["warrior250PG"];
+
+    let mode = attrs["warriorSoldierA"];
+
+    let OD1 = +attrs["deplOD"];
+    let OD2 = +attrs["forOD"];
+    let OD3 = +attrs["endOD"];
+
+    let bonus = 0;
     
-        var WEvol = parseInt(value["warrior250PG"], 10)||0;
-    
-        var ODDep = parseInt(value["deplOD"], 10)||0;
-        var ODFor = parseInt(value["forOD"], 10)||0;
-        var ODEnd = parseInt(value["endOD"], 10)||0;
-        
-        var bonus = 0;
-        
-        if(mode != 0)
-        {
-            bonus = 1+WEvol;
-            
-            setAttrs({
-                warriorHunterA:0,
-                warriorScholarA:0,
-                warriorHeraldA:0,
-                warriorScoutA:0
-            });
-        }
-        
-        setAttrs({
-            calODDep:ODDep+bonus,
-            calODFor:ODFor+bonus,
-            calODEnd:ODEnd+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0) {
+        bonus += 1;
+        bonus += PG250;
+
+        update["warriorHunterA"] = 0;
+        update["warriorScholarA"] = 0;
+        update["warriorHeraldA"] = 0;
+        update["warriorScoutA"] = 0;
+    }
+
+    update["calODDep"] = OD1+bonus;
+    update["calODFor"] = OD2+bonus;
+    update["calODEnd"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:warriorHunterA change:hargneOD change:combOD change:instOD sheet:opened"
-, function() 
-{
-    getAttrs(["warriorHunterA", "warrior250PG", "hargneOD", "combOD", "instOD"], function(value)
-    {
-        var mode = value["warriorHunterA"];
+on("change:warriorHunterA change:warrior250PG change:hargneOD change:combOD change:instOD", async ()=>{		
+
+    const attrs = await getAttrsAsync([
+        `warriorHunterA`, 
+        `warrior250PG`, 
+        `hargneOD`,
+        `combOD`,
+        `instOD`
+    ]);
+
+    let PG250 = +attrs["warrior250PG"];
+
+    let mode = attrs["warriorHunterA"];
+
+    let OD1 = +attrs["hargneOD"];
+    let OD2 = +attrs["combOD"];
+    let OD3 = +attrs["instOD"];
+
+    let bonus = 0;
     
-        var WEvol = parseInt(value["warrior250PG"], 10)||0;
-    
-        var ODHar = parseInt(value["hargneOD"], 10)||0;
-        var ODCom = parseInt(value["combOD"], 10)||0;
-        var ODIns = parseInt(value["instOD"], 10)||0;
-        
-        var bonus = 0;
-        
-        if(mode != 0)
-        {
-            bonus = 1+WEvol;
-            
-            setAttrs({
-                    warriorSoldierA:0,
-                    warriorScholarA:0,
-                    warriorHeraldA:0,
-                    warriorScoutA:0
-            });
-        }
-        
-        setAttrs({
-            calODHar:ODHar+bonus,
-            calODCom:ODCom+bonus,
-            calODIns:ODIns+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0) {
+        bonus += 1;
+        bonus += PG250;
+
+        update["warriorSoldierA"] = 0;
+        update["warriorScholarA"] = 0;
+        update["warriorHeraldA"] = 0;
+        update["warriorScoutA"] = 0;
+    }
+
+    update["calODHar"] = OD1+bonus;
+    update["calODCom"] = OD2+bonus;
+    update["calODIns"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:warriorScholarA change:tirOD change:savoirOD change:technOD sheet:opened"
-, function()
-{
-    getAttrs(["warriorScholarA", "warrior250PG", "tirOD", "savoirOD", "technOD"], function(value)
-    {
-        var mode = value["warriorScholarA"];
+on("change:warriorScholarA change:warrior250PG change:tirOD change:savoirOD change:technOD", async ()=>{		
+
+    const attrs = await getAttrsAsync([
+        `warriorScholarA`, 
+        `warrior250PG`, 
+        `tirOD`,
+        `savoirOD`,
+        `technOD`
+    ]);
+
+    let PG250 = +attrs["warrior250PG"];
+
+    let mode = attrs["warriorScholarA"];
+
+    let OD1 = +attrs["tirOD"];
+    let OD2 = +attrs["savoirOD"];
+    let OD3 = +attrs["technOD"];
+
+    let bonus = 0;
     
-        var WEvol = parseInt(value["warrior250PG"], 10)||0;
-    
-        var ODTir = parseInt(value["tirOD"], 10)||0;
-        var ODSav = parseInt(value["savoirOD"], 10)||0;
-        var ODTec = parseInt(value["technOD"], 10)||0;
-        
-        var bonus = 0;
-    
-        if(mode != 0)
-        {
-            bonus = 1+WEvol;
-            
-            setAttrs({
-                warriorSoldierA:0,
-                warriorHunterA:0,
-                warriorHeraldA:0,
-                warriorScoutA:0
-            });
-        }
-        
-        setAttrs({
-            calODTir:ODTir+bonus,
-            calODSav:ODSav+bonus,
-            calODTec:ODTec+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0) {
+        bonus += 1;
+        bonus += PG250;
+
+        update["warriorSoldierA"] = 0;
+        update["warriorHunterA"] = 0;
+        update["warriorHeraldA"] = 0;
+        update["warriorScoutA"] = 0;
+    }
+
+    update["calODTir"] = OD1+bonus;
+    update["calODSav"] = OD2+bonus;
+    update["calODTec"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:warriorHeraldA change:auraOD change:paroleOD change:sfOD sheet:opened"
-, function() 
-{
-    getAttrs(["warriorHeraldA", "warrior250PG", "auraOD", "paroleOD", "sfOD"], function(value)
-    {
-        var mode = value["warriorHeraldA"];
+on("change:warriorHeraldA change:warrior250PG change:auraOD change:paroleOD change:sfOD", async ()=>{		
+
+    const attrs = await getAttrsAsync([
+        `warriorHeraldA`, 
+        `warrior250PG`, 
+        `auraOD`,
+        `paroleOD`,
+        `sfOD`
+    ]);
+
+    let PG250 = +attrs["warrior250PG"];
+
+    let mode = attrs["warriorHeraldA"];
+
+    let OD1 = +attrs["auraOD"];
+    let OD2 = +attrs["paroleOD"];
+    let OD3 = +attrs["sfOD"];
+
+    let bonus = 0;
     
-        var WEvol = parseInt(value["warrior250PG"], 10)||0;
-    
-        var ODAur = parseInt(value["auraOD"], 10)||0;
-        var ODPar = parseInt(value["paroleOD"], 10)||0;
-        var ODSFR = parseInt(value["sfOD"], 10)||0;
-                    
-        var bonus = 0;
-    
-        if(mode != 0)
-        {
-            bonus = 1+WEvol;
-            
-            setAttrs({
-                warriorSoldierA:0,
-                warriorHunterA:0,
-                warriorScholarA:0,
-                warriorScoutA:0
-            });
-        }
-        
-        setAttrs({
-            calODAur:ODAur+bonus,
-            calODPar:ODPar+bonus,
-            calODSFR:ODSFR+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0) {
+        bonus += 1;
+        bonus += PG250;
+
+        update["warriorSoldierA"] = 0;
+        update["warriorHunterA"] = 0;
+        update["warriorScholarA"] = 0;
+        update["warriorScoutA"] = 0;
+    }
+
+    update["calODAur"] = OD1+bonus;
+    update["calODPar"] = OD2+bonus;
+    update["calODSFR"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:warriorScoutA change:discrOD change:percOD change:dextOD sheet:opened"
-, function() 
-{			
-    getAttrs(["warriorScoutA", "warrior250PG", "discrOD", "percOD", "dextOD"], function(value)
-    {
-        var mode = value["warriorScoutA"];
-    
-        var WEvol = parseInt(value["warrior250PG"], 10)||0;
-    
-        var ODDis = parseInt(value["discrOD"], 10)||0;
-        var ODPer = parseInt(value["percOD"], 10)||0;
-        var ODDex = parseInt(value["dextOD"], 10)||0;
-        
-        var bonus = 0;
+on("change:warriorScoutA change:warrior250PG change:discrOD change:percOD change:dextOD", async ()=>{		
 
-        if(mode != 0)
-        {
-            bonus = 1+WEvol;
-            
-            setAttrs({
-                warriorSoldierA:0,
-                warriorHunterA:0,
-                warriorScholarA:0,
-                warriorHeraldA:0
-            });
-        }
-        
-        setAttrs({
-            calODDis:ODDis+bonus,
-            calODPer:ODPer+bonus,
-            calODDex:ODDex+bonus
-        });
-    });
+    const attrs = await getAttrsAsync([
+        `warriorScoutA`, 
+        `warrior250PG`, 
+        `discrOD`,
+        `percOD`,
+        `dextOD`
+    ]);
+
+    let PG250 = +attrs["warrior250PG"];
+
+    let mode = attrs["warriorScoutA"];
+
+    let OD1 = +attrs["discrOD"];
+    let OD2 = +attrs["percOD"];
+    let OD3 = +attrs["dextOD"];
+
+    let bonus = 0;
+    
+    let update = {};
+
+    if(mode != 0) {
+        bonus += 1;
+        bonus += PG250;
+
+        update["warriorSoldierA"] = 0;
+        update["warriorHunterA"] = 0;
+        update["warriorScholarA"] = 0;
+        update["warriorHeraldA"] = 0;
+    }
+
+    update["calODDis"] = OD1+bonus;
+    update["calODPer"] = OD2+bonus;
+    update["calODDex"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
+on("change:druidWolfConfiguration", async ()=>{		
+
+    const attrs = await getAttrsAsync([
+        `druidWolfConfiguration`
+    ]);
+
+    let mode = attrs["druidWolfConfiguration"];
+    let PE = 0;
+
+    if(mode == "Labor" || mode == "Medic" || mode == "Recon")
+        PE = 1;
+    
+    if(mode == "Tech" || mode == "Fighter")
+        PE = 2;
+    
+    await setAttrsAsync({
+        druidWolfConfigurationPE:PE
+    });
+});
 
 //META-ARMURE DE LEGENDE
 on("change:armureLegende",function(eventInfo)
 {
-    var mal = eventInfo.newValue;
+    let mal = eventInfo.newValue;
     
     switch(mal)
     {
@@ -2556,98 +2026,106 @@ on("change:armureLegende",function(eventInfo)
     }
 });
 
-on("clicked:selectionMALWarrior",function()
-{
-    getAttrs(["listeTypeMALWarrior"], function(value)
-    {
-        var choix = parseInt(value["listeTypeMALWarrior"], 10)||0;
-        
-        setAttrs({
-            malwarriortype:choix,
-            popup:0
-        });
+on("clicked:selectionMALWarrior", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeTypeMALWarrior`
+    ]);
+
+    let choix = parseInt(attrs["listeTypeMALWarrior"], 10)||0;
+
+    await setAttrsAsync({
+        malwarriortype:choix,
+        popup:0
     });
 });
 
-on("clicked:selectionMALPriest",function()
-{
-    getAttrs(["listeTypeMALPriest"], function(value)
-    {
-        var choix = parseInt(value["listeTypeMALPriest"], 10)||0;
-        
-        setAttrs({
-            malpriestmode:choix,
-            popup:0
-        });
+on("clicked:selectionMALPriest", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeTypeMALPriest`
+    ]);
+
+    let choix = parseInt(attrs["listeTypeMALPriest"], 10)||0;
+
+    await setAttrsAsync({
+        malpriestmode:choix,
+        popup:0
     });
 });
 
-on("clicked:selectionMALWarmaster",function()
-{
-    getAttrs(["listeTypeMALWarmaster"], function(value)
-    {
-        var choix = parseInt(value["listeTypeMALWarmaster"], 10)||0;
-        var popup = 0;
-        
-        if(choix == 1)
-            popup = 9;
-        
-        setAttrs({
-            malwarmastermode:choix,
-            popup:popup
-        });
+on("clicked:selectionMALWarmaster", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeTypeMALWarmaster`
+    ]);
+
+    let choix = parseInt(attrs["listeTypeMALWarmaster"], 10)||0;
+
+    let popup = 0;
+
+    if(choix == 1)
+        popup = 9;
+    
+    await setAttrsAsync({
+        malwarmastermode:choix,
+        popup:popup
     });
 });
 
-on("clicked:selectionMALWarmasterWarlord",function()
-{
-    getAttrs(["listeTypeMALWarmasterWarlord"], function(value)
-    {
-        var choix = parseInt(value["listeTypeMALWarmasterWarlord"], 10)||0;
-        
-        setAttrs({
-            malwarmasterwarlord:choix,
-            popup:0
-        });
+on("clicked:selectionMALWarmasterWarlord", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeTypeMALWarmasterWarlord`
+    ]);
+
+    let choix = parseInt(attrs["listeTypeMALWarmasterWarlord"], 10)||0;
+
+    await setAttrsAsync({
+        malwarmasterwarlord:choix,
+        popup:0
     });
 });
 
-on("clicked:selectionMALPsion",function()
-{
-    getAttrs(["listeModeMALPsion"], function(value)
-    {
-        var choix = parseInt(value["listeModeMALPsion"], 10)||0;
-        
-        setAttrs({
-            malpsionmode:choix,
-            popup:0
-        });
+on("clicked:selectionMALPsion", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeModeMALPsion`
+    ]);
+
+    let choix = parseInt(attrs["listeModeMALPsion"], 10)||0;
+
+    await setAttrsAsync({
+        malpsionmode:choix,
+        popup:0
     });
 });
 
-on("clicked:selectionMALWarlock",function()
-{
-    getAttrs(["listeModeMALWarlock"], function(value)
-    {
-        var choix = parseInt(value["listeModeMALWarlock"], 10)||0;
-        
-        setAttrs({
-            malwarlockmode:choix,
-            popup:0
-        });
+on("clicked:selectionMALWarlock", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeModeMALWarlock`
+    ]);
+
+    let choix = parseInt(attrs["listeModeMALWarlock"], 10)||0;
+
+    await setAttrsAsync({
+        malwarlockmode:choix,
+        popup:0
     });
 });
 
-on("clicked:selectionMALDruid",function()
-{
-    getAttrs(["listeModeMALDruid"], function(value)
-    {
-        var choix = parseInt(value["listeModeMALDruid"], 10)||0;
-        
-        setAttrs({
-            maldruidmod:choix,
-            popup:0
-        });
+on("clicked:selectionMALDruid", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `listeModeMALDruid`
+    ]);
+
+    let choix = parseInt(attrs["listeModeMALDruid"], 10)||0;
+
+    await setAttrsAsync({
+        maldruidmod:choix,
+        popup:0
     });
 });
 
@@ -2661,325 +2139,338 @@ on("change:repeating_modulesMALDCLion remove:repeating_modulesMALDCLion", functi
     TAS.repeatingSimpleSum("modulesMALDCLion", "moduleSlotMALDCLJD", "slotsMALUDCLJDTot");
 });
 
-on("change:slotsMALUDCLTeteTot change:slotsMALUDCLTorseTot change:slotsMALUDCLBGTot change:slotsMALUDCLBDTot change:slotsMALUDCLJGTot change:slotsMALUDCLJDTot", function() 
-{
-    getAttrs(["slotsMALUDCLTeteTot", "slotsMALDCLTeteMax", "slotsMALUDCLTorseTot", "slotsMALDCLTorseMax", "slotsMALUDCLBGTot", "slotsMALDCLBGMax", "slotsMALUDCLBDTot", "slotsMALDCLBDMax", "slotsMALUDCLJGTot", "slotsMALDCLJGMax", "slotsMALUDCLJDTot", "slotsMALDCLJDMax"], function(value)
-    {
-        const IA = value["nomIA"];
-        const TeO = parseInt(value["slotsMALUDCLTeteTot"], 10)||0;
-        const TeM = parseInt(value["slotsMALDCLTeteMax"], 10)||0;
+on("change:slotsMALUDCLTeteTot change:slotsMALUDCLTorseTot change:slotsMALUDCLBGTot change:slotsMALUDCLBDTot change:slotsMALUDCLJGTot change:slotsMALUDCLJDTot", async ()=>{
+    const attrs = await getAttrsAsync([
+        `slotsMALUDCLTeteTot`, `slotsMALDCLTeteMax`,
+        `slotsMALUDCLTorseTot`, `slotsMALDCLTorseMax`,
+        `slotsMALUDCLBGTot`, `slotsMALDCLBGMax`,
+        `slotsMALUDCLBDTot`, `slotsMALDCLBDMax`,
+        `slotsMALUDCLJGTot`, `slotsMALDCLJGMax`,
+        `slotsMALUDCLJDTot`, `slotsMALDCLJDMax`
+    ]);
 
-        const ToO = parseInt(value["slotsMALUDCLTorseTot"], 10)||0;
-        const ToM = parseInt(value["slotsMALDCLTorseMax"], 10)||0;
+    const TeO = parseInt(attrs["slotsMALUDCLTeteTot"], 10)||0;
+    const TeM = parseInt(attrs["slotsMALDCLTeteMax"], 10)||0;
+
+    const ToO = parseInt(attrs["slotsMALUDCLTorseTot"], 10)||0;
+    const ToM = parseInt(attrs["slotsMALDCLTorseMax"], 10)||0;
+    
+    const BGO = parseInt(attrs["slotsMALUDCLBGTot"], 10)||0;
+    const BGM = parseInt(attrs["slotsMALDCLBGMax"], 10)||0;
+    
+    const BDO = parseInt(attrs["slotsMALUDCLBDTot"], 10)||0;
+    const BDM = parseInt(attrs["slotsMALDCLBDMax"], 10)||0;
+    
+    const JGO = parseInt(attrs["slotsMALUDCLJGTot"], 10)||0;
+    const JGM = parseInt(attrs["slotsMALDCLJGMax"], 10)||0;
+    
+    const JDO = parseInt(attrs["slotsMALUDCLJDTot"], 10)||0;
+    const JDM = parseInt(attrs["slotsMALDCLJDMax"], 10)||0;
+    
+    let totalTe = TeM-TeO;
+    let totalTo = ToM-ToO;
+    let totalBG = BGM-BGO;
+    let totalBD = BDM-BDO;
+    let totalJG = JGM-JGO;
+    let totalJD = JDM-JDO;
+    
+    let msg = "";
+    
+    PI["msgSlot"] = 0;
+    
+    if(PI["msgEnergie"] == 1)
+    {			
+        msg += "Erreur. Energie Indisponible. ";
+    }
+    
+    if(totalTe < 0)
+    {
+        msg += "Erreur. ";
         
-        const BGO = parseInt(value["slotsMALUDCLBGTot"], 10)||0;
-        const BGM = parseInt(value["slotsMALDCLBGMax"], 10)||0;
-        
-        const BDO = parseInt(value["slotsMALUDCLBDTot"], 10)||0;
-        const BDM = parseInt(value["slotsMALDCLBDMax"], 10)||0;
-        
-        const JGO = parseInt(value["slotsMALUDCLJGTot"], 10)||0;
-        const JGM = parseInt(value["slotsMALDCLJGMax"], 10)||0;
-        
-        const JDO = parseInt(value["slotsMALUDCLJDTot"], 10)||0;
-        const JDM = parseInt(value["slotsMALDCLJDMax"], 10)||0;
-        
-        var totalTe = TeM-TeO;
-        var totalTo = ToM-ToO;
-        var totalBG = BGM-BGO;
-        var totalBD = BDM-BDO;
-        var totalJG = JGM-JGO;
-        var totalJD = JDM-JDO;
-        
-        var msg = "";
-        
-        PI["msgSlot"] = 0;
-        
-        if(PI["msgEnergie"] == 1)
-        {			
-            msg += "Erreur. Energie Indisponible. ";
-        }
-        
-        if(totalTe < 0)
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la tête. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(totalTo < 0)
+        msg += "Trop de slots occupé au niveau de la tête. ";
+    }
+    
+    if(totalTo < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du torse. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(totalBG < 0)
+        msg += "Trop de slots occupé au niveau du torse. ";
+    }
+    
+    if(totalBG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras gauche. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(totalBD < 0)
+        msg += "Trop de slots occupé au niveau du bras gauche. ";
+    }
+    
+    if(totalBD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau du bras droit. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(totalJG < 0)
+        msg += "Trop de slots occupé au niveau du bras droit. ";
+    }
+    
+    if(totalJG < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-            
-            msg += "Trop de slots occupé au niveau de la jambe gauche. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
         
-        if(totalJD < 0)
+        msg += "Trop de slots occupé au niveau de la jambe gauche. ";
+    }
+    
+    if(totalJD < 0)
+    {
+        msg += "Erreur. ";
+        
+        if(PI["msgSlot"] == 0)
         {
-            msg += "Erreur. ";
-            
-            if(PI["msgSlot"] == 0)
-            {
-                PI["msgSlot"] = 1;
-                msg += "Capacité du Compagnon dépassée. ";
-            }
-                
-            msg += "Trop de slots occupé au niveau de la jambe droite. ";
+            PI["msgSlot"] = 1;
+            msg += "Capacité du Compagnon dépassée. ";
         }
-        
-        if(msg != "")
-            setPanneauInformation(msg, true, true);
-        else
-            resetPanneauInformation();
-    });
+            
+        msg += "Trop de slots occupé au niveau de la jambe droite. ";
+    }
+    
+    if(msg != "")
+        setPanneauInformation(msg, true, true);
+    else
+        resetPanneauInformation();
 });
 
-on("clicked:repeating_modulesmaldclion:pemdlion",function()
-{
-    getAttrs(["repeating_modules_moduleEnergieMALDCLion", "MALDruidLionPEAct", "nomIA"], function(value)
-    {
-        const IA = value["nomIA"];
-        const PEM = parseInt(value["repeating_modules_moduleEnergieMALDCLion"], 10)||0;
-        const PE = parseInt(value["MALDruidLionPEAct"], 10)||0;
-        
-        var total = PE-PEM;
+on("clicked:repeating_modulesmaldclion:pemdlion", async ()=>{
+    const attrs = await getAttrsAsync([
+        `repeating_modules_moduleEnergieMALDCLion`,
+        `MALDruidLionPEAct`
+    ]);
 
-        if(total < 0)
-        {				
-            setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
-            
-            PI["msgEnergie"] = 1;
-        }
-        else
-        {
-            setAttrs({
-                MALDruidLionPEAct:total
-            });
-        }
-    });
+    const PEM = parseInt(attrs["repeating_modules_moduleEnergieMALDCLion"], 10)||0;
+    const PE = parseInt(attrs["MALDruidLionPEAct"], 10)||0;
+    
+    var total = PE-PEM;
+
+    if(total < 0) {				
+        setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
+        
+        PI["msgEnergie"] = 1;
+    } else {        
+        setAttrs({
+            MALDruidLionPEAct:total
+        });
+    }
 });	
 
-on("change:MALWarriorSoldierA change:deplOD change:forOD change:endOD sheet:opened", function() 
-{		
-    getAttrs(["MALWarriorSoldierA", "deplOD", "forOD", "endOD"], function(value)
-    {			
-        var mode = value["MALWarriorSoldierA"];
-        
-        var ODDep = parseInt(value["deplOD"], 10)||0;
-        var ODFor = parseInt(value["forOD"], 10)||0;
-        var ODEnd = parseInt(value["endOD"], 10)||0;
-        
-        var bonus = 0;
-        
-        if(mode != 0)
-        {
-            bonus = 1;
-        }
+on("change:MALWarriorSoldierA change:deplOD change:forOD change:endOD", async ()=>{	
 
-        setAttrs({
-            calODDep:ODDep+bonus,
-            calODFor:ODFor+bonus,
-            calODEnd:ODEnd+bonus
-        });
-    });
-});
+    const attrs = await getAttrsAsync([
+        `MALWarriorSoldierA`, 
+        `deplOD`,
+        `forOD`,
+        `endOD`
+    ]);
 
-on("change:MALWarriorHunterA change:hargneOD change:combOD change:instOD sheet:opened", function() 
-{
-    getAttrs(["MALWarriorHunterA", "hargneOD", "combOD", "instOD"], function(value)
-    {
-        var mode = value["MALWarriorHunterA"];
+    let mode = attrs["MALWarriorSoldierA"];
+
+    let OD1 = +attrs["deplOD"];
+    let OD2 = +attrs["forOD"];
+    let OD3 = +attrs["endOD"];
+
+    let bonus = 0;
     
-        var ODHar = parseInt(value["hargneOD"], 10)||0;
-        var ODCom = parseInt(value["combOD"], 10)||0;
-        var ODIns = parseInt(value["instOD"], 10)||0;
-        
-        var bonus = 0;
-        
-        if(mode != 0)
-        {
-            bonus = 1;
-        }
-        
-        setAttrs({
-            calODHar:ODHar+bonus,
-            calODCom:ODCom+bonus,
-            calODIns:ODIns+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0)
+        bonus += 1;
+
+    update["calODDep"] = OD1+bonus;
+    update["calODFor"] = OD2+bonus;
+    update["calODEnd"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:MALWarriorScholarA change:tirOD change:savoirOD change:technOD sheet:opened", function()
-{
-    getAttrs(["MALWarriorScholarA", "tirOD", "savoirOD", "technOD"], function(value)
-    {
-        var mode = value["MALWarriorScholarA"];
-        
-        var ODTir = parseInt(value["tirOD"], 10)||0;
-        var ODSav = parseInt(value["savoirOD"], 10)||0;
-        var ODTec = parseInt(value["technOD"], 10)||0;
-        
-        var bonus = 0;
+on("change:MALWarriorHunterA change:hargneOD change:combOD change:instOD", async ()=>{
+    const attrs = await getAttrsAsync([
+        `MALWarriorHunterA`, 
+        `hargneOD`,
+        `combOD`,
+        `instOD`
+    ]);
+
+    let mode = attrs["MALWarriorHunterA"];
+
+    let OD1 = +attrs["hargneOD"];
+    let OD2 = +attrs["combOD"];
+    let OD3 = +attrs["instOD"];
+
+    let bonus = 0;
     
-        if(mode != 0)
-        {
-            bonus = 1;
-        }
-        
-        setAttrs({
-            calODTir:ODTir+bonus,
-            calODSav:ODSav+bonus,
-            calODTec:ODTec+bonus
-        });
-    });
+    let update = {};
+
+    if(mode != 0)
+        bonus += 1;
+
+    update["calODHar"] = OD1+bonus;
+    update["calODCom"] = OD2+bonus;
+    update["calODIns"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
 
-on("change:MALWarriorHeraldA change:auraOD change:paroleOD change:sfOD sheet:opened", function() 
-{
-    getAttrs(["MALWarriorHeraldA", "auraOD", "paroleOD", "sfOD"], function(value)
-    {
-        var mode = value["MALWarriorHeraldA"];
+on("change:MALWarriorScholarA change:tirOD change:savoirOD change:technOD", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `MALWarriorScholarA`, 
+        `tirOD`,
+        `savoirOD`,
+        `technOD`
+    ]);
+
+    let mode = attrs["MALWarriorScholarA"];
+
+    let OD1 = +attrs["tirOD"];
+    let OD2 = +attrs["savoirOD"];
+    let OD3 = +attrs["technOD"];
+
+    let bonus = 0;
     
-        var ODAur = parseInt(value["auraOD"], 10)||0;
-        var ODPar = parseInt(value["paroleOD"], 10)||0;
-        var ODSFR = parseInt(value["sfOD"], 10)||0;
-                    
-        var bonus = 0;
+    let update = {};
+
+    if(mode != 0)
+        bonus += 1;
+
+    update["calODTir"] = OD1+bonus;
+    update["calODSav"] = OD2+bonus;
+    update["calODTec"] = OD3+bonus;
+
+    await setAttrsAsync(update);
+});
+
+on("change:MALWarriorHeraldA change:auraOD change:paroleOD change:sfOD", async ()=>{
     
-        if(mode != 0)
-        {
-            bonus = 1;
-        }
-        
-        setAttrs({
-            calODAur:ODAur+bonus,
-            calODPar:ODPar+bonus,
-            calODSFR:ODSFR+bonus
-        });
-    });
-});
+    const attrs = await getAttrsAsync([
+        `MALWarriorHeraldA`, 
+        `auraOD`,
+        `paroleOD`,
+        `sfOD`
+    ]);
 
-on("change:MALWarriorScoutA change:discrOD change:percOD change:dextOD sheet:opened", function() 
-{			
-    getAttrs(["MALWarriorScoutA", "discrOD", "percOD", "dextOD"], function(value)
-    {
-        var mode = value["MALWarriorScoutA"];
+    let mode = attrs["MALWarriorHeraldA"];
+
+    let OD1 = +attrs["auraOD"];
+    let OD2 = +attrs["paroleOD"];
+    let OD3 = +attrs["sfOD"];
+
+    let bonus = 0;
     
-        var ODDis = parseInt(value["discrOD"], 10)||0;
-        var ODPer = parseInt(value["percOD"], 10)||0;
-        var ODDex = parseInt(value["dextOD"], 10)||0;
-        
-        var bonus = 0;
+    let update = {};
 
-        if(mode != 0)
-        {
-            bonus = 1;
-        }
-        
-        setAttrs({
-            calODDis:ODDis+bonus,
-            calODPer:ODPer+bonus,
-            calODDex:ODDex+bonus
-        });
-    });
+    if(mode != 0)
+        bonus += 1;
+
+    update["calODAur"] = OD1+bonus;
+    update["calODPar"] = OD2+bonus;
+    update["calODSFR"] = OD3+bonus;
+
+    await setAttrsAsync(update);
+});
+
+on("change:MALWarriorScoutA change:discrOD change:percOD change:dextOD", async ()=>{			
+    
+    const attrs = await getAttrsAsync([
+        `MALWarriorScoutA`, 
+        `discrOD`,
+        `percOD`,
+        `dextOD`
+    ]);
+
+    let mode = attrs["MALWarriorScoutA"];
+
+    let OD1 = +attrs["discrOD"];
+    let OD2 = +attrs["percOD"];
+    let OD3 = +attrs["dextOD"];
+
+    let bonus = 0;
+    
+    let update = {};
+
+    if(mode != 0)
+        bonus += 1;
+
+    update["calODDis"] = OD1+bonus;
+    update["calODPer"] = OD2+bonus;
+    update["calODDex"] = OD3+bonus;
+
+    await setAttrsAsync(update);
 });
     
-on("change:fichePNJ change:MALBarbarianGoliath sheet:opened", function() 
-{
-    getAttrs(["fichePNJ", "armure", "MALBarbarianGoliath"], function(value)
-    {
-        const fichePNJ = parseInt(value["fichePNJ"], 10)||0;
-        if(fichePNJ == 0)
-        
-        {				
-            const Arm = value["armure"];
-            const goliath = parseInt(value["MALBarbarianGoliath"], 10)||0;
-            
-            var totalGoliath = goliath;
-                                            
-            setAttrs({
-                MALBarbarianDef: totalGoliath,
-                MALBarbarianRea: totalGoliath*2,
-                MALBarbarianDegat: totalGoliath+"D6"
-            });
-        }
+on("change:MALBarbarianGoliath", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `MALBarbarianGoliath`
+    ]);
+
+    let goliath = +attrs["MALBarbarianGoliath"];
+
+    let defense = goliath;
+    let reaction = goliath*2;
+    let dgts = `${goliath}D6`;
+
+    await setAttrsAsync({
+        MALBarbarianDef: defense,
+        MALBarbarianRea: reaction,
+        MALBarbarianDegat: dgts
     });
 });
 
-on("change:MALDruidWolfConfiguration sheet:opened", function() 
-{			
-    getAttrs(["MALDruidWolfConfiguration"], function(value)
-    {
-        var mode = value["MALDruidWolfConfiguration"];
-        var PE = 0;
+on("change:MALDruidWolfConfiguration", async ()=>{
+    
+    const attrs = await getAttrsAsync([
+        `MALDruidWolfConfiguration`
+    ]);
 
-        if(mode == "Labor" || mode == "Medic" || mode == "Recon")
-        {
-            PE = 1;
-        }
-        
-        if(mode == "Tech" || mode == "Fighter")
-        {
-            PE = 2;
-        }
-        
-        setAttrs({
-            MAJDruidWolfConfigurationPE:PE
-        });
+    let mode = attrs["MALDruidWolfConfiguration"];
+    let PE = 0;
+
+    if(mode == "Labor" || mode == "Medic" || mode == "Recon")
+        PE = 1;
+    
+    if(mode == "Tech" || mode == "Fighter")
+        PE = 2;
+    
+    await setAttrsAsync({
+        MAJDruidWolfConfigurationPE:PE
     });
 });
-
 
 on("change:tabArmureLegende",function(eventInfo)
 {
@@ -2991,120 +2482,94 @@ on("change:tabArmureLegende",function(eventInfo)
         });
     }
 });
-
-
 //FIN META-ARMURE DE LEGENDE
-on("change:druidWolfConfiguration sheet:opened", function() 
-{			
-    getAttrs(["druidWolfConfiguration"], function(value)
-    {
-        var mode = value["druidWolfConfiguration"];
-        var PE = 0;
 
-        if(mode == "Labor" || mode == "Medic" || mode == "Recon")
-        {
-            PE = 1;
-        }
+on("change:bonusCarac", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `bonusCarac`
+    ]);
+
+    const bonus = attrs["bonusCarac"];
+
+    let update = {};
         
-        if(mode == "Tech" || mode == "Fighter")
-        {
-            PE = 2;
-        }
-        
-        setAttrs({
-            druidWolfConfigurationPE:PE
+    if(bonus == 1)
+        update["caracteristique4"] = "";
+    
+    if(bonus != 2 && bonus != 1) {
+        update["caracteristique3"] = "";
+        update["caracteristique4"] = "";
+    }
+
+    await setAttrsAsync(update);
+});
+
+on("clicked:capaciteUltime", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `coutCapaciteUltime`,
+        `energiePJ`,
+    ]);
+
+    const cout = +attrs["coutCapaciteUltime"];
+    const PE = +attrs["energiePJ"];
+
+    let total = PE-cout;
+
+    if(total < 0) {
+        setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
+
+        PI["msgEnergie"] = 1;
+    } else {
+        await setAttrsAsync({
+            energiePJ:total
         });
-    });
+    }
 });
 
-on("change:bonusCarac sheet:opened", function() 
-{
-    getAttrs(["bonusCarac"], function(value)
-    {
-        const bonus = value["bonusCarac"];
-        
-        if(bonus == 1)
-        {
-            setAttrs({
-                caracteristique4:""
-            });
-        }
-        
-        if(bonus != 2 && bonus != 1)
-        {
-            setAttrs({
-                caracteristique3:"",
-                caracteristique4:""
-            });
-        }
-    });
-});
+on("change:fichePNJ change:diceInitiative change:bonusInitiativeP change:malusInitiative change:MasquePNJAEMaj", async ()=>{
 
-on("clicked:capaciteUltime",function()
-{
-    getAttrs(["coutCapaciteUltime", "energiePJ"], function(value)
-    {			
-        var PE = parseInt(value["coutCapaciteUltime"], 10)||0;
-        var energie = parseInt(value["energiePJ"], 10)||0;
-        var total = energie-PE;
+    const attrs = await getAttrsAsync([
+        `fichePNJ`,
+        `MasquePNJAEMaj`,
+    ]);
 
-        if(total < 0)
-        {				
-            setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
-            
-            PI["msgEnergie"] = 1;
-        }
-        else
-        {
-            setAttrs({
-                energiePJ:total
-            });
-        }
-    });
-});
+    const fiche = attrs["fichePNJ"];
+    const masque = attrs["MasquePNJAEMaj"];
 
-on("change:fichePNJ change:diceInitiative change:bonusInitiativeP change:malusInitiative change:MasquePNJAEMaj sheet:opened", function() 
-{
-    getAttrs(["fichePNJ", "MasquePNJAEMaj"], function(value)
-    {
-        const TFiche = value["fichePNJ"];
-        
-        if(TFiche == 1 || TFiche == 2)
-        {
-            const MasqueMaj = value["MasquePNJAEMaj"];
-            
-            if(MasqueMaj > 0)
-            {
-                setAttrs({
-                    diceInitiative:0,
-                    bonusInitiativeP:30,
-                    malusInitiative:0
-                });
-            }
-        }
-        
-        if(TFiche == 3)
-        {
-            setAttrs({
+    if(fiche == 1 || fiche == 2) {
+        if(masque > 0) {
+            await setAttrsAsync({
                 diceInitiative:0,
-                bonusInitiativeP:1,
+                bonusInitiativeP:30,
                 malusInitiative:0
             });
         }
-    });
+    }
+
+    if(fiche == 3) {
+        await setAttrsAsync({
+            diceInitiative:0,
+            bonusInitiativeP:1,
+            malusInitiative:0
+        });
+    }
 });
 
-on("clicked:resetArmure",function()
-{
-    getAttrs(["armurePJ_max", "energiePJ_max"], function(value)
-    {			
-        var armMax = parseInt(value["armurePJ_max"], 10)||0;
-        var eneMax = parseInt(value["energiePJ_max"], 10)||0;
-        
-        setAttrs({
-            armurePJ:armMax,
-            energiePJ:eneMax
-        });
+on("clicked:resetArmure", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `armurePJ_max`,
+        `energiePJ_max`,
+    ]);
+
+    const armure = attrs["armurePJ_max"];
+    const energie = attrs["energiePJ_max"];
+
+    await setAttrsAsync({
+        armurePJ:armure,
+        energiePJ:energie
     });
 });
 
@@ -3524,94 +2989,86 @@ on("clicked:majV15",function()
     });
 });
 
-on("clicked:repeating_modules:pem",function()
-{
-    getAttrs(["repeating_modules_moduleEnergie", "fichePNJ", "armure", "espoir", "energiePNJ", "energiePJ"], function(value)
-    {
-        const TFiche = value["fichePNJ"];
+on("clicked:repeating_modules:pem", async ()=>{
+    const attrs = await getAttrsAsync([
+        `repeating_modules_moduleEnergie`,
+        `fichePNJ`,
+        `armure`,
+        `espoir`,
+        `energiePNJ`,
+        `energiePJ`,
+    ]);
 
-        if(TFiche == 0)
-        {
-            const armure = value["armure"];
-            const PEM = parseInt(value["repeating_modules_moduleEnergie"], 10)||0;
-            var PE = parseInt(value["energiePJ"], 10)||0;
-            
-            if(armure == "berserk")
-                PE = parseInt(value["espoir"], 10)||0;
-            
-            var total = PE-PEM;
+    const fiche = +attrs["fichePNJ"];
 
-            if(total < 0)
-            {
-                if(armure != "berserk")
-                    setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
-                else
-                    setPanneauInformation("Erreur. Espoir Indisponible.", false, false, true);
-                
-                PI["msgEnergie"] = 1;
-            }
-            else
-            {
-                if(armure == "berserk")
-                {
-                    setAttrs({
-                        espoir:total
-                    });
-                }
-                else
-                {
-                    setAttrs({
-                        energiePJ:total
-                    });
-                }
-            }
-        }
-        else if(TFiche == 1)
-        {
-            const PEM = parseInt(value["repeating_modules_moduleEnergie"], 10)||0;
-            const PE = parseInt(value["energiePNJ"], 10)||0;
-            
-            var total = PE-PEM;
+    const armure = attrs["armure"];
+    const espoir = +attrs["espoir"];
 
-            if(total < 0)
-            {				
+    const cout = +attrs["repeating_modules_moduleEnergie"];
+
+    let PE = 0;
+
+    let update = {};
+
+    let total = 0;
+    
+    if(fiche == 0) {
+
+        if(armure == "berserk")
+            PE = espoir;
+        else
+            PE = +attrs["energiePJ"];
+
+        total = PE-cout;
+
+        if(total < 0) {
+            if(armure != "berserk")
                 setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
-                
-                PI["msgEnergie"] = 1;
-            }
             else
-            {
-                setAttrs({
-                    energiePNJ:total
-                });
-            }
-        }
-    });
-});
-
-on("clicked:repeating_modulesdclion:pemdlion",function()
-{
-    getAttrs(["repeating_modules_moduleEnergieDCLion", "druidLionPEAct", "nomIA"], function(value)
-    {
-        const IA = value["nomIA"];
-        const PEM = parseInt(value["repeating_modules_moduleEnergieDCLion"], 10)||0;
-        const PE = parseInt(value["druidLionPEAct"], 10)||0;
-        
-        var total = PE-PEM;
-
-        if(total < 0)
-        {				
-            setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
+                setPanneauInformation("Erreur. Espoir Indisponible.", false, false, true);
             
             PI["msgEnergie"] = 1;
+        } else {
+            if(armure == "berserk")
+                update["espoir"] = total;
+            else
+                update["energiePJ"] = total;
         }
-        else
-        {
-            setAttrs({
-                druidLionPEAct:total
-            });
-        }
-    });
+    } else if(fiche == 1) {
+        PE = +attrs["energiePNJ"];
+
+        total = PE-cout;
+
+        if(total < 0) {
+            setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
+                
+            PI["msgEnergie"] = 1;
+        } else
+            update["energiePNJ"] = total;
+    }
+
+    await setAttrsAsync(update);
+});
+
+on("clicked:repeating_modulesdclion:pemdlion", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `repeating_modules_moduleEnergieDCLion`,
+        `druidLionPEAct`,
+    ]);
+
+    const PE = +attrs["druidLionPEAct"];
+    const cout = +attrs["repeating_modules_moduleEnergieDCLion"];
+
+    let total = PE-cout;
+
+    if(total < 0) {
+        setPanneauInformation("Erreur. Energie Indisponible.", false, false, true);
+            
+        PI["msgEnergie"] = 1;
+    } else {
+        await setAttrsAsync({druidLionPEAct:total});
+    }
 });
 
 on("change:tab change:fichePNJ",function()
@@ -3621,23 +3078,22 @@ on("change:tab change:fichePNJ",function()
 
 on("change:fichePNJ",function(value)
 {
-    var fiche = value.newValue;
+    let fiche = value.newValue;
+    let update = {};
 
     if(fiche == 0 || fiche == 1 || fiche == 2 || fiche == 3)
     {
-        setAttrs({
-            tab:"dossier",
-            armure:"sans"
-        });
+        update["tab"] = "dossier";
+        update["armure"] = "sans";
     }
     
     if(fiche == 4)
     {
-        setAttrs({
-            tab:"vehicule",
-            armure:"sans"
-        });
+        update["tab"] = "vehicule";
+        update["armure"] = "sans";
     }
+
+    setAttrs(update);
 });
 
 //MECHAARMURE
@@ -3688,121 +3144,129 @@ var mechaArmure = {
     }
 };
 
-on("change:mechaArmure change:mechaArmureVitesseModif change:mechaArmureManoeuvrabiliteModif change:mechaArmurePuissanceModif change:mechaArmureSenseursModif change:mechaArmureSystemesModif change:mechaArmureResilienceModif change:MANOGSTActive change:mechaArmureBlindageModif change:mechaArmureCdfModif change:mechaArmureNoyauxEnergieModif sheet:opened",function()
-{
-    getAttrs(["mechaArmure", "mechaArmureVitesseModif", "mechaArmureManoeuvrabiliteModif", "mechaArmurePuissanceModif", "mechaArmureSenseursModif", "mechaArmureSystemesModif", "mechaArmureResilienceModif", "MANOGSTActive","mechaArmureBlindageModif", "mechaArmureCdfModif", "mechaArmureNoyauxEnergieModif"], function(value)
-    {
-        const MA = value["mechaArmure"];
-        const type = mechaArmure[MA] || [];
+on("change:mechaArmure change:mechaArmureVitesseModif change:mechaArmureManoeuvrabiliteModif change:mechaArmurePuissanceModif change:mechaArmureSenseursModif change:mechaArmureSystemesModif change:mechaArmureResilienceModif change:MANOGSTActive change:mechaArmureBlindageModif change:mechaArmureCdfModif change:mechaArmureNoyauxEnergieModif sheet:opened", async ()=>{
 
-        const vitesse = parseInt(type["vitesse"], 10)||0;
-        const manoeuvrabilite = parseInt(type["manoeuvrabilite"], 10)||0;
-        const puissance = parseInt(type["puissance"], 10)||0;
-        const senseurs = parseInt(type["senseurs"], 10)||0;
-        const systemes = parseInt(type["systemes"], 10)||0;
-        const resilience = parseInt(type["resilience"], 10)||0;
-        const blindage = parseInt(type["blindage"], 10)||0;
-        const cdf = parseInt(type["cdf"], 10)||0;
-        const noyaux = parseInt(type["noyaux"], 10)||0;
-        
-        const vitesseM = parseInt(value["mechaArmureVitesseModif"], 10)||0;
-        const manoeuvrabiliteM = parseInt(value["mechaArmureManoeuvrabiliteModif"], 10)||0;
-        const puissanceM = parseInt(value["mechaArmurePuissanceModif"], 10)||0;
-        const senseursM = parseInt(value["mechaArmureSenseursModif"], 10)||0;
-        const systemesM = parseInt(value["mechaArmureSystemesModif"], 10)||0;
-        const resilienceM = parseInt(value["mechaArmureResilienceModif"], 10)||0;
-        const blindageM = parseInt(value["mechaArmureBlindageModif"], 10)||0;
-        const cdfM = parseInt(value["mechaArmureCdfModif"], 10)||0;
-        const noyauxM = parseInt(value["mechaArmureNoyauxEnergieModif"], 10)||0;
-        
-        const MST = parseInt(value["MANOGSTActive"], 10)||0;
-        
-        var resilienceB = 0;
-        
-        if(MST == 1)
-            resilienceB += 10;
-        
-        var vitesseTotal = vitesse+vitesseM;
-        var manoeuvrabiliteTotal = manoeuvrabilite+manoeuvrabiliteM;
-        var puissanceTotal = puissance+puissanceM;
-        var senseursTotal = senseurs+senseursM;
-        var systemesTotal = systemes+systemesM;
-        var resilienceTotal = resilience+resilienceM+resilienceB;
-        var blindageTotal = blindage+blindageM;
-        var cdfTotal = cdf+cdfM;
-        var noyauxTotal = noyaux+noyauxM;
+    const attrs = await getAttrsAsync([
+        `mechaArmure`,
+        `mechaArmureVitesseModif`,
+        `mechaArmureManoeuvrabiliteModif`,
+        `mechaArmurePuissanceModif`,
+        `mechaArmureSystemesModif`,
+        `mechaArmureResilienceModif`,
+        `MANOGSTActive`,
+        `mechaArmureBlindageModif`,
+        `mechaArmureCdfModif`,
+        `mechaArmureNoyauxEnergieModif`,
+    ]);
 
-        let translation;
-
-        if(!MA)
-            translation = "";
-        else
-            translation = getTranslationByKey(MA);
+    const MA = attrs["mechaArmure"];
+    const type = mechaArmure[MA] || [];
+    
+    const vitesse = parseInt(type["vitesse"], 10)||0;
+    const manoeuvrabilite = parseInt(type["manoeuvrabilite"], 10)||0;
+    const puissance = parseInt(type["puissance"], 10)||0;
+    const senseurs = parseInt(type["senseurs"], 10)||0;
+    const systemes = parseInt(type["systemes"], 10)||0;
+    const resilience = parseInt(type["resilience"], 10)||0;
+    const blindage = parseInt(type["blindage"], 10)||0;
+    const cdf = parseInt(type["cdf"], 10)||0;
+    const noyaux = parseInt(type["noyaux"], 10)||0;
+    
+    const vitesseM = parseInt(attrs["mechaArmureVitesseModif"], 10)||0;
+    const manoeuvrabiliteM = parseInt(attrs["mechaArmureManoeuvrabiliteModif"], 10)||0;
+    const puissanceM = parseInt(attrs["mechaArmurePuissanceModif"], 10)||0;
+    const senseursM = parseInt(attrs["mechaArmureSenseursModif"], 10)||0;
+    const systemesM = parseInt(attrs["mechaArmureSystemesModif"], 10)||0;
+    const resilienceM = parseInt(attrs["mechaArmureResilienceModif"], 10)||0;
+    const blindageM = parseInt(attrs["mechaArmureBlindageModif"], 10)||0;
+    const cdfM = parseInt(attrs["mechaArmureCdfModif"], 10)||0;
+    const noyauxM = parseInt(attrs["mechaArmureNoyauxEnergieModif"], 10)||0;
+    
+    const MST = parseInt(attrs["MANOGSTActive"], 10)||0;
+    
+    let resilienceB = 0;
         
-        setAttrs({
-            mechaArmureNom: translation,
-            mechaArmureVitesse: vitesseTotal,
-            mechaArmureManoeuvrabilite: manoeuvrabiliteTotal,
-            mechaArmurePuissance: puissanceTotal,
-            mechaArmureSenseurs: senseursTotal,
-            mechaArmureSystemes: systemesTotal,
-            mechaArmureResilience_max: resilienceTotal,
-            mechaArmureBlindage_max: blindageTotal,
-            mechaArmureCdf_max: cdfTotal,
-            mechaArmureNoyauxEnergie_max: noyauxTotal
-        });
+    if(MST == 1)
+        resilienceB += 10;
+    
+    let vitesseTotal = vitesse+vitesseM;
+    let manoeuvrabiliteTotal = manoeuvrabilite+manoeuvrabiliteM;
+    let puissanceTotal = puissance+puissanceM;
+    let senseursTotal = senseurs+senseursM;
+    let systemesTotal = systemes+systemesM;
+    let resilienceTotal = resilience+resilienceM+resilienceB;
+    let blindageTotal = blindage+blindageM;
+    let cdfTotal = cdf+cdfM;
+    let noyauxTotal = noyaux+noyauxM;
+
+    let translation;
+
+    if(!MA)
+        translation = "";
+    else
+        translation = getTranslationByKey(MA);
+    
+    await setAttrsAsync({
+        mechaArmureNom: translation,
+        mechaArmureVitesse: vitesseTotal,
+        mechaArmureManoeuvrabilite: manoeuvrabiliteTotal,
+        mechaArmurePuissance: puissanceTotal,
+        mechaArmureSenseurs: senseursTotal,
+        mechaArmureSystemes: systemesTotal,
+        mechaArmureResilience_max: resilienceTotal,
+        mechaArmureBlindage_max: blindageTotal,
+        mechaArmureCdf_max: cdfTotal,
+        mechaArmureNoyauxEnergie_max: noyauxTotal
     });
 });
 
-on("change:mechaArmureTypeJets change:mechaArmureManoeuvrabilite change:mechaArmurePuissance change:mechaArmureSenseurs change:mechaArmureSystemes sheet:opened",function()
-{
-    getAttrs(["mechaArmureTypeJets", "mechaArmureManoeuvrabilite", "mechaArmurePuissance", "mechaArmureSenseurs", "mechaArmureSystemes"], function(value)
+on("change:mechaArmureTypeJets change:mechaArmureManoeuvrabilite change:mechaArmurePuissance change:mechaArmureSenseurs change:mechaArmureSystemes sheet:opened", async ()=>{
+
+    const attrs = await getAttrsAsync([
+        `mechaArmureTypeJets`,
+        `mechaArmureManoeuvrabilite`,
+        `mechaArmurePuissance`,
+        `mechaArmureSenseurs`,
+        `mechaArmureSystemes`,
+    ]);
+
+    const type = parseInt(attrs["mechaArmureTypeJets"], 10)||0;
+    const manoeuvrabilite = parseInt(attrs["mechaArmureManoeuvrabilite"], 10)||0;
+    const puissance = parseInt(attrs["mechaArmurePuissance"], 10)||0;
+    const senseurs = parseInt(attrs["mechaArmureSenseurs"], 10)||0;
+    const systemes = parseInt(attrs["mechaArmureSystemes"], 10)||0;
+
+    let update = {};
+
+    switch(type)
     {
-        const type = parseInt(value["mechaArmureTypeJets"], 10)||0;
-        const manoeuvrabilite = parseInt(value["mechaArmureManoeuvrabilite"], 10)||0;
-        const puissance = parseInt(value["mechaArmurePuissance"], 10)||0;
-        const senseurs = parseInt(value["mechaArmureSenseurs"], 10)||0;
-        const systemes = parseInt(value["mechaArmureSystemes"], 10)||0;
-        
-        switch(type)
-        {
-            case 1:
-                setAttrs({
-                    mechaArmureJetBonus: manoeuvrabilite,
-                    mechaArmureJetBonusType: "Manoeuvrabilité"
-                });
-                break;
-            case 2:
-                setAttrs({
-                    mechaArmureJetBonus: puissance,
-                    mechaArmureJetBonusType: "Puissance"
-                });
-                break;
-            case 3:
-                setAttrs({
-                    mechaArmureJetBonus: senseurs,
-                    mechaArmureJetBonusType: "Senseurs"
-                });
-                break;
-            case 4:
-                setAttrs({
-                    mechaArmureJetBonus: systemes,
-                    mechaArmureJetBonusType: "Systèmes"
-                });
-                break;
-            case 5:
-                setAttrs({
-                    mechaArmureJetBonus: 0,
-                    mechaArmureJetBonusType: ""
-                });
-                break;
-        }
-    });
+        case 1:
+            update["mechaArmureJetBonus"] = manoeuvrabilite;
+            update["mechaArmureJetBonusType"] = "Manoeuvrabilité";
+            break;
+        case 2:
+            update["mechaArmureJetBonus"] = puissance;
+            update["mechaArmureJetBonusType"] = "Puissance";
+            break;
+        case 3:
+            update["mechaArmureJetBonus"] = senseurs;
+            update["mechaArmureJetBonusType"] = "Senseurs";
+            break;
+        case 4:
+            update["mechaArmureJetBonus"] = systemes;
+            update["mechaArmureJetBonusType"] = "Systèmes";
+            break;
+        case 5:
+            update["mechaArmureJetBonus"] = 0;
+            update["mechaArmureJetBonusType"] = "";
+            break;
+    }
+
+    await setAttrsAsync(update);
 });
 
-on("change:mechaArmure change:mechaArmureArchangelConfiguration change:mechaArmureNephilimConfiguration change:mechaArmureDemonConfiguration",function()
-{
-    setAttrs({
+on("change:mechaArmure change:mechaArmureArchangelConfiguration change:mechaArmureNephilimConfiguration change:mechaArmureDemonConfiguration", async ()=>{
+    await setAttrsAsync({
             MADABAmritaActive: 0,
             MAAEvacuationActive: 0,
             MANOGStationActive:0,
@@ -3821,131 +3285,158 @@ on("change:mechaArmure change:mechaArmureArchangelConfiguration change:mechaArmu
 //FIN MECHAARMURE
 
 //LONGBOW
-on("change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 sheet:opened",function()
-{
-    getAttrs(["rangerArmeDegatEvol", "rangerArmeDegat", "rangerArmeViolenceEvol", "rangerArmeViolence", "rangerArmePortee", "rangerChoc", "rangerDegatContinue", "rangerDesignation", "rangerSilencieux", "rangerPerceArmure", "rangerUltraViolence", "rangerAntiVehicule", "rangerArtillerie", "rangerDispersion", "rangerLumiere", "rangerPenetrant", "rangerPerceArmure60", "rangerAntiAnatheme", "rangerDemoralisant", "rangerEnChaine", "rangerFureur", "rangerIgnoreArmure", "rangerPenetrant10", "ranger100PG" , "ranger50PG2"], function(value)
-    {
-        let PG50 = value["ranger50PG2"];
-        let PG100 = value["ranger100PG"];
+on("change:rangerArmeDegatEvol change:rangerArmeDegat change:rangerArmeViolenceEvol change:rangerArmeViolence change:rangerArmePortee change:rangerChoc change:rangerDegatContinue change:rangerDesignation change:rangerSilencieux change:rangerPerceArmure change:rangerUltraViolence change:rangerAntiVehicule change:rangerArtillerie change:rangerDispersion change:rangerLumiere change:rangerPenetrant change:rangerPerceArmure60 change:rangerAntiAnatheme change:rangerDemoralisant change:rangerEnChaine change:rangerFureur change:rangerIgnoreArmure change:rangerPenetrant10 change:ranger100PG change:ranger50PG2 sheet:opened", async ()=>{
+    
+    const attrs = await getAttrsAsync([
+        `rangerArmeDegatEvol`,
+        `rangerArmeDegat`,
+        `rangerArmeViolenceEvol`,
+        `rangerArmeViolence`,
+        `rangerArmePortee`,
+        `rangerChoc`,
+        `rangerDegatContinue`,
+        `rangerDesignation`,
+        `rangerSilencieux`,
+        `rangerPerceArmure`,
+        `rangerUltraViolence`,
+        `rangerAntiVehicule`,
+        `rangerArtillerie`,
+        `rangerDispersion`,
+        `rangerLumiere`,
+        `rangerPenetrant`,
+        `rangerPerceArmure60`,
+        `rangerAntiAnatheme`,
+        `rangerDemoralisant`,
+        `rangerEnChaine`,
+        `rangerFureur`,
+        `rangerIgnoreArmure`,
+        `rangerPenetrant10`,
+        `ranger100PG`,
+        `ranger50PG2`,
+    ]);
 
-        let baseD = 3;
-        let baseV = 1;
+    let PG50 = attrs["ranger50PG2"];
+    let PG100 = attrs["ranger100PG"];
 
-        let E1 = 2;
-        let E2 = 3;
-        let E3 = 6;
+    let baseD = 3;
+    let baseV = 1;
 
-        let dgts = Number(value["rangerArmeDegat"]);
-        let violence = Number(value["rangerArmeViolence"]);
+    let E1 = 2;
+    let E2 = 3;
+    let E3 = 6;
 
-        let portee = value["rangerArmePortee"];
+    let dgts = Number(attrs["rangerArmeDegat"]);
+    let violence = Number(attrs["rangerArmeViolence"]);
 
-        if(PG50 == "on") {
-            baseD = 5;
-            baseV = 3;
+    let portee = attrs["rangerArmePortee"];
 
-            dgts = Number(value["rangerArmeDegatEvol"]);
-            violence = Number(value["rangerArmeViolenceEvol"]);
-        }
+    if(PG50 == "on") {
+        baseD = 5;
+        baseV = 3;
 
-        if(PG100 == "on") {
-            E1 = 1;
-            E2 = 1;
-            E3 = 4;
-        }
+        dgts = Number(attrs["rangerArmeDegatEvol"]);
+        violence = Number(attrs["rangerArmeViolenceEvol"]);
+    }
 
-        let eChoc = value["rangerChoc"];
-        let eDegatsContinus = value["rangerDegatContinue"];
-        let eDesignation = value["rangerDesignation"];
-        let eSilencieux = value["rangerSilencieux"];
-        let ePerceArmure = value["rangerPerceArmure"];
-        let eUltraviolence = value["rangerUltraViolence"];
-        let eAntiVehicule = value["rangerAntiVehicule"];
-        let eArtillerie = value["rangerArtillerie"];
-        let eDispersion = value["rangerDispersion"];
-        let eLumiere = value["rangerLumiere"];
-        let ePenetrant = value["rangerPenetrant"];
-        let ePerceArmure60 = value["rangerPerceArmure60"];
-        let eAntiAnatheme = value["rangerAntiAnatheme"];
-        let eDemoralisant = value["rangerDemoralisant"];
-        let eEnChaine = value["rangerEnChaine"];
-        let eFureur = value["rangerFureur"];        
-        let eIgnoreArmure = value["rangerIgnoreArmure"];
-        let ePenetrant10 = value["rangerPenetrant10"];
+    if(PG100 == "on") {
+        E1 = 1;
+        E2 = 1;
+        E3 = 4;
+    }
 
-        let energie = 0;
+    let eChoc = attrs["rangerChoc"];
+    let eDegatsContinus = attrs["rangerDegatContinue"];
+    let eDesignation = attrs["rangerDesignation"];
+    let eSilencieux = attrs["rangerSilencieux"];
+    let ePerceArmure = attrs["rangerPerceArmure"];
+    let eUltraviolence = attrs["rangerUltraViolence"];
+    let eAntiVehicule = attrs["rangerAntiVehicule"];
+    let eArtillerie = attrs["rangerArtillerie"];
+    let eDispersion = attrs["rangerDispersion"];
+    let eLumiere = attrs["rangerLumiere"];
+    let ePenetrant = attrs["rangerPenetrant"];
+    let ePerceArmure60 = attrs["rangerPerceArmure60"];
+    let eAntiAnatheme = attrs["rangerAntiAnatheme"];
+    let eDemoralisant = attrs["rangerDemoralisant"];
+    let eEnChaine = attrs["rangerEnChaine"];
+    let eFureur = attrs["rangerFureur"];        
+    let eIgnoreArmure = attrs["rangerIgnoreArmure"];
+    let ePenetrant10 = attrs["rangerPenetrant10"];
 
-        energie += (dgts-baseD);
-        energie += (violence-baseV);
+    let energie = 0;
 
-        switch(portee) {
-            case "^{portee-longue}":
-                energie += 1;
-                break;
+    energie += (dgts-baseD);
+    energie += (violence-baseV);
 
-            case "^{portee-lointaine}":
-                energie += 2;
-                break;
-        }
+    switch(portee) {
+        case "^{portee-longue}":
+            energie += 1;
+            break;
 
-        if(eChoc != "0")
-            energieDepense += E1;
+        case "^{portee-lointaine}":
+            energie += 2;
+            break;
+    }
+
+    let energieDepense = 0;
+
+    if(eChoc != "0")
+        energieDepense += E1;
+    
+    if(eSilencieux != "0")
+        energieDepense += E1;
+    
+    if(eUltraviolence != "0")
+        energieDepense += E1;
+    
+    if(eArtillerie != "0")
+        energieDepense += E2;
+    
+    if(eAntiAnatheme != "0")
+        energieDepense += E3;
+    
+    if(eDemoralisant != "0")
+        energieDepense += E3;
+    
+    if(eEnChaine != "0")
+        energieDepense += E3;
+    
+    if(eFureur != "0")
+        energieDepense += E3;
+
+    if(eAntiVehicule != "0")
+        energieDepense += E2;
+    
+    if(eDegatsContinus != "0")
+        energieDepense += E1;
+
+    if(eDesignation != "0")
+        energieDepense += E1;          
+
+    if(eDispersion != "0")
+        energieDepense += E2;
+
+    if(eLumiere != "0")
+        energieDepense += E2;
+
+    if(ePenetrant != "0")
+        energieDepense += E2;
+    
+    if(ePerceArmure != "0")
+        energieDepense += E1;
+
+    if(ePerceArmure60 != "0")
+        energieDepense += E2;       
+
+    if(eIgnoreArmure != "0")
+        energieDepense += E3;
         
-        if(eSilencieux != "0")
-            energieDepense += E1;
-        
-        if(eUltraviolence != "0")
-            energieDepense += E1;
-        
-        if(eArtillerie != "0")
-            energieDepense += E2;
-        
-        if(eAntiAnatheme != "0")
-            energieDepense += E3;
-        
-        if(eDemoralisant != "0")
-            energieDepense += E3;
-        
-        if(eEnChaine != "0")
-            energieDepense += E3;
-        
-        if(eFureur != "0")
-            energieDepense += E3;
+    if(ePenetrant10 != "0")
+        energieDepense += E3;
 
-        if(eAntiVehicule != "0")
-            energieDepense += E2;
-        
-        if(eDegatsContinus != "0")
-            energieDepense += E1;
+    energie += energieDepense;
 
-        if(eDesignation != "0")
-            energieDepense += E1;          
-
-        if(eDispersion != "0")
-            energieDepense += E2;
-
-        if(eLumiere != "0")
-            energieDepense += E2;
-
-        if(ePenetrant != "0")
-            energieDepense += E2;
-        
-        if(ePerceArmure != "0")
-            energieDepense += E1;
-
-        if(ePerceArmure60 != "0")
-            energieDepense += E2;       
-
-        if(eIgnoreArmure != "0")
-            energieDepense += E3;
-            
-        if(ePenetrant10 != "0")
-            energieDepense += E3;
-
-        setAttrs({
-                longbowEnergie: `(${getTranslationByKey("depense-energie-prevue")} : ${energie})`
-            });
-    });
+    await setAttrsAsync({longbowEnergie: `(${getTranslationByKey("depense-energie-prevue")} : ${energie})`});
 });
 //LONGBOW
 
@@ -4342,8 +3833,7 @@ on("clicked:importKNPCG",function()
 });
 
 //TRADUCTIONS
-on("sheet:opened",function()
-{
+on("sheet:opened", async ()=>{
     let bard = [i18n_ignoreArmure, i18n_ignoreCDF, i18n_dispersion+" 6", i18n_choc+" 1"];
     bard.sort();
 
@@ -4368,7 +3858,7 @@ on("sheet:opened",function()
     let MANMS = [i18n_antiVehicule, i18n_demoralisant, i18n_ultraviolence];
     MANMS.sort();
 
-    setAttrs({
+    await setAttrsAsync({
         bardEffetAttSpe: bard.join(" / "),
         berserkIlluminationBlazePortee: getTranslationByKey("portee-contact"),
         berserkIlluminationBeaconPortee: getTranslationByKey("portee-contact"),
@@ -4438,4 +3928,37 @@ on("sheet:opened",function()
         poingCaC: getTranslationByKey("coup-poing-pied"),
         poingMACaC: getTranslationByKey("coup-poing-pied")
     });
+});
+
+on("change:effetArmes",function(eventInfo)
+{
+    let text = eventInfo.newValue;
+
+    let update = {}
+
+    update["effetArmes-description"] = getTranslationByKey(text);
+    
+    setAttrsAsync(update);
+});
+
+on("change:ameliorationArmes",function(eventInfo)
+{
+    let text = eventInfo.newValue;
+
+    let update = {}
+
+    update["ameliorationArmes-description"] = getTranslationByKey(text);
+    
+    setAttrsAsync(update);
+});
+
+on("change:ameliorationOArmes",function(eventInfo)
+{
+    let text = eventInfo.newValue;
+
+    let update = {}
+
+    update["ameliorationOArmes-description"] = getTranslationByKey(text);
+    
+    setAttrsAsync(update);
 });

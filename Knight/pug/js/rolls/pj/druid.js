@@ -6,80 +6,90 @@ const druidRollSimple = [
 ];
 
 druidRollSimple.forEach(button => {
-    on(`clicked:${button}Roll`, function(info) {
+    on(`clicked:${button}Roll`, async function(info) {
         let roll = info.htmlAttributes.value;
     
         let attributs = [
             "jetModifDesComp",
         ];
 
-        getAttrs(attributs, function(value)
-        {
-            let exec = [];
-            let cRoll = [];
-            let bonus = [];
+        let attrs = await getAttrsAsync(attributs);
 
-            let mod = Number(value["jetModifDesComp"]);
+        let exec = [];
+        let cRoll = [];
+        let bonus = [];
 
-            let aspect = button;
-            let aNom = aspectCompanionsDruid[aspect];
+        let mod = +attrs["jetModifDesComp"];
 
-            let aValue = Number(aspectCompanionsDruidValue[aspect].value);
+        let aspect = button;
+        let aNom = aspectCompanionsDruid[aspect];
 
-            if(button != "druidCrowChair" && button != "druidCrowBete" && button != "druidCrowMachine" && button != "druidCrowDame"  && button != "druidCrowMasque") {
-                let aAE = Number(aspectCompanionsDruidValue[aspect].AE);
-                exec.push("{{vAE="+aAE+"}}");
-                bonus.push(aAE);
-            }
-            else
-                bonus.push(0);
+        let attrsAspects = await getAttrsAsync([
+            `${aspect}Base`,
+            `${aspect}Evol`,
+            `${aspect}AE`,
+        ]);
 
-            cRoll.push(aValue);
-            cRoll.push(mod);
-            
-            exec.push(roll);
-            exec.push("{{cBase="+aNom+"}}")
-            exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
-            exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-            exec.push("{{tBonus=[["+bonus.join("+")+"]]}}");
-    
-            startRoll(exec.join(" "), (results) => {
-                let tJet = results.results.jet.result;
-                let tBonus = results.results.tBonus.result;
-                let tExploit = results.results.Exploit.result;
-    
-                let total = tJet+tBonus;
-    
-                finishRoll(
-                    results.rollId, 
-                    {
-                        jet:total
-                    }
-                );
-    
-                if(tJet != 0 && tJet == tExploit)
-                    startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                        let tExploit = exploit.results.jet.result;
-    
-                        finishRoll(
-                            exploit.rollId, 
-                            {
-                                jet:tExploit
-                            }
-                        );
-                });
-                
+        let aValue = totalADruid(attrsAspects, aspect);
+
+        if(button != "druidCrowChair" && button != "druidCrowBete" && button != "druidCrowMachine" && button != "druidCrowDame"  && button != "druidCrowMasque") {
+            let aAE = +attrsAspects[`${aspect}AE`];
+            exec.push("{{vAE="+aAE+"}}");
+            bonus.push(aAE);
+        }
+        else
+            bonus.push(0);
+
+        cRoll.push(aValue);
+        cRoll.push(mod);
+        
+        exec.push(roll);
+        exec.push("{{cBase="+aNom+"}}")
+        exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
+        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+        exec.push("{{tBonus=[["+bonus.join("+")+"]]}}");
+
+        startRoll(exec.join(" "), (results) => {
+            let tJet = results.results.jet.result;
+            let tBonus = results.results.tBonus.result;
+            let tExploit = results.results.Exploit.result;
+
+            let total = tJet+tBonus;
+
+            finishRoll(
+                results.rollId, 
+                {
+                    jet:total
+                }
+            );
+
+            if(tJet != 0 && tJet == tExploit)
+                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                    let tExploit = exploit.results.jet.result;
+
+                    finishRoll(
+                        exploit.rollId, 
+                        {
+                            jet:tExploit
+                        }
+                    );
             });
+            
         });
     });
 });
 
-on(`clicked:druidLionArmeBase`, function(info) {
+on(`clicked:druidLionArmeBase`, async function(info) {
     let roll = info.htmlAttributes.value;
 
     let attributs = [
         "aspectDruidLionBase",
         "jetModifDesComp",
+        "druidLionChairBase",
+        "druidLionChairEvol",
+        "druidLionBeteBase",
+        "druidLionBeteEvol",
+        "druidLionBeteAE",
     ];
 
     let arme = [
@@ -100,180 +110,196 @@ on(`clicked:druidLionArmeBase`, function(info) {
         "bVDiversFixe"
     ]
 
-    attributs = attributs.concat(arme);
-    attributs = attributs.concat(special);
+    attributs = attributs.concat(arme, special);
 
-    getAttrs(attributs, function(value)
-    {
-        let exec = [];
-        exec.push(roll);
+    let attrs = await getAttrsAsync(attributs);
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    let exec = [];
+    exec.push(roll);
 
-        let diceDegats = 0;
-        let degats = [];
-        let bonusDegats = [];
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let diceViolence = 0;
-        let violence = [];
-        let bonusViolence = [];
+    let diceDegats = 0;
+    let degats = [];
+    let bonusDegats = [];
 
-        let portee = value["druidLionBasePortee"];
+    let diceViolence = 0;
+    let violence = [];
+    let bonusViolence = [];
 
-        let mod = Number(value["jetModifDesComp"]);
+    let portee = attrs["druidLionBasePortee"];
 
-        let aspect = value["aspectDruidLionBase"];
+    let mod = +attrs["jetModifDesComp"];
 
-        let aspectNom = aspectCompanionsDruid[aspect];
-        let aspectValue = aspectCompanionsDruidValue[aspect].value;
-        let AEValue = aspectCompanionsDruidValue[aspect].AE;
+    let aspect = attrs["aspectDruidLionBase"];
 
-        let vChair = aspectCompanionsDruidValue["druidLionChair"].value;
+    let aspectNom = aspectCompanionsDruid[aspect];
 
-        let bete = aspectCompanionsDruidValue["druidLionBete"].value;
-        let AEBete = aspectCompanionsDruidValue["druidLionBete"].AE;
+    let attrsAspects = await getAttrsAsync([
+        `${aspect}Base`,
+        `${aspect}Evol`,
+        `${aspect}AE`,
+    ]);
 
-        let cRoll = [];
-        let AE = [];
-        let bonus = [];
+    let aspectValue = totalADruid(attrsAspects, aspect);
+    let AEValue = +attrsAspects[`${aspect}AE`];
 
-        AE.push(AEValue);
-        
-        if(AE.length == 0)
-            exec.push("{{vAE=0}}");
-        else 
-            exec.push("{{vAE="+AEValue+"}}");
+    let vChair = totalADruid(attrs, "druidLionChair");
 
-        cRoll.push(aspectValue);
+    let bete = totalADruid(attrs, "druidLionBete");
+    let AEBete = +attrs["druidLionBeteAE"];
 
-        diceDegats = Number(value["druidLionBaseDegats"]);
-        bonusDegats.push(value["druidLionBaseDegatsBonus"]);
+    let cRoll = [];
+    let AE = [];
+    let bonus = [];
 
-        diceViolence = Number(value["druidLionBaseViolence"]);
-        bonusViolence.push(value["druidLionBaseViolenceBonus"]);
-
-        //GESTION DES BONUS DIVERS
-        let bChairD = Math.ceil(vChair/2);
-
-        bonusDegats.push(bChairD);
-        exec.push("{{vChair="+bChairD+"}}");
-        //FIN DE GESTION DES BONUS DIVERS
-
-        //GESTION DES ASPECTS EXCEPTIONNELS
-        if(AEBete > 0) {
-            let bonusBete = AEBete;
-
-            if(AEBete > 5) 
-                bonusBete += bete;
-
-            exec.push("{{vBeteD=+"+bonusBete+"}}");
-            bonusDegats.push(bonusBete);
-        }
-        //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
-        
-        //GESTION DES BONUS SPECIAUX
-        let sBonusDegats = value["coupBDDiversTotal"];
-        let sBonusDegatsD6 = value["bDDiversD6"];
-        let sBonusDegatsFixe = value["bDDiversFixe"];
-
-        let sBonusViolence = value["coupBVDiversTotal"];
-        let sBonusViolenceD6 = value["bVDiversD6"];
-        let sBonusViolenceFixe = value["bVDiversFixe"];
-
-        if(sBonusDegats != "0") {
-            exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
-            diceDegats += Number(sBonusDegatsD6);
-            bonusDegats.push(sBonusDegatsFixe);
-        }
-
-        if(sBonusViolence != "0") {
-            exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
-            diceViolence += Number(sBonusViolenceD6);
-            bonusViolence.push(sBonusViolenceFixe);
-        }
-        //FIN DE GESTION DES BONUS SPECIAUX
-
-        exec.push("{{cBase="+aspectNom+"}}");
-
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
-
-        if(cRoll.length == 0)
-            cRoll.push(0);
-
-        bonus = bonus.concat(AE);
+    AE.push(AEValue);
     
-        exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
-        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    if(AE.length == 0)
+        exec.push("{{vAE=0}}");
+    else 
+        exec.push("{{vAE="+AEValue+"}}");
 
-        degats.push(diceDegats+"D6");
-        degats = degats.concat(bonusDegats);
+    cRoll.push(aspectValue);
 
-        violence.push(diceViolence+"D6");
-        violence = violence.concat(bonusViolence);
+    diceDegats = +attrs["druidLionBaseDegats"];
+    bonusDegats.push(attrs["druidLionBaseDegatsBonus"]);
 
-        exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    diceViolence = +attrs["druidLionBaseViolence"];
+    bonusViolence.push(attrs["druidLionBaseViolenceBonus"]);
 
-        if(isConditionnelA == true)
-            exec.push("{{succesConditionnel=true}}");
+    //GESTION DES BONUS DIVERS
+    let bChairD = Math.ceil(vChair/2);
 
-        if(isConditionnelD == true)
-            exec.push("{{degatsConditionnel=true}}");
+    bonusDegats.push(bChairD);
+    exec.push("{{vChair="+bChairD+"}}");
+    //FIN DE GESTION DES BONUS DIVERS
 
-        if(isConditionnelV == true)
-            exec.push("{{violenceConditionnel=true}}");
-        
-        startRoll(exec.join(" "), (results) => {
-            let tJet = results.results.jet.result;
-            let tBonus = results.results.bonus.result;
-            let tExploit = results.results.Exploit.result;
+    //GESTION DES ASPECTS EXCEPTIONNELS
+    if(AEBete > 0) {
+        let bonusBete = AEBete;
 
-            let tDegats = results.results.degats.result;
-            let tViolence = results.results.violence.result;
+        if(AEBete > 5) 
+            bonusBete += bete;
 
-            finishRoll(
-                results.rollId, 
-                {
-                    jet:tJet+tBonus,
-                    degats:tDegats,
-                    violence:tViolence
-                }
-            );
+        exec.push("{{vBeteD=+"+bonusBete+"}}");
+        bonusDegats.push(bonusBete);
+    }
+    //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
+    
+    //GESTION DES BONUS SPECIAUX
+    let sBonusDegats = attrs["coupBDDiversTotal"];
+    let sBonusDegatsD6 = attrs["bDDiversD6"];
+    let sBonusDegatsFixe = attrs["bDDiversFixe"];
 
-            if(tJet != 0 && tJet == tExploit)
-                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                    let tExploit = exploit.results.jet.result;
+    let sBonusViolence = attrs["coupBVDiversTotal"];
+    let sBonusViolenceD6 = attrs["bVDiversD6"];
+    let sBonusViolenceFixe = attrs["bVDiversFixe"];
 
-                    finishRoll(
-                        exploit.rollId, 
-                        {
-                            jet:tExploit
-                        }
-                    );
-            });
-            
+    if(sBonusDegats != "0") {
+        exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
+        diceDegats += Number(sBonusDegatsD6);
+        bonusDegats.push(sBonusDegatsFixe);
+    }
+
+    if(sBonusViolence != "0") {
+        exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
+        diceViolence += Number(sBonusViolenceD6);
+        bonusViolence.push(sBonusViolenceFixe);
+    }
+    //FIN DE GESTION DES BONUS SPECIAUX
+
+    exec.push("{{cBase="+aspectNom+"}}");
+
+    if(mod != 0) {
+        cRoll.push(mod);
+        exec.push("{{mod="+mod+"}}");
+    }
+
+    if(cRoll.length == 0)
+        cRoll.push(0);
+
+    bonus = bonus.concat(AE);
+
+    exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
+    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+    exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+    degats.push(diceDegats+"D6");
+    degats = degats.concat(bonusDegats);
+
+    violence.push(diceViolence+"D6");
+    violence = violence.concat(bonusViolence);
+
+    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
+    exec.push("{{degats=[["+degats.join("+")+"]]}}");
+    exec.push("{{violence=[["+violence.join("+")+"]]}}");
+
+    if(isConditionnelA == true)
+        exec.push("{{succesConditionnel=true}}");
+
+    if(isConditionnelD == true)
+        exec.push("{{degatsConditionnel=true}}");
+
+    if(isConditionnelV == true)
+        exec.push("{{violenceConditionnel=true}}");
+    
+    startRoll(exec.join(" "), (results) => {
+        let tJet = results.results.jet.result;
+        let tBonus = results.results.bonus.result;
+        let tExploit = results.results.Exploit.result;
+
+        let tDegats = results.results.degats.result;
+        let tViolence = results.results.violence.result;
+
+        finishRoll(
+            results.rollId, 
+            {
+                jet:tJet+tBonus,
+                degats:tDegats,
+                violence:tViolence
+            }
+        );
+
+        if(tJet != 0 && tJet == tExploit)
+            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                let tExploit = exploit.results.jet.result;
+
+                finishRoll(
+                    exploit.rollId, 
+                    {
+                        jet:tExploit
+                    }
+                );
         });
+        
     });
 });
 
-on(`clicked:repeating_armeDruidLion:combatdruidroll`, function(info) {
+on(`clicked:repeating_armeDruidLion:combatdruidroll`, async function(info) {
     let roll = info.htmlAttributes.value;
 
     let attributs = [
         "repeating_armeDruidLion_armeDruidLion",
         "repeating_armeDruidLion_aspectDruidLion",
         "jetModifDesComp",
-        "druidLionPEAct"
+        "druidLionPEAct",
+        "druidLionChairBase",
+        "druidLionChairEvol",
+        "druidLionBeteBase",
+        "druidLionBeteEvol",
+        "druidLionBeteAE",
+        "druidLionMachineBase",
+        "druidLionMachineEvol",
+        "druidLionMachineAE",
+        "druidLionMasqueBase",
+        "druidLionMasqueEvol",
+        "druidLionMasqueAE",
     ];
 
-    let arme = [
+    let wpn = [
         "repeating_armeDruidLion_druidLionBaseNom",
         "repeating_armeDruidLion_degatDruidLion",
         "repeating_armeDruidLion_degatBonusDruidLion",
@@ -372,805 +398,807 @@ on(`clicked:repeating_armeDruidLion:combatdruidroll`, function(info) {
         "repeating_armeDruidLion_energieValue"
     ]
 
-    attributs = attributs.concat(arme);
-    attributs = attributs.concat(effets);
-    attributs = attributs.concat(ameliorations);
-    attributs = attributs.concat(special);
+    attributs = attributs.concat(wpn, effets, ameliorations, special);
 
-    getAttrs(attributs, function(value)
-    {
-        let exec = [];
-        exec.push(roll);
+    let attrs = await getAttrsAsync(attributs);
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    let exec = [];
+    exec.push(roll);
 
-        let arme = value["repeating_armeDruidLion_armeDruidLion"];
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let diceDegats = 0;
-        let degats = [];
-        let bonusDegats = [];
+    let arme = attrs["repeating_armeDruidLion_armeDruidLion"];
 
-        let diceViolence = 0;
-        let violence = [];
-        let bonusViolence = [];
+    let diceDegats = 0;
+    let degats = [];
+    let bonusDegats = [];
 
-        let attaquesSurprises = [];
-        let attaquesSurprisesValue = [];
-        let attaquesSurprisesCondition = "";
+    let diceViolence = 0;
+    let violence = [];
+    let bonusViolence = [];
 
-        let eASAssassin = "";
-        let eASAssassinValue = 0;
+    let attaquesSurprises = [];
+    let attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = "";
 
-        let energie = value["druidLionPEAct"];
-        let nEnergie = "druidLionPEAct";
-        let portee = value["repeating_armeDruidLion_porteeDruidLion"];
-        let autresEffets = [];
-        let autresAmeliorations = [];
-        let autresSpecial = [];
+    let eASAssassin = "";
+    let eASAssassinValue = 0;
 
-        let mod = Number(value["jetModifDesComp"]);
+    let energie = +attrs["druidLionPEAct"];
+    let nEnergie = "druidLionPEAct";
+    let portee = attrs["repeating_armeDruidLion_porteeDruidLion"];
+    let autresEffets = [];
+    let autresAmeliorations = [];
+    let autresSpecial = [];
 
-        let aspect = value["repeating_armeDruidLion_aspectDruidLion"];
+    let mod = +attrs["jetModifDesComp"];
 
-        let aspectNom = aspectCompanionsDruid[aspect];
-        let aspectValue = aspectCompanionsDruidValue[aspect].value;
-        let AEValue = aspectCompanionsDruidValue[aspect].AE;
+    let aspect = attrs["repeating_armeDruidLion_aspectDruidLion"];
 
-        let vChair = aspectCompanionsDruidValue["druidLionChair"].value;
+    let aspectNom = aspectCompanionsDruid[aspect];
 
-        let vBete = aspectCompanionsDruidValue["druidLionBete"].value;
-        let vAEBete = aspectCompanionsDruidValue["druidLionBete"].AE;
+    let attrsAspects = await getAttrsAsync([
+        `${aspect}Base`,
+        `${aspect}Evol`,
+        `${aspect}AE`,
+    ]);
 
-        let vMachine = aspectCompanionsDruidValue["druidLionMachine"].value;
-        let vAEMachine = aspectCompanionsDruidValue["druidLionMachine"].AE;
+    let aspectValue = totalADruid(attrsAspects, aspect);
+    let AEValue = +attrsAspects[`${aspect}AE`];
 
-        let vMasque = aspectCompanionsDruidValue["druidLionMasque"].value;
-        let vAEMasque = aspectCompanionsDruidValue["druidLionMasque"].AE;
+    let vChair = totalADruid(attrs, "druidLionChair");
 
-        let cRoll = [];
-        let AE = [];
-        let bonus = [];
+    let vBete = totalADruid(attrs, "druidLionBete");
+    let vAEBete = +attrs[`druidLionBeteAE`];
 
-        AE.push(AEValue);
+    let vMachine = totalADruid(attrs, "druidLionMachine");
+    let vAEMachine = +attrs[`druidLionMachineAE`];
 
-        exec.push("{{special1B="+arme+"}}");
+    let vMasque = totalADruid(attrs, "druidLionMasque");
+    let vAEMasque = +attrs[`druidLionMasqueAE`];
+
+    let cRoll = [];
+    let AE = [];
+    let bonus = [];
+
+    AE.push(AEValue);
+
+    exec.push("{{special1B="+arme+"}}");
+    
+    if(AE.length == 0)
+        exec.push("{{vAE=0}}");
+    else 
+        exec.push("{{vAE="+AEValue+"}}");
+
+    cRoll.push(aspectValue);
+
+    diceDegats = Number(attrs["repeating_armeDruidLion_degatDruidLion"]);
+    bonusDegats.push(attrs["repeating_armeDruidLion_degatBonusDruidLion"]);
+
+    diceViolence = Number(attrs["repeating_armeDruidLion_violenceDruidLion"]);
+    bonusViolence.push(attrs["repeating_armeDruidLion_violenceBonusDruidLion"]);
+
+    //GESTION DES BONUS DIVERS
+    let bChairD = Math.ceil(vChair/2);
+
+    if(portee == "^{portee-contact}") {
         
-        if(AE.length == 0)
-            exec.push("{{vAE=0}}");
-        else 
-            exec.push("{{vAE="+AEValue+"}}");
+        bonusDegats.push(bChairD);
+        exec.push("{{vChair="+bChairD+"}}");
+    }
+    //FIN DE GESTION DES BONUS DIVERS
 
-        cRoll.push(aspectValue);
+    //GESTION DES ASPECTS EXCEPTIONNELS
+    if(vAEBete > 0) {
+        let bonusBete = vAEBete;
 
-        diceDegats = Number(value["repeating_armeDruidLion_degatDruidLion"]);
-        bonusDegats.push(value["repeating_armeDruidLion_degatBonusDruidLion"]);
+        if(vAEBete > 5) 
+            bonusBete += vBete;
 
-        diceViolence = Number(value["repeating_armeDruidLion_violenceDruidLion"]);
-        bonusViolence.push(value["repeating_armeDruidLion_violenceBonusDruidLion"]);
+        exec.push("{{vBeteD=+"+bonusBete+"}}");
+        bonusDegats.push(bonusBete);
+    }
+    //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
 
-        //GESTION DES BONUS DIVERS
-        let bChairD = Math.ceil(vChair/2);
+    //GESTION DES EFFETS
+    let rCadence = 0;
 
-        if(portee == "^{portee-contact}") {
+    let eAntiAnatheme = attrs["repeating_armeDruidLion_antiAnatheme"];
+    let eAntiVehicule = attrs["repeating_armeDruidLion_antiVehicule"];
+    let eArtillerie = attrs["repeating_armeDruidLion_artillerie"];
+    let eAssassin = attrs["repeating_armeDruidLion_repeating_armeDruidLion_assassin"];
+    let eAssassinV = attrs["repeating_armeDruidLion_assassinValue"];
+    let eAssistanceAttaque = attrs["repeating_armeDruidLion_assistanceAttaque"];
+    let eBarrage = attrs["repeating_armeDruidLion_barrage"];
+    let eBarrageV = attrs["repeating_armeDruidLion_barrageValue"];
+    let eCadence = attrs["repeating_armeDruidLion_cadence"];
+    let eCadenceV = attrs["repeating_armeDruidLion_cadenceValue"];
+    let eChargeur = attrs["repeating_armeDruidLion_chargeur"];
+    let eChargeurV = attrs["repeating_armeDruidLion_chargeurValue"];
+    let eChoc = attrs["repeating_armeDruidLion_choc"];
+    let eChocV = attrs["repeating_armeDruidLion_chocValue"];
+    let eDefense = attrs["repeating_armeDruidLion_defense"];
+    let eDefenseV = attrs["repeating_armeDruidLion_defenseValue"];
+    let eDegatsContinus = attrs["repeating_armeDruidLion_degatContinue"];
+    let eDegatsContinusV = attrs["repeating_armeDruidLion_degatContinueValue"];
+    let eDeuxMains = attrs["repeating_armeDruidLion_deuxMains"];
+    let eDemoralisant = attrs["repeating_armeDruidLion_demoralisant"];
+    let eDesignation = attrs["repeating_armeDruidLion_designation"];
+    let eDestructeur = attrs["repeating_armeDruidLion_destructeur"];
+    let eDestructeurV = 2;
+    let eDispersion = attrs["repeating_armeDruidLion_dispersion"];
+    let eDispersionV = attrs["repeating_armeDruidLion_dispersionValue"];
+    let eEnChaine = attrs["repeating_armeDruidLion_enChaine"];
+    let eEsperance = attrs["repeating_armeDruidLion_esperance"];
+    let eFureur = attrs["repeating_armeDruidLion_fureur"];
+    let eFureurV = 4;
+    let eIgnoreArmure = attrs["repeating_armeDruidLion_ignoreArmure"];
+    let eIgnoreCDF = attrs["repeating_armeDruidLion_ignoreCdF"];
+    let eJAkimbo = attrs["repeating_armeDruidLion_akimbo"];
+    let eJAmbidextrie = attrs["repeating_armeDruidLion_ambidextrie"];
+    let eLeste = attrs["repeating_armeDruidLion_leste"];
+    let eLourd = attrs["repeating_armeDruidLion_lourd"];
+    let eLumiere = attrs["repeating_armeDruidLion_lumiere"];
+    let eLumiereV = attrs["repeating_armeDruidLion_lumiereValue"];
+    let eMeurtrier = attrs["repeating_armeDruidLion_meurtrier"];
+    let eMeurtrierV = 2;
+    let eObliteration = attrs["repeating_armeDruidLion_obliteration"];
+    let eOrfevrerie = attrs["repeating_armeDruidLion_orfevrerie"];
+    let eParasitage = attrs["repeating_armeDruidLion_parasitage"];
+    let eParasitageV = attrs["repeating_armeDruidLion_parasitageValue"];
+    let ePenetrant = attrs["repeating_armeDruidLion_penetrant"];
+    let ePenetrantV = attrs["repeating_armeDruidLion_penetrantValue"];
+    let ePerceArmure = attrs["repeating_armeDruidLion_perceArmure"];
+    let ePerceArmureV = attrs["repeating_armeDruidLion_perceArmureValue"];
+    let ePrecision = attrs["repeating_armeDruidLion_precision"];
+    let eReaction = attrs["repeating_armeDruidLion_reaction"];
+    let eReactionV = attrs["repeating_armeDruidLion_reactionValue"];
+    let eSilencieux = attrs["repeating_armeDruidLion_silencieux"];
+    let eSoumission = attrs["repeating_armeDruidLion_soumission"];
+    let eTenebricide = attrs["repeating_armeDruidLion_tenebricite"];
+    let eTirRafale = attrs["repeating_armeDruidLion_tirRafale"];
+    let eTirSecurite = attrs["repeating_armeDruidLion_tirSecurite"];
+    let eUltraviolence = attrs["repeating_armeDruidLion_ultraViolence"];
+    let eUltraviolenceV = 2;
+
+    if(eAntiAnatheme != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+        exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
+        exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
+    }
+    
+    if(eAssistanceAttaque != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+
+        exec.push("{{assistanceAttaque="+i18n_assistanceAttaque+"}}");
+        exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
+    }
+    
+    if(eArtillerie != "0") {
+        isConditionnelA = true;
+        exec.push("{{artillerie="+i18n_artillerie+"}}");
+        exec.push("{{artillerieCondition="+i18n_artillerieCondition+"}}");
+    }
+    
+    if(eAssassin != "0") {
+        eASAssassin = i18n_assassin;
+        eASAssassinValue = eAssassinV;
+
+        if(attaquesSurprisesCondition == "")
+            attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
+    }
+
+    if(eCadence != "0") { 
+        rCadence = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
+    }
+
+    if(eChoc != "0") {
+        isConditionnelA = true;
+        exec.push("{{choc="+i18n_choc+" "+eChocV+"}}");
+        exec.push("{{chocCondition="+i18n_chocCondition+"}}");
+    }
+                    
+    if(eDemoralisant != "0") {
+        isConditionnelA = true;
+        exec.push("{{demoralisant="+i18n_demoralisant+"}}");
+        exec.push("{{demoralisantCondition="+i18n_demoralisantCondition+"}}");
+    }
+                    
+    if(eDestructeur != "0") {
+        isConditionnelD = true;
+        exec.push("{{destructeur="+i18n_destructeur+"}}");
+        exec.push("{{destructeurValue=[["+eDestructeurV+"D6]]}}");
+        exec.push("{{destructeurCondition="+i18n_destructeurCondition+"}}");
+    }
+    
+    if(eEnChaine != "0") {
+        isConditionnelD = true;
+        exec.push("{{enChaine="+i18n_enChaine+"}}");
+        exec.push("{{enChaineCondition="+i18n_enChaineCondition+"}}");
+    }
+    
+    if(eEsperance != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+        exec.push("{{esperance="+i18n_esperance+"}}");
+        exec.push("{{esperanceConditionD="+i18n_esperanceConditionD+"}}");
+        exec.push("{{esperanceConditionV="+i18n_esperanceConditionV+"}}");
+    }
             
-            bonusDegats.push(bChairD);
-            exec.push("{{vChair="+bChairD+"}}");
-        }
-        //FIN DE GESTION DES BONUS DIVERS
+    if(eFureur != "0") {
+        isConditionnelV = true;
+        exec.push("{{fureur="+i18n_fureur+"}}");
+        exec.push("{{fureurValue=[["+eFureurV+"D6]]}}");
+        exec.push("{{fureurCondition="+i18n_fureurCondition+"}}");
+    }
+            
+    if(eLeste != "0") {
+        if(portee != "^{portee-contact}") 
+            bChairD = vChair;
 
-        //GESTION DES ASPECTS EXCEPTIONNELS
-        if(vAEBete > 0) {
-            let bonusBete = vAEBete;
+        bonusDegats.push(bChairD);
+        exec.push("{{vLeste="+bChairD+"}}");
+    }
+            
+    if(eMeurtrier != "0") {
+        isConditionnelD = true;
+        exec.push("{{meurtrier="+i18n_meurtrier+"}}");
+        exec.push("{{meurtrierValue=[["+eMeurtrierV+"D6]]}}");
+        exec.push("{{meurtrierCondition="+i18n_meurtrierCondition+"}}");
+    }
+            
+    if(eObliteration != "0") {
+        isConditionnelD = true;
+        exec.push("{{obliteration="+i18n_obliteration+"}}");
+        exec.push("{{obliterationCondition="+i18n_obliterationCondition+"}}");
+    }
+            
+    if(eOrfevrerie != "0") {
+        let vOrfevrerie = Math.ceil((vMasque/2)+vAEMasque);
 
-            if(vAEBete > 5) 
-                bonusBete += vBete;
+        bonusDegats.push(vOrfevrerie);
+        exec.push("{{vOrfevrerie="+vOrfevrerie+"}}");
+    }
+            
+    if(eParasitage != "0") {
+        isConditionnelA = true;
+        exec.push("{{parasitage="+i18n_parasitage+" "+eParasitageV+"}}");
+        exec.push("{{parasitageCondition="+i18n_parasitageCondition+"}}");
+    }
+            
+    if(ePrecision != "0") {
+        isConditionnelD = true;
+        let vPrecision = Math.ceil((vMachine/2)+vAEMachine);
 
-            exec.push("{{vBeteD=+"+bonusBete+"}}");
-            bonusDegats.push(bonusBete);
-        }
-        //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
+        bonusDegats.push(vPrecision);
+        exec.push("{{vPrecision="+vPrecision+"}}");
+    }
 
-        //GESTION DES EFFETS
-        let rCadence = 0;
+    if(eSilencieux != "0") {
+        let totalSilencieux = Math.ceil((vMasque/2)+vAEMasque);
 
-        let eAntiAnatheme = value["repeating_armeDruidLion_antiAnatheme"];
-        let eAntiVehicule = value["repeating_armeDruidLion_antiVehicule"];
-        let eArtillerie = value["repeating_armeDruidLion_artillerie"];
-        let eAssassin = value["repeating_armeDruidLion_repeating_armeDruidLion_assassin"];
-        let eAssassinV = value["repeating_armeDruidLion_assassinValue"];
-        let eAssistanceAttaque = value["repeating_armeDruidLion_assistanceAttaque"];
-        let eBarrage = value["repeating_armeDruidLion_barrage"];
-        let eBarrageV = value["repeating_armeDruidLion_barrageValue"];
-        let eCadence = value["repeating_armeDruidLion_cadence"];
-        let eCadenceV = value["repeating_armeDruidLion_cadenceValue"];
-        let eChargeur = value["repeating_armeDruidLion_chargeur"];
-        let eChargeurV = value["repeating_armeDruidLion_chargeurValue"];
-        let eChoc = value["repeating_armeDruidLion_choc"];
-        let eChocV = value["repeating_armeDruidLion_chocValue"];
-        let eDefense = value["repeating_armeDruidLion_defense"];
-        let eDefenseV = value["repeating_armeDruidLion_defenseValue"];
-        let eDegatsContinus = value["repeating_armeDruidLion_degatContinue"];
-        let eDegatsContinusV = value["repeating_armeDruidLion_degatContinueValue"];
-        let eDeuxMains = value["repeating_armeDruidLion_deuxMains"];
-        let eDemoralisant = value["repeating_armeDruidLion_demoralisant"];
-        let eDesignation = value["repeating_armeDruidLion_designation"];
-        let eDestructeur = value["repeating_armeDruidLion_destructeur"];
-        let eDestructeurV = 2;
-        let eDispersion = value["repeating_armeDruidLion_dispersion"];
-        let eDispersionV = value["repeating_armeDruidLion_dispersionValue"];
-        let eEnChaine = value["repeating_armeDruidLion_enChaine"];
-        let eEsperance = value["repeating_armeDruidLion_esperance"];
-        let eFureur = value["repeating_armeDruidLion_fureur"];
-        let eFureurV = 4;
-        let eIgnoreArmure = value["repeating_armeDruidLion_ignoreArmure"];
-        let eIgnoreCDF = value["repeating_armeDruidLion_ignoreCdF"];
-        let eJAkimbo = value["repeating_armeDruidLion_akimbo"];
-        let eJAmbidextrie = value["repeating_armeDruidLion_ambidextrie"];
-        let eLeste = value["repeating_armeDruidLion_leste"];
-        let eLourd = value["repeating_armeDruidLion_lourd"];
-        let eLumiere = value["repeating_armeDruidLion_lumiere"];
-        let eLumiereV = value["repeating_armeDruidLion_lumiereValue"];
-        let eMeurtrier = value["repeating_armeDruidLion_meurtrier"];
-        let eMeurtrierV = 2;
-        let eObliteration = value["repeating_armeDruidLion_obliteration"];
-        let eOrfevrerie = value["repeating_armeDruidLion_orfevrerie"];
-        let eParasitage = value["repeating_armeDruidLion_parasitage"];
-        let eParasitageV = value["repeating_armeDruidLion_parasitageValue"];
-        let ePenetrant = value["repeating_armeDruidLion_penetrant"];
-        let ePenetrantV = value["repeating_armeDruidLion_penetrantValue"];
-        let ePerceArmure = value["repeating_armeDruidLion_perceArmure"];
-        let ePerceArmureV = value["repeating_armeDruidLion_perceArmureValue"];
-        let ePrecision = value["repeating_armeDruidLion_precision"];
-        let eReaction = value["repeating_armeDruidLion_reaction"];
-        let eReactionV = value["repeating_armeDruidLion_reactionValue"];
-        let eSilencieux = value["repeating_armeDruidLion_silencieux"];
-        let eSoumission = value["repeating_armeDruidLion_soumission"];
-        let eTenebricide = value["repeating_armeDruidLion_tenebricite"];
-        let eTirRafale = value["repeating_armeDruidLion_tirRafale"];
-        let eTirSecurite = value["repeating_armeDruidLion_tirSecurite"];
-        let eUltraviolence = value["repeating_armeDruidLion_ultraViolence"];
-        let eUltraviolenceV = 2;
+        attaquesSurprises.push(i18n_silencieux);
+        attaquesSurprisesValue.push(totalSilencieux);
 
-        if(eAntiAnatheme != "0") {
+        if(attaquesSurprisesCondition == "")
+            attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
+    }
+
+    if(eSoumission != "0") {
+        isConditionnelA = true;
+        exec.push("{{soumission="+i18n_soumission+"}}");
+        exec.push("{{soumissionCondition="+i18n_soumissionCondition+"}}");
+    }
+    
+    if(eTenebricide != "0") {
+        exec.push("{{tenebricide="+i18n_tenebricide+"}}");
+        exec.push("{{tenebricideConditionD="+i18n_tenebricideConditionD+"}}");
+        exec.push("{{tenebricideConditionV="+i18n_tenebricideConditionV+"}}");
+    }
+
+    if(eTirRafale != "0") {
+        exec.push("{{tirRafale="+i18n_tirRafale+"}}");
+        exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
+    }
+    
+    if(eUltraviolence != "0") {
+        exec.push("{{ultraviolence="+i18n_ultraviolence+"}}");
+        exec.push("{{ultraviolenceValue=[["+eUltraviolenceV+"D6]]}}");
+        exec.push("{{ultraviolenceCondition="+i18n_ultraviolenceCondition+"}}");
+    }        
+
+    if(eAntiVehicule != "0") 
+        autresEffets.push(i18n_antiVehicule);
+
+    if(eBarrage != "0") 
+        autresEffets.push(i18n_barrage+" "+eBarrageV);
+
+    if(eChargeur != "0") 
+        autresEffets.push(i18n_chargeur+" "+eChargeurV);
+
+    if(eDefense != "0") 
+        autresEffets.push(i18n_defense+" "+eDefenseV);
+    
+    if(eDegatsContinus != "0") 
+        autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
+    
+    if(eDeuxMains != "0") 
+        autresEffets.push(i18n_deuxMains);
+    
+    if(eDesignation != "0") 
+        autresEffets.push(i18n_designation);
+
+    if(eDispersion != "0") 
+        autresEffets.push(i18n_dispersion+" "+eDispersionV);
+
+    if(eIgnoreArmure != "0") 
+        autresEffets.push(i18n_ignoreArmure);
+
+    if(eIgnoreCDF != "0") 
+        autresEffets.push(i18n_ignoreCDF);
+
+    if(eJAkimbo != "0") 
+        autresEffets.push(i18n_jAkimbo);
+
+    if(eJAmbidextrie != "0") 
+        autresEffets.push(i18n_jAmbidextrie);
+
+    if(eLourd != "0") 
+        autresEffets.push(i18n_lourd);
+
+    if(eLumiere != "0") 
+        autresEffets.push(i18n_lumiere+" "+eLumiereV);
+    
+    if(ePenetrant != "0") 
+        autresEffets.push(i18n_penetrant+" "+ePenetrantV);
+    
+    if(ePerceArmure != "0") 
+        autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
+    
+    if(eReaction != "0") 
+        autresEffets.push(i18n_reaction+" "+eReactionV);
+    
+    if(eTirSecurite != "0") 
+        autresEffets.push(i18n_tirSecurite);
+
+    //FIN GESTION DES EFFETS
+
+    //GESTION DES AMELIORATIONS
+    let rChambreDouble = 0;
+
+    let aChargeurGrappes = attrs["repeating_armeDruidLion_chargeurGrappes"];
+    let aCanonLong = attrs["repeating_armeDruidLion_canonLong"];
+    let aCanonRaccourci = attrs["repeating_armeDruidLion_canonRaccourci"];
+    let aChambreDouble = attrs["repeating_armeDruidLion_chambreDouble"];
+    let aInterfaceGuidage = attrs["repeating_armeDruidLion_interfaceGuidage"];
+    let aJumelage = attrs["repeating_armeDruidLion_jumelage"];
+    let aJumelageV = attrs["repeating_armeDruidLion_jumelageValue"];
+    let aJumelageT = attrs["repeating_armeDruidLion_jumelageType"];
+    let aLunetteIntelligente = attrs["repeating_armeDruidLion_lunetteIntelligente"];
+    let aMunitionsDrone = attrs["repeating_armeDruidLion_munitionsDrone"];
+    let aMunitionsHyperVelocite = attrs["repeating_armeDruidLion_munitionsHyperVelocite"];        
+    let aChargeurExplosives = attrs["repeating_armeDruidLion_chargeurExplosives"];
+    let aMunitionsIEM = attrs["repeating_armeDruidLion_munitionsIEM"];
+    let aMunitionsNonLetales = attrs["repeating_armeDruidLion_munitionsNonLetales"];
+    let aMunitionsSubsoniques = attrs["repeating_armeDruidLion_munitionsSubsoniques"];
+    let aPointeurLaser = attrs["repeating_armeDruidLion_pointeurLaser"];
+    let aProtectionArme = attrs["repeating_armeDruidLion_protectionArme"];
+    let aRevetementOmega = attrs["repeating_armeDruidLion_revetementOmega"];
+    let aStructureElement = attrs["repeating_armeDruidLion_structureElement"];
+    let aSystemeRefroidissement = attrs["repeating_armeDruidLion_systemeRefroidissement"];
+
+    if(aChargeurGrappes != "0") {
+        exec.push("{{vMGrappeD=-1D6}}");
+        exec.push("{{vMGrappeV=+1D6}}");
+        diceDegats -= 1;
+        diceViolence += 1;
+    }
+
+    if(aCanonLong != "0") {
+        isConditionnelA = true;
+        exec.push("{{canonLong="+i18n_canonLong+"}}");
+        exec.push("{{canonLongCondition="+i18n_canonLongCondition+"}}");
+    }
+
+    if(aCanonRaccourci != "0") {
+        isConditionnelA = true;
+        exec.push("{{canonRaccourci="+i18n_canonRaccourci+"}}");
+        exec.push("{{canonRaccourciCondition="+i18n_canonRaccourciCondition+"}}");
+    }
+
+    if(aChambreDouble != "0") { 
+        if(eCadence != 0)
+            autresAmeliorations.push(i18n_chambreDouble);
+        else if(eCadence == 0)
+            rChambreDouble = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
+    }
+
+    if(aLunetteIntelligente != "0") {
+        isConditionnelA = true;
+        exec.push("{{lunetteIntelligente="+i18n_lunetteIntelligente+"}}");
+        exec.push("{{lunetteIntelligenteCondition="+i18n_lunetteIntelligenteCondition+"}}");
+    }
+
+    if(aMunitionsDrone != "0") {
+        exec.push("{{vMDrone=+3}}");
+        bonus.push(3);
+    }
+
+    if(aMunitionsHyperVelocite != "0") {
+        if(eAssistanceAttaque != "0")
+            autresAmeliorations.push(i18n_munitionsHyperVelocite);
+        else if(eAssistanceAttaque == "0") {
             isConditionnelD = true;
             isConditionnelV = true;
-            exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-            exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
-        }
-        
-        if(eAssistanceAttaque != "0") {
-            isConditionnelD = true;
-            isConditionnelV = true;
 
-            exec.push("{{assistanceAttaque="+i18n_assistanceAttaque+"}}");
+            exec.push("{{assistanceAttaque="+i18n_munitionsHyperVelocite+"}}");
             exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
         }
-        
-        if(eArtillerie != "0") {
-            isConditionnelA = true;
-            exec.push("{{artillerie="+i18n_artillerie+"}}");
-            exec.push("{{artillerieCondition="+i18n_artillerieCondition+"}}");
-        }
-        
-        if(eAssassin != "0") {
-            eASAssassin = i18n_assassin;
-            eASAssassinValue = eAssassinV;
+    }
+    
+    if(aChargeurExplosives != "0") {
+        exec.push("{{vMExplosiveD=+1D6}}");
+        exec.push("{{vMExplosiveV=-1D6}}");
+        diceDegats += 1;
+        diceViolence -= 1;
+    }
+    
+    if(aMunitionsIEM != "0") {
+        exec.push("{{vMIEMD=-1D6}}");
+        exec.push("{{vMIEMV=-1D6}}");
+        diceDegats -= 1;
+        diceViolence -= 1;
+        autresAmeliorations.push(i18n_munitionsIEMParasitage);
+    }
+    
+    if(aMunitionsSubsoniques != "0") {
+
+        if(eSilencieux != "0")
+            autresAmeliorations.push(i18n_munitionsSubsoniques);
+        else if(eSilencieux == "0") {
+            let totalSubsonique = vDiscretion+oDiscretion;
+
+            attaquesSurprises.push(i18n_munitionsSubsoniques);
+            attaquesSurprisesValue.push(totalSubsonique);
 
             if(attaquesSurprisesCondition == "")
                 attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
         }
+    }
+    
+    if(aPointeurLaser != "0") {
+        exec.push("{{vMPLaser=+1}}");
+        bonus.push(1);
+    }
 
-        if(eCadence != "0") { 
-            rCadence = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
-        }
-
-        if(eChoc != "0") {
-            isConditionnelA = true;
-            exec.push("{{choc="+i18n_choc+" "+eChocV+"}}");
-            exec.push("{{chocCondition="+i18n_chocCondition+"}}");
-        }
-                       
-        if(eDemoralisant != "0") {
-            isConditionnelA = true;
-            exec.push("{{demoralisant="+i18n_demoralisant+"}}");
-            exec.push("{{demoralisantCondition="+i18n_demoralisantCondition+"}}");
-        }
-                       
-        if(eDestructeur != "0") {
-            isConditionnelD = true;
-            exec.push("{{destructeur="+i18n_destructeur+"}}");
-            exec.push("{{destructeurValue=[["+eDestructeurV+"D6]]}}");
-            exec.push("{{destructeurCondition="+i18n_destructeurCondition+"}}");
-        }
-        
-        if(eEnChaine != "0") {
-            isConditionnelD = true;
-            exec.push("{{enChaine="+i18n_enChaine+"}}");
-            exec.push("{{enChaineCondition="+i18n_enChaineCondition+"}}");
-        }
-        
-        if(eEsperance != "0") {
-            isConditionnelD = true;
-            isConditionnelV = true;
-            exec.push("{{esperance="+i18n_esperance+"}}");
-            exec.push("{{esperanceConditionD="+i18n_esperanceConditionD+"}}");
-            exec.push("{{esperanceConditionV="+i18n_esperanceConditionV+"}}");
-        }
-                
-        if(eFureur != "0") {
-            isConditionnelV = true;
-            exec.push("{{fureur="+i18n_fureur+"}}");
-            exec.push("{{fureurValue=[["+eFureurV+"D6]]}}");
-            exec.push("{{fureurCondition="+i18n_fureurCondition+"}}");
-        }
-                
-        if(eLeste != "0") {
-            if(portee != "^{portee-contact}") 
-                bChairD = vChair;
-
-            bonusDegats.push(bChairD);
-            exec.push("{{vLeste="+bChairD+"}}");
-        }
-                
-        if(eMeurtrier != "0") {
-            isConditionnelD = true;
-            exec.push("{{meurtrier="+i18n_meurtrier+"}}");
-            exec.push("{{meurtrierValue=[["+eMeurtrierV+"D6]]}}");
-            exec.push("{{meurtrierCondition="+i18n_meurtrierCondition+"}}");
-        }
-                
-        if(eObliteration != "0") {
-            isConditionnelD = true;
-            exec.push("{{obliteration="+i18n_obliteration+"}}");
-            exec.push("{{obliterationCondition="+i18n_obliterationCondition+"}}");
-        }
-                
-        if(eOrfevrerie != "0") {
-            let vOrfevrerie = Math.ceil((vMasque/2)+vAEMasque);
-
-            bonusDegats.push(vOrfevrerie);
-            exec.push("{{vOrfevrerie="+vOrfevrerie+"}}");
-        }
-                
-        if(eParasitage != "0") {
-            isConditionnelA = true;
-            exec.push("{{parasitage="+i18n_parasitage+" "+eParasitageV+"}}");
-            exec.push("{{parasitageCondition="+i18n_parasitageCondition+"}}");
-        }
-                
-        if(ePrecision != "0") {
-            isConditionnelD = true;
-            let vPrecision = Math.ceil((vMachine/2)+vAEMachine);
-
-            bonusDegats.push(vPrecision);
-            exec.push("{{vPrecision="+vPrecision+"}}");
-        }
-
-        if(eSilencieux != "0") {
-            let totalSilencieux = Math.ceil((vMasque/2)+vAEMasque);
-
-            attaquesSurprises.push(i18n_silencieux);
-            attaquesSurprisesValue.push(totalSilencieux);
-
-            if(attaquesSurprisesCondition == "")
-                attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
-        }
-
-        if(eSoumission != "0") {
-            isConditionnelA = true;
-            exec.push("{{soumission="+i18n_soumission+"}}");
-            exec.push("{{soumissionCondition="+i18n_soumissionCondition+"}}");
-        }
-        
-        if(eTenebricide != "0") {
-            exec.push("{{tenebricide="+i18n_tenebricide+"}}");
-            exec.push("{{tenebricideConditionD="+i18n_tenebricideConditionD+"}}");
-            exec.push("{{tenebricideConditionV="+i18n_tenebricideConditionV+"}}");
-        }
-
-        if(eTirRafale != "0") {
-            exec.push("{{tirRafale="+i18n_tirRafale+"}}");
+    if(aSystemeRefroidissement != "0") {
+        if(eTirRafale != "0")
+            autresAmeliorations.push(i18n_systemeRefroidissement+" ("+i18n_barrage+" 1)");
+        else if(eTirRafale == "0") {
+            exec.push("{{tirRafale="+i18n_systemeRefroidissement+" + "+i18n_barrage+" 1}}");
             exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
-        }
-        
-        if(eUltraviolence != "0") {
-            exec.push("{{ultraviolence="+i18n_ultraviolence+"}}");
-            exec.push("{{ultraviolenceValue=[["+eUltraviolenceV+"D6]]}}");
-            exec.push("{{ultraviolenceCondition="+i18n_ultraviolenceCondition+"}}");
-        }        
+        }   
+    }
 
-        if(eAntiVehicule != "0") 
-            autresEffets.push(i18n_antiVehicule);
+    if(aRevetementOmega != "0") {
+        if(eASAssassinValue < 2) {
+            eASAssassin = i18n_revetementOmega;
+            eASAssassinValue = 2;
 
-        if(eBarrage != "0") 
-            autresEffets.push(i18n_barrage+" "+eBarrageV);
+            if(eASAssassinValue != 0)
+                autresEffets.push(i18n_assassin);
 
-        if(eChargeur != "0") 
-            autresEffets.push(i18n_chargeur+" "+eChargeurV);
-
-        if(eDefense != "0") 
-            autresEffets.push(i18n_defense+" "+eDefenseV);
-        
-        if(eDegatsContinus != "0") 
-            autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
-        
-        if(eDeuxMains != "0") 
-            autresEffets.push(i18n_deuxMains);
-        
-        if(eDesignation != "0") 
-            autresEffets.push(i18n_designation);
-
-        if(eDispersion != "0") 
-            autresEffets.push(i18n_dispersion+" "+eDispersionV);
-
-        if(eIgnoreArmure != "0") 
-            autresEffets.push(i18n_ignoreArmure);
-
-        if(eIgnoreCDF != "0") 
-            autresEffets.push(i18n_ignoreCDF);
-
-        if(eJAkimbo != "0") 
-            autresEffets.push(i18n_jAkimbo);
-
-        if(eJAmbidextrie != "0") 
-            autresEffets.push(i18n_jAmbidextrie);
-
-        if(eLourd != "0") 
-            autresEffets.push(i18n_lourd);
-
-        if(eLumiere != "0") 
-            autresEffets.push(i18n_lumiere+" "+eLumiereV);
-        
-        if(ePenetrant != "0") 
-            autresEffets.push(i18n_penetrant+" "+ePenetrantV);
-        
-        if(ePerceArmure != "0") 
-            autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
-        
-        if(eReaction != "0") 
-            autresEffets.push(i18n_reaction+" "+eReactionV);
-        
-        if(eTirSecurite != "0") 
-            autresEffets.push(i18n_tirSecurite);
-
-        //FIN GESTION DES EFFETS
-
-        //GESTION DES AMELIORATIONS
-        let rChambreDouble = 0;
-
-        let aChargeurGrappes = value["repeating_armeDruidLion_chargeurGrappes"];
-        let aCanonLong = value["repeating_armeDruidLion_canonLong"];
-        let aCanonRaccourci = value["repeating_armeDruidLion_canonRaccourci"];
-        let aChambreDouble = value["repeating_armeDruidLion_chambreDouble"];
-        let aInterfaceGuidage = value["repeating_armeDruidLion_interfaceGuidage"];
-        let aJumelage = value["repeating_armeDruidLion_jumelage"];
-        let aJumelageV = value["repeating_armeDruidLion_jumelageValue"];
-        let aJumelageT = value["repeating_armeDruidLion_jumelageType"];
-        let aLunetteIntelligente = value["repeating_armeDruidLion_lunetteIntelligente"];
-        let aMunitionsDrone = value["repeating_armeDruidLion_munitionsDrone"];
-        let aMunitionsHyperVelocite = value["repeating_armeDruidLion_munitionsHyperVelocite"];        
-        let aChargeurExplosives = value["repeating_armeDruidLion_chargeurExplosives"];
-        let aMunitionsIEM = value["repeating_armeDruidLion_munitionsIEM"];
-        let aMunitionsNonLetales = value["repeating_armeDruidLion_munitionsNonLetales"];
-        let aMunitionsSubsoniques = value["repeating_armeDruidLion_munitionsSubsoniques"];
-        let aPointeurLaser = value["repeating_armeDruidLion_pointeurLaser"];
-        let aProtectionArme = value["repeating_armeDruidLion_protectionArme"];
-        let aRevetementOmega = value["repeating_armeDruidLion_revetementOmega"];
-        let aStructureElement = value["repeating_armeDruidLion_structureElement"];
-        let aSystemeRefroidissement = value["repeating_armeDruidLion_systemeRefroidissement"];
-
-        if(aChargeurGrappes != "0") {
-            exec.push("{{vMGrappeD=-1D6}}");
-            exec.push("{{vMGrappeV=+1D6}}");
-            diceDegats -= 1;
-            diceViolence += 1;
-        }
-
-        if(aCanonLong != "0") {
-            isConditionnelA = true;
-            exec.push("{{canonLong="+i18n_canonLong+"}}");
-            exec.push("{{canonLongCondition="+i18n_canonLongCondition+"}}");
-        }
-
-        if(aCanonRaccourci != "0") {
-            isConditionnelA = true;
-            exec.push("{{canonRaccourci="+i18n_canonRaccourci+"}}");
-            exec.push("{{canonRaccourciCondition="+i18n_canonRaccourciCondition+"}}");
-        }
-
-        if(aChambreDouble != "0") { 
-            if(eCadence != 0)
-                autresAmeliorations.push(i18n_chambreDouble);
-            else if(eCadence == 0)
-                rChambreDouble = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
-        }
-
-        if(aLunetteIntelligente != "0") {
-            isConditionnelA = true;
-            exec.push("{{lunetteIntelligente="+i18n_lunetteIntelligente+"}}");
-            exec.push("{{lunetteIntelligenteCondition="+i18n_lunetteIntelligenteCondition+"}}");
-        }
-
-        if(aMunitionsDrone != "0") {
-            exec.push("{{vMDrone=+3}}");
-            bonus.push(3);
-        }
-
-        if(aMunitionsHyperVelocite != "0") {
-            if(eAssistanceAttaque != "0")
-                autresAmeliorations.push(i18n_munitionsHyperVelocite);
-            else if(eAssistanceAttaque == "0") {
-                isConditionnelD = true;
-                isConditionnelV = true;
+        } else if(eASAssassinValue > 2)
+            autresAmeliorations.push(i18n_revetementOmega);
+    }            
     
-                exec.push("{{assistanceAttaque="+i18n_munitionsHyperVelocite+"}}");
-                exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
-            }
-        }
-        
-        if(aChargeurExplosives != "0") {
-            exec.push("{{vMExplosiveD=+1D6}}");
-            exec.push("{{vMExplosiveV=-1D6}}");
-            diceDegats += 1;
-            diceViolence -= 1;
-        }
-        
-        if(aMunitionsIEM != "0") {
-            exec.push("{{vMIEMD=-1D6}}");
-            exec.push("{{vMIEMV=-1D6}}");
-            diceDegats -= 1;
-            diceViolence -= 1;
-            autresAmeliorations.push(i18n_munitionsIEMParasitage);
-        }
-        
-        if(aMunitionsSubsoniques != "0") {
-
-            if(eSilencieux != "0")
-                autresAmeliorations.push(i18n_munitionsSubsoniques);
-            else if(eSilencieux == "0") {
-                let totalSubsonique = vDiscretion+oDiscretion;
-
-                attaquesSurprises.push(i18n_munitionsSubsoniques);
-                attaquesSurprisesValue.push(totalSubsonique);
+    if(aInterfaceGuidage != "0") 
+        autresAmeliorations.push(i18n_interfaceGuidage);
     
-                if(attaquesSurprisesCondition == "")
-                    attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
-            }
-        }
-        
-        if(aPointeurLaser != "0") {
-            exec.push("{{vMPLaser=+1}}");
-            bonus.push(1);
-        }
-
-        if(aSystemeRefroidissement != "0") {
-            if(eTirRafale != "0")
-                autresAmeliorations.push(i18n_systemeRefroidissement+" ("+i18n_barrage+" 1)");
-            else if(eTirRafale == "0") {
-                exec.push("{{tirRafale="+i18n_systemeRefroidissement+" + "+i18n_barrage+" 1}}");
-                exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
-            }   
-        }
-
-        if(aRevetementOmega != "0") {
-            if(eASAssassinValue < 2) {
-                eASAssassin = i18n_revetementOmega;
-                eASAssassinValue = 2;
-
-                if(eASAssassinValue != 0)
-                    autresEffets.push(i18n_assassin);
-
-            } else if(eASAssassinValue > 2)
-                autresAmeliorations.push(i18n_revetementOmega);
-        }            
-        
-        if(aInterfaceGuidage != "0") 
-            autresAmeliorations.push(i18n_interfaceGuidage);
-        
-        if(aJumelage != "0") 
-            autresAmeliorations.push(i18n_jumelage+" ("+aJumelageV+")");
-        
-        if(aMunitionsNonLetales != "0") 
-            autresAmeliorations.push(i18n_munitionsNonLetales);
-
-        if(aProtectionArme != "0") 
-            autresAmeliorations.push(i18n_protectionArme);
-
-        if(aStructureElement != "0") 
-            autresAmeliorations.push(i18n_structureElementAlpha);
-
-        //FIN GESTION DES AMELIORATIONS
-        
-        //GESTION DES BONUS SPECIAUX
-        let sBonusDegats = value["repeating_armeDruidLion_bDDiversTotal"];
-        let sBonusDegatsD6 = value["repeating_armeDruidLion_bDDiversD6"];
-        let sBonusDegatsFixe = value["repeating_armeDruidLion_bDDiversFixe"];
-
-        let sBonusViolence = value["repeating_armeDruidLion_bVDiversTotal"];
-        let sBonusViolenceD6 = value["repeating_armeDruidLion_bVDiversD6"];
-        let sBonusViolenceFixe = value["repeating_armeDruidLion_bVDiversFixe"];
-
-        let sEnergie = value["repeating_armeDruidLion_energie"];
-        let sEnergieValue = value["repeating_armeDruidLion_energieValue"];
-
-        let pasDEnergie = false;
-        let sEnergieText = "";
-
-        if(sBonusDegats != "0") {
-            exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
-
-            diceDegats += Number(sBonusDegatsD6);
-            bonusDegats.push(sBonusDegatsFixe);
-        }
-
-        if(sBonusViolence != "0") {
-            exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
-
-            diceViolence += Number(sBonusViolenceD6);
-            bonusViolence.push(sBonusViolenceFixe);
-        }
-
-        if(sEnergie != "0") {
-            autresSpecial.push(i18n_energieRetiree+" ("+sEnergieValue+")");
-
-            var newEnergie = Number(energie)-Number(sEnergieValue);
-
-            if(newEnergie == 0) {
-                sEnergieText = i18n_plusEnergie;
-
-            } else if(newEnergie < 0) {
-
-                newEnergie = 0;
-                sEnergieText = i18n_pasEnergie;
-                pasDEnergie = true;
-            }
-            
-            exec.push("{{energieR="+newEnergie+"}}");
-        }
-        //FIN DE GESTION DES BONUS SPECIAUX
-
-        exec.push("{{cBase="+aspectNom+"}}");
-
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
-
-        if(cRoll.length == 0)
-            cRoll.push(0);
-
-        bonus = bonus.concat(AE);
+    if(aJumelage != "0") 
+        autresAmeliorations.push(i18n_jumelage+" ("+aJumelageV+")");
     
-        exec.push("{{jet=[[ {[[{"+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-        exec.push("{{Exploit=[["+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    if(aMunitionsNonLetales != "0") 
+        autresAmeliorations.push(i18n_munitionsNonLetales);
 
-        if(diceDegats < 0)
-            diceDegats = 0;
+    if(aProtectionArme != "0") 
+        autresAmeliorations.push(i18n_protectionArme);
 
-        degats.push(diceDegats+"D6");
-        degats = degats.concat(bonusDegats);
+    if(aStructureElement != "0") 
+        autresAmeliorations.push(i18n_structureElementAlpha);
 
-        if(diceViolence < 0)
-            diceViolence = 0;
+    //FIN GESTION DES AMELIORATIONS
+    
+    //GESTION DES BONUS SPECIAUX
+    let sBonusDegats = attrs["repeating_armeDruidLion_bDDiversTotal"];
+    let sBonusDegatsD6 = attrs["repeating_armeDruidLion_bDDiversD6"];
+    let sBonusDegatsFixe = attrs["repeating_armeDruidLion_bDDiversFixe"];
 
-        violence.push(diceViolence+"D6");
-        violence = violence.concat(bonusViolence);
+    let sBonusViolence = attrs["repeating_armeDruidLion_bVDiversTotal"];
+    let sBonusViolenceD6 = attrs["repeating_armeDruidLion_bVDiversD6"];
+    let sBonusViolenceFixe = attrs["repeating_armeDruidLion_bVDiversFixe"];
 
-        exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    let sEnergie = attrs["repeating_armeDruidLion_energie"];
+    let sEnergieValue = attrs["repeating_armeDruidLion_energieValue"];
 
-        if(eTenebricide != "0") {
-            let degatsTenebricide = [];
-            let ASTenebricide = [];
-            let ASValueTenebricide = [];
+    let pasDEnergie = false;
+    let sEnergieText = "";
 
-            let violenceTenebricide = [];
+    if(sBonusDegats != "0") {
+        exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
 
-            diceDegatsTenebricide = Math.floor(diceDegats/2);
-            diceViolenceTenebricide = Math.floor(diceViolence/2);
+        diceDegats += Number(sBonusDegatsD6);
+        bonusDegats.push(sBonusDegatsFixe);
+    }
 
-            degatsTenebricide.push(diceDegatsTenebricide+"D6");
-            degatsTenebricide = degatsTenebricide.concat(bonusDegats);
+    if(sBonusViolence != "0") {
+        exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
 
-            violenceTenebricide.push(diceViolenceTenebricide+"D6");
-            violenceTenebricide = violenceTenebricide.concat(bonusViolence);
-            
-            exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
-            exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+        diceViolence += Number(sBonusViolenceD6);
+        bonusViolence.push(sBonusViolenceFixe);
+    }
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = Math.ceil(eASAssassinValue/2);
+    if(sEnergie != "0") {
+        autresSpecial.push(i18n_energieRetiree+" ("+sEnergieValue+")");
 
-                ASTenebricide.unshift(eASAssassin);
-                ASValueTenebricide.unshift(eAssassinTenebricideValue+"D6");
+        var newEnergie = Number(energie)-Number(sEnergieValue);
 
-                if(attaquesSurprises.length > 0) {
-                    ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-                    ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-                }
+        if(newEnergie == 0) {
+            sEnergieText = i18n_plusEnergie;
 
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
-            } else if(attaquesSurprises.length > 0) {
+        } else if(newEnergie < 0) {
 
+            newEnergie = 0;
+            sEnergieText = i18n_pasEnergie;
+            pasDEnergie = true;
+        }
+        
+        exec.push("{{energieR="+newEnergie+"}}");
+    }
+    //FIN DE GESTION DES BONUS SPECIAUX
+
+    exec.push("{{cBase="+aspectNom+"}}");
+
+    if(mod != 0) {
+        cRoll.push(mod);
+        exec.push("{{mod="+mod+"}}");
+    }
+
+    if(cRoll.length == 0)
+        cRoll.push(0);
+
+    bonus = bonus.concat(AE);
+
+    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
+    exec.push("{{Exploit=[["+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+"]]}}");
+    exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+    if(diceDegats < 0)
+        diceDegats = 0;
+
+    degats.push(diceDegats+"D6");
+    degats = degats.concat(bonusDegats);
+
+    if(diceViolence < 0)
+        diceViolence = 0;
+
+    violence.push(diceViolence+"D6");
+    violence = violence.concat(bonusViolence);
+
+    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
+    exec.push("{{degats=[["+degats.join("+")+"]]}}");
+    exec.push("{{violence=[["+violence.join("+")+"]]}}");
+
+    if(eTenebricide != "0") {
+        let degatsTenebricide = [];
+        let ASTenebricide = [];
+        let ASValueTenebricide = [];
+
+        let violenceTenebricide = [];
+
+        diceDegatsTenebricide = Math.floor(diceDegats/2);
+        diceViolenceTenebricide = Math.floor(diceViolence/2);
+
+        degatsTenebricide.push(diceDegatsTenebricide+"D6");
+        degatsTenebricide = degatsTenebricide.concat(bonusDegats);
+
+        violenceTenebricide.push(diceViolenceTenebricide+"D6");
+        violenceTenebricide = violenceTenebricide.concat(bonusViolence);
+        
+        exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
+        exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+
+        if(eASAssassinValue > 0) {
+            eAssassinTenebricideValue = Math.ceil(eASAssassinValue/2);
+
+            ASTenebricide.unshift(eASAssassin);
+            ASValueTenebricide.unshift(eAssassinTenebricideValue+"D6");
+
+            if(attaquesSurprises.length > 0) {
                 ASTenebricide = ASTenebricide.concat(attaquesSurprises);
                 ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
             }
+
+            exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
+        } else if(attaquesSurprises.length > 0) {
+
+            ASTenebricide = ASTenebricide.concat(attaquesSurprises);
+            ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+
+            exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
         }
+    }
 
-        if(eObliteration != "0") {
-            let ASObliteration = [];
-            let ASValueObliteration = [];
+    if(eObliteration != "0") {
+        let ASObliteration = [];
+        let ASValueObliteration = [];
 
-            diceDegatsObliteration = diceDegats*6;
-            
-            degatsFObliteration = _.reduce(bonusDegats, function(n1, n2){return Number(n1) + Number(n2);});
+        diceDegatsObliteration = diceDegats*6;
+        
+        degatsFObliteration = _.reduce(bonusDegats, function(n1, n2){return Number(n1) + Number(n2);});
 
-            let vObliteration = diceDegatsObliteration+degatsFObliteration;
-            
-            exec.push("{{obliterationValue="+vObliteration+"}}");
+        let vObliteration = diceDegatsObliteration+degatsFObliteration;
 
-            if(eMeurtrier != "0")
-                exec.push("{{obliterationMeurtrierValue="+eMeurtrierV*6+"}}");
+        exec.push("{{obliterationValue="+vObliteration+"}}");
 
-            if(eDestructeur != "0")
-                exec.push("{{obliterationDestructeurValue="+eDestructeurV*6+"}}");
+        if(eMeurtrier != "0")
+            exec.push("{{obliterationMeurtrierValue="+eMeurtrierV*6+"}}");
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = eASAssassinValue*6;
+        if(eDestructeur != "0")
+            exec.push("{{obliterationDestructeurValue="+eDestructeurV*6+"}}");
 
-                ASObliteration.unshift(eASAssassin);
-                ASValueObliteration.unshift(eAssassinTenebricideValue);
+        if(eASAssassinValue > 0) {
+            eAssassinTenebricideValue = eASAssassinValue*6;
 
-                if(attaquesSurprises.length > 0) {
-                    ASObliteration = ASObliteration.concat(attaquesSurprises);
-                    ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-                }
+            ASObliteration.unshift(eASAssassin);
+            ASValueObliteration.unshift(eAssassinTenebricideValue);
 
-                exec.push("{{obliterationAS="+ASObliteration.join("\n+")+"}}");
-                exec.push("{{obliterationASValue=[["+ASValueObliteration.join("+")+"]]}}");
-            } else if(attaquesSurprises.length > 0) {
-
+            if(attaquesSurprises.length > 0) {
                 ASObliteration = ASObliteration.concat(attaquesSurprises);
                 ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-
-                exec.push("{{obliterationAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
             }
+
+            exec.push("{{obliterationAS="+ASObliteration.join("\n+")+"}}");
+            exec.push("{{obliterationASValue=[["+ASValueObliteration.join("+")+"]]}}");
+        } else if(attaquesSurprises.length > 0) {
+
+            ASObliteration = ASObliteration.concat(attaquesSurprises);
+            ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
+
+            exec.push("{{obliterationAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
         }
+    }
 
-        if(rCadence != 0) {
-            exec.push("{{rCadence="+i18n_cadence+" "+eCadenceV+" "+i18n_inclus+"}}");
-            exec.push("{{vCadence="+rCadence+"D6}}");
-        }
-          
-        if(rChambreDouble != 0)
-            exec.push("{{vChambreDouble="+rChambreDouble+"}}");
+    if(rCadence != 0) {
+        exec.push("{{rCadence="+i18n_cadence+" "+eCadenceV+" "+i18n_inclus+"}}");
+        exec.push("{{vCadence="+rCadence+"D6}}");
+    }
+        
+    if(rChambreDouble != 0)
+        exec.push("{{vChambreDouble="+rChambreDouble+"}}");
 
-        if(eASAssassinValue > 0)
-        {
-            attaquesSurprises.unshift(eASAssassin);
-            attaquesSurprisesValue.unshift(eASAssassinValue+"D6");
-        }
+    if(eASAssassinValue > 0)
+    {
+        attaquesSurprises.unshift(eASAssassin);
+        attaquesSurprisesValue.unshift(eASAssassinValue+"D6");
+    }
 
-        if(attaquesSurprises.length > 0) {
-            exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
-            exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(attaquesSurprisesCondition);
-        }
+    if(attaquesSurprises.length > 0) {
+        exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
+        exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
+        exec.push(attaquesSurprisesCondition);
+    }
 
-        if(autresEffets.length > 0)
-            exec.push("{{effets="+autresEffets.join(" / ")+"}}");
+    if(autresEffets.length > 0)
+        exec.push("{{effets="+autresEffets.join(" / ")+"}}");
 
-        if(autresAmeliorations.length > 0)
-            exec.push("{{ameliorations="+autresAmeliorations.join(" / ")+"}}");
+    if(autresAmeliorations.length > 0)
+        exec.push("{{ameliorations="+autresAmeliorations.join(" / ")+"}}");
 
-        if(autresSpecial.length > 0)
-            exec.push("{{special="+autresSpecial.join(" / ")+"}}");
+    if(autresSpecial.length > 0)
+        exec.push("{{special="+autresSpecial.join(" / ")+"}}");
 
-        if(isConditionnelA == true)
-            exec.push("{{succesConditionnel=true}}");
+    if(isConditionnelA == true)
+        exec.push("{{succesConditionnel=true}}");
 
-        if(isConditionnelD == true)
-            exec.push("{{degatsConditionnel=true}}");
+    if(isConditionnelD == true)
+        exec.push("{{degatsConditionnel=true}}");
 
-        if(isConditionnelV == true)
-            exec.push("{{violenceConditionnel=true}}");
+    if(isConditionnelV == true)
+        exec.push("{{violenceConditionnel=true}}");
 
-        if(pasDEnergie == false) {
-            startRoll(exec.join(" "), (results) => {
-                let tJet = results.results.jet.result;
-                let tJetDice = results.results.jet.dice.length;
+    if(pasDEnergie == false) {
+        startRoll(exec.join(" "), (results) => {
+            let tJet = results.results.jet.result;
+            let tJetDice = results.results.jet.dice.length;
 
-                let tBonus = results.results.bonus.result;
-                let tExploit = results.results.Exploit.result;
+            let tBonus = results.results.bonus.result;
+            let tExploit = results.results.Exploit.result;
 
-                let tDegats = results.results.degats.result;
-                let tViolence = results.results.violence.result;
+            let tDegats = results.results.degats.result;
+            let tViolence = results.results.violence.result;
 
-                let tMeurtrier = results.results.meurtrierValue;
-                let vTMeurtrier = 0;
+            let tMeurtrier = results.results.meurtrierValue;
+            let vTMeurtrier = 0;
 
-                if(tMeurtrier != undefined)
-                    vTMeurtrier = tMeurtrier.dice[0];
+            if(tMeurtrier != undefined)
+                vTMeurtrier = tMeurtrier.dice[0];
 
-                let tDestructeur = results.results.destructeurValue;
-                let vTDestructeur = 0;
+            let tDestructeur = results.results.destructeurValue;
+            let vTDestructeur = 0;
 
-                if(tDestructeur != undefined)
-                    vTDestructeur = tDestructeur.dice[0];
+            if(tDestructeur != undefined)
+                vTDestructeur = tDestructeur.dice[0];
+            
+            let tFureur = results.results.fureurValue;
+            let vTFureur = 0;
+
+            if(tFureur != undefined)
+                vTFureur = tFureur.dice[0]+tFureur.dice[1];
+            
+            let tUltraviolence = results.results.ultraviolenceValue;
+            
+            let vTUltraviolence = 0;
+
+            if(tUltraviolence != undefined)
+                vTUltraviolence = tUltraviolence.dice[0];
+
+            finishRoll(
+                results.rollId, 
+                {
+                    jet:tJet+tBonus,
+                    degats:tDegats,
+                    violence:tViolence,
+                    meurtrierValue:vTMeurtrier,
+                    destructeurValue:vTDestructeur,
+                    fureurValue:vTFureur,
+                    ultraviolenceValue:vTUltraviolence,
+                }
+            );                
+
+            if(tJet != 0 && tJet == tExploit) 
+                startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+i18n_exploit+"}} {{jet=[[ {[[{"+tJetDice+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                    let tExploit = exploit.results.jet.result;
+
+                    finishRoll(
+                        exploit.rollId, 
+                        {
+                            jet:tExploit
+                        }
+                    );
+                });
                 
-                let tFureur = results.results.fureurValue;
-                let vTFureur = 0;
 
-                if(tFureur != undefined)
-                    vTFureur = tFureur.dice[0]+tFureur.dice[1];
-                
-                let tUltraviolence = results.results.ultraviolenceValue;
-                
-                let vTUltraviolence = 0;
+            if(sEnergie != "0") {
+                setAttrs({
+                    [nEnergie]: newEnergie
+                });
 
-                if(tUltraviolence != undefined)
-                    vTUltraviolence = tUltraviolence.dice[0];
-
-                finishRoll(
-                    results.rollId, 
-                    {
-                        jet:tJet+tBonus,
-                        degats:tDegats,
-                        violence:tViolence,
-                        meurtrierValue:vTMeurtrier,
-                        destructeurValue:vTDestructeur,
-                        fureurValue:vTFureur,
-                        ultraviolenceValue:vTUltraviolence,
-                    }
-                );                
-
-                if(tJet != 0 && tJet == tExploit) 
-                    startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+i18n_exploit+"}} {{jet=[[ {[[{"+tJetDice+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                        let tExploit = exploit.results.jet.result;
-
+                if(newEnergie == 0) {
+                    startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (exploit) => {    
                         finishRoll(
-                            exploit.rollId, 
-                            {
-                                jet:tExploit
-                            }
+                            exploit.rollId,{}
                         );
                     });
-                    
-
-                if(sEnergie != "0") {
-                    setAttrs({
-                        [nEnergie]: newEnergie
-                    });
-
-                    if(newEnergie == 0) {
-                        startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (exploit) => {    
-                            finishRoll(
-                                exploit.rollId,{}
-                            );
-                        });
-                    }
                 }
+            }
 
-                
-            });
-        } else {
-            startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (text) => {
-                finishRoll(
-                    text.rollId,{}
-                );
-            });
-        }
-        
-    });
+            
+        });
+    } else {
+        startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (text) => {
+            finishRoll(
+                text.rollId,{}
+            );
+        });
+    }
 });
 
 //MALDRUID
@@ -1181,80 +1209,90 @@ const MALDruidRollSimple = [
 ];
 
 MALDruidRollSimple.forEach(button => {
-    on(`clicked:${button}Roll`, function(info) {
+    on(`clicked:${button}Roll`, async function(info) {
         let roll = info.htmlAttributes.value;
     
         let attributs = [
             "MALJetModifDesComp",
         ];
 
-        getAttrs(attributs, function(value)
-        {
-            let exec = [];
-            let cRoll = [];
-            let bonus = [];
+        let attrs = await getAttrsAsync(attributs);
 
-            let mod = Number(value["MALJetModifDesComp"]);
+        let exec = [];
+        let cRoll = [];
+        let bonus = [];
 
-            let aspect = button;
-            let aNom = aspectCompanionsDruid[aspect];
+        let mod = +attrs["MALJetModifDesComp"];
 
-            let aValue = Number(aspectCompanionsDruidValue[aspect].value);
+        let aspect = button;
+        let aNom = aspectCompanionsDruid[aspect];
 
-            if(button != "MALDruidCrowChair" && button != "MALDruidCrowBete" && button != "MALDruidCrowMachine" && button != "MALDruidCrowDame"  && button != "MALDruidCrowMasque") {
-                let aAE = Number(aspectCompanionsDruidValue[aspect].AE);
-                exec.push("{{vAE="+aAE+"}}");
-                bonus.push(aAE);
-            }
-            else
-                bonus.push(0);
+        let attrsAspects = await getAttrsAsync([
+            `${aspect}Base`,
+            `${aspect}Evol`,
+            `${aspect}AE`,
+        ]);
 
-            cRoll.push(aValue);
-            cRoll.push(mod);
+        let aValue = totalADruid(attrsAspects, aspect);
 
-            exec.push(roll);
-            exec.push("{{cBase="+aNom+"}}")
-            exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
-            exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-            exec.push("{{tBonus=[["+bonus.join("+")+"]]}}");
-    
-            startRoll(exec.join(" "), (results) => {
-                let tJet = results.results.jet.result;
-                let tBonus = results.results.tBonus.result;
-                let tExploit = results.results.Exploit.result;
-    
-                let total = tJet+tBonus;
-    
-                finishRoll(
-                    results.rollId, 
-                    {
-                        jet:total
-                    }
-                );
-    
-                if(tJet != 0 && tJet == tExploit)
-                    startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                        let tExploit = exploit.results.jet.result;
-    
-                        finishRoll(
-                            exploit.rollId, 
-                            {
-                                jet:tExploit
-                            }
-                        );
-                });
-                
+        if(button != "MALDruidCrowChair" && button != "MALDruidCrowBete" && button != "MALDruidCrowMachine" && button != "MALDruidCrowDame"  && button != "MALDruidCrowMasque") {
+            let aAE = attrsAspects[`${aspect}AE`];
+            exec.push("{{vAE="+aAE+"}}");
+            bonus.push(aAE);
+        }
+        else
+            bonus.push(0);
+
+        cRoll.push(aValue);
+        cRoll.push(mod);
+
+        exec.push(roll);
+        exec.push("{{cBase="+aNom+"}}")
+        exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
+        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+        exec.push("{{tBonus=[["+bonus.join("+")+"]]}}");
+
+        startRoll(exec.join(" "), (results) => {
+            let tJet = results.results.jet.result;
+            let tBonus = results.results.tBonus.result;
+            let tExploit = results.results.Exploit.result;
+
+            let total = tJet+tBonus;
+
+            finishRoll(
+                results.rollId, 
+                {
+                    jet:total
+                }
+            );
+
+            if(tJet != 0 && tJet == tExploit)
+                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                    let tExploit = exploit.results.jet.result;
+
+                    finishRoll(
+                        exploit.rollId, 
+                        {
+                            jet:tExploit
+                        }
+                    );
             });
+            
         });
     });
 });
 
-on(`clicked:MALDruidLionArmeBase`, function(info) {
+on(`clicked:MALDruidLionArmeBase`, async function(info) {
     let roll = info.htmlAttributes.value;
 
     let attributs = [
         "MALAspectDruidLionBase",
         "MALJetModifDesComp",
+        "MALDruidLionChairBase",
+        "MALDruidLionChairEvol",
+        "MALDruidLionBeteBase",
+        "MALDruidLionBeteEvol",
+        "MALDruidLionBeteAE",
     ];
 
     let arme = [
@@ -1275,180 +1313,193 @@ on(`clicked:MALDruidLionArmeBase`, function(info) {
         "MALBVDiversFixe"
     ]
 
-    attributs = attributs.concat(arme);
-    attributs = attributs.concat(special);
+    attributs = attributs.concat(arme, special);
 
-    getAttrs(attributs, function(value)
-    {
-        let exec = [];
-        exec.push(roll);
+    let attrs = await getAttrsAsync(attributs);
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    let exec = [];
+    exec.push(roll);
 
-        let diceDegats = 0;
-        let degats = [];
-        let bonusDegats = [];
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let diceViolence = 0;
-        let violence = [];
-        let bonusViolence = [];
+    let diceDegats = 0;
+    let degats = [];
+    let bonusDegats = [];
 
-        let portee = value["MALDruidLionBasePortee"];
+    let diceViolence = 0;
+    let violence = [];
+    let bonusViolence = [];
 
-        let mod = Number(value["MALJetModifDesComp"]);
+    let portee = attrs["MALDruidLionBasePortee"];
 
-        let aspect = value["MALAspectDruidLionBase"];
+    let mod = Number(attrs["MALJetModifDesComp"]);
 
-        let aspectNom = aspectCompanionsDruid[aspect];
-        let aspectValue = aspectCompanionsDruidValue[aspect].value;
-        let AEValue = aspectCompanionsDruidValue[aspect].AE;
+    let aspect = attrs["MALAspectDruidLionBase"];
 
-        let vChair = aspectCompanionsDruidValue["MALDruidLionChair"].value;
+    let aspectNom = aspectCompanionsDruid[aspect];
 
-        let bete = aspectCompanionsDruidValue["MALDruidLionBete"].value;
-        let AEBete = aspectCompanionsDruidValue["MALDruidLionBete"].AE;
+    let attrsAspects = await getAttrsAsync([
+        `${aspect}Base`,
+        `${aspect}Evol`,
+        `${aspect}AE`,
+    ]);
 
-        let cRoll = [];
-        let AE = [];
-        let bonus = [];
+    let aspectValue = totalADruid(attrsAspects, aspect);
+    let AEValue = +attrsAspects[`${aspect}AE`] || 0;
 
-        AE.push(AEValue);
-        
-        if(AE.length == 0)
-            exec.push("{{vAE=0}}");
-        else 
-            exec.push("{{vAE="+AEValue+"}}");
+    let vChair = totalADruid(attrs, "MALDruidLionChair");
 
-        cRoll.push(aspectValue);
+    let bete = totalADruid(attrs, "MALDruidLionBete");
+    let AEBete = +attrs[`MALDruidLionBeteAE`];
 
-        diceDegats = Number(value["MALDruidLionBaseDegats"]);
-        bonusDegats.push(value["MALDruidLionBaseDegatsBonus"]);
+    let cRoll = [];
+    let AE = [];
+    let bonus = [];
 
-        diceViolence = Number(value["MALDruidLionBaseViolence"]);
-        bonusViolence.push(value["MALDruidLionBaseViolenceBonus"]);
-
-        //GESTION DES BONUS DIVERS
-        let bChairD = Math.ceil(vChair/2);
-
-        bonusDegats.push(bChairD);
-        exec.push("{{vChair="+bChairD+"}}");
-        //FIN DE GESTION DES BONUS DIVERS
-
-        //GESTION DES ASPECTS EXCEPTIONNELS
-        if(AEBete > 0) {
-            let bonusBete = AEBete;
-
-            if(AEBete > 5) 
-                bonusBete += bete;
-
-            exec.push("{{vBeteD=+"+bonusBete+"}}");
-            bonusDegats.push(bonusBete);
-        }
-        //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
-        
-        //GESTION DES BONUS SPECIAUX
-        let sBonusDegats = value["MALCoupBDDiversTotal"];
-        let sBonusDegatsD6 = value["MALBDDiversD6"];
-        let sBonusDegatsFixe = value["MALBDDiversFixe"];
-
-        let sBonusViolence = value["MALCoupBVDiversTotal"];
-        let sBonusViolenceD6 = value["MALBVDiversD6"];
-        let sBonusViolenceFixe = value["MALBVDiversFixe"];
-
-        if(sBonusDegats != "0") {
-            exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
-            diceDegats += Number(sBonusDegatsD6);
-            bonusDegats.push(sBonusDegatsFixe);
-        }
-
-        if(sBonusViolence != "0") {
-            exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
-            diceViolence += Number(sBonusViolenceD6);
-            bonusViolence.push(sBonusViolenceFixe);
-        }
-        //FIN DE GESTION DES BONUS SPECIAUX
-
-        exec.push("{{cBase="+aspectNom+"}}");
-
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
-
-        if(cRoll.length == 0)
-            cRoll.push(0);
-
-        bonus = bonus.concat(AE);
+    AE.push(AEValue);
     
-        exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
-        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    exec.push("{{vAE="+AEValue+"}}");
 
-        degats.push(diceDegats+"D6");
-        degats = degats.concat(bonusDegats);
+    cRoll.push(aspectValue);
 
-        violence.push(diceViolence+"D6");
-        violence = violence.concat(bonusViolence);
+    diceDegats = Number(attrs["MALDruidLionBaseDegats"]);
+    bonusDegats.push(attrs["MALDruidLionBaseDegatsBonus"]);
 
-        exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    diceViolence = Number(attrs["MALDruidLionBaseViolence"]);
+    bonusViolence.push(attrs["MALDruidLionBaseViolenceBonus"]);
 
-        if(isConditionnelA == true)
-            exec.push("{{succesConditionnel=true}}");
+    //GESTION DES BONUS DIVERS
+    let bChairD = Math.ceil(vChair/2);
 
-        if(isConditionnelD == true)
-            exec.push("{{degatsConditionnel=true}}");
+    bonusDegats.push(bChairD);
+    exec.push("{{vChair="+bChairD+"}}");
+    //FIN DE GESTION DES BONUS DIVERS
 
-        if(isConditionnelV == true)
-            exec.push("{{violenceConditionnel=true}}");
-        
-        startRoll(exec.join(" "), (results) => {
-            let tJet = results.results.jet.result;
-            let tBonus = results.results.bonus.result;
-            let tExploit = results.results.Exploit.result;
+    //GESTION DES ASPECTS EXCEPTIONNELS
+    if(AEBete > 0) {
+        let bonusBete = AEBete;
 
-            let tDegats = results.results.degats.result;
-            let tViolence = results.results.violence.result;
+        if(AEBete > 5) 
+            bonusBete += bete;
 
-            finishRoll(
-                results.rollId, 
-                {
-                    jet:tJet+tBonus,
-                    degats:tDegats,
-                    violence:tViolence
-                }
-            );
+        exec.push("{{vBeteD=+"+bonusBete+"}}");
+        bonusDegats.push(bonusBete);
+    }
+    //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
+    
+    //GESTION DES BONUS SPECIAUX
+    let sBonusDegats = attrs["MALCoupBDDiversTotal"];
+    let sBonusDegatsD6 = attrs["MALBDDiversD6"];
+    let sBonusDegatsFixe = attrs["MALBDDiversFixe"];
 
-            if(tJet != 0 && tJet == tExploit)
-                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                    let tExploit = exploit.results.jet.result;
+    let sBonusViolence = attrs["MALCoupBVDiversTotal"];
+    let sBonusViolenceD6 = attrs["MALBVDiversD6"];
+    let sBonusViolenceFixe = attrs["MALBVDiversFixe"];
 
-                    finishRoll(
-                        exploit.rollId, 
-                        {
-                            jet:tExploit
-                        }
-                    );
-            });
-            
+    if(sBonusDegats != "0") {
+        exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
+        diceDegats += Number(sBonusDegatsD6);
+        bonusDegats.push(sBonusDegatsFixe);
+    }
+
+    if(sBonusViolence != "0") {
+        exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
+        diceViolence += Number(sBonusViolenceD6);
+        bonusViolence.push(sBonusViolenceFixe);
+    }
+    //FIN DE GESTION DES BONUS SPECIAUX
+
+    exec.push("{{cBase="+aspectNom+"}}");
+
+    if(mod != 0) {
+        cRoll.push(mod);
+        exec.push("{{mod="+mod+"}}");
+    }
+
+    if(cRoll.length == 0)
+        cRoll.push(0);
+
+    bonus = bonus.concat(AE);
+
+    exec.push("{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}");
+    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+    exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+    degats.push(diceDegats+"D6");
+    degats = degats.concat(bonusDegats);
+
+    violence.push(diceViolence+"D6");
+    violence = violence.concat(bonusViolence);
+
+    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
+    exec.push("{{degats=[["+degats.join("+")+"]]}}");
+    exec.push("{{violence=[["+violence.join("+")+"]]}}");
+
+    if(isConditionnelA == true)
+        exec.push("{{succesConditionnel=true}}");
+
+    if(isConditionnelD == true)
+        exec.push("{{degatsConditionnel=true}}");
+
+    if(isConditionnelV == true)
+        exec.push("{{violenceConditionnel=true}}");
+    
+    startRoll(exec.join(" "), (results) => {
+        let tJet = results.results.jet.result;
+        let tBonus = results.results.bonus.result;
+        let tExploit = results.results.Exploit.result;
+
+        let tDegats = results.results.degats.result;
+        let tViolence = results.results.violence.result;
+
+        finishRoll(
+            results.rollId, 
+            {
+                jet:tJet+tBonus,
+                degats:tDegats,
+                violence:tViolence
+            }
+        );
+
+        if(tJet != 0 && tJet == tExploit)
+            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                let tExploit = exploit.results.jet.result;
+
+                finishRoll(
+                    exploit.rollId, 
+                    {
+                        jet:tExploit
+                    }
+                );
         });
+        
     });
 });
 
-on(`clicked:repeating_armeMALDruidLion:combatdruidroll`, function(info) {
+on(`clicked:repeating_armeMALDruidLion:combatdruidroll`, async function(info) {
     let roll = info.htmlAttributes.value;
 
     let attributs = [
         "repeating_armeMALDruidLion_armeDruidLion",
         "repeating_armeMALDruidLion_aspectDruidLion",
         "MALJetModifDesComp",
-        "MALDruidLionPEAct"
+        "MALDruidLionPEAct",
+        "MALDruidLionChairBase",
+        "MALDruidLionChairEvol",
+        "MALDruidLionBeteBase",
+        "MALDruidLionBeteEvol",
+        "MALDruidLionBeteAE",
+        "MALDruidLionMachineBase",
+        "MALDruidLionMachineEvol",
+        "MALDruidLionMachineAE",
+        "MALDruidLionMasqueBase",
+        "MALDruidLionMasqueEvol",
+        "MALDruidLionMasqueAE",
     ];
 
-    let arme = [
+    let wpn = [
         "repeating_armeMALDruidLion_druidLionBaseNom",
         "repeating_armeMALDruidLion_degatDruidLion",
         "repeating_armeMALDruidLion_degatBonusDruidLion",
@@ -1547,803 +1598,802 @@ on(`clicked:repeating_armeMALDruidLion:combatdruidroll`, function(info) {
         "repeating_armeMALDruidLion_energieValue"
     ]
 
-    attributs = attributs.concat(arme);
-    attributs = attributs.concat(effets);
-    attributs = attributs.concat(ameliorations);
-    attributs = attributs.concat(special);
+    attributs = attributs.concat(wpn, effets, ameliorations, special);
 
-    getAttrs(attributs, function(value)
-    {
-        let exec = [];
-        exec.push(roll);
+    let attrs = await getAttrsAsync(attributs);
 
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
+    let exec = [];
+    exec.push(roll);
 
-        let arme = value["repeating_armeMALDruidLion_armeDruidLion"];
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
 
-        let diceDegats = 0;
-        let degats = [];
-        let bonusDegats = [];
+    let arme = attrs["repeating_armeMALDruidLion_armeDruidLion"];
 
-        let diceViolence = 0;
-        let violence = [];
-        let bonusViolence = [];
+    let diceDegats = 0;
+    let degats = [];
+    let bonusDegats = [];
 
-        let attaquesSurprises = [];
-        let attaquesSurprisesValue = [];
-        let attaquesSurprisesCondition = "";
+    let diceViolence = 0;
+    let violence = [];
+    let bonusViolence = [];
 
-        let eASAssassin = "";
-        let eASAssassinValue = 0;
+    let attaquesSurprises = [];
+    let attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = "";
 
-        let energie = value["MALDruidLionPEAct"];
-        let nEnergie = "MALDruidLionPEAct";
-        let portee = value["repeating_armeMALDruidLion_porteeDruidLion"];
-        let autresEffets = [];
-        let autresAmeliorations = [];
-        let autresSpecial = [];
+    let eASAssassin = "";
+    let eASAssassinValue = 0;
 
-        let mod = Number(value["MALJetModifDesComp"]);
+    let energie = attrs["MALDruidLionPEAct"];
+    let nEnergie = "MALDruidLionPEAct";
+    let portee = attrs["repeating_armeMALDruidLion_porteeDruidLion"];
+    let autresEffets = [];
+    let autresAmeliorations = [];
+    let autresSpecial = [];
 
-        let aspect = value["repeating_armeMALDruidLion_aspectDruidLion"];
+    let mod = +attrs["MALJetModifDesComp"];
 
-        let aspectNom = aspectCompanionsDruid[aspect];
-        let aspectValue = aspectCompanionsDruidValue[aspect].value;
-        let AEValue = aspectCompanionsDruidValue[aspect].AE;
+    let aspect = attrs["repeating_armeMALDruidLion_aspectDruidLion"];
 
-        let vChair = aspectCompanionsDruidValue["MALDruidLionChair"].value;
+    let aspectNom = aspectCompanionsDruid[aspect];
 
-        let vBete = aspectCompanionsDruidValue["MALDruidLionBete"].value;
-        let vAEBete = aspectCompanionsDruidValue["MALDruidLionBete"].AE;
+    let attrsAspects = await getAttrsAsync([
+        `${aspect}Base`,
+        `${aspect}Evol`,
+        `${aspect}AE`,
+    ]);
 
-        let vMachine = aspectCompanionsDruidValue["MALDruidLionMachine"].value;
-        let vAEMachine = aspectCompanionsDruidValue["MALDruidLionMachine"].AE;
+    let aspectValue = totalADruid(attrsAspects, aspect);
+    let AEValue = +attrsAspects[`${aspect}AE`] || 0;
 
-        let vMasque = aspectCompanionsDruidValue["MALDruidLionMasque"].value;
-        let vAEMasque = aspectCompanionsDruidValue["MALDruidLionMasque"].AE;
+    let vChair = totalADruid(attrs, "MALDruidLionChair");
 
-        let cRoll = [];
-        let AE = [];
-        let bonus = [];
+    let vBete = totalADruid(attrs, "MALDruidLionBete");
+    let vAEBete = +attrs["MALDruidLionBeteAE"];
 
-        AE.push(AEValue);
+    let vMachine = totalADruid(attrs, "MALDruidLionMachine");
+    let vAEMachine = +attrs["MALDruidLionMachineAE"];
 
-        exec.push("{{special1B="+arme+"}}");
+    let vMasque = totalADruid(attrs, "MALDruidLionMasque");
+    let vAEMasque = +attrs["MALDruidLionMasqueAE"];
+
+    let cRoll = [];
+    let AE = [];
+    let bonus = [];
+
+    AE.push(AEValue);
+
+    exec.push("{{special1B="+arme+"}}");
+    
+    exec.push("{{vAE="+AEValue+"}}");
+
+    cRoll.push(aspectValue);
+
+    diceDegats = +attrs["repeating_armeMALDruidLion_degatDruidLion"];
+    bonusDegats.push(attrs["repeating_armeMALDruidLion_degatBonusDruidLion"]);
+
+    diceViolence = +attrs["repeating_armeMALDruidLion_violenceDruidLion"];
+    bonusViolence.push(attrs["repeating_armeMALDruidLion_violenceBonusDruidLion"]);
+
+    //GESTION DES BONUS DIVERS
+    let bChairD = Math.ceil(vChair/2);
+
+    if(portee == "^{portee-contact}") {
         
-        if(AE.length == 0)
-            exec.push("{{vAE=0}}");
-        else 
-            exec.push("{{vAE="+AEValue+"}}");
+        bonusDegats.push(bChairD);
+        exec.push("{{vChair="+bChairD+"}}");
+    }
+    //FIN DE GESTION DES BONUS DIVERS
 
-        cRoll.push(aspectValue);
+    //GESTION DES ASPECTS EXCEPTIONNELS
+    if(vAEBete > 0) {
+        let bonusBete = vAEBete;
 
-        diceDegats = Number(value["repeating_armeMALDruidLion_degatDruidLion"]);
-        bonusDegats.push(value["repeating_armeMALDruidLion_degatBonusDruidLion"]);
+        if(vAEBete > 5) 
+            bonusBete += vBete;
 
-        diceViolence = Number(value["repeating_armeMALDruidLion_violenceDruidLion"]);
-        bonusViolence.push(value["repeating_armeMALDruidLion_violenceBonusDruidLion"]);
+        exec.push("{{vBeteD=+"+bonusBete+"}}");
+        bonusDegats.push(bonusBete);
+    }
+    //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
 
-        //GESTION DES BONUS DIVERS
-        let bChairD = Math.ceil(vChair/2);
+    //GESTION DES EFFETS
+    let rCadence = 0;
 
-        if(portee == "^{portee-contact}") {
+    let eAntiAnatheme = attrs["repeating_armeMALDruidLion_antiAnatheme"];
+    let eAntiVehicule = attrs["repeating_armeMALDruidLion_antiVehicule"];
+    let eArtillerie = attrs["repeating_armeMALDruidLion_artillerie"];
+    let eAssassin = attrs["repeating_armeMALDruidLion_repeating_armeMALDruidLion_assassin"];
+    let eAssassinV = attrs["repeating_armeMALDruidLion_assassinValue"];
+    let eAssistanceAttaque = attrs["repeating_armeMALDruidLion_assistanceAttaque"];
+    let eBarrage = attrs["repeating_armeMALDruidLion_barrage"];
+    let eBarrageV = attrs["repeating_armeMALDruidLion_barrageValue"];
+    let eCadence = attrs["repeating_armeMALDruidLion_cadence"];
+    let eCadenceV = attrs["repeating_armeMALDruidLion_cadenceValue"];
+    let eChargeur = attrs["repeating_armeMALDruidLion_chargeur"];
+    let eChargeurV = attrs["repeating_armeMALDruidLion_chargeurValue"];
+    let eChoc = attrs["repeating_armeMALDruidLion_choc"];
+    let eChocV = attrs["repeating_armeMALDruidLion_chocValue"];
+    let eDefense = attrs["repeating_armeMALDruidLion_defense"];
+    let eDefenseV = attrs["repeating_armeMALDruidLion_defenseValue"];
+    let eDegatsContinus = attrs["repeating_armeMALDruidLion_degatContinue"];
+    let eDegatsContinusV = attrs["repeating_armeMALDruidLion_degatContinueValue"];
+    let eDeuxMains = attrs["repeating_armeMALDruidLion_deuxMains"];
+    let eDemoralisant = attrs["repeating_armeMALDruidLion_demoralisant"];
+    let eDesignation = attrs["repeating_armeMALDruidLion_designation"];
+    let eDestructeur = attrs["repeating_armeMALDruidLion_destructeur"];
+    let eDestructeurV = 2;
+    let eDispersion = attrs["repeating_armeMALDruidLion_dispersion"];
+    let eDispersionV = attrs["repeating_armeMALDruidLion_dispersionValue"];
+    let eEnChaine = attrs["repeating_armeMALDruidLion_enChaine"];
+    let eEsperance = attrs["repeating_armeMALDruidLion_esperance"];
+    let eFureur = attrs["repeating_armeMALDruidLion_fureur"];
+    let eFureurV = 4;
+    let eIgnoreArmure = attrs["repeating_armeMALDruidLion_ignoreArmure"];
+    let eIgnoreCDF = attrs["repeating_armeMALDruidLion_ignoreCdF"];
+    let eJAkimbo = attrs["repeating_armeMALDruidLion_akimbo"];
+    let eJAmbidextrie = attrs["repeating_armeMALDruidLion_ambidextrie"];
+    let eLeste = attrs["repeating_armeMALDruidLion_leste"];
+    let eLourd = attrs["repeating_armeMALDruidLion_lourd"];
+    let eLumiere = attrs["repeating_armeMALDruidLion_lumiere"];
+    let eLumiereV = attrs["repeating_armeMALDruidLion_lumiereValue"];
+    let eMeurtrier = attrs["repeating_armeMALDruidLion_meurtrier"];
+    let eMeurtrierV = 2;
+    let eObliteration = attrs["repeating_armeMALDruidLion_obliteration"];
+    let eOrfevrerie = attrs["repeating_armeMALDruidLion_orfevrerie"];
+    let eParasitage = attrs["repeating_armeMALDruidLion_parasitage"];
+    let eParasitageV = attrs["repeating_armeMALDruidLion_parasitageValue"];
+    let ePenetrant = attrs["repeating_armeMALDruidLion_penetrant"];
+    let ePenetrantV = attrs["repeating_armeMALDruidLion_penetrantValue"];
+    let ePerceArmure = attrs["repeating_armeMALDruidLion_perceArmure"];
+    let ePerceArmureV = attrs["repeating_armeMALDruidLion_perceArmureValue"];
+    let ePrecision = attrs["repeating_armeMALDruidLion_precision"];
+    let eReaction = attrs["repeating_armeMALDruidLion_reaction"];
+    let eReactionV = attrs["repeating_armeMALDruidLion_reactionValue"];
+    let eSilencieux = attrs["repeating_armeMALDruidLion_silencieux"];
+    let eSoumission = attrs["repeating_armeMALDruidLion_soumission"];
+    let eTenebricide = attrs["repeating_armeMALDruidLion_tenebricite"];
+    let eTirRafale = attrs["repeating_armeMALDruidLion_tirRafale"];
+    let eTirSecurite = attrs["repeating_armeMALDruidLion_tirSecurite"];
+    let eUltraviolence = attrs["repeating_armeMALDruidLion_ultraViolence"];
+    let eUltraviolenceV = 2;
+
+    if(eAntiAnatheme != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+        exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
+        exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
+    }
+    
+    if(eAssistanceAttaque != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+
+        exec.push("{{assistanceAttaque="+i18n_assistanceAttaque+"}}");
+        exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
+    }
+    
+    if(eArtillerie != "0") {
+        isConditionnelA = true;
+        exec.push("{{artillerie="+i18n_artillerie+"}}");
+        exec.push("{{artillerieCondition="+i18n_artillerieCondition+"}}");
+    }
+    
+    if(eAssassin != "0") {
+        eASAssassin = i18n_assassin;
+        eASAssassinValue = eAssassinV;
+
+        if(attaquesSurprisesCondition == "")
+            attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
+    }
+
+    if(eCadence != "0") { 
+        rCadence = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
+    }
+
+    if(eChoc != "0") {
+        isConditionnelA = true;
+        exec.push("{{choc="+i18n_choc+" "+eChocV+"}}");
+        exec.push("{{chocCondition="+i18n_chocCondition+"}}");
+    }
+                    
+    if(eDemoralisant != "0") {
+        isConditionnelA = true;
+        exec.push("{{demoralisant="+i18n_demoralisant+"}}");
+        exec.push("{{demoralisantCondition="+i18n_demoralisantCondition+"}}");
+    }
+                    
+    if(eDestructeur != "0") {
+        isConditionnelD = true;
+        exec.push("{{destructeur="+i18n_destructeur+"}}");
+        exec.push("{{destructeurValue=[["+eDestructeurV+"D6]]}}");
+        exec.push("{{destructeurCondition="+i18n_destructeurCondition+"}}");
+    }
+    
+    if(eEnChaine != "0") {
+        isConditionnelD = true;
+        exec.push("{{enChaine="+i18n_enChaine+"}}");
+        exec.push("{{enChaineCondition="+i18n_enChaineCondition+"}}");
+    }
+    
+    if(eEsperance != "0") {
+        isConditionnelD = true;
+        isConditionnelV = true;
+        exec.push("{{esperance="+i18n_esperance+"}}");
+        exec.push("{{esperanceConditionD="+i18n_esperanceConditionD+"}}");
+        exec.push("{{esperanceConditionV="+i18n_esperanceConditionV+"}}");
+    }
             
-            bonusDegats.push(bChairD);
-            exec.push("{{vChair="+bChairD+"}}");
-        }
-        //FIN DE GESTION DES BONUS DIVERS
+    if(eFureur != "0") {
+        isConditionnelV = true;
+        exec.push("{{fureur="+i18n_fureur+"}}");
+        exec.push("{{fureurValue=[["+eFureurV+"D6]]}}");
+        exec.push("{{fureurCondition="+i18n_fureurCondition+"}}");
+    }
+            
+    if(eLeste != "0") {
+        if(portee != "^{portee-contact}") 
+            bChairD = vChair;
 
-        //GESTION DES ASPECTS EXCEPTIONNELS
-        if(vAEBete > 0) {
-            let bonusBete = vAEBete;
+        bonusDegats.push(bChairD);
+        exec.push("{{vLeste="+bChairD+"}}");
+    }
+            
+    if(eMeurtrier != "0") {
+        isConditionnelD = true;
+        exec.push("{{meurtrier="+i18n_meurtrier+"}}");
+        exec.push("{{meurtrierValue=[["+eMeurtrierV+"D6]]}}");
+        exec.push("{{meurtrierCondition="+i18n_meurtrierCondition+"}}");
+    }
+            
+    if(eObliteration != "0") {
+        isConditionnelD = true;
+        exec.push("{{obliteration="+i18n_obliteration+"}}");
+        exec.push("{{obliterationCondition="+i18n_obliterationCondition+"}}");
+    }
+            
+    if(eOrfevrerie != "0") {
+        let vOrfevrerie = Math.ceil((vMasque/2)+vAEMasque);
 
-            if(vAEBete > 5) 
-                bonusBete += vBete;
+        bonusDegats.push(vOrfevrerie);
+        exec.push("{{vOrfevrerie="+vOrfevrerie+"}}");
+    }
+            
+    if(eParasitage != "0") {
+        isConditionnelA = true;
+        exec.push("{{parasitage="+i18n_parasitage+" "+eParasitageV+"}}");
+        exec.push("{{parasitageCondition="+i18n_parasitageCondition+"}}");
+    }
+            
+    if(ePrecision != "0") {
+        isConditionnelD = true;
+        let vPrecision = Math.ceil((vMachine/2)+vAEMachine);
 
-            exec.push("{{vBeteD=+"+bonusBete+"}}");
-            bonusDegats.push(bonusBete);
-        }
-        //FIN DE GESTION DES ASPECTS EXCEPTIONNELS
+        bonusDegats.push(vPrecision);
+        exec.push("{{vPrecision="+vPrecision+"}}");
+    }
 
-        //GESTION DES EFFETS
-        let rCadence = 0;
+    if(eSilencieux != "0") {
+        let totalSilencieux = Math.ceil((vMasque/2)+vAEMasque);
 
-        let eAntiAnatheme = value["repeating_armeMALDruidLion_antiAnatheme"];
-        let eAntiVehicule = value["repeating_armeMALDruidLion_antiVehicule"];
-        let eArtillerie = value["repeating_armeMALDruidLion_artillerie"];
-        let eAssassin = value["repeating_armeMALDruidLion_repeating_armeMALDruidLion_assassin"];
-        let eAssassinV = value["repeating_armeMALDruidLion_assassinValue"];
-        let eAssistanceAttaque = value["repeating_armeMALDruidLion_assistanceAttaque"];
-        let eBarrage = value["repeating_armeMALDruidLion_barrage"];
-        let eBarrageV = value["repeating_armeMALDruidLion_barrageValue"];
-        let eCadence = value["repeating_armeMALDruidLion_cadence"];
-        let eCadenceV = value["repeating_armeMALDruidLion_cadenceValue"];
-        let eChargeur = value["repeating_armeMALDruidLion_chargeur"];
-        let eChargeurV = value["repeating_armeMALDruidLion_chargeurValue"];
-        let eChoc = value["repeating_armeMALDruidLion_choc"];
-        let eChocV = value["repeating_armeMALDruidLion_chocValue"];
-        let eDefense = value["repeating_armeMALDruidLion_defense"];
-        let eDefenseV = value["repeating_armeMALDruidLion_defenseValue"];
-        let eDegatsContinus = value["repeating_armeMALDruidLion_degatContinue"];
-        let eDegatsContinusV = value["repeating_armeMALDruidLion_degatContinueValue"];
-        let eDeuxMains = value["repeating_armeMALDruidLion_deuxMains"];
-        let eDemoralisant = value["repeating_armeMALDruidLion_demoralisant"];
-        let eDesignation = value["repeating_armeMALDruidLion_designation"];
-        let eDestructeur = value["repeating_armeMALDruidLion_destructeur"];
-        let eDestructeurV = 2;
-        let eDispersion = value["repeating_armeMALDruidLion_dispersion"];
-        let eDispersionV = value["repeating_armeMALDruidLion_dispersionValue"];
-        let eEnChaine = value["repeating_armeMALDruidLion_enChaine"];
-        let eEsperance = value["repeating_armeMALDruidLion_esperance"];
-        let eFureur = value["repeating_armeMALDruidLion_fureur"];
-        let eFureurV = 4;
-        let eIgnoreArmure = value["repeating_armeMALDruidLion_ignoreArmure"];
-        let eIgnoreCDF = value["repeating_armeMALDruidLion_ignoreCdF"];
-        let eJAkimbo = value["repeating_armeMALDruidLion_akimbo"];
-        let eJAmbidextrie = value["repeating_armeMALDruidLion_ambidextrie"];
-        let eLeste = value["repeating_armeMALDruidLion_leste"];
-        let eLourd = value["repeating_armeMALDruidLion_lourd"];
-        let eLumiere = value["repeating_armeMALDruidLion_lumiere"];
-        let eLumiereV = value["repeating_armeMALDruidLion_lumiereValue"];
-        let eMeurtrier = value["repeating_armeMALDruidLion_meurtrier"];
-        let eMeurtrierV = 2;
-        let eObliteration = value["repeating_armeMALDruidLion_obliteration"];
-        let eOrfevrerie = value["repeating_armeMALDruidLion_orfevrerie"];
-        let eParasitage = value["repeating_armeMALDruidLion_parasitage"];
-        let eParasitageV = value["repeating_armeMALDruidLion_parasitageValue"];
-        let ePenetrant = value["repeating_armeMALDruidLion_penetrant"];
-        let ePenetrantV = value["repeating_armeMALDruidLion_penetrantValue"];
-        let ePerceArmure = value["repeating_armeMALDruidLion_perceArmure"];
-        let ePerceArmureV = value["repeating_armeMALDruidLion_perceArmureValue"];
-        let ePrecision = value["repeating_armeMALDruidLion_precision"];
-        let eReaction = value["repeating_armeMALDruidLion_reaction"];
-        let eReactionV = value["repeating_armeMALDruidLion_reactionValue"];
-        let eSilencieux = value["repeating_armeMALDruidLion_silencieux"];
-        let eSoumission = value["repeating_armeMALDruidLion_soumission"];
-        let eTenebricide = value["repeating_armeMALDruidLion_tenebricite"];
-        let eTirRafale = value["repeating_armeMALDruidLion_tirRafale"];
-        let eTirSecurite = value["repeating_armeMALDruidLion_tirSecurite"];
-        let eUltraviolence = value["repeating_armeMALDruidLion_ultraViolence"];
-        let eUltraviolenceV = 2;
+        attaquesSurprises.push(i18n_silencieux);
+        attaquesSurprisesValue.push(totalSilencieux);
 
-        if(eAntiAnatheme != "0") {
+        if(attaquesSurprisesCondition == "")
+            attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
+    }
+
+    if(eSoumission != "0") {
+        isConditionnelA = true;
+        exec.push("{{soumission="+i18n_soumission+"}}");
+        exec.push("{{soumissionCondition="+i18n_soumissionCondition+"}}");
+    }
+    
+    if(eTenebricide != "0") {
+        exec.push("{{tenebricide="+i18n_tenebricide+"}}");
+        exec.push("{{tenebricideConditionD="+i18n_tenebricideConditionD+"}}");
+        exec.push("{{tenebricideConditionV="+i18n_tenebricideConditionV+"}}");
+    }
+
+    if(eTirRafale != "0") {
+        exec.push("{{tirRafale="+i18n_tirRafale+"}}");
+        exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
+    }
+    
+    if(eUltraviolence != "0") {
+        exec.push("{{ultraviolence="+i18n_ultraviolence+"}}");
+        exec.push("{{ultraviolenceValue=[["+eUltraviolenceV+"D6]]}}");
+        exec.push("{{ultraviolenceCondition="+i18n_ultraviolenceCondition+"}}");
+    }        
+
+    if(eAntiVehicule != "0") 
+        autresEffets.push(i18n_antiVehicule);
+
+    if(eBarrage != "0") 
+        autresEffets.push(i18n_barrage+" "+eBarrageV);
+
+    if(eChargeur != "0") 
+        autresEffets.push(i18n_chargeur+" "+eChargeurV);
+
+    if(eDefense != "0") 
+        autresEffets.push(i18n_defense+" "+eDefenseV);
+    
+    if(eDegatsContinus != "0") 
+        autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
+    
+    if(eDeuxMains != "0") 
+        autresEffets.push(i18n_deuxMains);
+    
+    if(eDesignation != "0") 
+        autresEffets.push(i18n_designation);
+
+    if(eDispersion != "0") 
+        autresEffets.push(i18n_dispersion+" "+eDispersionV);
+
+    if(eIgnoreArmure != "0") 
+        autresEffets.push(i18n_ignoreArmure);
+
+    if(eIgnoreCDF != "0") 
+        autresEffets.push(i18n_ignoreCDF);
+
+    if(eJAkimbo != "0") 
+        autresEffets.push(i18n_jAkimbo);
+
+    if(eJAmbidextrie != "0") 
+        autresEffets.push(i18n_jAmbidextrie);
+
+    if(eLourd != "0") 
+        autresEffets.push(i18n_lourd);
+
+    if(eLumiere != "0") 
+        autresEffets.push(i18n_lumiere+" "+eLumiereV);
+    
+    if(ePenetrant != "0") 
+        autresEffets.push(i18n_penetrant+" "+ePenetrantV);
+    
+    if(ePerceArmure != "0") 
+        autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
+    
+    if(eReaction != "0") 
+        autresEffets.push(i18n_reaction+" "+eReactionV);
+    
+    if(eTirSecurite != "0") 
+        autresEffets.push(i18n_tirSecurite);
+
+    //FIN GESTION DES EFFETS
+
+    //GESTION DES AMELIORATIONS
+    let rChambreDouble = 0;
+
+    let aChargeurGrappes = attrs["repeating_armeMALDruidLion_chargeurGrappes"];
+    let aCanonLong = attrs["repeating_armeMALDruidLion_canonLong"];
+    let aCanonRaccourci = attrs["repeating_armeMALDruidLion_canonRaccourci"];
+    let aChambreDouble = attrs["repeating_armeMALDruidLion_chambreDouble"];
+    let aInterfaceGuidage = attrs["repeating_armeMALDruidLion_interfaceGuidage"];
+    let aJumelage = attrs["repeating_armeMALDruidLion_jumelage"];
+    let aJumelageV = attrs["repeating_armeMALDruidLion_jumelageValue"];
+    let aJumelageT = attrs["repeating_armeMALDruidLion_jumelageType"];
+    let aLunetteIntelligente = attrs["repeating_armeMALDruidLion_lunetteIntelligente"];
+    let aMunitionsDrone = attrs["repeating_armeMALDruidLion_munitionsDrone"];
+    let aMunitionsHyperVelocite = attrs["repeating_armeMALDruidLion_munitionsHyperVelocite"];        
+    let aChargeurExplosives = attrs["repeating_armeMALDruidLion_chargeurExplosives"];
+    let aMunitionsIEM = attrs["repeating_armeMALDruidLion_munitionsIEM"];
+    let aMunitionsNonLetales = attrs["repeating_armeMALDruidLion_munitionsNonLetales"];
+    let aMunitionsSubsoniques = attrs["repeating_armeMALDruidLion_munitionsSubsoniques"];
+    let aPointeurLaser = attrs["repeating_armeMALDruidLion_pointeurLaser"];
+    let aProtectionArme = attrs["repeating_armeMALDruidLion_protectionArme"];
+    let aRevetementOmega = attrs["repeating_armeMALDruidLion_revetementOmega"];
+    let aStructureElement = attrs["repeating_armeMALDruidLion_structureElement"];
+    let aSystemeRefroidissement = attrs["repeating_armeMALDruidLion_systemeRefroidissement"];
+
+    if(aChargeurGrappes != "0") {
+        exec.push("{{vMGrappeD=-1D6}}");
+        exec.push("{{vMGrappeV=+1D6}}");
+        diceDegats -= 1;
+        diceViolence += 1;
+    }
+
+    if(aCanonLong != "0") {
+        isConditionnelA = true;
+        exec.push("{{canonLong="+i18n_canonLong+"}}");
+        exec.push("{{canonLongCondition="+i18n_canonLongCondition+"}}");
+    }
+
+    if(aCanonRaccourci != "0") {
+        isConditionnelA = true;
+        exec.push("{{canonRaccourci="+i18n_canonRaccourci+"}}");
+        exec.push("{{canonRaccourciCondition="+i18n_canonRaccourciCondition+"}}");
+    }
+
+    if(aChambreDouble != "0") { 
+        if(eCadence != 0)
+            autresAmeliorations.push(i18n_chambreDouble);
+        else if(eCadence == 0)
+            rChambreDouble = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
+    }
+
+    if(aLunetteIntelligente != "0") {
+        isConditionnelA = true;
+        exec.push("{{lunetteIntelligente="+i18n_lunetteIntelligente+"}}");
+        exec.push("{{lunetteIntelligenteCondition="+i18n_lunetteIntelligenteCondition+"}}");
+    }
+
+    if(aMunitionsDrone != "0") {
+        exec.push("{{vMDrone=+3}}");
+        bonus.push(3);
+    }
+
+    if(aMunitionsHyperVelocite != "0") {
+        if(eAssistanceAttaque != "0")
+            autresAmeliorations.push(i18n_munitionsHyperVelocite);
+        else if(eAssistanceAttaque == "0") {
             isConditionnelD = true;
             isConditionnelV = true;
-            exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-            exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
-        }
-        
-        if(eAssistanceAttaque != "0") {
-            isConditionnelD = true;
-            isConditionnelV = true;
 
-            exec.push("{{assistanceAttaque="+i18n_assistanceAttaque+"}}");
+            exec.push("{{assistanceAttaque="+i18n_munitionsHyperVelocite+"}}");
             exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
         }
-        
-        if(eArtillerie != "0") {
-            isConditionnelA = true;
-            exec.push("{{artillerie="+i18n_artillerie+"}}");
-            exec.push("{{artillerieCondition="+i18n_artillerieCondition+"}}");
-        }
-        
-        if(eAssassin != "0") {
-            eASAssassin = i18n_assassin;
-            eASAssassinValue = eAssassinV;
+    }
+    
+    if(aChargeurExplosives != "0") {
+        exec.push("{{vMExplosiveD=+1D6}}");
+        exec.push("{{vMExplosiveV=-1D6}}");
+        diceDegats += 1;
+        diceViolence -= 1;
+    }
+    
+    if(aMunitionsIEM != "0") {
+        exec.push("{{vMIEMD=-1D6}}");
+        exec.push("{{vMIEMV=-1D6}}");
+        diceDegats -= 1;
+        diceViolence -= 1;
+        autresAmeliorations.push(i18n_munitionsIEMParasitage);
+    }
+    
+    if(aMunitionsSubsoniques != "0") {
+
+        if(eSilencieux != "0")
+            autresAmeliorations.push(i18n_munitionsSubsoniques);
+        else if(eSilencieux == "0") {
+            let totalSubsonique = vDiscretion+oDiscretion;
+
+            attaquesSurprises.push(i18n_munitionsSubsoniques);
+            attaquesSurprisesValue.push(totalSubsonique);
 
             if(attaquesSurprisesCondition == "")
                 attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
         }
+    }
+    
+    if(aPointeurLaser != "0") {
+        exec.push("{{vMPLaser=+1}}");
+        bonus.push(1);
+    }
 
-        if(eCadence != "0") { 
-            rCadence = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
-        }
-
-        if(eChoc != "0") {
-            isConditionnelA = true;
-            exec.push("{{choc="+i18n_choc+" "+eChocV+"}}");
-            exec.push("{{chocCondition="+i18n_chocCondition+"}}");
-        }
-                       
-        if(eDemoralisant != "0") {
-            isConditionnelA = true;
-            exec.push("{{demoralisant="+i18n_demoralisant+"}}");
-            exec.push("{{demoralisantCondition="+i18n_demoralisantCondition+"}}");
-        }
-                       
-        if(eDestructeur != "0") {
-            isConditionnelD = true;
-            exec.push("{{destructeur="+i18n_destructeur+"}}");
-            exec.push("{{destructeurValue=[["+eDestructeurV+"D6]]}}");
-            exec.push("{{destructeurCondition="+i18n_destructeurCondition+"}}");
-        }
-        
-        if(eEnChaine != "0") {
-            isConditionnelD = true;
-            exec.push("{{enChaine="+i18n_enChaine+"}}");
-            exec.push("{{enChaineCondition="+i18n_enChaineCondition+"}}");
-        }
-        
-        if(eEsperance != "0") {
-            isConditionnelD = true;
-            isConditionnelV = true;
-            exec.push("{{esperance="+i18n_esperance+"}}");
-            exec.push("{{esperanceConditionD="+i18n_esperanceConditionD+"}}");
-            exec.push("{{esperanceConditionV="+i18n_esperanceConditionV+"}}");
-        }
-                
-        if(eFureur != "0") {
-            isConditionnelV = true;
-            exec.push("{{fureur="+i18n_fureur+"}}");
-            exec.push("{{fureurValue=[["+eFureurV+"D6]]}}");
-            exec.push("{{fureurCondition="+i18n_fureurCondition+"}}");
-        }
-                
-        if(eLeste != "0") {
-            if(portee != "^{portee-contact}") 
-                bChairD = vChair;
-
-            bonusDegats.push(bChairD);
-            exec.push("{{vLeste="+bChairD+"}}");
-        }
-                
-        if(eMeurtrier != "0") {
-            isConditionnelD = true;
-            exec.push("{{meurtrier="+i18n_meurtrier+"}}");
-            exec.push("{{meurtrierValue=[["+eMeurtrierV+"D6]]}}");
-            exec.push("{{meurtrierCondition="+i18n_meurtrierCondition+"}}");
-        }
-                
-        if(eObliteration != "0") {
-            isConditionnelD = true;
-            exec.push("{{obliteration="+i18n_obliteration+"}}");
-            exec.push("{{obliterationCondition="+i18n_obliterationCondition+"}}");
-        }
-                
-        if(eOrfevrerie != "0") {
-            let vOrfevrerie = Math.ceil((vMasque/2)+vAEMasque);
-
-            bonusDegats.push(vOrfevrerie);
-            exec.push("{{vOrfevrerie="+vOrfevrerie+"}}");
-        }
-                
-        if(eParasitage != "0") {
-            isConditionnelA = true;
-            exec.push("{{parasitage="+i18n_parasitage+" "+eParasitageV+"}}");
-            exec.push("{{parasitageCondition="+i18n_parasitageCondition+"}}");
-        }
-                
-        if(ePrecision != "0") {
-            isConditionnelD = true;
-            let vPrecision = Math.ceil((vMachine/2)+vAEMachine);
-
-            bonusDegats.push(vPrecision);
-            exec.push("{{vPrecision="+vPrecision+"}}");
-        }
-
-        if(eSilencieux != "0") {
-            let totalSilencieux = Math.ceil((vMasque/2)+vAEMasque);
-
-            attaquesSurprises.push(i18n_silencieux);
-            attaquesSurprisesValue.push(totalSilencieux);
-
-            if(attaquesSurprisesCondition == "")
-                attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
-        }
-
-        if(eSoumission != "0") {
-            isConditionnelA = true;
-            exec.push("{{soumission="+i18n_soumission+"}}");
-            exec.push("{{soumissionCondition="+i18n_soumissionCondition+"}}");
-        }
-        
-        if(eTenebricide != "0") {
-            exec.push("{{tenebricide="+i18n_tenebricide+"}}");
-            exec.push("{{tenebricideConditionD="+i18n_tenebricideConditionD+"}}");
-            exec.push("{{tenebricideConditionV="+i18n_tenebricideConditionV+"}}");
-        }
-
-        if(eTirRafale != "0") {
-            exec.push("{{tirRafale="+i18n_tirRafale+"}}");
+    if(aSystemeRefroidissement != "0") {
+        if(eTirRafale != "0")
+            autresAmeliorations.push(i18n_systemeRefroidissement+" ("+i18n_barrage+" 1)");
+        else if(eTirRafale == "0") {
+            exec.push("{{tirRafale="+i18n_systemeRefroidissement+" + "+i18n_barrage+" 1}}");
             exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
-        }
-        
-        if(eUltraviolence != "0") {
-            exec.push("{{ultraviolence="+i18n_ultraviolence+"}}");
-            exec.push("{{ultraviolenceValue=[["+eUltraviolenceV+"D6]]}}");
-            exec.push("{{ultraviolenceCondition="+i18n_ultraviolenceCondition+"}}");
-        }        
+        }   
+    }
 
-        if(eAntiVehicule != "0") 
-            autresEffets.push(i18n_antiVehicule);
+    if(aRevetementOmega != "0") {
+        if(eASAssassinValue < 2) {
+            eASAssassin = i18n_revetementOmega;
+            eASAssassinValue = 2;
 
-        if(eBarrage != "0") 
-            autresEffets.push(i18n_barrage+" "+eBarrageV);
+            if(eASAssassinValue != 0)
+                autresEffets.push(i18n_assassin);
 
-        if(eChargeur != "0") 
-            autresEffets.push(i18n_chargeur+" "+eChargeurV);
-
-        if(eDefense != "0") 
-            autresEffets.push(i18n_defense+" "+eDefenseV);
-        
-        if(eDegatsContinus != "0") 
-            autresEffets.push(i18n_degatsContinus+" "+eDegatsContinusV+" ([[1d6]] "+i18n_tours+")");
-        
-        if(eDeuxMains != "0") 
-            autresEffets.push(i18n_deuxMains);
-        
-        if(eDesignation != "0") 
-            autresEffets.push(i18n_designation);
-
-        if(eDispersion != "0") 
-            autresEffets.push(i18n_dispersion+" "+eDispersionV);
-
-        if(eIgnoreArmure != "0") 
-            autresEffets.push(i18n_ignoreArmure);
-
-        if(eIgnoreCDF != "0") 
-            autresEffets.push(i18n_ignoreCDF);
-
-        if(eJAkimbo != "0") 
-            autresEffets.push(i18n_jAkimbo);
-
-        if(eJAmbidextrie != "0") 
-            autresEffets.push(i18n_jAmbidextrie);
-
-        if(eLourd != "0") 
-            autresEffets.push(i18n_lourd);
-
-        if(eLumiere != "0") 
-            autresEffets.push(i18n_lumiere+" "+eLumiereV);
-        
-        if(ePenetrant != "0") 
-            autresEffets.push(i18n_penetrant+" "+ePenetrantV);
-        
-        if(ePerceArmure != "0") 
-            autresEffets.push(i18n_perceArmure+" "+ePerceArmureV);
-        
-        if(eReaction != "0") 
-            autresEffets.push(i18n_reaction+" "+eReactionV);
-        
-        if(eTirSecurite != "0") 
-            autresEffets.push(i18n_tirSecurite);
-
-        //FIN GESTION DES EFFETS
-
-        //GESTION DES AMELIORATIONS
-        let rChambreDouble = 0;
-
-        let aChargeurGrappes = value["repeating_armeMALDruidLion_chargeurGrappes"];
-        let aCanonLong = value["repeating_armeMALDruidLion_canonLong"];
-        let aCanonRaccourci = value["repeating_armeMALDruidLion_canonRaccourci"];
-        let aChambreDouble = value["repeating_armeMALDruidLion_chambreDouble"];
-        let aInterfaceGuidage = value["repeating_armeMALDruidLion_interfaceGuidage"];
-        let aJumelage = value["repeating_armeMALDruidLion_jumelage"];
-        let aJumelageV = value["repeating_armeMALDruidLion_jumelageValue"];
-        let aJumelageT = value["repeating_armeMALDruidLion_jumelageType"];
-        let aLunetteIntelligente = value["repeating_armeMALDruidLion_lunetteIntelligente"];
-        let aMunitionsDrone = value["repeating_armeMALDruidLion_munitionsDrone"];
-        let aMunitionsHyperVelocite = value["repeating_armeMALDruidLion_munitionsHyperVelocite"];        
-        let aChargeurExplosives = value["repeating_armeMALDruidLion_chargeurExplosives"];
-        let aMunitionsIEM = value["repeating_armeMALDruidLion_munitionsIEM"];
-        let aMunitionsNonLetales = value["repeating_armeMALDruidLion_munitionsNonLetales"];
-        let aMunitionsSubsoniques = value["repeating_armeMALDruidLion_munitionsSubsoniques"];
-        let aPointeurLaser = value["repeating_armeMALDruidLion_pointeurLaser"];
-        let aProtectionArme = value["repeating_armeMALDruidLion_protectionArme"];
-        let aRevetementOmega = value["repeating_armeMALDruidLion_revetementOmega"];
-        let aStructureElement = value["repeating_armeMALDruidLion_structureElement"];
-        let aSystemeRefroidissement = value["repeating_armeMALDruidLion_systemeRefroidissement"];
-
-        if(aChargeurGrappes != "0") {
-            exec.push("{{vMGrappeD=-1D6}}");
-            exec.push("{{vMGrappeV=+1D6}}");
-            diceDegats -= 1;
-            diceViolence += 1;
-        }
-
-        if(aCanonLong != "0") {
-            isConditionnelA = true;
-            exec.push("{{canonLong="+i18n_canonLong+"}}");
-            exec.push("{{canonLongCondition="+i18n_canonLongCondition+"}}");
-        }
-
-        if(aCanonRaccourci != "0") {
-            isConditionnelA = true;
-            exec.push("{{canonRaccourci="+i18n_canonRaccourci+"}}");
-            exec.push("{{canonRaccourciCondition="+i18n_canonRaccourciCondition+"}}");
-        }
-
-        if(aChambreDouble != "0") { 
-            if(eCadence != 0)
-                autresAmeliorations.push(i18n_chambreDouble);
-            else if(eCadence == 0)
-                rChambreDouble = "?{Plusieurs cibles ?|Oui, 3|Non, 0}";
-        }
-
-        if(aLunetteIntelligente != "0") {
-            isConditionnelA = true;
-            exec.push("{{lunetteIntelligente="+i18n_lunetteIntelligente+"}}");
-            exec.push("{{lunetteIntelligenteCondition="+i18n_lunetteIntelligenteCondition+"}}");
-        }
-
-        if(aMunitionsDrone != "0") {
-            exec.push("{{vMDrone=+3}}");
-            bonus.push(3);
-        }
-
-        if(aMunitionsHyperVelocite != "0") {
-            if(eAssistanceAttaque != "0")
-                autresAmeliorations.push(i18n_munitionsHyperVelocite);
-            else if(eAssistanceAttaque == "0") {
-                isConditionnelD = true;
-                isConditionnelV = true;
+        } else if(eASAssassinValue > 2)
+            autresAmeliorations.push(i18n_revetementOmega);
+    }            
     
-                exec.push("{{assistanceAttaque="+i18n_munitionsHyperVelocite+"}}");
-                exec.push("{{assistanceAttaqueCondition="+i18n_assistanceAttaqueCondition+"}}");
-            }
-        }
-        
-        if(aChargeurExplosives != "0") {
-            exec.push("{{vMExplosiveD=+1D6}}");
-            exec.push("{{vMExplosiveV=-1D6}}");
-            diceDegats += 1;
-            diceViolence -= 1;
-        }
-        
-        if(aMunitionsIEM != "0") {
-            exec.push("{{vMIEMD=-1D6}}");
-            exec.push("{{vMIEMV=-1D6}}");
-            diceDegats -= 1;
-            diceViolence -= 1;
-            autresAmeliorations.push(i18n_munitionsIEMParasitage);
-        }
-        
-        if(aMunitionsSubsoniques != "0") {
-
-            if(eSilencieux != "0")
-                autresAmeliorations.push(i18n_munitionsSubsoniques);
-            else if(eSilencieux == "0") {
-                let totalSubsonique = vDiscretion+oDiscretion;
-
-                attaquesSurprises.push(i18n_munitionsSubsoniques);
-                attaquesSurprisesValue.push(totalSubsonique);
+    if(aInterfaceGuidage != "0") 
+        autresAmeliorations.push(i18n_interfaceGuidage);
     
-                if(attaquesSurprisesCondition == "")
-                    attaquesSurprisesCondition = "{{attaqueSurpriseCondition="+i18n_attaqueSurpriseCondition+"}}";
-            }
-        }
-        
-        if(aPointeurLaser != "0") {
-            exec.push("{{vMPLaser=+1}}");
-            bonus.push(1);
-        }
-
-        if(aSystemeRefroidissement != "0") {
-            if(eTirRafale != "0")
-                autresAmeliorations.push(i18n_systemeRefroidissement+" ("+i18n_barrage+" 1)");
-            else if(eTirRafale == "0") {
-                exec.push("{{tirRafale="+i18n_systemeRefroidissement+" + "+i18n_barrage+" 1}}");
-                exec.push("{{tirRafaleCondition="+i18n_tirRafaleCondition+"}}");
-            }   
-        }
-
-        if(aRevetementOmega != "0") {
-            if(eASAssassinValue < 2) {
-                eASAssassin = i18n_revetementOmega;
-                eASAssassinValue = 2;
-
-                if(eASAssassinValue != 0)
-                    autresEffets.push(i18n_assassin);
-
-            } else if(eASAssassinValue > 2)
-                autresAmeliorations.push(i18n_revetementOmega);
-        }            
-        
-        if(aInterfaceGuidage != "0") 
-            autresAmeliorations.push(i18n_interfaceGuidage);
-        
-        if(aJumelage != "0") 
-            autresAmeliorations.push(i18n_jumelage+" ("+aJumelageV+")");
-        
-        if(aMunitionsNonLetales != "0") 
-            autresAmeliorations.push(i18n_munitionsNonLetales);
-
-        if(aProtectionArme != "0") 
-            autresAmeliorations.push(i18n_protectionArme);
-
-        if(aStructureElement != "0") 
-            autresAmeliorations.push(i18n_structureElementAlpha);
-
-        //FIN GESTION DES AMELIORATIONS
-        
-        //GESTION DES BONUS SPECIAUX
-        let sBonusDegats = value["repeating_armeMALDruidLion_bDDiversTotal"];
-        let sBonusDegatsD6 = value["repeating_armeMALDruidLion_bDDiversD6"];
-        let sBonusDegatsFixe = value["repeating_armeMALDruidLion_bDDiversFixe"];
-
-        let sBonusViolence = value["repeating_armeMALDruidLion_bVDiversTotal"];
-        let sBonusViolenceD6 = value["repeating_armeMALDruidLion_bVDiversD6"];
-        let sBonusViolenceFixe = value["repeating_armeMALDruidLion_bVDiversFixe"];
-
-        let sEnergie = value["repeating_armeMALDruidLion_energie"];
-        let sEnergieValue = value["repeating_armeMALDruidLion_energieValue"];
-
-        let pasDEnergie = false;
-        let sEnergieText = "";
-
-        if(sBonusDegats != "0") {
-            exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
-
-            diceDegats += Number(sBonusDegatsD6);
-            bonusDegats.push(sBonusDegatsFixe);
-        }
-
-        if(sBonusViolence != "0") {
-            exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
-
-            diceViolence += Number(sBonusViolenceD6);
-            bonusViolence.push(sBonusViolenceFixe);
-        }
-
-        if(sEnergie != "0") {
-            autresSpecial.push(i18n_energieRetiree+" ("+sEnergieValue+")");
-
-            var newEnergie = Number(energie)-Number(sEnergieValue);
-
-            if(newEnergie == 0) {
-                sEnergieText = i18n_plusEnergie;
-
-            } else if(newEnergie < 0) {
-
-                newEnergie = 0;
-                sEnergieText = i18n_pasEnergie;
-                pasDEnergie = true;
-            }
-            
-            exec.push("{{energieR="+newEnergie+"}}");
-        }
-        //FIN DE GESTION DES BONUS SPECIAUX
-
-        exec.push("{{cBase="+aspectNom+"}}");
-
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
-
-        if(cRoll.length == 0)
-            cRoll.push(0);
-
-        bonus = bonus.concat(AE);
+    if(aJumelage != "0") 
+        autresAmeliorations.push(i18n_jumelage+" ("+aJumelageV+")");
     
-        exec.push("{{jet=[[ {[[{"+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-        exec.push("{{Exploit=[["+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    if(aMunitionsNonLetales != "0") 
+        autresAmeliorations.push(i18n_munitionsNonLetales);
 
-        if(diceDegats < 0)
-            diceDegats = 0;
+    if(aProtectionArme != "0") 
+        autresAmeliorations.push(i18n_protectionArme);
 
-        degats.push(diceDegats+"D6");
-        degats = degats.concat(bonusDegats);
+    if(aStructureElement != "0") 
+        autresAmeliorations.push(i18n_structureElementAlpha);
 
-        if(diceViolence < 0)
-            diceViolence = 0;
+    //FIN GESTION DES AMELIORATIONS
+    
+    //GESTION DES BONUS SPECIAUX
+    let sBonusDegats = attrs["repeating_armeMALDruidLion_bDDiversTotal"];
+    let sBonusDegatsD6 = attrs["repeating_armeMALDruidLion_bDDiversD6"];
+    let sBonusDegatsFixe = attrs["repeating_armeMALDruidLion_bDDiversFixe"];
 
-        violence.push(diceViolence+"D6");
-        violence = violence.concat(bonusViolence);
+    let sBonusViolence = attrs["repeating_armeMALDruidLion_bVDiversTotal"];
+    let sBonusViolenceD6 = attrs["repeating_armeMALDruidLion_bVDiversD6"];
+    let sBonusViolenceFixe = attrs["repeating_armeMALDruidLion_bVDiversFixe"];
 
-        exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    let sEnergie = attrs["repeating_armeMALDruidLion_energie"];
+    let sEnergieValue = attrs["repeating_armeMALDruidLion_energieValue"];
 
-        if(eTenebricide != "0") {
-            let degatsTenebricide = [];
-            let ASTenebricide = [];
-            let ASValueTenebricide = [];
+    let pasDEnergie = false;
+    let sEnergieText = "";
 
-            let violenceTenebricide = [];
+    if(sBonusDegats != "0") {
+        exec.push("{{vMSpecialD=+"+sBonusDegatsD6+"D6+"+sBonusDegatsFixe+"}}");
 
-            diceDegatsTenebricide = Math.floor(diceDegats/2);
-            diceViolenceTenebricide = Math.floor(diceViolence/2);
+        diceDegats += Number(sBonusDegatsD6);
+        bonusDegats.push(sBonusDegatsFixe);
+    }
 
-            degatsTenebricide.push(diceDegatsTenebricide+"D6");
-            degatsTenebricide = degatsTenebricide.concat(bonusDegats);
+    if(sBonusViolence != "0") {
+        exec.push("{{vMSpecialV=+"+sBonusViolenceD6+"D6+"+sBonusViolenceFixe+"}}");
 
-            violenceTenebricide.push(diceViolenceTenebricide+"D6");
-            violenceTenebricide = violenceTenebricide.concat(bonusViolence);
-            
-            exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
-            exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+        diceViolence += Number(sBonusViolenceD6);
+        bonusViolence.push(sBonusViolenceFixe);
+    }
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = Math.ceil(eASAssassinValue/2);
+    if(sEnergie != "0") {
+        autresSpecial.push(i18n_energieRetiree+" ("+sEnergieValue+")");
 
-                ASTenebricide.unshift(eASAssassin);
-                ASValueTenebricide.unshift(eAssassinTenebricideValue+"D6");
+        var newEnergie = Number(energie)-Number(sEnergieValue);
 
-                if(attaquesSurprises.length > 0) {
-                    ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-                    ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-                }
+        if(newEnergie == 0) {
+            sEnergieText = i18n_plusEnergie;
 
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
-            } else if(attaquesSurprises.length > 0) {
+        } else if(newEnergie < 0) {
 
+            newEnergie = 0;
+            sEnergieText = i18n_pasEnergie;
+            pasDEnergie = true;
+        }
+        
+        exec.push("{{energieR="+newEnergie+"}}");
+    }
+    //FIN DE GESTION DES BONUS SPECIAUX
+
+    exec.push("{{cBase="+aspectNom+"}}");
+
+    if(mod != 0) {
+        cRoll.push(mod);
+        exec.push("{{mod="+mod+"}}");
+    }
+
+    if(cRoll.length == 0)
+        cRoll.push(0);
+
+    bonus = bonus.concat(AE);
+
+    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
+    exec.push("{{Exploit=[["+cRoll.join("+")+"-"+rCadence+"-"+rChambreDouble+"]]}}");
+    exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+    if(diceDegats < 0)
+        diceDegats = 0;
+
+    degats.push(diceDegats+"D6");
+    degats = degats.concat(bonusDegats);
+
+    if(diceViolence < 0)
+        diceViolence = 0;
+
+    violence.push(diceViolence+"D6");
+    violence = violence.concat(bonusViolence);
+
+    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
+    exec.push("{{degats=[["+degats.join("+")+"]]}}");
+    exec.push("{{violence=[["+violence.join("+")+"]]}}");
+
+    if(eTenebricide != "0") {
+        let degatsTenebricide = [];
+        let ASTenebricide = [];
+        let ASValueTenebricide = [];
+
+        let violenceTenebricide = [];
+
+        diceDegatsTenebricide = Math.floor(diceDegats/2);
+        diceViolenceTenebricide = Math.floor(diceViolence/2);
+
+        degatsTenebricide.push(diceDegatsTenebricide+"D6");
+        degatsTenebricide = degatsTenebricide.concat(bonusDegats);
+
+        violenceTenebricide.push(diceViolenceTenebricide+"D6");
+        violenceTenebricide = violenceTenebricide.concat(bonusViolence);
+        
+        exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
+        exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+
+        if(eASAssassinValue > 0) {
+            eAssassinTenebricideValue = Math.ceil(eASAssassinValue/2);
+
+            ASTenebricide.unshift(eASAssassin);
+            ASValueTenebricide.unshift(eAssassinTenebricideValue+"D6");
+
+            if(attaquesSurprises.length > 0) {
                 ASTenebricide = ASTenebricide.concat(attaquesSurprises);
                 ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
-
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
             }
+
+            exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
+        } else if(attaquesSurprises.length > 0) {
+
+            ASTenebricide = ASTenebricide.concat(attaquesSurprises);
+            ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+
+            exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
         }
+    }
 
-        if(eObliteration != "0") {
-            let ASObliteration = [];
-            let ASValueObliteration = [];
+    if(eObliteration != "0") {
+        let ASObliteration = [];
+        let ASValueObliteration = [];
 
-            diceDegatsObliteration = diceDegats*6;
-            
-            degatsFObliteration = _.reduce(bonusDegats, function(n1, n2){return Number(n1) + Number(n2);});
+        diceDegatsObliteration = diceDegats*6;
+        
+        degatsFObliteration = _.reduce(bonusDegats, function(n1, n2){return Number(n1) + Number(n2);});
 
-            let vObliteration = diceDegatsObliteration+degatsFObliteration;
-            
-            exec.push("{{obliterationValue="+vObliteration+"}}");
+        let vObliteration = diceDegatsObliteration+degatsFObliteration;
+        
+        exec.push("{{obliterationValue="+vObliteration+"}}");
 
-            if(eMeurtrier != "0")
-                exec.push("{{obliterationMeurtrierValue="+eMeurtrierV*6+"}}");
+        if(eMeurtrier != "0")
+            exec.push("{{obliterationMeurtrierValue="+eMeurtrierV*6+"}}");
 
-            if(eDestructeur != "0")
-                exec.push("{{obliterationDestructeurValue="+eDestructeurV*6+"}}");
+        if(eDestructeur != "0")
+            exec.push("{{obliterationDestructeurValue="+eDestructeurV*6+"}}");
 
-            if(eASAssassinValue > 0) {
-                eAssassinTenebricideValue = eASAssassinValue*6;
+        if(eASAssassinValue > 0) {
+            eAssassinTenebricideValue = eASAssassinValue*6;
 
-                ASObliteration.unshift(eASAssassin);
-                ASValueObliteration.unshift(eAssassinTenebricideValue);
+            ASObliteration.unshift(eASAssassin);
+            ASValueObliteration.unshift(eAssassinTenebricideValue);
 
-                if(attaquesSurprises.length > 0) {
-                    ASObliteration = ASObliteration.concat(attaquesSurprises);
-                    ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-                }
-
-                exec.push("{{obliterationAS="+ASObliteration.join("\n+")+"}}");
-                exec.push("{{obliterationASValue=[["+ASValueObliteration.join("+")+"]]}}");
-            } else if(attaquesSurprises.length > 0) {
-
+            if(attaquesSurprises.length > 0) {
                 ASObliteration = ASObliteration.concat(attaquesSurprises);
                 ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
-
-                exec.push("{{obliterationAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
             }
+
+            exec.push("{{obliterationAS="+ASObliteration.join("\n+")+"}}");
+            exec.push("{{obliterationASValue=[["+ASValueObliteration.join("+")+"]]}}");
+        } else if(attaquesSurprises.length > 0) {
+
+            ASObliteration = ASObliteration.concat(attaquesSurprises);
+            ASValueObliteration = ASValueObliteration.concat(attaquesSurprisesValue);
+
+            exec.push("{{obliterationAS="+ASTenebricide.join("\n+")+"}}");
+            exec.push("{{obliterationASValue="+_.reduce(ASValueObliteration, function(n1, n2){ return n1 + n2; }, 0)+"}}");
         }
+    }
 
-        if(rCadence != 0) {
-            exec.push("{{rCadence="+i18n_cadence+" "+eCadenceV+" "+i18n_inclus+"}}");
-            exec.push("{{vCadence="+rCadence+"D6}}");
-        }
-          
-        if(rChambreDouble != 0)
-            exec.push("{{vChambreDouble="+rChambreDouble+"}}");
+    if(rCadence != 0) {
+        exec.push("{{rCadence="+i18n_cadence+" "+eCadenceV+" "+i18n_inclus+"}}");
+        exec.push("{{vCadence="+rCadence+"D6}}");
+    }
+        
+    if(rChambreDouble != 0)
+        exec.push("{{vChambreDouble="+rChambreDouble+"}}");
 
-        if(eASAssassinValue > 0)
-        {
-            attaquesSurprises.unshift(eASAssassin);
-            attaquesSurprisesValue.unshift(eASAssassinValue+"D6");
-        }
+    if(eASAssassinValue > 0)
+    {
+        attaquesSurprises.unshift(eASAssassin);
+        attaquesSurprisesValue.unshift(eASAssassinValue+"D6");
+    }
 
-        if(attaquesSurprises.length > 0) {
-            exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
-            exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(attaquesSurprisesCondition);
-        }
+    if(attaquesSurprises.length > 0) {
+        exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
+        exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
+        exec.push(attaquesSurprisesCondition);
+    }
 
-        if(autresEffets.length > 0)
-            exec.push("{{effets="+autresEffets.join(" / ")+"}}");
+    if(autresEffets.length > 0)
+        exec.push("{{effets="+autresEffets.join(" / ")+"}}");
 
-        if(autresAmeliorations.length > 0)
-            exec.push("{{ameliorations="+autresAmeliorations.join(" / ")+"}}");
+    if(autresAmeliorations.length > 0)
+        exec.push("{{ameliorations="+autresAmeliorations.join(" / ")+"}}");
 
-        if(autresSpecial.length > 0)
-            exec.push("{{special="+autresSpecial.join(" / ")+"}}");
+    if(autresSpecial.length > 0)
+        exec.push("{{special="+autresSpecial.join(" / ")+"}}");
 
-        if(isConditionnelA == true)
-            exec.push("{{succesConditionnel=true}}");
+    if(isConditionnelA == true)
+        exec.push("{{succesConditionnel=true}}");
 
-        if(isConditionnelD == true)
-            exec.push("{{degatsConditionnel=true}}");
+    if(isConditionnelD == true)
+        exec.push("{{degatsConditionnel=true}}");
 
-        if(isConditionnelV == true)
-            exec.push("{{violenceConditionnel=true}}");
+    if(isConditionnelV == true)
+        exec.push("{{violenceConditionnel=true}}");
 
-        if(pasDEnergie == false) {
-            startRoll(exec.join(" "), (results) => {
-                let tJet = results.results.jet.result;
-                let tJetDice = results.results.jet.dice.length;
+    if(pasDEnergie == false) {
+        startRoll(exec.join(" "), (results) => {
+            let tJet = results.results.jet.result;
+            let tJetDice = results.results.jet.dice.length;
 
-                let tBonus = results.results.bonus.result;
-                let tExploit = results.results.Exploit.result;
+            let tBonus = results.results.bonus.result;
+            let tExploit = results.results.Exploit.result;
 
-                let tDegats = results.results.degats.result;
-                let tViolence = results.results.violence.result;
+            let tDegats = results.results.degats.result;
+            let tViolence = results.results.violence.result;
 
-                let tMeurtrier = results.results.meurtrierValue;
-                let vTMeurtrier = 0;
+            let tMeurtrier = results.results.meurtrierValue;
+            let vTMeurtrier = 0;
 
-                if(tMeurtrier != undefined)
-                    vTMeurtrier = tMeurtrier.dice[0];
+            if(tMeurtrier != undefined)
+                vTMeurtrier = tMeurtrier.dice[0];
 
-                let tDestructeur = results.results.destructeurValue;
-                let vTDestructeur = 0;
+            let tDestructeur = results.results.destructeurValue;
+            let vTDestructeur = 0;
 
-                if(tDestructeur != undefined)
-                    vTDestructeur = tDestructeur.dice[0];
+            if(tDestructeur != undefined)
+                vTDestructeur = tDestructeur.dice[0];
+            
+            let tFureur = results.results.fureurValue;
+            let vTFureur = 0;
+
+            if(tFureur != undefined)
+                vTFureur = tFureur.dice[0]+tFureur.dice[1];
+            
+            let tUltraviolence = results.results.ultraviolenceValue;
+            
+            let vTUltraviolence = 0;
+
+            if(tUltraviolence != undefined)
+                vTUltraviolence = tUltraviolence.dice[0];
+
+            finishRoll(
+                results.rollId, 
+                {
+                    jet:tJet+tBonus,
+                    degats:tDegats,
+                    violence:tViolence,
+                    meurtrierValue:vTMeurtrier,
+                    destructeurValue:vTDestructeur,
+                    fureurValue:vTFureur,
+                    ultraviolenceValue:vTUltraviolence,
+                }
+            );                
+
+            if(tJet != 0 && tJet == tExploit) 
+                startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+i18n_exploit+"}} {{jet=[[ {[[{"+tJetDice+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
+                    let tExploit = exploit.results.jet.result;
+
+                    finishRoll(
+                        exploit.rollId, 
+                        {
+                            jet:tExploit
+                        }
+                    );
+                });
                 
-                let tFureur = results.results.fureurValue;
-                let vTFureur = 0;
 
-                if(tFureur != undefined)
-                    vTFureur = tFureur.dice[0]+tFureur.dice[1];
-                
-                let tUltraviolence = results.results.ultraviolenceValue;
-                
-                let vTUltraviolence = 0;
+            if(sEnergie != "0") {
+                setAttrs({
+                    [nEnergie]: newEnergie
+                });
 
-                if(tUltraviolence != undefined)
-                    vTUltraviolence = tUltraviolence.dice[0];
-
-                finishRoll(
-                    results.rollId, 
-                    {
-                        jet:tJet+tBonus,
-                        degats:tDegats,
-                        violence:tViolence,
-                        meurtrierValue:vTMeurtrier,
-                        destructeurValue:vTDestructeur,
-                        fureurValue:vTFureur,
-                        ultraviolenceValue:vTUltraviolence,
-                    }
-                );                
-
-                if(tJet != 0 && tJet == tExploit) 
-                    startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+i18n_exploit+"}} {{jet=[[ {[[{"+tJetDice+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                        let tExploit = exploit.results.jet.result;
-
+                if(newEnergie == 0) {
+                    startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (exploit) => {    
                         finishRoll(
-                            exploit.rollId, 
-                            {
-                                jet:tExploit
-                            }
+                            exploit.rollId,{}
                         );
                     });
-                    
-
-                if(sEnergie != "0") {
-                    setAttrs({
-                        [nEnergie]: newEnergie
-                    });
-
-                    if(newEnergie == 0) {
-                        startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (exploit) => {    
-                            finishRoll(
-                                exploit.rollId,{}
-                            );
-                        });
-                    }
                 }
-            });
-        } else {
-            startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (text) => {
-                finishRoll(
-                    text.rollId,{}
-                );
-            });
-        }
-        
-    });
+            }
+        });
+    } else {
+        startRoll("@{jetGM} &{template:simple} {{Nom=^{druid-companion-lion}}} {{special1=@{name}}} {{special1B="+arme+"}} {{text="+sEnergieText+"}}", (text) => {
+            finishRoll(
+                text.rollId,{}
+            );
+        });
+    }
 });
 
 const druidRollInit = [
@@ -2351,57 +2401,62 @@ const druidRollInit = [
 ];
 
 druidRollInit.forEach(button => {
-    on(`clicked:${button}Roll`, function(info) {
+    on(`clicked:${button}Roll`, async function(info) {
         let roll = info.htmlAttributes.value;
     
         let attributs = [
             `${button}Base`,
             `${button}Evol`,
+            `druidLionMasqueAE`,
+            `MALDruidLionMasqueAE`,
+            `druidWolfMasqueAE`,
+            `MALDruidWolfMasqueAE`,
         ];
 
-        getAttrs(attributs, function(value)
-        {
-            let exec = [];
-            let cRoll = [];  
+        let attrs = await getAttrsAsync(attributs);
 
-            let valueB = Number(value[`${button}Base`]);
-            let valueE = Number(value[`${button}Evol`]);
+        let exec = [];
+        let cRoll = [];  
 
-            let total = valueB+valueE;
+        let total = totalADruid(attrs, button);
 
-            let masqueAE = 0;
+        let masqueAE = 0;
 
-            if(button != "druidCrowInitiative" && button != "MALDruidCrowInitiative") {
-                if(button == "druidLionInitiative")
-                    masqueAE = Number(aspectCompanionsDruidValue["druidLionMasque"].AE);
-                else if(button == "MALDruidLionInitiative")
-                    masqueAE = Number(aspectCompanionsDruidValue["MALDruidLionMasque"].AE);
-                else if(button == "druidWolfInitiative")
-                    masqueAE = Number(aspectCompanionsDruidValue["druidWolfMasque"].AE);
-                else if(button == "MALDruidWolfInitiative")
-                    masqueAE = Number(aspectCompanionsDruidValue["MALDruidWolfMasque"].AE);
-
-
-                if(masqueAE > 5)
-                    cRoll.push(30);
-                else {
-                    cRoll.push("3D6");
-                    cRoll.push(total);
-                }
+        if(button != "druidCrowInitiative" && button != "MALDruidCrowInitiative") {
+            if(button == "druidLionInitiative")
+                masqueAE = attrs["druidLionMasqueAE"];
+            else if(button == "MALDruidLionInitiative")
+                masqueAE = +attrs["MALDruidLionMasqueAE"];
+            else if(button == "druidWolfInitiative") {
+                total = 2;
+                masqueAE = +attrs["druidWolfMasqueAE"];
             }
+            else if(button == "MALDruidWolfInitiative") {
+                total = 2;
+                masqueAE = +attrs["MALDruidWolfMasqueAE"];
+            }
+                
+
+
+            if(masqueAE > 5)
+                cRoll.push(30);
             else {
-                cRoll.push(1);
+                cRoll.push("3D6");
+                cRoll.push(total);
             }
+        }
+        else {
+            cRoll.push(1);
+        }
 
-            exec.push(roll);
-            exec.push("{{initiative=[["+cRoll.join("+")+" &{tracker}]]}}");
-    
-            startRoll(exec.join(" "), (results) => {    
-                finishRoll(
-                    results.rollId, 
-                    {}
-                );                
-            });
+        exec.push(roll);
+        exec.push("{{initiative=[["+cRoll.join("+")+" &{tracker}]]}}");
+
+        startRoll(exec.join(" "), (results) => {    
+            finishRoll(
+                results.rollId, 
+                {}
+            );                
         });
     });
 });
@@ -2411,7 +2466,7 @@ const druidRollFighter = [
 ];
 
 druidRollFighter.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let attributs = [];
@@ -2424,34 +2479,33 @@ druidRollFighter.forEach(button => {
 
         attributs.push(nbreW);
 
-        getAttrs(attributs, function(value)
-        {
-            let nbre = value[nbreW];
+        let attrs = await getAttrsAsync(attributs);
 
-            let exec = [];
-            exec.push(roll);
+        let nbre = attrs[nbreW];
 
-            let degats = [];
-            let violence = [];
+        let exec = [];
+        exec.push(roll);
 
-            degats.push(nbre+"D6");
-            violence.push(nbre+"D6");
+        let degats = [];
+        let violence = [];
 
-            exec.push("{{degats=[["+degats.join("+")+"]]}}");
-            exec.push("{{violence=[["+violence.join("+")+"]]}}");
-            
-            startRoll(exec.join(" "), (results) => {
-                let tDegats = results.results.degats.result;
-                let tViolence = results.results.violence.result;
+        degats.push(nbre+"D6");
+        violence.push(nbre+"D6");
 
-                finishRoll(
-                    results.rollId, 
-                    {
-                        degats:tDegats,
-                        violence:tViolence
-                    }
-                );
-            });
+        exec.push("{{degats=[["+degats.join("+")+"]]}}");
+        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+        
+        startRoll(exec.join(" "), (results) => {
+            let tDegats = results.results.degats.result;
+            let tViolence = results.results.violence.result;
+
+            finishRoll(
+                results.rollId, 
+                {
+                    degats:tDegats,
+                    violence:tViolence
+                }
+            );
         });
     });
 });
@@ -2461,7 +2515,7 @@ const druidRollCrow = [
 ];
 
 druidRollCrow.forEach(button => {
-    on(`clicked:${button}`, function(info) {
+    on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let attributs = [];
@@ -2474,33 +2528,32 @@ druidRollCrow.forEach(button => {
             attributs.push("MALDruidCrowTAttaque");
         }
 
-        getAttrs(attributs, function(value)
-        {
-            let tour = 0;
-            let valeur = 0;
+        let attrs = await getAttrsAsync(attributs);
 
-            if(button == "druidCrowAttaque") {
-                tour = value["druidCrowTAttaque"];
-                valeur = "[[2*"+value["druidNiveauCrow"]+"]]";
-            }
-            else if(button == "MALDruidCrowAttaque") {
-                tour = value["MALDruidCrowTAttaque"];
-                valeur = 4;
-            }
+        let tour = 0;
+        let valeur = 0;
 
-            let exec = [];
-            exec.push(roll);
+        if(button == "druidCrowAttaque") {
+            tour = attrs["druidCrowTAttaque"];
+            valeur = "[[2*"+attrs["druidNiveauCrow"]+"]]";
+        }
+        else if(button == "MALDruidCrowAttaque") {
+            tour = attrs["MALDruidCrowTAttaque"];
+            valeur = 4;
+        }
 
-            let debordement = tour+"*"+valeur;
+        let exec = [];
+        exec.push(roll);
 
-            exec.push("{{debordement=[["+debordement+"]]}}");
-            
-            startRoll(exec.join(" "), (results) => {
-                finishRoll(
-                    results.rollId, 
-                    {}
-                );
-            });
+        let debordement = tour+"*"+valeur;
+
+        exec.push("{{debordement=[["+debordement+"]]}}");
+        
+        startRoll(exec.join(" "), (results) => {
+            finishRoll(
+                results.rollId, 
+                {}
+            );
         });
     });
 });

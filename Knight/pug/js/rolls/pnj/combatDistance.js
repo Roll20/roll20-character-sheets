@@ -8,7 +8,23 @@ rollCombatDistancePNJ.forEach(button => {
         let exec = [];
         firstExec.push(roll);
 
-        let listAttrs = [];
+        let listAttrs = [
+            "jetModifDes",
+            "energiePNJ",
+            "Chair",
+            "Bete",
+            "BetePNJAE",
+            "BetePNJAEMaj",
+            "Machine",
+            "MachinePNJAE",
+            "MachinePNJAEMaj",
+            "Masque",
+            "MasquePNJAE",
+            "MasquePNJAEMaj",
+            "capaciteFanMade",
+            "attaqueOmbre",
+        ];
+
         let prefix = "";
         let id = "";
         var name = "";
@@ -20,12 +36,6 @@ rollCombatDistancePNJ.forEach(button => {
         let AAValue = [];
         let special = [];
         let specialValue = [];
-
-        let vChair = Number(AspectValue["Chair"].value);
-        let vMachine = AspectValue["Machine"].value;
-        let vMachineAE = Number(AspectValue["Machine"].AEMin)+Number(AspectValue["Machine"].AEMaj);
-        let vMasque = AspectValue["Masque"].value;
-        let vMasqueAE = Number(AspectValue["Masque"].AEMin)+Number(AspectValue["Masque"].AEMaj);
 
         let AE = 0;
 
@@ -141,7 +151,14 @@ rollCombatDistancePNJ.forEach(button => {
                 break;
         }
 
-        let attrs = await asw.getAttrs(listAttrs);
+        let attrs = await getAttrsAsync(listAttrs);
+        let attrsAspect = [];
+
+        let vChair = +attrs["Chair"];
+        let vMachine = +attrs["Machine"];
+        let vMachineAE = totalAspect(attrs, "Machine");
+        let vMasque = +attrs["Masque"];
+        let vMasqueAE = totalAspect(attrs, "Masque");
 
         let aspect = attrs[`${prefix}AspectPNJ`] || "0";
 
@@ -173,16 +190,17 @@ rollCombatDistancePNJ.forEach(button => {
         let cRoll = [];
         let bonus = [];
         
-        let mod = PJData["jetModifDes"];
+        let mod = attrs["jetModifDes"];
         
         let aspectNom = "";
+        let AEValue = 0;
 
         let attaquesSurprises = [];
         let attaquesSurprisesValue = [];
         let attaquesSurprisesCondition = "";
 
-        let capacitesFM = PNJData["capaciteFanMade"];
-        let attaquesOmbres = PNJData["attaqueOmbre"];
+        let capacitesFM = attrs["capaciteFanMade"];
+        let attaquesOmbres = attrs["attaqueOmbre"];
 
         let eASAssassin = "";
         let eASAssassinValue = 0; 
@@ -204,7 +222,7 @@ rollCombatDistancePNJ.forEach(button => {
 
         let pasEnergie = false;
         let sEnergieText = "";
-        let energie = PNJData["energiePNJ"];
+        let energie = attrs["energiePNJ"];
 
         let autresEffets = [];
         let autresAmeliorationsA = [];
@@ -213,13 +231,19 @@ rollCombatDistancePNJ.forEach(button => {
         if(aspect != "0") {
             aspectNom = aspect.slice(2, -1);
 
-            let aspectValue = Number(AspectValue[aspectNom].value);
-            AE = Number(AspectValue[aspectNom].AEMin)+Number(AspectValue[aspectNom].AEMaj);
+            attrsAspect = await getAttrsAsync([
+                aspectNom,
+                `${aspectNom}PNJAE`,
+                `${aspectNom}PNJAEMaj`,
+            ]);
 
-            cBase.push(AspectNom[aspectNom]);
+            aspectValue = +attrsAspect[aspectNom];
+            AEValue = totalAspect(attrsAspect, aspectNom);
+            aspect = `{{cBase=${AspectNom[aspectNom]}}}`;
+
             cRoll.push(aspectValue);
-
-            exec.push("{{vAE="+AE+"}}");
+            exec.push(aspect);
+            exec.push("{{vAE="+AEValue+"}}");
         }
 
         if(mod != 0) {
@@ -228,8 +252,7 @@ rollCombatDistancePNJ.forEach(button => {
         }
 
         //GESTION DES EFFETS
-
-        var effets = getWeaponsEffectsPNJ(prefix, attrs, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
+        var effets = getWeaponsEffectsPNJ(prefix, attrs, false, vChair, vMachine, vMachineAE, vMasque, vMasqueAE);
 
         bDegats = bDegats += Number(effets.bDegats);
         eASAssassin = effets.eASAssassin;
@@ -404,6 +427,12 @@ rollCombatDistancePNJ.forEach(button => {
         firstExec.push(jet);
         exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
         exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+        if(diceDegats < 0)
+            diceDegats = 0;
+
+        if(diceViolence < 0)
+            diceViolence = 0;
 
         exec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
         exec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);

@@ -28,28 +28,34 @@ rollCombatGrenadePNJ.forEach(button => {
 
         let AE = 0;
 
-        let vMasque = Number(AspectValue["Masque"].value);
-        let vBete = Number(AspectValue["Bete"].value);
-        let vBeteAEMin = Number(AspectValue["Bete"].AEMin);
-        let vBeteAEMaj = Number(AspectValue["Bete"].AEMaj);
-
         let vBeteD = 0;
         
         let ameliorations = false;
-
-        if(PJData["grenadeAvancee"] != "0")
-            ameliorations = true;
         
-        let mod = PJData["jetModifDes"];
-
         let diceDegats = 3;
         let diceViolence = 3;
 
         let bDegats = 0;
         let bViolence = 0;
 
-        let listAttrs = [`aspectPNJGrenade`];
-        let attrs = await asw.getAttrs(listAttrs);
+        let listAttrs = [
+            `jetModifDes`,
+            `aspectPNJGrenade`,
+            `Masque`,
+            `capaciteFanMade`,
+            `attaqueOmbre`,
+            `grenadeAvancee`,
+        ];
+
+        let attrs = await getAttrsAsync(listAttrs);
+        let attrsAspect = [];
+
+        let mod = +attrs["jetModifDes"];
+
+        if(attrs["grenadeAvancee"] != "0")
+            ameliorations = true;
+
+        let vMasque = +attrs["Masque"];
 
         let aspect = attrs[`aspectPNJGrenade`] || "0";
         
@@ -59,16 +65,22 @@ rollCombatGrenadePNJ.forEach(button => {
         let attaquesSurprisesValue = [];
         let attaquesSurprisesCondition = "";
 
-        let capacitesFM = PNJData["capaciteFanMade"];
-        let attaquesOmbres = PNJData["attaqueOmbre"];
+        let capacitesFM = attrs["capaciteFanMade"];
+        let attaquesOmbres = attrs["attaqueOmbre"];
 
         let autresEffets = [];
 
         if(aspect != "0") {
             aspectNom = aspect.slice(2, -1);
 
-            let aspectValue = Number(AspectValue[aspectNom].value);
-            AE = Number(AspectValue[aspectNom].AEMin)+Number(AspectValue[aspectNom].AEMaj);
+            attrsAspect = await getAttrsAsync([
+                aspectNom,
+                `${aspectNom}PNJAE`,
+                `${aspectNom}PNJAEMaj`,
+            ]);
+
+            let aspectValue = +attrsAspect[aspectNom];
+            AE = totalAspect(attrsAspect, aspectNom);
 
             cBase.push(AspectNom[aspectNom]);
             cRoll.push(aspectValue);
@@ -90,24 +102,6 @@ rollCombatGrenadePNJ.forEach(button => {
         }
 
         //FIN GESTION DES BONUS DE BASE
-
-        //GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
-        if(vBeteAEMin > 0 || vBeteAEMaj > 0) {
-            bDegats += vBeteAEMin;
-            bDegats += vBeteAEMaj;
-
-            vBeteD += vBeteAEMin;
-            vBeteD += vBeteAEMaj;
-        }
-
-        if(vBeteAEMaj > 0) {
-            bDegats += vBete;
-            vBeteD += vBete;
-        }
-
-        if(vBeteD > 0)
-            exec.push(`{{vBeteD=${vBeteD}}}`);
-        //FIN DE GESTION DES BONUS DES ASPECTS EXCEPTIONNELS
 
         //GESTION DES EFFETS
 
@@ -176,6 +170,12 @@ rollCombatGrenadePNJ.forEach(button => {
         bonus.push(AE);
 
         if(hasDgts) {
+            if(diceDegats < 0)
+                diceDegats = 0;
+
+            if(diceViolence < 0)
+                diceViolence = 0;
+                
             exec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
             exec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);
         }

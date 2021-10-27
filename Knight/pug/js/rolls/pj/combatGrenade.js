@@ -4,8 +4,6 @@ const rollCombatGrenade = ["grenade1", "grenade2", "grenade3", "grenade4", "gren
 rollCombatGrenade.forEach(button => {
     on(`clicked:${button}`, async function(info) {
         let roll = info.htmlAttributes.value;
-        let armure = donneesPJ["Armure"];
-        let armureL = donneesPJ["ArmureLegende"];
 
         var hasArmure = true;
         var hasDgts = true;
@@ -16,9 +14,6 @@ rollCombatGrenade.forEach(button => {
 
         if(button == "grenade2")
             hasLumiere = true;
-
-        if(armure == "sans" || armure == "guardian")
-            hasArmure = false;
 
         let firstExec = [];
         let exec = [];
@@ -37,12 +32,6 @@ rollCombatGrenade.forEach(button => {
         
         let ameliorations = false;
 
-        if(PJData["grenadeAvancee"] != "0")
-            ameliorations = true;
-        
-        let mod = PJData["jetModifDes"];
-        let hasBonus = PJData["bonusCarac"];
-
         let diceDegats = 3;
         let diceViolence = 3;
 
@@ -56,20 +45,35 @@ rollCombatGrenade.forEach(button => {
             "caracteristique1Grenade",
             "caracteristique2Grenade",
             "caracteristique3Grenade",
-            "caracteristique4Grenade"
-        ]
+            "caracteristique4Grenade",
+            "grenadeAvancee",
+            "discretion",
+            `${ODValue["discretion"]}`,
+            `tir`,
+        ];
 
-        let attrs = await asw.getAttrs(listAttrs);
+        listAttrs = listAttrs.concat(listArmure, listArmureLegende, listStyle, listBase);
+
+        let attrs = await getAttrsAsync(listAttrs);
+
+        let armure = attrs["armure"];
+        let armureL = attrs["armureLegende"];
+
+        if(armure == "sans" || armure == "guardian")
+            hasArmure = false;
+
+        if(attrs["grenadeAvancee"] != "0")
+            ameliorations = true;
+        
+        let mod = attrs["jetModifDes"];
+        let hasBonus = attrs["bonusCarac"];
 
         let C1 = attrs[`caracteristique1Grenade`] || "0";
         let C2 = attrs[`caracteristique2Grenade`] || "0";
         let C3 = attrs[`caracteristique3Grenade`] || "0";
         let C4 = attrs[`caracteristique4Grenade`] || "0";
-        
-        let C1Nom = "";
-        let C2Nom = "";
-        let C3Nom = "";
-        let C4Nom = "";
+
+        let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
         let ODBarbarian = [];
         let ODMALBarbarian = [];
@@ -78,9 +82,9 @@ rollCombatGrenade.forEach(button => {
         let ODWarrior = [];
         let ODMALWarrior = [];
 
-        let vDiscretion = CaracValue["discretion"].value;
-        let oDiscretion = CaracValue["discretion"].VraiOD;
-        let oTir = CaracValue["tir"].VraiOD;
+        let vDiscretion = +attrs["discretion"];
+        let oDiscretion = +attrs[`${ODValue["discretion"]}`];
+        let oTir = +attrs["tir"];
 
         let attaquesSurprises = [];
         let attaquesSurprisesValue = [];
@@ -93,69 +97,64 @@ rollCombatGrenade.forEach(button => {
         if(hasArmure)
             exec.push("{{OD=true}}");
 
-        if(C1 != "0") {
-            C1Nom = C1.slice(2, -1);
-        
+        let C1Nom = "";
+        let C2Nom = "";
+        let C3Nom = "";
+        let C4Nom = "";
 
-            let C1Value = Number(CaracValue[C1Nom].value);
-            let C1OD = Number(CaracValue[C1Nom].OD);
+        if(attrsCarac["C1"]) {
+            C1Nom = attrsCarac["C1Brut"];
 
-            cBase.push(CaracNom[C1Nom]);
+            let C1Value = attrsCarac["C1Base"];
+            let C1OD = attrsCarac["C1OD"];
+
+            cBase.push(attrsCarac["C1Nom"]);
             cRoll.push(C1Value);
 
             if(hasArmure)
                 OD += C1OD;
-        };
+        }
 
-        if(C2 != "0") {
-            C2Nom = C2.slice(2, -1);
-        
+        if(attrsCarac["C2"]) {
+            C2Nom = attrsCarac["C2Brut"];
 
-            let C2Value = Number(CaracValue[C2Nom].value);
-            let C2OD = Number(CaracValue[C2Nom].OD);
+            let C2Value = attrsCarac["C2Base"];
+            let C2OD = attrsCarac["C2OD"];
 
-            cBase.push(CaracNom[C2Nom]);
+            cBase.push(attrsCarac["C2Nom"]);
             cRoll.push(C2Value);
 
             if(hasArmure)
                 OD += C2OD;
         }
 
-        if(hasBonus == 1 || hasBonus == 2) {
-            if(C3 != "0") {
-                C3Nom = C3.slice(2, -1);
-        
+        if(attrsCarac["C3"]) {
+            C3Nom = attrsCarac["C3Brut"];
 
-                let C3Value = Number(CaracValue[C3Nom].value);
-                let C3OD = Number(CaracValue[C3Nom].OD);
+            let C3Value = attrsCarac["C3Base"];
+            let C3OD = attrsCarac["C3OD"];
 
-                cBonus.push(CaracNom[C3Nom]);
-                cRoll.push(C3Value);
+            cBonus.push(attrsCarac["C3Nom"]);
+            cRoll.push(C3Value);
 
-                if(hasArmure)
-                    OD += C3OD;
-            }
-
-            if(hasBonus == 2) {
-                if(C4 != "0") {
-                    C4Nom = C4.slice(2, -1);
-
-                    let C4Value = Number(CaracValue[C4Nom].value);
-                    let C4OD = Number(CaracValue[C4Nom].OD);
-
-                    cBonus.push(CaracNom[C4Nom]);
-                    cRoll.push(C4Value);
-    
-                    if(hasArmure)
-                        OD += C4OD;
-                }
-            }
+            if(hasArmure)
+                OD += C3OD;
         }
 
-        if(OD.length == 0)
-            exec.push("{{vOD=0}}");
-        else 
-            exec.push("{{vOD="+OD+"}}");
+        if(attrsCarac["C4"]) {
+            C4Nom = attrsCarac["C4Brut"];
+
+            let C4Value = attrsCarac["C4Base"];
+            let C4OD = attrsCarac["C4OD"];
+
+            cBonus.push(attrsCarac["C4Nom"]);
+            cRoll.push(C4Value);
+
+            if(hasArmure)
+                OD += C4OD;
+        }
+
+        exec.push("{{vOD="+OD+"}}");
 
         if(mod != 0) {
             cRoll.push(mod);
@@ -184,6 +183,8 @@ rollCombatGrenade.forEach(button => {
             attaquesSurprisesCondition = `{{attaqueSurpriseCondition=`+i18n_attaqueSurpriseCondition+`}}`;
         }
         //FIN DE GESTION DES BONUS DES OD
+
+        log(attaquesSurprisesCondition);
 
         //GESTION DES EFFETS
 
@@ -235,7 +236,7 @@ rollCombatGrenade.forEach(button => {
 
         //GESTION DU STYLE
 
-        let getStyle = getStyleDistanceMod(PJData, diceDegats, diceViolence, "", hasArmure, oTir, false, false, false, false);
+        let getStyle = getStyleDistanceMod(attrs, diceDegats, diceViolence, "", hasArmure, oTir, false, false, false, false);
 
         exec = exec.concat(getStyle.exec);
         cRoll = cRoll.concat(getStyle.cRoll);
@@ -246,7 +247,7 @@ rollCombatGrenade.forEach(button => {
 
         //GESTION DES BONUS D'ARMURE
 
-        let armorBonus = getArmorBonus(PJData, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let armorBonus = getArmorBonus(attrs, armure, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(armorBonus.exec);
         cRoll = cRoll.concat(armorBonus.cRoll);
@@ -278,7 +279,7 @@ rollCombatGrenade.forEach(button => {
             exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}} {{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
         }
 
-        let MALBonus = getMALBonus(PJData, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let MALBonus = getMALBonus(attrs, armureL, hasLumiere, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(MALBonus.exec);
         cRoll = cRoll.concat(MALBonus.cRoll);
@@ -319,6 +320,12 @@ rollCombatGrenade.forEach(button => {
         bonus = bonus.concat(ODMALWarrior);
 
         if(hasDgts) {
+            if(diceDegats < 0)
+                diceDegats = 0;
+
+            if(diceViolence < 0)
+                diceViolence = 0;
+                
             degats.push(`${diceDegats}D6`);
             degats = degats.concat(bDegats);
 
@@ -373,7 +380,7 @@ rollCombatGrenade.forEach(button => {
         if(attaquesSurprises.length > 0 && hasDgts) {
             exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
             exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(`{{attaqueSurpriseCondition=${attaquesSurprisesCondition}}}`);
+            exec.push(attaquesSurprisesCondition);
         }
 
         if(autresEffets.length > 0) {
@@ -391,6 +398,9 @@ rollCombatGrenade.forEach(button => {
             exec.push("{{violenceConditionnel=true}}");
 
         exec = firstExec.concat(exec);
+
+        log(attaquesSurprisesCondition);
+        log(exec);
 
         startRoll(exec.join(" "), (results) => {
             let tJet = results.results.jet.result;

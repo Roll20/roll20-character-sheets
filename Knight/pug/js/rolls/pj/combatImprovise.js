@@ -5,8 +5,6 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
     on(`clicked:${str}`, async function(info) {
         let roll = info.htmlAttributes.value;
-        let armure = donneesPJ["Armure"];
-        let armureL = donneesPJ["ArmureLegende"];
 
         var hasArmure = true;
 
@@ -85,9 +83,6 @@ for(let i = 0;i < rollCombatImprovise;i++) {
                 break;
         }
 
-        if(armure == "sans" || armure == "guardian")
-            hasArmure = false;
-
         let exec = [];
         exec.push(roll);
 
@@ -101,10 +96,6 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let bonus = [];
 
         let OD = 0;
-        
-        let type = PJData["utilisationArmeAI"];
-        let mod = PJData["jetModifDes"];
-        let hasBonus = PJData["bonusCarac"];
 
         let baseDegats = dDgts;
         let baseViolence = dViolence;
@@ -122,11 +113,34 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let C2Nom;
 
         let listAttrs = [
+            "utilisationArmeAI",
             "caracteristique3ArmeImprovisee",
-            "caracteristique4ArmeImprovisee"
-        ]
+            "caracteristique4ArmeImprovisee",
+            "force",
+            `${ODValue["force"]}`,
+            "discretion",
+            `${ODValue["discretion"]}`,
+            "tir",
+            `${ODValue["tir"]}`,
+            "combat",
+            `${ODValue["combat"]}`,
+        ];
 
-        let attrs = await asw.getAttrs(listAttrs);
+        listAttrs = listAttrs.concat(listBase);
+        listAttrs = listAttrs.concat(listArmure);
+        listAttrs = listAttrs.concat(listArmureLegende);
+
+        let attrs = await getAttrsAsync(listAttrs);
+
+        let armure = attrs["armure"];
+        let armureL = attrs["armureLegende"];
+
+        if(armure == "sans" || armure == "guardian")
+            hasArmure = false;
+
+        let type = attrs["utilisationArmeAI"];
+        let mod = attrs["jetModifDes"];
+        let hasBonus = attrs["bonusCarac"];
 
         let C3 = attrs[`caracteristique3ArmeImprovisee`];
         let C4 = attrs[`caracteristique4ArmeImprovisee`];
@@ -149,12 +163,12 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let ODWarrior = [];
         let ODMALWarrior = [];
 
-        let vForce = CaracValue["force"].value;
-        let oForce = CaracValue["force"].VraiOD;
-        let vDiscretion = CaracValue["discretion"].value;
-        let oDiscretion = CaracValue["discretion"].VraiOD;
-        let oTir = CaracValue["tir"].VraiOD;
-        let oCombat = CaracValue["combat"].VraiOD;
+        let vForce = +attrs[`force`];
+        let oForce = +attrs[ODValue["force"]];
+        let vDiscretion = +attrs[`discretion`];
+        let oDiscretion = +attrs[ODValue["discretion"]];
+        let oTir = +attrs[ODValue["tir"]];
+        let oCombat = +attrs[ODValue["combat"]];
 
         let attaquesSurprises = [];
         let attaquesSurprisesValue = [];
@@ -164,8 +178,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         if(hasArmure)
             exec.push("{{OD=true}}");
 
-        let C1Value = Number(CaracValue[C1Nom].value);
-        let C1OD = Number(CaracValue[C1Nom].OD);
+        let C1Value = +attrs[C1Nom];
+        let C1OD = +attrs[ODValue[C1Nom]];
 
         cBase.push(CaracNom[C1Nom]);
         cRoll.push(C1Value);
@@ -173,8 +187,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         if(hasArmure)
             OD += C1OD;
 
-        let C2Value = Number(CaracValue[C2Nom].value);
-        let C2OD = Number(CaracValue[C2Nom].OD);
+        let C2Value = +attrs[C2Nom];
+        let C2OD = +attrs[ODValue[C2Nom]];
 
         cBase.push(CaracNom[C2Nom]);
         cRoll.push(C2Value);
@@ -182,40 +196,35 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         if(hasArmure)
             OD += C2OD;
 
-        if(hasBonus == 1 || hasBonus == 2) {
-            if(C3 != "0") {
-                C3Nom = C3.slice(2, -1);
-                
-                let C3Value = Number(CaracValue[C3Nom].value);
-                let C3OD = Number(CaracValue[C3Nom].OD);
+        let attrsCarac = await getCarac(hasBonus, "0", "0", C3, C4);
 
-                cBonus.push(CaracNom[C3Nom]);
-                cRoll.push(C3Value);
+        if(attrsCarac["C3"]) {
+            C3Nom = attrsCarac["C3Brut"];
 
-                if(hasArmure)
-                    OD += C3OD;
-            }
+            let C3Value = attrsCarac["C3Base"];
+            let C3OD = attrsCarac["C3OD"];
 
-            if(hasBonus == 2) {
-                if(C4 != "0") {
-                    C4Nom = C4.slice(2, -1);
+            cBonus.push(attrsCarac["C3Nom"]);
+            cRoll.push(C3Value);
 
-                    let C4Value = Number(CaracValue[C4Nom].value);
-                    let C4OD = Number(CaracValue[C4Nom].OD);
-
-                    cBonus.push(CaracNom[C4Nom]);
-                    cRoll.push(C4Value);
-    
-                    if(hasArmure)
-                        OD += C4OD;
-                }
-            }
+            if(hasArmure)
+                OD += C3OD;
         }
 
-        if(OD.length == 0)
-            exec.push("{{vOD=0}}");
-        else
-            exec.push("{{vOD="+OD+"}}");
+        if(attrsCarac["C4"]) {
+            C4Nom = attrsCarac["C4Brut"];
+
+            let C4Value = attrsCarac["C4Base"];
+            let C4OD = attrsCarac["C4OD"];
+
+            cBonus.push(attrsCarac["C4Nom"]);
+            cRoll.push(C4Value);
+
+            if(hasArmure)
+                OD += C4OD;
+        }
+
+        exec.push("{{vOD="+OD+"}}");
 
         if(mod != 0) {
             cRoll.push(mod);
@@ -252,9 +261,9 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let getStyle;
 
         if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
-            getStyle = getStyleContactMod(PJData, "", baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
+            getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
         } else {
-            getStyle = getStyleDistanceMod(PJData, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
+            getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
         }
 
         exec = exec.concat(getStyle.exec);
@@ -266,7 +275,7 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
         //GESTION DES BONUS D'ARMURE
 
-        let armorBonus = getArmorBonus(PJData, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(armorBonus.exec);
         cRoll = cRoll.concat(armorBonus.cRoll);
@@ -290,9 +299,7 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         ODShaman = ODShaman.concat(armorBonus.ODShaman);
         ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
-        log(PJData);
-
-        let MALBonus = getMALBonus(PJData, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+        let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
         exec = exec.concat(MALBonus.exec);
         cRoll = cRoll.concat(MALBonus.cRoll);

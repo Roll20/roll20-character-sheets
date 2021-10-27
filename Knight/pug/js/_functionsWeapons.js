@@ -107,15 +107,6 @@ const wpnSpecialValue = [
     "BDDiversD6", "BDDiversFixe", "BVDiversD6", "BVDiversFixe", "energieValue"
 ];
 
-function isApplied(e) {
-    let result = false;
-
-    if(e != "0")
-        result = e;
-
-    return result;
-}
-
 function getWeaponsEffects(prefix, effet, hasArmure, armure, vForce, vDexterite, oDexterite, vDiscretion, oDiscretion, vTir, oTir) {
     let result = {};
 
@@ -766,6 +757,9 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
 
         isConditionnelD = true;
 
+        log(vMasque);
+        log(totalSilencieux);
+
         attaquesSurprises.push(i18n_silencieux);
         attaquesSurprisesValue.push(totalSilencieux);
 
@@ -781,7 +775,7 @@ function getWeaponsEffectsPNJ(prefix, data, addChair, vChair, vMachine, vMachine
         exec.push("{{soumission="+i18n_soumission+"}} {{soumissionCondition="+i18n_soumissionCondition+"}}");
     }
     
-    if(eTenebricide || armure == "berserk") {
+    if(eTenebricide) {
         isConditionnelD = true;
         isConditionnelV = true;
 
@@ -1012,7 +1006,7 @@ function getWeaponsEffectsAutre(prefix, effet) {
     let eUltraviolenceV = 2;
 
 
-    if(eAntiAnatheme || armure == "berserk") {
+    if(eAntiAnatheme) {
         isConditionnelD = true;
         isConditionnelV = true;
 
@@ -1388,7 +1382,7 @@ function getWeaponsEffectsAutrePNJ(prefix, effet) {
     let eUltraviolenceV = 2;
 
 
-    if(eAntiAnatheme || armure == "berserk") {
+    if(eAntiAnatheme) {
         isConditionnelD = true;
         isConditionnelV = true;
 
@@ -3549,8 +3543,6 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
     let bName = "";
     let modA = 0;
 
-    log(isAProtectrice);
-
     switch(style) {
         case "standard": 
             exec.push("{{style="+i18n_style+" "+i18n_standard+"}}");
@@ -3692,12 +3684,10 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
             exec.push("{{style="+i18n_style+" "+i18n_precis+"}}");
 
             if(isEDeuxMains && !isAAllegee) {         
-                if(cPrecis != "0") {
-                    let CPNom = cPrecis.slice(2, -1);
+                if(cPrecis["nom"] != "0") {
+                    exec.push("{{cPrecis="+CaracNom[cPrecis["nom"]]+"}}");
 
-                    exec.push("{{cPrecis="+CaracNom[CPNom]+"}}");
-
-                    let CPValue = Number(CaracValue[CPNom].value);
+                    let CPValue = Number(cPrecis["base"]);
 
                     cRoll.push(CPValue);
 
@@ -3892,21 +3882,6 @@ function getStyleDistanceMod(value, diceDegats, diceViolence, pilonnage, hasArmu
         
         case "puissant":
             exec.push("{{style="+i18n_style+" "+i18n_puissant+"}}");
-
-            if(isLourd) {
-                let bDegats = Number(value["styleSuppressionD"]);
-                let bViolence = Number(value["styleSuppressionV"]);
-
-                if(bDegats != 0) {
-                    dDegats -= bDegats;
-                    exec.push("{{vMStyleD=-"+bDegats+"D6}}");
-                }
-            
-                if(bViolence != 0) {
-                    dViolence -= bViolence;
-                    exec.push("{{vMStyleV=-"+bViolence+"D6}}");
-                }            
-            }
             break;
     }
 

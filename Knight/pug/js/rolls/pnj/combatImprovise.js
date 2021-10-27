@@ -1,7 +1,7 @@
 for(let i = 0;i < rollCombatImprovise;i++) {
     let str = `AIPNJ${i}`;
 
-    on(`clicked:${str}`, function(info) {
+    on(`clicked:${str}`, async function(info) {
         let roll = info.htmlAttributes.value;
 
         let dDgts = 0;
@@ -79,6 +79,23 @@ for(let i = 0;i < rollCombatImprovise;i++) {
                 break;
         }
 
+        let listAttrs = [
+            "jetModifDes",
+            "utilisationArmeAIPNJ",
+            "Chair",
+            "ChairPNJAE",
+            "ChairPNJAEMaj",
+            "Bete",
+            "BetePNJAE",
+            "BetePNJAEMaj",
+            "Machine",
+            "Masque",
+            "capaciteFanMade",
+            "attaqueOmbre",
+        ];
+
+        let attrs = await getAttrsAsync(listAttrs);
+
         let exec = [];
         exec.push(roll);
 
@@ -90,8 +107,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         let cRoll = [];
         let bonus = [];
         
-        let type = PNJData["utilisationArmeAIPNJ"];
-        let mod = PJData["jetModifDes"];
+        let type = attrs["utilisationArmeAIPNJ"];
+        let mod = attrs["jetModifDes"];
 
         let baseDegats = dDgts;
         let baseViolence = dViolence;
@@ -104,11 +121,12 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
         let aspectNom = "Chair";
 
-        let vChair = Number(AspectValue["Chair"].value);
-        let vBete = Number(AspectValue["Bete"].value);
-        let vBeteAEMin = Number(AspectValue["Bete"].AEMin);
-        let vBeteAEMaj = Number(AspectValue["Bete"].AEMaj);
-        let vMasque = AspectValue["Masque"].value;
+        let vChair = +attrs["Chair"];
+        let vChairAE = totalAspect(attrs, "Chair");
+        let vBete = +attrs["Bete"];
+        let vBeteAEMin = +attrs["BetePNJAE"];
+        let vBeteAEMaj = +attrs["BetePNJAEMaj"];
+        let vMasque = +attrs["Masque"];
 
         let vBeteD = 0;
 
@@ -118,8 +136,8 @@ for(let i = 0;i < rollCombatImprovise;i++) {
 
         let autresEffets = [];
 
-        let aspectValue = Number(AspectValue[aspectNom].value);
-        let AE = Number(AspectValue[aspectNom].AEMin)+Number(AspectValue[aspectNom].AEMaj);
+        let aspectValue = vChair;
+        let AE = vChairAE;
 
         cBase.push(AspectNom[aspectNom]);
         cRoll.push(aspectValue);
@@ -130,7 +148,7 @@ for(let i = 0;i < rollCombatImprovise;i++) {
             exec.push("{{mod="+mod+"}}");
         }
 
-        //GESTION DES BONUS DE BASE
+        //GESTION DES BONUS DE BASE ET ASPECTS EXCEPTIONNELS
         if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
             if(vChair > 0) {
                 let vChairD = Math.ceil(vChair/2);
@@ -138,32 +156,28 @@ for(let i = 0;i < rollCombatImprovise;i++) {
                 bDegats += vChairD;
                 exec.push(`{{vChair=${vChairD}}}`);
             }
+
+            if(vBeteAEMin > 0 || vBeteAEMaj > 0) {
+                bDegats += vBeteAEMin;
+                bDegats += vBeteAEMaj;
+    
+                vBeteD += vBeteAEMin;
+                vBeteD += vBeteAEMaj;
+            }
+    
+            if(vBeteAEMaj > 0) {
+                bDegats += vBete;
+                vBeteD += vBete;
+            }
+    
+            if(vBeteD > 0)
+                exec.push(`{{vBeteD=${vBeteD}}}`);
         }
 
-        //FIN GESTION DES BONUS DE BASE
+        //FIN GESTION DES BONUS DE BASE ET ASPECTS EXCEPTIONNELS
 
-        //GESTION DES ASPECTS EXCEPTIONNELS
-
-        if(vBeteAEMin > 0 || vBeteAEMaj > 0) {
-            bDegats += vBeteAEMin;
-            bDegats += vBeteAEMaj;
-
-            vBeteD += vBeteAEMin;
-            vBeteD += vBeteAEMaj;
-        }
-
-        if(vBeteAEMaj > 0) {
-            bDegats += vBete;
-            vBeteD += vBete;
-        }
-
-        if(vBeteD > 0)
-            exec.push(`{{vBeteD=${vBeteD}}}`);
-
-        //FIN GESTION DES ASPECTS EXCEPTIONNELS
-
-        let capacitesFM = PNJData["capaciteFanMade"];
-        let attaquesOmbres = PNJData["attaqueOmbre"];
+        let capacitesFM = attrs["capaciteFanMade"];
+        let attaquesOmbres = attrs["attaqueOmbre"];
 
         if(attaquesOmbres != "0" && capacitesFM != "0") {
             isConditionnelD = true;
@@ -191,6 +205,12 @@ for(let i = 0;i < rollCombatImprovise;i++) {
         exec.push(jet);
         exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
         exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+
+        if(diceDegats < 0)
+            diceDegats = 0;
+
+        if(diceViolence < 0)
+            diceViolence = 0;
 
         exec.push(`{{degats=[[${diceDegats}D6+${bDegats}]]}}`);
         exec.push(`{{violence=[[${diceViolence}D6+${bViolence}]]}}`);

@@ -1,17 +1,24 @@
-on(`clicked:simplePNJ`, function(info) {
+on(`clicked:simplePNJ`, async function(info) {
     let roll = info.htmlAttributes.value;
+
+    let listAttrs = [
+        "jetModifDes",
+        "aspectPNJ",
+    ];
+
+    let attrs = await getAttrsAsync(listAttrs);
+    let attrsAspect = [];
 
     let exec = [];
     let isConditionnel = false;
 
-    let mod = Number(PJData["jetModifDes"]);
-
-    let aspect = PNJData["aspectPNJ"];
+    let mod = +attrs["jetModifDes"];
+    let aspect = attrs["aspectPNJ"];
 
     let aspectNom = aspect.slice(2, -1);
 
     let aRoll = [];
-    let aNom = [];
+    let aNom = "";
 
     let bonus = [];
     let AE = 0;
@@ -19,14 +26,22 @@ on(`clicked:simplePNJ`, function(info) {
     exec.push(roll);
 
     if(aspect != "0") {
-        aNom.push(AspectNom[aspectNom]);
-        aRoll.push(AspectValue[aspectNom].value);
-        AE += AspectValue[aspectNom].AEMin;
-        AE += AspectValue[aspectNom].AEMaj;
-        exec.push("{{vAE=[["+AspectValue[aspectNom].AEMin+"+"+AspectValue[aspectNom].AEMaj+"]]}}");
+        attrsAspect = await getAttrsAsync([
+            aspectNom,
+            `${aspectNom}PNJAE`,
+            `${aspectNom}PNJAEMaj`,
+        ]);
+
+        let tAE = totalAspect(attrsAspect, aspectNom)
+
+        aNom = AspectNom[aspectNom];
+        aRoll.push(attrsAspect[aspectNom]);
+        AE += tAE;
+
+        exec.push("{{vAE="+tAE+"}}");
     };
 
-    exec.push("{{cBase="+aNom.join(" - ")+"}}");
+    exec.push("{{cBase="+aNom+"}}");
 
     if(mod != 0) {
         aRoll.push(mod);

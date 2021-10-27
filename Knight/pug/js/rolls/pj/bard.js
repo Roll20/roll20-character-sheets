@@ -1,32 +1,18 @@
 on(`clicked:distanceBard`, function(info) {
     let roll = info.htmlAttributes.value;
-    let armureL = donneesPJ["ArmureLegende"];
 
     let attributs = [
+        "armureLegende",
         "bardAttSpe"
     ];
 
-    switch(armureL) {
-        case "barbarian":
-            attributs.push("MALBarbarianGoliath");
-            break;
-
-        case "rogue":
-            attributs.push("MALRogueGhost");
-            break;
-            
-        case "warrior":
-            attributs.push("MALWarriorSoldierA");
-            attributs.push("MALWarriorHunterA");
-            attributs.push("MALWarriorScholarA");
-            attributs.push("MALWarriorHeraldA");
-            attributs.push("MALWarriorScoutA");
-            break;
-    }
+    attributs = attributs.concat(listArmureLegende);
 
     getAttrs(attributs, function(value)
     {
         let exec = [];
+
+        let armureL = value["armureLegende"];
 
         let degats = value["bardAttSpe"];
         let violence = value["bardAttSpe"];

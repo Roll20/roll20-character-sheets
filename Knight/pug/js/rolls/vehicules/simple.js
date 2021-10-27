@@ -1,11 +1,19 @@
-on(`clicked:rollVehicule`, function(info) {
+on(`clicked:rollVehicule`, async function(info) {
     let roll = info.htmlAttributes.value;
 
     let exec = "";
 
-    let base = Number(VehiculeData["desVehicule"]) || 0;
-    let mod = Number(PJData["jetModifDes"]) || 0;
-    let bonus = Number(VehiculeData["ODVehicule"]) || 0;
+    let listAttrs = [
+        "desVehicule",
+        "jetModifDes",
+        "ODVehicule",
+    ];
+
+    let attrs = await getAttrsAsync(listAttrs);
+
+    let base = +attrs["desVehicule"] || 0;
+    let mod = +attrs["jetModifDes"] || 0;
+    let bonus = +attrs["ODVehicule"] || 0;
     var rollT = base+mod;
 
     exec = roll+"{{jet=[[ {[[{"+rollT+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD=true}} {{vOD="+bonus+"}} {{tBonus=[["+bonus+"]]}} {{Exploit=[["+rollT+"]]}}";      
