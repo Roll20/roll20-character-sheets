@@ -1,48 +1,50 @@
-on(`clicked:rollVehicule`, async function(info) {
-    let roll = info.htmlAttributes.value;
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
+on('clicked:rollVehicule', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let exec = "";
+  let exec = '';
 
-    let listAttrs = [
-        "desVehicule",
-        "jetModifDes",
-        "ODVehicule",
-    ];
+  const listAttrs = [
+    'desVehicule',
+    'jetModifDes',
+    'ODVehicule',
+  ];
 
-    let attrs = await getAttrsAsync(listAttrs);
+  const attrs = await getAttrsAsync(listAttrs);
 
-    let base = +attrs["desVehicule"] || 0;
-    let mod = +attrs["jetModifDes"] || 0;
-    let bonus = +attrs["ODVehicule"] || 0;
-    var rollT = base+mod;
+  const base = +attrs.desVehicule || 0;
+  const mod = +attrs.jetModifDes || 0;
+  const bonus = +attrs.ODVehicule || 0;
+  const rollT = base + mod;
 
-    exec = roll+"{{jet=[[ {[[{"+rollT+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD=true}} {{vOD="+bonus+"}} {{tBonus=[["+bonus+"]]}} {{Exploit=[["+rollT+"]]}}";      
+  exec = `${roll}{{jet=[[ {[[{${rollT}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{OD=true}} {{vOD=${bonus}}} {{tBonus=[[${bonus}]]}} {{Exploit=[[${rollT}]]}}`;
 
-    startRoll(exec, (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  startRoll(exec, (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
 
-        let total = tJet+tBonus;
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}} {{jet=[[ {[[{${rollT}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}} {{jet=[[ {[[{"+rollT+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });

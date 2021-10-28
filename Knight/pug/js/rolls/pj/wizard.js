@@ -1,504 +1,493 @@
-on(`clicked:distanceWizardBorealis`, async function(info) {
-    let roll = info.htmlAttributes.value;    
-    let hasArmure = true;
+/* eslint-disable default-case */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-undef */
+on('clicked:distanceWizardBorealis', async (info) => {
+  const roll = info.htmlAttributes.value;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "wizardBDmg",
-        "wizardBViolence",
-        "wizardBPortee",
-        "wizardBTypeAttaque",
-        "calODTir",
-        "calODCom",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'wizardBDmg',
+    'wizardBViolence',
+    'wizardBPortee',
+    'wizardBTypeAttaque',
+    'calODTir',
+    'calODCom',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listStyle, listArmureLegende);
+  attributs = attributs.concat(listBase, listStyle, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
+  let exec = [];
+  let isConditionnel = false;
 
-    let typeAttaque = attrs["wizardBTypeAttaque"];
+  const typeAttaque = attrs.wizardBTypeAttaque;
 
-    let diceDegats = Number(attrs["wizardBDmg"].split("D")[0]);
-    let diceViolence = Number(attrs["wizardBViolence"].split("D")[0]);
-    let portee = attrs["wizardBPortee"];
-    
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  let diceDegats = Number(attrs.wizardBDmg.split('D')[0]);
+  let diceViolence = Number(attrs.wizardBViolence.split('D')[0]);
+  const portee = attrs.wizardBPortee;
 
-    let vDiscretion = +attrs["discretion"];
-    let oDiscretion = +attrs[ODValue["discretion"]];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let C1 = attrs["caracteristique1"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const vDiscretion = +attrs.discretion;
+  const oDiscretion = +attrs[ODValue.discretion];
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let bonus = [];
+  let OD = 0;
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
+
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    if (hasArmure) { OD += C4OD; }
+  }
+
+  exec.push(`{{vOD=${OD}}}`);
+
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
+
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{vOD="+OD+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  // GESTION DU STYLE
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  const ODTir = attrs.calODTir;
+  const ODCombat = attrs.calODCom;
+  const style = attrs.styleCombat;
+  let bName = '';
+  let modA = 0;
+  let violenceB = 0;
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  switch (style) {
+    case 'standard':
+      exec.push(`{{style=${i18n_style} ${i18n_standard}}}`);
+      break;
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+    case 'couvert':
+      bName = 'atkCouvert';
+      modA = attrs[bName];
 
-    //GESTION DU STYLE
-    
-    let ODTir = attrs["calODTir"];
-    let ODCombat = attrs["calODCom"];
-    let style = attrs["styleCombat"];
-    let bName = "";
-    let modA = 0;
+      exec.push(`{{style=${i18n_style} ${i18n_couvert}}}`);
+      exec.push(`{{vMStyleA=${modA}D}}`);
+      cRoll.push(modA);
+      break;
 
-    switch(style) {
-        case "standard": 
-            exec.push("{{style="+i18n_style+" "+i18n_standard+"}}");
-        break;
+    case 'agressif':
+      bName = 'atkAgressif';
+      modA = attrs[bName];
 
-        case "couvert":
-            bName = "atkCouvert";
-            modA = attrs[bName];
-
-            exec.push("{{style="+i18n_style+" "+i18n_couvert+"}}");
-            exec.push("{{vMStyleA="+modA+"D}}");
-            cRoll.push(modA);
-            break;
-
-        case "agressif":
-            bName = "atkAgressif";
-            modA = attrs[bName];
-
-            exec.push("{{style="+i18n_style+" "+i18n_agressif+"}}");
-            exec.push("{{vMStyleA="+modA+"D}}");
-            cRoll.push(modA);
-            break;
-
-        case "akimbo":
-            bName = "atkAkimbo";
-            modA = attrs[bName];
-            let violenceB = Math.ceil(diceViolence/2);
-
-            exec.push("{{style="+i18n_style+" "+i18n_akimbo+"}}");
-            exec.push("{{vMStyleD=+"+diceDegats+"}}");
-            exec.push("{{vMStyleV=+"+violenceB+"D6}}");
-            diceDegats += diceDegats;
-            diceViolence += violenceB;
-
-            if(typeAttaque == "distance" && ODTir >= 3) {
-
-                exec.push("{{vMStyleA=-1D}}");
-                cRoll.push(-1);
-                
-            } else if(typeAttaque == "contact" && ODCombat >= 3) {
-
-                exec.push("{{vMStyleA=-1D}}");
-                cRoll.push(-1);
-
-            } else {
-
-                exec.push("{{vMStyleA="+modA+"D}}");
-                cRoll.push(modA);
-            }
-
-            break;
-
-        case "ambidextre":
-            bName = "atkAmbidextre";
-            modA = attrs[bName];
-
-            exec.push("{{style="+i18n_style+" "+i18n_ambidextre+"}}");
-
-            if(typeAttaque == "distance" && ODTir >= 3) {
-
-                exec.push("{{vMStyleA=-1D}}");
-                cRoll.push(-1);
-                
-            } else if(typeAttaque == "contact" && ODCombat >= 3) {
-
-                exec.push("{{vMStyleA=-1D}}");
-                cRoll.push(-1);
-
-            } else {
-
-                exec.push("{{vMStyleA="+modA+"D}}");
-                cRoll.push(modA);
-                
-            }
-            break;
-
-        case "defensif":
-            bName = "atkDefensif";
-            modA = attrs[bName];
-
-            exec.push("{{style="+i18n_style+" "+i18n_defensif+"}}");
-            exec.push("{{vMStyleA="+modA+"D}}");
-            cRoll.push(modA);
-            break;
-    }
-    
-    //FIN GESTION DU STYLE
-
-    if(cRoll.length == 0)
-        cRoll.push(0);
-
-    bonus.push(OD);
-
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALWarrior);
-    bonus = bonus.concat(ODMALShaman);
-
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-
-    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-    exec.push("{{degats=[["+diceDegats+"D6]]}}");
-    exec.push("{{violence=[["+diceViolence+"D6]]}}");
-    exec.push("{{effets="+i18n_degatsContinus+" ([[1d6]] "+i18n_tours+")}}");
-
-    exec.push("{{degatsConditionnel=true}}");
-    exec.push("{{violenceConditionnel=true}}");
-    exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-    exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
-
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
-
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
-
-        let tDegats = results.results.degats.result;
-        let tViolence = results.results.violence.result;
-
-        let total = tJet+tBonus;
+      exec.push(`{{style=${i18n_style} ${i18n_agressif}}}`);
+      exec.push(`{{vMStyleA=${modA}D}}`);
+      cRoll.push(modA);
+      break;
+
+    case 'akimbo':
+      bName = 'atkAkimbo';
+      modA = attrs[bName];
+      violenceB = Math.ceil(diceViolence / 2);
+
+      exec.push(`{{style=${i18n_style} ${i18n_akimbo}}}`);
+      exec.push(`{{vMStyleD=+${diceDegats}}}`);
+      exec.push(`{{vMStyleV=+${violenceB}D6}}`);
+      diceDegats += diceDegats;
+      diceViolence += violenceB;
+
+      if (typeAttaque === 'distance' && ODTir >= 3) {
+        exec.push('{{vMStyleA=-1D}}');
+        cRoll.push(-1);
+      } else if (typeAttaque === 'contact' && ODCombat >= 3) {
+        exec.push('{{vMStyleA=-1D}}');
+        cRoll.push(-1);
+      } else {
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(modA);
+      }
+
+      break;
+
+    case 'ambidextre':
+      bName = 'atkAmbidextre';
+      modA = attrs[bName];
+
+      exec.push(`{{style=${i18n_style} ${i18n_ambidextre}}}`);
+
+      if (typeAttaque === 'distance' && ODTir >= 3) {
+        exec.push('{{vMStyleA=-1D}}');
+        cRoll.push(-1);
+      } else if (typeAttaque === 'contact' && ODCombat >= 3) {
+        exec.push('{{vMStyleA=-1D}}');
+        cRoll.push(-1);
+      } else {
+        exec.push(`{{vMStyleA=${modA}D}}`);
+        cRoll.push(modA);
+      }
+      break;
+
+    case 'defensif':
+      bName = 'atkDefensif';
+      modA = attrs[bName];
+
+      exec.push(`{{style=${i18n_style} ${i18n_defensif}}}`);
+      exec.push(`{{vMStyleA=${modA}D}}`);
+      cRoll.push(modA);
+      break;
+  }
+
+  // FIN GESTION DU STYLE
+
+  if (cRoll.length === 0) { cRoll.push(0); }
+
+  bonus.push(OD);
+
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALShaman);
+
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+
+  exec.push(`{{portee=${i18n_portee} ${portee}}}`);
+  exec.push(`{{degats=[[${diceDegats}D6]]}}`);
+  exec.push(`{{violence=[[${diceViolence}D6]]}}`);
+  exec.push(`{{effets=${i18n_degatsContinus} ([[1d6]] ${i18n_tours})}}`);
+
+  exec.push('{{degatsConditionnel=true}}');
+  exec.push('{{violenceConditionnel=true}}');
+  exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
+  exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
+
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
+
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const tDegats = results.results.degats.result;
+    const tViolence = results.results.violence.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+        degats: tDegats,
+        violence: tViolence,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total,
-                degats:tDegats,
-                violence:tViolence
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:distanceWizardOriflamme`, async function(info) {
-    let roll = info.htmlAttributes.value;
+on('clicked:distanceWizardOriflamme', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let attributs = [
-        "wizardODmg",
-        "wizardOViolence",
-        "wizardOPortee"
-    ];
+  let attributs = [
+    'wizardODmg',
+    'wizardOViolence',
+    'wizardOPortee',
+  ];
 
-    attributs = attributs.concat(listArmureLegende);
+  attributs = attributs.concat(listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let autresEffets = [];
-    
-    let MALGoliath;
-    let MALGhost;
-    let MALTypeSoldier;
-    let MALTypeHunter;
-    let MALTypeHerald;
-    let MALTypeScholar;
-    let MALTypeScout;
+  const exec = [];
+  const autresEffets = [];
 
-    let degats = attrs["wizardODmg"];
-    let violence = attrs["wizardOViolence"];
-    let portee = attrs["wizardOPortee"];
+  let MALGoliath;
+  let MALGhost;
+  let MALTypeSoldier;
+  let MALTypeHunter;
+  let MALTypeHerald;
+  let MALTypeScholar;
+  let MALTypeScout;
 
-    exec.push(roll);
+  const degats = attrs.wizardODmg;
+  const violence = attrs.wizardOViolence;
+  const portee = attrs.wizardOPortee;
 
-    switch(armureL) {
-        case "barbarian":
-            MALGoliath = +attrs["MALBarbarianGoliath"];
+  exec.push(roll);
 
-            if(MALGoliath != 0)
-                exec.push("{{MALGoliath=[["+MALGoliath+"]]}}");
-            break;
+  switch (armureL) {
+    case 'barbarian':
+      MALGoliath = +attrs.MALBarbarianGoliath;
 
-        case "rogue":
-            MALGhost = attrs["MALRogueGhost"];
+      if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
 
-            if(MALGhost != "")
-                exec.push("{{MALspecial2="+i18n_ghostActive+"}}");
-            break;
-            
-        case "warrior":
-            MALTypeSoldier = attrs["MALWarriorSoldierA"];
-            MALTypeHunter = attrs["MALWarriorHunterA"];
-            MALTypeHerald = attrs["MALWarriorHeraldA"];
-            MALTypeScholar = attrs["MALWarriorScholarA"];
-            MALTypeScout = attrs["MALWarriorScoutA"];
+    case 'rogue':
+      MALGhost = attrs.MALRogueGhost;
 
-            if(MALTypeSoldier != 0)
-                exec.push("{{MALspecial2="+i18n_typeSoldier+"}}");
-            
+      if (MALGhost !== '') { exec.push(`{{MALspecial2=${i18n_ghostActive}}}`); }
+      break;
 
-            if(MALTypeHunter != 0)
-                exec.push("{{MALspecial2="+i18n_typeHunter+"}}");
+    case 'warrior':
+      MALTypeSoldier = attrs.MALWarriorSoldierA;
+      MALTypeHunter = attrs.MALWarriorHunterA;
+      MALTypeHerald = attrs.MALWarriorHeraldA;
+      MALTypeScholar = attrs.MALWarriorScholarA;
+      MALTypeScout = attrs.MALWarriorScoutA;
 
-            if(MALTypeHerald != 0)
-                exec.push("{{MALspecial2="+i18n_typeHerald+"}}");
+      if (MALTypeSoldier !== 0) { exec.push(`{{MALspecial2=${i18n_typeSoldier}}}`); }
 
-            if(MALTypeScholar != 0)
-                exec.push("{{MALspecial2="+i18n_typeScholar+"}}");
+      if (MALTypeHunter !== 0) { exec.push(`{{MALspecial2=${i18n_typeHunter}}}`); }
 
-            if(MALTypeScout != 0)
-                exec.push("{{MALspecial2="+i18n_typeScout+"}}");
-            break;
-    }
+      if (MALTypeHerald !== 0) { exec.push(`{{MALspecial2=${i18n_typeHerald}}}`); }
 
-    autresEffets.push(i18n_lumiere+" 2");
+      if (MALTypeScholar !== 0) { exec.push(`{{MALspecial2=${i18n_typeScholar}}}`); }
 
-    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-    exec.push("{{degats=[["+degats+"]]}}");
-    exec.push("{{violence=[["+violence+"]]}}");
+      if (MALTypeScout !== 0) { exec.push(`{{MALspecial2=${i18n_typeScout}}}`); }
+      break;
 
-    exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-    exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
+    default:
+      MALGoliath = 0;
+      MALGhost = '';
+      MALTypeSoldier = '';
+      MALTypeHunter = '';
+      MALTypeHerald = '';
+      MALTypeScholar = '';
+      MALTypeScout = '';
+      break;
+  }
 
-    exec.push("{{degatsConditionnel=true}}");
-    exec.push("{{violenceConditionnel=true}}");
-    exec.push("{{affecteAnathemeD="+i18n_affecteAnatheme+"}}");
-    exec.push("{{affecteAnathemeV="+i18n_affecteAnatheme+"}}");
+  autresEffets.push(`${i18n_lumiere} 2`);
 
-    exec.push("{{effets="+autresEffets.join(" / ")+"}}");
+  exec.push(`{{portee=${i18n_portee} ${portee}}}`);
+  exec.push(`{{degats=[[${degats}]]}}`);
+  exec.push(`{{violence=[[${violence}]]}}`);
 
-    startRoll(exec.join(" "), (results) => {
-        let tDegats = results.results.degats.result;
-        let tViolence = results.results.violence.result;
+  exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
+  exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
 
-        finishRoll(
-            results.rollId, 
-            {
-                degats:tDegats,
-                violence:tViolence
-            }
-        );
-    });
+  exec.push('{{degatsConditionnel=true}}');
+  exec.push('{{violenceConditionnel=true}}');
+  exec.push(`{{affecteAnathemeD=${i18n_affecteAnatheme}}}`);
+  exec.push(`{{affecteAnathemeV=${i18n_affecteAnatheme}}}`);
+
+  exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
+
+  startRoll(exec.join(' '), (results) => {
+    const tDegats = results.results.degats.result;
+    const tViolence = results.results.violence.result;
+
+    finishRoll(
+      results.rollId,
+      {
+        degats: tDegats,
+        violence: tViolence,
+      },
+    );
+  });
 });
 
-on(`clicked:distanceMALWizardOriflamme`, async function(info) {
-    let roll = info.htmlAttributes.value;
+on('clicked:distanceMALWizardOriflamme', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let attributs = [
-        "MALWizardODmg",
-        "MALWizardOViolence",
-        "MALWizardOPortee"
-    ];
+  let attributs = [
+    'MALWizardODmg',
+    'MALWizardOViolence',
+    'MALWizardOPortee',
+  ];
 
-    attributs = attributs.concat(listArmureLegende);
+  attributs = attributs.concat(listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
+  const exec = [];
 
-    let degats = attrs["MALWizardODmg"];
-    let violence = attrs["MALWizardOViolence"];
-    let portee = attrs["MALWizardOPortee"];
+  const degats = attrs.MALWizardODmg;
+  const violence = attrs.MALWizardOViolence;
+  const portee = attrs.MALWizardOPortee;
 
-    let autresEffets = [];
+  const autresEffets = [];
 
-    let MALGoliath;
-    let MALGhost;
-    let MALTypeSoldier;
-    let MALTypeHunter;
-    let MALTypeHerald;
-    let MALTypeScholar;
-    let MALTypeScout;
+  let MALGoliath;
+  let MALGhost;
+  let MALTypeSoldier;
+  let MALTypeHunter;
+  let MALTypeHerald;
+  let MALTypeScholar;
+  let MALTypeScout;
 
-    exec.push(roll);
+  exec.push(roll);
 
-    switch(armureL) {
-        case "barbarian":
-            MALGoliath = +attrs["MALBarbarianGoliath"];
+  switch (armureL) {
+    case 'barbarian':
+      MALGoliath = +attrs.MALBarbarianGoliath;
 
-            if(MALGoliath != 0)
-                exec.push("{{MALGoliath=[["+MALGoliath+"]]}}");
-            break;
+      if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+      break;
 
-        case "rogue":
-            MALGhost = attrs["MALRogueGhost"];
+    case 'rogue':
+      MALGhost = attrs.MALRogueGhost;
 
-            if(MALGhost != "")
-                exec.push("{{MALspecial2="+i18n_ghostActive+"}}");
-            break;
-            
-        case "warrior":
-            MALTypeSoldier = attrs["MALWarriorSoldierA"];
-            MALTypeHunter = attrs["MALWarriorHunterA"];
-            MALTypeHerald = attrs["MALWarriorHeraldA"];
-            MALTypeScholar = attrs["MALWarriorScholarA"];
-            MALTypeScout = attrs["MALWarriorScoutA"];
+      if (MALGhost !== '') { exec.push(`{{MALspecial2=${i18n_ghostActive}}}`); }
+      break;
 
-            if(MALTypeSoldier != 0)
-                exec.push("{{MALspecial2="+i18n_typeSoldier+"}}");
-            
+    case 'warrior':
+      MALTypeSoldier = attrs.MALWarriorSoldierA;
+      MALTypeHunter = attrs.MALWarriorHunterA;
+      MALTypeHerald = attrs.MALWarriorHeraldA;
+      MALTypeScholar = attrs.MALWarriorScholarA;
+      MALTypeScout = attrs.MALWarriorScoutA;
 
-            if(MALTypeHunter != 0)
-                exec.push("{{MALspecial2="+i18n_typeHunter+"}}");
+      if (MALTypeSoldier !== 0) { exec.push(`{{MALspecial2=${i18n_typeSoldier}}}`); }
 
-            if(MALTypeHerald != 0)
-                exec.push("{{MALspecial2="+i18n_typeHerald+"}}");
+      if (MALTypeHunter !== 0) { exec.push(`{{MALspecial2=${i18n_typeHunter}}}`); }
 
-            if(MALTypeScholar != 0)
-                exec.push("{{MALspecial2="+i18n_typeScholar+"}}");
+      if (MALTypeHerald !== 0) { exec.push(`{{MALspecial2=${i18n_typeHerald}}}`); }
 
-            if(MALTypeScout != 0)
-                exec.push("{{MALspecial2="+i18n_typeScout+"}}");
-            break;
-    }
+      if (MALTypeScholar !== 0) { exec.push(`{{MALspecial2=${i18n_typeScholar}}}`); }
 
-    autresEffets.push(i18n_lumiere+" 2");
+      if (MALTypeScout !== 0) { exec.push(`{{MALspecial2=${i18n_typeScout}}}`); }
+      break;
 
-    exec.push("{{portee="+i18n_portee+" "+portee+"}}");
-    exec.push("{{degats=[["+degats+"]]}}");
-    exec.push("{{violence=[["+violence+"]]}}");
+    default:
+      MALGoliath = 0;
+      MALGhost = '';
+      MALTypeSoldier = '';
+      MALTypeHunter = '';
+      MALTypeHerald = '';
+      MALTypeScholar = '';
+      MALTypeScout = '';
+  }
 
-    exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-    exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
+  autresEffets.push(`${i18n_lumiere} 2`);
 
-    exec.push("{{degatsConditionnel=true}}");
-    exec.push("{{violenceConditionnel=true}}");
-    exec.push("{{affecteAnathemeD="+i18n_affecteAnatheme+"}}");
-    exec.push("{{affecteAnathemeV="+i18n_affecteAnatheme+"}}");
+  exec.push(`{{portee=${i18n_portee} ${portee}}}`);
+  exec.push(`{{degats=[[${degats}]]}}`);
+  exec.push(`{{violence=[[${violence}]]}}`);
 
-    exec.push("{{effets="+autresEffets.join(" / ")+"}}");
+  exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
+  exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
 
-    startRoll(exec.join(" "), (results) => {
-        let tDegats = results.results.degats.result;
-        let tViolence = results.results.violence.result;
+  exec.push('{{degatsConditionnel=true}}');
+  exec.push('{{violenceConditionnel=true}}');
+  exec.push(`{{affecteAnathemeD=${i18n_affecteAnatheme}}}`);
+  exec.push(`{{affecteAnathemeV=${i18n_affecteAnatheme}}}`);
 
-        finishRoll(
-            results.rollId, 
-            {
-                degats:tDegats,
-                violence:tViolence
-            }
-        );
-    });
+  exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
+
+  startRoll(exec.join(' '), (results) => {
+    const tDegats = results.results.degats.result;
+    const tViolence = results.results.violence.result;
+
+    finishRoll(
+      results.rollId,
+      {
+        degats: tDegats,
+        violence: tViolence,
+      },
+    );
+  });
 });

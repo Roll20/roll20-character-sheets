@@ -1,88 +1,88 @@
-on(`clicked:simplePNJ`, async function(info) {
-    let roll = info.htmlAttributes.value;
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
+on('clicked:simplePNJ', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let listAttrs = [
-        "jetModifDes",
-        "aspectPNJ",
-    ];
+  const listAttrs = [
+    'jetModifDes',
+    'aspectPNJ',
+  ];
 
-    let attrs = await getAttrsAsync(listAttrs);
-    let attrsAspect = [];
+  const attrs = await getAttrsAsync(listAttrs);
+  let attrsAspect = [];
 
-    let exec = [];
-    let isConditionnel = false;
+  const exec = [];
+  const isConditionnel = false;
 
-    let mod = +attrs["jetModifDes"];
-    let aspect = attrs["aspectPNJ"];
+  const mod = +attrs.jetModifDes;
+  const aspect = attrs.aspectPNJ;
 
-    let aspectNom = aspect.slice(2, -1);
+  const aspectNom = aspect.slice(2, -1);
 
-    let aRoll = [];
-    let aNom = "";
+  const aRoll = [];
+  let aNom = '';
 
-    let bonus = [];
-    let AE = 0;
+  const bonus = [];
+  let AE = 0;
 
-    exec.push(roll);
+  exec.push(roll);
 
-    if(aspect != "0") {
-        attrsAspect = await getAttrsAsync([
-            aspectNom,
-            `${aspectNom}PNJAE`,
-            `${aspectNom}PNJAEMaj`,
-        ]);
+  if (aspect !== '0') {
+    attrsAspect = await getAttrsAsync([
+      aspectNom,
+      `${aspectNom}PNJAE`,
+      `${aspectNom}PNJAEMaj`,
+    ]);
 
-        let tAE = totalAspect(attrsAspect, aspectNom)
+    const tAE = totalAspect(attrsAspect, aspectNom);
 
-        aNom = AspectNom[aspectNom];
-        aRoll.push(attrsAspect[aspectNom]);
-        AE += tAE;
+    aNom = AspectNom[aspectNom];
+    aRoll.push(attrsAspect[aspectNom]);
+    AE += tAE;
 
-        exec.push("{{vAE="+tAE+"}}");
-    };
+    exec.push(`{{vAE=${tAE}}}`);
+  }
 
-    exec.push("{{cBase="+aNom+"}}");
+  exec.push(`{{cBase=${aNom}}}`);
 
-    if(mod != 0) {
-        aRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (mod !== 0) {
+    aRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    if(aRoll.length == 0)
-        aRoll.push(0);
+  if (aRoll.length === 0) { aRoll.push(0); }
 
-    bonus.push(AE);        
+  bonus.push(AE);
 
-    exec.push("{{jet=[[ {[[{"+aRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{tBonus=[["+bonus.join("+")+"+0]]}} {{Exploit=[["+aRoll.join("+")+"]]}}");
+  exec.push(`{{jet=[[ {[[{${aRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}} {{tBonus=[[${bonus.join('+')}+0]]}} {{Exploit=[[${aRoll.join('+')}]]}}`);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
 
-        let total = tJet+tBonus;
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}} {{jet=[[ {[[{${aRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}} {{jet=[[ {[[{"+aRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });

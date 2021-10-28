@@ -1,89 +1,95 @@
-on(`clicked:distanceBard`, function(info) {
-    let roll = info.htmlAttributes.value;
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
+on('clicked:distanceBard', (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let attributs = [
-        "armureLegende",
-        "bardAttSpe"
-    ];
+  let attributs = [
+    'armureLegende',
+    'bardAttSpe',
+  ];
 
-    attributs = attributs.concat(listArmureLegende);
+  attributs = attributs.concat(listArmureLegende);
 
-    getAttrs(attributs, function(value)
-    {
-        let exec = [];
+  getAttrs(attributs, (value) => {
+    const exec = [];
 
-        let armureL = value["armureLegende"];
+    const armureL = value.armureLegende;
 
-        let degats = value["bardAttSpe"];
-        let violence = value["bardAttSpe"];
+    const degats = value.bardAttSpe;
+    const violence = value.bardAttSpe;
 
-        let MALGoliath;
-        let MALGhost;
-        let MALTypeSoldier;
-        let MALTypeHunter;
-        let MALTypeHerald;
-        let MALTypeScholar;
-        let MALTypeScout;
+    let MALGoliath;
+    let MALGhost;
+    let MALTypeSoldier;
+    let MALTypeHunter;
+    let MALTypeHerald;
+    let MALTypeScholar;
+    let MALTypeScout;
 
-        exec.push(roll);
+    exec.push(roll);
 
-        switch(armureL) {
-            case "barbarian":
-                MALGoliath = Number(value["MALBarbarianGoliath"]);
+    switch (armureL) {
+      case 'barbarian':
+        MALGoliath = Number(value.MALBarbarianGoliath);
 
-                if(MALGoliath != 0)
-                    exec.push("{{MALGoliath=[["+MALGoliath+"]]}}");
-                break;
-    
-            case "rogue":
-                MALGhost = value["MALRogueGhost"];
+        if (MALGoliath !== 0) { exec.push(`{{MALGoliath=[[${MALGoliath}]]}}`); }
+        break;
 
-                if(MALGhost != "")
-                    exec.push("{{MALspecial2="+i18n_ghostActive+"}}");
-                break;
+      case 'rogue':
+        MALGhost = value.MALRogueGhost;
 
-            case "warrior":
-                MALTypeSoldier = value["MALWarriorSoldierA"];
-                MALTypeHunter = value["MALWarriorHunterA"];
-                MALTypeHerald = value["MALWarriorHeraldA"];
-                MALTypeScholar = value["MALWarriorScholarA"];
-                MALTypeScout = value["MALWarriorScoutA"];
+        if (MALGhost !== '') { exec.push(`{{MALspecial2=${i18n_ghostActive}}}`); }
+        break;
 
-                if(MALTypeSoldier != 0)
-                    exec.push("{{MALspecial2="+i18n_typeSoldier+"}}");         
+      case 'warrior':
+        MALTypeSoldier = value.MALWarriorSoldierA;
+        MALTypeHunter = value.MALWarriorHunterA;
+        MALTypeHerald = value.MALWarriorHeraldA;
+        MALTypeScholar = value.MALWarriorScholarA;
+        MALTypeScout = value.MALWarriorScoutA;
 
-                if(MALTypeHunter != 0)
-                    exec.push("{{MALspecial2="+i18n_typeHunter+"}}");
+        if (MALTypeSoldier !== 0) { exec.push(`{{MALspecial2=${i18n_typeSoldier}}}`); }
 
-                if(MALTypeHerald != 0)
-                    exec.push("{{MALspecial2="+i18n_typeHerald+"}}");
+        if (MALTypeHunter !== 0) { exec.push(`{{MALspecial2=${i18n_typeHunter}}}`); }
 
-                if(MALTypeScholar != 0)
-                    exec.push("{{MALspecial2="+i18n_typeScholar+"}}");
+        if (MALTypeHerald !== 0) { exec.push(`{{MALspecial2=${i18n_typeHerald}}}`); }
 
-                if(MALTypeScout != 0)
-                    exec.push("{{MALspecial2="+i18n_typeScout+"}}");
-                break;
-        }
+        if (MALTypeScholar !== 0) { exec.push(`{{MALspecial2=${i18n_typeScholar}}}`); }
 
-        exec.push("{{degats=[["+degats+"]]}}");
-        exec.push("{{violence=[["+violence+"]]}}");
-        exec.push("{{succesConditionnel=true}}");
-        exec.push("{{chocAutomatique="+i18n_choc+" 1}}");
-        exec.push("{{chocAutomatiqueCondition="+i18n_chocAutomatique+" < 12}}");
-        exec.push("{{effets="+i18n_ignoreArmure+" / "+i18n_ignoreCDF+" / "+i18n_dispersion+" 6}}")
+        if (MALTypeScout !== 0) { exec.push(`{{MALspecial2=${i18n_typeScout}}}`); }
+        break;
 
-        startRoll(exec.join(" "), (results) => {
-            let tDegats = results.results.degats.result;
-            let tViolence = results.results.violence.result;
+      default:
+        MALGoliath = 0;
 
-            finishRoll(
-                results.rollId, 
-                {
-                    degats:tDegats,
-                    violence:tViolence
-                }
-            );            
-        });
+        MALGhost = '';
+
+        MALTypeSoldier = '';
+        MALTypeHunter = '';
+        MALTypeHerald = '';
+        MALTypeScholar = '';
+        MALTypeScout = '';
+        break;
+    }
+
+    exec.push(`{{degats=[[${degats}]]}}`);
+    exec.push(`{{violence=[[${violence}]]}}`);
+    exec.push('{{succesConditionnel=true}}');
+    exec.push(`{{chocAutomatique=${i18n_choc} 1}}`);
+    exec.push(`{{chocAutomatiqueCondition=${i18n_chocAutomatique} < 12}}`);
+    exec.push(`{{effets=${i18n_ignoreArmure} / ${i18n_ignoreCDF} / ${i18n_dispersion} 6}}`);
+
+    startRoll(exec.join(' '), (results) => {
+      const tDegats = results.results.degats.result;
+      const tViolence = results.results.violence.result;
+
+      finishRoll(
+        results.rollId,
+        {
+          degats: tDegats,
+          violence: tViolence,
+        },
+      );
     });
+  });
 });

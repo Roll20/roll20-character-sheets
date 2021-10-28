@@ -1,3 +1,7 @@
+/* eslint-disable no-global-assign */
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-undef */
 /* ---- BEGIN: TheAaronSheet.js ---- */
 // Github:   https://github.com/shdwjk/TheAaronSheet/blob/master/TheAaronSheet.js
 // By:       The Aaron, Arcane Scriptomancer
@@ -229,6 +233,7 @@ debugMode = function(){
 
 getCallstack = function(){
     var e = new Error('dummy'),
+        // eslint-disable-next-line no-useless-escape
         stack = _.map(_.rest(e.stack.replace(/^[^\(]+?[\n$]/gm, '')
         .replace(/^\s+at\s+/gm, '')
         .replace(/^Object.<anonymous>\s*\(/gm, '{anonymous}()@')
@@ -861,7 +866,7 @@ function maxCar(carac, score, aspect)
             [carac]: aspect
         });
     }
-};
+}
 
 function totalADruid(attrs, aspect) {
     let base = +attrs[`${aspect}Base`];
@@ -919,7 +924,7 @@ function setPanneauInformation(texte, reset = false, slot = false, energie = fal
         
     if(energie == true)
         PI["msgEnergie"] = 1;
-};
+}
 
 function resetPanneauInformation()
 {
@@ -931,7 +936,7 @@ function resetPanneauInformation()
     PI["msgSlot"] = 0;
     
     PI["msgEnergie"] = 0;
-};
+}
 
 function setActiveCharacterId(charId){
     var oldAcid=getActiveCharacterId();
@@ -1387,7 +1392,7 @@ async function getCarac(hasBonus, C1, C2, C3, C4, CO1 = false) {
     }
 
     return result;
-};
+}
 
 //Versioning 
 on("sheet:opened",function()
@@ -1544,8 +1549,7 @@ on("sheet:opened",function()
                         
                         if(M250 == 1)
                         {
-                            setAttrs
-                            ({
+                            setAttrs({
                                 monkSalveEffets: "Parasitage 1 / Dispersion 6 / Ultraviolence / Destructeur",
                                 monkVagueEffets: "Parasitage 4 / Dispersion 3 / Choc 2",
                                 monkRayonEffets: "Parasitage 1 / Ignore Armure"
@@ -1553,8 +1557,7 @@ on("sheet:opened",function()
                         }
                         else
                         {
-                            setAttrs
-                            ({
+                            setAttrs({
                                 monkSalveEffets: "Parasitage 1 / Dispersion 3 / Ultraviolence / Destructeur",
                                 monkVagueEffets: "Parasitage 2 / Dispersion 3 / Choc 2",
                                 monkRayonEffets: "Parasitage 1 / Perce Armure 40"
@@ -2736,7 +2739,6 @@ on("sheet:opened",function()
                 pSCcaracteristique1Equipement: "0",
                 pSCcaracteristique2Equipement: "0",
                 pSCcaracteristique3Equipement: "0",
-                pSCcaracteristique4Equipement: "0",
                 pSCcaracteristique4Equipement: "0",
                 pSCcaracteristiqueSPrecis: "0",
                 mECcaracteristique1Equipement: "0",

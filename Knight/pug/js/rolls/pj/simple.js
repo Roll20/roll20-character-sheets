@@ -1,1907 +1,1890 @@
-on(`clicked:simple clicked:simpleRogue`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    
-    let hasArmure = true;
+/* eslint-disable default-case */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-undef */
+on('clicked:simple clicked:simpleRogue', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let attributs = [
-        "caracteristique1",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let hasArmure = true;
 
-    attributs = attributs.concat(listBase, listArmure, listArmureLegende);
+  let attributs = [
+    'caracteristique1',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    let attrs = await getAttrsAsync(attributs);
+  attributs = attributs.concat(listBase, listArmure, listArmureLegende);
 
-    let armure = attrs["armure"];
-    let armureL = attrs["armureLegende"];
+  const attrs = await getAttrsAsync(attributs);
 
-    if(armure == "sans" || armure == "guardian")
-        hasArmure = false;
+  const armure = attrs.armure;
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  let exec = [];
+  let isConditionnel = false;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let C1 = attrs["caracteristique1"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
-    let ODBarbarian = [];
-    let ODShaman = [];
-    let ODWarrior = [];        
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALShaman = [];
-    let ODMALWarrior = [];
+  let bonus = [];
+  let OD = 0;
+  let ODBarbarian = [];
+  let ODShaman = [];
+  let ODWarrior = [];
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALShaman = [];
+  let ODMALWarrior = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    exec.push("{{vOD="+OD+"}}");
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    let armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{vOD=${OD}}}`);
 
-    exec = exec.concat(armorBonus.exec);
-    cRoll = cRoll.concat(armorBonus.cRoll);
+  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = armorBonus.isConditionnelA;
+  exec = exec.concat(armorBonus.exec);
+  cRoll = cRoll.concat(armorBonus.cRoll);
 
-    ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-    ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
+  if (isConditionnel === false) { isConditionnel = armorBonus.isConditionnelA; }
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+  ODShaman = ODShaman.concat(armorBonus.ODShaman);
+  ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    bonus.push(OD);
-    bonus = bonus.concat(ODBarbarian);
-    bonus = bonus.concat(ODShaman);
-    bonus = bonus.concat(ODWarrior);        
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALShaman);
-    bonus = bonus.concat(ODMALWarrior);        
+  bonus.push(OD);
+  bonus = bonus.concat(ODBarbarian);
+  bonus = bonus.concat(ODShaman);
+  bonus = bonus.concat(ODWarrior);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALShaman);
+  bonus = bonus.concat(ODMALWarrior);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-        let total = tJet+tBonus;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simplePriest`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    
-    let hasArmure = true;
+on('clicked:simplePriest', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let attributs = [
-        "caracteristique1Priest",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  const hasArmure = true;
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  let attributs = [
+    'caracteristique1Priest',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    let attrs = await getAttrsAsync(attributs);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let armureL = attrs["armureLegende"];
+  const attrs = await getAttrsAsync(attributs);
 
-    let exec = [];
-    let isConditionnel = false;
-    
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  const armureL = attrs.armureLegende;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  let exec = [];
+  let isConditionnel = false;
 
-    let C1 = attrs["caracteristique1Priest"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const C1 = attrs.caracteristique1Priest;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let bonus = [];
-    let OD = 0;
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    exec.push(roll);
-    exec.push("{{special1=^{priest-mode-nanoc}}}");
+  let bonus = [];
+  let OD = 0;
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  exec.push(roll);
+  exec.push('{{special1=^{priest-mode-nanoc}}}');
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-    exec.push("{{vOD="+OD+"}}");
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  exec.push(`{{vOD=${OD}}}`);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    bonus.push(OD);
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    bonus = bonus.concat(ODMALWarrior);
-    bonus = bonus.concat(ODMALShaman);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  bonus.push(OD);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALShaman);
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-        let total = tJet+tBonus;
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simplePsionPuppet clicked:simplePsionDiscord`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+on('clicked:simplePsionPuppet clicked:simplePsionDiscord', async (info) => {
+  const roll = info.htmlAttributes.value;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1Psion",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1Psion',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
-    
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  let exec = [];
+  let isConditionnel = false;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let C1 = attrs["caracteristique1Psion"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1Psion;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let bonus = [];
+  let OD = 0;
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    exec.push("{{vOD="+OD+"}}");
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{vOD=${OD}}}`);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    bonus.push(OD);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALWarrior);
-    bonus = bonus.concat(ODMALShaman);
+  bonus.push(OD);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALShaman);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-        let total = tJet+tBonus;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simpleRangerVision`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+on('clicked:simpleRangerVision', async (info) => {
+  const roll = info.htmlAttributes.value;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1Ranger",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1Ranger',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    exec.push("{{special1=^{ranger-vision}}}");
+  let exec = [];
+  exec.push('{{special1=^{ranger-vision}}}');
 
-    let isConditionnel = false;
-    
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  let isConditionnel = false;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let C1 = attrs["caracteristique1Ranger"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1Ranger;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let bonus = [];
+  let OD = 0;
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    exec.push("{{vOD="+OD+"}}");
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{vOD=${OD}}}`);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    bonus.push(OD);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALWarrior);
-    bonus = bonus.concat(ODMALShaman);
+  bonus.push(OD);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALShaman);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-        let total = tJet+tBonus;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simpleShamanImpregnation`, async function(info) {
-    let roll = info.htmlAttributes.value;
+on('clicked:simpleShamanImpregnation', async (info) => {
+  const roll = info.htmlAttributes.value;
 
-    let hasArmure = true;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1ShamanImpregnation",
-        "caracteristique2ShamanImpregnation",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1ShamanImpregnation',
+    'caracteristique2ShamanImpregnation',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
-    
-    let hasBonus = +attrs["bonusCarac"];
+  let exec = [];
+  let isConditionnel = false;
 
-    let C1 = attrs["caracteristique1ShamanImpregnation"];
-    let C2 = attrs["caracteristique2ShamanImpregnation"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const hasBonus = +attrs.bonusCarac;
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1ShamanImpregnation;
+  const C2 = attrs.caracteristique2ShamanImpregnation;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let bonus = [];
+  let OD = 0;
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    exec.push("{{vOD="+OD+"}}");
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{vOD=${OD}}}`);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    bonus.push(OD);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALShaman);
-    bonus = bonus.concat(ODMALWarrior);
+  bonus.push(OD);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALShaman);
+  bonus = bonus.concat(ODMALWarrior);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-        let total = tJet+tBonus;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}} {{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}} {{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simpleMALShamanImpregnation`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+on('clicked:simpleMALShamanImpregnation', async (info) => {
+  const roll = info.htmlAttributes.value;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1MALShamanImpregnation",
-        "caracteristique2MALShamanImpregnation",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1MALShamanImpregnation',
+    'caracteristique2MALShamanImpregnation',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
+  let exec = [];
+  let isConditionnel = false;
 
-    let hasBonus = +attrs["bonusCarac"];
+  const hasBonus = +attrs.bonusCarac;
 
-    let C1 = attrs["caracteristique1MALShamanImpregnation"];
-    let C2 = attrs["caracteristique2MALShamanImpregnation"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const C1 = attrs.caracteristique1MALShamanImpregnation;
+  const C2 = attrs.caracteristique2MALShamanImpregnation;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let bonus = [];
-    let OD = 0;
+  let bonus = [];
+  let OD = 0;
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
 
-    exec.push(roll);
+  exec.push(roll);
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    if (hasArmure) { OD += C1OD; }
+  }
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    if (hasArmure) { OD += C2OD; }
+  }
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    if (hasArmure) { OD += C3OD; }
+  }
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    exec.push("{{vOD="+OD+"}}");
+  exec.push(`{{vOD=${OD}}}`);
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus.push(OD);
+  bonus.push(OD);
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
 
-    if(isConditionnel == true)
-        exec.push("{{conditionnel=true}}");
+  if (isConditionnel === true) { exec.push('{{conditionnel=true}}'); }
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
 
-        let total = tJet+tBonus;
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:simpleSorcererEtirement`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+on('clicked:simpleSorcererEtirement', async (info) => {
+  const roll = info.htmlAttributes.value;
+  const hasArmure = true;
 
-    let attributs = [
-        "caracteristique1",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'caracteristique1',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armureL = attrs["armureLegende"];
+  const armureL = attrs.armureLegende;
 
-    let exec = [];
-    let isConditionnel = false;
+  let exec = [];
+  let isConditionnel = false;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
-    
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let C1 = attrs["caracteristique1"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const C1 = attrs.caracteristique1;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let bonus = [];
-    let OD = 0;
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let ODMALBarbarian = [];
-    let ODMALWarrior = [];
-    let ODMALShaman = [];
+  let bonus = [];
+  let OD = 0;
 
-    exec.push(roll);
+  let ODMALBarbarian = [];
+  let ODMALWarrior = [];
+  let ODMALShaman = [];
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  exec.push(roll);
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+    if (hasArmure) { OD += C1OD; }
+  }
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+    if (hasArmure) { OD += C2OD; }
+  }
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+    if (hasArmure) { OD += C3OD; }
+  }
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-    exec.push("{{vOD="+OD+"}}");
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  exec.push(`{{vOD=${OD}}}`);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    bonus.push(OD);
-    bonus = bonus.concat(3);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALWarrior);
-    bonus = bonus.concat(ODMALShaman);
+  bonus.push(OD);
+  bonus = bonus.concat(3);
 
-    exec.push("{{vODSorcerer=[[3]]}}");
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALWarrior);
+  bonus = bonus.concat(ODMALShaman);
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  exec.push('{{vODSorcerer=[[3]]}}');
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-        let total = tJet+tBonus;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
+
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
         );
-
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
-
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
-        });
-        
-    });
+      });
+    }
+  });
 });
 
-on(`clicked:pilotage`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+on('clicked:pilotage', async (info) => {
+  const roll = info.htmlAttributes.value;
+  let hasArmure = true;
 
-    let attributs = [
-        "vehicule_manoeuvrabilite",
-        "caracteristique1",
-        "caracteristique2",
-        "caracteristique3",
-        "caracteristique4",
-        "discretion",
-        ODValue["discretion"],
-    ];
+  let attributs = [
+    'vehicule_manoeuvrabilite',
+    'caracteristique1',
+    'caracteristique2',
+    'caracteristique3',
+    'caracteristique4',
+    'discretion',
+    ODValue.discretion,
+  ];
 
-    attributs = attributs.concat(listBase, listArmure, listArmureLegende);
+  attributs = attributs.concat(listBase, listArmure, listArmureLegende);
 
-    let attrs = await getAttrsAsync(attributs);
+  const attrs = await getAttrsAsync(attributs);
 
-    let armure = attrs["Armure"];
-    let armureL = attrs["armureLegende"];
+  const armure = attrs.Armure;
+  const armureL = attrs.armureLegende;
 
-    if(armure == "sans" || armure == "guardian")
-        hasArmure = false;
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
-    let exec = [];
-    let isConditionnel = false;
+  let exec = [];
+  let isConditionnel = false;
 
-    let manoeuvrabilite = +attrs["vehicule_manoeuvrabilite"];
-    let mod = +attrs["jetModifDes"];
-    let hasBonus = +attrs["bonusCarac"];
+  const manoeuvrabilite = +attrs.vehicule_manoeuvrabilite;
+  const mod = +attrs.jetModifDes;
+  const hasBonus = +attrs.bonusCarac;
 
-    let vDiscretion = attrs["discretion"];
-    let oDiscretion = attrs[ODValue["discretion"]];
+  const vDiscretion = attrs.discretion;
+  const oDiscretion = attrs[ODValue.discretion];
 
-    let C1 = attrs["caracteristique1"];
-    let C2 = attrs["caracteristique2"];
-    let C3 = attrs["caracteristique3"];
-    let C4 = attrs["caracteristique4"];
+  const C1 = attrs.caracteristique1;
+  const C2 = attrs.caracteristique2;
+  const C3 = attrs.caracteristique3;
+  const C4 = attrs.caracteristique4;
 
-    let attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
+  const attrsCarac = await getCarac(hasBonus, C1, C2, C3, C4);
 
-    let C1Nom = "";
-    let C2Nom = "";
-    let C3Nom = "";
-    let C4Nom = "";
+  let C1Nom = '';
+  let C2Nom = '';
+  let C3Nom = '';
+  let C4Nom = '';
 
-    let cRoll = [];
-    let cBase = [];
-    let cBonus = [];
+  let cRoll = [];
+  const cBase = [];
+  const cBonus = [];
 
-    let bonus = [];
-    let OD = 0;
+  let bonus = [];
+  let OD = 0;
 
-    let ODBarbarian = [];
-    let ODShaman = [];
-    let ODWarrior = [];        
+  let ODBarbarian = [];
+  let ODShaman = [];
+  let ODWarrior = [];
 
-    let ODMALBarbarian = [];
-    let ODMALShaman = [];
-    let ODMALWarrior = [];
+  let ODMALBarbarian = [];
+  let ODMALShaman = [];
+  let ODMALWarrior = [];
 
-    exec.push(roll);
+  exec.push(roll);
 
-    if(hasArmure)
-        exec.push("{{OD=true}}");
+  if (hasArmure) { exec.push('{{OD=true}}'); }
 
-    if(attrsCarac["C1"]) {
-        C1Nom = attrsCarac["C1Brut"];
+  if (attrsCarac.C1) {
+    C1Nom = attrsCarac.C1Brut;
 
-        let C1Value = attrsCarac["C1Base"];
-        let C1OD = attrsCarac["C1OD"];
+    const C1Value = attrsCarac.C1Base;
+    const C1OD = attrsCarac.C1OD;
 
-        cBase.push(attrsCarac["C1Nom"]);
-        cRoll.push(C1Value);
+    cBase.push(attrsCarac.C1Nom);
+    cRoll.push(C1Value);
 
-        if(hasArmure)
-            OD += C1OD;
-    }
+    if (hasArmure) { OD += C1OD; }
+  }
 
-    if(attrsCarac["C2"]) {
-        C2Nom = attrsCarac["C2Brut"];
+  if (attrsCarac.C2) {
+    C2Nom = attrsCarac.C2Brut;
 
-        let C2Value = attrsCarac["C2Base"];
-        let C2OD = attrsCarac["C2OD"];
+    const C2Value = attrsCarac.C2Base;
+    const C2OD = attrsCarac.C2OD;
 
-        cBase.push(attrsCarac["C2Nom"]);
-        cRoll.push(C2Value);
+    cBase.push(attrsCarac.C2Nom);
+    cRoll.push(C2Value);
 
-        if(hasArmure)
-            OD += C2OD;
-    }
+    if (hasArmure) { OD += C2OD; }
+  }
 
-    if(attrsCarac["C3"]) {
-        C3Nom = attrsCarac["C3Brut"];
+  if (attrsCarac.C3) {
+    C3Nom = attrsCarac.C3Brut;
 
-        let C3Value = attrsCarac["C3Base"];
-        let C3OD = attrsCarac["C3OD"];
+    const C3Value = attrsCarac.C3Base;
+    const C3OD = attrsCarac.C3OD;
 
-        cBonus.push(attrsCarac["C3Nom"]);
-        cRoll.push(C3Value);
+    cBonus.push(attrsCarac.C3Nom);
+    cRoll.push(C3Value);
 
-        if(hasArmure)
-            OD += C3OD;
-    }
+    if (hasArmure) { OD += C3OD; }
+  }
 
-    if(attrsCarac["C4"]) {
-        C4Nom = attrsCarac["C4Brut"];
+  if (attrsCarac.C4) {
+    C4Nom = attrsCarac.C4Brut;
 
-        let C4Value = attrsCarac["C4Base"];
-        let C4OD = attrsCarac["C4OD"];
+    const C4Value = attrsCarac.C4Base;
+    const C4OD = attrsCarac.C4OD;
 
-        cBonus.push(attrsCarac["C4Nom"]);
-        cRoll.push(C4Value);
+    cBonus.push(attrsCarac.C4Nom);
+    cRoll.push(C4Value);
 
-        if(hasArmure)
-            OD += C4OD;
-    }
+    if (hasArmure) { OD += C4OD; }
+  }
 
-    exec.push("{{vOD="+OD+"}}");
+  exec.push(`{{vOD=${OD}}}`);
 
-    let armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    exec = exec.concat(armorBonus.exec);
-    cRoll = cRoll.concat(armorBonus.cRoll);
+  exec = exec.concat(armorBonus.exec);
+  cRoll = cRoll.concat(armorBonus.cRoll);
 
-    if(isConditionnel == false)
-        isConditionnel = armorBonus.isConditionnelA;
+  if (isConditionnel === false) { isConditionnel = armorBonus.isConditionnelA; }
 
-    ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-    ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
+  ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+  ODShaman = ODShaman.concat(armorBonus.ODShaman);
+  ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
-    let MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+  const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-    exec = exec.concat(MALBonus.exec);
-    cRoll = cRoll.concat(MALBonus.cRoll);
+  exec = exec.concat(MALBonus.exec);
+  cRoll = cRoll.concat(MALBonus.cRoll);
 
-    if(isConditionnel == false)
-        isConditionnel = MALBonus.isConditionnelA;
+  if (isConditionnel === false) { isConditionnel = MALBonus.isConditionnelA; }
 
-    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+  ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+  ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+  ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-    exec.push("{{cBase="+cBase.join(" - ")+"}}");
+  exec.push(`{{cBase=${cBase.join(' - ')}}}`);
 
-    if(hasBonus > 0)
-        exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+  if (hasBonus > 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
 
-    if(mod != 0) {
-        cRoll.push(mod);
-        exec.push("{{mod=[["+mod+"]]}}");
-    }
+  if (mod !== 0) {
+    cRoll.push(mod);
+    exec.push(`{{mod=[[${mod}]]}}`);
+  }
 
-    cRoll.push(manoeuvrabilite);
-    exec.push("{{vManoeuvrabilite=+"+manoeuvrabilite+"D6}}");
+  cRoll.push(manoeuvrabilite);
+  exec.push(`{{vManoeuvrabilite=+${manoeuvrabilite}D6}}`);
 
-    if(cRoll.length == 0)
-        cRoll.push(0);
+  if (cRoll.length === 0) { cRoll.push(0); }
 
-    bonus.push(OD);
+  bonus.push(OD);
 
-    bonus = bonus.concat(ODBarbarian);
-    bonus = bonus.concat(ODShaman);
-    bonus = bonus.concat(ODWarrior);        
+  bonus = bonus.concat(ODBarbarian);
+  bonus = bonus.concat(ODShaman);
+  bonus = bonus.concat(ODWarrior);
 
-    bonus = bonus.concat(ODMALBarbarian);
-    bonus = bonus.concat(ODMALShaman);
-    bonus = bonus.concat(ODMALWarrior);        
+  bonus = bonus.concat(ODMALBarbarian);
+  bonus = bonus.concat(ODMALShaman);
+  bonus = bonus.concat(ODMALWarrior);
 
-    exec.push("{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}");
-    exec.push("{{tBonus=[["+bonus.join("+")+"+0]]}}");
-    exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
+  exec.push(`{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`);
+  exec.push(`{{tBonus=[[${bonus.join('+')}+0]]}}`);
+  exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
 
-    if(isConditionnel)
-        exec.push("{{conditionnel=true}}");
+  if (isConditionnel) { exec.push('{{conditionnel=true}}'); }
 
-    startRoll(exec.join(" "), (results) => {
-        let tJet = results.results.jet.result;
-        let tBonus = results.results.tBonus.result;
-        let tExploit = results.results.Exploit.result;
+  startRoll(exec.join(' '), (results) => {
+    const tJet = results.results.jet.result;
+    const tBonus = results.results.tBonus.result;
+    const tExploit = results.results.Exploit.result;
 
-        let total = tJet+tBonus;
+    const total = tJet + tBonus;
+
+    finishRoll(
+      results.rollId,
+      {
+        jet: total,
+      },
+    );
+
+    if (tJet !== 0 && tJet === tExploit) {
+      startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}{{jet=[[ {[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}`, (exploit) => {
+        const tExploit2 = exploit.results.jet.result;
 
         finishRoll(
-            results.rollId, 
-            {
-                jet:total
-            }
+          exploit.rollId,
+          {
+            jet: tExploit2,
+          },
+        );
+      });
+    }
+  });
+});
+
+on('clicked:initiative', async (info) => {
+  const roll = info.htmlAttributes.value;
+  let hasArmure = true;
+
+  let listAttrs = [
+    'diceInitiative',
+    'bonusInitiative',
+    'bonusInitiativeP',
+    'malusInitiative',
+    'discretion',
+    ODValue.discretion,
+    ODValue.instinct,
+  ];
+
+  listAttrs = listAttrs.concat(listBase);
+
+  const attrs = await getAttrsAsync(listAttrs);
+
+  const armure = attrs.armure;
+
+  if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
+
+  const dice = +attrs.diceInitiative || 3;
+  const bonus = +attrs.bonusInitiative || 0;
+  const bonusP = +attrs.bonusInitiativeP || 0;
+  const malus = +attrs.malusInitiative || 0;
+
+  const str = '';
+
+  const ODInstinct = +attrs[ODValue.instinct];
+
+  let result1 = 0;
+  let result2 = 0;
+  let resultF = 0;
+
+  if (ODInstinct > 1 && hasArmure) {
+    startRoll(`${roll} {{special1=^{initiative} 1}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus}]]}}`, (results) => {
+      result1 = results.results.jDiversV.result;
+
+      finishRoll(
+        results.rollId, {},
+      );
+
+      startRoll(`${roll} {{special1=^{initiative} 2}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus}]]}}`, (results2) => {
+        result2 = results2.results.jDiversV.result;
+
+        finishRoll(
+          results2.rollId, {},
         );
 
-        if(tJet != 0 && tJet == tExploit)
-            startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}{{jet=[[ {[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0]]}}", (exploit) => {
-                let tExploit = exploit.results.jet.result;
+        resultF = Math.max(result1, result2);
 
-                finishRoll(
-                    exploit.rollId, 
-                    {
-                        jet:tExploit
-                    }
-                );
+        startRoll(`${roll} {{special1=^{initiative-finale}}} {{jDivers=^{resultat}}} {{jDiversV=[[${resultF} &{tracker}]]}} ${str}`, (results3) => {
+          finishRoll(
+            results3.rollId, {},
+          );
         });
-        
+      });
     });
+  } else {
+    startRoll(`${roll} {{special1=^{initiative}}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus} &{tracker}]]}} ${str}`, (results) => {
+      finishRoll(
+        results.rollId, {},
+      );
+    });
+  }
 });
 
-on(`clicked:initiative`, async function(info) {
-    let roll = info.htmlAttributes.value;
-    let hasArmure = true;
+const nods = ['nodsSoin', 'nodsArmure', 'nodsEnergie'];
 
-    let listAttrs = [
-        "diceInitiative",
-        "bonusInitiative",
-        "bonusInitiativeP",
-        "malusInitiative",
-        "discretion",
-        ODValue["discretion"],
-        ODValue["instinct"],
-    ];
+nods.forEach((button) => {
+  on(`clicked:${button}`, async (info) => {
+    const roll = info.htmlAttributes.value;
 
-    listAttrs = listAttrs.concat(listBase);
+    let sActuel = '';
+    let sMax = '';
 
-    let attrs = await getAttrsAsync(listAttrs);
+    let actuel = 0;
+    let max = 0;
 
-    let armure = attrs["armure"];
-
-    if(armure == "sans" || armure == "guardian")
-        hasArmure = false;
-
-    let dice = +attrs["diceInitiative"] || 3;
-    let bonus = +attrs["bonusInitiative"] || 0;
-    let bonusP = +attrs["bonusInitiativeP"] || 0;
-    let malus = +attrs["malusInitiative"] || 0;
-
-    let str = "";
-
-    let ODInstinct = +attrs[ODValue["instinct"]];
-
-    var result1 = 0;
-    var result2 = 0;
-    var resultF = 0;
-
-    if(ODInstinct > 1 && hasArmure) {
-        startRoll(`${roll} {{special1=^{initiative} 1}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus}]]}}`, (results) => {
-            result1 = results.results.jDiversV.result;
-
-            finishRoll(
-                results.rollId,{}
-            );
-
-            startRoll(`${roll} {{special1=^{initiative} 2}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus}]]}}`, (results) => {
-                result2 = results.results.jDiversV.result;
-    
-                finishRoll(
-                    results.rollId,{}
-                );            
-
-                resultF = Math.max(result1, result2);
-
-                startRoll(`${roll} {{special1=^{initiative-finale}}} {{jDivers=^{resultat}}} {{jDiversV=[[${resultF} &{tracker}]]}} ${str}`, (results) => {        
-                    finishRoll(
-                        results.rollId,{}
-                    );            
-                });
-            });
-        });
-    } else {
-        startRoll(`${roll} {{special1=^{initiative}}} {{jDivers=^{resultat}}} {{jDiversV=[[${dice}D6+${bonus}+${bonusP}-${malus} &{tracker}]]}} ${str}`, (results) => {        
-            finishRoll(
-                results.rollId,{}
-            );            
-        });
+    switch (button) {
+      case 'nodsSoin':
+        sActuel = 'santepj';
+        sMax = 'santepj_max';
+        break;
+      case 'nodsArmure':
+        sActuel = 'armurePJ';
+        sMax = 'armurePJ_max';
+        break;
+      case 'nodsEnergie':
+        sActuel = 'energiePJ';
+        sMax = 'energiePJ_max';
+        break;
+      default:
+        sActuel = '';
+        sMax = '';
+        break;
     }
+
+    const attrs = await getAttrsAsync([
+      sActuel,
+      sMax,
+    ]);
+
+    actuel = +attrs[sActuel];
+    max = +attrs[sMax];
+
+    startRoll(`${roll} {{jDivers=^{recupere}}} {{jDiversV=[[3D6]]}}`, (results) => {
+      const recup = Number(results.results.jDiversV.result);
+      let total = actuel + recup;
+
+      if (total > max) { total = max; }
+
+      switch (button) {
+        case 'nodsSoin':
+          setAttrsAsync({
+            santepj: total,
+          });
+          break;
+        case 'nodsArmure':
+          setAttrsAsync({
+            armurePJ: total,
+          });
+          break;
+        case 'nodsEnergie':
+          setAttrsAsync({
+            energiePJ: total,
+          });
+          break;
+      }
+
+      finishRoll(
+        results.rollId, {},
+      );
+    });
+  });
 });
 
-const nods = ["nodsSoin", "nodsArmure", "nodsEnergie"];
+on('clicked:blessuresGraves', (info) => {
+  const roll = info.htmlAttributes.value;
 
-nods.forEach(button => {
-    on(`clicked:${button}`, async function(info) {
-        let roll = info.htmlAttributes.value;
+  startRoll(`${roll} {{rollTitre=[[1D6]]}} {{rollText=[[1D6]]}}`, (results) => {
+    const D1 = Number(results.results.rollTitre.result);
+    const D2 = Number(results.results.rollText.result);
 
-        let sActuel = "";
-        let sMax = "";
+    let titre = '';
+    let text = '';
 
-        let actuel = 0;
-        let max = 0;
+    switch (D1) {
+      case 1:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('blessures-mort');
+            text = getTranslationByKey('blessures-mort-description');
+            break;
 
-        switch(button) {
-            case "nodsSoin":
-                sActuel = "santepj";
-                sMax = "santepj_max";
-                break;
-            case "nodsArmure":
-                sActuel = "armurePJ";
-                sMax = "armurePJ_max";
-                break;
-            case "nodsEnergie":
-                sActuel = "energiePJ";
-                sMax = "energiePJ_max";
-                break;
+          case 2:
+            titre = getTranslationByKey('blessures-organes-internes');
+            text = getTranslationByKey('blessures-organes-internes-touches-description');
+            break;
+
+          case 3:
+            titre = getTranslationByKey('blessures-cerveau-touche');
+            text = getTranslationByKey('blessures-cerveau-touche-description');
+            break;
+
+          case 4:
+            titre = getTranslationByKey('blessures-colonne-vertebrale-touchee');
+            text = getTranslationByKey('blessures-colonne-vertebrale-touchee-description');
+            break;
+
+          case 5:
+            titre = getTranslationByKey('blessures-hemorragie-interne');
+            text = getTranslationByKey('blessures-hemorragie-interne-description');
+            break;
+
+          case 6:
+            titre = getTranslationByKey('blessures-poumons-perfores');
+            text = getTranslationByKey('blessures-poumons-perfores-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
         }
+        break;
 
-        let attrs = await getAttrsAsync([
-            sActuel,
-            sMax
-        ]);
+      case 2:
+      case 3:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('blessures-crane-brise');
+            text = getTranslationByKey('blessures-crane-brise-description');
+            break;
 
-        actuel = +attrs[sActuel];
-        max = +attrs[sMax];
+          case 2:
+            titre = getTranslationByKey('blessures-yeux-detruits');
+            text = getTranslationByKey('blessures-yeux-detruits-description');
+            break;
 
-        startRoll(`${roll} {{jDivers=^{recupere}}} {{jDiversV=[[3D6]]}}`, (results) => {        
-            let recup = Number(results.results.jDiversV.result);
-            let total = actuel+recup;
+          case 3:
+            titre = getTranslationByKey('blessures-dos-brise');
+            text = getTranslationByKey('blessures-dos-brise-description');
+            break;
 
-            if(total > max)
-                total = max;
+          case 4:
+            titre = getTranslationByKey('blessures-main-brise');
+            text = getTranslationByKey('blessures-main-brise-description');
+            break;
 
-            switch(button) {
-                case "nodsSoin":
-                    setAttrsAsync({
-                        santepj: total
-                    });
-                    break;
-                case "nodsArmure":
-                    setAttrsAsync({
-                        armurePJ: total
-                    });
-                    break;
-                case "nodsEnergie":
-                    setAttrsAsync({
-                        energiePJ: total
-                    });
-                    break;
-            }
+          case 5:
+            titre = getTranslationByKey('blessures-oreille-eclatee');
+            text = getTranslationByKey('blessures-oreille-eclatee-description');
+            break;
 
-            finishRoll(
-                results.rollId,{}
-            );            
-        });
-    });
+          case 6:
+            titre = getTranslationByKey('blessures-cotes-brisees');
+            text = getTranslationByKey('blessures-cotes-brisees-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
+        }
+        break;
+
+      case 4:
+      case 5:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('blessures-colonne-vertebrale-brisee');
+            text = getTranslationByKey('blessures-colonne-vertebrale-brisee-description');
+            break;
+
+          case 2:
+            titre = getTranslationByKey('blessures-machoire-langue-dents-detruites');
+            text = getTranslationByKey('blessures-machoire-langue-dents-detruites-description');
+            break;
+
+          case 3:
+            titre = getTranslationByKey('blessures-pied-brise');
+            text = getTranslationByKey('blessures-pied-brise-description');
+            break;
+
+          case 4:
+            titre = getTranslationByKey('blessures-dos-touche');
+            text = getTranslationByKey('blessures-dos-touche-description');
+            break;
+
+          case 5:
+            titre = getTranslationByKey('blessures-tempe-touchee');
+            text = getTranslationByKey('blessures-tempe-touchee-description');
+            break;
+
+          case 6:
+            titre = getTranslationByKey('blessures-blessure-mineure');
+            text = getTranslationByKey('blessures-blessure-mineure-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
+        }
+        break;
+
+      case 6:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('blessures-bras-mutile');
+            text = getTranslationByKey('blessures-bras-mutile-description');
+            break;
+
+          case 2:
+            titre = getTranslationByKey('blessures-jambe-mutilee');
+            text = getTranslationByKey('blessures-jambe-mutilee-description');
+            break;
+
+          case 3:
+            titre = getTranslationByKey('blessures-traumatisme-cranien');
+            text = getTranslationByKey('blessures-traumatisme-cranien-description');
+            break;
+
+          case 4:
+            titre = getTranslationByKey('blessures-borgne');
+            text = getTranslationByKey('blessures-borgne-description');
+            break;
+
+          case 5:
+            titre = getTranslationByKey('blessures-blessure-mineure');
+            text = getTranslationByKey('blessures-blessure-mineure-description');
+            break;
+
+          case 6:
+            titre = getTranslationByKey('blessures-rien');
+            text = getTranslationByKey('blessures-rien-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
+        }
+        break;
+
+      default:
+        titre = '';
+        text = '';
+        break;
+    }
+
+    finishRoll(
+      results.rollId, {
+        rollTitre: titre,
+        rollText: text,
+      },
+    );
+  });
 });
 
-on(`clicked:blessuresGraves`, function(info) {
-    let roll = info.htmlAttributes.value;
+on('clicked:traumas', (info) => {
+  const roll = info.htmlAttributes.value;
 
-    startRoll(`${roll} {{rollTitre=[[1D6]]}} {{rollText=[[1D6]]}}`, (results) => { 
-        let D1 = Number(results.results.rollTitre.result);
-        let D2 = Number(results.results.rollText.result);
+  startRoll(`${roll}`, (results) => {
+    const D1 = Number(results.results.rollTitre.result);
+    const D2 = Number(results.results.rollText.result);
 
-        let titre = "";
-        let text = "";
-        
-        switch(D1) {
-            case 1:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("blessures-mort");
-                        text = getTranslationByKey("blessures-mort-description");
-                        break;
+    let titre = '';
+    let text = '';
 
-                    case 2:
-                        titre = getTranslationByKey("blessures-organes-internes");
-                        text = getTranslationByKey("blessures-organes-internes-touches-description");
-                        break;
+    switch (D1) {
+      case 0:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('traumas-anxiete');
+            text = getTranslationByKey('traumas-anxiete-description');
+            break;
 
-                    case 3:
-                        titre = getTranslationByKey("blessures-cerveau-touche");
-                        text = getTranslationByKey("blessures-cerveau-touche-description");
-                        break;
+          case 2:
+            titre = getTranslationByKey('traumas-tic');
+            text = getTranslationByKey('traumas-tic-description');
+            break;
 
-                    case 4:
-                        titre = getTranslationByKey("blessures-colonne-vertebrale-touchee");
-                        text = getTranslationByKey("blessures-colonne-vertebrale-touchee-description");
-                        break;
+          case 3:
+            titre = getTranslationByKey('traumas-perte-confiance');
+            text = getTranslationByKey('traumas-perte-confiance-description');
+            break;
 
-                    case 5:
-                        titre = getTranslationByKey("blessures-hemorragie-interne");
-                        text = getTranslationByKey("blessures-hemorragie-interne-description");
-                        break;
+          case 4:
+            titre = getTranslationByKey('traumas-peur-monstre');
+            text = getTranslationByKey('traumas-peur-monstre-description');
+            break;
 
-                    case 6:
-                        titre = getTranslationByKey("blessures-poumons-perfores");
-                        text = getTranslationByKey("blessures-poumons-perfores-description");
-                        break;
-                }
-                break;
+          case 5:
+            titre = getTranslationByKey('traumas-rituel');
+            text = getTranslationByKey('traumas-rituel-description');
+            break;
 
-            case 2:
-            case 3:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("blessures-crane-brise");
-                        text = getTranslationByKey("blessures-crane-brise-description");
-                        break;
+          case 6:
+            titre = getTranslationByKey('traumas-collection');
+            text = getTranslationByKey('traumas-collection-description');
+            break;
 
-                    case 2:
-                        titre = getTranslationByKey("blessures-yeux-detruits");
-                        text = getTranslationByKey("blessures-yeux-detruits-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("blessures-dos-brise");
-                        text = getTranslationByKey("blessures-dos-brise-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("blessures-main-brise");
-                        text = getTranslationByKey("blessures-main-brise-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("blessures-oreille-eclatee");
-                        text = getTranslationByKey("blessures-oreille-eclatee-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("blessures-cotes-brisees");
-                        text = getTranslationByKey("blessures-cotes-brisees-description");
-                        break;
-                }
-                break;
-        
-            case 4:
-            case 5:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("blessures-colonne-vertebrale-brisee");
-                        text = getTranslationByKey("blessures-colonne-vertebrale-brisee-description");
-                        break;
-
-                    case 2:
-                        titre = getTranslationByKey("blessures-machoire-langue-dents-detruites");
-                        text = getTranslationByKey("blessures-machoire-langue-dents-detruites-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("blessures-pied-brise");
-                        text = getTranslationByKey("blessures-pied-brise-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("blessures-dos-touche");
-                        text = getTranslationByKey("blessures-dos-touche-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("blessures-tempe-touchee");
-                        text = getTranslationByKey("blessures-tempe-touchee-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("blessures-blessure-mineure");
-                        text = getTranslationByKey("blessures-blessure-mineure-description");
-                        break;
-                }
-                break;
-
-            case 6:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("blessures-bras-mutile");
-                        text = getTranslationByKey("blessures-bras-mutile-description");
-                        break;
-
-                    case 2:
-                        titre = getTranslationByKey("blessures-jambe-mutilee");
-                        text = getTranslationByKey("blessures-jambe-mutilee-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("blessures-traumatisme-cranien");
-                        text = getTranslationByKey("blessures-traumatisme-cranien-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("blessures-borgne");
-                        text = getTranslationByKey("blessures-borgne-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("blessures-blessure-mineure");
-                        text = getTranslationByKey("blessures-blessure-mineure-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("blessures-rien");
-                        text = getTranslationByKey("blessures-rien-description");
-                        break;
-                }
-                break;
+          default:
+            titre = '';
+            text = '';
+            break;
         }
+        break;
 
-        finishRoll(
-            results.rollId,{
-                rollTitre:titre,
-                rollText:text
-            }
-        );            
-    });
-});
+      case 1:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('traumas-faiblesse');
+            text = getTranslationByKey('traumas-faiblesse-description');
+            break;
 
-on(`clicked:traumas`, function(info) {
-    let roll = info.htmlAttributes.value;
+          case 2:
+            titre = getTranslationByKey('traumas-somatisation');
+            text = getTranslationByKey('traumas-somatisation-description');
+            break;
 
-    startRoll(`${roll}`, (results) => { 
-        let D1 = Number(results.results.rollTitre.result);
-        let D2 = Number(results.results.rollText.result);
+          case 3:
+            titre = getTranslationByKey('traumas-distanciation');
+            text = getTranslationByKey('traumas-distanciation-description');
+            break;
 
-        let titre = "";
-        let text = "";
-        
-        switch(D1) {
-            case 0:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("traumas-anxiete");
-                        text = getTranslationByKey("traumas-anxiete-description");
-                        break;
+          case 4:
+            titre = getTranslationByKey('traumas-reveries');
+            text = getTranslationByKey('traumas-reveries-description');
+            break;
 
-                    case 2:
-                        titre = getTranslationByKey("traumas-tic");
-                        text = getTranslationByKey("traumas-tic-description");
-                        break;
+          case 5:
+            titre = getTranslationByKey('traumas-hypersensibilite');
+            text = getTranslationByKey('traumas-hypersensibilite-description');
+            break;
 
-                    case 3:
-                        titre = getTranslationByKey("traumas-perte-confiance");
-                        text = getTranslationByKey("traumas-perte-confiance-description");
-                        break;
+          case 6:
+            titre = getTranslationByKey('traumas-trouble-sensitif');
+            text = getTranslationByKey('traumas-trouble-sensitif-description');
+            break;
 
-                    case 4:
-                        titre = getTranslationByKey("traumas-peur-monstre");
-                        text = getTranslationByKey("traumas-peur-monstre-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("traumas-rituel");
-                        text = getTranslationByKey("traumas-rituel-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("traumas-collection");
-                        text = getTranslationByKey("traumas-collection-description");
-                        break;
-                }
-                break;
-
-            case 1:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("traumas-faiblesse");
-                        text = getTranslationByKey("traumas-faiblesse-description");
-                        break;
-
-                    case 2:
-                        titre = getTranslationByKey("traumas-somatisation");
-                        text = getTranslationByKey("traumas-somatisation-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("traumas-distanciation");
-                        text = getTranslationByKey("traumas-distanciation-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("traumas-reveries");
-                        text = getTranslationByKey("traumas-reveries-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("traumas-hypersensibilite");
-                        text = getTranslationByKey("traumas-hypersensibilite-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("traumas-trouble-sensitif");
-                        text = getTranslationByKey("traumas-trouble-sensitif-description");
-                        break;
-                }
-                break;
-
-            case 2:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("traumas-dissociation");
-                        text = getTranslationByKey("traumas-dissociation-description");
-                        break;
-
-                    case 2:
-                        titre = getTranslationByKey("traumas-depression");
-                        text = getTranslationByKey("traumas-depression-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("traumas-paranoia");
-                        text = getTranslationByKey("traumas-paranoia-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("traumas-trouble-memoriel");
-                        text = getTranslationByKey("traumas-trouble-memoriel-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("traumas-addiction");
-                        text = getTranslationByKey("traumas-addiction-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("traumas-hallucinations");
-                        text = getTranslationByKey("traumas-hallucinations-description");
-                        break;
-                }
-                break;
-
-            case 3:
-                switch(D2) {
-                    case 1:
-                        titre = getTranslationByKey("traumas-anatheme");
-                        text = getTranslationByKey("traumas-anatheme-description");
-                        break;
-
-                    case 2:
-                        titre = getTranslationByKey("traumas-abattement");
-                        text = getTranslationByKey("traumas-abattement-description");
-                        break;
-
-                    case 3:
-                        titre = getTranslationByKey("traumas-decouragement");
-                        text = getTranslationByKey("traumas-decouragement-description");
-                        break;
-
-                    case 4:
-                        titre = getTranslationByKey("traumas-oubli");
-                        text = getTranslationByKey("traumas-oubli-description");
-                        break;
-
-                    case 5:
-                        titre = getTranslationByKey("traumas-phobie-sociale");
-                        text = getTranslationByKey("traumas-phobie-sociale-description");
-                        break;
-
-                    case 6:
-                        titre = getTranslationByKey("traumas-perte-controle");
-                        text = getTranslationByKey("traumas-perte-controle-description");
-                        break;
-                }
-                break;
+          default:
+            titre = '';
+            text = '';
+            break;
         }
+        break;
 
-        finishRoll(
-            results.rollId,{
-                rollTitre:titre,
-                rollText:text
-            }
-        );            
-    });
+      case 2:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('traumas-dissociation');
+            text = getTranslationByKey('traumas-dissociation-description');
+            break;
+
+          case 2:
+            titre = getTranslationByKey('traumas-depression');
+            text = getTranslationByKey('traumas-depression-description');
+            break;
+
+          case 3:
+            titre = getTranslationByKey('traumas-paranoia');
+            text = getTranslationByKey('traumas-paranoia-description');
+            break;
+
+          case 4:
+            titre = getTranslationByKey('traumas-trouble-memoriel');
+            text = getTranslationByKey('traumas-trouble-memoriel-description');
+            break;
+
+          case 5:
+            titre = getTranslationByKey('traumas-addiction');
+            text = getTranslationByKey('traumas-addiction-description');
+            break;
+
+          case 6:
+            titre = getTranslationByKey('traumas-hallucinations');
+            text = getTranslationByKey('traumas-hallucinations-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
+        }
+        break;
+
+      case 3:
+        switch (D2) {
+          case 1:
+            titre = getTranslationByKey('traumas-anatheme');
+            text = getTranslationByKey('traumas-anatheme-description');
+            break;
+
+          case 2:
+            titre = getTranslationByKey('traumas-abattement');
+            text = getTranslationByKey('traumas-abattement-description');
+            break;
+
+          case 3:
+            titre = getTranslationByKey('traumas-decouragement');
+            text = getTranslationByKey('traumas-decouragement-description');
+            break;
+
+          case 4:
+            titre = getTranslationByKey('traumas-oubli');
+            text = getTranslationByKey('traumas-oubli-description');
+            break;
+
+          case 5:
+            titre = getTranslationByKey('traumas-phobie-sociale');
+            text = getTranslationByKey('traumas-phobie-sociale-description');
+            break;
+
+          case 6:
+            titre = getTranslationByKey('traumas-perte-controle');
+            text = getTranslationByKey('traumas-perte-controle-description');
+            break;
+
+          default:
+            titre = '';
+            text = '';
+            break;
+        }
+        break;
+
+      default:
+        titre = '';
+        text = '';
+        break;
+    }
+
+    finishRoll(
+      results.rollId, {
+        rollTitre: titre,
+        rollText: text,
+      },
+    );
+  });
 });
