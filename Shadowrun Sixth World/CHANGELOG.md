@@ -1,7 +1,8 @@
 Change Log
 ==============================================
 **2021-11-02 ** v.45 Chuz (James Culp)
-	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
+	Add SR Title to "Character Sheet" tab
+	Make Bio & Info, Character Sheet and Attributes & Abilities tabs stay in view as the sheet is scrolled.	Modified Notes tab to have an automatic scrollbar and removed the expand widget since it did nothing.
 	Added matrix_overclock attribute which can be put in the Modifications box for a program which will cause the Matrix Rolls on the Rolls tab automatically add 2 dice, one of which is the wild die to rolls.  If added via the Matrix->Programs->Modifications when the Program is toggled off/on it will turn the effect off/on.  Valid values 1|0.  This will also indicate in the header of the rolls-computed roll template the +2 dicepool bonus.
 **2021-10-26 ** v.44 Chuz (James Culp)
 	Bugfix returned notes to the roll template outputs for PC roll buttons in repeating sections.
