@@ -496,7 +496,7 @@ function setupRepeatingSpellSumming(sections, oldField, newField, resultFieldNam
 }
 // --- End summing numbers from repeating spells for wizard and priest --- //
 
-function setupAutoFillSpellInfo(section, spellsTable) {
+function setupAutoFillSpellInfo(section, spellsTable, levelFunc) {
     if (!spellsTable[section])
         return;
     
@@ -507,20 +507,20 @@ function setupAutoFillSpellInfo(section, spellsTable) {
             return;
 
         let spellInfo = {
-            [`repeating_spells-${section}_spell-cast-time`]: spell['cast-time'],
-            [`repeating_spells-${section}_spell-level`]: spell['level'],
-            [`repeating_spells-${section}_spell-school`]: spell['school'],
-            [`repeating_spells-${section}_spell-components`]: spell['components'],
-            [`repeating_spells-${section}_spell-range`]: spell['range'],
-            [`repeating_spells-${section}_spell-aoe`]: spell['aoe'],
-            [`repeating_spells-${section}_spell-duration`]: spell['duration'],
-            [`repeating_spells-${section}_spell-damage`]: spell['damage'],
-            [`repeating_spells-${section}_spell-damage-type`]: spell['damage-type'],
-            [`repeating_spells-${section}_spell-saving-throw`]: spell['saving-throw'],
-            [`repeating_spells-${section}_spell-healing`]: spell['healing'],
-            [`repeating_spells-${section}_spell-materials`]: spell['materials'],
-            [`repeating_spells-${section}_spell-reference`]: spell['reference'],
-            [`repeating_spells-${section}_spell-effect`]: spell['effect']
+            [`repeating_spells-${section}_spell-cast-time`]    : spell['cast-time'],
+            [`repeating_spells-${section}_spell-level`]        : levelFunc(spell['level']),
+            [`repeating_spells-${section}_spell-school`]       : spell['school'],
+            [`repeating_spells-${section}_spell-components`]   : spell['components'],
+            [`repeating_spells-${section}_spell-range`]        : spell['range'],
+            [`repeating_spells-${section}_spell-aoe`]          : spell['aoe'],
+            [`repeating_spells-${section}_spell-duration`]     : spell['duration'],
+            [`repeating_spells-${section}_spell-damage`]       : spell['damage'],
+            [`repeating_spells-${section}_spell-damage-type`]  : spell['damage-type'],
+            [`repeating_spells-${section}_spell-saving-throw`] : spell['saving-throw'],
+            [`repeating_spells-${section}_spell-healing`]      : spell['healing'],
+            [`repeating_spells-${section}_spell-materials`]    : spell['materials'],
+            [`repeating_spells-${section}_spell-reference`]    : spell['reference'],
+            [`repeating_spells-${section}_spell-effect`]       : spell['effect']
         };
         if (section.startsWith('pri')) {
             spellInfo[`repeating_spells-${section}_spell-sphere`] = spell['sphere'];
@@ -803,6 +803,13 @@ let priestSpellLevelsSections = [
     {level: 'q', sections: ['49', '50', '51', 'priq']},
 ];
 
+function wizardDisplayLevel(s) {
+    return `Level ${s} Wizard`
+}
+function priestDisplayLevel(s) {
+    return `Level ${s} Priest`
+}
+
 // --- Start setup Spell Slots --- //
 wizardSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-level${spellLevel.level}`;
@@ -815,10 +822,10 @@ wizardSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, wizardSpells);
+        setupAutoFillSpellInfo(lastSection, wizardSpells, wizardDisplayLevel);
     }
 });
-setupAutoFillSpellInfo("wizmonster", wizardSpells);
+setupAutoFillSpellInfo("wizmonster", wizardSpells, wizardDisplayLevel);
 
 priestSpellLevelsSections.forEach(spellLevel => {
     let prefix = `spell-priest-level${spellLevel.level}`;
@@ -831,11 +838,11 @@ priestSpellLevelsSections.forEach(spellLevel => {
     // Auto set spell info function
     let lastSection = spellLevel.sections[spellLevel.sections.length - 1];
     if (isNewSpellSection(lastSection)) {
-        setupAutoFillSpellInfo(lastSection, priestSpells);
+        setupAutoFillSpellInfo(lastSection, priestSpells, priestDisplayLevel);
         setupAddPriestSpell(lastSection);
     }
 });
-setupAutoFillSpellInfo("primonster", priestSpells);
+setupAutoFillSpellInfo("primonster", priestSpells, priestDisplayLevel);
 // --- End setup Spell Slots --- //
 
 // --- Start setup Spell Points, Arc, and Wind --- //
