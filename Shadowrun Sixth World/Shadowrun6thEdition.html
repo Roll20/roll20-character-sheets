@@ -5674,18 +5674,18 @@ const rollButtons = {
 };
 
 const initiatives = {
-	initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{initiative}}}{{initiative=[[(@{initiative_base}+@{modifiers_toggle})+(@{initiative_dice}d6cf0) &{tracker}]]}}",
-	astral_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{astral} ^{initiative}}}{{dice=[[(@{astral_initiative_base}+@{modifiers_toggle})+(@{astral_initiative_dice}d6cf0) &{tracker}]]}}",
-	cold_sim_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{coldsiminitiative}}}{{dice=[[(@{cold_sim_initiative_base}+@{modifiers_toggle})+(@{cold_sim_initiative_dice}d6cf0) &{tracker}]]}}",
-	hot_sim_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{hotsiminitiative}}}{{dice=[[(@{hot_sim_initiative_base}+@{modifiers_toggle})+(@{hot_sim_initiative_dice}d6cf0) &{tracker}]]}}",
-	matrix_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{matrixinitiative}}}{{dice=[[(@{matrix_initiative_base}+@{modifiers_toggle})+(@{matrix_initiative_dice}d6cf0) &{tracker}]]}}",
+	initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{initiative}}}{{initiative=[[(@{initiative_base}+@{modifiers_toggle})+(@{initiative_dice}d6cf0)]]}}",
+	astral_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{astral} ^{initiative}}}{{initiative=[[(@{astral_initiative_base}+@{modifiers_toggle})+(@{astral_initiative_dice}d6cf0)]]}}",
+	cold_sim_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{coldsiminitiative}}}{{initiative=[[(@{cold_sim_initiative_base}+@{modifiers_toggle})+(@{cold_sim_initiative_dice}d6cf0)]]}}",
+	hot_sim_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{hotsiminitiative}}}{{initiative=[[(@{hot_sim_initiative_base}+@{modifiers_toggle})+(@{hot_sim_initiative_dice}d6cf0)]]}}",
+	matrix_initiative: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[0]]}}{{edge=[[0]]}}{{combat_paralysis=[[@{combat_paralysis}]]}}{{header=@{character_name}}}{{base=^{matrixinitiative}}}{{initiative=[[(@{matrix_initiative_base}+@{modifiers_toggle})+(@{matrix_initiative_dice}d6cf0)]]}}",
 };
 
 // Initiatives
 Object.keys(initiatives).forEach((ini) => {
 	on(`clicked:${ini}`, (eventInfo) => {
 
-		startRoll(initiatives[eventInfo.triggerName.slice(8)], (results) => {
+		const displayRoll = startRoll(initiatives[eventInfo.triggerName.slice(8)], (results) => {
 			var rolled = results.results.initiative.dice;
 			var init = results.results.initiative.result;
 
@@ -5693,6 +5693,8 @@ Object.keys(initiatives).forEach((ini) => {
 			if(results.results.combat_paralysis.result) {
 				init = Math.ceil(init / 2);
 			}
+
+			let trueInitiative = init;
 
 			finishRoll(
 				results.rollId, {
@@ -5702,6 +5704,13 @@ Object.keys(initiatives).forEach((ini) => {
 					wilddie: 0,
 				}
 			);
+
+			// Roll with the API (!) to hide the roll and add the same value as the calculated initiative to the tracker
+			const trackerRoll = startRoll(`![[${trueInitiative}&{tracker}]]`, (tracker) => {
+				finishRoll(
+					tracker.rollId, {}
+				);
+			});
 		});
 	});
 });
