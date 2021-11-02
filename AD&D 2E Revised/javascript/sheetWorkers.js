@@ -1065,6 +1065,23 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
     setAttrs(weaponInfo);
 });
 
+on('clicked:grenade-miss', function (eventInfo) {
+   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}}', function(results) {
+       console.log(results);
+       let expression = results.results.distance.expression;
+       let displayDistance = '';
+       switch (expression) {
+           case '1d6': displayDistance = 'Short'; break;
+           case '1d10': displayDistance = 'Medium'; break;
+           case '2d10': displayDistance = 'Long'; break;
+           default: displayDistance = 'Invalid'; break;
+       }
+       finishRoll(results.rollId, {
+           distance: displayDistance
+       })
+   });
+});
+
 //Follower weapons
 function setupFollowerWeaponsAutoFill(repeating, sections) {
     let prefix = '';
