@@ -2,10 +2,18 @@
 
 This is a character sheet for the 1st Edition of Gamma World.  It features 3 separate tabs for Humans, Mutants, and Monsters.
 
-## Current Version
-1.01
 
 ### Changelog
+
+#### 1.02 (Oct. 2021)
+* Roll updates
+  * Update initiative roll to be `1d6+@{dex}`, (from previous `@{selected|dex}`). Init rolls now work without selecting token.
+  * Init rolls can be called with `%{selected|INIT}`/`%{selected|INIT-mutant}`
+  * artifact rolls can be called with `%{selected|ARTIFACT}`/`%{selected|ARTIFACT-mutant}`
+* Armor Class input looks better
+
+#### 1.01 (2018)
+* Incorporated changes to Human and Mutant sheet to include "Artifact Use" roll button and calculation, with roll 1d10 modified by Artiface Use bonus (intMod) (-1 to Artifact Use for every Intelligence point above 15 and +1 for every point below 7), and limited to range 1 to 10, with negative numbers returned as 1 and numbers larger than 10 returned as 10 per this equation: [[ {{1d10 + @{intMod}, {1}}kh1, {10}}kl1 [Die Roll] ]].
 
 #### 1.0
 * Sheet creation per Character Sheet Request Thread.
@@ -16,9 +24,6 @@ This is a character sheet for the 1st Edition of Gamma World.  It features 3 sep
 * Incorporated updates to weapons used table, including Small, Man-Sized and Large opponents damage dice.
 * Incorporated changes to Monster sheet, including modifications to the mutant generation section.
 
-#### 1.01
-* Incorporated changes to Human and Mutant sheet to include "Artifact Use" roll button and calculation, with roll 1d10 modified by Artiface Use bonus (intMod) (-1 to Artifact Use for every Intelligence point above 15 and +1 for every point below 7), and limited to range 1 to 10, with negative numbers returned as 1 and numbers larger than 10 returned as 10 per this equation: [[ {{1d10 + @{intMod}, {1}}kh1, {10}}kl1 [Die Roll] ]].
 
-
-### Credit Where Credit is Due
+### Credits
 The CSS of this sheet is from the Metamorphosis Alpha 1e character sheet.
