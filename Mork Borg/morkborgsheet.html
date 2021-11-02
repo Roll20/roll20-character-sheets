@@ -119,7 +119,10 @@
                 </label>
               </div>
               <div class="col">
+                <!--
               <button type="roll" value="&{template:default} {{name=@{char_name} @{labelrolls} @{labeldefense}}} {{Defend:=[[1d20 + @{agility}]] (DR +@{defdr})}} {{@{labelifhit}:=[[?{Enemy Damage|1d6} - 1d@{armortier} - @{shield}]] damage}} {{@{labelifcrit}:=@{labelcritmsg}.}} {{@{labeliffumble}:=@{labelfumblemsg} (@{labelcurrently} [[@{armortier}/2]]).}}" name="roll_defense2"></button>
+              -->
+              <button type="roll" value="&{template:defense} {{name=@{char_name} @{labelrolls} @{labeldefense}}} {{defend=@{labeldefense}: [[1d20 + @{agility}]] (DR +@{defdr})}} {{damage=@{labeldamage}: [[?{Enemy Damage|1d6} - 1d@{armortier} - @{shield}]]}} {{critmsg=@{labelcritmsg}.}} {{fumblemsg=@{labelfumblemsg} (@{labelcurrently} [[@{armortier}/2]]).}}" name="roll_defense2"></button>
               </div>
           </div>
           <div class="2colrow">
@@ -231,7 +234,10 @@
                 <option value="1d12">d12</option>
                 <option value="?{Damage die|1d2}">Special</option>
               </select>
+              <!--
               <button type="roll" value="&{template:default} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{@{labelattack}:=[[1d20 + @{attacktype}]]}} {{@{labeldamage}:=[[@{weapondamage} - ?{Enemy Armor|1d0} - ?{Enemy Shield?|no,0|yes,1}]]}} {{@{labelifcrit}:=@{labelfumblemsg}.}} {{@{labeliffumble}:=@{labelattackfumble}.}}" name="roll_strength2"></button>
+              -->
+              <button type="roll" value="&{template:attack} {{name=@{char_name} @{labelattacks} @{labelwith} @{weaponname}}} {{attack=@{labelattack}: [[1d20 + @{attacktype}]]}} {{damage=@{labeldamage}: [[@{weapondamage}]]}} {{critdmg=[[@{weapondamage}*2]]}} {{critmsg=@{labelfumblemsg}.}} {{dmgfumble=@{labelattackfumble}.}}" name="roll_strength2"></button>
             </fieldset>
           </div>
         </div>
@@ -240,6 +246,7 @@
             <span data-i18n="armor-u" class="unifraktur">Armor</span>
           </label>
           <input name="attr_armor" class="inline-block" type="text" />
+          <br />
           <label class="inline">
             <span data-i18n="armor-tier-u">Tier</span>
           </label>
@@ -346,6 +353,73 @@
 
       </div>
     </div>
+
+    <rolltemplate class="sheet-rolltemplate-attack">
+      <div class="sheet-container sheet-yellow-bg">
+        <div>
+          <h1>{{name}}</h1>
+        </div>
+        <div>
+          <span>{{attack}}</span>
+          {{#rollWasCrit() attack}}
+            <span data-i18n="crit-template" class="sheet-bold-text">CRIT</span>
+          {{/rollWasCrit() attack}}
+          {{#rollWasFumble() attack}}
+            <span data-i18n="fumble-template" class="sheet-bold-text">FUMBLE</span>
+          {{/rollWasFumble() attack}}
+        </div>
+        {{#^rollWasCrit() attack}}
+          <div>
+            <span>{{damage}}</span>
+          </div>
+        {{/^rollWasCrit() attack}}
+        {{#rollWasCrit() attack}}
+          <div>
+            <span><span data-i18n="crit-damage-template">Crit Damage</span>: {{critdmg}}</span>
+          </div>
+          <div class="sheet-crit">
+            <span>{{critmsg}}</span>
+          </div>
+        {{/rollWasCrit() attack}}
+        {{#rollWasFumble() attack}}
+          <div class="sheet-crit-black">
+            <span class="lacquer"><b>{{dmgfumble}}</b></span>
+          </div>
+        {{/rollWasFumble() attack}}
+      </div>
+    </rolltemplate>
+
+    <rolltemplate class="sheet-rolltemplate-defense">
+      <div class="sheet-container sheet-yellow-bg">
+        <div>
+          <h1>{{name}}</h1>
+        </div>
+        <div>
+          <span>{{defend}}</span>
+          {{#rollWasCrit() defend}}
+            <span data-i18n="crit-template" class="sheet-bold-text">CRIT</span>
+          {{/rollWasCrit() defend}}
+          {{#rollWasFumble() defend}}
+            <span data-i18n="fumble-template" class="sheet-bold-text">FUMBLE</span>
+          {{/rollWasFumble() defend}}
+        </div>
+        {{#damage}}
+          <div>
+            <span>{{damage}}</span>
+          </div>
+        {{/damage}}
+        {{#rollWasCrit() defend}}
+          <div class="sheet-crit">
+            <span>{{critmsg}}</span>
+          </div>
+        {{/rollWasCrit() defend}}
+        {{#rollWasFumble() defend}}
+          <div class="sheet-crit-black">
+            <span>{{fumblemsg}}</span>
+          </div>
+        {{/rollWasFumble() defend}}
+      </div>
+    </rolltemplate>
 
     <div class="no-display">
       <span class="no-display" data-i18n="labeldailypowers">daily powers</span>
