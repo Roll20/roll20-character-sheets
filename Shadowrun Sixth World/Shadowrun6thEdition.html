@@ -5248,19 +5248,12 @@
 
 		{{#dice}}
 		<div class="sheet-template-row">
-			{{#rerolls}}<span class="left">[+](~{{header}}|reroll{{computed::misses}})</span>{{/rerolls}}
-			Hits: <!-- {{dice}} => --> {{computed::dice}}
-			{{#rerolls}}<span class="right">[-](~{{header}}|reroll{{computed::hits}})</span>{{/rerolls}}
+			<span class="left" style="width: 30%"><span title="Reroll Misses">{{#rerolls}}[+](~{{header}}|reroll{{computed::misses}}){{/rerolls}}</span>
+			<span title="Bump 4's to 5's">{{#rollGreater() computed::fours 0}}[+4s](~{{header}}|bump_fours{{computed::fours}}){{/rollGreater() computed::fours 0}}</span></span>
+			<span style="width: 70%">Hits: <!-- {{dice}} => -->{{computed::dice}}</span>
+			<span class="right" style="width: 30%"><span title="Reroll Hits">{{#rerolls}}[-](~{{header}}|reroll{{computed::hits}}){{/rerolls}}</span></span>
 		</div>
 		{{/dice}}
-		{{#rerolls}}
-		<div class="sheet-template-row">
-			<span>[+Reroll Misses+](~{{header}}|reroll{{computed::misses}})</span>
-			{{#rollGreater() computed::fours 0}}<span>[+Bump Fours+](~{{header}}|bump_fours{{computed::fours}})</span>{{/rollGreater() computed::fours 0}}
-			{{#rollLess() computed::fours 1}}<span></span>{{/rollLess() computed::fours 1}}
-			<span>[-Reroll Hits-](~{{header}}|reroll{{computed::hits}})</span>
-		</div>
-		{{/rerolls}}
 
 		{{#sprint}}<div class="sheet-template-row">Sprint: {{dice}} meters</div>{{/sprint}}
 		{{#initiative}}<div class="sheet-template-row">Initiative: <!-- {{initiative}} => --> {{computed::initiative}}</div>{{/initiative}}
@@ -5478,9 +5471,9 @@ on("change:repeating_spell:notes change:repeating_npcspell:notes change:repeatin
 
 // Roll Button Definitions
 const rollButtons = {
-//	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5?{Exploding 6's?|N, |Y,!}cs>5cf<[[(1+@{bad_luck})]])]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{rerolls=1}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}",
-	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5?{Exploding 6's?|N, |Y,!}cs>5cf<[[(1+@{bad_luck})]])]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
-	bump_fours: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{bump4s}}}{{desc=Bumping ?{How many?|-#-} fours to fives.  +?{How many?|{{computed::fours}}} hits, -[[?{How many?|{{computed::fours}}} * 2]] Edge}}",
+//	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{rerolls=1}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}",
+	d6: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{d6}}}{{dice=[[(?{d6s|0}d6>5cs>5cf<[[(1+@{bad_luck})]]?{Exploding 6's?|N, |Y,!})]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
+	bump_fours: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{bump4s}}}{{desc=Bumping ?{How many?|-#-} fours to fives.  +?{How many?} hits, -[[?{How many?} * 2]] Edge}}",
 	reroll: "@{gm_toggle} &{template:rolls-computed}{{header=@{character_name}}}{{base=^{rerolling} ?{Reroll how many?|-#-} ^{dice}}}{{dice=[[(?{Reroll how many?|-#-}d6>5cs>5cf<[[(1+@{bad_luck})]])]]}}{{dicepool=[[0]]}}",
 
 	body: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=^{body}}}{{dice=[[(@{body}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
@@ -5743,7 +5736,7 @@ console.log(rollButton);
 // Bump 4s 1-7
 for(c = 1; c < 7; c++) {
 	on(`clicked:bump_fours${c}`, (eventInfo) => {
-		var to_bump = eventInfo.triggerName.slice(10);
+		var to_bump = eventInfo.triggerName.slice(18);
 		var rollButton = rollButtons.bump_fours;
 
 		rollButton = rollButton.replace('-#-', to_bump);
@@ -5946,7 +5939,7 @@ console.log("Glitch Threshold: "+glitch_threshold);
 					glitch = 2;
 				}
 			}
-console.log("Original Hits: "+hits+"Hits: "+total_hits+" Glitches: "+glitches+" Glitch: "+glitch);
+console.log("Original Hits: "+hits+" Hits: "+total_hits+" Glitches: "+glitches+" Glitch: "+glitch);
 console.log("Dicepool: "+results.results.dice.dice.length);
 console.log("Wild Dice Results: "+wd_results);
 
@@ -5955,7 +5948,7 @@ console.log("Wild Dice Results: "+wd_results);
 			}
 
 			var misses = results.results.dice.dice.length - hits;
-
+console.log("total_hits: "+total_hits);
 			finishRoll(
 				results.rollId, {
 					dice: total_hits,
