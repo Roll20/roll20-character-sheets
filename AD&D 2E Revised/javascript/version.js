@@ -100,26 +100,37 @@ function migrateGems() {
         let name = section[1];
         let oldGemFields = fieldArray.map(s => `${s}${index}`);
         let sectionName = `gem${index}`;
+        let gemdesc = `gemdesc${index}`;
+        let gemsizecut = `gemsizecut${index}`;
+        let gemvalue = `gemvalue${index}`;
+        let gemqty = `gemqty${index}`;
         TAS.repeating(sectionName)
             .attrs(oldGemFields)
             .fields(oldGemFields)
             .reduce(function (memo, row) {
-                if (row.S[`gemdesc${index}`] || row.S[`gemsizecut${index}`] || row.F[`gemvalue${index}`] || row.F[`gemqty`]) {
-                    console.log(`Moving repeating gem: '${row.S[`gemdesc${index}`]}'`)
-                    memo.push(oldGemFields.map(field => row.S[field]));
+                if ((row.hasOwnProperty(gemdesc) && row.S[gemdesc]) ||
+                    (row.hasOwnProperty(gemsizecut) && row.S[gemsizecut]) ||
+                    (row.hasOwnProperty(gemvalue) && row.F[gemvalue]) ||
+                    (row.hasOwnProperty(gemqty) && row.F[gemqty])) {
+                    console.log(`Moving repeating gem: '${row[gemdesc]}'`)
+                    
+                    memo.push(oldGemFields.map(field => row[field] || ''));
                     removeRepeatingRow(`repeating_${sectionName}_${row.id}`);
                 }
                 return memo;
             }, [], function (memo, rowSet, attrSet) {
                 let newValue = {};
-                if (attrSet.S[`gemdesc${index}`] || attrSet.S[`gemsizecut${index}`] || attrSet.F[`gemvalue${index}`] || attrSet.F[`gemqty`]) {
-                    console.log(`Moving static gem: '${attrSet.S[`gemdesc${index}`]}'`)
+                if ((attrSet.hasOwnProperty(gemdesc) && attrSet.S[gemdesc]) ||
+                    (attrSet.hasOwnProperty(gemsizecut) && attrSet.S[gemsizecut]) ||
+                    (attrSet.hasOwnProperty(gemvalue) && attrSet.F[gemvalue]) ||
+                    (attrSet.hasOwnProperty(gemqty) && attrSet.F[gemqty])) {
+                    console.log(`Moving static gem: '${attrSet[gemdesc]}'`)
                     
-                    memo.splice(0, 0, oldGemFields.map(field => attrSet.S[field]));
-                    newValue[`gemdesc${index}`] = '';
-                    newValue[`gemvalue${index}`] = '';
-                    newValue[`gemqty${index}`] = '';
-                    newValue[`gemsizecut${index}`] = '';
+                    memo.splice(0, 0, oldGemFields.map(field => attrSet[field]));
+                    newValue[gemdesc] = '';
+                    newValue[gemvalue] = '';
+                    newValue[gemqty] = '';
+                    newValue[gemsizecut] = '';
                 }
                 if (memo.length > 0) {
                     memo.splice(0, 0, [`--${name}--`, '', '', '---------']);

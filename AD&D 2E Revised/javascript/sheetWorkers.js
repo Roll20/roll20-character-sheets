@@ -1077,7 +1077,8 @@ on('clicked:grenade-miss', function (eventInfo) {
            default: displayDistance = 'Invalid'; break;
        }
        finishRoll(results.rollId, {
-           distance: displayDistance
+           distance: displayDistance,
+           grenade: "computed grenade"
        })
    });
 });
