@@ -436,9 +436,9 @@ const upgradeSheet = function(
 // Stuff to do when the sheet is opened...
 
 // Adjust CSS for long Character Names
-on("sheet:opened change:character_name", function() {
+on("sheet:opened change:character_name change:character_avatar change:character_token", function() {
     log("Name Change", "Name was changed", r20color);
-    getAttrs(["character_name"], function(v) {
+    getAttrs(["character_name","character_avatar","character_token"], function(v) {
         let name = v.character_name;
         let namelen = name.length;
         log("Name Size", namelen, r20color);
@@ -447,7 +447,9 @@ on("sheet:opened change:character_name", function() {
             (nameclass = "smallHeader") :
             (nameclass = "normalHeader");
         log("Name Class", nameclass, r20color);
-        setAttrs({ namelength: nameclass });
+        setAttrs({ namelength: nameclass,
+                   "avatar": v.character_avatar,
+                   "ctoken": v.character_token });
     });
 });
 
@@ -712,12 +714,13 @@ const updateAnimalIntelligenceDisplay = function() {
             "Updating animal smarts " + attributesValues.animalsmarts
         );
         if (attributesValues.animalsmarts === "on") {
-            setAttrs({ animalsmarts_display: "(A)" });
+            setAttrs({ "animalsmarts_display": getTranslationByKey("animal-smarts-abbreviation") });
         } else {
-            setAttrs({ animalsmarts_display: "" });
+            setAttrs({ "animalsmarts_display": " " });
         }
     });
 };
+
 on("change:animalsmarts", function() {
     updateAnimalIntelligenceDisplay();
 });
@@ -6101,7 +6104,9 @@ on(
   <input class="hiddenInput" type="text" name="attr_CompendiumCategory" accept="Category"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumContent" accept="Content"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumData" accept="data"/>
-  <input class="useBackground hiddenInput" type="checkbox" name="attr_background" value="1" checked="checked"/>
+  <input type="hidden" name="attr_avatar"/>
+  <input type="hidden" name="attr_ctoken"/>
+  <input class="useBackground hiddenInput" type="hidden" name="attr_background" value="1"/>
   <div class="background">
     <div class="base"> 
       <!--"sheet of paper" the character sheet is on.-->
@@ -7633,7 +7638,8 @@ on(
               <h2 class="traitHeader" data-i18n="attributes">Attributes</h2>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_agility_delta" value="0"/>
-                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tagilityRoll" value="@{agilitybutton} @{unshakeTemplate}" title="@{tagilityRoll}"><span data-i18n="agility"></span></button>
+                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tagilityRoll" value="@{agilitybutton} @{unshakeTemplate}" title="@{tagilityRoll}"><span data-i18n="agility"></span>
+                </button>
                 <input type="hidden" name="attr_agilitybutton" value="@{whisperagility} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltagility} @{setmodsenc} @{showtraitmods}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="agility-die-type-d4">
@@ -7684,7 +7690,8 @@ on(
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_smarts_delta" value="0"/>
-                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tsmartsRoll" value="@{smartsbutton} @{unshakeTemplate}" title="@{tsmartsRoll}"><span data-i18n="smarts"></span></button>
+                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tsmartsRoll" value="@{smartsbutton} @{unshakeTemplate}" title="@{tsmartsRoll}"><span data-i18n="smarts"></span><span class="isAnimal" name="attr_animalsmarts_display"></span>
+                </button>
                 <input type="hidden" name="attr_smartsbutton" value="@{whispersmarts} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltsmarts} @{setmodsenc} @{showtraitmods}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="smarts-die-type-d4">
@@ -7723,6 +7730,7 @@ on(
                       <option value="12" data-i18n="d12">d12</option>
                     </select><span data-i18n="wild-die">Wild Die</span>
                     <input class="wildDieDesc" type="text" name="attr_smwilddieinfo" placeholder="No modifying edges" data-i18n-placeholder="no-modifying-edges"/>
+                    <input class="whispercheck" type="checkbox" name="attr_animalsmarts"/><span class="ModDesc" data-i18n="animal-intelligence">Animal Intelligence</span><br/>
                     <input class="deltamod" type="number" name="attr_smarts_delta" value="0" title="@{smarts_delta}"/>
                     <label class="delta" data-i18n="die-step-delta">Boost/Lower Trait</label>
                     <input type="hidden" name="attr_smarts_base"/>
@@ -7735,7 +7743,8 @@ on(
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_spirit_delta" value="0"/>
-                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tspiritRoll" value="@{spiritbutton} @{unshakeTemplate}" title="@{tspiritRoll}"><span data-i18n="spirit"></span></button>
+                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tspiritRoll" value="@{spiritbutton} @{unshakeTemplate}" title="@{tspiritRoll}"><span data-i18n="spirit"></span>
+                </button>
                 <input type="hidden" name="attr_spiritbutton" value="@{whisperspirit} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltspirit} @{setmodsenc} @{showtraitmods}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="spirit-die-type-d4">
@@ -7786,7 +7795,8 @@ on(
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_strength_delta" value="0"/>
-                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tstrengthRoll" value="@{strengthbutton} @{unshakeTemplate}" title="@{tstrengthRoll}"><span data-i18n="strength"></span></button>
+                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tstrengthRoll" value="@{strengthbutton} @{unshakeTemplate}" title="@{tstrengthRoll}"><span data-i18n="strength"></span>
+                </button>
                 <input type="hidden" name="attr_strengthbutton" value="@{whisperstrength} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltstrength} @{setmodsenc} @{showtraitmods}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="strength-die-type-d4">
@@ -7837,7 +7847,8 @@ on(
               </div>
               <div class="basetrait">
                 <input class="deltabutton" type="hidden" name="attr_vigor_delta" value="0"/>
-                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tvigorRoll" value="@{vigorbutton} @{unshakeTemplate}" title="@{tvigorRoll}"><span data-i18n="vigor"></span></button>
+                <button class="traitbutton traitflexattbutton" type="roll" name="roll_tvigorRoll" value="@{vigorbutton} @{unshakeTemplate}" title="@{tvigorRoll}"><span data-i18n="vigor"></span>
+                </button>
                 <input type="hidden" name="attr_vigorbutton" value="@{whispervigor} &amp;{template:roll} {{namelength=@{namelength}}} @{rolltvigor} @{setmodsenc} @{showtraitmods}"/><span>
                   <input class="useAlphaNum" type="checkbox" name="attr_useAlphaNum" value="1"/>
                   <label class="traitlabel" data-i18n-title="vigor-die-type-d4">
@@ -13874,6 +13885,12 @@ on(
             <label class="miscItem"><span data-i18n="avatar-url"></span>: 
               <input class="standard" type="text" name="attr_avatarURL" style="width:200px;"/>
             </label>
+            <label class="miscItem"><span data-i18n="sheet-background">Sheet Background</span>
+              <select class="sheet-background" name="attr_background">
+                <option value="0" data-i18n="no-background-image">No Background Image</option>
+                <option value="1" selected="selected" data-i18n="swade-parchment">Atk^ roll query sorted Low to High</option><!-- option(value="2" data-i18n="attack-abbr-always-roll-max-no-roll-query") Atk^ always roll max (no roll query) -->
+              </select>
+            </label>
           </div>
         </div>
         <!-- Change/Modify Skill Names-->
@@ -14685,6 +14702,13 @@ on(
   </div>
 </div>
 <!--rolltemplates--><rolltemplate class="sheet-rolltemplate-roll">
+	{{#token}}
+		<!-- To use, I'd need to pass something like {{token=@{ctoken}}} -->
+		<!-- Should have the sheetworker check to see if it's empty and if so, not send Token with rolls -->
+		<div class="sheet-tokenImage">
+			{{token}}
+		</div>
+	{{/token}}
 	<div class="sheet-templateMain">
 		<div class="sheet-templateHeader">
 		    {{^PowerTemplate}}
