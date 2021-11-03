@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = "Official Savage Worlds v";
-const sheetVersion = "1.00.16";
+const sheetVersion = "1.00.17";
 
 // Define colors for Logs
 const r20color = "#E948C9";
@@ -102,7 +102,7 @@ const log = (
     let titleStyle = `color:${color}; ${headerstyle} text-decoration:underline;`;
     let textStyle = `color:${color}; ${bodystyle}`;
     const output = `%c${title}:%c ${text}`;
-    //console.log(output, titleStyle, textStyle);
+    console.log(output, titleStyle, textStyle);
 };
 
 const debug = function(msg, force) {
@@ -418,7 +418,11 @@ const upgradeSheet = function(
         }
         if (versionthree < 0.16) {
             setattrvals["newcontent"] = "unread";
-        } else {
+        } 
+        if (versionthree < 0.17) {
+            setattrvals["newcontent"] = "unread";
+        }
+        else {
             log(
                 "Upgrade",
                 `Sheet already updgraded (${characterName})`,
@@ -2141,6 +2145,7 @@ const getDropInfo = function(jsonObj, targetObj, repSection) {
             fields = abilitiesfields;
             //handle specialabilityeffect
             log("Special Ability",JSON.stringify(jsonObj),r20color);
+            targetObj[`repeating_${repSection}_${repSectionID}_showSpecAbilityDesc`] = "0";
             if (typeof jsonObj["specialabilityeffect"] !== "undefined") {
                 //get all the different pieces
                 let effects = jsonObj["specialabilityeffect"].split(/\s*,\s*/);
@@ -2325,7 +2330,8 @@ const compendiumDrop = function(category) {
                 repSection = "edges";
                 break;
             case "Abilities":
-                repSection = "specialabilities";;
+                repSection = "specialabilities";
+                setattrvalues["showSpecAbilities"] = "1";
                 break;
             case "Powers":
                 repSection = "spells";
@@ -6072,7 +6078,7 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.16"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.17"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
@@ -14049,6 +14055,21 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.17-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10017" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.17</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10017" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="special-abilities-not-auto-showing">Fixed the issue of Special Abilities not automatically being set to show when a Special Ability is dragged and dropped onto the character sheet.</span></li>
+            <li> <span class="black" data-i18n="wild-card-icon-misplaced">Fixed the issue of the Wild Card icon not being placed correctly.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.16-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10016" value="1"/><span class="releasenotesVersion">
