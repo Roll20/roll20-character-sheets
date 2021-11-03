@@ -1066,9 +1066,10 @@ on('change:repeating_ammo:ammoname', function(eventInfo){
 });
 
 on('clicked:grenade-miss', function (eventInfo) {
-   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid|Holy water|Oil (lit)|Poison}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}}', function(results) {
+   startRoll('&{template:2Egrenademiss} {{grenade=?{What grenade have been thrown?|Acid,[[1Acid]]|Holy water,[[1Holy water]]|Oil (lit),[[3Oil (lit)]]|Poison,[[1Poison]]}}} {{direction=[[1d10]]}} {{distance=?{How far was it throw?|Short,[[1d6]]|Medium,[[1d10]]|Long,[[2d10]]}}} {{aoe=?{What grenade have been thrown?}}} {{hit=[[0]]}} {{splash=[[0]]}}', function(results) {
        console.log(results);
-       let expression = results.results.distance.expression;
+       let distance = results.results.distance;
+       let expression = distance.expression;
        let displayDistance = '';
        switch (expression) {
            case '1d6': displayDistance = 'Short'; break;
@@ -1076,10 +1077,38 @@ on('clicked:grenade-miss', function (eventInfo) {
            case '2d10': displayDistance = 'Long'; break;
            default: displayDistance = 'Invalid'; break;
        }
-       finishRoll(results.rollId, {
+       let aoeSplash = results.results.aoe.result+6;
+       let displayGrenade = results.results.grenade.expression.substring(1);
+       let computedRolls = {
            distance: displayDistance,
-           grenade: "computed grenade"
-       })
+           grenade: displayGrenade,
+           aoe: aoeSplash,
+           hit: 0,
+           splash: 0
+       };
+       // See if monster is within direct hit
+       if (distance.result < results.results.aoe.result / 2) {
+           console.log(`hit radius: ${results.results.aoe.result / 2}`);
+           let directDamage;
+           switch (displayGrenade) {
+               case 'Acid': directDamage = '2d4 Acid damage'; break;
+               case 'Holy water': directDamage = '1d6+1 damage'; break;
+               case 'Oil (lit)': directDamage = '2d6/1d6 Fire damage'; break;
+               case 'Poison': directDamage = 'Special'; break;
+           }
+           computedRolls.hit = directDamage;
+       } else if (distance.result < aoeSplash / 2) {
+           console.log(`splash radius: ${aoeSplash / 2}`);
+           let splashDamage;
+           switch (displayGrenade) {
+               case 'Acid': splashDamage = '1 Acid damage'; break;
+               case 'Holy water': splashDamage = '2 damage'; break;
+               case 'Oil (lit)': splashDamage = '1d3 Fire damage'; break;
+               case 'Poison': splashDamage = 'Special'; break;
+           }
+           computedRolls.splash = splashDamage;
+       }
+       finishRoll(results.rollId, computedRolls);
    });
 });
 
