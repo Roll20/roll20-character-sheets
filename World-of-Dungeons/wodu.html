@@ -30,30 +30,30 @@
         <div class="sheet-row">
           <div class="sheet-column sheet-col-6">
             <label class="sheet-attribute">
-                <input type="number" name="attr_str" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=str}} {{result=[[2d6+@{str}]]}}">Str</button>
+                <input type="number" name="attr_strength" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=str}} {{result=[[2d6+@{strength}]]}}">Str</button>
             </label>
             <label class="sheet-attribute">
-                <input type="number" name="attr_dex" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=dex}} {{result=[[2d6+@{dex}]]}}">Dex</button>
+                <input type="number" name="attr_dexterity" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=dex}} {{result=[[2d6+@{dexterity}]]}}">Dex</button>
             </label>
             <label class="sheet-attribute">
-                <input type="number" name="attr_con" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=con}} {{result=[[2d6+@{con}]]}}">Con</button>
+                <input type="number" name="attr_constitution" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=con}} {{result=[[2d6+@{constitution}]]}}">Con</button>
             </label>
           </div>
           <div class="sheet-column sheet-col-6">
             <label class="sheet-attribute">
-                <input type="number" name="attr_int" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=int}} {{result=[[2d6+@{int}]]}}">Int</button>
+                <input type="number" name="attr_intelligence" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=int}} {{result=[[2d6+@{intelligence}]]}}">Int</button>
             </label>
             <label class="sheet-attribute">
-                <input type="number" name="attr_wis" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=wis}} {{result=[[2d6+@{wis}]]}}">Wis</button>
+                <input type="number" name="attr_wisdom" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=wisdom}} {{result=[[2d6+@{wisdom}]]}}">Wis</button>
             </label>
             <label class="sheet-attribute">
-                <input type="number" name="attr_cha" min="0" max="3"/>
-                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=cha}} {{result=[[2d6+@{cha}]]}}">Cha</button>
+                <input type="number" name="attr_charisma" min="0" max="3"/>
+                <button type="roll" value="&{template:check} {{name=@{character_name}}} {{label=cha}} {{result=[[2d6+@{charisma}]]}}">Cha</button>
             </label>
           </div>
         </div>
@@ -296,7 +296,7 @@
 
         <!--HitPoints-->
       <div class="sheet-column sheet-col-2 sheet-white-bg">
-        <button class="sheet-btn-hit-points" type="roll" value="&{template:roll} {{name=@{character_name}}} {{label=hp}} {{result=[[(@{hit_dice}+@{con})d6kh@{level}+@{hardy}]]}}""><h2>Hit Points</h2></button>
+        <button class="sheet-btn-hit-points" type="roll" value="&{template:roll} {{name=@{character_name}}} {{label=hp}} {{result=[[(@{hit_dice}+@{constitution})d6kh@{level}+@{hardy}]]}}""><h2>Hit Points</h2></button>
          <label class="sheet-number">
             <input type="number" name="attr_hit_points" min="1"/>
         </label>
@@ -326,7 +326,7 @@
       <div class="sheet-column sheet-col-3">
         <label class="sheet-number">
           <h2>To Next Level</h2>
-          <input type="number" name="attr_xp_next"/>
+          <input type="number" name="attr_needed_for_next_level"/>
         </label>
       </div>
         <!--XP-->
@@ -339,6 +339,21 @@
     </div>
 
 </div>
+<input type="hidden" name="attr_weapons"/>
+
+<script type="text/worker">
+  on('sheet:opened',function(){
+    //Preserve weapons data from previous sheet.
+    getAttrs(["weapons", "notes"], function(values) {
+      if(values.weapons !== "") {
+        setAttrs({
+          notes: values.notes + "\n\nYour weapons:\n" + values.weapons,
+          weapons: ""
+        });
+      }
+    });
+  });
+</script>
 
 <rolltemplate class="sheet-rolltemplate-check">
   {{#rollGreater() result 9}}
