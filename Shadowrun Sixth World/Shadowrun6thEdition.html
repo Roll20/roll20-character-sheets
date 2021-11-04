@@ -5248,10 +5248,10 @@
 
 		{{#dice}}
 		<div class="sheet-template-row">
-			<span class="left" style="width: 30%"><span title="Reroll Misses">{{#rerolls}}[+](~{{header}}|reroll{{computed::misses}}){{/rerolls}}</span>
-			<span title="Bump 4's to 5's">{{#rollGreater() computed::fours 0}}[+4s](~{{header}}|bump_fours{{computed::fours}}){{/rollGreater() computed::fours 0}}</span></span>
+			<span class="left" style="width: 30%">{{#rollGreater() rerolls 0}}<span title="Reroll Misses">[+](~{{header}}|reroll{{computed::misses}})</span>
+			<span title="Bump 4's to 5's">{{#rollGreater() computed::fours 0}}[+4s](~{{header}}|bump_fours{{computed::fours}}){{/rollGreater() computed::fours 0}}</span>{{/rollGreater() rerolls 0}}</span>
 			<span style="width: 70%">Hits: <!-- {{dice}} => -->{{computed::dice}}</span>
-			<span class="right" style="width: 30%"><span title="Reroll Hits">{{#rerolls}}[-](~{{header}}|reroll{{computed::hits}}){{/rerolls}}</span></span>
+			<span class="right" style="width: 30%">{{#rollGreater() rerolls 0}}<span title="Reroll Hits">{{#rollGreater() rerolls 0}}[-](~{{header}}|reroll{{computed::hits}}){{/rollGreater() rerolls 0}}</span>{{/rollGreater() rerolls 0}}</span>
 		</div>
 		{{/dice}}
 
@@ -5439,7 +5439,7 @@
 <input type="hidden" name="attr_combat_paralysis_initiative_mod" value="" />
 <input type="hidden" name="attr_bad_luck" value="0" />
 <input type="hidden" name="attr_matrix_overclock" value="0" />
-<input type="hidden" name="attr_rerolls" value="1" />
+<input type="hidden" name="attr_rerolls" value="0" />
 
 <input type="hidden" name="attr_sheet_version" value="0.46">
 <input type="hidden" name="attr_data_version" value="0">
@@ -5521,7 +5521,7 @@ const rollButtons = {
 	grenadeweapon: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{weapon}}}{{dice=[[(@{type}+@{spec}+@{expert}+@{dicepool_modifier}+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=DV @{ground_zero}/@{close}/@{near}, Blast Area: @{blast}, Notes: @{notes} [GM Roll Scatter](~@{character_name}|GrenadeScatterAndDistance)}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 	GrenadeScatterAndDistance: "/w GM &{template:multirow}{{header=Grenade}}{{base=Bounce & Scatter}}{{desc=Scatter Direction [[2d6]]}}{{desc2=Bounce Distance [[{[[2d6]]-(?{Hits?|0}?{Range?|Close,+4|Near,+2|Medium,+0|Far,-2|Extreme,-4}),0}kh1]]m}}",
 
-	spell: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=@{rerolls}}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{desc=@{notes}}}",
+	spell: "@{gm_toggle} &{template:rolls-computed}{{dice=[[((@{skill}+@{magic}+@{dicepool_modifier}+@{specialization}+@{expertise})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}{{misses=[[0]]}}{{hits=[[0]]}}{{fours=[[0]]}}{{rerolls=[[@{rerolls}]]}}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{ampup=[[?{Amp Up|0|1|2|3|4|5|6|7|8|9|10}]]}}{{increasearea=[[?{Increase Area|0m,0|2m,1|4m,2|6m,3|8m,4|10m,5|12m,5|14m,6|16m,8|18m,9|20m,10}*2]]}}{{drain=[[?{Amp Up}*2+?{Increase Area}+(@{drain})]]}}{{header=@{character_name}}}{{base=@{name} (@{category} ^{magic})}}{{effecttype=@{effect_type}}}{{desc=@{notes}}}",
 	preparation: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name}}}{{dice=[[((@{magic}+@{potency}+@{expert}+@{spec})+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=@{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 	ritual: "@{gm_toggle} &{template:rolls-computed}{{mod=[[@{modifiers_toggle}]]}}{{wound=[[@{wounds_toggle}]]}}{{edge=[[@{edge_toggle}]]}}{{header=@{character_name}}}{{base=@{name} (Sorcery + Magic + Teamwork Hits)}}{{dice=[[((@{skill}+@{magic}+@{spec}+@{expert}+@{dicepool_modifier}+?{Teamwork test hits?|})+@{wounds_toggle}+@{modifiers_toggle}+@{edge_toggle})d6>5@{explode_toggle}cs>5cf<[[(1+@{bad_luck})]]]]}}{{desc=Threshold: @{threshold}, Teamwork Test Hits: ?{Teamwork test hits?|}\nNotes:@{notes}}}{{wilddie=[[@{wild_die}]]}}{{glitch=[[0]]}}{{wilddie_dice=[[0]]}}{{dicepool=[[0]]}}",
 
