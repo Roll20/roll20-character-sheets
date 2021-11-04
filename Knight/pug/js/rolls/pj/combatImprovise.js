@@ -1,442 +1,432 @@
+/* eslint-disable no-loop-func */
+/* eslint-disable camelcase */
+/* eslint-disable max-len */
+/* eslint-disable prefer-destructuring */
+/* eslint-disable no-undef */
 const rollCombatImprovise = 14;
 
-for(let i = 0;i < rollCombatImprovise;i++) {
-    let str = `AI${i}`;
-
-    on(`clicked:${str}`, async function(info) {
-        let roll = info.htmlAttributes.value;
-        let armure = donneesPJ["Armure"];
-        let armureL = donneesPJ["ArmureLegende"];
-
-        var hasArmure = true;
-
-        let dDgts = 0;
-        let dViolence = 0;
-
-        switch(i) {
-            case 1:
-                dDgts = 4;
-                dViolence = 4;
-                break;
-
-            case 2:
-                dDgts = 2;
-                dViolence = 5;
-                break;
-
-            case 3:
-                dDgts = 4;
-                dViolence = 4;
-                break;
-
-            case 4:
-                dDgts = 6;
-                dViolence = 4;
-                break;
-
-            case 5:
-                dDgts = 4;
-                dViolence = 6;
-                break;
-
-            case 6:
-                dDgts = 5;
-                dViolence = 5;
-                break;
-
-            case 7:
-                dDgts = 7;
-                dViolence = 5;
-                break;
-
-            case 8:
-                dDgts = 5;
-                dViolence = 7;
-                break;
-
-            case 9:
-                dDgts = 6;
-                dViolence = 6;
-                break;
-
-            case 10:
-                dDgts = 7;
-                dViolence = 9;
-                break;
-
-            case 11:
-                dDgts = 8;
-                dViolence = 8;
-                break;
-
-            case 12:
-                dDgts = 10;
-                dViolence = 12;
-                break;
-
-            case 13:
-                dDgts = 11;
-                dViolence = 11;
-                break;
-
-            default:
-                dDgts = 0;
-                dViolence = 0;
-                break;
-        }
-
-        if(armure == "sans" || armure == "guardian")
-            hasArmure = false;
-
-        let exec = [];
-        exec.push(roll);
-
-        let isConditionnelA = false;
-        let isConditionnelD = false;
-        let isConditionnelV = false;
-
-        let cBase = [];
-        let cBonus = [];
-        let cRoll = [];
-        let bonus = [];
-
-        let OD = 0;
-        
-        let type = PJData["utilisationArmeAI"];
-        let mod = PJData["jetModifDes"];
-        let hasBonus = PJData["bonusCarac"];
-
-        let baseDegats = dDgts;
-        let baseViolence = dViolence;
-
-        let diceDegats = baseDegats;
-        let diceViolence = baseDegats;
-
-        let bDegats = [];
-        let bViolence = [];
-
-        let degats = [];
-        let violence = [];
-
-        let C1Nom;
-        let C2Nom;
-
-        let listAttrs = [
-            "caracteristique3ArmeImprovisee",
-            "caracteristique4ArmeImprovisee"
-        ]
-
-        let attrs = await asw.getAttrs(listAttrs);
-
-        let C3 = attrs[`caracteristique3ArmeImprovisee`];
-        let C4 = attrs[`caracteristique4ArmeImprovisee`];
-        
-        if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
-            C1Nom = "force";
-            C2Nom = "combat";
-        } else {
-            C1Nom = "force";
-            C2Nom = "tir";
-        }
-
-        let C3Nom = "";
-        let C4Nom = "";
-
-        let ODBarbarian = [];
-        let ODMALBarbarian = [];
-        let ODShaman = [];
-        let ODMALShaman = [];
-        let ODWarrior = [];
-        let ODMALWarrior = [];
-
-        let vForce = CaracValue["force"].value;
-        let oForce = CaracValue["force"].VraiOD;
-        let vDiscretion = CaracValue["discretion"].value;
-        let oDiscretion = CaracValue["discretion"].VraiOD;
-        let oTir = CaracValue["tir"].VraiOD;
-        let oCombat = CaracValue["combat"].VraiOD;
-
-        let attaquesSurprises = [];
-        let attaquesSurprisesValue = [];
-        let attaquesSurprisesCondition = "";
-
-        let autresEffets = [];
-        if(hasArmure)
-            exec.push("{{OD=true}}");
-
-        let C1Value = Number(CaracValue[C1Nom].value);
-        let C1OD = Number(CaracValue[C1Nom].OD);
-
-        cBase.push(CaracNom[C1Nom]);
-        cRoll.push(C1Value);
-
-        if(hasArmure)
-            OD += C1OD;
-
-        let C2Value = Number(CaracValue[C2Nom].value);
-        let C2OD = Number(CaracValue[C2Nom].OD);
-
-        cBase.push(CaracNom[C2Nom]);
-        cRoll.push(C2Value);
-
-        if(hasArmure)
-            OD += C2OD;
-
-        if(hasBonus == 1 || hasBonus == 2) {
-            if(C3 != "0") {
-                C3Nom = C3.slice(2, -1);
-                
-                let C3Value = Number(CaracValue[C3Nom].value);
-                let C3OD = Number(CaracValue[C3Nom].OD);
+for (let i = 0; i < rollCombatImprovise; i += 1) {
+  const str = `AI${i}`;
+
+  on(`clicked:${str}`, async (info) => {
+    const roll = info.htmlAttributes.value;
+
+    let hasArmure = true;
+
+    let dDgts = 0;
+    let dViolence = 0;
+
+    switch (i) {
+      case 1:
+        dDgts = 4;
+        dViolence = 4;
+        break;
+
+      case 2:
+        dDgts = 2;
+        dViolence = 5;
+        break;
+
+      case 3:
+        dDgts = 4;
+        dViolence = 4;
+        break;
+
+      case 4:
+        dDgts = 6;
+        dViolence = 4;
+        break;
+
+      case 5:
+        dDgts = 4;
+        dViolence = 6;
+        break;
+
+      case 6:
+        dDgts = 5;
+        dViolence = 5;
+        break;
+
+      case 7:
+        dDgts = 7;
+        dViolence = 5;
+        break;
+
+      case 8:
+        dDgts = 5;
+        dViolence = 7;
+        break;
+
+      case 9:
+        dDgts = 6;
+        dViolence = 6;
+        break;
+
+      case 10:
+        dDgts = 7;
+        dViolence = 9;
+        break;
+
+      case 11:
+        dDgts = 8;
+        dViolence = 8;
+        break;
+
+      case 12:
+        dDgts = 10;
+        dViolence = 12;
+        break;
+
+      case 13:
+        dDgts = 11;
+        dViolence = 11;
+        break;
+
+      default:
+        dDgts = 0;
+        dViolence = 0;
+        break;
+    }
+
+    let exec = [];
+    exec.push(roll);
+
+    let isConditionnelA = false;
+    let isConditionnelD = false;
+    let isConditionnelV = false;
+
+    const cBase = [];
+    const cBonus = [];
+    let cRoll = [];
+    let bonus = [];
+
+    let OD = 0;
+
+    const baseDegats = dDgts;
+    const baseViolence = dViolence;
+
+    let diceDegats = baseDegats;
+    let diceViolence = baseDegats;
 
-                cBonus.push(CaracNom[C3Nom]);
-                cRoll.push(C3Value);
+    const bDegats = [];
+    const bViolence = [];
 
-                if(hasArmure)
-                    OD += C3OD;
-            }
+    let degats = [];
+    let violence = [];
 
-            if(hasBonus == 2) {
-                if(C4 != "0") {
-                    C4Nom = C4.slice(2, -1);
+    let C1Nom;
+    let C2Nom;
 
-                    let C4Value = Number(CaracValue[C4Nom].value);
-                    let C4OD = Number(CaracValue[C4Nom].OD);
+    let listAttrs = [
+      'utilisationArmeAI',
+      'caracteristique3ArmeImprovisee',
+      'caracteristique4ArmeImprovisee',
+      'force',
+      `${ODValue.force}`,
+      'discretion',
+      `${ODValue.discretion}`,
+      'tir',
+      `${ODValue.tir}`,
+      'combat',
+      `${ODValue.combat}`,
+    ];
 
-                    cBonus.push(CaracNom[C4Nom]);
-                    cRoll.push(C4Value);
-    
-                    if(hasArmure)
-                        OD += C4OD;
-                }
-            }
-        }
+    listAttrs = listAttrs.concat(listBase);
+    listAttrs = listAttrs.concat(listArmure);
+    listAttrs = listAttrs.concat(listArmureLegende);
 
-        if(OD.length == 0)
-            exec.push("{{vOD=0}}");
-        else
-            exec.push("{{vOD="+OD+"}}");
+    const attrs = await getAttrsAsync(listAttrs);
 
-        if(mod != 0) {
-            cRoll.push(mod);
-            exec.push("{{mod="+mod+"}}");
-        }
+    const armure = attrs.armure;
+    const armureL = attrs.armureLegende;
 
-        //GESTION DES BONUS DE BASE
-        if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
-            let dForce = vForce;
+    if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
-            if(hasArmure)
-                dForce += oForce*3;
+    const type = attrs.utilisationArmeAI;
+    const mod = attrs.jetModifDes;
+    const hasBonus = attrs.bonusCarac;
 
-            bDegats.push(dForce);
-            exec.push("{{vForce="+dForce+"}}");
-        }
+    const C3 = attrs.caracteristique3ArmeImprovisee;
+    const C4 = attrs.caracteristique4ArmeImprovisee;
 
-        //FIN GESTION DES BONUS DE BASE
+    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+      C1Nom = 'force';
+      C2Nom = 'combat';
+    } else {
+      C1Nom = 'force';
+      C2Nom = 'tir';
+    }
 
-        //GESTION DES BONUS DES OD
-        if(oDiscretion >= 2 && hasArmure) {
-            let bODDiscretion = vDiscretion;
-            attaquesSurprises.push(i18n_odDiscretion);
+    let C3Nom = '';
+    let C4Nom = '';
 
-            if(oDiscretion >= 5)
-                bODDiscretion += vDiscretion+oDiscretion;
+    let ODBarbarian = [];
+    let ODMALBarbarian = [];
+    let ODShaman = [];
+    let ODMALShaman = [];
+    let ODWarrior = [];
+    let ODMALWarrior = [];
 
-            attaquesSurprisesValue.push(bODDiscretion);
-            attaquesSurprisesCondition = `{{attaqueSurpriseCondition=`+i18n_attaqueSurpriseCondition+`}}`;
-        }
-        //FIN DE GESTION DES BONUS DES OD
+    const vForce = +attrs.force;
+    const oForce = +attrs[ODValue.force];
+    const vDiscretion = +attrs.discretion;
+    const oDiscretion = +attrs[ODValue.discretion];
+    const oTir = +attrs[ODValue.tir];
+    const oCombat = +attrs[ODValue.combat];
 
-        //GESTION DU STYLE
-        let getStyle;
+    let attaquesSurprises = [];
+    let attaquesSurprisesValue = [];
+    let attaquesSurprisesCondition = '';
 
-        if(type == "&{template:combat} {{portee=^{portee-contact}}}") {
-            getStyle = getStyleContactMod(PJData, "", baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
-        } else {
-            getStyle = getStyleDistanceMod(PJData, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
-        }
+    const autresEffets = [];
+    if (hasArmure) { exec.push('{{OD=true}}'); }
 
-        exec = exec.concat(getStyle.exec);
-        cRoll = cRoll.concat(getStyle.cRoll);
-        diceDegats += getStyle.diceDegats;
-        diceViolence += getStyle.diceViolence;
+    const C1Value = +attrs[C1Nom];
+    const C1OD = +attrs[ODValue[C1Nom]];
 
-        //FIN GESTION DU STYLE
+    cBase.push(CaracNom[C1Nom]);
+    cRoll.push(C1Value);
 
-        //GESTION DES BONUS D'ARMURE
+    if (hasArmure) { OD += C1OD; }
 
-        let armorBonus = getArmorBonus(PJData, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+    const C2Value = +attrs[C2Nom];
+    const C2OD = +attrs[ODValue[C2Nom]];
 
-        exec = exec.concat(armorBonus.exec);
-        cRoll = cRoll.concat(armorBonus.cRoll);
+    cBase.push(CaracNom[C2Nom]);
+    cRoll.push(C2Value);
 
-        if(isConditionnelA == false)
-            isConditionnelA = armorBonus.isConditionnelA;
+    if (hasArmure) { OD += C2OD; }
 
-        if(isConditionnelD == false)
-            isConditionnelD = armorBonus.isConditionnelD;
+    const attrsCarac = await getCarac(hasBonus, '0', '0', C3, C4);
 
-        attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
-        attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
+    if (attrsCarac.C3) {
+      C3Nom = attrsCarac.C3Brut;
 
-        if(attaquesSurprisesCondition == "")
-            attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition);
+      const C3Value = attrsCarac.C3Base;
+      const C3OD = attrsCarac.C3OD;
 
-        diceDegats += Number(armorBonus.diceDegats);
-        diceViolence += Number(armorBonus.diceViolence);
+      cBonus.push(attrsCarac.C3Nom);
+      cRoll.push(C3Value);
 
-        ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
-        ODShaman = ODShaman.concat(armorBonus.ODShaman);
-        ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
+      if (hasArmure) { OD += C3OD; }
+    }
 
-        log(PJData);
+    if (attrsCarac.C4) {
+      C4Nom = attrsCarac.C4Brut;
 
-        let MALBonus = getMALBonus(PJData, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
+      const C4Value = attrsCarac.C4Base;
+      const C4OD = attrsCarac.C4OD;
 
-        exec = exec.concat(MALBonus.exec);
-        cRoll = cRoll.concat(MALBonus.cRoll);
+      cBonus.push(attrsCarac.C4Nom);
+      cRoll.push(C4Value);
 
-        if(isConditionnelA == false)
-            isConditionnelA = MALBonus.isConditionnelA;
+      if (hasArmure) { OD += C4OD; }
+    }
 
-        if(isConditionnelD == false)
-            isConditionnelD = MALBonus.isConditionnelD;
+    exec.push(`{{vOD=${OD}}}`);
 
-        attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
-        attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
+    if (mod !== 0) {
+      cRoll.push(mod);
+      exec.push(`{{mod=${mod}}}`);
+    }
 
-        if(attaquesSurprisesCondition == "")
-            attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition);
+    // GESTION DES BONUS DE BASE
+    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+      let dForce = vForce;
 
-        diceDegats += Number(MALBonus.diceDegats);
-        diceViolence += Number(MALBonus.diceViolence);
+      if (hasArmure) { dForce += oForce * 3; }
 
-        ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
-        ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-        ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+      bDegats.push(dForce);
+      exec.push(`{{vForce=${dForce}}}`);
+    }
 
-        //FIN GESTION DES BONUS D'ARMURE
+    // FIN GESTION DES BONUS DE BASE
 
-        if(cRoll.length == 0)
-            cRoll.push(0);
+    // GESTION DES BONUS DES OD
+    if (oDiscretion >= 2 && hasArmure) {
+      let bODDiscretion = vDiscretion;
+      attaquesSurprises.push(i18n_odDiscretion);
 
-        if(bonus.length == 0)
-            bonus.push(0);
+      if (oDiscretion >= 5) { bODDiscretion += vDiscretion + oDiscretion; }
 
-        bonus = bonus.concat(OD);
-        bonus = bonus.concat(ODBarbarian);
-        bonus = bonus.concat(ODMALBarbarian);
-        bonus = bonus.concat(ODShaman);
-        bonus = bonus.concat(ODMALShaman);
-        bonus = bonus.concat(ODWarrior);
-        bonus = bonus.concat(ODMALWarrior);
+      attaquesSurprisesValue.push(bODDiscretion);
+      attaquesSurprisesCondition = `{{attaqueSurpriseCondition=${i18n_attaqueSurpriseCondition}}}`;
+    }
+    // FIN DE GESTION DES BONUS DES OD
 
-        degats.push(`${diceDegats}D6`);
-        degats = degats.concat(bDegats);
+    // GESTION DU STYLE
+    let getStyle;
 
-        violence.push(`${diceViolence}D6`);
-        violence = violence.concat(bViolence);
+    if (type === '&{template:combat} {{portee=^{portee-contact}}}') {
+      getStyle = getStyleContactMod(attrs, [], baseDegats, baseViolence, hasArmure, oCombat, false, false, false, false, false, false, false, false, false);
+    } else {
+      getStyle = getStyleDistanceMod(attrs, baseDegats, baseViolence, 0, hasArmure, oTir, false, false, false, false);
+    }
 
-        if(cBase.length != 0)
-            exec.push("{{cBase="+cBase.join(" - ")+"}}");
+    exec = exec.concat(getStyle.exec);
+    cRoll = cRoll.concat(getStyle.cRoll);
+    diceDegats += getStyle.diceDegats;
+    diceViolence += getStyle.diceViolence;
 
-        if(cBonus.length != 0)
-            exec.push("{{cBonus="+cBonus.join(" - ")+"}}");
+    // FIN GESTION DU STYLE
 
-        var jet = "{{jet=[[ {{[[{"+cRoll.join("+")+", 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}";
+    // GESTION DES BONUS D'ARMURE
 
-        exec.push(jet);
-        exec.push("{{Exploit=[["+cRoll.join("+")+"]]}}");
-        exec.push("{{bonus=[["+bonus.join("+")+"]]}}");
+    const armorBonus = getArmorBonus(attrs, armure, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-        exec.push("{{degats=[["+degats.join("+")+"]]}}");
-        exec.push("{{violence=[["+violence.join("+")+"]]}}");
+    exec = exec.concat(armorBonus.exec);
+    cRoll = cRoll.concat(armorBonus.cRoll);
 
-        if(attaquesSurprises.length > 0) {
-            exec.push("{{attaqueSurprise="+attaquesSurprises.join("\n+")+"}}");
-            exec.push("{{attaqueSurpriseValue=[["+attaquesSurprisesValue.join("+")+"]]}}");
-            exec.push(attaquesSurprisesCondition);
-        }
+    if (isConditionnelA === false) { isConditionnelA = armorBonus.isConditionnelA; }
 
-        if(armure == "berserk") {
-            isConditionnelD = true;
-            isConditionnelV = true;
-    
-            exec.push("{{antiAnatheme="+i18n_antiAnatheme+"}}");
-            exec.push("{{antiAnathemeCondition="+i18n_antiAnathemeCondition+"}}");
+    if (isConditionnelD === false) { isConditionnelD = armorBonus.isConditionnelD; }
 
-            let degatsTenebricide = [];
-            let ASTenebricide = [];
-            let ASValueTenebricide = [];
+    attaquesSurprises = armorBonus.attaquesSurprises.concat(attaquesSurprises);
+    attaquesSurprisesValue = armorBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
 
-            let violenceTenebricide = [];
+    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = armorBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
-            let diceDegatsTenebricide = Math.floor(diceDegats/2);
-            let diceViolenceTenebricide = Math.floor(diceViolence/2);
+    diceDegats += Number(armorBonus.diceDegats);
+    diceViolence += Number(armorBonus.diceViolence);
 
-            degatsTenebricide.push(diceDegatsTenebricide+"D6");
-            degatsTenebricide = degatsTenebricide.concat(bDegats);
+    ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
+    ODShaman = ODShaman.concat(armorBonus.ODShaman);
+    ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
 
-            violenceTenebricide.push(diceViolenceTenebricide+"D6");
-            violenceTenebricide = violenceTenebricide.concat(bViolence);
-            
-            exec.push("{{tenebricideValueD=[["+degatsTenebricide.join("+")+"]]}}");
-            exec.push("{{tenebricideValueV=[["+violenceTenebricide.join("+")+"]]}}");
+    const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
-            exec.push("{{tenebricide="+i18n_tenebricide+"}}");
-            exec.push("{{tenebricideConditionD="+i18n_tenebricideConditionD+"}}");
-            exec.push("{{tenebricideConditionV="+i18n_tenebricideConditionV+"}}");
+    exec = exec.concat(MALBonus.exec);
+    cRoll = cRoll.concat(MALBonus.cRoll);
 
-            if(attaquesSurprises.length > 0) {
+    if (isConditionnelA === false) { isConditionnelA = MALBonus.isConditionnelA; }
 
-                ASTenebricide = ASTenebricide.concat(attaquesSurprises);
-                ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+    if (isConditionnelD === false) { isConditionnelD = MALBonus.isConditionnelD; }
 
-                exec.push("{{tenebricideAS="+ASTenebricide.join("\n+")+"}}");
-                exec.push("{{tenebricideASValue=[["+ASValueTenebricide.join("+")+"]]}}");
-            }
-        }
+    attaquesSurprises = MALBonus.attaquesSurprises.concat(attaquesSurprises);
+    attaquesSurprisesValue = MALBonus.attaquesSurprisesValue.concat(attaquesSurprisesValue);
 
-        if(autresEffets.length > 0) {
-            autresEffets.sort();
-            exec.push("{{effets="+autresEffets.join(" / ")+"}}");
-        }           
+    if (attaquesSurprisesCondition === '') { attaquesSurprisesCondition = MALBonus.attaquesSurprisesCondition.concat(attaquesSurprisesCondition); }
 
-        if(isConditionnelA)
-            exec.push("{{succesConditionnel=true}}");
+    diceDegats += Number(MALBonus.diceDegats);
+    diceViolence += Number(MALBonus.diceViolence);
 
-        if(isConditionnelD)
-            exec.push("{{degatsConditionnel=true}}");
+    ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
+    ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
+    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
 
-        if(isConditionnelV)
-            exec.push("{{violenceConditionnel=true}}");
+    // FIN GESTION DES BONUS D'ARMURE
 
-        startRoll(exec.join(" "), (results) => {
-            let tJet = results.results.jet.result;
+    if (cRoll.length === 0) { cRoll.push(0); }
 
-            let tBonus = results.results.bonus.result;
-            let tExploit = results.results.Exploit.result;
+    if (bonus.length === 0) { bonus.push(0); }
 
-            finishRoll(
-                results.rollId, 
-                {
-                    jet:tJet+tBonus
-                }
-            );
+    bonus = bonus.concat(OD);
+    bonus = bonus.concat(ODBarbarian);
+    bonus = bonus.concat(ODMALBarbarian);
+    bonus = bonus.concat(ODShaman);
+    bonus = bonus.concat(ODMALShaman);
+    bonus = bonus.concat(ODWarrior);
+    bonus = bonus.concat(ODMALWarrior);
 
-            if(tJet != 0 && tJet == tExploit) {
-                startRoll(roll+"@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1="+i18n_exploit+"}}"+jet, (exploit) => {
-                    let tExploit = exploit.results.jet.result;
+    degats.push(`${diceDegats}D6`);
+    degats = degats.concat(bDegats);
 
-                    finishRoll(
-                        exploit.rollId, 
-                        {
-                            jet:tExploit
-                        }
-                    );
-                });
-            }
-        });           
+    violence.push(`${diceViolence}D6`);
+    violence = violence.concat(bViolence);
+
+    if (cBase.length !== 0) { exec.push(`{{cBase=${cBase.join(' - ')}}}`); }
+
+    if (cBonus.length !== 0) { exec.push(`{{cBonus=${cBonus.join(' - ')}}}`); }
+
+    const jet = `{{jet=[[ {{[[{${cRoll.join('+')}, 0}kh1]]d6cs2cs4cs6cf1cf3cf5s%2}=0}]]}}`;
+
+    exec.push(jet);
+    exec.push(`{{Exploit=[[${cRoll.join('+')}]]}}`);
+    exec.push(`{{bonus=[[${bonus.join('+')}]]}}`);
+
+    exec.push(`{{degats=[[${degats.join('+')}]]}}`);
+    exec.push(`{{violence=[[${violence.join('+')}]]}}`);
+
+    if (attaquesSurprises.length > 0) {
+      exec.push(`{{attaqueSurprise=${attaquesSurprises.join('\n+')}}}`);
+      exec.push(`{{attaqueSurpriseValue=[[${attaquesSurprisesValue.join('+')}]]}}`);
+      exec.push(attaquesSurprisesCondition);
+    }
+
+    if (armure === 'berserk') {
+      isConditionnelD = true;
+      isConditionnelV = true;
+
+      exec.push(`{{antiAnatheme=${i18n_antiAnatheme}}}`);
+      exec.push(`{{antiAnathemeCondition=${i18n_antiAnathemeCondition}}}`);
+
+      let degatsTenebricide = [];
+      let ASTenebricide = [];
+      let ASValueTenebricide = [];
+
+      let violenceTenebricide = [];
+
+      const diceDegatsTenebricide = Math.floor(diceDegats / 2);
+      const diceViolenceTenebricide = Math.floor(diceViolence / 2);
+
+      degatsTenebricide.push(`${diceDegatsTenebricide}D6`);
+      degatsTenebricide = degatsTenebricide.concat(bDegats);
+
+      violenceTenebricide.push(`${diceViolenceTenebricide}D6`);
+      violenceTenebricide = violenceTenebricide.concat(bViolence);
+
+      exec.push(`{{tenebricideValueD=[[${degatsTenebricide.join('+')}]]}}`);
+      exec.push(`{{tenebricideValueV=[[${violenceTenebricide.join('+')}]]}}`);
+
+      exec.push(`{{tenebricide=${i18n_tenebricide}}}`);
+      exec.push(`{{tenebricideConditionD=${i18n_tenebricideConditionD}}}`);
+      exec.push(`{{tenebricideConditionV=${i18n_tenebricideConditionV}}}`);
+
+      if (attaquesSurprises.length > 0) {
+        ASTenebricide = ASTenebricide.concat(attaquesSurprises);
+        ASValueTenebricide = ASValueTenebricide.concat(attaquesSurprisesValue);
+
+        exec.push(`{{tenebricideAS=${ASTenebricide.join('\n+')}}}`);
+        exec.push(`{{tenebricideASValue=[[${ASValueTenebricide.join('+')}]]}}`);
+      }
+    }
+
+    if (autresEffets.length > 0) {
+      autresEffets.sort();
+      exec.push(`{{effets=${autresEffets.join(' / ')}}}`);
+    }
+
+    if (isConditionnelA) { exec.push('{{succesConditionnel=true}}'); }
+
+    if (isConditionnelD) { exec.push('{{degatsConditionnel=true}}'); }
+
+    if (isConditionnelV) { exec.push('{{violenceConditionnel=true}}'); }
+
+    startRoll(exec.join(' '), (results) => {
+      const tJet = results.results.jet.result;
+
+      const tBonus = results.results.bonus.result;
+      const tExploit = results.results.Exploit.result;
+
+      finishRoll(
+        results.rollId,
+        {
+          jet: tJet + tBonus,
+        },
+      );
+
+      if (tJet !== 0 && tJet === tExploit) {
+        startRoll(`${roll}@{jetGM} &{template:simple} {{Nom=@{name}}} {{special1=${i18n_exploit}}}${jet}`, (exploit) => {
+          const tExploit2 = exploit.results.jet.result;
+
+          finishRoll(
+            exploit.rollId,
+            {
+              jet: tExploit2,
+            },
+          );
+        });
+      }
     });
+  });
 }
