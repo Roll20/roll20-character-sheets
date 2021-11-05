@@ -648,7 +648,7 @@ rollCombatArchangel.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.canonMetatronCaracteristique1;
         C2 = attrs.canonMetatronCaracteristique2;
@@ -918,7 +918,7 @@ rollCombatNephilim.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.canonMagmaCaracteristique1;
         C2 = attrs.canonMagmaCaracteristique2;
@@ -1029,7 +1029,7 @@ rollCombatNephilim.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.MSurturCaracteristique1;
         C2 = attrs.MSurturCaracteristique2;
@@ -1268,7 +1268,7 @@ rollCombatDemon.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.DSouffleCaracteristique1;
         C2 = attrs.DSouffleCaracteristique2;
@@ -1377,7 +1377,7 @@ rollCombatDemon.forEach((button) => {
         active = attrs.MADDjinnWraithActive;
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = '@{discretion}';
         C2 = attrs.caracteristiqueWraith2;
@@ -1462,7 +1462,7 @@ rollCombatDemon.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.APoingsCaracteristique1;
         C2 = attrs.APoingsCaracteristique2;
@@ -1569,7 +1569,7 @@ rollCombatDemon.forEach((button) => {
         attrs = await getAttrsAsync(listAttrs);
 
         bCarac = attrs.bonusCarac;
-        mod = attrs.jetModifDes;
+        mod = +attrs.jetModifDes;
 
         C1 = attrs.LCGCaracteristique1;
         C2 = attrs.LCGCaracteristique2;
