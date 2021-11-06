@@ -202,7 +202,7 @@ rollCombatDistancePNJ.forEach((button) => {
     const cRoll = [];
     let bonus = [];
 
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
 
     let aspectNom = '';
     let AEValue = 0;

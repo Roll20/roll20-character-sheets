@@ -223,7 +223,7 @@ rollCombatContact.forEach((button) => {
     const armure = attrs.armure;
     const armureL = attrs.armureLegende;
 
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
     const hasBonus = attrs.bonusCarac;
 
     if (button === 'repeating_armeCaC:armecontact') {
@@ -620,7 +620,8 @@ rollCombatContact.forEach((button) => {
       const sBonusViolenceD6 = attrs[`${prefix}BVDiversD6`];
       const sBonusViolenceFixe = attrs[`${prefix}BVDiversFixe`];
 
-      sEnergie = isApplied(attrs[`${prefix}energie`]);
+      if (button !== 'poingMAContact') { sEnergie = isApplied(attrs[`${prefix}energie`]); }
+
       const sEnergieValue = attrs[`${prefix}energieValue`];
 
       if (sBonusDegats) {

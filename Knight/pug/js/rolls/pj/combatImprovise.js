@@ -143,7 +143,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     if (armure === 'sans' || armure === 'guardian') { hasArmure = false; }
 
     const type = attrs.utilisationArmeAI;
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
     const hasBonus = attrs.bonusCarac;
 
     const C3 = attrs.caracteristique3ArmeImprovisee;

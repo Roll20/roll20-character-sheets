@@ -111,7 +111,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
     let bonus = [];
 
     const type = attrs.utilisationArmeAIPNJ;
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
 
     let diceDegats = dDgts;
     let diceViolence = dViolence;
