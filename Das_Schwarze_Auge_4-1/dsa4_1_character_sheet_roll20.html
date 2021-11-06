@@ -18127,4 +18127,177 @@ function prettifyMod(uglyModifier) {
 	}
 	return prettyModifier;
 }
+/*
+	calcCritLevels
+Calculates the required d20 rolls for critical success/failure
+type:
+	talent,
+	kampf_at, kampf_pa, kampf_fk,
+	zauber, ritual,
+	liturgie
+effects (object):
+	Tollpatsch
+	wilde Magie
+	// effects below not yet used, added for completeness and later implementation
+	Axxeleratus, Blitzgeschwind
+	Murks und Patz
+	Reversalis(Murks und Patz)
+	Standfest Katzengleich
+	Stillstand
+	Reversalis(Stillstand)
+	Thalionmels Schlachtgesang
+	// effects below ignored and not added due to complex implementation
+	Sensattaco
+	Reversalis(Sensattaco)
+	Reversalis(Standfest)
+It outputs an object with the
+	maximum roll triggering critical success (default: 1)
+	minimum roll triggering critical failure (default: 20)
+Note: No critical success/failure for liturgies (see Wege der Götter, p. 242).
+*/
+function calcCritLevels (type = 'talent', effects) {
+	const caller = 'calcCritLevels';
+	var result = {
+		'success': 1,
+		'failure': 20
+	};
+	const types = [
+		'talent',
+		'kampf_at', 'kampf_pa', 'kampf_fk',
+		'zauber', 'ritual'
+	];
+	const effectList = [
+		'Tollpatsch',
+		'wilde Magie',
+		'Axxeleratus, Blitzgeschwind',
+		'Murks und Patz',
+		'Reversalis(Murks und Patz)',
+		'Standfest Katzengleich',
+		'Stillstand',
+		'Reversalis(Stillstand)',
+		'Thalionmels Schlachtgesang'
+	];
+	// Check type, per check type list influence on critical success/failure per effect
+	// Higher values for critical success = good (+2 means 1, 2, 3 are success)
+	// Lower values for critical failure = bad (-2 means 18, 19, 20 are failure)
+	// Values outside of d20 results (< 1, > 20): critical not possible
+	// Karmic effects trump magic effects
+	const effectMatrix = {
+		'talent': {
+			'Tollpatsch': { 'success': 0, 'failure': -1 },
+			'wilde Magie': { 'success': 0, 'failure': 0 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': 0 },
+			'Murks und Patz': { 'success': 0, 'failure': 0 },
+			'Reversalis(Murks und Patz)': { 'success': 0, 'failure': 0 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 0 },
+			'Stillstand': { 'success': 0, 'failure': 0 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': 0 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 0 }
+		},
+		'kampf_at': {
+			'Tollpatsch': { 'success': 0, 'failure': -1 },
+			'wilde Magie': { 'success': 0, 'failure': 0 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': -2 },
+			'Murks und Patz': { 'success': -50, 'failure': -50 },
+			'Reversalis(Murks und Patz)': { 'success': 50, 'failure': 50 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 50 },
+			'Stillstand': { 'success': 0, 'failure': 50 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': -2 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 100 }
+		},
+		'kampf_pa': {
+			'Tollpatsch': { 'success': 0, 'failure': -1 },
+			'wilde Magie': { 'success': 0, 'failure': 0 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': -2 },
+			'Murks und Patz': { 'success': -50, 'failure': -50 },
+			'Reversalis(Murks und Patz)': { 'success': 50, 'failure': 50 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 50 },
+			'Stillstand': { 'success': 0, 'failure': 50 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': -2 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 100 }
+		},
+		'kampf_fk': {
+			'Tollpatsch': { 'success': 0, 'failure': -1 },
+			'wilde Magie': { 'success': 0, 'failure': 0 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': -2 },
+			'Murks und Patz': { 'success': -50, 'failure': -50 },
+			'Reversalis(Murks und Patz)': { 'success': 50, 'failure': 50 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 0 },
+			'Stillstand': { 'success': 0, 'failure': 50 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': -2 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 0 }
+		},
+		'zauber': {
+			'Tollpatsch': { 'success': 0, 'failure': 0 },
+			'wilde Magie': { 'success': 0, 'failure': -1 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': 0 },
+			'Murks und Patz': { 'success': 0, 'failure': 0 },
+			'Reversalis(Murks und Patz)': { 'success': 0, 'failure': 0 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 0 },
+			'Stillstand': { 'success': 0, 'failure': 0 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': 0 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 0 }
+		},
+		'ritual': {
+			'Tollpatsch': { 'success': 0, 'failure': 0 },
+			'wilde Magie': { 'success': 0, 'failure': -1 },
+			'Axxeleratus, Blitzgeschwind': { 'success': 0, 'failure': 0 },
+			'Murks und Patz': { 'success': 0, 'failure': 0 },
+			'Reversalis(Murks und Patz)': { 'success': 0, 'failure': 0 },
+			'Standfest Katzengleich': { 'success': 0, 'failure': 0 },
+			'Stillstand': { 'success': 0, 'failure': 0 },
+			'Reversalis(Stillstand)': { 'success': 0, 'failure': 0 },
+			'Thalionmels Schlachtgesang': { 'success': 0, 'failure': 0 }
+		}
+	};
+	/* Input Sanitation */
+	// Type
+	if (types.includes(type) === false)
+	{
+		debugLog(caller, 'Invalid type encountered: "', type, '". Using default values.');
+		return result;
+	}
+
+	// Effects
+	var propertyCheck = checkRequiredProperties(effectList, effects);
+	if (propertyCheck['errors'] >= 1)
+	{
+		debugLog(caller, 'Missing properties:', propertyCheck['missing'], '. Missing values added with default value 0.');
+		for (property of propertyCheck['missing'])
+		{
+			effects[property] = 0;
+		}
+	}
+
+	// Assumption: safeGetAttrs() used, so no undefined or NaN
+	// Correct values: 0 or 1
+	for (property of effectList)
+	{
+		if (isNaN(parseInt(effects[property])))
+		{
+			debugLog(caller, 'Property not a number:', property, 'with value', effects[property] + '. Assuming 0.');
+			effects[property] = 0;
+		} else {
+			if (parseInt(effects[property]) < 0)
+			{
+				effects[property] = 0;
+			} else if (parseInt(effects[property]) > 1) {
+				effects[property] = 1;
+			}
+		}
+	}
+	debugLog(caller, 'Inputs sanitized: type:', type, 'effects:', effects);
+
+	/* Calculations */
+	for (crit of ['success', 'failure'])
+	{
+		for (effect of effectList)
+		{
+			result[crit] += effects[effect] * effectMatrix[type][effect][crit];
+		}
+	}
+
+	debugLog(caller, 'Result:', result);
+	return result;
+}
 </script>
