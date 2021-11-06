@@ -91,7 +91,7 @@ buttonCaracBonus.forEach((button) => {
   on(`clicked:${button}`, () => {
     getAttrs(['bonusCarac'], (value) => {
       const bonusCarac = parseInt(value.bonusCarac, 10) || 0;
-      let newValue = button.split('_')[1];
+      let newValue = +button.split('_')[1];
 
       if (bonusCarac === newValue) { newValue = 0; }
 

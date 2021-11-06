@@ -236,7 +236,7 @@ rollCombatDistance.forEach((button) => {
 
     let OD = 0;
 
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
     const hasBonus = attrs.bonusCarac;
 
     let degats = [];
