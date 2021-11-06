@@ -2761,15 +2761,19 @@
 			Finally, the amount of prompts for rolls using the api script can become really extensive, such as for a withering damage roll, where soak, net successes, bonus dice, results to double, and results to reroll would all require a prompt.-->
 		</div>
 		<div class="sheet-miscessence">
-			<span class="sheet-headtext" data-il8n="essence-pool-changes-u">Essence Pool Mods.</span>
+			<span class="sheet-headtext" data-il8n="sheet-val-mods-u">Sheet Value Modifiers</span>
 			<div class="sheet-abilities-miscrownew4">
-				<span>Additional Max Personal Essence:</span>
+				<span data-il8n="add-max-personal-ess-u">Additional Max Personal Essence:</span>
 				<input type="number" name="attr_max_pers_mod" value="0">
 			</div>
 			<div class="sheet-abilities-miscrownew4">
-				<span>Additional Max Peripheral Essence:</span>
+				<span data-il8n="add-max-peripheral-ess-u">Additional Max Peripheral Essence:</span>
 				<input type="number" name="attr_max_periph_mod" value="0">
-			</div>		
+			</div>	
+			<div class="sheet-abilities-miscrownew4">
+				<span data-il8n="wound-penalty-negation-u">Wound Penalty Negation:</span>
+				<input type="number" name="attr_wound_pen_negation" value="0">
+			</div>	
 		</div>
 		<div class="sheet-miscintimacies">
 			<div class="sheet-intimacy-row2">
@@ -2898,9 +2902,12 @@ initTAS();
         })).execute();
     }));
 
-on('sheet:opened ' + damageWatch, TAS._fn(function updateWoundPenalty(e) {
+on('sheet:opened ' 
+	+ 'change:wound_pen_negation ' + damageWatch, TAS._fn(function updateWoundPenalty(e) {
     TAS.debug('Updating wound penalty', e);
-    getAttrs(damageAttrs, TAS._fn(function calcPenalty(values) {
+	getAttrs(['wound_pen_negation'], function(vals) {
+    getAttrs( damageAttrs , TAS._fn(function calcPenalty(values) {
+		let wpn = parseInt(vals.wound_pen_negation)||0;
         var pen;
 
         for (i = 27; i >= 1; i--) {
@@ -2912,10 +2919,13 @@ on('sheet:opened ' + damageWatch, TAS._fn(function updateWoundPenalty(e) {
 
         if (pen === 'I') pen = -4;
         if (pen === '') pen = 0;
-        pen = parseInt(pen);
+        pen = parseInt(pen) + wpn;
+		if (pen > 0) pen = 0;
+		
         TAS.debug('Calculated penalty', pen);
         setAttrs({ 'wound-penalty': pen });
     }));
+	});
 }));
 	
 on('sheet:opened', TAS._fn(function initIntimacies(e) {
