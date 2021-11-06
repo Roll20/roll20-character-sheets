@@ -1656,7 +1656,7 @@ on('change:warriorSoldierA change:warrior250PG change:deplOD change:forOD change
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorSoldierA;
+  const mode = +attrs.warriorSoldierA;
 
   const OD1 = +attrs.deplOD;
   const OD2 = +attrs.forOD;
@@ -1694,7 +1694,7 @@ on('change:warriorHunterA change:warrior250PG change:hargneOD change:combOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorHunterA;
+  const mode = +attrs.warriorHunterA;
 
   const OD1 = +attrs.hargneOD;
   const OD2 = +attrs.combOD;
@@ -1732,7 +1732,7 @@ on('change:warriorScholarA change:warrior250PG change:tirOD change:savoirOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorScholarA;
+  const mode = +attrs.warriorScholarA;
 
   const OD1 = +attrs.tirOD;
   const OD2 = +attrs.savoirOD;
@@ -1770,7 +1770,7 @@ on('change:warriorHeraldA change:warrior250PG change:auraOD change:paroleOD chan
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorHeraldA;
+  const mode = +attrs.warriorHeraldA;
 
   const OD1 = +attrs.auraOD;
   const OD2 = +attrs.paroleOD;
@@ -1808,7 +1808,7 @@ on('change:warriorScoutA change:warrior250PG change:discrOD change:percOD change
 
   const PG250 = +attrs.warrior250PG;
 
-  const mode = attrs.warriorScoutA;
+  const mode = +attrs.warriorScoutA;
 
   const OD1 = +attrs.discrOD;
   const OD2 = +attrs.percOD;
@@ -2136,7 +2136,7 @@ on('change:MALWarriorSoldierA change:deplOD change:forOD change:endOD', async ()
     'endOD',
   ]);
 
-  const mode = attrs.MALWarriorSoldierA;
+  const mode = +attrs.MALWarriorSoldierA;
 
   const OD1 = +attrs.deplOD;
   const OD2 = +attrs.forOD;
@@ -2163,7 +2163,7 @@ on('change:MALWarriorHunterA change:hargneOD change:combOD change:instOD', async
     'instOD',
   ]);
 
-  const mode = attrs.MALWarriorHunterA;
+  const mode = +attrs.MALWarriorHunterA;
 
   const OD1 = +attrs.hargneOD;
   const OD2 = +attrs.combOD;
@@ -2190,7 +2190,7 @@ on('change:MALWarriorScholarA change:tirOD change:savoirOD change:technOD', asyn
     'technOD',
   ]);
 
-  const mode = attrs.MALWarriorScholarA;
+  const mode = +attrs.MALWarriorScholarA;
 
   const OD1 = +attrs.tirOD;
   const OD2 = +attrs.savoirOD;
@@ -2217,7 +2217,7 @@ on('change:MALWarriorHeraldA change:auraOD change:paroleOD change:sfOD', async (
     'sfOD',
   ]);
 
-  const mode = attrs.MALWarriorHeraldA;
+  const mode = +attrs.MALWarriorHeraldA;
 
   const OD1 = +attrs.auraOD;
   const OD2 = +attrs.paroleOD;
@@ -2244,7 +2244,7 @@ on('change:MALWarriorScoutA change:discrOD change:percOD change:dextOD', async (
     'dextOD',
   ]);
 
-  const mode = attrs.MALWarriorScoutA;
+  const mode = +attrs.MALWarriorScoutA;
 
   const OD1 = +attrs.discrOD;
   const OD2 = +attrs.percOD;
