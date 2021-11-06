@@ -65,7 +65,7 @@ rollCombatGrenade.forEach((button) => {
 
     if (attrs.grenadeAvancee !== '0') { ameliorations = true; }
 
-    const mod = attrs.jetModifDes;
+    const mod = +attrs.jetModifDes;
     const hasBonus = attrs.bonusCarac;
 
     const C1 = attrs.caracteristique1Grenade || '0';

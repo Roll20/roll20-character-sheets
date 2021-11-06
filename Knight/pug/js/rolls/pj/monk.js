@@ -460,14 +460,6 @@ monkCeaRoll.forEach((button) => {
         modA = attrs[bName];
 
         exec.push(`{{style=${i18n_style} ${i18n_ambidextre}}}`);
-
-        if (oTir >= 3) {
-          exec.push('{{vMStyleA=-1D}}');
-          cRoll.push(-1);
-        } else {
-          exec.push(`{{vMStyleA=${modA}D}}`);
-          cRoll.push(Number(modA));
-        }
         break;
 
       case 'defensif':
