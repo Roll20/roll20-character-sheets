@@ -18127,14 +18127,10 @@ function prettifyMod(uglyModifier) {
 	}
 	return prettyModifier;
 }
+
 /*
 	calcCritLevels
-Calculates the required d20 rolls for critical success/failure
-type:
-	talent,
-	kampf_at, kampf_pa, kampf_fk,
-	zauber, ritual,
-	liturgie
+Calculates the required d20 rolls for critical success/failure by check type
 effects (object):
 	Tollpatsch
 	wilde Magie
@@ -18150,16 +18146,20 @@ effects (object):
 	Sensattaco
 	Reversalis(Sensattaco)
 	Reversalis(Standfest)
-It outputs an object with the
+It outputs an object with one property per check type containing one object with
 	maximum roll triggering critical success (default: 1)
 	minimum roll triggering critical failure (default: 20)
 Note: No critical success/failure for liturgies (see Wege der Götter, p. 242).
 */
-function calcCritLevels (type = 'talent', effects) {
+function calcCritLevels (effects) {
 	const caller = 'calcCritLevels';
 	var result = {
-		'success': 1,
-		'failure': 20
+		'talent': {'success': 1, 'failure': 20},
+		'kampf_at': {'success': 1, 'failure': 20},
+		'kampf_pa': {'success': 1, 'failure': 20},
+		'kampf_fk': {'success': 1, 'failure': 20},
+		'zauber': {'success': 1, 'failure': 20},
+		'ritual': {'success': 1, 'failure': 20}
 	};
 	const types = [
 		'talent',
@@ -18251,13 +18251,6 @@ function calcCritLevels (type = 'talent', effects) {
 		}
 	};
 	/* Input Sanitation */
-	// Type
-	if (types.includes(type) === false)
-	{
-		debugLog(caller, 'Invalid type encountered: "', type, '". Using default values.');
-		return result;
-	}
-
 	// Effects
 	var propertyCheck = checkRequiredProperties(effectList, effects);
 	if (propertyCheck['errors'] >= 1)
@@ -18286,16 +18279,17 @@ function calcCritLevels (type = 'talent', effects) {
 			}
 		}
 	}
-	debugLog(caller, 'Inputs sanitized: type:', type, 'effects:', effects);
+	debugLog(caller, 'Inputs sanitized: effects:', effects);
 
 	/* Calculations */
-	for (crit of ['success', 'failure'])
+	for (type of types)
 	{
 		for (effect of effectList)
 		{
-			result[crit] += effects[effect] * effectMatrix[type][effect][crit];
+			for (crit of ['success', 'failure'])
+				result[type][crit] += effects[effect] * effectMatrix[type][effect][crit];
+			}
 		}
-	}
 
 	debugLog(caller, 'Result:', result);
 	return result;
