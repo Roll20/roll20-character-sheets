@@ -1676,7 +1676,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
     if (hasArmure) { vSurMesure += oCombat; }
 
-    bAttaque.push(vSurMesure);
+    bDegats.push(vSurMesure);
     exec.push(`{{vSurMesure=${vSurMesure}}}`);
   }
 

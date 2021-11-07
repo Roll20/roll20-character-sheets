@@ -4478,7 +4478,7 @@ function getWeaponsContactAS(prefix, AS, hasArmure, isSilencieux, isMeurtrier, i
 
     if (hasArmure) { vSurMesure += oCombat; }
 
-    bAttaque.push(vSurMesure);
+    bDegats.push(vSurMesure);
     exec.push(`{{vSurMesure=${vSurMesure}}}`);
   }
 
@@ -7845,13 +7845,14 @@ on('change:slotsUDCLTeteTot change:slotsUDCLTorseTot change:slotsUDCLBGTot chang
   if (msg !== '') { setPanneauInformation(msg, true, true); } else { resetPanneauInformation(); }
 });
 
-on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async () => {
+on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async (eventInfo) => {
   const attrs = await getAttrsAsync([
     'repeating_equipDefensif_defenseBonus',
     'repeating_equipDefensif_reactionBonus',
     'repeating_equipDefensif_porte',
   ]);
 
+  const id = eventInfo.sourceAttribute.split('_')[2];
   const equipe = +attrs.repeating_equipDefensif_porte;
 
   let defense = 0;
@@ -7862,10 +7863,12 @@ on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseB
     reaction = +attrs.repeating_equipDefensif_reactionBonus;
   }
 
-  await setAttrsAsync({
-    repeating_equipDefensif_defLigne: defense,
-    repeating_equipDefensif_reaLigne: reaction,
-  });
+  const update = {};
+
+  update[`repeating_equipDefensif_${id}_defLigne`] = defense;
+  update[`repeating_equipDefensif_${id}_reaLigne`] = reaction;
+
+  await setAttrsAsync(update);
 });
 
 on('change:repeating_equipDefensif:reaLigne remove:repeating_equipDefensif:reaLigne', () => {
@@ -53050,10 +53053,6 @@ on('clicked:rollVehicule', async (info) => {
 				<span class="full"><span data-i18n="warrior-inclus">Bonus du type de la warrior inclus</span> ({{vODMALWarrior}})</span>
 			{{/vODMALWarrior}}
 
-			{{#vSurMesure}}
-				<span class="full"><span data-i18n="sur-mesure-inclus">Sur mesure inclus</span> ({{vSurMesure}})</span>
-			{{/vSurMesure}}
-
 			{{#vMDrone}}
 				<span class="full"><span data-i18n="munitions-drones-inclus">Munitions drones inclus</span> ({{vMDrone}})</span>
 			{{/vMDrone}}
@@ -53224,6 +53223,9 @@ on('clicked:rollVehicule', async (info) => {
 			{{#vSournoise}}
 				<span class="full"><span data-i18n="sournoise-inclus">Bonus sournoise inclus</span> ({{vSournoise}})</span>
 			{{/vSournoise}}
+			{{#vSurMesure}}
+				<span class="full"><span data-i18n="sur-mesure-inclus">Sur mesure inclus</span> ({{vSurMesure}})</span>
+			{{/vSurMesure}}
 			{{#vPrecision}}
 				<span class="full"><span data-i18n="precision-inclus">Bonus precision inclus</span> ({{vPrecision}})</span>
 			{{/vPrecision}}

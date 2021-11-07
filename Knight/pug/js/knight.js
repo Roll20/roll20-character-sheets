@@ -1442,13 +1442,14 @@ on('change:slotsUDCLTeteTot change:slotsUDCLTorseTot change:slotsUDCLBGTot chang
   if (msg !== '') { setPanneauInformation(msg, true, true); } else { resetPanneauInformation(); }
 });
 
-on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async () => {
+on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseBonus change:repeating_equipDefensif:reactionBonus', async (eventInfo) => {
   const attrs = await getAttrsAsync([
     'repeating_equipDefensif_defenseBonus',
     'repeating_equipDefensif_reactionBonus',
     'repeating_equipDefensif_porte',
   ]);
 
+  const id = eventInfo.sourceAttribute.split('_')[2];
   const equipe = +attrs.repeating_equipDefensif_porte;
 
   let defense = 0;
@@ -1459,10 +1460,12 @@ on('change:repeating_equipDefensif:porte change:repeating_equipDefensif:defenseB
     reaction = +attrs.repeating_equipDefensif_reactionBonus;
   }
 
-  await setAttrsAsync({
-    repeating_equipDefensif_defLigne: defense,
-    repeating_equipDefensif_reaLigne: reaction,
-  });
+  const update = {};
+
+  update[`repeating_equipDefensif_${id}_defLigne`] = defense;
+  update[`repeating_equipDefensif_${id}_reaLigne`] = reaction;
+
+  await setAttrsAsync(update);
 });
 
 on('change:repeating_equipDefensif:reaLigne remove:repeating_equipDefensif:reaLigne', () => {
