@@ -1808,7 +1808,7 @@ function getWeaponsContactASPNJ(prefix, data, isAssistanceAttaque, isChoc, isLes
   if (aSurmesure) {
     const vSurMesure = Math.ceil(vBete / 2);
 
-    bAttaque.push(vSurMesure);
+    bDegats.push(vSurMesure);
     exec.push(`{{vSurMesure=${vSurMesure}}}`);
   }
 
