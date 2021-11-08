@@ -6,6 +6,7 @@
 3. fixed end turn - no longer refreshes pools unless there are no more combat phases for the icon.
 4. fixed matrix target number, legit vs. intruder were reversed.
 5. killjoy resistance is now willpower - not body.
+6. vehicle gunnery updated to account for movement penalty re-write for showing it in the rangedTN
 
 ## Release Notes 10/8/2021
 
