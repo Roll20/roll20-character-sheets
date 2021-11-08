@@ -1262,8 +1262,7 @@
             <div class="magic-spells-table">
                 <div class="table-top-left header" data-i18n="name">Name</div>
                 <div class="table-top-mid header" title="Spell Category" data-i18n="category">Category</div>
-                <div class="table-top-mid header" title="Specialization" data-i18n="specialization-abbreviation">Spec.
-                </div>
+                <div class="table-top-mid header" data-i18n="plus-dice-abbreviation">+Dice</div>
                 <div class="table-top-mid header" title="Force of spell" data-i18n="force">Force</div>
                 <div class="table-top-mid header" title="Reusable Foci" data-i18n="foci">Foci</div>
                 <div class="table-top-mid header" title="Expendable Foci" data-i18n="expendable-abbreviation">Exp.</div>
@@ -1391,10 +1390,7 @@
                         <option data-i18n="health" value="health">Health</option>
                         <option data-i18n="detection" value="detection">Detection</option>
                         <option data-i18n="illusion" value="illusion">Illusion</option>
-                        <option data-i18n="elemental" value="elemental">Elemental</option>
-                        <option data-i18n="control" value="control">Control</option>
-                        <option data-i18n="telekinetic" value="telekinetic">Telekinetic</option>
-                        <option data-i18n="transformation" value="transformation">Transformation</option>
+                        <option data-i18n="manipulation" value="manipulation">Manipulation</option>
                     </select>
                 </div>
                 <div class="spiritfocus">
@@ -1863,7 +1859,10 @@
                     <div data-i18n="offline-storage">Offline Storage</div>
                     <input type="number" name="attr_deck-offlinestorage" value=0 min=0>
                 </div>
-                <div class="deck-extras"> </div>
+                <div class="deck-extras">
+			<div>Notes</div>
+            		<textarea name="attr_deck-notes" style='width:300px;height:50%;margin-bottom:unset;'></textarea>
+		</div>
             </div>
         </div>
         <div class="matrix-show-frame">
@@ -3897,6 +3896,7 @@
                 <option data-i18n="train" value="train">Train/Monorail</option>
                 <option data-i18n="ultralight" value="ultralight">Ultra-light Aircraft</option>
                 <option data-i18n="yacht" value="yacht">Yacht</option>
+                <option data-i18n="walkers" value="walkers">Walkers</option>
             </select>
             <select name="attr_vehicle-size" class="mediumselect2">
                 <option data-i18n="normal" value="Normal" SELECTED>Normal</option>
@@ -4996,7 +4996,7 @@ deckingtabs.forEach(tab => {
 	});
    });
 
-      const matrixtn={BLUE: {Intruder: 3, Legitimate: 6, secrating: 1, wdmg: 2}, GREEN: {Intruder: 4, Legitimate: 5, secrating: 2, wdmg: 2}, ORANGE: {Intruder: 5, Legitimate: 4, secrating: 3, wdmg: 3}, RED: {Intruder: 6, Legitimate: 3, secrating: 4, wdmg: 3}};
+      const matrixtn={BLUE: {Intruder: 6, Legitimate: 3, secrating: 1, wdmg: 2}, GREEN: {Intruder: 5, Legitimate: 4, secrating: 2, wdmg: 2}, ORANGE: {Intruder: 4, Legitimate: 5, secrating: 3, wdmg: 3}, RED: {Intruder: 3, Legitimate: 6, secrating: 4, wdmg: 3}};
       const matrixsecnumber={1: "BLUE", 2: "GREEN", 3: "ORANGE",4: "RED"};
       const attributes=[ "body", "quickness", "strength", "charisma", "willpower", "intelligence", "force" ];
       const quicknesslinked=["@{blowgun}", "@{bracer}", "@{guncane}", "@{gyrojet}", "@{eyegun}", "@{oralgun}", "@{oralstrike}", "@{pistols}", "@{smgs}", "@{rifles}", "@{assaultrifles}", "@{lasers}", "@{whips}", "@{stealth}", "@{shotguns}"]
@@ -5698,8 +5698,14 @@ on('clicked:matrixattack', (info) => {
 		});
 
 	});
+	const refreshphase = function() {
+		atts=[];
+		atts["rounds-phase"]=0;
+		atts["sorcery-used"]=0;
+		setAttrs(atts);
+	};
 
-   	var refreshpools = function () {
+   	const refreshpools = function () {
 		atts=[];
 		atts["rounds-phase"]=0;
 		atts["controlpool-used"]=0;
@@ -5720,7 +5726,7 @@ on('clicked:matrixattack', (info) => {
 		const myid=info["htmlAttributes"]["id"]
 		var sourceattr=source.pop();
 		var myrepeat=source.join('_').concat('_'); 
-		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage", "range", "spellcategory"];
+		const attlist=["target", "force", "drain", "drainlvl", "name", "description", "damage", "range", "spellcategory", "specialized"];
 		attlist.forEach(attr=>{
 			let myname=myrepeat + attr;
 			atts.push(myname);
@@ -5729,6 +5735,7 @@ on('clicked:matrixattack', (info) => {
 		getAttrs(atts, function(myval) {
 			console.log('vals');
 			console.log(myval);
+			const specdice=parseInt(myval["specialized"]);
 			const magic=myval["magic"];
 			const myname=myval["character_name"];
 			const plane=(myval["astralstate"]=="astral-projection")? "astral" : "physical";
@@ -5750,7 +5757,7 @@ on('clicked:matrixattack', (info) => {
 				resistattr=target.split("|")[2];
 			}
 			var myroll="&{template:spell}";
-			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?}";
+			var calcDice="?{" + lang["sorcery-dice"] +"?} + ?{"+ lang["spell-pool-dice"] +"?} + " + specdice;
 			var calcDrainTN="floor(?{" + lang["force"] + "?}/2) + " + drain + " + ( 2 * @{spellsus} )";
 			/* var calcDrainDice="@{willpower|max} + ?{" + lang["sorcery-dice-for-drain"] + "?} + ?{"+ lang["spell-pool-dice-for-drain"] +"?}"; */
 			var calcDrainDice="@{willpower|max}d6!![willpower] + ?{" + lang["sorcery-dice-for-drain"] + "?}d6!![sorcery dice] + ?{"+ lang["spell-pool-dice-for-drain"] +"?}d6!![spell pool]";
@@ -6024,18 +6031,39 @@ on('clicked:matrixattack', (info) => {
 		initiative(init, reaction, dmgpen, mytitle, character);	
 		refreshpools();
  	});
-
-	on('clicked:endturn', (info) => {
+	const getTokenName = async () => {
+	    const rxGrab = /^0\[(.*)\]\s*$/;
+	    let myroll = "! {{mytoken=[[0[@{selected|token_name}]]]}}";
+	    rollresult = await startRoll(myroll),
+            	tokenname = (rollresult.results.mytoken.expression.match(rxGrab) || [])[1]; 
+	    	finishRoll(rollresult.rollId); 
+	    console.log('debug getTokenName ' + tokenname );
+	    return tokenname;
+	};
+	
+	const endTurn = async() => {
+		const tokenname = await getTokenName();
+		console.log('token name ' + tokenname);
 		if (!("yes" in lang)) geti18n();
-        	var myroll="&{template:init} {{character=@{character_name}}}{{type=End Combat Pass}}"
-		myroll += "{{setinit=[[10 &{tracker:-}]]}}"
+        	var myroll="&{template:init} {{character=" + tokenname + "}}{{type=[[0]]}}"
+		var endtypemsg="End Combat Pass";
+		myroll += "{{setinit=[[10 &{tracker:-}]]}}{{initval=[[@{tracker|" + tokenname + "}]]}}"
 		console.log(myroll);
         	startRoll(myroll, (results) => {
-		finishRoll( results.rollId);
-		refreshpools();
+			const initval=results.results.initval.result;
+			if ( initval <= 10 ) refreshpools();
+			else  {
+				refreshphase();
+				endtypemsg="End Combat Turn";
+			}
+			console.log(results.results);
+			finishRoll( results.rollId);
 		});
-	});
+	};
 
+	on('clicked:endturn', (info) => {
+		endTurn(info);
+	});
 
 	on('clicked:resistbanish', (info) => {
 		if (!("yes" in lang)) geti18n();
@@ -6106,12 +6134,17 @@ on('clicked:matrixattack', (info) => {
 	
    	const resistdmg = function (myid, mods) {
 		if (!("yes" in lang)) geti18n();
-	   atts=["ballistic", "impact", "armor-on", "deck-hardening"];
+	   atts=["ballistic", "impact", "armor-on", "deck-hardening", "body_max", "willpower_max"];
 	   getAttrs(atts, function (myval) {
+	   	console.log('myval');
+	   	console.log(myval);
 	   	const ballistic=myval["ballistic"];
 	   	const impact=myval["impact"];
 	   	const armoron=myval["armor-on"];
 	   	const hardening=myval["deck-hardening"];
+		const body = parseInt(myval["body_max"]);
+		const willpower = parseInt(myval["willpower_max"]);
+		var resistattr=body;
 		var armorname;
 		var wdmg;
 		var dmgcode=0;
@@ -6136,7 +6169,8 @@ on('clicked:matrixattack', (info) => {
 			myroll +="{{attacktest=[[" + mods["attacktest"] + "]]}}";
 			myroll+="{{dodge=[[" + mods["dodge"] + "]]}}";
 	 		myroll +="{{AttackType=" + ammo  + "}}";
-			calcTN="?{" + lang["attack-power"] + "} + " +  powermod + " - " + armorval;
+			if (ammo=="deckkilljoy") resistattr = willpower;
+			calcTN="?{" + lang["attack-power"] + "} + " +  powermod + " - " + armorval; 
 			if ( mods["blast"] ) { 
 				myroll+="{{distance=[[?{" + lang["distance-from-explosive-in-meters"] +"|0}]]}}"
 				myroll+="{{blastredux=[[?{" + lang["distance-from-explosive-in-meters"] +"|0} / " + mods["blast"] + "]]}}"
@@ -6155,7 +6189,8 @@ on('clicked:matrixattack', (info) => {
 			myroll += "{{armorvalue=@{" + myid + "}}}"
 		}
 	 	let actionname = myid.charAt(0).toUpperCase() + myid.slice(1);
-	        var calcDice= "@{body|max} + ?{" + lang["combat-pool-dice"] + "}";
+		
+	        var calcDice= resistattr + " + ?{" + lang["combat-pool-dice"] + "}";
 	 	myroll +="{{finaldmg=[[0]]}}{{netresult=[[0]]}}";
 	 	myroll +="{{name=" + actionname + " Armor}}{{character=@{character_name}}}{{combatpool=[[?{" + lang["combat-pool-dice"] + "|0}]]}}";
 	 	myroll +="{{action=" + lang["damage-resistance-test"] + "}}";
@@ -9267,11 +9302,11 @@ on("change:sorcery-defense change:spellpool-defense change:sorcery-used change:s
 
 });
 
-on("sheet:opened change:deck-masking-final change:decksleaze-rating", function() {
-    getAttrs(["deck-masking-final", "decksleaze-rating"], function (myval) {
+on("sheet:opened change:deck-masking-final change:decksleaze-rating-final", function() {
+    getAttrs(["deck-masking-final", "decksleaze-rating-final"], function (myval) {
 	console.log(myval["deck-masking-final"]);
 	let mymask=parseInt(myval["deck-masking-final"]) || 0;
-	let mysleaze=parseInt(myval["decksleaze-rating"]) || 0;
+	let mysleaze=parseInt(myval["decksleaze-rating-final"]) || 0;
 	let mydf = Math.ceil((mymask + mysleaze ) / 2);
         setAttrs({"deck-detection-max": mydf});
     });

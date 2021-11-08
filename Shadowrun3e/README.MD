@@ -1,8 +1,11 @@
 # Shadowrun 3rd Edition
 
-## Release Notes 10/25/2021
+## Release Notes 11/08/2021
 1. movment pentaly is now shown in RangedTN modifiers
 2. fixed calculation of ammo weight
+3. fixed end turn - no longer refreshes pools unless there are no more combat phases for the icon.
+4. fixed matrix target number, legit vs. intruder were reversed.
+5. killjoy resistance is now willpower - not body.
 
 ## Release Notes 10/8/2021
 
