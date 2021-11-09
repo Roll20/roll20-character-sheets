@@ -1,7 +1,7 @@
 Change Log
 ==============================================
 **2021-11-09 ** v.47 Chuz (James Culp)
-
+	Bugfix - Technomancer Complex Forms with no roll were displaying oddly.  This has been fixed, now the roll button that shows up will show the fade and notes section.
 **2021-11-04 ** v.46 Chuz (James Culp)
 	Fix for spells not displaying hits
 **2021-11-02 ** v.45 Chuz (James Culp)
