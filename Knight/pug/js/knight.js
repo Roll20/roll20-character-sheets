@@ -481,7 +481,7 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
   const berserkRageN3 = +attrs.berserkRageN3DR;
 
   const sorcererCorpFluide = attrs.sorcererMMCorpFluide;
-  const sorcerer150PG = attrs.sorcerer150PG;
+  const sorcerer150PG = +attrs.sorcerer150PG;
   const sorcerer250PG = attrs.sorcerer250PG;
   const sorcererMM250PG = +attrs.sorcererMM250PG;
 
@@ -530,18 +530,18 @@ on('change:fichePNJ change:armure change:armureLegende change:defense change:def
           if (sorcererMM250PG === 1) {
             modif += 2;
 
-            if (sorcerer150PG !== '0') { modif += 1; }
+            if (sorcerer150PG !== 0) { modif += 1; }
           }
         } else if (sorcererCorpFluide !== '0') {
           modif += 2;
 
-          if (sorcerer150PG !== '0') { modif += 1; }
+          if (sorcerer150PG !== 0) { modif += 1; }
         }
       }
 
-      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== '0') { modif += 2; }
+      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== 0) { modif += 2; }
 
-      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== '0') { modif += 2; }
+      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== 0) { modif += 2; }
 
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 
@@ -609,7 +609,7 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
   const paladinWatchtower = attrs.paladinWatchtower;
 
   const sorcererCorpFluide = attrs.sorcererMMCorpFluide;
-  const sorcerer150PG = attrs.sorcerer150PG;
+  const sorcerer150PG = +attrs.sorcerer150PG;
   const sorcerer250PG = attrs.sorcerer250PG;
   const sorcererMM250PG = +attrs.sorcererMM250PG;
 
@@ -658,18 +658,18 @@ on('change:fichePNJ change:armure change:armureLegende change:reaction change:rc
           if (sorcererMM250PG === 1) {
             modif += 2;
 
-            if (sorcerer150PG !== '0') { modif += 1; }
+            if (sorcerer150PG !== 0) { modif += 1; }
           }
         } else if (sorcererCorpFluide !== '0') {
           modif += 2;
 
-          if (sorcerer150PG !== '0') { modif += 1; }
+          if (sorcerer150PG !== 0) { modif += 1; }
         }
       }
 
-      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== '0') { modif += 2; }
+      if (armure === 'warmaster' && warmasterEsquive !== '0' && warmasterEsquiveP !== 0) { modif += 2; }
 
-      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== '0') { modif += 2; }
+      if (armureL === 'warmaster' && MALWarmasterEsquive !== '0' && MALWarmasterEsquiveP !== 0) { modif += 2; }
 
       if (armureL === 'barbarian') { modif -= MALGoliath; }
 

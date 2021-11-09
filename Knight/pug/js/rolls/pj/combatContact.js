@@ -256,6 +256,8 @@ rollCombatContact.forEach((button) => {
       base: 0,
     };
 
+    log(attrsCarac.CO1);
+
     if (attrsCarac.CO1) {
       CPrecisValues.nom = attrsCarac.CO1Nom;
       CPrecisValues.base = attrsCarac.CO1Base;

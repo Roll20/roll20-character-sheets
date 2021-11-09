@@ -3401,9 +3401,11 @@ function getStyleContactMod(value, cPrecis, diceDegats, diceViolence, hasArmure,
     case 'precis':
       exec.push(`{{style=${i18n_style} ${i18n_precis}}}`);
 
+      log(cPrecis);
+
       if (isEDeuxMains && !isAAllegee) {
         if (cPrecis.nom !== '0') {
-          exec.push(`{{cPrecis=${CaracNom[cPrecis.nom]}}}`);
+          exec.push(`{{cPrecis=${cPrecis.nom}}}`);
 
           const CPValue = Number(cPrecis.base);
 
