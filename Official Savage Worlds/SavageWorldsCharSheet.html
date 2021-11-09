@@ -1,7 +1,7 @@
 
 <script type="text/worker">
   const sheetVersionPrefix = "Official Savage Worlds v";
-const sheetVersion = "1.00.17";
+const sheetVersion = "1.00.18";
 
 // Define colors for Logs
 const r20color = "#E948C9";
@@ -86,7 +86,7 @@ const traits = [
     "thievery",
     "trade",
     "weirdscience",
-    "repeating_skills:skillnamerank",
+    "repeating_skills:knowledgeother",
     "pastrength",
     "rastrength",
 ];
@@ -131,11 +131,11 @@ function repeatingSimpleSum(section, field, destination) {
                 repSection + "_" + idArray[a] + "_" + field;
         }
         getAttrs(sumFields, function(v) {
-            console.log("%%% values of v: " + JSON.stringify(v) + " %%%");
+            //console.log("%%% values of v: " + JSON.stringify(v) + " %%%");
             var sumTotal = 0;
             for (a = 0; a < idArray.length; a++) {
                 sumTotal += parseFloat(v[sumFields[a]]) || 0;
-                console.log("$$$ sumTotal: " + sumTotal + " $$$");
+                //console.log("$$$ sumTotal: " + sumTotal + " $$$");
             }
             var setSumValue = {};
             setSumValue[destination] = sumTotal;
@@ -152,8 +152,8 @@ function repeatingSimpleSumWCheck(
     checkfield,
     checkvalue
 ) {
-    console.log("Made it repeatingSimpleSumWCheck");
-    console.log("checkvalue: " + checkvalue);
+    //console.log("Made it repeatingSimpleSumWCheck");
+    //console.log("checkvalue: " + checkvalue);
     let repSection = "repeating_" + section;
     getSectionIDs(repSection, function(idArray) {
         //Construct Array of fields to get attributes for...
@@ -165,19 +165,19 @@ function repeatingSimpleSumWCheck(
             checkFields[checkFields.length] =
                 repSection + "_" + idArray[a] + "_" + checkfield;
         }
-        console.log("List of IDs: " + idArray);
-        console.log("List of Sum Fields: " + sumFields);
-        console.log("List of check Fields: " + checkFields);
+        //console.log("List of IDs: " + idArray);
+        //console.log("List of Sum Fields: " + sumFields);
+        //console.log("List of check Fields: " + checkFields);
         getAttrs(sumFields, function(v) {
             getAttrs(checkFields, function(c) {
-                console.log(
+                /*console.log(
                     "%%% values of v: " + JSON.stringify(v) + " %%%"
-                );
+                );*/
                 var sumTotal = 0;
                 for (a = 0; a < idArray.length; a++) {
                     if (c[checkFields[a]] === checkvalue) {
                         sumTotal += parseFloat(v[sumFields[a]]) || 0;
-                        console.log("$$$ sumTotal: " + sumTotal + " $$$");
+                        //console.log("$$$ sumTotal: " + sumTotal + " $$$");
                     }
                 }
                 var setSumValue = {};
@@ -189,11 +189,11 @@ function repeatingSimpleSumWCheck(
 }
 
 function fauxChange(field, fauxvalue) {
-    //repeating  fields should be passed in the format: repating_<section>:attributes
+    //repeating  fields should be passed in the format: repeating_<section>:attributes
     //example: repeating_skills:skillnamerank
     log("Setting faux value(s) for", field, "orangered");
     if (field.indexOf(":") > -1) {
-        console.log("Need to update values in a repeating section");
+        //console.log("Need to update values in a repeating section");
         let getfields = field.split(":");
         let repeatingSection = getfields[0];
         let repeatingField = getfields[1];
@@ -237,15 +237,15 @@ function fauxChange(field, fauxvalue) {
             }
         });
     } else {
-        console.log("Updating values in a Non-Repeating Section");
+        //console.log("Updating values in a Non-Repeating Section");
         getAttrs([field], function(v) {
             let prevValue = v[field];
             let sattrs = {};
-            console.log(`++++ Setting ${field} to ${fauxvalue} ++++`);
+            //console.log(`++++ Setting ${field} to ${fauxvalue} ++++`);
             //console.log("Setting " + field + " to " + fauxvalue);
             sattrs[field] = fauxvalue;
             setAttrs(sattrs);
-            console.log(`---- Setting ${field} to ${prevValue} ----`);
+            //console.log(`---- Setting ${field} to ${prevValue} ----`);
             //console.log("Setting " + field + " to " + fauxvalue);
             sattrs[field] = prevValue;
             setAttrs(sattrs);
@@ -267,23 +267,24 @@ const stepwiseFaux = function(section, field) {
         if (idArray.length > 0) {
             for (let a = 0; a < idArray.length; a++) {
                 let fullField = `repeating_${section}_${idArray[a]}_${field}`;
-                console.log("Stepwise Faux for: " + fullField);
+                //("Stepwise Faux for: " + fullField);
                 fauxChange(fullField, "1000");
             }
-        } else {
-            console.log("Nothing to see here...move along.");
-        }
+        } 
     });
 };
 
-const swapAttribute = function(section, oldField, newField) {
+const swapAttribute = function(section, oldField, newField, silent) {
+    //oldField and newField can be strings of single fields or arrays of multiple fields
+    //silent should be a boolean true/false and indicates whether the setAttrs should be set silently
     log("Section", section, "orange");
     log("oldField", oldField, "orange");
     log("newField", newField, "orange");
     let repeatingSection = `repeating_${section}`;
-    let output = {};
+    let outputOBj = {};
     let fieldList = [];
     let sectionList = [];
+    let newFieldList = [];
     //build list of fields to get the value of the field
     getSectionIDs(repeatingSection, function(idArray) {
         log(
@@ -299,9 +300,20 @@ const swapAttribute = function(section, oldField, newField) {
             );
             for (let a = 0; a < idArray.length; a++) {
                 log("Loop Count", a, "orange");
-                let fullField = `${repeatingSection}_${idArray[a]}_${oldField}`;
-                fieldList.push(fullField);
-                sectionList.push(idArray[a]);
+                let fullField;
+                if (typeof oldField === "string") {
+                    fullField = `${repeatingSection}_${idArray[a]}_${oldField}`;
+                    fieldList.push(fullField);
+                    sectionList.push(idArray[a]);
+                }
+                else {
+                    for (let b = 0; b < oldField.length; b++) {
+                        fullField = `${repeatingSection}_${idArray[a]}_${oldField[b]}`;
+                        fieldList.push(fullField);
+                        newFieldList.push(`${repeatingSection}_${idArray[a]}_${newField[b]}`);
+                        //sectionList.push(idArray[a]);
+                    }
+                }
             }
         } else {
             log(
@@ -317,13 +329,27 @@ const swapAttribute = function(section, oldField, newField) {
                 log("getAttrs Loop", b, "orange");
                 let fieldValue = v[fieldList[b]];
                 log("Field Value", fieldValue, "orange");
-                output[
+                log("Value Type",typeof fieldValue,"orange");
+                typeof fieldValue === "undefined" ? fieldValue = "0" : fieldValue = fieldValue;
+                /*output[
                     `${repeatingSection}_${sectionList[b]}_${newField}`
+                ] = fieldValue;*/
+                outputOBj[
+                    `${newFieldList[b]}`
                 ] = fieldValue;
             }
-            log("Output", JSON.stringify(output), "orange");
-            console.log("!!! Setting Real Values !!!");
-            setAttrs(output);
+            log("Output", JSON.stringify(outputOBj), "orange");
+
+            //return outputOBj;
+            
+            if (silent) {
+                log("Set Silently","Setting the values silently","orange");
+                setAttrs(outputOBj,{"silent":true});
+             }
+            else {
+                log("Set Silently","NOT Setting the values silently","orange");
+                setAttrs(outputOBj);
+            }
         });
     });
 };
@@ -422,6 +448,14 @@ const upgradeSheet = function(
         if (versionthree < 0.17) {
             setattrvals["newcontent"] = "unread";
         }
+        if (versionthree < 0.18) {
+            //Get Old Knowledge Skills
+            swapAttribute("skills", ["skillnamerank_base","skillnamerankmod_base","skillnamerank_delta","skillnamerank","skillnamerankmod","otherModType","SkillMod","linkedotherattscore","whisperskillname","skillnamewilddie","skillnamewilddieinfo","skillnamerank_rank","skillnamerank_display"], ["knowledgeother_base","knowledgeothermod_base","knowledgeother_delta","knowledgeother","knowledgeothermod","knowledgeotherModType","KnowledgeotherskillMod","linkedknowledgeotheratt","whisperknowledgeother","knowledgeotherwilddie","knowledgeotherwilddieinfo","knowledgeother_rank","knowledgeother_display"],true);
+
+            //Fix Weapon Skill Rolls
+            stepwiseFaux("weapons","weaponskill");
+            setattrvals["newcontent"] = "unread";
+        }
         else {
             log(
                 "Upgrade",
@@ -429,7 +463,7 @@ const upgradeSheet = function(
                 "lime"
             );
         }
-        setAttrs(setattrvals);
+        setAttrs(setattrvals,{"silent":true});
     });
 };
 
@@ -540,13 +574,7 @@ newSkillList.forEach((skillname) => {
                 let setskill = {};
                 setskill[`${skillname}name`] = value;
                 setAttrs(setskill);
-            } else {
-                console.log(
-                    "^^^ Skill Name Already Set: " +
-                    skillv[`${skillname}name`] +
-                    " ^^^"
-                );
-            }
+            } 
         });
     });
 });
@@ -616,16 +644,16 @@ buttonlist.forEach((button) => {
 traits.forEach((trait) => {
     on(`change:${trait} change:${trait}mod`, function(eventInfo) {
         /*change:${trait}_delta*/
-        log("Change Detected", `for ${trait}`, "cyan");
+        log("Change Detected" + " (source type: " + eventInfo.sourceType + ")", `for ${trait}`, "cyan");
         log("Trait triggering update", eventInfo.sourceAttribute, "cyan");
         //let trait = traits;
-        console.log("trait = " + trait);
+        //console.log("trait = " + trait);
         log("Check for repeating", trait.slice(0, 6), "cyan");
         /*if (trait.slice(0,5) === 'repeating') {
             traitcheck = `repeating_skills_${traits}`;
         }*/
         trait = trait.replace(":", "_");
-        console.log("trait = " + trait);
+        //console.log("trait = " + trait);
         getAttrs([trait, `${trait}mod`, `${trait}_delta`], (v) => {
             log(
                 "Get Attrs",
@@ -673,7 +701,7 @@ traits.forEach((trait) => {
 on("change:attsatdsix", function(eventInfo) {
     let defaultdtype = "4";
     if (eventInfo.newValue === "1") {
-        console.log("### Set default starting Die Type to d6");
+        //console.log("### Set default starting Die Type to d6");
         defaultdtype = "6";
     }
     setAttrs({
@@ -687,8 +715,8 @@ on("change:attsatdsix", function(eventInfo) {
 
 const setWildDie = function() {
     getAttrs(["is_npc"], function(lvalue) {
-        console.log("<==== Updating whether to Roll the Wild Die ====>");
-        console.log("is_npc value: " + lvalue.is_npc);
+        //console.log("<==== Updating whether to Roll the Wild Die ====>");
+        //console.log("is_npc value: " + lvalue.is_npc);
         if (lvalue.is_npc === "0") {
             console.log("Is a Wild Card: Roll a Wild Die");
             setAttrs({ wdNum: 1 });
@@ -696,7 +724,7 @@ const setWildDie = function() {
             console.log("Is not a Wild Card: Don't roll a Wild Die");
             setAttrs({ wdNum: 0 });
         }
-        console.log("<==== Finished Identifying Mook vs Wild Card ====>");
+        //console.log("<==== Finished Identifying Mook vs Wild Card ====>");
     });
 };
 
@@ -710,9 +738,9 @@ on("change:is_npc", function() {
 // Animalistic Intelligence
 const updateAnimalIntelligenceDisplay = function() {
     getAttrs(["animalsmarts"], function(attributesValues) {
-        console.log(
+        /*console.log(
             "Updating animal smarts " + attributesValues.animalsmarts
-        );
+        );*/
         if (attributesValues.animalsmarts === "on") {
             setAttrs({ "animalsmarts_display": getTranslationByKey("animal-smarts-abbreviation") });
         } else {
@@ -770,15 +798,15 @@ on(
                 "setrank",
             ],
             function(value) {
-                console.log("useXP Value: " + value.useXP);
-                console.log("xp value: " + value.xp);
-                console.log("rank value: " + value.rank);
+                //console.log("useXP Value: " + value.useXP);
+                //console.log("xp value: " + value.xp);
+                //console.log("rank value: " + value.rank);
                 let xpVal;
                 value.setadvance === "1" ?
                     (xpVal = parseInt(value.manualAdvance) || 0) :
                     (xpVal = parseInt(value.xp) || 0);
                 //var xpVal = parseInt(value.xp)||0;
-                console.log(xpVal);
+                //console.log(xpVal);
                 if (value.setrank === "on") {
                     console.log(
                         "Don't set Rank at all, because there's a different structure"
@@ -786,57 +814,57 @@ on(
                 } else if (value.useXP === "on") {
                     //Using XP instead of Advances
                     if (xpVal >= 80) {
-                        console.log("Setting rank to Legendary");
+                        //console.log("Setting rank to Legendary");
                         setAttrs({ Rank: 5 });
-                        console.log("Setting class to Grad Student");
+                        //console.log("Setting class to Grad Student");
                         setAttrs({ Class: 5 });
                     } else if (xpVal >= 60) {
-                        console.log("Setting rank to Heroic");
+                        //console.log("Setting rank to Heroic");
                         setAttrs({ Rank: 4 });
-                        console.log("Setting class to Senior");
+                        //console.log("Setting class to Senior");
                         setAttrs({ Class: 4 });
                     } else if (xpVal >= 40) {
-                        console.log("Setting rank to Veteran");
+                        //console.log("Setting rank to Veteran");
                         setAttrs({ Rank: 3 });
-                        console.log("Setting class to Junior");
+                        //console.log("Setting class to Junior");
                         setAttrs({ Class: 3 });
                     } else if (xpVal >= 20) {
-                        console.log("Setting rank to Seasoned");
+                        //console.log("Setting rank to Seasoned");
                         setAttrs({ Rank: 2 });
-                        console.log("Setting class to Sophomore");
+                        //console.log("Setting class to Sophomore");
                         setAttrs({ Class: 2 });
                     } else {
-                        console.log("Setting rank to Novice");
+                        //console.log("Setting rank to Novice");
                         setAttrs({ Rank: 1 });
-                        console.log("Setting class to Freshman");
+                        //console.log("Setting class to Freshman");
                         setAttrs({ Class: 1 });
                     }
                 } else {
                     //Using Advances instead of xp
                     if (xpVal < 4) {
-                        console.log("Setting rank to Novice");
+                        //console.log("Setting rank to Novice");
                         setAttrs({ Rank: 1 });
-                        console.log("Setting class to Freshman");
+                        //console.log("Setting class to Freshman");
                         setAttrs({ Class: 1 });
                     } else if (xpVal < 8) {
-                        console.log("Setting rank to Seasoned");
+                       // console.log("Setting rank to Seasoned");
                         setAttrs({ Rank: 2 });
-                        console.log("Setting class to Sophomore");
+                        //console.log("Setting class to Sophomore");
                         setAttrs({ Class: 2 });
                     } else if (xpVal < 12) {
-                        console.log("Setting rank to Veteran");
+                       // console.log("Setting rank to Veteran");
                         setAttrs({ Rank: 3 });
-                        console.log("Setting class to Junior");
+                       // console.log("Setting class to Junior");
                         setAttrs({ Class: 3 });
                     } else if (xpVal < 16) {
-                        console.log("Setting rank to Heroic");
+                       // console.log("Setting rank to Heroic");
                         setAttrs({ Rank: 4 });
-                        console.log("Setting class to Senior");
+                       // console.log("Setting class to Senior");
                         setAttrs({ Class: 4 });
                     } else {
-                        console.log("Setting rank to Legendary");
+                        //console.log("Setting rank to Legendary");
                         setAttrs({ Rank: 5 });
-                        console.log("Setting class to Grad Student");
+                        //console.log("Setting class to Grad Student");
                         setAttrs({ Class: 5 });
                     }
                 }
@@ -854,42 +882,42 @@ on("change:size change:sizemod", function() {
         let sizemod = parseInt(value.sizemod) || 0;
         let cursize = size + sizemod;
         let sizecat = "Normal";
-        console.log(
+        /*console.log(
             `#### Size: ${size}, Size Mod: ${sizemod}, Current Size: ${cursize} ####`
-        );
+        );*/
         switch (cursize) {
             case cursize <= -4 ? cursize:
                 -4:
-                    console.log("Tiny");
+                    //console.log("Tiny");
                 sizecat = "tiny";
                 break;
             case cursize <= -3 ? cursize:
                 -3:
-                    console.log("Very Small");
+                    //console.log("Very Small");
                 sizecat = "very-small";
                 break;
             case cursize <= -2 ? cursize:
                 -2:
-                    console.log("Small");
+                    //console.log("Small");
                 sizecat = "small";
                 break;
             case cursize >= -1 && cursize <= 3 ? cursize:
                 0:
-                    console.log("Normal");
+                    //console.log("Normal");
                 sizecat = "normal";
                 break;
             case cursize >= 4 && cursize <= 7 ? cursize:
                 7:
-                    console.log("Large");
+                    //console.log("Large");
                 sizecat = "large";
                 break;
             case cursize >= 8 && cursize <= 11 ? cursize:
                 8:
-                    console.log("Huge");
+                    //console.log("Huge");
                 sizecat = "huge";
                 break;
             default:
-                console.log("Gargantuan");
+                //console.log("Gargantuan");
                 sizecat = "gargantuan";
         }
         setAttrs({
@@ -903,7 +931,7 @@ on("change:wealth change:wealthwild", function(eventInfo) {
     let wealth =
         "&{template:roll} {{namelength=@{namelength}}} {{name=@{character_name} }} {{trait=^{wealth}}} {{skill_rank=@{wealth} }} {{skill_roll=[[@{wealth} + @{traitmods}]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[1d@{wealthwilddie}! + @{traitmods}]]}}";
     if (eventInfo.newValue === "d0") {
-        console.log("The character is broke");
+        //console.log("The character is broke");
         wealth = "/em is broke and can't make purchases.";
     }
     setAttrs({ rollwealth: wealth });
@@ -953,20 +981,20 @@ on("change:staticall", function(eventInfo) {
     if (eventInfo.newValue === "1") {
         //All has been checked
         for (let i = 0; i < static.length; i++) {
-            console.log("Loop 1");
+            //console.log("Loop 1");
             // log("setting",static[i]+" to on","goldenrod");
             sattr[static[i]] = "on";
         }
-        console.log("Set: " + JSON.stringify(sattr));
+        //console.log("Set: " + JSON.stringify(sattr));
         setAttrs(sattr);
     } else {
         //All has been deselected
         for (let i = 0; i < static.length; i++) {
-            console.log("Loop 1");
+            //console.log("Loop 1");
             // log("setting",static[i]+" to off","goldenrod");
             sattr[static[i]] = 0;
         }
-        console.log("Set: " + JSON.stringify(sattr));
+        //console.log("Set: " + JSON.stringify(sattr));
         setAttrs(sattr);
     }
 });
@@ -998,81 +1026,88 @@ on("change:staticcore", function(eventInfo) {
 //Set the actual trait and trait mod fields...this is needed so things like Vigor and Parry update if the appropriate trait is boosted/lowered
 traits.forEach((trait) => {
     on(`change:${trait}_delta`, function(eventInfo) {
-        // log("Delta Change Detected",`for ${trait}`,deltaColor);
-        trait = trait.replace(":", "_");
-        //log("Trait",trait,deltaColor);
-        getAttrs(
-            [trait, `${trait}mod`, `${trait}_base`, `${trait}mod_base`],
-            function(v) {
-                // log("Get Attrs",`${trait}, ${trait}mod, ${trait}_base, ${trait}attr_gutsmod_base`,deltaColor);
-                let tRank = parseInt(v[`${trait}`]) || 0;
-                let tMod = parseInt(v[`${trait}mod`]) || 0;
-                let tDelta = parseInt(eventInfo.newValue) || 0;
-                let prevDelta = parseInt(eventInfo.previousValue) || 0;
-                let tRankBase = v[`${trait}_base`];
-                let tModBase = v[`${trait}mod_base`];
-                const sAttRankBase = trait + "_base",
-                    sAttRankModBase = trait + "mod_base",
-                    sAttRank = trait,
-                    sAttMod = trait + "mod";
-                // log("Attributes to be Set",`${sAttRankBase}, ${sAttRankModBase}, ${sAttRank}, ${sAttMod}`,deltaColor);
-                const sattrs = {};
-                let counter = Math.abs(tDelta);
-                // log("Starting Values",`Rank/Base: ${tRank}/${tRankBase}, Mod/Base: ${tMod}/${tModBase}, Delta: ${tDelta}, Prev Delta: ${prevDelta}`,deltaColor);
-                //Check if previous Delta was 0, if so, will want to set base before changing anything
-                if (prevDelta === 0 || tRankBase === "") {
-                    //set the base values to the current values of the trait and mod
-                    // log("Message","^^^ Setting the Bases ^^^",deltaColor);
-                    sattrs[sAttRankBase] = tRank;
-                    sattrs[sAttRankModBase] = tMod;
-                    //set tRankBase and tModBase in case needed Boosting/lowering
-                    tRankBase = tRank;
-                    tModBase = tMod;
-                }
-                // Boosting/Lowering Trait or resetting to base?
-                if (tDelta === 0) {
-                    // log("Message","--- Resetting stats to base ---",deltaColor);
-                    sattrs[sAttRank] = tRankBase;
-                    sattrs[sAttMod] = tModBase;
-                } else if (tDelta > 0) {
-                    //reset rank and mod back to the baseline so the boost math is correct
-                    // log("Message","!!! Re-baselining Attribute !!!",deltaColor);
-                    tRank = tRankBase;
-                    tMod = tModBase;
-                    // log("Message","+++ Boosting a Trait from Base +++",deltaColor);
-                    tRank === 4 && tMod === -2 ?
-                        ((tMod = 0), (counter = counter - 1)) :
-                        (counter = counter);
-                    //log("Delta Info",`tRank: ${tRank}, tMod: ${tMod}, counter: ${counter}`,deltaColor);
-                    for (let i = counter; i > 0; i--) {
-                        if (tRank === 12) {
-                            // log("Message","+++ Rank is maxed...Boosting the Modifier +++",deltaColor);
-                            tMod += 1;
-                        } else {
-                            // log("Message","+++ Boosting Die Type +++",deltaColor);
-                            tRank += 2;
-                        }
+        log(`Change Detected (source type: ${eventInfo.sourceType})`,`for ${eventInfo.sourceAttribute}`,"cyan");
+        /*if (eventInfo.sourceType === "sheetworker") {
+            log("Delta Trigger","Sheetworker - don't do anything","orange");
+        }
+        else {*/
+            // log("Delta Change Detected",`for ${trait}`,deltaColor);
+            trait = trait.replace(":", "_");
+            //log("Trait",trait,deltaColor);
+            getAttrs(
+                [trait, `${trait}mod`, `${trait}_base`, `${trait}mod_base`],
+                function(v) {
+                    // log("Get Attrs",`${trait}, ${trait}mod, ${trait}_base, ${trait}attr_gutsmod_base`,deltaColor);
+                    let tRank = parseInt(v[`${trait}`]) || 0;
+                    let tMod = parseInt(v[`${trait}mod`]) || 0;
+                    let tDelta = parseInt(eventInfo.newValue) || 0;
+                    let prevDelta = parseInt(eventInfo.previousValue) || 0;
+                    let tRankBase = v[`${trait}_base`];
+                    let tModBase = v[`${trait}mod_base`];
+                    const sAttRankBase = trait + "_base",
+                        sAttRankModBase = trait + "mod_base",
+                        sAttRank = trait,
+                        sAttMod = trait + "mod";
+                    // log("Attributes to be Set",`${sAttRankBase}, ${sAttRankModBase}, ${sAttRank}, ${sAttMod}`,deltaColor);
+                    const sattrs = {};
+                    let counter = Math.abs(tDelta);
+                    // log("Starting Values",`Rank/Base: ${tRank}/${tRankBase}, Mod/Base: ${tMod}/${tModBase}, Delta: ${tDelta}, Prev Delta: ${prevDelta}`,deltaColor);
+                    //Check if previous Delta was 0, if so, will want to set base before changing anything
+                    if (prevDelta === 0 || tRankBase === "") {
+                        //set the base values to the current values of the trait and mod
+                        // log("Message","^^^ Setting the Bases ^^^",deltaColor);
+                        sattrs[sAttRankBase] = tRank;
+                        sattrs[sAttRankModBase] = tMod;
+                        //set tRankBase and tModBase in case needed Boosting/lowering
+                        tRankBase = tRank;
+                        tModBase = tMod;
                     }
-                    sattrs[sAttRank] = tRank;
-                    sattrs[sAttMod] = tMod;
-                } else {
-                    //reset rank and mod back to the baseline so the boost math is correct
-                    tRank = tRankBase;
-                    tMod = tModBase;
-                    for (let i = counter; i > 0; i--) {
-                        if (tRank === 4) {
-                            break;
+                    // Boosting/Lowering Trait or resetting to base?
+                    if (tDelta === 0) {
+                        // log("Message","--- Resetting stats to base ---",deltaColor);
+                        sattrs[sAttRank] = tRankBase;
+                        sattrs[sAttMod] = tModBase;
+                    } else if (tDelta > 0) {
+                        //reset rank and mod back to the baseline so the boost math is correct
+                        // log("Message","!!! Re-baselining Attribute !!!",deltaColor);
+                        tRank = tRankBase;
+                        tMod = tModBase;
+                        // log("Message","+++ Boosting a Trait from Base +++",deltaColor);
+                        tRank === 4 && tMod === -2 ?
+                            ((tMod = 0), (counter = counter - 1)) :
+                            (counter = counter);
+                        //log("Delta Info",`tRank: ${tRank}, tMod: ${tMod}, counter: ${counter}`,deltaColor);
+                        for (let i = counter; i > 0; i--) {
+                            if (tRank === 12) {
+                                // log("Message","+++ Rank is maxed...Boosting the Modifier +++",deltaColor);
+                                tMod += 1;
+                            } else {
+                                // log("Message","+++ Boosting Die Type +++",deltaColor);
+                                tRank += 2;
+                            }
                         }
-                        tRank === 12 && tMod > 0 ?
-                            (tMod = tMod - 1) :
-                            (tRank = tRank - 2);
+                        sattrs[sAttRank] = tRank;
+                        sattrs[sAttMod] = tMod;
+                    } else {
+                        //reset rank and mod back to the baseline so the boost math is correct
+                        tRank = tRankBase;
+                        tMod = tModBase;
+                        for (let i = counter; i > 0; i--) {
+                            if (tRank === 4) {
+                                break;
+                            }
+                            tRank === 12 && tMod > 0 ?
+                                (tMod = tMod - 1) :
+                                (tRank = tRank - 2);
+                        }
+                        sattrs[sAttRank] = tRank;
+                        sattrs[sAttMod] = tMod;
                     }
-                    sattrs[sAttRank] = tRank;
-                    sattrs[sAttMod] = tMod;
+                    setAttrs(sattrs);
                 }
-                setAttrs(sattrs);
-            }
-        );
+            );
+        //}
+        
     });
 });
 
@@ -1120,21 +1155,21 @@ const setDynamicEnc = function(field) {
             v[field] === "(STR)" ||
             v[field] === "1"
         ) {
-            console.log(`Need to set trait (${field}) to use Encumbrance`);
+            //console.log(`Need to set trait (${field}) to use Encumbrance`);
             sattrs[button] = `@{setmodsenc}`;
             sattrs[
                 formula
             ] = `@{ModSumEnc}[Distracted, Wounds, Fatigue, Encumbrance]`;
         } else {
-            console.log(
+            /*console.log(
                 `Need to set trait (${field}) to NOT use Encumbrance`
-            );
+            );*/
             sattrs[button] = `@{setmods}`;
             sattrs[formula] = `@{ModSum}[Distracted, Wounds, Fatigue]`;
         }
-        console.log(
+        /*console.log(
             "Setting the following Values: " + JSON.stringify(sattrs)
-        );
+        );*/
         setAttrs(sattrs);
     });
 };
@@ -1150,9 +1185,9 @@ const dynoTraits = [
 ];
 dynoTraits.forEach((dynoTrait) => {
     on(`change:${dynoTrait}`, function(eventInfo) {
-        console.log(
+        /*console.log(
             `###### Changed Attribute: ${eventInfo.sourceAttribute} ######`
-        );
+        );*/
         setDynamicEnc(eventInfo.sourceAttribute);
     });
 });const baseToughness = function() {
@@ -2184,20 +2219,25 @@ const getDropInfo = function(jsonObj, targetObj, repSection) {
                     .replace(/(\/)/g, "")
                 )) :
                 log("Range", "Not found...melee weapons", r20color);
-            shortRange === 0 ?
-                /*Set Skill to Fighting*/
-                (targetObj[
-                    `repeating_weapons_${repSectionID}_weaponskill`
-                ] = "fighting") :
-                shortRange < 12 ?
-                /*Set Skill to Athletics*/
-                (targetObj[
-                    `repeating_weapons_${repSectionID}_weaponskill`
-                ] = "athletics") :
-                /*Set Skill to Shooting*/
-                (targetObj[
-                    `repeating_weapons_${repSectionID}_weaponskill`
-                ] = "shooting");
+            if(jsonObj.weaponskill){
+                targetObj[`repeating_weapons_${repSectionID}_weaponskill`] = jsonObj.weaponskill;
+            }
+            else {
+                shortRange === 0 ?
+                    /*Set Skill to Fighting*/
+                    (targetObj[
+                        `repeating_weapons_${repSectionID}_weaponskill`
+                    ] = "fighting") :
+                    shortRange < 12 ?
+                    /*Set Skill to Athletics*/
+                    (targetObj[
+                        `repeating_weapons_${repSectionID}_weaponskill`
+                    ] = "athletics") :
+                    /*Set Skill to Shooting*/
+                    (targetObj[
+                        `repeating_weapons_${repSectionID}_weaponskill`
+                    ] = "shooting");
+                }
             //if damageatt is not passed, set to na
             typeof jsonObj["damageatt"] === "undefined" ?
                 (targetObj[
@@ -2988,11 +3028,15 @@ weaponlist.forEach((weapon) => {
                 wbutton = "repeating_raweapons_raweaponbutton";
                 wskill = "repeating_raweapons_raweaponskill";
             }
-            const skillUn = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=&{noerror} [[ @{weaponUnskilledFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponUnskilledWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{trait=^{unskilled}}} {{source=@{${pa}weapon}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{unskilledencumbrancebutton} @{showtraitmods} @{multiattack}`;
+            const skillUn = `@{whisperweapon} &{template:roll} {{name=@{character_name} }} {{namelength=@{namelength}}} @{rolltUnskilled} {{skill_roll=&{noerror} [[ @{weaponUnskilledFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{mook=[[1d0+@{wdNum}]]}} {{wild_die=[[ @{weaponUnskilledWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{trait=^{unskilled}}} {{source=@{${pa}weapon}}} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{unskilledencumbrancebutton} @{showtraitmods} @{multiattack}`;
             const skillFi = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{fightingname}}} {{source=@{${pa}weapon}}} @{rolltFighting} {{skill_roll=&{noerror} [[ @{weaponFightingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+            
             const skillAt = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{athleticsname}}} {{source=@{${pa}weapon}}} @{rolltAthletics} {{skill_roll=&{noerror} [[ @{weaponAthleticsFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponAthleticsWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+            
             const skillSh = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{shootingname}}} {{source=@{${pa}weapon}}} @{rolltShooting} {{skill_roll=&{noerror} [[ @{weaponShootingFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponShootingWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}@{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+            
             const skillWS = `@{whisperweapon} &{template:roll} {{namelength=@{namelength}}} {{trait=@{weirdsciencename}}} {{source=@{${pa}weapon}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{weaponWeirdScienceFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}} {{wild_die=[[ @{weaponWeirdScienceWildDieFormula} + @{weaponAttackBonus} [@{weaponAttackBonusReason}] ]]}}@{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_${pa}weapons_${pa}dmg) }} @{setmodsenc} @{showtraitmods} @{multiattack}`;
+            
             console.log(eventInfo.sourceAttribute);
             let sid = eventInfo.sourceAttribute.slice(18, 38);
             let skillToUse = skillFi;
@@ -3215,6 +3259,7 @@ on(
             "{{trait=@{spellcastingname}}} @{rolltSpellcasting} @{unshakeTemplate} @{linkedspellcastingattbutton} @{showtraitmods} {{button=y}} {{ReRoll=^{reroll}(~repeating_spells_tPower) }}";
         const skillWs =
             "{{trait=@{weirdsciencename}}} @{rolltWeirdScience} {{skill_roll=&{noerror} [[ @{spellWeirdScienceFormula} + @{spellAttackBonus} [@{spellAttackBonusReason}] ]]}} {{wild_die=[[ @{spellWeirdScienceWildDieFormula} + @{spellAttackBonus} [@{spellAttackBonusReason}] ]]}} @{unshakeTemplate} @{linkedweirdscienceattbutton} @{showtraitmods} {{button=y}} {{ReRoll=^{reroll}(~repeating_spells_tPower) }}";
+        //skillWs used to have @{rolltWeirdScience} after {{trait...}}
         const skilltemp =
             "@{whisperspell} &{template:roll} {{namelength=@{namelength}}} {{source=@{power}}} {{trappings=@{trappings}}} {{PowerTemplate=y}} @{shownotes} {{button=y}} {{ReRoll=^{reroll}(~repeating_spells_tPower) }}";
 
@@ -4420,7 +4465,7 @@ on("clicked:editMode", function() {
 });
 
 on("clicked:repeating_weapons:wdamage", function() {
-    console.log("Damage Field clicked...show the Weapon config");
+    //console.log("Damage Field clicked...show the Weapon config");
     setAttrs({
         repeating_weapons_showweaponconfig: "on",
         repeating_weapons_highlightdamage: "1",
@@ -4428,7 +4473,7 @@ on("clicked:repeating_weapons:wdamage", function() {
 });
 
 on("clicked:repeating_spells:sdamage", function() {
-    console.log("Damage Field clicked...show the Weapon config");
+    //console.log("Damage Field clicked...show the Weapon config");
     setAttrs({
         repeating_spells_showspellconfig: "on",
         repeating_spells_shighlightdamage: "1",
@@ -4628,7 +4673,7 @@ const descStatBlock = function() {
             chardesc += " {{wci=@{WCI}}}";
         }
         let physdesc = v.physdescription;
-        console.log("Description length: " + physdesc.length);
+        //console.log("Description length: " + physdesc.length);
         if (physdesc.length > 0) {
             chardesc += " {{description=@{physdescription}}}";
         }
@@ -4675,12 +4720,12 @@ const staticlist = [
     "staticWeirdScience",
 ];
 const skillsStatBlock = function() {
-    console.log(
+    /*console.log(
         "skillnamelist length: " +
         skillnamelist.length +
         " staticlist length: " +
         staticlist.length
-    );
+    );*/
     getAttrs(staticlist, function(v) {
         let charskills = "";
         for (let i = 0; i < staticlist.length; i++) {
@@ -4701,19 +4746,15 @@ const skillsStatBlock = function() {
                 } else {
                     charskills += `, [@{${skillname}name} @{${skilldisplay}_display}](~t${uskillname}Roll)`;
                 }
-            } else {
-                console.log(
-                    staticlist[i] + " isn't a shown character skill"
-                );
-            }
+            } 
         }
         //Need to do custom skill
         getSectionIDs("repeating_skills", function(idArray) {
             for (a = 0; a < idArray.length; a++) {
                 if (charskills.length < 1) {
-                    charskills = `[@{repeating_skills_${idArray[a]}_custSkillName} @{repeating_skills_${idArray[a]}_skillnamerank_display}](~repeating_skills_${idArray[a]}_tSkillRoll)`;
+                    charskills = `[@{repeating_skills_${idArray[a]}_custSkillName} @{repeating_skills_${idArray[a]}_knowledgeother_display}](~repeating_skills_${idArray[a]}_tKnowledgeotherRoll)`;
                 } else {
-                    charskills += `, [@{repeating_skills_${idArray[a]}_custSkillName} @{repeating_skills_${idArray[a]}_skillnamerank_display}](~repeating_skills_${idArray[a]}_tSkillRoll)`;
+                    charskills += `, [@{repeating_skills_${idArray[a]}_custSkillName} @{repeating_skills_${idArray[a]}_knowledgeother_display}](~repeating_skills_${idArray[a]}_tKnowledgeotherRoll)`;
                 }
             }
             setAttrs({ charskills: charskills });
@@ -4723,7 +4764,7 @@ const skillsStatBlock = function() {
 
 staticlist.forEach((staticitem) => {
     on(
-        `change:${staticitem} change:repeating_skills:skillname change:repeating_skills:skillnamerank change:repeating_skills:skillnamerankmod remove:repeating_skills`,
+        `change:${staticitem} change:repeating_skills:custSkillName change:repeating_skills:knowledgeother change:repeating_skills:knowledgeothermod remove:repeating_skills`,
         function() {
             skillsStatBlock();
         }
@@ -4805,13 +4846,13 @@ on(
 
 const gearStatBlock = function() {
     //Includes Armor, Weapons, Gear
-    console.log("Started gearStatBlock");
+    //console.log("Started gearStatBlock");
     let chargear = "";
     let gearvals = [];
     let armorrows = [];
     let weaponrows = [];
     getSectionIDs(["armor"], function(armoridArray) {
-        console.log("Got Armor Section IDs");
+        //console.log("Got Armor Section IDs");
         for (a = 0; a < armoridArray.length; a++) {
             gearvals[
                 gearvals.length
@@ -4821,11 +4862,11 @@ const gearStatBlock = function() {
             ] = `repeating_armor_${armoridArray[a]}_`;
             weaponrows[weaponrows.length] = "empty";
         }
-        console.log("Armor ID Array: " + armoridArray);
+        //console.log("Armor ID Array: " + armoridArray);
         getSectionIDs(["weapons"], function(weaponidArray) {
-            console.log("Got Weapon Section IDs");
-            console.log("Armor ID Array (again): " + armoridArray);
-            console.log("Weapon ID Array: " + weaponidArray);
+            //console.log("Got Weapon Section IDs");
+            //console.log("Armor ID Array (again): " + armoridArray);
+            //console.log("Weapon ID Array: " + weaponidArray);
             for (b = 0; b < weaponidArray.length; b++) {
                 gearvals[
                     gearvals.length
@@ -4835,24 +4876,24 @@ const gearStatBlock = function() {
                 ] = `repeating_weapons_${weaponidArray[b]}_`;
             }
             getSectionIDs(["gear"], function(gearidArray) {
-                console.log("Got Gear Section IDs");
-                console.log("gearvals: " + gearvals);
-                console.log("Armor ID Array (again x2): " + armoridArray);
-                console.log("Weapon ID Array (again): " + weaponidArray);
-                console.log("Gear ID Array: " + gearidArray);
+                //console.log("Got Gear Section IDs");
+                //console.log("gearvals: " + gearvals);
+                //console.log("Armor ID Array (again x2): " + armoridArray);
+                //console.log("Weapon ID Array (again): " + weaponidArray);
+                //console.log("Gear ID Array: " + gearidArray);
                 getAttrs(gearvals, function(v) {
-                    console.log("Got Armor and Weapon Values");
+                    //console.log("Got Armor and Weapon Values");
                     for (c = 0; c < gearvals.length; c++) {
-                        console.log(
+                        /*console.log(
                             "Cycling through Armor and Weapons: " + c
-                        );
+                        );*/
                         if (c < armoridArray.length) {
                             //getting Armor
                             let worn = gearvals[c];
-                            console.log("⍚⍚⍚ Worn: " + worn + " ⍚⍚⍚");
-                            console.log("worn value: " + v[worn]);
+                            //console.log("⍚⍚⍚ Worn: " + worn + " ⍚⍚⍚");
+                            //console.log("worn value: " + v[worn]);
                             if (v[worn] !== "0") {
-                                console.log("Armor is Worn");
+                                //console.log("Armor is Worn");
                                 if (chargear.length < 1) {
                                     //First Item in List
                                     chargear = `@{${armorrows[c]}ArmorType} (+@{${armorrows[c]}ArmorTypeProtection})`;
@@ -4860,17 +4901,15 @@ const gearStatBlock = function() {
                                     //not first item in list
                                     chargear += `, @{${armorrows[c]}ArmorType} (+@{${armorrows[c]}ArmorTypeProtection})`;
                                 }
-                            } else {
-                                console.log("Armor is NOT Worn");
                             }
                         } else {
                             //getting weapons
                             let carried = gearvals[c];
-                            console.log(
+                            /*console.log(
                                 "⍚⍚⍚ carried: " + carried + " ⍚⍚⍚"
-                            );
+                            );*/
                             if (v[carried] !== "0") {
-                                console.log("Weapons is Carried");
+                                //console.log("Weapons is Carried");
                                 if (chargear.length < 1) {
                                     //First Item in List
                                     chargear = `[@{${weaponrows[c]}weapon} (@{${weaponrows[c]}weapondamage})](~${weaponrows[c]}tWeapon)`;
@@ -4878,9 +4917,7 @@ const gearStatBlock = function() {
                                     //not first item in list
                                     chargear += `, [@{${weaponrows[c]}weapon} (@{${weaponrows[c]}weapondamage})](~${weaponrows[c]}tWeapon)`;
                                 }
-                            } else {
-                                console.log("Weapon is NOT Carried");
-                            }
+                            } 
                         }
                     }
                     for (d = 0; d < gearidArray.length; d++) {
@@ -4952,15 +4989,15 @@ const specabilityStatBlock = function() {
                         for (c = 0; c < abilityvals.length; c++) {
                             let evalval = "";
                             if (c < hindrancerow.length) {
-                                console.log(
+                                /*console.log(
                                     "Found a Hindrance for Evaluation"
-                                );
+                                );*/
                                 evalval =
                                     hindrancerow[c] + "hindranceType";
                                 let speccheck = v[evalval];
-                                console.log("Spec Check: " + speccheck);
+                                //console.log("Spec Check: " + speccheck);
                                 speccheck = speccheck.toLowerCase();
-                                console.log("Spec Check: " + speccheck);
+                                //console.log("Spec Check: " + speccheck);
                                 if (speccheck === "racial") {
                                     //Special ability
                                     charspecabilities += `<li>**@{${hindrancerow[c]}hindrance}:** @{${hindrancerow[c]}hindrancedescription}</li>`;
@@ -4974,9 +5011,9 @@ const specabilityStatBlock = function() {
                                 }
                             } else if (c < edgerow.length) {
                                 //used to just be an else statement...
-                                console.log(
+                                /*console.log(
                                     "Found an Edge for evaluation"
-                                );
+                                );*/
                                 evalval = edgerow[c] + "tookat";
                                 if (
                                     v[evalval].toLowerCase() ===
@@ -5038,7 +5075,7 @@ const spellsStatBlock = function() {
     let powercount = 0;
     getSectionIDs("spells", function(idArray) {
         if (idArray.length < 1) {
-            console.log("No spells to worry about");
+            //console.log("No spells to worry about");
             setAttrs({ powercount: "0" });
         } else {
             let getvalues = [
@@ -5071,7 +5108,7 @@ const spellsStatBlock = function() {
                 (x) => `repeating_spells_${x}_powergroup`
             );
             getvalues = getvalues.concat(actualpower, powergroup);
-            console.log("Values I want to get: " + getvalues);
+            //console.log("Values I want to get: " + getvalues);
             getAttrs(getvalues, function(v) {
                 let ablabels = [
                     v.ablabel,
@@ -5088,7 +5125,7 @@ const spellsStatBlock = function() {
                     v.pplabel5,
                 ];
                 if (v.NoPPRule == "0") {
-                    console.log("!!! Power Points are used !!!");
+                    //console.log("!!! Power Points are used !!!");
                     pplabels = [
                         v.ppelabel,
                         v.pplabel2,
@@ -5115,13 +5152,13 @@ const spellsStatBlock = function() {
                 ];
                 let powerpointmax = "";
                 let abpowercount = 0;
-                console.log("Actual Powers: " + actualpower);
-                console.log("Power Buttons: " + powerbutton);
-                console.log("Values for v are: " + JSON.stringify(v));
-                console.info("Beginning For Loops");
+                //console.log("Actual Powers: " + actualpower);
+                //console.log("Power Buttons: " + powerbutton);
+                //console.log("Values for v are: " + JSON.stringify(v));
+                //console.info("Beginning For Loops");
                 for (let i = 0; i < v.numberofabs; i++) {
                     //cycle through the number of ABs used on the character
-                    console.log("Entering the First For Loop");
+                    //console.log("Entering the First For Loop");
                     arcanebg = `**${ablabels[i]}**`;
                     if (v.NoPPRule == "0") {
                         powerpointmax = `<ul><li>${pplabels[i]}: ${powerpoints[i]}</li>`;
@@ -5130,20 +5167,18 @@ const spellsStatBlock = function() {
                     }
                     abpowercount = 0;
                     for (let p = 0; p < idArray.length; p++) {
-                        console.log("Reached the Inner Loop");
+                        //console.log("Reached the Inner Loop");
                         //Check to see if any of the powers are associated the AB we are checking
                         if (v[powergroup[p]] == `ab${i + 1}`) {
                             //powergroup is associated with the AB we are currently looking for
                             if (abpowercount < 1) {
-                                console.warn("First Power found");
+                                //console.warn("First Power found");
                                 powers = `[@{${actualpower[p]}}](~${powerbutton[p]})`;
                             } else {
-                                console.log("Subsequent Power Found");
+                                //console.log("Subsequent Power Found");
                                 powers += `, [@{${actualpower[p]}}](~${powerbutton[p]})`;
                             }
                             abpowercount++;
-                        } else {
-                            console.info("Power not in Power Group");
                         }
                     }
                     powercount += abpowercount;
@@ -6081,12 +6116,42 @@ on(
 </script>
 <!-- Necessary Mixins-->
 <!-- Hidden inputs for character sheet versioning, etc-->
-<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.17"/>
+<input type="hidden" name="attr_character_sheet" value="Official Savage Worlds v1.00.18"/>
 <input type="hidden" name="attr_firstInit" value="0"/>
 <input type="hidden" name="attr_namelength" value="0"/>
 <input type="hidden" name="attr_wdNum" value="1"/>
 <input type="hidden" name="wilddie" value="6"/>
+<input type="hidden" name="attr_dopay" value="init"/>
+<input class="hiddenInput" type="checkbox" name="attr_dealtJoker" value="2"/>
+<input type="checkbox" style="display: none;" name="attr_showFightingByDefault" value="1"/>
 <!-- hidden inputs to build the Statblock to Chat output-->
+<input type="hidden" name="attr_initstatblock" value="0"/>
+<input type="hidden" name="attr_initdesc" value="0"/>
+<input type="hidden" name="attr_chardesc" value="{{name=@{character_name}}}"/>
+<input type="hidden" name="attr_charatts" value="[^{agility} @{agility_display}](~tAgilityRoll), [^{smarts} @{smarts_display}@{animalsmarts_display}](~tSmartsRoll), [^{spirit} @{spirit_display}](~tSpiritRoll), [^{strength} @{strength_display}](~tStrengthRoll), [^{vigor} @{vigor_display}](~tVigorRoll)"/>
+<input type="hidden" name="attr_initskills" value="0"/>
+<input type="hidden" name="attr_charskills"/>
+<input type="hidden" name="attr_initderived" value="0"/>
+<input type="hidden" name="attr_charderived"/>
+<input type="hidden" name="attr_initgear" value="0"/>
+<input type="hidden" name="attr_chargear"/>
+<input type="hidden" name="attr_inithindrances" value="0"/>
+<input type="hidden" name="attr_charhindrances"/>
+<input type="hidden" name="attr_initsbedges" value="0"/>
+<input type="hidden" name="attr_charedges"/>
+<input type="hidden" name="attr_initspecabilities" value="0"/>
+<input type="hidden" name="attr_showspec"/>
+<input type="hidden" name="attr_charspecabilities"/>
+<input type="hidden" name="attr_initpowers" value="0"/>
+<input type="hidden" name="attr_powercount" value="0"/>
+<input type="hidden" name="attr_charpowers"/>
+<input type="hidden" name="attr_ab1powerlist"/>
+<input type="hidden" name="attr_ab2powerlist"/>
+<input type="hidden" name="attr_ab3powerlist"/>
+<input type="hidden" name="attr_ab4powerlist"/>
+<input type="hidden" name="attr_ab5powerlist"/>
+<input type="hidden" name="attr_unshakeTemplate" value="{{shaken=[[0d6+@{isShaken}]]}} {{unshake=[&lt;span data-i18n='roll-unshake-button'&gt;&lt;/span&gt;](~unshakeroll)}}"/>
+<input type="hidden" name="attr_templateConditions" value="{{wildcard=[[@{is_npc}d1]]}} {{wcicon=@{WCI}}} {{vulnerable=[[0d6+@{vulnerable}]]}} {{stunned=[[0d6+@{stunned}]]}} {{distracteds=[[0d6+@{distracted}]]}}"/>
 <!-- hidden inputs for modifiers-->
 <input type="hidden" name="attr_ttmod" value="0"/>
 <input type="hidden" name="attr_dmgmod" value="0"/>
@@ -6104,6 +6169,7 @@ on(
   <input class="hiddenInput" type="text" name="attr_CompendiumCategory" accept="Category"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumContent" accept="Content"/>
   <input class="hiddenInput" type="text" name="attr_CompendiumData" accept="data"/>
+  <!-- Avatar and Token URL information-->
   <input type="hidden" name="attr_avatar"/>
   <input type="hidden" name="attr_ctoken"/>
   <input class="useBackground hiddenInput" type="hidden" name="attr_background" value="1"/>
@@ -7011,7 +7077,8 @@ on(
                     <input type="hidden" name="attr_knowledgeother_display" value="d4"/>
                     <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod}+ @{linkedknowledgeotherattformula} + @{traitmods}"/>
                     <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} + @{linkedknowledgeotherattformula} + @{traitmods}"/>
-                    <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{knowledgeotherSkillRollFormula} ]]}} {{wild_die=[[ @{knowledgeotherWildDieFormula} ]]}}"/>
+                    <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                    <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                     <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   </div>
                 </fieldset>
@@ -7420,6 +7487,7 @@ on(
               <input type="hidden" name="attr_weaponroll" value="@{damageOnly}"/>
               <!-- Used for Skill and Damage roll-->
               <input type="hidden" name="attr_skillNDamage" value="@{whisperweapon} &amp;{template:roll} {{namelength=@{namelength}}} {{trait=Fighting}} {{source=@{weapon}}} @{rolltFighting} {{skill_roll=&amp;{noerror} [[ @{weaponFightingFormula} ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_weapons_dmg) }} @{multiattack}"/>
+              <!-- skillNDamage used to have @{rolltFighting}  right after {{source=@{weapon}}}-->
               <!-- Used for Multiattack-->
               <input type="hidden" name="attr_multiattack" value="0"/>
               <!-- Used for Damage Only-->
@@ -8179,7 +8247,8 @@ on(
                   <input type="hidden" name="attr_academics_display" value="d4"/>
                   <input type="hidden" name="attr_academicsSkillRollFormula" value="@{academics_rank} + @{AcademicsskillMod}+ @{linkedacademicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_academicsWildDieFormula" value="1d@{academicswilddie}! + @{academicsmod} + @{AcademicsskillMod} + @{linkedacademicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltAcademics" value="{{name=@{character_name} }} {{skill_rank=@{academics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{academicsSkillRollFormula} ]]}} {{wild_die=[[ @{academicsWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltAcademics" value="{{name=@{character_name} }} {{skill_rank=@{academics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8295,7 +8364,8 @@ on(
                   <input type="hidden" name="attr_athletics_display" value="d4"/>
                   <input type="hidden" name="attr_athleticsSkillRollFormula" value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_athleticsWildDieFormula" value="1d@{athleticswilddie}! + @{athleticsmod} + @{AthleticsskillMod} + @{linkedathleticsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltAthletics" value="{{name=@{character_name} }} {{skill_rank=@{athletics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{athleticsSkillRollFormula} ]]}} {{wild_die=[[ @{athleticsWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltAthletics" value="{{name=@{character_name} }} {{skill_rank=@{athletics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8406,7 +8476,8 @@ on(
                   <input type="hidden" name="attr_battle_display" value="d4"/>
                   <input type="hidden" name="attr_battleSkillRollFormula" value="@{battle_rank} + @{BattleskillMod}+ @{linkedbattleattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_battleWildDieFormula" value="1d@{battlewilddie}! + @{battlemod} + @{BattleskillMod} + @{linkedbattleattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltBattle" value="{{name=@{character_name} }} {{skill_rank=@{battle_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{battleSkillRollFormula} ]]}} {{wild_die=[[ @{battleWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltBattle" value="{{name=@{character_name} }} {{skill_rank=@{battle_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8517,7 +8588,8 @@ on(
                   <input type="hidden" name="attr_boating_display" value="d4"/>
                   <input type="hidden" name="attr_boatingSkillRollFormula" value="@{boating_rank} + @{BoatingskillMod}+ @{linkedboatingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_boatingWildDieFormula" value="1d@{boatingwilddie}! + @{boatingmod} + @{BoatingskillMod} + @{linkedboatingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltBoating" value="{{name=@{character_name} }} {{skill_rank=@{boating_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{boatingSkillRollFormula} ]]}} {{wild_die=[[ @{boatingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltBoating" value="{{name=@{character_name} }} {{skill_rank=@{boating_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8628,7 +8700,8 @@ on(
                   <input type="hidden" name="attr_commonknowledge_display" value="d4"/>
                   <input type="hidden" name="attr_commonknowledgeSkillRollFormula" value="@{commonknowledge_rank} + @{CommonknowledgeskillMod}+ @{linkedcommonknowledgeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_commonknowledgeWildDieFormula" value="1d@{commonknowledgewilddie}! + @{commonknowledgemod} + @{CommonknowledgeskillMod} + @{linkedcommonknowledgeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltCommonknowledge" value="{{name=@{character_name} }} {{skill_rank=@{commonknowledge_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{commonknowledgeSkillRollFormula} ]]}} {{wild_die=[[ @{commonknowledgeWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltCommonknowledge" value="{{name=@{character_name} }} {{skill_rank=@{commonknowledge_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8739,7 +8812,8 @@ on(
                   <input type="hidden" name="attr_driving_display" value="d4"/>
                   <input type="hidden" name="attr_drivingSkillRollFormula" value="@{driving_rank} + @{DrivingskillMod}+ @{linkeddrivingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_drivingWildDieFormula" value="1d@{drivingwilddie}! + @{drivingmod} + @{DrivingskillMod} + @{linkeddrivingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltDriving" value="{{name=@{character_name} }} {{skill_rank=@{driving_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{drivingSkillRollFormula} ]]}} {{wild_die=[[ @{drivingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltDriving" value="{{name=@{character_name} }} {{skill_rank=@{driving_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8850,7 +8924,8 @@ on(
                   <input type="hidden" name="attr_electronics_display" value="d4"/>
                   <input type="hidden" name="attr_electronicsSkillRollFormula" value="@{electronics_rank} + @{ElectronicsskillMod}+ @{linkedelectronicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_electronicsWildDieFormula" value="1d@{electronicswilddie}! + @{electronicsmod} + @{ElectronicsskillMod} + @{linkedelectronicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltElectronics" value="{{name=@{character_name} }} {{skill_rank=@{electronics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{electronicsSkillRollFormula} ]]}} {{wild_die=[[ @{electronicsWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltElectronics" value="{{name=@{character_name} }} {{skill_rank=@{electronics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -8961,7 +9036,8 @@ on(
                   <input type="hidden" name="attr_faith_display" value="d4"/>
                   <input type="hidden" name="attr_faithSkillRollFormula" value="@{faith_rank} + @{FaithskillMod}+ @{linkedfaithattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_faithWildDieFormula" value="1d@{faithwilddie}! + @{faithmod} + @{FaithskillMod} + @{linkedfaithattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltFaith" value="{{name=@{character_name} }} {{skill_rank=@{faith_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{faithSkillRollFormula} ]]}} {{wild_die=[[ @{faithWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltFaith" value="{{name=@{character_name} }} {{skill_rank=@{faith_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9072,7 +9148,8 @@ on(
                   <input type="hidden" name="attr_fighting_display" value="d4"/>
                   <input type="hidden" name="attr_fightingSkillRollFormula" value="@{fighting_rank} + @{FightingskillMod}+ @{linkedfightingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_fightingWildDieFormula" value="1d@{fightingwilddie}! + @{fightingmod} + @{FightingskillMod} + @{linkedfightingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltFighting" value="{{name=@{character_name} }} {{skill_rank=@{fighting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{fightingSkillRollFormula} ]]}} {{wild_die=[[ @{fightingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltFighting" value="{{name=@{character_name} }} {{skill_rank=@{fighting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9183,7 +9260,8 @@ on(
                   <input type="hidden" name="attr_focus_display" value="d4"/>
                   <input type="hidden" name="attr_focusSkillRollFormula" value="@{focus_rank} + @{FocusskillMod}+ @{linkedfocusattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_focusWildDieFormula" value="1d@{focuswilddie}! + @{focusmod} + @{FocusskillMod} + @{linkedfocusattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltFocus" value="{{name=@{character_name} }} {{skill_rank=@{focus_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{focusSkillRollFormula} ]]}} {{wild_die=[[ @{focusWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltFocus" value="{{name=@{character_name} }} {{skill_rank=@{focus_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9294,7 +9372,8 @@ on(
                   <input type="hidden" name="attr_gambling_display" value="d4"/>
                   <input type="hidden" name="attr_gamblingSkillRollFormula" value="@{gambling_rank} + @{GamblingskillMod}+ @{linkedgamblingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_gamblingWildDieFormula" value="1d@{gamblingwilddie}! + @{gamblingmod} + @{GamblingskillMod} + @{linkedgamblingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltGambling" value="{{name=@{character_name} }} {{skill_rank=@{gambling_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{gamblingSkillRollFormula} ]]}} {{wild_die=[[ @{gamblingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltGambling" value="{{name=@{character_name} }} {{skill_rank=@{gambling_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9405,7 +9484,8 @@ on(
                   <input type="hidden" name="attr_hacking_display" value="d4"/>
                   <input type="hidden" name="attr_hackingSkillRollFormula" value="@{hacking_rank} + @{HackingskillMod}+ @{linkedhackingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_hackingWildDieFormula" value="1d@{hackingwilddie}! + @{hackingmod} + @{HackingskillMod} + @{linkedhackingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltHacking" value="{{name=@{character_name} }} {{skill_rank=@{hacking_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{hackingSkillRollFormula} ]]}} {{wild_die=[[ @{hackingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltHacking" value="{{name=@{character_name} }} {{skill_rank=@{hacking_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9516,7 +9596,8 @@ on(
                   <input type="hidden" name="attr_healing_display" value="d4"/>
                   <input type="hidden" name="attr_healingSkillRollFormula" value="@{healing_rank} + @{HealingskillMod}+ @{linkedhealingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_healingWildDieFormula" value="1d@{healingwilddie}! + @{healingmod} + @{HealingskillMod} + @{linkedhealingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltHealing" value="{{name=@{character_name} }} {{skill_rank=@{healing_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{healingSkillRollFormula} ]]}} {{wild_die=[[ @{healingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltHealing" value="{{name=@{character_name} }} {{skill_rank=@{healing_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9627,7 +9708,8 @@ on(
                   <input type="hidden" name="attr_intimidation_display" value="d4"/>
                   <input type="hidden" name="attr_intimidationSkillRollFormula" value="@{intimidation_rank} + @{IntimidationskillMod}+ @{linkedintimidationattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_intimidationWildDieFormula" value="1d@{intimidationwilddie}! + @{intimidationmod} + @{IntimidationskillMod} + @{linkedintimidationattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltIntimidation" value="{{name=@{character_name} }} {{skill_rank=@{intimidation_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{intimidationSkillRollFormula} ]]}} {{wild_die=[[ @{intimidationWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltIntimidation" value="{{name=@{character_name} }} {{skill_rank=@{intimidation_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9738,7 +9820,8 @@ on(
                   <input type="hidden" name="attr_language_display" value="d4"/>
                   <input type="hidden" name="attr_languageSkillRollFormula" value="@{language_rank} + @{LanguageskillMod}+ @{linkedlanguageattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_languageWildDieFormula" value="1d@{languagewilddie}! + @{languagemod} + @{LanguageskillMod} + @{linkedlanguageattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltLanguage" value="{{name=@{character_name} }} {{skill_rank=@{language_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{languageSkillRollFormula} ]]}} {{wild_die=[[ @{languageWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltLanguage" value="{{name=@{character_name} }} {{skill_rank=@{language_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9849,7 +9932,8 @@ on(
                   <input type="hidden" name="attr_notice_display" value="d4"/>
                   <input type="hidden" name="attr_noticeSkillRollFormula" value="@{notice_rank} + @{NoticeskillMod}+ @{linkednoticeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_noticeWildDieFormula" value="1d@{noticewilddie}! + @{noticemod} + @{NoticeskillMod} + @{linkednoticeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltNotice" value="{{name=@{character_name} }} {{skill_rank=@{notice_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{noticeSkillRollFormula} ]]}} {{wild_die=[[ @{noticeWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltNotice" value="{{name=@{character_name} }} {{skill_rank=@{notice_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -9960,7 +10044,8 @@ on(
                   <input type="hidden" name="attr_occult_display" value="d4"/>
                   <input type="hidden" name="attr_occultSkillRollFormula" value="@{occult_rank} + @{OccultskillMod}+ @{linkedoccultattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_occultWildDieFormula" value="1d@{occultwilddie}! + @{occultmod} + @{OccultskillMod} + @{linkedoccultattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltOccult" value="{{name=@{character_name} }} {{skill_rank=@{occult_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{occultSkillRollFormula} ]]}} {{wild_die=[[ @{occultWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltOccult" value="{{name=@{character_name} }} {{skill_rank=@{occult_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10071,7 +10156,8 @@ on(
                   <input type="hidden" name="attr_performance_display" value="d4"/>
                   <input type="hidden" name="attr_performanceSkillRollFormula" value="@{performance_rank} + @{PerformanceskillMod}+ @{linkedperformanceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_performanceWildDieFormula" value="1d@{performancewilddie}! + @{performancemod} + @{PerformanceskillMod} + @{linkedperformanceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltPerformance" value="{{name=@{character_name} }} {{skill_rank=@{performance_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{performanceSkillRollFormula} ]]}} {{wild_die=[[ @{performanceWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltPerformance" value="{{name=@{character_name} }} {{skill_rank=@{performance_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10182,7 +10268,8 @@ on(
                   <input type="hidden" name="attr_persuasion_display" value="d4"/>
                   <input type="hidden" name="attr_persuasionSkillRollFormula" value="@{persuasion_rank} + @{PersuasionskillMod}+ @{linkedpersuasionattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_persuasionWildDieFormula" value="1d@{persuasionwilddie}! + @{persuasionmod} + @{PersuasionskillMod} + @{linkedpersuasionattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltPersuasion" value="{{name=@{character_name} }} {{skill_rank=@{persuasion_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{persuasionSkillRollFormula} ]]}} {{wild_die=[[ @{persuasionWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltPersuasion" value="{{name=@{character_name} }} {{skill_rank=@{persuasion_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10293,7 +10380,8 @@ on(
                   <input type="hidden" name="attr_piloting_display" value="d4"/>
                   <input type="hidden" name="attr_pilotingSkillRollFormula" value="@{piloting_rank} + @{PilotingskillMod}+ @{linkedpilotingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_pilotingWildDieFormula" value="1d@{pilotingwilddie}! + @{pilotingmod} + @{PilotingskillMod} + @{linkedpilotingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltPiloting" value="{{name=@{character_name} }} {{skill_rank=@{piloting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{pilotingSkillRollFormula} ]]}} {{wild_die=[[ @{pilotingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltPiloting" value="{{name=@{character_name} }} {{skill_rank=@{piloting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10409,7 +10497,8 @@ on(
                   <input type="hidden" name="attr_psionics_display" value="d4"/>
                   <input type="hidden" name="attr_psionicsSkillRollFormula" value="@{psionics_rank} + @{PsionicsskillMod}+ @{linkedpsionicsattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_psionicsWildDieFormula" value="1d@{psionicswilddie}! + @{psionicsmod} + @{PsionicsskillMod} + @{linkedpsionicsattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltPsionics" value="{{name=@{character_name} }} {{skill_rank=@{psionics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{psionicsSkillRollFormula} ]]}} {{wild_die=[[ @{psionicsWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltPsionics" value="{{name=@{character_name} }} {{skill_rank=@{psionics_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10520,7 +10609,8 @@ on(
                   <input type="hidden" name="attr_repair_display" value="d4"/>
                   <input type="hidden" name="attr_repairSkillRollFormula" value="@{repair_rank} + @{RepairskillMod}+ @{linkedrepairattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_repairWildDieFormula" value="1d@{repairwilddie}! + @{repairmod} + @{RepairskillMod} + @{linkedrepairattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltRepair" value="{{name=@{character_name} }} {{skill_rank=@{repair_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{repairSkillRollFormula} ]]}} {{wild_die=[[ @{repairWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltRepair" value="{{name=@{character_name} }} {{skill_rank=@{repair_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10631,7 +10721,8 @@ on(
                   <input type="hidden" name="attr_research_display" value="d4"/>
                   <input type="hidden" name="attr_researchSkillRollFormula" value="@{research_rank} + @{ResearchskillMod}+ @{linkedresearchattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_researchWildDieFormula" value="1d@{researchwilddie}! + @{researchmod} + @{ResearchskillMod} + @{linkedresearchattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltResearch" value="{{name=@{character_name} }} {{skill_rank=@{research_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{researchSkillRollFormula} ]]}} {{wild_die=[[ @{researchWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltResearch" value="{{name=@{character_name} }} {{skill_rank=@{research_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10742,7 +10833,8 @@ on(
                   <input type="hidden" name="attr_riding_display" value="d4"/>
                   <input type="hidden" name="attr_ridingSkillRollFormula" value="@{riding_rank} + @{RidingskillMod}+ @{linkedridingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_ridingWildDieFormula" value="1d@{ridingwilddie}! + @{ridingmod} + @{RidingskillMod} + @{linkedridingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltRiding" value="{{name=@{character_name} }} {{skill_rank=@{riding_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{ridingSkillRollFormula} ]]}} {{wild_die=[[ @{ridingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltRiding" value="{{name=@{character_name} }} {{skill_rank=@{riding_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10853,7 +10945,8 @@ on(
                   <input type="hidden" name="attr_science_display" value="d4"/>
                   <input type="hidden" name="attr_scienceSkillRollFormula" value="@{science_rank} + @{ScienceskillMod}+ @{linkedscienceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_scienceWildDieFormula" value="1d@{sciencewilddie}! + @{sciencemod} + @{ScienceskillMod} + @{linkedscienceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltScience" value="{{name=@{character_name} }} {{skill_rank=@{science_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{scienceSkillRollFormula} ]]}} {{wild_die=[[ @{scienceWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltScience" value="{{name=@{character_name} }} {{skill_rank=@{science_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -10964,7 +11057,8 @@ on(
                   <input type="hidden" name="attr_shooting_display" value="d4"/>
                   <input type="hidden" name="attr_shootingSkillRollFormula" value="@{shooting_rank} + @{ShootingskillMod}+ @{linkedshootingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_shootingWildDieFormula" value="1d@{shootingwilddie}! + @{shootingmod} + @{ShootingskillMod} + @{linkedshootingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltShooting" value="{{name=@{character_name} }} {{skill_rank=@{shooting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{shootingSkillRollFormula} ]]}} {{wild_die=[[ @{shootingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltShooting" value="{{name=@{character_name} }} {{skill_rank=@{shooting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11083,7 +11177,8 @@ on(
                   <input type="hidden" name="attr_spellcasting_display" value="d4"/>
                   <input type="hidden" name="attr_spellcastingSkillRollFormula" value="@{spellcasting_rank} + @{SpellcastingskillMod}+ @{linkedspellcastingattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_spellcastingWildDieFormula" value="1d@{spellcastingwilddie}! + @{spellcastingmod} + @{SpellcastingskillMod} + @{linkedspellcastingattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltSpellcasting" value="{{name=@{character_name} }} {{skill_rank=@{spellcasting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{spellcastingSkillRollFormula} ]]}} {{wild_die=[[ @{spellcastingWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltSpellcasting" value="{{name=@{character_name} }} {{skill_rank=@{spellcasting_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11194,7 +11289,8 @@ on(
                   <input type="hidden" name="attr_stealth_display" value="d4"/>
                   <input type="hidden" name="attr_stealthSkillRollFormula" value="@{stealth_rank} + @{StealthskillMod}+ @{linkedstealthattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_stealthWildDieFormula" value="1d@{stealthwilddie}! + @{stealthmod} + @{StealthskillMod} + @{linkedstealthattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltStealth" value="{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{stealthSkillRollFormula} ]]}} {{wild_die=[[ @{stealthWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltStealth" value="{{name=@{character_name} }} {{skill_rank=@{stealth_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11305,7 +11401,8 @@ on(
                   <input type="hidden" name="attr_survival_display" value="d4"/>
                   <input type="hidden" name="attr_survivalSkillRollFormula" value="@{survival_rank} + @{SurvivalskillMod}+ @{linkedsurvivalattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_survivalWildDieFormula" value="1d@{survivalwilddie}! + @{survivalmod} + @{SurvivalskillMod} + @{linkedsurvivalattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltSurvival" value="{{name=@{character_name} }} {{skill_rank=@{survival_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{survivalSkillRollFormula} ]]}} {{wild_die=[[ @{survivalWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltSurvival" value="{{name=@{character_name} }} {{skill_rank=@{survival_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11416,7 +11513,8 @@ on(
                   <input type="hidden" name="attr_taunt_display" value="d4"/>
                   <input type="hidden" name="attr_tauntSkillRollFormula" value="@{taunt_rank} + @{TauntskillMod}+ @{linkedtauntattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_tauntWildDieFormula" value="1d@{tauntwilddie}! + @{tauntmod} + @{TauntskillMod} + @{linkedtauntattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltTaunt" value="{{name=@{character_name} }} {{skill_rank=@{taunt_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{tauntSkillRollFormula} ]]}} {{wild_die=[[ @{tauntWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltTaunt" value="{{name=@{character_name} }} {{skill_rank=@{taunt_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11527,7 +11625,8 @@ on(
                   <input type="hidden" name="attr_thievery_display" value="d4"/>
                   <input type="hidden" name="attr_thieverySkillRollFormula" value="@{thievery_rank} + @{ThieveryskillMod}+ @{linkedthieveryattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_thieveryWildDieFormula" value="1d@{thieverywilddie}! + @{thieverymod} + @{ThieveryskillMod} + @{linkedthieveryattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltThievery" value="{{name=@{character_name} }} {{skill_rank=@{thievery_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{thieverySkillRollFormula} ]]}} {{wild_die=[[ @{thieveryWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltThievery" value="{{name=@{character_name} }} {{skill_rank=@{thievery_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11638,7 +11737,8 @@ on(
                   <input type="hidden" name="attr_trade_display" value="d4"/>
                   <input type="hidden" name="attr_tradeSkillRollFormula" value="@{trade_rank} + @{TradeskillMod}+ @{linkedtradeattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_tradeWildDieFormula" value="1d@{tradewilddie}! + @{trademod} + @{TradeskillMod} + @{linkedtradeattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltTrade" value="{{name=@{character_name} }} {{skill_rank=@{trade_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{tradeSkillRollFormula} ]]}} {{wild_die=[[ @{tradeWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltTrade" value="{{name=@{character_name} }} {{skill_rank=@{trade_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11757,7 +11857,8 @@ on(
                   <input type="hidden" name="attr_weirdscience_display" value="d4"/>
                   <input type="hidden" name="attr_weirdscienceSkillRollFormula" value="@{weirdscience_rank} + @{WeirdscienceskillMod}+ @{linkedweirdscienceattformula} + @{traitmods}"/>
                   <input type="hidden" name="attr_weirdscienceWildDieFormula" value="1d@{weirdsciencewilddie}! + @{weirdsciencemod} + @{WeirdscienceskillMod} + @{linkedweirdscienceattformula} + @{traitmods}"/>
-                  <input type="hidden" name="attr_rolltWeirdscience" value="{{name=@{character_name} }} {{skill_rank=@{weirdscience_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{weirdscienceSkillRollFormula} ]]}} {{wild_die=[[ @{weirdscienceWildDieFormula} ]]}}"/>
+                  <input type="hidden" name="attr_rolltWeirdscience" value="{{name=@{character_name} }} {{skill_rank=@{weirdscience_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                  <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                   <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                   <input class="useSkillSpec hiddenInput" type="checkbox" name="attr_altRuleSkillSpec"/>
                   <div class="SkillSpec">
@@ -11882,7 +11983,8 @@ on(
                       <input type="hidden" name="attr_knowledgeother_display" value="d4"/>
                       <input type="hidden" name="attr_knowledgeotherSkillRollFormula" value="@{knowledgeother_rank} + @{KnowledgeotherskillMod}+ @{linkedknowledgeotherattformula} + @{traitmods}"/>
                       <input type="hidden" name="attr_knowledgeotherWildDieFormula" value="1d@{knowledgeotherwilddie}! + @{knowledgeothermod} + @{KnowledgeotherskillMod} + @{linkedknowledgeotherattformula} + @{traitmods}"/>
-                      <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }} {{skill_roll=[[ @{knowledgeotherSkillRollFormula} ]]}} {{wild_die=[[ @{knowledgeotherWildDieFormula} ]]}}"/>
+                      <input type="hidden" name="attr_rolltKnowledgeother" value="{{name=@{character_name} }} {{skill_rank=@{knowledgeother_display} }} {{mook=[[1d0+@{wdNum}]]}} @{templateConditions} {{conviction=[[ [[@{conviction}]]d6! ]] }}"/>
+                      <!-- attr_rollt${skillName} used to have this in the value: {{skill_roll=[[ @{${skill}SkillRollFormula} ]]}} {{wild_die=[[ @{${skill}WildDieFormula} ]]}}-->
                       <!-- input(type="hidden", name="attr_athleticsrollformula", value="@{athletics_rank} + @{AthleticsskillMod}+ @{linkedathleticsattformula} + @{traitmods}")-->
                     </div>
                   </fieldset>
@@ -12610,6 +12712,7 @@ on(
                 <input type="hidden" name="attr_weaponroll" value="@{damageOnly}"/>
                 <!-- Used for Skill and Damage roll-->
                 <input type="hidden" name="attr_skillNDamage" value="@{whisperweapon} &amp;{template:roll} {{namelength=@{namelength}}} {{trait=Fighting}} {{source=@{weapon}}} @{rolltFighting} {{skill_roll=&amp;{noerror} [[ @{weaponFightingFormula} ]]}} {{wild_die=[[ @{weaponFightingWildDieFormula} ]]}} @{unshakeTemplate} {{button=y}} {{ReRoll=^{reroll}(~repeating_weapons_tWeapon) }} {{DmgRoll=^{roll-damage}(~repeating_weapons_dmg) }} @{multiattack}"/>
+                <!-- skillNDamage used to have @{rolltFighting}  right after {{source=@{weapon}}}-->
                 <!-- Used for Multiattack-->
                 <input type="hidden" name="attr_multiattack" value="0"/>
                 <!-- Used for Damage Only-->
@@ -14072,6 +14175,27 @@ on(
       </div>
       <div class="releasenotesTab">
         <h1 class="groupHeader documentationHeader" data-i18n="release-notes">Release Notes</h1>
+        <!-- Release 1.00.18-->
+        <label class="rowlabel">
+          <input class="releasenotes" type="checkbox" name="attr_releasenotes10018" value="1"/><span class="releasenotesVersion">
+            <h4 class="rnversion"><span data-i18n="version"></span>1.00.18</h4></span>
+        </label>
+        <input class="releasenotes" type="checkbox" style="display:none;" name="attr_releasenotes10018" value="1"/>
+        <div class="releasenotes"> 
+          <h2 class="releaseNotesSubHeader" data-i18n="bug-fix-release">Bug Fix Release</h2>
+          <p data-i18n="bug-fix-release-info">This release focuses on Bug Fixes</p>
+          <h2 class="releaseNotesSubHeader" data-i18n="bugs-fixed">Bugs Fixed</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="multiple-3d-dice">Fixed an issue where the Skill die and the Wild/Group Die were rolling multiple 3D dice.</span></li>
+            <li> <span class="black" data-i18n="missing-custom-skills">Fixed an issue Custom/Knowledge skills were missing.<br/><br/><span style='font-weight:bold;color:red;'>Warning</span>: Due to some limitations I couldn't figure out, if any of these skills were &quot;Boosted&quot; or &quot;Lowered&quot; at the time they went missing, the skill rank will reflect the boosted/lowered die type plus/minus one additional level. For example, if the skill base was d8 and it was boosed 1 level (to a d10), the skill will now reflect a d12; likewise, if the skill was a d8 and lowered 1 step, the skill will not reflect a d4 (instead of the d6). You'll know this occurred when you roll that skill (you'll see an asterisk next to the rank in the chat output). I apologize I wasn't able to care for this, but I figured it was a fringe case and I was running out of time to meet the next release window; I made the decision to deploy his patch without trying further to fix that aspect of the patch, because I figured getting the skills back on the sheet was more important. I apologize if this causes any problems for your games.<br/><br/>One other issue you may notice is the linked attribute for the skill may show 0; this a bug a that I have raised with Roll20 and nothing I can fix.</span></li>
+            <li> <span class="black" data-i18n="chat-statblock-output">Fixed the issue with sending the statblock to the Chat window where fields/error were missing; clicking the statblock button at the top of the sheet should now send the statblock to chat properly.</span></li>
+          </ul>
+          <h2 class="releaseNotesSubHeader" data-i18n="known-issues">Known Issues</h2>
+          <ul class="releaseNotesList"> 
+            <li> <span class="black" data-i18n="custom-skill-alphanumeric">The styling for Custom/Knowledge skills when using the alphanumeric visual instead of the die type visuals is still not working; since this purely a comesmetic thing, I prioritized other issues above this one. I'll get this fixed with the next update.</span></li>
+            <li> <span class="black" data-i18n="boosted-lowered-skills">Boosted/Lowered skills are not showing the proper styling on the sheet; this is not an issue on the condensed view of the character sheet, however.</span></li>
+          </ul>
+        </div>
         <!-- Release 1.00.17-->
         <label class="rowlabel">
           <input class="releasenotes" type="checkbox" name="attr_releasenotes10017" value="1"/><span class="releasenotesVersion">
