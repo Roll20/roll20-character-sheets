@@ -1,4 +1,4 @@
-﻿& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
+& 'D:\git\roll20-character-sheets\AD&D 2E Revised\build\sanitizeFiles.ps1'
 node buildPug.js
 
 "---- Combining files ----"
