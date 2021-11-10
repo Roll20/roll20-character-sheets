@@ -2869,9 +2869,11 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
       break;
 
     case 'rogue':
-      ghost = value.rogueGhost;
+      ghost = +value.rogueGhost;
 
-      if (ghost !== '') {
+      log(ghost);
+
+      if (ghost !== 0) {
         exec.push(`{{special2=${i18n_ghostActive}}}`);
 
         if (isELumiere === false && isASLumiere === false) {
@@ -2907,7 +2909,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C5 !== '0') {
           exec.push(`{{totem1=${CaracNom[C5Nom]}}}`);
           cRoll.push(C5);
-          ODShaman.push(`@{${ODNom[C5Nom]}}`);
+          ODShaman.push(`@{${ODValue[C5Nom]}}`);
         }
       }
 
@@ -2915,7 +2917,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C6 !== '0') {
           exec.push(`{{totem2=${CaracNom[C6Nom]}}}`);
           cRoll.push(C6);
-          ODShaman.push(`@{${ODNom[C6Nom]}}`);
+          ODShaman.push(`@{${ODValue[C6Nom]}}`);
         }
       }
 
@@ -2923,7 +2925,7 @@ function getArmorBonus(value, armure, isELumiere, isASLumiere, vDiscretion, oDis
         if (C7 !== '0') {
           exec.push(`{{totem3=${CaracNom[C7Nom]}}}`);
           cRoll.push(C7);
-          ODShaman.push(`@{${ODNom[C7Nom]}}`);
+          ODShaman.push(`@{${ODValue[C7Nom]}}`);
         }
       }
 
