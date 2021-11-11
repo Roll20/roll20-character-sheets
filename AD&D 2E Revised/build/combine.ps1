@@ -30,6 +30,7 @@ $inserts | ForEach-Object {
       $replace = $replaceConstant -f $i;
       $rawContent = $rawContent.Replace($replace, $replaces[$i])
    }
+   $rawContent = $rawContent -replace "\#REPLACE\d+\#", ""
    
    $regex = "^" + [Regex]::Escape($_.Line) + "$"
    $content = $content -replace $regex, $rawContent
