@@ -4375,16 +4375,7 @@
 				</h4>
 				
 				<ul>
-					<li>Internationalization updates.</li>
-					<ul>
-						<li>Minor change to Tabs. The Width will adjust according to the title length. In other languages the length may be longer. Reported by Paulo.</li>
-						<li>Several changes and corrections to the sheet, to provide a way to translate fields that were not possible before.</li>
-						<li>Fixed bug that changed combat entries switched from being based on skills to being based on DX. Reported by Philip W..</li>
-					</ul>
-					<li>Bug fix in container "turning and velocity modifiers". Values are incorrect when the current move has the step in parentheses. Reported by Paulo.</li>
-					<li>Bug fix in roll template. The notes are shown even if the option "Show Skill Modifier notes (refer to the current skill description)" is not checked. Reported by Paulo.</li>
-					<li>Bug fix in perception button. When the Private option is marked, the only place that does not work is the Perception. Reported by Paulo.</li>
-					<li>Bug fix. When entering a value other than F or U under the INFO column, the text box was not being cleared. Reported by Paulo.</li>
+					<li>GCA 4 Import - Added code to help avoid typechecking issues in Javascript. Reported by Mike W.<li>
 				</ul>
 
 				<label class="check"><input type="checkbox" name="attr_announcements_hide" value="1">&nbsp;<b><span data-i18n="hide-until-next-update">Hide until next update</span></b></label>
@@ -13217,6 +13208,14 @@ visualize what it will look like in chat.
 			<p>Pull Request: <span name="attr_latest_changes"></span></p>
 
 			<ul>
+				<li>GCA 4 Import - Added code to help avoid typechecking issues in Javascript. Reported by Mike.<li>
+			</ul>
+
+			<h4>Version: 2.6.7</h4>
+
+			<p>Pull Request: 7/17/2021</p>
+
+			<ul>
 				<li>Internationalization updates.</li>
 				<ul>
 					<li>Minor change to Tabs. The Width will adjust according to the title length. In other languages the length may be longer. Reported by Paulo.</li>
@@ -15754,9 +15753,9 @@ visualize what it will look like in chat.
 
 	var noop = function () {}; // do nothing callback function.
 
-	var version = "2.6.7";
+	var version = "2.6.8";
 
-	var latestChangesDate = "7/26/2021";
+	var latestChangesDate = "11/10/2021";
 
 	var modCascade = true;
 	
@@ -20094,23 +20093,23 @@ visualize what it will look like in chat.
 	 */
 	function getModifiedDamage(damageDice, damageMod) {
 	    
-	    var newDamageDice = damageDice;
+	    let newDamageDice = String(damageDice);
 	    
-	    damageDice = damageDice.toLowerCase();
+	    damageDice = String(damageDice).toLowerCase();
 	    
 	    // split into array. 
 	    // 3d6 = [3,6]
-	    var arrDice = damageDice.split("d");
+	    let arrDice = String(damageDice).split("d");
 	    
 	    if (arrDice.length == 2) {
 
-            var diceCount = parseInt(arrDice[0]);
+            let diceCount = parseInt(arrDice[0]);
 	    
-    	    var diceType = arrDice[1];
+    	    let diceType = arrDice[1];
     	    
-    	    var arrDiceTypeModifier = [];
+    	    let arrDiceTypeModifier = [];
     	    
-    	    var diceModifier = "";
+    	    let diceModifier = "";
 	        
 	        if (diceCount < 1) {
 	            diceCount = 1;
@@ -20524,9 +20523,9 @@ visualize what it will look like in chat.
 	    
 	    getAttrs(['repeating_defense_type'], function(v) {
 			
-			var defenseTypeName = v.repeating_defense_type;
+			let defenseTypeName = String(v.repeating_defense_type);
 			
-			var defenseTypeId = 1;
+			let defenseTypeId = 1;
 			
 // 		    <option>Dodge</option> = 1
 // 			<option>Parry</option> = 2
@@ -20600,21 +20599,21 @@ visualize what it will look like in chat.
 			
 			getAttrs(getFields, function (values) {
 		    
-		        var updateFields = {};
+		        let updateFields = {};
 		    
 		        // loop through the row ids again so we can get the values
 		        // and fill array of defense_type id numbers
 		        _.each(ids, function(id) {
 		        
-		            var defenseTypeField = "repeating_defense_" + id + '_type';
+		            let defenseTypeField = "repeating_defense_" + id + '_type';
 			
 			        // field we need to update
-			        var defenseTypeIdField = "repeating_defense_" + id + '_defense_type';
+			        let defenseTypeIdField = "repeating_defense_" + id + '_defense_type';
 				    
-		            var defenseName = values[defenseTypeField];
+		            let defenseName = String(values[defenseTypeField]);
 		            
 		            // determine id based on defense type name
-                    var defenseTypeId = 0;
+                    let defenseTypeId = 0;
                     
 					// TODO: Update for new defense types
                     switch (defenseName.toLowerCase()) {
@@ -21040,7 +21039,7 @@ visualize what it will look like in chat.
 
         var note = "";
 
-        if (defenseInfo) {
+        if (typeof defenseInfo === "string") {
 
             switch(defenseInfo.toLowerCase()) {
 
@@ -21219,7 +21218,7 @@ visualize what it will look like in chat.
         
         getAttrs(["turning_move_type", "start_velocity", "current_move", "enhanced_move_current", "current_air", "current_water", "change_velocity"], function(values) {
             
-            var moveType = values.turning_move_type;
+            var moveType = String(values.turning_move_type);
             
             var velocityStart = Number(values.start_velocity);
             
@@ -21756,7 +21755,9 @@ visualize what it will look like in chat.
 	 */
 	 function getRowIdFromRowFieldKey(fieldKey, sectionName) {
 		
-		 // repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
+		let rowId = "";
+
+		// repeating_skills_-l6zk36zhcjhsyvc-kax_level_mirror
 		if (fieldKey) {
 
 			// remove the sectionname
@@ -21769,10 +21770,8 @@ visualize what it will look like in chat.
 			let arrKey = fieldKey.split("_");
 			
 			// first element should be rowId
-			rowId = arrKey[0];
+			rowId = String(arrKey[0]).toLowerCase();
 			
-			rowId = rowId.toLowerCase();
-
 		}
         
         return rowId;
@@ -21796,9 +21795,7 @@ visualize what it will look like in chat.
 		// example: ["repeating", "spells", "-mi2gev09xkxzckxltdw"]
 		let arrName = triggerName.split("_");
 
-		let rowId = arrName.pop();
-
-		rowId = rowId.toLowerCase();
+		let rowId = String(arrName.pop()).toLowerCase;
 
 		let sectionName = `${arrName[0]}_${arrName[1]}`;
 
@@ -23064,11 +23061,11 @@ visualize what it will look like in chat.
 	 */
 	function getNumberOfDiceToRoll(rollString) {
 	    
-	    rollString = rollString.toLowerCase();
+	    rollString = String(rollString).toLowerCase();
 	    
-	    var arrRoll = rollString.split("d");
+	    let arrRoll = rollString.split("d");
 	    
-	    var diceCount = +arrRoll[0];
+	    let diceCount = Number(arrRoll[0]);
 	    
 	    return diceCount;
 	    
@@ -23274,18 +23271,20 @@ visualize what it will look like in chat.
 	 */
 	function getModifierForTechniqueDifficulty(difficultyLevel, points) {
 
-		var mod = 0;
+		let mod = 0;
 
-		if (points > 0) {
+		let characterPoints = Number(points);
 
-			if (difficultyLevel.toLowerCase() == "average") {
+		if (characterPoints > 0) {
 
-				mod = points;
+			if (String(difficultyLevel).toLowerCase() == "average") {
 
-			} else if (points > 1) {
+				mod = characterPoints;
+
+			} else if (characterPoints > 1) {
 
 				// Hard requires a minimum of 2 spoint be spent.
-				mod = points - 1;
+				mod = characterPoints - 1;
 			}
 
 		}
@@ -23609,7 +23608,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			let {closeRof, modifier} = getShotGunModifiers(values.shotgun_rof);
 
 			// calculate close damage: 1d6+2
-			let arrDamage = values.shotgun_damage.toLowerCase().split("d");
+			let arrDamage = String(values.shotgun_damage).toLowerCase().split("d");
 
 			let damageDie = 1;
 
@@ -23690,7 +23689,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 		
 		// rateOfFire = shotes x Mulitplier
 		// example: 2 x 9
-		let arrRof = rateOfFire.toLowerCase().split("x");
+		let arrRof = String(rateOfFire).toLowerCase().split("x");
 
 		let baseRof = 1;
 
@@ -27493,7 +27492,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			// loop through the attributes
 			attributes.forEach(attribute => {
 
-				if (name.toLowerCase() === String(attribute.name).toLowerCase()) {
+				if (String(name).toLowerCase() === String(attribute.name).toLowerCase()) {
 
 					points = Number(attribute.points);
 
@@ -27530,7 +27529,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		attributes.forEach(attribute => {
 
-			if (attribute.name.toLowerCase() === name.toLowerCase()) {
+			if ( String(attribute.name).toLowerCase() === String(name).toLowerCase()) {
 
 				trait = attribute;
 
@@ -27559,7 +27558,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 			// loop through the advantages
 			advantages.forEach(advantage => {
 
-				if (name.toLowerCase() === String(advantage.name).toLowerCase()) {
+				if (String(name).toLowerCase() === String(advantage.name).toLowerCase()) {
 
 					points = Number(advantage.points);
 
@@ -27897,7 +27896,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		arrModes.forEach(mode => {
 
-			if (mode.toLowerCase() === "thrown") {
+			if (String(mode).toLowerCase() === "thrown") {
 				return;
 			}
 
@@ -28187,7 +28186,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		arrModes.forEach(mode => {
 
-			if (mode.toLowerCase() === "swing" || mode.toLowerCase() === "thrust") {
+			if (String(mode).toLowerCase() === "swing" || String(mode).toLowerCase() === "thrust") {
 				return;
 			}
 
@@ -28424,7 +28423,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			if (trait.blocklevel) {
 			
-				blocklevel = trait.blocklevel;
+				blocklevel = String(trait.blocklevel);
 
 				// unset if value is "no"
 				if (blocklevel.toLowerCase() === "no" || blocklevel == 0) {
@@ -28480,7 +28479,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let defenseInfo;
 
-		if (defenseType.toLowerCase() === "parry") {
+		if (String(defenseType).toLowerCase() === "parry") {
 
 			[skill, defenseDropDownValue, defenseInfo] = getParryDefenseInfoFromGca(trait.charparryscore, trait.name);
 
@@ -28528,14 +28527,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 		// "charparryscore": "10|10|No",
 		let arrParry;
 
-		if (defenseType.toLowerCase() === "parry" && trait.charparryscore) {
+		if (String(defenseType).toLowerCase() === "parry" && trait.charparryscore) {
 			arrParry = trait.charparryscore.split("|");
 		}
 
 		// "charparryscore": "10|No|No",
 		let arrBlock;
 
-		if (defenseType.toLowerCase() === "block" && trait.blocklevel) {
+		if (String(defenseType).toLowerCase() === "block" && trait.blocklevel) {
 			arrBlock = trait.blocklevel.split("|");
 		}
 
@@ -28561,7 +28560,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 			defenseInfo = "";
 
-			if (defenseType.toLowerCase() === "parry") {
+			if (String(defenseType).toLowerCase() === "parry") {
 
 				parryScore = arrParry[index];
 
@@ -28659,7 +28658,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		};
 
-		if (name.toLowerCase() === "punch" || name.toLowerCase() === "brawling" || name.toLowerCase() === "karate") {
+		if (String(name).toLowerCase() === "punch" || String(name).toLowerCase() === "brawling" || String(name).toLowerCase() === "karate") {
 			dropDownValue = "Unarmed Parry";
 		} else {
 			dropDownValue = "Parry";
@@ -29248,7 +29247,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesForNativeLanguage(rows, name, basedon, advantage) {
 
-		basedon = basedon.toLowerCase();
+		basedon = String(basedon).toLowerCase();
 
 		let writtenLevel = -3;
 
@@ -29348,7 +29347,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesForRepeatingLanguage(uniqueKeys, rows, name, basedon, advantage) {
 
-		basedon =  basedon ? basedon.toLowerCase() : "";
+		basedon =  basedon ? String(basedon).toLowerCase() : "";
 
 		let idkey = advantage.IDKey.trim();
 
@@ -29356,7 +29355,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 
 		let baseFieldName = `repeating_languages_${rowId}`;
 
-		let langName = name.toLowerCase();
+		let langName = String(name).toLowerCase();
 
 		let writtenLevel = "-3";
 
@@ -29547,7 +29546,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaModifiersForAdvantage(rows, name, advantage, runningTotals) {
 
-		let nameCompare = name.toLowerCase();
+		let nameCompare = String(name).toLowerCase();
 
 		switch (nameCompare) {
 
@@ -29619,7 +29618,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaModifiersDisadvantage(rows, name, disadvantage, runningTotals, importNotes) {
 
-		let nameCompare = name.toLowerCase();
+		let nameCompare = String(name).toLowerCase();
 
 		switch (nameCompare) {
 
@@ -29997,7 +29996,7 @@ The attacker may choose to hit the original target or the limb you used to parry
 	 */
 	function getGcaValuesByDisadvantageName(rows, name, disadvantage) {
 
-		let nameCheck = name.toLowerCase();
+		let nameCheck = String(name).toLowerCase();
 
 		switch (nameCheck) {
 
@@ -30033,14 +30032,14 @@ The attacker may choose to hit the original target or the limb you used to parry
 		if (attribute && attribute.levelnames && attribute.levelnames.includes(",") && attribute.level) {
 
 			// get rid of spaces between commas (seems to change from advantage to advantage)
-			let levelNames = attribute.levelnames.replaceAll(", ", ",");
+			let levelNames = String(attribute.levelnames).replaceAll(", ", ",");
 
 			let arrNames = levelNames.split(",");
 
 			let level = Number(attribute.level);
 
 			// NOTE: Appearance index needs to start at 1 so we can ignore "average"
-			if (attribute.name.toLowerCase() !== "appearance" && attribute.name.toLowerCase() !== "wealth") {
+			if (String(attribute.name).toLowerCase() !== "appearance" && String(attribute.name).toLowerCase() !== "wealth") {
 				level = level - 1;
 			}
 
