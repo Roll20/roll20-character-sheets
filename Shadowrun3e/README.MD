@@ -7,6 +7,8 @@
 4. fixed matrix target number, legit vs. intruder were reversed.
 5. killjoy resistance is now willpower - not body.
 6. vehicle gunnery updated to account for movement penalty re-write for showing it in the rangedTN
+7. killjoy and blackhammer were not using deck armro - fixed
+8. added stun damage options for spells when using "choose at cast time" option
 
 ## Release Notes 10/8/2021
 
