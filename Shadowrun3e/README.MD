@@ -9,6 +9,7 @@
 6. vehicle gunnery updated to account for movement penalty re-write for showing it in the rangedTN
 7. killjoy and blackhammer were not using deck armro - fixed
 8. added stun damage options for spells when using "choose at cast time" option
+9. drain calc for stun damage spells using "dmg + or dmg -" now correclty calculate
 
 ## Release Notes 10/8/2021
 
