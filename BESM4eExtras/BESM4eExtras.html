@@ -6202,10 +6202,17 @@
 		}
 		
 		function setGroupDefectPointsOnActivation(debug, attrIDs, attrdb, value, sectionName, rowID, setObj){
+			const groupid = getGroupID(value, 'attr');
+			const groupType = value[`static_attrgroup_${groupid}_type`] || 'standard';
+			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
+			const isPowerFlux = /flux/i.test(groupType);
+			const fluxcost = parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
 			const aggregateAttrGroupCost = getAggregateAttrGroupCost(debug, attrIDs, value, sectionName, rowID, setObj);
 			const aggregateDefectPoints = getAggregateGroupDefectPoints(debug, attrIDs, attrdb, value, rowID, setObj);
-			const groupcost = aggregateAttrGroupCost + aggregateDefectPoints;
-			const groupid = parseInt(value[`repeating_attr_${rowID}_group`]) || 0;
+			const groupcost = isPowerFlux ?
+				fluxcost + aggregateDefectPoints :
+				aggregateAttrGroupCost + aggregateDefectPoints;
+			//const groupid = parseInt(value[`repeating_attr_${rowID}_group`]) || 0;
 			setObj[`static_attrgroup_${groupid}_groupcost`] = groupcost;
 		}
 		
@@ -6253,13 +6260,15 @@
 			const groupid = getGroupID(value, 'attr');
 			const groupType = value[`static_attrgroup_${groupid}_type`] || 'standard';
 			const groupSourceID = value[`static_attrgroup_${groupid}_source`];
+			const groupCost = parseInt(value[`repeating_attr_${groupSourceID}_totalcost`]);
 			const isPowerFlux = /flux/i.test(groupType);
 			const isDefect = /defect/i.test(value[`repeating_attr_${rowID}_attribute`]);
-			const attrcost = groupSourceID == rowID ? 0 :
+			const attrcost = groupSourceID == rowID ? 0 : 
 				isDefect ? 0 :
-				parseInt(value[`repeating_attr_${rowID}_totalcost`]) || 0;
+				parseInt(value[`repeating_attr_${rowID}_totalcost`]);
 			const aggregateAttrCost = getAggregateAttrGroupCost(debug, attrIDs, value, 'attr', rowID, setObj);
-			const poolcost = isActive ? aggregateAttrCost : aggregateAttrCost - attrcost;
+			//const poolcost = isActive ? aggregateAttrCost - groupCost : 0;
+			const poolcost = aggregateAttrCost - groupCost;
 			const setAttrCostIfFlux = isFlux => isFlux ? 
 				setObj[`static_attrgroup_${groupid}_spent`] = poolcost : false;
 			setAttrCostIfFlux(isPowerFlux);
@@ -9882,66 +9891,89 @@
 		function setCombatRoll(debug, value, attrdb, rowID, sourceAttr, setObj, invertState = false) {
 			const activeweapon = 
 				rowID === undefined ? setObj.active_weapon || value.active_weapon : rowID;
+				console.log(`[setCombatRoll()] activeweapon = ${activeweapon}`);
 			const weapon = 
 				_.find(attrdb.weapon, o => { if (o.source == activeweapon) return o; });
+				console.log(`[setCombatRoll()] weapon = ${weapon}`);
 			const isWeapon = 
 				getIsObject(weapon);
+				console.log(`[setCombatRoll()] isWeapon = ${isWeapon}`);
 			const targetedmdState = 
 				parseInt(value.static_button_targeted_damage) || 0;
+				console.log(`[setCombatRoll()] targetedmdState = ${targetedmdState}`);
 			const targetedmdLevel = 
 				getTargetedLevel(attrdb, 'massivedamage') || 0;
+				console.log(`[setCombatRoll()] targetedmdLevel = ${targetedmdLevel}`);
 			const targetedmd = 
 				invertState && sourceAttr == 'damage' ?
 				targetedmdState > 0 ? 0 : targetedmdLevel :
 				targetedmdState > 0 ? targetedmdLevel : 0;
+				console.log(`[setCombatRoll()] targetedmd = ${targetedmd}`);
 			const name = 
 				isWeapon ? weapon.name : 'Unarmed';
+				console.log(`[setCombatRoll()] name = ${name}`);
 			const level = 
 				isWeapon ? weapon.level :
 				getSumOfActiveSubAttrRanks(attrdb, 'combattechnique', 'brutal') || 0;
+				console.log(`[setCombatRoll()] level = ${level}`);
 			const weaponclass = 
 				isWeapon ? weapon.focus : 'unarmed';
+				console.log(`[setCombatRoll()] weaponclass = ${weaponclass}`);
 			const damagetype = 
 				isWeapon ? weapon.damagetype : 'blunt';
+				console.log(`[setCombatRoll()] damagetype = ${damagetype}`);
 			const isMelee = 
 				getIsMelee(debug, weaponclass);
+				console.log(`[setCombatRoll()] isMelee = ${isMelee}`);
 			const muscle = 
 				isMelee > 0 ? 1 :
 				_.find(weapon.customizations, o => { if (o.name == 'muscle') return 1; }) || 0;
+				console.log(`[setCombatRoll()] muscle = ${muscle}`);
 			const massivedamage = 
 				getSumOfActiveAttrLevels(attrdb, 'massivedamage', weaponclass) || 0;
+				console.log(`[setCombatRoll()] massivedamage = ${massivedamage}`);
 			const superstrength = 
 				getSumOfActiveAttrLevels(attrdb, 'superstrength') || 0;
+				console.log(`[setCombatRoll()] superstrength = ${superstrength}`);
 			let maneuver = 
 				setObj.static_activity_maneuver_name || value.static_activity_maneuver_name;
 			maneuver = 
 				`${maneuver.replace(/\s+/g, '')}`;
+				console.log(`[setCombatRoll()] maneuver = ${maneuver}`);
 			const acv = 
 				attack_maneuvers_regex.test(maneuver) ? 
 				getCV(debug, value, attrdb, setObj, sourceAttr, 'acv', weaponclass) : 0;
+				console.log(`[setCombatRoll()] acv = ${acv}`);
 			const dcv = 
 				defense_maneuvers_regex.test(maneuver) ? 
 				getCV(debug, value, attrdb, setObj, sourceAttr, 'dcv', weaponclass) : 0;
+				console.log(`[setCombatRoll()] dcv = ${dcv}`);
 			let damage = 
 				((level + (superstrength * muscle) + massivedamage + targetedmd) * 5) + acv;
+				console.log(`[setCombatRoll()] damage = ${damage}`);
 			let edge = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
 					if (c.name == 'accurate') return true; 
-				}) : { rank: 0 };
+				}) ||  { rank: 0 } : { rank: 0 };
+				console.log(`[setCombatRoll()] edge:`); console.log(edge); 
 			let obstacle = 
 				(isWeapon) ? _.find(weapon.customizations, c => { 
 					if (c.name == 'inaccurate') return true; 
 				}) || { rank: 0 } : { rank: 0 };
+				console.log(`[setCombatRoll()] obstacle:`); console.log(obstacle); 
 			let rollmod = 
 				edge.rank + obstacle.rank;
+				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
 			damage = 
 				non_damaging_attack_regex.test(maneuver) ? 0 : damage;
+				console.log(`[setCombatRoll()] damage = ${damage}`);
 			rollmod = 
 				minor_obstacle_maneuvers_regex.test(maneuver) ? rollmod - 1 :
 				major_obstacle_maneuvers_regex.test(maneuver) ? rollmod - 2 :
 				maneuver == 'disarm' && isMelee ? rollmod - 1 :
 				maneuver == 'disarm' ? rollmod - 2 :
 				rollmod;
+				console.log(`[setCombatRoll()] rollmod = ${rollmod}`);
 			const weakpoint = 
 				maneuver == 'weakpoint' ? 
 				`{{weakpoint=[[ [[?{Weak Point is|Large, ${setDice(rollmod, -2)}|Small, ${setDice(rollmod, -1)}|Tiny, ${setDice(rollmod, -1)}}]] ]] }}` : 
