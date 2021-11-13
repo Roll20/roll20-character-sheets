@@ -1251,6 +1251,7 @@ const listArmure = [
     `warriorHeraldA`,
     `warriorScholarA`,
     `warriorScoutA`,
+    `warrior250PG`,
 ];
 
 const listArmureLegende = [

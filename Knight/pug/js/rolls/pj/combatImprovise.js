@@ -223,8 +223,6 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
       if (hasArmure) { OD += C4OD; }
     }
 
-    exec.push(`{{vOD=${OD}}}`);
-
     if (mod !== 0) {
       cRoll.push(mod);
       exec.push(`{{mod=${mod}}}`);
@@ -291,7 +289,7 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     ODBarbarian = ODBarbarian.concat(armorBonus.ODBarbarian);
     ODShaman = ODShaman.concat(armorBonus.ODShaman);
-    ODWarrior = ODWarrior.concat(armorBonus.ODWarrior);
+    ODWarrior = ODWarrior.push(armorBonus.ODWarrior);
 
     const MALBonus = getMALBonus(attrs, armureL, false, false, vDiscretion, oDiscretion, hasBonus, C1Nom, C2Nom, C3Nom, C4Nom);
 
@@ -312,9 +310,13 @@ for (let i = 0; i < rollCombatImprovise; i += 1) {
 
     ODMALBarbarian = ODMALBarbarian.concat(MALBonus.ODMALBarbarian);
     ODMALShaman = ODMALShaman.concat(MALBonus.ODMALShaman);
-    ODMALWarrior = ODMALWarrior.concat(MALBonus.ODMALWarrior);
+    ODMALWarrior = ODMALWarrior.push(MALBonus.ODMALWarrior);
 
     // FIN GESTION DES BONUS D'ARMURE
+    OD -= armorBonus.ODWarrior;
+    OD -= MALBonus.ODMALWarrior;
+
+    exec.push(`{{vOD=${OD}}}`);
 
     if (cRoll.length === 0) { cRoll.push(0); }
 
