@@ -30,7 +30,7 @@
 											<div class="row padt padb"><h3 class="col-1 center border"><span>Sheet Options</span></h3></div>
 											<div class="row center padb">
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Version
-													<input type="text" class="center" name="attr_version" value="1.1.2" readonly />
+													<input type="text" class="center" name="attr_version" value="1.1.3" readonly />
 												</span></h4></div>
 												<div class="col-1-5 padr"><h4 class="center border"><span>Sheet Type
 													<select class="border"><option value="Sheet">Character</option><!--<option value="NPC Sheet">NPC</option><option value="Thing Sheet">Thing</option><option value="GM Sheet">GM</option>--></select>
@@ -8333,7 +8333,7 @@
 			} else if (attribute == 'sizechange') {
 				characteristic = (level < 11) ? `Grow/Shrink by ${level} Size Ranks` : `Does not improve beyond level 10`;
 			} else if (attribute == 'telekinesis') {
-				characteristic = (level < 7) ? (chardb[`${attribute}`][level] || chardb[`${attribute}`]["default"]) : `Move ${(10 ** (level - 4))} tonnes`;// at ${get1or3(level,1)*(10**(Math.ceil((level-7)/2)))} km`;
+				characteristic = (level < 7) ? (chardb[`${attribute}`][level] || chardb[`${attribute}`]["default"]) : `Move ${(10 ** (level - 4))} tonnes`;
 			} else if (attribute == 'teleport') {
 				characteristic = (level < 7) ? (chardb[`${attribute}`][level] || chardb[`${attribute}`]["default"]) : `${(10 ** (level - 3))} km teleportation distance`;
 			} else if (attribute == 'tunneling') {
@@ -8880,7 +8880,7 @@
 		}
 		
 		function setEnergized(isActive, debug, value, rowID, sourceAttr, setObj) {
-			const level = parseInt(value[`repeating_attr_${rowID}_elevel`]) * 10 || 0,
+			const level = parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) * 10 || 0,
 				mind = parseInt(value[`static_stat_base_mind`]) || 0,
 				soul = parseInt(value[`static_stat_base_soul`]) || 0,
 				prevAdj = parseInt(value[`stat_adj_energy`]) || 0,
@@ -9673,6 +9673,7 @@
 				break;
 				case "skill": 
 					setSkillGroup(isActive, debug, value, rowID, setObj, level);
+					setSkillGroupMaxByLevelChange(isActive, debug, value, rowID, setObj);
 				break;
 				case "socialmastery":
 					setAttrdb(isActive, debug, value, attrdb, attrIDs, rowID, sourceAttr, attribute, setObj);
@@ -9807,11 +9808,12 @@
 			setObj[`static_skillgroup_${group}_source`] = source;
 		}
 		
-		function setSkillGroupMaxByLevelChange(debug, eventInfo, value, rowID, setObj){
+		function setSkillGroupMaxByLevelChange(isActive, debug, value, rowID, setObj){
 			const isSkillAttr = attribute => attribute=='skill' ? true: false;
 			if(isSkillAttr(value[`repeating_attr_${rowID}_attribute`])==false) return;
 			const groupid = parseInt(value[`repeating_attr_${rowID}_skillgroup`]);
-			const skillpointmax = parseInt(eventInfo.newValue) * 10;
+			const skillpointmax = isActive ? 
+				parseInt(value[`repeating_attr_${rowID}_effectivelevel`]) * 10 : 0;
 			setObj[`static_skillgroup_${groupid}_groupmax`] = skillpointmax;
 			if(debug){
 				console.log(`[setSkillGroupMaxByLevelChange()] groupid = ${groupid}`);
@@ -10734,7 +10736,7 @@
 											setLevelElevation(eventInfo, source, `levelelevation`, setObj);
 											setAttrCostByLevelChange(debug, attrdb, eventInfo, value, attrIDs, sectionName, rowID, sourceAttr, setObj);
 											setEffectiveLevelByLevelChange(debug, eventInfo, value, sectionName, rowID, sourceAttr, setObj);
-											setSkillGroupMaxByLevelChange(debug, eventInfo, value, rowID, setObj);
+											
 										break;
 										case `activate`:
 											if (!getIsLocked(debug, value, rowID, sourceAttr)) return;
@@ -10745,6 +10747,7 @@
 											setPoolCostIfGroupIsVariation(debug, isActive, attrIDs, value, rowID, setObj);
 											disableActiveWeapon(debug, value, rowID, setObj);
 											setGroupDefectPointsOnActivation(debug, attrIDs, attrdb, value, sectionName, rowID, setObj);
+											//setSkillGroupMaxByLevelChange(debug, value, rowID, setObj);
 										break;
 										case `lock`:
 											if (resetOnActive(debug, eventInfo, value, match, rowID, setObj)) return;
