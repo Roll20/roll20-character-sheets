@@ -2317,7 +2317,7 @@ on('change:bonusCarac', async () => {
     'bonusCarac',
   ]);
 
-  const bonus = attrs.bonusCarac;
+  const bonus = +attrs.bonusCarac;
 
   const update = {};
 
@@ -2359,8 +2359,8 @@ on('change:fichePNJ change:diceInitiative change:bonusInitiativeP change:malusIn
     'MasquePNJAEMaj',
   ]);
 
-  const fiche = attrs.fichePNJ;
-  const masque = attrs.MasquePNJAEMaj;
+  const fiche = +attrs.fichePNJ;
+  const masque = +attrs.MasquePNJAEMaj;
 
   if (fiche === 1 || fiche === 2) {
     if (masque > 0) {
